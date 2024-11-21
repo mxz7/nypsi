@@ -30,6 +30,7 @@ import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
+import { isAnnoying } from "../utils/functions/economy/annoying";
 
 const playerCooldown = new Set<string>();
 
@@ -175,6 +176,9 @@ async function run(
 
   if (await isPassive(message.member))
     return send({ embeds: [new ErrorEmbed("you are currently in passive mode")] });
+
+  if (await isAnnoying(message.member))
+    return send({ embeds: [new ErrorEmbed("if you werent so annoying you could rob other people")] });
 
   const targetGuild = await getGuildByUser(target);
 

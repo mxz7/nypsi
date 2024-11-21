@@ -15,6 +15,7 @@ import { isPassive } from "./passive";
 import { addTaskProgress } from "./tasks";
 import { getBakeryUpgradesData, getItems, getUpgradesData } from "./utils";
 import ms = require("ms");
+import { isAnnoying } from "./annoying";
 
 async function getLastBake(member: GuildMember | string) {
   let id: string;
@@ -182,6 +183,16 @@ export async function runBakery(member: GuildMember) {
   }
 
   if (await isPassive(member)) {
+    click[1] -= 2;
+
+    if (click[1] > 10) click[1] -= 5;
+    if (click[1] > 30) click[1] -= 5;
+    if (click[1] > 50) click[1] -= 5;
+    if (click[1] > 100) click[1] *= 0.75;
+    if (click[1] > 100) click[1] -= 10;
+  }
+
+  if (await isAnnoying(member)) {
     click[1] -= 2;
 
     if (click[1] > 10) click[1] -= 5;

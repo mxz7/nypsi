@@ -176,6 +176,7 @@ model Economy {
   defaultBet Int?
   padlock    Boolean @default(false)
   passive    Boolean @default(false)
+  annoying   Boolean @default(false)
 
   xp       BigInt @default(0)
   level    Int    @default(0)

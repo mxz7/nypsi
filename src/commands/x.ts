@@ -48,6 +48,7 @@ import { addNotificationToQueue } from "../utils/functions/users/notifications";
 import { addTag, getTags, removeTag } from "../utils/functions/users/tags";
 import { hasProfile } from "../utils/functions/users/utils";
 import { logger } from "../utils/logger";
+import { isAnnoying, setAnnoying } from "../utils/functions/economy/annoying";
 
 const cmd = new Command("x", "admincmd", "none").setPermissions(["bot owner"]);
 
@@ -1592,6 +1593,28 @@ async function run(
     }
 
     return findId(args.slice(1, args.length).join(" "));
+  } else if (args[0].toLowerCase() == "thisguysannoying") {
+    if ((await getAdminLevel(message.author.id)) < 3) {
+      return message.channel.send({
+        embeds: [new ErrorEmbed("you require admin level **3** to do this")],
+      });
+    }
+    if (args.length == 1) {
+      return message.channel.send({ embeds: [new ErrorEmbed("who the hell is the annoying one? its probably you isnt it")] });
+    }
+
+    const user = await message.client.users.fetch(args[1]).catch(() => null);
+
+    if (!user) {
+      return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });
+    }
+
+    await setAnnoying(args[1], !await isAnnoying(args[1]));
+
+    return message.channel.send({ 
+      embeds: [new CustomEmbed(message.member, `${user.username} is ${await isAnnoying(args[1]) ? "now" : "no longer"} annoying`)] 
+    });
+
   } else if (args[0].toLowerCase() === "transfer") {
     if (message.author.id !== Constants.TEKOH_ID) return;
 

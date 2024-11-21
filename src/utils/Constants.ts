@@ -100,6 +100,7 @@ export default {
         NETWORTH: "cache:economy:networth",
         PADLOCK: "cache:economy:padlock",
         PASSIVE: "cache:economy:passive",
+        ANNOYING: "cache:economy:annoying",
         PRESTIGE: "cache:economy:prestige",
         VOTE: "cache:economy:vote",
         XP: "cache:economy:xp",

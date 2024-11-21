@@ -22,6 +22,7 @@ import { hasVoted } from "./vote";
 import { calcWorkerValues } from "./workers";
 import ms = require("ms");
 import _ = require("lodash");
+import { isAnnoying } from "./annoying";
 
 export async function getBalance(member: GuildMember | string) {
   let id: string;
@@ -259,6 +260,7 @@ export async function getGambleMulti(member: GuildMember | string) {
     boosters,
     guildUpgrades,
     passive,
+    annoying,
     dmSettings,
     inventory,
     tier,
@@ -269,6 +271,7 @@ export async function getGambleMulti(member: GuildMember | string) {
     getBoosters(id),
     getGuildUpgradesByUser(member),
     isPassive(id),
+    isAnnoying(id),
     getDmSettings(id),
     getInventory(id),
     getTier(id),
@@ -339,6 +342,11 @@ export async function getGambleMulti(member: GuildMember | string) {
     breakdownMap.set("passive", -3);
   }
 
+  if (annoying) {
+    multi -= 5;
+    breakdownMap.set("annoying", -5);
+  }
+
   const beforeBoosters = multi;
 
   for (const boosterId of boosters.keys()) {
@@ -396,7 +404,7 @@ export async function getSellMulti(member: GuildMember | string) {
     id = member;
   }
 
-  const [level, tier, booster, boosters, guildUpgrades, passive, inventory, upgrades] =
+  const [level, tier, booster, boosters, guildUpgrades, passive, annoying, inventory, upgrades] =
     await Promise.all([
       getRawLevel(member),
       getTier(member),
@@ -404,6 +412,7 @@ export async function getSellMulti(member: GuildMember | string) {
       getBoosters(id),
       getGuildUpgradesByUser(member),
       isPassive(member),
+      isAnnoying(member),
       getInventory(member),
       getUpgrades(member),
     ]);
@@ -470,6 +479,11 @@ export async function getSellMulti(member: GuildMember | string) {
   if (passive) {
     multi -= 5;
     breakdown.set("passive", -5);
+  }
+
+  if (annoying) {
+    multi -= 7;
+    breakdown.set("annoying", -7);
   }
 
   const beforeBoosters = multi;
