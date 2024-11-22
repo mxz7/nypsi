@@ -725,7 +725,7 @@ async function run(
 
       const embed = new CustomEmbed(message.member).setHeader(
         "guild deposit",
-        message.author.avatarURL(),
+        guild.avatarId || undefined,
         `https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}`,
       );
 
@@ -754,7 +754,7 @@ async function run(
 
     const embed = new CustomEmbed(message.member).setHeader(
       `${guild.guildName} stats`,
-      message.author.avatarURL(),
+      guild.avatarId || undefined,
       `https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}`,
     );
 
@@ -905,7 +905,7 @@ async function run(
 
     embed.setHeader(
       guild.guildName,
-      message.author.avatarURL(),
+      guild.avatarId || undefined,
       `https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}`,
     );
     embed.setDescription(
@@ -950,7 +950,7 @@ async function run(
         new CustomEmbed(
           message.member,
           "10MB max file size\n\nsend a picture in the channel",
-        ).setHeader("guild avatar", message.author.avatarURL()),
+        ).setHeader("guild avatar", guild.avatarId || undefined),
       ],
     });
 
@@ -1176,7 +1176,7 @@ async function run(
     const embed = new CustomEmbed(message.member)
       .setHeader(
         `${guild.guildName} upgrades`,
-        message.author.avatarURL(),
+        guild.avatarId || undefined,
         `https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}`,
       )
       .setFields(...pages.get(1))
