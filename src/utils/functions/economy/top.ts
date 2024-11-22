@@ -217,11 +217,11 @@ export async function topNetWorthGlobal(userId: string, amount = 100) {
 
 const topNetLock = new Set<string>();
 
-export async function topNetWorth(guild: Guild, userId?: string, repeatcount = 1) {
+export async function topNetWorth(guild: Guild, userId?: string, repeatCount = 1) {
   if (topNetLock.has(guild.id)) {
-    if (repeatcount > 100) topNetLock.delete(guild.id);
+    if (repeatCount > 50) topNetLock.delete(guild.id);
     await sleep(100);
-    return topNetWorth(guild, userId, repeatcount++);
+    return topNetWorth(guild, userId, repeatCount + 1);
   }
   topNetLock.add(guild.id);
 
