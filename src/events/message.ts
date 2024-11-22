@@ -425,7 +425,7 @@ export default async function messageCreate(message: Message) {
         let i = 0;
         for (const m of message.mentions.members) {
           i++;
-          if (i % 100 === 0) await sleep(15);
+          if (i % 50 === 0) await sleep(15);
 
           if (!mentionMembers.includes(m[0])) {
             mentionMembers.push(m[0]);
@@ -435,7 +435,7 @@ export default async function messageCreate(message: Message) {
         let i = 0;
         for (const m of message.mentions.members) {
           i++;
-          if (i % 100 === 0) await sleep(15);
+          if (i % 50 === 0) await sleep(15);
 
           mentionMembers.push(m[0]);
         }
@@ -455,7 +455,7 @@ export default async function messageCreate(message: Message) {
       let i = 0;
       for (const m of channelMembers) {
         i++;
-        if (i % 100 === 0) await sleep(15);
+        if (i % 50 === 0) await sleep(15);
 
         channelMemberIds.push(m[0]);
       }
