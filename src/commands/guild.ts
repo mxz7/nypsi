@@ -421,7 +421,10 @@ async function run(
 
     const embed = new CustomEmbed(message.member);
 
-    embed.setHeader("guild invitation");
+    embed.setHeader(
+      "guild invitation",
+      guild.avatarId ? `https://cdn.nypsi.xyz/${guild.avatarId}` : undefined,
+    );
     embed.setDescription(`you have been invited to join **${guild.guildName}**\n\ndo you accept?`);
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -725,7 +728,7 @@ async function run(
 
       const embed = new CustomEmbed(message.member).setHeader(
         "guild deposit",
-        guild.avatarId || undefined,
+        guild.avatarId ? `https://cdn.nypsi.xyz/${guild.avatarId}` : undefined,
         `https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}`,
       );
 
@@ -754,7 +757,7 @@ async function run(
 
     const embed = new CustomEmbed(message.member).setHeader(
       `${guild.guildName} stats`,
-      guild.avatarId || undefined,
+      guild.avatarId ? `https://cdn.nypsi.xyz/${guild.avatarId}` : undefined,
       `https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}`,
     );
 
@@ -905,7 +908,7 @@ async function run(
 
     embed.setHeader(
       guild.guildName,
-      guild.avatarId || undefined,
+      guild.avatarId ? `https://cdn.nypsi.xyz/${guild.avatarId}` : undefined,
       `https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}`,
     );
     embed.setDescription(
@@ -951,7 +954,10 @@ async function run(
           message.member,
           "10MB max file size\n\nsend a picture in the channel\n" +
             "please note that innapropriate images may result in your guild being deleted",
-        ).setHeader("guild avatar", guild.avatarId || undefined),
+        ).setHeader(
+          "guild avatar",
+          guild.avatarId ? `https://cdn.nypsi.xyz/${guild.avatarId}` : undefined,
+        ),
       ],
     });
 
@@ -1177,7 +1183,7 @@ async function run(
     const embed = new CustomEmbed(message.member)
       .setHeader(
         `${guild.guildName} upgrades`,
-        guild.avatarId || undefined,
+        guild.avatarId ? `https://cdn.nypsi.xyz/${guild.avatarId}` : undefined,
         `https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}`,
       )
       .setFields(...pages.get(1))
