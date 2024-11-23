@@ -422,23 +422,13 @@ export default async function messageCreate(message: Message) {
 
     if (message.mentions?.members?.size > 0) {
       if (mentionMembers) {
-        let i = 0;
-        for (const m of message.mentions.members) {
-          i++;
-          if (i % 50 === 0) await sleep(15);
-
-          if (!mentionMembers.includes(m[0])) {
-            mentionMembers.push(m[0]);
+        message.mentions.members.forEach((m) => {
+          if (!mentionMembers.includes(m.user.id)) {
+            mentionMembers.push(m.user.id);
           }
-        }
+        });
       } else {
-        let i = 0;
-        for (const m of message.mentions.members) {
-          i++;
-          if (i % 50 === 0) await sleep(15);
-
-          mentionMembers.push(m[0]);
-        }
+        mentionMembers = Array.from(message.mentions.members.mapValues((m) => m.user.id).values());
       }
     }
 
@@ -450,20 +440,10 @@ export default async function messageCreate(message: Message) {
         channelMembers = channelMembers.cache;
       }
 
-      const channelMemberIds: string[] = [];
-
-      let i = 0;
-      for (const m of channelMembers) {
-        i++;
-        if (i % 50 === 0) await sleep(15);
-
-        channelMemberIds.push(m[0]);
-      }
-
       mentionQueue
         .createJob({
           members: mentionMembers,
-          channelMembers: channelMemberIds,
+          channelMembers: Array.from(channelMembers.mapValues((m) => m.user.id).values()),
           content:
             message.content.length > 100
               ? message.content.substring(0, 97) + "..."
