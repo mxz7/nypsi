@@ -9,10 +9,10 @@ import { loadItems } from "./utils/functions/economy/utils";
 import { addFailedHeartbeat, sendHeartbeat } from "./utils/functions/heartbeat";
 import { updateStats } from "./utils/functions/topgg";
 import { getVersion } from "./utils/functions/version";
+import { startMentionInterval } from "./utils/handlers/mentions";
 import { listen } from "./utils/handlers/webhookhandler";
 import { getWebhooks, logger, setClusterId } from "./utils/logger";
 import { handleDmQueue } from "./utils/queues/dms";
-import { handleMentionQueue } from "./utils/queues/mentions";
 import ms = require("ms");
 
 setClusterId("main");
@@ -97,9 +97,8 @@ manager.spawn();
 listen(manager);
 
 setTimeout(async () => {
-  logger.debug("queues started");
   handleDmQueue(manager);
-  handleMentionQueue();
+  startMentionInterval();
 }, 300000);
 // }, 15000);
 

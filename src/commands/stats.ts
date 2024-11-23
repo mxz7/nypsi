@@ -40,7 +40,6 @@ import { getVersion } from "../utils/functions/version";
 import { aliasesSize, commandsSize } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
-import { dmQueue, mentionQueue } from "../utils/queues/queues";
 
 const cmd = new Command("stats", "view your nypsi stats", "info");
 
@@ -131,7 +130,7 @@ async function run(
         const gameWins = await getGameWins(message.member, stat.game);
 
         winsMap.set(stat.game, gameWins);
-      };
+      }
 
       promises.push(getWins());
     }
@@ -496,8 +495,6 @@ async function run(
     const currentCluster = client.cluster.id;
     const currentShard = message.guild.shardId;
 
-    const queueHealth = await Promise.all([dmQueue.checkHealth(), mentionQueue.checkHealth()]);
-
     const userCount: number = await client.cluster
       .broadcastEval("this.users.cache.size")
       .then((res) => res.reduce((a, b) => a + b));
@@ -526,9 +523,10 @@ async function run(
         true,
       )
       .addField(
-        "queues",
-        `**waiting** ${queueHealth[0].waiting} ${queueHealth[1].waiting}\n` +
-          `**active** ${queueHealth[0].active} ${queueHealth[1].active}`,
+        "mentions",
+        `**queue size** ${await redis.llen(Constants.redis.nypsi.MENTION_QUEUE)}\n` +
+          `**delay** ${Number(await redis.get(Constants.redis.nypsi.MENTION_DELAY)) || 5}\n` +
+          `**max** ${Number(await redis.get(Constants.redis.nypsi.MENTION_MAX)) || 3}`,
         true,
       )
       .addField(
