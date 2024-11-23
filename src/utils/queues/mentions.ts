@@ -20,7 +20,7 @@ setInterval(() => {
 }, ms("1 hour"));
 
 export function handleMentionQueue() {
-  mentionQueueHandler.process(3, async (job) => {
+  mentionQueueHandler.process(7, async (job) => {
     const item = job.data;
 
     if (!item) return;
