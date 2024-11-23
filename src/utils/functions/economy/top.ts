@@ -2,6 +2,7 @@ import dayjs = require("dayjs");
 import { Collection, Guild, GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
+import redis from "../../../init/redis";
 import Constants from "../../Constants";
 import PageManager from "../page";
 import sleep from "../sleep";
@@ -25,10 +26,6 @@ export async function topBalance(guild: Guild, userId?: string) {
   }
 
   if (!members) members = guild.members.cache;
-
-  members = members.filter((m) => {
-    return !m.user.bot;
-  });
 
   const query = await prisma.economy.findMany({
     where: {
@@ -235,10 +232,6 @@ export async function topNetWorth(guild: Guild, userId?: string, repeatCount = 1
 
   if (!members) members = guild.members.cache;
 
-  members = members.filter((m) => {
-    return !m.user.bot;
-  });
-
   const amounts = new Map<string, number>();
   let userIds: string[] = [];
 
@@ -348,10 +341,6 @@ export async function topPrestige(guild: Guild, userId?: string) {
   }
 
   if (!members) members = guild.members.cache;
-
-  members = members.filter((m) => {
-    return !m.user.bot;
-  });
 
   const query = await prisma.economy.findMany({
     where: {
@@ -494,10 +483,6 @@ export async function topItem(guild: Guild, item: string, userId: string) {
   }
 
   if (!members) members = guild.members.cache;
-
-  members = members.filter((m) => {
-    return !m.user.bot;
-  });
 
   const query = await prisma.inventory.findMany({
     where: {
@@ -642,6 +627,8 @@ export async function topItemGlobal(item: string, userId: string, amount = 100) 
 }
 
 export async function topCompletion(guild: Guild, userId: string) {
+  const cache = await redis.get(`${Constants.redis.cache.economy.BALANCE}:${guild.id}`);
+
   let members: Collection<string, GuildMember>;
 
   if (guild.memberCount == guild.members.cache.size) {
@@ -652,69 +639,76 @@ export async function topCompletion(guild: Guild, userId: string) {
 
   if (!members) members = guild.members.cache;
 
-  members = members.filter((m) => {
-    return !m.user.bot;
-  });
+  let users: { id: string; completion: number }[] = [];
 
-  const query = await prisma.achievements.findMany({
-    where: {
-      AND: [
-        { completed: true },
-        { userId: { in: Array.from(members.keys()) } },
-        { user: { blacklisted: false } },
-      ],
-    },
-    select: {
-      userId: true,
-      user: {
-        select: {
-          Economy: {
-            select: {
-              banned: true,
+  if (cache) {
+    users = JSON.parse(cache);
+  } else {
+    const query = await prisma.achievements.findMany({
+      where: {
+        AND: [
+          { completed: true },
+          { userId: { in: Array.from(members.keys()) } },
+          { user: { blacklisted: false } },
+        ],
+      },
+      select: {
+        userId: true,
+        user: {
+          select: {
+            Economy: {
+              select: {
+                banned: true,
+              },
             },
           },
         },
       },
-    },
-  });
+    });
 
-  if (query.length == 0) {
-    return { pages: new Map<number, string[]>(), pos: 0 };
-  }
-
-  const allAchievements = Object.keys(getAchievements()).length;
-  let userIds = query.map((i) => i.userId);
-  const completionRate = new Map<string, number>();
-
-  userIds = [...new Set(userIds)];
-
-  for (const userId of userIds) {
-    if (
-      query.find((u) => u.userId).user?.Economy?.banned &&
-      dayjs().isBefore(query.find((u) => u.userId).user.Economy.banned)
-    ) {
-      userIds.splice(userIds.indexOf(userId), 1);
-      continue;
+    if (query.length == 0) {
+      return { pages: new Map<number, string[]>(), pos: 0 };
     }
 
-    const achievementsForUser = query.filter((i) => i.userId == userId);
+    const allAchievements = Object.keys(getAchievements()).length;
+    users = query.map((i) => ({ id: i.userId, completion: 0 }));
 
-    completionRate.set(userId, (achievementsForUser.length / allAchievements) * 100);
-  }
+    users = [...new Set(users)];
 
-  if (userIds.length > 500) {
-    userIds = await workerSort(userIds, completionRate);
-    userIds.reverse();
-  } else {
-    inPlaceSort(userIds).desc((i) => completionRate.get(i));
+    for (const user of users) {
+      if (
+        query.find((u) => u.userId === user.id).user?.Economy?.banned &&
+        dayjs().isBefore(query.find((u) => u.userId === user.id).user.Economy.banned)
+      ) {
+        users.splice(users.indexOf(user), 1);
+        continue;
+      }
+
+      const achievementsForUser = query.filter((i) => i.userId == user.id);
+
+      user.completion = (achievementsForUser.length / allAchievements) * 100;
+    }
+
+    if (users.length > 2000) {
+      users = await workerSort(users, (i) => i.completion, "desc");
+    } else {
+      inPlaceSort(users).desc((i) => i.completion);
+    }
+
+    await redis.set(
+      `${Constants.redis.cache.economy.COMPLETION_LB}:${guild.id}`,
+      JSON.stringify(users),
+      "EX",
+      600,
+    );
   }
 
   const out = [];
 
   let count = 0;
 
-  for (const user of userIds) {
-    if (completionRate.get(user) != 0) {
+  for (const user of users) {
+    if (user.completion !== 0) {
       let pos = (count + 1).toString();
 
       if (pos == "1") {
@@ -728,10 +722,10 @@ export async function topCompletion(guild: Guild, userId: string) {
       }
 
       out[count] = `${pos} ${await formatUsername(
-        user,
-        members.get(user).user.username,
+        user.id,
+        members.get(user.id).user.username,
         true,
-      )} ${completionRate.get(user).toFixed(1)}%`;
+      )} ${user.completion.toFixed(1)}%`;
 
       count++;
     }
@@ -742,7 +736,7 @@ export async function topCompletion(guild: Guild, userId: string) {
   let pos = 0;
 
   if (userId) {
-    pos = userIds.indexOf(userId) + 1;
+    pos = users.findIndex((i) => i.id === userId) + 1;
   }
 
   return { pages, pos };
@@ -796,10 +790,6 @@ export async function topDailyStreak(guild: Guild, userId?: string) {
   }
 
   if (!members) members = guild.members.cache;
-
-  members = members.filter((m) => {
-    return !m.user.bot;
-  });
 
   const query = await prisma.economy.findMany({
     where: {
@@ -933,10 +923,6 @@ export async function topLottoWins(guild: Guild, userId?: string) {
   }
 
   if (!members) members = guild.members.cache;
-
-  members = members.filter((m) => {
-    return !m.user.bot;
-  });
 
   const query = await prisma.achievements.findMany({
     where: {
@@ -1072,10 +1058,6 @@ export async function topWordle(guild: Guild, userId: string) {
   }
 
   if (!members) members = guild.members.cache;
-
-  members = members.filter((m) => {
-    return !m.user.bot;
-  });
 
   const query = await prisma.wordleStats.findMany({
     where: {
@@ -1250,10 +1232,6 @@ export async function topCommand(guild: Guild, command: string, userId: string) 
 
   if (!members) members = guild.members.cache;
 
-  members = members.filter((m) => {
-    return !m.user.bot;
-  });
-
   const query = await prisma.commandUse.findMany({
     where: {
       AND: [
@@ -1379,10 +1357,6 @@ export async function topCommandUses(guild: Guild, userId: string) {
 
   if (!members) members = guild.members.cache;
 
-  members = members.filter((m) => {
-    return !m.user.bot;
-  });
-
   const query = await prisma.commandUse.groupBy({
     where: {
       AND: [{ userId: { in: Array.from(members.keys()) } }, { user: { blacklisted: false } }],
@@ -1504,10 +1478,6 @@ export async function topVote(guild: Guild, userId?: string) {
   }
 
   if (!members) members = guild.members.cache;
-
-  members = members.filter((m) => {
-    return !m.user.bot;
-  });
 
   const query = await prisma.economy.findMany({
     where: {
@@ -1661,10 +1631,6 @@ export async function topChatReaction(guild: Guild, daily: boolean, userId?: str
   }
 
   if (!members) members = guild.members.cache;
-
-  members = members.filter((m) => {
-    return !m.user.bot;
-  });
 
   const query = await prisma.chatReactionLeaderboards.findMany({
     where: {
