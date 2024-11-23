@@ -85,7 +85,7 @@ async function run(
     });
   }
 
-  let membersSorted: string[] = [];
+  let membersSorted: { id: string; joinedTimestamp: number }[] = [];
   let msg: Message;
 
   if (await redis.exists(`${Constants.redis.cache.guild.JOIN_ORDER}:${message.guildId}`)) {
@@ -93,17 +93,8 @@ async function run(
       await redis.get(`${Constants.redis.cache.guild.JOIN_ORDER}:${message.guildId}`),
     );
   } else {
-    const membersMap = new Map<string, number>();
-
-    members.forEach((m) => {
-      if (m.joinedTimestamp) {
-        membersSorted.push(m.id);
-        membersMap.set(m.id, m.joinedTimestamp);
-      }
-    });
-
-    if (membersSorted.length > 500) {
-      if (membersSorted.length > 1000)
+    if (membersSorted.length > 2000) {
+      if (membersSorted.length > 5000)
         msg = await send({
           embeds: [
             new CustomEmbed(
@@ -113,9 +104,15 @@ async function run(
           ],
         });
 
-      membersSorted = await workerSort(membersSorted, membersMap);
+      membersSorted = await workerSort(
+        Array.from(members.map((i) => ({ id: i.id, joinedTimestamp: i.joinedTimestamp }))),
+        (i) => i.joinedTimestamp,
+        "asc",
+      );
     } else {
-      inPlaceSort(membersSorted).asc((i) => membersMap.get(i));
+      inPlaceSort(
+        Array.from(members.map((i) => ({ id: i.id, joinedTimestamp: i.joinedTimestamp }))),
+      ).asc((i) => i.joinedTimestamp);
     }
 
     await redis.set(
@@ -126,7 +123,7 @@ async function run(
     );
   }
 
-  let joinPos: number | string = membersSorted.indexOf(member.id) + 1;
+  let joinPos: number | string = membersSorted.findIndex((i) => i.id === member.id) + 1;
 
   if (joinPos == 0) joinPos = "invalid";
 

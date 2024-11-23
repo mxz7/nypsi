@@ -1,13 +1,14 @@
-import { inPlaceSort } from "fast-sort";
+import { inPlaceSort, ISortBy } from "fast-sort";
 import { isMainThread, parentPort, Worker, workerData } from "worker_threads";
 
-export default function workerSort(
-  array: string[],
-  sortData: Map<string, number>,
-): Promise<string[]> {
+export default function workerSort<T>(
+  data: T[],
+  sortFunction: ISortBy<T>,
+  direction: "asc" | "desc",
+): Promise<T[]> {
   return new Promise((resolve, reject) => {
     const worker = new Worker(__filename, {
-      workerData: [array, sortData],
+      workerData: [data, sortFunction],
     });
     worker.on("message", resolve);
     worker.on("error", reject);
@@ -19,11 +20,16 @@ export default function workerSort(
 
 if (!isMainThread) {
   process.title = "nypsi: sort worker";
-  const arr: string[] = workerData[0];
-  const sortData: Map<string, number> = workerData[1];
+  const data: any[] = workerData[0];
+  const func: ISortBy<any> = workerData[1];
+  const direction: "asc" | "desc" = workerData[2];
 
-  inPlaceSort(arr).asc((i) => sortData.get(i));
+  if (direction === "asc") {
+    inPlaceSort(data).asc(func);
+  } else {
+    inPlaceSort(data).desc(func);
+  }
 
-  parentPort.postMessage(arr);
+  parentPort.postMessage(data);
   process.exit(0);
 }
