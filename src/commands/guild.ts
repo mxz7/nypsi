@@ -949,7 +949,8 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          "10MB max file size\n\nsend a picture in the channel",
+          "10MB max file size\n\nsend a picture in the channel\n" +
+            "please note that innapropriate images may result in your guild being deleted",
         ).setHeader("guild avatar", guild.avatarId || undefined),
       ],
     });
