@@ -239,42 +239,62 @@ export async function topNetWorth(guild: Guild, userId?: string, repeatCount = 1
     return !m.user.bot;
   });
 
-  const query = await prisma.economy.findMany({
-    where: {
-      AND: [{ userId: { in: Array.from(members.keys()) } }, { user: { blacklisted: false } }],
-    },
-    select: {
-      userId: true,
-      banned: true,
-    },
-  });
-
   const amounts = new Map<string, number>();
   let userIds: string[] = [];
 
-  const promises = [];
+  if (members.size < 1000) {
+    const query = await prisma.economy.findMany({
+      where: {
+        AND: [{ userId: { in: Array.from(members.keys()) } }, { user: { blacklisted: false } }],
+      },
+      select: {
+        userId: true,
+        banned: true,
+      },
+    });
 
-  for (const user of query) {
-    if (user.banned && dayjs().isBefore(user.banned)) {
-      continue;
+    const promises = [];
+
+    for (const user of query) {
+      if (user.banned && dayjs().isBefore(user.banned)) {
+        continue;
+      }
+
+      promises.push(async () => {
+        const net = await calcNetWorth("leaderboard", user.userId);
+
+        amounts.set(user.userId, net.amount);
+        userIds.push(user.userId);
+        return;
+      });
     }
 
-    promises.push(async () => {
-      const net = await calcNetWorth("leaderboard", user.userId);
+    await pAll(promises, { concurrency: 25 });
 
-      amounts.set(user.userId, net.amount);
-      userIds.push(user.userId);
-      return;
-    });
-  }
-
-  await pAll(promises, { concurrency: 25 });
-
-  if (userIds.length > 500) {
-    userIds = await workerSort(userIds, amounts);
-    userIds.reverse();
-  } else {
     inPlaceSort(userIds).desc((i) => amounts.get(i));
+  } else {
+    const query = await prisma.economy.findMany({
+      where: {
+        AND: [{ userId: { in: Array.from(members.keys()) } }, { user: { blacklisted: false } }],
+      },
+      select: {
+        userId: true,
+        netWorth: true,
+        banned: true,
+      },
+      orderBy: {
+        netWorth: "desc",
+      },
+    });
+
+    for (const user of query) {
+      if (user.banned && dayjs().isBefore(user.banned)) {
+        continue;
+      }
+
+      amounts.set(user.userId, Number(user.netWorth));
+      userIds.push(user.userId);
+    }
   }
 
   const out = [];
