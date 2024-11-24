@@ -1,5 +1,5 @@
 import { CommandInteraction, Message } from "discord.js";
-import { inPlaceSort } from "fast-sort";
+import { sort } from "fast-sort";
 import redis from "../init/redis";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
@@ -58,8 +58,8 @@ async function run(
       await redis.get(`${Constants.redis.cache.guild.JOIN_ORDER}:${message.guildId}`),
     );
   } else {
-    if (membersSorted.length > 2000) {
-      if (membersSorted.length > 5000)
+    if (members.size > 2000) {
+      if (members.size > 5000)
         msg = await message.channel.send({
           embeds: [
             new CustomEmbed(
@@ -71,11 +71,11 @@ async function run(
 
       membersSorted = await workerSort(
         Array.from(members.map((i) => ({ id: i.id, joinedTimestamp: i.joinedTimestamp }))),
-        (i) => i.joinedTimestamp,
+        "joinedTimestamp",
         "asc",
       );
     } else {
-      inPlaceSort(
+      membersSorted = sort(
         Array.from(members.map((i) => ({ id: i.id, joinedTimestamp: i.joinedTimestamp }))),
       ).asc((i) => i.joinedTimestamp);
     }
