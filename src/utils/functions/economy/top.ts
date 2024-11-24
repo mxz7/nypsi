@@ -690,7 +690,7 @@ export async function topCompletion(guild: Guild, userId: string) {
     }
 
     if (users.length > 2000) {
-      users = await workerSort(users, (i) => i.completion, "desc");
+      users = await workerSort(users, "completion", "desc");
     } else {
       inPlaceSort(users).desc((i) => i.completion);
     }
