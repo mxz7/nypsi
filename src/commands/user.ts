@@ -88,7 +88,7 @@ async function run(
     );
   }
 
-  let joinPos: number | string = membersSorted.findIndex((i) => i.id) + 1;
+  let joinPos: number | string = membersSorted.findIndex((i) => i.id === member.id) + 1;
 
   if (joinPos == 0) joinPos = "invalid";
 
