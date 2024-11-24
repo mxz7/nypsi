@@ -233,7 +233,7 @@ export async function topNetWorth(guild: Guild, userId?: string, repeatCount = 1
   if (!members) members = guild.members.cache;
 
   const amounts = new Map<string, number>();
-  let userIds: string[] = [];
+  const userIds: string[] = [];
 
   if (members.size < 1000) {
     const query = await prisma.economy.findMany({
