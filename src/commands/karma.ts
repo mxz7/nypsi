@@ -10,7 +10,7 @@ import { getPrefix } from "../utils/functions/guilds/utils";
 import { getKarma } from "../utils/functions/karma/karma";
 import { getMember } from "../utils/functions/member";
 
-const cmd = new Command("karma", "check how much karma you have", "info").setDocs(
+const cmd = new Command("karma", "check how much karma you have", "money").setDocs(
   "https://nypsi.xyz/docs/economy/karma",
 );
 
