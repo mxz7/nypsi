@@ -13,7 +13,7 @@ import { addProgress } from "./achievements";
 import { addBalance } from "./balance";
 import { addToGuildXP, getGuildName } from "./guilds";
 import { addInventoryItem } from "./inventory";
-import { getItems, getTasksData, userExists } from "./utils";
+import { getItems, getTasksData, isEcoBanned, userExists } from "./utils";
 import { addXp } from "./xp";
 
 const taskGeneration = new Map<string, number>();
@@ -223,6 +223,7 @@ export function parseReward(reward: string) {
 
 export async function addTaskProgress(userId: string, taskId: string, amount = 1) {
   if (!(await userExists(userId))) return;
+  if ((await isEcoBanned(userId)).banned) return;
 
   const tasks = await getTasks(userId);
 
