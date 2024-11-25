@@ -832,7 +832,7 @@ export async function topDailyStreak(guild: Guild, userId?: string) {
       user.userId,
       members.get(user.userId).user.username,
       true,
-    )} ${user.dailyStreak}`;
+    )} ${user.dailyStreak.toLocaleString()}`;
 
     count++;
   }
@@ -895,7 +895,7 @@ export async function topDailyStreakGlobal(userId: string, amount = 100) {
       user.userId,
       user.user.lastKnownUsername,
       (await getPreferences(user.userId)).leaderboards,
-    )} ${user.dailyStreak}`;
+    )} ${user.dailyStreak.toLocaleString()}`;
 
     count++;
   }
