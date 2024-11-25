@@ -232,8 +232,7 @@ export async function topNetWorth(guild: Guild, userId?: string, repeatCount = 1
 
   if (!members) members = guild.members.cache;
 
-  const amounts = new Map<string, number>();
-  const userIds: string[] = [];
+  const users: { userId: string; netWorth: number | bigint }[] = [];
 
   if (members.size < 1000) {
     const query = await prisma.economy.findMany({
@@ -256,15 +255,13 @@ export async function topNetWorth(guild: Guild, userId?: string, repeatCount = 1
       promises.push(async () => {
         const net = await calcNetWorth("leaderboard", user.userId);
 
-        amounts.set(user.userId, net.amount);
-        userIds.push(user.userId);
-        return;
+        users.push({ userId: user.userId, netWorth: net.amount });
       });
     }
 
     await pAll(promises, { concurrency: 25 });
 
-    inPlaceSort(userIds).desc((i) => amounts.get(i));
+    inPlaceSort(users).desc((i) => i.netWorth);
   } else {
     const query = await prisma.economy.findMany({
       where: {
@@ -275,9 +272,7 @@ export async function topNetWorth(guild: Guild, userId?: string, repeatCount = 1
         netWorth: true,
         banned: true,
       },
-      orderBy: {
-        netWorth: "desc",
-      },
+      orderBy: [{ netWorth: "desc" }, { user: { lastKnownUsername: "asc" } }],
     });
 
     for (const user of query) {
@@ -285,8 +280,7 @@ export async function topNetWorth(guild: Guild, userId?: string, repeatCount = 1
         continue;
       }
 
-      amounts.set(user.userId, Number(user.netWorth));
-      userIds.push(user.userId);
+      users.push({ userId: user.userId, netWorth: user.netWorth });
     }
   }
 
@@ -294,10 +288,10 @@ export async function topNetWorth(guild: Guild, userId?: string, repeatCount = 1
 
   let count = 0;
 
-  for (const user of userIds) {
+  for (const user of users) {
     if (out.length >= 100) break;
 
-    if (amounts.get(user) != 0) {
+    if (user.netWorth > 0) {
       let pos = (count + 1).toString();
 
       if (pos == "1") {
@@ -311,10 +305,10 @@ export async function topNetWorth(guild: Guild, userId?: string, repeatCount = 1
       }
 
       out[count] = `${pos} ${await formatUsername(
-        user,
-        members.get(user).user.username,
+        user.userId,
+        members.get(user.userId).user.username,
         true,
-      )} $${amounts.get(user).toLocaleString()}`;
+      )} $${Number(user.netWorth).toLocaleString()}`;
 
       count++;
     }
@@ -325,8 +319,10 @@ export async function topNetWorth(guild: Guild, userId?: string, repeatCount = 1
   let pos = 0;
 
   if (userId) {
-    pos = userIds.indexOf(userId) + 1;
+    pos = users.findIndex((i) => i.userId === userId) + 1;
   }
+
+  topNetLock.delete(guild.id);
 
   return { pages, pos };
 }
