@@ -236,7 +236,7 @@ async function run(
           const roleStr = await message.guild.roles
             .fetch(role.roleId)
             .then((r) => r.toString())
-            .catch(() => {});
+            .catch(() => undefined);
 
           if (!roleStr)
             await deleteRoleFromReactionRole(message.guild.id, reactionRole.messageId, role.roleId);
