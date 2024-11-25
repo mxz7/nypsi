@@ -237,6 +237,10 @@ async function run(
             .fetch(role.roleId)
             .then((r) => r.toString())
             .catch(() => {});
+
+          if (!roleStr)
+            await deleteRoleFromReactionRole(message.guild.id, reactionRole.messageId, role.roleId);
+
           fieldDesc.push(`${role.label}: ${roleStr || role.roleId}`);
         }
 
