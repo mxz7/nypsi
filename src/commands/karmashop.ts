@@ -40,7 +40,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 import dayjs = require("dayjs");
 import ms = require("ms");
 
-const cmd = new Command("karmashop", "buy stuff with your karma", "info").setAliases(["ks"]);
+const cmd = new Command("karmashop", "buy stuff with your karma", "money").setAliases(["ks"]);
 
 cmd.slashEnabled = true;
 cmd.slashData
