@@ -131,12 +131,12 @@ async function run(
   for (const case0 of pages[0]) {
     if (case0.deleted) {
       embed.addField(
-        `case ${case0.caseId}`,
+        case0.caseId.toString(),
         `${case0.evidence?.id ? `[\`[deleted]\`](https://cdn.nypsi.xyz/evidence/${case0.guildId}/${case0.evidence.id})` : "`[deleted`]"}`,
       );
     } else {
       embed.addField(
-        `${case0.caseId}`,
+        case0.caseId.toString(),
         (case0.evidence?.id
           ? `[\`${case0.type}\`](https://cdn.nypsi.xyz/evidence/${case0.guildId}/${case0.evidence.id})`
           : `\`${case0.type}\``) +
@@ -266,19 +266,18 @@ async function run(
         } else {
           currentPage++;
           for (const case0 of pages[currentPage]) {
-            let title = `case ${case0.caseId}`;
-
-            if (case0.evidence?.id)
-              title = `[case ${case0.caseId}](https://cdn.nypsi.xyz/evidence/${case0.guildId}/${case0.evidence.id}) `;
-
             if (case0.deleted) {
-              newEmbed.addField(title, "`[deleted]`");
+              newEmbed.addField(
+                case0.caseId.toString(),
+                `${case0.evidence?.id ? `[\`[deleted]\`](https://cdn.nypsi.xyz/evidence/${case0.guildId}/${case0.evidence.id})` : "`[deleted`]"}`,
+              );
             } else {
               newEmbed.addField(
-                title,
-                "`" +
-                  case0.type +
-                  "` - " +
+                case0.caseId.toString(),
+                (case0.evidence?.id
+                  ? `[\`${case0.type}\`](https://cdn.nypsi.xyz/evidence/${case0.guildId}/${case0.evidence.id})`
+                  : `\`${case0.type}\``) +
+                  " - " +
                   case0.command +
                   "\non " +
                   `<t:${Math.floor(case0.time.getTime() / 1000)}:d>`,
