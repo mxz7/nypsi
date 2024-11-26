@@ -402,7 +402,7 @@ async function start(client: NypsiClient) {
 
         if (player.stoppedAt > 1) {
           const [xp, { multi }] = await Promise.all([
-            calcEarnedGambleXp(player.userId, player.bet, player.autoStop),
+            calcEarnedGambleXp(player.userId, player.bet, player.stoppedAt),
             getGambleMulti(player.userId),
           ]);
 
@@ -437,7 +437,7 @@ async function start(client: NypsiClient) {
         }
       } else if (player.autoStop && player.autoStop <= status.value && !player.won) {
         player.stoppedAt = player.autoStop;
-        player.won = Math.round(player.bet * player.autoStop);
+        player.won = Math.round(player.bet * player.stoppedAt);
 
         logger.info(
           `crash: ${player.username} stopped via autostop (${player.autoStop.toFixed(2)})`,
@@ -445,7 +445,7 @@ async function start(client: NypsiClient) {
 
         if (player.stoppedAt > 1) {
           const [xp, { multi }] = await Promise.all([
-            calcEarnedGambleXp(player.userId, player.bet, player.autoStop),
+            calcEarnedGambleXp(player.userId, player.bet, player.stoppedAt),
             getGambleMulti(player.userId),
           ]);
 
