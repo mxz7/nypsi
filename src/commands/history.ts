@@ -214,9 +214,9 @@ async function run(
               title = `[case ${case0.caseId}](https://cdn.nypsi.xyz/evidence/${case0.guildId}/${case0.evidence.id}) `;
 
             if (case0.deleted) {
-              embed.addField(title, "`[deleted]`");
+              newEmbed.addField(title, "`[deleted]`");
             } else {
-              embed.addField(
+              newEmbed.addField(
                 title,
                 "`" +
                   case0.type +
@@ -272,9 +272,9 @@ async function run(
               title = `[case ${case0.caseId}](https://cdn.nypsi.xyz/evidence/${case0.guildId}/${case0.evidence.id}) `;
 
             if (case0.deleted) {
-              embed.addField(title, "`[deleted]`");
+              newEmbed.addField(title, "`[deleted]`");
             } else {
-              embed.addField(
+              newEmbed.addField(
                 title,
                 "`" +
                   case0.type +
