@@ -25,6 +25,7 @@ import {
 } from "../utils/functions/guilds/reactionroles";
 import { getRole } from "../utils/functions/member";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
+import { logger } from "../utils/logger";
 
 const cmd = new Command("reactionroles", "create & manage the server's reaction roles", "admin")
   .setPermissions(["MANAGE_SERVER"])
@@ -516,6 +517,8 @@ async function run(
 
     args.shift();
     args.shift();
+
+    logger.debug(args.join(" ").substring(0, 80).match(Constants.EMOJI_REGEX));
 
     await addRoleToReactionRole({
       messageId: reactionRole.messageId,
