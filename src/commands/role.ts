@@ -529,7 +529,7 @@ async function run(
         if (!role) {
           roles.splice(roles.indexOf(r), 1);
           await setAutoJoinRoles(message.guild, roles);
-          break;
+          continue;
         }
 
         rolesDisplay.push(role.toString());
@@ -607,7 +607,7 @@ async function run(
         if (!role) {
           roles.splice(roles.indexOf(r), 1);
           await setPersistentRoles(message.guild, roles);
-          break;
+          continue;
         }
 
         rolesDisplay.push(role.toString());
