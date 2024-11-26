@@ -134,7 +134,7 @@ async function run(
     desc.push(`\n**worth** $${Math.floor(value).toLocaleString()}`);
   }
 
-  if (total) {
+  if (total && selected.id !== "lottery_ticket") {
     desc.push(`\n**in world** ${total.toLocaleString()}`);
   }
 

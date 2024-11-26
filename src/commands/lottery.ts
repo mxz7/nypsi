@@ -8,7 +8,7 @@ import {
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { getInventory } from "../utils/functions/economy/inventory";
-import { getTicketCount } from "../utils/functions/economy/lottery";
+import { getApproximatPrizePool } from "../utils/functions/economy/lottery";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 
@@ -70,7 +70,7 @@ async function run(
     );
     const embed = new CustomEmbed(message.member);
 
-    const winChance = ((tickets / (await getTicketCount())) * 100 || 0).toPrecision(3);
+    const pool = await getApproximatPrizePool();
 
     embed.setHeader("lottery", message.author.avatarURL());
     embed.setDescription(
@@ -78,7 +78,8 @@ async function run(
         .add(1, "day")
         .startOf("day")
         .unix()}:R>\n\n` +
-        `you can buy lottery tickets with ${(await getPrefix(message.guild))[0]}**buy lotto**\nyou have **${tickets.toLocaleString()}** tickets (${winChance}% chance of winning)`,
+        `current prize pool is $${pool.min.toLocaleString()} - $${pool.max.toLocaleString()}\n\n` +
+        `you can buy lottery tickets with ${(await getPrefix(message.guild))[0]}**buy lotto**\nyou have **${tickets.toLocaleString()}** tickets`,
     );
 
     return send({ embeds: [embed] });
