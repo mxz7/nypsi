@@ -23,6 +23,7 @@ import Constants from "../utils/Constants";
 import { b, c } from "../utils/functions/anticheat";
 import { giveCaptcha } from "../utils/functions/captcha";
 import { updateBalance, updateBankBalance } from "../utils/functions/economy/balance";
+import { initCrashGame } from "../utils/functions/economy/crash";
 import { setInventoryItem } from "../utils/functions/economy/inventory";
 import { setLevel, setPrestige } from "../utils/functions/economy/levelling";
 import { getEcoBanTime, getItems, isEcoBanned, setEcoBan } from "../utils/functions/economy/utils";
@@ -1626,6 +1627,10 @@ async function run(
         ),
       ],
     });
+  } else if (args[0].toLowerCase() === "fixcrash") {
+    if (message.author.id !== Constants.TEKOH_ID) return;
+    await redis.del(Constants.redis.nypsi.CRASH_STATUS);
+    await initCrashGame(message.client as NypsiClient);
   }
 }
 
