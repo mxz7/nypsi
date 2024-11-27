@@ -31,3 +31,27 @@ export async function getTicketCount() {
 
   return Number(query._sum.amount);
 }
+
+export async function getDailyLottoTickets(userId: string) {
+  const query = await prisma.economy.findUnique({
+    where: {
+      userId,
+    },
+    select: {
+      dailyLottery: true,
+    },
+  });
+
+  return query.dailyLottery;
+}
+
+export async function setDailyLotteryTickets(userId: string, amount: number) {
+  await prisma.economy.update({
+    where: {
+      userId,
+    },
+    data: {
+      dailyLottery: amount,
+    },
+  });
+}

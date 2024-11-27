@@ -9,7 +9,7 @@ import { CustomEmbed } from "../../models/EmbedBuilders";
 import { Job } from "../../types/Jobs";
 import Constants from "../../utils/Constants";
 import { addProgress } from "../../utils/functions/economy/achievements";
-import { addBalance } from "../../utils/functions/economy/balance";
+import { addBalance, getBalance, removeBalance } from "../../utils/functions/economy/balance";
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { getTicketCount } from "../../utils/functions/economy/lottery";
 import { addStat } from "../../utils/functions/economy/stats";
@@ -116,6 +116,47 @@ export default {
                 )
                 .setTitle("you've found a gem")
                 .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+            },
+          });
+        }
+      }
+    }
+
+    const autoBuys = await prisma.economy.findMany({
+      where: {
+        dailyLottery: { gt: 0 },
+      },
+      select: {
+        userId: true,
+        dailyLottery: true,
+        user: {
+          select: {
+            DMSettings: {
+              select: {
+                other: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    for (const user of autoBuys) {
+      const balance = await getBalance(user.userId);
+
+      if (balance >= getItems()["lottery_ticket"].buy * user.dailyLottery) {
+        await removeBalance(user.userId, getItems()["lottery_ticket"].buy * user.dailyLottery);
+        addStat(user.userId, "spent-shop", getItems()["lottery_ticket"].buy * user.dailyLottery);
+        await addInventoryItem(user.userId, "lottery_ticket", user.dailyLottery);
+
+        if (user.user.DMSettings.other) {
+          await addNotificationToQueue({
+            memberId: user.userId,
+            payload: {
+              embed: new CustomEmbed(
+                user.userId,
+                `you have auto bought **${user.dailyLottery}** lottery tickets`,
+              ),
             },
           });
         }
