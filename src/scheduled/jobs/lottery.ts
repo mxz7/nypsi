@@ -9,7 +9,7 @@ import { CustomEmbed } from "../../models/EmbedBuilders";
 import { Job } from "../../types/Jobs";
 import Constants from "../../utils/Constants";
 import { addProgress } from "../../utils/functions/economy/achievements";
-import { addBalance } from "../../utils/functions/economy/balance";
+import { addBalance, getBalance, removeBalance } from "../../utils/functions/economy/balance";
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { getTicketCount } from "../../utils/functions/economy/lottery";
 import { addStat } from "../../utils/functions/economy/stats";
@@ -42,80 +42,121 @@ export default {
 
       await hook.send({ embeds: [embed] });
       hook.destroy();
-      return;
-    }
+    } else {
+      const taxedAmount =
+        Math.floor(ticketCount * getItems()["lottery_ticket"].buy * (await getTax())) * 1.5;
 
-    const taxedAmount =
-      Math.floor(ticketCount * getItems()["lottery_ticket"].buy * (await getTax())) * 1.5;
+      const total = Math.floor(ticketCount * getItems()["lottery_ticket"].buy - taxedAmount);
 
-    const total = Math.floor(ticketCount * getItems()["lottery_ticket"].buy - taxedAmount);
+      const before = performance.now();
+      const winner = await findWinner();
+      const after = performance.now();
 
-    const before = performance.now();
-    const winner = await findWinner();
-    const after = performance.now();
+      log(`winner found in ${after - before}ms`);
 
-    log(`winner found in ${after - before}ms`);
+      if (!winner) {
+        log("ERROR RUNNING LOTTERY");
+        return;
+      }
 
-    if (!winner) {
-      log("ERROR RUNNING LOTTERY");
-      return;
-    }
+      const winnerUsername = await getLastKnownUsername(winner.winner);
+      const winnerAvatar = await getLastKnownAvatar(winner.winner);
+      prisma.inventory
+        .deleteMany({ where: { item: "lottery_ticket" } })
+        .then(() => exec('redis-cli KEYS "*inventory*" | xargs redis-cli DEL'));
 
-    const winnerUsername = await getLastKnownUsername(winner.winner);
-    const winnerAvatar = await getLastKnownAvatar(winner.winner);
-    prisma.inventory
-      .deleteMany({ where: { item: "lottery_ticket" } })
-      .then(() => exec('redis-cli KEYS "*inventory*" | xargs redis-cli DEL'));
+      log(`winner: ${winner.winner} (${winnerUsername})`);
 
-    log(`winner: ${winner.winner} (${winnerUsername})`);
+      await Promise.all([
+        addBalance(winner.winner, total),
+        addProgress(winner.winner, "lucky", 1),
+        addStat(winner.winner, "earned-lottery", total),
+      ]);
 
-    await Promise.all([
-      addBalance(winner.winner, total),
-      addProgress(winner.winner, "lucky", 1),
-      addStat(winner.winner, "earned-lottery", total),
-    ]);
+      const embed = new CustomEmbed();
 
-    const embed = new CustomEmbed();
-
-    embed.setHeader("lottery winner", winnerAvatar);
-    embed.setDescription(
-      `**${winnerUsername}** has won the lottery with ${winner.amount.toLocaleString()} tickets!!\n\n` +
-        `they have won $**${total.toLocaleString()}**`,
-    );
-    embed.setFooter({ text: `a total of ${ticketCount.toLocaleString()} tickets were bought` });
-    embed.setColor(flavors.latte.colors.base.hex as ColorResolvable);
-
-    await hook.send({ embeds: [embed] });
-
-    hook.destroy();
-
-    if ((await getDmSettings(winner.winner)).lottery) {
-      embed.setTitle("you have won the lottery!");
+      embed.setHeader("lottery winner", winnerAvatar);
       embed.setDescription(
-        `you have won a total of $**${total.toLocaleString()}**\n\nyou had ${winner.amount.toLocaleString()} tickets`,
+        `**${winnerUsername}** has won the lottery with ${winner.amount.toLocaleString()} tickets!!\n\n` +
+          `they have won $**${total.toLocaleString()}**`,
       );
+      embed.setFooter({ text: `a total of ${ticketCount.toLocaleString()} tickets were bought` });
       embed.setColor(flavors.latte.colors.base.hex as ColorResolvable);
 
-      addNotificationToQueue({ memberId: winner.winner, payload: { embed } });
+      await hook.send({ embeds: [embed] });
 
-      if (percentChance(0.9) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
-        await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t");
-        await redis.expire(Constants.redis.nypsi.GEM_GIVEN, Math.floor(ms("1 days") / 1000));
-        await addInventoryItem(winner.winner, "purple_gem", 1);
-        addProgress(winner.winner, "gem_hunter", 1);
+      hook.destroy();
 
-        if ((await getDmSettings(winner.winner)).other) {
-          addNotificationToQueue({
-            memberId: winner.winner,
+      if ((await getDmSettings(winner.winner)).lottery) {
+        embed.setTitle("you have won the lottery!");
+        embed.setDescription(
+          `you have won a total of $**${total.toLocaleString()}**\n\nyou had ${winner.amount.toLocaleString()} tickets`,
+        );
+        embed.setColor(flavors.latte.colors.base.hex as ColorResolvable);
+
+        addNotificationToQueue({ memberId: winner.winner, payload: { embed } });
+
+        if (percentChance(0.9) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
+          await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t");
+          await redis.expire(Constants.redis.nypsi.GEM_GIVEN, Math.floor(ms("1 days") / 1000));
+          await addInventoryItem(winner.winner, "purple_gem", 1);
+          addProgress(winner.winner, "gem_hunter", 1);
+
+          if ((await getDmSettings(winner.winner)).other) {
+            addNotificationToQueue({
+              memberId: winner.winner,
+              payload: {
+                embed: new CustomEmbed()
+                  .setDescription(
+                    `${
+                      getItems()["purple_gem"].emoji
+                    } you've found a gem! i wonder what powers it holds...`,
+                  )
+                  .setTitle("you've found a gem")
+                  .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+              },
+            });
+          }
+        }
+      }
+    }
+
+    const autoBuys = await prisma.economy.findMany({
+      where: {
+        dailyLottery: { gt: 0 },
+      },
+      select: {
+        userId: true,
+        dailyLottery: true,
+        user: {
+          select: {
+            DMSettings: {
+              select: {
+                other: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    for (const user of autoBuys) {
+      const balance = await getBalance(user.userId);
+
+      if (balance >= getItems()["lottery_ticket"].buy * user.dailyLottery) {
+        log(`auto buying ${user.dailyLottery} lottery tickets for ${user.userId}`);
+        await removeBalance(user.userId, getItems()["lottery_ticket"].buy * user.dailyLottery);
+        addStat(user.userId, "spent-shop", getItems()["lottery_ticket"].buy * user.dailyLottery);
+        await addInventoryItem(user.userId, "lottery_ticket", user.dailyLottery);
+
+        if (user.user.DMSettings.other) {
+          await addNotificationToQueue({
+            memberId: user.userId,
             payload: {
-              embed: new CustomEmbed()
-                .setDescription(
-                  `${
-                    getItems()["purple_gem"].emoji
-                  } you've found a gem! i wonder what powers it holds...`,
-                )
-                .setTitle("you've found a gem")
-                .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+              embed: new CustomEmbed(
+                user.userId,
+                `you have auto bought **${user.dailyLottery}** lottery tickets`,
+              ),
             },
           });
         }

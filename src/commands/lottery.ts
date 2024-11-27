@@ -6,22 +6,29 @@ import {
   Message,
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
-import { CustomEmbed } from "../models/EmbedBuilders";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getInventory } from "../utils/functions/economy/inventory";
-import { getTicketCount } from "../utils/functions/economy/lottery";
-import { createUser, userExists } from "../utils/functions/economy/utils";
+import {
+  getApproximatPrizePool,
+  getDailyLottoTickets,
+  setDailyLotteryTickets,
+} from "../utils/functions/economy/lottery";
+import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 
 const cmd = new Command("lottery", "enter the daily lottery draw", "money").setAliases(["lotto"]);
 
 cmd.slashEnabled = true;
 cmd.slashData
-  .addSubcommand((buy) =>
-    buy
-      .setName("buy")
-      .setDescription("buy lottery tickets")
+  .addSubcommand((autobuy) =>
+    autobuy
+      .setName("autobuy")
+      .setDescription("auto buy lottery tickets")
       .addStringOption((option) =>
-        option.setName("amount").setDescription("amount of lottery tickets to buy"),
+        option
+          .setName("amount")
+          .setDescription("amount of lottery tickets to auto buy daily")
+          .setRequired(true),
       ),
   )
   .addSubcommand((tickets) =>
@@ -70,7 +77,8 @@ async function run(
     );
     const embed = new CustomEmbed(message.member);
 
-    const winChance = ((tickets / (await getTicketCount())) * 100 || 0).toPrecision(3);
+    const pool = await getApproximatPrizePool();
+    const autoBuy = await getDailyLottoTickets(message.author.id);
 
     embed.setHeader("lottery", message.author.avatarURL());
     embed.setDescription(
@@ -78,7 +86,8 @@ async function run(
         .add(1, "day")
         .startOf("day")
         .unix()}:R>\n\n` +
-        `you can buy lottery tickets with ${(await getPrefix(message.guild))[0]}**buy lotto**\nyou have **${tickets.toLocaleString()}** tickets (${winChance}% chance of winning)`,
+        `current prize pool is $${pool.min.toLocaleString()} - $${pool.max.toLocaleString()}\n\n` +
+        `you can buy lottery tickets with ${(await getPrefix(message.guild))[0]}**buy lotto**\nyou have **${tickets.toLocaleString()}** tickets${typeof autoBuy === "number" ? `, auto buying ${autoBuy} tickets daily` : ""}`,
     );
 
     return send({ embeds: [embed] });
@@ -92,6 +101,33 @@ async function run(
         new CustomEmbed(
           message.member,
           `this has moved to ${(await getPrefix(message.guild))[0]}**buy lotto**`,
+        ),
+      ],
+    });
+  } else if (args[0].toLowerCase() == "tickets") {
+    return help();
+  } else if (args[0].toLowerCase() === "autobuy") {
+    if (args.length === 1) {
+      return send({ embeds: [new ErrorEmbed("$lotto autobuy <amount>")] });
+    }
+
+    const amount = parseInt(args[1]);
+
+    if (isNaN(amount) || amount <= 0) {
+      return send({ embeds: [new ErrorEmbed("invalid number")] });
+    }
+
+    if (amount > 100000) {
+      return send({ embeds: [new ErrorEmbed("invalid number")] });
+    }
+
+    await setDailyLotteryTickets(message.author.id, amount);
+
+    return send({
+      embeds: [
+        new CustomEmbed(
+          message.member,
+          `you will now auto buy **${amount}** lottery tickets daily ($${(amount * getItems()["lottery_ticket"].buy).toLocaleString()})`,
         ),
       ],
     });
