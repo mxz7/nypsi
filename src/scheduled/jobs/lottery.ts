@@ -145,6 +145,7 @@ export default {
       const balance = await getBalance(user.userId);
 
       if (balance >= getItems()["lottery_ticket"].buy * user.dailyLottery) {
+        log(`auto buying ${user.dailyLottery} lottery tickets for ${user.userId}`);
         await removeBalance(user.userId, getItems()["lottery_ticket"].buy * user.dailyLottery);
         addStat(user.userId, "spent-shop", getItems()["lottery_ticket"].buy * user.dailyLottery);
         await addInventoryItem(user.userId, "lottery_ticket", user.dailyLottery);
