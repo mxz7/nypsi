@@ -78,6 +78,7 @@ async function run(
     const embed = new CustomEmbed(message.member);
 
     const pool = await getApproximatPrizePool();
+    const autoBuy = await getDailyLottoTickets(message.author.id);
 
     embed.setHeader("lottery", message.author.avatarURL());
     embed.setDescription(
@@ -86,7 +87,7 @@ async function run(
         .startOf("day")
         .unix()}:R>\n\n` +
         `current prize pool is $${pool.min.toLocaleString()} - $${pool.max.toLocaleString()}\n\n` +
-        `you can buy lottery tickets with ${(await getPrefix(message.guild))[0]}**buy lotto**\nyou have **${tickets.toLocaleString()}** tickets, autobuying ${await getDailyLottoTickets(message.author.id)} tickets daily`,
+        `you can buy lottery tickets with ${(await getPrefix(message.guild))[0]}**buy lotto**\nyou have **${tickets.toLocaleString()}** tickets${typeof autoBuy === "number" ? `, auto buying ${autoBuy} tickets daily` : ""}`,
     );
 
     return send({ embeds: [embed] });
