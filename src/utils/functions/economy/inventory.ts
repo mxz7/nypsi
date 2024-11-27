@@ -518,6 +518,8 @@ export async function openCrate(
 }
 
 export async function getTotalAmountOfItem(itemId: string) {
+  if (itemId === "lottery_ticket") return 0;
+
   const query = await prisma.inventory.aggregate({
     where: {
       item: itemId,

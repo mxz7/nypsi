@@ -84,6 +84,7 @@ async function doItems() {
     .toDate();
 
   for (const i of query) {
+    if (i.item === "lottery_ticket") i._sum.amount = BigInt(0);
     await prisma.graphMetrics.create({
       data: {
         category: `item-count-${i.item}`,

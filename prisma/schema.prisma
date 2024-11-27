@@ -196,6 +196,8 @@ model Economy {
   autosell    String[]
   offersBlock String[]
 
+  dailyLottery Int?
+
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @id
 
