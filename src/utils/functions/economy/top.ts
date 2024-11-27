@@ -2,14 +2,12 @@ import dayjs = require("dayjs");
 import { Collection, Guild, GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
-import redis from "../../../init/redis";
 import Constants from "../../Constants";
 import PageManager from "../page";
 import sleep from "../sleep";
 import { getPreferences } from "../users/notifications";
 import { getLastKnownUsername } from "../users/tag";
 import { getActiveTag } from "../users/tags";
-import workerSort from "../workers/sort";
 import wordleSortWorker from "../workers/wordlesort";
 import { calcNetWorth } from "./balance";
 import { checkLeaderboardPositions } from "./stats";
@@ -623,8 +621,6 @@ export async function topItemGlobal(item: string, userId: string, amount = 100) 
 }
 
 export async function topCompletion(guild: Guild, userId: string) {
-  const cache = await redis.get(`${Constants.redis.cache.economy.BALANCE}:${guild.id}`);
-
   let members: Collection<string, GuildMember>;
 
   if (guild.memberCount == guild.members.cache.size) {
@@ -635,68 +631,38 @@ export async function topCompletion(guild: Guild, userId: string) {
 
   if (!members) members = guild.members.cache;
 
-  let users: { id: string; completion: number }[] = [];
+  const users: { id: string; completion: number }[] = [];
 
-  if (cache) {
-    users = JSON.parse(cache);
-  } else {
-    const query = await prisma.achievements.findMany({
-      where: {
-        AND: [
-          { completed: true },
-          { userId: { in: Array.from(members.keys()) } },
-          { user: { blacklisted: false } },
-        ],
+  const query = await prisma.achievements.groupBy({
+    where: {
+      AND: [
+        { completed: true },
+        { userId: { in: Array.from(members.keys()) } },
+        { user: { blacklisted: false } },
+      ],
+    },
+    by: ["userId"],
+    _count: {
+      completed: true,
+    },
+    orderBy: {
+      _count: {
+        completed: "desc",
       },
-      select: {
-        userId: true,
-        user: {
-          select: {
-            Economy: {
-              select: {
-                banned: true,
-              },
-            },
-          },
-        },
-      },
+    },
+  });
+
+  if (query.length == 0) {
+    return { pages: new Map<number, string[]>(), pos: 0 };
+  }
+
+  const allAchievements = Object.keys(getAchievements()).length;
+
+  for (const user of query) {
+    users.push({
+      id: user.userId,
+      completion: (user._count.completed / allAchievements) * 100,
     });
-
-    if (query.length == 0) {
-      return { pages: new Map<number, string[]>(), pos: 0 };
-    }
-
-    const allAchievements = Object.keys(getAchievements()).length;
-    users = query.map((i) => ({ id: i.userId, completion: 0 }));
-
-    users = [...new Set(users)];
-
-    for (const user of users) {
-      if (
-        query.find((u) => u.userId === user.id).user?.Economy?.banned &&
-        dayjs().isBefore(query.find((u) => u.userId === user.id).user.Economy.banned)
-      ) {
-        users.splice(users.indexOf(user), 1);
-        continue;
-      }
-
-      const achievementsForUser = query.filter((i) => i.userId == user.id);
-
-      user.completion = (achievementsForUser.length / allAchievements) * 100;
-    }
-
-    if (users.length > 2000) {
-      users = await workerSort(users, "completion", "desc");
-    } else {
-      inPlaceSort(users).desc((i) => i.completion);
-    }
-
-    await redis.set(
-      `${Constants.redis.cache.economy.COMPLETION_LB}:${guild.id}`,
-      JSON.stringify(users),
-      "EX",
-      600,
-    );
   }
 
   const out = [];
