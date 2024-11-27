@@ -13,7 +13,7 @@ import {
   getDailyLottoTickets,
   setDailyLotteryTickets,
 } from "../utils/functions/economy/lottery";
-import { createUser, userExists } from "../utils/functions/economy/utils";
+import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 
 const cmd = new Command("lottery", "enter the daily lottery draw", "money").setAliases(["lotto"]);
@@ -117,13 +117,17 @@ async function run(
       return send({ embeds: [new ErrorEmbed("invalid number")] });
     }
 
+    if (amount > 100000) {
+      return send({ embeds: [new ErrorEmbed("invalid number")] });
+    }
+
     await setDailyLotteryTickets(message.author.id, amount);
 
     return send({
       embeds: [
         new CustomEmbed(
           message.member,
-          `you will now auto buy **${amount}** lottery tickets daily`,
+          `you will now auto buy **${amount}** lottery tickets daily ($${(amount * getItems()["lottery_ticket"].buy).toLocaleString()})`,
         ),
       ],
     });
