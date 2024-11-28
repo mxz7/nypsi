@@ -95,7 +95,6 @@ async function run(
               Task: true,
               Inventory: true,
               Boosters: true,
-              Game: true,
               Stats: true,
               Crafting: true,
               LotteryTicket: true,
