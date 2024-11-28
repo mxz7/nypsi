@@ -2529,7 +2529,7 @@
       "id:infinity_tag:70",
       "id:unbreaking:90",
       "id:highroller",
-      "id:turbo_upgrade_part:50",
+      "id:turbo_upgrade_part:75",
       "id:wheel_upgrade_part:50",
       "id:double_xp",
       "id:gem_crate:25",
@@ -2559,11 +2559,9 @@
       "id:lucky_cheese",
       "money:100000000",
       "money:69000000:90",
-      "xp:5000",
+      "xp:10000",
       "id:multi_potion",
-      "id:skyline_r34:85",
       "id:lucky_7:95",
-      "id:lamborghini:40",
       "id:reroll_token:20"
     ]
   },
