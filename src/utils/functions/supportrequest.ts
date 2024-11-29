@@ -1,8 +1,12 @@
+import { Attachment, Collection } from "discord.js";
+import { nanoid } from "nanoid";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { NypsiClient } from "../../models/Client";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import Constants from "../Constants";
+import { uploadImage } from "./image";
+import pAll = require("p-all");
 
 export async function getSupportRequestByChannelId(id: string) {
   const query = await prisma.supportRequest.findUnique({
@@ -162,4 +166,36 @@ export async function sendToRequestChannel(id: string, embed: CustomEmbed, clien
   if (!res.includes(true)) return false;
 
   return true;
+}
+
+export async function handleAttachments(attachments: Collection<string, Attachment>) {
+  const urls: string[] = [];
+
+  for (const attachment of attachments.values()) {
+    if (attachment.size > 1e8) return "too big";
+  }
+
+  const promises = [];
+
+  for (const attachment of attachments.values()) {
+    promises.push(async () => {
+      const arrayBuffer = await fetch(attachment.url).then((res) => res.arrayBuffer());
+
+      const key = `support/${nanoid(7)}.${attachment.contentType.split("/")[1]}`;
+
+      const uploadRes = await uploadImage(
+        key,
+        Buffer.from(arrayBuffer),
+        attachment.contentType,
+      ).catch(() => false);
+
+      if (!uploadRes) return false;
+
+      urls.push(`https://cdn.nypsi.xyz/${key}`);
+    });
+  }
+
+  await pAll(promises, { concurrency: 2 });
+
+  return urls;
 }

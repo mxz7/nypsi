@@ -37,6 +37,7 @@ import sleep from "../utils/functions/sleep";
 import {
   createSupportRequest,
   getSupportRequest,
+  handleAttachments,
   sendToRequestChannel,
 } from "../utils/functions/supportrequest";
 import { createAuraTransaction } from "../utils/functions/users/aura";
@@ -219,8 +220,15 @@ export default async function messageCreate(message: Message) {
         embed.setDescription(message.content);
       }
 
-      if (message.attachments.first()) {
-        embed.setImage(message.attachments.first().url);
+      if (message.attachments.size > 0) {
+        const attachments = await handleAttachments(message.attachments);
+
+        if (attachments === "too big")
+          return message.channel.send({
+            embeds: [new ErrorEmbed("cannot upload file larger than 100mb")],
+          });
+
+        embed.addField("attachments", attachments.join("\n"));
       }
 
       const res = await sendToRequestChannel(

@@ -166,6 +166,8 @@ export async function uploadImage(id: string, buffer: Buffer, ContentType: strin
   ]);
 
   await redis.set(`${Constants.redis.cache.IMAGE}:${id}`, "y", "EX", 86400);
+
+  return true;
 }
 
 export async function deleteImage(id: string) {
