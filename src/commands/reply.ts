@@ -4,6 +4,7 @@ import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Comman
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import {
   getSupportRequestByChannelId,
+  handleAttachments,
   sendToRequestChannel,
 } from "../utils/functions/supportrequest";
 import { addNotificationToQueue } from "../utils/functions/users/notifications";
@@ -33,8 +34,15 @@ async function run(
     embed.setDescription(args.join(" "));
   }
 
-  if (message.attachments.first()) {
-    embed.setImage(message.attachments.first().url);
+  if (message.attachments.size > 0) {
+    const attachments = await handleAttachments(message.attachments);
+
+    if (attachments === "too big")
+      return message.channel.send({
+        embeds: [new ErrorEmbed("cannot upload file larger than 100mb")],
+      });
+
+    embed.addField("attachments", attachments.join("\n"));
   }
 
   Promise.all([
