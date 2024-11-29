@@ -1,6 +1,7 @@
 import * as Cluster from "discord-hybrid-sharding";
 import { ClusterManager } from "discord-hybrid-sharding";
 import "dotenv/config";
+import { loadavg } from "os";
 import { clearInterval } from "timers";
 import redis from "./init/redis";
 import { loadJobs, runJob } from "./scheduled/scheduler";
@@ -171,11 +172,15 @@ export async function checkStatus() {
     maintenance: boolean;
     uptime: number;
     clusters: { online: boolean; responsive: boolean; id: number }[];
+    load: string;
   } = {
     main: true,
     maintenance: (await redis.get("nypsi:maintenance")) == "t",
     clusters: [],
     uptime: Math.floor(process.uptime() * 1000),
+    load: loadavg()
+      .map((i) => i.toFixed(2))
+      .join(" "),
   };
 
   const promises = [];
