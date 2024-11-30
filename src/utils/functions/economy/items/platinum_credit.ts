@@ -9,7 +9,6 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
-import { NypsiClient } from "../../../../models/Client";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
@@ -85,9 +84,9 @@ module.exports = new ItemUse(
         embeds: [
           new CustomEmbed(
             message.member,
-            `your **platinum** membership will now expire <t:${Math.floor(
-              profile.expireDate.getTime() / 1000,
-            )}:R>`,
+            `your **platinum** membership will now expire <t:${dayjs(profile.expireDate)
+              .add(profile.credits + 7, "day")
+              .unix()}:R>`,
           ),
         ],
       });

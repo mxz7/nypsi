@@ -82,9 +82,9 @@ module.exports = new ItemUse(
         embeds: [
           new CustomEmbed(
             message.member,
-            `your bronze membership will now expire <t:${Math.floor(
-              profile.expireDate.getTime() / 1000,
-            )}:R>`,
+            `your bronze membership will now expire <t:${dayjs(profile.expireDate)
+              .add(profile.credits + 7, "day")
+              .unix()}:R>`,
           ),
         ],
       });
