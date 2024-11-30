@@ -289,26 +289,28 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
     });
   }
 
-  if (typeof parseFloat(autoStop) === "number") {
-    if (parseFloat(autoStop) <= 1)
-      return modalInteraction.reply({
-        ephemeral: true,
-        embeds: [new ErrorEmbed("your autostop must be higher than 1")],
-      });
+  if (autoStop) {
+    if (typeof parseFloat(autoStop) === "number") {
+      if (parseFloat(autoStop) <= 1)
+        return modalInteraction.reply({
+          ephemeral: true,
+          embeds: [new ErrorEmbed("your autostop must be higher than 1")],
+        });
 
-    if (parseFloat(autoStop) > 100) {
+      if (parseFloat(autoStop) > 100) {
+        return modalInteraction.reply({
+          ephemeral: true,
+          embeds: [new ErrorEmbed("invalid autostop")],
+        });
+      }
+    }
+
+    if (isNaN(parseFloat(autoStop))) {
       return modalInteraction.reply({
         ephemeral: true,
         embeds: [new ErrorEmbed("invalid autostop")],
       });
     }
-  }
-
-  if (isNaN(parseFloat(autoStop))) {
-    return modalInteraction.reply({
-      ephemeral: true,
-      embeds: [new ErrorEmbed("invalid autostop")],
-    });
   }
 
   removeBalance(interaction.user.id, bet);
