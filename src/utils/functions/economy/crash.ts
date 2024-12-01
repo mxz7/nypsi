@@ -18,7 +18,7 @@ import { CustomEmbed, ErrorEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { a } from "../anticheat";
-import { isLockedOut, verifyUser } from "../captcha";
+import { giveCaptcha, isLockedOut, verifyUser } from "../captcha";
 import { percentChance } from "../random";
 import sleep from "../sleep";
 import { addBalance, calcMaxBet, getBalance, getGambleMulti, removeBalance } from "./balance";
@@ -226,6 +226,8 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
     message.author = interaction.user;
     message.content = "crash";
     return verifyUser(message);
+  } else if (percentChance(2)) {
+    giveCaptcha(interaction.user.id);
   }
 
   await interaction.showModal(modal);
