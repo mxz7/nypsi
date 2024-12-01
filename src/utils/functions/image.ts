@@ -1,6 +1,6 @@
 import { DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { Image, ImageSuggestion } from "@prisma/client";
-import { User, WebhookClient } from "discord.js";
+import { User } from "discord.js";
 import { parse } from "twemoji-parser";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
@@ -10,8 +10,6 @@ import { logger } from "../logger";
 import { addProgress } from "./economy/achievements";
 import { userExists } from "./economy/utils";
 import { addNotificationToQueue } from "./users/notifications";
-
-let hook: WebhookClient;
 
 export function isImageUrl(url: string): boolean {
   return /\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(url);
