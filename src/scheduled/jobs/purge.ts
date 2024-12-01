@@ -2,6 +2,7 @@ import dayjs = require("dayjs");
 import { readFile, readdir, unlink } from "fs/promises";
 import prisma from "../../init/database";
 import { Job } from "../../types/Jobs";
+import { deleteImage } from "../../utils/functions/image";
 
 export default {
   name: "purge",
@@ -87,5 +88,21 @@ export default {
     });
 
     if (views.count > 0) log(`${views.count.toLocaleString()} monthly views purged`);
+
+    const supportImages = await prisma.images.findMany({
+      where: {
+        AND: [
+          { id: { startsWith: "support/" } },
+          { createdAt: { lt: dayjs().subtract(180, "day").toDate() } },
+        ],
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    for (const image of supportImages) {
+      await deleteImage(image.id);
+    }
   },
 } satisfies Job;
