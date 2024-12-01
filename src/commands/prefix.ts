@@ -29,7 +29,7 @@ async function run(
         prefix.map((i) => "`" + i + "`").join("\n") +
         `\n\n${prefix[0]}**prefix add <prefix>** *add a prefix*\n` +
         `${prefix[0]}**prefix del <prefix>** *remove a prefix*`,
-    ).setHeader("prefix");
+    ).setHeader("prefix", message.guild.iconURL());
 
     return message.channel.send({ embeds: [embed] });
   }
