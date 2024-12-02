@@ -14,8 +14,8 @@ export async function getApproximatPrizePool() {
   const value = Number(tickets._sum.amount) * getItems()["lottery_ticket"].buy;
 
   return {
-    min: Math.floor(value / 1_000_000_000) * 1_000_000_000,
-    max: Math.ceil(value / 1_000_000_000) * 1_000_000_000,
+    min: Math.floor(value / 75_000_000) * 75_000_000,
+    max: Math.ceil(value / 75_000_000) * 75_000_000,
   };
 }
 
