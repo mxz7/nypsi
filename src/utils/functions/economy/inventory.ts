@@ -791,6 +791,8 @@ export async function calcItemValue(item: string) {
   if (
     getItems()[item].buy ||
     item === "cookie" ||
+    item === "bitcoin" ||
+    item === "ethereum" ||
     ["prey", "fish", "sellable", "ore"].includes(getItems()[item].role)
   ) {
     itemValue = getItems()[item].sell || 1000;
