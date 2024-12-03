@@ -15,7 +15,7 @@
     "@aws-sdk/client-s3": "^3.701.0",
     "@catppuccin/palette": "1.7.1",
     "@discordjs/rest": "2.4.0",
-    "@prisma/client": "6.0.0",
+    "@prisma/client": "6.0.1",
     "@top-gg/sdk": "3.1.6",
     "@zeyrbot/urbandictionary": "^1.0.3",
     "bee-queue": "^1.7.1",
@@ -58,7 +58,7 @@
     "eslint-plugin-deprecation": "3.0.0",
     "jest": "^29.7.0",
     "prettier": "3.4.1",
-    "prisma": "6.0.0",
+    "prisma": "6.0.1",
     "typescript": "5.6.3"
   },
   "repository": {
