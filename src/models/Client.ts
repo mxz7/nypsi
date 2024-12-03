@@ -153,6 +153,8 @@ export class NypsiClient extends Client {
         }
       });
 
+      logger.info("listeners loaded");
+
       setTimeout(async () => {
         this.runIntervals();
       }, 60000);
