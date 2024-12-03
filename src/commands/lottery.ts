@@ -13,7 +13,12 @@ import {
   getDailyLottoTickets,
   setDailyLotteryTickets,
 } from "../utils/functions/economy/lottery";
-import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
+import {
+  createUser,
+  formatNumberPretty,
+  getItems,
+  userExists,
+} from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 
 const cmd = new Command("lottery", "enter the daily lottery draw", "money").setAliases(["lotto"]);
@@ -86,7 +91,7 @@ async function run(
         .add(1, "day")
         .startOf("day")
         .unix()}:R>\n\n` +
-        `current prize pool is $${pool.min.toLocaleString()} - $${pool.max.toLocaleString()}\n\n` +
+        `current prize pool is $**${formatNumberPretty(pool.min)}** - $**${formatNumberPretty(pool.max)}**\n\n` +
         `you can buy lottery tickets with ${(await getPrefix(message.guild))[0]}**buy lotto**\nyou have **${tickets.toLocaleString()}** tickets${typeof autoBuy === "number" ? `, auto buying ${autoBuy} tickets daily` : ""}`,
     );
 
