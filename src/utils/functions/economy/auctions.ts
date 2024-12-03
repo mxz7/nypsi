@@ -124,9 +124,9 @@ export async function createAuction(
 
   embed.setDescription(
     `started <t:${Math.floor(Date.now() / 1000)}:R>\n\n` +
-      `**${itemAmount.toLocaleString()}x** ${items[itemId].emoji} ${
+      `**${itemAmount.toLocaleString()}x** ${items[itemId].emoji} [${
         items[itemId].name
-      } for $**${bin.toLocaleString()}**`,
+      }](https://nypsi.xyz/item/${itemId}) for $**${bin.toLocaleString()}**`,
   );
 
   if (itemAmount > 1 && bin > 69_420) {
@@ -245,9 +245,9 @@ export async function bumpAuction(id: number, client: NypsiClient) {
 
   embed.setDescription(
     `started <t:${Math.floor(query.createdAt.getTime() / 1000)}:R>\n\n` +
-      `**${query.itemAmount.toLocaleString()}x** ${items[query.itemId].emoji} ${
+      `**${query.itemAmount.toLocaleString()}x** ${items[query.itemId].emoji} [${
         items[query.itemId].name
-      } for $**${query.bin.toLocaleString()}**`,
+      }](https://nypsi.xyz/item/${query.itemId}) for $**${query.bin.toLocaleString()}**`,
   );
 
   if (query.itemAmount > 1 && query.bin > 69_420) {
@@ -471,9 +471,9 @@ async function checkWatchers(
       embed: new CustomEmbed()
         .setColor(Constants.TRANSPARENT_EMBED_COLOR)
         .setDescription(
-          `an auction has started for ${getItems()[itemName].emoji} **${
+          `an auction has started for ${getItems()[itemName].emoji} [**${
             getItems()[itemName].name
-          }**`,
+          }**](https://nypsi.xyz/item/${itemName})`,
         ),
       components: new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setStyle(ButtonStyle.Link).setURL(messageUrl).setLabel("jump"),
