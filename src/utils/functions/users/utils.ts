@@ -338,7 +338,9 @@ export async function dataDelete(userId: string) {
     })
     .catch(() => null);
 
-  exec(`redis-cli KEYS "*${userId}*" | xargs redis-cli DEL`);
-
   logger.info(`data deleted for ${userId}`);
+
+  return new Promise((resolve) => {
+    exec(`redis-cli KEYS "*${userId}*" | xargs redis-cli DEL`, () => resolve(0));
+  });
 }
