@@ -134,9 +134,6 @@ export async function updateUser(user: User, command: string) {
   }
 
   await prisma.user.update({
-    select: {
-      id: true,
-    },
     where: {
       id: user.id,
     },
