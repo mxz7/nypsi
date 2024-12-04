@@ -208,5 +208,11 @@
     "name": "animal lover",
     "description": "found in the animal lover achievement",
     "emoji": "😻"
+  },
+  "whore": {
+    "id": "whore",
+    "name": "whore",
+    "description": "found in the whore achievement",
+    "emoji": "🍑"
   }
 }
