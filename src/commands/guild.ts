@@ -116,6 +116,9 @@ cmd.slashData
         option.setName("text").setDescription("text for the motd").setRequired(true),
       ),
   )
+  .addSubcommand((avatar) =>
+    avatar.setName("avatar").setDescription("set the avatar for the guild"),
+  )
   .addSubcommand((view) =>
     view
       .setName("view")
@@ -1082,6 +1085,7 @@ async function run(
         `${prefix}**guild buy** *buy guild upgrades with tokens*\n` +
         `${prefix}**guild upgrade** *show requirements for next upgrade*\n` +
         `${prefix}**guild motd <motd>** *set guild motd*\n` +
+        `${prefix}**guild avatar** *set the guild avatar*\n` +
         `${prefix}**top guild** *view top guilds on nypsi*\n` +
         `${prefix}**guild (name)** *show guild info*`,
     );
