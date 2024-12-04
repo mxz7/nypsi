@@ -1,13 +1,22 @@
 import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
+import redis from "../../../init/redis";
+import Constants from "../../Constants";
 import { addInventoryItem } from "./inventory";
 import { getPlantsData } from "./utils";
 import dayjs = require("dayjs");
+import ms = require("ms");
 
 export async function getFarm(member: GuildMember | string) {
   let id: string;
   if (typeof member === "string") id = member;
   else id = member.user.id;
+
+  const cache = await redis.get(`${Constants.redis.cache.economy.farm}:${id}`);
+
+  if (cache) {
+    return JSON.parse(cache);
+  }
 
   const query = await prisma.farm.findMany({
     where: {
@@ -17,6 +26,13 @@ export async function getFarm(member: GuildMember | string) {
       id: "asc",
     },
   });
+
+  await redis.set(
+    `${Constants.redis.cache.economy.farm}:${id}`,
+    JSON.stringify(query),
+    "EX",
+    Math.floor(ms("3 hour") / 1000),
+  );
 
   return query;
 }
@@ -29,6 +45,7 @@ export async function addFarm(member: GuildMember | string, plantId: string, amo
   await prisma.farm.createMany({
     data: new Array(amount).fill({ userId: id, plantId }),
   });
+  await redis.del(`${Constants.redis.cache.economy.farm}:${id}`);
 }
 
 export async function getClaimable(member: GuildMember | string, plantId: string, claim: boolean) {
@@ -60,6 +77,8 @@ export async function getClaimable(member: GuildMember | string, plantId: string
         harvestedAt: new Date(),
       },
     });
+
+    await redis.del(`${Constants.redis.cache.economy.farm}:${id}`);
   }
 
   let items = 0;
