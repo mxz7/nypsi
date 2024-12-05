@@ -249,11 +249,22 @@ async function run(
 
     const res = await waterFarm(message.author.id);
 
+    if (res.count === 0) {
+      return send({
+        embeds: [
+          new ErrorEmbed(
+            "none of your plants need water" +
+              (res?.dead > 0 ? `\n\n${res.dead} of your plants have died` : ""),
+          ),
+        ],
+      });
+    }
+
     return send({
       embeds: [
         new CustomEmbed(
           message.member,
-          "✅ you have watered your farm" +
+          `✅ you have watered ${res.count} plants` +
             (res?.dead > 0 ? `\n\n${res.dead} of your plants have died` : ""),
         ),
       ],

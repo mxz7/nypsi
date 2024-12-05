@@ -151,9 +151,22 @@ async function checkDead(userId: string, plantId?: string) {
 export async function waterFarm(userId: string) {
   const dead = await checkDead(userId);
 
+  const farm = await getFarm(userId);
+
+  const toWater: number[] = [];
+
+  for (const plant of farm) {
+    if (
+      plant.wateredAt.valueOf() <
+      Date.now() - getPlantsData()[plant.plantId].water.every * 1000
+    ) {
+      toWater.push(plant.id);
+    }
+  }
+
   await prisma.farm.updateMany({
     where: {
-      userId,
+      id: { in: toWater },
     },
     data: {
       wateredAt: new Date(),
@@ -161,7 +174,7 @@ export async function waterFarm(userId: string) {
   });
   await redis.del(`${Constants.redis.cache.economy.farm}:${userId}`);
 
-  if (dead) return { dead };
+  return { count: toWater.length, dead };
 }
 
 export async function fertiliseFarm(
