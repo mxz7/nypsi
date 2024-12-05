@@ -24,7 +24,7 @@ import { b, c } from "../utils/functions/anticheat";
 import { giveCaptcha } from "../utils/functions/captcha";
 import { updateBalance, updateBankBalance } from "../utils/functions/economy/balance";
 import { initCrashGame } from "../utils/functions/economy/crash";
-import { setInventoryItem } from "../utils/functions/economy/inventory";
+import { addInventoryItem, setInventoryItem } from "../utils/functions/economy/inventory";
 import { setLevel, setPrestige } from "../utils/functions/economy/levelling";
 import { getEcoBanTime, getItems, isEcoBanned, setEcoBan } from "../utils/functions/economy/utils";
 import { updateXp } from "../utils/functions/economy/xp";
@@ -1630,6 +1630,19 @@ async function run(
     if (message.author.id !== Constants.TEKOH_ID) return;
     await redis.del(Constants.redis.nypsi.CRASH_STATUS);
     await initCrashGame(message.client as NypsiClient);
+  } else if (args[0].toLowerCase() === "temp") {
+    if (message.author.id !== Constants.TEKOH_ID) return;
+
+    const users = await prisma.farm.groupBy({
+      by: "userId",
+      _count: {
+        _all: true,
+      },
+    });
+
+    for (const user of users) {
+      await addInventoryItem(user.userId, "fertiliser", user._count._all * 2);
+    }
   }
 }
 
