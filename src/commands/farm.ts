@@ -133,11 +133,14 @@ async function run(
           } else if (
             i.fertilisedAt.valueOf() <
               dayjs()
-                .subtract(getPlantsData()[plantId].fertilise.every, "seconds")
+                .subtract(getPlantsData()[plantId].fertilise.every * 1.5, "seconds")
                 .toDate()
                 .valueOf() ||
             i.wateredAt.valueOf() <
-              dayjs().subtract(getPlantsData()[plantId].water.every, "seconds").toDate().valueOf()
+              dayjs()
+                .subtract(getPlantsData()[plantId].water.every * 1.5, "seconds")
+                .toDate()
+                .valueOf()
           ) {
             unhealthy++;
           } else if (growTime > 0) {

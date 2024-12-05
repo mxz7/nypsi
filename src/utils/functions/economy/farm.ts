@@ -80,8 +80,20 @@ export async function getClaimable(member: GuildMember | string, plantId: string
         { plantId },
         { plantedAt: { lt: dayjs().subtract(plantData.growthTime, "seconds").toDate() } },
         { harvestedAt: { lt: dayjs().subtract(1, "hour").toDate() } },
-        { wateredAt: { gt: dayjs().subtract(plantData.water.every, "seconds").toDate() } },
-        { fertilisedAt: { gt: dayjs().subtract(plantData.fertilise.every, "seconds").toDate() } },
+        {
+          wateredAt: {
+            gt: dayjs()
+              .subtract(plantData.water.every * 1.5, "seconds")
+              .toDate(),
+          },
+        },
+        {
+          fertilisedAt: {
+            gt: dayjs()
+              .subtract(plantData.fertilise.every * 1.5, "seconds")
+              .toDate(),
+          },
+        },
       ],
     },
   });
