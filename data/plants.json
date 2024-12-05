@@ -56,7 +56,7 @@
     "growthTime": 604800,
     "hourly": 1.15,
     "max": 10,
-    "item": "strawberry bush",
+    "item": "strawberry",
     "type": "bush",
     "water": {
       "every": 259200,
