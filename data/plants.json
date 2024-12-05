@@ -54,7 +54,7 @@
     "id": "strawberry_bush",
     "name": "strawberry bush",
     "growthTime": 604800,
-    "hourly": 1.1,
+    "hourly": 1.15,
     "max": 10,
     "item": "strawberry bush",
     "type": "bush",
