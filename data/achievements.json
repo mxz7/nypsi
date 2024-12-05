@@ -1399,5 +1399,45 @@
     "target": 100,
     "description": "upload 100 animal images (https://animals.maxz.dev)",
     "prize": ["lucky_scratch_card:1", "nypsi_crate:1", "tag:animal_lover"]
+  },
+  "green_fingers_i": {
+    "id": "green_fingers_i",
+    "name": "green fingers **I**",
+    "emoji": "🌱",
+    "target": 1000,
+    "description": "harvest 1,000 items from your farm",
+    "prize": ["lucky_scratch_card:1"]
+  },
+  "green_fingers_ii": {
+    "id": "green_fingers_ii",
+    "name": "green fingers **II**",
+    "emoji": "🌱",
+    "target": 10000,
+    "description": "harvest 10,000 items from your farm",
+    "prize": ["lucky_scratch_card:2"]
+  },
+  "green_fingers_iii": {
+    "id": "green_fingers_iii",
+    "name": "green fingers **III**",
+    "emoji": "🌱",
+    "target": 100000,
+    "description": "harvest 100,000 items from your farm",
+    "prize": ["lucky_scratch_card:3"]
+  },
+  "green_fingers_iv": {
+    "id": "green_fingers_iv",
+    "name": "green fingers **IV**",
+    "emoji": "🌱",
+    "target": 500000,
+    "description": "harvest 500,000 items from your farm",
+    "prize": ["lucky_scratch_card:4", "nypsi_crate:1"]
+  },
+  "green_fingers_v": {
+    "id": "green_fingers_v",
+    "name": "green fingers **V**",
+    "emoji": "🌱",
+    "target": 1000000,
+    "description": "harvest 1,000,000 items from your farm",
+    "prize": ["lucky_scratch_card:4", "omega_crate:1", "tag:farmer"]
   }
 }

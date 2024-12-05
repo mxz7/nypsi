@@ -3,10 +3,18 @@
     "id": "banana_tree",
     "name": "banana tree",
     "growthTime": 172800,
-    "hourly": 1,
+    "hourly": 0.75,
     "max": 6,
     "item": "banana",
-    "type": "tree"
+    "type": "tree",
+    "water": {
+      "every": 86400,
+      "die": 604800
+    },
+    "fertilise": {
+      "every": 604800,
+      "dead": 2.628e6
+    }
   },
   "apple_tree": {
     "id": "apple_tree",
@@ -15,6 +23,48 @@
     "hourly": 0.5,
     "max": 4,
     "item": "apple",
-    "type": "tree"
+    "type": "tree",
+    "water": {
+      "every": 172800,
+      "die": 604800
+    },
+    "fertilise": {
+      "every": 604800,
+      "dead": 2.628e6
+    }
+  },
+  "orange_tree": {
+    "id": "orange_tree",
+    "name": "orange tree",
+    "growthTime": 345600,
+    "hourly": 0.75,
+    "max": 3,
+    "item": "orange",
+    "type": "tree",
+    "water": {
+      "every": 172800,
+      "die": 604800
+    },
+    "fertilise": {
+      "every": 604800,
+      "dead": 2.628e6
+    }
+  },
+  "strawberry_bush": {
+    "id": "strawberry_bush",
+    "name": "strawberry bush",
+    "growthTime": 604800,
+    "hourly": 1.15,
+    "max": 10,
+    "item": "strawberry bush",
+    "type": "bush",
+    "water": {
+      "every": 259200,
+      "die": 1.21e6
+    },
+    "fertilise": {
+      "every": 1.21e6,
+      "dead": 2.628e6
+    }
   }
 }

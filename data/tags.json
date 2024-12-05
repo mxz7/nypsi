@@ -214,5 +214,11 @@
     "name": "whore",
     "description": "found in the whore achievement",
     "emoji": "🍑"
+  },
+  "farmer": {
+    "id": "farmer",
+    "name": "farmer",
+    "description": "found in the green fingers achievement",
+    "emoji": "🌱"
   }
 }
