@@ -247,7 +247,7 @@ export async function bumpAuction(id: number, client: NypsiClient) {
     `started <t:${Math.floor(query.createdAt.getTime() / 1000)}:R>\n\n` +
       `**${query.itemAmount.toLocaleString()}x** ${items[query.itemId].emoji} **[${
         items[query.itemId].name
-      }]**(https://nypsi.xyz/item/${query.itemId}) for $**${query.bin.toLocaleString()}**`,
+      }](https://nypsi.xyz/item/${query.itemId})** for $**${query.bin.toLocaleString()}**`,
   );
 
   if (query.itemAmount > 1 && query.bin > 69_420) {
@@ -262,7 +262,14 @@ export async function bumpAuction(id: number, client: NypsiClient) {
     new ButtonBuilder().setCustomId("b").setLabel("buy").setStyle(ButtonStyle.Success),
   );
 
-  if (query.itemAmount > 1)
+  if (query.itemAmount >= 10)
+    buttonRow.addComponents(
+      new ButtonBuilder()
+        .setCustomId("b-multi")
+        .setLabel("buy multiple")
+        .setStyle(ButtonStyle.Secondary),
+    );
+  else if (query.itemAmount > 1)
     buttonRow.addComponents(
       new ButtonBuilder().setCustomId("b-one").setLabel("buy one").setStyle(ButtonStyle.Secondary),
     );
