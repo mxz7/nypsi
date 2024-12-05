@@ -3157,5 +3157,34 @@
     "sell": 10000,
     "in_crates": true,
     "aliases": ["fert", "fertilizer"]
+  },
+  "strawberry": {
+    "id": "strawberry",
+    "name": "strawberry",
+    "article": "a",
+    "plural": "strawberries",
+    "emoji": "🍓",
+    "longDesc": "sweet treat",
+    "aliases": ["berry"],
+    "rarity": 0,
+    "role": "sellable",
+    "buy": 0,
+    "sell": 20000,
+    "in_crates": false
+  },
+  "strawberry_seed": {
+    "id": "strawberry_seed",
+    "name": "strawberry bush seed",
+    "article": "a",
+    "plural": "strawberry bush seeds",
+    "emoji": "<:nypsi_apple_tree_seeds:1261357859891843132>",
+    "longDesc": "plant to grow a strawberry bush",
+    "rarity": 4,
+    "role": "seed",
+    "plantId": "strawberry_bush",
+    "buy": 0,
+    "sell": 50000,
+    "in_crates": true,
+    "aliases": ["sbush"]
   }
 }
