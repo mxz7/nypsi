@@ -23,6 +23,9 @@ importers:
       '@top-gg/sdk':
         specifier: 3.1.6
         version: 3.1.6
+      '@twemoji/parser':
+        specifier: ^15.1.1
+        version: 15.1.1
       '@zeyrbot/urbandictionary':
         specifier: ^1.0.3
         version: 1.0.3
@@ -86,9 +89,6 @@ importers:
       string-similarity:
         specifier: 4.0.4
         version: 4.0.4
-      twemoji-parser:
-        specifier: 14.0.0
-        version: 14.0.0
     devDependencies:
       '@types/crypto-js':
         specifier: 4.2.2
@@ -117,9 +117,6 @@ importers:
       '@types/string-similarity':
         specifier: 4.0.2
         version: 4.0.2
-      '@types/twemoji-parser':
-        specifier: 13.1.4
-        version: 13.1.4
       '@types/urban-dictionary':
         specifier: 3.0.2
         version: 3.0.2
@@ -1028,6 +1025,9 @@ packages:
   '@top-gg/sdk@3.1.6':
     resolution: {integrity: sha512-qWWYDKAwJHaKaA/5EyLYMzfR76MwCbmKVMSXTPMd9FZFPHuLWJHO+m7Q8dWpWtcnunHa6evRAwlB3p83cht7Ww==}
 
+  '@twemoji/parser@15.1.1':
+    resolution: {integrity: sha512-CChRzIu6ngkCJOmURBlYEdX5DZSu+bBTtqR60XjBkFrmvplKW7OQsea+i8XwF4bLVlUXBO7ZmHhRPDzfQyLwwg==}
+
   '@types/babel__core@7.20.5':
     resolution: {integrity: sha512-qoQprZvz5wQFJwMDqeseRXWv3rqMvhgpbXFfVyWhbx9X47POIA6i/+dXefEmZKoAgOaTdaIgNSMqMIU61yRyzA==}
 
@@ -1117,9 +1117,6 @@ packages:
 
   '@types/string-similarity@4.0.2':
     resolution: {integrity: sha512-LkJQ/jsXtCVMK+sKYAmX/8zEq+/46f1PTQw7YtmQwb74jemS1SlNLmARM2Zml9DgdDTWKAtc5L13WorpHPDjDA==}
-
-  '@types/twemoji-parser@13.1.4':
-    resolution: {integrity: sha512-pDZcn6irxV/CD8C9cAEyZeECKFGZud8R5Zvs9PLO+5361GXu8khZ2peEwidMwq1dqYFSAbSQCUNkWDl87DsX2g==}
 
   '@types/urban-dictionary@3.0.2':
     resolution: {integrity: sha512-JRzGHobtpGu8fepWfoxKgiquPkaOxAKp60xDpyjgJS7RVqVMnVg27Xz7kIllH2n4zyB+HWUhdoeZkTLPBN8vLg==}
@@ -2872,9 +2869,6 @@ packages:
     peerDependencies:
       typescript: '>=2.8.0 || >= 3.2.0-dev || >= 3.3.0-dev || >= 3.4.0-dev || >= 3.5.0-dev || >= 3.6.0-dev || >= 3.6.0-beta || >= 3.7.0-dev || >= 3.7.0-beta'
 
-  twemoji-parser@14.0.0:
-    resolution: {integrity: sha512-9DUOTGLOWs0pFWnh1p6NF+C3CkQ96PWmEFwhOVmT3WbecRC+68AIqpsnJXygfkFcp4aXbOp8Dwbhh/HQgvoRxA==}
-
   type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
     engines: {node: '>= 0.8.0'}
@@ -4512,6 +4506,8 @@ snapshots:
       raw-body: 2.5.2
       undici: 5.28.4
 
+  '@twemoji/parser@15.1.1': {}
+
   '@types/babel__core@7.20.5':
     dependencies:
       '@babel/parser': 7.24.7
@@ -4617,8 +4613,6 @@ snapshots:
   '@types/stack-utils@2.0.3': {}
 
   '@types/string-similarity@4.0.2': {}
-
-  '@types/twemoji-parser@13.1.4': {}
 
   '@types/urban-dictionary@3.0.2': {}
 
@@ -6680,8 +6674,6 @@ snapshots:
     dependencies:
       tslib: 1.14.1
       typescript: 5.6.3
-
-  twemoji-parser@14.0.0: {}
 
   type-check@0.4.0:
     dependencies:

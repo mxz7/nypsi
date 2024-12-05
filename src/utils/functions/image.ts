@@ -1,7 +1,7 @@
 import { DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { Image, ImageSuggestion } from "@prisma/client";
+import { parse } from "@twemoji/parser";
 import { User } from "discord.js";
-import { parse } from "twemoji-parser";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import s3 from "../../init/s3";
@@ -127,10 +127,7 @@ export function getEmojiImage(emoji: string) {
     }
   } else {
     try {
-      image = parse(emoji, { assetType: "png" })[0].url.replace(
-        "https://twemoji.maxcdn.com/v/latest/",
-        "https://jdecked.github.io/twemoji/v/latest/",
-      );
+      image = parse(emoji, { assetType: "png" })[0].url;
     } catch {
       /* happy linter */
     }
