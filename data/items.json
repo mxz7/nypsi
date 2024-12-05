@@ -883,7 +883,9 @@
       "id:bob:80",
       "id:stolen_credit_card",
       "id:banana_seed:10",
-      "id:apple_seed:7"
+      "id:apple_seed:7",
+      "id:strawberry_seed:10",
+      "id:orange_seed:15"
     ]
   },
   "calendar": {
@@ -2563,7 +2565,9 @@
       "xp:10000",
       "id:multi_potion",
       "id:lucky_7:95",
-      "id:reroll_token:20"
+      "id:reroll_token:20",
+      "id:apple_seed:50",
+      "id:strawberry_seed:50"
     ]
   },
   "infinity_tag": {
