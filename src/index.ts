@@ -6,7 +6,7 @@ import { clearInterval } from "timers";
 import redis from "./init/redis";
 import { loadJobs, runJob } from "./scheduled/scheduler";
 import Constants from "./utils/Constants";
-import { loadItems } from "./utils/functions/economy/utils";
+import { loadItems, runEconomySetup } from "./utils/functions/economy/utils";
 import { addFailedHeartbeat, sendHeartbeat } from "./utils/functions/heartbeat";
 import { updateStats } from "./utils/functions/topgg";
 import { getVersion } from "./utils/functions/version";
@@ -100,6 +100,7 @@ listen(manager);
 setTimeout(async () => {
   handleDmQueue(manager);
   startMentionInterval();
+  runEconomySetup();
 }, 300000);
 // }, 15000);
 
