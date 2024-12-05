@@ -3,6 +3,7 @@ import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
+import { addProgress } from "./achievements";
 import { addInventoryItem, getInventory, setInventoryItem } from "./inventory";
 import { getPlantsData } from "./utils";
 import dayjs = require("dayjs");
@@ -113,7 +114,10 @@ export async function getClaimable(member: GuildMember | string, plantId: string
 
   items = Math.floor(items);
 
-  if (claim && items > 0) await addInventoryItem(id, plantData.item, items);
+  if (claim && items > 0) {
+    await addInventoryItem(id, plantData.item, items);
+    addProgress(id, "green_fingers", items);
+  }
 
   return items;
 }
