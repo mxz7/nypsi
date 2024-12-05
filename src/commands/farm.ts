@@ -11,7 +11,13 @@ import {
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { getClaimable, getFarm } from "../utils/functions/economy/farm";
+import {
+  deletePlant,
+  fertiliseFarm,
+  getClaimable,
+  getFarm,
+  waterFarm,
+} from "../utils/functions/economy/farm";
 import { createUser, getItems, getPlantsData, userExists } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import _ = require("lodash");
@@ -24,6 +30,10 @@ cmd.slashData
   .addSubcommand((view) => view.setName("view").setDescription("view your farms"))
   .addSubcommand((claim) =>
     claim.setName("harvest").setDescription("harvest everything from your farm"),
+  )
+  .addSubcommand((water) => water.setName("water").setDescription("water your plants"))
+  .addSubcommand((fertilise) =>
+    fertilise.setName("fertilise").setDescription("fertilise your plants"),
   );
 
 async function run(
@@ -100,14 +110,37 @@ async function run(
 
       let growing = 0;
       let healthy = 0;
+      let unhealthy = 0;
+      let dead = 0;
 
       let nextGrow = Number.MAX_SAFE_INTEGER;
       const plants = farms.filter((i) => {
         if (i.plantId === plantId) {
           const growTime =
-            i.plantedAt.getTime() + getPlantsData()[plantId].growthTime * 1000 - Date.now();
+            i.plantedAt.valueOf() + getPlantsData()[plantId].growthTime * 1000 - Date.now();
 
-          if (growTime > 0) {
+          if (
+            i.fertilisedAt.valueOf() <
+              dayjs()
+                .subtract(getPlantsData()[plantId].fertilise.dead, "seconds")
+                .toDate()
+                .valueOf() ||
+            i.wateredAt.valueOf() <
+              dayjs().subtract(getPlantsData()[plantId].water.dead, "seconds").toDate().valueOf()
+          ) {
+            dead++;
+            deletePlant(i.id);
+          } else if (
+            i.fertilisedAt.valueOf() <
+              dayjs()
+                .subtract(getPlantsData()[plantId].fertilise.every, "seconds")
+                .toDate()
+                .valueOf() ||
+            i.wateredAt.valueOf() <
+              dayjs().subtract(getPlantsData()[plantId].water.every, "seconds").toDate().valueOf()
+          ) {
+            unhealthy++;
+          } else if (growTime > 0) {
             growing++;
             if (growTime < nextGrow) nextGrow = growTime;
           } else {
@@ -128,6 +161,8 @@ async function run(
               ? `${growing.toLocaleString()} growing (next <t:${dayjs().add(nextGrow, "milliseconds").unix()}:R>)\n`
               : ""
           }` +
+          `${dead > 0 ? `${dead.toLocaleString()} dead\n` : ""}` +
+          `${unhealthy > 0 ? `${unhealthy.toLocaleString()} unhealthy\n` : ""}` +
           `${healthy > 0 ? `${healthy.toLocaleString()} healthy\n` : ""}` +
           `${ready > 0 ? `\n\`${ready.toLocaleString()}x\` ${getItems()[getPlantsData()[plantId].item].emoji} ${getItems()[getPlantsData()[plantId].item].name} ready for harvest` : ""}`,
       );
@@ -207,6 +242,64 @@ async function run(
     );
 
     return send({ embeds: [embed] });
+  } else if (args[0].toLowerCase() === "water") {
+    if (farms.length === 0) return send({ embeds: [new ErrorEmbed("you have no plants")] });
+
+    if (await onCooldown(cmd.name + "_water", message.member)) {
+      return send({ embeds: [new ErrorEmbed("you have already watered your farm recently")] });
+    }
+
+    await addCooldown(cmd.name + "_water", message.member, 3600);
+
+    const res = await waterFarm(message.author.id);
+
+    if (res.count === 0) {
+      return send({
+        embeds: [
+          new ErrorEmbed(
+            "none of your plants need water" +
+              (res?.dead > 0 ? `\n\n${res.dead} of your plants have died` : ""),
+          ),
+        ],
+      });
+    }
+
+    return send({
+      embeds: [
+        new CustomEmbed(
+          message.member,
+          `✅ you have watered ${res.count} plants` +
+            (res?.dead > 0 ? `\n\n${res.dead} of your plants have died` : ""),
+        ),
+      ],
+    });
+  } else if (args[0].toLowerCase() === "fertilise") {
+    if (farms.length === 0) return send({ embeds: [new ErrorEmbed("you have no plants")] });
+
+    const res = await fertiliseFarm(message.author.id);
+
+    if (res.msg === "not fertiliser") {
+      return send({
+        embeds: [
+          new ErrorEmbed(
+            "you don't have any fertiliser" +
+              (res?.dead > 0 ? `\n\n${res.dead} of your plants have died` : ""),
+          ),
+        ],
+      });
+    }
+
+    if (res.done) {
+      return send({
+        embeds: [
+          new CustomEmbed(
+            message.member,
+            `✅ you have fertilised ${res.done} plants` +
+              (res?.dead > 0 ? `\n\n${res.dead} of your plants have died` : ""),
+          ),
+        ],
+      });
+    }
   }
 }
 

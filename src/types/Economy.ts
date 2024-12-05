@@ -112,4 +112,12 @@ export type Plant = {
   max: number;
   item: string;
   type: string; // tree / plant etc
+  water: {
+    every: number;
+    dead: number;
+  };
+  fertilise: {
+    every: number;
+    dead: number;
+  };
 };

@@ -883,7 +883,9 @@
       "id:bob:80",
       "id:stolen_credit_card",
       "id:banana_seed:10",
-      "id:apple_seed:7"
+      "id:apple_seed:7",
+      "id:strawberry_seed:10",
+      "id:orange_seed:15"
     ]
   },
   "calendar": {
@@ -2306,7 +2308,8 @@
       "id:quarry_scrap:3",
       "id:big_tiddy_goth_gf:20",
       "id:69420_crate:40",
-      "id:banana_seed:5"
+      "id:banana_seed:5",
+      "id:fertiliser:60"
     ]
   },
   "bob": {
@@ -2562,7 +2565,9 @@
       "xp:10000",
       "id:multi_potion",
       "id:lucky_7:95",
-      "id:reroll_token:20"
+      "id:reroll_token:20",
+      "id:apple_seed:50",
+      "id:strawberry_seed:50"
     ]
   },
   "infinity_tag": {
@@ -3115,5 +3120,75 @@
     "sell": 10000,
     "in_crates": true,
     "aliases": ["lotto", "lottery"]
+  },
+  "orange": {
+    "id": "orange",
+    "name": "orange",
+    "article": "an",
+    "plural": "oranges",
+    "emoji": "🍊",
+    "longDesc": "apples are better",
+    "rarity": 0,
+    "role": "sellable",
+    "buy": 0,
+    "sell": 30000,
+    "in_crates": false
+  },
+  "orange_seed": {
+    "id": "orange_seed",
+    "name": "orange tree seed",
+    "article": "an",
+    "plural": "orange tree seeds",
+    "emoji": "<:nypsi_banana_tree_seeds:1261357859891843132>",
+    "longDesc": "plant to grow a orange tree",
+    "rarity": 3,
+    "role": "seed",
+    "plantId": "orange_tree",
+    "buy": 0,
+    "sell": 50000,
+    "in_crates": true,
+    "aliases": ["oseed"]
+  },
+  "fertiliser": {
+    "id": "fertiliser",
+    "name": "fertiliser",
+    "article": "a",
+    "emoji": "<:fertiliser:1314233680406777947>",
+    "longDesc": "used to grow plants and keep them healthy",
+    "rarity": 0,
+    "role": "item",
+    "buy": 0,
+    "sell": 10000,
+    "in_crates": true,
+    "aliases": ["fert", "fertilizer"]
+  },
+  "strawberry": {
+    "id": "strawberry",
+    "name": "strawberry",
+    "article": "a",
+    "plural": "strawberries",
+    "emoji": "🍓",
+    "longDesc": "sweet treat",
+    "aliases": ["berry"],
+    "rarity": 0,
+    "role": "sellable",
+    "buy": 0,
+    "sell": 20000,
+    "in_crates": false
+  },
+  "strawberry_seed": {
+    "id": "strawberry_seed",
+    "name": "strawberry bush seed",
+    "article": "a",
+    "plural": "strawberry bush seeds",
+    "emoji": "<:nypsi_apple_tree_seeds:1261357859891843132>",
+    "longDesc": "plant to grow a strawberry bush",
+    "rarity": 4,
+    "role": "seed",
+    "plantId": "strawberry_bush",
+    "buy": 0,
+    "sell": 50000,
+    "in_crates": true,
+    "aliases": ["sbush"]
   }
 }
