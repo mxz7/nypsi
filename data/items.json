@@ -3115,5 +3115,33 @@
     "sell": 10000,
     "in_crates": true,
     "aliases": ["lotto", "lottery"]
+  },
+  "orange": {
+    "id": "orange",
+    "name": "orange",
+    "article": "an",
+    "plural": "oranges",
+    "emoji": " b",
+    "longDesc": "apples are better",
+    "rarity": 0,
+    "role": "sellable",
+    "buy": 0,
+    "sell": 30000,
+    "in_crates": false
+  },
+  "orange_seed": {
+    "id": "orange_seed",
+    "name": "orange tree seed",
+    "article": "an",
+    "plural": "orange tree seeds",
+    "emoji": "<:nypsi_banana_tree_seeds:1261357859891843132>",
+    "longDesc": "plant to grow a orange tree",
+    "rarity": 4,
+    "role": "seed",
+    "plantId": "orange_tree",
+    "buy": 0,
+    "sell": 50000,
+    "in_crates": true,
+    "aliases": ["oseed"]
   }
 }
