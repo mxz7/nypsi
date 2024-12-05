@@ -226,8 +226,10 @@ model Farm {
   userId  String
   plantId String
 
-  plantedAt   DateTime @default(now())
-  harvestedAt DateTime @default(now())
+  plantedAt    DateTime @default(now())
+  harvestedAt  DateTime @default(now())
+  wateredAt    DateTime @default(now()) // remove for season 9
+  fertilisedAt DateTime @default(now()) // remove for season 9
 
   economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
 

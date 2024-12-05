@@ -3143,5 +3143,18 @@
     "sell": 50000,
     "in_crates": true,
     "aliases": ["oseed"]
+  },
+  "fertiliser": {
+    "id": "fertiliser",
+    "name": "fertiliser",
+    "article": "a",
+    "emoji": "<:fertiliser:1314211820541579304>",
+    "longDesc": "used to grow plants and keep them healthy",
+    "rarity": 0,
+    "role": "item",
+    "buy": 0,
+    "sell": 10000,
+    "in_crates": true,
+    "aliases": ["fert", "fertilizer"]
   }
 }
