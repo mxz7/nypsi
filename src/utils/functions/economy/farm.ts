@@ -201,16 +201,14 @@ export async function fertiliseFarm(
 
   if (possible.length > fertiliser.amount) possible = possible.slice(0, fertiliser.amount);
 
-  for (const plant of possible) {
-    prisma.farm.update({
-      where: {
-        id: plant.id,
-      },
-      data: {
-        fertilisedAt: new Date(),
-      },
-    });
-  }
+  await prisma.farm.updateMany({
+    where: {
+      id: { in: possible.map((i) => i.id) },
+    },
+    data: {
+      fertilisedAt: new Date(),
+    },
+  });
 
   await setInventoryItem(userId, fertiliser.item, fertiliser.amount - possible.length);
   await redis.del(`${Constants.redis.cache.economy.farm}:${userId}`);
