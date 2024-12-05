@@ -565,9 +565,14 @@ async function run(
     return show(data.pages, data.pos, title, url);
   } else {
     const selected =
-      selectItem(args.join(" ")) ||
-      selectItem(args.slice(0, args.length - 1).join(" ")) ||
-      selectItem(args[0]);
+      selectItem(args.join(" ").toLowerCase()) ||
+      selectItem(
+        args
+          .slice(0, args.length - 1)
+          .join(" ")
+          .toLowerCase(),
+      ) ||
+      selectItem(args[0].toLowerCase());
 
     if (!selected) return send({ embeds: [new ErrorEmbed("invalid option")] });
 
