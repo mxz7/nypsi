@@ -30,6 +30,10 @@ cmd.slashData
   .addSubcommand((view) => view.setName("view").setDescription("view your farms"))
   .addSubcommand((claim) =>
     claim.setName("harvest").setDescription("harvest everything from your farm"),
+  )
+  .addSubcommand((water) => water.setName("water").setDescription("water your plants"))
+  .addSubcommand((fertilise) =>
+    fertilise.setName("fertilise").setDescription("fertilise your plants"),
   );
 
 async function run(
