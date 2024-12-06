@@ -275,7 +275,9 @@ export function formatNumber(number: string | number) {
 
 export function formatNumberPretty(number: number): string {
   let out: string;
-  if (number >= 1e9) {
+  if (number >= 1e12) {
+    out = (number / 1e12).toFixed(1) + "t";
+  } else if (number >= 1e9) {
     out = (number / 1e9).toFixed(1) + "b";
   } else if (number >= 1e6) {
     out = (number / 1e6).toFixed(1) + "m";
