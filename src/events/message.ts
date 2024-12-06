@@ -26,7 +26,6 @@ import Constants from "../utils/Constants";
 import { a } from "../utils/functions/anticheat";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { userExists } from "../utils/functions/economy/utils";
-import { getDisabledCommands } from "../utils/functions/guilds/disabledcommands";
 import { checkAutoMute, checkMessageContent } from "../utils/functions/guilds/filters";
 import { isSlashOnly } from "../utils/functions/guilds/slash";
 import { getPrefix, hasGuild } from "../utils/functions/guilds/utils";
@@ -40,11 +39,9 @@ import {
   handleAttachments,
   sendToRequestChannel,
 } from "../utils/functions/supportrequest";
-import { createAuraTransaction } from "../utils/functions/users/aura";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { getLastCommand } from "../utils/functions/users/commands";
 import { MentionQueueItem } from "../utils/functions/users/mentions";
-import { hasProfile } from "../utils/functions/users/utils";
 import { runCommand } from "../utils/handlers/commandhandler";
 import { logger } from "../utils/logger";
 import ms = require("ms");
@@ -79,6 +76,21 @@ const brainrotFilter = [
   "mogging",
   "hawk tua",
 ];
+
+const helpContent = [
+  "i need help",
+  "i need mod",
+  "i need staff",
+  "help me staff",
+  "who is owner",
+  "help me owner",
+  "i got scammed",
+  "i found a glitch",
+  "i found a bug",
+  "i found a problem",
+  "i need support",
+];
+const helpCooldown = new Set<string>();
 
 export default async function messageCreate(message: Message) {
   if (!message.channel.isSendable()) return;
@@ -259,30 +271,6 @@ export default async function messageCreate(message: Message) {
   if (message.channel.isVoiceBased()) return;
   if (!message.member) return;
 
-  const checkAura = async () => {
-    if (
-      (await hasProfile(message.member)) &&
-      (await getLastCommand(message.member)).getTime() > Date.now() - ms("1 day")
-    ) {
-      for (const brainrot of brainrotFilter) {
-        if (message.content.toLowerCase().includes(brainrot)) {
-          const amounts = [5, 10, 25, 50, 75];
-          const chosen = amounts[Math.floor(Math.random() * amounts.length)];
-
-          createAuraTransaction(message.author.id, message.client.user.id, -chosen);
-
-          if (!(await redis.exists(`brainrot:cooldown:${message.channelId}`))) {
-            const disabledCommands = await getDisabledCommands(message.guild);
-
-            if (!disabledCommands.includes("aura"))
-              message.reply({ embeds: [new CustomEmbed(message.member, `-${chosen} aura`)] });
-          }
-          redis.set(`brainrot:cooldown:${message.channelId}`, 1, "EX", 1);
-        }
-      }
-    }
-  };
-
   const checkTask = async () => {
     await sleep(500);
 
@@ -346,9 +334,36 @@ export default async function messageCreate(message: Message) {
     addProgress();
   };
 
+  const checkNeedSupport = async () => {
+    if (helpCooldown.has(message.author.id)) return;
+    if (message.member.roles.cache.hasAny("1091314758986256424", "1310619772714614825")) return;
+
+    for (const i of helpContent) {
+      if (message.content.toLowerCase().includes(i)) {
+        helpCooldown.add(message.author.id);
+        setTimeout(() => {
+          helpCooldown.delete(message.author.id);
+        }, 60000);
+        return message.reply({
+          embeds: [
+            new CustomEmbed(
+              message.member,
+              `need help? you can dm ${message.client.user.toString()} to create a support request and talk directly to staff`,
+            ),
+          ],
+          content: message.member.toString(),
+        });
+      }
+    }
+  };
+
   if (!message.author.bot) {
-    if (message.guildId === Constants.NYPSI_SERVER_ID) checkTask();
-    // checkAura();
+    if (message.guildId === Constants.NYPSI_SERVER_ID) {
+      setTimeout(() => {
+        checkNeedSupport();
+        checkTask();
+      }, 1000);
+    }
   }
 
   message.content = message.content.replace(/ +(?= )/g, ""); // remove any additional spaces
