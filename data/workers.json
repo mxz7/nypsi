@@ -4,7 +4,7 @@
       "id": "deep_pockets",
       "name": "deep pockets",
       "upgrades": "max_storage",
-      "effect": 0.25,
+      "effect": 0.2,
       "stack_limit": 25,
       "base_cost": 10000
     },
@@ -12,7 +12,7 @@
       "id": "premium_quality",
       "name": "premium quality",
       "upgrades": "per_item",
-      "effect": 0.5,
+      "effect": 0.35,
       "stack_limit": 50,
       "base_cost": 10000
     },
@@ -20,7 +20,7 @@
       "id": "immigrant_farmers",
       "name": "immigrant farmers",
       "upgrades": "per_interval",
-      "effect": 0.2,
+      "effect": 0.15,
       "stack_limit": 20,
       "base_cost": 17000,
       "for": "potato_farmer"
@@ -29,7 +29,7 @@
       "id": "bait",
       "name": "bait",
       "upgrades": "per_interval",
-      "effect": 0.2,
+      "effect": 0.15,
       "stack_limit": 20,
       "base_cost": 17000,
       "for": "fisherman"
@@ -38,7 +38,7 @@
       "id": "sweatshop_workers",
       "name": "sweatshop workers",
       "upgrades": "per_interval",
-      "effect": 0.2,
+      "effect": 0.15,
       "stack_limit": 20,
       "base_cost": 17000,
       "for": "tailor"
@@ -47,7 +47,7 @@
       "id": "ipad_kids",
       "name": "ipad kids",
       "upgrades": "per_interval",
-      "effect": 0.2,
+      "effect": 0.15,
       "stack_limit": 20,
       "base_cost": 17000,
       "for": "mcdonalds"
@@ -56,7 +56,7 @@
       "id": "warehouse_workers",
       "name": "warehouse workers",
       "upgrades": "per_interval",
-      "effect": 0.2,
+      "effect": 0.15,
       "stack_limit": 20,
       "base_cost": 17000,
       "for": "amazon"
@@ -66,7 +66,7 @@
       "name": "nasa computer",
       "plural": "nasa computers",
       "upgrades": "per_interval",
-      "effect": 0.75,
+      "effect": 0.6,
       "stack_limit": 15,
       "for": "spacex"
     },
@@ -75,7 +75,7 @@
       "name": "launchpad",
       "plural": "launchpads",
       "upgrades": "max_storage",
-      "effect": 1.2,
+      "effect": 1,
       "stack_limit": 10,
       "for": "spacex"
     },
@@ -84,7 +84,7 @@
       "name": "warehouse expansion",
       "plural": "warehouse expansions",
       "upgrades": "max_storage",
-      "effect": 0.4,
+      "effect": 0.3,
       "stack_limit": 15,
       "for": "amazon"
     },
@@ -93,7 +93,7 @@
       "name": "underage worker",
       "plural": "underage workers",
       "upgrades": "per_item",
-      "effect": 0.75,
+      "effect": 0.6,
       "stack_limit": 10,
       "for": "amazon"
     },
@@ -102,7 +102,7 @@
       "name": "drill",
       "plural": "drills",
       "upgrades": "per_interval",
-      "effect": 0.2,
+      "effect": 0.15,
       "stack_limit": 15,
       "base_cost": 25000,
       "for": "quarry"
@@ -112,7 +112,7 @@
       "name": "manager",
       "plural": "managers",
       "upgrades": "per_item",
-      "effect": 0.75,
+      "effect": 0.6,
       "stack_limit": 15,
       "for": "quarry"
     },
@@ -121,7 +121,7 @@
       "name": "shipping container",
       "plural": "shipping containers",
       "upgrades": "max_storage",
-      "effect": 0.4,
+      "effect": 0.35,
       "stack_limit": 10,
       "for": "quarry"
     },
@@ -130,7 +130,7 @@
       "name": "gem radar",
       "plural": "gem radars",
       "upgrades": "gem_chance",
-      "effect": 0.00027,
+      "effect": 0.0002,
       "stack_limit": 10,
       "for": "quarry"
     },
@@ -139,7 +139,7 @@
       "name": "earth scanner",
       "plural": "earth scanners",
       "upgrades": "scrap_chance",
-      "effect": 0.00077,
+      "effect": 0.0007,
       "stack_limit": 10,
       "for": "quarry"
     }
@@ -150,9 +150,9 @@
       "name": "quarry",
       "item_emoji": "🪨",
       "prestige_requirement": 3,
-      "cost": 100000,
+      "cost": 50000,
       "base": {
-        "per_item": 17,
+        "per_item": 14,
         "max_storage": 500,
         "per_interval": 150
       }
@@ -162,9 +162,9 @@
       "name": "potato farmer",
       "item_emoji": "🥔",
       "prestige_requirement": 10,
-      "cost": 50000,
+      "cost": 25000,
       "base": {
-        "per_item": 3,
+        "per_item": 2,
         "max_storage": 500,
         "per_interval": 204
       }
@@ -174,9 +174,9 @@
       "name": "fisherman",
       "item_emoji": "🐟",
       "prestige_requirement": 25,
-      "cost": 75000,
+      "cost": 50000,
       "base": {
-        "per_item": 6,
+        "per_item": 5,
         "max_storage": 250,
         "per_interval": 120
       }
@@ -186,9 +186,9 @@
       "name": "miner",
       "item_emoji": "⛏️",
       "prestige_requirement": 50,
-      "cost": 100000,
+      "cost": 7500,
       "base": {
-        "per_item": 13,
+        "per_item": 11,
         "max_storage": 300,
         "per_interval": 168
       }
@@ -198,9 +198,9 @@
       "name": "lumberjack",
       "item_emoji": "🪓",
       "prestige_requirement": 50,
-      "cost": 250000,
+      "cost": 100000,
       "base": {
-        "per_item": 16,
+        "per_item": 14,
         "max_storage": 300,
         "per_interval": 120
       }
@@ -210,9 +210,9 @@
       "name": "butcher",
       "item_emoji": "🥓",
       "prestige_requirement": 50,
-      "cost": 500000,
+      "cost": 150000,
       "base": {
-        "per_item": 10,
+        "per_item": 9,
         "max_storage": 450,
         "per_interval": 300
       }
@@ -222,9 +222,9 @@
       "name": "tailor",
       "item_emoji": "👕",
       "prestige_requirement": 75,
-      "cost": 500000,
+      "cost": 200000,
       "base": {
-        "per_item": 10,
+        "per_item": 8,
         "max_storage": 700,
         "per_interval": 360
       }
@@ -234,9 +234,9 @@
       "name": "spacex",
       "item_emoji": "🚀",
       "prestige_requirement": 100,
-      "cost": 750000,
+      "cost": 250000,
       "base": {
-        "per_item": 40,
+        "per_item": 35,
         "max_storage": 180,
         "per_interval": 84
       }
@@ -248,7 +248,7 @@
       "prestige_requirement": 40,
       "cost": 100000,
       "base": {
-        "per_item": 10,
+        "per_item": 8,
         "max_storage": 350,
         "per_interval": 250
       }
@@ -258,9 +258,9 @@
       "name": "amazon",
       "item_emoji": "📦",
       "prestige_requirement": 100,
-      "cost": 1000000,
+      "cost": 300000,
       "base": {
-        "per_item": 5,
+        "per_item": 4,
         "max_storage": 4500,
         "per_interval": 425
       }
