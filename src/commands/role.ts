@@ -264,7 +264,7 @@ async function run(
         embeds: [new ErrorEmbed(`you do not have permission to modify ${role.toString()}`)],
       });
 
-    if (members.length > 10) {
+    if (members.length > 5) {
       const msg = await send({
         embeds: [
           new CustomEmbed(
@@ -411,7 +411,7 @@ async function run(
       return send({ embeds: [new ErrorEmbed("no members to remove role from")] });
     }
 
-    if (members.length > 50) {
+    if (members.length > 5) {
       const msg = await send({
         embeds: [
           new CustomEmbed(
