@@ -3190,5 +3190,21 @@
     "sell": 50000,
     "in_crates": true,
     "aliases": ["sbush"]
+  },
+  "super_furnace": {
+    "id": "super_furnace",
+    "name": "super furnace",
+    "article": "a",
+    "plural": "super furnaces",
+    "emoji": "<:super_furnace:1314669318151213119>",
+    "longDesc": "used to smelt 10x more ore",
+    "role": "tool",
+    "rarity": 0,
+    "sell": 150000,
+    "in_crates": false,
+    "craft": {
+      "ingredients": ["furnace:10"],
+      "time": 3600
+    }
   }
 }
