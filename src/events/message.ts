@@ -205,7 +205,7 @@ export default async function messageCreate(message: Message) {
           return modalSubmit.editReply({
             embeds: [
               new CustomEmbed().setDescription(
-                "✅ created support request, you can now talk directly to nypsi staff",
+                "✅ created support request, anything you send while this is open will be sent directly to nypsi staff",
               ),
             ],
           });
