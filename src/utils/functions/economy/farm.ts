@@ -128,7 +128,7 @@ export async function getClaimable(member: GuildMember | string, plantId: string
 
   if (claim && items > 0) {
     await addInventoryItem(id, plantData.item, items);
-    addProgress(id, "green_fingers", items);
+    await addProgress(id, "green_fingers", items);
   }
 
   return items;
