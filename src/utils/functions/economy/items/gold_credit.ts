@@ -155,6 +155,7 @@ module.exports = new ItemUse(
             `your **gold** membership will expire <t:${dayjs().add(7, "day").unix()}:R>`,
           ),
         ],
+        components: [],
       });
     }
   },
