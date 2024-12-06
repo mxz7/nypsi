@@ -156,6 +156,7 @@ module.exports = new ItemUse(
             `your **bronze** membership will expire <t:${dayjs().add(7, "day").unix()}:R>`,
           ),
         ],
+        components: [],
       });
     }
   },

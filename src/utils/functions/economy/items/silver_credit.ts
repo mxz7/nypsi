@@ -159,6 +159,7 @@ module.exports = new ItemUse(
             `your **silver** membership will expire <t:${dayjs().add(7, "day").unix()}:R>`,
           ),
         ],
+        components: [],
       });
     }
   },
