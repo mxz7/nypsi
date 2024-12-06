@@ -64,14 +64,20 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
   const items = getItems();
 
   let hasFurnace = false;
+  let max = 64;
   let coal = 0;
   const ores = [];
 
+  if (inventory.find((i) => i.item === "super_furnace")?.amount > 0) {
+    hasFurnace = true;
+    max = 640;
+  }
   if (
     inventory.find((i) => i.item == "furnace") &&
     inventory.find((i) => i.item == "furnace").amount > 0
   ) {
     hasFurnace = true;
+    max = 64;
   }
 
   if (!hasFurnace) {
@@ -88,7 +94,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
     if (items[i.item].role != "ore") continue;
 
     for (let x = 0; x < i.amount; x++) {
-      if (ores.length >= 64) break;
+      if (ores.length >= max) break;
       ores.push(i.item);
     }
   }
@@ -110,13 +116,14 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
 
   if (coal < ores.length) {
     return send({
-      embeds: [new ErrorEmbed("you don't have enough coal to smelt")],
+      embeds: [new ErrorEmbed(`you don't have enough coal to smelt (${ores.length} ores)`)],
     });
   }
 
   await addCooldown(cmd.name, message.member, 600);
 
-  await addStat(message.member, "furnace");
+  if (max === 64) addStat(message.member, "furnace");
+  else if (max === 640) addStat(message.member, "super_furnace");
 
   const smelted = new Map<string, number>();
 
@@ -155,7 +162,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
     setInventoryItem(
       message.member,
       "furnace",
-      inventory.find((i) => i.item == "furnace").amount - 1,
+      inventory.find((i) => i.item == (max === 64 ? "furnace" : "super_furnace")).amount - 1,
     ),
   );
 
@@ -163,7 +170,9 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
 
   const embed = new CustomEmbed(message.member);
   embed.setHeader("furnace", message.author.avatarURL());
-  embed.setDescription("<:nypsi_furnace_lit:1264185514978705472> smelting...");
+  embed.setDescription(
+    `${max === 64 ? "<:nypsi_furnace_lit:1264185514978705472>" : "<:super_furnace:1314669318151213119>"} smelting...`,
+  );
 
   const msg = await send({ embeds: [embed] });
 
@@ -177,7 +186,9 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
   };
 
   setTimeout(() => {
-    embed.setDescription(`<:nypsi_furnace:959445132585869373> you have smelted: \n${res}`);
+    embed.setDescription(
+      `${max === 64 ? "<:nypsi_furnace:959445132585869373>" : "<:super_furnace:1314669318151213119>"} you have smelted: \n${res}`,
+    );
     edit({ embeds: [embed] }, msg);
   }, 2000);
 }
