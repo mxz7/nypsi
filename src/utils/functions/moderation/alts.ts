@@ -2,7 +2,6 @@ import { Guild } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
-import { getExactMember } from "../member";
 import ms = require("ms");
 
 export async function addAlt(guild: Guild, mainId: string, altId: string) {
@@ -111,9 +110,7 @@ export async function isAlt(guild: Guild, altId: string) {
     },
   });
 
-  return query && (await getExactMember(guild, await getMainAccountId(guild, altId)))
-    ? true
-    : false;
+  return query ? true : false;
 }
 
 export async function getMainAccountId(guild: Guild | string, altId: string) {
