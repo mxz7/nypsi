@@ -292,6 +292,9 @@ async function run(
         });
 
       if (!msg) return;
+      console.log(await isAlt(message.guild, msg.content));
+      console.log(await getMainAccountId(message.guild, msg.content));
+
       if (
         !(await isAlt(message.guild, msg.content)) ||
         (await getMainAccountId(message.guild, msg.content)) !=
