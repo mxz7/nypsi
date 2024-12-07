@@ -14,7 +14,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { ItemUse } from "../models/ItemUse";
 import { addBakeryUpgrade, getBakeryUpgrades } from "../utils/functions/economy/bakery";
 import { addBooster, getBoosters } from "../utils/functions/economy/boosters";
-import { addFarm } from "../utils/functions/economy/farm";
+import { addFarm, getFarm } from "../utils/functions/economy/farm";
 import { getInventory, selectItem, setInventoryItem } from "../utils/functions/economy/inventory";
 import { addStat } from "../utils/functions/economy/stats";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
@@ -483,11 +483,16 @@ async function run(
     );
     await addFarm(message.member, selected.plantId, amount);
 
+    const farm = await getFarm(message.member);
+
     return send({
       embeds: [
         new CustomEmbed(
           message.member,
-          `you've planted ${amount} ${amount > 1 ? selected.plural : selected.name} in your farm`,
+          `you've planted ${amount} ${amount > 1 ? selected.plural : selected.name} in your farm` +
+            (farm.length === amount
+              ? "\n\nif you're new to farming, it's recommended you read the [farm care guide](https://nypsi.xyz/docs/economy/farm#caring-for-your-farm) to make sure you don't kill your plants"
+              : ""),
         ),
       ],
     });
