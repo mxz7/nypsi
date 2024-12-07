@@ -71,8 +71,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
   if (inventory.find((i) => i.item === "super_furnace")?.amount > 0) {
     hasFurnace = true;
     max = 640;
-  }
-  if (
+  } else if (
     inventory.find((i) => i.item == "furnace") &&
     inventory.find((i) => i.item == "furnace").amount > 0
   ) {
