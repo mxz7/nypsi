@@ -34,7 +34,6 @@ import { addStat, createGame } from "../utils/functions/economy/stats";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { createUser, formatBet, getItems, userExists } from "../utils/functions/economy/utils";
 import sleep from "../utils/functions/sleep";
-import { logger } from "../utils/logger";
 import ms = require("ms");
 
 const cmd = new Command("race", "create or join a race", "money").setAliases(["sr"]);
@@ -197,7 +196,6 @@ class Race {
   }
 
   private async collectorFunction(interaction: ButtonInteraction): Promise<any> {
-    logger.debug(`race collector: ${interaction.user.id}`, interaction);
     if (interaction.customId === "join") {
       if (!(await userExists(interaction.user.id)))
         return interaction.reply({
@@ -230,7 +228,7 @@ class Race {
           embeds: [new ErrorEmbed("you cannot afford the entry fee for this race")],
         });
 
-      inventory.push({ amount: 1, item: "cycle" });
+      if (!inventory.find((i) => i.item === "cycle")) inventory.push({ amount: 1, item: "cycle" });
 
       const cars: (RaceUserItem | RaceUserCar)[] = [
         ...garage.map((car) => ({
