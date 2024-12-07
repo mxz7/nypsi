@@ -160,7 +160,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
   promises.push(
     setInventoryItem(
       message.member,
-      "furnace",
+      max === 64 ? "furnace" : "super_furnace",
       inventory.find((i) => i.item == (max === 64 ? "furnace" : "super_furnace")).amount - 1,
     ),
   );
