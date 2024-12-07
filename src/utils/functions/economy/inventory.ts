@@ -423,20 +423,15 @@ export async function openCrate(
           }
         }
 
-        let filteredItems: string[] = [];
-
         if (itemFilter.startsWith("id:")) {
-          filteredItems = Object.keys(items).filter((i) => i === itemFilter.split(":")[1]);
+          crateItems.push(...Object.keys(items).filter((i) => i === itemFilter.split(":")[1]));
         } else if (itemFilter.startsWith("role:")) {
-          filteredItems = Object.keys(items).filter(
-            (i) => items[i].role === itemFilter.split(":")[1],
+          crateItems.push(
+            ...Object.keys(items).filter((i) => items[i].role === itemFilter.split(":")[1]),
           );
         } else {
           crateItems.push(itemFilter);
-          continue;
         }
-
-        crateItems.push(...filteredItems);
       }
 
       const chosen = crateItems[Math.floor(Math.random() * crateItems.length)];
