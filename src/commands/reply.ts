@@ -31,7 +31,23 @@ async function run(
   );
 
   if (args.length > 0) {
-    embed.setDescription(args.join(" "));
+    if (args[0].toLowerCase() === "auto.scam") {
+      embed.setDescription(
+        "for scamming the burden is on you to provide evidence and we just verify it and decide if a punishment is worthy\n\n" +
+          "you need to clearly show:\n" +
+          "- the agreement of terms\n" +
+          "- the payment\n" +
+          "- the refusal when the terms are met\n\n" +
+          "if you're unable to provide sufficient evidence, then unfortunately nothing can be done.\n\n" +
+          "*please send evidence in chronological order*",
+      );
+    } else if (args[0].toLowerCase() === "auto.transfer") {
+      embed.setDescription(
+        "it sounds like you're asking about a **profile transfer** where data from one account will be applied to another\n\n" +
+          "you must provide evidence the old account username and user ID, as well as prove that it is your account\n\n" +
+          "if you're unable to prove that it's your account, we cannot do anything.",
+      );
+    } else embed.setDescription(args.join(" "));
   }
 
   if (message.attachments.size > 0) {
