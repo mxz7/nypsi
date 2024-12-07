@@ -292,15 +292,6 @@ export async function openCrate(
 
       for (const i of crateItems) {
         if (items[i]) {
-          if (
-            item.id == "nypsi_crate" &&
-            (["collectable", "sellable", "item", "car"].includes(items[i].role) || items[i].buy)
-          ) {
-            const chance = Math.floor(Math.random() * 7);
-
-            if (chance != 2) continue;
-          }
-
           if (items[i].rarity === 6) {
             const chance = Math.floor(Math.random() * 2000);
 
@@ -319,7 +310,7 @@ export async function openCrate(
             const chance = Math.floor(Math.random() * 15);
             if (chance == 4) {
               crateItemsModified.push(i);
-            } else if (chance > 7 && item.id == "nypsi_crate") {
+            } else if (chance > 7) {
               for (let x = 0; x < 3; x++) {
                 crateItemsModified.push(i);
               }
@@ -328,50 +319,35 @@ export async function openCrate(
             const chance = Math.floor(Math.random() * 3);
             if (chance == 2) {
               crateItemsModified.push(i);
-            } else if (item.id == "nypsi_crate") {
-              for (let x = 0; x < 3; x++) {
-                crateItemsModified.push(i);
-              }
             }
           } else if (items[i].rarity == 2) {
-            if (item.id == "nypsi_crate") {
-              for (let x = 0; x < 5; x++) {
-                crateItemsModified.push(i);
-              }
-            }
             crateItemsModified.push(i);
           } else if (items[i].rarity == 1) {
             for (let x = 0; x < 2; x++) {
-              if (items[i].role == "collectable" && item.id != "nypsi_crate") {
+              if (items[i].role == "collectable") {
                 const chance = Math.floor(Math.random() * 3);
 
                 if (chance == 2) {
                   crateItemsModified.push(i);
                 }
               } else {
-                if (item.id == "nypsi_crate") {
-                  const chance = Math.floor(Math.random() * 10);
-
-                  if (chance < 7) {
-                    crateItemsModified.push(i);
-                  }
-                } else {
-                  crateItemsModified.push(i);
-                }
-              }
-              crateItemsModified.push(i);
-            }
-          } else if (items[i].rarity == 0 && item.id != "nypsi_crate") {
-            if (items[i].role == "collectable") {
-              const chance = Math.floor(Math.random() * 3);
-
-              if (chance == 2) {
                 crateItemsModified.push(i);
               }
-            } else {
               crateItemsModified.push(i);
             }
-            crateItemsModified.push(i);
+          } else if (items[i].rarity == 0) {
+            for (let x = 0; x < 5; x++) {
+              if (items[i].role == "collectable") {
+                const chance = Math.floor(Math.random() * 3);
+
+                if (chance == 2) {
+                  crateItemsModified.push(i);
+                }
+              } else {
+                crateItemsModified.push(i);
+              }
+              crateItemsModified.push(i);
+            }
           }
         } else {
           if (item.id == "nypsi_crate") {
