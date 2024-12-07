@@ -154,7 +154,7 @@ async function run(
   ) {
     return send({
       embeds: [
-        new ErrorEmbed("you dont have any " + selected.plural ? selected.plural : selected.name),
+        new ErrorEmbed("you dont have any " + (selected.plural ? selected.plural : selected.name)),
       ],
     });
   }
