@@ -158,7 +158,7 @@ async function run(
 
       embed.setDescription(
         `${getItems()[getPlantsData()[plantId].item].emoji} **${getPlantsData()[plantId].name}** farm\n\n` +
-          `you have **${plants.length.toLocaleString()}** ${getPlantsData()[plantId].type}${plants.length > 1 ? "s" : ""}\n` +
+          `you have **${plants.length.toLocaleString()}** ${plants.length > 1 ? getPlantsData()[plantId].type_plural : getPlantsData()[plantId].type}\n` +
           `${
             growing > 0
               ? `${growing.toLocaleString()} growing (next <t:${dayjs().add(nextGrow, "milliseconds").unix()}:R>)\n`
