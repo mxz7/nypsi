@@ -101,7 +101,7 @@ export async function updateUser(user: User, command: string) {
 
   const newAvatar = user.displayAvatarURL({ size: 256, extension: "png" });
 
-  if (newAvatar !== avatar) {
+  if (newAvatar !== avatar && user.client.user.id === Constants.BOT_USER_ID) {
     await redis.set(`${Constants.redis.cache.user.avatar}:${user.id}`, newAvatar);
 
     updateAvatar = true;
