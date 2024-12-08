@@ -246,9 +246,19 @@ export async function clearAvatarHistory(member: GuildMember | string) {
     id = member;
   }
 
-  await prisma.username.deleteMany({
+  const avatars = await prisma.username.findMany({
     where: {
       AND: [{ userId: id }, { type: "avatar" }],
     },
+    select: {
+      id: true,
+      value: true,
+    },
   });
+
+  for (const avatar of avatars) {
+    const key = avatar.value.substring(22);
+    s3.send(new DeleteObjectCommand({ Bucket: process.env.S3_BUCKET, Key: key }));
+    await prisma.username.delete({ where: { id: avatar.id } });
+  }
 }
