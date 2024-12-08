@@ -6,6 +6,7 @@ import { NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { percentChance } from "../random";
+import sleep from "../sleep";
 import {
   addInlineNotification,
   addNotificationToQueue,
@@ -261,9 +262,30 @@ export async function getUserAchievement(userId: string, achievementId: string) 
   });
 }
 
-export async function addProgress(userId: string, achievementStartName: string, amount: number) {
-  if (!(await userExists(userId))) return;
-  if ((await isEcoBanned(userId)).banned) return;
+const addProgressMutex = new Set<string>();
+
+export async function addProgress(
+  userId: string,
+  achievementStartName: string,
+  amount: number,
+  repeat = 0,
+) {
+  if (addProgressMutex.has(userId)) {
+    if (repeat > 10) addProgressMutex.delete(userId);
+    await sleep(100);
+    return addProgress(userId, achievementStartName, amount, repeat + 1);
+  }
+
+  addProgressMutex.add(userId);
+
+  if (!(await userExists(userId))) {
+    addProgressMutex.delete(userId);
+    return;
+  }
+  if ((await isEcoBanned(userId)).banned) {
+    addProgressMutex.delete(userId);
+    return;
+  }
 
   const achievements = await getAllAchievements(userId, achievementStartName);
   let count = 0;
@@ -288,6 +310,7 @@ export async function addProgress(userId: string, achievementStartName: string, 
 
         if (thing) await setAchievementProgress(userId, thing, achievement.progress + amount);
       }
+      addProgressMutex.delete(userId);
       return;
     }
   }
@@ -309,6 +332,8 @@ export async function addProgress(userId: string, achievementStartName: string, 
       await setAchievementProgress(userId, `${achievementStartName}_v`, amount);
       break;
   }
+
+  addProgressMutex.delete(userId);
 }
 
 export async function setProgress(userId: string, achievementStartName: string, amount: number) {
