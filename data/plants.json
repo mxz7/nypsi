@@ -7,6 +7,7 @@
     "max": 6,
     "item": "banana",
     "type": "tree",
+    "type_plural": "trees",
     "water": {
       "every": 86400,
       "die": 604800
@@ -24,6 +25,7 @@
     "max": 4,
     "item": "apple",
     "type": "tree",
+    "type_plural": "trees",
     "water": {
       "every": 172800,
       "die": 604800
@@ -41,6 +43,7 @@
     "max": 3,
     "item": "orange",
     "type": "tree",
+    "type_plural": "trees",
     "water": {
       "every": 172800,
       "die": 604800
@@ -58,6 +61,7 @@
     "max": 10,
     "item": "strawberry",
     "type": "bush",
+    "type_plural": "bushes",
     "water": {
       "every": 259200,
       "die": 1.21e6
