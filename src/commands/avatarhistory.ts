@@ -12,6 +12,7 @@ import { nanoid } from "nanoid";
 import s3 from "../init/s3";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import Constants from "../utils/Constants";
 import { formatDate } from "../utils/functions/date";
 import { getRawLevel } from "../utils/functions/economy/levelling";
 import { isEcoBanned } from "../utils/functions/economy/utils";
@@ -53,7 +54,10 @@ async function run(
 
   await addCooldown(cmd.name, message.member, 15);
 
-  if ((await getRawLevel(message.member).catch(() => 0)) < 500)
+  if (
+    (await getRawLevel(message.member).catch(() => 0)) < 500 ||
+    message.client.user.id !== Constants.BOT_USER_ID
+  )
     return message.channel.send({
       embeds: [
         new ErrorEmbed(
