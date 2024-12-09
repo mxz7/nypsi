@@ -4,12 +4,10 @@ import {
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
-  ComponentType,
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
   StringSelectMenuBuilder,
-  StringSelectMenuInteraction,
   StringSelectMenuOptionBuilder,
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
@@ -204,24 +202,31 @@ async function run(
       const userUpgrades = await getFarmUpgrades(message.member);
 
       for (const upgradeId of Object.keys(upgrades)) {
-        if (upgrades[upgradeId].for && !upgrades[upgradeId].for.includes(selected)) continue;
+        let upgrade = upgrades[upgradeId];
+
+        if (upgrade.for && !upgrade.for.includes(selected)) continue;
+  
   
         const owned = userUpgrades.find((u) => u.upgradeId == upgradeId && u.plantId === selected)?.amount || 0;
-  
-        const pluralName = upgrades[upgradeId].plural ? upgrades[upgradeId].plural : upgrades[upgradeId].name;
+        const pluralName = upgrade.plural ? upgrade.plural : upgrade.name;
 
-        desc += `**${pluralName}** ${owned}/${upgrades[upgradeId].stack_limit}`;
+
+        if (upgrade.type_single) {
+          desc += `**${pluralName}** ${owned}/${upgrade.type_single.stack_limit}`;
+        } else if (upgrade.type_upgradable) {
+          desc += `**${upgrade.name}** ${owned == 0 ? "none" : getItems()[upgrade.type_upgradable.items[owned - 1]].name}`
+        }
 
         const button = new ButtonBuilder()
           .setCustomId(`up-${upgradeId}`)
           .setEmoji("⬆️")
-          .setLabel(`add ${upgrades[upgradeId].name}`);
+          .setLabel(`add ${upgrade.name}`);
         const maxButton = new ButtonBuilder()
           .setCustomId(`up-${upgradeId}-max`)
           .setEmoji("⏫")
           .setLabel(`add all ${pluralName}`);
 
-        if (owned < upgrades[upgradeId].stack_limit) {
+        if (owned < upgrade.type_single?.stack_limit || owned < upgrade.type_upgradable?.items.length) {
           button.setStyle(ButtonStyle.Success);
           maxButton.setStyle(ButtonStyle.Success);
         } else {
@@ -298,41 +303,86 @@ async function run(
         const upgradeId = interaction.customId.split("-")[1];
         const upgrade = getPlantUpgrades()[upgradeId];
 
-        const itemCount = (await getInventory(message.member)).find((i) => i.item === upgrade.item)?.amount || 0;
-        const item = getItems()[upgrade.item];
+        if (upgrade.type_single) {
+          const itemCount = (await getInventory(message.member)).find((i) => i.item === upgrade.type_single.item)?.amount || 0;
+          const item = getItems()[upgrade.type_single.item];
 
-        if (itemCount === 0) {
-          await interaction.reply({
-            embeds: [new ErrorEmbed(`you don't have any ${item.plural ? item.plural : item.name}`)],
-            ephemeral: true,
+          if (itemCount === 0) {
+            await interaction.reply({
+              embeds: [new ErrorEmbed(`you don't have any ${item.plural ? item.plural : item.name}`)],
+              ephemeral: true,
+            });
+            return listen();
+          }
+
+          const userUpgradeCount = (await getFarmUpgrades(message.member)).find((u) => u.upgradeId === upgradeId && u.plantId === selected)?.amount || 0;
+
+          if (userUpgradeCount >= upgrade.type_single.stack_limit) {
+            await interaction.reply({
+              embeds: [new ErrorEmbed(`you already have the max amount of ${item.plural ? item.plural : item.name}`)],
+              ephemeral: true,
+            });
+            return listen();
+          }
+
+          let count = 1;
+
+          if (interaction.customId.endsWith("-max")) {
+            count = Math.min(itemCount, upgrade.type_single.stack_limit - userUpgradeCount);
+          }
+
+          await setInventoryItem(message.member, item.id, itemCount - count);
+          await addFarmUpgrade(message.member, selected, upgradeId, count);
+
+          const { embed, rows } = await renderUpgrades(selected);
+          await interaction.update({
+            embeds: [embed],
+            components: rows
           });
-          return listen();
-        }
+        } else if (upgrade.type_upgradable) {
+          const userUpgradeLevel = (await getFarmUpgrades(message.member)).find((u) => u.upgradeId === upgradeId && u.plantId === selected)?.amount || 0;
+          const nextLevelItem = getItems()[upgrade.type_upgradable.items[userUpgradeLevel]];
+          const itemCount = (await getInventory(message.member)).find((i) => i.item === nextLevelItem.id)?.amount || 0;
 
-        const userUpgradeCount = (await getFarmUpgrades(message.member)).find((u) => u.upgradeId === upgradeId && u.plantId === selected)?.amount || 0;
+          if (userUpgradeLevel == upgrade.type_upgradable.items.length) {
+            await interaction.reply({
+              embeds: [new ErrorEmbed(`you are already at the max level for this upgrade`)],
+              ephemeral: true,
+            });
+            return listen();
+          }
 
-        if (userUpgradeCount >= upgrade.stack_limit) {
-          await interaction.reply({
-            embeds: [new ErrorEmbed(`you already have the max amount of ${item.plural ? item.plural : item.name}`)],
-            ephemeral: true,
+          if (itemCount === 0) {
+            await interaction.reply({
+              embeds: [new ErrorEmbed(`you don't have ${nextLevelItem.article} ${nextLevelItem.name}`)],
+              ephemeral: true,
+            });
+            return listen();
+          }
+
+          await setInventoryItem(message.member, nextLevelItem.id, itemCount - 1);
+          await addFarmUpgrade(message.member, selected, upgradeId, 1)
+
+          if (interaction.customId.endsWith("-max")) {
+            while (userUpgradeLevel < upgrade.type_upgradable.items.length) {
+              const userUpgradeLevel = (await getFarmUpgrades(message.member)).find((u) => u.upgradeId === upgradeId && u.plantId === selected)?.amount || 0;
+              const nextLevelItem = getItems()[upgrade.type_upgradable.items[userUpgradeLevel]];
+              if (!nextLevelItem) break;
+              const itemCount = (await getInventory(message.member)).find((i) => i.item === nextLevelItem.id)?.amount || 0;
+
+              if (itemCount === 0) break;
+
+              await setInventoryItem(message.member, nextLevelItem.id, itemCount - 1);
+              await addFarmUpgrade(message.member, selected, upgradeId, 1)
+            }
+          }
+
+          const { embed, rows } = await renderUpgrades(selected);
+          await interaction.update({
+            embeds: [embed],
+            components: rows
           });
-          return listen();
         }
-
-        let count = 1;
-
-        if (interaction.customId.endsWith("-max")) {
-          count = Math.min(itemCount, upgrade.stack_limit - userUpgradeCount);
-        }
-
-        await setInventoryItem(message.member, item.id, itemCount - count);
-        await addFarmUpgrade(message.member, selected, upgradeId, count);
-
-        const { embed, rows } = await renderUpgrades(selected);
-        await interaction.update({
-          embeds: [embed],
-          components: rows
-        });
 
         return listen();
       }

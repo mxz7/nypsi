@@ -80,8 +80,20 @@
       "plural": "silos",
       "upgrades": "max_storage",
       "effect": 0.5,
-      "stack_limit": 4,
-      "item": "farm_silo"
+      "type_single": {
+        "stack_limit": 4,
+        "item": "farm_silo"
+      }
+    },
+    "hoe": {
+      "id": "hoe",
+      "name": "hoe",
+      "plural": "hoes",
+      "upgrades": "interval",
+      "effect": 0.05,
+      "type_upgradable": {
+        "items": ["stone_hoe", "iron_hoe", "gold_hoe", "diamond_hoe", "netherite_hoe"]
+      }
     }
   }
 }
