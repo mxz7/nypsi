@@ -127,9 +127,14 @@ export type PlantUpgrade = {
   id: string;
   name: string;
   plural?: string;
-  upgrades: "max_storage";
+  upgrades: string;
   effect: number;
-  stack_limit: number;
-  item: string;
-  for?: string;
+  for?: string[]; // use if upgrade is only for select plants
+  type_single?: {
+    stack_limit: number;
+    item: string;
+  }
+  type_upgradable?: {
+    items: string[];
+  }
 };

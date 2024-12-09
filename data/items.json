@@ -3209,6 +3209,104 @@
       "ingredients": ["galvanised_square_steel:40"]
     }
   },
+  "stick": {
+    "id": "stick",
+    "name": "stick",
+    "article": "a",
+    "plural": "sticks",
+    "emoji": ":nypsi_stick:",
+    "longDesc": "used to make hoes for farms",
+    "rarity": 2,
+    "role": "item",
+    "buy": 0,
+    "sell": 1000,
+    "in-crates": false
+  },
+  "stone_hoe": {
+    "id": "stone_hoe",
+    "name": "stone hoe",
+    "article": "a",
+    "plural": "stone hoes",
+    "emoji": ":nypsi_stone_hoe:",
+    "longDesc": "increase a farm's output rate by 5%",
+    "rarity": 69,
+    "role": "farm-upgrade",
+    "buy": 0,
+    "sell": 8500,
+    "in-crates": false,
+    "craft": {
+      "time": 7200,
+      "ingredients": ["stick:4", "cobblestone:10"]
+    }
+  },
+  "iron_hoe": {
+    "id": "iron_hoe",
+    "name": "iron hoe",
+    "article": "an",
+    "plural": "iron hoes",
+    "emoji": ":nypsi_iron_hoe:",
+    "longDesc": "increase a farm's output rate by 10% when stacked with lower level hoes",
+    "rarity": 69,
+    "role": "farm-upgrade",
+    "buy": 0,
+    "sell": 200000,
+    "in-crates": false,
+    "craft": {
+      "time": 14400,
+      "ingredients": ["stick:4", "iron_ingot:10"]
+    }
+  },
+  "gold_hoe": {
+    "id": "gold_hoe",
+    "name": "gold hoe",
+    "article": "a",
+    "plural": "gold hoes",
+    "emoji": ":nypsi_gold_hoe:",
+    "longDesc": "increase a farm's output rate by 15% when stacked with lower level hoes",
+    "rarity": 69,
+    "role": "farm-upgrade",
+    "buy": 0,
+    "sell": 330000,
+    "in-crates": false,
+    "craft": {
+      "time": 21600,
+      "ingredients": ["stick:4", "gold_ingot:10"]
+    }
+  },
+  "diamond_hoe": {
+    "id": "diamond_hoe",
+    "name": "diamond hoe",
+    "article": "a",
+    "plural": "diamond hoes",
+    "emoji": ":nypsi_diamond_hoe:",
+    "longDesc": "increase a farm's output rate by 20% when stacked with lower level hoes",
+    "rarity": 69,
+    "role": "farm-upgrade",
+    "buy": 0,
+    "sell": 600000,
+    "in-crates": false,
+    "craft": {
+      "time": 28800,
+      "ingredients": ["stick:4", "diamond:10"]
+    }
+  },
+  "netherite_hoe": {
+    "id": "netherite_hoe",
+    "name": "netherite hoe",
+    "article": "a",
+    "plural": "netherite hoes",
+    "emoji": ":nypsi_netherite_hoe:",
+    "longDesc": "increase a farm's output rate by 25% when stacked with lower level hoes",
+    "rarity": 69,
+    "role": "farm-upgrade",
+    "buy": 0,
+    "sell": 30000000,
+    "in-crates": false,
+    "craft": {
+      "time": 36000,
+      "ingredients": ["stick:4", "netherite_ingot:10"]
+    }
+  },
   "super_furnace": {
     "id": "super_furnace",
     "name": "super furnace",
