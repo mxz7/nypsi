@@ -79,7 +79,7 @@
       "name": "silo",
       "plural": "silos",
       "upgrades": "max_storage",
-      "effect": 0.5,
+      "effect": 0.1,
       "type_single": {
         "stack_limit": 4,
         "item": "farm_silo"
