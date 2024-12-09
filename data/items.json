@@ -3191,6 +3191,24 @@
     "in_crates": true,
     "aliases": ["sbush"]
   },
+  "farm_silo": {
+    "id": "farm_silo",
+    "name": "farm silo",
+    "article": "a",
+    "plural": "farm silos",
+    "emoji": ":nypsi_silo:",
+    "longDesc": "increase a farm's output capacity by 50%",
+    "rarity": 69,
+    "role": "farm-upgrade",
+    "buy": 0,
+    "sell": 100000,
+    "in-crates": false,
+    "aliases": ["silo"],
+    "craft": {
+      "time": 43200,
+      "ingredients": ["galvanised_square_steel:40"]
+    }
+  },
   "super_furnace": {
     "id": "super_furnace",
     "name": "super furnace",

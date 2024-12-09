@@ -122,3 +122,14 @@ export type Plant = {
     dead: number;
   };
 };
+
+export type PlantUpgrade = {
+  id: string;
+  name: string;
+  plural?: string;
+  upgrades: "max_storage";
+  effect: number;
+  stack_limit: number;
+  item: string;
+  for?: string;
+};
