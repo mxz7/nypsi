@@ -1028,6 +1028,7 @@ export async function calcNetWorth(
 
   const typesChecked: string[] = [];
 
+  // todo: add farm upgrades to farm breakdown
   for (const farm of farms) {
     if (typesChecked.includes(farm.plantId)) continue;
 

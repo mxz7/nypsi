@@ -122,3 +122,19 @@ export type Plant = {
     dead: number;
   };
 };
+
+export type PlantUpgrade = {
+  id: string;
+  name: string;
+  plural?: string;
+  upgrades: string;
+  effect: number;
+  for?: string[]; // use if upgrade is only for select plants
+  type_single?: {
+    stack_limit: number;
+    item: string;
+  }
+  type_upgradable?: {
+    items: string[];
+  }
+};

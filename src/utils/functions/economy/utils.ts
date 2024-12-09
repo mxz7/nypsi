@@ -12,6 +12,7 @@ import {
   GuildUpgrade,
   Item,
   Plant,
+  PlantUpgrade,
   UserUpgrade,
 } from "../../../types/Economy";
 import { Tag } from "../../../types/Tags";
@@ -43,6 +44,7 @@ let userUpgrades: { [key: string]: UserUpgrade };
 let tags: { [key: string]: Tag };
 let tasks: { [key: string]: Task };
 let plants: { [key: string]: Plant };
+let plantUpgrades: { [key: string]: PlantUpgrade };
 
 export let maxPrestige = 0;
 
@@ -67,7 +69,8 @@ export function loadItems(crypto = true) {
   tags = JSON.parse(tagsFile);
   userUpgrades = JSON.parse(userUpgradesFile);
   tasks = JSON.parse(tasksFile);
-  plants = JSON.parse(plantsFile);
+  plants = JSON.parse(plantsFile).plants;
+  plantUpgrades = JSON.parse(plantsFile).upgrades;
 
   Object.values(userUpgrades).forEach((i) => {
     maxPrestige += i.max;
@@ -535,6 +538,10 @@ export function getTasksData() {
 
 export function getPlantsData() {
   return plants;
+}
+
+export function getPlantUpgrades() {
+  return plantUpgrades;
 }
 
 export async function deleteUser(member: GuildMember | string) {

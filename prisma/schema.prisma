@@ -219,6 +219,7 @@ model Economy {
   Task               Task[]
   CustomCar          CustomCar[]
   Farm               Farm[]
+  FarmUpgrades       FarmUpgrades[]
 }
 
 model Farm {
@@ -234,6 +235,18 @@ model Farm {
   economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
   @@index([userId])
+}
+
+model FarmUpgrades {
+  userId  String
+  plantId String
+
+  upgradeId String
+  amount    Int    @default(1)
+
+  economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@id([userId, plantId, upgradeId])
 }
 
 model CustomCar {

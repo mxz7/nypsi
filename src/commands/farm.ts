@@ -1,8 +1,9 @@
 import {
   ActionRowBuilder,
   BaseMessageOptions,
+  ButtonBuilder,
+  ButtonStyle,
   CommandInteraction,
-  ComponentType,
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
@@ -12,16 +13,19 @@ import {
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import {
+  addFarmUpgrade,
   deletePlant,
   fertiliseFarm,
   getClaimable,
   getFarm,
+  getFarmUpgrades,
   waterFarm,
 } from "../utils/functions/economy/farm";
-import { createUser, getItems, getPlantsData, userExists } from "../utils/functions/economy/utils";
+import { createUser, getItems, getPlantsData, getPlantUpgrades, userExists } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import _ = require("lodash");
 import dayjs = require("dayjs");
+import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 
 const cmd = new Command("farm", "view your farms and harvest", "money").setAliases(["fields"]);
 
@@ -173,22 +177,96 @@ async function run(
       return embed;
     };
 
+
+    let selected = options.options[0].data.value;
+
+    const renderUpgrades = async (plantId: string) => {
+      const embed = new CustomEmbed(message.member).setHeader(
+        `${getPlantsData()[plantId].name} upgrades`,
+        message.author.avatarURL(),
+      );
+
+      const upgrades = getPlantUpgrades();
+
+
+      const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(
+        new ButtonBuilder().setCustomId("back1").setLabel("back").setStyle(ButtonStyle.Danger)
+      );
+
+      const maxRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(
+        new ButtonBuilder().setCustomId("back2").setLabel("back").setStyle(ButtonStyle.Danger)
+      );
+
+      let desc = "";
+
+      const userUpgrades = await getFarmUpgrades(message.member);
+
+      for (const upgradeId of Object.keys(upgrades)) {
+        const upgrade = upgrades[upgradeId];
+
+        if (upgrade.for && !upgrade.for.includes(selected)) continue;
+  
+  
+        const owned = userUpgrades.find((u) => u.upgradeId == upgradeId && u.plantId === selected)?.amount || 0;
+        const pluralName = upgrade.plural ? upgrade.plural : upgrade.name;
+
+
+        if (upgrade.type_single) {
+          desc += `**${pluralName}** ${owned}/${upgrade.type_single.stack_limit}`;
+        } else if (upgrade.type_upgradable) {
+          desc += `**${upgrade.name}** ${owned == 0 ? "none" : getItems()[upgrade.type_upgradable.items[owned - 1]].name}`
+        }
+
+        const button = new ButtonBuilder()
+          .setCustomId(`up-${upgradeId}`)
+          .setEmoji("⬆️")
+          .setLabel(`add ${upgrade.name}`);
+        const maxButton = new ButtonBuilder()
+          .setCustomId(`up-${upgradeId}-max`)
+          .setEmoji("⏫")
+          .setLabel(`add all ${pluralName}`);
+
+        if (owned < upgrade.type_single?.stack_limit || owned < upgrade.type_upgradable?.items.length) {
+          button.setStyle(ButtonStyle.Success);
+          maxButton.setStyle(ButtonStyle.Success);
+        } else {
+          button.setStyle(ButtonStyle.Secondary);
+          maxButton.setStyle(ButtonStyle.Secondary);
+          button.setDisabled(true);
+          maxButton.setDisabled(true);
+        }
+        desc += "\n";
+
+        row.addComponents(button);
+        maxRow.addComponents(maxButton);
+      }
+
+      embed.setDescription(desc);
+
+      return {embed: embed, rows: [row, maxRow]};
+    };
+
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(
+      new ButtonBuilder().setCustomId("upg").setLabel("upgrades").setStyle(ButtonStyle.Primary)
+    );
+
     const msg = await send({
       embeds: [await render(options.options[0].data.value)],
-      components: [new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(options)],
+      components: [new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(options), row],
     });
+
+    let inUpgradeMenu = false;
 
     const listen = async () => {
       const interaction = await msg
         .awaitMessageComponent({
           filter: (i) => i.user.id === message.author.id,
-          componentType: ComponentType.StringSelect,
           time: 60000,
         })
         .catch(() => {
           options.setDisabled(true);
           msg.edit({
-            components: [
+            components: inUpgradeMenu ? [] : [
               new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(options),
             ],
           });
@@ -196,15 +274,116 @@ async function run(
 
       if (!interaction) return;
 
-      if (interaction.customId === "farm") {
-        const embed = await render(interaction.values[0]);
-
+      if (interaction.customId === "farm" || interaction.customId.startsWith("back")) {
+        if (interaction.isStringSelectMenu()) selected = interaction.values[0];
+        const embed = await render(selected);
+        inUpgradeMenu = false;
+        
         interaction.update({
           embeds: [embed],
           components: [
             new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(options),
+            row,
           ],
         });
+        return listen();
+      }
+
+      if (interaction.customId === "upg") {
+        const { embed, rows } = await renderUpgrades(selected);
+        inUpgradeMenu = true;
+        await interaction.update({
+          embeds: [embed],
+          components: rows
+        });
+        return listen();
+      }
+
+      if (interaction.customId.startsWith("up-")) {
+        const upgradeId = interaction.customId.split("-")[1];
+        const upgrade = getPlantUpgrades()[upgradeId];
+
+        if (upgrade.type_single) {
+          const itemCount = (await getInventory(message.member)).find((i) => i.item === upgrade.type_single.item)?.amount || 0;
+          const item = getItems()[upgrade.type_single.item];
+
+          if (itemCount === 0) {
+            await interaction.reply({
+              embeds: [new ErrorEmbed(`you don't have any ${item.plural ? item.plural : item.name}`)],
+              ephemeral: true,
+            });
+            return listen();
+          }
+
+          const userUpgradeCount = (await getFarmUpgrades(message.member)).find((u) => u.upgradeId === upgradeId && u.plantId === selected)?.amount || 0;
+
+          if (userUpgradeCount >= upgrade.type_single.stack_limit) {
+            await interaction.reply({
+              embeds: [new ErrorEmbed(`you already have the max amount of ${item.plural ? item.plural : item.name}`)],
+              ephemeral: true,
+            });
+            return listen();
+          }
+
+          let count = 1;
+
+          if (interaction.customId.endsWith("-max")) {
+            count = Math.min(itemCount, upgrade.type_single.stack_limit - userUpgradeCount);
+          }
+
+          await setInventoryItem(message.member, item.id, itemCount - count);
+          await addFarmUpgrade(message.member, selected, upgradeId, count);
+
+          const { embed, rows } = await renderUpgrades(selected);
+          await interaction.update({
+            embeds: [embed],
+            components: rows
+          });
+        } else if (upgrade.type_upgradable) {
+          const userUpgradeLevel = (await getFarmUpgrades(message.member)).find((u) => u.upgradeId === upgradeId && u.plantId === selected)?.amount || 0;
+          const nextLevelItem = getItems()[upgrade.type_upgradable.items[userUpgradeLevel]];
+          const itemCount = (await getInventory(message.member)).find((i) => i.item === nextLevelItem.id)?.amount || 0;
+
+          if (userUpgradeLevel == upgrade.type_upgradable.items.length) {
+            await interaction.reply({
+              embeds: [new ErrorEmbed(`you are already at the max level for this upgrade`)],
+              ephemeral: true,
+            });
+            return listen();
+          }
+
+          if (itemCount === 0) {
+            await interaction.reply({
+              embeds: [new ErrorEmbed(`you don't have ${nextLevelItem.article} ${nextLevelItem.name}`)],
+              ephemeral: true,
+            });
+            return listen();
+          }
+
+          await setInventoryItem(message.member, nextLevelItem.id, itemCount - 1);
+          await addFarmUpgrade(message.member, selected, upgradeId, 1)
+
+          if (interaction.customId.endsWith("-max")) {
+            while (userUpgradeLevel < upgrade.type_upgradable.items.length) {
+              const userUpgradeLevel = (await getFarmUpgrades(message.member)).find((u) => u.upgradeId === upgradeId && u.plantId === selected)?.amount || 0;
+              const nextLevelItem = getItems()[upgrade.type_upgradable.items[userUpgradeLevel]];
+              if (!nextLevelItem) break;
+              const itemCount = (await getInventory(message.member)).find((i) => i.item === nextLevelItem.id)?.amount || 0;
+
+              if (itemCount === 0) break;
+
+              await setInventoryItem(message.member, nextLevelItem.id, itemCount - 1);
+              await addFarmUpgrade(message.member, selected, upgradeId, 1)
+            }
+          }
+
+          const { embed, rows } = await renderUpgrades(selected);
+          await interaction.update({
+            embeds: [embed],
+            components: rows
+          });
+        }
+
         return listen();
       }
     };
