@@ -202,7 +202,7 @@ async function run(
       const userUpgrades = await getFarmUpgrades(message.member);
 
       for (const upgradeId of Object.keys(upgrades)) {
-        let upgrade = upgrades[upgradeId];
+        const upgrade = upgrades[upgradeId];
 
         if (upgrade.for && !upgrade.for.includes(selected)) continue;
   
