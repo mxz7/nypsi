@@ -158,12 +158,12 @@ export async function getClaimable(member: GuildMember | string, plantId: string
 
   let items = 0;
 
+  const upgrades = getPlantUpgrades();
+  const userUpgrades = await getFarmUpgrades(id);
+
   for (const plant of plants) {
     const start = Date.now() - plant.harvestedAt.getTime();
     let hours = start / 3600000; // hours - chatgpt
-
-    const upgrades = getPlantUpgrades();
-    const userUpgrades = await getFarmUpgrades(id);
 
     let intervalMulti = 1;
 
