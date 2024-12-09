@@ -2176,7 +2176,8 @@
       "id:bronze_credit:0.7",
       "id:gem_shard:0.9",
       "id:omega_crate:0.05",
-      "id:apple_seed:7"
+      "id:apple_seed:7",
+      "id:stick:5"
     ],
     "random_drop_chance": 90
   },
@@ -2220,7 +2221,8 @@
       "id:cat_tag:0.1",
       "id:ferrari_skin:10",
       "id:reroll_token:4",
-      "id:veilside_rx7_skin:5"
+      "id:veilside_rx7_skin:5",
+      "id:stick:40"
     ],
     "random_drop_chance": 40
   },
@@ -2261,7 +2263,8 @@
       "id:xp_potion:50",
       "id:double_xp:15",
       "id:multi_potion:40",
-      "id:veilside_rx7_skin:10"
+      "id:veilside_rx7_skin:10",
+      "id:stick:20"
     ]
   },
   "corner_shop_scratchie": {
@@ -3206,7 +3209,7 @@
     "aliases": ["silo"],
     "craft": {
       "time": 43200,
-      "ingredients": ["galvanised_square_steel:40"]
+      "ingredients": ["galvanised_square_steel:70"]
     }
   },
   "stick": {
@@ -3216,10 +3219,10 @@
     "plural": "sticks",
     "emoji": ":nypsi_stick:",
     "longDesc": "used to make hoes for farms",
-    "rarity": 2,
+    "rarity": 4,
     "role": "item",
     "buy": 0,
-    "sell": 1000,
+    "sell": 10000,
     "in-crates": false
   },
   "stone_hoe": {
@@ -3232,11 +3235,11 @@
     "rarity": 69,
     "role": "farm-upgrade",
     "buy": 0,
-    "sell": 8500,
+    "sell": 200000,
     "in-crates": false,
     "craft": {
       "time": 7200,
-      "ingredients": ["stick:4", "cobblestone:10"]
+      "ingredients": ["stick:4", "cobblestone:400"]
     }
   },
   "iron_hoe": {
@@ -3249,11 +3252,11 @@
     "rarity": 69,
     "role": "farm-upgrade",
     "buy": 0,
-    "sell": 200000,
+    "sell": 5000000,
     "in-crates": false,
     "craft": {
       "time": 14400,
-      "ingredients": ["stick:4", "iron_ingot:10"]
+      "ingredients": ["stick:4", "iron_ingot:250"]
     }
   },
   "gold_hoe": {
@@ -3266,11 +3269,11 @@
     "rarity": 69,
     "role": "farm-upgrade",
     "buy": 0,
-    "sell": 330000,
+    "sell": 8250000,
     "in-crates": false,
     "craft": {
       "time": 21600,
-      "ingredients": ["stick:4", "gold_ingot:10"]
+      "ingredients": ["stick:4", "gold_ingot:250"]
     }
   },
   "diamond_hoe": {
@@ -3283,11 +3286,11 @@
     "rarity": 69,
     "role": "farm-upgrade",
     "buy": 0,
-    "sell": 600000,
+    "sell": 6000000,
     "in-crates": false,
     "craft": {
       "time": 28800,
-      "ingredients": ["stick:4", "diamond:10"]
+      "ingredients": ["stick:4", "diamond:100"]
     }
   },
   "netherite_hoe": {
@@ -3300,11 +3303,11 @@
     "rarity": 69,
     "role": "farm-upgrade",
     "buy": 0,
-    "sell": 30000000,
+    "sell": 75000000,
     "in-crates": false,
     "craft": {
       "time": 36000,
-      "ingredients": ["stick:4", "netherite_ingot:10"]
+      "ingredients": ["stick:4", "netherite_ingot:25"]
     }
   },
   "super_furnace": {
