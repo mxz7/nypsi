@@ -160,11 +160,20 @@ export async function getClaimable(member: GuildMember | string, plantId: string
 
   for (const plant of plants) {
     const start = Date.now() - plant.harvestedAt.getTime();
-    const hours = start / 3600000; // hours - chatgpt
-    const earned = hours * plantData.hourly;
+    let hours = start / 3600000; // hours - chatgpt
 
     const upgrades = getPlantUpgrades();
     const userUpgrades = await getFarmUpgrades(id);
+
+    let intervalMulti = 1;
+
+    for (const upgradeId of Object.keys(upgrades).filter((u) => upgrades[u].upgrades === "interval")) {
+      intervalMulti += upgrades[upgradeId].effect * userUpgrades.find((u) => u.upgradeId == upgradeId && u.plantId === plant.plantId)?.amount || 0;
+    }
+
+    hours *= intervalMulti;
+
+    const earned = hours * plantData.hourly;
 
     let storageMulti = 1;
 
