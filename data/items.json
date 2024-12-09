@@ -3205,7 +3205,7 @@
     "role": "farm-upgrade",
     "buy": 0,
     "sell": 100000,
-    "in-crates": false,
+    "in_crates": false,
     "aliases": ["silo"],
     "craft": {
       "time": 43200,
@@ -3223,7 +3223,7 @@
     "role": "item",
     "buy": 0,
     "sell": 10000,
-    "in-crates": false
+    "in_crates": false
   },
   "stone_hoe": {
     "id": "stone_hoe",
@@ -3236,7 +3236,7 @@
     "role": "farm-upgrade",
     "buy": 0,
     "sell": 200000,
-    "in-crates": false,
+    "in_crates": false,
     "craft": {
       "time": 7200,
       "ingredients": ["stick:4", "cobblestone:400"]
@@ -3253,7 +3253,7 @@
     "role": "farm-upgrade",
     "buy": 0,
     "sell": 5000000,
-    "in-crates": false,
+    "in_crates": false,
     "craft": {
       "time": 14400,
       "ingredients": ["stick:4", "iron_ingot:250"]
@@ -3270,7 +3270,7 @@
     "role": "farm-upgrade",
     "buy": 0,
     "sell": 8250000,
-    "in-crates": false,
+    "in_crates": false,
     "craft": {
       "time": 21600,
       "ingredients": ["stick:4", "gold_ingot:250"]
@@ -3287,7 +3287,7 @@
     "role": "farm-upgrade",
     "buy": 0,
     "sell": 6000000,
-    "in-crates": false,
+    "in_crates": false,
     "craft": {
       "time": 28800,
       "ingredients": ["stick:4", "diamond:100"]
@@ -3304,7 +3304,7 @@
     "role": "farm-upgrade",
     "buy": 0,
     "sell": 75000000,
-    "in-crates": false,
+    "in_crates": false,
     "craft": {
       "time": 36000,
       "ingredients": ["stick:4", "netherite_ingot:25"]
