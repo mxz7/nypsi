@@ -24,6 +24,7 @@ export default {
   name: "lottery",
   cron: "0 0 * * *",
   async run(log) {
+    await redis.set("nypsi:lottery", "boobies", "EX", 3600);
     const hook = new WebhookClient({ url: process.env.LOTTERY_HOOK });
 
     const ticketCount = await getTicketCount();
@@ -56,6 +57,7 @@ export default {
 
       if (!winner) {
         log("ERROR RUNNING LOTTERY");
+        await redis.del("nypsi:lottery");
         return;
       }
 
@@ -120,6 +122,8 @@ export default {
         }
       }
     }
+
+    await redis.del("nypsi:lottery");
 
     const autoBuys = await prisma.economy.findMany({
       where: {
