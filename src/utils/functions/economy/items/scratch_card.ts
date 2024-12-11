@@ -223,7 +223,7 @@ async function prepare(
 
     await card.clicked(response).catch((e: any) => {
       redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
-      logger.error("scratch card weird error !", { card, interactionId: interaction.customId });
+      logger.error("scratch card weird error !", { card, interactionId: response.customId });
       console.error(e);
       logger.error("follow up", e);
       console.trace();
