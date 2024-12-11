@@ -2176,7 +2176,8 @@
       "id:bronze_credit:0.7",
       "id:gem_shard:0.9",
       "id:omega_crate:0.05",
-      "id:apple_seed:7"
+      "id:apple_seed:7",
+      "id:stick:5"
     ],
     "random_drop_chance": 90
   },
@@ -2220,7 +2221,8 @@
       "id:cat_tag:0.1",
       "id:ferrari_skin:10",
       "id:reroll_token:4",
-      "id:veilside_rx7_skin:5"
+      "id:veilside_rx7_skin:5",
+      "id:stick:40"
     ],
     "random_drop_chance": 40
   },
@@ -2261,7 +2263,8 @@
       "id:xp_potion:50",
       "id:double_xp:15",
       "id:multi_potion:40",
-      "id:veilside_rx7_skin:10"
+      "id:veilside_rx7_skin:10",
+      "id:stick:20"
     ]
   },
   "corner_shop_scratchie": {
@@ -3190,6 +3193,122 @@
     "sell": 50000,
     "in_crates": true,
     "aliases": ["sbush"]
+  },
+  "farm_silo": {
+    "id": "farm_silo",
+    "name": "farm silo",
+    "article": "a",
+    "plural": "farm silos",
+    "emoji": "<:nypsi_silo:1316504619408687166>",
+    "longDesc": "increase a farm's output capacity by 50%",
+    "rarity": 69,
+    "role": "farm-upgrade",
+    "buy": 0,
+    "sell": 100000,
+    "in_crates": false,
+    "aliases": ["silo"],
+    "craft": {
+      "time": 43200,
+      "ingredients": ["galvanised_square_steel:70"]
+    }
+  },
+  "stick": {
+    "id": "stick",
+    "name": "stick",
+    "article": "a",
+    "plural": "sticks",
+    "emoji": "<:nypsi_stick:1315753197196808222>",
+    "longDesc": "used to make hoes for farms",
+    "rarity": 4,
+    "role": "item",
+    "buy": 0,
+    "sell": 10000,
+    "in_crates": false
+  },
+  "stone_hoe": {
+    "id": "stone_hoe",
+    "name": "stone hoe",
+    "article": "a",
+    "plural": "stone hoes",
+    "emoji": "<:stone_hoe:1315753227836330034>",
+    "longDesc": "increase a farm's output rate by 5%",
+    "rarity": 69,
+    "role": "farm-upgrade",
+    "buy": 0,
+    "sell": 200000,
+    "in_crates": false,
+    "craft": {
+      "time": 7200,
+      "ingredients": ["stick:4", "cobblestone:400"]
+    }
+  },
+  "iron_hoe": {
+    "id": "iron_hoe",
+    "name": "iron hoe",
+    "article": "an",
+    "plural": "iron hoes",
+    "emoji": "<:iron_hoe:1315753252343779328>",
+    "longDesc": "increase a farm's output rate by 10% when stacked with lower level hoes",
+    "rarity": 69,
+    "role": "farm-upgrade",
+    "buy": 0,
+    "sell": 5000000,
+    "in_crates": false,
+    "craft": {
+      "time": 14400,
+      "ingredients": ["stick:4", "iron_ingot:250"]
+    }
+  },
+  "gold_hoe": {
+    "id": "gold_hoe",
+    "name": "gold hoe",
+    "article": "a",
+    "plural": "gold hoes",
+    "emoji": "<:gold_hoe:1315753275701854249>",
+    "longDesc": "increase a farm's output rate by 15% when stacked with lower level hoes",
+    "rarity": 69,
+    "role": "farm-upgrade",
+    "buy": 0,
+    "sell": 8250000,
+    "in_crates": false,
+    "craft": {
+      "time": 21600,
+      "ingredients": ["stick:4", "gold_ingot:250"]
+    }
+  },
+  "diamond_hoe": {
+    "id": "diamond_hoe",
+    "name": "diamond hoe",
+    "article": "a",
+    "plural": "diamond hoes",
+    "emoji": "<:diamond_hoe:1315753311256711190>",
+    "longDesc": "increase a farm's output rate by 20% when stacked with lower level hoes",
+    "rarity": 69,
+    "role": "farm-upgrade",
+    "buy": 0,
+    "sell": 6000000,
+    "in_crates": false,
+    "craft": {
+      "time": 28800,
+      "ingredients": ["stick:4", "diamond:100"]
+    }
+  },
+  "netherite_hoe": {
+    "id": "netherite_hoe",
+    "name": "netherite hoe",
+    "article": "a",
+    "plural": "netherite hoes",
+    "emoji": "<:netherite:1315753341967663254>",
+    "longDesc": "increase a farm's output rate by 25% when stacked with lower level hoes",
+    "rarity": 69,
+    "role": "farm-upgrade",
+    "buy": 0,
+    "sell": 75000000,
+    "in_crates": false,
+    "craft": {
+      "time": 36000,
+      "ingredients": ["stick:4", "netherite_ingot:25"]
+    }
   },
   "super_furnace": {
     "id": "super_furnace",

@@ -5,7 +5,7 @@ import redis from "../../../init/redis";
 import Constants from "../../Constants";
 import { addProgress } from "./achievements";
 import { addInventoryItem, getInventory, setInventoryItem } from "./inventory";
-import { getPlantsData } from "./utils";
+import { getPlantsData, getPlantUpgrades } from "./utils";
 import dayjs = require("dayjs");
 import ms = require("ms");
 
@@ -53,6 +53,49 @@ export async function getFarm(member: GuildMember | string) {
   );
 
   return query;
+}
+
+export async function getFarmUpgrades(member: GuildMember | string) {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
+  const query = await prisma.farmUpgrades.findMany({
+    where: {
+      userId: id,
+    }
+  });
+
+  return query;
+}
+
+export async function addFarmUpgrade(
+  member: GuildMember,
+  plantId: string,
+  upgradeId: string,
+  amount = 1,
+) {
+  await prisma.farmUpgrades.upsert({
+    where: {
+      userId_plantId_upgradeId: {
+        upgradeId: upgradeId,
+        userId: member.user.id,
+        plantId: plantId,
+      },
+    },
+    update: {
+      amount: { increment: amount },
+    },
+    create: {
+      upgradeId: upgradeId,
+      userId: member.user.id,
+      plantId: plantId,
+      amount,
+    },
+  });
 }
 
 export async function addFarm(member: GuildMember | string, plantId: string, amount = 1) {
@@ -115,13 +158,31 @@ export async function getClaimable(member: GuildMember | string, plantId: string
 
   let items = 0;
 
+  const upgrades = getPlantUpgrades();
+  const userUpgrades = await getFarmUpgrades(id);
+
   for (const plant of plants) {
     const start = Date.now() - plant.harvestedAt.getTime();
-    const hours = start / 3600000; // hours - chatgpt
+    let hours = start / 3600000; // hours - chatgpt
+
+    let intervalMulti = 1;
+
+    for (const upgradeId of Object.keys(upgrades).filter((u) => upgrades[u].upgrades === "interval")) {
+      intervalMulti += upgrades[upgradeId].effect * userUpgrades.find((u) => u.upgradeId == upgradeId && u.plantId === plant.plantId)?.amount || 0;
+    }
+
+    hours *= intervalMulti;
+
     const earned = hours * plantData.hourly;
 
-    if (earned > plantData.max) items += plantData.max;
-    else items += earned;
+    let storageMulti = 1;
+
+    for (const upgradeId of Object.keys(upgrades).filter((u) => upgrades[u].upgrades === "max_storage")) {
+      storageMulti += upgrades[upgradeId].effect * userUpgrades.find((u) => u.upgradeId == upgradeId && u.plantId === plant.plantId)?.amount || 0;
+    }
+
+    if (earned > plantData.max) items += Math.floor(plantData.max * storageMulti);
+    else items += Math.floor(earned * storageMulti);
   }
 
   items = Math.floor(items);
