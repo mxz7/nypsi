@@ -3201,7 +3201,7 @@
     "article": "a",
     "plural": "farm silos",
     "emoji": "<:nypsi_silo:1316504619408687166>",
-    "longDesc": "increase a farm's output capacity by 50%",
+    "longDesc": "increase a farm's output capacity by 10%",
     "rarity": 69,
     "role": "farm-upgrade",
     "buy": 0,
