@@ -2131,7 +2131,8 @@
       "id:blue_gem:0.5",
       "id:lucky_cheese:5",
       "id:reroll_token:0.05",
-      "id:banana_seed:7"
+      "id:banana_seed:7",
+      "id:fertiliser"
     ]
   },
   "lucky_scratch_card": {
