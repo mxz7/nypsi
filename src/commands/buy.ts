@@ -10,6 +10,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
+import redis from "../init/redis";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getBalance, removeBalance } from "../utils/functions/economy/balance";
@@ -18,6 +19,7 @@ import { addStat } from "../utils/functions/economy/stats";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import dayjs = require("dayjs");
 
 const cmd = new Command("buy", "buy items from the shop", "money");
 
@@ -114,6 +116,14 @@ async function run(
 
   if (!selected.buy) {
     return send({ embeds: [new ErrorEmbed("you cannot buy this item")] });
+  }
+
+  if (selected.id === "lottery_ticket") {
+    const limit = dayjs().set("hour", 23).set("minute", 59).set("second", 0).set("millisecond", 0);
+
+    if (dayjs().isAfter(limit) || (await redis.exists("nypsi:lottery"))) {
+      return send({ embeds: [new ErrorEmbed("you cannot currently buy a lottery ticket")] });
+    }
   }
 
   let balance = await getBalance(message.member);
