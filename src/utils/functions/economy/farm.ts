@@ -66,7 +66,7 @@ export async function getFarmUpgrades(member: GuildMember | string) {
   const query = await prisma.farmUpgrades.findMany({
     where: {
       userId: id,
-    }
+    },
   });
 
   return query;
@@ -122,7 +122,13 @@ export async function getClaimable(member: GuildMember | string, plantId: string
         { userId: id },
         { plantId },
         { plantedAt: { lt: dayjs().subtract(plantData.growthTime, "seconds").toDate() } },
-        { harvestedAt: { lt: dayjs().subtract(1, "hour").toDate() } },
+        {
+          harvestedAt: {
+            lt: dayjs()
+              .subtract(60 / plantData.hourly, "minutes")
+              .toDate(),
+          },
+        },
         {
           wateredAt: {
             gt: dayjs()
@@ -167,8 +173,13 @@ export async function getClaimable(member: GuildMember | string, plantId: string
 
     let intervalMulti = 1;
 
-    for (const upgradeId of Object.keys(upgrades).filter((u) => upgrades[u].upgrades === "interval")) {
-      intervalMulti += upgrades[upgradeId].effect * userUpgrades.find((u) => u.upgradeId == upgradeId && u.plantId === plant.plantId)?.amount || 0;
+    for (const upgradeId of Object.keys(upgrades).filter(
+      (u) => upgrades[u].upgrades === "interval",
+    )) {
+      intervalMulti +=
+        upgrades[upgradeId].effect *
+          userUpgrades.find((u) => u.upgradeId == upgradeId && u.plantId === plant.plantId)
+            ?.amount || 0;
     }
 
     hours *= intervalMulti;
@@ -177,8 +188,13 @@ export async function getClaimable(member: GuildMember | string, plantId: string
 
     let storageMulti = 1;
 
-    for (const upgradeId of Object.keys(upgrades).filter((u) => upgrades[u].upgrades === "max_storage")) {
-      storageMulti += upgrades[upgradeId].effect * userUpgrades.find((u) => u.upgradeId == upgradeId && u.plantId === plant.plantId)?.amount || 0;
+    for (const upgradeId of Object.keys(upgrades).filter(
+      (u) => upgrades[u].upgrades === "max_storage",
+    )) {
+      storageMulti +=
+        upgrades[upgradeId].effect *
+          userUpgrades.find((u) => u.upgradeId == upgradeId && u.plantId === plant.plantId)
+            ?.amount || 0;
     }
 
     if (earned > plantData.max) items += Math.floor(plantData.max * storageMulti);
