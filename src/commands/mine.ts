@@ -357,7 +357,10 @@ async function doMine(
     foundItems.set(chosen, foundItems.has(chosen) ? foundItems.get(chosen) + amount : amount);
   }
 
-  if (!unbreakable && percentChance(0.65)) foundItems.set("stick", 1);
+  if (!unbreakable && percentChance(0.65)) {
+    foundItems.set("stick", 1);
+    await addInventoryItem(member, "stick", 1);
+  }
 
   let total = 0;
 

@@ -81,7 +81,7 @@
       "upgrades": "max_storage",
       "effect": 0.1,
       "type_single": {
-        "stack_limit": 4,
+        "stack_limit": 5,
         "item": "farm_silo"
       }
     },
