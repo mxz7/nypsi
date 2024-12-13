@@ -1,19 +1,23 @@
 import { DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
-import { Image, ImageSuggestion } from "@prisma/client";
 import { parse } from "@twemoji/parser";
-import { User } from "discord.js";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import s3 from "../../init/s3";
 import Constants from "../Constants";
-import { logger } from "../logger";
-import { addProgress } from "./economy/achievements";
-import { userExists } from "./economy/utils";
-import { addNotificationToQueue } from "./users/notifications";
 
 export function isImageUrl(url: string): boolean {
   return /\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(url);
 }
+
+type Image = {
+  id: string;
+  type: string;
+  name?: string;
+  likes: number;
+  reports: number;
+  url: string;
+  image: string;
+};
 
 export async function getRandomImage(type: string) {
   const cache = await redis.get(`${Constants.redis.cache.IMAGE}:${type}`);
@@ -23,93 +27,16 @@ export async function getRandomImage(type: string) {
   if (cache) {
     images = JSON.parse(cache) as Image[];
   } else {
-    if (type !== "wholesome") {
-      images = await fetch(`https://animals.maxz.dev/api/${type}/all`).then((r) =>
-        r.json().then((i) => i.map((i: any) => ({ id: i.id, url: i.image, name: i.name }))),
-      );
+    images = await fetch(`https://animals.maxz.dev/api/${type}/all`).then((r) =>
+      r.json().then((i) => i.map((i: any) => ({ id: i.id, url: i.image, name: i.name }))),
+    );
 
-      await redis.set(
-        `${Constants.redis.cache.IMAGE}:${type}`,
-        JSON.stringify(images),
-        "EX",
-        86400,
-      );
-    } else {
-      images = await prisma.image.findMany({
-        where: {
-          type,
-        },
-      });
-
-      await redis.set(
-        `${Constants.redis.cache.IMAGE}:${type}`,
-        JSON.stringify(images),
-        "EX",
-        86400,
-      );
-    }
+    await redis.set(`${Constants.redis.cache.IMAGE}:${type}`, JSON.stringify(images), "EX", 86400);
   }
 
   const chosen = images[Math.floor(Math.random() * images.length)];
 
-  // doesnt work if not awaited !?!?!??!!?
-  await prisma.image
-    .update({
-      where: { id: chosen.id },
-      data: { views: { increment: 1 } },
-    })
-    .catch(() => null);
-
   return chosen;
-}
-
-export async function getImageSuggestion() {
-  return await prisma.imageSuggestion.findFirst();
-}
-
-export async function reviewImageSuggestion(
-  image: ImageSuggestion,
-  result: "accept" | "deny",
-  mod: User,
-) {
-  const found = await prisma.imageSuggestion
-    .delete({
-      where: {
-        id: image.id,
-      },
-    })
-    .catch(() => null);
-
-  if (!found) return;
-
-  if (result === "accept") {
-    const { id } = await prisma.image.create({
-      data: {
-        type: image.type,
-        accepterId: mod.id,
-        uploaderId: image.uploaderId,
-        url: image.url,
-      },
-      select: {
-        id: true,
-      },
-    });
-
-    await redis.del(`${Constants.redis.cache.IMAGE}:${image.type}`);
-
-    logger.info(
-      `admin: ${mod.id} (${mod.username}) accepted suggestion by ${image.uploaderId} id: ${id}`,
-    );
-
-    if (image.uploaderId !== Constants.BOT_USER_ID)
-      addNotificationToQueue({
-        memberId: image.uploaderId,
-        payload: { content: `your image (${image.url}) has been accepted` },
-      });
-    if (await userExists(image.uploaderId)) addProgress(image.uploaderId, "wholesome", 1);
-  } else {
-    logger.info(`admin: ${mod.id} (${mod.username}) denied suggestion by ${image.uploaderId}`);
-  }
 }
 
 export function getEmojiImage(emoji: string) {

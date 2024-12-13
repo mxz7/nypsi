@@ -845,37 +845,6 @@ model ActiveChannels {
   @@id([userId, channelId])
 }
 
-// for image commands (wholesome etc)
-model Image {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-
-  url  String
-  type ImageType
-
-  uploaderId String?
-  accepterId String?
-
-  views Int @default(0)
-}
-
-model ImageSuggestion {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-
-  url  String
-  type ImageType
-
-  uploaderId String
-}
-
-enum ImageType {
-  cat
-  dog
-  capybara
-  wholesome
-}
-
 model Session {
   id        String   @id
   userId    String
