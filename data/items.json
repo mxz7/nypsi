@@ -1002,7 +1002,7 @@
     "emoji": "<:nypsi_galvanised_square_steel:1255597224361070783>",
     "longDesc": "eco friendly wood veneer and screws from your aunt",
     "rarity": 1,
-    "role": "collectable",
+    "role": "item",
     "in_crates": true
   },
   "bitch": {
