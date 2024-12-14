@@ -16,7 +16,11 @@ async function run(
   args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
-    if ((message.channel as TextChannel).parentId != "747056029795221514") return;
+    if (
+      (message.channel as TextChannel).parentId !== "747056029795221514" &&
+      message.channelId !== "1071476219972948050"
+    )
+      return;
     if (!(await isPremium(message.member))) return;
   }
 
