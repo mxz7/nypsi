@@ -94,6 +94,9 @@ async function run(
 
         interaction.reply({ embeds: [embed] });
       } else if (interaction.customId === "kick") {
+        if (profile.userId === message.author.id)
+          return interaction.reply({ embeds: [new ErrorEmbed("masochist")] });
+
         if (!profile.invitedById)
           return interaction.reply({
             embeds: [new ErrorEmbed("cannot vote kick a founding father")],
