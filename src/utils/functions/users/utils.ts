@@ -294,12 +294,6 @@ export async function dataDelete(userId: string) {
     },
   });
 
-  await prisma.lotteryTicket.deleteMany({
-    where: {
-      userId: userId,
-    },
-  });
-
   await prisma.premiumCommand.deleteMany({
     where: {
       owner: userId,
