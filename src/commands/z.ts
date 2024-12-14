@@ -25,9 +25,14 @@ async function run(
 ) {
   if (await onCooldown(cmd.name, message.member)) return;
 
+  if (message.channelId !== Constants.Z_CHANNEL) {
+    await addCooldown(cmd.name, message.member, 10);
+    return (message as Message).react("💤");
+  }
+
   const profile = await getZProfile(message.author.id);
 
-  if (!profile || message.channelId !== Constants.Z_CHANNEL) {
+  if (!profile || profile.removed) {
     await addCooldown(cmd.name, message.member, 10);
     return (message as Message).react("💤");
   }
