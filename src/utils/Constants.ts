@@ -111,7 +111,7 @@ export default {
         COMPLETION_LB: "cache:economy:lb:completion",
       },
       z: {
-        profile: "nypsi:z:profile",
+        profile: "cache:z:profile",
       },
     },
     nypsi: {
