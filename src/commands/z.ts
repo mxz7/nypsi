@@ -25,7 +25,7 @@ async function run(
 ) {
   if (await onCooldown(cmd.name, message.member)) return;
 
-  let profile = await getZProfile(message.author.id);
+  const profile = await getZProfile(message.author.id);
 
   if (!profile || message.channelId !== Constants.Z_CHANNEL) {
     await addCooldown(cmd.name, message.member, 10);
@@ -77,7 +77,7 @@ async function run(
           `${await getLastKnownUsername(profile.userId)}'s invites`,
           await getLastKnownAvatar(profile.userId),
         );
-        let desc: string[] = [];
+        const desc: string[] = [];
 
         for (const invite of profile.invitees) {
           desc.push(`${await getLastKnownUsername(invite.userId)} \`${invite.userId}\``);
