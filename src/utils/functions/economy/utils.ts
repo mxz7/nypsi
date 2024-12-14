@@ -401,8 +401,6 @@ export async function setEcoBan(id: string, date?: Date) {
 
 export async function reset() {
   logger.info("deleting lottery");
-  await prisma.lotteryTicket.deleteMany();
-  await prisma.$executeRaw`ALTER SEQUENCE "LotteryTicket_id_seq" RESTART WITH 1;`;
   logger.info("deleting boosters");
   await prisma.booster.deleteMany();
   await prisma.$executeRaw`TRUNCATE TABLE "Booster" RESTART IDENTITY;`;

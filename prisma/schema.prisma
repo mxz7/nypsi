@@ -204,7 +204,6 @@ model Economy {
 
   auctionWatch       AuctionWatch[]
   Boosters           Booster[]
-  LotteryTicket      LotteryTicket[]
   EconomyWorker      EconomyWorker[]
   Inventory          Inventory[]
   Crafting           Crafting[]
@@ -372,13 +371,6 @@ model EconomyWorkerUpgrades {
   worker EconomyWorker @relation(fields: [userId, workerId], references: [userId, workerId], onDelete: Cascade)
 
   @@id([userId, workerId, upgradeId])
-}
-
-model LotteryTicket {
-  id     Int    @id @default(autoincrement())
-  userId String
-
-  economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
 }
 
 model Booster {
