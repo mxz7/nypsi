@@ -60,7 +60,8 @@ async function run(
         new ButtonBuilder().setCustomId("kick").setLabel("kick").setStyle(ButtonStyle.Danger),
       );
 
-      msg = await message.channel.send({ embeds: [embed], components: [row] });
+      if (msg) msg.edit({ embeds: [embed], components: [row] });
+      else msg = await message.channel.send({ embeds: [embed], components: [row] });
       return msg;
     };
 
@@ -104,7 +105,7 @@ async function run(
 
         if (profile.voteKicks.find((i) => i.userId === message.author.id)) {
           const res = await removeVoteKick(message.author.id, profile.userId);
-          profile = await getZProfile(message.author.id);
+          profile = await getZProfile(profile.userId);
           render(msg);
 
           if (res === "removed") {
@@ -122,7 +123,7 @@ async function run(
           }
         } else {
           const res = await castVoteKick(message.author.id, profile.userId, message.guild);
-          profile = await getZProfile(message.author.id);
+          profile = await getZProfile(profile.userId);
 
           if (res === "already voted") {
             await interaction.reply({ embeds: [new ErrorEmbed("already voted")] });
