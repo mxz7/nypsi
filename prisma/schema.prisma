@@ -46,6 +46,7 @@ model User {
   Captchas                 Captcha[]
   ModerationEvidence       ModerationEvidence[]
   ChatReactionLeaderboards ChatReactionLeaderboards[]
+  z                        z?
 }
 
 model ProfileView {
@@ -876,8 +877,41 @@ model BotMetrics {
 
 // for specific image hosting on cdn.nypsi.xyz
 model Images {
-  id           String         @id
-  createdAt    DateTime       @default(now())
-  bytes        BigInt
+  id        String   @id
+  createdAt DateTime @default(now())
+  bytes     BigInt
+
   EconomyGuild EconomyGuild[]
+}
+
+model z {
+  userId String @id
+
+  createdAt DateTime @default(now())
+  hasInvite Boolean  @default(false)
+  removed   Boolean  @default(false)
+  rating    Int      @default(0) @db.SmallInt
+
+  voteKickId  Int[]   @default([])
+  invitedById String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  invitedBy z?  @relation("invitedby", fields: [invitedById], references: [userId], onDelete: Cascade)
+  invitees  z[] @relation("invitedby")
+
+  userVoteKicks zKicks[] @relation(name: "owner")
+  voteKicks     zKicks[] @relation(name: "target")
+}
+
+model zKicks {
+  userId   String
+  targetId String
+
+  createdAt DateTime @default(now())
+
+  zUser   z @relation("owner", fields: [userId], references: [userId], onDelete: Cascade)
+  zTarget z @relation("target", fields: [targetId], references: [userId], onDelete: Cascade)
+
+  @@id([userId, targetId])
 }

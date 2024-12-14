@@ -110,6 +110,9 @@ export default {
         LEVELLING_UP: "cache:economy:levellingup",
         COMPLETION_LB: "cache:economy:lb:completion",
       },
+      z: {
+        profile: "nypsi:z:profile",
+      },
     },
     nypsi: {
       MENTION_QUEUE: "nypsi:mention:queue",
@@ -198,4 +201,6 @@ export default {
   HIGHEROLLER_REQUIREMENT: 500,
   EVIDENCE_BASE: 30000000, // 30MB
   CRASH_CHANNEL: "1300561687975432272",
+  Z_ROLE: "1316836307242319882",
+  Z_CHANNEL: "1316836441204068463",
 } as const;
