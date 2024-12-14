@@ -17,7 +17,7 @@ import { logger } from "../../utils/logger";
 
 export default {
   name: "seed leaderboards",
-  cron: "0 * * * *",
+  cron: "0 0 * * *",
   run: async () => {
     const start = Date.now();
     const itemIds = Object.keys(getItems());
