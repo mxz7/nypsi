@@ -9,7 +9,7 @@ import pAll = require("p-all");
 
 export default {
   name: "netupdate",
-  cron: "0 */3 * * *",
+  cron: "0 */6 * * *",
   async run(log) {
     const start = Date.now();
     const query = await prisma.economy.findMany({
