@@ -1,3 +1,4 @@
+import dayjs = require("dayjs");
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { Job } from "../../types/Jobs";
@@ -8,13 +9,18 @@ import sleep from "../../utils/functions/sleep";
 import pAll = require("p-all");
 
 export default {
-  name: "netupdate",
-  cron: "0 */6 * * *",
+  name: "netupdate-3",
+  cron: "0 0 * * *",
   async run(log) {
     const start = Date.now();
     const query = await prisma.economy.findMany({
       select: {
         userId: true,
+      },
+      where: {
+        user: {
+          lastCommand: { gt: dayjs().subtract(1, "day").toDate() },
+        },
       },
     });
 
