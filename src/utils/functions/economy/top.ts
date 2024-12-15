@@ -103,7 +103,7 @@ export async function topBalanceGlobal(amount: number, allowHidden = true): Prom
       },
     },
     orderBy: [{ money: "desc" }, { user: { lastKnownUsername: "asc" } }],
-    take: amount,
+    take: amount * 2,
   });
 
   const usersFinal = [];
@@ -144,7 +144,7 @@ export async function topBalanceGlobal(amount: number, allowHidden = true): Prom
     "balance",
   );
 
-  return usersFinal;
+  return usersFinal.slice(0, amount);
 }
 
 export async function topNetWorthGlobal(userId: string, amount = 100) {
