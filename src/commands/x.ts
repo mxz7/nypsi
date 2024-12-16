@@ -46,7 +46,7 @@ import {
 import { getAdminLevel, setAdminLevel } from "../utils/functions/users/admin";
 import { isUserBlacklisted, setUserBlacklist } from "../utils/functions/users/blacklist";
 import { getCommandUses } from "../utils/functions/users/commands";
-import { checkPurchases, getEmail, getTotalSpend } from "../utils/functions/users/email";
+import { getEmail, getTotalSpend } from "../utils/functions/users/email";
 import { addNotificationToQueue } from "../utils/functions/users/notifications";
 import { addTag, getTags, removeTag } from "../utils/functions/users/tags";
 import { hasProfile } from "../utils/functions/users/utils";
@@ -469,8 +469,6 @@ async function run(
             amount: amount ? parseInt(amount) : undefined,
           },
         });
-
-        checkPurchases(user.id);
 
         logger.info(
           `admin: ${message.author.id} (${message.author.username}) created purchase for ${user.id} ${msgResponse.first().content}`,
