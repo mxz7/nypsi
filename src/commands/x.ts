@@ -1691,7 +1691,7 @@ async function run(
     for (const i of old) {
       newData.push({
         cost: new Prisma.Decimal(
-          Array.from(Constants.KOFI_PRODUCTS.values()).find((i) => i.name === i.name).cost,
+          Array.from(Constants.KOFI_PRODUCTS.values()).find((j) => j.name === i.item)?.cost || 0,
         ),
         item: i.item,
         source: "kofi-old",
