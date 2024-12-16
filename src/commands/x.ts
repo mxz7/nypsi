@@ -1645,7 +1645,7 @@ async function run(
         ),
         item: i.item,
         source: "kofi-old",
-        email: i.email || (await getEmail(i.userId)) || "unknown email",
+        email: i.email || (await getEmail(i.userId).catch(() => "")) || "unknown email",
         userId: i.userId,
         createdAt: i.date,
       });
