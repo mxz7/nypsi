@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import * as topgg from "@top-gg/sdk";
 import { ClusterManager } from "discord-hybrid-sharding";
 import {
@@ -304,22 +305,31 @@ async function handleKofiData(data: KofiResponse) {
     }`,
   );
 
+  if (user) {
+    await redis.del(`${Constants.redis.cache.premium.TOTAL_SPEND}:${user.id}`);
+  }
+
   if (data.type === "Donation") {
     if (user) {
       createAuraTransaction(user.id, Constants.BOT_USER_ID, 500);
-      await prisma.user.update({
-        where: {
-          id: user.id,
-        },
+
+      await prisma.purchases.create({
         data: {
-          totalSpend: { increment: parseFloat(data.amount) },
+          userId: user.id,
+          item: "donation",
+          cost: new Prisma.Decimal(data.amount),
+          email: data.email,
+          source: "kofi",
         },
       });
-
-      await prisma.kofiPurchases.create({ data: { item: "donation", userId: user.id } });
     } else {
-      await prisma.kofiPurchases.create({
-        data: { item: `donation-${data.amount}`, email: data.email },
+      await prisma.purchases.create({
+        data: {
+          item: "donation",
+          cost: new Prisma.Decimal(data.amount),
+          email: data.email,
+          source: "kofi",
+        },
       });
     }
 
@@ -341,20 +351,16 @@ async function handleKofiData(data: KofiResponse) {
 
       if (user) {
         createAuraTransaction(user.id, Constants.BOT_USER_ID, 500);
-        await prisma.user.update({
-          where: {
-            id: user.id,
-          },
-          data: {
-            totalSpend: { increment: parseFloat((item.cost * shopItem.quantity).toString()) },
-          },
-        });
 
-        await prisma.kofiPurchases.createMany({
-          data: new Array(shopItem.quantity).fill({
+        await prisma.purchases.create({
+          data: {
             userId: user.id,
             item: item.name,
-          }),
+            amount: shopItem.quantity,
+            cost: new Prisma.Decimal(item.cost).mul(new Prisma.Decimal(shopItem.quantity)),
+            email: data.email,
+            source: "kofi",
+          },
         });
 
         if (item.name === "unecoban") {
@@ -377,9 +383,10 @@ async function handleKofiData(data: KofiResponse) {
               const hook = new WebhookClient({ url: process.env.THANKYOU_HOOK });
               await hook.send({
                 embeds: [
-                  new CustomEmbed(null, `${user.lastKnownUsername} just bought an **unban**!!!!`)
-                    .setFooter({ text: "thank you for your purchase (:" })
-                    .setColor(Constants.PURPLE),
+                  new CustomEmbed(
+                    user.id,
+                    `${user.lastKnownUsername} just bought an **unban**!!!!`,
+                  ).setFooter({ text: "thank you for your purchase (:" }),
                 ],
               });
               hook.destroy();
@@ -411,13 +418,11 @@ async function handleKofiData(data: KofiResponse) {
               await hook.send({
                 embeds: [
                   new CustomEmbed(
-                    null,
+                    user.id,
                     `${user.lastKnownUsername} just bought ${shopItem.quantity}x ${
                       getItems()[item.name].emoji
                     } **${getItems()[item.name].name}**!!!!`,
-                  )
-                    .setFooter({ text: "thank you for your purchase (:" })
-                    .setColor(Constants.PURPLE),
+                  ).setFooter({ text: "thank you for your purchase (:" }),
                 ],
               });
               hook.destroy();
@@ -525,11 +530,14 @@ async function handleKofiData(data: KofiResponse) {
           }
         }
       } else {
-        await prisma.kofiPurchases.createMany({
-          data: new Array(shopItem.quantity).fill({
+        await prisma.purchases.create({
+          data: {
             email: data.email,
             item: item.name,
-          }),
+            amount: shopItem.quantity,
+            cost: new Prisma.Decimal(item.cost).mul(new Prisma.Decimal(shopItem.quantity)),
+            source: "kofi",
+          },
         });
 
         logger.info(`created purchase for ${data.email}`, item);
@@ -555,17 +563,14 @@ async function handleKofiData(data: KofiResponse) {
 
     if (user) {
       createAuraTransaction(user.id, Constants.BOT_USER_ID, 500);
-      await prisma.user.update({
-        where: {
-          id: user.id,
-        },
-        data: { totalSpend: { increment: parseFloat(item.cost.toString()) } },
-      });
 
-      await prisma.kofiPurchases.create({
+      await prisma.purchases.create({
         data: {
           userId: user.id,
+          email: data.email,
+          cost: new Prisma.Decimal(item.cost),
           item: item.name,
+          source: "kofi",
         },
       });
 
@@ -578,11 +583,12 @@ async function handleKofiData(data: KofiResponse) {
             const hook = new WebhookClient({ url: process.env.THANKYOU_HOOK });
             await hook.send({
               embeds: [
-                new CustomEmbed(null, `${user.lastKnownUsername} just bought **${item.name}**!!!!`)
-                  .setFooter({
-                    text: "thank you for your purchase (:",
-                  })
-                  .setColor(Constants.PURPLE),
+                new CustomEmbed(
+                  user.id,
+                  `${user.lastKnownUsername} just bought **${item.name}**!!!!`,
+                ).setFooter({
+                  text: "thank you for your purchase (:",
+                }),
               ],
             });
             hook.destroy();
@@ -596,23 +602,27 @@ async function handleKofiData(data: KofiResponse) {
           const hook = new WebhookClient({ url: process.env.THANKYOU_HOOK });
           await hook.send({
             embeds: [
-              new CustomEmbed(null, `${user.lastKnownUsername} just bought **${item.name}**!!!!`)
-                .setFooter({
-                  text: "thank you for your purchase (:",
-                })
-                .setColor(Constants.PURPLE),
+              new CustomEmbed(
+                user.id,
+                `${user.lastKnownUsername} just bought **${item.name}**!!!!`,
+              ).setFooter({
+                text: "thank you for your purchase (:",
+              }),
             ],
           });
           hook.destroy();
         }
       }
     } else {
-      await prisma.kofiPurchases.create({
+      await prisma.purchases.create({
         data: {
           email: data.email,
           item: item.name,
+          cost: new Prisma.Decimal(item.cost),
+          source: "kofi",
         },
       });
+
       logger.info(`created purchase for ${data.email}`, item);
     }
   }

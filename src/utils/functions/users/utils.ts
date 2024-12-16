@@ -132,17 +132,17 @@ export async function doProfileTransfer(fromId: string, toId: string) {
           await prisma.tags.createMany({ data: tags });
         }
 
-        const purchases = (await prisma.kofiPurchases.findMany({ where: { userId: fromId } })).map(
+        const purchases = (await prisma.purchases.findMany({ where: { userId: fromId } })).map(
           (i) => {
             i.userId = toId;
             return i;
           },
         );
         if (purchases.length > 0) {
-          await prisma.kofiPurchases.deleteMany({
+          await prisma.purchases.deleteMany({
             where: { id: { in: purchases.map((i) => i.id) } },
           });
-          await prisma.kofiPurchases.createMany({ data: purchases });
+          await prisma.purchases.createMany({ data: purchases });
         }
 
         const economy = await prisma.economy.findUnique({ where: { userId: fromId } });

@@ -1,4 +1,5 @@
 import dayjs = require("dayjs");
+import { Prisma } from "@prisma/client";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -45,6 +46,7 @@ import {
 import { getAdminLevel, setAdminLevel } from "../utils/functions/users/admin";
 import { isUserBlacklisted, setUserBlacklist } from "../utils/functions/users/blacklist";
 import { getCommandUses } from "../utils/functions/users/commands";
+import { getEmail, getTotalSpend } from "../utils/functions/users/email";
 import { addNotificationToQueue } from "../utils/functions/users/notifications";
 import { addTag, getTags, removeTag } from "../utils/functions/users/tags";
 import { hasProfile } from "../utils/functions/users/utils";
@@ -1574,8 +1576,8 @@ async function run(
         "\n$x findid (tag/username) - will attempt to find user id from cached users and database" +
         "\n$x transfer <from id> <to id> - start a profile transfer" +
         "\n$x drop - start a random drop" +
-        "\n$x review - review image suggestions" +
-        "\n$x img <id> - view a specific image",
+        "\n$x memberfind - debug member targetting" +
+        "\n$x fixcrash - reinitialise crash",
     );
 
     return message.channel.send({ embeds: [embed] });
@@ -1597,8 +1599,8 @@ async function run(
     const fromId = args[1];
     const toId = args[2];
 
-    const fromUser = await message.client.users.fetch(fromId).catch(() => null);
-    const toUser = await message.client.users.fetch(toId).catch(() => null);
+    const fromUser = await message.client.users.fetch(fromId).catch(() => {});
+    const toUser = await message.client.users.fetch(toId).catch(() => {});
 
     if (!fromUser) return message.channel.send({ embeds: [new ErrorEmbed("invalid from user")] });
     if (!toUser) return message.channel.send({ embeds: [new ErrorEmbed("invalid to user")] });
@@ -1629,6 +1631,55 @@ async function run(
     if (message.author.id !== Constants.TEKOH_ID) return;
     await redis.del(Constants.redis.nypsi.CRASH_STATUS);
     await initCrashGame(message.client as NypsiClient);
+  } else if (args[0].toLowerCase() === "kofi") {
+    if (message.author.id !== Constants.TEKOH_ID) return;
+
+    const old = await prisma.kofiPurchases.findMany();
+
+    const newData: Prisma.PurchasesCreateManyInput[] = [];
+
+    for (const i of old) {
+      newData.push({
+        cost: new Prisma.Decimal(
+          Array.from(Constants.KOFI_PRODUCTS.values()).find((i) => i.name === i.name).cost,
+        ),
+        item: i.item,
+        source: "kofi-old",
+        email: i.email || (await getEmail(i.userId)) || "unknown email",
+        userId: i.userId,
+        createdAt: i.date,
+      });
+    }
+
+    await prisma.purchases.createMany({
+      data: newData,
+    });
+  } else if (args[0].toLowerCase() === "checkspend") {
+    const userIds = await prisma.purchases.findMany({
+      distinct: ["userId"],
+      select: {
+        userId: true,
+      },
+    });
+
+    for (const userId of userIds) {
+      const old = await prisma.user.findUnique({
+        where: {
+          id: userId.userId,
+        },
+        select: {
+          totalSpend: true,
+        },
+      });
+
+      const newSpend = await getTotalSpend(userId.userId);
+
+      if (newSpend !== old.totalSpend) {
+        logger.debug(
+          `wrong total spend ${newSpend} - ${old.totalSpend}. diff: ${newSpend - old.totalSpend}`,
+        );
+      }
+    }
   }
 }
 
