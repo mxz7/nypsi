@@ -1677,7 +1677,7 @@ async function run(
 
       if (newSpend !== old.totalSpend) {
         logger.debug(
-          `wrong total spend ${newSpend} - ${old.totalSpend}. diff: ${newSpend - old.totalSpend}`,
+          `${userId} wrong total spend ${newSpend} - ${old.totalSpend}. diff: ${newSpend - old.totalSpend}`,
         );
       }
     }
