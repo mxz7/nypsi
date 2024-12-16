@@ -37,6 +37,7 @@ export default {
         LEVEL: "cache:premium:level",
         BOOSTER: "cache:premium:booster",
         COLOR: "cache:premium:color",
+        TOTAL_SPEND: "cache:premium:spend",
       },
       user: {
         DM_BLOCK: "cache:user:dmblock",
