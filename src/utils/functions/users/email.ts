@@ -1,4 +1,5 @@
 import prisma from "../../../init/database";
+import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
@@ -48,7 +49,7 @@ export async function checkPurchases(id: string) {
 
   if (!email) return;
 
-  const query = await prisma.kofiPurchases.findMany({
+  const query = await prisma.purchases.findMany({
     where: {
       AND: [
         {
@@ -67,16 +68,7 @@ export async function checkPurchases(id: string) {
   for (const item of query) {
     logger.info(`giving purchased item to ${id}`, item);
 
-    if (item.item.startsWith("donation-")) {
-      await prisma.user.update({
-        where: {
-          id,
-        },
-        data: {
-          totalSpend: { increment: parseFloat(item.item.split("-")[1] || "0") },
-        },
-      });
-
+    if (item.item === "donation") {
       if ((await getDmSettings(id)).premium) {
         const payload: NotificationPayload = {
           memberId: id,
@@ -87,7 +79,7 @@ export async function checkPurchases(id: string) {
                 `thank you very much for your donation of ${Intl.NumberFormat("en-GB", {
                   style: "currency",
                   currency: "GBP",
-                }).format(parseFloat(item.item.split("-")[1] || "0"))}`,
+                }).format(item.cost.toNumber())}`,
               )
               .setColor(Constants.TRANSPARENT_EMBED_COLOR),
           },
@@ -96,19 +88,6 @@ export async function checkPurchases(id: string) {
         addNotificationToQueue(payload);
       }
     } else {
-      await prisma.user.update({
-        where: {
-          id,
-        },
-        data: {
-          totalSpend: {
-            increment:
-              Array.from(Constants.KOFI_PRODUCTS.values()).find((i) => i.name === item.item)
-                ?.cost || 0,
-          },
-        },
-      });
-
       if (premiums.includes(item.item)) {
         if (await isPremium(id)) {
           if (levelString(await getTier(id)).toLowerCase() != item.item) {
@@ -163,7 +142,7 @@ export async function checkPurchases(id: string) {
     }
   }
 
-  await prisma.kofiPurchases.updateMany({
+  await prisma.purchases.updateMany({
     where: {
       email: {
         equals: email,
@@ -171,19 +150,37 @@ export async function checkPurchases(id: string) {
       },
     },
     data: {
-      email: null,
       userId: id,
     },
   });
+
+  await redis.del(`${Constants.redis.cache.premium.TOTAL_SPEND}:${id}`);
 }
 
 export async function getTotalSpend(userId: string) {
-  if (!(await hasProfile(userId))) return 0;
+  const cache = await redis.get(`${Constants.redis.cache.premium.TOTAL_SPEND}:${userId}`);
 
-  const query = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { totalSpend: true },
+  if (cache) {
+    return parseFloat(cache);
+  }
+
+  if (!(await hasProfile(userId))) {
+    await redis.set(`${Constants.redis.cache.premium.TOTAL_SPEND}:${userId}`, "0", "EX", 86400);
+    return 0;
+  }
+
+  const query = await prisma.purchases.aggregate({
+    _sum: {
+      cost: true,
+    },
   });
 
-  return query.totalSpend;
+  await redis.set(
+    `${Constants.redis.cache.premium.TOTAL_SPEND}:${userId}`,
+    query._sum.cost.toNumber(),
+    "EX",
+    86400,
+  );
+
+  return query._sum.cost.toNumber();
 }

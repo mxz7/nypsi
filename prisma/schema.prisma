@@ -47,6 +47,7 @@ model User {
   ModerationEvidence       ModerationEvidence[]
   ChatReactionLeaderboards ChatReactionLeaderboards[]
   z                        z?
+  Purchases                Purchases[]
 }
 
 model ProfileView {
@@ -814,6 +815,21 @@ model KofiPurchases {
   userId String?
 
   user User? @relation(fields: [userId], references: [id])
+}
+
+model Purchases {
+  id Int @id @default(autoincrement())
+
+  createdAt DateTime @default(now())
+  source    String
+  email     String?
+
+  item   String
+  amount Int?
+  cost   Decimal
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
 }
 
 // data for creating graphs
