@@ -16,7 +16,6 @@ import {
   setTier,
 } from "../premium/premium";
 import { addNotificationToQueue, getDmSettings } from "./notifications";
-import { hasProfile } from "./utils";
 
 export async function getEmail(id: string) {
   const query = await prisma.user.findUnique({
@@ -162,11 +161,6 @@ export async function getTotalSpend(userId: string) {
 
   if (cache) {
     return parseFloat(cache);
-  }
-
-  if (!(await hasProfile(userId))) {
-    await redis.set(`${Constants.redis.cache.premium.TOTAL_SPEND}:${userId}`, "0", "EX", 86400);
-    return 0;
   }
 
   const query = await prisma.purchases.aggregate({
