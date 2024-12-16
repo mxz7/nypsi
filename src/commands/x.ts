@@ -1663,6 +1663,7 @@ async function run(
     });
 
     for (const userId of userIds) {
+      if (!userId) continue;
       const old = await prisma.user.findUnique({
         where: {
           id: userId.userId,
