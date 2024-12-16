@@ -240,6 +240,11 @@ async function run(
           .setLabel("tags")
           .setStyle(ButtonStyle.Primary)
           .setEmoji("🏷️"),
+        new ButtonBuilder()
+          .setCustomId("add-purchase")
+          .setLabel("add purchase")
+          .setEmoji("💰")
+          .setStyle(ButtonStyle.Primary),
       ),
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
@@ -425,6 +430,51 @@ async function run(
 
         doTags(user, res as ButtonInteraction);
         return waitForButton();
+      } else if (res.customId === "add-purchase") {
+        if ((await getAdminLevel(message.author.id)) < 4) {
+          await res.editReply({
+            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+          });
+          return waitForButton();
+        }
+        await res.editReply({
+          embeds: [new CustomEmbed(message.member, "<item> <source> <cost> (amount)")],
+        });
+
+        waitForButton();
+
+        const msgResponse = await message.channel
+          .awaitMessages({
+            filter: (msg) => msg.author.id === message.author.id,
+            max: 1,
+            time: 60000,
+          })
+          .catch(() => {});
+
+        if (!msgResponse) return;
+
+        const args = msgResponse.first().content.split(" ");
+
+        const item = args[0];
+        const source = args[1];
+        const cost = new Prisma.Decimal(args[2]);
+        const amount = args[3];
+
+        await prisma.purchases.create({
+          data: {
+            userId: user.id,
+            cost,
+            item,
+            source,
+            amount: amount ? parseInt(amount) : undefined,
+          },
+        });
+
+        logger.info(
+          `admin: ${message.author.id} (${message.author.username}) created purchase for ${user.id} ${msgResponse.first().content}`,
+        );
+
+        msgResponse.first().react("✅");
       } else if (res.customId === "set-bal") {
         if ((await getAdminLevel(message.author.id)) < 4) {
           await res.editReply({
