@@ -158,7 +158,6 @@ async function run(
                 Game: true,
                 Stats: true,
                 Crafting: true,
-                LotteryTicket: true,
                 EconomyGuild: {
                   include: {
                     upgrades: true,
