@@ -155,6 +155,7 @@ export default {
       DAILY_COMMANDS: "nypsi:dailycommands",
       HOURLY_COMMAND_PREPROCESS: "nypso:preprocess",
       CRASH_STATUS: "nypsi:crash:status",
+      FARM_STATUS_DM: "nypsi:farm:status:dm",
     },
   },
   ADMIN_IDS: ["672793821850894347"] as string[],

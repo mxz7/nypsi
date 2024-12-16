@@ -1,6 +1,6 @@
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["relationJoins"]
+  previewFeatures = ["relationJoins", "typedSql"]
 }
 
 datasource db {
@@ -119,6 +119,7 @@ model DMSettings {
   netWorth       Int             @default(0)
   autosellStatus Boolean         @default(true)
   level          LevelDmSetting  @default(OnlyReward)
+  farmHealth     Boolean         @default(true)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
