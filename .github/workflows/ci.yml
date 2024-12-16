@@ -48,7 +48,7 @@ jobs:
         run: bash ${GITHUB_WORKSPACE}/setup.sh
 
       - name: setup prisma
-        run: npx prisma generate --sql
+        run: npx prisma generate
 
       - name: build
         run: npx tsc
@@ -97,7 +97,7 @@ jobs:
         run: bash ${GITHUB_WORKSPACE}/setup.sh
 
       - name: setup prisma
-        run: npx prisma generate --sql
+        run: npx prisma generate
 
       - name: build
         run: npx tsc
@@ -156,7 +156,7 @@ jobs:
         run: bash ${GITHUB_WORKSPACE}/setup.sh
 
       - name: setup prisma
-        run: npx prisma generate --sql
+        run: npx prisma generate
 
       - name: build
         run: npx tsc
