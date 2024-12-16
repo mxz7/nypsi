@@ -63,11 +63,6 @@
       "name": "autosell status",
       "description": "get a dm hourly for autosell status (/autosell)"
     },
-    "other": {
-      "id": "other",
-      "name": "miscellaneous",
-      "description": "get a dm for miscellaneous things, such as guild level upgrades"
-    },
     "level": {
       "id": "level",
       "name": "level notifications",
@@ -85,6 +80,16 @@
           "value": "All"
         }
       ]
+    },
+    "farmHealth": {
+      "id": "farmHealth",
+      "name": "farm health",
+      "description": "(platinum only) get a dm when your plants are unhealthy and dying"
+    },
+    "other": {
+      "id": "other",
+      "name": "miscellaneous",
+      "description": "get a dm for miscellaneous things, such as guild level upgrades"
     }
   },
   "preferences": {
