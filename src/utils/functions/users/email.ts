@@ -174,10 +174,10 @@ export async function getTotalSpend(userId: string) {
 
   await redis.set(
     `${Constants.redis.cache.premium.TOTAL_SPEND}:${userId}`,
-    query._sum.cost.toNumber(),
+    query._sum.cost?.toNumber() || 0,
     "EX",
     86400,
   );
 
-  return query._sum.cost.toNumber();
+  return query._sum.cost?.toNumber() || 0;
 }
