@@ -170,6 +170,9 @@ export async function getTotalSpend(userId: string) {
   }
 
   const query = await prisma.purchases.aggregate({
+    where: {
+      userId,
+    },
     _sum: {
       cost: true,
     },
