@@ -1,5 +1,4 @@
 import dayjs = require("dayjs");
-import { getUnhealthyPlatinumPlants } from "@prisma/client/sql";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { CustomEmbed } from "../../models/EmbedBuilders";
@@ -13,9 +12,38 @@ export default {
   name: "plant health check",
   cron: "0 */8 * * *",
   async run(log) {
-    const query = await prisma.$queryRawTyped(getUnhealthyPlatinumPlants());
+    const query = await prisma.farm.findMany({
+      select: {
+        userId: true,
+        id: true,
+        plantId: true,
+        fertilisedAt: true,
+        wateredAt: true,
+      },
+      where: {
+        AND: [
+          { economy: { user: { Premium: { level: 4 } } } },
+          { economy: { user: { DMSettings: { farmHealth: true } } } },
+          {
+            OR: [
+              { fertilisedAt: { lt: dayjs().subtract(1, "day").toDate() } },
+              { wateredAt: { lt: dayjs().subtract(1, "day").toDate() } },
+            ],
+          },
+        ],
+      },
+    });
 
-    const grouped = new Map<string, getUnhealthyPlatinumPlants.Result[]>();
+    const grouped = new Map<
+      string,
+      {
+        id: number;
+        userId: string;
+        plantId: string;
+        wateredAt: Date;
+        fertilisedAt: Date;
+      }[]
+    >();
 
     for (const plant of query) {
       if (!grouped.has(plant.userId)) {
