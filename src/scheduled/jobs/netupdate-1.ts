@@ -9,7 +9,7 @@ import sleep from "../../utils/functions/sleep";
 import pAll = require("p-all");
 
 export default {
-  name: "netupdate-3",
+  name: "netupdate-1",
   cron: "0 0 */7 * *",
   async run(log) {
     const start = Date.now();
