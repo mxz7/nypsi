@@ -96,31 +96,54 @@ export class NypsiClient extends Client {
       this.ready = true;
 
       logger.info(`cluster ${this.cluster.id} ready`);
-      await redis.del(`${Constants.redis.nypsi.RESTART}:${this.cluster.id}`, "nypsi:users:playing");
+      redis.del(`${Constants.redis.nypsi.RESTART}:${this.cluster.id}`, "nypsi:users:playing");
+      logger.debug("deleted redis playing key");
       this.on("guildCreate", guildCreate.bind(null, this));
+      logger.debug("guild create event loaded");
       this.on("guildDelete", guildDelete.bind(null, this));
+      logger.debug("guild delete event loaded");
       this.rest.on("rateLimited", (rate) => {
         logger.warn("rate limit: " + rate.url);
       });
+      logger.debug("rest rate limit event loaded");
       this.on("guildMemberUpdate", guildMemberUpdate.bind(null));
+      logger.debug("guild member update event loaded");
       this.on("guildMemberAdd", guildMemberAdd.bind(null));
+      logger.debug("guild member add event loaded");
       this.on("guildMemberRemove", guildMemberRemove.bind(null));
+      logger.debug("guild member remove event loaded");
       this.on("messageDelete", messageDelete.bind(null));
+      logger.debug("message delete event loaded");
       this.on("messageUpdate", messageUpdate.bind(null));
+      logger.debug("message update event loaded");
       this.on("messageCreate", messageCreate.bind(null));
+      logger.debug("message create event loaded");
       this.on("messageDeleteBulk", messageDeleteBulk.bind(null));
+      logger.debug("message delete bulk event loaded");
       this.on("channelCreate", channelCreate.bind(null));
+      logger.debug("channel create event loaded");
       this.on("channelDelete", channelDelete.bind(null));
+      logger.debug("channel delete event loaded");
       this.on("roleDelete", roleDelete.bind(null));
+      logger.debug("role delete event loaded");
       this.on("userUpdate", userUpdate.bind(null));
+      logger.debug("user update event loaded");
       this.on("interactionCreate", interactionCreate.bind(null));
+      logger.debug("interaction create event loaded");
       this.on("channelUpdate", channelUpdate.bind(null));
+      logger.debug("channel update event loaded");
       this.on("emojiCreate", emojiCreate.bind(null));
+      logger.debug("emoji create event loaded");
       this.on("emojiDelete", emojiDelete.bind(null));
+      logger.debug("emoji delete event loaded");
       this.on("emojiUpdate", emojiUpdate.bind(null));
+      logger.debug("emoji update event loaded");
       this.on("entitlementCreate", entitlementCreate.bind(null));
+      logger.debug("entitlement create event loaded");
       this.on("entitlementUpdate", entitlementUpdate.bind(null));
+      logger.debug("entitlement update event loaded");
       this.on("entitlementDelete", entitlementDelete.bind(null));
+      logger.debug("entitlement delete event loaded");
 
       this.cluster.on("message", async (message: any) => {
         if (message._type) {
@@ -152,6 +175,7 @@ export class NypsiClient extends Client {
           }
         }
       });
+      logger.debug("cluster message event loaded");
 
       logger.info("listeners loaded");
 
