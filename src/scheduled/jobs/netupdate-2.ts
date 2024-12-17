@@ -5,8 +5,6 @@ import { Job } from "../../types/Jobs";
 import Constants from "../../utils/Constants";
 import { MStoTime } from "../../utils/functions/date";
 import { calcNetWorth } from "../../utils/functions/economy/balance";
-import sleep from "../../utils/functions/sleep";
-import pAll = require("p-all");
 
 export default {
   name: "netupdate-2",
@@ -33,19 +31,17 @@ export default {
       },
     });
 
-    const actions = [];
+    let count = 0;
 
     for (const user of query) {
-      await sleep(25);
       if (await redis.exists(`${Constants.redis.cache.economy.NETWORTH}:${user.userId}`)) continue;
 
-      actions.push(async () => {
-        await calcNetWorth("job", user.userId);
-      });
+      await calcNetWorth("job", user.userId);
+      count++;
     }
 
-    await pAll(actions, { concurrency: 2 });
-
-    log(`net worth updated for ${actions.length} members in ${MStoTime(Date.now() - start)}`);
+    log(
+      `net worth updated for ${count.toLocaleString()} members in ${MStoTime(Date.now() - start)}`,
+    );
   },
 } satisfies Job;
