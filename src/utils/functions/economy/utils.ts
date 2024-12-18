@@ -443,6 +443,7 @@ export async function reset() {
   await prisma.task.deleteMany();
   logger.info("deleting farms");
   await prisma.farm.deleteMany();
+  await prisma.farmUpgrades.deleteMany();
   await prisma.$executeRaw`TRUNCATE TABLE "Farm" RESTART IDENTITY;`;
 
   logger.info("deleting banned/blacklisted");
