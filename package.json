@@ -12,7 +12,7 @@
   "author": "mxz7",
   "license": "ISC",
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.713.0",
+    "@aws-sdk/client-s3": "^3.714.0",
     "@catppuccin/palette": "1.7.1",
     "@discordjs/rest": "2.4.0",
     "@prisma/client": "6.0.1",
