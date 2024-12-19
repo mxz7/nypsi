@@ -39,6 +39,14 @@
     "prizes": ["id:basic_crate:1", "id:69420_crate:1", "xp:200", "id:lucky_scratch_card:1"],
     "type": "daily"
   },
+  "rickroll": {
+    "id": "rickroll",
+    "name": "rick astley",
+    "description": "rick roll people",
+    "target": [1, 3],
+    "prizes": ["id:basic_crate:1", "id:69420_crate:1", "xp:200", "id:lucky_scratch_card:1"],
+    "type": "daily"
+  },
   "daily_streaks": {
     "id": "daily_streaks",
     "name": "daily streaks",
