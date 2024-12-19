@@ -11,13 +11,13 @@ import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getAuctionAverage } from "./auctions";
 import { getBoosters } from "./boosters";
 import { calcCarCost } from "./cars";
-import { getClaimable, getFarm } from "./farm";
+import { getClaimable, getFarm, getFarmUpgrades } from "./farm";
 import { getGuildUpgradesByUser } from "./guilds";
 import { calcItemValue, gemBreak, getInventory } from "./inventory";
 import { doLevelUp, getRawLevel, getUpgrades } from "./levelling";
 import { getOffersAverage } from "./offers";
 import { isPassive } from "./passive";
-import { getBaseUpgrades, getBaseWorkers, getItems, getPlantsData, getUpgradesData } from "./utils";
+import { getBaseUpgrades, getBaseWorkers, getItems, getPlantsData, getPlantUpgrades, getUpgradesData } from "./utils";
 import { hasVoted } from "./vote";
 import { calcWorkerValues } from "./workers";
 import ms = require("ms");
@@ -1028,7 +1028,6 @@ export async function calcNetWorth(
 
   const typesChecked: string[] = [];
 
-  // todo: add farm upgrades to farm breakdown
   for (const farm of farms) {
     if (typesChecked.includes(farm.plantId)) continue;
 
@@ -1039,9 +1038,25 @@ export async function calcNetWorth(
     const harvestValue =
       (await getClaimable(id, farm.plantId, false)) *
       (await calcItemValue(getPlantsData()[farm.plantId].item));
+    
+    let upgradesValue = 0;
 
-    worth += seedValue + harvestValue;
-    farmBreakdown += seedValue + harvestValue;
+    const upgrades = getPlantUpgrades();
+
+    for (const userUpgrade of (await getFarmUpgrades(id)).filter(u => u.plantId == farm.plantId)) {
+      const upgrade = upgrades[Object.keys(upgrades).find(u => upgrades[u].id == userUpgrade.upgradeId)];
+
+      if (upgrade.type_single) {
+        upgradesValue += userUpgrade.amount * (await calcItemValue(upgrade.type_single.item));
+      } else if (upgrade.type_upgradable) {
+        for (let i = 0; i < userUpgrade.amount; i++) {
+          upgradesValue += await calcItemValue(upgrade.type_upgradable.items[i]);
+        }
+      }
+    }
+
+    worth += seedValue + harvestValue + upgradesValue;
+    farmBreakdown += seedValue + harvestValue + upgradesValue;
 
     typesChecked.push(farm.plantId);
   }
