@@ -152,6 +152,8 @@ async function run(
           include: {
             Economy: {
               include: {
+                Farm: true,
+                FarmUpgrades: true,
                 Task: true,
                 Inventory: true,
                 Boosters: true,
@@ -211,6 +213,7 @@ async function run(
             ModerationEvidence: true,
             Sessions: true,
             Viewed: true,
+            Purchases: true,
           },
         }),
         moderation: {

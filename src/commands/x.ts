@@ -94,6 +94,8 @@ async function run(
         include: {
           Economy: {
             include: {
+              Farm: true,
+              FarmUpgrades: true,
               Task: true,
               Inventory: true,
               Boosters: true,
@@ -139,6 +141,12 @@ async function run(
           ActiveChannels: true,
           Leaderboards: true,
           Tags: true,
+          Purchases: true,
+          Captchas: true,
+          ChatReactionLeaderboards: true,
+          ModerationEvidence: true,
+          Viewed: true,
+          Views: true,
         },
       }),
       moderation: {
