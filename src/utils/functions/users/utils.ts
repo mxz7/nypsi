@@ -183,6 +183,28 @@ export async function doProfileTransfer(fromId: string, toId: string) {
           await prisma.customCar.createMany({ data: cars });
         }
 
+        const farm = (await prisma.farm.findMany({ where: { userId: fromId } })).map((i) => {
+          i.userId = toId;
+          return i;
+        });
+
+        if (farm.length > 0) {
+          await prisma.farm.deleteMany({ where: { userId: fromId } });
+          await prisma.farm.createMany({ data: farm });
+        }
+
+        const farmUpgrades = (
+          await prisma.farmUpgrades.findMany({ where: { userId: fromId } })
+        ).map((i) => {
+          i.userId = toId;
+          return i;
+        });
+
+        if (farmUpgrades.length > 0) {
+          await prisma.farmUpgrades.deleteMany({ where: { userId: fromId } });
+          await prisma.farmUpgrades.createMany({ data: farmUpgrades });
+        }
+
         const inventory = (await prisma.inventory.findMany({ where: { userId: fromId } })).map(
           (i) => {
             i.userId = toId;
