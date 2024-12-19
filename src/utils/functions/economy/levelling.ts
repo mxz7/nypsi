@@ -179,7 +179,7 @@ const cratesFormula = (rawLevel: number) => {
   const level = rawLevel - prestige * 100;
   const neededXp = xpFormula(level, prestige);
 
-  let crates = neededXp / 200 + prestige * 0.69;
+  let crates = neededXp / 200;
 
   if (rawLevel < 1000) {
     if (rawLevel % 30 !== 0) crates = 0;
