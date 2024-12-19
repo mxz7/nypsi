@@ -6,10 +6,9 @@ import { addBalance } from "../../utils/functions/economy/balance";
 import { getItems } from "../../utils/functions/economy/utils";
 import { addNotificationToQueue } from "../../utils/functions/users/notifications";
 import { getLastKnownUsername } from "../../utils/functions/users/tag";
-import pAll = require("p-all");
 
 export default {
-  name: "netupdate",
+  name: "offerexpire",
   cron: "0 */2 * * *",
   async run(log) {
     const query = await prisma.offer.findMany({
