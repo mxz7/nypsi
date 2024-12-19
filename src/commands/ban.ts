@@ -13,7 +13,7 @@ import Constants from "../utils/Constants";
 import { isAltPunish } from "../utils/functions/guilds/altpunish";
 import { getExactMember } from "../utils/functions/member";
 import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
-import { isBanned, newBan } from "../utils/functions/moderation/ban";
+import { deleteBan, isBanned, newBan } from "../utils/functions/moderation/ban";
 import { newCase } from "../utils/functions/moderation/cases";
 
 import dayjs = require("dayjs");
@@ -201,6 +201,8 @@ async function run(
 
   if (temporary) banLength = getTime(duration * 1000);
 
+  if (await isBanned(message.guild, target)) await deleteBan(message.guild, target);
+
   const caseId = await doBan(
     message,
     target,
@@ -250,21 +252,20 @@ async function run(
   if (punishAlts) {
     for (const id of ids) {
       if (id == target?.user.id || userId) continue;
-      if (!(await isBanned(message.guild, id))) {
-        const banned = await doBan(
-          message,
-          await getExactMember(message.guild, id),
-          reason,
-          args,
-          "target",
-          temporary,
-          banLength,
-          unbanDate,
-          id,
-          true,
-        );
-        if (banned) altsBanned++;
-      }
+      if (await isBanned(message.guild, id)) await deleteBan(message.guild, id);
+      const banned = await doBan(
+        message,
+        await getExactMember(message.guild, id),
+        reason,
+        args,
+        "target",
+        temporary,
+        banLength,
+        unbanDate,
+        id,
+        true,
+      );
+      if (banned) altsBanned++;
     }
   }
 

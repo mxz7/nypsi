@@ -339,21 +339,20 @@ async function run(
   if (punishAlts) {
     for (const id of ids) {
       if (id == target.user.id) continue;
-      if (!(await isMuted(message.guild, id))) {
-        const muted = await doMute(
-          message,
-          await getExactMember(message.guild, id),
-          reason,
-          args,
-          mode,
-          timedMute,
-          mutedLength,
-          unmuteDate,
-          muteRole,
-          true,
-        );
-        if (muted) altsMuted++;
-      }
+      if (await isMuted(message.guild, id)) await deleteMute(message.guild, id);
+      const muted = await doMute(
+        message,
+        await getExactMember(message.guild, id),
+        reason,
+        args,
+        mode,
+        timedMute,
+        mutedLength,
+        unmuteDate,
+        muteRole,
+        true,
+      );
+      if (muted) altsMuted++;
     }
   }
 
