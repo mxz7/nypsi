@@ -93,8 +93,8 @@ export async function updateUser(user: User, command: string) {
     if (await isTracking(user.id)) {
       const history = await fetchUsernameHistory(user.id, 1);
 
-      if (history[0]?.value !== user.username) {
-        addNewUsername(user.id, user.username);
+      if (history[0]?.value !== username) {
+        addNewUsername(user.id, username);
       }
     }
   }
