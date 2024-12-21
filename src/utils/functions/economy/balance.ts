@@ -710,7 +710,7 @@ export async function calcMaxBet(member: GuildMember | string): Promise<number> 
 
   if (await redis.exists("nypsi:infinitemaxbet")) return 1000000000000;
 
-  let total = 100000;
+  let total = 1_000_000;
 
   const [voted, level, boosters, guildUpgrades, booster] = await Promise.all([
     hasVoted(member),
