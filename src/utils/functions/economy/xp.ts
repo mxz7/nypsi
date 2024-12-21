@@ -168,6 +168,9 @@ export async function calcEarnedGambleXp(
 
   let percentageOfMaxBet = bet / (maxBetAdjusted * 0.25);
   if (percentageOfMaxBet < 0.25) percentageOfMaxBet = 0.25;
+
+  if (percentageOfMaxBet > 1.2) percentageOfMaxBet = 1.2;
+
   min = min * percentageOfMaxBet;
 
   min = min * (multiplier * 0.7);
