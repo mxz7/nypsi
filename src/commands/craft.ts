@@ -13,7 +13,6 @@ import {
 import { inPlaceSort } from "fast-sort";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { addProgress } from "../utils/functions/economy/achievements";
 import { getCraftingItems, newCraftItem } from "../utils/functions/economy/crafting";
 import { getInventory, selectItem, setInventoryItem } from "../utils/functions/economy/inventory";
 import { addStat } from "../utils/functions/economy/stats";
@@ -151,8 +150,6 @@ async function run(
       const desc: string[] = [];
 
       for (const completed of crafting.completed) {
-        if (completed.itemId.includes("_gem") || completed.itemId === "crystal_heart")
-          await addProgress(message.author.id, "gem_hunter", completed.amount);
         desc.push(
           `\`${completed.amount}x\` ${items[completed.itemId].emoji} ${
             items[completed.itemId].name
