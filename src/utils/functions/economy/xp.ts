@@ -118,9 +118,9 @@ export async function calcEarnedGambleXp(
   } else {
     id = member;
   }
-  const requiredBet = await getRequiredBetForXp(member);
+  if (await redis.exists("nypsi:infinitemaxbet")) return 0;
 
-  if (await redis.exists("nypsi:infinitemaxbet")) bet = 0;
+  const requiredBet = await getRequiredBetForXp(member);
 
   if (bet < requiredBet) {
     return 0;
@@ -156,7 +156,17 @@ export async function calcEarnedGambleXp(
     }
   }
 
-  let percentageOfMaxBet = bet / maxBet;
+  let maxBetAdjusted = maxBet;
+
+  if (rawLevel < 500) {
+    maxBetAdjusted = maxBetAdjusted * 0.25;
+  } else if (rawLevel < 750) {
+    maxBetAdjusted = maxBetAdjusted * 0.5;
+  } else if (rawLevel < 1000) {
+    maxBetAdjusted = maxBetAdjusted * 0.75;
+  }
+
+  let percentageOfMaxBet = bet / (maxBetAdjusted * 0.25);
   if (percentageOfMaxBet < 0.25) percentageOfMaxBet = 0.25;
   min = min * percentageOfMaxBet;
 
