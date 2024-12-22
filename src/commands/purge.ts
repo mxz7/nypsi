@@ -339,7 +339,9 @@ async function run(
 
     let collected = await message.channel.messages.fetch({ limit: 100 });
 
-    collected = collected.filter((msg: Message) => msg.content.toLowerCase().includes(text));
+    collected = collected.filter((msg: Message) =>
+      msg.content.toLowerCase().includes(text.toLowerCase()),
+    );
 
     if (collected.size == 0) {
       return;
