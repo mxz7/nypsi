@@ -97,5 +97,20 @@ export default {
     for (const image of supportImages) {
       await deleteImage(image.id);
     }
+    log(`deleted ${supportImages.length} support images`);
+
+    const searchResults = await prisma.images.findMany({
+      where: {
+        AND: [
+          { id: { startsWith: "search_result" } },
+          { createdAt: { lt: dayjs().subtract(1, "day").toDate() } },
+        ],
+      },
+    });
+
+    for (const image of searchResults) {
+      await deleteImage(image.id);
+    }
+    log(`deleted ${searchResults.length} search results`);
   },
 } satisfies Job;
