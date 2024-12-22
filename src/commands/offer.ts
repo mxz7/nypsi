@@ -166,7 +166,7 @@ async function run(
         },
         {
           name: "target",
-          value: `${(await getLastKnownUsername(offers[page].targetId).catch(() => null)) || "unknown user"} (${
+          value: `${(await getLastKnownUsername(offers[page].targetId).catch(() => {})) || "unknown user"} (${
             offers[page].targetId
           })`,
           inline: true,

@@ -5,6 +5,7 @@ import {
   ButtonInteraction,
   ButtonStyle,
   CommandInteraction,
+  ComponentType,
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
@@ -283,12 +284,13 @@ async function run(
   const msg = await send({ embeds: [embed], components: [row] });
 
   const awaitButton: any = async () => {
-    const reaction: ButtonInteraction = await msg
+    const reaction: ButtonInteraction | void = await msg
       .awaitMessageComponent({
         filter: (i) => i.user.id === message.author.id,
         time: 30000,
+        componentType: ComponentType.Button,
       })
-      .catch(() => null);
+      .catch(() => {});
 
     if (!reaction) return msg.edit({ components: [] });
 
@@ -334,7 +336,7 @@ async function run(
           .reply({ embeds: [prestigeConfirmation], components: [prestigeRow] })
           .then(() => reaction.fetchReply());
 
-        const prestigeReaction: string = await prestigeMsg
+        const prestigeReaction: string | void = await prestigeMsg
           .awaitMessageComponent({ filter: (i) => i.user.id === message.author.id, time: 15000 })
           .then(async (collected) => {
             await collected.deferUpdate();
@@ -353,7 +355,6 @@ async function run(
                 ),
               ],
             });
-            return null;
           });
 
         if (!prestigeReaction) return;

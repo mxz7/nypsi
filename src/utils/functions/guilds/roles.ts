@@ -67,7 +67,7 @@ export async function setPersistentRoles(guild: Guild, roles: string[]) {
 }
 
 export async function getPersistentRolesForUser(guild: Guild, userId: string) {
-  const query = await prisma.rolePersist
+  const query: string[] = await prisma.rolePersist
     .findUnique({
       where: {
         guildId_userId: {
@@ -80,7 +80,7 @@ export async function getPersistentRolesForUser(guild: Guild, userId: string) {
       },
     })
     .then((r) => r.roles)
-    .catch(() => []);
+    .catch((): string[] => []);
 
   if (query.length > 0) {
     await prisma.rolePersist.delete({

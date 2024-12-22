@@ -508,7 +508,7 @@ class Game {
       })
       .then((collected) => {
         setTimeout(() => {
-          collected.deferUpdate().catch(() => null);
+          collected.deferUpdate().catch(() => {});
         }, 1000);
 
         return collected;
@@ -646,7 +646,7 @@ class Game {
       })
       .then((collected) => {
         setTimeout(() => {
-          collected.deferUpdate().catch(() => null);
+          collected.deferUpdate().catch(() => {});
         }, 1000);
 
         return collected;

@@ -90,7 +90,7 @@ export async function doProfileTransfer(fromId: string, toId: string) {
 
         const premium = await prisma.premium
           .findUnique({ where: { userId: fromId } })
-          .catch(() => null);
+          .catch(() => {});
         if (premium) {
           premium.userId = toId;
           await prisma.premium.create({ data: premium });
@@ -98,7 +98,7 @@ export async function doProfileTransfer(fromId: string, toId: string) {
 
         const wordleStats = await prisma.wordleStats
           .findUnique({ where: { userId: fromId } })
-          .catch(() => null);
+          .catch(() => {});
         if (wordleStats) {
           wordleStats.userId = toId;
           await prisma.wordleStats.create({ data: wordleStats });
@@ -352,7 +352,7 @@ export async function dataDelete(userId: string) {
         id: userId,
       },
     })
-    .catch(() => null);
+    .catch(() => {});
 
   logger.info(`data deleted for ${userId}`);
 

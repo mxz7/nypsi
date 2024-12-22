@@ -277,7 +277,7 @@ async function run(
         .awaitMessageComponent({ filter, time: 30_000 })
         .then(async (i) => {
           setTimeout(() => {
-            if (!i.deferred && !i.replied) i.deferUpdate().catch(() => null);
+            if (!i.deferred && !i.replied) i.deferUpdate().catch(() => {});
           }, 2000);
 
           return i;
@@ -433,7 +433,7 @@ async function run(
         .awaitMessageComponent({ filter, time: 30_000 })
         .then(async (i) => {
           setTimeout(() => {
-            if (!i.deferred && !i.replied) i.deferUpdate().catch(() => null);
+            if (!i.deferred && !i.replied) i.deferUpdate().catch(() => {});
           }, 2000);
           return i;
         })

@@ -61,7 +61,7 @@ export async function addView(userId: string, viewerId: string, source: string) 
         referrer: source,
       },
     })
-    .catch(() => null);
+    .catch(() => {});
 
   redis.del(`${Constants.redis.cache.user.views}:${userId}`);
 }
