@@ -205,7 +205,11 @@ export async function calcEarnedHFMXp(member: GuildMember, items: number) {
 
   min *= 1.369;
 
-  const [boosters, level] = await Promise.all([getBoosters(member), getRawLevel(member)]);
+  const [boosters, level, upgrades] = await Promise.all([
+    getBoosters(member),
+    getRawLevel(member),
+    getUpgrades(member),
+  ]);
 
   const max = min + level / 50 > 30 ? 30 : level / 50;
 
@@ -220,6 +224,10 @@ export async function calcEarnedHFMXp(member: GuildMember, items: number) {
       boosterEffect += getItems()[boosterId].boosterEffect.effect * boosters.get(boosterId).length;
     }
   }
+
+  if (upgrades.find((i) => i.upgradeId === "xp"))
+    boosterEffect +=
+      upgrades.find((i) => i.upgradeId === "xp").amount * getUpgradesData()["xp"].effect;
 
   earned += boosterEffect * earned;
 
