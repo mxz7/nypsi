@@ -419,7 +419,7 @@ async function run(
   } else if (args[0].toLowerCase() === "member" || args[0].toLowerCase() === "user") {
     let memberId: string;
 
-    if (!message.mentions.members.first()) {
+    if (!message.mentions?.members.first()) {
       if (args[1].match(Constants.SNOWFLAKE_REGEX)) memberId = args[1];
       memberId = (await getMember(message.guild, args[1]))?.id;
     } else {
