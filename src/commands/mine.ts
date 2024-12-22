@@ -134,7 +134,7 @@ async function doMine(
     return send({
       embeds: [
         new ErrorEmbed(
-          "you need a pickaxe to mine\n[how do i get a pickaxe?](https://nypsi.xyz/docs/economy/fishhuntmine)",
+          "you need a pickaxe to mine\n[how do i get a pickaxe?](https://nypsi.xyz/docs/economy/fish-hunt-mine)",
         ),
       ],
       ephemeral: true,
