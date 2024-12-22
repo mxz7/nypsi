@@ -394,7 +394,7 @@ logger.addTransport(
 const webhook = new Map<string, string>();
 const nextLogMsg = new Map<string, string>();
 
-export function setClusterId(id: number | string) {
+export function setClusterId(id: string) {
   logger.meta = { cluster: id };
 }
 

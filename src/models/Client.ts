@@ -53,7 +53,7 @@ export class NypsiClient extends Client {
 
     this.cluster = new ClusterClient(this);
 
-    setClusterId(this.cluster.id);
+    setClusterId(this.cluster.id.toString());
     process.title = `nypsi v${getVersion()}: cluster ${this.cluster.id}`;
 
     runEconomySetup();
