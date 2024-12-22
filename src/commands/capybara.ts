@@ -19,7 +19,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
 
   await addCooldown(cmd.name, message.member, 3);
 
-  const image = await getRandomImage("capybara").catch(() => null);
+  const image = await getRandomImage("capybara").catch(() => {});
 
   if (!image)
     return message.channel.send({ embeds: [new ErrorEmbed("failed to find a capybara image")] });

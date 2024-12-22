@@ -113,7 +113,6 @@ export async function isLogsEnabled(guild: Guild) {
     })
     .catch(() => {
       checkingLogsEnabled = false;
-      return null;
     });
 
   checkingLogsEnabled = false;

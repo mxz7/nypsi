@@ -326,7 +326,7 @@ async function run(
 
       embed.disableFooter();
 
-      await i.update({ embeds: [embed] }).catch(() => null);
+      await i.update({ embeds: [embed] }).catch(() => {});
       return;
     }
 
