@@ -2132,7 +2132,8 @@
       "id:lucky_cheese:5",
       "id:reroll_token:0.05",
       "id:banana_seed:7",
-      "id:fertiliser"
+      "id:fertiliser",
+      "id:toe:10"
     ]
   },
   "lucky_scratch_card": {
@@ -2313,7 +2314,8 @@
       "id:big_tiddy_goth_gf:20",
       "id:69420_crate:40",
       "id:banana_seed:5",
-      "id:fertiliser:60"
+      "id:fertiliser:80",
+      "id:toe:50"
     ]
   },
   "bob": {
@@ -3324,6 +3326,32 @@
     "in_crates": false,
     "craft": {
       "ingredients": ["furnace:10"],
+      "time": 3600
+    }
+  },
+  "toe": {
+    "id": "toe",
+    "name": "toe",
+    "article": "a",
+    "plural": "toes",
+    "emoji": "<:nypsi_toe:1320517027936337991>",
+    "longDesc": "ewwwww smelly",
+    "role": "collectable",
+    "rarity": 1,
+    "in_crates": true
+  },
+  "foot": {
+    "id": "foot",
+    "name": "foot",
+    "article": "a",
+    "plural": "feet",
+    "emoji": "🦶",
+    "longDesc": "ewwwww smelly",
+    "role": "collectable",
+    "rarity": 1,
+    "in_crates": false,
+    "craft": {
+      "ingredients": ["toe:5"],
       "time": 3600
     }
   }
