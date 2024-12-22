@@ -2,7 +2,6 @@ import dayjs = require("dayjs");
 import {
   BaseMessageOptions,
   CommandInteraction,
-  GuildMember,
   InteractionReplyOptions,
   InteractionResponse,
   Message,
@@ -11,6 +10,7 @@ import {
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import Constants from "../utils/Constants";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -239,7 +239,7 @@ async function run(
     }
   };
 
-  const deleteMemberMessages = async (member: GuildMember, amount: number) => {
+  const deleteMemberMessages = async (member: string, amount: number) => {
     if (!message.channel.isTextBased()) return;
     if (message.channel.isDMBased()) return;
 
@@ -256,7 +256,7 @@ async function run(
 
     collected = collected.filter((msg: Message) => {
       if (!msg.author) return;
-      return msg.author.id == member.user.id;
+      return msg.author.id == member;
     });
 
     if (collected.size == 0) {
@@ -417,15 +417,16 @@ async function run(
 
     return deleteAnyMessages(amount);
   } else if (args[0].toLowerCase() === "member" || args[0].toLowerCase() === "user") {
-    let member: GuildMember;
+    let memberId: string;
 
     if (!message.mentions.members.first()) {
-      member = await getMember(message.guild, args[1]);
+      if (args[1].match(Constants.SNOWFLAKE_REGEX)) memberId = args[1];
+      memberId = (await getMember(message.guild, args[1]))?.id;
     } else {
-      member = message.mentions.members.first();
+      memberId = message.mentions.members.first()?.id;
     }
 
-    if (!member) {
+    if (!memberId) {
       return send({ embeds: [new ErrorEmbed("invalid user")] });
     }
 
@@ -439,7 +440,7 @@ async function run(
 
     await addCooldown(cmd.name, message.member, 10);
 
-    return deleteMemberMessages(member, amount);
+    return deleteMemberMessages(memberId, amount);
   } else if (args[0].toLowerCase() == "bot") {
     let amount = parseInt(args[1]);
 
