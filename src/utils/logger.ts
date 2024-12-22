@@ -185,12 +185,8 @@ class FileTransport implements Transport {
       level: data.label,
       msg: data.message,
       time: data.date,
+      data: data.data,
     };
-
-    for (const item in data.data) {
-      // @ts-expect-error grrrr
-      out[item] = data.data[item];
-    }
 
     for (const item in data.meta) {
       // @ts-expect-error grrrr
