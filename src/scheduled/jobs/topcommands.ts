@@ -59,7 +59,7 @@ export default {
     embed.setDescription(msg.join("\n"));
     embed.setColor(flavors.latte.colors.base.hex as ColorResolvable);
 
-    if ((await getPreferences(users[0]).catch(() => null))?.leaderboards || false) {
+    if ((await getPreferences(users[0]))?.leaderboards || false) {
       embed.setFooter({
         text: `${await getLastKnownUsername(users[0])} has no life (${parseInt(
           topUsers[users[0]],

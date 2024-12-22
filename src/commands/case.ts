@@ -382,8 +382,8 @@ async function run(
             attachment.contentType,
           );
 
-          evidenceMessage.delete().catch(() => null);
-          evidencePrompt.delete().catch(() => null);
+          evidenceMessage.delete().catch(() => {});
+          evidencePrompt.delete().catch(() => {});
           caseData = await getCase(message.guild, caseData.caseId);
           showEvidence(null, evidenceMsg);
           displayCase(caseMsg);

@@ -618,7 +618,7 @@ export async function buyFullAuction(
   if (auction.bin >= preferences.auctionConfirm && Number(preferences.auctionConfirm) !== 0) {
     beingBought.delete(auction.id);
     const modalResponse = await showAuctionConfirmation(interaction, Number(auction.bin)).catch(
-      () => null,
+      () => {},
     );
     if (beingBought.has(auction.id)) return;
     beingBought.add(auction.id);

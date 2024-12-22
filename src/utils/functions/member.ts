@@ -52,11 +52,11 @@ export async function getMember(
   if (!guild) return null;
 
   if (memberName.match(Constants.MENTION_REGEX)) {
-    return (await guild.members.fetch(memberName.replaceAll(/\D/g, "")).catch(() => null)) || null;
+    return (await guild.members.fetch(memberName.replaceAll(/\D/g, "")).catch(() => {})) || null;
   }
 
   if (memberName.match(Constants.SNOWFLAKE_REGEX)) {
-    return await guild.members.fetch(memberName).catch(() => null);
+    return (await guild.members.fetch(memberName).catch(() => {})) || null;
   }
 
   let members: Collection<string, GuildMember>;
@@ -165,11 +165,11 @@ export async function getExactMember(guild: Guild, memberName: string): Promise<
   if (!guild) return null;
 
   if (memberName.match(Constants.MENTION_REGEX)) {
-    return (await guild.members.fetch(memberName.replaceAll(/\D/g, "")).catch(() => null)) || null;
+    return (await guild.members.fetch(memberName.replaceAll(/\D/g, "")).catch(() => {})) || null;
   }
 
   if (memberName.match(Constants.SNOWFLAKE_REGEX)) {
-    return await guild.members.fetch(memberName).catch(() => null);
+    return (await guild.members.fetch(memberName).catch(() => {})) || null;
   }
 
   let members: Collection<string, GuildMember>;

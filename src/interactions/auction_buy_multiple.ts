@@ -35,9 +35,7 @@ export default {
         });
       }
 
-      const res = await showMultiBuyModal(interaction, Number(auction.itemAmount)).catch(
-        () => null,
-      );
+      const res = await showMultiBuyModal(interaction, Number(auction.itemAmount)).catch(() => {});
       if (userBuying.has(interaction.user.id)) return;
       userBuying.set(interaction.user.id, auction.id);
 

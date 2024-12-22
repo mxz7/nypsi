@@ -208,14 +208,14 @@ export default class PageManager<T> {
       .catch(() => {});
 
     if (!res) {
-      await this.message.edit({ components: [] }).catch(() => null);
+      await this.message.edit({ components: [] }).catch(() => {});
       return;
     }
 
     if (this.handleResponses.has(res.customId)) {
       return this.handleResponses
         .get(res.customId)(this, res)
-        .catch(() => null);
+        .catch(() => {});
     }
   }
 

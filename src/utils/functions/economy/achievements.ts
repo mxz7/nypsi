@@ -191,7 +191,7 @@ async function completeAchievement(userId: string, achievementId: string) {
     const prizes: string[] = [];
     for (const prize of achievements[achievementId].prize) {
       if (prize.startsWith("tag:")) {
-        await addTag(userId, prize.split("tag:")[1]).catch(() => null);
+        await addTag(userId, prize.split("tag:")[1]).catch(() => {});
         prizes.push(
           `+ ${getTagsData()[prize.split("tag:")[1]].emoji} ${
             getTagsData()[prize.split("tag:")[1]].name

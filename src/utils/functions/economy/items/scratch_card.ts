@@ -207,7 +207,7 @@ async function prepare(
       .awaitMessageComponent({ filter, time: 90000 })
       .then(async (collected) => {
         setTimeout(() => {
-          collected.deferUpdate().catch(() => null);
+          collected.deferUpdate().catch(() => {});
         }, 1500);
         return collected;
       })

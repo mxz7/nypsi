@@ -112,7 +112,7 @@ async function run(
     return send({
       embeds: [
         new ErrorEmbed(
-          `\`${(await getLastKnownUsername(target).catch(() => null)) || target}\` is not banned`,
+          `\`${(await getLastKnownUsername(target).catch(() => {})) || target}\` is not banned`,
         ),
       ],
     });
@@ -125,7 +125,7 @@ async function run(
     return send({
       embeds: [
         new ErrorEmbed(
-          `failed to unban \`${(await getLastKnownUsername(target).catch(() => null)) || target}\``,
+          `failed to unban \`${(await getLastKnownUsername(target).catch(() => {})) || target}\``,
         ),
       ],
     });
