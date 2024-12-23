@@ -63,11 +63,29 @@ export async function getFarmUpgrades(member: GuildMember | string) {
     id = member;
   }
 
+  const cache = await redis.get(`${Constants.redis.cache.economy.farmUpgrades}:${id}`);
+
+  if (cache) {
+    return JSON.parse(cache) as {
+      userId: string;
+      plantId: string;
+      upgradeId: string;
+      amount: number;
+    }[];
+  }
+
   const query = await prisma.farmUpgrades.findMany({
     where: {
       userId: id,
     },
   });
+
+  await redis.set(
+    `${Constants.redis.cache.economy.farmUpgrades}:${id}`,
+    JSON.stringify(query),
+    "EX",
+    Math.floor(ms("3 hour") / 1000),
+  );
 
   return query;
 }

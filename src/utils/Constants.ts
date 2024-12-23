@@ -83,6 +83,7 @@ export default {
       },
       economy: {
         farm: "cache:economy:farm",
+        farmUpgrades: "cache:economy:farmupgrades",
         TASKS: "cache:economy:tasks",
         AUTO_SELL: "cache:economy:autosell",
         AUCTION_AVG: "cache:economy:auctionavg",
