@@ -30,7 +30,6 @@ import { checkAutoMute, checkMessageContent } from "../utils/functions/guilds/fi
 import { isSlashOnly } from "../utils/functions/guilds/slash";
 import { getPrefix, hasGuild } from "../utils/functions/guilds/utils";
 import { getKarma } from "../utils/functions/karma/karma";
-import { addMuteViolation } from "../utils/functions/moderation/mute";
 import { isPremium } from "../utils/functions/premium/premium";
 import sleep from "../utils/functions/sleep";
 import {
@@ -392,8 +391,7 @@ export default async function messageCreate(message: Message) {
     const res = await checkMessageContent(message);
 
     if (!res) {
-      await addMuteViolation(message.guild, message.member);
-      await checkAutoMute(message);
+      checkAutoMute(message);
       return;
     }
   }
