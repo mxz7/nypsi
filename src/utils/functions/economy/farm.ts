@@ -132,38 +132,26 @@ export async function getClaimable(member: GuildMember | string, plantId: string
   if (typeof member === "string") id = member;
   else id = member.user.id;
 
+  const farm = await getFarm(id);
   const plantData = getPlantsData()[plantId];
 
-  const plants = await prisma.farm.findMany({
-    where: {
-      AND: [
-        { userId: id },
-        { plantId },
-        { plantedAt: { lt: dayjs().subtract(plantData.growthTime, "seconds").toDate() } },
-        {
-          harvestedAt: {
-            lt: dayjs()
-              .subtract(60 / plantData.hourly, "minutes")
-              .toDate(),
-          },
-        },
-        {
-          wateredAt: {
-            gt: dayjs()
-              .subtract(plantData.water.every * 1.5, "seconds")
-              .toDate(),
-          },
-        },
-        {
-          fertilisedAt: {
-            gt: dayjs()
-              .subtract(plantData.fertilise.every * 1.5, "seconds")
-              .toDate(),
-          },
-        },
-      ],
-    },
-  });
+  const plants = farm.filter(
+    (plant) =>
+      plant.plantId === plantId &&
+      plant.harvestedAt.valueOf() < dayjs().subtract(plantData.growthTime, "seconds").valueOf() &&
+      plant.harvestedAt.valueOf() <
+        dayjs()
+          .subtract(60 / plantData.hourly, "minutes")
+          .valueOf() &&
+      plant.wateredAt.valueOf() >
+        dayjs()
+          .subtract(plantData.water.every * 1.5, "seconds")
+          .valueOf() &&
+      plant.fertilisedAt.valueOf() >
+        dayjs()
+          .subtract(plantData.fertilise.every * 1.5, "seconds")
+          .valueOf(),
+  );
 
   if (plants.length === 0) return 0;
 
