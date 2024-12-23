@@ -76,7 +76,7 @@ async function run(
   }
 
   if (!isUserTracking) {
-    history.push({
+    history.unshift({
       value: "[tracking disabled]",
       createdAt: new Date(),
     });
