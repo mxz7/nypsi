@@ -47,7 +47,7 @@ export async function getBannedUsers(guild: Guild) {
       guildId: guild.id,
     },
     orderBy: {
-      expire: "desc",
+      expire: "asc",
     },
   });
 
