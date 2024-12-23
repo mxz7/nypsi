@@ -62,10 +62,9 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
 
   const pages = PageManager.createPages(pageItems);
 
-  const embed = new CustomEmbed(message.member).setHeader("muted users");
+  const embed = new CustomEmbed(message.member).setHeader("muted users", message.guild.iconURL());
 
   embed.setDescription(pages.get(1).join("\n"));
-  embed.setFooter({ text: `1/${pages.size}` });
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder()

@@ -156,7 +156,7 @@ export async function getMutedUsers(guild: Guild) {
       guildId: guild.id,
     },
     orderBy: {
-      expire: "desc",
+      expire: "asc",
     },
   });
 

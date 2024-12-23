@@ -74,10 +74,9 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
     }
   }
 
-  const embed = new CustomEmbed(message.member).setHeader("banned users");
+  const embed = new CustomEmbed(message.member).setHeader("banned users", message.guild.iconURL());
 
   embed.setDescription(pages.get(1).join("\n"));
-  embed.setFooter({ text: `1/${pages.size}` });
 
   let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder()
