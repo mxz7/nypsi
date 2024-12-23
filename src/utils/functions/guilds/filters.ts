@@ -10,6 +10,7 @@ import { getAllGroupAccountIds } from "../moderation/alts";
 import { newCase } from "../moderation/cases";
 import { addModLog } from "../moderation/logs";
 import {
+  addMuteViolation,
   deleteMute,
   getAutoMuteLevels,
   getMuteRole,
@@ -19,6 +20,7 @@ import {
 } from "../moderation/mute";
 import { isAltPunish } from "./altpunish";
 import { getPercentMatch } from "./utils";
+import ms = require("ms");
 
 const chatFilterCache = new Map<string, string[]>();
 const snipeFilterCache = new Map<string, string[]>();
@@ -242,6 +244,8 @@ export async function checkAutoMute(message: Message) {
 
   if (muteLevels.length == 0) return;
 
+  await addMuteViolation(message.guild, message.member);
+
   const muteUser = async (member: GuildMember, length: number, isAlt?: boolean) => {
     const guildMuteRole = await getMuteRole(message.guild);
 
@@ -319,6 +323,8 @@ export async function checkAutoMute(message: Message) {
     let successful = false;
 
     if (mode == "timeout") {
+      if (length > Math.floor(ms("28 days") / 1000)) length = Math.floor(ms("28 days") / 1000);
+
       await member
         .disableCommunicationUntil(
           new Date(Date.now() + length * 1000),
