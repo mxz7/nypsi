@@ -328,10 +328,12 @@ async function run(
     if (!message.channel.isTextBased()) return;
     if (message.channel.isDMBased()) return;
 
+    let msg: Message;
+
     if (message instanceof Message) {
       await message.delete();
     } else {
-      await send({
+      msg = await send({
         embeds: [new CustomEmbed(message.member, "deleting messages...")],
         ephemeral: true,
       });
@@ -344,6 +346,7 @@ async function run(
     );
 
     if (collected.size == 0) {
+      if (msg) msg.edit({ embeds: [new ErrorEmbed("no messages to delete")] }).catch(() => {});
       return;
     }
 
@@ -360,11 +363,22 @@ async function run(
 
     await message.channel.bulkDelete(collected);
 
-    if (!(message instanceof Message)) {
-      return edit({
-        embeds: [new CustomEmbed(message.member, `✅ **${collected.size}** messages deleted`)],
+    if (msg) {
+      const members = collected.map((m) => m.id);
+
+      const membersUnique = Array.from(new Set(members));
+
+      msg.edit({
+        embeds: [
+          new CustomEmbed(message.member, `✅ **${collected.size}** messages deleted`).addField(
+            "members",
+            membersUnique.map((i) => `<@${i}> \`${i}\``).join("\n"),
+          ),
+        ],
       });
     }
+
+    return;
   };
 
   const helpMenu = async () => {
