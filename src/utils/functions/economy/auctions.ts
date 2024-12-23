@@ -1062,11 +1062,13 @@ export async function buyAuctionMulti(
             repeatCount + 1,
           ),
         );
-      }, 500);
+      }, 50);
     });
   }
 
   if (interaction.createdTimestamp < Date.now() - 5000) return;
+
+  beingBought.add(auction.id);
 
   if (!(await userExists(interaction.user.id))) await createUser(interaction.user.id);
 
@@ -1074,13 +1076,12 @@ export async function buyAuctionMulti(
     (await getBalance(interaction.user.id)) <
     Math.floor(Number((auction.bin / auction.itemAmount) * amount))
   ) {
+    beingBought.delete(auction.id);
     return await interaction.reply({
       embeds: [new ErrorEmbed("you cannot afford this")],
       ephemeral: true,
     });
   }
-
-  beingBought.add(auction.id);
 
   setTimeout(() => {
     beingBought.delete(auction.id);

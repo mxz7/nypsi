@@ -43,8 +43,12 @@ export default {
 
       const amount = parseInt(res.fields.fields.first().value);
 
-      if (!amount || amount < 1)
+      if (!amount || amount < 1) {
+        userBuying.delete(interaction.user.id);
         return res.reply({ embeds: [new ErrorEmbed("invalid amount")], ephemeral: true });
+      }
+
+      userBuying.delete(interaction.user.id);
 
       if (auction.itemAmount == BigInt(amount)) {
         res.deferReply({ ephemeral: true });
@@ -55,11 +59,13 @@ export default {
 
       return buyAuctionMulti(BigInt(amount), res, auction);
     } else if (auction?.sold || Number(auction.itemAmount) === 0) {
+      userBuying.delete(interaction.user.id);
       return await interaction.reply({
         embeds: [new ErrorEmbed("too slow ):").removeTitle()],
         ephemeral: true,
       });
     } else {
+      userBuying.delete(interaction.user.id);
       await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], ephemeral: true });
       await interaction.message.delete();
     }
