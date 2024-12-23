@@ -3153,7 +3153,8 @@
     "buy": 0,
     "sell": 50000,
     "in_crates": true,
-    "aliases": ["oseed"]
+    "aliases": ["oseed"],
+    "random_drop_chance": 20
   },
   "fertiliser": {
     "id": "fertiliser",
@@ -3338,7 +3339,8 @@
     "longDesc": "ewwwww smelly",
     "role": "collectable",
     "rarity": 1,
-    "in_crates": true
+    "in_crates": true,
+    "random_drop_chance": 10
   },
   "foot": {
     "id": "foot",
