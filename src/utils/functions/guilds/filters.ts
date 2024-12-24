@@ -238,13 +238,11 @@ export async function checkMessageContent(message: Message) {
 }
 
 export async function checkAutoMute(message: Message) {
-  const vl = (await getMuteViolations(message.guild, message.member)) - 1;
-
   const muteLevels = await getAutoMuteLevels(message.guild);
-
   if (muteLevels.length == 0) return;
 
   await addMuteViolation(message.guild, message.member);
+  const vl = (await getMuteViolations(message.guild, message.member)) - 1;
 
   const muteUser = async (member: GuildMember, length: number, isAlt?: boolean) => {
     const guildMuteRole = await getMuteRole(message.guild);
