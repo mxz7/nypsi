@@ -335,7 +335,7 @@ export default async function messageCreate(message: Message) {
 
   const checkNeedSupport = async () => {
     if (helpCooldown.has(message.author.id)) return;
-    if (message.member.roles.cache.hasAny("1091314758986256424", "1310619772714614825")) return;
+    if (message.member.roles.cache.has("1310619772714614825")) return;
 
     for (const i of helpContent) {
       if (message.content.toLowerCase().includes(i)) {
