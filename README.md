@@ -59,7 +59,7 @@ better showcase of features can be found on the bot's website: [`nypsi.xyz`](htt
 
 #### gambling / economy
 
-- nypsi has a seasonal economy system, meaning that the economy resets every few months. this also means that the top 5 richest users on the bot at the end of every season receive real life rewards, such as paypal money or equivalent
+- nypsi has a seasonal economy system, meaning that the economy resets every few months. this also means that the top richest users on the bot at the end of every season receive real life money as a reward.
 
 #### moderation
 
