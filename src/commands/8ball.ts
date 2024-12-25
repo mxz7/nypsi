@@ -26,7 +26,7 @@ const answers = [
   "you may rely on it",
 ];
 
-const cmd = new Command("8ball", "ask the 8ball a question", "fun").setAliases(["8"]);
+const cmd = new Command("8ball", "ask the 8ball a question", "fun");
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
