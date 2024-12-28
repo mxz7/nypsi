@@ -46,7 +46,6 @@ import {
 import { getAdminLevel, setAdminLevel } from "../utils/functions/users/admin";
 import { isUserBlacklisted, setUserBlacklist } from "../utils/functions/users/blacklist";
 import { getCommandUses } from "../utils/functions/users/commands";
-import { getEmail, getTotalSpend } from "../utils/functions/users/email";
 import { addNotificationToQueue } from "../utils/functions/users/notifications";
 import { addTag, getTags, removeTag } from "../utils/functions/users/tags";
 import { hasProfile } from "../utils/functions/users/utils";
@@ -1689,55 +1688,24 @@ async function run(
     if (message.author.id !== Constants.TEKOH_ID) return;
     await redis.del(Constants.redis.nypsi.CRASH_STATUS);
     await initCrashGame(message.client as NypsiClient);
-  } else if (args[0].toLowerCase() === "kofi") {
+  } else if (args[0].toLowerCase() === "meow") {
     if (message.author.id !== Constants.TEKOH_ID) return;
 
-    const old = await prisma.kofiPurchases.findMany();
-
-    const newData: Prisma.PurchasesCreateManyInput[] = [];
-
-    for (const i of old) {
-      newData.push({
-        cost: new Prisma.Decimal(
-          Array.from(Constants.KOFI_PRODUCTS.values()).find((j) => j.name === i.item)?.cost || 0,
-        ),
-        item: i.item,
-        source: "kofi-old",
-        email: i.email || (await getEmail(i.userId).catch(() => "")) || "unknown email",
-        userId: i.userId,
-        createdAt: i.date,
-      });
-    }
-
-    await prisma.purchases.createMany({
-      data: newData,
-    });
-  } else if (args[0].toLowerCase() === "checkspend") {
-    const userIds = await prisma.purchases.findMany({
-      distinct: ["userId"],
-      select: {
-        userId: true,
-      },
+    const guilds = await prisma.guild.findMany({
+      where: { chatFilter: { isEmpty: false } },
+      select: { chatFilter: true, id: true, percentMatch: true },
     });
 
-    for (const userId of userIds) {
-      if (!userId.userId) continue;
-      const old = await prisma.user.findUnique({
-        where: {
-          id: userId.userId,
-        },
-        select: {
-          totalSpend: true,
-        },
+    for (const guild of guilds) {
+      await prisma.chatFilter.createMany({
+        data: guild.chatFilter.map((i) => ({
+          guildId: guild.id,
+          content: i,
+          percentMatch: guild.percentMatch,
+        })),
       });
-
-      const newSpend = await getTotalSpend(userId.userId);
-
-      if (newSpend !== old.totalSpend) {
-        logger.debug(
-          `${userId.userId} wrong total spend ${newSpend} - ${old.totalSpend}. diff: ${newSpend - old.totalSpend}`,
-        );
-      }
+      await redis.del(`${Constants.redis.cache.guild.CHATFILTER}:${guild.id}`);
+      logger.info(`done ${guild.id} (${guild.chatFilter.length} words)`);
     }
   }
 }

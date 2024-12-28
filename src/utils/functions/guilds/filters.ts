@@ -1,6 +1,7 @@
 import { Guild, GuildMember, Message, Role, ThreadChannel } from "discord.js";
 import * as stringSimilarity from "string-similarity";
 import prisma from "../../../init/database";
+import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
@@ -19,10 +20,8 @@ import {
   newMute,
 } from "../moderation/mute";
 import { isAltPunish } from "./altpunish";
-import { getPercentMatch } from "./utils";
 import ms = require("ms");
 
-const chatFilterCache = new Map<string, string[]>();
 const snipeFilterCache = new Map<string, string[]>();
 
 export async function getSnipeFilter(guild: Guild): Promise<string[]> {
@@ -62,179 +61,169 @@ export async function updateSnipeFilter(guild: Guild, array: string[]) {
   if (snipeFilterCache.has(guild.id)) snipeFilterCache.delete(guild.id);
 }
 
-export async function getChatFilter(guild: Guild): Promise<string[]> {
-  if (chatFilterCache.has(guild.id)) {
-    return chatFilterCache.get(guild.id);
-  }
+export async function getChatFilter(guild: Guild): Promise<
+  {
+    content: string;
+    percentMatch: number;
+    guildId: string;
+  }[]
+> {
+  const cache = await redis.get(`${Constants.redis.cache.guild.CHATFILTER}:${guild.id}`);
 
-  const query = await prisma.guild.findUnique({
+  if (cache) return JSON.parse(cache);
+
+  const query = await prisma.chatFilter.findMany({
     where: {
-      id: guild.id,
-    },
-    select: {
-      chatFilter: true,
+      guildId: guild.id,
     },
   });
 
-  chatFilterCache.set(guild.id, query.chatFilter);
+  await redis.set(
+    `${Constants.redis.cache.guild.CHATFILTER}:${guild.id}`,
+    JSON.stringify(query),
+    "EX",
+    3600,
+  );
 
-  setTimeout(() => {
-    if (chatFilterCache.has(guild.id)) chatFilterCache.delete(guild.id);
-  }, 43200000);
-
-  return query.chatFilter;
+  return query;
 }
 
-export async function updateChatFilter(guild: Guild, array: string[]) {
-  await prisma.guild.update({
+export async function deleteChatFilterWord(guildId: string, content: string) {
+  await prisma.chatFilter.delete({
     where: {
-      id: guild.id,
+      guildId_content: {
+        guildId,
+        content: content.toLowerCase().normalize("NFD"),
+      },
     },
+  });
+
+  await redis.del(`${Constants.redis.cache.guild.CHATFILTER}:${guildId}`);
+}
+
+export async function addChatFilterWord(guildId: string, content: string, percentMatch?: number) {
+  await prisma.chatFilter.create({
     data: {
-      chatFilter: array,
+      guildId,
+      content: content.toLowerCase().normalize("NFD"),
+      percentMatch,
     },
   });
 
-  if (chatFilterCache.has(guild.id)) chatFilterCache.delete(guild.id);
+  await redis.del(`${Constants.redis.cache.guild.CHATFILTER}:${guildId}`);
 }
-export async function checkMessageContentNoModLog(content: string, guild: Guild) {
-  const [filter, match] = await Promise.all([getChatFilter(guild), getPercentMatch(guild)]);
 
-  if (content.length >= 69) {
-    for (const word of filter) {
-      if (word.includes(" ")) {
-        if (content.includes(word.toLowerCase())) {
-          const contentModified = content.replace(word, `**${word}**`);
-          return {
-            filtered: true,
-            contentModified,
-          };
-        }
-      } else {
-        if (content.split(" ").indexOf(word.toLowerCase()) != -1) {
-          const contentModified = content.replace(word, `**${word}**`);
-          return {
-            filtered: true,
-            contentModified,
-          };
-        }
-      }
-    }
-  } else {
-    for (const word of filter) {
-      if (word.includes(" ")) {
-        if (content.includes(word.toLowerCase())) {
-          const contentModified = content.replace(word, `**${word}**`);
-          return {
-            filtered: true,
-            contentModified,
-          };
-        }
-      } else {
-        for (const contentWord of content.split(" ")) {
-          const similarity = stringSimilarity.compareTwoStrings(word, contentWord);
+export async function checkMessageContent(
+  guild: Guild,
+  content: string,
+  modlog: true,
+  message: Message,
+): Promise<boolean>;
 
-          if (similarity >= match / 100) {
-            const contentModified = content.replace(contentWord, `**${contentWord}**`);
-            return {
-              filtered: true,
-              contentModified,
-              similarity: (similarity * 100).toFixed(2),
-            };
+export async function checkMessageContent(
+  guild: Guild,
+  content: string,
+  modlog: false,
+  message?: undefined,
+): Promise<boolean>;
+
+// Implementation
+export async function checkMessageContent(
+  guild: Guild,
+  content: string,
+  modlog: boolean,
+  message?: Message,
+): Promise<boolean> {
+  {
+    const filter = await getChatFilter(guild);
+
+    content = content.toLowerCase().normalize("NFD");
+
+    if (content.length >= 69) {
+      for (const word of filter) {
+        if (word.content.includes(" ")) {
+          if (content.includes(word.content)) {
+            const contentModified = content.replace(word.content, `**${word}**`);
+            if (modlog) {
+              addModLog(
+                guild,
+                "filter violation",
+                message.author.id,
+                guild.client.user,
+                contentModified,
+                -1,
+                message.channelId,
+              );
+              await message.delete().catch(() => {});
+            }
+            return false;
           }
-        }
-      }
-    }
-  }
-  return {
-    filtered: false,
-  };
-}
-
-export async function checkMessageContent(message: Message) {
-  const [filter, match] = await Promise.all([
-    getChatFilter(message.guild),
-    getPercentMatch(message.guild),
-  ]);
-
-  const content = message.content.toLowerCase().normalize("NFD");
-
-  if (content.length >= 69) {
-    for (const word of filter) {
-      if (word.includes(" ")) {
-        if (content.includes(word.toLowerCase())) {
-          const contentModified = content.replace(word, `**${word}**`);
-          addModLog(
-            message.guild,
-            "filter violation",
-            message.author.id,
-            message.client.user,
-            contentModified,
-            -1,
-            message.channel.id,
-          );
-          await message.delete().catch(() => {});
-          return false;
-        }
-      } else {
-        if (content.split(" ").indexOf(word.toLowerCase()) != -1) {
-          const contentModified = content.replace(word, `**${word}**`);
-          addModLog(
-            message.guild,
-            "filter violation",
-            message.author.id,
-            message.client.user,
-            contentModified,
-            -1,
-            message.channel.id,
-          );
-          await message.delete().catch(() => {});
-          return false;
-        }
-      }
-    }
-  } else {
-    for (const word of filter) {
-      if (word.includes(" ")) {
-        if (content.includes(word.toLowerCase())) {
-          const contentModified = content.replace(word, `**${word}**`);
-          addModLog(
-            message.guild,
-            "filter violation",
-            message.author.id,
-            message.client.user,
-            contentModified,
-            -1,
-            message.channel.id,
-          );
-          await message.delete().catch(() => {});
-          return false;
-        }
-      } else {
-        for (const contentWord of content.split(" ")) {
-          const similarity = stringSimilarity.compareTwoStrings(word, contentWord);
-
-          if (similarity >= match / 100) {
-            const contentModified = content.replace(contentWord, `**${contentWord}**`);
-
-            addModLog(
-              message.guild,
-              "filter violation",
-              message.author.id,
-              message.client.user,
-              contentModified,
-              -1,
-              message.channel.id,
-              (similarity * 100).toFixed(2),
-            );
-            await message.delete().catch(() => {});
+        } else {
+          if (content.split(" ").indexOf(word.content) != -1) {
+            const contentModified = content.replace(word.content, `**${word}**`);
+            if (modlog) {
+              addModLog(
+                guild,
+                "filter violation",
+                message.author.id,
+                guild.client.user,
+                contentModified,
+                -1,
+                message.channelId,
+              );
+              await message.delete().catch(() => {});
+            }
             return false;
           }
         }
       }
+    } else {
+      for (const word of filter) {
+        if (word.content.includes(" ")) {
+          if (content.includes(word.content)) {
+            const contentModified = content.replace(word.content, `**${word}**`);
+            if (modlog) {
+              addModLog(
+                guild,
+                "filter violation",
+                message.author.id,
+                guild.client.user,
+                contentModified,
+                -1,
+                message.channelId,
+              );
+              await message.delete().catch(() => {});
+            }
+            return false;
+          }
+        } else {
+          for (const contentWord of content.split(" ")) {
+            const similarity = stringSimilarity.compareTwoStrings(word.content, contentWord);
+
+            if (similarity >= (word.percentMatch || 100) / 100) {
+              const contentModified = content.replace(contentWord, `**${contentWord}**`);
+
+              if (modlog) {
+                addModLog(
+                  message.guild,
+                  "filter violation",
+                  message.author.id,
+                  message.client.user,
+                  contentModified,
+                  -1,
+                  message.channel.id,
+                  (similarity * 100).toFixed(2),
+                );
+                await message.delete().catch(() => {});
+              }
+              return false;
+            }
+          }
+        }
+      }
     }
+    return true;
   }
-  return true;
 }
 
 export async function checkAutoMute(message: Message) {
