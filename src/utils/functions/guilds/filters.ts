@@ -124,7 +124,7 @@ export async function checkMessageContent(
   guild: Guild,
   content: string,
   modlog: false,
-  message: undefined,
+  message?: undefined,
 ): Promise<boolean>;
 
 // Implementation
@@ -144,7 +144,7 @@ export async function checkMessageContent(
         if (word.content.includes(" ")) {
           if (content.includes(word.content)) {
             const contentModified = content.replace(word.content, `**${word}**`);
-            if (modlog)
+            if (modlog) {
               addModLog(
                 guild,
                 "filter violation",
@@ -154,13 +154,14 @@ export async function checkMessageContent(
                 -1,
                 message.channelId,
               );
-            await message.delete().catch(() => {});
+              await message.delete().catch(() => {});
+            }
             return false;
           }
         } else {
           if (content.split(" ").indexOf(word.content) != -1) {
             const contentModified = content.replace(word.content, `**${word}**`);
-            if (modlog)
+            if (modlog) {
               addModLog(
                 guild,
                 "filter violation",
@@ -170,7 +171,8 @@ export async function checkMessageContent(
                 -1,
                 message.channelId,
               );
-            await message.delete().catch(() => {});
+              await message.delete().catch(() => {});
+            }
             return false;
           }
         }
@@ -180,7 +182,7 @@ export async function checkMessageContent(
         if (word.content.includes(" ")) {
           if (content.includes(word.content)) {
             const contentModified = content.replace(word.content, `**${word}**`);
-            if (modlog)
+            if (modlog) {
               addModLog(
                 guild,
                 "filter violation",
@@ -190,7 +192,8 @@ export async function checkMessageContent(
                 -1,
                 message.channelId,
               );
-            await message.delete().catch(() => {});
+              await message.delete().catch(() => {});
+            }
             return false;
           }
         } else {
@@ -200,17 +203,19 @@ export async function checkMessageContent(
             if (similarity >= (word.percentMatch || 100) / 100) {
               const contentModified = content.replace(contentWord, `**${contentWord}**`);
 
-              addModLog(
-                message.guild,
-                "filter violation",
-                message.author.id,
-                message.client.user,
-                contentModified,
-                -1,
-                message.channel.id,
-                (similarity * 100).toFixed(2),
-              );
-              await message.delete().catch(() => {});
+              if (modlog) {
+                addModLog(
+                  message.guild,
+                  "filter violation",
+                  message.author.id,
+                  message.client.user,
+                  contentModified,
+                  -1,
+                  message.channel.id,
+                  (similarity * 100).toFixed(2),
+                );
+                await message.delete().catch(() => {});
+              }
               return false;
             }
           }
