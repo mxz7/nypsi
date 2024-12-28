@@ -75,6 +75,7 @@ export default {
         ALTS: "cache:guilds:alts",
         EVIDENCE_MAX: "cache:guilds:evidence:max",
         AUTOMUTE_VL: "cache:guild:automute",
+        CHATFILTER: "cache:guild:chatfilter",
       },
       chatReaction: {
         EXISTS: "cache:chatreaction:exists",

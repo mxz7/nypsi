@@ -39,7 +39,7 @@ export default async function messageDelete(message: Message) {
     const chatFilter = await getChatFilter(message.guild);
 
     for (const word of chatFilter) {
-      if (content.includes(word.toLowerCase())) return;
+      if (content.includes(word.content)) return;
     }
 
     snipe.set(message.channel.id, {

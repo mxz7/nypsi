@@ -729,7 +729,7 @@ export async function runCommand(
         contentToCheck = contentToCheck.split(" ");
 
         for (const word of filter) {
-          if (contentToCheck.indexOf(word.toLowerCase()) != -1) {
+          if (contentToCheck.indexOf(word.content) != -1) {
             return message.channel.send({
               embeds: [new ErrorEmbed("this custom command is not allowed in this server")],
             });

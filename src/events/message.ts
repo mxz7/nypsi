@@ -388,7 +388,7 @@ export default async function messageCreate(message: Message) {
     (await hasGuild(message.guild)) &&
     !message.member.permissions.has(PermissionsBitField.Flags.ManageMessages)
   ) {
-    const res = await checkMessageContent(message);
+    const res = await checkMessageContent(message.guild, message.content, true, message);
 
     if (!res) {
       checkAutoMute(message);

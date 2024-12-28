@@ -10,11 +10,12 @@ import { inPlaceSort } from "fast-sort";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import {
-  checkMessageContentNoModLog,
+  addChatFilterWord,
+  checkMessageContent,
+  deleteChatFilterWord,
   getChatFilter,
-  updateChatFilter,
 } from "../utils/functions/guilds/filters";
-import { getPercentMatch, getPrefix, setPercentMatch } from "../utils/functions/guilds/utils";
+import { getPrefix } from "../utils/functions/guilds/utils";
 import PageManager from "../utils/functions/page";
 
 const cmd = new Command("chatfilter", "change the chat filter for your server", "admin")
@@ -39,7 +40,7 @@ async function run(
 
   if (args.length == 0) {
     const pages = PageManager.createPages(
-      inPlaceSort(filter)
+      inPlaceSort(filter.map((i) => i.content))
         .asc()
         .map((i) => `\`${i}\``),
       15,
@@ -83,45 +84,10 @@ async function run(
     const embed = new CustomEmbed(message.member).setHeader("chat filter help");
 
     embed.setDescription(
-      `${prefix}**filter add/+ <word>** *add a word to the chat filter*\n${prefix}**filter del/- <word>** *remove a word from the chat filter*\n${prefix}**filter reset** *reset the chat filter*\n${prefix}**filter match <percentage>** *percentage match required to delete message\n${prefix}**filter test** *test the chat filter*`,
+      `${prefix}**filter add/+ <word>** *add a word to the chat filter*\n${prefix}**filter del/- <word>** *remove a word from the chat filter*\n${prefix}**filter reset** *reset the chat filter*\n${prefix}**filter test** *test the chat filter*\n\nyou can use the [web dashboard](https://nypsi.xyz/me/guild/${message.guildId}) for percentage matching`,
     );
 
     return message.channel.send({ embeds: [embed] });
-  }
-
-  if (args[0].toLowerCase() == "match" || args[0].toLowerCase() == "percent") {
-    if (args.length == 1) {
-      const embed = new CustomEmbed(message.member).setHeader("chat filter percentage match");
-
-      const current = await getPercentMatch(message.guild);
-
-      embed.setDescription(
-        `current: \`${current}%\` match required\nuse ${prefix}**filter match <percent>** to change this.\n\n` +
-          "the percentage match setting allows nypsi to calculate a percentage difference from words in a user's message and with words in the filter, if a word has a high enough match rate, that can be deleted. set this to 100 for exact matches only",
-      );
-
-      return message.channel.send({ embeds: [embed] });
-    }
-
-    if (!parseInt(args[1])) {
-      return message.channel.send({ embeds: [new ErrorEmbed("must be a number idiot")] });
-    }
-
-    const amount = parseInt(args[1]);
-
-    if (amount < 0 || amount > 100) {
-      return message.channel.send({
-        embeds: [new ErrorEmbed("ur pretty stupid arent u. **PERCENTAGE** MATCH")],
-      });
-    }
-
-    await setPercentMatch(message.guild, amount);
-
-    return message.channel.send({
-      embeds: [
-        new CustomEmbed(message.member, `✅ percentage match has been set to \`${amount}%\``),
-      ],
-    });
   }
 
   if (args[0].toLowerCase() == "add" || args[0].toLowerCase() == "+") {
@@ -141,7 +107,7 @@ async function run(
       return message.channel.send({ embeds: [new ErrorEmbed("invalid")] });
     }
 
-    if (filter.indexOf(word) > -1) {
+    if (filter.findIndex((i) => i.content === word) > -1) {
       const embed = new CustomEmbed(
         message.member,
         "❌ `" + word + "` already exists in the filter",
@@ -152,11 +118,7 @@ async function run(
       return message.channel.send({ embeds: [embed] });
     }
 
-    filter.push(word);
-
-    if (filter.join("").length > 2000) {
-      filter.splice(filter.indexOf(word), 1);
-
+    if (filter.length + 1 > 250) {
       const embed = new CustomEmbed(
         message.member,
         `❌ filter has exceeded the maximum size - please use *${prefix}filter del/-* or *${prefix}filter reset*`,
@@ -165,7 +127,7 @@ async function run(
       return message.channel.send({ embeds: [embed] });
     }
 
-    await updateChatFilter(message.guild, filter);
+    await addChatFilterWord(message.guildId, word);
 
     const embed = new CustomEmbed(
       message.member,
@@ -181,8 +143,8 @@ async function run(
 
     const word = args.slice(1, args.length).join(" ").toLowerCase().normalize("NFD");
 
-    if (filter.indexOf(word) > -1) {
-      filter.splice(filter.indexOf(word), 1);
+    if (filter.findIndex((i) => i.content === word) > -1) {
+      await deleteChatFilterWord(message.guildId, word);
     } else {
       const embed = new CustomEmbed(message.member, "❌ `" + word + "` not found in the filter")
         .setHeader("chat filter")
@@ -190,8 +152,6 @@ async function run(
 
       return message.channel.send({ embeds: [embed] });
     }
-
-    await updateChatFilter(message.guild, filter);
 
     const embed = new CustomEmbed(message.member, "✅ removed `" + word + "` from the filter")
       .setHeader("chat filter")
@@ -203,7 +163,9 @@ async function run(
   if (args[0].toLowerCase() == "reset") {
     filter = [];
 
-    await updateChatFilter(message.guild, filter);
+    for (const word of filter) {
+      await deleteChatFilterWord(message.guildId, word.content);
+    }
 
     const embed = new CustomEmbed(message.member, "✅ filter has been reset").setHeader(
       "chat filter",
@@ -214,13 +176,11 @@ async function run(
 
   if (args[0].toLowerCase() == "test") {
     const content = args.slice(1, args.length).join(" ").toLowerCase().normalize("NFD");
-    const check = await checkMessageContentNoModLog(content, message.guild);
+    const check = await checkMessageContent(message.guild, content, false);
     let embed;
-    if (check.filtered) {
+    if (check) {
       embed = new CustomEmbed(message.member).setHeader("chat filter test");
-      embed.setDescription(
-        `\`${content}\` was found in the filter with a similarity of **${check.similarity}%**`,
-      );
+      embed.setDescription(`\`${content}\` was filtered`);
     } else {
       embed = new ErrorEmbed(`\`${content}\` was not found in the filter`);
     }
