@@ -136,7 +136,6 @@ async function run(
           CommandUse: true,
           Achievements: true,
           DMSettings: true,
-          KofiPurchases: true,
           ActiveChannels: true,
           Leaderboards: true,
           Tags: true,
