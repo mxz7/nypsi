@@ -555,7 +555,7 @@ model ChatFilter {
   guildId String
   content String
 
-  percentMatch Int
+  percentMatch Int?
 
   guild Guild @relation(fields: [guildId], references: [id])
 
