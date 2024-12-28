@@ -35,7 +35,7 @@ export default async function messageUpdate(message: Message, newMessage: Messag
   }
 
   if (!message.member.permissions.has(PermissionFlagsBits.Administrator)) {
-    const res = await checkMessageContent(newMessage);
+    const res = await checkMessageContent(message.guild, message.content, true, message);
 
     if (!res) {
       addMuteViolation(message.guild, message.member);
@@ -58,7 +58,7 @@ export default async function messageUpdate(message: Message, newMessage: Messag
     const chatFilter = await getChatFilter(message.guild);
 
     for (const word of chatFilter) {
-      if (content.includes(word.toLowerCase())) return;
+      if (content.includes(word.content)) return;
     }
 
     eSnipe.set(message.channel.id, {
