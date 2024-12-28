@@ -84,7 +84,7 @@ async function run(
     const embed = new CustomEmbed(message.member).setHeader("chat filter help");
 
     embed.setDescription(
-      `${prefix}**filter add/+ <word>** *add a word to the chat filter*\n${prefix}**filter del/- <word>** *remove a word from the chat filter*\n${prefix}**filter reset** *reset the chat filter*\n${prefix}**filter test** *test the chat filter*\n\nyou can use the [web dashboard](https://nypsi.xyz/me/guild/${message.guildId}) for percentage matching`,
+      `${prefix}**filter add/+ <word>** *add a word to the chat filter*\n${prefix}**filter del/- <word>** *remove a word from the chat filter*\n${prefix}**filter reset** *reset the chat filter*\n${prefix}**filter test** *test the chat filter*\n\nyou can use the [web dashboard](https://nypsi.xyz/me/guilds/${message.guildId}) for percentage matching`,
     );
 
     return message.channel.send({ embeds: [embed] });
