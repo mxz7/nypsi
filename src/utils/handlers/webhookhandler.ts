@@ -117,6 +117,19 @@ export function listen(manager: ClusterManager) {
     res.status(200).send();
   });
 
+  app.delete("/redis", express.text(), async (req, res) => {
+    const auth = req.headers.authorization;
+
+    if (auth !== process.env.API_AUTH) {
+      res.status(401).send();
+      return;
+    }
+
+    await redis.del(...req.body.split("\n"));
+
+    res.status(200).send();
+  });
+
   app.get("/item/value/:item", async (req, res) => {
     const { item } = req.params;
 
