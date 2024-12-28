@@ -125,6 +125,8 @@ export function listen(manager: ClusterManager) {
       return;
     }
 
+    logger.info(`deleting redis keys (${req.body.split("\n").join(", ")})`);
+
     await redis.del(...req.body.split("\n"));
 
     res.status(200).send();
