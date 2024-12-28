@@ -23,7 +23,6 @@ model User {
   blacklisted       Boolean  @default(false)
   adminLevel        Int      @default(0)
   booster           Boolean  @default(false)
-  totalSpend        Float    @default(0)
 
   birthday         DateTime?
   birthdayAnnounce Boolean   @default(true)
@@ -38,7 +37,6 @@ model User {
   Preferences              Preferences?
   Leaderboards             Leaderboards[]
   ActiveChannels           ActiveChannels[]
-  KofiPurchases            KofiPurchases[]
   Tags                     Tags[]
   Views                    ProfileView[]
   Viewed                   ProfileView[]              @relation(name: "viewer")
@@ -517,8 +515,6 @@ model Guild {
   peak             Int      @default(0)
   disabledCommands String[]
   snipeFilter      String[]
-  chatFilter       String[]
-  percentMatch     Int      @default(75)
   prefixes         String[] @default(["$"])
   createdAt        DateTime @default(now())
   slash_only       Boolean  @default(false)
@@ -816,17 +812,6 @@ model Mention {
 model SupportRequest {
   userId    String @id
   channelId String @unique
-}
-
-model KofiPurchases {
-  id Int @id @default(autoincrement())
-
-  date   DateTime @default(now())
-  email  String?
-  item   String
-  userId String?
-
-  user User? @relation(fields: [userId], references: [id])
 }
 
 model Purchases {
