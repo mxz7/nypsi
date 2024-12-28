@@ -548,6 +548,18 @@ model Guild {
   mutes               ModerationMute[]
   ModerationEvidence  ModerationEvidence[]
   GuildEvidenceCredit GuildEvidenceCredit[]
+  ChatFilter          ChatFilter[]
+}
+
+model ChatFilter {
+  guildId String
+  content String
+
+  percentMatch Int
+
+  guild Guild @relation(fields: [guildId], references: [id])
+
+  @@id([guildId, content])
 }
 
 model ReactionRole {
