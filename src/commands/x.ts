@@ -1688,25 +1688,6 @@ async function run(
     if (message.author.id !== Constants.TEKOH_ID) return;
     await redis.del(Constants.redis.nypsi.CRASH_STATUS);
     await initCrashGame(message.client as NypsiClient);
-  } else if (args[0].toLowerCase() === "meow") {
-    if (message.author.id !== Constants.TEKOH_ID) return;
-
-    const guilds = await prisma.guild.findMany({
-      where: { chatFilter: { isEmpty: false } },
-      select: { chatFilter: true, id: true, percentMatch: true },
-    });
-
-    for (const guild of guilds) {
-      await prisma.chatFilter.createMany({
-        data: guild.chatFilter.map((i) => ({
-          guildId: guild.id,
-          content: i,
-          percentMatch: guild.percentMatch,
-        })),
-      });
-      await redis.del(`${Constants.redis.cache.guild.CHATFILTER}:${guild.id}`);
-      logger.info(`done ${guild.id} (${guild.chatFilter.length} words)`);
-    }
   }
 }
 
