@@ -66,6 +66,6 @@ export default {
     const count = await prisma.task.deleteMany({ where: { type: "weekly" } });
     exec(`redis-cli KEYS "cache:economy:tasks:*" | xargs redis-cli DEL`);
 
-    log(`${count.count} daily tasks deleted`);
+    log(`${count.count} weekly tasks deleted`);
   },
 } satisfies Job;
