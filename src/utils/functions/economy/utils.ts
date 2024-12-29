@@ -484,7 +484,7 @@ export async function reset() {
       },
     });
 
-    let upgradesCount = user.Upgrades.map((i) => i.amount).reduce((a, b) => a + b, 0);
+    const upgradesCount = user.Upgrades.map((i) => i.amount).reduce((a, b) => a + b, 0);
 
     if (upgradesCount !== user.prestige) {
       if (user.prestige === 0) {
