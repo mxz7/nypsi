@@ -307,7 +307,7 @@ export async function fertiliseFarm(
 
   if (possible.length === 0) return { dead, msg: "no need" };
 
-  if (possible.length > fertiliser.amount) possible = possible.slice(0, fertiliser.amount);
+  if (possible.length > fertiliser.amount * 3) possible = possible.slice(0, fertiliser.amount * 3);
 
   await prisma.farm.updateMany({
     where: {
@@ -318,7 +318,11 @@ export async function fertiliseFarm(
     },
   });
 
-  await setInventoryItem(userId, fertiliser.item, fertiliser.amount - possible.length);
+  await setInventoryItem(
+    userId,
+    fertiliser.item,
+    fertiliser.amount - Math.ceil(possible.length / 3),
+  );
   await redis.del(`${Constants.redis.cache.economy.farm}:${userId}`);
 
   return { done: possible.length, dead };
