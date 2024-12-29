@@ -463,7 +463,7 @@ export async function reset() {
     .then((r) => r.count);
 
   logger.info("resetting");
-  const query = await prisma.economy.findMany();
+  const query = await prisma.economy.findMany({ include: { Upgrades: true } });
   let updated = 0;
 
   for (const user of query) {
@@ -484,20 +484,20 @@ export async function reset() {
       },
     });
 
-    updated++;
+    let upgradesCount = user.Upgrades.map((i) => i.amount).reduce((a, b) => a + b, 0);
 
-    await redis.del(`${Constants.redis.cache.economy.EXISTS}:${user.userId}`);
-    await redis.del(`${Constants.redis.cache.economy.BANNED}:${user.userId}`);
-    await redis.del(`${Constants.redis.cache.economy.PRESTIGE}:${user.userId}`);
-    await redis.del(`${Constants.redis.cache.economy.EXISTS}:${user.userId}`);
-    await redis.del(`${Constants.redis.cache.economy.XP}:${user.userId}`);
-    await redis.del(`${Constants.redis.cache.economy.BALANCE}:${user.userId}`);
-    await redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${user.userId}`);
-    await redis.del(`economy:handcuffed:${user.userId}`);
-    await redis.del(`${Constants.redis.cache.economy.GUILD_USER}:${user.userId}`);
-    await redis.del(`${Constants.redis.cache.economy.NETWORTH}:${user.userId}`);
-    await redis.del(`${Constants.redis.nypsi.STEVE_EARNED}:${user.userId}`);
+    if (upgradesCount !== user.prestige) {
+      if (user.prestige === 0) {
+        logger.info(`deleting upgrades for ${user.userId}`, { upgrades: user.Upgrades });
+        await prisma.upgrades.deleteMany({ where: { userId: user.userId } });
+      }
+      logger.error(`invalid upgrade count for ${user.userId}`);
+    }
+
+    updated++;
   }
+
+  exec(`redis-cli KEYS "*economy*" | xargs redis-cli DEL`);
 
   logger.info("done");
 
