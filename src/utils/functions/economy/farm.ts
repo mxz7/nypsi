@@ -138,7 +138,10 @@ export async function getClaimable(member: GuildMember | string, plantId: string
   const plants = farm.filter(
     (plant) =>
       plant.plantId === plantId &&
-      plant.harvestedAt.valueOf() < dayjs().subtract(plantData.growthTime, "seconds").valueOf() &&
+      plant.harvestedAt.valueOf() <
+        dayjs()
+          .subtract(60 / plantData.hourly, "minutes")
+          .valueOf() &&
       plant.harvestedAt.valueOf() <
         dayjs()
           .subtract(60 / plantData.hourly, "minutes")
