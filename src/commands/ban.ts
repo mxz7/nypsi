@@ -201,7 +201,8 @@ async function run(
 
   if (temporary) banLength = getTime(duration * 1000);
 
-  if (await isBanned(message.guild, target)) await deleteBan(message.guild, target);
+  if (await isBanned(message.guild, mode === "id" ? userId : target))
+    await deleteBan(message.guild, mode === "id" ? userId : target);
 
   const caseId = await doBan(
     message,
