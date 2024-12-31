@@ -118,7 +118,7 @@ async function run(
 
     const amount = parseInt(args[1]);
 
-    if (isNaN(amount) || amount <= 0) {
+    if (isNaN(amount) || amount < 0) {
       return send({ embeds: [new ErrorEmbed("invalid number")] });
     }
 
