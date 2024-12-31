@@ -320,6 +320,7 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
   status = await getCrashStatus();
 
   if (status.players.find((p) => p.userId === interaction.user.id)) {
+    logger.debug(`crash: ${interaction.user.username} already joined`, status);
     return interaction.reply({
       embeds: [new ErrorEmbed("you have already joined")],
       ephemeral: true,
