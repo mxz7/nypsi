@@ -143,7 +143,7 @@ export async function checkMessageContent(
       for (const word of filter) {
         if (word.content.includes(" ")) {
           if (content.includes(word.content)) {
-            const contentModified = content.replace(word.content, `**${word}**`);
+            const contentModified = content.replace(word.content, `**${word.content}**`);
             if (modlog) {
               addModLog(
                 guild,
@@ -160,7 +160,7 @@ export async function checkMessageContent(
           }
         } else {
           if (content.split(" ").indexOf(word.content) != -1) {
-            const contentModified = content.replace(word.content, `**${word}**`);
+            const contentModified = content.replace(word.content, `**${word.content}**`);
             if (modlog) {
               addModLog(
                 guild,
@@ -181,7 +181,7 @@ export async function checkMessageContent(
       for (const word of filter) {
         if (word.content.includes(" ")) {
           if (content.includes(word.content)) {
-            const contentModified = content.replace(word.content, `**${word}**`);
+            const contentModified = content.replace(word.content, `**${word.content}**`);
             if (modlog) {
               addModLog(
                 guild,
