@@ -431,6 +431,7 @@ export async function doLevelUp(member: GuildMember | string) {
   }
 
   if (await redis.exists(`${Constants.redis.cache.economy.LEVELLING_UP}:${id}`)) return;
+  if (await redis.exists("nypsi:infinitemaxbet")) return;
 
   const [beforePrestige, beforeLevel] = await Promise.all([getPrestige(id), getLevel(id)]);
   let requirements = getLevelRequirements(beforePrestige, beforeLevel);
