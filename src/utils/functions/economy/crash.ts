@@ -315,7 +315,7 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
     }
   }
 
-  removeBalance(interaction.user.id, bet);
+  await removeBalance(interaction.user.id, bet);
 
   status = await getCrashStatus();
 
