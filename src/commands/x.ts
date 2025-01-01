@@ -25,7 +25,7 @@ import { b, c } from "../utils/functions/anticheat";
 import { giveCaptcha } from "../utils/functions/captcha";
 import { updateBalance, updateBankBalance } from "../utils/functions/economy/balance";
 import { initCrashGame } from "../utils/functions/economy/crash";
-import { setInventoryItem } from "../utils/functions/economy/inventory";
+import { addInventoryItem, setInventoryItem } from "../utils/functions/economy/inventory";
 import { setLevel, setPrestige } from "../utils/functions/economy/levelling";
 import { getEcoBanTime, getItems, isEcoBanned, setEcoBan } from "../utils/functions/economy/utils";
 import { updateXp } from "../utils/functions/economy/xp";
@@ -479,6 +479,10 @@ async function run(
         logger.info(
           `admin: ${message.author.id} (${message.author.username}) created purchase for ${user.id} ${msgResponse.first().content}`,
         );
+
+        if (getItems()[item]) {
+          await addInventoryItem(user.id, item, amount ? parseInt(amount) : 1);
+        }
 
         msgResponse.first().react("✅");
       } else if (res.customId === "set-bal") {
