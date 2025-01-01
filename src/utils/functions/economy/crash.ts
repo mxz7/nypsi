@@ -315,12 +315,14 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
     }
   }
 
+  logger.debug(`crash: ${interaction.user.username} remving balance`);
   await removeBalance(interaction.user.id, bet);
 
   status = await getCrashStatus();
 
   if (status.players.find((p) => p.userId === interaction.user.id)) {
     logger.debug(`crash: ${interaction.user.username} already joined`, status);
+    await addBalance(interaction.user.id, bet);
     return interaction.reply({
       embeds: [new ErrorEmbed("you have already joined")],
       ephemeral: true,
