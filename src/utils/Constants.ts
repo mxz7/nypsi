@@ -14,7 +14,7 @@ products.set("4b1d3a70b2", { name: "boosters_crate", cost: 2.99 });
 products.set("4ec1ebe6b4", { name: "gem_crate", cost: 14.99 });
 products.set("d18331a5bb", { name: "gem_shard", cost: 0 });
 products.set("1d78b621a5", { name: "unecoban", cost: 19.99 });
-products.set("0aec346b01", { name: "omega_crate", cost: 14.99 });
+products.set("0aec346b01", { name: "omega_crate", cost: 9.99 });
 
 export default {
   redis: {
@@ -196,8 +196,8 @@ export default {
       [100, 5],
     ]),
   },
-  SEASON_START: new Date("06/01/2024"),
-  SEASON_NUMBER: 8,
+  SEASON_START: new Date("01/01/2025"),
+  SEASON_NUMBER: 9,
   SNOWFLAKE_REGEX: /^\d{17,19}$/,
   BADGES: ["owner", "staff", "highroller", "contributor", "season_winner", "og", "keyboard"],
   PURPLE: "#8b5cf6" as ColorResolvable,

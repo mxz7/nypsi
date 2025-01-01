@@ -1,5 +1,5 @@
 import { GuildMember } from "discord.js";
-import { inPlaceSort } from "fast-sort";
+import { sort } from "fast-sort";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
@@ -281,16 +281,22 @@ export async function waterFarm(userId: string) {
 
 export async function fertiliseFarm(
   userId: string,
-): Promise<{ dead?: number; msg?: "not fertiliser"; done?: number }> {
+): Promise<{ dead?: number; msg?: "no fertiliser" | "no need"; done?: number }> {
   const dead = await checkDead(userId);
 
   const [farm, inventory] = await Promise.all([getFarm(userId), getInventory(userId)]);
 
   const fertiliser = inventory.find((i) => i.item === "fertiliser");
 
-  if (!fertiliser || fertiliser.amount <= 0) return { dead, msg: "not fertiliser" };
+  if (!fertiliser || fertiliser.amount <= 0) return { dead, msg: "no fertiliser" };
 
-  inPlaceSort(farm).asc((i) => {
+  let possible = sort(
+    farm.filter(
+      (i) =>
+        i.fertilisedAt.valueOf() <
+        dayjs().subtract(getPlantsData()[i.plantId].fertilise.every, "seconds").valueOf(),
+    ),
+  ).asc((i) => {
     const timeTillDead =
       new Date(i.fertilisedAt).getTime() +
       getPlantsData()[i.plantId].fertilise.dead * 1000 -
@@ -299,9 +305,9 @@ export async function fertiliseFarm(
     return timeTillDead;
   });
 
-  let possible = farm;
+  if (possible.length === 0) return { dead, msg: "no need" };
 
-  if (possible.length > fertiliser.amount) possible = possible.slice(0, fertiliser.amount);
+  if (possible.length > fertiliser.amount * 3) possible = possible.slice(0, fertiliser.amount * 3);
 
   await prisma.farm.updateMany({
     where: {
@@ -312,7 +318,11 @@ export async function fertiliseFarm(
     },
   });
 
-  await setInventoryItem(userId, fertiliser.item, fertiliser.amount - possible.length);
+  await setInventoryItem(
+    userId,
+    fertiliser.item,
+    fertiliser.amount - Math.ceil(possible.length / 3),
+  );
   await redis.del(`${Constants.redis.cache.economy.farm}:${userId}`);
 
   return { done: possible.length, dead };

@@ -493,11 +493,20 @@ async function run(
 
     const res = await fertiliseFarm(message.author.id);
 
-    if (res.msg === "not fertiliser") {
+    if (res.msg === "no fertiliser") {
       return send({
         embeds: [
           new ErrorEmbed(
             "you don't have any fertiliser" +
+              (res?.dead > 0 ? `\n\n${res.dead} of your plants have died` : ""),
+          ),
+        ],
+      });
+    } else if (res.msg === "no need") {
+      return send({
+        embeds: [
+          new ErrorEmbed(
+            "none of your plants need fertiliser" +
               (res?.dead > 0 ? `\n\n${res.dead} of your plants have died` : ""),
           ),
         ],
