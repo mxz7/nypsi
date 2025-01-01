@@ -82,7 +82,7 @@ export async function initCrashGame(client: NypsiClient) {
     state: "waiting",
     messageId: "",
     players: [],
-    chance: 10,
+    chance: 15,
     value: 1,
   };
 
@@ -396,7 +396,7 @@ async function start(client: NypsiClient) {
     if (status.value >= 1.5) status.chance += 1;
     if (status.value >= 2) status.chance += 1;
 
-    if (status.chance > 50) status.chance = 50;
+    if (status.chance > 50) status.chance = 45;
 
     return false;
   }
