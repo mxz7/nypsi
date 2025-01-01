@@ -183,15 +183,35 @@ export async function crashOut(interaction: ButtonInteraction) {
   interaction.deferUpdate();
 }
 
+const addCrashPlayerMutex = new Set<string>();
 export async function addCrashPlayer(interaction: ButtonInteraction) {
   if (!ready)
     return interaction.reply({ embeds: [new ErrorEmbed("crash not ready yet")], ephemeral: true });
+
+  if (addCrashPlayerMutex.has(interaction.user.id)) {
+    logger.debug(`crash mutex already has ${interaction.user.id}`);
+    return;
+  }
+
+  addCrashPlayerMutex.add(interaction.user.id);
+
+  setTimeout(() => {
+    addCrashPlayerMutex.delete(interaction.user.id);
+  }, 60000);
+
   let status = await getCrashStatus();
 
-  if (!status) return;
-  if (status.state !== "waiting") return;
+  if (!status) {
+    addCrashPlayerMutex.delete(interaction.user.id);
+    return;
+  }
+  if (status.state !== "waiting") {
+    addCrashPlayerMutex.delete(interaction.user.id);
+    return;
+  }
 
   if (status.players.find((p) => p.userId === interaction.user.id)) {
+    addCrashPlayerMutex.delete(interaction.user.id);
     return interaction.reply({
       embeds: [new ErrorEmbed("you have already joined")],
       ephemeral: true,
@@ -221,6 +241,7 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
   a(interaction.user.id, interaction.user.username, "crash", "crash");
 
   if (await isLockedOut(interaction.user.id)) {
+    addCrashPlayerMutex.delete(interaction.user.id);
     const message = interaction as unknown as NypsiMessage;
 
     message.author = interaction.user;
@@ -244,19 +265,24 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
 
   status = await getCrashStatus();
 
-  if (status.state !== "waiting")
+  if (status.state !== "waiting") {
+    addCrashPlayerMutex.delete(interaction.user.id);
     return modalInteraction.reply({
       embeds: [new ErrorEmbed("this game has already started")],
       ephemeral: true,
     });
+  }
 
-  if (status.players.length >= 15)
+  if (status.players.length >= 15) {
+    addCrashPlayerMutex.delete(interaction.user.id);
     return modalInteraction.reply({
       embeds: [new ErrorEmbed("this game is full")],
       ephemeral: true,
     });
+  }
 
   if (status.players.find((p) => p.userId === interaction.user.id)) {
+    addCrashPlayerMutex.delete(interaction.user.id);
     return interaction.reply({
       embeds: [new ErrorEmbed("you have already joined")],
       ephemeral: true,
@@ -270,10 +296,12 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
   const maxBet = await calcMaxBet(interaction.user.id);
 
   if (!bet || bet <= 0) {
+    addCrashPlayerMutex.delete(interaction.user.id);
     return modalInteraction.reply({ embeds: [new ErrorEmbed("invalid bet")], ephemeral: true });
   }
 
   if (bet > (await getBalance(interaction.user.id))) {
+    addCrashPlayerMutex.delete(interaction.user.id);
     return modalInteraction.reply({
       embeds: [new ErrorEmbed("you cannot afford this bet")],
       ephemeral: true,
@@ -281,6 +309,7 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
   }
 
   if (bet > maxBet) {
+    addCrashPlayerMutex.delete(interaction.user.id);
     return modalInteraction.reply({
       embeds: [
         new ErrorEmbed(
@@ -293,13 +322,16 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
 
   if (autoStop) {
     if (typeof parseFloat(autoStop) === "number") {
-      if (parseFloat(autoStop) <= 1)
+      if (parseFloat(autoStop) <= 1) {
+        addCrashPlayerMutex.delete(interaction.user.id);
         return modalInteraction.reply({
           ephemeral: true,
           embeds: [new ErrorEmbed("your autostop must be higher than 1")],
         });
+      }
 
       if (parseFloat(autoStop) > 100) {
+        addCrashPlayerMutex.delete(interaction.user.id);
         return modalInteraction.reply({
           ephemeral: true,
           embeds: [new ErrorEmbed("invalid autostop")],
@@ -308,6 +340,7 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
     }
 
     if (isNaN(parseFloat(autoStop))) {
+      addCrashPlayerMutex.delete(interaction.user.id);
       return modalInteraction.reply({
         ephemeral: true,
         embeds: [new ErrorEmbed("invalid autostop")],
@@ -321,7 +354,8 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
   status = await getCrashStatus();
 
   if (status.players.find((p) => p.userId === interaction.user.id)) {
-    logger.debug(`crash: ${interaction.user.username} already joined`, status);
+    addCrashPlayerMutex.delete(interaction.user.id);
+    logger.debug(`crash: ${interaction.user.username} already joined`);
     await addBalance(interaction.user.id, bet);
     return interaction.reply({
       embeds: [new ErrorEmbed("you have already joined")],
@@ -338,6 +372,7 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
   });
 
   await setCrashStatus(status);
+  addCrashPlayerMutex.delete(interaction.user.id);
 
   render(interaction.client as NypsiClient);
 
