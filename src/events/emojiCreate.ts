@@ -6,12 +6,10 @@ export default async function emojiCreate(emoji: GuildEmoji) {
   if (await isLogsEnabled(emoji.guild)) {
     const embed = new CustomEmbed().disableFooter().setTimestamp();
 
-    const creator = await emoji.fetchAuthor();
+    const creator = (await emoji.fetchAuthor().then((res) => res.id)) || "unknown";
 
     embed.setHeader("emoji created");
-    embed.setDescription(
-      `\`${emoji.name}\` - \`${emoji.id}\`\ncreated by ${creator.toString()} \`${creator.id}\``,
-    );
+    embed.setDescription(`\`${emoji.name}\` - \`${emoji.id}\`\ncreated by \`${creator}\``);
     embed.setImage(emoji.url);
   }
 }
