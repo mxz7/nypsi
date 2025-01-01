@@ -130,14 +130,16 @@ async function render(client: NypsiClient, status?: CrashStatus) {
       }
     }
 
+    const roundedValue = Math.floor(status.value * 100) / 100;
+
     if (status.state === "waiting") {
       embed.setDescription(`starting <t:${Math.floor(lastJoin / 1000) + 15}:R>`);
     } else if (status.state === "started") {
       embed.setColor(Constants.EMBED_SUCCESS_COLOR);
-      embed.setDescription(`\`${status.value.toFixed(2)}x\``);
+      embed.setDescription(`\`${roundedValue}x\``);
     } else if (status.state === "ended") {
       embed.setColor(Constants.EMBED_FAIL_COLOR);
-      embed.setDescription(`**CRASHED**\n\n\`${status.value.toFixed(2)}x\``);
+      embed.setDescription(`**CRASHED**\n\n\`${roundedValue}x\``);
     }
   }
 
