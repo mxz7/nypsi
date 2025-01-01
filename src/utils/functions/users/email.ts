@@ -117,7 +117,7 @@ export async function checkPurchases(id: string) {
             addNotificationToQueue(payload);
           }
         } else {
-          await addInventoryItem(id, item.item, 1);
+          await addInventoryItem(id, item.item, item.amount || 1);
 
           if ((await getDmSettings(id)).premium) {
             const payload: NotificationPayload = {
@@ -126,7 +126,7 @@ export async function checkPurchases(id: string) {
                 content: "thank you for your purchase",
                 embed: new CustomEmbed()
                   .setDescription(
-                    `you have received 1 ${getItems()[item.item].emoji} ${
+                    `you have received ${item.amount}x ${getItems()[item.item].emoji} ${
                       getItems()[item.item].name
                     }`,
                   )
