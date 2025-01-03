@@ -117,7 +117,9 @@ export async function addFarmUpgrade(
     },
   });
 
-  await redis.del(`${Constants.redis.cache.economy.farmUpgrades}:${id}`);
+  await redis.del(
+    `${Constants.redis.cache.economy.farmUpgrades}:${member.user.id}`
+  );
 }
 
 export async function addFarm(
@@ -296,9 +298,7 @@ export async function waterFarm(userId: string) {
   return { count: toWater.length, dead };
 }
 
-export async function fertiliseFarm(
-  userId: string
-): Promise<{
+export async function fertiliseFarm(userId: string): Promise<{
   dead?: number;
   msg?: "no fertiliser" | "no need";
   done?: number;
