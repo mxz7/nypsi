@@ -110,9 +110,9 @@ async function render(client: NypsiClient, status?: CrashStatus) {
       let text = `${await formatUsername(player.userId, player.username, true)} $${formatNumberPretty(player.bet)}\n`;
 
       if (player.stoppedAt && player.stoppedAt > 1) {
-        text = `:green_circle: ${await formatUsername(player.userId, player.username, true)} +$${formatNumberPretty(player.won)} (\`${player.stoppedAt.toFixed(2)}x\`)\n`;
+        text = `:green_circle: ${await formatUsername(player.userId, player.username, true)} +$${formatNumberPretty(player.won)} (\`${(Math.floor(player.stoppedAt * 100) / 100).toFixed(2)}x\`)\n`;
       } else if (player.stoppedAt && player.stoppedAt <= 1) {
-        text = `:red_circle: ${await formatUsername(player.userId, player.username, true)} +$${formatNumberPretty(player.won)} (\`${player.stoppedAt.toFixed(2)}x\`)\n`;
+        text = `:red_circle: ${await formatUsername(player.userId, player.username, true)} +$${formatNumberPretty(player.won)} (\`${(Math.floor(player.stoppedAt * 100) / 100).toFixed(2)}x\`)\n`;
       } else if (!player.stoppedAt && status.state === "ended") {
         text = `:red_circle: ${await formatUsername(player.userId, player.username, true)} $${formatNumberPretty(player.bet)}\n`;
       }
@@ -130,7 +130,7 @@ async function render(client: NypsiClient, status?: CrashStatus) {
       }
     }
 
-    const roundedValue = Math.floor(status.value * 100) / 100;
+    const roundedValue = (Math.floor(status.value * 100) / 100).toFixed(2);
 
     if (status.state === "waiting") {
       embed.setDescription(`starting <t:${Math.floor(lastJoin / 1000) + 15}:R>`);
@@ -390,7 +390,7 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
       new CustomEmbed(
         interaction.user.id,
         "✅ joined game\n\n" +
-          `**bet** $${bet.toLocaleString()}${autoStop ? `\n**auto stop** \`${parseFloat(autoStop).toFixed(2)}x\`` : ""}`,
+          `**bet** $${bet.toLocaleString()}${autoStop ? `\n**auto stop** \`${parseFloat((Math.floor(parseFloat(autoStop) * 100) / 100).toFixed(2)).toFixed(2)}x\`` : ""}`,
       ),
     ],
     ephemeral: true,
@@ -455,7 +455,7 @@ async function start(client: NypsiClient) {
         player.stoppedAt = status.value;
 
         logger.info(
-          `crash: ${player.username} stopped via button (${status.value.toFixed(2)})`,
+          `crash: ${player.username} stopped via button (${(Math.floor(status.value * 100) / 100).toFixed(2)})`,
           status,
         );
 
@@ -473,7 +473,7 @@ async function start(client: NypsiClient) {
             bet: player.bet,
             game: "crash",
             result: "win",
-            outcome: status.value.toFixed(2),
+            outcome: (Math.floor(status.value * 100) / 100).toFixed(2),
             earned: player.won,
             xp: xp,
           });
@@ -489,7 +489,7 @@ async function start(client: NypsiClient) {
             bet: player.bet,
             game: "crash",
             result: "lose",
-            outcome: status.value.toFixed(2),
+            outcome: (Math.floor(status.value * 100) / 100).toFixed(2),
             earned: player.won,
           });
           addBalance(player.userId, player.won);
@@ -516,7 +516,7 @@ async function start(client: NypsiClient) {
             bet: player.bet,
             game: "crash",
             result: "win",
-            outcome: status.value.toFixed(2),
+            outcome: (Math.floor(status.value * 100) / 100).toFixed(2),
             earned: player.won,
             xp: xp,
           });
@@ -532,7 +532,7 @@ async function start(client: NypsiClient) {
             bet: player.bet,
             game: "crash",
             result: "lose",
-            outcome: status.value.toFixed(2),
+            outcome: (Math.floor(status.value * 100) / 100).toFixed(2),
             earned: player.won,
           });
         }
@@ -550,7 +550,7 @@ async function start(client: NypsiClient) {
             bet: player.bet,
             game: "crash",
             result: "lose",
-            outcome: status.value.toFixed(2),
+            outcome: (Math.floor(status.value * 100) / 100).toFixed(2),
           });
         }
       }
