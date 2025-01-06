@@ -368,7 +368,7 @@ export async function openCrate(
       const uniqueItems = new Set<string>();
 
       for (const item of crateItemsModified) {
-        if (items[item].unique && !uniqueItems.has(item)) {
+        if (items[item] && items[item].unique && !uniqueItems.has(item)) {
           if (await itemExists(item)) {
             uniqueItems.add(item);
           }

@@ -256,7 +256,7 @@ export default class ScratchCard {
 
       if (value.includes("_gem") && (await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) continue;
 
-      if (getItems()[value].unique) {
+      if (getItems()[value]?.unique) {
         if (await itemExists(value)) continue;
       }
 
