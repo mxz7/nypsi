@@ -3369,5 +3369,19 @@
     "sell": 50000000,
     "in_crates": true,
     "unique": true
+  },
+  "mona_lisa": {
+    "id": "mona_lisa",
+    "name": "mona lisa",
+    "plural": "mona lisas",
+    "article": "a",
+    "emoji": "<:nypsi_monalisa:1325885265817894922>",
+    "longDesc": "famous painting for real",
+    "rarity": 6,
+    "role": "collectable",
+    "sell": 50000000,
+    "in_crates": false,
+    "unique": true,
+    "random_drop_chance": 5
   }
 }
