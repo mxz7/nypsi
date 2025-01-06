@@ -1487,7 +1487,7 @@
     "sell": 75000,
     "role": "booster",
     "stackable": true,
-    "max": 4,
+    "max": 3,
     "boosterEffect": {
       "boosts": ["mine"],
       "effect": 1,
