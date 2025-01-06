@@ -98,9 +98,19 @@ async function randomDrop(client: NypsiClient) {
 
     await redis.set(`nypsi:lootdrop:channel:cd:${channelId}`, "69", "EX", cooldownSeconds);
 
-    const items = Array.from(Object.values(getItems()))
+    let items = Array.from(Object.values(getItems()))
       .filter((i) => i.random_drop_chance && percentChance(i.random_drop_chance))
       .map((i) => `item:${i.id}`);
+
+    const uniqueItems = new Set<string>();
+
+    for (const item of items) {
+      if (item.startsWith("item:") && getItems()[item.substring(5)].unique) {
+        uniqueItems.add(item);
+      }
+    }
+
+    if (uniqueItems.size > 0) items = items.filter((i) => !uniqueItems.has(i));
 
     if (items.length === 0) continue;
 
