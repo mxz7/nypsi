@@ -17,7 +17,14 @@ import { calcItemValue, gemBreak, getInventory } from "./inventory";
 import { doLevelUp, getRawLevel, getUpgrades } from "./levelling";
 import { getOffersAverage } from "./offers";
 import { isPassive } from "./passive";
-import { getBaseUpgrades, getBaseWorkers, getItems, getPlantsData, getPlantUpgrades, getUpgradesData } from "./utils";
+import {
+  getBaseUpgrades,
+  getBaseWorkers,
+  getItems,
+  getPlantsData,
+  getPlantUpgrades,
+  getUpgradesData,
+} from "./utils";
 import { hasVoted } from "./vote";
 import { calcWorkerValues } from "./workers";
 import ms = require("ms");
@@ -727,7 +734,7 @@ export async function calcMaxBet(member: GuildMember | string): Promise<number> 
   if (total > 2_500_000) {
     total = 2_500_000;
 
-    if (level > 1250) total += Math.floor((level - 1250) / 75) * 10000;
+    if (level > 1250) total += Math.floor((level - 1250) / 75) * 15000;
   }
 
   if (voted) {
@@ -1038,13 +1045,16 @@ export async function calcNetWorth(
     const harvestValue =
       (await getClaimable(id, farm.plantId, false)) *
       (await calcItemValue(getPlantsData()[farm.plantId].item));
-    
+
     let upgradesValue = 0;
 
     const upgrades = getPlantUpgrades();
 
-    for (const userUpgrade of (await getFarmUpgrades(id)).filter(u => u.plantId == farm.plantId)) {
-      const upgrade = upgrades[Object.keys(upgrades).find(u => upgrades[u].id == userUpgrade.upgradeId)];
+    for (const userUpgrade of (await getFarmUpgrades(id)).filter(
+      (u) => u.plantId == farm.plantId,
+    )) {
+      const upgrade =
+        upgrades[Object.keys(upgrades).find((u) => upgrades[u].id == userUpgrade.upgradeId)];
 
       if (upgrade.type_single) {
         upgradesValue += userUpgrade.amount * (await calcItemValue(upgrade.type_single.item));
