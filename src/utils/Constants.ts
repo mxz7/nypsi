@@ -112,6 +112,7 @@ export default {
         GARAGE: "cache:economy:garage",
         LEVELLING_UP: "cache:economy:levellingup",
         COMPLETION_LB: "cache:economy:lb:completion",
+        ITEM_EXISTS: "cache:economy:item:exists",
       },
       z: {
         profile: "cache:z:profile",

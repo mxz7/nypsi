@@ -38,6 +38,7 @@ export interface Item {
   tagId?: string;
   upgrades?: CarUpgradeType;
   plantId: string; // for seeds
+  unique: boolean; // only allow one in world at a time
 }
 
 export interface LotteryTicket {
@@ -133,8 +134,8 @@ export type PlantUpgrade = {
   type_single?: {
     stack_limit: number;
     item: string;
-  }
+  };
   type_upgradable?: {
     items: string[];
-  }
+  };
 };

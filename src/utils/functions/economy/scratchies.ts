@@ -16,7 +16,7 @@ import { addKarma } from "../karma/karma";
 import { percentChance, shuffle } from "../random";
 import { addProgress } from "./achievements";
 import { addBalance } from "./balance";
-import { addInventoryItem } from "./inventory";
+import { addInventoryItem, itemExists } from "./inventory";
 import { addStat } from "./stats";
 import { addTaskProgress } from "./tasks";
 import { getItems } from "./utils";
@@ -255,6 +255,10 @@ export default class ScratchCard {
       if (chance && !percentChance(parseFloat(chance))) continue;
 
       if (value.includes("_gem") && (await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) continue;
+
+      if (getItems()[value].unique) {
+        if (await itemExists(value)) continue;
+      }
 
       items.push(`${type}:${value}`);
     }

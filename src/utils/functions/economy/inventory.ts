@@ -175,7 +175,10 @@ export async function addInventoryItem(
     },
   });
 
-  await redis.del(`${Constants.redis.cache.economy.INVENTORY}:${id}`);
+  await redis.del(
+    `${Constants.redis.cache.economy.INVENTORY}:${id}`,
+    `${Constants.redis.cache.economy.ITEM_EXISTS}:${itemId}`,
+  );
 }
 
 export async function setInventoryItem(
@@ -225,7 +228,10 @@ export async function setInventoryItem(
     });
   }
 
-  await redis.del(`${Constants.redis.cache.economy.INVENTORY}:${id}`);
+  await redis.del(
+    `${Constants.redis.cache.economy.INVENTORY}:${id}`,
+    `${Constants.redis.cache.economy.ITEM_EXISTS}:${itemId}`,
+  );
 }
 
 export async function openCrate(
@@ -288,7 +294,7 @@ export async function openCrate(
 
   if (mode === "normal") {
     for (let i = 0; i < times; i++) {
-      const crateItemsModified = [];
+      let crateItemsModified = [];
 
       for (const i of crateItems) {
         if (items[i]) {
@@ -359,6 +365,19 @@ export async function openCrate(
         }
       }
 
+      const uniqueItems = new Set<string>();
+
+      for (const item of crateItemsModified) {
+        if (items[item].unique && !uniqueItems.has(item)) {
+          if (await itemExists(item)) {
+            uniqueItems.add(item);
+          }
+        }
+      }
+      if (uniqueItems.size > 0) {
+        crateItemsModified = crateItemsModified.filter((i) => !uniqueItems.has(i));
+      }
+
       const chosen = crateItemsModified[Math.floor(Math.random() * crateItemsModified.length)];
 
       if (chosen.includes("money:") || chosen.includes("xp:")) {
@@ -416,6 +435,10 @@ export async function openCrate(
         if (parseFloat(itemFilter.split(":")[2])) {
           if (!percentChance(parseFloat(itemFilter.split(":")[2]))) {
             continue;
+          } else if (itemFilter.startsWith("id:") && items[itemFilter.split(":")[1]].unique) {
+            if (await itemExists(itemFilter.split(":")[1])) {
+              continue;
+            }
           }
         }
 
@@ -813,4 +836,37 @@ export async function calcItemValue(item: string) {
   })();
 
   return itemValue;
+}
+
+export async function itemExists(itemId: string) {
+  const cache = await redis.get(`${Constants.redis.cache.economy.ITEM_EXISTS}:${itemId}`);
+
+  if (cache === "t") return true;
+  else if (cache === "f") return false;
+
+  const inventory = await prisma.inventory.findFirst({
+    where: {
+      item: itemId,
+    },
+  });
+
+  if (inventory) {
+    await redis.set(`${Constants.redis.cache.economy.ITEM_EXISTS}:${itemId}`, "t");
+    return true;
+  }
+
+  const auction = await prisma.auction.findFirst({
+    where: {
+      sold: false,
+      itemId: itemId,
+    },
+  });
+
+  if (auction) {
+    await redis.set(`${Constants.redis.cache.economy.ITEM_EXISTS}:${itemId}`, "t");
+    return true;
+  }
+
+  await redis.set(`${Constants.redis.cache.economy.ITEM_EXISTS}:${itemId}`, "f");
+  return false;
 }
