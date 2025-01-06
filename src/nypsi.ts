@@ -11,7 +11,8 @@ const client = new NypsiClient({
     messages: {
       interval: 60,
       filter: () => (msg) => {
-        if (msg.author.bot) return true;
+        if (!msg.author) return true;
+        if (msg.author?.bot) return true;
 
         if (msg.createdTimestamp > Date.now() - 60000 || msg.editedTimestamp > Date.now() - 60000)
           return false;
@@ -23,6 +24,7 @@ const client = new NypsiClient({
       interval: 900,
       filter: () => (member) => {
         if (member.id === member.client.user.id) return false;
+        if (!member.user) return true;
         if (member.user.bot) return true;
 
         if (recentCommands.has(member.id)) {
@@ -35,6 +37,7 @@ const client = new NypsiClient({
     users: {
       interval: 900,
       filter: () => (user) => {
+        if (!user) return true;
         if (user.id === user.client.user.id) return false;
         if (user.bot) return true;
 
