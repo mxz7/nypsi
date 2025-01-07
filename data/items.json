@@ -3383,5 +3383,43 @@
     "in_crates": false,
     "unique": true,
     "random_drop_chance": 5
+  },
+  "rose": {
+    "id": "rose",
+    "name": "rose",
+    "plural": "roses",
+    "article": "a",
+    "emoji": "🌹",
+    "longDesc": "a beautiful romantic flower",
+    "rarity": 5,
+    "role": "collectable",
+    "sell": 1000000,
+    "in_crates": true,
+    "random_drop_chance": 10
+  },
+  "tulip": {
+    "id": "tulip",
+    "name": "tulip",
+    "plural": "tulips",
+    "article": "a",
+    "emoji": "🌷",
+    "longDesc": "a pink flower",
+    "rarity": 5,
+    "role": "collectable",
+    "sell": 1000000,
+    "in_crates": true,
+    "random_drop_chance": 10
+  },
+  "sunflower": {
+    "id": "sunflower",
+    "name": "sunflower",
+    "plural": "sunflowers",
+    "article": "a",
+    "emoji": "🌻",
+    "longDesc": "they're pretty cute i suppose",
+    "rarity": 3,
+    "role": "collectable",
+    "sell": 100000,
+    "in_crates": true
   }
 }
