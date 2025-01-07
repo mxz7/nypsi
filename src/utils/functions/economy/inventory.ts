@@ -519,7 +519,16 @@ export async function getTotalAmountOfItem(itemId: string) {
     },
   });
 
-  return Number(query._sum.amount);
+  const auctions = await prisma.auction.aggregate({
+    where: {
+      AND: [{ sold: false }, { itemId }],
+    },
+    _sum: {
+      itemAmount: true,
+    },
+  });
+
+  return Number(query._sum.amount + auctions._sum.itemAmount);
 }
 
 export function selectItem(search: string) {
