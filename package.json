@@ -25,8 +25,8 @@
     "cron": "^3.3.2",
     "crypto-js": "4.2.0",
     "dayjs": "1.11.13",
-    "discord-hybrid-sharding": "2.2.3",
-    "discord.js": "14.17.2",
+    "discord-hybrid-sharding": "2.2.4",
+    "discord.js": "14.17.3",
     "dotenv": "16.4.7",
     "express": "4.21.2",
     "fast-sort": "3.4.1",
@@ -58,7 +58,7 @@
     "jest": "^29.7.0",
     "prettier": "3.4.2",
     "prisma": "6.1.0",
-    "typescript": "5.7.2"
+    "typescript": "5.7.3"
   },
   "repository": {
     "type": "git",
