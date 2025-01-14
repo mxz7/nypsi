@@ -220,23 +220,47 @@ async function run(
   };
 
   const wordleStats = async () => {
-    const wins = prisma.$queryRaw`select array_length(guesses, 1) as guesses, count(*) from "WordleGame" where won = true and "userId" = ${message.author.id} group by guesses order by guesses;`;
+    const wins: Promise<{ guesses: number; count: number }[]> =
+      prisma.$queryRaw`select array_length(guesses, 1) as guesses, count(*) from "WordleGame" where won = true and "userId" = ${message.author.id} group by guesses order by guesses;`;
     const loses = prisma.wordleGame.count({ where: { won: false } });
     const fastest = prisma.wordleGame.findFirst({
       select: {
         time: true,
       },
       where: {
-        AND: [{ userId: message.author.id }, { won: true }],
+        AND: [{ userId: message.author.id }, { won: true }, { time: { gt: 0 } }],
       },
       orderBy: { time: "asc" },
     });
-    const average = prisma.$queryRaw`select avg(time) as average from "WordleGame" where won = true and "userId" = ${message.author.id};`;
+    const average = prisma.wordleGame.aggregate({
+      where: {
+        AND: [{ userId: message.author.id }, { won: true }, { time: { gt: 0 } }],
+      },
+      _avg: {
+        time: true,
+      },
+    });
 
-    console.log(await Promise.resolve(wins));
-    console.log(await Promise.resolve(loses));
-    console.log(await Promise.resolve(fastest));
-    console.log(await Promise.resolve(average));
+    const embed = new CustomEmbed(message.member).setHeader(
+      `${message.author.username}'s wordle stats`,
+      message.author.avatarURL(),
+      `https://nypsi.xyz/user/${message.author.id}`,
+    );
+
+    let desc = "";
+
+    for (const stat of await wins) {
+      desc += `${new Array(stat.guesses - 1).fill("<:solid_grey:987046773157691452>").join("")}:green_square: **${stat.count.toLocaleString()}**\n`;
+    }
+
+    if (await loses) desc += `:red_square: **${(await loses).toLocaleString()}**\n`;
+
+    desc += `**fastest** ${(await fastest) ? `<t:${Math.floor((await fastest).time / 1000)}>` : ""}\n`;
+    desc += `**average** ${(await average)._avg.time ? `<t:${Math.floor((await average)._avg.time / 1000)}>` : ""}\n`;
+
+    embed.setDescription(desc);
+
+    return send({ embeds: [embed] });
   };
 
   const scratchStats = async () => {
