@@ -3392,7 +3392,7 @@
     "emoji": "🌹",
     "longDesc": "a beautiful romantic flower",
     "rarity": 5,
-    "role": "collectable",
+    "role": "flower",
     "sell": 1000000,
     "in_crates": true,
     "random_drop_chance": 10
@@ -3405,7 +3405,7 @@
     "emoji": "🌷",
     "longDesc": "a pink flower",
     "rarity": 5,
-    "role": "collectable",
+    "role": "flower",
     "sell": 1000000,
     "in_crates": true,
     "random_drop_chance": 10
@@ -3418,7 +3418,7 @@
     "emoji": "🌻",
     "longDesc": "they're pretty cute i suppose",
     "rarity": 3,
-    "role": "collectable",
+    "role": "flower",
     "sell": 100000,
     "in_crates": true
   },
@@ -3430,7 +3430,7 @@
     "emoji": "🌺",
     "longDesc": "beautiful little flower wow i love it",
     "rarity": 5,
-    "role": "collectable",
+    "role": "flower",
     "sell": 100000,
     "in_crates": true
   },
@@ -3442,7 +3442,7 @@
     "emoji": "🌼",
     "longDesc": "cherry is better",
     "rarity": 4,
-    "role": "collectable",
+    "role": "flower",
     "sell": 100000,
     "in_crates": true
   },
@@ -3454,7 +3454,7 @@
     "emoji": "🌸",
     "longDesc": "pretty pink",
     "rarity": 5,
-    "role": "collectable",
+    "role": "flower",
     "sell": 100000,
     "in_crates": true
   }
