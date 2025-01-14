@@ -46,6 +46,7 @@ model User {
   ChatReactionLeaderboards ChatReactionLeaderboards[]
   z                        z?
   Purchases                Purchases[]
+  WordleGame               WordleGame[]
 }
 
 model ProfileView {
@@ -449,6 +450,17 @@ model Username {
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
+}
+
+model WordleGame {
+  id      Int      @id @default(autoincrement())
+  guesses String[]
+  word    String
+  won     Boolean
+  time    Int // seconds
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
 }
 
 model WordleStats {

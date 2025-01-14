@@ -183,7 +183,7 @@ async function run(
     guesses: [],
     board: board,
     embed: embed,
-    start: Date.now(),
+    start: performance.now(),
   });
 
   return play(message);
@@ -320,10 +320,11 @@ async function cancel(message: Message | (NypsiCommandInteraction & CommandInter
     }
   };
 
-  const embed = games.get(message.author.id).embed;
+  const game = games.get(message.author.id);
+
+  const embed = game.embed;
   embed.setDescription(
-    `${renderBoard(games.get(message.author.id).board)}\n\n` +
-      `game cancelled. the word was **${games.get(message.author.id).word}**`,
+    `${renderBoard(game.board)}\n\n` + `game cancelled. the word was **${game.word}**`,
   );
   embed.setColor(Constants.EMBED_FAIL_COLOR);
   embed.setFooter(null);
@@ -333,7 +334,7 @@ async function cancel(message: Message | (NypsiCommandInteraction & CommandInter
   games.delete(message.author.id);
 
   if (!message.member) return;
-  addWordleGame(message.member, false);
+  addWordleGame(message.author.id, false, game.guesses, performance.now() - game.start, game.word);
 }
 
 async function win(message: Message | (NypsiCommandInteraction & CommandInteraction), m: any) {
@@ -347,10 +348,11 @@ async function win(message: Message | (NypsiCommandInteraction & CommandInteract
   };
 
   addWordleGame(
-    message.member,
+    message.author.id,
     true,
-    games.get(message.author.id).guesses.length,
-    Date.now() - games.get(message.author.id).start,
+    games.get(message.author.id).guesses,
+    performance.now() - games.get(message.author.id).start,
+    games.get(message.author.id).word,
   );
 
   const embed = games.get(message.author.id).embed;
@@ -387,10 +389,10 @@ async function lose(message: Message | (NypsiCommandInteraction & CommandInterac
     }
   };
 
+  const game = games.get(message.author.id);
   const embed = games.get(message.author.id).embed;
   embed.setDescription(
-    `${renderBoard(games.get(message.author.id).board)}\n\n` +
-      `you lost ): the word was **${games.get(message.author.id).word}**`,
+    `${renderBoard(game.board)}\n\n` + `you lost ): the word was **${game.word}**`,
   );
   embed.setColor(Constants.EMBED_FAIL_COLOR);
   embed.setFooter(null);
@@ -400,7 +402,7 @@ async function lose(message: Message | (NypsiCommandInteraction & CommandInterac
   games.delete(message.author.id);
 
   if (!message.member) return;
-  addWordleGame(message.member, false);
+  addWordleGame(message.author.id, false, game.guesses, performance.now() - game.start, game.word);
 }
 
 function createBoard(): string[][] {
