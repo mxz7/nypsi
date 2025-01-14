@@ -130,7 +130,7 @@ async function run(
         const gameWins = await getGameWins(message.member, stat.game);
 
         winsMap.set(stat.game, gameWins);
-      }
+      };
 
       promises.push(getWins());
     }
@@ -217,6 +217,26 @@ async function run(
     };
 
     listen();
+  };
+
+  const wordleStats = async () => {
+    const wins = prisma.$queryRaw`select array_length(guesses, 1) as guesses, count(*) from "WordleGame" where won = true and "userId" = ${message.author.id} group by guesses order by guesses;`;
+    const loses = prisma.wordleGame.count({ where: { won: false } });
+    const fastest = prisma.wordleGame.findFirst({
+      select: {
+        time: true,
+      },
+      where: {
+        AND: [{ userId: message.author.id }, { won: true }],
+      },
+      orderBy: { time: "asc" },
+    });
+    const average = prisma.$queryRaw`select avg(time) as average from "WordleGame" where won = true and "userId" = ${message.author.id};`;
+
+    console.log(await Promise.resolve(wins));
+    console.log(await Promise.resolve(loses));
+    console.log(await Promise.resolve(fastest));
+    console.log(await Promise.resolve(average));
   };
 
   const scratchStats = async () => {
@@ -826,6 +846,8 @@ async function run(
     return earnedStats();
   } else if (args[0].toLowerCase() === "spent") {
     return spentStats();
+  } else if (args[0].toLowerCase() === "wordle") {
+    return wordleStats();
   } else {
     return gambleStats();
   }

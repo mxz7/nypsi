@@ -457,7 +457,7 @@ model WordleGame {
   guesses String[]
   word    String
   won     Boolean
-  time    Int // seconds
+  time    Int // milliseconds
 
   userId String
   user   User   @relation(fields: [userId], references: [id])
