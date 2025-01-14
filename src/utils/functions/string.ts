@@ -67,3 +67,10 @@ export function getOrdinalSuffix(num: number): string {
       return "th";
   }
 }
+
+export function formatTime(ms: number) {
+  const minutes = Math.floor(ms / 60000);
+  const seconds = ((ms % 60000) / 1000).toFixed(2);
+
+  return `${minutes}m${seconds}s`;
+}

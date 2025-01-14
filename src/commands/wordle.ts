@@ -13,7 +13,7 @@ import Constants from "../utils/Constants";
 import { MStoTime } from "../utils/functions/date";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { addKarma } from "../utils/functions/karma/karma";
-import { addWordleGame, getWordleStats } from "../utils/functions/users/wordle";
+import { addWordleGame } from "../utils/functions/users/wordle";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
 
@@ -22,7 +22,6 @@ const cmd = new Command("wordle", "play wordle on discord", "fun").setAliases(["
 cmd.slashEnabled = true;
 cmd.slashData
   .addSubcommand((option) => option.setName("play").setDescription("play a game of wordle"))
-  .addSubcommand((option) => option.setName("stats").setDescription("view your stats for wordle"))
   .addSubcommand((option) =>
     option.setName("help").setDescription("view the help menu for wordle"),
   );
@@ -101,47 +100,6 @@ async function run(
     return await send({ embeds: [embed] });
   }
 
-  if (args[0].toLowerCase() == "stats") {
-    const stats = await getWordleStats(message.member);
-
-    if (!stats) {
-      return send({ embeds: [new ErrorEmbed("you have no wordle stats")] });
-    }
-
-    const embed = new CustomEmbed(message.member).setHeader(
-      `${message.author.username}'s wordle stats`,
-      message.author.avatarURL(),
-      `https://nypsi.xyz/user/${message.author.id}`,
-    );
-
-    let desc = "";
-
-    if (stats.win1) desc += `:green_square: **${stats.win1.toLocaleString()}**\n`;
-    if (stats.win2)
-      desc += `<:solid_grey:987046773157691452>:green_square: **${stats.win2.toLocaleString()}**\n`;
-    if (stats.win3)
-      desc += `<:solid_grey:987046773157691452><:solid_grey:987046773157691452>:green_square: **${stats.win3.toLocaleString()}**\n`;
-    if (stats.win4)
-      desc += `<:solid_grey:987046773157691452><:solid_grey:987046773157691452><:solid_grey:987046773157691452>:green_square: **${stats.win4.toLocaleString()}**\n`;
-    if (stats.win5)
-      desc += `<:solid_grey:987046773157691452><:solid_grey:987046773157691452><:solid_grey:987046773157691452><:solid_grey:987046773157691452>:green_square: **${stats.win5.toLocaleString()}**\n`;
-    if (stats.win6)
-      desc += `<:solid_grey:987046773157691452><:solid_grey:987046773157691452><:solid_grey:987046773157691452><:solid_grey:987046773157691452><:solid_grey:987046773157691452>:green_square: **${stats.win6.toLocaleString()}**\n`;
-    if (stats.lose) desc += `:red_square: **${stats.lose.toLocaleString()}**\n`;
-
-    desc += `\n[view online](https://nypsi.xyz/user/${message.author.id}#wordle)`;
-
-    embed.setDescription(desc);
-
-    if (stats.history.length > 2) {
-      const average = stats.history.reduce((a, b) => Number(a) + Number(b)) / stats.history.length;
-
-      embed.setFooter({ text: `average length of winning game: ${MStoTime(average)}` });
-    }
-
-    return send({ embeds: [embed] });
-  }
-
   if (
     args[0].toLowerCase() != "start" &&
     args[0].toLowerCase() != "play" &&
@@ -183,7 +141,7 @@ async function run(
     guesses: [],
     board: board,
     embed: embed,
-    start: Date.now(),
+    start: performance.now(),
   });
 
   return play(message);
@@ -320,10 +278,11 @@ async function cancel(message: Message | (NypsiCommandInteraction & CommandInter
     }
   };
 
-  const embed = games.get(message.author.id).embed;
+  const game = games.get(message.author.id);
+
+  const embed = game.embed;
   embed.setDescription(
-    `${renderBoard(games.get(message.author.id).board)}\n\n` +
-      `game cancelled. the word was **${games.get(message.author.id).word}**`,
+    `${renderBoard(game.board)}\n\n` + `game cancelled. the word was **${game.word}**`,
   );
   embed.setColor(Constants.EMBED_FAIL_COLOR);
   embed.setFooter(null);
@@ -333,7 +292,7 @@ async function cancel(message: Message | (NypsiCommandInteraction & CommandInter
   games.delete(message.author.id);
 
   if (!message.member) return;
-  addWordleGame(message.member, false);
+  addWordleGame(message.author.id, false, game.guesses, performance.now() - game.start, game.word);
 }
 
 async function win(message: Message | (NypsiCommandInteraction & CommandInteraction), m: any) {
@@ -347,10 +306,11 @@ async function win(message: Message | (NypsiCommandInteraction & CommandInteract
   };
 
   addWordleGame(
-    message.member,
+    message.author.id,
     true,
-    games.get(message.author.id).guesses.length,
-    Date.now() - games.get(message.author.id).start,
+    games.get(message.author.id).guesses,
+    performance.now() - games.get(message.author.id).start,
+    games.get(message.author.id).word,
   );
 
   const embed = games.get(message.author.id).embed;
@@ -387,10 +347,10 @@ async function lose(message: Message | (NypsiCommandInteraction & CommandInterac
     }
   };
 
+  const game = games.get(message.author.id);
   const embed = games.get(message.author.id).embed;
   embed.setDescription(
-    `${renderBoard(games.get(message.author.id).board)}\n\n` +
-      `you lost ): the word was **${games.get(message.author.id).word}**`,
+    `${renderBoard(game.board)}\n\n` + `you lost ): the word was **${game.word}**`,
   );
   embed.setColor(Constants.EMBED_FAIL_COLOR);
   embed.setFooter(null);
@@ -400,7 +360,7 @@ async function lose(message: Message | (NypsiCommandInteraction & CommandInterac
   games.delete(message.author.id);
 
   if (!message.member) return;
-  addWordleGame(message.member, false);
+  addWordleGame(message.author.id, false, game.guesses, performance.now() - game.start, game.word);
 }
 
 function createBoard(): string[][] {
