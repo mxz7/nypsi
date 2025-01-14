@@ -222,7 +222,9 @@ async function run(
   const wordleStats = async () => {
     const wins: Promise<{ guesses: number; count: number }[]> =
       prisma.$queryRaw`select array_length(guesses, 1) as guesses, count(*) from "WordleGame" where won = true and "userId" = ${message.author.id} group by guesses order by guesses;`;
-    const loses = prisma.wordleGame.count({ where: { won: false } });
+    const loses = prisma.wordleGame.count({
+      where: { AND: [{ userId: message.author.id }, { won: false }] },
+    });
     const fastest = prisma.wordleGame.findFirst({
       select: {
         time: true,
