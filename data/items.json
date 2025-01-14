@@ -3421,5 +3421,41 @@
     "role": "collectable",
     "sell": 100000,
     "in_crates": true
+  },
+  "hibiscus": {
+    "id": "hibiscus",
+    "name": "hibiscus",
+    "plural": "hibiscus",
+    "article": "a",
+    "emoji": "🌺",
+    "longDesc": "beautiful little flower wow i love it",
+    "rarity": 5,
+    "role": "collectable",
+    "sell": 100000,
+    "in_crates": true
+  },
+  "blossom": {
+    "id": "blossom",
+    "name": "blossom",
+    "plural": "blossoms",
+    "article": "a",
+    "emoji": "🌼",
+    "longDesc": "cherry is better",
+    "rarity": 4,
+    "role": "collectable",
+    "sell": 100000,
+    "in_crates": true
+  },
+  "cherry_blossom": {
+    "id": "cherry_blossom",
+    "name": "cherry blossom",
+    "plural": "cherry blossoms",
+    "article": "a",
+    "emoji": "🌸",
+    "longDesc": "pretty pink",
+    "rarity": 5,
+    "role": "collectable",
+    "sell": 100000,
+    "in_crates": true
   }
 }
