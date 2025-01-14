@@ -8,7 +8,6 @@ import sleep from "../sleep";
 import { getPreferences } from "../users/notifications";
 import { getLastKnownUsername } from "../users/tag";
 import { getActiveTag } from "../users/tags";
-import wordleSortWorker from "../workers/wordlesort";
 import { calcNetWorth } from "./balance";
 import { checkLeaderboardPositions } from "./stats";
 import { getAchievements, getItems, getTagsData } from "./utils";
@@ -1021,65 +1020,12 @@ export async function topWordle(guild: Guild, userId: string) {
 
   if (!members) members = guild.members.cache;
 
-  const query = await prisma.wordleStats.findMany({
-    where: {
-      AND: [
-        { userId: { in: Array.from(members.keys()) } },
-        {
-          OR: [
-            { win1: { gt: 0 } },
-            { win2: { gt: 0 } },
-            { win3: { gt: 0 } },
-            { win4: { gt: 0 } },
-            { win5: { gt: 0 } },
-            { win6: { gt: 0 } },
-          ],
-        },
-      ],
-    },
-    select: {
-      win1: true,
-      win2: true,
-      win3: true,
-      win4: true,
-      win5: true,
-      win6: true,
-      user: {
-        select: {
-          id: true,
-          lastKnownUsername: true,
-          blacklisted: true,
-        },
-      },
-    },
-  });
-
-  let sorted: {
-    wins: number;
-    user: {
-      lastKnownUsername: string;
-      blacklisted: boolean;
-      id: string;
-    };
-  }[];
-
-  if (query.length > 500) {
-    sorted = await wordleSortWorker(query);
-  } else {
-    sorted = query
-      .filter((i) => !i.user.blacklisted)
-      .map((i) => {
-        return { wins: i.win1 + i.win2 + i.win3 + i.win4 + i.win5 + i.win6, user: i.user };
-      });
-
-    inPlaceSort(sorted).desc((i) => i.wins);
-
-    if (sorted.length > 100) sorted = sorted.slice(0, 100);
-  }
+  const query: { wins: number; username: string; userId: string }[] =
+    await prisma.$queryRaw`select userId, count(*) as wins, "User"."lastKnownTag" as username from "WordleGame" left join "User" on "User"."id" = "WordleGame"."userId" where "WordleGame"."userId" in (${Array.from(members.keys()).join(",")}) and "WordleGame"."won" = true and "User"."blacklisted" = false group by userId order by wins desc limit 100`;
 
   const out: string[] = [];
 
-  for (const user of sorted) {
+  for (const user of query) {
     let pos = (out.length + 1).toString();
 
     if (pos == "1") {
@@ -1094,8 +1040,8 @@ export async function topWordle(guild: Guild, userId: string) {
 
     out.push(
       `${pos} ${await formatUsername(
-        user.user.id,
-        members.get(user.user.id).user.username,
+        user.userId,
+        user.username,
         true,
       )} ${user.wins.toLocaleString()} win${user.wins != 1 ? "s" : ""}`,
     );
@@ -1106,46 +1052,19 @@ export async function topWordle(guild: Guild, userId: string) {
   let pos = 0;
 
   if (userId) {
-    pos = sorted.findIndex((i) => i.user.id === userId) + 1;
+    pos = query.findIndex((i) => i.userId === userId) + 1;
   }
 
   return { pages, pos };
 }
 
 export async function topWordleGlobal(userId: string) {
-  const query = await prisma.wordleStats.findMany({
-    where: {
-      OR: [
-        { win1: { gt: 0 } },
-        { win2: { gt: 0 } },
-        { win3: { gt: 0 } },
-        { win4: { gt: 0 } },
-        { win5: { gt: 0 } },
-        { win6: { gt: 0 } },
-      ],
-    },
-    select: {
-      win1: true,
-      win2: true,
-      win3: true,
-      win4: true,
-      win5: true,
-      win6: true,
-      user: {
-        select: {
-          id: true,
-          lastKnownUsername: true,
-          blacklisted: true,
-        },
-      },
-    },
-  });
-
-  const sorted = await wordleSortWorker(query);
+  const query: { wins: number; username: string; userId: string }[] =
+    await prisma.$queryRaw`select userId, count(*) as wins, "User"."lastKnownTag" as username from "WordleGame" left join "User" on "User"."id" = "WordleGame"."userId" where "WordleGame"."won" = true and "User"."blacklisted" = false group by userId order by wins desc limit 100`;
 
   const out: string[] = [];
 
-  for (const user of sorted) {
+  for (const user of query) {
     let pos = (out.length + 1).toString();
 
     if (pos == "1") {
@@ -1160,10 +1079,10 @@ export async function topWordleGlobal(userId: string) {
 
     out.push(
       `${pos} ${await formatUsername(
-        user.user.id,
-        user.user.lastKnownUsername,
-        (await getPreferences(user.user.id)).leaderboards,
-      )} ${user.wins.toLocaleString()} wins`,
+        user.userId,
+        user.username,
+        true,
+      )} ${user.wins.toLocaleString()} win${user.wins != 1 ? "s" : ""}`,
     );
   }
 
@@ -1172,11 +1091,11 @@ export async function topWordleGlobal(userId: string) {
   let pos = 0;
 
   if (userId) {
-    pos = sorted.findIndex((i) => i.user.id === userId) + 1;
+    pos = query.findIndex((i) => i.userId === userId) + 1;
   }
 
   checkLeaderboardPositions(
-    sorted.map((i) => i.user.id),
+    query.map((i) => i.userId),
     "wordle",
   );
 
