@@ -5,6 +5,7 @@ import prisma from "../../../init/database";
 import Constants from "../../Constants";
 import PageManager from "../page";
 import sleep from "../sleep";
+import { formatTime } from "../string";
 import { getPreferences } from "../users/notifications";
 import { getLastKnownUsername } from "../users/tag";
 import { getActiveTag } from "../users/tags";
@@ -1021,7 +1022,7 @@ export async function topWordle(guild: Guild, userId: string) {
   if (!members) members = guild.members.cache;
 
   const query: { wins: number; username: string; userId: string }[] =
-    await prisma.$queryRaw`select userId, count(*) as wins, "User"."lastKnownTag" as username from "WordleGame" left join "User" on "User"."id" = "WordleGame"."userId" where "WordleGame"."userId" in (${Array.from(members.keys()).join(",")}) and "WordleGame"."won" = true and "User"."blacklisted" = false group by userId order by wins desc limit 100`;
+    await prisma.$queryRaw`select "userId", count(*) as wins, "User"."lastKnownTag" as username from "WordleGame" left join "User" on "User"."id" = "WordleGame"."userId" where "WordleGame"."userId" in (${Array.from(members.keys()).join(",")}) and "WordleGame"."won" = true and "User"."blacklisted" = false group by "userId", "User"."lastKnownTag" order by wins desc limit 100`;
 
   const out: string[] = [];
 
@@ -1060,7 +1061,7 @@ export async function topWordle(guild: Guild, userId: string) {
 
 export async function topWordleGlobal(userId: string) {
   const query: { wins: number; username: string; userId: string }[] =
-    await prisma.$queryRaw`select userId, count(*) as wins, "User"."lastKnownTag" as username from "WordleGame" left join "User" on "User"."id" = "WordleGame"."userId" where "WordleGame"."won" = true and "User"."blacklisted" = false group by userId order by wins desc limit 100`;
+    await prisma.$queryRaw`select "userId", count(*) as wins, "User"."lastKnownTag" as username from "WordleGame" left join "User" on "User"."id" = "WordleGame"."userId" where "WordleGame"."won" = true and "User"."blacklisted" = false group by "userId", "User"."lastKnownTag" order by wins desc limit 100`;
 
   const out: string[] = [];
 
@@ -1097,6 +1098,99 @@ export async function topWordleGlobal(userId: string) {
   checkLeaderboardPositions(
     query.map((i) => i.userId),
     "wordle",
+  );
+
+  return { pages, pos };
+}
+
+export async function topWordleTime(guild: Guild, userId: string) {
+  let members: Collection<string, GuildMember>;
+
+  if (guild.memberCount == guild.members.cache.size) {
+    members = guild.members.cache;
+  } else {
+    members = await guild.members.fetch();
+  }
+
+  if (!members) members = guild.members.cache;
+
+  const query: { time: number; username: string; userId: string }[] =
+    await prisma.$queryRaw`select "userId", min(time) as time, "User"."lastKnownTag" as username from "WordleGame" left join "User" on "User"."id" = "WordleGame"."userId" where "WordleGame"."userId" in (${Array.from(members.keys()).join(",")}) and "WordleGame"."won" = true and "User"."blacklisted" = false group by "userId", "User"."lastKnownTag" order by time asc limit 100`;
+
+  const out: string[] = [];
+
+  for (const user of query) {
+    let pos = (out.length + 1).toString();
+
+    if (pos == "1") {
+      pos = "🥇";
+    } else if (pos == "2") {
+      pos = "🥈";
+    } else if (pos == "3") {
+      pos = "🥉";
+    } else {
+      pos += ".";
+    }
+
+    out.push(
+      `${pos} ${await formatUsername(
+        user.userId,
+        user.username,
+        true,
+      )} \`${formatTime(user.time)}\``,
+    );
+  }
+
+  const pages = PageManager.createPages(out);
+
+  let pos = 0;
+
+  if (userId) {
+    pos = query.findIndex((i) => i.userId === userId) + 1;
+  }
+
+  return { pages, pos };
+}
+
+export async function topWordleTimeGlobal(userId: string) {
+  const query: { time: number; username: string; userId: string }[] =
+    await prisma.$queryRaw`select "userId", min(time) as time, "User"."lastKnownTag" as username from "WordleGame" left join "User" on "User"."id" = "WordleGame"."userId" where "WordleGame"."won" = true and "User"."blacklisted" = false group by "userId", "User"."lastKnownTag" order by time asc limit 100`;
+
+  const out: string[] = [];
+
+  for (const user of query) {
+    let pos = (out.length + 1).toString();
+
+    if (pos == "1") {
+      pos = "🥇";
+    } else if (pos == "2") {
+      pos = "🥈";
+    } else if (pos == "3") {
+      pos = "🥉";
+    } else {
+      pos += ".";
+    }
+
+    out.push(
+      `${pos} ${await formatUsername(
+        user.userId,
+        user.username,
+        true,
+      )} \`${formatTime(user.time)}\``,
+    );
+  }
+
+  const pages = PageManager.createPages(out);
+
+  let pos = 0;
+
+  if (userId) {
+    pos = query.findIndex((i) => i.userId === userId) + 1;
+  }
+
+  checkLeaderboardPositions(
+    query.map((i) => i.userId),
+    "wordle-time",
   );
 
   return { pages, pos };

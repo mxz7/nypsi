@@ -39,6 +39,8 @@ import {
   topVoteGlobal,
   topWordle,
   topWordleGlobal,
+  topWordleTime,
+  topWordleTimeGlobal,
 } from "../utils/functions/economy/top";
 import { getItems } from "../utils/functions/economy/utils.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
@@ -444,6 +446,25 @@ async function run(
       data.pos,
       `top lottery wins ${global ? "[global]" : `for ${message.guild.name}`}`,
       global ? "https://nypsi.xyz/leaderboard/lottery" : null,
+    );
+  } else if (args[0].toLowerCase().includes("wordle-time")) {
+    let global = false;
+
+    if (args[1]?.toLowerCase() == "global") global = true;
+
+    let data: { pages: Map<number, string[]>; pos: number };
+
+    if (global) {
+      data = await topWordleTimeGlobal(message.author.id);
+    } else {
+      data = await topWordleTime(message.guild, message.author.id);
+    }
+
+    return show(
+      data.pages,
+      data.pos,
+      `fastest wordle wins ${global ? "[global]" : `for ${message.guild.name}`}`,
+      global ? "https://nypsi.xyz/leaderboard/wordle" : null,
     );
   } else if (args[0].toLowerCase().includes("wordle")) {
     let global = false;
