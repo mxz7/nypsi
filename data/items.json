@@ -3408,7 +3408,7 @@
     "role": "flower",
     "sell": 1000000,
     "in_crates": true,
-    "random_drop_chance": 10
+    "random_drop_chance": 5
   },
   "sunflower": {
     "id": "sunflower",
@@ -3456,6 +3456,7 @@
     "rarity": 5,
     "role": "flower",
     "sell": 100000,
-    "in_crates": true
+    "in_crates": true,
+    "random_drop_chance": 3
   }
 }
