@@ -34,7 +34,7 @@ async function run(
   const inventory = await getInventory(message.member);
 
   let hasCount = 0;
-  let desc: string[] = [];
+  const desc: string[] = [];
 
   for (const item of sort(items).asc((i) => i.name)) {
     const count = inventory.find((i) => i.item === item.id)?.amount || 0;
