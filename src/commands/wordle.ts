@@ -319,7 +319,7 @@ async function win(message: Message | (NypsiCommandInteraction & CommandInteract
   );
   embed.setColor(Constants.EMBED_SUCCESS_COLOR);
   embed.setFooter({
-    text: `completed in ${formatTime((performance.now() - games.get(message.author.id).start) / 1000)}`,
+    text: `completed in ${formatTime(performance.now() - games.get(message.author.id).start)}`,
   });
 
   edit({ embeds: [embed] });
