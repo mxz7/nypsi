@@ -608,7 +608,7 @@ async function run(
       prisma.premium.count(),
       prisma.premiumCommand.count(),
       prisma.username.count(),
-      prisma.wordleStats.count(),
+      prisma.wordleGame.count(),
       prisma.auction.count(),
       prisma.moderationBan.count(),
       prisma.moderationMute.count(),
@@ -630,7 +630,7 @@ async function run(
         `**premium** ${res[8].toLocaleString()}\n` +
         `**premium command** ${res[9].toLocaleString()}\n` +
         `**username** ${res[10].toLocaleString()}\n` +
-        `**wordle stats** ${res[11].toLocaleString()}\n` +
+        `**wordle games** ${res[11].toLocaleString()}\n` +
         `**auctions** ${res[12].toLocaleString()}\n` +
         `**bans** ${res[13].toLocaleString()}\n` +
         `**mutes** ${res[14].toLocaleString()}\n` +

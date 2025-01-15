@@ -191,7 +191,7 @@ async function run(
               },
             },
             Username: true,
-            WordleStats: true,
+            WordleGame: true,
             Preferences: true,
             CommandUse: true,
             Achievements: true,

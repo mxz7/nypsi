@@ -96,14 +96,6 @@ export async function doProfileTransfer(fromId: string, toId: string) {
           await prisma.premium.create({ data: premium });
         }
 
-        const wordleStats = await prisma.wordleStats
-          .findUnique({ where: { userId: fromId } })
-          .catch(() => {});
-        if (wordleStats) {
-          wordleStats.userId = toId;
-          await prisma.wordleStats.create({ data: wordleStats });
-        }
-
         const commandUses = (await prisma.commandUse.findMany({ where: { userId: fromId } })).map(
           (i) => {
             i.userId = toId;
@@ -298,7 +290,7 @@ export async function dataDelete(userId: string) {
     },
   });
 
-  await prisma.wordleStats.deleteMany({
+  await prisma.wordleGame.deleteMany({
     where: {
       userId: userId,
     },
