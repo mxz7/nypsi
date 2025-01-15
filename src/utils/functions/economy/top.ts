@@ -1,4 +1,5 @@
 import dayjs = require("dayjs");
+import { Prisma } from "@prisma/client";
 import { Collection, Guild, GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
@@ -1144,26 +1145,24 @@ export async function topWordleTime(guild: Guild, userId: string) {
 
   if (!members) members = guild.members.cache;
 
-  const query = await prisma.wordleGame.groupBy({
-    by: ["userId"],
-    _min: {
-      time: true,
-    },
-    orderBy: {
-      _min: {
-        time: "asc",
-      },
-    },
-    take: 100,
-    where: {
-      AND: [
-        { won: true },
-        { user: { blacklisted: false } },
-        { userId: { in: Array.from(members.keys()) } },
-        { time: { gt: 0 } },
-      ],
-    },
-  });
+  const userIds = Array.from(members.keys());
+
+  console.log(userIds.includes("779696205629489172"));
+
+  const query: { userId: string; time: number; gameId: number }[] =
+    await prisma.$queryRaw`WITH ranked_results AS (
+      SELECT 
+          "userId", 
+          time AS time, 
+          "WordleGame"."id" as "gameId", 
+          ROW_NUMBER() OVER (PARTITION BY "userId" ORDER BY time ASC) AS rank
+      FROM "WordleGame"
+      where won = true and "userId" IN (${Prisma.join(userIds)})
+  )
+  SELECT "userId", time, "gameId"
+  FROM ranked_results
+  WHERE rank = 1
+  ORDER BY time ASC;`;
 
   const out: string[] = [];
 
@@ -1185,7 +1184,7 @@ export async function topWordleTime(guild: Guild, userId: string) {
         user.userId,
         await getLastKnownUsername(user.userId),
         true,
-      )} \`${formatTime(user._min.time)}\``,
+      )} [\`${formatTime(user.time)}\`](https://nypsi.xyz/wordle/${user.gameId?.toString(36)})`,
     );
   }
 
@@ -1201,21 +1200,20 @@ export async function topWordleTime(guild: Guild, userId: string) {
 }
 
 export async function topWordleTimeGlobal(userId: string) {
-  const query = await prisma.wordleGame.groupBy({
-    by: ["userId"],
-    _min: {
-      time: true,
-    },
-    orderBy: {
-      _min: {
-        time: "asc",
-      },
-    },
-    take: 100,
-    where: {
-      AND: [{ won: true }, { user: { blacklisted: false } }, { time: { gt: 0 } }],
-    },
-  });
+  const query: { userId: string; time: number; gameId: number }[] =
+    await prisma.$queryRaw`WITH ranked_results AS (
+    SELECT 
+        "userId", 
+        time AS time, 
+        "WordleGame"."id" as "gameId", 
+        ROW_NUMBER() OVER (PARTITION BY "userId" ORDER BY time ASC) AS rank
+    FROM "WordleGame"
+    where won = true
+)
+SELECT "userId", time, "gameId"
+FROM ranked_results
+WHERE rank = 1
+ORDER BY time ASC;`;
 
   const out: string[] = [];
 
@@ -1237,7 +1235,7 @@ export async function topWordleTimeGlobal(userId: string) {
         user.userId,
         await getLastKnownUsername(user.userId),
         true,
-      )} \`${formatTime(user._min.time)}\``,
+      )} [\`${formatTime(user.time)}\`](https://nypsi.xyz/wordle/${user.gameId?.toString(36)})`,
     );
   }
 
