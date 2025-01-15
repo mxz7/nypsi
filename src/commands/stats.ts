@@ -250,8 +250,6 @@ async function run(
       `https://nypsi.xyz/user/${message.author.id}`,
     );
 
-    console.log(await wins);
-
     let desc = "";
 
     for (const stat of await wins) {
