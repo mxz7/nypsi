@@ -70,7 +70,11 @@ export function getOrdinalSuffix(num: number): string {
 
 export function formatTime(ms: number) {
   const minutes = Math.floor(ms / 60000);
-  const seconds = ((ms % 60000) / 1000).toFixed(2);
+  let seconds = ((ms % 60000) / 1000).toFixed(2);
 
-  return `${minutes}m${seconds}s`;
+  if (minutes > 0) {
+    seconds = Math.round((ms % 60000) / 1000).toString();
+  }
+
+  return `${minutes > 0 ? `${minutes}m` : ""}${seconds}s`;
 }
