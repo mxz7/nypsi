@@ -36,6 +36,7 @@ import { getItems } from "../utils/functions/economy/utils";
 import PageManager from "../utils/functions/page";
 import { getCommandUses } from "../utils/functions/users/commands";
 
+import { formatTime } from "../utils/functions/string";
 import { getVersion } from "../utils/functions/version";
 import { aliasesSize, commandsSize } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -257,8 +258,9 @@ async function run(
 
     if (await loses) desc += `:red_square: **${(await loses).toLocaleString()}**\n`;
 
-    desc += `**fastest** ${(await fastest) ? `<t:${Math.floor((await fastest).time / 1000)}>` : ""}\n`;
-    desc += `**average** ${(await average)._avg.time ? `<t:${Math.floor((await average)._avg.time / 1000)}>` : ""}\n`;
+    if ((await fastest).time) desc += `**fastest** \`${formatTime((await fastest).time)}\`\n`;
+    if ((await average)._avg.time)
+      desc += `**average** \`${formatTime((await average)._avg.time)}\`\n`;
 
     embed.setDescription(desc);
 
