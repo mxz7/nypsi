@@ -46,7 +46,7 @@ async function run(
           `has invite: ${profile.hasInvite}\n` +
           `removed: ${profile.removed}\n` +
           `rating: ${profile.rating}\n` +
-          `kick: ${profile.voteKicks.length}/${Math.ceil((await prisma.z.count({ where: { removed: false } })) / 3)}`,
+          `kick: ${profile.voteKicks.length}/${Math.ceil((await prisma.z.count({ where: { removed: false } })) / 5)}`,
       ).setHeader(
         await getLastKnownUsername(profile.userId),
         await getLastKnownAvatar(profile.userId),
