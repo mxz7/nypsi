@@ -15,7 +15,7 @@ export async function addWordleGame(
     addTaskProgress(userId, "wordles_weekly");
   }
 
-  await prisma.wordleGame.create({
+  const id = await prisma.wordleGame.create({
     data: {
       time: Math.floor(ms),
       won: win,
@@ -23,5 +23,18 @@ export async function addWordleGame(
       guesses,
       userId,
     },
+    select: {
+      id: true,
+    },
   });
+
+  return id.id.toString(36);
+}
+
+export async function getWordleGame(id: string) {
+  const query = await prisma.wordleGame.findUnique({
+    where: { id: parseInt(id, 36) },
+  });
+
+  return query;
 }

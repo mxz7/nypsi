@@ -13,7 +13,9 @@ import Constants from "../utils/Constants";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { addKarma } from "../utils/functions/karma/karma";
 import { formatTime } from "../utils/functions/string";
-import { addWordleGame } from "../utils/functions/users/wordle";
+import { getPreferences } from "../utils/functions/users/notifications";
+import { getLastKnownAvatar, getLastKnownUsername } from "../utils/functions/users/tag";
+import { addWordleGame, getWordleGame } from "../utils/functions/users/wordle";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
 
@@ -105,7 +107,41 @@ async function run(
     args[0].toLowerCase() != "play" &&
     args[0].toLowerCase() != "p"
   ) {
-    return send({ embeds: [new ErrorEmbed(`${prefix}wordle play`)] });
+    const game = await getWordleGame(args[0].toLowerCase());
+    if (!game) return send({ embeds: [new ErrorEmbed(`${prefix}wordle play`)] });
+
+    const username = (await getPreferences(game.userId))?.leaderboards
+      ? await getLastKnownUsername(game.userId).catch(() => {})
+      : "[hidden]";
+
+    const embed = new CustomEmbed(game.userId).setHeader(
+      username ? `${username}'s wordle game` : `id: ${game.id.toString(36)}`,
+      username === "[hidden]" ? message.author.avatarURL() : await getLastKnownAvatar(game.userId),
+      `https://nypsi.xyz/wordle/${game.id.toString(36)}`,
+    );
+
+    games.set(game.id.toString(36), {
+      board: createBoard(),
+      embed: new CustomEmbed(),
+      guesses: [],
+      message: message as Message,
+      notInWord: [],
+      start: 0,
+      word: game.word,
+    });
+
+    for (const guess of game.guesses) {
+      guessWord(guess, game.id.toString(36));
+    }
+
+    embed.setDescription(
+      renderBoard(games.get(game.id.toString(36)).board) +
+        "\n\n" +
+        `${game.won ? "won" : "lost"} in ${formatTime(game.time)}${game.won ? "" : `\n\nthe word was ${game.word}`}`,
+    );
+    games.delete(game.id.toString(36));
+
+    return send({ embeds: [embed] });
   }
 
   if (await onCooldown(cmd.name, message.member)) {
@@ -305,13 +341,13 @@ async function win(message: Message | (NypsiCommandInteraction & CommandInteract
     }
   };
 
-  addWordleGame(
+  const id = await addWordleGame(
     message.author.id,
     true,
     games.get(message.author.id).guesses,
     performance.now() - games.get(message.author.id).start,
     games.get(message.author.id).word,
-  );
+  ).catch(() => 0);
 
   const embed = games.get(message.author.id).embed;
   embed.setDescription(
@@ -319,7 +355,7 @@ async function win(message: Message | (NypsiCommandInteraction & CommandInteract
   );
   embed.setColor(Constants.EMBED_SUCCESS_COLOR);
   embed.setFooter({
-    text: `completed in ${formatTime(performance.now() - games.get(message.author.id).start)}`,
+    text: `completed in ${formatTime(performance.now() - games.get(message.author.id).start)} | ${id}`,
   });
 
   edit({ embeds: [embed] });
@@ -425,12 +461,13 @@ function guessWord(word: string, id: string): Response {
     if (emoji) board[game.guesses.length][i] = emoji;
   }
 
+  game.guesses.push(word);
+
   if (word == game.word) {
     return "win" as Response;
-  } else if (game.guesses.length == 5) {
+  } else if (game.guesses.length == 6) {
     return "lose" as Response;
   } else {
-    game.guesses.push(word);
     return "continue" as Response;
   }
 }
