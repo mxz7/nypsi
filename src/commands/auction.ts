@@ -722,7 +722,7 @@ async function run(
   if (args.length == 0 || args[0].toLowerCase() == "manage") {
     return manageAuctions();
   } else if (args[0].toLowerCase() == "del") {
-    if (message.guild.id != "747056029795221513") return;
+    if (message.guild.id != Constants.NYPSI_SERVER_ID) return;
 
     const roles = message.member.roles.cache;
 
@@ -901,7 +901,7 @@ async function run(
               ? ` ($${Math.floor(Number(a.bin / a.itemAmount)).toLocaleString()} each)`
               : ""
           }\n` +
-          `- [jump](https://discord.com/channels/747056029795221513/1008467335973179482/${a.messageId})\n`,
+          `- [jump](https://discord.com/channels/${Constants.NYPSI_SERVER_ID}/${Constants.AUCTION_CHANNEL_ID}/${a.messageId})\n`,
       ),
       3,
     );

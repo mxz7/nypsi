@@ -20,6 +20,7 @@ import {
   userExists,
 } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
+import Constants from "../utils/Constants";
 
 const cmd = new Command("lottery", "enter the daily lottery draw", "money").setAliases(["lotto"]);
 
@@ -87,7 +88,7 @@ async function run(
 
     embed.setHeader("lottery", message.author.avatarURL());
     embed.setDescription(
-      `nypsi lottery is a daily draw which happens in the [official nypsi server](https://discord.gg/hJTDNST)\nnext draw <t:${dayjs()
+      `nypsi lottery is a daily draw which happens in the [official nypsi server](${Constants.NYPSI_SERVER_INVITE_LINK})\nnext draw <t:${dayjs()
         .add(1, "day")
         .startOf("day")
         .unix()}:R>\n\n` +

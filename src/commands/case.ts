@@ -329,7 +329,7 @@ async function run(
                 new ErrorEmbed(
                   "you have used all of your evidence storage\n\n" +
                     `\`${formatBytes(used)}/${formatBytes(max)}\`\n\n` +
-                    `to get more storage, join the [official server](https://discord.gg/hJTDNST") and contact **max**`,
+                    `to get more storage, join the [official server](${Constants.NYPSI_SERVER_INVITE_LINK}) and contact **max**`,
                 ),
               ],
             });

@@ -116,7 +116,7 @@ export async function addMember(member: GuildMember | string, level: number, exp
           profile.level,
         )}** membership, this will expire on **${formatDate(
           profile.expireDate,
-        )}**\n\nplease join the support server if you have any problems, or questions. discord.gg/hJTDNST`,
+        )}**\n\nplease join the support server if you have any problems, or questions. ${Constants.NYPSI_SERVER_INVITE_LINK}`,
       },
     });
   }
