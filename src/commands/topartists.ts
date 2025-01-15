@@ -14,7 +14,6 @@ import {
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { getPrefix } from "../utils/functions/guilds/utils";
 import { getLastfmUsername } from "../utils/functions/users/lastfm";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
@@ -115,11 +114,7 @@ async function run(
 
   if (!username) {
     return send({
-      embeds: [
-        new ErrorEmbed(
-          `you have not set your last.fm username (${(await getPrefix(message.guild))[0]}**slfm**)`,
-        ),
-      ],
+      embeds: [new ErrorEmbed("you have not set your last.fm username (**/settings me lastfm**)")],
     });
   }
 
