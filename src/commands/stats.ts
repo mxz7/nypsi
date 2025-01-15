@@ -221,8 +221,8 @@ async function run(
   };
 
   const wordleStats = async () => {
-    const wins: Promise<{ guesses: number; count: number }[]> =
-      prisma.$queryRaw`select array_length(guesses, 1) as guesses, count(*) from "WordleGame" where won = true and "userId" = ${message.author.id} group by guesses order by guesses;`;
+    const wins: Promise<{ guessAmount: number; count: number }[]> =
+      prisma.$queryRaw`select array_length(guesses, 1) as "guessAmount", count(*) from "WordleGame" where won = true and "userId" = ${message.author.id} group by "guessAmount" order by "guessAmount";`;
     const loses = prisma.wordleGame.count({
       where: { AND: [{ userId: message.author.id }, { won: false }] },
     });
@@ -250,16 +250,18 @@ async function run(
       `https://nypsi.xyz/user/${message.author.id}`,
     );
 
+    console.log(await wins);
+
     let desc = "";
 
     for (const stat of await wins) {
-      desc += `${new Array(stat.guesses - 1).fill("<:solid_grey:987046773157691452>").join("")}:green_square: **${stat.count.toLocaleString()}**\n`;
+      desc += `${new Array(stat.guessAmount - 1).fill("<:solid_grey:987046773157691452>").join("")}:green_square: **${stat.count.toLocaleString()}**\n`;
     }
 
     if (await loses) desc += `:red_square: **${(await loses).toLocaleString()}**\n`;
 
-    if ((await fastest).time) desc += `**fastest** \`${formatTime((await fastest).time)}\`\n`;
-    if ((await average)._avg.time)
+    if ((await fastest)?.time) desc += `**fastest** \`${formatTime((await fastest).time)}\`\n`;
+    if ((await average)?._avg?.time)
       desc += `**average** \`${formatTime((await average)._avg.time)}\`\n`;
 
     embed.setDescription(desc);
