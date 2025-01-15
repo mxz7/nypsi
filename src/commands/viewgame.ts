@@ -16,7 +16,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { fetchGame } from "../utils/functions/economy/stats";
 import PageManager from "../utils/functions/page";
 import { getPreferences } from "../utils/functions/users/notifications";
-import { getLastKnownUsername } from "../utils/functions/users/tag";
+import { getLastKnownAvatar, getLastKnownUsername } from "../utils/functions/users/tag";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import dayjs = require("dayjs");
 
@@ -235,9 +235,9 @@ async function run(
       ? await getLastKnownUsername(game.userId).catch(() => {})
       : "[hidden]";
 
-    const embed = new CustomEmbed(message.member).setHeader(
+    const embed = new CustomEmbed(game.userId).setHeader(
       username ? `${username}'s ${game.game} game` : `id: ${game.id.toString(36)}`,
-      message.author.avatarURL(),
+      username === "[hidden]" ? message.author.avatarURL() : await getLastKnownAvatar(game.userId),
       `https://nypsi.xyz/game/${game.id.toString(36)}`,
     );
 
