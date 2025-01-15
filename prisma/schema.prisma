@@ -30,7 +30,6 @@ model User {
   Economy                  Economy?
   Premium                  Premium?
   Username                 Username[]
-  WordleStats              WordleStats?
   CommandUse               CommandUse[]
   Achievements             Achievements[]
   DMSettings               DMSettings?
@@ -461,20 +460,6 @@ model WordleGame {
 
   userId String
   user   User   @relation(fields: [userId], references: [id])
-}
-
-model WordleStats {
-  win1    Int   @default(0)
-  win2    Int   @default(0)
-  win3    Int   @default(0)
-  win4    Int   @default(0)
-  win5    Int   @default(0)
-  win6    Int   @default(0)
-  lose    Int   @default(0)
-  history Int[]
-
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String @id
 }
 
 model Auction {
