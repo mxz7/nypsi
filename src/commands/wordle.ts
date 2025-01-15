@@ -10,9 +10,9 @@ import redis from "../init/redis";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
-import { MStoTime } from "../utils/functions/date";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { addKarma } from "../utils/functions/karma/karma";
+import { formatTime } from "../utils/functions/string";
 import { addWordleGame } from "../utils/functions/users/wordle";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
@@ -319,7 +319,7 @@ async function win(message: Message | (NypsiCommandInteraction & CommandInteract
   );
   embed.setColor(Constants.EMBED_SUCCESS_COLOR);
   embed.setFooter({
-    text: `completed in ${MStoTime((performance.now() - games.get(message.author.id).start) / 1000)}`,
+    text: `completed in ${formatTime((performance.now() - games.get(message.author.id).start) / 1000)}`,
   });
 
   edit({ embeds: [embed] });
