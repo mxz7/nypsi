@@ -1160,6 +1160,7 @@ export async function topWordleTime(guild: Guild, userId: string) {
         { won: true },
         { user: { blacklisted: false } },
         { userId: { in: Array.from(members.keys()) } },
+        { time: { gt: 0 } },
       ],
     },
   });
@@ -1212,7 +1213,7 @@ export async function topWordleTimeGlobal(userId: string) {
     },
     take: 100,
     where: {
-      AND: [{ won: true }, { user: { blacklisted: false } }],
+      AND: [{ won: true }, { user: { blacklisted: false } }, { time: { gt: 0 } }],
     },
   });
 
