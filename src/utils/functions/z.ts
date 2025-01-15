@@ -121,7 +121,7 @@ export async function castVoteKick(
 
   const count = await prisma.z.count({ where: { removed: false } });
 
-  if (target.voteKicks.length + 1 >= count / 3) {
+  if (target.voteKicks.length + 1 >= count / 5) {
     removeZUser(targetId, guild);
 
     return "kicked";
