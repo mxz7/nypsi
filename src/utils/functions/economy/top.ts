@@ -1021,8 +1021,25 @@ export async function topWordle(guild: Guild, userId: string) {
 
   if (!members) members = guild.members.cache;
 
-  const query: { wins: number; username: string; userId: string }[] =
-    await prisma.$queryRaw`select "userId", count(*) as wins, "User"."lastKnownTag" as username from "WordleGame" left join "User" on "User"."id" = "WordleGame"."userId" where "WordleGame"."userId" in (${Array.from(members.keys()).join(",")}) and "WordleGame"."won" = true and "User"."blacklisted" = false group by "userId", "User"."lastKnownTag" order by wins desc limit 100`;
+  const query = await prisma.wordleGame.groupBy({
+    by: ["userId"],
+    _count: {
+      userId: true,
+    },
+    orderBy: {
+      _count: {
+        userId: "desc",
+      },
+    },
+    take: 100,
+    where: {
+      AND: [
+        { userId: { in: Array.from(members.keys()) } },
+        { won: true },
+        { user: { blacklisted: false } },
+      ],
+    },
+  });
 
   const out: string[] = [];
 
@@ -1042,9 +1059,9 @@ export async function topWordle(guild: Guild, userId: string) {
     out.push(
       `${pos} ${await formatUsername(
         user.userId,
-        user.username,
+        await getLastKnownUsername(user.userId),
         true,
-      )} ${user.wins.toLocaleString()} win${user.wins != 1 ? "s" : ""}`,
+      )} ${user._count.userId.toLocaleString()} win${user._count.userId != 1 ? "s" : ""}`,
     );
   }
 
@@ -1060,8 +1077,21 @@ export async function topWordle(guild: Guild, userId: string) {
 }
 
 export async function topWordleGlobal(userId: string) {
-  const query: { wins: number; username: string; userId: string }[] =
-    await prisma.$queryRaw`select "userId", count(*) as wins, "User"."lastKnownTag" as username from "WordleGame" left join "User" on "User"."id" = "WordleGame"."userId" where "WordleGame"."won" = true and "User"."blacklisted" = false group by "userId", "User"."lastKnownTag" order by wins desc limit 100`;
+  const query = await prisma.wordleGame.groupBy({
+    by: ["userId"],
+    _count: {
+      userId: true,
+    },
+    orderBy: {
+      _count: {
+        userId: "desc",
+      },
+    },
+    take: 100,
+    where: {
+      AND: [{ won: true }, { user: { blacklisted: false } }],
+    },
+  });
 
   const out: string[] = [];
 
@@ -1081,9 +1111,9 @@ export async function topWordleGlobal(userId: string) {
     out.push(
       `${pos} ${await formatUsername(
         user.userId,
-        user.username,
+        await getLastKnownUsername(user.userId),
         true,
-      )} ${user.wins.toLocaleString()} win${user.wins != 1 ? "s" : ""}`,
+      )} ${user._count.userId.toLocaleString()} win${user._count.userId != 1 ? "s" : ""}`,
     );
   }
 
@@ -1114,8 +1144,25 @@ export async function topWordleTime(guild: Guild, userId: string) {
 
   if (!members) members = guild.members.cache;
 
-  const query: { time: number; username: string; userId: string }[] =
-    await prisma.$queryRaw`select "userId", min(time) as time, "User"."lastKnownTag" as username from "WordleGame" left join "User" on "User"."id" = "WordleGame"."userId" where "WordleGame"."userId" in (${Array.from(members.keys()).join(",")}) and time > 0 and "WordleGame"."won" = true and "User"."blacklisted" = false group by "userId", "User"."lastKnownTag" order by time asc limit 100`;
+  const query = await prisma.wordleGame.groupBy({
+    by: ["userId"],
+    _min: {
+      time: true,
+    },
+    orderBy: {
+      _min: {
+        time: "asc",
+      },
+    },
+    take: 100,
+    where: {
+      AND: [
+        { won: true },
+        { user: { blacklisted: false } },
+        { userId: { in: Array.from(members.keys()) } },
+      ],
+    },
+  });
 
   const out: string[] = [];
 
@@ -1135,9 +1182,9 @@ export async function topWordleTime(guild: Guild, userId: string) {
     out.push(
       `${pos} ${await formatUsername(
         user.userId,
-        user.username,
+        await getLastKnownUsername(user.userId),
         true,
-      )} \`${formatTime(user.time)}\``,
+      )} \`${formatTime(user._min.time)}\``,
     );
   }
 
@@ -1153,8 +1200,21 @@ export async function topWordleTime(guild: Guild, userId: string) {
 }
 
 export async function topWordleTimeGlobal(userId: string) {
-  const query: { time: number; username: string; userId: string }[] =
-    await prisma.$queryRaw`select "userId", min(time) as time, "User"."lastKnownTag" as username from "WordleGame" left join "User" on "User"."id" = "WordleGame"."userId" where "WordleGame"."won" = true and "User"."blacklisted" = false and time > 0 group by "userId", "User"."lastKnownTag" order by time asc limit 100`;
+  const query = await prisma.wordleGame.groupBy({
+    by: ["userId"],
+    _min: {
+      time: true,
+    },
+    orderBy: {
+      _min: {
+        time: "asc",
+      },
+    },
+    take: 100,
+    where: {
+      AND: [{ won: true }, { user: { blacklisted: false } }],
+    },
+  });
 
   const out: string[] = [];
 
@@ -1174,9 +1234,9 @@ export async function topWordleTimeGlobal(userId: string) {
     out.push(
       `${pos} ${await formatUsername(
         user.userId,
-        user.username,
+        await getLastKnownUsername(user.userId),
         true,
-      )} \`${formatTime(user.time)}\``,
+      )} \`${formatTime(user._min.time)}\``,
     );
   }
 
