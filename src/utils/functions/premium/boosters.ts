@@ -62,7 +62,7 @@ export async function setBooster(userId: string, value: boolean): Promise<void> 
       payload: {
         embed: new CustomEmbed(
           null,
-          `thank you for boosting the nypsi server, you can see your rewards [here](${Constants.PREMIUM_REWARDS_LINK})`,
+          `thank you for boosting the nypsi server, you can see your rewards [here](${Constants.BOOST_REWARDS_LINK})`,
         )
           .setColor(Constants.EMBED_SUCCESS_COLOR)
           .setHeader("thank you for supporting nypsi!!"),
