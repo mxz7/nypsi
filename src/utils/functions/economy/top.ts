@@ -1147,8 +1147,6 @@ export async function topWordleTime(guild: Guild, userId: string) {
 
   const userIds = Array.from(members.keys());
 
-  console.log(userIds.includes("779696205629489172"));
-
   const query: { userId: string; time: number; gameId: number }[] =
     await prisma.$queryRaw`WITH ranked_results AS (
       SELECT 
