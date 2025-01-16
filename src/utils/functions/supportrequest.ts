@@ -39,16 +39,19 @@ export async function getSupportRequest(id: string) {
 }
 
 export async function createSupportRequest(id: string, client: NypsiClient, username: string) {
-  const clusterHas = await client.cluster.broadcastEval(async (c) => {
-    const client = c as unknown as NypsiClient;
-    const channel = client.channels.cache.get("1015299117934723173");
+  const clusterHas = await client.cluster.broadcastEval(
+    async (c, {channelId}) => {
+      const client = c as unknown as NypsiClient;
+      const channel = client.channels.cache.get(channelId);
 
-    if (channel) {
-      return client.cluster.id;
-    } else {
-      return "not-found";
-    }
-  });
+      if (channel) {
+        return client.cluster.id;
+      } else {
+        return "not-found";
+      }
+    },
+    { context: { channelId: Constants.SUPPORT_CHANNEL_ID } }
+  );
 
   let shard: number;
 
@@ -64,11 +67,11 @@ export async function createSupportRequest(id: string, client: NypsiClient, user
   }
 
   const res = await client.cluster.broadcastEval(
-    async (c, { shard, username }) => {
+    async (c, { shard, username, channelId, roleId }) => {
       const client = c as unknown as NypsiClient;
       if (client.cluster.id != shard) return false;
 
-      const channel = await client.channels.cache.get("1015299117934723173");
+      const channel = await client.channels.cache.get(channelId);
 
       if (!channel) return false;
 
@@ -80,12 +83,19 @@ export async function createSupportRequest(id: string, client: NypsiClient, user
       const thread = await channel.threads.create({ name: username });
 
       await thread.send({
-        content: "<@&1091314758986256424>",
+        content: `<@&${roleId}>`,
       });
 
       return thread.id;
     },
-    { context: { shard: shard, username: username } },
+    {
+      context: {
+        shard: shard,
+        username: username,
+        channelId: Constants.SUPPORT_CHANNEL_ID,
+        roleId: Constants.SUPPORT_ROLE_ID
+      }
+    },
   );
 
   let channelId: string;

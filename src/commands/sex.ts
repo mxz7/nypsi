@@ -193,8 +193,8 @@ async function run(
       const embed = new CustomEmbed(
         message.member,
         `a match has been made from **${
-          milf.guildId == "747056029795221513"
-            ? "[nypsi](https://discord.gg/hJTDNST)"
+          milf.guildId == Constants.NYPSI_SERVER_ID
+            ? `[nypsi](${Constants.NYPSI_SERVER_INVITE_LINK})`
             : milf.guildName
         }**\n\n` +
           `go ahead and send [**${
@@ -207,8 +207,8 @@ async function run(
       if (milf.description != "") {
         embed.setDescription(
           `a match has been made from **${
-            milf.guildId == "747056029795221513"
-              ? "[nypsi](https://discord.gg/hJTDNST)"
+            milf.guildId == Constants.NYPSI_SERVER_ID
+              ? `[nypsi](${Constants.NYPSI_SERVER_INVITE_LINK})`
               : milf.guildName
           }**\n\n` +
             `[**${tag ? `[${getTagsData()[tag.tagId].emoji}] ` : ""}${await getLastKnownUsername(
@@ -231,8 +231,8 @@ async function run(
       const embed2 = new CustomEmbed(
         undefined,
         `a match has been made from **${
-          message.guild.id == "747056029795221513"
-            ? "[nypsi](https://discord.gg/hJTDNST)"
+          message.guild.id == Constants.NYPSI_SERVER_ID
+            ? `[nypsi](${Constants.NYPSI_SERVER_INVITE_LINK})`
             : message.guild.name
         }**\n\ngo ahead and send [${
           authorTag ? `[${getTagsData()[authorTag.tagId].emoji}] ` : ""
@@ -263,8 +263,8 @@ async function run(
       if (description !== "") {
         embed2.setDescription(
           `a match has been made from **${
-            message.guild.id == "747056029795221513"
-              ? "[nypsi](https://discord.gg/hJTDNST)"
+            message.guild.id == Constants.NYPSI_SERVER_ID
+              ? `[nypsi](${Constants.NYPSI_SERVER_INVITE_LINK})`
               : message.guild.name
           }**\n\n` +
             `[${authorTag ? `[${getTagsData()[authorTag.tagId].emoji}] ` : ""}**${

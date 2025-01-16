@@ -722,16 +722,14 @@ async function run(
   if (args.length == 0 || args[0].toLowerCase() == "manage") {
     return manageAuctions();
   } else if (args[0].toLowerCase() == "del") {
-    if (message.guild.id != "747056029795221513") return;
+    if (message.guild.id != Constants.NYPSI_SERVER_ID) return;
 
     const roles = message.member.roles.cache;
 
     let allow = false;
-
-    if (roles.has("747056620688900139")) allow = true;
-    if (roles.has("747059949770768475")) allow = true;
-    if (roles.has("845613231229370429")) allow = true;
-    if (roles.has("1105179633919471707")) allow = true;
+    for (const role_id of Constants.AUCTION_MANAGEMENT_ROLE_IDS) {
+      if (roles.has(role_id)) allow = true;
+    }
 
     if (!allow) return;
 
@@ -901,7 +899,7 @@ async function run(
               ? ` ($${Math.floor(Number(a.bin / a.itemAmount)).toLocaleString()} each)`
               : ""
           }\n` +
-          `- [jump](https://discord.com/channels/747056029795221513/1008467335973179482/${a.messageId})\n`,
+          `- [jump](https://discord.com/channels/${Constants.NYPSI_SERVER_ID}/${Constants.AUCTION_CHANNEL_ID}/${a.messageId})\n`,
       ),
       3,
     );

@@ -76,12 +76,13 @@ export async function openKarmaShop(client: NypsiClient, now = false) {
 
     logger.info("karma shop has been opened");
 
-    const clusters = await client.cluster.broadcastEval(async (client) => {
-      const guild = await client.guilds.cache.get("747056029795221513");
+    const clusters = await client.cluster.broadcastEval(async (client, {guildId}) => {
+      const guild = await client.guilds.cache.get(guildId);
 
       if (guild) return (client as unknown as NypsiClient).cluster.id;
       return "not-found";
-    });
+    },
+    { context: { guildId: Constants.NYPSI_SERVER_ID } });
 
     let cluster: number;
 
@@ -94,13 +95,13 @@ export async function openKarmaShop(client: NypsiClient, now = false) {
 
     await client.cluster
       .broadcastEval(
-        async (client, { content, cluster }) => {
+        async (client, { content, guildId, channelId, cluster }) => {
           if ((client as unknown as NypsiClient).cluster.id != cluster) return;
-          const guild = await client.guilds.cache.get("747056029795221513");
+          const guild = await client.guilds.cache.get(guildId);
 
           if (!guild) return;
 
-          const channel = await guild.channels.cache.get("747057465245564939");
+          const channel = await guild.channels.cache.get(channelId);
 
           if (!channel) return;
 
@@ -110,11 +111,13 @@ export async function openKarmaShop(client: NypsiClient, now = false) {
         },
         {
           context: {
-            content: `🔮 <@&1088800175532806187> karma shop has been opened!! it will next open at <t:${Math.floor(
+            content: `🔮 <@&${Constants.KARMA_SHOP_ROLE_ID}> karma shop has been opened!! it will next open at <t:${Math.floor(
               dayjs(await getNextKarmaShopOpen())
                 .set("seconds", 0)
                 .unix(),
             )}>`,
+            guildId: Constants.NYPSI_SERVER_ID,
+            channelId: Constants.ANNOUNCEMENTS_CHANNEL_ID,
             cluster: cluster,
           },
         },

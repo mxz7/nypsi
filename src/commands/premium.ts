@@ -379,7 +379,7 @@ async function run(
       embed.addField(
         "payment methods",
         "[ko-fi](https://ko-fi.com/tekoh/tiers)\n\n" +
-          "if you'd like to pay another way (crypto, paypal, etc) join the [support server](https://discord.gg/hJTDNST)\nif you are just looking to buy crates, you can do so from the [nypsi shop](https://ko-fi.com/U7U4AEDXM/shop)",
+          `if you'd like to pay another way (crypto, paypal, etc) join the [support server](${Constants.NYPSI_SERVER_INVITE_LINK})\nif you are just looking to buy crates, you can do so from the [nypsi shop](https://ko-fi.com/U7U4AEDXM/shop)`,
       );
 
       return send({ embeds: [embed] });
@@ -392,7 +392,7 @@ async function run(
       embed.addField(
         "payment methods",
         "[ko-fi](https://ko-fi.com/tekoh/tiers)\n\n" +
-          "if you'd like to pay another way (crypto, paypal, etc) join the [support server](https://discord.gg/hJTDNST)\nif you are just looking to buy crates, you can do so from the [nypsi shop](https://ko-fi.com/U7U4AEDXM/shop)",
+          `if you'd like to pay another way (crypto, paypal, etc) join the [support server](${Constants.NYPSI_SERVER_INVITE_LINK})\nif you are just looking to buy crates, you can do so from the [nypsi shop](https://ko-fi.com/U7U4AEDXM/shop)`,
       );
 
       return send({ embeds: [embed] });

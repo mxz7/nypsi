@@ -251,7 +251,7 @@ async function helpCmd(message: NypsiMessage, args: string[]) {
     embed.setTitle("help menu");
     embed.setDescription(
       "[invite nypsi to your server](https://discord.com/oauth2/authorize?client_id=678711738845102087&permissions=1377879583830&scope=bot%20applications.commands)\n\n" +
-        "if you need support, want to report a bug or suggest a feature, you can join the nypsi server: https://discord.gg/hJTDNST\n\n" +
+        `if you need support, want to report a bug or suggest a feature, you can join the nypsi server: ${Constants.NYPSI_SERVER_INVITE_LINK}\n\n` +
         `my prefix for this server is \`${prefix}\``,
     );
     embed.addField("command categories", categoriesMsg, true);
@@ -548,7 +548,7 @@ export async function runCommand(
   args: string[],
 ) {
   const preProcessLength = [performance.now()];
-  if (message.author.bot && message.author.id !== "974297735559806986") return;
+  if (message.author.bot && !Constants.WHITELISTED_BOTS.includes(message.author.id)) return;
   if (!message.channel.isTextBased()) return;
   if (message.channel.isDMBased()) return;
 
@@ -760,7 +760,7 @@ export async function runCommand(
   }
 
   if (
-    message.author.id === "974297735559806986" &&
+    Constants.WHITELISTED_BOTS.includes(message.author.id) &&
     (command.category === "admin" || command.category === "moderation")
   )
     return;
@@ -824,7 +824,7 @@ export async function runCommand(
             embeds: [
               new CustomEmbed(
                 message.member,
-                "nypsi is rebooting, this shouldn't take more than 2 minutes.\njoin https://discord.gg/hJTDNST for help",
+                `nypsi is rebooting, this shouldn't take more than 2 minutes.\njoin ${Constants.NYPSI_SERVER_INVITE_LINK} for help`,
               ),
             ],
           });
@@ -833,7 +833,7 @@ export async function runCommand(
             embeds: [
               new CustomEmbed(
                 message.member,
-                "nypsi is rebooting, this shouldn't take more than 2 minutes.\njoin https://discord.gg/hJTDNST for help",
+                `nypsi is rebooting, this shouldn't take more than 2 minutes.\njoin ${Constants.NYPSI_SERVER_INVITE_LINK} for help`,
               ),
             ],
           });
