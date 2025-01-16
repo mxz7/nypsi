@@ -1157,12 +1157,12 @@ export async function topWordleTime(guild: Guild, userId: string) {
           "WordleGame"."id" as "gameId", 
           ROW_NUMBER() OVER (PARTITION BY "userId" ORDER BY time ASC) AS rank
       FROM "WordleGame"
-      where won = true and "userId" IN (${Prisma.join(userIds)})
+      where won = true and "userId" IN (${Prisma.join(userIds)}) and time > 0
   )
   SELECT "userId", time, "gameId"
   FROM ranked_results
   WHERE rank = 1
-  ORDER BY time ASC;`;
+  ORDER BY time ASC limit 100`;
 
   const out: string[] = [];
 
@@ -1204,16 +1204,16 @@ export async function topWordleTimeGlobal(userId: string) {
     await prisma.$queryRaw`WITH ranked_results AS (
     SELECT 
         "userId", 
-        time AS time, 
+        time, 
         "WordleGame"."id" as "gameId", 
         ROW_NUMBER() OVER (PARTITION BY "userId" ORDER BY time ASC) AS rank
     FROM "WordleGame"
-    where won = true
+    where won = true and time > 0
 )
 SELECT "userId", time, "gameId"
 FROM ranked_results
 WHERE rank = 1
-ORDER BY time ASC;`;
+ORDER BY time ASC limit 100`;
 
   const out: string[] = [];
 
