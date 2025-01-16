@@ -727,11 +727,9 @@ async function run(
     const roles = message.member.roles.cache;
 
     let allow = false;
-
-    if (roles.has("747056620688900139")) allow = true;
-    if (roles.has("747059949770768475")) allow = true;
-    if (roles.has("845613231229370429")) allow = true;
-    if (roles.has("1105179633919471707")) allow = true;
+    for (const role_id of Constants.AUCTION_MANAGEMENT_ROLE_IDS) {
+      if (roles.has(role_id)) allow = true;
+    }
 
     if (!allow) return;
 

@@ -548,7 +548,7 @@ export async function runCommand(
   args: string[],
 ) {
   const preProcessLength = [performance.now()];
-  if (message.author.bot && message.author.id !== "974297735559806986") return;
+  if (message.author.bot && !Constants.WHITELISTED_BOTS.includes(message.author.id)) return;
   if (!message.channel.isTextBased()) return;
   if (message.channel.isDMBased()) return;
 
@@ -760,7 +760,7 @@ export async function runCommand(
   }
 
   if (
-    message.author.id === "974297735559806986" &&
+    Constants.WHITELISTED_BOTS.includes(message.author.id) &&
     (command.category === "admin" || command.category === "moderation")
   )
     return;

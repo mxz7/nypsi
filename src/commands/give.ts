@@ -20,6 +20,7 @@ import { getMember } from "../utils/functions/member";
 import { getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { transaction } from "../utils/logger";
+import Constants from "../utils/Constants";
 
 const cmd = new Command("give", "give other users items from your inventory", "money");
 
@@ -101,7 +102,7 @@ async function run(
     return send({ embeds: [new ErrorEmbed("invalid user")] });
   }
 
-  if (target.user.bot && target.user.id !== "974297735559806986") {
+  if (target.user.bot && !Constants.WHITELISTED_BOTS.includes(target.user.id)) {
     return send({ embeds: [new ErrorEmbed("invalid user")] });
   }
 
