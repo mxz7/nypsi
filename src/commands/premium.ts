@@ -291,7 +291,7 @@ async function run(
         if (guildMember.roles.cache.find((i) => i.name === guildMember.user.id)) {
           await sleep(250);
           const role = guildMember.roles.cache.find((i) => i.name === guildMember.user.id);
-          await guildMember.roles.remove(role);
+          await guildMember.guild.roles.delete(role);
         }
       } else if (!guildMember.roles.cache.find((i) => i.name === guildMember.user.id)) {
         await sleep(250);
