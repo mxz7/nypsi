@@ -23,6 +23,7 @@ import { getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { transaction } from "../utils/logger";
 import dayjs = require("dayjs");
+import Constants from "../utils/Constants";
 
 const cmd = new Command("pay", "give other users money", "money");
 
@@ -96,7 +97,7 @@ async function run(
     return send({ embeds: [new ErrorEmbed("invalid user")] });
   }
 
-  if (target.user.bot && ![message.client.user.id, "974297735559806986"].includes(target.user.id)) {
+  if (target.user.bot && ![message.client.user.id, ...Constants.WHITELISTED_BOTS].includes(target.user.id)) {
     return send({ embeds: [new ErrorEmbed("invalid user")] });
   }
 

@@ -37,7 +37,7 @@ export default async function interactionCreate(interaction: Interaction) {
       .setColor(Constants.TRANSPARENT_EMBED_COLOR)
       .setDescription(
         "unfortunately you can't do commands in direct messages ):\n\n" +
-          "if you need support or help for nypsi, please join the official nypsi server: https://discord.gg/hJTDNST",
+          `if you need support or help for nypsi, please join the official nypsi server: ${Constants.NYPSI_SERVER_INVITE_LINK}`,
       );
     return await interaction.reply({ embeds: [embed] });
   }

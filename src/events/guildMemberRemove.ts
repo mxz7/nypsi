@@ -75,7 +75,7 @@ export default async function guildMemberRemove(member: GuildMember) {
     });
   }
 
-  if (member.guild.id != "747056029795221513") return;
+  if (member.guild.id != Constants.NYPSI_SERVER_ID) return;
 
   if (await isBooster(member.user.id)) await setBooster(member.user.id, false);
 }

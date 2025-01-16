@@ -284,7 +284,7 @@ async function run(
             fail = true;
             message.channel.send({
               content:
-                "i am missing some permissions. if you need support join: https://discord.gg/hJTDNST",
+                `i am missing some permissions. if you need support join: ${Constants.NYPSI_SERVER_INVITE_LINK}`,
             });
           });
         return m.first().content;
@@ -320,7 +320,7 @@ async function run(
             fail = true;
             message.channel.send({
               content:
-                "i am missing some permissions. if you need support join: https://discord.gg/hJTDNST",
+                `i am missing some permissions. if you need support join: ${Constants.NYPSI_SERVER_INVITE_LINK}`,
             });
           });
         return m.first().content;
@@ -355,7 +355,7 @@ async function run(
             fail = true;
             message.channel.send({
               content:
-                "i am missing some permissions. if you need support join: https://discord.gg/hJTDNST",
+                `i am missing some permissions. if you need support join: ${Constants.NYPSI_SERVER_INVITE_LINK}`,
             });
           });
         return m.first().mentions.channels.first();

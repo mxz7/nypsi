@@ -85,12 +85,12 @@ export async function deleteAuction(id: number, client: NypsiClient) {
     });
 
     await client.cluster.broadcastEval(
-      async (client, { id }) => {
-        const guild = await client.guilds.cache.get("747056029795221513");
+      async (client, {guildId, channelId, id}) => {
+        const guild = await client.guilds.cache.get(guildId);
 
         if (!guild) return;
 
-        const channel = await guild.channels.cache.get("1008467335973179482");
+        const channel = await guild.channels.cache.get(channelId);
 
         if (!channel) return;
 
@@ -100,7 +100,7 @@ export async function deleteAuction(id: number, client: NypsiClient) {
           if (msg) await msg.delete().catch(() => {});
         }
       },
-      { context: { id: auction.messageId } },
+      { context: { guildId: Constants.NYPSI_SERVER_ID, channelId: Constants.AUCTION_CHANNEL_ID, id: auction.messageId } },
     );
   }
 
@@ -151,12 +151,14 @@ export async function createAuction(
       new ButtonBuilder().setCustomId("b-one").setLabel("buy one").setStyle(ButtonStyle.Secondary),
     );
 
-  const clusters = await (member.client as NypsiClient).cluster.broadcastEval(async (client) => {
-    const guild = await client.guilds.cache.get("747056029795221513");
+  const clusters = await (member.client as NypsiClient).cluster.broadcastEval(
+    async (client, {guildId}) => {
+      const guild = await client.guilds.cache.get(guildId);
 
-    if (guild) return (client as unknown as NypsiClient).cluster.id;
-    return "not-found";
-  });
+      if (guild) return (client as unknown as NypsiClient).cluster.id;
+      return "not-found";
+  },
+  { context: { guildId: Constants.NYPSI_SERVER_ID } });
 
   let cluster: number;
 
@@ -169,13 +171,13 @@ export async function createAuction(
 
   const { url, id } = await (member.client as NypsiClient).cluster
     .broadcastEval(
-      async (client, { embed, row, cluster }) => {
+      async (client, {guildId, channelId, embed, row, cluster}) => {
         if ((client as unknown as NypsiClient).cluster.id != cluster) return;
-        const guild = await client.guilds.cache.get("747056029795221513");
+        const guild = await client.guilds.cache.get(guildId);
 
         if (!guild) return;
 
-        const channel = await guild.channels.cache.get("1008467335973179482");
+        const channel = await guild.channels.cache.get(channelId);
 
         if (!channel) return;
 
@@ -185,7 +187,15 @@ export async function createAuction(
           return { url: msg.url, id: msg.id };
         }
       },
-      { context: { embed: embed.toJSON(), row: buttonRow.toJSON(), cluster: cluster } },
+      {
+        context: {
+          guildId: Constants.NYPSI_SERVER_ID,
+          channelId: Constants.AUCTION_CHANNEL_ID,
+          embed: embed.toJSON(),
+          row: buttonRow.toJSON(),
+          cluster: cluster
+        } 
+      },
     )
     .then((res) => {
       return res.filter((i) => Boolean(i))[0];
@@ -275,7 +285,7 @@ export async function bumpAuction(id: number, client: NypsiClient) {
     );
 
   const clusters = await client.cluster.broadcastEval(async (client) => {
-    const guild = await client.guilds.cache.get("747056029795221513");
+    const guild = await client.guilds.cache.get(Constants.NYPSI_SERVER_ID);
 
     if (guild) return (client as unknown as NypsiClient).cluster.id;
     return "not-found";
@@ -292,13 +302,13 @@ export async function bumpAuction(id: number, client: NypsiClient) {
 
   const [messageUrl, messageId] = await client.cluster
     .broadcastEval(
-      async (client, { row, messageId, embed, cluster }) => {
+      async (client, { guildId, channelId, row, messageId, embed, cluster }) => {
         if ((client as unknown as NypsiClient).cluster.id != cluster) return null;
-        const guild = await client.guilds.cache.get("747056029795221513");
+        const guild = await client.guilds.cache.get(guildId);
 
         if (!guild) return;
 
-        const channel = await guild.channels.cache.get("1008467335973179482");
+        const channel = await guild.channels.cache.get(channelId);
 
         if (!channel) return;
 
@@ -319,6 +329,8 @@ export async function bumpAuction(id: number, client: NypsiClient) {
       },
       {
         context: {
+          guildId: Constants.NYPSI_SERVER_ID,
+          channelId: Constants.AUCTION_CHANNEL_ID,
           messageId: query.messageId,
           row: buttonRow.toJSON(),
           embed: embed.toJSON(),

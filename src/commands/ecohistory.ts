@@ -75,7 +75,7 @@ async function run(
   //   });
   // }
 
-  // if (args[0].toLowerCase() == "all" && Constants.ADMIN_IDS.includes(message.author.id)) {
+  // if (args[0].toLowerCase() == "all" && message.author.id === Constants.TEKOH_ID) {
   //   const res = await getJsonGraphData(args[1].toLowerCase(), args.slice(2));
 
   //   console.log(res);

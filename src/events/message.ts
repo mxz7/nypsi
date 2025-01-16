@@ -108,7 +108,7 @@ export default async function messageCreate(message: Message) {
       return message.reply({
         embeds: [
           new ErrorEmbed(
-            "you have created a support request recently, try again later.\nif you need support and don't want to wait, you can join the nypsi support server [here](https://discord.gg/hJTDNST)",
+            `you have created a support request recently, try again later.\nif you need support and don't want to wait, you can join the nypsi support server [here](${Constants.NYPSI_SERVER_INVITE_LINK})`,
           ),
         ],
       });
@@ -128,7 +128,7 @@ export default async function messageCreate(message: Message) {
         .setHeader("support")
         .setColor(Constants.TRANSPARENT_EMBED_COLOR)
         .setDescription(
-          "if you need support, join the [**official nypsi server**](https://discord.gg/hJTDNST) or click the button below to talk to a staff member" +
+          `if you need support, join the [**official nypsi server**](${Constants.NYPSI_SERVER_INVITE_LINK}) or click the button below to talk to a staff member` +
             "\n\nthis is **NOT** support for if you have been punished in an unrelated server" +
             "\n\n**ONLY CLICK IF YOU WISH TO TALK TO A NYPSI STAFF MEMBER**",
         );
@@ -141,7 +141,7 @@ export default async function messageCreate(message: Message) {
       );
 
       const msg = await message.reply({
-        content: "discord.gg/hJTDNST",
+        content: Constants.NYPSI_SERVER_INVITE_LINK,
         embeds: [embed],
         components: [row],
       });
@@ -260,7 +260,7 @@ export default async function messageCreate(message: Message) {
       .setColor(Constants.TRANSPARENT_EMBED_COLOR)
       .setDescription(
         "unfortunately you can't do commands in direct messages ):\n\n" +
-          "if you need support or help for nypsi, please join the official nypsi server: https://discord.gg/hJTDNST",
+          `if you need support or help for nypsi, please join the official nypsi server: ${Constants.NYPSI_SERVER_INVITE_LINK}`,
       );
     return await message.channel.send({ embeds: [embed] });
   }
