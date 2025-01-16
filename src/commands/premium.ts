@@ -194,14 +194,33 @@ async function run(
 
       if (!(await isPremium(guildMember)) || guildMember.user.id == Constants.TEKOH_ID) {
         // i dont want plat role lol
-        if (roleIds.includes(Constants.PLATINUM_ROLE_ID))
-          guildMember.roles.remove(Constants.PLATINUM_ROLE_ID);
-        if (roleIds.includes(Constants.GOLD_ROLE_ID))
-          guildMember.roles.remove(Constants.GOLD_ROLE_ID);
-        if (roleIds.includes(Constants.SILVER_ROLE_ID))
-          guildMember.roles.remove(Constants.SILVER_ROLE_ID);
-        if (roleIds.includes(Constants.BRONZE_ROLE_ID))
-          guildMember.roles.remove(Constants.BRONZE_ROLE_ID);
+        if (roleIds.includes(Constants.PLATINUM_ROLE_ID)) {
+          await sleep(250);
+          await guildMember.roles.remove(Constants.PLATINUM_ROLE_ID);
+        }
+
+        if (roleIds.includes(Constants.GOLD_ROLE_ID)) {
+          await sleep(250);
+          await guildMember.roles.remove(Constants.GOLD_ROLE_ID);
+        }
+
+        if (roleIds.includes(Constants.SILVER_ROLE_ID)) {
+          await sleep(250);
+          await guildMember.roles.remove(Constants.SILVER_ROLE_ID);
+        }
+
+        if (roleIds.includes(Constants.BRONZE_ROLE_ID)) {
+          await sleep(250);
+          await guildMember.roles.remove(Constants.BRONZE_ROLE_ID);
+        }
+
+        if (guildMember.roles.cache.find((i) => i.name === guildMember.user.id)) {
+          await sleep(250);
+          await guildMember.guild.roles.delete(
+            guildMember.roles.cache.find((i) => i.name === guildMember.user.id),
+          );
+        }
+
         continue;
       }
 
@@ -263,6 +282,36 @@ async function run(
               await addTag(guildMember.id, "highroller");
             await guildMember.roles.add(Constants.HIGHROLLER_ROLE);
           }
+        }
+      }
+
+      const colour = await getEmbedColor(guildMember.user.id);
+
+      if (colour === "default") {
+        if (guildMember.roles.cache.find((i) => i.name === guildMember.user.id)) {
+          await sleep(250);
+          const role = guildMember.roles.cache.find((i) => i.name === guildMember.user.id);
+          await guildMember.roles.remove(role);
+        }
+      } else if (!guildMember.roles.cache.find((i) => i.name === guildMember.user.id)) {
+        await sleep(250);
+
+        const seperatorRole = guildMember.guild.roles.cache.get("1329425677614845972");
+
+        const role = await guildMember.guild.roles.create({
+          name: guildMember.user.id,
+          color: colour,
+          position: seperatorRole.position + 1,
+        });
+
+        await guildMember.roles.add(role);
+      } else {
+        const role = guildMember.roles.cache.find((i) => i.name === guildMember.user.id);
+
+        if (role.hexColor !== colour) {
+          await sleep(250);
+
+          await guildMember.guild.roles.edit(role, { color: colour });
         }
       }
     }
