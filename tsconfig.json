@@ -6,6 +6,19 @@
     "module": "commonjs",
     "strictFunctionTypes": true,
     "skipLibCheck": true,
-    "noImplicitAny": true
+    "noImplicitAny": true,
+    "paths": {
+      "@utils/*": ["./src/utils/*"],
+      "@init/*": ["./src/init/*"],
+      "@models/*": ["./src/models/*"],
+      "@commands/*": ["./src/commands/*"],
+      "@functions/*": ["./src/utils/functions/*"],
+      "@handlers/*": ["./src/utils/handlers/*"],
+      "@queues/*": ["./src/utils/queues/*"],
+      "@events/*": ["./src/events/*"],
+      "@interactions/*": ["./src/interactions/*"],
+      "@scheduled/*": ["./src/scheduled/*"],
+      "@types/*": ["./src/types/*"],
+    }
   }
 }
