@@ -451,11 +451,32 @@ async function run(
 
     await setEmbedColor(message.author.id, color.toLowerCase());
 
+    if (message.guildId === Constants.NYPSI_SERVER_ID) {
+      if (message.member.roles.cache.find((i) => i.name === message.author.id)) {
+        const role = message.member.roles.cache.find((i) => i.name === message.author.id);
+        if (color === "default") {
+          await role.delete();
+        } else {
+          await role.edit({ color: color as ColorResolvable });
+        }
+      } else {
+        const seperatorRole = message.guild.roles.cache.get("1329425677614845972");
+
+        const role = await message.guild.roles.create({
+          name: message.author.id,
+          color: color as ColorResolvable,
+          position: seperatorRole.position + 1,
+        });
+
+        await message.member.roles.add(role);
+      }
+    }
+
     return send({
       embeds: [
         new CustomEmbed(
           message.member,
-          `your message color has been updated to **${await getEmbedColor(message.author.id)}**`,
+          `your color has been updated to **${await getEmbedColor(message.author.id)}**`,
         ).setColor((await getEmbedColor(message.author.id)) as `#${string}`),
       ],
     });
