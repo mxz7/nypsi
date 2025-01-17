@@ -472,13 +472,12 @@ async function run(
       }
     }
 
+    embed.setDescription(
+      `your color has been updated to **${await getEmbedColor(message.author.id)}**`,
+    );
+
     return send({
-      embeds: [
-        new CustomEmbed(
-          message.member,
-          `your color has been updated to **${await getEmbedColor(message.author.id)}**`,
-        ).setColor((await getEmbedColor(message.author.id)) as `#${string}`),
-      ],
+      embeds: [embed],
     });
   };
 
