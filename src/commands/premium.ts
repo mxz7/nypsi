@@ -434,7 +434,7 @@ async function run(
 
     if (!color.startsWith("#") && color != "default") color = `#${color}`;
 
-    if (!color.match(Constants.COLOUR_REGEX))
+    if (!color.match(Constants.COLOUR_REGEX) && color !== "default")
       return send({ embeds: [new ErrorEmbed("invalid hex color code. example: #abcdef")] });
 
     const embed = new CustomEmbed();
