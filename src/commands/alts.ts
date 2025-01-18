@@ -19,7 +19,7 @@ import { CustomEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { isAltPunish } from "../utils/functions/guilds/altpunish";
 import { getPrefix } from "../utils/functions/guilds/utils";
-import { getExactMember, getMember } from "../utils/functions/member";
+import { getMember } from "../utils/functions/member";
 import {
   addAlt,
   deleteAlt,
@@ -29,11 +29,12 @@ import {
   isAlt,
   isMainAccount,
 } from "../utils/functions/moderation/alts";
-import { isBanned, newBan } from "../utils/functions/moderation/ban";
-import { deleteMute, getMuteRole, isMuted, newMute } from "../utils/functions/moderation/mute";
+import { newBan } from "../utils/functions/moderation/ban";
+import { getMuteRole, isMuted, newMute } from "../utils/functions/moderation/mute";
 
-import { getLastKnownUsername } from "../utils/functions/users/tag";
+import { getLastKnownAvatar, getLastKnownUsername } from "../utils/functions/users/tag";
 import { getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import ms = require("ms");
 
 const cmd = new Command("alts", "view a user's alts", "moderation")
   .setAliases(["alt", "account", "accounts"])
@@ -105,21 +106,21 @@ async function run(
     return send({ embeds: [embed] });
   }
 
-  let member = (await getMember(message.guild, args.join(" "))) || args[0];
+  let memberId = (await getMember(message.guild, args.join(" ")))?.user.id;
 
-  if (await isAlt(message.guild, member instanceof GuildMember ? member.user.id : member)) {
-    member = await getMember(
-      message.guild,
-      await getMainAccountId(
-        message.guild,
-        member instanceof GuildMember ? member.user.id : member,
-      ),
-    );
+  if (!memberId) {
+    if (args[0].match(Constants.SNOWFLAKE_REGEX)) {
+      memberId = args[0];
+    }
+  }
+
+  if (await isAlt(message.guild, memberId)) {
+    memberId = await getMainAccountId(message.guild, memberId);
   }
 
   const msg = await send({
-    embeds: [await getEmbed(message, member)],
-    components: [await getRow(message, member)],
+    embeds: [await getEmbed(message, memberId)],
+    components: [await getRow(message, memberId)],
   });
 
   const waitForButton = async (altMsg: Message): Promise<void> => {
@@ -155,7 +156,7 @@ async function run(
         return waitForButton(altMsg);
       }
 
-      if (msg.content === (member instanceof GuildMember ? member.user.id : member)) {
+      if (msg.content === memberId) {
         await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid user")] });
         return waitForButton(altMsg);
       }
@@ -172,106 +173,107 @@ async function run(
         return waitForButton(altMsg);
       }
 
-      const addAltRes = await addAlt(
-        message.guild,
-        member instanceof GuildMember ? member.user.id : member,
-        msg.content,
-      );
+      const addAltRes = await addAlt(message.guild, memberId, msg.content);
 
       if (addAltRes) {
         await res.editReply({
           embeds: [
             new CustomEmbed(
               message.member,
-              `✅ added \`${msg.content}\` as an alt for ${
-                member instanceof GuildMember ? member.user.username : `\`${member}\``
-              }`,
+              `✅ added \`${msg.content}\` as an alt for ${`\`${memberId}\``}`,
             ),
           ],
         });
 
         exec(`redis-cli KEYS "*economy:banned*" | xargs redis-cli DEL`);
 
-        const alt = await getMember(message.guild, msg.content);
+        if (await isAltPunish(message.guild)) {
+          const accountIds = await getAllGroupAccountIds(message.guild, memberId);
 
-        if (alt != null) {
-          if ((await getMuteRole(message.guild)) != "timeout") {
-            let toMute: string = null;
+          let muted: string[] = [];
 
-            for (const id of await getAllGroupAccountIds(message.guild, msg.content)) {
-              if (await isMuted(message.guild, id)) toMute = id;
+          for (const id of accountIds) {
+            if (await isMuted(message.guild, id)) {
+              muted.push(id);
             }
+          }
 
-            if (
-              (await isAltPunish(message.guild)) &&
-              !(await isMuted(message.guild, msg.content)) &&
-              toMute
-            ) {
-              const query = await prisma.moderationMute.findFirst({
-                where: {
-                  guildId: message.guild.id,
-                  userId: toMute,
-                },
-                select: {
-                  expire: true,
-                },
-              });
+          const query = await prisma.moderationMute.findFirst({
+            where: {
+              AND: [{ guildId: message.guild.id }, { userId: { in: muted } }],
+            },
+            select: {
+              expire: true,
+            },
+          });
 
-              await newMute(message.guild, [msg.content], query.expire);
+          await newMute(
+            message.guild,
+            accountIds.filter((i) => !muted.includes(i)),
+            query.expire,
+          );
 
-              let muteRole = await message.guild.roles.cache.get(await getMuteRole(message.guild));
+          for (const id of accountIds.filter((i) => !muted.includes(i))) {
+            const member = await message.guild.members.fetch(id).catch(() => {});
 
-              if (!(await getMuteRole(message.guild))) {
-                muteRole = await message.guild.roles.cache.find(
-                  (r) => r.name.toLowerCase() == "muted",
-                );
+            if (member) {
+              const muteRole = await getMuteRole(message.guild);
+
+              if (muteRole === "timeout") {
+                let time = query.expire.getTime() - Date.now();
+                if (time > ms("28 days")) time = ms("28 days");
+                await member.timeout(time, "in group of muted accounts");
+              } else {
+                await member.roles.add(muteRole).catch(() => {});
               }
-
-              if (!muteRole) return await deleteMute(message.guild, alt);
-
-              alt.roles.add(muteRole);
             }
           }
-          let toBan: string = null;
 
-          for (const id of await getAllGroupAccountIds(message.guild, msg.content)) {
-            if (await isBanned(message.guild, id)) toBan = id;
+          let banned: string[] = [];
+
+          for (const id of accountIds) {
+            if (await message.guild.bans.fetch(id)) {
+              banned.push(id);
+            }
           }
 
-          if ((await isAltPunish(message.guild)) && toBan) {
-            const query = await prisma.moderationBan.findFirst({
-              where: {
-                guildId: message.guild.id,
-                userId: toBan,
-              },
-              select: {
-                expire: true,
-              },
-            });
+          const banQuery = await prisma.moderationBan.findFirst({
+            where: {
+              AND: [{ guildId: message.guild.id }, { userId: { in: banned } }],
+            },
+            select: {
+              expire: true,
+            },
+          });
 
-            let fail = false;
+          if (banQuery) {
+            await newBan(
+              message.guild,
+              accountIds.filter((i) => !banned.includes(i)),
+              banQuery.expire,
+            );
+          }
 
-            await alt.ban({ reason: `known alt of banned user joined` }).catch(() => (fail = true));
-
-            if (!fail) await newBan(message.guild, [msg.content], query.expire);
+          for (const id of accountIds.filter((i) => !banned.includes(i))) {
+            await message.guild.bans
+              .create(id, { reason: "in group of banned accounts" })
+              .catch(() => {});
           }
         }
-      } else
+      } else {
         await res.editReply({
           embeds: [
             new CustomEmbed(
               message.member,
-              `user is already an alt of ${await getExactMember(
-                message.guild,
-                await getMainAccountId(message.guild, msg.content),
-              )}`,
+              `user is already an alt of ${await getMainAccountId(message.guild, msg.content)}`,
             ),
           ],
         });
+      }
 
       await altMsg.edit({
-        embeds: [await getEmbed(message, member)],
-        components: [await getRow(message, member)],
+        embeds: [await getEmbed(message, memberId)],
+        components: [await getRow(message, memberId)],
       });
 
       return waitForButton(altMsg);
@@ -297,8 +299,7 @@ async function run(
 
       if (
         !(await isAlt(message.guild, msg.content)) ||
-        (await getMainAccountId(message.guild, msg.content)) !=
-          (member instanceof GuildMember ? member.user.id : member)
+        (await getMainAccountId(message.guild, msg.content)) != memberId
       ) {
         await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid alt")] });
         return waitForButton(altMsg);
@@ -309,16 +310,14 @@ async function run(
         embeds: [
           new CustomEmbed(
             message.member,
-            `✅ removed \`${msg.content}\` as an alt for ${
-              member instanceof GuildMember ? member.user.username : `\`${member}\``
-            }`,
+            `✅ removed \`${msg.content}\` as an alt for ${memberId}`,
           ),
         ],
       });
       exec(`redis-cli KEYS "*economy:banned*" | xargs redis-cli DEL`);
       await altMsg.edit({
-        embeds: [await getEmbed(message, member)],
-        components: [await getRow(message, member)],
+        embeds: [await getEmbed(message, memberId)],
+        components: [await getRow(message, memberId)],
       });
       return waitForButton(altMsg);
     }
@@ -328,17 +327,18 @@ async function run(
 
 async function getEmbed(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
-  member: GuildMember | string,
+  member: string,
 ) {
   const alts = await getUserAlts(message.guild, member);
 
   const embed = new CustomEmbed(message.member);
 
-  if (!(member instanceof GuildMember)) {
-    embed.setHeader("alts of " + member);
-  } else {
-    embed.setHeader("alts of " + member.user.username, member.user.avatarURL());
-  }
+  const username = await getLastKnownUsername(member);
+
+  embed.setHeader(
+    "alts of " + username ? username + ` (${member})` : member,
+    await getLastKnownAvatar(member),
+  );
 
   if (alts.length == 0) {
     embed.setDescription("no alts to display");
@@ -359,7 +359,7 @@ async function getEmbed(
 
 async function getRow(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
-  member: GuildMember | string,
+  member: string,
 ) {
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder().setCustomId("add-alt").setLabel("add alt").setStyle(ButtonStyle.Success),
