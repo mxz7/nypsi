@@ -34,10 +34,15 @@ import {
   addWorkerUpgrade,
   calcWorkerValues,
   claimFromWorkers,
+  evaluateWorker,
+  getWorker,
   getWorkers,
 } from "../utils/functions/economy/workers";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import _ = require("lodash");
+import Constants from "../utils/Constants";
+import { logger } from "../utils/logger";
+import prisma from "../init/database";
 
 const cmd = new Command(
   "workers",
@@ -551,6 +556,86 @@ async function run(
       .disableFooter();
 
     return send({ embeds: [embed] });
+  } else if (args[0].toLowerCase() == "debug" && message.author.id === Constants.TEKOH_ID) {
+    const debugInfoEmbed = new CustomEmbed(
+      message.member,
+      "$workers debug set <worker> <amount> - set a worker's stored amount" +
+        "\n$workers debug reset <worker> - resets a worker's upgrades" +
+        "\n$workers debug value <worker> <# claims> - simulates <#> claims of <worker> with the current stored amount"
+    );
+
+    const worker = baseWorkers[args[2]?.toLowerCase()];
+    const value = parseInt(args[3]);
+    if (args[1]?.toLowerCase() == "set") {
+      if (!(worker && value)) return message.channel.send({ embeds: [debugInfoEmbed] });
+      await prisma.economyWorker.update({
+        where: {
+          userId_workerId: {
+            userId: message.author.id,
+            workerId: worker.id
+          }
+        },
+        data: {
+          stored: value,
+        },
+      });
+      logger.info(
+        `workers debug: ${message.author.id} (${message.author.username}) set stored for ${worker.id} to ${value}`,
+      );
+      return message.channel.send({ embeds: [
+        new CustomEmbed(message.member, `set stored for **${worker.id}** to ${value} ${worker.item_emoji}`)
+          .setHeader("workers debug", message.author.avatarURL())
+      ] });
+
+    } else if (args[1]?.toLowerCase() == "reset") {
+      if (!worker) return message.channel.send({ embeds: [debugInfoEmbed] });
+      await prisma.economyWorkerUpgrades.updateMany({
+        where: {
+          userId: message.author.id,
+          workerId: worker.id
+        },
+        data: {
+          amount: 0,
+        },
+      });
+      logger.info(
+        `workers debug: ${message.author.id} (${message.author.username}) reset upgrades for ${worker.id}`,
+      );
+      return message.channel.send({ embeds: [
+        new CustomEmbed(message.member, `reset upgrades for **${worker.id}**`)
+          .setHeader("workers debug", message.author.avatarURL())
+      ] });
+
+    } else if (args[1]?.toLowerCase() == "value") {
+      if (!(worker && value)) return message.channel.send({ embeds: [debugInfoEmbed] });
+      let totalEarned = 0;
+      let totalByproducts = new Map<string, number>();
+      let byproductsDescription = "";
+      for(let i = 0; i < value; i++) {
+        const { amountEarned, byproducts } = await evaluateWorker(message.author.id, worker);
+        totalEarned += amountEarned;
+        for(let byproduct of byproducts.keys()) {
+          if(!totalByproducts.has(byproduct)) totalByproducts.set(byproduct, 0);
+          totalByproducts.set(byproduct, totalByproducts.get(byproduct) + byproducts.get(byproduct));
+        }
+      }
+      for(let byproduct of totalByproducts.keys()) {
+        let item = getItems()[byproduct];
+        let amount = totalByproducts.get(byproduct);
+        byproductsDescription += `\n  **${(amount/value).toFixed(3)}** ${item.emoji} ${amount === value ? item.name : item.plural}`;
+      }
+      return message.channel.send({ embeds: [
+        new CustomEmbed(message.member,
+          `average yield for **${worker.id}** over ${value} run${value === 1 ? "" : "s"} ` +
+          `at ${(await getWorker(message.author.id, worker)).stored} ${worker.item_emoji} is **$${(totalEarned/value).toFixed(3)}**` +
+          ((totalByproducts.size > 0) ? " and:" : "") +
+          byproductsDescription
+        ).setHeader("workers debug", message.author.avatarURL())
+      ] });
+
+    } else {
+      return message.channel.send({ embeds: [debugInfoEmbed] });
+    }
   } else {
     return showWorkers();
   }

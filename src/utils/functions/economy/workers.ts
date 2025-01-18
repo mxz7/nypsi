@@ -10,6 +10,7 @@ import { getBoosters } from "./boosters";
 import { addInventoryItem, gemBreak, getInventory } from "./inventory";
 import { addStat } from "./stats";
 import { getBaseUpgrades, getBaseWorkers, getItems } from "./utils";
+import { Worker } from "../../../types/Workers";
 
 export async function getWorkers(member: GuildMember | string) {
   let id: string;
@@ -22,6 +23,27 @@ export async function getWorkers(member: GuildMember | string) {
   const query = await prisma.economyWorker.findMany({
     where: {
       userId: id,
+    },
+    include: {
+      upgrades: true,
+    },
+  });
+
+  return query;
+}
+
+export async function getWorker(member: GuildMember | string, worker: Worker) {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
+  const query = await prisma.economyWorker.findFirst({
+    where: {
+      userId: id,
+      workerId: worker.id
     },
     include: {
       upgrades: true,
@@ -221,6 +243,28 @@ export async function addWorkerUpgrade(
       amount,
     },
   });
+}
+
+export async function evaluateWorker(userId: string, worker: Worker) {
+  const userWorker = await getWorker(userId, worker);
+
+  const { perItem, gemChance, scrapChance } = await calcWorkerValues(userWorker);
+
+  let amountEarned = Math.floor(perItem * userWorker.stored);
+  const byproducts = new Map<string, number>();
+
+  while (gemChance > 0 && percentChance(gemChance * userWorker.stored)) {
+    byproducts.set("gem_shard", byproducts.has("gem_shard") ? byproducts.get("gem_shard") + 1 : 1);
+  }
+
+  while (scrapChance > 0 && percentChance(scrapChance * userWorker.stored)) {
+    byproducts.set(
+      "quarry_scrap",
+      byproducts.has("quarry_scrap") ? byproducts.get("quarry_scrap") + 1 : 1,
+    );
+  }
+
+  return { amountEarned, byproducts }
 }
 
 export async function claimFromWorkers(userId: string): Promise<string> {
