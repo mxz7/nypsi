@@ -157,7 +157,7 @@ export async function removeZUser(userId: string, guild: Guild) {
       },
     });
 
-    if (inviter.rating <= 3) {
+    if (inviter.rating <= -3) {
       removeZUser(inviter.userId, guild);
     }
   }
