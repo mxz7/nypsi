@@ -141,7 +141,7 @@
       "plural": "earth scanners",
       "upgrades": "byproduct_chance",
       "byproduct": "quarry_scrap",
-      "effect": 0.0034,
+      "effect": 0.0036,
       "stack_limit": 10,
       "for": "quarry"
     }
