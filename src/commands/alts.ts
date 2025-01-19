@@ -190,7 +190,7 @@ async function run(
         if (await isAltPunish(message.guild)) {
           const accountIds = await getAllGroupAccountIds(message.guild, memberId);
 
-          let muted: string[] = [];
+          const muted: string[] = [];
 
           for (const id of accountIds) {
             if (await isMuted(message.guild, id)) {
@@ -229,7 +229,7 @@ async function run(
             }
           }
 
-          let banned: string[] = [];
+          const banned: string[] = [];
 
           for (const id of accountIds) {
             if (await message.guild.bans.fetch(id)) {
