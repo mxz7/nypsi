@@ -38,3 +38,10 @@ export function percentChance(percent: number) {
 //   console.log(`${(yes / 100_000_000) * 100}%`);
 // }
 // test();
+
+// rounds a number up or down randomly,
+// fraction part is chance of rounding up
+export function randomRound(n: number): number {
+  let lower = Math.floor(n);
+  return lower + +(Math.random() < n - lower);
+}

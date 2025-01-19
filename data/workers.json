@@ -129,8 +129,9 @@
       "id": "gem_radar",
       "name": "gem radar",
       "plural": "gem radars",
-      "upgrades": "gem_chance",
-      "effect": 0.0002,
+      "upgrades": "byproduct_chance",
+      "byproduct": "gem_shard",
+      "effect": 0.001,
       "stack_limit": 10,
       "for": "quarry"
     },
@@ -138,8 +139,9 @@
       "id": "earth_scanner",
       "name": "earth scanner",
       "plural": "earth scanners",
-      "upgrades": "scrap_chance",
-      "effect": 0.0007,
+      "upgrades": "byproduct_chance",
+      "byproduct": "quarry_scrap",
+      "effect": 0.0034,
       "stack_limit": 10,
       "for": "quarry"
     }
@@ -154,7 +156,21 @@
       "base": {
         "per_item": 14,
         "max_storage": 500,
-        "per_interval": 150
+        "per_interval": 150,
+        "byproducts": {
+          "quarry_scrap": {
+            "chance": 0.00044,
+            "rolls": 0.00205,
+            "multiply_chance": false,
+            "multiply_rolls": true
+          },
+          "gem_shard": {
+            "chance": 0.00015,
+            "rolls": 0.00205,
+            "multiply_chance": false,
+            "multiply_rolls": true
+          }
+        }
       }
     },
     "potato_farmer": {

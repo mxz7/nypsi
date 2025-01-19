@@ -3,14 +3,14 @@ import { GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import { logger } from "../../logger";
-import { percentChance } from "../random";
+import { randomRound } from "../random";
 import { addProgress } from "./achievements";
 import { addBalance } from "./balance";
 import { getBoosters } from "./boosters";
 import { addInventoryItem, gemBreak, getInventory } from "./inventory";
 import { addStat } from "./stats";
 import { getBaseUpgrades, getBaseWorkers, getItems } from "./utils";
-import { Worker } from "../../../types/Workers";
+import { Worker, WorkerByproducts } from "../../../types/Workers";
 
 export async function getWorkers(member: GuildMember | string) {
   let id: string;
@@ -108,12 +108,19 @@ export async function calcWorkerValues(
   let perIntervalBonus = 0;
   let perItemBonus = 0;
   let maxStoredBonus = 0;
-  let gemChance = 0;
-  let scrapChance = 0;
+  let byproductChances = {} as {
+    [item: string]: {
+      chance: number;
+      rolls: number;
+    }
+  };
 
-  if (worker.workerId === "quarry") {
-    scrapChance = 0.00009;
-    gemChance = 0.00003;
+  let baseByproducts = baseWorkers[worker.workerId].base.byproducts;
+  for(let byproduct in baseByproducts) {
+    byproductChances[byproduct] = {
+      chance: baseByproducts[byproduct].chance,
+      rolls: baseByproducts[byproduct].rolls
+    }
   }
 
   for (const upgrade of worker.upgrades) {
@@ -136,17 +143,17 @@ export async function calcWorkerValues(
           upgrade.amount *
           baseWorkers[worker.workerId].base.max_storage;
         break;
-      case "scrap_chance":
-        scrapChance += baseUpgrades[upgrade.upgradeId].effect * upgrade.amount;
+      case "byproduct_chance":
+        byproductChances[baseUpgrades[upgrade.upgradeId].byproduct].chance += baseUpgrades[upgrade.upgradeId].effect * upgrade.amount;
         break;
-      case "gem_chance":
-        gemChance += baseUpgrades[upgrade.upgradeId].effect * upgrade.amount;
+      case "byproduct_rolls":
+        byproductChances[baseUpgrades[upgrade.upgradeId].byproduct].rolls += baseUpgrades[upgrade.upgradeId].effect * upgrade.amount;
         break;
     }
   }
 
   for (const boosterId of boosters.keys()) {
-    if (items[boosterId].role != "booster") return;
+    if (items[boosterId].role != "booster") continue;
 
     switch (items[boosterId].boosterEffect.boosts[0]) {
       case "per_interval":
@@ -202,21 +209,12 @@ export async function calcWorkerValues(
     maxStoredBonus += maxStoredBonus * 0.7;
   }
 
-  const res = {
-    perInterval: Math.floor(baseWorkers[worker.workerId].base.per_interval + perIntervalBonus),
-    perItem: Math.floor(baseWorkers[worker.workerId].base.per_item + perItemBonus),
-    maxStorage: Math.floor(baseWorkers[worker.workerId].base.max_storage + maxStoredBonus),
-    scrapChance,
-    gemChance,
+  return {
+    perInterval: Math.max(0, Math.floor(baseWorkers[worker.workerId].base.per_interval + perIntervalBonus)),
+    perItem: Math.max(0, Math.floor(baseWorkers[worker.workerId].base.per_item + perItemBonus)),
+    maxStorage: Math.max(0, Math.floor(baseWorkers[worker.workerId].base.max_storage + maxStoredBonus)),
+    byproductChances
   };
-
-  if (res.perInterval < 0) res.perInterval = 0;
-  if (res.perItem < 0) res.perItem = 0;
-  if (res.maxStorage < 0) res.maxStorage = 0;
-  if (res.scrapChance > 0.5) res.scrapChance = 0.5;
-  if (res.gemChance > 0.1) res.gemChance = 0.1;
-
-  return res;
 }
 
 export async function addWorkerUpgrade(
@@ -247,97 +245,78 @@ export async function addWorkerUpgrade(
 
 export async function evaluateWorker(userId: string, worker: Worker) {
   const userWorker = await getWorker(userId, worker);
+  return await evaluateWorkerWithStored(userId, worker, userWorker.stored);
+}
 
-  const { perItem, gemChance, scrapChance } = await calcWorkerValues(userWorker);
+export async function evaluateWorkerWithStored(userId: string, worker: Worker, stored: number) {
+  const { perItem, byproductChances } = await calcWorkerValues(await getWorker(userId, worker));
+  const byproductAmounts = {} as WorkerByproducts;
 
-  let amountEarned = Math.floor(perItem * userWorker.stored);
-  const byproducts = new Map<string, number>();
+  if (stored == 0) return { amountEarned: 0, byproductAmounts };
 
-  while (gemChance > 0 && percentChance(gemChance * userWorker.stored)) {
-    byproducts.set("gem_shard", byproducts.has("gem_shard") ? byproducts.get("gem_shard") + 1 : 1);
+  for (const byproduct in byproductChances) {
+    byproductChances[byproduct].chance *= worker.base.byproducts[byproduct].multiply_chance ? stored : 1;
+    byproductChances[byproduct].rolls *= worker.base.byproducts[byproduct].multiply_rolls ? stored : 1;
+    byproductChances[byproduct].rolls = randomRound(byproductChances[byproduct].rolls);
+    byproductAmounts[byproduct] = 0;
+    for (let i = 0; i < byproductChances[byproduct].rolls; i++) {
+      byproductAmounts[byproduct] += randomRound(byproductChances[byproduct].chance);
+    }
+    if (byproductAmounts[byproduct] <= 0) delete byproductAmounts[byproduct];
   }
 
-  while (scrapChance > 0 && percentChance(scrapChance * userWorker.stored)) {
-    byproducts.set(
-      "quarry_scrap",
-      byproducts.has("quarry_scrap") ? byproducts.get("quarry_scrap") + 1 : 1,
-    );
-  }
-
-  return { amountEarned, byproducts }
+  return { amountEarned: Math.floor(perItem * stored), byproductAmounts, perItem }
 }
 
 export async function claimFromWorkers(userId: string): Promise<string> {
   const baseWorkers = getBaseWorkers();
   const userWorkers = await getWorkers(userId);
+  const allItems = getItems();
 
-  let amountEarned = 0;
-  const earnedBreakdown: string[] = [];
-  const amounts = new Map<string, number>();
+  let totalAmountEarned = 0;
+  const moneyAmounts = new Map<string, { money: number, info: string }>();
+  const totalByproducts = new Map<string, number>();
 
   for (const worker of userWorkers) {
-    if (worker.stored == 0) continue;
+    let { amountEarned, byproductAmounts, perItem } = await evaluateWorker(userId, baseWorkers[worker.workerId]);
+    totalAmountEarned += amountEarned;
+
     const baseWorker = baseWorkers[worker.workerId];
-
-    const { perItem, gemChance, scrapChance } = await calcWorkerValues(worker);
-
-    amountEarned += Math.floor(perItem * worker.stored);
-
-    while (gemChance > 0 && percentChance(gemChance * worker.stored)) {
-      amounts.set("gem_scrap", amounts.has("gem_scrap") ? amounts.get("gem_scrap") + 1 : 1);
-      await addInventoryItem(worker.userId, "gem_shard", 1);
+    const infoLine = `${baseWorker.name} +$${Math.floor(perItem * worker.stored)
+      .toLocaleString()} (${worker.stored.toLocaleString()} ${baseWorker.item_emoji})`;
+    if(worker.stored > 0) {
+      moneyAmounts.set(worker.workerId, { money: perItem * worker.stored, info: infoLine });
     }
 
-    while (scrapChance > 0 && percentChance(scrapChance * worker.stored)) {
-      amounts.set(
-        "quarry_scrap",
-        amounts.has("quarry_scrap") ? amounts.get("quarry_scrap") + 1 : 1,
+    for (const byproduct in byproductAmounts) {
+      totalByproducts.set(byproduct,
+        (totalByproducts.has(byproduct) ? totalByproducts.get(byproduct) : 0) + byproductAmounts[byproduct]
       );
-      await addInventoryItem(worker.userId, "quarry_scrap", 1);
+      await addInventoryItem(worker.userId, byproduct, byproductAmounts[byproduct]);
     }
-
-    earnedBreakdown.push(
-      `${baseWorker.name} +$${Math.floor(
-        perItem * worker.stored,
-      ).toLocaleString()} (${worker.stored.toLocaleString()} ${baseWorker.item_emoji})`,
-    );
-    amounts.set(
-      `${baseWorker.name} +$${Math.floor(
-        perItem * worker.stored,
-      ).toLocaleString()} (${worker.stored.toLocaleString()} ${baseWorker.item_emoji})`,
-      perItem * worker.stored,
-    );
   }
 
-  inPlaceSort(earnedBreakdown).desc((x) => amounts.get(x));
-
-  if (amountEarned == 0) {
+  if (totalAmountEarned == 0 && totalByproducts.size == 0) {
     return "you have no money to claim from your workers";
   }
 
   await emptyWorkersStored(userId);
-  await addBalance(userId, amountEarned);
-  await addProgress(userId, "capitalist", amountEarned);
-  await addStat(userId, "earned-workers", amountEarned);
+  await addBalance(userId, totalAmountEarned);
+  await addProgress(userId, "capitalist", totalAmountEarned);
+  await addStat(userId, "earned-workers", totalAmountEarned);
 
-  const res = `+$**${amountEarned.toLocaleString()}**\n\n${earnedBreakdown.join("\n")}`;
-  const footer: string[] = [];
+  let workers = moneyAmounts.keys().toArray();
+  let byproducts = totalByproducts.keys().toArray();
+  inPlaceSort(workers).desc((x) => moneyAmounts.get(x).money);
+  inPlaceSort(byproducts).asc((x) => totalByproducts.get(x));
 
-  if (amounts.has("gem_scrap")) {
-    footer.push(
-      `you found **${amounts.get("gem_scrap")}** ${getItems()["gem_shard"].emoji} gem shard${
-        amounts.get("gem_scrap") > 1 ? "s" : ""
-      }`,
+  return `+$**${totalAmountEarned.toLocaleString()}**\n\n` +
+    `${workers
+      .map((x) => moneyAmounts.get(x).info)
+      .reduce((a, b) => [a, b].join("\n"))}` +
+    (byproducts.length == 0 ? "" :
+      `\n\n${byproducts
+        .map((x) => `you found **${totalByproducts.get(x)}** ${allItems[x].emoji} ${totalByproducts.get(x) > 1 ? allItems[x].plural : allItems[x].name}`)
+        .reduce((a, b) => [a, b].join("\n"))}`
     );
-  }
-
-  if (amounts.has("quarry_scrap")) {
-    footer.push(
-      `you found **${amounts.get("quarry_scrap")}** ${
-        getItems()["quarry_scrap"].emoji
-      } quarry scrap${amounts.get("quarry_scrap") > 1 ? "s" : ""}`,
-    );
-  }
-
-  return footer.length > 0 ? res + `\n\n${footer.join("\n")}` : res;
 }

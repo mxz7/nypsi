@@ -71,7 +71,7 @@ async function checkBoosters(member: string | GuildMember, boosters: Map<string,
             await redis.get(`${Constants.redis.nypsi.STEVE_EARNED}:${userId}`),
           );
 
-          if (!earned) earned = { money: 0, gemShards: 0, scraps: 0 };
+          if (!earned) earned = { money: 0, byproducts: {} };
 
           desc += `\`${expired.get(expiredBoosterId)}x\` ${items[expiredBoosterId].emoji} ${
             items[expiredBoosterId].name
@@ -79,20 +79,14 @@ async function checkBoosters(member: string | GuildMember, boosters: Map<string,
 
           const descOther: string[] = [];
 
-          if (earned.gemShards > 0) {
-            descOther.push(
-              `steve found **${earned.gemShards}x** ${getItems()["gem_shard"].emoji} ${
-                getItems()["gem_shard"].name
-              }`,
-            );
-          }
-
-          if (earned.scraps > 0) {
-            descOther.push(
-              `steve found **${earned.scraps}x** ${getItems()["quarry_scrap"].emoji} ${
-                getItems()["quarry_scrap"].name
-              }`,
-            );
+          for (const byproduct in earned.byproducts) {
+            if (earned.byproducts[byproduct] > 0) {
+              descOther.push(
+                `steve found **${earned.byproducts[byproduct]}x** ${getItems()[byproduct].emoji} ${
+                  getItems()[byproduct].name
+                }`,
+              );
+            }
           }
 
           if (descOther.length > 0) desc += `\n${descOther.join("\n")}\n\n`;

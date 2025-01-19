@@ -17,7 +17,7 @@ import {
 import { inPlaceSort } from "fast-sort";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { Worker } from "../types/Workers";
+import { Worker, WorkerByproducts } from "../types/Workers";
 import { getBalance, removeBalance } from "../utils/functions/economy/balance";
 import { getBoosters } from "../utils/functions/economy/boosters";
 import { getLevel, getPrestige, getRawLevel } from "../utils/functions/economy/levelling";
@@ -609,19 +609,19 @@ async function run(
     } else if (args[1]?.toLowerCase() == "value") {
       if (!(worker && value)) return message.channel.send({ embeds: [debugInfoEmbed] });
       let totalEarned = 0;
-      let totalByproducts = new Map<string, number>();
+      let totalByproducts = {} as WorkerByproducts;
       let byproductsDescription = "";
       for(let i = 0; i < value; i++) {
-        const { amountEarned, byproducts } = await evaluateWorker(message.author.id, worker);
+        const { amountEarned, byproductAmounts } = await evaluateWorker(message.author.id, worker);
         totalEarned += amountEarned;
-        for(let byproduct of byproducts.keys()) {
-          if(!totalByproducts.has(byproduct)) totalByproducts.set(byproduct, 0);
-          totalByproducts.set(byproduct, totalByproducts.get(byproduct) + byproducts.get(byproduct));
+        for(const byproduct in byproductAmounts) {
+          if(totalByproducts[byproduct] == undefined) totalByproducts[byproduct] = 0;
+          totalByproducts[byproduct] += byproductAmounts[byproduct];
         }
       }
-      for(let byproduct of totalByproducts.keys()) {
+      for(const byproduct in totalByproducts) {
         let item = getItems()[byproduct];
-        let amount = totalByproducts.get(byproduct);
+        let amount = totalByproducts[byproduct];
         byproductsDescription += `\n  **${(amount/value).toFixed(3)}** ${item.emoji} ${amount === value ? item.name : item.plural}`;
       }
       return message.channel.send({ embeds: [
