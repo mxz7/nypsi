@@ -234,7 +234,7 @@ async function run(
           const banned: string[] = [];
 
           for (const id of accountIds) {
-            if (await message.guild.bans.fetch(id).catch(() => null)) {
+            if (await message.guild.bans.fetch(id).catch(() => {})) {
               banned.push(id);
             }
           }
