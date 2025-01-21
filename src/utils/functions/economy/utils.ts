@@ -232,7 +232,7 @@ export async function formatBet(
   bet: string | number,
   member: GuildMember | string,
   maxBet?: number,
-): Promise<number | void> {
+): Promise<number | null> {
   if (!maxBet) maxBet = await calcMaxBet(member);
 
   bet = bet.toString().toLowerCase();
