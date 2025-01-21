@@ -207,11 +207,13 @@ async function run(
             },
           });
 
-          await newMute(
-            message.guild,
-            accountIds.filter((i) => !muted.includes(i)),
-            query.expire,
-          );
+          if (query) {
+            await newMute(
+              message.guild,
+              accountIds.filter((i) => !muted.includes(i)),
+              query.expire,
+            );
+          }
 
           for (const id of accountIds.filter((i) => !muted.includes(i))) {
             const member = await message.guild.members.fetch(id).catch(() => {});
