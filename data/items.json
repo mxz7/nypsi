@@ -2131,8 +2131,8 @@
       "id:blue_gem:0.5",
       "id:lucky_cheese:5",
       "id:reroll_token:0.05",
-      "id:banana_seed:7",
-      "id:fertiliser",
+      "id:banana_seed:1",
+      "id:fertiliser:75",
       "id:toe:10"
     ]
   },
@@ -2313,8 +2313,8 @@
       "id:quarry_scrap:3",
       "id:big_tiddy_goth_gf:20",
       "id:69420_crate:40",
-      "id:banana_seed:5",
-      "id:fertiliser:80",
+      "id:banana_seed:1",
+      "id:fertiliser:45",
       "id:toe:50"
     ]
   },
