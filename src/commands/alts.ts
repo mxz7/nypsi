@@ -34,6 +34,7 @@ import { getMuteRole, isMuted, newMute } from "../utils/functions/moderation/mut
 
 import { getLastKnownAvatar, getLastKnownUsername } from "../utils/functions/users/tag";
 import { getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { logger } from "../utils/logger";
 import ms = require("ms");
 
 const cmd = new Command("alts", "view a user's alts", "moderation")
@@ -234,7 +235,10 @@ async function run(
           const banned: string[] = [];
 
           for (const id of accountIds) {
-            if (await message.guild.bans.fetch(id).catch(() => {})) {
+            const ban = await message.guild.bans.fetch(id).catch(() => {});
+            if (ban) {
+              console.log(ban);
+              logger.debug(`${id} is banned`);
               banned.push(id);
             }
           }
