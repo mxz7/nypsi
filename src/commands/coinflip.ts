@@ -129,10 +129,17 @@ async function run(
         !player2Inventory.find((i) => i.item === item.id) ||
         player2Inventory.find((i) => i.item === item.id).amount < itemAmount
       ) {
+        await addInventoryItem(player1, item.id, itemAmount);
         return response.editReply({
           embeds: [new ErrorEmbed(`${player2.user.toString()} does not have enough ${item.name}`)],
         });
       }
+
+      await setInventoryItem(
+        player2,
+        item.id,
+        player2Inventory.find((i) => i.item === item.id).amount - itemAmount,
+      );
     }
 
     // its big to make sure that theres little to no deviation in chance cus of rounding
