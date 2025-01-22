@@ -34,7 +34,6 @@ import { getMuteRole, isMuted, newMute } from "../utils/functions/moderation/mut
 
 import { getLastKnownAvatar, getLastKnownUsername } from "../utils/functions/users/tag";
 import { getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { logger } from "../utils/logger";
 import ms = require("ms");
 
 const cmd = new Command("alts", "view a user's alts", "moderation")
@@ -199,35 +198,37 @@ async function run(
             }
           }
 
-          const query = await prisma.moderationMute.findFirst({
-            where: {
-              AND: [{ guildId: message.guild.id }, { userId: { in: muted } }],
-            },
-            select: {
-              expire: true,
-            },
-          });
+          if (muted.length > 0) {
+            const query = await prisma.moderationMute.findFirst({
+              where: {
+                AND: [{ guildId: message.guild.id }, { userId: { in: muted } }],
+              },
+              select: {
+                expire: true,
+              },
+            });
 
-          if (query) {
-            await newMute(
-              message.guild,
-              accountIds.filter((i) => !muted.includes(i)),
-              query.expire,
-            );
-          }
+            if (query) {
+              await newMute(
+                message.guild,
+                accountIds.filter((i) => !muted.includes(i)),
+                query.expire,
+              );
+            }
 
-          for (const id of accountIds.filter((i) => !muted.includes(i))) {
-            const member = await message.guild.members.fetch(id).catch(() => {});
+            for (const id of accountIds.filter((i) => !muted.includes(i))) {
+              const member = await message.guild.members.fetch(id).catch(() => {});
 
-            if (member) {
-              const muteRole = await getMuteRole(message.guild);
+              if (member) {
+                const muteRole = await getMuteRole(message.guild);
 
-              if (muteRole === "timeout") {
-                let time = query.expire.getTime() - Date.now();
-                if (time > ms("28 days")) time = ms("28 days");
-                await member.timeout(time, "in group of muted accounts");
-              } else {
-                await member.roles.add(muteRole).catch(() => {});
+                if (muteRole === "timeout") {
+                  let time = query.expire.getTime() - Date.now();
+                  if (time > ms("28 days")) time = ms("28 days");
+                  await member.timeout(time, "in group of muted accounts");
+                } else {
+                  await member.roles.add(muteRole).catch(() => {});
+                }
               }
             }
           }
@@ -237,33 +238,33 @@ async function run(
           for (const id of accountIds) {
             const ban = await message.guild.bans.fetch(id).catch(() => {});
             if (ban) {
-              console.log(ban);
-              logger.debug(`${id} is banned`);
               banned.push(id);
             }
           }
 
-          const banQuery = await prisma.moderationBan.findFirst({
-            where: {
-              AND: [{ guildId: message.guild.id }, { userId: { in: banned } }],
-            },
-            select: {
-              expire: true,
-            },
-          });
+          if (banned.length > 0) {
+            const banQuery = await prisma.moderationBan.findFirst({
+              where: {
+                AND: [{ guildId: message.guild.id }, { userId: { in: banned } }],
+              },
+              select: {
+                expire: true,
+              },
+            });
 
-          if (banQuery) {
-            await newBan(
-              message.guild,
-              accountIds.filter((i) => !banned.includes(i)),
-              banQuery.expire,
-            );
-          }
+            if (banQuery) {
+              await newBan(
+                message.guild,
+                accountIds.filter((i) => !banned.includes(i)),
+                banQuery.expire,
+              );
+            }
 
-          for (const id of accountIds.filter((i) => !banned.includes(i))) {
-            await message.guild.bans
-              .create(id, { reason: "in group of banned accounts" })
-              .catch(() => {});
+            for (const id of accountIds.filter((i) => !banned.includes(i))) {
+              await message.guild.bans
+                .create(id, { reason: "in group of banned accounts" })
+                .catch(() => {});
+            }
           }
         }
       } else {
