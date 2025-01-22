@@ -321,6 +321,9 @@ async function run(
   }
 
   if (!bet && !item) {
+    if (args.length === 1) {
+      return send({ embeds: [new ErrorEmbed("$coinflip (user) <bet>")] });
+    }
     bet = await formatBet(args[1], message.member, memberMaxBet);
 
     if (bet <= 0) bet = undefined;
