@@ -8,14 +8,28 @@ import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { getRawLevel } from "../economy/levelling";
 import { isEcoBanned } from "../economy/utils";
+import sleep from "../sleep";
 import { addNewAvatar, addNewUsername, fetchUsernameHistory, isTracking } from "./history";
 import { getLastKnownAvatar, getLastKnownUsername } from "./tag";
 import ms = require("ms");
 
 export const recentCommands = new Map<string, number>();
 
-setInterval(() => {
+setInterval(async () => {
   logger.debug(`recent commands size: ${recentCommands.size}`);
+
+  let count = 0;
+
+  for (const [key, value] of recentCommands.entries()) {
+    await sleep(10);
+
+    if (Date.now() - value > ms("10 days")) {
+      recentCommands.delete(key);
+      count++;
+    }
+  }
+
+  if (count > 0) logger.debug(`${count} deleted from recent commands`);
 }, ms("1 hour"));
 
 export async function getLastCommand(member: GuildMember | string): Promise<Date> {
