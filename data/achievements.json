@@ -1242,6 +1242,46 @@
     "description": "earn $1,000,000,000 from your workers",
     "prize": ["nypsi_crate:1", "legendary_scratch_card:1", "earth_scanner:1"]
   },
+  "super_capitalist_i": {
+    "id": "super_capitalist_i",
+    "name": "super capitalist **I**",
+    "emoji": "👷🏻‍♂️",
+    "target": 5000000000,
+    "description": "earn $1,000,000,000 from your workers",
+    "prize": ["lucky_scratch_card:1"]
+  },
+  "super_capitalist_ii": {
+    "id": "super_capitalist_ii",
+    "name": "super capitalist **II**",
+    "emoji": "👷🏻‍♂️",
+    "target": 15000000000,
+    "description": "earn $15,000,000,000 from your workers",
+    "prize": ["lucky_scratch_card:3"]
+  },
+  "super_capitalist_iii": {
+    "id": "super_capitalist_iii",
+    "name": "super capitalist **III**",
+    "emoji": "👷🏻‍♂️",
+    "target": 50000000000,
+    "description": "earn $50,000,000,000 from your workers",
+    "prize": ["lucky_scratch_card:3", "nypsi_crate:1"]
+  },
+  "super_capitalist_iv": {
+    "id": "super_capitalist_iv",
+    "name": "super capitalist **IV**",
+    "emoji": "👷🏻‍♂️",
+    "target": 75000000000,
+    "description": "earn $75,000,000,000 from your workers",
+    "prize": ["lucky_scratch_card:3", "nypsi_crate:2"]
+  },
+  "super_capitalist_v": {
+    "id": "super_capitalist_v",
+    "name": "super capitalist **V**",
+    "emoji": "👷🏻‍♂️",
+    "target": 100000000000,
+    "description": "earn $100,000,000,000 from your workers",
+    "prize": ["legendary_scratch_card:2", "nypsi_crate:3", "tag:cupcake"]
+  },
   "discordian_i": {
     "id": "discordian_i",
     "name": "discordian **I**",
