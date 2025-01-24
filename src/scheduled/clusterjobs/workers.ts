@@ -92,6 +92,7 @@ async function doWorkerThing() {
 
       await addBalance(worker.userId, earned);
       await addProgress(worker.userId, "capitalist", earned);
+      await addProgress(worker.userId, "super_capitalist", earned);
       await addStat(worker.userId, "earned-workers", earned);
 
       steveStorage.money += earned;

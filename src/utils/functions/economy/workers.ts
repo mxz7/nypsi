@@ -274,6 +274,7 @@ export async function claimFromWorkers(userId: string): Promise<string> {
   await emptyWorkersStored(userId);
   await addBalance(userId, amountEarned);
   await addProgress(userId, "capitalist", amountEarned);
+  await addProgress(userId, "super_capitalist", amountEarned);
   await addStat(userId, "earned-workers", amountEarned);
 
   const res = `+$**${amountEarned.toLocaleString()}**\n\n${earnedBreakdown.join("\n")}`;
