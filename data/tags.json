@@ -220,5 +220,11 @@
     "name": "farmer",
     "description": "found in the green fingers achievement",
     "emoji": "🌱"
+  },
+  "capitalist": {
+    "id": "capitalist",
+    "name": "capitalist",
+    "description": "found in the super capitalist achievement",
+    "emoji": "👷🏻‍♂️"
   }
 }

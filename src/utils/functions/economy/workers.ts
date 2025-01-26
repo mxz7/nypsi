@@ -303,6 +303,7 @@ export async function claimFromWorkers(userId: string): Promise<string> {
   await emptyWorkersStored(userId);
   await addBalance(userId, totalAmountEarned);
   await addProgress(userId, "capitalist", totalAmountEarned);
+  await addProgress(userId, "super_capitalist", totalAmountEarned);
   await addStat(userId, "earned-workers", totalAmountEarned);
 
   let workers = moneyAmounts.keys().toArray();

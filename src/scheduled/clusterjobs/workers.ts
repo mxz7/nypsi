@@ -87,6 +87,7 @@ async function doWorkerThing() {
 
       await addBalance(worker.userId, amountEarned);
       await addProgress(worker.userId, "capitalist", amountEarned);
+      await addProgress(worker.userId, "super_capitalist", amountEarned);
       await addStat(worker.userId, "earned-workers", amountEarned);
 
       for (const byproduct in byproductAmounts) {

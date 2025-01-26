@@ -1,6 +1,6 @@
 {
   "name": "nypsi",
-  "version": "9.1.0",
+  "version": "9.2.0",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
@@ -12,7 +12,7 @@
   "author": "mxz7",
   "license": "ISC",
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.726.1",
+    "@aws-sdk/client-s3": "^3.729.0",
     "@catppuccin/palette": "1.7.1",
     "@discordjs/rest": "2.4.2",
     "@prisma/client": "6.2.1",
@@ -47,7 +47,7 @@
     "@types/jest": "^29.5.14",
     "@types/lodash": "4.17.14",
     "@types/ms": "0.7.34",
-    "@types/node": "22.10.6",
+    "@types/node": "22.10.8",
     "@types/node-os-utils": "1.3.4",
     "@types/string-similarity": "4.0.2",
     "@types/urban-dictionary": "3.0.2",

@@ -13,12 +13,19 @@ import {
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import { Item } from "../types/Economy";
 import {
   addBalance,
   calcMaxBet,
   getBalance,
   removeBalance,
 } from "../utils/functions/economy/balance";
+import {
+  addInventoryItem,
+  getInventory,
+  selectItem,
+  setInventoryItem,
+} from "../utils/functions/economy/inventory";
 import { createGame } from "../utils/functions/economy/stats";
 import { createUser, formatBet, isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { getMember } from "../utils/functions/member.js";
@@ -97,17 +104,43 @@ async function run(
   const doGame = async (
     player1: GuildMember,
     player2: GuildMember,
-    bet: number,
+    type: "money" | "item",
     response: ButtonInteraction,
+    bet?: number,
+    item?: Item,
+    itemAmount?: number,
   ) => {
-    if (bet > (await getBalance(player2))) {
-      await addBalance(player1.user.id, bet);
-      return response.editReply({
-        embeds: [new ErrorEmbed(`${player2.user.toString()} cannot afford this bet`)],
-      });
-    }
+    const [player1Inventory, player2Inventory] = await Promise.all([
+      getInventory(player1),
+      getInventory(player2),
+    ]);
 
-    await removeBalance(player2, bet);
+    if (type === "money") {
+      if (bet > (await getBalance(player2))) {
+        await addBalance(player1.user.id, bet);
+        return response.editReply({
+          embeds: [new ErrorEmbed(`${player2.user.toString()} cannot afford this bet`)],
+        });
+      }
+
+      await removeBalance(player2, bet);
+    } else {
+      if (
+        !player2Inventory.find((i) => i.item === item.id) ||
+        player2Inventory.find((i) => i.item === item.id).amount < itemAmount
+      ) {
+        await addInventoryItem(player1, item.id, itemAmount);
+        return response.editReply({
+          embeds: [new ErrorEmbed(`${player2.user.toString()} does not have enough ${item.name}`)],
+        });
+      }
+
+      await setInventoryItem(
+        player2,
+        item.id,
+        player2Inventory.find((i) => i.item === item.id).amount - itemAmount,
+      );
+    }
 
     // its big to make sure that theres little to no deviation in chance cus of rounding
     const lols = [
@@ -154,75 +187,164 @@ async function run(
       loser = player1;
     }
 
-    let winnings = bet * 2;
-    let tax = 0;
+    const embed = new CustomEmbed(message.member).setHeader("coinflip");
 
-    if (winnings > 1_000_000 && !(await isPremium(winner.user.id))) {
-      tax = await getTax();
-
-      const taxed = Math.floor(winnings * tax);
-      await addToNypsiBank(taxed * 0.5);
-      winnings -= taxed;
+    if (type === "money") {
+      embed.setDescription(`*throwing..*\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}`);
+    } else {
+      embed.setDescription(
+        `*throwing..*\n\n${thingy}\n\n` +
+          `**bet** ${itemAmount.toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/item/${item.id})**`,
+      );
     }
-
-    const id = await createGame({
-      userId: message.author.id,
-      bet: bet,
-      game: "coinflip",
-      outcome: `**winner** ${winner.user.username}\n**loser** ${loser.user.username}`,
-      result: winner.user.id == message.author.id ? "win" : "lose",
-      earned: winner.user.id == message.author.id ? winnings : null,
-    });
-
-    await createGame({
-      userId: player2.user.id,
-      bet: bet,
-      game: "coinflip",
-      outcome: `**winner** ${winner.user.username}\n**loser** ${loser.user.username}`,
-      result: winner.user.id == player2.user.id ? "win" : "lose",
-      earned: winner.user.id == player2.user.id ? winnings : null,
-    });
-
-    gamble(winner.user, "coinflip", bet, "win", id, bet * 2);
-    gamble(loser.user, "coinflip", bet, "lose", id);
-
-    await addBalance(winner, winnings);
-
-    const embed = new CustomEmbed(
-      message.member,
-      `*throwing..*\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}`,
-    ).setHeader("coinflip");
 
     const msg = await response.editReply({ embeds: [embed] });
 
-    if (winner == message.member) {
-      thingy = `**${message.author.username}** +$${winnings.toLocaleString()}${
-        tax ? ` (${(tax * 100).toFixed(1)}% tax)` : ""
-      }\n${player2.user.username}`;
-    } else {
-      thingy = `${message.author.username}\n**${
-        player2.user.username
-      }** +$${winnings.toLocaleString()}${tax ? ` (${(tax * 100).toFixed(1)}% tax)` : ""}`;
-    }
+    if (type === "money") {
+      let winnings = bet * 2;
+      let tax = 0;
 
-    embed.setDescription(
-      `**winner** ${winner.user.username}\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}`,
-    );
-    embed.setColor(winner.displayHexColor);
-    embed.setFooter({ text: `id: ${id}` });
+      if (winnings > 1_000_000 && !(await isPremium(winner.user.id))) {
+        tax = await getTax();
+
+        const taxed = Math.floor(winnings * tax);
+        await addToNypsiBank(taxed * 0.5);
+        winnings -= taxed;
+      }
+
+      const id = await createGame({
+        userId: message.author.id,
+        bet: bet,
+        game: "coinflip",
+        outcome: `**winner** ${winner.user.username}\n**loser** ${loser.user.username}`,
+        result: winner.user.id == message.author.id ? "win" : "lose",
+        earned: winner.user.id == message.author.id ? winnings : null,
+      });
+
+      await createGame({
+        userId: player2.user.id,
+        bet: bet,
+        game: "coinflip",
+        outcome: `**winner** ${winner.user.username}\n**loser** ${loser.user.username}`,
+        result: winner.user.id == player2.user.id ? "win" : "lose",
+        earned: winner.user.id == player2.user.id ? winnings : null,
+      });
+
+      gamble(winner.user, "coinflip", bet, "win", id, bet * 2);
+      gamble(loser.user, "coinflip", bet, "lose", id);
+
+      await addBalance(winner, winnings);
+
+      if (winner == message.member) {
+        thingy = `**${message.author.username}** +$${winnings.toLocaleString()}${
+          tax ? ` (${(tax * 100).toFixed(1)}% tax)` : ""
+        }\n${player2.user.username}`;
+      } else {
+        thingy = `${message.author.username}\n**${
+          player2.user.username
+        }** +$${winnings.toLocaleString()}${tax ? ` (${(tax * 100).toFixed(1)}% tax)` : ""}`;
+      }
+
+      embed.setDescription(
+        `**winner** ${winner.user.username}\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}`,
+      );
+      embed.setColor(winner.displayHexColor);
+      embed.setFooter({ text: `id: ${id}` });
+    } else {
+      const id = await createGame({
+        userId: message.author.id,
+        bet: 0,
+        game: "coinflip",
+        outcome: `**winner** ${winner.user.username}\n**loser** ${loser.user.username} (${itemAmount}x ${item.id})`,
+        result: winner.user.id == message.author.id ? "win" : "lose",
+        earned: 0,
+        xp: 0,
+      });
+
+      await createGame({
+        userId: player2.user.id,
+        bet: 0,
+        game: "coinflip",
+        outcome: `**winner** ${winner.user.username}\n**loser** ${loser.user.username} (${itemAmount}x ${item.id})`,
+        result: winner.user.id == player2.user.id ? "win" : "lose",
+      });
+
+      gamble(winner.user, "coinflip", 0, "win", id, 0);
+      gamble(loser.user, "coinflip", 0, "lose", id);
+
+      await addInventoryItem(winner, item.id, itemAmount * 2);
+
+      if (winner == message.member) {
+        thingy = `**${message.author.username}** +${(itemAmount * 2).toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/item/${item.id})**\n${player2.user.username}`;
+      } else {
+        thingy = `${message.author.username}\n**${
+          player2.user.username
+        }** +${(itemAmount * 2).toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/item/${item.id})**`;
+      }
+
+      embed.setDescription(
+        `**winner** ${winner.user.username}\n\n${thingy}\n\n**bet** ${itemAmount.toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/item/${item.id})**`,
+      );
+      embed.setColor(winner.displayHexColor);
+      embed.setFooter({ text: `id: ${id}` });
+    }
 
     setTimeout(() => {
       return msg.edit({ embeds: [embed] });
     }, 2000);
   };
 
-  if (args.length == 2) {
-    const target = await getMember(message.guild, args[0]);
+  const memberMaxBet = (await calcMaxBet(message.member)) * 10;
 
-    if (!target) {
-      return send({ embeds: [new ErrorEmbed("unable to find that member")] });
+  let bet: number;
+  let item: Item;
+  let itemAmount: number;
+  let target: GuildMember;
+
+  bet = await formatBet(args[0], message.member, memberMaxBet);
+
+  if (!bet || isNaN(bet)) {
+    item = selectItem(args[0].toLowerCase());
+
+    if (item) {
+      itemAmount = parseInt(args[1] || "1");
+      if (isNaN(itemAmount)) {
+        itemAmount = 1;
+      }
+    } else {
+      target = await getMember(message.guild, args[0]);
     }
+  }
 
+  if (!bet && !item && !target) {
+    return send({ embeds: [new ErrorEmbed("$coinflip (user) <bet>")] });
+  }
+
+  if (!bet && !item) {
+    if (args.length === 1) {
+      return send({ embeds: [new ErrorEmbed("$coinflip (user) <bet>")] });
+    }
+    bet = await formatBet(args[1], message.member, memberMaxBet);
+
+    if (bet <= 0) bet = undefined;
+
+    if (!bet || isNaN(bet)) {
+      item = selectItem(args[1].toLowerCase());
+
+      if (item) {
+        itemAmount = parseInt(args[2] || "1");
+        if (isNaN(itemAmount) || itemAmount <= 0) {
+          itemAmount = 1;
+        }
+      }
+    }
+  }
+
+  if (!bet && !item) {
+    return send({ embeds: [new ErrorEmbed("$coinflip (user) <bet>")] });
+  }
+
+  if (target) {
     if (message.member == target) {
       return send({ embeds: [new ErrorEmbed("invalid user")] });
     }
@@ -246,42 +368,73 @@ async function run(
 
     if (!(await userExists(target))) await createUser(target);
 
-    const memberMaxBet = (await calcMaxBet(message.member)) * 10;
-    const targetMaxBet = (await calcMaxBet(target)) * 10;
+    const requestEmbed = new CustomEmbed(message.member).setFooter({
+      text: "expires in 60 seconds",
+    });
 
-    const bet = await formatBet(args[1], message.member, memberMaxBet);
+    if (bet) {
+      const targetMaxBet = (await calcMaxBet(target)) * 10;
 
-    if (!bet) {
-      return send({ embeds: [new ErrorEmbed("invalid bet")] });
+      if (bet > (await getBalance(message.member))) {
+        return send({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
+      }
+
+      if (bet > (await getBalance(target))) {
+        return send({
+          embeds: [new ErrorEmbed(`**${target.user.username}** cannot afford this bet`)],
+        });
+      }
+
+      if (bet > memberMaxBet)
+        return send({
+          embeds: [new ErrorEmbed(`your max bet is $**${memberMaxBet.toLocaleString()}**`)],
+        });
+
+      if (bet > targetMaxBet)
+        return send({
+          embeds: [new ErrorEmbed(`their max bet is $**${targetMaxBet.toLocaleString()}**`)],
+        });
+
+      await removeBalance(message.member, bet);
+      requestEmbed.setDescription(
+        `**${
+          message.author.username
+        }** has challenged you to a coinflip\n\n**bet** $${bet.toLocaleString()}\n\ndo you accept?`,
+      );
+    } else {
+      const userInventory = await getInventory(message.author.id);
+      const targetInventory = await getInventory(target);
+
+      if (
+        !userInventory.find((i) => i.item === item.id) ||
+        userInventory.find((i) => i.item === item.id).amount < itemAmount
+      ) {
+        return send({
+          embeds: [new ErrorEmbed(`you don't have enough ${item.name}`)],
+        });
+      }
+
+      if (
+        !targetInventory.find((i) => i.item === item.id) ||
+        targetInventory.find((i) => i.item === item.id).amount < itemAmount
+      ) {
+        return send({
+          embeds: [new ErrorEmbed(`**${target.user.username}** doesn't have enough ${item.name}`)],
+        });
+      }
+
+      await setInventoryItem(
+        message.member,
+        item.id,
+        userInventory.find((i) => i.item === item.id).amount - itemAmount,
+      );
+
+      requestEmbed.setDescription(
+        `**${
+          message.author.username
+        }** has challenged you to a coinflip\n\n**bet** ${itemAmount}x ${item.emoji} **[${item.name}](https://nypsi.xyz/item/${item.id})**\n\ndo you accept?`,
+      );
     }
-
-    if (isNaN(bet)) {
-      return send({ embeds: [new ErrorEmbed("invalid bet")] });
-    }
-
-    if (bet <= 0) {
-      return send({ embeds: [new ErrorEmbed("/coinflip user bet")] });
-    }
-
-    if (bet > (await getBalance(message.member))) {
-      return send({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
-    }
-
-    if (bet > (await getBalance(target))) {
-      return send({
-        embeds: [new ErrorEmbed(`**${target.user.username}** cannot afford this bet`)],
-      });
-    }
-
-    if (bet > memberMaxBet)
-      return send({
-        embeds: [new ErrorEmbed(`your max bet is $**${memberMaxBet.toLocaleString()}**`)],
-      });
-
-    if (bet > targetMaxBet)
-      return send({
-        embeds: [new ErrorEmbed(`their max bet is $**${targetMaxBet.toLocaleString()}**`)],
-      });
 
     await addCooldown(cmd.name, message.member, 10);
     playing.add(message.author.id);
@@ -289,7 +442,6 @@ async function run(
       if (playing.has(message.author.id)) playing.delete(message.author.id);
     }, 120000);
 
-    await removeBalance(message.member, bet);
     let cancelled = false;
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -297,15 +449,8 @@ async function run(
       new ButtonBuilder().setCustomId("n").setLabel("deny").setStyle(ButtonStyle.Danger),
     );
 
-    const requestEmbed = new CustomEmbed(
-      message.member,
-      `**${
-        message.author.username
-      }** has challenged you to a coinflip\n\n**bet** $${bet.toLocaleString()}\n\ndo you accept?`,
-    ).setFooter({ text: "expires in 60 seconds" });
-
     const msg = await send({
-      content: `${target.user.toString()} you have been invited to a coinflip worth $${bet.toLocaleString()}`,
+      content: `${target.user.toString()} you have been invited to a coinflip`,
       embeds: [requestEmbed],
       components: [row],
     });
@@ -326,17 +471,33 @@ async function run(
       .catch(async () => {
         fail = true;
         playing.delete(message.author.id);
-        if (!cancelled) await addBalance(message.member, bet);
+        if (!cancelled) {
+          if (bet) await addBalance(message.member, bet);
+          else await addInventoryItem(message.member, item.id, itemAmount);
+        }
         msg.edit({ components: [] });
       });
 
     if (fail || !response) return;
 
     if (response.customId == "y") {
-      return doGame(message.member, target, bet, response as ButtonInteraction);
+      if (bet) {
+        return doGame(message.member, target, "money", response as ButtonInteraction, bet);
+      } else {
+        return doGame(
+          message.member,
+          target,
+          "item",
+          response as ButtonInteraction,
+          null,
+          item,
+          itemAmount,
+        );
+      }
     } else {
       cancelled = true;
-      await addBalance(message.member, bet);
+      if (bet) await addBalance(message.member, bet);
+      else await addInventoryItem(message.member, item.id, itemAmount);
       if (message.author.id === response.user.id) {
         response.editReply({
           embeds: [new CustomEmbed(message.member, "✅ coinflip request cancelled")],
@@ -345,30 +506,64 @@ async function run(
         response.editReply({ embeds: [new CustomEmbed(target, "✅ coinflip request denied")] });
       }
     }
-  } else if (args.length == 1) {
-    const memberMaxBet = (await calcMaxBet(message.member)) * 10;
-    const bet = await formatBet(args[0], message.member, memberMaxBet);
+  } else {
+    const requestEmbed = new CustomEmbed(message.member).setFooter({
+      text: "expires in 60 seconds",
+    });
 
-    if (!bet) {
-      return send({ embeds: [new ErrorEmbed("invalid bet")] });
+    if (bet) {
+      if (!bet) {
+        return send({ embeds: [new ErrorEmbed("invalid bet")] });
+      }
+
+      if (isNaN(bet)) {
+        return send({ embeds: [new ErrorEmbed("invalid bet")] });
+      }
+
+      if (bet <= 0) {
+        return send({ embeds: [new ErrorEmbed("/coinflip user bet")] });
+      }
+
+      if (bet > (await getBalance(message.member))) {
+        return send({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
+      }
+
+      if (bet > memberMaxBet)
+        return send({
+          embeds: [new ErrorEmbed(`your max bet is $**${memberMaxBet.toLocaleString()}**`)],
+        });
+
+      await removeBalance(message.member, bet);
+
+      requestEmbed.setDescription(
+        `**${
+          message.author.username
+        }** has created an open coinflip\n\n**bet** $${bet.toLocaleString()}`,
+      );
+    } else {
+      const userInventory = await getInventory(message.author.id);
+
+      if (
+        !userInventory.find((i) => i.item === item.id) ||
+        userInventory.find((i) => i.item === item.id).amount < itemAmount
+      ) {
+        return send({
+          embeds: [new ErrorEmbed(`you don't have enough ${item.name}`)],
+        });
+      }
+
+      await setInventoryItem(
+        message.member,
+        item.id,
+        userInventory.find((i) => i.item === item.id).amount - itemAmount,
+      );
+
+      requestEmbed.setDescription(
+        `**${
+          message.author.username
+        }** has created an open coinflip\n\n**bet** ${itemAmount}x ${item.emoji} **[${item.name}](https://nypsi.xyz/item/${item.id})**`,
+      );
     }
-
-    if (isNaN(bet)) {
-      return send({ embeds: [new ErrorEmbed("invalid bet")] });
-    }
-
-    if (bet <= 0) {
-      return send({ embeds: [new ErrorEmbed("/coinflip user bet")] });
-    }
-
-    if (bet > (await getBalance(message.member))) {
-      return send({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
-    }
-
-    if (bet > memberMaxBet)
-      return send({
-        embeds: [new ErrorEmbed(`your max bet is $**${memberMaxBet.toLocaleString()}**`)],
-      });
 
     await addCooldown(cmd.name, message.member, 10);
     playing.add(message.author.id);
@@ -376,20 +571,12 @@ async function run(
       if (playing.has(message.author.id)) playing.delete(message.author.id);
     }, 120000);
 
-    await removeBalance(message.member, bet);
     let cancelled = false;
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder().setCustomId("y").setLabel("play").setStyle(ButtonStyle.Success),
       new ButtonBuilder().setCustomId("n").setLabel("cancel").setStyle(ButtonStyle.Danger),
     );
-
-    const requestEmbed = new CustomEmbed(
-      message.member,
-      `**${
-        message.author.username
-      }** has created an open coinflip\n\n**bet** $${bet.toLocaleString()}`,
-    ).setFooter({ text: "expires in 60 seconds" });
 
     const msg = await send({
       embeds: [requestEmbed],
@@ -405,7 +592,7 @@ async function run(
         return false;
       }
 
-      if (!(await userExists(i.user.id)) || (await getBalance(i.user.id)) < bet) {
+      if (!(await userExists(i.user.id))) {
         if (i.isRepliable())
           await i.reply({
             ephemeral: true,
@@ -414,18 +601,43 @@ async function run(
         return false;
       }
 
-      if ((await calcMaxBet(i.user.id)) * 10 < bet) {
-        if (i.isRepliable())
-          i.reply({
-            embeds: [
-              new ErrorEmbed(
-                `your max bet is $**${((await calcMaxBet(i.user.id)) * 10).toLocaleString()}**`,
-              ),
-            ],
-            ephemeral: true,
-          });
+      if (bet) {
+        if ((await getBalance(i.user.id)) < bet) {
+          if (i.isRepliable())
+            i.reply({
+              embeds: [new ErrorEmbed("you cannot afford this bet")],
+              ephemeral: true,
+            });
+          return false;
+        }
 
-        return false;
+        if ((await calcMaxBet(i.user.id)) * 10 < bet) {
+          if (i.isRepliable())
+            i.reply({
+              embeds: [
+                new ErrorEmbed(
+                  `your max bet is $**${((await calcMaxBet(i.user.id)) * 10).toLocaleString()}**`,
+                ),
+              ],
+              ephemeral: true,
+            });
+
+          return false;
+        }
+      } else {
+        const inventory = await getInventory(i.user.id);
+
+        if (
+          !inventory.find((i) => i.item === item.id) ||
+          inventory.find((i) => i.item === item.id).amount < itemAmount
+        ) {
+          if (i.isRepliable())
+            i.reply({
+              embeds: [new ErrorEmbed(`you don't have enough ${item.name}`)],
+              ephemeral: true,
+            });
+          return false;
+        }
       }
 
       return true;
@@ -443,7 +655,10 @@ async function run(
       .catch(async () => {
         fail = true;
         playing.delete(message.author.id);
-        if (!cancelled) await addBalance(message.member, bet);
+        if (!cancelled) {
+          if (bet) await addBalance(message.member, bet);
+          else await addInventoryItem(message.member, item.id, itemAmount);
+        }
         msg.edit({ components: [] });
       });
 
@@ -454,10 +669,23 @@ async function run(
     if (!target) return message.channel.send({ embeds: [new ErrorEmbed("invalid guild member")] });
 
     if (response.customId == "y") {
-      return doGame(message.member, target, bet, response as ButtonInteraction);
+      if (bet) {
+        return doGame(message.member, target, "money", response as ButtonInteraction, bet);
+      } else {
+        return doGame(
+          message.member,
+          target,
+          "item",
+          response as ButtonInteraction,
+          null,
+          item,
+          itemAmount,
+        );
+      }
     } else {
       cancelled = true;
-      await addBalance(message.member, bet);
+      if (bet) await addBalance(message.member, bet);
+      else await addInventoryItem(message.member, item.id, itemAmount);
       if (message.author.id === response.user.id) {
         response.editReply({
           embeds: [new CustomEmbed(message.member, "✅ coinflip request cancelled")],

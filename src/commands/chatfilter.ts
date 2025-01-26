@@ -178,7 +178,7 @@ async function run(
     const content = args.slice(1, args.length).join(" ").toLowerCase().normalize("NFD");
     const check = await checkMessageContent(message.guild, content, false);
     let embed;
-    if (check) {
+    if (!check) {
       embed = new CustomEmbed(message.member).setHeader("chat filter test");
       embed.setDescription(`\`${content}\` was filtered`);
     } else {

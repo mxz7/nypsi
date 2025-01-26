@@ -389,19 +389,7 @@ async function run(
       });
     }
 
-    if (
-      cost > Constants.MAX_AUCTION_PER_ITEM * amount &&
-      selected.rarity < 3 &&
-      (selected.in_crates || ["prey", "fish", "ore", "sellable"].includes(selected.role))
-    ) {
-      return send({
-        embeds: [
-          new ErrorEmbed(
-            `the maximum cost per item is $${Constants.MAX_AUCTION_PER_ITEM.toLocaleString()}`,
-          ),
-        ],
-      });
-    } else if (cost > 10_000_000_000)
+    if (cost > 10_000_000_000)
       return send({
         embeds: [new ErrorEmbed("the maximum cost per item is $10,000,000,000")],
       });
@@ -1009,19 +997,7 @@ async function run(
       });
     }
 
-    if (
-      cost > Constants.MAX_AUCTION_PER_ITEM * amount &&
-      selected.rarity < 3 &&
-      (selected.in_crates || ["prey", "fish", "ore", "sellable"].includes(selected.role))
-    ) {
-      return send({
-        embeds: [
-          new ErrorEmbed(
-            `the maximum cost per item is $${Constants.MAX_AUCTION_PER_ITEM.toLocaleString()}`,
-          ),
-        ],
-      });
-    } else if (cost > 10_000_000_000)
+    if (cost > 10_000_000_000)
       return send({
         embeds: [new ErrorEmbed("the maximum cost per item is $10,000,000,000")],
       });

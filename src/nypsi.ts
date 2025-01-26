@@ -56,7 +56,7 @@ const client = new NypsiClient({
     GuildInviteManager: 0,
     GuildStickerManager: 0,
     GuildScheduledEventManager: 0,
-    MessageManager: 20,
+    MessageManager: 10,
     PresenceManager: 0,
     ReactionManager: 0,
     ReactionUserManager: 0,
@@ -69,16 +69,13 @@ const client = new NypsiClient({
     GuildForumThreadManager: 0,
     GuildTextThreadManager: 0,
     UserManager: {
-      maxSize: 10_000,
+      maxSize: 5_000,
       keepOverLimit: (user) => {
         if (user.id === user.client.user.id) return true;
         if (user.bot) return false;
 
-        if (recentCommands.has(user.id)) {
-          if (recentCommands.get(user.id) > Date.now() - ms("10 minutes")) return true;
-          recentCommands.delete(user.id);
-          return false;
-        }
+        if (recentCommands.has(user.id)) return true;
+        else return false;
       },
     },
     GuildMemberManager: {
@@ -87,11 +84,8 @@ const client = new NypsiClient({
         if (user.id === user.client.user.id) return true;
         if (user.user.bot) return false;
 
-        if (recentCommands.has(user.id)) {
-          if (recentCommands.get(user.id) > Date.now() - ms("10 minutes")) return true;
-          recentCommands.delete(user.id);
-          return false;
-        }
+        if (recentCommands.has(user.id)) return true;
+        else return false;
       },
     },
   }),
