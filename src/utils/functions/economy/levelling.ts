@@ -78,6 +78,9 @@ levellingRewards.set(50, {
       "\n- +1% gamble multi",
   ],
 });
+levellingRewards.set(60, {
+  text: ["you have unlocked:\n" + "- 🔩 scrapyard (</workers view:1014905682341924945>)"],
+});
 levellingRewards.set(69, {
   text: ["hahaaaaahaha......\n\n" + "- `3x` 🎁 69420 crate"],
   rewards: ["id:69420_crate", "id:69420_crate", "id:69420_crate"],
