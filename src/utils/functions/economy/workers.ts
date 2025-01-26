@@ -314,10 +314,12 @@ export async function claimFromWorkers(userId: string): Promise<string> {
   return `+$**${totalAmountEarned.toLocaleString()}**\n\n` +
     `${workers
       .map((x) => moneyAmounts.get(x).info)
-      .reduce((a, b) => [a, b].join("\n"))}` +
+      .join("\n")}` +
     (byproducts.length == 0 ? "" :
       `\n\n${byproducts
-        .map((x) => `you found **${totalByproducts.get(x)}** ${allItems[x].emoji} ${totalByproducts.get(x) > 1 ? allItems[x].plural : allItems[x].name}`)
-        .reduce((a, b) => [a, b].join("\n"))}`
+        .map((x) => `you found **${totalByproducts.get(x)}** ${allItems[x].emoji} ${
+          totalByproducts.get(x) > 1 ? allItems[x].plural : allItems[x].name
+        }`)
+        .join("\n")}`
     );
 }
