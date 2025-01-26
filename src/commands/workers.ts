@@ -50,18 +50,8 @@ const cmd = new Command(
   "money",
 ).setAliases(["worker", "minion", "minions", "slave", "slaves"]);
 
-const workerChoices: APIApplicationCommandOptionChoice<string>[] = [
-  { name: "quarry", value: "quarry" },
-  { name: "potato farmer", value: "potato_farmer" },
-  { name: "fisherman", value: "fisherman" },
-  { name: "miner", value: "miner" },
-  { name: "lumberjack", value: "lumberjack" },
-  { name: "butcher", value: "butcher" },
-  { name: "tailor", value: "tailor" },
-  { name: "spacex", value: "spacex" },
-  { name: "amazon", value: "amazon" },
-  { name: "mcdonalds", value: "mcdonalds" },
-];
+const workerChoices: APIApplicationCommandOptionChoice<string>[] = Object.keys(getBaseWorkers())
+  .map((x) => { return { name: x.replaceAll("_", " "), value: x } });
 
 inPlaceSort(workerChoices).asc((wch) => getBaseWorkers()[wch.value].prestige_requirement);
 
