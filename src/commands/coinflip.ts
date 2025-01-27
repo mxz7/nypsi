@@ -7,7 +7,6 @@ import {
   CommandInteraction,
   ComponentType,
   GuildMember,
-  Interaction,
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
@@ -107,14 +106,12 @@ async function run(
     player2: GuildMember,
     type: "money" | "item",
     response: ButtonInteraction,
+    msg: Message,
     bet?: number,
     item?: Item,
     itemAmount?: number,
   ) => {
-    const [player1Inventory, player2Inventory] = await Promise.all([
-      getInventory(player1),
-      getInventory(player2),
-    ]);
+    const player2Inventory = await getInventory(player2);
 
     if (type === "money") {
       if (bet > (await getBalance(player2))) {
@@ -199,7 +196,14 @@ async function run(
       );
     }
 
-    const msg = await response.editReply({ embeds: [embed] });
+    if (response.replied) {
+      msg = await msg.reply({ embeds: [embed] });
+    } else {
+      msg = await response
+        .reply({ embeds: [embed] })
+        .then((m) => m.fetch())
+        .catch(async () => (msg = await msg.reply({ embeds: [embed] })));
+    }
 
     if (type === "money") {
       let winnings = bet * 2;
@@ -498,15 +502,70 @@ async function run(
       });
     }
 
-    const filter = (i: Interaction) =>
-      i.user.id == target.id ||
-      (message.author.id === i.user.id && (i as ButtonInteraction).customId === "n");
     let fail = false;
+    let proceeded = false;
+    const filter = async (i: ButtonInteraction) => {
+      if (message.author.id === i.user.id) {
+        if (i.customId === "n") return true;
+        return false;
+      }
+
+      if (bet) {
+        const maxBet = await calcMaxBet(i.user.id);
+
+        if (bet > maxBet * 10) {
+          const confirmEmbed = new CustomEmbed(
+            i.user.id,
+            `are you sure you want to accept? the bet is $**${bet.toLocaleString()}**`,
+          );
+
+          const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+            new ButtonBuilder().setCustomId("y").setLabel("yes").setStyle(ButtonStyle.Success),
+            new ButtonBuilder().setCustomId("n").setLabel("no").setStyle(ButtonStyle.Danger),
+          );
+
+          const confirmMsg = await i
+            .reply({ embeds: [confirmEmbed], components: [row], ephemeral: true })
+            .then((m) => m.fetch());
+
+          const confirmInteraction = await confirmMsg
+            .awaitMessageComponent({
+              filter: (i2) => i.user.id === i2.user.id,
+              time: 15000,
+              componentType: ComponentType.Button,
+            })
+            .catch(() => {});
+
+          if (proceeded || fail) return false;
+
+          if (!confirmInteraction) return false;
+
+          if ((await getBalance(i.user.id)) < bet) {
+            if (confirmInteraction.isRepliable())
+              confirmInteraction.reply({
+                embeds: [new ErrorEmbed("you cannot afford this bet")],
+                ephemeral: true,
+              });
+            return false;
+          }
+
+          confirmInteraction.update({ components: [] });
+
+          if (confirmInteraction.customId === "y") {
+            return true;
+          } else {
+            return false;
+          }
+        }
+      }
+
+      return true;
+    };
 
     const response = await msg
-      .awaitMessageComponent({ filter, time: 60000 })
-      .then(async (collected) => {
-        await collected.deferReply();
+      .awaitMessageComponent({ filter, time: 60000, componentType: ComponentType.Button })
+      .then((collected) => {
+        proceeded = true;
         msg.edit({ components: [] });
         playing.delete(message.author.id);
         return collected;
@@ -525,13 +584,14 @@ async function run(
 
     if (response.customId == "y") {
       if (bet) {
-        return doGame(message.member, target, "money", response as ButtonInteraction, bet);
+        return doGame(message.member, target, "money", response as ButtonInteraction, msg, bet);
       } else {
         return doGame(
           message.member,
           target,
           "item",
           response as ButtonInteraction,
+          msg,
           null,
           item,
           itemAmount,
@@ -668,7 +728,9 @@ async function run(
       msg = await send({ embeds: [requestEmbed], components: [row] });
     }
 
-    const filter = async (i: Interaction): Promise<boolean> => {
+    let proceeded = false;
+    let fail = false;
+    const filter = async (i: ButtonInteraction): Promise<boolean> => {
       if (i.user.id != message.author.id && (i as ButtonInteraction).customId == "n") return false;
       if ((await isEcoBanned(i.user.id)).banned) return false;
 
@@ -695,6 +757,53 @@ async function run(
             });
           return false;
         }
+
+        const maxBet = await calcMaxBet(i.user.id);
+
+        if (bet > maxBet * 10) {
+          const confirmEmbed = new CustomEmbed(
+            i.user.id,
+            `are you sure you want to accept? the bet is $**${bet.toLocaleString()}**`,
+          );
+
+          const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+            new ButtonBuilder().setCustomId("y").setLabel("yes").setStyle(ButtonStyle.Success),
+            new ButtonBuilder().setCustomId("n").setLabel("no").setStyle(ButtonStyle.Danger),
+          );
+
+          const confirmMsg = await i
+            .reply({ embeds: [confirmEmbed], components: [row], ephemeral: true })
+            .then((m) => m.fetch());
+
+          const confirmInteraction = await confirmMsg
+            .awaitMessageComponent({
+              filter: (i2) => i.user.id === i2.user.id,
+              time: 15000,
+              componentType: ComponentType.Button,
+            })
+            .catch(() => {});
+
+          if (proceeded) return false;
+
+          if (!confirmInteraction) return false;
+
+          if ((await getBalance(i.user.id)) < bet) {
+            if (confirmInteraction.isRepliable())
+              confirmInteraction.reply({
+                embeds: [new ErrorEmbed("you cannot afford this bet")],
+                ephemeral: true,
+              });
+            return false;
+          }
+
+          confirmInteraction.update({ components: [] });
+
+          if (confirmInteraction.customId === "y") {
+            return true;
+          } else {
+            return false;
+          }
+        }
       } else {
         const inventory = await getInventory(i.user.id);
 
@@ -713,12 +822,11 @@ async function run(
 
       return true;
     };
-    let fail = false;
 
     const response = await msg
-      .awaitMessageComponent({ filter, time: 60000 })
-      .then(async (collected) => {
-        await collected.deferReply();
+      .awaitMessageComponent({ filter, time: 60000, componentType: ComponentType.Button })
+      .then((collected) => {
+        proceeded = true;
         msg.edit({ components: [] });
         playing.delete(message.author.id);
         return collected;
@@ -741,13 +849,14 @@ async function run(
 
     if (response.customId == "y") {
       if (bet) {
-        return doGame(message.member, target, "money", response as ButtonInteraction, bet);
+        return doGame(message.member, target, "money", response as ButtonInteraction, msg, bet);
       } else {
         return doGame(
           message.member,
           target,
           "item",
           response as ButtonInteraction,
+          msg,
           null,
           item,
           itemAmount,
