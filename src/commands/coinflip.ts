@@ -411,12 +411,16 @@ async function run(
             return null;
           });
 
+        if (!interaction) return;
+
         if ((await getBalance(message.author.id)) < bet)
           return interaction.reply({ embeds: [new ErrorEmbed("nice try buddy")] });
 
         if (interaction.customId !== "y") {
           msg.edit({ components: [] });
-          return interaction.reply({ embeds: [new ErrorEmbed("coinflip cancelled")] });
+          return interaction.reply({
+            embeds: [new CustomEmbed(message.member, "✅ coinflip  cancelled")],
+          });
         }
 
         msg.edit({ components: [] });
@@ -594,12 +598,16 @@ async function run(
             return null;
           });
 
+        if (!interaction) return;
+
         if ((await getBalance(message.author.id)) < bet)
           return interaction.reply({ embeds: [new ErrorEmbed("nice try buddy")] });
 
         if (interaction.customId !== "y") {
           msg.edit({ components: [] });
-          return interaction.reply({ embeds: [new ErrorEmbed("coinflip cancelled")] });
+          return interaction.reply({
+            embeds: [new CustomEmbed(message.member, "✅ coinflip  cancelled")],
+          });
         }
 
         msg.edit({ components: [] });
