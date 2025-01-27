@@ -5,6 +5,7 @@ import {
   ButtonInteraction,
   ButtonStyle,
   CommandInteraction,
+  ComponentType,
   GuildMember,
   Interaction,
   InteractionReplyOptions,
@@ -301,7 +302,7 @@ async function run(
   let itemAmount: number;
   let target: GuildMember;
 
-  bet = await formatBet(args[0], message.member, memberMaxBet);
+  bet = await formatBet(args[0], message.member, 10_000_000_000);
 
   if (!bet || isNaN(bet)) {
     item = selectItem(args[0].toLowerCase());
@@ -324,7 +325,7 @@ async function run(
     if (args.length === 1) {
       return send({ embeds: [new ErrorEmbed("$coinflip (user) <bet>")] });
     }
-    bet = await formatBet(args[1], message.member, memberMaxBet);
+    bet = await formatBet(args[1], message.member, 10_000_000_000);
 
     if (bet <= 0) bet = undefined;
 
@@ -372,9 +373,9 @@ async function run(
       text: "expires in 60 seconds",
     });
 
-    if (bet) {
-      const targetMaxBet = (await calcMaxBet(target)) * 10;
+    let interaction: ButtonInteraction;
 
+    if (bet) {
       if (bet > (await getBalance(message.member))) {
         return send({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
       }
@@ -385,15 +386,41 @@ async function run(
         });
       }
 
-      if (bet > memberMaxBet)
-        return send({
-          embeds: [new ErrorEmbed(`your max bet is $**${memberMaxBet.toLocaleString()}**`)],
-        });
+      if (bet > memberMaxBet) {
+        const authorConfirmationEmbed = new CustomEmbed(
+          message.member,
+          `this will create a coinflip worth $**${bet.toLocaleString()}**. are you sure?`,
+        );
 
-      if (bet > targetMaxBet)
-        return send({
-          embeds: [new ErrorEmbed(`their max bet is $**${targetMaxBet.toLocaleString()}**`)],
-        });
+        const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+          new ButtonBuilder().setCustomId("y").setLabel("yes").setStyle(ButtonStyle.Success),
+          new ButtonBuilder().setCustomId("n").setLabel("no").setStyle(ButtonStyle.Danger),
+        );
+
+        const msg = await send({ embeds: [authorConfirmationEmbed], components: [row] });
+
+        interaction = await msg
+          .awaitMessageComponent({
+            filter: (i) => i.user.id === message.author.id,
+            time: 30000,
+            componentType: ComponentType.Button,
+          })
+          .catch((): null => {
+            row.components.forEach((c) => c.setDisabled(true));
+            msg.edit({ components: [row] });
+            return null;
+          });
+
+        if ((await getBalance(message.author.id)) < bet)
+          return interaction.reply({ embeds: [new ErrorEmbed("nice try buddy")] });
+
+        if (interaction.customId !== "y") {
+          msg.edit({ components: [] });
+          return interaction.reply({ embeds: [new ErrorEmbed("coinflip cancelled")] });
+        }
+
+        msg.edit({ components: [] });
+      }
 
       await removeBalance(message.member, bet);
       requestEmbed.setDescription(
@@ -449,11 +476,23 @@ async function run(
       new ButtonBuilder().setCustomId("n").setLabel("deny").setStyle(ButtonStyle.Danger),
     );
 
-    const msg = await send({
-      content: `${target.user.toString()} you have been invited to a coinflip`,
-      embeds: [requestEmbed],
-      components: [row],
-    });
+    let msg: Message;
+
+    if (interaction) {
+      msg = await interaction
+        .reply({
+          content: `${target.user.toString()} you have been invited to a coinflip`,
+          embeds: [requestEmbed],
+          components: [row],
+        })
+        .then((m) => m.fetch());
+    } else {
+      msg = await send({
+        content: `${target.user.toString()} you have been invited to a coinflip`,
+        embeds: [requestEmbed],
+        components: [row],
+      });
+    }
 
     const filter = (i: Interaction) =>
       i.user.id == target.id ||
@@ -511,6 +550,8 @@ async function run(
       text: "expires in 60 seconds",
     });
 
+    let interaction: ButtonInteraction;
+
     if (bet) {
       if (!bet) {
         return send({ embeds: [new ErrorEmbed("invalid bet")] });
@@ -528,10 +569,41 @@ async function run(
         return send({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
       }
 
-      if (bet > memberMaxBet)
-        return send({
-          embeds: [new ErrorEmbed(`your max bet is $**${memberMaxBet.toLocaleString()}**`)],
-        });
+      if (bet > memberMaxBet) {
+        const authorConfirmationEmbed = new CustomEmbed(
+          message.member,
+          `this will create a coinflip worth $**${bet.toLocaleString()}**. are you sure?`,
+        );
+
+        const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+          new ButtonBuilder().setCustomId("y").setLabel("yes").setStyle(ButtonStyle.Success),
+          new ButtonBuilder().setCustomId("n").setLabel("no").setStyle(ButtonStyle.Danger),
+        );
+
+        const msg = await send({ embeds: [authorConfirmationEmbed], components: [row] });
+
+        interaction = await msg
+          .awaitMessageComponent({
+            filter: (i) => i.user.id === message.author.id,
+            time: 30000,
+            componentType: ComponentType.Button,
+          })
+          .catch((): null => {
+            row.components.forEach((c) => c.setDisabled(true));
+            msg.edit({ components: [row] });
+            return null;
+          });
+
+        if ((await getBalance(message.author.id)) < bet)
+          return interaction.reply({ embeds: [new ErrorEmbed("nice try buddy")] });
+
+        if (interaction.customId !== "y") {
+          msg.edit({ components: [] });
+          return interaction.reply({ embeds: [new ErrorEmbed("coinflip cancelled")] });
+        }
+
+        msg.edit({ components: [] });
+      }
 
       await removeBalance(message.member, bet);
 
@@ -578,10 +650,15 @@ async function run(
       new ButtonBuilder().setCustomId("n").setLabel("cancel").setStyle(ButtonStyle.Danger),
     );
 
-    const msg = await send({
-      embeds: [requestEmbed],
-      components: [row],
-    });
+    let msg: Message;
+
+    if (interaction) {
+      msg = await interaction
+        .reply({ embeds: [requestEmbed], components: [row] })
+        .then((r) => r.fetch());
+    } else {
+      msg = await send({ embeds: [requestEmbed], components: [row] });
+    }
 
     const filter = async (i: Interaction): Promise<boolean> => {
       if (i.user.id != message.author.id && (i as ButtonInteraction).customId == "n") return false;
@@ -608,20 +685,6 @@ async function run(
               embeds: [new ErrorEmbed("you cannot afford this bet")],
               ephemeral: true,
             });
-          return false;
-        }
-
-        if ((await calcMaxBet(i.user.id)) * 10 < bet) {
-          if (i.isRepliable())
-            i.reply({
-              embeds: [
-                new ErrorEmbed(
-                  `your max bet is $**${((await calcMaxBet(i.user.id)) * 10).toLocaleString()}**`,
-                ),
-              ],
-              ephemeral: true,
-            });
-
           return false;
         }
       } else {
