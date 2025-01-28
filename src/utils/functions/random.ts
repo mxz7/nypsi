@@ -42,6 +42,6 @@ export function percentChance(percent: number) {
 // rounds a number up or down randomly,
 // fraction part is chance of rounding up
 export function randomRound(n: number): number {
-  let lower = Math.floor(n);
+  const lower = Math.floor(n);
   return lower + +(Math.random() < n - lower);
 }

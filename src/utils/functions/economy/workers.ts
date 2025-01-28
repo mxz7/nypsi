@@ -108,15 +108,15 @@ export async function calcWorkerValues(
   let perIntervalBonus = 0;
   let perItemBonus = 0;
   let maxStoredBonus = 0;
-  let byproductChances = {} as {
+  const byproductChances = {} as {
     [item: string]: {
       chance: number;
       rolls: number;
     }
   };
 
-  let baseByproducts = baseWorkers[worker.workerId].base.byproducts;
-  for(let byproduct in baseByproducts) {
+  const baseByproducts = baseWorkers[worker.workerId].base.byproducts;
+  for(const byproduct in baseByproducts) {
     byproductChances[byproduct] = {
       chance: baseByproducts[byproduct].chance,
       rolls: baseByproducts[byproduct].rolls
@@ -278,7 +278,7 @@ export async function claimFromWorkers(userId: string): Promise<string> {
   const totalByproducts = new Map<string, number>();
 
   for (const worker of userWorkers) {
-    let { amountEarned, byproductAmounts, perItem } = await evaluateWorker(userId, baseWorkers[worker.workerId]);
+    const { amountEarned, byproductAmounts, perItem } = await evaluateWorker(userId, baseWorkers[worker.workerId]);
     totalAmountEarned += amountEarned;
 
     const baseWorker = baseWorkers[worker.workerId];
@@ -306,8 +306,8 @@ export async function claimFromWorkers(userId: string): Promise<string> {
   await addProgress(userId, "super_capitalist", totalAmountEarned);
   await addStat(userId, "earned-workers", totalAmountEarned);
 
-  let workers = moneyAmounts.keys().toArray();
-  let byproducts = totalByproducts.keys().toArray();
+  const workers = moneyAmounts.keys().toArray();
+  const byproducts = totalByproducts.keys().toArray();
   inPlaceSort(workers).desc((x) => moneyAmounts.get(x).money);
   inPlaceSort(byproducts).asc((x) => totalByproducts.get(x));
 

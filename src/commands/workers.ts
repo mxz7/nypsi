@@ -599,7 +599,7 @@ async function run(
     } else if (args[1]?.toLowerCase() == "value") {
       if (!(worker && value)) return message.channel.send({ embeds: [debugInfoEmbed] });
       let totalEarned = 0;
-      let totalByproducts = {} as WorkerByproducts;
+      const totalByproducts = {} as WorkerByproducts;
       let byproductsDescription = "";
       for(let i = 0; i < value; i++) {
         const { amountEarned, byproductAmounts } = await evaluateWorker(message.author.id, worker);
@@ -610,8 +610,8 @@ async function run(
         }
       }
       for(const byproduct in totalByproducts) {
-        let item = getItems()[byproduct];
-        let amount = totalByproducts[byproduct];
+        const item = getItems()[byproduct];
+        const amount = totalByproducts[byproduct];
         byproductsDescription += `\n  **${(amount/value).toFixed(3)}** ${item.emoji} ${amount === value ? item.name : item.plural}`;
       }
       return message.channel.send({ embeds: [

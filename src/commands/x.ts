@@ -1704,7 +1704,7 @@ async function run(
       const key = `${Constants.redis.nypsi.STEVE_EARNED}:${worker.userId}`;
       if (!Array.from(boosters.keys()).includes("steve")) continue;
       if (!await redis.exists(key)) continue;
-      let steveStorage = JSON.parse(await redis.get(key));
+      const steveStorage = JSON.parse(await redis.get(key));
       if ( steveStorage.byproducts !== undefined) continue; // protection against running more than once
       steveStorage.byproducts = {};
       steveStorage.byproducts.quarry_scrap = steveStorage.scraps;
