@@ -273,7 +273,7 @@
         "max_storage": 200,
         "per_interval": 50,
         "byproducts": {
-          "gear": {
+          "hook": {
             "chance": 0.0035,
             "rolls": 0.008,
             "multiply_chance": false,

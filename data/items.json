@@ -876,7 +876,7 @@
       "id:grandma:65",
       "id:lamborghini:5",
       "id:orphan:50",
-      "id:gear:32",
+      "id:hook:32",
       "id:magnet:8",
       "id:big_tiddy_goth_gf:75",
       "id:viagra:30",
@@ -1645,13 +1645,13 @@
     },
     "in_crates": true
   },
-  "gear": {
-    "id": "gear",
-    "name": "gear",
+  "hook": {
+    "id": "hook",
+    "name": "hook",
     "article": "a",
-    "plural": "gears",
-    "emoji": "⚙️",
-    "longDesc": "a fine piece of machinery",
+    "plural": "hooks",
+    "emoji": "🪝",
+    "longDesc": "need a tow?",
     "rarity": 2,
     "sell": 100000,
     "role": "item",
@@ -1672,7 +1672,7 @@
     "in_crates": false,
     "craft": {
       "time": 43200,
-      "ingredients": ["gear:8"]
+      "ingredients": ["hook:8"]
     }
   },
   "magnet": {
@@ -2225,7 +2225,7 @@
       "id:omega_crate:0.05",
       "id:apple_seed:7",
       "id:stick:5",
-      "id:gear:5"
+      "id:hook:5"
     ],
     "random_drop_chance": 90
   },
