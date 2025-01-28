@@ -2209,6 +2209,7 @@
       "id:super_cursor:50",
       "id:range_rover_skin:10",
       "id:pontiac_skin:10",
+      "id:hook:25",
       "id:oven:30",
       "id:lamborghini:1",
       "id:engine_upgrade_part:50",
@@ -2224,8 +2225,7 @@
       "id:gem_shard:0.9",
       "id:omega_crate:0.05",
       "id:apple_seed:7",
-      "id:stick:5",
-      "id:hook:5"
+      "id:stick:5"
     ],
     "random_drop_chance": 90
   },
