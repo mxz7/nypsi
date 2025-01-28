@@ -876,8 +876,8 @@
       "id:grandma:65",
       "id:lamborghini:5",
       "id:orphan:50",
-      "id:gear:30",
-      "id:magnet:15",
+      "id:gear:32",
+      "id:magnet:8",
       "id:big_tiddy_goth_gf:75",
       "id:viagra:30",
       "id:looting:30",
@@ -1653,7 +1653,7 @@
     "emoji": "⚙️",
     "longDesc": "a fine piece of machinery",
     "rarity": 2,
-    "sell": 200000,
+    "sell": 100000,
     "role": "item",
     "in_crates": true
   },
@@ -1665,14 +1665,14 @@
     "aliases": ["claw", "crane"],
     "emoji": "🦾",
     "longDesc": "increases chance of finding wheel upgrade parts from your scrapyard",
-    "rarity": 4,
+    "rarity": 5,
     "sell": 1000000,
     "role": "worker-upgrade",
     "worker_upgrade_id": "claw_crane",
     "in_crates": false,
     "craft": {
       "time": 43200,
-      "ingredients": ["gear:4"]
+      "ingredients": ["gear:8"]
     }
   },
   "magnet": {
@@ -1682,7 +1682,7 @@
     "plural": "magnets",
     "emoji": "🧲",
     "longDesc": "increases chance of finding turbo upgrade parts from your scrapyard",
-    "rarity": 3,
+    "rarity": 4,
     "sell": 1000000,
     "role": "worker-upgrade",
     "worker_upgrade_id": "magnet",
