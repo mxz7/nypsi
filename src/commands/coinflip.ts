@@ -505,11 +505,12 @@ async function run(
     let fail = false;
     let proceeded = false;
     const filter = async (i: ButtonInteraction) => {
-      if (i.user.id !== target.user.id) return false;
       if (message.author.id === i.user.id) {
         if (i.customId === "n") return true;
         return false;
       }
+
+      if (i.user.id !== target.user.id) return false;
 
       if (bet) {
         const maxBet = await calcMaxBet(i.user.id);
