@@ -60,6 +60,10 @@ async function run(
         new ButtonBuilder().setCustomId("kick").setLabel("kick").setStyle(ButtonStyle.Danger),
       );
 
+      if (profile.removed) {
+        delete row.components[1];
+      }
+
       if (msg) msg.edit({ embeds: [embed], components: [row] });
       else msg = await message.channel.send({ embeds: [embed], components: [row] });
       return msg;
@@ -135,6 +139,8 @@ async function run(
             await interaction.reply({ embeds: [new ErrorEmbed("user not exist error")] });
           } else if (res === "no user profile") {
             await interaction.reply({ embeds: [new ErrorEmbed("user not exist error")] });
+          } else if (res === "already removed") {
+            await interaction.reply({ embeds: [new ErrorEmbed("already kicked from z")] });
           } else {
             await interaction.reply({
               embeds: [

@@ -96,7 +96,12 @@ export async function castVoteKick(
   targetId: string,
   guild: Guild,
 ): Promise<
-  "no user profile" | "no target profile" | "founding father" | "already voted" | "kicked"
+  | "no user profile"
+  | "no target profile"
+  | "founding father"
+  | "already voted"
+  | "kicked"
+  | "already removed"
 > {
   const user = await getZProfile(userId);
   const target = await getZProfile(targetId);
@@ -106,6 +111,7 @@ export async function castVoteKick(
 
   if (!target.invitedById) return "founding father";
   if (user.userVoteKicks.find((i) => i.targetId === targetId)) return "already voted";
+  if (user.removed) return "already removed";
 
   await prisma.zKicks.create({
     data: {
