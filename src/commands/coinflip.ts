@@ -604,11 +604,23 @@ async function run(
       if (bet) await addBalance(message.member, bet);
       else await addInventoryItem(message.member, item.id, itemAmount);
       if (message.author.id === response.user.id) {
-        response.editReply({
-          embeds: [new CustomEmbed(message.member, "✅ coinflip request cancelled")],
-        });
+        response
+          .reply({
+            embeds: [new CustomEmbed(message.member, "✅ coinflip request cancelled")],
+          })
+          .catch(() => {
+            msg.reply({
+              embeds: [new CustomEmbed(message.member, "✅ coinflip request cancelled")],
+            });
+          });
       } else {
-        response.editReply({ embeds: [new CustomEmbed(target, "✅ coinflip request denied")] });
+        response
+          .reply({ embeds: [new CustomEmbed(target, "✅ coinflip request denied")] })
+          .catch(() => {
+            msg.reply({
+              embeds: [new CustomEmbed(message.member, "✅ coinflip request cancelled")],
+            });
+          });
       }
     }
   } else {
@@ -869,11 +881,21 @@ async function run(
       if (bet) await addBalance(message.member, bet);
       else await addInventoryItem(message.member, item.id, itemAmount);
       if (message.author.id === response.user.id) {
-        response.editReply({
-          embeds: [new CustomEmbed(message.member, "✅ coinflip request cancelled")],
-        });
+        response
+          .reply({
+            embeds: [new CustomEmbed(message.member, "✅ coinflip request cancelled")],
+          })
+          .catch(() => {
+            msg.reply({
+              embeds: [new CustomEmbed(message.member, "✅ coinflip request cancelled")],
+            });
+          });
       } else {
-        response.editReply({ embeds: [new CustomEmbed(target, "✅ coinflip request denied")] });
+        response
+          .reply({ embeds: [new CustomEmbed(target, "✅ coinflip request denied")] })
+          .catch(() => {
+            msg.reply({ embeds: [new CustomEmbed(target, "✅ coinflip request denied")] });
+          });
       }
     }
   }
