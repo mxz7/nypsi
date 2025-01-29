@@ -243,16 +243,16 @@ export async function addWorkerUpgrade(
   });
 }
 
-export async function evaluateWorker(userId: string, worker: Worker) {
+export async function evaluateWorker(userId: string, worker: Worker, stored: number) {
   const userWorker = await getWorker(userId, worker);
-  return await evaluateWorkerWithStored(userId, worker, userWorker.stored);
-}
+  if (stored === undefined) {
+    stored = userWorker.stored; // reassigned parameter
+  }
 
-export async function evaluateWorkerWithStored(userId: string, worker: Worker, stored: number) {
-  const { perItem, byproductChances } = await calcWorkerValues(await getWorker(userId, worker));
+  if (stored == 0) return { amountEarned: 0, byproductAmounts: {} as WorkerByproducts };
+
+  const { perItem, byproductChances } = await calcWorkerValues(userWorker);
   const byproductAmounts = {} as WorkerByproducts;
-
-  if (stored == 0) return { amountEarned: 0, byproductAmounts };
 
   for (const byproduct in byproductChances) {
     byproductChances[byproduct].chance *= worker.base.byproducts[byproduct].multiply_chance ? stored : 1;
@@ -278,7 +278,7 @@ export async function claimFromWorkers(userId: string): Promise<string> {
   const totalByproducts = new Map<string, number>();
 
   for (const worker of userWorkers) {
-    const { amountEarned, byproductAmounts, perItem } = await evaluateWorker(userId, baseWorkers[worker.workerId]);
+    const { amountEarned, byproductAmounts, perItem } = await evaluateWorker(userId, baseWorkers[worker.workerId], worker.stored);
     totalAmountEarned += amountEarned;
 
     const baseWorker = baseWorkers[worker.workerId];

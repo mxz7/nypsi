@@ -16,7 +16,7 @@ import { getBoosters } from "../../utils/functions/economy/boosters";
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { addStat } from "../../utils/functions/economy/stats";
 import { getBaseWorkers } from "../../utils/functions/economy/utils";
-import { calcWorkerValues, evaluateWorkerWithStored, getWorkers } from "../../utils/functions/economy/workers";
+import { calcWorkerValues, evaluateWorker, getWorkers } from "../../utils/functions/economy/workers";
 import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
 import { logger } from "../../utils/logger";
 import ms = require("ms");
@@ -66,7 +66,7 @@ async function doWorkerThing() {
 
       let totalEarned = 0;
       const { amountEarned, byproductAmounts } =
-        await evaluateWorkerWithStored(worker.userId, baseWorkers[worker.workerId], worker.stored + incrementAmount);
+        await evaluateWorker(worker.userId, baseWorkers[worker.workerId], worker.stored + incrementAmount);
 
       if (worker.stored != 0) {
         await prisma.economyWorker.update({
