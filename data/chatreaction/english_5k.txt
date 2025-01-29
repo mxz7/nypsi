@@ -171,7 +171,7 @@ alter
 alternative
 although
 altogether
-aluminum
+aluminium
 always
 amateur
 amazed
