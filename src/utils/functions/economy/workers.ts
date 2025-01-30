@@ -243,15 +243,37 @@ export async function addWorkerUpgrade(
   });
 }
 
-export async function evaluateWorker(userId: string, worker: Worker, stored: number) {
-  const userWorker = await getWorker(userId, worker);
+export async function evaluateWorker(userId: string, worker: Worker, options: {
+  stored?: number,
+  calculated?: {
+    perItem: number,
+    byproductChances: {
+      [item: string]: {
+        chance: number;
+        rolls: number;
+      }
+    }
+  }
+}) {
+
+  let userWorker = undefined;
+  let stored = options.stored;
   if (stored === undefined) {
-    stored = userWorker.stored; // reassigned parameter
+    // be lazy in getting the user worker, because it might not be needed
+    userWorker = await getWorker(userId, worker);
+    stored = userWorker.stored;
   }
 
   if (stored == 0) return { amountEarned: 0, byproductAmounts: {} as WorkerByproducts };
 
-  const { perItem, byproductChances } = await calcWorkerValues(userWorker);
+  let perItem = options.calculated?.perItem;
+  let byproductChances = options.calculated?.byproductChances;
+  if (options.calculated === undefined) {
+    // be lazy in getting the user worker, because it might not be needed
+    if (userWorker === undefined) userWorker = await getWorker(userId, worker);
+    ( { perItem, byproductChances } = await calcWorkerValues(userWorker) );
+  }
+
   const byproductAmounts = {} as WorkerByproducts;
 
   for (const byproduct in byproductChances) {
@@ -265,7 +287,7 @@ export async function evaluateWorker(userId: string, worker: Worker, stored: num
     if (byproductAmounts[byproduct] <= 0) delete byproductAmounts[byproduct];
   }
 
-  return { amountEarned: Math.floor(perItem * stored), byproductAmounts, perItem }
+  return { amountEarned: Math.floor(perItem * stored), byproductAmounts }
 }
 
 export async function claimFromWorkers(userId: string): Promise<string> {
@@ -278,14 +300,17 @@ export async function claimFromWorkers(userId: string): Promise<string> {
   const totalByproducts = new Map<string, number>();
 
   for (const worker of userWorkers) {
-    const { amountEarned, byproductAmounts, perItem } = await evaluateWorker(userId, baseWorkers[worker.workerId], worker.stored);
+    const { amountEarned, byproductAmounts } = await evaluateWorker(userId, baseWorkers[worker.workerId], {
+      stored: worker.stored
+    });
+
     totalAmountEarned += amountEarned;
 
     const baseWorker = baseWorkers[worker.workerId];
-    const infoLine = `${baseWorker.name} +$${Math.floor(perItem * worker.stored)
+    const infoLine = `${baseWorker.name} +$${Math.floor(amountEarned)
       .toLocaleString()} (${worker.stored.toLocaleString()} ${baseWorker.item_emoji})`;
     if(worker.stored > 0) {
-      moneyAmounts.set(worker.workerId, { money: perItem * worker.stored, info: infoLine });
+      moneyAmounts.set(worker.workerId, { money: amountEarned, info: infoLine });
     }
 
     for (const byproduct in byproductAmounts) {

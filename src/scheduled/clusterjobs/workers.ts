@@ -35,7 +35,7 @@ async function doWorkerThing() {
   const baseWorkers = getBaseWorkers();
 
   for (const worker of query) {
-    const { maxStorage, perInterval } = await calcWorkerValues(worker);
+    const { perItem, perInterval, maxStorage, byproductChances } = await calcWorkerValues(worker);
 
     if (!hasSteve.has(worker.userId)) {
       const boosters = await getBoosters(worker.userId);
@@ -66,7 +66,13 @@ async function doWorkerThing() {
 
       let totalEarned = 0;
       const { amountEarned, byproductAmounts } =
-        await evaluateWorker(worker.userId, baseWorkers[worker.workerId], worker.stored + incrementAmount);
+        await evaluateWorker(worker.userId, baseWorkers[worker.workerId], {
+          stored: worker.stored + incrementAmount,
+          calculated: {
+            perItem: perItem,
+            byproductChances: byproductChances
+          }
+        });
 
       if (worker.stored != 0) {
         await prisma.economyWorker.update({
@@ -106,7 +112,7 @@ async function doWorkerThing() {
         `${Constants.redis.nypsi.STEVE_EARNED}:${worker.userId}`,
         ms("24 hours") / 1000,
       );
-    } else {
+    } else if (incrementAmount != 0) {
       await prisma.economyWorker.update({
         where: {
           userId_workerId: {
