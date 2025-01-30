@@ -27,11 +27,7 @@ const client = new NypsiClient({
         if (!member.user) return true;
         if (member.user.bot) return true;
 
-        if (recentCommands.has(member.id)) {
-          if (recentCommands.get(member.id) > Date.now() - ms("10 minutes")) return false;
-          recentCommands.delete(member.id);
-          return true;
-        }
+        if (recentCommands.has(member.id)) return false;
       },
     },
     users: {
@@ -41,11 +37,7 @@ const client = new NypsiClient({
         if (user.id === user.client.user.id) return false;
         if (user.bot) return true;
 
-        if (recentCommands.has(user.id)) {
-          if (recentCommands.get(user.id) > Date.now() - ms("10 minutes")) return false;
-          recentCommands.delete(user.id);
-          return true;
-        }
+        if (recentCommands.has(user.id)) return false;
       },
     },
   },
