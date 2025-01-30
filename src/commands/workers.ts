@@ -602,7 +602,7 @@ async function run(
       const totalByproducts = {} as WorkerByproducts;
       let byproductsDescription = "";
       for(let i = 0; i < value; i++) {
-        const { amountEarned, byproductAmounts } = await evaluateWorker(message.author.id, worker, undefined);
+        const { amountEarned, byproductAmounts } = await evaluateWorker(message.author.id, worker, {});
         totalEarned += amountEarned;
         for(const byproduct in byproductAmounts) {
           if(totalByproducts[byproduct] == undefined) totalByproducts[byproduct] = 0;
