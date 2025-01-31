@@ -1175,7 +1175,7 @@ export function logCommand(
   let msg: string;
 
   if (!(message instanceof Message)) {
-    msg = `${message.guild.id} ${message.author.username}: /${message.commandName} ${args.join(
+    msg = `${message.guild.id} ${message.channelId} ${message.author.username}: /${message.commandName} ${args.join(
       " ",
     )}`;
   } else {
@@ -1185,7 +1185,7 @@ export function logCommand(
       content = content.substring(0, 75) + "...";
     }
 
-    msg = `${message.guild.id} ${message.author.username}: ${content}`;
+    msg = `${message.guild.id} ${message.channelId} ${message.author.username}: ${content}`;
   }
 
   logger.info(`::cmd ${msg}`);
