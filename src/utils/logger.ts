@@ -2,6 +2,7 @@ import { flavors } from "@catppuccin/palette";
 import { Client, User, WebhookClient } from "discord.js";
 import { WriteStream, createWriteStream, existsSync } from "fs";
 import { rename, stat } from "fs/promises";
+import { cloneDeep } from "lodash";
 import DiscordTransport from "../models/DiscordLogs";
 import Constants from "./Constants";
 import chalk = require("chalk");
@@ -323,17 +324,27 @@ const formatter = (data: WriteData) => {
   let jsonData = "";
 
   if (Boolean(data.data) && Object.keys(data.data).length > 0) {
-    jsonData = JSON.stringify(
-      data.data,
-      (key, value) => (typeof value === "bigint" ? value.toString() : value),
-      2,
-    );
-    jsonData = jsonColor(
-      jsonData
-        .substring(1, jsonData.length - 1)
-        .trim()
-        .replaceAll("\\n", "\n"),
-    );
+    if (data.data["channelId"]) {
+      const clonedData = cloneDeep(data.data);
+
+      delete clonedData.channelId;
+
+      if (Object.keys(clonedData).length > 0) {
+        jsonData = JSON.stringify(
+          clonedData,
+          (key, value) => (typeof value === "bigint" ? value.toString() : value),
+          2,
+        );
+        jsonData = jsonColor(jsonData.substring(1, jsonData.length - 1).trim());
+      }
+    } else {
+      jsonData = JSON.stringify(
+        data.data,
+        (key, value) => (typeof value === "bigint" ? value.toString() : value),
+        2,
+      );
+      jsonData = jsonColor(jsonData.substring(1, jsonData.length - 1).trim());
+    }
   } else if (typeof data.message === "object") {
     jsonData = JSON.stringify(
       data.message,

@@ -1188,7 +1188,7 @@ export function logCommand(
     msg = `${message.guild.id} ${message.author.username}: ${content}`;
   }
 
-  logger.info(`::cmd ${msg}`);
+  logger.info(`::cmd ${msg}`, { channelId: message.channelId });
 }
 
 export function addHourlyCommand(member: GuildMember) {
