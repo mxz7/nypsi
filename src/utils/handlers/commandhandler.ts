@@ -777,7 +777,7 @@ export async function runCommand(
     let msg: string;
 
     if (!(message instanceof Message)) {
-      msg = `[${getTimestamp()}] ${message.guild.id} - ${message.author.username}: [/]${
+      msg = `[${getTimestamp()}] ${message.guild.id} ${message.channelId} - ${message.author.username}: [/]${
         message.commandName
       } ${args.join(" ")}`;
     } else {
@@ -787,7 +787,7 @@ export async function runCommand(
         content = content.substring(0, 75) + "...";
       }
 
-      msg = `[${getTimestamp()}] ${message.guildId}:${message.channelId} - ${
+      msg = `[${getTimestamp()}] ${message.guildId} ${message.channelId} - ${
         message.author.username
       }: ${content}`;
     }
