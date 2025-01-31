@@ -876,6 +876,8 @@
       "id:grandma:65",
       "id:lamborghini:5",
       "id:orphan:50",
+      "id:hook:32",
+      "id:magnet:8",
       "id:big_tiddy_goth_gf:75",
       "id:viagra:30",
       "id:looting:30",
@@ -1643,6 +1645,49 @@
     },
     "in_crates": true
   },
+  "hook": {
+    "id": "hook",
+    "name": "hook",
+    "article": "a",
+    "plural": "hooks",
+    "emoji": "🪝",
+    "longDesc": "need a tow?",
+    "rarity": 2,
+    "sell": 100000,
+    "role": "item",
+    "in_crates": true
+  },
+  "claw_crane": {
+    "id": "claw_crane",
+    "name": "claw crane",
+    "article": "a",
+    "plural": "claw cranes",
+    "aliases": ["claw", "crane"],
+    "emoji": "🦾",
+    "longDesc": "increases chance of finding wheel upgrade parts from your scrapyard",
+    "rarity": 5,
+    "sell": 1000000,
+    "role": "worker-upgrade",
+    "worker_upgrade_id": "claw_crane",
+    "in_crates": false,
+    "craft": {
+      "time": 43200,
+      "ingredients": ["hook:8"]
+    }
+  },
+  "magnet": {
+    "id": "magnet",
+    "name": "magnet",
+    "article": "a",
+    "plural": "magnets",
+    "emoji": "🧲",
+    "longDesc": "increases chance of finding turbo upgrade parts from your scrapyard",
+    "rarity": 4,
+    "sell": 1000000,
+    "role": "worker-upgrade",
+    "worker_upgrade_id": "magnet",
+    "in_crates": true
+  },
   "stolen_nasa_computer": {
     "id": "stolen_nasa_computer",
     "name": "stolen nasa computer",
@@ -2164,6 +2209,7 @@
       "id:super_cursor:50",
       "id:range_rover_skin:10",
       "id:pontiac_skin:10",
+      "id:hook:25",
       "id:oven:30",
       "id:lamborghini:1",
       "id:engine_upgrade_part:50",

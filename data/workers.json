@@ -52,6 +52,15 @@
       "base_cost": 17000,
       "for": "mcdonalds"
     },
+    "compactors": {
+      "id": "compactors",
+      "name": "compactors",
+      "upgrades": "per_interval",
+      "effect": 0.2,
+      "stack_limit": 20,
+      "base_cost": 40000,
+      "for": "scrapyard"
+    },
     "warehouse_workers": {
       "id": "warehouse_workers",
       "name": "warehouse workers",
@@ -129,8 +138,9 @@
       "id": "gem_radar",
       "name": "gem radar",
       "plural": "gem radars",
-      "upgrades": "gem_chance",
-      "effect": 0.0002,
+      "upgrades": "byproduct_chance",
+      "byproduct": "gem_shard",
+      "effect": 0.001,
       "stack_limit": 10,
       "for": "quarry"
     },
@@ -138,10 +148,31 @@
       "id": "earth_scanner",
       "name": "earth scanner",
       "plural": "earth scanners",
-      "upgrades": "scrap_chance",
-      "effect": 0.0007,
+      "upgrades": "byproduct_chance",
+      "byproduct": "quarry_scrap",
+      "effect": 0.0036,
       "stack_limit": 10,
       "for": "quarry"
+    },
+    "claw_crane": {
+      "id": "claw_crane",
+      "name": "claw crane",
+      "plural": "claw cranes",
+      "upgrades": "byproduct_chance",
+      "byproduct": "wheel_upgrade_part",
+      "effect": 0.0014,
+      "stack_limit": 10,
+      "for": "scrapyard"
+    },
+    "magnet": {
+      "id": "magnet",
+      "name": "magnet",
+      "plural": "magnets",
+      "upgrades": "byproduct_chance",
+      "byproduct": "turbo_upgrade_part",
+      "effect": 0.0014,
+      "stack_limit": 10,
+      "for": "scrapyard"
     }
   },
   "workers": {
@@ -154,7 +185,21 @@
       "base": {
         "per_item": 14,
         "max_storage": 500,
-        "per_interval": 150
+        "per_interval": 150,
+        "byproducts": {
+          "quarry_scrap": {
+            "chance": 0.00044,
+            "rolls": 0.00205,
+            "multiply_chance": false,
+            "multiply_rolls": true
+          },
+          "gem_shard": {
+            "chance": 0.00015,
+            "rolls": 0.00205,
+            "multiply_chance": false,
+            "multiply_rolls": true
+          }
+        }
       }
     },
     "potato_farmer": {
@@ -215,6 +260,38 @@
         "per_item": 9,
         "max_storage": 450,
         "per_interval": 300
+      }
+    },
+    "scrapyard": {
+      "id": "scrapyard",
+      "name": "scrapyard",
+      "item_emoji": "🔩",
+      "prestige_requirement": 60,
+      "cost": 175000,
+      "base": {
+        "per_item": 4,
+        "max_storage": 200,
+        "per_interval": 50,
+        "byproducts": {
+          "hook": {
+            "chance": 0.0035,
+            "rolls": 0.008,
+            "multiply_chance": false,
+            "multiply_rolls": true
+          },
+          "wheel_upgrade_part": {
+            "chance": 0.00035,
+            "rolls": 0.008,
+            "multiply_chance": false,
+            "multiply_rolls": true
+          },
+          "turbo_upgrade_part": {
+            "chance": 0.00035,
+            "rolls": 0.008,
+            "multiply_chance": false,
+            "multiply_rolls": true
+          }
+        }
       }
     },
     "tailor": {

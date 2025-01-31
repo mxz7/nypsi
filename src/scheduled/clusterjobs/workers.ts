@@ -16,8 +16,7 @@ import { getBoosters } from "../../utils/functions/economy/boosters";
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { addStat } from "../../utils/functions/economy/stats";
 import { getBaseWorkers } from "../../utils/functions/economy/utils";
-import { calcWorkerValues, getWorkers } from "../../utils/functions/economy/workers";
-import { percentChance } from "../../utils/functions/random";
+import { calcWorkerValues, evaluateWorker, getWorkers } from "../../utils/functions/economy/workers";
 import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
 import { logger } from "../../utils/logger";
 import ms = require("ms");
@@ -33,14 +32,13 @@ async function doWorkerThing() {
 
   const dms = new Set<string>();
   const hasSteve = new Set<string>();
+  const baseWorkers = getBaseWorkers();
 
   for (const worker of query) {
-    const { maxStorage, perInterval, perItem, scrapChance, gemChance } =
-      await calcWorkerValues(worker);
+    const { perItem, perInterval, maxStorage, byproductChances } = await calcWorkerValues(worker);
 
     if (!hasSteve.has(worker.userId)) {
       const boosters = await getBoosters(worker.userId);
-
       if (Array.from(boosters.keys()).includes("steve")) hasSteve.add(worker.userId);
     }
 
@@ -50,7 +48,6 @@ async function doWorkerThing() {
 
     if (worker.stored + incrementAmount > maxStorage) {
       incrementAmount = maxStorage - worker.stored;
-
       if ((await getDmSettings(worker.userId)).worker != "Disabled") {
         dms.add(worker.userId);
       }
@@ -63,18 +60,21 @@ async function doWorkerThing() {
         steveStorage = JSON.parse(
           await redis.get(`${Constants.redis.nypsi.STEVE_EARNED}:${worker.userId}`),
         );
-        steveStorage.money = parseInt(steveStorage.money as unknown as string);
-        steveStorage.gemShards = parseInt(steveStorage.gemShards as unknown as string);
-        steveStorage.scraps = parseInt(steveStorage.scraps as unknown as string);
       } else {
-        steveStorage = { money: 0, gemShards: 0, scraps: 0 };
+        steveStorage = { money: 0, byproducts: {} };
       }
 
-      let earned = 0;
+      let totalEarned = 0;
+      const { amountEarned, byproductAmounts } =
+        await evaluateWorker(worker.userId, baseWorkers[worker.workerId], {
+          stored: worker.stored + incrementAmount,
+          calculated: {
+            perItem: perItem,
+            byproductChances: byproductChances
+          }
+        });
 
       if (worker.stored != 0) {
-        earned += Math.floor(worker.stored * perItem);
-
         await prisma.economyWorker.update({
           where: {
             userId_workerId: {
@@ -88,23 +88,20 @@ async function doWorkerThing() {
         });
       }
 
-      earned += Math.floor(incrementAmount * perItem);
+      totalEarned += amountEarned;
+      steveStorage.money += amountEarned;
 
-      await addBalance(worker.userId, earned);
-      await addProgress(worker.userId, "capitalist", earned);
-      await addProgress(worker.userId, "super_capitalist", earned);
-      await addStat(worker.userId, "earned-workers", earned);
+      await addBalance(worker.userId, amountEarned);
+      await addProgress(worker.userId, "capitalist", amountEarned);
+      await addProgress(worker.userId, "super_capitalist", amountEarned);
+      await addStat(worker.userId, "earned-workers", amountEarned);
 
-      steveStorage.money += earned;
-
-      while (percentChance(gemChance * incrementAmount)) {
-        steveStorage.gemShards++;
-        await addInventoryItem(worker.userId, "gem_shard", 1);
-      }
-
-      while (percentChance(scrapChance * incrementAmount)) {
-        steveStorage.scraps++;
-        await addInventoryItem(worker.userId, "quarry_scrap", 1);
+      for (const byproduct in byproductAmounts) {
+        if (steveStorage.byproducts[byproduct] == undefined) {
+          steveStorage.byproducts[byproduct] = 0;
+        }
+        steveStorage.byproducts[byproduct] += byproductAmounts[byproduct];
+        await addInventoryItem(worker.userId, byproduct, byproductAmounts[byproduct]);
       }
 
       await redis.set(
@@ -115,7 +112,7 @@ async function doWorkerThing() {
         `${Constants.redis.nypsi.STEVE_EARNED}:${worker.userId}`,
         ms("24 hours") / 1000,
       );
-    } else {
+    } else if (incrementAmount != 0) {
       await prisma.economyWorker.update({
         where: {
           userId_workerId: {
