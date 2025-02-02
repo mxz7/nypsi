@@ -103,6 +103,8 @@ async function run(
       `${target.user.username} has **${aura.toLocaleString()}** aura`,
     ).setHeader(`${target.user.username}`, target.user.displayAvatarURL());
 
+    if (target.user.id === target.client.user.id) return send({ embeds: [embed] });
+
     const msg = await send({ embeds: [embed], components: [row] });
 
     const interaction = await msg
