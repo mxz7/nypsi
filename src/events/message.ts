@@ -38,9 +38,11 @@ import {
   handleAttachments,
   sendToRequestChannel,
 } from "../utils/functions/supportrequest";
+import { createAuraTransaction } from "../utils/functions/users/aura";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { getLastCommand } from "../utils/functions/users/commands";
 import { MentionQueueItem } from "../utils/functions/users/mentions";
+import { hasProfile } from "../utils/functions/users/utils";
 import { runCommand } from "../utils/handlers/commandhandler";
 import { logger } from "../utils/logger";
 import ms = require("ms");
@@ -356,11 +358,30 @@ export default async function messageCreate(message: Message) {
     }
   };
 
+  const checkAura = async () => {
+    if (
+      (await hasProfile(message.member)) &&
+      (await getLastCommand(message.member)).getTime() > Date.now() - ms("1 day")
+    ) {
+      for (const brainrot of brainrotFilter) {
+        if (message.content.toLowerCase().includes(brainrot)) {
+          const amounts = [5, 10, 25, 50, 75];
+          const chosen = amounts[Math.floor(Math.random() * amounts.length)];
+
+          createAuraTransaction(message.author.id, message.client.user.id, -chosen);
+
+          redis.set(`brainrot:cooldown:${message.channelId}`, 1, "EX", 30);
+        }
+      }
+    }
+  };
+
   if (!message.author.bot) {
     if (message.guildId === Constants.NYPSI_SERVER_ID) {
       setTimeout(() => {
         checkNeedSupport();
         checkTask();
+        checkAura();
       }, 1000);
     }
   }
