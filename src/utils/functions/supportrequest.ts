@@ -156,7 +156,7 @@ export async function sendToRequestChannel(id: string, embed: CustomEmbed, clien
   }
 
   const res = await client.cluster.broadcastEval(
-    async (c, { shard, embed, channelId }) => {
+    async (c, { shard, embed, channelId, notify }) => {
       const client = c as unknown as NypsiClient;
       if (client.cluster.id != shard) return false;
 
@@ -166,12 +166,25 @@ export async function sendToRequestChannel(id: string, embed: CustomEmbed, clien
 
       if (!channel.isSendable()) return;
 
-      const msg = await channel.send({ embeds: [embed] }).catch(() => {});
+      let content: string;
+
+      if (notify) {
+        content = notify.map((i) => `<@${i}>`).join(" ");
+      }
+
+      const msg = await channel.send({ embeds: [embed], content }).catch(() => {});
 
       if (!msg) return false;
       return true;
     },
-    { context: { shard: shard, embed: embed.toJSON(), channelId: request.channelId } },
+    {
+      context: {
+        shard: shard,
+        embed: embed.toJSON(),
+        channelId: request.channelId,
+        notify: request.notify,
+      },
+    },
   );
 
   if (!res.includes(true)) return false;
