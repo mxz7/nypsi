@@ -55,7 +55,7 @@ async function run(
           "if you're unable to prove that it's your account, we cannot do anything.",
       );
     } else if (args[0].toLowerCase() === "notify") {
-      const res = await toggleNotify(support.channelId, support.userId);
+      const res = await toggleNotify(support.userId, message.author.id);
       if (res) return message.react("✅");
     } else embed.setDescription(args.join(" "));
   }
