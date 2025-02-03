@@ -136,9 +136,21 @@ export function runLogs() {
       )
         continue;
 
-      const webhook = new WebhookClient({
-        url: modlog.modlogs,
-      });
+      let webhook: WebhookClient;
+
+      try {
+        webhook = new WebhookClient({ url: modlog.modlogs });
+      } catch (e) {
+        logger.error(`invalid webhook` + modlog);
+        await prisma.guild.update({
+          where: {
+            id: modlog.id,
+          },
+          data: {
+            modlogs: null,
+          },
+        });
+      }
 
       const embeds: APIEmbed[] = [];
 
