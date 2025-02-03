@@ -14,6 +14,7 @@ import {
 import { checkOffer } from "../utils/functions/economy/offers";
 import { addStat } from "../utils/functions/economy/stats";
 import { getItems, isEcoBanned } from "../utils/functions/economy/utils";
+import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import { getTier } from "../utils/functions/premium/premium";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
@@ -77,7 +78,10 @@ export default {
         embeds: [new ErrorEmbed("you don't have the items for this offer")],
       });
     }
-    if (Number(offer.money / offer.itemAmount) < 50_000) {
+
+    const accounts = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, offer.ownerId);
+
+    if (Number(offer.money / offer.itemAmount) < 50_000 || accounts.includes(offer.targetId)) {
       await prisma.offer.delete({
         where: {
           messageId: offer.messageId,
