@@ -1,11 +1,13 @@
 import dayjs = require("dayjs");
 import { Prisma } from "@prisma/client";
+import { exec } from "child_process";
 import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
   CommandInteraction,
+  ComponentType,
   Interaction,
   Message,
   MessageActionRowComponentBuilder,
@@ -300,6 +302,11 @@ async function run(
           .setLabel("blacklist")
           .setStyle(ButtonStyle.Danger)
           .setEmoji("❌"),
+        new ButtonBuilder()
+          .setCustomId("wipe")
+          .setLabel("wipe")
+          .setStyle(ButtonStyle.Danger)
+          .setEmoji("🧹"),
       ),
     ];
 
@@ -860,6 +867,119 @@ async function run(
         );
         doAnticheat(user, res as ButtonInteraction);
         return waitForButton();
+      } else if (res.customId === "wipe") {
+        if ((await getAdminLevel(message.author.id)) < 69) {
+          await res.editReply({
+            embeds: [new ErrorEmbed("you require admin level **69** to do this")],
+          });
+          return waitForButton();
+        }
+
+        const confirmMsg = await res.editReply({
+          embeds: [
+            new CustomEmbed(
+              message.member,
+              `are you sure you want to wipe ${user.username} (${user.id})`,
+            ),
+          ],
+          components: [
+            new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+              new ButtonBuilder().setCustomId("yes").setLabel("yes").setStyle(ButtonStyle.Danger),
+            ),
+          ],
+        });
+
+        const confirmRes = await confirmMsg
+          .awaitMessageComponent({
+            filter: (i) => i.user.id === message.author.id,
+            time: 15000,
+            componentType: ComponentType.Button,
+          })
+          .catch(() => {});
+
+        if (confirmRes && confirmRes.customId === "yes") {
+          await confirmRes.reply({
+            embeds: [new CustomEmbed(message.member, `wiping ${user.username} (${user.id})...`)],
+          });
+
+          logger.info(`admin: ${message.author.id} (${message.author.username}) wiping ${user.id}`);
+
+          await prisma.inventory.deleteMany({
+            where: {
+              userId: user.id,
+            },
+          });
+
+          await prisma.economyWorker.deleteMany({
+            where: {
+              userId: user.id,
+            },
+          });
+
+          await prisma.farm.deleteMany({
+            where: {
+              userId: user.id,
+            },
+          });
+
+          await prisma.economyGuild.delete({
+            where: {
+              ownerId: user.id,
+            },
+          });
+
+          await prisma.achievements.deleteMany({
+            where: {
+              userId: user.id,
+            },
+          });
+
+          await prisma.bakeryUpgrade.deleteMany({
+            where: {
+              userId: user.id,
+            },
+          });
+
+          await prisma.upgrades.deleteMany({
+            where: {
+              userId: user.id,
+            },
+          });
+
+          await prisma.customCar.deleteMany({
+            where: {
+              userId: user.id,
+            },
+          });
+
+          await prisma.booster.deleteMany({
+            where: {
+              userId: user.id,
+            },
+          });
+
+          await prisma.crafting.deleteMany({
+            where: {
+              userId: user.id,
+            },
+          });
+
+          await prisma.economy.update({
+            where: {
+              userId: user.id,
+            },
+            data: {
+              money: 0,
+              bank: 0,
+              bankStorage: 0,
+              prestige: 0,
+              level: 0,
+              xp: 0,
+            },
+          });
+
+          exec(`redis-cli KEYS "*${user.id}*" | xargs redis-cli DEL`);
+        }
       }
     };
     return waitForButton();
