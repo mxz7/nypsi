@@ -50,7 +50,6 @@ import { addNotificationToQueue } from "../utils/functions/users/notifications";
 import { addTag, getTags, removeTag } from "../utils/functions/users/tags";
 import { hasProfile } from "../utils/functions/users/utils";
 import { logger } from "../utils/logger";
-import { getBoosters } from "../utils/functions/economy/boosters";
 import ms = require("ms");
 
 const cmd = new Command("x", "admincmd", "none").setPermissions(["bot owner"]);
@@ -1692,28 +1691,6 @@ async function run(
     if (message.author.id !== Constants.TEKOH_ID) return;
     await redis.del(Constants.redis.nypsi.CRASH_STATUS);
     await initCrashGame(message.client as NypsiClient);
-  } else if (args[0].toLowerCase() === "migratesteve") {
-    if (message.author.id !== Constants.TEKOH_ID) return;
-    const query = await prisma.economyWorker.findMany({
-      include: {
-        upgrades: true,
-      },
-    });
-    for (const worker of query) {
-      const boosters = await getBoosters(worker.userId);
-      const key = `${Constants.redis.nypsi.STEVE_EARNED}:${worker.userId}`;
-      if (!Array.from(boosters.keys()).includes("steve")) continue;
-      if (!await redis.exists(key)) continue;
-      const steveStorage = JSON.parse(await redis.get(key));
-      if ( steveStorage.byproducts !== undefined) continue; // protection against running more than once
-      steveStorage.byproducts = {};
-      steveStorage.byproducts.quarry_scrap = steveStorage.scraps;
-      steveStorage.byproducts.gem_shard = steveStorage.gemShards;
-      delete steveStorage.scraps;
-      delete steveStorage.gemShards;
-      await redis.set(key, JSON.stringify(steveStorage));
-      await redis.expire(key, ms("24 hours") / 1000);
-    }
   }
 }
 
