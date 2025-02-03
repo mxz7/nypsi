@@ -809,8 +809,9 @@ model Mention {
 }
 
 model SupportRequest {
-  userId    String @id
-  channelId String @unique
+  userId    String   @id
+  channelId String   @unique
+  notify    String[]
 }
 
 model Purchases {
