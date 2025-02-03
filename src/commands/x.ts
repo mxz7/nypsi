@@ -980,6 +980,12 @@ async function run(
             },
           });
 
+          confirmRes.editReply({
+            embeds: [
+              new CustomEmbed(message.member, `wiping ${user.username} (${user.id})...\n\ndone`),
+            ],
+          });
+
           exec(`redis-cli KEYS "*${user.id}*" | xargs redis-cli DEL`);
         }
       }
