@@ -1,3 +1,4 @@
+import { SupportRequest } from "@prisma/client";
 import { Attachment, Collection } from "discord.js";
 import { nanoid } from "nanoid";
 import prisma from "../../init/database";
@@ -18,9 +19,9 @@ export async function getSupportRequestByChannelId(id: string) {
   return query;
 }
 
-export async function getSupportRequest(id: string) {
+export async function getSupportRequest(id: string): Promise<SupportRequest> {
   if (await redis.exists(`${Constants.redis.cache.SUPPORT}:${id}`)) {
-    return await redis.get(`${Constants.redis.cache.SUPPORT}:${id}`);
+    return JSON.parse(await redis.get(`${Constants.redis.cache.SUPPORT}:${id}`));
   }
 
   const query = await prisma.supportRequest.findUnique({
@@ -30,9 +31,9 @@ export async function getSupportRequest(id: string) {
   });
 
   if (query) {
-    await redis.set(`${Constants.redis.cache.SUPPORT}:${id}`, query.channelId);
+    await redis.set(`${Constants.redis.cache.SUPPORT}:${id}`, JSON.stringify(query));
     await redis.expire(`${Constants.redis.cache.SUPPORT}:${id}`, 900);
-    return query.channelId;
+    return query;
   } else {
     return null;
   }
@@ -40,7 +41,7 @@ export async function getSupportRequest(id: string) {
 
 export async function createSupportRequest(id: string, client: NypsiClient, username: string) {
   const clusterHas = await client.cluster.broadcastEval(
-    async (c, {channelId}) => {
+    async (c, { channelId }) => {
       const client = c as unknown as NypsiClient;
       const channel = client.channels.cache.get(channelId);
 
@@ -50,7 +51,7 @@ export async function createSupportRequest(id: string, client: NypsiClient, user
         return "not-found";
       }
     },
-    { context: { channelId: Constants.SUPPORT_CHANNEL_ID } }
+    { context: { channelId: Constants.SUPPORT_CHANNEL_ID } },
   );
 
   let shard: number;
@@ -93,8 +94,8 @@ export async function createSupportRequest(id: string, client: NypsiClient, user
         shard: shard,
         username: username,
         channelId: Constants.SUPPORT_CHANNEL_ID,
-        roleId: Constants.SUPPORT_ROLE_ID
-      }
+        roleId: Constants.SUPPORT_ROLE_ID,
+      },
     },
   );
 
@@ -123,9 +124,9 @@ export async function createSupportRequest(id: string, client: NypsiClient, user
 }
 
 export async function sendToRequestChannel(id: string, embed: CustomEmbed, client: NypsiClient) {
-  const channelId = await getSupportRequest(id);
+  const request = await getSupportRequest(id);
 
-  if (!channelId) return false;
+  if (!request?.channelId) return false;
 
   const clusterHas = await client.cluster.broadcastEval(
     async (c, { channelId }) => {
@@ -138,7 +139,7 @@ export async function sendToRequestChannel(id: string, embed: CustomEmbed, clien
         return "not-found";
       }
     },
-    { context: { channelId: channelId } },
+    { context: { channelId: request.channelId } },
   );
 
   let shard: number;
@@ -170,7 +171,7 @@ export async function sendToRequestChannel(id: string, embed: CustomEmbed, clien
       if (!msg) return false;
       return true;
     },
-    { context: { shard: shard, embed: embed.toJSON(), channelId: channelId } },
+    { context: { shard: shard, embed: embed.toJSON(), channelId: request.channelId } },
   );
 
   if (!res.includes(true)) return false;
@@ -208,4 +209,34 @@ export async function handleAttachments(attachments: Collection<string, Attachme
   await pAll(promises, { concurrency: 2 });
 
   return urls;
+}
+
+export async function toggleNotify(id: string, userId: string) {
+  const request = await getSupportRequest(id);
+
+  if (!request) return false;
+
+  if (request.notify.includes(userId)) {
+    await prisma.supportRequest.update({
+      where: {
+        channelId: id,
+      },
+      data: {
+        notify: {
+          set: request.notify.filter((i) => i != userId),
+        },
+      },
+    });
+  } else {
+    await prisma.supportRequest.update({
+      where: { channelId: id },
+      data: {
+        notify: {
+          push: userId,
+        },
+      },
+    });
+  }
+
+  return true;
 }
