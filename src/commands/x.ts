@@ -922,11 +922,13 @@ async function run(
             },
           });
 
-          await prisma.economyGuild.delete({
-            where: {
-              ownerId: user.id,
-            },
-          });
+          await prisma.economyGuild
+            .delete({
+              where: {
+                ownerId: user.id,
+              },
+            })
+            .catch(() => {});
 
           await prisma.achievements.deleteMany({
             where: {
