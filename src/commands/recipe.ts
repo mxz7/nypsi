@@ -1,6 +1,7 @@
 import { CommandInteraction } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { MStoTime } from "../utils/functions/date";
 import { selectItem } from "../utils/functions/economy/inventory";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -47,7 +48,9 @@ async function run(
     desc.push(`* ${ingredient.split(":")[1]} ${item.emoji} ${item.name}`);
   });
 
-  embed.setDescription(desc.join("\n"));
+  embed.setDescription(
+    desc.join("\n") + `\n\n**${MStoTime(selected.craft.time * 1000)}** craft time`,
+  );
 
   return message.channel.send({ embeds: [embed] });
 }
