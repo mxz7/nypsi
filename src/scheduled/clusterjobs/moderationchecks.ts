@@ -162,6 +162,8 @@ export function runLogs() {
         } else {
           invalidWebhookCounts.set(modlog.id, 1);
         }
+
+        continue;
       }
 
       const embeds: APIEmbed[] = [];
