@@ -133,7 +133,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
       addExpiry(cmd.name, message.member, 30);
     });
 
-  if (reaction == "✅") {
+  if (reaction == "✅" || Constants.WHITELISTED_BOTS.includes(message.author.id)) {
     await addExpiry(cmd.name, message.member, 300);
     [level, prestige] = await Promise.all([getLevel(message.member), getPrestige(message.member)]);
 
