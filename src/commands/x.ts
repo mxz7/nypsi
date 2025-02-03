@@ -972,6 +972,18 @@ async function run(
             },
           });
 
+          await prisma.offer.deleteMany({
+            where: {
+              AND: [{ ownerId: user.id }, { sold: false }],
+            },
+          });
+
+          await prisma.auction.deleteMany({
+            where: {
+              AND: [{ ownerId: user.id }, { sold: false }],
+            },
+          });
+
           await prisma.economy.update({
             where: {
               userId: user.id,
