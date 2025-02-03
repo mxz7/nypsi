@@ -93,10 +93,9 @@ export async function passedCaptcha(member: GuildMember, check: Captcha) {
 
   let ttl = Math.floor(ms("30 minutes") / 1000);
 
-  if (check.received > 1) ttl = Math.floor(ms("15 minutes") / 1000);
-  else if (check.received > 3) ttl = Math.floor(ms("10 minutes") / 1000);
-  else if (check.received > 5) ttl = Math.floor(ms("5 minutes") / 1000);
-  else if (check.received > 10) ttl = 1;
+  if (check.received > 1) ttl = Math.floor(ms("10 minutes") / 1000);
+  else if (check.received > 3) ttl = Math.floor(ms("5 minutes") / 1000);
+  else if (check.received > 5) ttl = 1;
 
   await redis.set(
     `${Constants.redis.nypsi.CAPTCHA_VERIFIED}:${member.user.id}`,
