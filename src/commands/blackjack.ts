@@ -539,7 +539,7 @@ class Game {
     if (res && res.customId == "rp") {
       this.interaction = res;
       logger.info(
-        `::cmd ${this.message.guild.id} ${this.member.user.username}: replaying blackjack`,
+        `::cmd ${this.message.guild.id} ${this.message.channelId} ${this.member.user.username}: replaying blackjack`,
       );
       if (await isLockedOut(this.member.user.id)) return verifyUser(this.playerMessage);
 
