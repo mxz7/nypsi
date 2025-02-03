@@ -15,6 +15,7 @@ import {
   MessageActionRowComponentBuilder,
   MessageCreateOptions,
   MessageEditOptions,
+  WebhookClient,
 } from "discord.js";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
@@ -22,7 +23,7 @@ import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Comman
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { a } from "../utils/functions/anticheat";
-import { isLockedOut, verifyUser } from "../utils/functions/captcha";
+import { giveCaptcha, isLockedOut, verifyUser } from "../utils/functions/captcha";
 import { addProgress } from "../utils/functions/economy/achievements";
 import {
   addBalance,
@@ -43,12 +44,12 @@ import {
 } from "../utils/functions/economy/utils.js";
 import { addXp, calcEarnedGambleXp } from "../utils/functions/economy/xp";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
-import { shuffle } from "../utils/functions/random";
+import { percentChance, shuffle } from "../utils/functions/random";
 import sleep from "../utils/functions/sleep";
 import { recentCommands } from "../utils/functions/users/commands";
 import { addHourlyCommand } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
-import { gamble, logger } from "../utils/logger";
+import { gamble, getTimestamp, logger } from "../utils/logger";
 
 const cmd = new Command("blackjack", "play blackjack", "money").setAliases(["bj", "blowjob"]);
 
@@ -492,6 +493,23 @@ class Game {
       (await getBalance(this.member)) < this.bet
     ) {
       return this.edit({ embeds: [embed], components: [] });
+    }
+
+    if (percentChance(0.7)) {
+      const res = await giveCaptcha(this.member.user.id);
+
+      if (res) {
+        logger.info(
+          `${this.member.user.username} (${this.member.user.id}) given captcha randomly in blackjack`,
+        );
+        const hook = new WebhookClient({
+          url: process.env.ANTICHEAT_HOOK,
+        });
+        await hook.send({
+          content: `[${getTimestamp()}] ${this.member.user.username} (${this.member.user.id}) given captcha randomly in blackjack`,
+        });
+        hook.destroy();
+      }
     }
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(

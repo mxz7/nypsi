@@ -14,6 +14,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
   MessageEditOptions,
+  WebhookClient,
 } from "discord.js";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
@@ -21,7 +22,7 @@ import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Comman
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { a } from "../utils/functions/anticheat";
-import { isLockedOut, verifyUser } from "../utils/functions/captcha";
+import { giveCaptcha, isLockedOut, verifyUser } from "../utils/functions/captcha";
 import { addProgress } from "../utils/functions/economy/achievements";
 import {
   addBalance,
@@ -46,7 +47,7 @@ import { percentChance } from "../utils/functions/random";
 import { recentCommands } from "../utils/functions/users/commands";
 import { addHourlyCommand } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { gamble, logger } from "../utils/logger";
+import { gamble, getTimestamp, logger } from "../utils/logger";
 import _ = require("lodash");
 import ms = require("ms");
 
@@ -521,6 +522,23 @@ async function playGame(
         (await getBalance(message.member)) < game.bet
       ) {
         return edit({ embeds: [embed], components: createRows(board, true) }, interaction);
+      }
+
+      if (percentChance(0.7)) {
+        const res = await giveCaptcha(this.member.user.id);
+
+        if (res) {
+          logger.info(
+            `${this.member.user.username} (${this.member.user.id}) given captcha randomly in tower`,
+          );
+          const hook = new WebhookClient({
+            url: process.env.ANTICHEAT_HOOK,
+          });
+          await hook.send({
+            content: `[${getTimestamp()}] ${this.member.user.username} (${this.member.user.id}) given captcha randomly in tower`,
+          });
+          hook.destroy();
+        }
       }
 
       (components[components.length - 1].components[0] as ButtonBuilder)
