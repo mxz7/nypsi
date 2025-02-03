@@ -20,6 +20,7 @@ import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed, ErrorEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { logger, transaction } from "../../logger";
+import { getAllGroupAccountIds } from "../moderation/alts";
 import { filterOutliers } from "../outliers";
 import { getTier, isPremium } from "../premium/premium";
 import { addToNypsiBank, getTax } from "../tax";
@@ -85,7 +86,7 @@ export async function deleteAuction(id: number, client: NypsiClient) {
     });
 
     await client.cluster.broadcastEval(
-      async (client, {guildId, channelId, id}) => {
+      async (client, { guildId, channelId, id }) => {
         const guild = await client.guilds.cache.get(guildId);
 
         if (!guild) return;
@@ -100,7 +101,13 @@ export async function deleteAuction(id: number, client: NypsiClient) {
           if (msg) await msg.delete().catch(() => {});
         }
       },
-      { context: { guildId: Constants.NYPSI_SERVER_ID, channelId: Constants.AUCTION_CHANNEL_ID, id: auction.messageId } },
+      {
+        context: {
+          guildId: Constants.NYPSI_SERVER_ID,
+          channelId: Constants.AUCTION_CHANNEL_ID,
+          id: auction.messageId,
+        },
+      },
     );
   }
 
@@ -152,13 +159,14 @@ export async function createAuction(
     );
 
   const clusters = await (member.client as NypsiClient).cluster.broadcastEval(
-    async (client, {guildId}) => {
+    async (client, { guildId }) => {
       const guild = await client.guilds.cache.get(guildId);
 
       if (guild) return (client as unknown as NypsiClient).cluster.id;
       return "not-found";
-  },
-  { context: { guildId: Constants.NYPSI_SERVER_ID } });
+    },
+    { context: { guildId: Constants.NYPSI_SERVER_ID } },
+  );
 
   let cluster: number;
 
@@ -171,7 +179,7 @@ export async function createAuction(
 
   const { url, id } = await (member.client as NypsiClient).cluster
     .broadcastEval(
-      async (client, {guildId, channelId, embed, row, cluster}) => {
+      async (client, { guildId, channelId, embed, row, cluster }) => {
         if ((client as unknown as NypsiClient).cluster.id != cluster) return;
         const guild = await client.guilds.cache.get(guildId);
 
@@ -193,8 +201,8 @@ export async function createAuction(
           channelId: Constants.AUCTION_CHANNEL_ID,
           embed: embed.toJSON(),
           row: buttonRow.toJSON(),
-          cluster: cluster
-        } 
+          cluster: cluster,
+        },
       },
     )
     .then((res) => {
@@ -680,7 +688,9 @@ export async function buyFullAuction(
     });
   }
 
-  if (Number(auction.bin / auction.itemAmount) < 50_000) {
+  const accounts = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, auction.ownerId);
+
+  if (Number(auction.bin / auction.itemAmount) < 50_000 || accounts.includes(interaction.user.id)) {
     await prisma.auction.delete({
       where: {
         id: auction.id,
@@ -874,7 +884,12 @@ export async function buyAuctionOne(
     });
   }
 
-  if (Number(auction.bin) < 10_000 && Number(auction.itemAmount) === 1) {
+  const accounts = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, auction.ownerId);
+
+  if (
+    (Number(auction.bin) < 10_000 && Number(auction.itemAmount) === 1) ||
+    accounts.includes(interaction.user.id)
+  ) {
     await prisma.auction.delete({
       where: {
         id: auction.id,
@@ -1138,7 +1153,12 @@ export async function buyAuctionMulti(
     });
   }
 
-  if (Number(auction.bin) < 10_000 && Number(auction.itemAmount) === 1) {
+  const accounts = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, auction.ownerId);
+
+  if (
+    (Number(auction.bin) < 10_000 && Number(auction.itemAmount) === 1) ||
+    accounts.includes(interaction.user.id)
+  ) {
     await prisma.auction.delete({
       where: {
         id: auction.id,
