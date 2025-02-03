@@ -7,6 +7,7 @@ import {
   Interaction,
   InteractionReplyOptions,
   Message,
+  WebhookClient,
 } from "discord.js";
 import redis from "../../../../init/redis";
 import { NypsiClient } from "../../../../models/Client";
@@ -15,9 +16,10 @@ import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import Constants from "../../../Constants";
 import { addHourlyCommand } from "../../../handlers/commandhandler";
-import { logger } from "../../../logger";
+import { getTimestamp, logger } from "../../../logger";
 import { a } from "../../anticheat";
-import { isLockedOut, verifyUser } from "../../captcha";
+import { giveCaptcha, isLockedOut, verifyUser } from "../../captcha";
+import { percentChance } from "../../random";
 import { recentCommands } from "../../users/commands";
 import { getInventory, selectItem, setInventoryItem } from "../inventory";
 import ScratchCard from "../scratchies";
@@ -108,6 +110,23 @@ async function prepare(
         userId: message.author.id,
         result: card.won ? "win" : "lose",
       });
+
+      if (percentChance(0.7)) {
+        const res = await giveCaptcha(message.author.id);
+
+        if (res) {
+          logger.info(
+            `${message.author.username} (${message.author.id}) given captcha randomly in scratch card`,
+          );
+          const hook = new WebhookClient({
+            url: process.env.ANTICHEAT_HOOK,
+          });
+          await hook.send({
+            content: `[${getTimestamp()}] ${message.author.username} (${message.author.id}) given captcha randomly in scratch card`,
+          });
+          hook.destroy();
+        }
+      }
 
       embed.setDescription(
         `**${card.remainingClicks}** click${card.remainingClicks != 1 ? "s" : ""} left`,
