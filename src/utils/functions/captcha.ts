@@ -15,6 +15,7 @@ import { NypsiCommandInteraction, NypsiMessage } from "../../models/Command";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import Constants from "../Constants";
 import { getTimestamp } from "../logger";
+import { MStoTime } from "./date";
 import { isEcoBanned, setEcoBan } from "./economy/utils";
 import { addNotificationToQueue } from "./users/notifications";
 import ms = require("ms");
@@ -73,6 +74,8 @@ export async function passedCaptcha(member: GuildMember, check: Captcha) {
     );
   }
 
+  const timeTakenToSolve = check.solvedAt.getTime() - check.createdAt.getTime();
+
   await hook.send(
     `[${getTimestamp()}] **${member.user.username}** (${
       member.user.id
@@ -81,8 +84,10 @@ export async function passedCaptcha(member: GuildMember, check: Captcha) {
     )}]\n` +
       "```" +
       `received: ${check.received}\n` +
+      `received at: ${dayjs(check.createdAt).format("HH:mm:ss")}\n` +
       `visits (${check.visits.length}): ${check.visits.map((i) => dayjs(i).format("HH:mm:ss")).join(" ")}\n` +
       `solved at: ${dayjs(check.solvedAt).format("HH:mm:ss")}\n` +
+      `time taken: ${MStoTime(timeTakenToSolve)}\n` +
       "```",
   );
 
