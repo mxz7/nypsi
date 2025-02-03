@@ -6,6 +6,7 @@ import {
   getSupportRequestByChannelId,
   handleAttachments,
   sendToRequestChannel,
+  toggleNotify,
 } from "../utils/functions/supportrequest";
 import { addNotificationToQueue } from "../utils/functions/users/notifications";
 
@@ -22,7 +23,13 @@ async function run(
   if (!(message instanceof Message)) return;
 
   if (args.length == 0 && !message.attachments.first()) {
-    return message.channel.send({ embeds: [new ErrorEmbed("dumbass")] });
+    return message.channel.send({
+      embeds: [
+        new ErrorEmbed(
+          "**auto.scam**\n" + "**auto.transfer**\n" + "**notify**\n" + "<message content>",
+        ),
+      ],
+    });
   }
 
   const embed = new CustomEmbed(message.member).setHeader(
@@ -47,6 +54,9 @@ async function run(
           "you must provide evidence the old account username and user ID, as well as prove that it is your account\n\n" +
           "if you're unable to prove that it's your account, we cannot do anything.",
       );
+    } else if (args[0].toLowerCase() === "notify") {
+      const res = await toggleNotify(support.channelId, support.userId);
+      if (res) return message.react("✅");
     } else embed.setDescription(args.join(" "));
   }
 
