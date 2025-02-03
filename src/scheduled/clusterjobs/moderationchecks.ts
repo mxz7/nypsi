@@ -12,6 +12,8 @@ import { logger } from "../../utils/logger";
 export const unmuteTimeouts = new Set<string>();
 export const unbanTimeouts = new Set<string>();
 
+const invalidWebhookCounts = new Map<string, number>();
+
 export function runLogs() {
   setInterval(async () => {
     let query: {
@@ -141,15 +143,25 @@ export function runLogs() {
       try {
         webhook = new WebhookClient({ url: modlog.modlogs });
       } catch (e) {
-        logger.error(`invalid webhook` + modlog);
-        await prisma.guild.update({
-          where: {
-            id: modlog.id,
-          },
-          data: {
-            modlogs: null,
-          },
-        });
+        logger.error(`invalid webhook`, modlog);
+
+        if (invalidWebhookCounts.has(modlog.id)) {
+          invalidWebhookCounts.set(modlog.id, invalidWebhookCounts.get(modlog.id) + 1);
+
+          if (invalidWebhookCounts.get(modlog.id) > 10) {
+            await prisma.guild.update({
+              where: {
+                id: modlog.id,
+              },
+              data: {
+                modlogs: null,
+              },
+            });
+            await redis.del(Constants.redis.cache.guild.MODLOGS_GUILDS);
+          }
+        } else {
+          invalidWebhookCounts.set(modlog.id, 1);
+        }
       }
 
       const embeds: APIEmbed[] = [];
