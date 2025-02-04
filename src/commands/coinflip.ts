@@ -349,6 +349,8 @@ async function run(
     return send({ embeds: [new ErrorEmbed("$coinflip (user) <bet>")] });
   }
 
+  if (item && item.account_locked) return send({ embeds: [new ErrorEmbed("invalid item")] });
+
   if (target) {
     if (message.member == target) {
       return send({ embeds: [new ErrorEmbed("invalid user")] });
