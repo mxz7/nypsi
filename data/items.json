@@ -2905,8 +2905,8 @@
     "in_crates": false,
     "boosterEffect": {
       "boosts": ["cooldown"],
-      "effect": 0.1,
-      "time": 180
+      "effect": 0.15,
+      "time": 600
     },
     "craft": {
       "ingredients": ["apple:13"],
