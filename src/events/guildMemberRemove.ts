@@ -78,5 +78,6 @@ export default async function guildMemberRemove(member: GuildMember) {
   if (member.guild.id != Constants.NYPSI_SERVER_ID) return;
 
   if (await isBooster(member.user.id)) await setBooster(member.user.id, false);
-  if (member.roles.cache.has(member.user.id)) member.guild.roles.delete(member.user.id);
+  if (member.roles.cache.find((r) => r.name === member.user.id))
+    member.guild.roles.delete(member.user.id);
 }
