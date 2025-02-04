@@ -173,7 +173,7 @@ async function calculateCooldownLength(
   let ms = seconds * 1000;
 
   if (premiumTier == 4) {
-    ms = ms * 0.7;
+    ms = ms * 0.5;
   } else if (premiumTier > 0) {
     ms = ms * 0.9;
   }
