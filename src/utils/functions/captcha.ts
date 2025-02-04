@@ -143,7 +143,7 @@ export async function failedCaptcha(member: GuildMember, content: string) {
     addNotificationToQueue({
       memberId: member.user.id,
       payload: {
-        content: `you have been banned from nypsi economy for 24 hours for failing 50 captchas`,
+        content: `you have been banned from nypsi economy for 24 hours for failing too many captchas`,
       },
     });
   }
