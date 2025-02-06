@@ -23,13 +23,11 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
 
   await sendToRequestChannel(support.userId, embed, message.client as NypsiClient);
 
-  embed.setDescription(
-    "your support request has been closed, you will be able to create another in 24 hours",
-  );
+  embed.setDescription("your support request has been closed");
 
   addNotificationToQueue({
     memberId: support.userId,
-    payload: { embed, content: "your support request has been closed" },
+    payload: { embed },
   });
 
   const clusterHas = await (message.client as NypsiClient).cluster.broadcastEval(
@@ -88,7 +86,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
   await redis.set(`${Constants.redis.cooldown.SUPPORT}:${support.userId}`, "t");
   await redis.expire(
     `${Constants.redis.cooldown.SUPPORT}:${support.userId}`,
-    Math.floor(ms("24 hours") / 1000),
+    Math.floor(ms("8 hours") / 1000),
   );
 }
 
