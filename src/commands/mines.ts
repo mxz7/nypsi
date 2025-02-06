@@ -313,7 +313,7 @@ async function prepareGame(
     }
   }
 
-  await addCooldown(cmd.name, message.member, 15);
+  await addCooldown(cmd.name, message.member, 10);
 
   setTimeout(async () => {
     if (games.has(message.author.id)) {

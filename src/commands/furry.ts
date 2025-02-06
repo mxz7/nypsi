@@ -66,7 +66,7 @@ async function run(
     return;
   }
 
-  await addCooldown(cmd.name, message.member, 7);
+  await addCooldown(cmd.name, message.member, 5);
 
   let member: GuildMember;
 

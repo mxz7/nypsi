@@ -418,7 +418,7 @@ async function run(
       return send({ embeds: [new ErrorEmbed("that user is already in a guild")] });
     }
 
-    await addCooldown(cmd.name, message.member, 15);
+    await addCooldown(cmd.name, message.member, 10);
 
     invited.add(target.user.id);
 
@@ -1222,7 +1222,7 @@ async function run(
     return send({ embeds: [new ErrorEmbed("invalid guild")] });
   }
 
-  await addCooldown(cmd.name, message.member, 7);
+  await addCooldown(cmd.name, message.member, 5);
 
   const targetGuild = await getGuildByName(name);
 

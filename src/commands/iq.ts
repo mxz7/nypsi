@@ -74,7 +74,7 @@ async function run(
     }
   }
 
-  await addCooldown(cmd.name, message.member, 7);
+  await addCooldown(cmd.name, message.member, 5);
 
   let iq;
   let iqMsg;

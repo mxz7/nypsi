@@ -78,7 +78,7 @@ async function run(
     });
   }
 
-  await addCooldown(cmd.name, message.member, 15);
+  await addCooldown(cmd.name, message.member, 10);
 
   // http://127.0.0.1:5500/#!ff0000!00ff00!0000ff&?test&?6c8ab9
 

@@ -157,7 +157,7 @@ async function run(
     return message.channel.send({ embeds: [embed] });
   }
 
-  await addCooldown(cmd.name, message.member, 15);
+  await addCooldown(cmd.name, message.member, 10);
 
   if (args.length === 0) {
     return allUsers();
