@@ -113,7 +113,7 @@ async function doFish(
     });
   }
 
-  await addCooldown(cmd.name, member, 90);
+  await addCooldown(cmd.name, member, 75);
 
   const fishItems = [
     "nothing",

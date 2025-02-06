@@ -127,7 +127,7 @@ async function doHunt(
     });
   }
 
-  await addCooldown(cmd.name, member, 90);
+  await addCooldown(cmd.name, member, 75);
 
   await addStat(member, gun);
 
