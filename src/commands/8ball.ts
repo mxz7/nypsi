@@ -43,7 +43,7 @@ async function run(
     return message.channel.send({ embeds: [new ErrorEmbed("you must ask the 8ball something")] });
   }
 
-  await addCooldown(cmd.name, message.member, 7);
+  await addCooldown(cmd.name, message.member, 5);
 
   const question = args.join(" ");
 

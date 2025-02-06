@@ -37,7 +37,7 @@ async function run(
   const ip = `${randNumber()}.${randNumber()}.${randNumber()}.${randNumber()}`;
   const port = `${randPort()}`;
 
-  await addCooldown(cmd.name, message.member, 7);
+  await addCooldown(cmd.name, message.member, 5);
 
   const embed = new CustomEmbed(
     message.member,

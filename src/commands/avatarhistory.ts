@@ -52,7 +52,7 @@ async function run(
     });
   }
 
-  await addCooldown(cmd.name, message.member, 15);
+  await addCooldown(cmd.name, message.member, 10);
 
   if (
     (await getRawLevel(message.member).catch(() => 0)) < 500 ||

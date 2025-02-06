@@ -43,7 +43,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
     });
   }
 
-  await addCooldown(cmd.name, message.member, 15);
+  await addCooldown(cmd.name, message.member, 10);
 
   const pages = new Map<number, string[]>();
 

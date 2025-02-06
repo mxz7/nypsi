@@ -98,7 +98,7 @@ async function run(
     return send({ embeds: [new ErrorEmbed("no history to display")] });
   }
 
-  await addCooldown(cmd.name, message.member, 7);
+  await addCooldown(cmd.name, message.member, 5);
 
   let count = 0;
   let page: typeof cases = [];

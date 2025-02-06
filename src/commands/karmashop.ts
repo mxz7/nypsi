@@ -109,7 +109,7 @@ async function run(
   }
 
   if (!(await isKarmaShopOpen())) {
-    await addCooldown(cmd.name, message.member, 7);
+    await addCooldown(cmd.name, message.member, 5);
     const embed = new CustomEmbed(message.member);
 
     embed.setDescription(
@@ -456,7 +456,7 @@ async function run(
       return send({ embeds: [new ErrorEmbed("you cannot afford this")] });
     }
 
-    await addCooldown(cmd.name, message.member, 7);
+    await addCooldown(cmd.name, message.member, 5);
 
     return buyItem(selected.id);
   } else {
