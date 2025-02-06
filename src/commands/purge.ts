@@ -489,7 +489,7 @@ async function run(
 
     return deleteIncludesMessages(text, amount);
   } else if (args[0].toLowerCase() == "clean") {
-    await addCooldown(cmd.name, message.member, 15);
+    await addCooldown(cmd.name, message.member, 10);
 
     const prefix = await getPrefix(message.guild);
 

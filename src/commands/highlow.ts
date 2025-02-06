@@ -252,7 +252,7 @@ async function prepareGame(
     return send({ embeds: [new ErrorEmbed("you have an active game")] });
   }
 
-  await addCooldown(cmd.name, message.member, 15);
+  await addCooldown(cmd.name, message.member, 10);
   await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
   await removeBalance(message.member, bet);
 

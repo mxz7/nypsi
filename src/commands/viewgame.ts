@@ -80,7 +80,7 @@ async function run(
 
   if (args[0].toLowerCase() === "search") {
     if (args.length !== 5) return send({ embeds: [new ErrorEmbed("invalid arguments")] });
-    await addCooldown(cmd.name, message.member, 15);
+    await addCooldown(cmd.name, message.member, 10);
     const search: Prisma.GameFindManyArgs = {
       where: { AND: [] },
       include: {
@@ -224,7 +224,7 @@ async function run(
 
     return manager.listen();
   } else {
-    await addCooldown(cmd.name, message.member, 7);
+    await addCooldown(cmd.name, message.member, 5);
 
     const game = await fetchGame(args[0].toLowerCase());
 

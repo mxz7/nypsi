@@ -35,7 +35,7 @@ async function run(
 
   if (message.channel.isDMBased()) return;
 
-  await addCooldown(cmd.name, message.member, 15);
+  await addCooldown(cmd.name, message.member, 10);
 
   let amount = 50;
 
