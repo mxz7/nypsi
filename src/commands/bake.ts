@@ -115,7 +115,7 @@ async function doBake(
     });
   }
 
-  await addCooldown(cmd.name, member, 75);
+  await addCooldown(cmd.name, member, 60);
   await setInventoryItem(member, "coal", inventory.find((i) => i.item === "coal").amount - 1);
 
   const response = await runBakery(member);
