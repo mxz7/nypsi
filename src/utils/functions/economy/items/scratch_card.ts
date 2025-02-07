@@ -111,7 +111,10 @@ async function prepare(
         result: card.won ? "win" : "lose",
       });
 
-      if (percentChance(0.7)) {
+      if (
+        percentChance(0.7) &&
+        parseInt(await redis.get(`anticheat:interactivegame:count:${message.author.id}`)) > 100
+      ) {
         const res = await giveCaptcha(message.author.id);
 
         if (res) {
@@ -127,6 +130,9 @@ async function prepare(
           hook.destroy();
         }
       }
+
+      await redis.incr(`anticheat:interactivegame:count:${message.author.id}`);
+      await redis.expire(`anticheat:interactivegame:count:${message.author.id}`, 86400);
 
       embed.setDescription(
         `**${card.remainingClicks}** click${card.remainingClicks != 1 ? "s" : ""} left`,
