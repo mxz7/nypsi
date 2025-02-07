@@ -524,7 +524,10 @@ async function playGame(
         return edit({ embeds: [embed], components: createRows(board, true) }, interaction);
       }
 
-      if (percentChance(0.7)) {
+      if (
+        percentChance(0.7) &&
+        parseInt(await redis.get(`anticheat:interactivegame:count:${this.member.user.id}`)) > 100
+      ) {
         const res = await giveCaptcha(this.member.user.id);
 
         if (res) {
@@ -540,6 +543,9 @@ async function playGame(
           hook.destroy();
         }
       }
+
+      await redis.incr(`anticheat:interactivegame:count:${this.member.user.id}`);
+      await redis.expire(`anticheat:interactivegame:count:${this.member.user.id}`, 86400);
 
       (components[components.length - 1].components[0] as ButtonBuilder)
         .setCustomId("rp")

@@ -551,7 +551,10 @@ async function playGame(
   const replay = async (embed: CustomEmbed, interaction: ButtonInteraction, update = true) => {
     await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
 
-    if (percentChance(0.7)) {
+    if (
+      percentChance(0.7) &&
+      parseInt(await redis.get(`anticheat:interactivegame:count:${this.member.user.id}`)) > 100
+    ) {
       const res = await giveCaptcha(this.member.user.id);
 
       if (res) {
@@ -567,6 +570,9 @@ async function playGame(
         hook.destroy();
       }
     }
+
+    await redis.incr(`anticheat:interactivegame:count:${this.member.user.id}`);
+    await redis.expire(`anticheat:interactivegame:count:${this.member.user.id}`, 86400);
 
     const components = getRows(grid, true);
 
