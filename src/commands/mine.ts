@@ -141,7 +141,7 @@ async function doMine(
     });
   }
 
-  await addCooldown(cmd.name, member, 75);
+  await addCooldown(cmd.name, member, 60);
 
   await addStat(member, pickaxe);
 
