@@ -104,5 +104,20 @@
     "you told unfunny jokes on a discord call",
     "you hacked a youtuber discord server",
     "you publicly announced your home address"
+  ],
+  "tips": [
+    "**workers** are a great way to make money, they make money for you in the background. you can buy and manage them with **$workers**. you may get some worker upgrades you can use to upgrade you workers to earn more money for you",
+    "a risky method of making money on nypsi is **gambling**, the most popular games are blackjack, mines and slots. you can also gamble your money and items with other players with **coinflips**",
+    "**achievements** are an awesome way to track your progression through nypsi. some can be very easy to complete, with some taking a huge amount of dedication. you can view your currently in progress achievements with **$ach**",
+    "making quick money on nypsi can be difficult, but for a quick boost, make sure to do **$daily** and to **$vote**. keeping up with these basic commands will help you progress",
+    "did you know you can turn on vote reminders (/settings me notifications) to get a multiplier bonus?",
+    "if you're already a professional and don't need these tips, you can turn them off with /settings me preferences",
+    "**tasks** are similar to achievements, however they reset daily and weekly. they can be a quick and easy way to earn a crate",
+    "**guilds** are a fundamental part of nypsi. they allow you to work as a team and to earn a lot of crates. you can learn more about guilds [here](https://nypsi.xyz/docs/economy/guilds)",
+    "to level up you need to have money in your bank and enough xp. you can view the requirements in **$profile**. once you get to level 100 you can prestige",
+    "prestiging may sound scary, but it's not like other games you might be familiar with. when you prestige in nypsi you don't lose anything, your level just goes down by 100, and you gain a **personal upgrade**. these upgrades will persist through seasons and can be changed with a [**reroll token**](https://nypsi.xyz/item/reroll_token)",
+    "need a bigger bank? use [**stolen credit cards**](https://nypsi.xyz/item/stolen_credit_card) to upgrade your bank capacity",
+    "nypsi has a **seasonal economy**. this means the majority of stuff resets every 6 months. you can view the current season with **$season**\n\nprestige, achievements, daily streak and premium do not reset",
+    "want to get a boost over other players? take a visit to our [**online store**](https://ko-fi.com/tekoh) where you can buy premium or crates, as well as supporting the bot <3"
   ]
 }
