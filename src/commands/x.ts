@@ -46,6 +46,7 @@ import {
   setTier,
 } from "../utils/functions/premium/premium";
 import { getAdminLevel, setAdminLevel } from "../utils/functions/users/admin";
+import { setBirthday } from "../utils/functions/users/birthday";
 import { isUserBlacklisted, setUserBlacklist } from "../utils/functions/users/blacklist";
 import { getCommandUses } from "../utils/functions/users/commands";
 import { addNotificationToQueue } from "../utils/functions/users/notifications";
@@ -53,7 +54,6 @@ import { addTag, getTags, removeTag } from "../utils/functions/users/tags";
 import { hasProfile } from "../utils/functions/users/utils";
 import { logger } from "../utils/logger";
 import ms = require("ms");
-import { setBirthday } from "../utils/functions/users/birthday";
 
 const cmd = new Command("x", "admincmd", "none").setPermissions(["bot owner"]);
 
@@ -507,12 +507,7 @@ async function run(
         }
 
         await res.editReply({
-          embeds: [
-            new CustomEmbed(
-              message.member,
-              "enter new birthday",
-            ),
-          ],
+          embeds: [new CustomEmbed(message.member, "enter new birthday")],
         });
 
         const msg = await message.channel
@@ -527,14 +522,15 @@ async function run(
           });
 
         if (!msg) return;
-        
-        let birthday = new Date(msg.content);
+
+        const birthday = new Date(msg.content);
 
         if (isNaN(birthday as unknown as number)) {
-          await res.editReply({ embeds: [new ErrorEmbed("invalid date, use the format YYYY-MM-DD")] });
+          await res.editReply({
+            embeds: [new ErrorEmbed("invalid date, use the format YYYY-MM-DD")],
+          });
           return waitForButton();
         }
-        
 
         logger.info(
           `admin: ${message.author.id} (${message.author.username}) set ${user.id} birthday to ${birthday}`,
