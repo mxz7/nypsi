@@ -23,6 +23,8 @@ import { giveCaptcha, isLockedOut, verifyUser } from "../functions/captcha";
 import { formatDate, MStoTime } from "../functions/date";
 import { getNews, hasSeenNews } from "../functions/news";
 import { getTimestamp, logger } from "../logger";
+// @ts-expect-error doesnt like getting from json file
+import { tips } from "../../data/lists.json";
 // @ts-expect-error typescript doesnt like opening package.json
 import { version } from "../../../package.json";
 import prisma from "../../init/database";
@@ -967,6 +969,19 @@ export async function runCommand(
 
   setTimeout(async () => {
     if (command.category === "money") {
+      if (
+        percentChance(0.77777) &&
+        (await getRawLevel(message.author.id)) < 250 &&
+        (await getPreferences(message.author.id)).tips
+      ) {
+        const tip = tips[Math.floor(Math.random() * tips.length)];
+
+        await addInlineNotification({
+          memberId: message.author.id,
+          embed: new CustomEmbed(message.member, tip),
+        });
+      }
+
       if (!(await redis.exists(`nypsi:inactiveuserthing:${message.author.id}`))) {
         await redis.set(`nypsi:inactiveuserthing:${message.author.id}`, "boobies", "EX", 2.628e6);
         const lastCommand = await getLastCommand(message.author.id);
@@ -983,7 +998,7 @@ export async function runCommand(
             memberId: message.author.id,
             embed: new CustomEmbed(
               message.member,
-              "**welcome back!!**\n\nwelcome back to nypsi, since it's been a while, we've given you a 24 hour 40% xp booster. enjoy!",
+              "**welcome back!!**\n\nwelcome back to nypsi, since it's been a while, we've given you a 24 hour xp booster. enjoy!",
             ),
           });
         }
