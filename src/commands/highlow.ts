@@ -439,26 +439,26 @@ async function playGame(
 
     if (
       percentChance(0.7) &&
-      parseInt(await redis.get(`anticheat:interactivegame:count:${this.member.user.id}`)) > 100
+      parseInt(await redis.get(`anticheat:interactivegame:count:${message.author.id}`)) > 100
     ) {
-      const res = await giveCaptcha(this.member.user.id);
+      const res = await giveCaptcha(message.author.id);
 
       if (res) {
         logger.info(
-          `${this.member.user.username} (${this.member.user.id}) given captcha randomly in high low`,
+          `${this.member.user.username} (${message.author.id}) given captcha randomly in high low`,
         );
         const hook = new WebhookClient({
           url: process.env.ANTICHEAT_HOOK,
         });
         await hook.send({
-          content: `[${getTimestamp()}] ${this.member.user.username} (${this.member.user.id}) given captcha randomly in high low`,
+          content: `[${getTimestamp()}] ${this.member.user.username} (${message.author.id}) given captcha randomly in high low`,
         });
         hook.destroy();
       }
     }
 
-    await redis.incr(`anticheat:interactivegame:count:${this.member.user.id}`);
-    await redis.expire(`anticheat:interactivegame:count:${this.member.user.id}`, 86400);
+    await redis.incr(`anticheat:interactivegame:count:${message.author.id}`);
+    await redis.expire(`anticheat:interactivegame:count:${message.author.id}`, 86400);
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder().setLabel("play again").setStyle(ButtonStyle.Success).setCustomId("rp"),
