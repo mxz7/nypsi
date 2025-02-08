@@ -142,6 +142,7 @@ model Preferences {
   auctionConfirm Int     @default(25000000)
   offers         Int     @default(3)
   leaderboards   Boolean @default(true)
+  tips           Boolean @default(true)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
