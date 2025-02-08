@@ -53,6 +53,7 @@ import { addTag, getTags, removeTag } from "../utils/functions/users/tags";
 import { hasProfile } from "../utils/functions/users/utils";
 import { logger } from "../utils/logger";
 import ms = require("ms");
+import { setBirthday } from "../utils/functions/users/birthday";
 
 const cmd = new Command("x", "admincmd", "none").setPermissions(["bot owner"]);
 
@@ -252,6 +253,11 @@ async function run(
           .setCustomId("add-purchase")
           .setLabel("add purchase")
           .setEmoji("💰")
+          .setStyle(ButtonStyle.Primary),
+        new ButtonBuilder()
+          .setCustomId("set-birthday")
+          .setLabel("set birthday")
+          .setEmoji("🎂")
           .setStyle(ButtonStyle.Primary),
       ),
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -492,6 +498,50 @@ async function run(
         }
 
         msgResponse.first().react("✅");
+      } else if (res.customId === "set-birthday") {
+        if ((await getAdminLevel(message.author.id)) < 1) {
+          await res.editReply({
+            embeds: [new ErrorEmbed("you require admin level **1** to do this")],
+          });
+          return waitForButton();
+        }
+
+        await res.editReply({
+          embeds: [
+            new CustomEmbed(
+              message.member,
+              "enter new birthday",
+            ),
+          ],
+        });
+
+        const msg = await message.channel
+          .awaitMessages({
+            filter: (msg: Message) => msg.author.id === message.author.id,
+            max: 1,
+            time: 30000,
+          })
+          .then((collected) => collected.first())
+          .catch(() => {
+            res.editReply({ embeds: [new CustomEmbed(message.member, "expired")] });
+          });
+
+        if (!msg) return;
+        
+        let birthday = new Date(msg.content);
+
+        if (isNaN(birthday as unknown as number)) {
+          await res.editReply({ embeds: [new ErrorEmbed("invalid date, use the format YYYY-MM-DD")] });
+          return waitForButton();
+        }
+        
+
+        logger.info(
+          `admin: ${message.author.id} (${message.author.username}) set ${user.id} birthday to ${birthday}`,
+        );
+        await setBirthday(user.id, birthday);
+        msg.react("✅");
+        return waitForButton();
       } else if (res.customId === "set-bal") {
         if ((await getAdminLevel(message.author.id)) < 4) {
           await res.editReply({
