@@ -84,7 +84,7 @@ export function getPreferencesData() {
   return preferencesData;
 }
 
-export async function getPreferences(member: GuildMember | string) {
+export async function getPreferences(member: GuildMember | string): Promise<Preferences> {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
