@@ -24,7 +24,7 @@ import { formatDate, MStoTime } from "../functions/date";
 import { getNews, hasSeenNews } from "../functions/news";
 import { getTimestamp, logger } from "../logger";
 // @ts-expect-error doesnt like getting from json file
-import { tips } from "../../data/lists.json";
+import { tips } from "../../../data/lists.json";
 // @ts-expect-error typescript doesnt like opening package.json
 import { version } from "../../../package.json";
 import prisma from "../../init/database";
