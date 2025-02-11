@@ -1,12 +1,14 @@
 import {
   BaseMessageOptions,
   CommandInteraction,
+  InteractionEditReplyOptions,
   InteractionReplyOptions,
   Message,
   MessageEditOptions,
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import Constants from "../utils/Constants";
 import { addBalance, getBalance, removeBalance } from "../utils/functions/economy/balance";
 import { addStat } from "../utils/functions/economy/stats";
 import {
@@ -23,7 +25,6 @@ import { getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { transaction } from "../utils/logger";
 import dayjs = require("dayjs");
-import Constants from "../utils/Constants";
 
 const cmd = new Command("pay", "give other users money", "money");
 
@@ -46,13 +47,13 @@ async function run(
       let res;
 
       if (message.deferred) {
-        res = await message.editReply(data).catch(async () => {
+        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
           usedNewMessage = true;
           return await message.channel.send(data as BaseMessageOptions);
         });
       } else {
         res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data).catch(async () => {
+          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
             usedNewMessage = true;
             return await message.channel.send(data as BaseMessageOptions);
           });
@@ -97,7 +98,10 @@ async function run(
     return send({ embeds: [new ErrorEmbed("invalid user")] });
   }
 
-  if (target.user.bot && ![message.client.user.id, ...Constants.WHITELISTED_BOTS].includes(target.user.id)) {
+  if (
+    target.user.bot &&
+    ![message.client.user.id, ...Constants.WHITELISTED_BOTS].includes(target.user.id)
+  ) {
     return send({ embeds: [new ErrorEmbed("invalid user")] });
   }
 
@@ -234,7 +238,7 @@ async function run(
 
   const edit = async (data: MessageEditOptions, msg: Message) => {
     if (!(message instanceof Message)) {
-      await message.editReply(data);
+      await message.editReply(data as InteractionEditReplyOptions);
       return await message.fetchReply();
     } else {
       return await msg.edit(data);

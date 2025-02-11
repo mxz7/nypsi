@@ -1,6 +1,7 @@
 import {
   BaseMessageOptions,
   CommandInteraction,
+  InteractionEditReplyOptions,
   InteractionReplyOptions,
   Message,
   MessageEditOptions,
@@ -56,13 +57,13 @@ async function run(
       let res;
 
       if (message.deferred) {
-        res = await message.editReply(data).catch(async () => {
+        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
           usedNewMessage = true;
           return await message.channel.send(data as BaseMessageOptions);
         });
       } else {
         res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data).catch(async () => {
+          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
             usedNewMessage = true;
             return await message.channel.send(data as BaseMessageOptions);
           });
@@ -189,7 +190,7 @@ async function play(
   const m = games.get(message.author.id).message;
   const edit = async (data: MessageEditOptions) => {
     if (!(message instanceof Message)) {
-      await message.editReply(data).catch(() => {
+      await message.editReply(data as InteractionEditReplyOptions).catch(() => {
         redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
         games.delete(message.author.id);
         return;
@@ -307,7 +308,7 @@ async function play(
 async function cancel(message: Message | (NypsiCommandInteraction & CommandInteraction), m: any) {
   const edit = async (data: BaseMessageOptions) => {
     if (!(message instanceof Message)) {
-      await message.editReply(data);
+      await message.editReply(data as InteractionEditReplyOptions);
       return await message.fetchReply();
     } else {
       return await m.edit(data);
@@ -334,7 +335,7 @@ async function cancel(message: Message | (NypsiCommandInteraction & CommandInter
 async function win(message: Message | (NypsiCommandInteraction & CommandInteraction), m: any) {
   const edit = async (data: BaseMessageOptions) => {
     if (!(message instanceof Message)) {
-      await message.editReply(data);
+      await message.editReply(data as InteractionEditReplyOptions);
       return await message.fetchReply();
     } else {
       return await m.edit(data);
@@ -376,7 +377,7 @@ async function win(message: Message | (NypsiCommandInteraction & CommandInteract
 async function lose(message: Message | (NypsiCommandInteraction & CommandInteraction), m: any) {
   const edit = async (data: BaseMessageOptions) => {
     if (!(message instanceof Message)) {
-      await message.editReply(data);
+      await message.editReply(data as InteractionEditReplyOptions);
       return await message.fetchReply();
     } else {
       return await m.edit(data);
