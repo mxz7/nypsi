@@ -1,4 +1,9 @@
-import { BaseMessageOptions, InteractionReplyOptions, Message } from "discord.js";
+import {
+  BaseMessageOptions,
+  InteractionEditReplyOptions,
+  InteractionReplyOptions,
+  Message,
+} from "discord.js";
 import { Command } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { getUpgrades } from "../utils/functions/economy/levelling";
@@ -14,13 +19,13 @@ cmd.setRun(async (message) => {
       let res;
 
       if (message.deferred) {
-        res = await message.editReply(data).catch(async () => {
+        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
           usedNewMessage = true;
           return await message.channel.send(data as BaseMessageOptions);
         });
       } else {
         res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data).catch(async () => {
+          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
             usedNewMessage = true;
             return await message.channel.send(data as BaseMessageOptions);
           });

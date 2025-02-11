@@ -2,11 +2,13 @@ import dayjs = require("dayjs");
 import {
   BaseMessageOptions,
   CommandInteraction,
+  InteractionEditReplyOptions,
   InteractionReplyOptions,
   Message,
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import Constants from "../utils/Constants";
 import {
   addInventoryItem,
   getInventory,
@@ -20,7 +22,6 @@ import { getMember } from "../utils/functions/member";
 import { getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { transaction } from "../utils/logger";
-import Constants from "../utils/Constants";
 
 const cmd = new Command("give", "give other users items from your inventory", "money");
 
@@ -50,13 +51,13 @@ async function run(
       let res;
 
       if (message.deferred) {
-        res = await message.editReply(data).catch(async () => {
+        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
           usedNewMessage = true;
           return await message.channel.send(data as BaseMessageOptions);
         });
       } else {
         res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data).catch(async () => {
+          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
             usedNewMessage = true;
             return await message.channel.send(data as BaseMessageOptions);
           });

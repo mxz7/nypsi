@@ -2,11 +2,13 @@ import dayjs = require("dayjs");
 import {
   BaseMessageOptions,
   CommandInteraction,
+  InteractionEditReplyOptions,
   InteractionReplyOptions,
   Message,
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import Constants from "../utils/Constants";
 import { getInventory } from "../utils/functions/economy/inventory";
 import {
   getApproximatPrizePool,
@@ -20,7 +22,6 @@ import {
   userExists,
 } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
-import Constants from "../utils/Constants";
 
 const cmd = new Command("lottery", "enter the daily lottery draw", "money").setAliases(["lotto"]);
 
@@ -53,13 +54,13 @@ async function run(
       let res;
 
       if (message.deferred) {
-        res = await message.editReply(data).catch(async () => {
+        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
           usedNewMessage = true;
           return await message.channel.send(data as BaseMessageOptions);
         });
       } else {
         res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data).catch(async () => {
+          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
             usedNewMessage = true;
             return await message.channel.send(data as BaseMessageOptions);
           });

@@ -1,6 +1,7 @@
 import {
   BaseMessageOptions,
   CommandInteraction,
+  InteractionEditReplyOptions,
   InteractionReplyOptions,
   Message,
   MessageEditOptions,
@@ -24,7 +25,7 @@ module.exports = new ItemUse(
     const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
       if (!(message instanceof Message)) {
         if (message.deferred) {
-          await message.editReply(data);
+          await message.editReply(data as InteractionEditReplyOptions);
         } else {
           await message.reply(data as InteractionReplyOptions);
         }
@@ -39,7 +40,7 @@ module.exports = new ItemUse(
 
     const edit = async (data: MessageEditOptions, msg: Message) => {
       if (!(message instanceof Message)) {
-        await message.editReply(data);
+        await message.editReply(data as InteractionEditReplyOptions);
         return await message.fetchReply();
       } else {
         return await msg.edit(data);
