@@ -5,6 +5,7 @@ import {
   ButtonStyle,
   CommandInteraction,
   Interaction,
+  InteractionEditReplyOptions,
   InteractionReplyOptions,
   Message,
   WebhookClient,
@@ -38,10 +39,10 @@ async function prepare(
     }
     if (!(message instanceof Message)) {
       if (message.deferred) {
-        await message.editReply(data);
+        await message.editReply(data as InteractionEditReplyOptions);
       } else {
         await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data);
+          return message.editReply(data as InteractionEditReplyOptions);
         });
       }
       const replyMsg = await message.fetchReply();

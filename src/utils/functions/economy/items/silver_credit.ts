@@ -5,11 +5,11 @@ import {
   ButtonStyle,
   CommandInteraction,
   Interaction,
+  InteractionEditReplyOptions,
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
-import { NypsiClient } from "../../../../models/Client";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
@@ -36,13 +36,13 @@ module.exports = new ItemUse(
         let res;
 
         if (message.deferred) {
-          res = await message.editReply(data).catch(async () => {
+          res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
             usedNewMessage = true;
             return await message.channel.send(data as BaseMessageOptions);
           });
         } else {
           res = await message.reply(data as InteractionReplyOptions).catch(() => {
-            return message.editReply(data).catch(async () => {
+            return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
               usedNewMessage = true;
               return await message.channel.send(data as BaseMessageOptions);
             });

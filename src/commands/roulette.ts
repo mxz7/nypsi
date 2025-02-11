@@ -1,6 +1,7 @@
 import {
   BaseMessageOptions,
   CommandInteraction,
+  InteractionEditReplyOptions,
   InteractionReplyOptions,
   InteractionResponse,
   Message,
@@ -97,13 +98,13 @@ async function run(
       let res;
 
       if (message.deferred) {
-        res = await message.editReply(data).catch(async () => {
+        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
           usedNewMessage = true;
           return await message.channel.send(data as BaseMessageOptions);
         });
       } else {
         res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data).catch(async () => {
+          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
             usedNewMessage = true;
             return await message.channel.send(data as BaseMessageOptions);
           });
@@ -312,7 +313,7 @@ async function run(
 
   const edit = async (data: MessageEditOptions, msg: Message | InteractionResponse) => {
     if (!(message instanceof Message)) {
-      return await message.editReply(data);
+      return await message.editReply(data as InteractionEditReplyOptions);
     } else {
       if (msg instanceof InteractionResponse) return;
       return await msg.edit(data);
