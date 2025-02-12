@@ -308,7 +308,8 @@ export async function addProgress(
           thing = `${achievementStartName}_v`;
         }
 
-        if (thing) await setAchievementProgress(userId, thing, achievement.progress + amount);
+        if (thing)
+          await setAchievementProgress(userId, thing, Number(achievement.progress) + amount);
       }
       addProgressMutex.delete(userId);
       return;
