@@ -103,7 +103,7 @@ async function run(
     const desc: string[] = [];
 
     inPlaceSort(achievements).desc(
-      (i) => (i.progress / allAchievementData[i.achievementId].target) * 100,
+      (i) => (Number(i.progress) / allAchievementData[i.achievementId].target) * 100,
     );
 
     for (const achievement of achievements) {
@@ -114,7 +114,7 @@ async function run(
         } \`${achievement.progress.toLocaleString()} / ${allAchievementData[
           achievement.achievementId
         ].target.toLocaleString()} (${(
-          (achievement.progress / allAchievementData[achievement.achievementId].target) *
+          (Number(achievement.progress) / allAchievementData[achievement.achievementId].target) *
           100
         ).toFixed(1)}%)\``,
       );
@@ -196,7 +196,7 @@ async function run(
           } ago\``;
         } else {
           str += `\`${achData.progress.toLocaleString()} / ${achievement.target.toLocaleString()} (${(
-            (achData.progress / achievement.target) *
+            (Number(achData.progress) / achievement.target) *
             100
           ).toFixed(1)}%)\``;
         }
@@ -293,7 +293,7 @@ async function run(
         desc += `completed <t:${Math.floor(achievement.completedAt.getTime() / 1000)}:R>\n`;
       } else {
         desc += `${achievement.progress.toLocaleString()} / ${selected.target.toLocaleString()} (${(
-          (achievement.progress / selected.target) *
+          (Number(achievement.progress) / selected.target) *
           100
         ).toFixed(1)}%)\n`;
       }
