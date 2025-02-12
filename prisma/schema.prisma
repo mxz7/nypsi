@@ -162,7 +162,7 @@ model Achievements {
   achievementId String
   completed     Boolean   @default(false)
   completedAt   DateTime?
-  progress      Int       @default(1)
+  progress      BigInt    @default(1)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
