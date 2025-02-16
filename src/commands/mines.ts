@@ -553,7 +553,7 @@ async function playGame(
     await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
 
     if (
-      percentChance(0.1) &&
+      percentChance(0.05) &&
       parseInt(await redis.get(`anticheat:interactivegame:count:${message.author.id}`)) > 100
     ) {
       const res = await giveCaptcha(message.author.id);
