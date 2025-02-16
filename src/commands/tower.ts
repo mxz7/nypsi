@@ -526,7 +526,7 @@ async function playGame(
       }
 
       if (
-        percentChance(0.1) &&
+        percentChance(0.05) &&
         parseInt(await redis.get(`anticheat:interactivegame:count:${message.author.id}`)) > 100
       ) {
         const res = await giveCaptcha(message.author.id);

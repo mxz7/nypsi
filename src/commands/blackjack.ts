@@ -497,7 +497,7 @@ class Game {
     }
 
     if (
-      percentChance(0.1) &&
+      percentChance(0.05) &&
       parseInt(await redis.get(`anticheat:interactivegame:count:${this.member.user.id}`)) > 100
     ) {
       const res = await giveCaptcha(this.member.user.id);

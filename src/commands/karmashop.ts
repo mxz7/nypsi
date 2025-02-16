@@ -380,7 +380,7 @@ async function run(
     }
 
     if (
-      percentChance(0.1) &&
+      percentChance(0.05) &&
       (await getDmSettings(message.member)).other &&
       !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))
     ) {
