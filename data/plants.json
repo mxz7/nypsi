@@ -71,6 +71,24 @@
         "every": 1.21e6,
         "dead": 2.628e6
       }
+    },
+    "mango_tree": {
+      "id": "mango_tree",
+      "name": "mango tree",
+      "growthTime": 259200,
+      "hourly": 0.3,
+      "max": 4,
+      "item": "mango",
+      "type": "tree",
+      "type_plural": "trees",
+      "water": {
+        "every": 129600,
+        "die": 604800
+      },
+      "fertilise": {
+        "every": 604800,
+        "dead": 2.628e6
+      }
     }
   },
   "upgrades": {
