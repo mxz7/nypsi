@@ -1471,10 +1471,10 @@
     "boosterEffect": {
       "boosts": ["mine", "fish", "hunt"],
       "effect": 0.5,
-      "time": 3600
+      "time": 1800
     },
     "in_crates": true,
-    "random_drop_chance": 50,
+    "random_drop_chance": 55,
     "aliases": ["unb"]
   },
   "efficiency": {
@@ -2178,7 +2178,8 @@
       "id:reroll_token:0.05",
       "id:banana_seed:1",
       "id:fertiliser:75",
-      "id:toe:10"
+      "id:toe:10",
+      "id:unbreaking:2"
     ]
   },
   "lucky_scratch_card": {
@@ -2312,7 +2313,8 @@
       "id:double_xp:15",
       "id:multi_potion:40",
       "id:veilside_rx7_skin:10",
-      "id:stick:20"
+      "id:stick:20",
+      "id:unbreaking:10"
     ]
   },
   "corner_shop_scratchie": {
