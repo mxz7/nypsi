@@ -3534,5 +3534,33 @@
     "sell": 50000,
     "in_crates": true,
     "aliases": ["mseed"]
+  },
+  "coconut": {
+    "id": "coconut",
+    "name": "coconut",
+    "article": "a",
+    "plural": "coconuts",
+    "emoji": "🥥",
+    "longDesc": "[i'd like to thank tori for her generous gift of $2](https://youtu.be/eRRXEWNuYy4?t=19)",
+    "rarity": 69,
+    "role": "sellable",
+    "buy": 0,
+    "sell": 40000,
+    "in_crates": false
+  },
+  "coconut_seed": {
+    "id": "coconut_seed",
+    "name": "coconut tree seed",
+    "article": "a",
+    "plural": "coconut tree seeds",
+    "emoji": "<:nypsi_apple_tree_seeds:1261357859891843132>",
+    "longDesc": "plant to grow a coconut tree",
+    "rarity": 4,
+    "role": "seed",
+    "plantId": "coconut_tree",
+    "buy": 0,
+    "sell": 50000,
+    "in_crates": true,
+    "aliases": ["mseed"]
   }
 }
