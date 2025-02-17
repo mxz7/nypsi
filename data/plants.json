@@ -77,8 +77,26 @@
       "name": "mango tree",
       "growthTime": 259200,
       "hourly": 0.3,
-      "max": 4,
+      "max": 5,
       "item": "mango",
+      "type": "tree",
+      "type_plural": "trees",
+      "water": {
+        "every": 129600,
+        "die": 604800
+      },
+      "fertilise": {
+        "every": 604800,
+        "dead": 2.628e6
+      }
+    },
+    "coconut_tree": {
+      "id": "coconut_tree",
+      "name": "coconut tree",
+      "growthTime": 259200,
+      "hourly": 0.65,
+      "max": 4,
+      "item": "coconut",
       "type": "tree",
       "type_plural": "trees",
       "water": {
