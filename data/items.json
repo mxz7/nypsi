@@ -3506,5 +3506,33 @@
     "sell": 100000,
     "in_crates": true,
     "random_drop_chance": 3
+  },
+  "mango": {
+    "id": "mango",
+    "name": "mango",
+    "article": "a",
+    "plural": "mangos",
+    "emoji": "🥭",
+    "longDesc": "the owner used to call himself a mango",
+    "rarity": 69,
+    "role": "sellable",
+    "buy": 0,
+    "sell": 60000,
+    "in_crates": false
+  },
+  "mango_seed": {
+    "id": "mango_seed",
+    "name": "mango tree seed",
+    "article": "a",
+    "plural": "mango tree seeds",
+    "emoji": "<:nypsi_apple_tree_seeds:1261357859891843132>",
+    "longDesc": "plant to grow a apple tree",
+    "rarity": 4,
+    "role": "seed",
+    "plantId": "mango_tree",
+    "buy": 0,
+    "sell": 50000,
+    "in_crates": true,
+    "aliases": ["mseed"]
   }
 }
