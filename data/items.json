@@ -1461,7 +1461,7 @@
     "plural": "unbreakings",
     "article": "an",
     "emoji": "<a:nypsi_book:1001459250163359786>",
-    "longDesc": "when mining, fishing or hunting it will not reduce durability for 1 hour",
+    "longDesc": "when mining, fishing or hunting it will not reduce durability for 30 minutes",
     "rarity": 4,
     "buy": 0,
     "sell": 150000,
