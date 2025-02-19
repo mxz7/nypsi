@@ -515,6 +515,8 @@ async function run(
 
       if (i.user.id !== target.user.id) return false;
 
+      if (i.customId == "n") return true;
+
       if (bet) {
         const maxBet = await calcMaxBet(i.user.id);
 
