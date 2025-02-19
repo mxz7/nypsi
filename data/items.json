@@ -1474,7 +1474,7 @@
       "time": 1800
     },
     "in_crates": true,
-    "random_drop_chance": 55,
+    "random_drop_chance": 15,
     "aliases": ["unb"]
   },
   "efficiency": {
