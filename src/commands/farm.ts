@@ -91,7 +91,7 @@ async function run(
     return;
   }
 
-  await addCooldown(cmd.name, message.member, 5);
+  await addCooldown(cmd.name, message.member, 4);
 
   const farms = await getFarm(message.member);
 
