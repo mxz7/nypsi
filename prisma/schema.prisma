@@ -195,8 +195,9 @@ model Economy {
 
   banned DateTime?
 
-  autosell    String[]
-  offersBlock String[]
+  autosell      String[]
+  sellallFilter String[]
+  offersBlock   String[]
 
   dailyLottery Int?
 
