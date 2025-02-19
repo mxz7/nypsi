@@ -28,7 +28,10 @@ const cmd = new Command("sellall", "sell all commonly sold items", "money");
 
 cmd.slashEnabled = true;
 
-async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) {
+async function run(
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  args: string[],
+) {
   if (!(await userExists(message.member))) await createUser(message.member);
 
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
@@ -68,150 +71,154 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
     return;
   }
 
-  if ((await calcValues(message)).selected.size == 0) {
-    return send({ embeds: [new ErrorEmbed("you do not have anything to sell")] });
-  }
+  if (args.length === 0) {
+    const values = await calcValues(message);
 
-  await addCooldown(cmd.name, message.member, 30);
-
-  const embed = new CustomEmbed(message.member, "are you sure you want to sell all?");
-
-  const { desc, amounts, total } = await calcValues(message);
-  inPlaceSort(desc).desc((i) => amounts.get(i));
-  if (desc.length <= 10) embed.addField("items to be sold", desc.join("\n"));
-  else {
-    let newDesc = "";
-    for (let i = 0; i < 9; i++) newDesc += `${desc[i]}\n`;
-    let amount = 0;
-    for (let i = 9; i < desc.length; i++)
-      amount += Number(desc[i].split(" ($")[1].split(")")[0].replaceAll(",", ""));
-    newDesc += `*${desc.length - 9} more ($${amount.toLocaleString()})*`;
-    embed.addField("items to be sold", newDesc);
-  }
-  embed.setFooter({ text: `total: $${total.toLocaleString()}` });
-
-  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("✅").setLabel("confirm").setStyle(ButtonStyle.Success),
-    new ButtonBuilder().setCustomId("❌").setLabel("cancel").setStyle(ButtonStyle.Danger),
-  );
-
-  const msg = await send({ embeds: [embed], components: [row] });
-
-  const filter = (i: Interaction) => i.user.id == message.author.id;
-
-  const reaction = await msg.awaitMessageComponent({ filter, time: 15000 }).catch(async () => {
-    await msg.edit({
-      embeds: [embed],
-      components: [
-        new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-          new ButtonBuilder()
-            .setStyle(ButtonStyle.Danger)
-            .setLabel("expired")
-            .setCustomId("boobies")
-            .setDisabled(true),
-        ),
-      ],
-    });
-    addExpiry(cmd.name, message.member, 30);
-  });
-
-  if (!reaction) return;
-
-  if (reaction.customId === "❌") {
-    msg.edit({ components: [] });
-    return reaction.reply({
-      embeds: [new CustomEmbed(message.member, "✅ cancelled")],
-      ephemeral: true,
-    });
-  }
-
-  if (reaction.customId == "✅") {
-    await reaction.deferReply({ ephemeral: true });
-
-    const { selected, taxedAmount, desc, amounts, total, taxEnabled, multi } =
-      await calcValues(message);
-
-    if (selected.size == 0) {
-      const embed = new ErrorEmbed("you do not have anything to sell");
-      reaction.editReply({ embeds: [new CustomEmbed(message.member, "lol nice try")] });
-      return msg
-        ? msg.edit({ embeds: [embed], components: [] })
-        : send({ embeds: [embed], components: [] });
+    if (values.selected.size == 0) {
+      return send({ embeds: [new ErrorEmbed("you do not have anything to sell")] });
     }
 
-    const functions = [];
-    for (const item of selected.keys())
-      functions.push(async () => {
-        await setInventoryItem(message.member, item, 0);
-      });
+    await addCooldown(cmd.name, message.member, 30);
 
-    functions.push(async () => {
-      await addToNypsiBank(taxedAmount * 0.7);
-    });
-    functions.push(async () => {
-      await addBalance(message.member, total);
-    });
+    const embed = new CustomEmbed(message.member, "are you sure you want to sell all?");
 
-    addStat(message.author.id, "earned-sold", total);
-
-    await pAll(functions, { concurrency: 5 });
-
+    const { desc, amounts, total } = values;
     inPlaceSort(desc).desc((i) => amounts.get(i));
-
-    const embed = new CustomEmbed(message.member);
-
-    embed.setDescription(`+$**${total.toLocaleString()}**`);
-
-    reaction.editReply({
-      embeds: [
-        new CustomEmbed(null, `+$**${total.toLocaleString()}**`).setColor(
-          Constants.EMBED_SUCCESS_COLOR,
-        ),
-      ],
-    });
-
-    const footer: string[] = [];
-
-    if (taxEnabled) footer.push(`${((await getTax()) * 100).toFixed(1)}% tax`);
-    if (multi > 0) footer.push(`${Math.floor(multi * 100)}% bonus`);
-    if (footer.length > 0) embed.setFooter({ text: footer.join(" | ") });
-
-    const pages = PageManager.createPages(desc, 10);
-
-    embed.addField("items sold", pages.get(1).join("\n"));
+    if (desc.length <= 10) embed.addField("items to be sold", desc.join("\n"));
+    else {
+      let newDesc = "";
+      for (let i = 0; i < 9; i++) newDesc += `${desc[i]}\n`;
+      let amount = 0;
+      for (let i = 9; i < desc.length; i++)
+        amount += Number(desc[i].split(" ($")[1].split(")")[0].replaceAll(",", ""));
+      newDesc += `*${desc.length - 9} more ($${amount.toLocaleString()})*`;
+      embed.addField("items to be sold", newDesc);
+    }
+    embed.setFooter({ text: `total: $${total.toLocaleString()}` });
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder()
-        .setCustomId("⬅")
-        .setLabel("back")
-        .setStyle(ButtonStyle.Primary)
-        .setDisabled(true),
-      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+      new ButtonBuilder().setCustomId("✅").setLabel("confirm").setStyle(ButtonStyle.Success),
+      new ButtonBuilder().setCustomId("❌").setLabel("cancel").setStyle(ButtonStyle.Danger),
     );
-    if (pages.size == 1)
-      return msg
-        ? msg.edit({ embeds: [embed], components: [] })
-        : send({ embeds: [embed], components: [] });
-    const m = await (msg
-      ? msg.edit({ embeds: [embed], components: [row] })
-      : send({ embeds: [embed], components: [row] }));
 
-    const manager = new PageManager({
-      embed,
-      message: m,
-      row,
-      userId: message.author.id,
-      allowMessageDupe: true,
-      pages,
-      updateEmbed(page, embed) {
-        embed.data.fields.length = 0;
-        embed.addField("items sold", page.join("\n"));
+    const msg = await send({ embeds: [embed], components: [row] });
 
-        return embed;
-      },
+    const filter = (i: Interaction) => i.user.id == message.author.id;
+
+    const reaction = await msg.awaitMessageComponent({ filter, time: 15000 }).catch(async () => {
+      await msg.edit({
+        embeds: [embed],
+        components: [
+          new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+            new ButtonBuilder()
+              .setStyle(ButtonStyle.Danger)
+              .setLabel("expired")
+              .setCustomId("boobies")
+              .setDisabled(true),
+          ),
+        ],
+      });
+      addExpiry(cmd.name, message.member, 30);
     });
 
-    return manager.listen();
+    if (!reaction) return;
+
+    if (reaction.customId === "❌") {
+      msg.edit({ components: [] });
+      return reaction.reply({
+        embeds: [new CustomEmbed(message.member, "✅ cancelled")],
+        ephemeral: true,
+      });
+    }
+
+    if (reaction.customId == "✅") {
+      await reaction.deferReply({ ephemeral: true });
+
+      const { selected, taxedAmount, desc, amounts, total, taxEnabled, multi } =
+        await calcValues(message);
+
+      if (selected.size == 0) {
+        const embed = new ErrorEmbed("you do not have anything to sell");
+        reaction.editReply({ embeds: [new CustomEmbed(message.member, "lol nice try")] });
+        return msg
+          ? msg.edit({ embeds: [embed], components: [] })
+          : send({ embeds: [embed], components: [] });
+      }
+
+      const functions = [];
+      for (const item of selected.keys())
+        functions.push(async () => {
+          await setInventoryItem(message.member, item, 0);
+        });
+
+      functions.push(async () => {
+        await addToNypsiBank(taxedAmount * 0.7);
+      });
+      functions.push(async () => {
+        await addBalance(message.member, total);
+      });
+
+      addStat(message.author.id, "earned-sold", total);
+
+      await pAll(functions, { concurrency: 5 });
+
+      inPlaceSort(desc).desc((i) => amounts.get(i));
+
+      const embed = new CustomEmbed(message.member);
+
+      embed.setDescription(`+$**${total.toLocaleString()}**`);
+
+      reaction.editReply({
+        embeds: [
+          new CustomEmbed(null, `+$**${total.toLocaleString()}**`).setColor(
+            Constants.EMBED_SUCCESS_COLOR,
+          ),
+        ],
+      });
+
+      const footer: string[] = [];
+
+      if (taxEnabled) footer.push(`${((await getTax()) * 100).toFixed(1)}% tax`);
+      if (multi > 0) footer.push(`${Math.floor(multi * 100)}% bonus`);
+      if (footer.length > 0) embed.setFooter({ text: footer.join(" | ") });
+
+      const pages = PageManager.createPages(desc, 10);
+
+      embed.addField("items sold", pages.get(1).join("\n"));
+
+      const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder()
+          .setCustomId("⬅")
+          .setLabel("back")
+          .setStyle(ButtonStyle.Primary)
+          .setDisabled(true),
+        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+      );
+      if (pages.size == 1)
+        return msg
+          ? msg.edit({ embeds: [embed], components: [] })
+          : send({ embeds: [embed], components: [] });
+      const m = await (msg
+        ? msg.edit({ embeds: [embed], components: [row] })
+        : send({ embeds: [embed], components: [row] }));
+
+      const manager = new PageManager({
+        embed,
+        message: m,
+        row,
+        userId: message.author.id,
+        allowMessageDupe: true,
+        pages,
+        updateEmbed(page, embed) {
+          embed.data.fields.length = 0;
+          embed.addField("items sold", page.join("\n"));
+
+          return embed;
+        },
+      });
+
+      return manager.listen();
+    }
   }
 }
 
