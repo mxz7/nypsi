@@ -784,6 +784,60 @@ export async function getAutosellItems(member: GuildMember | string) {
   return query;
 }
 
+export async function setSellFilter(member: GuildMember, items: string[]) {
+  const query = await prisma.economy
+    .update({
+      where: {
+        userId: member.user.id,
+      },
+      data: {
+        sellallFilter: items,
+      },
+      select: {
+        sellallFilter: true,
+      },
+    })
+    .then((q) => q.sellallFilter);
+
+  await redis.del(`${Constants.redis.cache.economy.SELL_FILTER}:${member.user.id}`);
+
+  return query;
+}
+
+export async function getSellFilter(member: GuildMember | string) {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
+  if (await redis.exists(`${Constants.redis.cache.economy.AUTO_SELL}:${id}`)) {
+    return JSON.parse(
+      await redis.get(`${Constants.redis.cache.economy.AUTO_SELL}:${id}`),
+    ) as string[];
+  }
+
+  const query = await prisma.economy
+    .findUnique({
+      where: {
+        userId: id,
+      },
+      select: {
+        sellallFilter: true,
+      },
+    })
+    .then((q) => q.sellallFilter);
+
+  await redis.set(`${Constants.redis.cache.economy.SELL_FILTER}:${id}`, JSON.stringify(query));
+  await redis.expire(
+    `${Constants.redis.cache.economy.SELL_FILTER}:${id}`,
+    Math.floor(ms("1 hour") / 1000),
+  );
+
+  return query;
+}
+
 export async function calcItemValue(item: string) {
   let itemValue = 1000;
 
