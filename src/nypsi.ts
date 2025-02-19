@@ -9,12 +9,12 @@ const client = new NypsiClient({
   sweepers: {
     ...Options.DefaultSweeperSettings,
     messages: {
-      interval: 60,
+      interval: 45,
       filter: () => (msg) => {
         if (!msg.author) return true;
         if (msg.author?.bot) return true;
 
-        if (msg.createdTimestamp > Date.now() - 60000 || msg.editedTimestamp > Date.now() - 60000)
+        if (msg.createdTimestamp > Date.now() - 30000 || msg.editedTimestamp > Date.now() - 30000)
           return false;
 
         return true;
