@@ -170,8 +170,6 @@ async function requestDM(options: RequestDMOptions): Promise<boolean> {
         },
       );
 
-      let shard: number;
-
       for (const i of clusterHas) {
         if (i != "not-found") {
           shard = i;
