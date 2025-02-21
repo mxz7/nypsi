@@ -139,7 +139,7 @@ async function requestDM(options: RequestDMOptions): Promise<boolean> {
           },
         );
 
-      if (res.find((i) => i.success)) {
+      if (res.filter((i) => i.success)) {
         logger.info(`::success DM sent: ${options.memberId} (${shard})`);
         return true;
       } else {
@@ -238,7 +238,7 @@ async function requestDM(options: RequestDMOptions): Promise<boolean> {
           },
         );
 
-      if (res.find((i) => i.success)) {
+      if (res.filter((i) => i.success)) {
         logger.info(`::success DM sent: ${options.memberId} (${shard})`);
         return true;
       } else {
