@@ -1,16 +1,10 @@
-import * as topgg from "@top-gg/sdk";
-
-const topggStats = new topgg.Api(process.env.TOPGG_TOKEN);
+import Constants from "../Constants";
 
 export function updateStats(guildCount: number, shardCount: number) {
-  topggStats.postStats({
-    serverCount: guildCount,
-    shardCount: shardCount,
+  fetch(`https://top.gg/api/bots/${Constants.BOT_USER_ID}/stats`, {
+    headers: {
+      authorization: process.env.TOPGG_TOKEN,
+    },
+    body: JSON.stringify({ server_count: guildCount, shard_count: shardCount }),
   });
-
-  // fetch("https://discord.bots.gg/bots/Constants.BOT_USER_ID/stats", {
-  //     method: "POST",
-  //     body: JSON.stringify({ shardCount: shardCount, guildCount: guildCount }),
-  //     headers: { "Content-Type": "application/json", "Authorization": "removed token" }
-  // }) FOR POSTING TO DISCORD.BOTS.GG
 }
