@@ -555,6 +555,8 @@ async function run(
 
     const queueHealth = await dmQueue.checkHealth();
 
+    console.log(queueHealth);
+
     const embed = new CustomEmbed(message.member)
       .setHeader(
         `nypsi stats | cluster: ${currentCluster + 1}/${clusterCount}`,
