@@ -109,40 +109,41 @@ async function requestDM(options: RequestDMOptions): Promise<boolean> {
     }
 
     try {
-      const res = await options.client.cluster.broadcastEval(
-        async (c, { needed, memberId, payload }) => {
-          const client = c as unknown as NypsiClient;
-          if (client.cluster.id != needed) return false;
+      const res: ({ success: true } | { success: false; reason: string })[] =
+        await options.client.cluster.broadcastEval(
+          async (c, { needed, memberId, payload }) => {
+            const client = c as unknown as NypsiClient;
+            if (client.cluster.id != needed) return { success: false, reason: "wrong cluster" };
 
-          const user = await client.users.fetch(memberId).catch(() => {});
+            const user = await client.users.fetch(memberId).catch(() => {});
 
-          if (!user) return false;
+            if (!user) return { success: false, reason: "user not found" };
 
-          let fail = false;
+            let fail = false;
 
-          await user.send(payload as MessagePayload).catch(() => {
-            fail = true;
-          });
+            await user.send(payload as MessagePayload).catch(() => {
+              fail = true;
+            });
 
-          if (fail) {
-            return false;
-          }
-          return true;
-        },
-        {
-          context: {
-            needed: shard,
-            memberId: options.memberId,
-            payload: payload,
+            if (fail) {
+              return { success: false, reason: "failed to send" };
+            }
+            return { success: true };
           },
-        },
-      );
+          {
+            context: {
+              needed: shard,
+              memberId: options.memberId,
+              payload: payload,
+            },
+          },
+        );
 
-      if (res.includes(true)) {
+      if (res.find((i) => i.success)) {
         logger.info(`::success DM sent: ${options.memberId} (${shard})`);
         return true;
       } else {
-        logger.warn(`failed to send DM: ${options.memberId}`);
+        logger.warn(`failed to send DM: ${options.memberId}`, { results: res });
         return false;
       }
     } catch {
@@ -207,41 +208,41 @@ async function requestDM(options: RequestDMOptions): Promise<boolean> {
     }
 
     try {
-      const res = await options.client.broadcastEval(
-        async (c, { needed, memberId, payload }) => {
-          const client = c as unknown as NypsiClient;
-          if (client.cluster.id != needed) return false;
+      const res: ({ success: true } | { success: false; reason: string })[] =
+        await options.client.broadcastEval(
+          async (c, { needed, memberId, payload }) => {
+            const client = c as unknown as NypsiClient;
+            if (client.cluster.id != needed) return { success: false, reason: "wrong cluster" };
 
-          const user = await client.users.fetch(memberId).catch(() => {});
+            const user = await client.users.fetch(memberId).catch(() => {});
 
-          if (!user) return false;
+            if (!user) return { success: false, reason: "user not found" };
 
-          let fail = false;
+            let fail = false;
 
-          await user.send(payload as MessagePayload).catch(() => {
-            fail = true;
-          });
+            await user.send(payload as MessagePayload).catch(() => {
+              fail = true;
+            });
 
-          if (fail) {
-            return false;
-          }
-          return true;
-        },
-        {
-          context: {
-            needed: shard,
-            memberId: options.memberId,
-            payload: payload,
+            if (fail) {
+              return { success: false, reason: "failed to send" };
+            }
+            return { success: true };
           },
-        },
-      );
+          {
+            context: {
+              needed: shard,
+              memberId: options.memberId,
+              payload: payload,
+            },
+          },
+        );
 
-      if (res.includes(true)) {
-        logger.info(`::success DM sent: ${options.memberId}`);
+      if (res.find((i) => i.success)) {
+        logger.info(`::success DM sent: ${options.memberId} (${shard})`);
         return true;
       } else {
-        logger.warn(`failed to send DM: ${options.memberId}`);
-        await checkVoteReminder(options.memberId);
+        logger.warn(`failed to send DM: ${options.memberId}`, { results: res });
         return false;
       }
     } catch {
