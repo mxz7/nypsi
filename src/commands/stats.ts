@@ -42,6 +42,8 @@ import { getVersion } from "../utils/functions/version";
 import { aliasesSize, commandsSize } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
+import { dmQueue } from "../utils/queues/queues";
+import BeeQueue = require("bee-queue");
 
 const cmd = new Command("stats", "view your nypsi stats", "info");
 
@@ -551,6 +553,8 @@ async function run(
       .broadcastEval("this.guilds.cache.size")
       .then((res) => res.reduce((a, b) => a + b));
 
+    const queueHealth = await dmQueue.checkHealth();
+
     const embed = new CustomEmbed(message.member)
       .setHeader(
         `nypsi stats | cluster: ${currentCluster + 1}/${clusterCount}`,
@@ -589,7 +593,15 @@ async function run(
             .join(" ")}`,
         true,
       )
-      .addField("cluster", `**uptime** ${uptime}`, true);
+      .addField("cluster", `**uptime** ${uptime}`, true)
+      .addField(
+        "dms",
+        `**delayed** ${queueHealth.delayed}\n` +
+          `**active** ${queueHealth.active}\n` +
+          `**failed** ${queueHealth.failed}\n` +
+          `**waiting** ${queueHealth.waiting}`,
+        true,
+      );
 
     embed.setFooter({ text: `v${getVersion()} | shard: ${currentShard}` });
 
