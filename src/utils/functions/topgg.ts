@@ -6,5 +6,6 @@ export function updateStats(guildCount: number, shardCount: number) {
       authorization: process.env.TOPGG_TOKEN,
     },
     body: JSON.stringify({ server_count: guildCount, shard_count: shardCount }),
+    method: "post",
   });
 }
