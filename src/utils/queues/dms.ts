@@ -42,35 +42,45 @@ interface RequestDMOptions {
 async function requestDM(options: RequestDMOptions): Promise<boolean> {
   logger.info(`DM requested: ${options.memberId}`);
 
-  if (await isUserBlacklisted(options.memberId)) {
-    logger.info(`${options.memberId} is blacklisted`);
+  try {
+    if (await isUserBlacklisted(options.memberId)) {
+      logger.info(`${options.memberId} is blacklisted`);
+      return false;
+    }
+  } catch {
+    logger.error(`failed blacklist check: ${options.memberId}`);
     return false;
   }
 
   if (options.client instanceof NypsiClient) {
-    const clusterHas = await options.client.cluster.broadcastEval(
-      async (c, { userId }) => {
-        const client = c as unknown as NypsiClient;
-        const user = await client.users.fetch(userId).catch(() => {});
-
-        if (user) {
-          return client.cluster.id;
-        } else {
-          return "not-found";
-        }
-      },
-      {
-        context: { userId: options.memberId },
-      },
-    );
-
+    let clusterHas: (number | "not-found")[];
     let shard: number;
 
-    for (const i of clusterHas) {
-      if (i != "not-found") {
-        shard = i;
-        break;
+    try {
+      clusterHas = await options.client.cluster.broadcastEval(
+        async (c, { userId }) => {
+          const client = c as unknown as NypsiClient;
+          const user = await client.users.fetch(userId).catch(() => {});
+
+          if (user) {
+            return client.cluster.id;
+          } else {
+            return "not-found";
+          }
+        },
+        {
+          context: { userId: options.memberId },
+        },
+      );
+
+      for (const i of clusterHas) {
+        if (i != "not-found") {
+          shard = i;
+          break;
+        }
       }
+    } catch {
+      logger.error(`failed finding member/shard: ${options.memberId}`);
     }
 
     if (isNaN(shard)) {
@@ -98,71 +108,82 @@ async function requestDM(options: RequestDMOptions): Promise<boolean> {
       }
     }
 
-    const res = await options.client.cluster.broadcastEval(
-      async (c, { needed, memberId, payload }) => {
-        const client = c as unknown as NypsiClient;
-        if (client.cluster.id != needed) return false;
+    try {
+      const res = await options.client.cluster.broadcastEval(
+        async (c, { needed, memberId, payload }) => {
+          const client = c as unknown as NypsiClient;
+          if (client.cluster.id != needed) return false;
 
-        const user = await client.users.fetch(memberId).catch(() => {});
+          const user = await client.users.fetch(memberId).catch(() => {});
 
-        if (!user) return false;
+          if (!user) return false;
 
-        let fail = false;
+          let fail = false;
 
-        await user.send(payload as MessagePayload).catch(() => {
-          fail = true;
-        });
+          await user.send(payload as MessagePayload).catch(() => {
+            fail = true;
+          });
 
-        if (fail) {
-          return false;
-        }
-        return true;
-      },
-      {
-        context: {
-          needed: shard,
-          memberId: options.memberId,
-          payload: payload,
+          if (fail) {
+            return false;
+          }
+          return true;
         },
-      },
-    );
+        {
+          context: {
+            needed: shard,
+            memberId: options.memberId,
+            payload: payload,
+          },
+        },
+      );
 
-    if (res.includes(true)) {
-      logger.info(`::success DM sent: ${options.memberId} (${shard})`);
-      return true;
-    } else {
-      logger.warn(`failed to send DM: ${options.memberId}`);
-      return false;
+      if (res.includes(true)) {
+        logger.info(`::success DM sent: ${options.memberId} (${shard})`);
+        return true;
+      } else {
+        logger.warn(`failed to send DM: ${options.memberId}`);
+        return false;
+      }
+    } catch {
+      logger.error(`failed to send DM: ${options.memberId} (caught)`);
     }
   } else {
-    const clusterHas = await options.client.broadcastEval(
-      async (c, { userId }) => {
-        const client = c as unknown as NypsiClient;
-        const user = await client.users.fetch(userId).catch(() => {});
-
-        if (user) {
-          return client.cluster.id;
-        } else {
-          return "not-found";
-        }
-      },
-      {
-        context: { userId: options.memberId },
-      },
-    );
-
+    let clusterHas: (number | "not-found")[];
     let shard: number;
 
-    for (const i of clusterHas) {
-      if (i != "not-found") {
-        shard = i;
-        break;
-      }
-    }
+    try {
+      clusterHas = await options.client.broadcastEval(
+        async (c, { userId }) => {
+          const client = c as unknown as NypsiClient;
+          const user = await client.users.fetch(userId).catch(() => {});
 
-    if (isNaN(shard)) {
-      logger.warn(`user not found: ${options.memberId}`);
-      return false;
+          if (user) {
+            return client.cluster.id;
+          } else {
+            return "not-found";
+          }
+        },
+        {
+          context: { userId: options.memberId },
+        },
+      );
+
+      let shard: number;
+
+      for (const i of clusterHas) {
+        if (i != "not-found") {
+          shard = i;
+          break;
+        }
+      }
+
+      if (isNaN(shard)) {
+        logger.warn(`user not found: ${options.memberId}`);
+        return false;
+      }
+    } catch {
+      logger.error(`failed finding user/shard: ${options.memberId}`);
     }
 
     const payload: BaseMessageOptions = {
@@ -185,44 +206,50 @@ async function requestDM(options: RequestDMOptions): Promise<boolean> {
       }
     }
 
-    const res = await options.client.broadcastEval(
-      async (c, { needed, memberId, payload }) => {
-        const client = c as unknown as NypsiClient;
-        if (client.cluster.id != needed) return false;
+    try {
+      const res = await options.client.broadcastEval(
+        async (c, { needed, memberId, payload }) => {
+          const client = c as unknown as NypsiClient;
+          if (client.cluster.id != needed) return false;
 
-        const user = await client.users.fetch(memberId).catch(() => {});
+          const user = await client.users.fetch(memberId).catch(() => {});
 
-        if (!user) return false;
+          if (!user) return false;
 
-        let fail = false;
+          let fail = false;
 
-        await user.send(payload as MessagePayload).catch(() => {
-          fail = true;
-        });
+          await user.send(payload as MessagePayload).catch(() => {
+            fail = true;
+          });
 
-        if (fail) {
-          return false;
-        }
-        return true;
-      },
-      {
-        context: {
-          needed: shard,
-          memberId: options.memberId,
-          payload: payload,
+          if (fail) {
+            return false;
+          }
+          return true;
         },
-      },
-    );
+        {
+          context: {
+            needed: shard,
+            memberId: options.memberId,
+            payload: payload,
+          },
+        },
+      );
 
-    if (res.includes(true)) {
-      logger.info(`::success DM sent: ${options.memberId}`);
-      return true;
-    } else {
-      logger.warn(`failed to send DM: ${options.memberId}`);
-      await checkVoteReminder(options.memberId);
-      return false;
+      if (res.includes(true)) {
+        logger.info(`::success DM sent: ${options.memberId}`);
+        return true;
+      } else {
+        logger.warn(`failed to send DM: ${options.memberId}`);
+        await checkVoteReminder(options.memberId);
+        return false;
+      }
+    } catch {
+      logger.error(`failed to send DM: ${options.memberId} (caught)`);
     }
   }
+
+  return false;
 }
 
 async function checkVoteReminder(userId: string) {
