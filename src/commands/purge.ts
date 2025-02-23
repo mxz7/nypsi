@@ -15,6 +15,7 @@ import Constants from "../utils/Constants";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import ms = require("ms");
 
 const cmd = new Command("purge", "bulk delete/purge messages", "moderation")
   .setAliases(["del"])
@@ -299,7 +300,9 @@ async function run(
 
     let collected = await message.channel.messages.fetch({ limit: 100 });
 
-    collected = collected.filter((msg: Message) => msg.author.bot);
+    collected = collected.filter(
+      (msg: Message) => msg.author.bot && msg.createdAt.getTime() > Date.now() - ms("2 weeks"),
+    );
 
     if (collected.size == 0) {
       return;
