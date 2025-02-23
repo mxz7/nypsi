@@ -118,7 +118,7 @@ async function run(
     return send({ embeds: [new ErrorEmbed("invalid payment")] });
   }
 
-  await addCooldown(cmd.name, message.member, 30);
+  await addCooldown(cmd.name, message.member, 5);
 
   const embed = new CustomEmbed(message.member)
     .setHeader("bank deposit", message.author.avatarURL())
