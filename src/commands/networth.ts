@@ -34,7 +34,7 @@ async function run(
     return;
   }
 
-  await addCooldown(cmd.name, message.member, 30);
+  await addCooldown(cmd.name, message.member, 15);
 
   let target = message.member;
 
