@@ -121,7 +121,7 @@ async function run(
     return;
   }
 
-  await addCooldown(cmd.name, message.member, 5);
+  await addCooldown(cmd.name, message.member, 2);
 
   if (!(await userExists(target))) await createUser(target);
 
