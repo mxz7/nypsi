@@ -17,6 +17,28 @@ import { logger } from "../logger";
 
 const dmQueueHandler = new BeeQueue<NotificationPayload>("nypsi:dms", {
   redis: redis,
+  removeOnFailure: true,
+  removeOnSuccess: true,
+});
+
+dmQueueHandler.on("error", (err) => {
+  logger.error(`bee queue error: ${err.message}`, err);
+});
+
+dmQueueHandler.on("ready", () => {
+  logger.info("bee queue: DM queue handler ready");
+});
+
+dmQueueHandler.on("failed", (job, err) => {
+  logger.error(`bee queue: DM ${job.data.memberId} failed: ${err.message}`, err);
+});
+
+dmQueueHandler.on("stalled", (jobId) => {
+  logger.warn(`bee queue: DM ${jobId} stalled`);
+});
+
+dmQueueHandler.on("retrying", (job) => {
+  logger.info(`bee queue: DM ${job.data.memberId} retrying`);
 });
 
 export function handleDmQueue(manager: ClusterManager) {
