@@ -49,6 +49,7 @@ const client = new NypsiClient({
     GuildStickerManager: 0,
     GuildScheduledEventManager: 0,
     MessageManager: 10,
+    GuildMessageManager: 10,
     PresenceManager: 0,
     ReactionManager: 0,
     ReactionUserManager: 0,
@@ -60,6 +61,7 @@ const client = new NypsiClient({
     AutoModerationRuleManager: 0,
     GuildForumThreadManager: 0,
     GuildTextThreadManager: 0,
+    DMMessageManager: 0,
     UserManager: {
       maxSize: 3_000,
       keepOverLimit: (user) => {
