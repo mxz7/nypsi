@@ -140,7 +140,7 @@ export async function updatePreferences(member: GuildMember | string, data: Pref
 
 export function addNotificationToQueue(...payload: NotificationPayload[]) {
   dmQueue.saveAll(
-    payload.map((p) => dmQueue.createJob(p).timeout(30000).retries(1).backoff("fixed", 60000)),
+    payload.map((p) => dmQueue.createJob(p).timeout(30000).retries(5).backoff("fixed", 120000)),
   );
 }
 
