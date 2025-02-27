@@ -67,5 +67,15 @@
   "bugs": {
     "url": "https://github.com/mxz7/nypsi/issues"
   },
-  "homepage": "https://github.com/mxz7/nypsi#readme"
+  "homepage": "https://github.com/mxz7/nypsi#readme",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "prisma"
+    ],
+    "ignoredBuiltDependencies": [
+      "esbuild"
+    ]
+  }
 }
