@@ -282,7 +282,7 @@ export default async function messageCreate(message: Message) {
     if (
       (message.channel as TextChannel).parentId === "1246516186171314337" &&
       message.content.includes(`<@${Constants.TEKOH_ID}>`) &&
-      parseInt(await redis.get("nypsi:tekoh:lastchat")) < Date.now() - ms("1 hour")
+      parseInt(await redis.get("nypsi:tekoh:lastchat")) < Date.now() - ms("15 minutes")
     ) {
       message.reply({
         content: message.author.toString(),
