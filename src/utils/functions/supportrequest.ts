@@ -232,7 +232,7 @@ export async function toggleNotify(id: string, userId: string) {
   if (request.notify.includes(userId)) {
     await prisma.supportRequest.update({
       where: {
-        channelId: id,
+        userId: id,
       },
       data: {
         notify: {
@@ -242,7 +242,7 @@ export async function toggleNotify(id: string, userId: string) {
     });
   } else {
     await prisma.supportRequest.update({
-      where: { channelId: id },
+      where: { userId: id },
       data: {
         notify: {
           push: userId,
