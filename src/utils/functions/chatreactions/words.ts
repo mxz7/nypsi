@@ -43,6 +43,7 @@ export async function getWords(guild: Guild, type?: ChatReactionWordList) {
       const words = cache.split(" ");
 
       if (words.length === 0) return getWords(guild, "english_1k");
+      return words;
     } else {
       const query = await prisma.chatReaction.findUnique({
         where: {
