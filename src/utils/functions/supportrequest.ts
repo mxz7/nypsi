@@ -251,5 +251,7 @@ export async function toggleNotify(id: string, userId: string) {
     });
   }
 
+  await redis.del(`${Constants.redis.cache.SUPPORT}:${id}`);
+
   return true;
 }
