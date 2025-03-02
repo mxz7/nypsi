@@ -235,7 +235,7 @@ export async function formatBet(
 ): Promise<number | null> {
   if (!maxBet) maxBet = await calcMaxBet(member);
 
-  bet = bet.toString().toLowerCase();
+  bet = bet.toString().toLowerCase().replaceAll("Μ", "m");
 
   if (bet == "all") {
     bet = await getBalance(member);
