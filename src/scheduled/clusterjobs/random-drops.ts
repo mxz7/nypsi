@@ -38,7 +38,9 @@ const words = [
   "{prefix}slots all",
   "{prefix}height",
   "{prefix}findamilf",
-  "{prefix}wholesome",
+  "{prefix}cat",
+  "{prefix}dog",
+  "meow",
 ];
 
 function doRandomDrop(client: NypsiClient) {
