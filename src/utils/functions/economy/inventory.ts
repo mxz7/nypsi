@@ -812,9 +812,9 @@ export async function getSellFilter(member: GuildMember | string) {
     id = member;
   }
 
-  if (await redis.exists(`${Constants.redis.cache.economy.AUTO_SELL}:${id}`)) {
+  if (await redis.exists(`${Constants.redis.cache.economy.SELL_FILTER}:${id}`)) {
     return JSON.parse(
-      await redis.get(`${Constants.redis.cache.economy.AUTO_SELL}:${id}`),
+      await redis.get(`${Constants.redis.cache.economy.SELL_FILTER}:${id}`),
     ) as string[];
   }
 
