@@ -2621,7 +2621,9 @@
       "id:lucky_7:95",
       "id:reroll_token:20",
       "id:apple_seed:50",
-      "id:strawberry_seed:50"
+      "id:strawberry_seed:50",
+      "id:mango_seed:25",
+      "id:coconut_seed:25"
     ]
   },
   "infinity_tag": {
