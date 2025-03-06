@@ -735,8 +735,6 @@ async function playGame(
       embed.setFooter({ text: `id: ${id}` });
     }
 
-    if (win >= 7) addProgress(message.author.id, "minesweeper_pro", 1);
-
     await addBalance(message.member, winnings);
     games.delete(message.author.id);
     return replay(embed, interaction);
@@ -858,6 +856,8 @@ async function playGame(
       } else {
         grid[location] = "gc";
         win += 3;
+
+        addProgress(message.author.id, "minesweeper_pro", 1);
 
         if (percentChance(0.5) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
           await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t");
