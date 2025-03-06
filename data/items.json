@@ -529,7 +529,7 @@
     "role": "prey",
     "rarity": 0,
     "buy": 0,
-    "sell": 2500,
+    "sell": 3000,
     "in_crates": false
   },
   "normal_rabbit": {
@@ -542,7 +542,7 @@
     "role": "prey",
     "rarity": 1,
     "buy": 0,
-    "sell": 5000,
+    "sell": 6000,
     "in_crates": false
   },
   "large_rabbit": {
@@ -555,7 +555,7 @@
     "role": "prey",
     "rarity": 2,
     "buy": 0,
-    "sell": 7500,
+    "sell": 8000,
     "in_crates": false
   },
   "deer": {
@@ -568,7 +568,7 @@
     "role": "prey",
     "rarity": 2,
     "buy": 0,
-    "sell": 10000,
+    "sell": 12000,
     "in_crates": false
   },
   "llama": {
@@ -581,7 +581,7 @@
     "role": "prey",
     "rarity": 2,
     "buy": 0,
-    "sell": 12500,
+    "sell": 13000,
     "in_crates": false
   },
   "monkey": {
@@ -595,7 +595,7 @@
     "role": "prey",
     "rarity": 2,
     "buy": 0,
-    "sell": 12500,
+    "sell": 13000,
     "in_crates": false
   },
   "harambe": {
@@ -608,7 +608,7 @@
     "role": "prey",
     "rarity": 3,
     "buy": 0,
-    "sell": 20000,
+    "sell": 22500,
     "in_crates": false
   },
   "giraffe": {
@@ -621,7 +621,7 @@
     "role": "prey",
     "rarity": 3,
     "buy": 0,
-    "sell": 25000,
+    "sell": 27500,
     "in_crates": false
   },
   "lion": {
@@ -647,7 +647,7 @@
     "role": "prey",
     "rarity": 3,
     "buy": 0,
-    "sell": 25000,
+    "sell": 30000,
     "in_crates": false
   },
   "rat": {
@@ -660,7 +660,7 @@
     "role": "prey",
     "rarity": 0,
     "buy": 0,
-    "sell": 1500,
+    "sell": 2000,
     "in_crates": false
   },
   "mouse": {
@@ -673,7 +673,7 @@
     "role": "prey",
     "rarity": 0,
     "buy": 0,
-    "sell": 1250,
+    "sell": 1500,
     "in_crates": false
   },
   "kangaroo": {
@@ -738,7 +738,7 @@
     "role": "prey",
     "rarity": 3,
     "buy": 0,
-    "sell": 75000,
+    "sell": 80000,
     "in_crates": false
   },
   "ghast": {
@@ -751,7 +751,7 @@
     "role": "prey",
     "rarity": 3,
     "buy": 0,
-    "sell": 75000,
+    "sell": 80000,
     "in_crates": false
   },
   "enderman": {
@@ -764,7 +764,7 @@
     "role": "prey",
     "rarity": 5,
     "buy": 0,
-    "sell": 100000,
+    "sell": 125000,
     "in_crates": false
   },
   "mineshaft_chest": {
