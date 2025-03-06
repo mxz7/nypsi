@@ -519,7 +519,7 @@
     "name": "mines professional **I**",
     "emoji": "💣",
     "target": 5,
-    "description": "reach a 7x multiplier in mines 5 times",
+    "description": "find the diamond in mines 5 times",
     "prize": ["lucky_scratch_card:1"]
   },
   "minesweeper_pro_ii": {
@@ -527,7 +527,7 @@
     "name": "mines professional **II**",
     "emoji": "💣",
     "target": 25,
-    "description": "reach a 7x multiplier in mines 25 times",
+    "description": "find the diamond in mines 25 times",
     "prize": ["lucky_scratch_card:2"]
   },
   "minesweeper_pro_iii": {
@@ -535,7 +535,7 @@
     "name": "mines professional **III**",
     "emoji": "💣",
     "target": 100,
-    "description": "reach a 7x multiplier in mines 100 times",
+    "description": "find the diamond in mines 100 times",
     "prize": ["lucky_scratch_card:3"]
   },
   "minesweeper_pro_iv": {
@@ -543,7 +543,7 @@
     "name": "mines professional **IV**",
     "emoji": "💣",
     "target": 500,
-    "description": "reach a 7x multiplier in mines 500 times",
+    "description": "find the diamond in mines 500 times",
     "prize": ["lucky_scratch_card:4"]
   },
   "minesweeper_pro_v": {
@@ -551,7 +551,7 @@
     "name": "mines professional **V**",
     "emoji": "💣",
     "target": 1000,
-    "description": "reach a 7x multiplier in mines 1,000 times",
+    "description": "find the diamond in mines 1,000 times",
     "prize": ["nypsi_crate:1", "legendary_scratch_card:1", "tag:bomb"]
   },
   "highlow_pro_i": {
@@ -1008,7 +1008,7 @@
     "name": "tower professional **I**",
     "emoji": "🐲",
     "target": 2,
-    "description": "complete the dragons tower twice on medium or higher",
+    "description": "complete the dragons tower twice",
     "prize": ["lucky_scratch_card:1"]
   },
   "tower_pro_ii": {
@@ -1016,7 +1016,7 @@
     "name": "tower professional **II**",
     "emoji": "🐲",
     "target": 5,
-    "description": "complete the dragons tower 5 times on medium or higher",
+    "description": "complete the dragons tower 5 times",
     "prize": ["lucky_scratch_card:2"]
   },
   "tower_pro_iii": {
@@ -1024,7 +1024,7 @@
     "name": "tower professional **III**",
     "emoji": "🐲",
     "target": 25,
-    "description": "complete the dragons tower 25 times on medium or higher",
+    "description": "complete the dragons tower 25 times",
     "prize": ["legendary_scratch_card:1", "lucky_scratch_card:3"]
   },
   "tower_pro_iv": {
@@ -1032,7 +1032,7 @@
     "name": "tower professional **IV**",
     "emoji": "🐲",
     "target": 75,
-    "description": "complete the dragons tower 75 times on medium or higher",
+    "description": "complete the dragons tower 75 times",
     "prize": ["legendary_scratch_card:2", "lucky_scratch_card:4"]
   },
   "tower_pro_v": {
@@ -1040,7 +1040,7 @@
     "name": "tower professional **V**",
     "emoji": "🐲",
     "target": 250,
-    "description": "complete the dragons tower 250 times on medium or higher",
+    "description": "complete the dragons tower 250 times",
     "prize": ["legendary_scratch_card:3", "nypsi_crate:2", "lucky_scratch_card:5"]
   },
   "scratchies_pro_i": {
