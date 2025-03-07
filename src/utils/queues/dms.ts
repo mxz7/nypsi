@@ -21,8 +21,18 @@ const dmQueueHandler = new BeeQueue<NotificationPayload>("nypsi:dms", {
   removeOnSuccess: true,
 });
 
+let connectingTimeout: NodeJS.Timeout;
+
 dmQueueHandler.on("error", (err) => {
   logger.error(`bee queue error: ${err.message}`, err);
+
+  if (err.message.includes("connection lost")) {
+    if (connectingTimeout) return;
+    connectingTimeout = setTimeout(async () => {
+      await dmQueueHandler.connect();
+      connectingTimeout = undefined;
+    }, 30000);
+  }
 });
 
 dmQueueHandler.on("ready", () => {
