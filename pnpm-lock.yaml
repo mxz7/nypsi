@@ -48,8 +48,8 @@ importers:
         specifier: 1.11.13
         version: 1.11.13
       discord-hybrid-sharding:
-        specifier: 2.2.4
-        version: 2.2.4
+        specifier: 2.2.5
+        version: 2.2.5
       discord.js:
         specifier: 14.18.0
         version: 14.18.0(bufferutil@4.0.9)
@@ -69,8 +69,8 @@ importers:
         specifier: 4.17.21
         version: 4.17.21
       mathjs:
-        specifier: 14.3.0
-        version: 14.3.0
+        specifier: 14.3.1
+        version: 14.3.1
       ms:
         specifier: 2.1.3
         version: 2.1.3
@@ -1739,8 +1739,8 @@ packages:
   discord-api-types@0.37.119:
     resolution: {integrity: sha512-WasbGFXEB+VQWXlo6IpW3oUv73Yuau1Ig4AZF/m13tXcTKnMpc/mHjpztIlz4+BM9FG9BHQkEXiPto3bKduQUg==}
 
-  discord-hybrid-sharding@2.2.4:
-    resolution: {integrity: sha512-Kz27bIZoH4ouqSCJNrj/2KYiBnS1Q0tGIY2yBUnY7HWiFxIEVzdkbN4TFYd4fDuqj7uwOQ0z3yyr6Tg6ZDHIeQ==}
+  discord-hybrid-sharding@2.2.5:
+    resolution: {integrity: sha512-XMScPJIaPGuze5RAKmIydZFi3MV0vRTJhHLP+ww+VGgTf/pKRuCpJYYa7CRcnuyH/0qOmDByZscJRiWJmLINMQ==}
 
   discord.js@14.18.0:
     resolution: {integrity: sha512-SvU5kVUvwunQhN2/+0t55QW/1EHfB1lp0TtLZUSXVHDmyHTrdOj5LRKdR0zLcybaA15F+NtdWuWmGOX9lE+CAw==}
@@ -2496,8 +2496,8 @@ packages:
   makeerror@1.0.12:
     resolution: {integrity: sha512-JmqCvUhmt43madlpFzG4BQzG2Z3m6tvQDNKdClZnO3VbIudJYmxsT0FNJMeiB2+JTSlTQTSbU8QdesVmwJcmLg==}
 
-  mathjs@14.3.0:
-    resolution: {integrity: sha512-kJbTdBp+6OgZewCkvnm8pOWyiel7VGJVEPkmU+NHPdrpqDJlxwX9Q1F2DQv8nq7FrqnvVnJaL4OBQXA/S7TnhQ==}
+  mathjs@14.3.1:
+    resolution: {integrity: sha512-tgN2/TQXWVHegcl/Yw/Rkd/yhq0CagK5KnWmKUJ2/Cz/2JZoq4K2Ili9B3wZqvxaof7TVNoXbyKmA3CV3P9ZsA==}
     engines: {node: '>= 18'}
     hasBin: true
 
@@ -5340,7 +5340,7 @@ snapshots:
 
   discord-api-types@0.37.119: {}
 
-  discord-hybrid-sharding@2.2.4: {}
+  discord-hybrid-sharding@2.2.5: {}
 
   discord.js@14.18.0(bufferutil@4.0.9):
     dependencies:
@@ -6403,7 +6403,7 @@ snapshots:
     dependencies:
       tmpl: 1.0.5
 
-  mathjs@14.3.0:
+  mathjs@14.3.1:
     dependencies:
       '@babel/runtime': 7.26.9
       complex.js: 2.4.2
