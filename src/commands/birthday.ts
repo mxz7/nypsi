@@ -117,7 +117,7 @@ async function run(
       return send({ embeds: [new ErrorEmbed("you forgot your birthday..... idiot.....")] });
     }
 
-    let birthday = new Date(args[1]);
+    let birthday = new Date(args[1].trim().replaceAll("/", "-").replaceAll(" ", "-"));
 
     if (isNaN(birthday as unknown as number))
       return send({ embeds: [new ErrorEmbed("invalid date, use the format YYYY-MM-DD")] });
