@@ -6,7 +6,6 @@ import { InlineNotificationPayload, NotificationPayload } from "../../../types/N
 import Constants from "../../Constants";
 import { dmQueue } from "../../queues/queues";
 import ms = require("ms");
-import BeeQueue = require("bee-queue");
 
 declare function require(name: string): any;
 
@@ -139,8 +138,12 @@ export async function updatePreferences(member: GuildMember | string, data: Pref
 }
 
 export function addNotificationToQueue(...payload: NotificationPayload[]) {
-  dmQueue.saveAll(
-    payload.map((p) => dmQueue.createJob(p).timeout(30000).retries(5).backoff("fixed", 120000)),
+  dmQueue.addBulk(
+    payload.map((data) => ({
+      data,
+      name: data.memberId,
+      opts: { removeOnComplete: true, removeOnFail: true },
+    })),
   );
 }
 

@@ -13,7 +13,7 @@ import { getVersion } from "./utils/functions/version";
 import { startMentionInterval } from "./utils/handlers/mentions";
 import { listen } from "./utils/handlers/webhookhandler";
 import { getWebhooks, logger, setClusterId } from "./utils/logger";
-import { handleDmQueue } from "./utils/queues/dms";
+import { dmQueueWorker } from "./utils/queues/dms";
 import ms = require("ms");
 
 setClusterId("main");
@@ -67,7 +67,10 @@ manager.on("clusterCreate", (cluster) => {
   });
   cluster.on("message", (message) => {
     if (message == "restart") {
-      manager.recluster.start({ restartMode: "rolling", delay: 2500 });
+      dmQueueWorker.pause();
+      manager.recluster.start({ restartMode: "rolling", delay: 2500 }).then(() => {
+        dmQueueWorker.resume();
+      });
       heartBeatIntervals.forEach((i) => clearInterval(i));
       heartBeatIntervals = [];
     } else if (typeof message === "string" && message.startsWith("trigger_job")) {
@@ -93,12 +96,14 @@ process.on("uncaughtException", (e) => {
   logger.error(e.message, e);
 });
 
-manager.spawn();
+manager.spawn().then(() => {
+  logger.debug("manager spawn resolved");
+});
 
 listen(manager);
 
 setTimeout(async () => {
-  handleDmQueue(manager);
+  dmQueueWorker.resume();
   startMentionInterval();
   runEconomySetup();
 }, 300000);

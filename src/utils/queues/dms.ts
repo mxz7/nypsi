@@ -1,4 +1,4 @@
-import BeeQueue = require("bee-queue");
+import { Worker } from "bullmq";
 import { ClusterManager } from "discord-hybrid-sharding";
 import {
   ActionRowBuilder,
@@ -7,7 +7,8 @@ import {
   MessageActionRowComponentBuilder,
   MessagePayload,
 } from "discord.js";
-import redis from "../../init/redis";
+import Redis from "ioredis";
+import { manager } from "../..";
 import { NypsiClient } from "../../models/Client";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import { NotificationPayload } from "../../types/Notification";
@@ -15,53 +16,28 @@ import { isUserBlacklisted } from "../functions/users/blacklist";
 import { getDmSettings, updateDmSettings } from "../functions/users/notifications";
 import { logger } from "../logger";
 
-const dmQueueHandler = new BeeQueue<NotificationPayload>("nypsi:dms", {
-  redis: redis,
-  removeOnFailure: true,
-  removeOnSuccess: true,
-});
+const connection = new Redis({ maxRetriesPerRequest: null });
 
-let connectingTimeout: NodeJS.Timeout;
-
-dmQueueHandler.on("error", (err) => {
-  logger.error(`bee queue error: ${err.message}`, err);
-
-  if (err.message.includes("connection lost")) {
-    if (connectingTimeout) return;
-    connectingTimeout = setTimeout(async () => {
-      await dmQueueHandler.connect();
-      connectingTimeout = undefined;
-    }, 30000);
-  }
-});
-
-dmQueueHandler.on("ready", () => {
-  logger.info("bee queue: DM queue handler ready");
-});
-
-dmQueueHandler.on("failed", (job, err) => {
-  logger.error(`bee queue: DM ${job.data.memberId} failed: ${err.message}`, err);
-});
-
-dmQueueHandler.on("stalled", (jobId) => {
-  logger.warn(`bee queue: DM ${jobId} stalled`);
-});
-
-dmQueueHandler.on("retrying", (job) => {
-  logger.info(`bee queue: DM ${job.data.memberId} retrying`);
-});
-
-export function handleDmQueue(manager: ClusterManager) {
-  dmQueueHandler.process(3, async (job) => {
+export const dmQueueWorker = new Worker<NotificationPayload, boolean>(
+  "dms",
+  async (job) => {
     return await requestDM({
-      client: manager,
       content: job.data.payload.content,
       memberId: job.data.memberId,
       components: job.data.payload.components,
       embed: job.data.payload.embed,
+      client: manager,
     });
-  });
-}
+  },
+  {
+    removeOnComplete: { count: 0 },
+    removeOnFail: { count: 0 },
+    connection,
+    concurrency: 3,
+  },
+);
+
+dmQueueWorker.pause();
 
 interface RequestDMOptions {
   memberId: string;
