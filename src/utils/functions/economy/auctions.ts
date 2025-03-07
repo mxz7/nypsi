@@ -63,7 +63,23 @@ export async function getAuctionByMessage(id: string) {
   return auction;
 }
 
-export async function deleteAuction(id: number, client: NypsiClient) {
+export async function deleteAuction(id: number, client: NypsiClient, repeatCount = 1) {
+  if (
+    beingBought.has(id) ||
+    (await redis.exists(`${Constants.redis.nypsi.auction_buying}:${id}`))
+  ) {
+    return new Promise((resolve) => {
+      logger.debug(`repeating auction delete - ${id}`);
+      setTimeout(async () => {
+        if (repeatCount > 100) {
+          beingBought.delete(id);
+          await redis.del(`${Constants.redis.nypsi.auction_buying}:${id}`);
+        }
+        resolve(deleteAuction(id, client, repeatCount + 1));
+      }, 1000);
+    });
+  }
+
   const auction = await prisma.auction
     .findFirst({
       where: {
@@ -615,18 +631,22 @@ export async function buyFullAuction(
   }
 
   beingBought.add(auction.id);
+  await redis.set(`${Constants.redis.nypsi.auction_buying}:${auction.id}`, "d", "EX", 600);
   setTimeout(() => {
     beingBought.delete(auction.id);
   }, ms("5 minutes"));
 
   if (interaction.createdTimestamp < Date.now() - 5000) {
     beingBought.delete(auction.id);
+    await redis.del(`${Constants.redis.nypsi.auction_buying}:${auction.id}`);
+    return;
   }
 
   if (!(await userExists(interaction.user.id))) await createUser(interaction.user.id);
 
   if ((await getBalance(interaction.user.id)) < Number(auction.bin)) {
     beingBought.delete(auction.id);
+    await redis.del(`${Constants.redis.nypsi.auction_buying}:${auction.id}`);
     return await interaction.reply({
       embeds: [new ErrorEmbed("you cannot afford this")],
       ephemeral: true,
@@ -637,22 +657,30 @@ export async function buyFullAuction(
 
   if (auction.bin >= preferences.auctionConfirm && Number(preferences.auctionConfirm) !== 0) {
     beingBought.delete(auction.id);
+    await redis.del(`${Constants.redis.nypsi.auction_buying}:${auction.id}`);
     const modalResponse = await showAuctionConfirmation(interaction, Number(auction.bin)).catch(
       () => {},
     );
     if (beingBought.has(auction.id)) return;
     beingBought.add(auction.id);
+    await redis.set(`${Constants.redis.nypsi.auction_buying}:${auction.id}`, "d", "EX", 600);
 
-    if (!modalResponse) return beingBought.delete(auction.id);
+    if (!modalResponse) {
+      beingBought.delete(auction.id);
+      await redis.del(`${Constants.redis.nypsi.auction_buying}:${auction.id}`);
+      return;
+    }
 
     if ((await getBalance(interaction.user.id)) < Number(auction.bin)) {
       beingBought.delete(auction.id);
+      await redis.del(`${Constants.redis.nypsi.auction_buying}:${auction.id}`);
       return await interaction.followUp({
         embeds: [new ErrorEmbed("you cannot afford this")],
         ephemeral: true,
       });
     }
     beingBought.add(auction.id);
+    await redis.set(`${Constants.redis.nypsi.auction_buying}:${auction.id}`, "d", "EX", 600);
   }
 
   auction = await prisma.auction.findFirst({
@@ -665,11 +693,13 @@ export async function buyFullAuction(
     await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], ephemeral: true });
     await interaction.message.delete();
     beingBought.delete(auction.id);
+    await redis.del(`${Constants.redis.nypsi.auction_buying}:${auction.id}`);
     return;
   }
 
   if (auction.sold || Number(auction.itemAmount) === 0) {
     beingBought.delete(auction.id);
+    await redis.del(`${Constants.redis.nypsi.auction_buying}:${auction.id}`);
     return await interaction.reply({
       embeds: [new ErrorEmbed("too slow ):").removeTitle()],
       ephemeral: true,
@@ -682,6 +712,7 @@ export async function buyFullAuction(
 
   if (balance < Number(auction.bin)) {
     beingBought.delete(auction.id);
+    await redis.del(`${Constants.redis.nypsi.auction_buying}:${auction.id}`);
     return await interaction.reply({
       embeds: [new ErrorEmbed("you cannot afford this")],
       ephemeral: true,
@@ -805,6 +836,7 @@ export async function buyFullAuction(
     embed.setFooter({ text: embed.data.footer.text });
   }
 
+  await redis.del(`${Constants.redis.nypsi.auction_buying}:${auction.id}`);
   beingBought.delete(auction.id);
   await interaction
     .update({ embeds: [embed], components: [] })
@@ -848,6 +880,7 @@ export async function buyAuctionOne(
   }
 
   beingBought.add(auction.id);
+  await redis.set(`${Constants.redis.nypsi.auction_buying}:${auction.id}`, "d", "EX", 600);
 
   setTimeout(() => {
     beingBought.delete(auction.id);
@@ -863,11 +896,13 @@ export async function buyAuctionOne(
     await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], ephemeral: true });
     await interaction.message.delete();
     beingBought.delete(auction.id);
+    await redis.del(`${Constants.redis.nypsi.auction_buying}:${auction.id}`);
     return;
   }
 
   if (auction.sold || Number(auction.itemAmount) === 0) {
     beingBought.delete(auction.id);
+    await redis.del(`${Constants.redis.nypsi.auction_buying}:${auction.id}`);
     return await interaction.reply({
       embeds: [new ErrorEmbed("too slow ):").removeTitle()],
       ephemeral: true,
@@ -878,6 +913,7 @@ export async function buyAuctionOne(
 
   if (balance < Math.floor(Number(auction.bin / auction.itemAmount))) {
     beingBought.delete(auction.id);
+    await redis.del(`${Constants.redis.nypsi.auction_buying}:${auction.id}`);
     return await interaction.reply({
       embeds: [new ErrorEmbed("you cannot afford this")],
       ephemeral: true,
@@ -1063,6 +1099,7 @@ export async function buyAuctionOne(
   }
 
   beingBought.delete(auction.id);
+  await redis.del(`${Constants.redis.nypsi.auction_buying}:${auction.id}`);
   await interaction
     .update({ embeds: [embed], components: [buttonRow] })
     .catch(() => interaction.message.edit({ embeds: [embed], components: [buttonRow] }));
@@ -1096,6 +1133,7 @@ export async function buyAuctionMulti(
   if (interaction.createdTimestamp < Date.now() - 5000) return;
 
   beingBought.add(auction.id);
+  await redis.set(`${Constants.redis.nypsi.auction_buying}:${auction.id}`, "d", "EX", 600);
 
   if (!(await userExists(interaction.user.id))) await createUser(interaction.user.id);
 
@@ -1103,6 +1141,7 @@ export async function buyAuctionMulti(
     (await getBalance(interaction.user.id)) <
     Math.floor(Number((auction.bin / auction.itemAmount) * amount))
   ) {
+    await redis.del(`${Constants.redis.nypsi.auction_buying}:${auction.id}`);
     beingBought.delete(auction.id);
     return await interaction.reply({
       embeds: [new ErrorEmbed("you cannot afford this")],
@@ -1124,11 +1163,13 @@ export async function buyAuctionMulti(
     await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], ephemeral: true });
     await interaction.message.delete();
     beingBought.delete(auction.id);
+    await redis.del(`${Constants.redis.nypsi.auction_buying}:${auction.id}`);
     return;
   }
 
   if (auction.sold || Number(auction.itemAmount) === 0) {
     beingBought.delete(auction.id);
+    await redis.del(`${Constants.redis.nypsi.auction_buying}:${auction.id}`);
     return await interaction.reply({
       embeds: [new ErrorEmbed("too slow ):").removeTitle()],
       ephemeral: true,
@@ -1137,6 +1178,7 @@ export async function buyAuctionMulti(
 
   if (amount > auction.itemAmount) {
     beingBought.delete(auction.id);
+    await redis.del(`${Constants.redis.nypsi.auction_buying}:${auction.id}`);
     return await interaction.reply({
       embeds: [new ErrorEmbed("not enough items")],
       ephemeral: true,
@@ -1147,6 +1189,7 @@ export async function buyAuctionMulti(
 
   if (balance < Math.floor(Number((auction.bin / auction.itemAmount) * amount))) {
     beingBought.delete(auction.id);
+    await redis.del(`${Constants.redis.nypsi.auction_buying}:${auction.id}`);
     return await interaction.reply({
       embeds: [new ErrorEmbed("you cannot afford this")],
       ephemeral: true,
@@ -1342,6 +1385,7 @@ export async function buyAuctionMulti(
   }
 
   beingBought.delete(auction.id);
+  await redis.del(`${Constants.redis.nypsi.auction_buying}:${auction.id}`);
 
   await interaction.deferUpdate().catch(() => {});
   await interaction.message.edit({ embeds: [embed], components: [buttonRow] });
