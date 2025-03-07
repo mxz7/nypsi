@@ -161,6 +161,7 @@ export default {
       HOURLY_COMMAND_PREPROCESS: "nypso:preprocess",
       CRASH_STATUS: "nypsi:crash:status",
       FARM_STATUS_DM: "nypsi:farm:status:dm",
+      auction_buying: "nypsi:auction:buying",
     },
   },
   ANNOUNCEMENTS_CHANNEL_ID: "747057465245564939",
