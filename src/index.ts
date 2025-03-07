@@ -98,16 +98,19 @@ process.on("uncaughtException", (e) => {
 
 manager.spawn().then(() => {
   logger.debug("manager spawn resolved");
+  dmQueueWorker.resume();
+  startMentionInterval();
+  runEconomySetup();
 });
 
 listen(manager);
 
-setTimeout(async () => {
-  dmQueueWorker.resume();
-  startMentionInterval();
-  runEconomySetup();
-}, 300000);
-// }, 15000);
+// setTimeout(async () => {
+//   dmQueueWorker.resume();
+//   startMentionInterval();
+//   runEconomySetup();
+// }, 300000);
+// // }, 15000);
 
 setTimeout(async () => {
   const userId = await manager.fetchClientValues("user.id");
