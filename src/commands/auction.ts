@@ -409,7 +409,7 @@ async function run(
       });
     }
 
-    let max = 1;
+    let max = 3;
 
     if (await isPremium(message.member)) {
       max += await getTier(message.member);
@@ -567,7 +567,7 @@ async function run(
         }
       }
 
-      let max = 1;
+      let max = 3;
 
       if (await isPremium(message.member)) {
         max += await getTier(message.member);
@@ -923,7 +923,7 @@ async function run(
 
     return manager.listen();
   } else {
-    let maxAuctions = 1;
+    let maxAuctions = 3;
 
     if (await isPremium(message.member)) {
       maxAuctions += await getTier(message.member);
