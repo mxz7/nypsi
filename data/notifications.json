@@ -84,7 +84,7 @@
     "farmHealth": {
       "id": "farmHealth",
       "name": "farm health",
-      "description": "(platinum only) get a dm when your plants are unhealthy and dying"
+      "description": "get a dm when your plants are unhealthy and dying"
     },
     "other": {
       "id": "other",

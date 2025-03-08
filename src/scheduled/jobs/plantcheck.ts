@@ -22,7 +22,6 @@ export default {
       },
       where: {
         AND: [
-          { economy: { user: { Premium: { level: 4 } } } },
           { economy: { user: { DMSettings: { farmHealth: true } } } },
           {
             OR: [
