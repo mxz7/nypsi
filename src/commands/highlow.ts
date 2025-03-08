@@ -740,10 +740,12 @@ async function playGame(
     const newCard1 = getValue(message.member);
 
     if (newCard1 < oldCard) {
-      if (win < 2) {
-        win += 0.5;
-      } else {
+      if (win == 0) {
         win += 1;
+      } else if (win > 5) {
+        win += 1;
+      } else {
+        win += 0.5;
       }
 
       games.set(message.author.id, {
