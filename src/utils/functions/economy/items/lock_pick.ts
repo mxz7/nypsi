@@ -52,12 +52,6 @@ module.exports = new ItemUse(
       }
     };
 
-    if ((await getDisabledCommands(message.guild)).includes("rob")) {
-      return send({
-        embeds: [new ErrorEmbed(`lockpicks have been disabled in ${message.guild.name}`)],
-      });
-    }
-
     if (await isUserBlacklisted(message.guild.ownerId)) {
       return send({
         embeds: [
@@ -106,6 +100,12 @@ module.exports = new ItemUse(
         );
       }
       return send({ embeds: [new ErrorEmbed("invalid user")] });
+    }
+
+    if ((await getDisabledCommands(message.guild)).includes("rob")) {
+      return send({
+        embeds: [new ErrorEmbed(`lockpicks have been disabled in ${message.guild.name}`)],
+      });
     }
 
     if (
