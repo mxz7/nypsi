@@ -3563,6 +3563,6 @@
     "buy": 0,
     "sell": 50000,
     "in_crates": true,
-    "aliases": ["mseed"]
+    "aliases": ["cseed"]
   }
 }
