@@ -336,17 +336,14 @@ export async function getRequiredForGuildUpgrade(
 
   const guild = await getGuildByName(name);
 
-  const baseMoney = 3000000 * Math.pow(guild.level, 2.1);
-  const baseXP = 1750 * Math.pow(guild.level, 1.8);
-
-  const bonusMoney = 1000000 * guild.members.length * Math.floor(guild.level / 7);
-  const bonusXP = 2500 * guild.members.length * Math.floor(guild.level / 7);
+  const money = 3000000 * Math.pow(guild.level, 2.1);
+  const xp = 1750 * Math.pow(guild.level, 1.8);
 
   await redis.set(
     `${Constants.redis.cache.economy.GUILD_REQUIREMENTS}:${name}`,
     JSON.stringify({
-      money: Math.floor(baseMoney + bonusMoney),
-      xp: Math.floor(baseXP + bonusXP),
+      money: Math.floor(money),
+      xp: Math.floor(xp),
       members: guild.members.length,
     }),
   );
@@ -356,8 +353,8 @@ export async function getRequiredForGuildUpgrade(
   );
 
   return {
-    money: Math.floor(baseMoney + bonusMoney),
-    xp: Math.floor(baseXP + bonusXP),
+    money: Math.floor(money),
+    xp: Math.floor(xp),
     members: guild.members.length,
   };
 }
