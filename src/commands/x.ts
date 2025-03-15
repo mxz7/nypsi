@@ -1535,8 +1535,8 @@ async function run(
         res.followUp({ content: "✅" });
         return waitForButton();
       } else if (res.customId === "captcha-hist") {
-        if ((await getAdminLevel(res.user.id)) < 1) {
-          res.followUp({ embeds: [new ErrorEmbed("you require admin level 2 for this")] });
+        if ((await getAdminLevel(res.user.id)) < 3) {
+          res.followUp({ embeds: [new ErrorEmbed("you require admin level 3 for this")] });
           return;
         }
 
