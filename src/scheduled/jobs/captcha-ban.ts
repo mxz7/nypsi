@@ -15,7 +15,11 @@ export default {
   async run(log) {
     const query = await prisma.captcha.findMany({
       where: {
-        AND: [{ solved: false }, { createdAt: { lt: dayjs().subtract(1, "day").toDate() } }],
+        AND: [
+          { solved: false },
+          { createdAt: { lt: dayjs().subtract(1, "day").toDate() } },
+          { received: { gt: 3 } },
+        ],
       },
     });
 
