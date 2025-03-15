@@ -872,6 +872,8 @@ model Captcha {
   createdAt DateTime  @default(now())
   solvedAt  DateTime? @default(now())
 
+  solvedIp String?
+
   user User @relation(fields: [userId], references: [id])
 }
 

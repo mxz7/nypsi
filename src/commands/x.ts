@@ -25,6 +25,7 @@ import { startRandomDrop } from "../scheduled/clusterjobs/random-drops";
 import Constants from "../utils/Constants";
 import { b, c } from "../utils/functions/anticheat";
 import { giveCaptcha } from "../utils/functions/captcha";
+import { MStoTime } from "../utils/functions/date";
 import { updateBalance, updateBankBalance } from "../utils/functions/economy/balance";
 import { initCrashGame } from "../utils/functions/economy/crash";
 import { addInventoryItem, setInventoryItem } from "../utils/functions/economy/inventory";
@@ -1553,12 +1554,14 @@ async function run(
         const pages = PageManager.createPages(
           history.map(
             (captcha) =>
-              "```\n" +
-              `received at: ${dayjs(captcha.createdAt).format("YYYY-MM-DD HH:mm:ss")}\n` +
-              `prompts: ${captcha.received}\n` +
-              `visits: ${captcha.visits.map((i) => dayjs(i).format("HH:mm:ss")).join(" ")}\n` +
-              `${captcha.solved ? `solved at: ${dayjs(captcha.solvedAt).format("HH:mm:ss")}` : "not solved"}` +
-              "\n```",
+              "```" +
+              `received: ${captcha.received}\n` +
+              `received at: ${dayjs(captcha.createdAt).format("HH:mm:ss")}\n` +
+              `visits (${captcha.visits.length}): ${captcha.visits.map((i) => dayjs(i).format("HH:mm:ss")).join(" ")}\n` +
+              `solved at: ${dayjs(captcha.solvedAt).format("HH:mm:ss")}\n` +
+              `time taken: ${MStoTime(captcha.solvedAt.getTime() - captcha.createdAt.getTime())}\n` +
+              `solved ip: ${captcha.solvedIp}\n` +
+              "```",
           ),
           1,
         );
