@@ -571,6 +571,8 @@ export async function commandGemCheck(member: GuildMember, commandCategory: Comm
 
     const gem = gems[Math.floor(Math.random() * gems.length)];
 
+    logger.info(`${member.user.id} received ${gem} randomly`);
+
     await addInventoryItem(member, gem, 1);
     addProgress(member.user.id, "gem_hunter", 1);
 
@@ -591,6 +593,7 @@ export async function commandGemCheck(member: GuildMember, commandCategory: Comm
 
   if (commandCategory == "moderation") {
     if (percentChance(0.07)) {
+      logger.info(`${member.user.id} received pink_gem randomly`);
       await addInventoryItem(member, "pink_gem", 1);
       addProgress(member.user.id, "gem_hunter", 1);
 
@@ -612,6 +615,7 @@ export async function commandGemCheck(member: GuildMember, commandCategory: Comm
     }
   } else if (commandCategory == "animals") {
     if (percentChance(0.007)) {
+      logger.info(`${member.user.id} received purple_gem randomly`);
       await addInventoryItem(member, "purple_gem", 1);
       addProgress(member.user.id, "gem_hunter", 1);
 
