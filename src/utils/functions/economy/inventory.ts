@@ -565,8 +565,7 @@ export async function commandGemCheck(member: GuildMember, commandCategory: Comm
   gemChanceCooldown.add(member.user.id);
 
   if (percentChance(0.001)) {
-    await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t");
-    await redis.expire(Constants.redis.nypsi.GEM_GIVEN, Math.floor(ms("1 days") / 1000));
+    await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t", "EX", 86400);
     const gems = ["green_gem", "blue_gem", "purple_gem", "pink_gem"];
 
     const gem = gems[Math.floor(Math.random() * gems.length)];
@@ -593,6 +592,7 @@ export async function commandGemCheck(member: GuildMember, commandCategory: Comm
 
   if (commandCategory == "moderation") {
     if (percentChance(0.07)) {
+      await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t", "EX", 86400);
       logger.info(`${member.user.id} received pink_gem randomly`);
       await addInventoryItem(member, "pink_gem", 1);
       addProgress(member.user.id, "gem_hunter", 1);
@@ -615,6 +615,7 @@ export async function commandGemCheck(member: GuildMember, commandCategory: Comm
     }
   } else if (commandCategory == "animals") {
     if (percentChance(0.007)) {
+      await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t", "EX", 86400);
       logger.info(`${member.user.id} received purple_gem randomly`);
       await addInventoryItem(member, "purple_gem", 1);
       addProgress(member.user.id, "gem_hunter", 1);

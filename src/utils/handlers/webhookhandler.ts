@@ -241,8 +241,8 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
   createAuraTransaction(user, Constants.BOT_USER_ID, 50);
 
   if (percentChance(0.05) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
-    await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t");
-    await redis.expire(Constants.redis.nypsi.GEM_GIVEN, Math.floor(ms("1 days") / 1000));
+    await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t", "EX", 86400);
+    logger.info(`${user} received blue_gem randomly (vote)`);
     await addInventoryItem(user, "blue_gem", 1);
     addProgress(user, "gem_hunter", 1);
 
