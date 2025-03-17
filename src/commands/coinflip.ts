@@ -12,6 +12,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
+import { randomInt } from "node:crypto";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { Item } from "../types/Economy";
@@ -172,7 +173,7 @@ async function run(
       "heads",
       "tails",
     ];
-    const choice = lols[Math.floor(Math.random() * lols.length)];
+    const choice = lols[randomInt(lols.length)];
     let thingy = `${player1.user.username}\n${player2.user.username}`;
 
     let winner: GuildMember;
