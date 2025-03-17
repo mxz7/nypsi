@@ -312,27 +312,43 @@ async function run(
     }
 
     embed.setDescription(desc);
+    const prizes: string[] = [];
 
-    if (selected.prize) {
-      embed.addField(
-        "reward",
-        selected.prize
-          .map((prize) => {
-            if (prize.startsWith("tag:")) {
-              return `${getTagsData()[prize.split("tag:")[1]].emoji} ${
-                getTagsData()[prize.split("tag:")[1]].name
-              } tag`;
-            } else {
-              const amount = parseInt(prize.split(":")[1]);
-
-              return `\`${amount}x\` ${getItems()[prize.split(":")[0]].emoji} ${
-                getItems()[prize.split(":")[0]].name
-              }`;
-            }
-          })
-          .join("\n"),
-      );
+    if (selected.id.endsWith("_v")) {
+      prizes.push("5,000xp");
+      prizes.push("69420_crate:5");
+    } else if (selected.id.endsWith("_iv")) {
+      prizes.push("1,500xp");
+      prizes.push("69420_crate:4");
+    } else if (selected.id.endsWith("_iii")) {
+      prizes.push("750xp");
+      prizes.push("69420_crate:3");
+    } else if (selected.id.endsWith("_ii")) {
+      prizes.push("250xp");
+    } else {
+      prizes.push("100xp");
     }
+
+    if (selected.prize) prizes.push(...selected.prize);
+
+    embed.addField(
+      "reward",
+      prizes
+        .map((prize) => {
+          if (prize.startsWith("tag:")) {
+            return `${getTagsData()[prize.split("tag:")[1]].emoji} ${
+              getTagsData()[prize.split("tag:")[1]].name
+            } tag`;
+          } else if (getItems()[prize.split(":")[0]]) {
+            const amount = parseInt(prize.split(":")[1]);
+
+            return `\`${amount}x\` ${getItems()[prize.split(":")[0]].emoji} ${
+              getItems()[prize.split(":")[0]].name
+            }`;
+          } else return prize;
+        })
+        .join("\n"),
+    );
 
     return send({ embeds: [embed] });
   };
