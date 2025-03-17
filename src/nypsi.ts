@@ -63,7 +63,7 @@ const client = new NypsiClient({
     GuildTextThreadManager: 0,
     DMMessageManager: 0,
     UserManager: {
-      maxSize: 3_000,
+      maxSize: 2_500,
       keepOverLimit: (user) => {
         if (user.id === user.client.user.id) return true;
         if (user.bot) return false;
