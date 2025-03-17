@@ -214,8 +214,7 @@ export default class ScratchCard {
         }
 
         if (clickedItem.includes("_gem")) {
-          await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t");
-          await redis.expire(Constants.redis.nypsi.GEM_GIVEN, Math.floor(ms("1 days") / 1000));
+          await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t", "EX", 86400);
         }
 
         await addInventoryItem(this.member, clickedItem, amount);

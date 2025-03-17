@@ -23,6 +23,7 @@ import {
 import { percentChance } from "../utils/functions/random";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { logger } from "../utils/logger";
 import ms = require("ms");
 
 const cmd = new Command("daily", "get your daily bonus", "money");
@@ -81,8 +82,8 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
   }
 
   if (percentChance(0.03) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
-    await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t");
-    await redis.expire(Constants.redis.nypsi.GEM_GIVEN, Math.floor(ms("1 days") / 1000));
+    await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t", "EX", 86400);
+    logger.info(`${message.author.id} received blue_gem randomly (daily)`);
     await addInventoryItem(message.member, "blue_gem", 1);
     addProgress(message.author.id, "gem_hunter", 1);
 

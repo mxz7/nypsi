@@ -19,6 +19,7 @@ import sleep from "../../utils/functions/sleep";
 import { getTax } from "../../utils/functions/tax";
 import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
 import { getLastKnownAvatar, getLastKnownUsername } from "../../utils/functions/users/tag";
+import { logger } from "../../utils/logger";
 
 export default {
   name: "lottery",
@@ -99,8 +100,8 @@ export default {
         addNotificationToQueue({ memberId: winner.winner, payload: { embed } });
 
         if (percentChance(0.9) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
-          await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t");
-          await redis.expire(Constants.redis.nypsi.GEM_GIVEN, Math.floor(ms("1 days") / 1000));
+          await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t", "EX", 86400);
+          logger.info(`${winner.winner} received purple_gem randomly (mines)`);
           await addInventoryItem(winner.winner, "purple_gem", 1);
           addProgress(winner.winner, "gem_hunter", 1);
 

@@ -225,11 +225,12 @@ async function completeAchievement(userId: string, achievementId: string) {
     addNotificationToQueue(payload);
 
     if (percentChance(0.07) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
-      await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t");
-      await redis.expire(Constants.redis.nypsi.GEM_GIVEN, Math.floor(ms("1 days") / 1000));
+      await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t", "EX", 86400);
       const gems = ["green_gem", "blue_gem", "purple_gem", "pink_gem"];
 
       const gem = gems[Math.floor(Math.random() * gems.length)];
+
+      logger.info(`${userId} received ${gem} randomly`);
 
       await addInventoryItem(userId, gem, 1);
       await addProgress(userId, "gem_hunter", 1);
