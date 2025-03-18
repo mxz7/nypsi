@@ -2,12 +2,11 @@ import { ActivitiesOptions, ActivityType } from "discord.js";
 import redis from "../../init/redis";
 import Constants from "../Constants";
 import { daysUntilChristmas } from "./date";
+import { getTotalAmountOfItem } from "./economy/inventory";
+import { getItems } from "./economy/utils";
 
-export function randomPresence(): ActivitiesOptions {
+export async function randomPresence(): Promise<ActivitiesOptions> {
   const possibilities: ActivitiesOptions[] = [
-    { name: "nypsi.xyz", type: ActivityType.Custom },
-    { name: "nypsi.xyz", type: ActivityType.Custom },
-    { name: "nypsi.xyz", type: ActivityType.Custom },
     { name: "nypsi.xyz", type: ActivityType.Custom },
     { name: "nypsi.xyz", type: ActivityType.Custom },
     { name: "nypsi.xyz", type: ActivityType.Custom },
@@ -32,6 +31,10 @@ export function randomPresence(): ActivitiesOptions {
       type: ActivityType.Streaming,
       url: "https://www.youtube.com/watch?v=7fMrijCFVdE",
     },
+    {
+      name: "item",
+      type: ActivityType.Watching,
+    },
   ];
 
   const chosen = possibilities[Math.floor(Math.random() * possibilities.length)];
@@ -44,6 +47,11 @@ export function randomPresence(): ActivitiesOptions {
     } else {
       chosen.name = `${days} day${parseInt(days) > 1 ? "s" : ""} until christmas`;
     }
+  } else if (chosen.name === "item") {
+    const items = Object.values(getItems());
+    const item = items[Math.floor(Math.random() * items.length)];
+    const count = await getTotalAmountOfItem(item.id);
+    chosen.name = `${count.toLocaleString()} ${!item.emoji.includes("<") ? `${item.emoji} ` : ""}${count !== 1 ? (item.plural ? item.plural : item.name + "s") : item.name}`;
   }
 
   return chosen;

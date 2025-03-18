@@ -43,6 +43,7 @@ import { getCustomPresence, randomPresence, setCustomPresence } from "../utils/f
 import { getVersion } from "../utils/functions/version";
 import { runCommandUseTimers } from "../utils/handlers/commandhandler";
 import { getWebhooks, logger, setClusterId } from "../utils/logger";
+import ms = require("ms");
 
 export class NypsiClient extends Client {
   public cluster: ClusterClient<Client>;
@@ -183,19 +184,16 @@ export class NypsiClient extends Client {
         this.runIntervals();
       }, 60000);
 
-      setInterval(
-        async () => {
-          if (await redis.exists("nypsi:maintenance")) return;
-          if (await getCustomPresence()) return;
-          const presence = randomPresence();
+      setInterval(async () => {
+        if (await redis.exists("nypsi:maintenance")) return;
+        if (await getCustomPresence()) return;
+        const presence = await randomPresence();
 
-          this.user.setPresence({
-            status: "online",
-            activities: [presence],
-          });
-        },
-        30 * 60 * 1000,
-      );
+        this.user.setPresence({
+          status: "online",
+          activities: [presence],
+        });
+      }, ms("15 minutes"));
 
       await setCustomPresence();
 
