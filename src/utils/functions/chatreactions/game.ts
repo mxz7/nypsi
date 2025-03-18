@@ -119,7 +119,9 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel, 
 
   collector.on("collect", async (message): Promise<void> => {
     const time = (performance.now() - start) / 1000;
-    logger.debug(`cr discord test (${word.actual}) ${message.createdTimestamp - discordStart}ms`);
+    logger.debug(
+      `cr discord test (${word.actual}) ${message.createdTimestamp - discordStart}ms, performance: ${time}`,
+    );
 
     winnersList.push({ user: message.author.toString(), time: time.toFixed(2) });
 
@@ -332,7 +334,9 @@ export async function startChatReactionDuel(
         time: `${((performance.now() - start) / 1000).toFixed(2)}s`,
       });
 
-      logger.debug(`cr discord test ${word.actual} ${message.createdTimestamp - discordStart}ms`);
+      logger.debug(
+        `cr discord test ${word.actual} ${message.createdTimestamp - discordStart}ms, performance: ${winners.find((i) => i.user.id === message.author.id).time}ms`,
+      );
 
       if (winners.length === 1) {
         message.react("🏆");
