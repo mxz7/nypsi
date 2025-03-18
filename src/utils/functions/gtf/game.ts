@@ -16,6 +16,7 @@ import { NypsiCommandInteraction, NypsiMessage } from "../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../models/EmbedBuilders";
 // @ts-expect-error doesnt like getting from json file
 import { countries } from "../../../../data/lists.json";
+import prisma from "../../../init/database";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { MStoTime } from "../date";
@@ -162,6 +163,13 @@ export async function startGTFGame(
         })
         .catch(() => {});
       collector.stop("win");
+      saveGameStats(
+        message.author.id,
+        id,
+        guesses,
+        true,
+        res.createdTimestamp - msg.createdTimestamp,
+      );
     } else {
       embed.setFields({ name: "guesses", value: guesses.map((i) => `\`${i}\``).join("\n") });
 
@@ -181,10 +189,12 @@ export async function startGTFGame(
     embed.setFields({ name: "guesses", value: guesses.map((i) => `\`${i}\``).join("\n") });
 
     if (reason === "cancelled") {
+      saveGameStats(message.author.id, id, guesses, false);
       embed
         .setDescription("**game cancelled**\n\n" + `the country was: **${country.name.common}**`)
         .setColor(Constants.EMBED_FAIL_COLOR);
     } else if (reason === "time") {
+      saveGameStats(message.author.id, id, guesses, false);
       embed
         .setDescription("**out of time**\n\n" + `the country was: **${country.name.common}**`)
         .setColor(Constants.EMBED_FAIL_COLOR);
@@ -201,5 +211,23 @@ export async function startGTFGame(
     if (reason === "cancelled")
       await collected.last().update({ embeds: [embed], components: [row] });
     else await msg.edit({ embeds: [embed], components: [row] });
+  });
+}
+
+async function saveGameStats(
+  userId: string,
+  countryId: string,
+  guesses: string[],
+  won: boolean,
+  time?: number,
+) {
+  await prisma.flagGame.create({
+    data: {
+      time,
+      won,
+      userId,
+      country: countryId,
+      guesses,
+    },
   });
 }

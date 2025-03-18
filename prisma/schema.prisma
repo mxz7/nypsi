@@ -46,6 +46,7 @@ model User {
   z                        z?
   Purchases                Purchases[]
   WordleGame               WordleGame[]
+  FlagGame                 FlagGame[]
 }
 
 model ProfileView {
@@ -462,6 +463,19 @@ model WordleGame {
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model FlagGame {
+  id      Int      @id @default(autoincrement())
+  guesses String[]
+  country String // iso country code
+  won     Boolean
+  time    Int? // milliseconds
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
 
   @@index([userId])
 }
