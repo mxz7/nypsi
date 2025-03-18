@@ -20,6 +20,7 @@ import prisma from "../../../init/database";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { MStoTime } from "../date";
+import { addProgress } from "../economy/achievements";
 
 interface CountryData {
   name: {
@@ -170,6 +171,7 @@ export async function startGTFGame(
         true,
         res.createdTimestamp - msg.createdTimestamp,
       );
+      addProgress(message.author.id, "flag", 1);
     } else {
       embed.setFields({ name: "guesses", value: guesses.map((i) => `\`${i}\``).join("\n") });
 
