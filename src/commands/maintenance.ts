@@ -13,7 +13,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
   if ((await redis.get("nypsi:maintenance")) == "t") {
     await redis.del("nypsi:maintenance");
 
-    const presence = randomPresence();
+    const presence = await randomPresence();
 
     (message.client as NypsiClient).cluster.broadcastEval(
       (c, { presence }) => {
