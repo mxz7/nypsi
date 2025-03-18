@@ -33,8 +33,8 @@ importers:
         specifier: 4.0.9
         version: 4.0.9
       bullmq:
-        specifier: ^5.43.0
-        version: 5.43.0
+        specifier: ^5.43.1
+        version: 5.43.1
       chalk:
         specifier: 4.1.2
         version: 4.1.2
@@ -75,8 +75,8 @@ importers:
         specifier: 2.1.3
         version: 2.1.3
       nanoid:
-        specifier: ^3.3.9
-        version: 3.3.9
+        specifier: ^3.3.10
+        version: 3.3.10
       node-os-utils:
         specifier: 1.3.7
         version: 1.3.7
@@ -1551,8 +1551,8 @@ packages:
     resolution: {integrity: sha512-WDtdLmJvAuNNPzByAYpRo2rF1Mmradw6gvWsQKf63476DDXmomT9zUiGypLcG4ibIM67vhAj8jJRdbmEws2Aqw==}
     engines: {node: '>=6.14.2'}
 
-  bullmq@5.43.0:
-    resolution: {integrity: sha512-gIl9b7yFNV6IE/5I/RsN8yrjkVJR/EC0tE580wF8jpWZukhY3YBJwIoUyMUYIIxeKRscc8DU5eIjuxqeQqfwAA==}
+  bullmq@5.43.1:
+    resolution: {integrity: sha512-gtAa4QiPMVY0/iUoMXFjs8OXIfVlFHBk5Fo9GIKLs6+nrzyHoJvAM4KphY4w8yUUSonnkw4PkYo0Ey684a+PeA==}
 
   bytes@3.1.2:
     resolution: {integrity: sha512-/Nf7TyzTx6S3yRJObOAV7956r8cr2+Oj8AC5dt8wSP3BQAoeX58NoHyCU8P8zGkNXStjTSi6fzO6F0pBdcYbEg==}
@@ -2478,8 +2478,8 @@ packages:
   msgpackr@1.11.2:
     resolution: {integrity: sha512-F9UngXRlPyWCDEASDpTf6c9uNhGPTqnTeLVt7bN+bU1eajoR/8V9ys2BRaV5C/e5ihE6sJ9uPIKaYt6bFuO32g==}
 
-  nanoid@3.3.9:
-    resolution: {integrity: sha512-SppoicMGpZvbF1l3z4x7No3OlIjP7QJvC9XR7AhZr1kL133KHnKPztkKDc+Ir4aJ/1VhTySrtKhrsycmrMQfvg==}
+  nanoid@3.3.10:
+    resolution: {integrity: sha512-vSJJTG+t/dIKAUhUDw/dLdZ9s//5OxcHqLaDWWrW4Cdq7o6tdLIczUkMXt2MBNmk6sJRZBZRXVixs7URY1CmIg==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
@@ -5019,7 +5019,7 @@ snapshots:
     dependencies:
       node-gyp-build: 4.8.4
 
-  bullmq@5.43.0:
+  bullmq@5.43.1:
     dependencies:
       cron-parser: 4.9.0
       ioredis: 5.6.0
@@ -6170,7 +6170,7 @@ snapshots:
     optionalDependencies:
       msgpackr-extract: 3.0.3
 
-  nanoid@3.3.9: {}
+  nanoid@3.3.10: {}
 
   natural-compare-lite@1.4.0: {}
 
