@@ -1479,5 +1479,45 @@
     "target": 1000000,
     "description": "harvest 1,000,000 items from your farm",
     "prize": ["lucky_scratch_card:4", "omega_crate:1", "tag:farmer"]
+  },
+  "flag_i": {
+    "id": "flag_i",
+    "name": "flag professional **I**",
+    "emoji": "🌍",
+    "target": 15,
+    "description": "win 15 guess the flag games",
+    "prize": ["lucky_scratch_card:1"]
+  },
+  "flag_ii": {
+    "id": "flag_ii",
+    "name": "flag professional **II**",
+    "emoji": "🌍",
+    "target": 75,
+    "description": "win 75 guess the flag games",
+    "prize": ["lucky_scratch_card:2"]
+  },
+  "flag_iii": {
+    "id": "flag_iii",
+    "name": "flag professional **III**",
+    "emoji": "🌍",
+    "target": 250,
+    "description": "win 250 guess the flag games",
+    "prize": ["lucky_scratch_card:3"]
+  },
+  "flag_iv": {
+    "id": "flag_iv",
+    "name": "flag professional **IV**",
+    "emoji": "🌍",
+    "target": 1000,
+    "description": "win 1,000 guess the flag games",
+    "prize": ["legendary_scratch_card:1"]
+  },
+  "flag_v": {
+    "id": "flag_v",
+    "name": "flag professional **V**",
+    "emoji": "🌍",
+    "target": 2500,
+    "description": "win 2,500 guess the flag games",
+    "prize": ["legendary_scratch_card:2", "gold_credit:2", "nypsi_crate:1"]
   }
 }
