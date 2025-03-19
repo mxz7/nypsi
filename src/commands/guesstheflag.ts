@@ -95,7 +95,7 @@ async function run(
     const embed = new CustomEmbed(
       message.member,
       `you have won ${won.toLocaleString()} games of ${(won + lost).toLocaleString()} total games (${((won / (won + lost)) * 100).toFixed(1)}%)\n\n` +
-        `your fastest game was \`${MStoTime(quick._min.time)}s\``,
+        `your fastest game was \`${MStoTime(quick._min.time)}\``,
     ).setHeader(`${message.author.username}'s guess the flag stats`);
 
     return send({ embeds: [embed] });
