@@ -21,6 +21,7 @@ import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { MStoTime } from "../date";
 import { addProgress } from "../economy/achievements";
+import { addTaskProgress } from "../economy/tasks";
 
 interface CountryData {
   name: {
@@ -171,7 +172,6 @@ export async function startGTFGame(
         true,
         res.createdTimestamp - msg.createdTimestamp,
       );
-      addProgress(message.author.id, "flag", 1);
     } else {
       embed.setFields({ name: "guesses", value: guesses.map((i) => `\`${i}\``).join("\n") });
 
@@ -223,6 +223,11 @@ async function saveGameStats(
   won: boolean,
   time?: number,
 ) {
+  if (won) {
+    addProgress(userId, "flag", 1);
+    addTaskProgress(userId, "flag_daily");
+    addTaskProgress(userId, "flag_weekly");
+  }
   await prisma.flagGame.create({
     data: {
       time,

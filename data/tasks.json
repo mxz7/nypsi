@@ -310,5 +310,21 @@
     "target": [1],
     "prizes": ["xp:100"],
     "type": "daily"
+  },
+  "flag_daily": {
+    "id": "flag_daily",
+    "name": "geo pro",
+    "description": "win guess the flag games",
+    "target": [2, 5, 7],
+    "prizes": ["id:basic_crate:1", "xp:300"],
+    "type": "daily"
+  },
+  "flag_weekly": {
+    "id": "flag_weekly",
+    "name": "old man gamer",
+    "description": "win guess the flag games",
+    "target": [15, 25, 35],
+    "prizes": ["id:basic_crate:3", "xp:1000"],
+    "type": "weekly"
   }
 }
