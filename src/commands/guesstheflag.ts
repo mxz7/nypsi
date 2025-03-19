@@ -81,9 +81,15 @@ async function run(
     return startGTFGame(message);
   } else if (args[0].toLowerCase() === "stats") {
     await addCooldown(cmd.name, message.member, 20);
-    const [quick, won, lost] = await Promise.all([
+    const [quick, average, won, lost] = await Promise.all([
       prisma.flagGame.aggregate({
         _min: {
+          time: true,
+        },
+        where: { AND: [{ userId: message.author.id }, { won: true }] },
+      }),
+      prisma.flagGame.aggregate({
+        _avg: {
           time: true,
         },
         where: { AND: [{ userId: message.author.id }, { won: true }] },
@@ -95,7 +101,8 @@ async function run(
     const embed = new CustomEmbed(
       message.member,
       `you have won ${won.toLocaleString()} games of ${(won + lost).toLocaleString()} total games (${((won / (won + lost)) * 100).toFixed(1)}%)\n\n` +
-        `your fastest game was \`${MStoTime(quick._min.time)}\``,
+        `your fastest game was \`${MStoTime(quick._min.time)}\`\n` +
+        `your average win takes \`${MStoTime(average._avg.time)}\``,
     ).setHeader(`${message.author.username}'s guess the flag stats`);
 
     return send({ embeds: [embed] });
