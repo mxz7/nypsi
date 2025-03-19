@@ -818,6 +818,13 @@ async function run(
     const selected = selectItem(args[1].toLowerCase());
 
     if (!selected) {
+      if (args[1].toLowerCase() === "clear") {
+        await setAuctionWatch(message.member, []);
+        return send({
+          embeds: [new CustomEmbed(message.member, "✅ your auction watch has been cleared")],
+        });
+      }
+
       return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[1]}\``)] });
     }
 
