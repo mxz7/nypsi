@@ -86,10 +86,10 @@ async function run(
         _min: {
           time: true,
         },
-        where: { won: true },
+        where: { AND: [{ userId: message.author.id }, { won: true }] },
       }),
-      prisma.flagGame.count({ where: { won: true } }),
-      prisma.flagGame.count({ where: { won: false } }),
+      prisma.flagGame.count({ where: { AND: [{ userId: message.author.id }, { won: true }] } }),
+      prisma.flagGame.count({ where: { AND: [{ userId: message.author.id }, { won: false }] } }),
     ]);
 
     const embed = new CustomEmbed(
