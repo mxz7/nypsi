@@ -11,7 +11,7 @@ import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Comman
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { MStoTime } from "../utils/functions/date";
 import { startGTFGame } from "../utils/functions/gtf/game";
-import { getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
 
 const cmd = new Command("guesstheflag", "play a guess the flag game", "fun").setAliases([
@@ -77,8 +77,10 @@ async function run(
       ],
     });
   } else if (args[0].toLowerCase() === "play" || args[0].toLowerCase() === "p") {
+    await addCooldown(cmd.name, message.member, 20);
     return startGTFGame(message);
   } else if (args[0].toLowerCase() === "stats") {
+    await addCooldown(cmd.name, message.member, 20);
     const [quick, won, lost] = await Promise.all([
       prisma.flagGame.aggregate({
         _min: {
