@@ -68,7 +68,12 @@ export async function startGTFGame(
   if (message instanceof Message) {
     msg = await message.channel.send({ embeds: [embed], components: [row] });
   } else {
-    msg = await message.reply({ embeds: [embed], components: [row] }).then((m) => m.fetch());
+    msg = await message
+      .reply({ embeds: [embed], components: [row] })
+      .then((m) => m.fetch())
+      .catch(() =>
+        message.editReply({ embeds: [embed], components: [row] }).then((m) => m.fetch()),
+      );
   }
 
   const collector = msg.createMessageComponentCollector({
