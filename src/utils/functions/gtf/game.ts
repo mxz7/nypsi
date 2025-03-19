@@ -188,7 +188,8 @@ export async function startGTFGame(
   collector.on("end", async (collected, reason) => {
     row.components.forEach((c) => c.setDisabled(true));
 
-    embed.setFields({ name: "guesses", value: guesses.map((i) => `\`${i}\``).join("\n") });
+    if (guesses.length > 0)
+      embed.setFields({ name: "guesses", value: guesses.map((i) => `\`${i}\``).join("\n") });
 
     if (reason === "cancelled") {
       saveGameStats(message.author.id, id, guesses, false);
