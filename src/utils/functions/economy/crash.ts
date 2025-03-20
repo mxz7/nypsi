@@ -410,7 +410,7 @@ async function start(client: NypsiClient) {
   const formulas = [
     (i: number) => {
       if (i < 1) i += 0.05;
-      return i * 1.17;
+      return i * 1.18;
     },
     (i: number) => {
       if (i < 1) i += 0.04;
