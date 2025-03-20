@@ -17,6 +17,7 @@ import Constants from "../Constants";
 import { getTimestamp } from "../logger";
 import { MStoTime } from "./date";
 import { isEcoBanned, setEcoBan } from "./economy/utils";
+import { getAllGroupAccountIds } from "./moderation/alts";
 import { addNotificationToQueue } from "./users/notifications";
 import ms = require("ms");
 import dayjs = require("dayjs");
@@ -103,6 +104,32 @@ export async function passedCaptcha(member: GuildMember, check: Captcha) {
     "EX",
     ttl,
   );
+
+  if (check.solvedIp) {
+    let otherUsers = await prisma.captcha.findMany({
+      where: {
+        solvedIp: check.solvedIp,
+      },
+      distinct: ["userId"],
+      select: {
+        userId: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    if (otherUsers.length > 0) {
+      const altGroup = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, member.user.id);
+
+      otherUsers = otherUsers.filter((i) => !altGroup.includes(i.userId));
+
+      if (otherUsers.length > 0)
+        await hook.send(
+          `[${getTimestamp()}] **${member.user.username}** (${member.user.id}) has matching ip with: \`${otherUsers.join("` `")}\``,
+        );
+    }
+  }
 
   hook.destroy();
 }
