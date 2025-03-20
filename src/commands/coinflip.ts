@@ -762,7 +762,10 @@ async function run(
     let proceeded = false;
     let fail = false;
     const filter = async (i: ButtonInteraction): Promise<boolean> => {
-      if (i.user.id != message.author.id && (i as ButtonInteraction).customId == "n") return false;
+      if (message.author.id === i.user.id) {
+        if (i.customId === "n") return true;
+        return false;
+      }
       if ((await isEcoBanned(i.user.id)).banned) return false;
 
       if (playing.has(i.user.id)) {
