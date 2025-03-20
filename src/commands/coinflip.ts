@@ -353,6 +353,9 @@ async function run(
 
   if (item && item.account_locked) return send({ embeds: [new ErrorEmbed("invalid item")] });
 
+  if (playing.has(message.author.id))
+    return send({ embeds: [new ErrorEmbed("you already have an outstanding coinflip game")] });
+
   if (target) {
     if (message.member == target) {
       return send({ embeds: [new ErrorEmbed("invalid user")] });
