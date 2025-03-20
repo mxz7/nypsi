@@ -1886,6 +1886,36 @@ async function run(
     if (message.author.id !== Constants.TEKOH_ID) return;
     await redis.del(Constants.redis.nypsi.CRASH_STATUS);
     await initCrashGame(message.client as NypsiClient);
+  } else if (args[0].toLowerCase() === "findalts") {
+    if ((await getAdminLevel(message.author.id)) < 3) {
+      return message.channel.send({
+        embeds: [new ErrorEmbed("you require admin level **3** to do this")],
+      });
+    }
+
+    const captchas = await prisma.captcha.findMany({
+      where: {
+        solvedIp: { not: null },
+      },
+      select: {
+        userId: true,
+        solvedIp: true,
+      },
+    });
+
+    const map = new Map<string, string[]>();
+
+    for (const captcha of captchas) {
+      if (map.has(captcha.solvedIp)) {
+        map.get(captcha.solvedIp).push(captcha.userId);
+      } else {
+        map.set(captcha.solvedIp, [captcha.userId]);
+      }
+    }
+
+    // idk how this should be done lol i might get back to it
+
+    console.log(map);
   }
 }
 
