@@ -1901,6 +1901,7 @@ async function run(
         userId: true,
         solvedIp: true,
       },
+      distinct: ["userId"],
     });
 
     const map = new Map<string, string[]>();
