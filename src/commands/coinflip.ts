@@ -514,6 +514,14 @@ async function run(
         return false;
       }
 
+      if (playing.has(i.user.id)) {
+        i.reply({
+          embeds: [new ErrorEmbed("you already have an outsanding coinflip game")],
+          ephemeral: true,
+        });
+        return false;
+      }
+
       if (i.user.id !== target.user.id) return false;
 
       if (i.customId == "n") return true;
@@ -753,6 +761,14 @@ async function run(
     const filter = async (i: ButtonInteraction): Promise<boolean> => {
       if (i.user.id != message.author.id && (i as ButtonInteraction).customId == "n") return false;
       if ((await isEcoBanned(i.user.id)).banned) return false;
+
+      if (playing.has(i.user.id)) {
+        i.reply({
+          embeds: [new ErrorEmbed("you already have an outstanding coinflip game")],
+          ephemeral: true,
+        });
+        return false;
+      }
 
       if (i.user.id === message.author.id) {
         if ((i as ButtonInteraction).customId === "n") return true;
