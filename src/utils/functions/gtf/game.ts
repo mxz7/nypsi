@@ -12,6 +12,7 @@ import {
   TextInputStyle,
   User,
 } from "discord.js";
+import { nanoid } from "nanoid";
 import { compareTwoStrings } from "string-similarity";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../models/Command";
 import { CustomEmbed, ErrorEmbed, getColor } from "../../../models/EmbedBuilders";
@@ -126,8 +127,10 @@ export async function startGTFGame(
       return;
     }
 
+    const id = `gtf-guess-${nanoid()}`;
+
     const modal = new ModalBuilder()
-      .setCustomId("gtf-guess")
+      .setCustomId(id)
       .setTitle("guess the flag")
       .addComponents(
         new ActionRowBuilder<TextInputBuilder>().addComponents(
@@ -142,7 +145,10 @@ export async function startGTFGame(
     await interaction.showModal(modal);
 
     const res = await interaction
-      .awaitModalSubmit({ time: 300000, filter: (i) => i.user.id === interaction.user.id })
+      .awaitModalSubmit({
+        time: 300000,
+        filter: (i) => i.user.id === interaction.user.id && i.customId === id,
+      })
       .catch(() => {});
 
     if (!res) return;
