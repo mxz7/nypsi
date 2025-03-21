@@ -252,11 +252,13 @@ export async function startGTFGame(
 
     if (reason === "cancelled") {
       saveGameStats(message.author.id, id, guesses, false);
+      saveGameStats(secondPlayer.id, id, guesses, false);
       embed
         .setDescription("**game cancelled**\n\n" + `the country was: **${country.name.common}**`)
         .setColor(Constants.EMBED_FAIL_COLOR);
     } else if (reason === "time") {
       saveGameStats(message.author.id, id, guesses, false);
+      saveGameStats(secondPlayer.id, id, guesses, false);
       embed
         .setDescription("**out of time**\n\n" + `the country was: **${country.name.common}**`)
         .setColor(Constants.EMBED_FAIL_COLOR);
