@@ -221,16 +221,14 @@ export async function startGTFGame(
           secondPlayer.id,
           id,
           guesses.filter((i) => i.startsWith(secondPlayer.username + ":")),
-          true,
-          res.createdTimestamp - msg.createdTimestamp,
+          false,
         );
       } else {
         saveGameStats(
           message.author.id,
           id,
           guesses.filter((i) => i.startsWith(message.author.username + ":")),
-          true,
-          res.createdTimestamp - msg.createdTimestamp,
+          false,
         );
       }
     } else {
