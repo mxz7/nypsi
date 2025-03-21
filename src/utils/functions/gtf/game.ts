@@ -41,13 +41,22 @@ export async function startGTFGame(
 ) {
   const id = countries[Math.floor(Math.random() * countries.length)];
 
-  const res = await fetch(`https://restcountries.com/v3.1/alpha/${id.toLowerCase()}`);
+  const res: Response | { ok: false } = await fetch(
+    `https://restcountries.com/v3.1/alpha/${id.toLowerCase()}`,
+  ).catch(() => ({
+    ok: false,
+  }));
 
   if (!res.ok) {
     logger.error(`failed to fetch valid country (${id})`, res);
     if (message instanceof Message)
       return message.channel.send({ embeds: [new ErrorEmbed(`failed to fetch a valid country`)] });
-    else return message.reply({ embeds: [new ErrorEmbed(`failed to fetch a valid country`)] });
+    else
+      return message
+        .reply({ embeds: [new ErrorEmbed(`failed to fetch a valid country`)] })
+        .catch(() =>
+          message.channel.send({ embeds: [new ErrorEmbed(`failed to fetch a valid country`)] }),
+        );
   }
 
   const country: CountryData = await res.json().then((r) => r[0]);
