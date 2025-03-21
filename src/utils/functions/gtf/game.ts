@@ -159,7 +159,7 @@ export async function startGTFGame(
     if (
       secondPlayer
         ? guesses.find(
-            (i) => i.toLowerCase() === `${interaction.user.username}: guess.toLowerCase()`,
+            (i) => i.toLowerCase() === `${interaction.user.username}: ${guess.toLowerCase()}`,
           )
         : guesses.find((i) => i.toLowerCase() === guess.toLowerCase())
     )
