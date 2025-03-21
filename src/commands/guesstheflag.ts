@@ -192,6 +192,15 @@ async function run(
         });
       }
     } else {
+      if (res.user.id === message.author.id)
+        return res.reply({
+          embeds: [
+            new ErrorEmbed("HASHAHAHAH WE GOT A SCHIZOPHRENIC OVER HERE AHAHHAHAHA").setImage(
+              "https://i.imgur.com/Tob0Oxz.jpeg",
+            ),
+          ],
+          flags: MessageFlags.Ephemeral,
+        });
       res.update({ components: [] });
       return startGTFGame(message, res.user, requestMessage);
     }
