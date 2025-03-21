@@ -10,10 +10,11 @@ import {
   ModalBuilder,
   TextInputBuilder,
   TextInputStyle,
+  User,
 } from "discord.js";
 import { compareTwoStrings } from "string-similarity";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../models/Command";
-import { CustomEmbed, ErrorEmbed } from "../../../models/EmbedBuilders";
+import { CustomEmbed, ErrorEmbed, getColor } from "../../../models/EmbedBuilders";
 // @ts-expect-error doesnt like getting from json file
 import { countries } from "../../../../data/lists.json";
 import prisma from "../../../init/database";
@@ -38,6 +39,8 @@ interface CountryData {
 
 export async function startGTFGame(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  secondPlayer?: User,
+  requestMessage?: Message,
 ) {
   const id = countries[Math.floor(Math.random() * countries.length)];
 
@@ -71,30 +74,42 @@ export async function startGTFGame(
     new ButtonBuilder().setLabel("end").setCustomId("gtf-end").setStyle(ButtonStyle.Danger),
   );
 
+  if (secondPlayer) {
+    row.components.splice(1, 2);
+
+    embed.setDescription(
+      "guess the country of the flag below\n\n" +
+        `${message.author.username} vs ${secondPlayer.username}`,
+    );
+    embed.setHeader("guess the flag");
+  }
+
   let msg: Message;
+  let winner: User;
   const guesses: string[] = [];
 
-  if (message instanceof Message) {
-    msg = await message.channel.send({ embeds: [embed], components: [row] });
+  if (requestMessage) {
+    msg = await requestMessage.reply({ embeds: [embed], components: [row] });
   } else {
-    msg = await message
-      .reply({ embeds: [embed], components: [row] })
-      .then((m) => m.fetch())
-      .catch(() =>
-        message.editReply({ embeds: [embed], components: [row] }).then((m) => m.fetch()),
-      );
+    if (message instanceof Message) {
+      msg = await message.channel.send({ embeds: [embed], components: [row] });
+    } else {
+      msg = await message
+        .reply({ embeds: [embed], components: [row] })
+        .then((m) => m.fetch())
+        .catch(() =>
+          message.editReply({ embeds: [embed], components: [row] }).then((m) => m.fetch()),
+        );
+    }
   }
 
   const collector = msg.createMessageComponentCollector({
     componentType: ComponentType.Button,
-    filter: (i) => i.user.id === message.author.id,
+    filter: (i) =>
+      secondPlayer
+        ? i.user.id === message.author.id || i.user.id === secondPlayer.id
+        : i.user.id === message.author.id,
     time: 300000,
-  });
-
-  collector.on("collect", async (i) => {
-    if (i.customId === "gtf-end") {
-      collector.stop("cancelled");
-    }
   });
 
   collector.on("collect", async (interaction) => {
@@ -102,8 +117,8 @@ export async function startGTFGame(
       return collector.stop("cancelled");
     } else if (interaction.customId === "gtf-hint") {
       row.components.splice(1, 1);
-      msg.edit({ embeds: [embed], components: [row] });
-      await interaction.reply({
+      await interaction.update({ embeds: [embed], components: [row] });
+      await interaction.followUp({
         embeds: [
           new CustomEmbed(message.member, `this country is in **${country.continents[0]}**`),
         ],
@@ -127,7 +142,7 @@ export async function startGTFGame(
     await interaction.showModal(modal);
 
     const res = await interaction
-      .awaitModalSubmit({ time: 300000, filter: (i) => i.user.id === message.author.id })
+      .awaitModalSubmit({ time: 300000, filter: (i) => i.user.id === interaction.user.id })
       .catch(() => {});
 
     if (!res) return;
@@ -135,7 +150,13 @@ export async function startGTFGame(
 
     const guess = res.fields.fields.first().value;
 
-    if (guesses.find((i) => i.toLowerCase() === guess.toLowerCase()))
+    if (
+      secondPlayer
+        ? guesses.find(
+            (i) => i.toLowerCase() === `${interaction.user.username}: guess.toLowerCase()`,
+          )
+        : guesses.find((i) => i.toLowerCase() === guess.toLowerCase())
+    )
       return res
         .reply({
           embeds: [new ErrorEmbed("you have already guessed this")],
@@ -143,7 +164,7 @@ export async function startGTFGame(
         })
         .catch(() => {});
 
-    guesses.push(guess);
+    guesses.push(secondPlayer ? `${interaction.user.username}: ${guess}` : guess);
 
     let correct = false;
 
@@ -161,12 +182,16 @@ export async function startGTFGame(
     }
 
     if (collector.ended)
-      return res.reply({
-        embeds: [new ErrorEmbed("this game has ended")],
-        flags: MessageFlags.Ephemeral,
-      });
+      return res
+        .reply({
+          embeds: [new ErrorEmbed("this game has ended")],
+          flags: MessageFlags.Ephemeral,
+        })
+        .catch(() => {});
 
     if (correct) {
+      winner = res.user;
+      collector.stop("win");
       await res
         .reply({
           embeds: [
@@ -178,11 +203,10 @@ export async function startGTFGame(
           flags: MessageFlags.Ephemeral,
         })
         .catch(() => {});
-      collector.stop("win");
       saveGameStats(
-        message.author.id,
+        res.user.id,
         id,
-        guesses,
+        guesses.filter((i) => i.startsWith(res.user.username + ":")),
         true,
         res.createdTimestamp - msg.createdTimestamp,
       );
@@ -216,13 +240,23 @@ export async function startGTFGame(
         .setDescription("**out of time**\n\n" + `the country was: **${country.name.common}**`)
         .setColor(Constants.EMBED_FAIL_COLOR);
     } else {
-      embed
-        .setDescription(
-          `you won! the country was: **${country.name.common}**\n\n` +
-            `population: **${country.population.toLocaleString()}**\n` +
-            `official name: **${country.name.official}**`,
-        )
-        .setColor(Constants.EMBED_SUCCESS_COLOR);
+      if (secondPlayer) {
+        embed
+          .setDescription(
+            `**${winner.username}** won! the country was: **${country.name.common}**\n\n` +
+              `population: **${country.population.toLocaleString()}**\n` +
+              `official name: **${country.name.official}**`,
+          )
+          .setColor(getColor(winner.id));
+      } else {
+        embed
+          .setDescription(
+            `you won! the country was: **${country.name.common}**\n\n` +
+              `population: **${country.population.toLocaleString()}**\n` +
+              `official name: **${country.name.official}**`,
+          )
+          .setColor(Constants.EMBED_SUCCESS_COLOR);
+      }
     }
 
     if (reason === "cancelled")
