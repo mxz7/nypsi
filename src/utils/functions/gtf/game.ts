@@ -210,12 +210,29 @@ export async function startGTFGame(
         })
         .catch(() => {});
       saveGameStats(
-        res.user.id,
+        winner.id,
         id,
-        guesses.filter((i) => i.startsWith(res.user.username + ":")),
+        guesses.filter((i) => i.startsWith(winner.username + ":")),
         true,
         res.createdTimestamp - msg.createdTimestamp,
       );
+      if (winner.id === message.author.id) {
+        saveGameStats(
+          secondPlayer.id,
+          id,
+          guesses.filter((i) => i.startsWith(secondPlayer.username + ":")),
+          true,
+          res.createdTimestamp - msg.createdTimestamp,
+        );
+      } else {
+        saveGameStats(
+          message.author.id,
+          id,
+          guesses.filter((i) => i.startsWith(message.author.username + ":")),
+          true,
+          res.createdTimestamp - msg.createdTimestamp,
+        );
+      }
     } else {
       embed.setFields({ name: "guesses", value: guesses.map((i) => `\`${i}\``).join("\n") });
 
