@@ -98,7 +98,7 @@ async function run(
     return startGTFGame(message);
   } else if (args[0].toLowerCase() === "stats") {
     await addCooldown(cmd.name, message.member, 20);
-    const [quick, average, won, lost] = await Promise.all([
+    const [quick, average, won, lost, avgGuess] = await Promise.all([
       prisma.flagGame.aggregate({
         _min: {
           time: true,
@@ -113,13 +113,14 @@ async function run(
       }),
       prisma.flagGame.count({ where: { AND: [{ userId: message.author.id }, { won: true }] } }),
       prisma.flagGame.count({ where: { AND: [{ userId: message.author.id }, { won: false }] } }),
+      prisma.$executeRaw`select avg(array_length(guesses, 1)) as "averageGuesses" from "FlagGame" where won = true and "userId" = ${message.author.id};`,
     ]);
 
     const embed = new CustomEmbed(
       message.member,
       `you have won ${won.toLocaleString()} games of ${(won + lost).toLocaleString()} total games (${((won / (won + lost)) * 100).toFixed(1)}%)\n\n` +
         `your fastest game was \`${MStoTime(quick._min.time)}\`\n` +
-        `your average win takes \`${MStoTime(average._avg.time)}\``,
+        `your average win takes \`${MStoTime(average._avg.time)}\` with \`${avgGuess.toFixed(2)}\` guesses`,
     ).setHeader(`${message.author.username}'s guess the flag stats`);
 
     return send({ embeds: [embed] });
