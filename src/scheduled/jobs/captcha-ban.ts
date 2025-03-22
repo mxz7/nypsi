@@ -17,7 +17,7 @@ export default {
       where: {
         AND: [
           { solved: false },
-          { createdAt: { lt: dayjs().subtract(1, "day").toDate() } },
+          { createdAt: { lt: dayjs().subtract(12, "hours").toDate() } },
           { received: { gt: 3 } },
         ],
       },
