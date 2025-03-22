@@ -20,7 +20,7 @@ export default {
   cron: "0 0 * * *",
   run: async () => {
     const start = Date.now();
-    const itemIds = Object.keys(getItems());
+    const itemIds = Object.keys(getItems()).filter((i) => i !== "lottery_ticket");
 
     await topBalanceGlobal(100);
     await sleep(1000);
