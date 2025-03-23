@@ -1,7 +1,7 @@
 import { Guild, GuildMember, Message, TextChannel, User } from "discord.js";
 import { CustomEmbed, getColor } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
-import { gamble, logger } from "../../logger";
+import { gamble } from "../../logger";
 import { addProgress } from "../economy/achievements";
 import { addBalance } from "../economy/balance";
 import { createGame } from "../economy/stats";
@@ -114,14 +114,10 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel, 
     }
   }, 750);
 
-  const start = performance.now();
   const discordStart = msg.createdTimestamp;
 
   collector.on("collect", async (message): Promise<void> => {
-    const time = (performance.now() - start) / 1000;
-    logger.debug(
-      `cr discord test (${word.actual}) ${message.createdTimestamp - discordStart}ms, performance: ${time}`,
-    );
+    const time = (message.createdTimestamp - discordStart) / 1000;
 
     winnersList.push({ user: message.author.toString(), time: time.toFixed(2) });
 
@@ -325,18 +321,13 @@ export async function startChatReactionDuel(
 
     const winners: { user: User; time: string }[] = [];
 
-    const start = performance.now();
     const discordStart = msg.createdTimestamp;
 
     collector.on("collect", async (message) => {
       winners.push({
         user: message.author,
-        time: `${((performance.now() - start) / 1000).toFixed(2)}s`,
+        time: `${((message.createdTimestamp - discordStart) / 1000).toFixed(2)}s`,
       });
-
-      logger.debug(
-        `cr discord test ${word.actual} ${message.createdTimestamp - discordStart}ms, performance: ${winners.find((i) => i.user.id === message.author.id).time}ms`,
-      );
 
       if (winners.length === 1) {
         message.react("🏆");
