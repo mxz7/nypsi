@@ -126,7 +126,7 @@ export async function passedCaptcha(member: GuildMember, check: Captcha) {
 
       if (otherUsers.length > 0)
         await hook.send(
-          `[${getTimestamp()}] **${member.user.username}** (${member.user.id}) has matching ip with: \`${otherUsers.join("` `")}\``,
+          `[${getTimestamp()}] **${member.user.username}** (${member.user.id}) has matching ip with: \`${otherUsers.map((i) => i.userId).join("` `")}\``,
         );
     }
   }
