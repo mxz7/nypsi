@@ -308,12 +308,15 @@ export async function bumpAuction(id: number, client: NypsiClient) {
       new ButtonBuilder().setCustomId("b-one").setLabel("buy one").setStyle(ButtonStyle.Secondary),
     );
 
-  const clusters = await client.cluster.broadcastEval(async (client) => {
-    const guild = await client.guilds.cache.get(Constants.NYPSI_SERVER_ID);
+  const clusters = await client.cluster.broadcastEval(
+    async (client, { serverId }) => {
+      const guild = await client.guilds.cache.get(serverId);
 
-    if (guild) return (client as unknown as NypsiClient).cluster.id;
-    return "not-found";
-  });
+      if (guild) return (client as unknown as NypsiClient).cluster.id;
+      return "not-found";
+    },
+    { context: { serverId: Constants.NYPSI_SERVER_ID } },
+  );
 
   let cluster: number;
 
