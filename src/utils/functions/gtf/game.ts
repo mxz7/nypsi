@@ -108,7 +108,7 @@ export async function startGTFGame(
     componentType: ComponentType.Button,
     filter: (i) =>
       secondPlayer
-        ? i.user.id === message.author.id || i.user.id === secondPlayer.id
+        ? i.user.id === message.author.id || i.user.id === secondPlayer?.id
         : i.user.id === message.author.id,
     time: 300000,
   });
@@ -217,12 +217,13 @@ export async function startGTFGame(
         res.createdTimestamp - msg.createdTimestamp,
       );
       if (winner.id === message.author.id) {
-        saveGameStats(
-          secondPlayer.id,
-          id,
-          guesses.filter((i) => i.startsWith(secondPlayer.username + ":")),
-          false,
-        );
+        if (secondPlayer)
+          saveGameStats(
+            secondPlayer.id,
+            id,
+            guesses.filter((i) => i.startsWith(secondPlayer.username + ":")),
+            false,
+          );
       } else {
         saveGameStats(
           message.author.id,
@@ -252,13 +253,13 @@ export async function startGTFGame(
 
     if (reason === "cancelled") {
       saveGameStats(message.author.id, id, guesses, false);
-      saveGameStats(secondPlayer.id, id, guesses, false);
+      if (secondPlayer) saveGameStats(secondPlayer.id, id, guesses, false);
       embed
         .setDescription("**game cancelled**\n\n" + `the country was: **${country.name.common}**`)
         .setColor(Constants.EMBED_FAIL_COLOR);
     } else if (reason === "time") {
       saveGameStats(message.author.id, id, guesses, false);
-      saveGameStats(secondPlayer.id, id, guesses, false);
+      if (secondPlayer) saveGameStats(secondPlayer.id, id, guesses, false);
       embed
         .setDescription("**out of time**\n\n" + `the country was: **${country.name.common}**`)
         .setColor(Constants.EMBED_FAIL_COLOR);
