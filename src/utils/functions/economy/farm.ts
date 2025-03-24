@@ -49,7 +49,7 @@ export async function getFarm(member: GuildMember | string) {
     `${Constants.redis.cache.economy.farm}:${id}`,
     JSON.stringify(query),
     "EX",
-    Math.floor(ms("3 hour") / 1000)
+    Math.floor(ms("3 hour") / 1000),
   );
 
   return query;
@@ -63,9 +63,7 @@ export async function getFarmUpgrades(member: GuildMember | string) {
     id = member;
   }
 
-  const cache = await redis.get(
-    `${Constants.redis.cache.economy.farmUpgrades}:${id}`
-  );
+  const cache = await redis.get(`${Constants.redis.cache.economy.farmUpgrades}:${id}`);
 
   if (cache) {
     return JSON.parse(cache) as {
@@ -86,7 +84,7 @@ export async function getFarmUpgrades(member: GuildMember | string) {
     `${Constants.redis.cache.economy.farmUpgrades}:${id}`,
     JSON.stringify(query),
     "EX",
-    Math.floor(ms("3 hour") / 1000)
+    Math.floor(ms("3 hour") / 1000),
   );
 
   return query;
@@ -96,7 +94,7 @@ export async function addFarmUpgrade(
   member: GuildMember,
   plantId: string,
   upgradeId: string,
-  amount = 1
+  amount = 1,
 ) {
   await prisma.farmUpgrades.upsert({
     where: {
@@ -117,16 +115,10 @@ export async function addFarmUpgrade(
     },
   });
 
-  await redis.del(
-    `${Constants.redis.cache.economy.farmUpgrades}:${member.user.id}`
-  );
+  await redis.del(`${Constants.redis.cache.economy.farmUpgrades}:${member.user.id}`);
 }
 
-export async function addFarm(
-  member: GuildMember | string,
-  plantId: string,
-  amount = 1
-) {
+export async function addFarm(member: GuildMember | string, plantId: string, amount = 1) {
   let id: string;
   if (typeof member === "string") id = member;
   else id = member.user.id;
@@ -137,15 +129,12 @@ export async function addFarm(
   await redis.del(`${Constants.redis.cache.economy.farm}:${id}`);
 }
 
-export async function getClaimable(
-  member: GuildMember | string,
-  plantId: string,
-  claim: boolean
-) {
+export async function getClaimable(member: GuildMember | string, plantId: string, claim: boolean) {
   let id: string;
   if (typeof member === "string") id = member;
   else id = member.user.id;
 
+  const inventory = await getInventory(member);
   const farm = await getFarm(id);
   const plantData = getPlantsData()[plantId];
 
@@ -167,7 +156,7 @@ export async function getClaimable(
       plant.fertilisedAt.valueOf() >
         dayjs()
           .subtract(plantData.fertilise.every * 1.5, "seconds")
-          .valueOf()
+          .valueOf(),
   );
 
   if (plants.length === 0) return 0;
@@ -197,33 +186,50 @@ export async function getClaimable(
     let intervalMulti = 1;
 
     for (const upgradeId of Object.keys(upgrades).filter(
-      (u) => upgrades[u].upgrades === "interval"
+      (u) => upgrades[u].upgrades === "interval",
     )) {
       intervalMulti +=
         upgrades[upgradeId].effect *
-          userUpgrades.find(
-            (u) => u.upgradeId == upgradeId && u.plantId === plant.plantId
-          )?.amount || 0;
+          userUpgrades.find((u) => u.upgradeId == upgradeId && u.plantId === plant.plantId)
+            ?.amount || 0;
     }
 
     hours *= intervalMulti;
+
+    if (inventory.find((i) => i.item === "pink_gem")) {
+      const chance = Math.floor(Math.random() * 10);
+      if (chance < 3) {
+        hours *= 0.8;
+      } else {
+        hours *= 1.25;
+      }
+    }
 
     const earned = hours * plantData.hourly;
 
     let storageMulti = 1;
 
     for (const upgradeId of Object.keys(upgrades).filter(
-      (u) => upgrades[u].upgrades === "max_storage"
+      (u) => upgrades[u].upgrades === "max_storage",
     )) {
       storageMulti +=
         upgrades[upgradeId].effect *
-          userUpgrades.find(
-            (u) => u.upgradeId == upgradeId && u.plantId === plant.plantId
-          )?.amount || 0;
+          userUpgrades.find((u) => u.upgradeId == upgradeId && u.plantId === plant.plantId)
+            ?.amount || 0;
     }
 
-    if (earned > plantData.max)
-      items += Math.floor(plantData.max * storageMulti);
+    if (inventory.find((i) => i.item === "green_gem")) {
+      storageMulti += 0.2;
+    }
+
+    if (
+      inventory.find((i) => i.item === "pink_gem") &&
+      inventory.find((i) => i.item === "purple_gem")
+    ) {
+      storageMulti += 0.2;
+    }
+
+    if (earned > plantData.max) items += Math.floor(plantData.max * storageMulti);
     else items += Math.floor(earned * storageMulti);
   }
 
@@ -255,16 +261,14 @@ async function checkDead(userId: string, plantId?: string) {
     if (
       plant.fertilisedAt.valueOf() <
         Date.now() - getPlantsData()[plant.plantId].fertilise.dead * 1000 ||
-      plant.wateredAt.valueOf() <
-        Date.now() - getPlantsData()[plant.plantId].water.dead * 1000
+      plant.wateredAt.valueOf() < Date.now() - getPlantsData()[plant.plantId].water.dead * 1000
     ) {
       await deletePlant(plant.id);
       count++;
     }
   }
 
-  if (count > 0)
-    await redis.del(`${Constants.redis.cache.economy.farm}:${userId}`);
+  if (count > 0) await redis.del(`${Constants.redis.cache.economy.farm}:${userId}`);
 
   return count;
 }
@@ -305,24 +309,18 @@ export async function fertiliseFarm(userId: string): Promise<{
 }> {
   const dead = await checkDead(userId);
 
-  const [farm, inventory] = await Promise.all([
-    getFarm(userId),
-    getInventory(userId),
-  ]);
+  const [farm, inventory] = await Promise.all([getFarm(userId), getInventory(userId)]);
 
   const fertiliser = inventory.find((i) => i.item === "fertiliser");
 
-  if (!fertiliser || fertiliser.amount <= 0)
-    return { dead, msg: "no fertiliser" };
+  if (!fertiliser || fertiliser.amount <= 0) return { dead, msg: "no fertiliser" };
 
   let possible = sort(
     farm.filter(
       (i) =>
         i.fertilisedAt.valueOf() <
-        dayjs()
-          .subtract(getPlantsData()[i.plantId].fertilise.every, "seconds")
-          .valueOf()
-    )
+        dayjs().subtract(getPlantsData()[i.plantId].fertilise.every, "seconds").valueOf(),
+    ),
   ).asc((i) => {
     const timeTillDead =
       new Date(i.fertilisedAt).getTime() +
@@ -334,8 +332,7 @@ export async function fertiliseFarm(userId: string): Promise<{
 
   if (possible.length === 0) return { dead, msg: "no need" };
 
-  if (possible.length > fertiliser.amount * 3)
-    possible = possible.slice(0, fertiliser.amount * 3);
+  if (possible.length > fertiliser.amount * 3) possible = possible.slice(0, fertiliser.amount * 3);
 
   await prisma.farm.updateMany({
     where: {
@@ -349,7 +346,7 @@ export async function fertiliseFarm(userId: string): Promise<{
   await setInventoryItem(
     userId,
     fertiliser.item,
-    fertiliser.amount - Math.ceil(possible.length / 3)
+    fertiliser.amount - Math.ceil(possible.length / 3),
   );
   await redis.del(`${Constants.redis.cache.economy.farm}:${userId}`);
 
