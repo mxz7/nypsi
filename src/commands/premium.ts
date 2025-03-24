@@ -37,6 +37,7 @@ import { cleanString } from "../utils/functions/string";
 import { getTotalSpend } from "../utils/functions/users/email";
 import { addTag, getTags, removeTag } from "../utils/functions/users/tags";
 import { commandExists } from "../utils/handlers/commandhandler";
+import { logger } from "../utils/logger";
 import dayjs = require("dayjs");
 
 let doingRoles = false;
@@ -179,7 +180,7 @@ async function run(
     if (doingRoles) return;
     doingRoles = true;
 
-    let members = message.guild.members.cache;
+    let members = await message.guild.members.fetch();
 
     if (members.size !== message.guild.memberCount) members = await message.guild.members.fetch();
 
@@ -294,7 +295,7 @@ async function run(
         }
       }
 
-      if (guildMember.id === "504455013964447746") console.log(totalSpend);
+      logger.debug(`${guildMember.user.id} has ${totalSpend} spend`);
 
       if (guildMember.roles.cache.has(Constants.SUPPORTER_ROLE) && totalSpend <= 0) {
         await sleep(250);
