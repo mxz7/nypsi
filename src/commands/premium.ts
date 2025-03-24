@@ -37,7 +37,6 @@ import { cleanString } from "../utils/functions/string";
 import { getTotalSpend } from "../utils/functions/users/email";
 import { addTag, getTags, removeTag } from "../utils/functions/users/tags";
 import { commandExists } from "../utils/handlers/commandhandler";
-import { logger } from "../utils/logger";
 import dayjs = require("dayjs");
 
 let doingRoles = false;
@@ -292,8 +291,6 @@ async function run(
           }
         }
       }
-
-      logger.debug(`${guildMember.user.id} has ${totalSpend} spend`);
 
       if (guildMember.roles.cache.has(Constants.SUPPORTER_ROLE) && totalSpend <= 0) {
         await sleep(250);
