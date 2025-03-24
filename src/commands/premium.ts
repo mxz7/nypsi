@@ -270,20 +270,32 @@ async function run(
             await guildMember.roles.remove(role.id);
           }
         }
+      }
 
-        if (guildMember.roles.cache.has(Constants.HIGHROLLER_ROLE)) {
-          if ((await getTotalSpend(guildMember.id)) < Constants.HIGHROLLER_REQUIREMENT) {
-            if ((await getTags(guildMember.id)).find((i) => i.tagId === "highroller"))
-              await removeTag(guildMember.id, "highroller");
-            await guildMember.roles.remove(Constants.HIGHROLLER_ROLE);
-          }
-        } else {
-          if ((await getTotalSpend(guildMember.id)) >= Constants.HIGHROLLER_REQUIREMENT) {
-            if (!(await getTags(guildMember.id)).find((i) => i.tagId === "highroller"))
-              await addTag(guildMember.id, "highroller");
-            await guildMember.roles.add(Constants.HIGHROLLER_ROLE);
-          }
+      const totalSpend = await getTotalSpend(guildMember.id);
+
+      if (guildMember.roles.cache.has(Constants.HIGHROLLER_ROLE)) {
+        if (totalSpend < Constants.HIGHROLLER_REQUIREMENT) {
+          if ((await getTags(guildMember.id)).find((i) => i.tagId === "highroller"))
+            await removeTag(guildMember.id, "highroller");
+          await sleep(250);
+          await guildMember.roles.remove(Constants.HIGHROLLER_ROLE);
         }
+      } else {
+        if (totalSpend >= Constants.HIGHROLLER_REQUIREMENT) {
+          if (!(await getTags(guildMember.id)).find((i) => i.tagId === "highroller"))
+            await addTag(guildMember.id, "highroller");
+          await sleep(250);
+          await guildMember.roles.add(Constants.HIGHROLLER_ROLE);
+        }
+      }
+
+      if (guildMember.roles.cache.has(Constants.HIGHROLLER_ROLE) && totalSpend <= 0) {
+        await sleep(250);
+        await guildMember.roles.remove(Constants.SUPPORTER_ROLE);
+      } else if (totalSpend > 0) {
+        await sleep(250);
+        await guildMember.roles.add(Constants.SUPPORTER_ROLE);
       }
 
       const colour = await getEmbedColor(guildMember.user.id);
