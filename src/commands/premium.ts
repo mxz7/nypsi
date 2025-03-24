@@ -222,8 +222,6 @@ async function run(
             guildMember.roles.cache.find((i) => i.name === guildMember.user.id),
           );
         }
-
-        continue;
       }
 
       let requiredRole = "none";
