@@ -205,7 +205,7 @@
     "emoji": "🧁",
     "target": 500000,
     "description": "bake 500,000 cookies",
-    "prize": ["lucky_scratch_card:1"]
+    "prize": ["lucky_scratch_card:2"]
   },
   "super_baker_ii": {
     "id": "super_baker_ii",
@@ -1248,7 +1248,7 @@
     "emoji": "👷🏻‍♂️",
     "target": 5000000000,
     "description": "earn $5,000,000,000 from your workers",
-    "prize": ["lucky_scratch_card:1"]
+    "prize": ["lucky_scratch_card:2"]
   },
   "super_capitalist_ii": {
     "id": "super_capitalist_ii",
