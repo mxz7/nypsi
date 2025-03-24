@@ -762,6 +762,7 @@ async function run(
     let proceeded = false;
     let fail = false;
     const filter = async (i: ButtonInteraction): Promise<boolean> => {
+      if (i.customId === "n" && message.author.id !== i.user.id) return false;
       if (message.author.id === i.user.id) {
         if (i.customId === "n") return true;
         return false;
