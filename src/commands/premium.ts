@@ -294,6 +294,8 @@ async function run(
         }
       }
 
+      if (guildMember.id === "504455013964447746") console.log(totalSpend);
+
       if (guildMember.roles.cache.has(Constants.SUPPORTER_ROLE) && totalSpend <= 0) {
         await sleep(250);
         await guildMember.roles.remove(Constants.SUPPORTER_ROLE);
