@@ -290,10 +290,10 @@ async function run(
         }
       }
 
-      if (guildMember.roles.cache.has(Constants.HIGHROLLER_ROLE) && totalSpend <= 0) {
+      if (guildMember.roles.cache.has(Constants.SUPPORTER_ROLE) && totalSpend <= 0) {
         await sleep(250);
         await guildMember.roles.remove(Constants.SUPPORTER_ROLE);
-      } else if (totalSpend > 0) {
+      } else if (totalSpend > 0 && !guildMember.roles.cache.has(Constants.HIGHROLLER_ROLE)) {
         await sleep(250);
         await guildMember.roles.add(Constants.SUPPORTER_ROLE);
       }
