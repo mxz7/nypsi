@@ -176,7 +176,7 @@ export async function getTotalSpend(userId: string) {
     `${Constants.redis.cache.premium.TOTAL_SPEND}:${userId}`,
     query._sum.cost?.toNumber() || 0,
     "EX",
-    86400,
+    3600,
   );
 
   return query._sum.cost?.toNumber() || 0;
