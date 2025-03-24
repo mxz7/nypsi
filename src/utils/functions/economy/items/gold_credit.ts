@@ -83,7 +83,10 @@ module.exports = new ItemUse(
         embeds: [
           new CustomEmbed(
             message.member,
-            `your gold membership will now expire <t:${dayjs(profile.expireDate)
+            `your **gold** membership will expire <t:${(profile.expireDate.getTime() < Date.now()
+              ? dayjs()
+              : dayjs(profile.expireDate)
+            )
               .add(profile.credit + 7, "day")
               .unix()}:R>`,
           ),
