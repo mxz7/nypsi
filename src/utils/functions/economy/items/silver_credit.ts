@@ -84,7 +84,10 @@ module.exports = new ItemUse(
         embeds: [
           new CustomEmbed(
             message.member,
-            `your silver membership will now expire <t:${dayjs(profile.expireDate)
+            `your **silver** membership will expire <t:${(profile.expireDate.getTime() < Date.now()
+              ? dayjs()
+              : dayjs(profile.expireDate)
+            )
               .add(await getCredits(message.author.id), "day")
               .unix()}:R>`,
           ),
