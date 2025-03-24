@@ -287,13 +287,21 @@ async function run(
             await addTag(guildMember.id, "highroller");
           await sleep(250);
           await guildMember.roles.add(Constants.HIGHROLLER_ROLE);
+          if (guildMember.roles.cache.has(Constants.SUPPORTER_ROLE)) {
+            await sleep(250);
+            await guildMember.roles.remove(Constants.SUPPORTER_ROLE);
+          }
         }
       }
 
       if (guildMember.roles.cache.has(Constants.SUPPORTER_ROLE) && totalSpend <= 0) {
         await sleep(250);
         await guildMember.roles.remove(Constants.SUPPORTER_ROLE);
-      } else if (totalSpend > 0 && !guildMember.roles.cache.has(Constants.HIGHROLLER_ROLE)) {
+      } else if (
+        totalSpend > 0 &&
+        !guildMember.roles.cache.has(Constants.HIGHROLLER_ROLE) &&
+        !guildMember.roles.cache.has(Constants.SUPPORTER_ROLE)
+      ) {
         await sleep(250);
         await guildMember.roles.add(Constants.SUPPORTER_ROLE);
       }
