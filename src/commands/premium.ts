@@ -184,6 +184,7 @@ async function run(
     if (members.size !== message.guild.memberCount) members = await message.guild.members.fetch();
 
     for (const guildMember of members.values()) {
+      if (guildMember.user.id === Constants.TEKOH_ID) continue; // no roles for me teehee
       const roleIds = Array.from(guildMember.roles.cache.keys());
 
       if (roleIds.includes(Constants.BOOST_ROLE_ID)) {
@@ -193,7 +194,7 @@ async function run(
         await setBooster(guildMember.user.id, false);
       }
 
-      if (!(await isPremium(guildMember)) || guildMember.user.id == Constants.TEKOH_ID) {
+      if (!(await isPremium(guildMember))) {
         // i dont want plat role lol
         if (roleIds.includes(Constants.PLATINUM_ROLE_ID)) {
           await sleep(250);
