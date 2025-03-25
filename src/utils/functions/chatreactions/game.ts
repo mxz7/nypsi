@@ -1,4 +1,5 @@
 import { Guild, GuildMember, Message, TextChannel, User } from "discord.js";
+import { inPlaceSort } from "fast-sort";
 import { CustomEmbed, getColor } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { gamble } from "../../logger";
@@ -41,10 +42,15 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel, 
 
   const embed = new CustomEmbed().setColor(Constants.EMBED_SUCCESS_COLOR);
 
+  const winners: { user: User; time: number }[] = [];
+  const winnersText: string[] = [];
+  const medals = new Map<number, string>();
+  medals.set(1, "🥇");
+  medals.set(2, "🥈");
+  medals.set(3, "🥉");
+
   embed.setHeader("chat reaction");
   embed.setDescription(`type: \`${word.display}\``);
-
-  const winnersIDs: string[] = [];
 
   const blacklisted = await getBlacklisted(guild);
 
@@ -52,7 +58,7 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel, 
     m.content = m.content.replaceAll("’", "'").replaceAll("”", "'").replaceAll("‘", "'");
     return (
       m.content.toLowerCase() == word.actual.toLowerCase() &&
-      winnersIDs.indexOf(m.author.id) == -1 &&
+      !winners.find((i) => i.user.id === m.author.id) &&
       !m.member.user.bot &&
       blacklisted.indexOf(m.author.id) == -1
     );
@@ -68,29 +74,21 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel, 
     time: timeout * 1000,
   });
 
-  const winnersList: { user: string; time: string }[] = [];
-  const winnersText: string[] = [];
-  const medals = new Map<number, string>();
-
-  medals.set(1, "🥇");
-  medals.set(2, "🥈");
-  medals.set(3, "🥉");
-
   let ended = false;
 
   const updateWinnersText = () => {
     winnersText.length = 0;
 
-    for (const winner of winnersList) {
+    for (const winner of winners) {
       if (winnersText.length >= 3) break;
-      const pos = medals.get(winnersList.indexOf(winner) + 1);
+      const pos = medals.get(winners.indexOf(winner) + 1);
 
-      winnersText.push(`${pos} ${winner.user} in \`${winner.time}s\``);
+      winnersText.push(`${pos} ${winner.user.toString()} in \`${winner.time.toFixed(2)}s\``);
     }
   };
 
   const interval = setInterval(async () => {
-    if (winnersList.length == winnersText.length) return;
+    if (winners.length == winnersText.length) return;
 
     setTimeout(() => {
       if (ended) return;
@@ -109,7 +107,7 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel, 
 
     msg = await msg.edit({ embeds: [embed] });
 
-    if (winnersList.length == 3) {
+    if (winners.length == 3) {
       clearInterval(interval);
     }
   }, 750);
@@ -119,24 +117,26 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel, 
   collector.on("collect", async (message): Promise<void> => {
     const time = (message.createdTimestamp - discordStart) / 1000;
 
-    winnersList.push({ user: message.author.toString(), time: time.toFixed(2) });
+    winners.push({ user: message.author, time: time });
 
-    winnersIDs.push(message.author.id);
+    inPlaceSort(winners).asc((i) => i.time);
 
-    switch (winnersList.length) {
-      case 1:
-        await addWin(guild, message.member);
-        message.react("🥇");
-        break;
-      case 2:
-        await add2ndPlace(guild, message.member);
-        message.react("🥈");
-        break;
-      case 3:
-        await add3rdPlace(guild, message.member);
-        message.react("🥉");
-        break;
-    }
+    setTimeout(async () => {
+      switch (winners.findIndex((i) => i.user.id === message.author.id) + 1) {
+        case 0:
+          await addWin(guild, message.member);
+          message.react("🥇");
+          break;
+        case 1:
+          await add2ndPlace(guild, message.member);
+          message.react("🥈");
+          break;
+        case 2:
+          await add3rdPlace(guild, message.member);
+          message.react("🥉");
+          break;
+      }
+    }, 500);
 
     if (!forced && wordListType !== "custom") {
       const update = await addLeaderboardEntry(message.author.id, time).catch(() => ({
@@ -174,18 +174,18 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel, 
     ended = true;
     setTimeout(async () => {
       clearInterval(interval);
-      if (winnersList.length == 0) {
+      if (winners.length == 0) {
         embed.setDescription(embed.data.description + "\n\nnobody won ):");
       } else {
-        if (winnersList.length == 1) {
+        if (winners.length == 1) {
           embed.setFooter({ text: "ended with 1 winner" });
         } else {
-          if (winnersList.length === 3) {
-            await addProgress(winnersIDs[0], "fast_typer", 1);
-            await addTaskProgress(winnersIDs[0], "chat_reaction_daily");
-            await addTaskProgress(winnersIDs[0], "chat_reaction_weekly");
+          if (winners.length === 3) {
+            await addProgress(winners[0].user.id, "fast_typer", 1);
+            await addTaskProgress(winners[0].user.id, "chat_reaction_daily");
+            await addTaskProgress(winners[0].user.id, "chat_reaction_weekly");
           }
-          embed.setFooter({ text: `ended with ${winnersList.length} winners` });
+          embed.setFooter({ text: `ended with ${winners.length} winners` });
         }
         updateWinnersText();
 
@@ -278,7 +278,7 @@ export async function startChatReactionDuel(
         value: `${winners
           .map(
             (value, index) =>
-              `${index === 0 ? "🏅" : "🥈"} ${value.user.toString()} in \`${value.time}\`${
+              `${index === 0 ? "🏅" : "🥈"} ${value.user.toString()} in \`${value.time.toFixed(2)}s\`${
                 index === 0 && winnings > 0
                   ? ` +$**${winnings.toLocaleString()}**${
                       tax ? ` (${(tax * 100).toFixed(1)}% tax)` : ""
@@ -319,77 +319,81 @@ export async function startChatReactionDuel(
 
     const collector = channel.createMessageCollector({ filter, time: 30000, max: 2 });
 
-    const winners: { user: User; time: string }[] = [];
+    const winners: { user: User; time: number }[] = [];
 
     const discordStart = msg.createdTimestamp;
 
     collector.on("collect", async (message) => {
       winners.push({
         user: message.author,
-        time: `${((message.createdTimestamp - discordStart) / 1000).toFixed(2)}s`,
+        time: (message.createdTimestamp - discordStart) / 1000,
       });
 
-      if (winners.length === 1) {
-        message.react("🏆");
-        addProgress(message.author.id, "fast_typer", 1);
-        await addTaskProgress(message.author.id, "chat_reaction_daily");
-        addTaskProgress(message.author.id, "chat_reaction_weekly");
+      inPlaceSort(winners).asc((i) => i.time);
 
-        winnings = wager * 2;
-        tax = 0;
+      setTimeout(async () => {
+        if (winners[0].user.id === message.author.id) {
+          message.react("🏆");
+          addProgress(message.author.id, "fast_typer", 1);
+          addTaskProgress(message.author.id, "chat_reaction_daily");
+          addTaskProgress(message.author.id, "chat_reaction_weekly");
 
-        if (winnings > 1_000_000 && !(await isPremium(message.author.id))) {
-          tax = await getTax();
+          winnings = wager * 2;
+          tax = 0;
 
-          const taxed = Math.floor(winnings * tax);
-          await addToNypsiBank(taxed * 0.5);
-          winnings -= taxed;
+          if (winnings > 1_000_000 && !(await isPremium(message.author.id))) {
+            tax = await getTax();
+
+            const taxed = Math.floor(winnings * tax);
+            await addToNypsiBank(taxed * 0.5);
+            winnings -= taxed;
+          }
+
+          resolve({ winner: message.author.id, winnings });
+
+          const challengerId = await createGame({
+            bet: wager,
+            game: "chatreactionduel",
+            outcome: `${message.author.username} won in ${winners[0].time.toFixed(2)}s vs ${
+              message.author.id === challenger.user.id
+                ? target.user.username
+                : challenger.user.username
+            }\nword: ${word.actual}`,
+            userId: challenger.user.id,
+            result: message.author.id === challenger.user.id ? "win" : "lose",
+            earned: message.author.id === challenger.user.id ? winnings : 0,
+          });
+          const targetId = await createGame({
+            bet: wager,
+            game: "chatreactionduel",
+            outcome: `${message.author.username} won in ${winners[0].time.toFixed(2)}s vs ${
+              message.author.id === target.user.id ? challenger.user.username : target.user.username
+            }\nword: ${word.actual}`,
+            userId: target.user.id,
+            result: message.author.id === target.user.id ? "win" : "lose",
+            earned: message.author.id === target.user.id ? winnings : 0,
+          });
+
+          gamble(
+            challenger.user,
+            "chatreactionduel",
+            wager,
+            message.author.id == challenger.user.id ? "win" : "lose",
+            challengerId,
+            message.author.id == challenger.user.id ? winnings : null,
+          );
+          gamble(
+            target.user,
+            "chatreactionduel",
+            wager,
+            message.author.id == target.user.id ? "win" : "lose",
+            targetId,
+            message.author.id == target.user.id ? winnings : null,
+          );
+        } else {
+          message.react("🐌");
         }
-
-        resolve({ winner: message.author.id, winnings });
-
-        const challengerId = await createGame({
-          bet: wager,
-          game: "chatreactionduel",
-          outcome: `${message.author.username} won in ${winners[0].time} vs ${
-            message.author.id === challenger.user.id
-              ? target.user.username
-              : challenger.user.username
-          }\nword: ${word.actual}`,
-          userId: challenger.user.id,
-          result: message.author.id === challenger.user.id ? "win" : "lose",
-          earned: message.author.id === challenger.user.id ? winnings : 0,
-        });
-        const targetId = await createGame({
-          bet: wager,
-          game: "chatreactionduel",
-          outcome: `${message.author.username} won in ${winners[0].time} vs ${
-            message.author.id === target.user.id ? challenger.user.username : target.user.username
-          }\nword: ${word.actual}`,
-          userId: target.user.id,
-          result: message.author.id === target.user.id ? "win" : "lose",
-          earned: message.author.id === target.user.id ? winnings : 0,
-        });
-
-        gamble(
-          challenger.user,
-          "chatreactionduel",
-          wager,
-          message.author.id == challenger.user.id ? "win" : "lose",
-          challengerId,
-          message.author.id == challenger.user.id ? winnings : null,
-        );
-        gamble(
-          target.user,
-          "chatreactionduel",
-          wager,
-          message.author.id == target.user.id ? "win" : "lose",
-          targetId,
-          message.author.id == target.user.id ? winnings : null,
-        );
-      } else {
-        message.react("🐌");
-      }
+      }, 500);
     });
 
     collector.on("end", async () => {
