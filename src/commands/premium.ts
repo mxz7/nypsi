@@ -545,6 +545,10 @@ async function run(
         }
       }
 
+      if (commandContent.match(/^#+\s/gm)) {
+        return send({ embeds: [new ErrorEmbed("spammy content 🙄")] });
+      }
+
       if (commandExists(commandTrigger))
         return send({ embeds: [new ErrorEmbed("this is already a nypsi command")] });
 
@@ -556,7 +560,13 @@ async function run(
       await setCommand(message.author.id, commandTrigger, commandContent);
 
       return send({
-        embeds: [new CustomEmbed(message.member, "✅ your command has been updated")],
+        embeds: [
+          new CustomEmbed(
+            message.member,
+            "✅ your command has been updated\n\n" +
+              "please note that if your custom command is used **abusively** or contains **explicit or spammy content**, your command will be removed and your premium could be revoked with **zero** compensation",
+          ),
+        ],
       });
     }
   };
