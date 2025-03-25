@@ -1518,6 +1518,6 @@
     "emoji": "🌍",
     "target": 2500,
     "description": "win 2,500 guess the flag games",
-    "prize": ["legendary_scratch_card:2", "gold_credit:2", "nypsi_crate:1"]
+    "prize": ["legendary_scratch_card:2", "nypsi_crate:1"]
   }
 }
