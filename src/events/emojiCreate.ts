@@ -6,7 +6,11 @@ export default async function emojiCreate(emoji: GuildEmoji) {
   if (await isLogsEnabled(emoji.guild)) {
     const embed = new CustomEmbed().disableFooter().setTimestamp();
 
-    const creator = (await emoji.fetchAuthor().then((res) => res.id)) || "unknown";
+    const creator =
+      (await emoji
+        .fetchAuthor()
+        .then((res) => res.id)
+        .catch(() => undefined)) || "unknown";
 
     embed.setHeader("emoji created");
     embed.setDescription(`\`${emoji.name}\` - \`${emoji.id}\`\ncreated by \`${creator}\``);
