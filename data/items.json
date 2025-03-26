@@ -887,7 +887,8 @@
       "id:banana_seed:10",
       "id:apple_seed:7",
       "id:strawberry_seed:10",
-      "id:orange_seed:15"
+      "id:orange_seed:15",
+      "id:pineapple_seed:5"
     ]
   },
   "calendar": {
@@ -2314,7 +2315,10 @@
       "id:multi_potion:40",
       "id:veilside_rx7_skin:10",
       "id:stick:20",
-      "id:unbreaking:10"
+      "id:unbreaking:10",
+      "id:apple_seed:30",
+      "id:pineapple_seed:15",
+      "id:strawberry_seed:13"
     ]
   },
   "corner_shop_scratchie": {
@@ -3564,5 +3568,33 @@
     "sell": 50000,
     "in_crates": true,
     "aliases": ["cseed"]
+  },
+  "pineapple": {
+    "id": "pineapple",
+    "name": "pineapple",
+    "article": "a",
+    "plural": "pineapples",
+    "emoji": "🍍",
+    "longDesc": "who lives in a pineapple under the seaaa... SPONGE BOB SQUARE PANTS",
+    "rarity": 69,
+    "role": "sellable",
+    "buy": 0,
+    "sell": 50000,
+    "in_crates": false
+  },
+  "pineapple_seed": {
+    "id": "pineapple_seed",
+    "name": "pineapple tree seed",
+    "article": "a",
+    "plural": "pineapple tree seeds",
+    "emoji": "<:nypsi_apple_tree_seeds:1261357859891843132>",
+    "longDesc": "plant to grow a pineapple plant",
+    "rarity": 4,
+    "role": "seed",
+    "plantId": "pineapple_plant",
+    "buy": 0,
+    "sell": 50000,
+    "in_crates": true,
+    "aliases": ["pseed"]
   }
 }

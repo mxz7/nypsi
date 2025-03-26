@@ -107,6 +107,24 @@
         "every": 604800,
         "dead": 2.628e6
       }
+    },
+    "pineapple_plant": {
+      "id": "pineapple_plant",
+      "name": "pineapple plant",
+      "growthTime": 259200,
+      "hourly": 1,
+      "max": 2,
+      "item": "pineapple",
+      "type": "plant",
+      "type_plural": "plants",
+      "water": {
+        "every": 129600,
+        "die": 604800
+      },
+      "fertilise": {
+        "every": 604800,
+        "dead": 2.628e6
+      }
     }
   },
   "upgrades": {
