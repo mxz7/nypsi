@@ -10,10 +10,10 @@ import { InteractionHandler } from "../types/InteractionHandler";
 import Constants from "../utils/Constants";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { calcItemValue, getInventory, openCrate } from "../utils/functions/economy/inventory";
-import { getRawLevel } from "../utils/functions/economy/levelling";
 import { addStat } from "../utils/functions/economy/stats";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { getItems, isEcoBanned } from "../utils/functions/economy/utils";
+import { getVoteStreak } from "../utils/functions/economy/vote";
 import PageManager from "../utils/functions/page";
 import { getEmbedColor } from "../utils/functions/premium/color";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -35,14 +35,21 @@ export default {
 
     const inventory = await getInventory(interaction.user.id);
 
-    let crateAmount = 0;
-    let rawLevel = await getRawLevel(interaction.user.id);
+    const determineCrateAmount = (value: number) => {
+      let amount = 0;
 
-    while (crateAmount === 0 && rawLevel > -1) {
-      if (Constants.PROGRESSION.VOTE_CRATE.has(rawLevel)) {
-        crateAmount = Constants.PROGRESSION.VOTE_CRATE.get(rawLevel);
-      } else rawLevel--;
-    }
+      while (!amount && value >= 0) {
+        if (Constants.PROGRESSION.VOTE_CRATE.has(value)) {
+          amount = Constants.PROGRESSION.VOTE_CRATE.get(value);
+          break;
+        }
+        value--;
+      }
+
+      return amount;
+    };
+
+    const crateAmount = determineCrateAmount(await getVoteStreak(interaction.user.id));
 
     if (
       !inventory.find((i) => i.item === "vote_crate") ||
