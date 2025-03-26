@@ -215,19 +215,6 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
   await redis.set(`${Constants.redis.cache.economy.VOTE}:${user}`, "true");
   await redis.expire(`${Constants.redis.cache.economy.VOTE}:${user}`, ms("1 hour") / 1000);
 
-  const crates = new Map<number, number>();
-
-  crates.set(0, 1);
-  crates.set(1, 2);
-  crates.set(3, 3);
-  crates.set(5, 4);
-  crates.set(7, 5);
-  crates.set(10, 6);
-  crates.set(15, 7);
-  crates.set(20, 8);
-  crates.set(30, 9);
-  crates.set(40, 10);
-
   let level = await getRawLevel(user);
 
   if (level > 100) level = 100;
@@ -244,8 +231,8 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
     let amount = 0;
 
     while (!amount && value >= 0) {
-      if (crates.has(value)) {
-        amount = crates.get(value);
+      if (Constants.PROGRESSION.VOTE_CRATE.has(value)) {
+        amount = Constants.PROGRESSION.VOTE_CRATE.get(value);
         break;
       }
       value--;
