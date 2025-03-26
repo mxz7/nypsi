@@ -1,8 +1,8 @@
 import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
-import ms = require("ms");
 import Constants from "../../Constants";
+import ms = require("ms");
 
 export async function getLastVote(member: GuildMember | string) {
   let id: string;
@@ -53,4 +53,17 @@ export async function hasVoted(member: GuildMember | string) {
     redis.expire(`${Constants.redis.cache.economy.VOTE}:${id}`, ms("1 hour") / 1000);
     return false;
   }
+}
+
+export async function getVoteStreak(userId: string) {
+  const query = await prisma.economy.findUnique({
+    where: {
+      userId,
+    },
+    select: {
+      voteStreak: true,
+    },
+  });
+
+  return query?.voteStreak || 0;
 }

@@ -1522,10 +1522,9 @@ export async function topVote(guild: Guild, userId?: string) {
     select: {
       userId: true,
       monthVote: true,
-      seasonVote: true,
       banned: true,
     },
-    orderBy: [{ seasonVote: "desc" }, { lastVote: "asc" }, { user: { lastKnownUsername: "asc" } }],
+    orderBy: [{ monthVote: "desc" }, { lastVote: "asc" }, { user: { lastKnownUsername: "asc" } }],
     take: 100,
   });
 
@@ -1557,11 +1556,7 @@ export async function topVote(guild: Guild, userId?: string) {
       user.userId,
       members.get(user.userId).user.username,
       true,
-    )} ${
-      dayjs().subtract(1, "month").isAfter(Constants.SEASON_START)
-        ? `${user.seasonVote.toLocaleString()} | ${user.monthVote.toLocaleString()}`
-        : user.monthVote.toLocaleString()
-    }`;
+    )} ${user.monthVote.toLocaleString()}`;
 
     count++;
   }

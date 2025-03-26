@@ -190,6 +190,7 @@ model Economy {
 
   monthVote        Int @default(0)
   seasonVote       Int @default(0)
+  voteStreak       Int @default(0)
   dailyStreak      Int @default(0)
   dailyTaskStreak  Int @default(0)
   weeklyTaskStreak Int @default(0)
