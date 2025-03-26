@@ -241,8 +241,8 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
     return amount;
   };
 
-  let crateAmount = determineCrateAmount(votes.voteStreak);
-  let newCrateAmount = determineCrateAmount(query.voteStreak) < crateAmount;
+  const crateAmount = determineCrateAmount(votes.voteStreak);
+  const newCrateAmount = determineCrateAmount(query.voteStreak) < crateAmount;
 
   try {
     await Promise.all([
