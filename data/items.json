@@ -3584,9 +3584,9 @@
   },
   "pineapple_seed": {
     "id": "pineapple_seed",
-    "name": "pineapple tree seed",
+    "name": "pineapple plant seed",
     "article": "a",
-    "plural": "pineapple tree seeds",
+    "plural": "pineapple plant seeds",
     "emoji": "<:nypsi_apple_tree_seeds:1261357859891843132>",
     "longDesc": "plant to grow a pineapple plant",
     "rarity": 4,
