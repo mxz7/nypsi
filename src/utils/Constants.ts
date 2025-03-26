@@ -196,15 +196,15 @@ export default {
   TRANSPARENT_EMBED_COLOR: "#2B2D31" as ColorResolvable,
   PROGRESSION: {
     VOTE_CRATE: new Map([
-      [0, 1],
-      [1, 2],
+      [1, 1],
+      [2, 2],
       [3, 3],
-      [5, 4],
-      [7, 5],
-      [10, 6],
-      [15, 7],
-      [20, 8],
-      [30, 9],
+      [4, 4],
+      [5, 5],
+      [7, 6],
+      [10, 7],
+      [15, 8],
+      [25, 9],
       [40, 10],
     ]),
     MULTI: new Map([
