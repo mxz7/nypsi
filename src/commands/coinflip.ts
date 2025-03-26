@@ -500,7 +500,14 @@ async function run(
           embeds: [requestEmbed],
           components: [row],
         })
-        .then((m) => m.fetch());
+        .then((m) => m.fetch())
+        .catch(() =>
+          send({
+            content: `${target.user.toString()} you have been invited to a coinflip`,
+            embeds: [requestEmbed],
+            components: [row],
+          }),
+        );
     } else {
       msg = await send({
         content: `${target.user.toString()} you have been invited to a coinflip`,
@@ -754,7 +761,8 @@ async function run(
     if (interaction) {
       msg = await interaction
         .reply({ embeds: [requestEmbed], components: [row] })
-        .then((r) => r.fetch());
+        .then((r) => r.fetch())
+        .catch(() => send({ embeds: [requestEmbed], components: [row] }));
     } else {
       msg = await send({ embeds: [requestEmbed], components: [row] });
     }
