@@ -122,7 +122,7 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel, 
     inPlaceSort(winners).asc((i) => i.time);
 
     setTimeout(async () => {
-      switch (winners.findIndex((i) => i.user.id === message.author.id) + 1) {
+      switch (winners.findIndex((i) => i.user.id === message.author.id)) {
         case 0:
           await addWin(guild, message.member);
           message.react("🥇");
