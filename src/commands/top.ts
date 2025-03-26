@@ -81,7 +81,7 @@ cmd.slashData
   .addSubcommand((prestige) =>
     prestige
       .setName("vote")
-      .setDescription("view top votes in the server")
+      .setDescription("view top monthly votes in the server")
       .addStringOption((option) =>
         option
           .setName("scope")
@@ -502,7 +502,7 @@ async function run(
     return show(
       data.pages,
       data.pos,
-      `top votes ${global ? "[global]" : `for ${message.guild.name}`}`,
+      `top monthly votes ${global ? "[global]" : `for ${message.guild.name}`}`,
       global ? "https://nypsi.xyz/leaderboard/vote" : null,
     );
   } else if (["cr", "crglobal", "cr-global", "chatreaction"].includes(args[0].toLowerCase())) {
