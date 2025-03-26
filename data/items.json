@@ -897,7 +897,7 @@
     "article": "a",
     "plural": "calendars",
     "emoji": "📅",
-    "longDesc": "protects your daily streak in the event you forget to do /daily",
+    "longDesc": "protects your daily streak and/or vote streak",
     "role": "item",
     "rarity": 4,
     "buy": 0,
