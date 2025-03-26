@@ -296,7 +296,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
         "+ **3**% multiplier\n" +
         `+ **${crateAmount}** vote crate${crateAmount != 1 ? "s" : ""}` +
         "\n+ **1** lottery ticket\n\n" +
-        (newCrateAmount
+        (newCrateAmount && votes.voteStreak > 5
           ? `you will now receive **${crateAmount}** crates each vote thanks to your streak\n\n`
           : "") +
         `you have voted **${votes.monthVote}** time${votes.monthVote > 1 ? "s" : ""} this month`,
