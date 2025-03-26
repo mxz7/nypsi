@@ -158,10 +158,15 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
 
   if (await isUserBlacklisted(user)) {
     logger.info(`${user} blacklisted`);
+    addNotificationToQueue({
+      memberId: user,
+      payload: {
+        content:
+          "you voted but you're blacklisted. hahahahahahhhahah no it won't help you hahahahahahhahahahahahahah",
+      },
+    });
     return;
   }
-
-  const now = new Date().getTime();
 
   const query = await prisma.economy.findUnique({
     where: {
@@ -169,12 +174,13 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
     },
     select: {
       lastVote: true,
+      voteStreak: true,
     },
   });
 
   const lastVote = query.lastVote.getTime();
 
-  if (now - lastVote < 25200000) {
+  if (Date.now() - lastVote < 25200000) {
     return logger.error(`${user} already voted`);
   }
 
@@ -183,22 +189,48 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
       userId: user,
     },
     data: {
-      lastVote: new Date(now),
+      lastVote: new Date(),
       monthVote: { increment: 1 },
       seasonVote: { increment: 1 },
+      voteStreak: { increment: 1 },
     },
     select: {
       monthVote: true,
       seasonVote: true,
+      voteStreak: true,
     },
   });
+
+  if ((await isEcoBanned(user)).banned) {
+    logger.info(`${user} banned`);
+    addNotificationToQueue({
+      memberId: user,
+      payload: {
+        content: "you voted but you're banned. hahahahahahhhahah lol you get NOTHING.",
+      },
+    });
+    return;
+  }
 
   await redis.set(`${Constants.redis.cache.economy.VOTE}:${user}`, "true");
   await redis.expire(`${Constants.redis.cache.economy.VOTE}:${user}`, ms("1 hour") / 1000);
 
+  const crates = new Map<number, number>();
+
+  crates.set(0, 1);
+  crates.set(1, 2);
+  crates.set(3, 3);
+  crates.set(5, 4);
+  crates.set(7, 5);
+  crates.set(10, 6);
+  crates.set(15, 7);
+  crates.set(20, 8);
+  crates.set(30, 9);
+  crates.set(40, 10);
+
   let level = await getRawLevel(user);
 
-  if (level > 75) level = 75;
+  if (level > 100) level = 100;
 
   const amount = Math.floor(15000 * (level / 13 + 1));
 
@@ -206,39 +238,43 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
 
   xp += Math.floor((await getRawLevel(user)) * 0.3);
 
-  if (xp > 50) xp = 50;
+  if (xp > 100) xp = 100;
 
-  if (!(await isEcoBanned(user)).banned) {
-    try {
-      await Promise.all([
-        addBalance(user, amount),
-        addKarma(user, 10),
-        addXp(user, xp),
-        addBooster(user, "vote_booster"),
-        redis.del(`${Constants.redis.cache.economy.VOTE}:${user}`),
-        redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${user}`),
-        addStat(user, "earned-vote", amount),
-      ]).catch((e) => {
-        logger.error("vote error", e);
-      });
-    } catch (e) {
-      logger.error("vote error", e);
+  const determineCrateAmount = (value: number) => {
+    let amount = 0;
+
+    while (!amount && value >= 0) {
+      if (crates.has(value)) {
+        amount = crates.get(value);
+        break;
+      }
+      value--;
     }
+
+    return amount;
+  };
+
+  let crateAmount = determineCrateAmount(votes.voteStreak);
+  let newCrateAmount = determineCrateAmount(query.voteStreak) < crateAmount;
+
+  try {
+    await Promise.all([
+      addBalance(user, amount),
+      addKarma(user, 10),
+      addXp(user, xp),
+      addBooster(user, "vote_booster"),
+      redis.del(`${Constants.redis.cache.economy.VOTE}:${user}`),
+      redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${user}`),
+      addStat(user, "earned-vote", amount),
+      addInventoryItem(user, "lottery_ticket", 1),
+      createAuraTransaction(user, Constants.BOT_USER_ID, 50),
+      addInventoryItem(user, "vote_crate", crateAmount),
+    ]).catch((e) => {
+      logger.error("vote error", e);
+    });
+  } catch (e) {
+    logger.error("vote error", e);
   }
-
-  await addInventoryItem(user, "lottery_ticket", 1);
-
-  let crateAmount = 0;
-  let rawLevel = await getRawLevel(user);
-
-  while (crateAmount === 0 && rawLevel > -1) {
-    if (Constants.PROGRESSION.VOTE_CRATE.has(rawLevel)) {
-      crateAmount = Constants.PROGRESSION.VOTE_CRATE.get(rawLevel);
-    } else rawLevel--;
-  }
-
-  await addInventoryItem(user, "vote_crate", crateAmount);
-  createAuraTransaction(user, Constants.BOT_USER_ID, 50);
 
   if (percentChance(0.05) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
     await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t", "EX", 86400);
@@ -273,9 +309,12 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
         "+ **3**% multiplier\n" +
         `+ **${crateAmount}** vote crate${crateAmount != 1 ? "s" : ""}` +
         "\n+ **1** lottery ticket\n\n" +
-        `you have voted **${votes.monthVote}** time${votes.monthVote > 1 ? "s" : ""} this month`,
+        newCrateAmount
+        ? `you will now receive **${crateAmount}** crates each vote thanks to your streak\n\n`
+        : "" +
+            `you have voted **${votes.monthVote}** time${votes.monthVote > 1 ? "s" : ""} this month`,
     )
-    .setFooter({ text: `+${xp}xp` });
+    .setFooter({ text: `+${xp}xp | streak: ${votes.voteStreak.toLocaleString()}` });
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder()
@@ -285,16 +324,12 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
   );
 
   if (!(await getDmSettings(user)).voteReminder) {
-    const chance = Math.floor(Math.random() * 10);
-
-    if (chance == 7) {
-      row.addComponents(
-        new ButtonBuilder()
-          .setLabel("enable vote reminders")
-          .setCustomId("enable-vote-reminders")
-          .setStyle(ButtonStyle.Secondary),
-      );
-    }
+    row.addComponents(
+      new ButtonBuilder()
+        .setLabel("enable vote reminders")
+        .setCustomId("enable-vote-reminders")
+        .setStyle(ButtonStyle.Secondary),
+    );
   }
 
   addNotificationToQueue({
