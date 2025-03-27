@@ -171,7 +171,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
   const embed = new CustomEmbed(message.member);
   embed.setHeader("furnace", message.author.avatarURL());
   embed.setDescription(
-    `${max === 64 ? "<:nypsi_furnace_lit:1264185514978705472>" : "<a:super_furnace:1314953706609049671>"} smelting...`,
+    `${max === 64 ? "<:furnace_lit:1354808468887965928>" : "<a:super_furnace:1314953706609049671>"} smelting...`,
   );
 
   const msg = await send({ embeds: [embed] });
