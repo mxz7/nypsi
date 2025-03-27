@@ -54,9 +54,7 @@ async function checkBoosters(member: string | GuildMember, boosters: Map<string,
     await redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${userId}`);
 
     if ((await getDmSettings(userId)).booster) {
-      const embed = new CustomEmbed()
-        .setColor(Constants.TRANSPARENT_EMBED_COLOR)
-        .setFooter({ text: "/settings me notifications" });
+      const embed = new CustomEmbed(userId).setFooter({ text: "/settings me notifications" });
 
       let desc = "";
       let text = "";

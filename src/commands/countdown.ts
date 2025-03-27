@@ -207,7 +207,7 @@ async function run(
     const embedd = new CustomEmbed();
 
     embedd.setDescription(format.split("%days%").join(daysUntil(date) + 1));
-    embedd.setColor(Constants.TRANSPARENT_EMBED_COLOR);
+    embedd.setColor(Constants.PURPLE);
 
     await channel.send({ embeds: [embedd] }).catch(() => {
       fail = true;

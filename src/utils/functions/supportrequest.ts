@@ -115,7 +115,7 @@ export async function createSupportRequest(id: string, client: NypsiClient, user
   });
 
   const embed = new CustomEmbed()
-    .setColor(Constants.TRANSPARENT_EMBED_COLOR)
+    .setColor(Constants.PURPLE)
     .setDescription(`support request for [${username} (${id})](https://nypsi.xyz/user/${id})`);
 
   await sendToRequestChannel(id, embed, client);

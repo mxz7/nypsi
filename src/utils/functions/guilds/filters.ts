@@ -346,8 +346,8 @@ export async function checkAutoMute(message: Message) {
         .addField("length", `\`${MStoTime(length * 1000, true).trim()}\``, true)
         .setFooter({ text: "unmuted at:" })
         .setTimestamp(new Date(Date.now() + length * 1000))
-        .setColor(Constants.TRANSPARENT_EMBED_COLOR)
-        .addField("reason", `filter violation${isAlt ? " (alt)" : ""}`, true);
+        .addField("reason", `filter violation${isAlt ? " (alt)" : ""}`, true)
+        .setColor(Constants.EMBED_FAIL_COLOR);
 
       return await member
         .send({ content: `you have been muted in ${message.guild.name}`, embeds: [embed] })

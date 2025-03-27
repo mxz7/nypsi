@@ -16,7 +16,11 @@ import { getBoosters } from "../../utils/functions/economy/boosters";
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { addStat } from "../../utils/functions/economy/stats";
 import { getBaseWorkers } from "../../utils/functions/economy/utils";
-import { calcWorkerValues, evaluateWorker, getWorkers } from "../../utils/functions/economy/workers";
+import {
+  calcWorkerValues,
+  evaluateWorker,
+  getWorkers,
+} from "../../utils/functions/economy/workers";
 import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
 import { logger } from "../../utils/logger";
 import ms = require("ms");
@@ -65,14 +69,17 @@ async function doWorkerThing() {
       }
 
       let totalEarned = 0;
-      const { amountEarned, byproductAmounts } =
-        await evaluateWorker(worker.userId, baseWorkers[worker.workerId], {
+      const { amountEarned, byproductAmounts } = await evaluateWorker(
+        worker.userId,
+        baseWorkers[worker.workerId],
+        {
           stored: worker.stored + incrementAmount,
           calculated: {
             perItem: perItem,
-            byproductChances: byproductChances
-          }
-        });
+            byproductChances: byproductChances,
+          },
+        },
+      );
 
       if (worker.stored != 0) {
         await prisma.economyWorker.update({
@@ -159,20 +166,14 @@ async function doWorkerThing() {
     try {
       if (full.length == workers.length) {
         data.payload.content = null;
-        data.payload.embed = new CustomEmbed()
-          .setDescription("all of your workers are full")
-          .setColor(Constants.TRANSPARENT_EMBED_COLOR);
+        data.payload.embed = new CustomEmbed(userId).setDescription("all of your workers are full");
       } else if (full.length == 1 && (await getDmSettings(userId)).worker == "All") {
-        data.payload.embed = new CustomEmbed()
-          .setDescription(
-            `your ${getBaseWorkers()[full[0]].item_emoji} ${
-              getBaseWorkers()[full[0]].name
-            } is full`,
-          )
-          .setColor(Constants.TRANSPARENT_EMBED_COLOR);
+        data.payload.embed = new CustomEmbed(userId).setDescription(
+          `your ${getBaseWorkers()[full[0]].item_emoji} ${getBaseWorkers()[full[0]].name} is full`,
+        );
       } else if ((await getDmSettings(userId)).worker == "All") {
         data.payload.content = `${full.length} of your workers are full`;
-        data.payload.embed = new CustomEmbed()
+        data.payload.embed = new CustomEmbed(userId)
           .setDescription(
             full
               .map(
@@ -182,7 +183,6 @@ async function doWorkerThing() {
               .join("\n"),
           )
           .setHeader("full workers:")
-          .setColor(Constants.TRANSPARENT_EMBED_COLOR)
           .setFooter({ text: "/settings me notifications" });
       }
 

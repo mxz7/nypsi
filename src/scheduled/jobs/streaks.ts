@@ -50,28 +50,28 @@ async function doDailyStreaks() {
   });
 
   const calendarSavedEmbed = new CustomEmbed()
-    .setColor(Constants.TRANSPARENT_EMBED_COLOR)
+    .setColor(Constants.EMBED_FAIL_COLOR)
     .setTitle("your daily streak has been saved by a calendar!")
     .setDescription(
       "calendars in your inventory protect your streaks, make sure to do `/daily` to continue your streak",
     );
 
   const gemSavedEmbed = new CustomEmbed()
-    .setColor(Constants.TRANSPARENT_EMBED_COLOR)
+    .setColor(Constants.EMBED_FAIL_COLOR)
     .setTitle("your daily streak was saved by your white gem!")
     .setDescription(
       "<:nypsi_gem_white:1046933670436552725> white gems have a chance to protect your streaks. make sure to do /daily to continue your streak",
     );
 
   const whiteGemBrokeEmbed = new CustomEmbed()
-    .setColor(Constants.TRANSPARENT_EMBED_COLOR)
+    .setColor(Constants.EMBED_FAIL_COLOR)
     .setTitle("your white gem has shattered")
     .setDescription(
       "<:nypsi_gem_white:1046933670436552725> the power exerted by your white gem to save your streak has unfortunately caused it to shatter...",
     );
 
   const resetEmbed = new CustomEmbed()
-    .setColor(Constants.TRANSPARENT_EMBED_COLOR)
+    .setColor(Constants.EMBED_FAIL_COLOR)
     .setTitle("you have lost your daily streak!")
     .setDescription(
       "you have lost your daily streak by not doing `/daily`. calendars can be used to protect your daily streak from being reset",
@@ -160,28 +160,28 @@ async function doVoteStreaks() {
   });
 
   const calendarSavedEmbed = new CustomEmbed()
-    .setColor(Constants.TRANSPARENT_EMBED_COLOR)
+    .setColor(Constants.EMBED_FAIL_COLOR)
     .setTitle("your vote streak has been saved by a calendar!")
     .setDescription(
       "calendars in your inventory protect your streaks, make sure to vote to continue your streak",
     );
 
   const gemSavedEmbed = new CustomEmbed()
-    .setColor(Constants.TRANSPARENT_EMBED_COLOR)
+    .setColor(Constants.EMBED_FAIL_COLOR)
     .setTitle("your vote streak was saved by your white gem!")
     .setDescription(
       "<:nypsi_gem_white:1046933670436552725> white gems have a chance to protect your streak. make sure to vote to continue your streak",
     );
 
   const whiteGemBrokeEmbed = new CustomEmbed()
-    .setColor(Constants.TRANSPARENT_EMBED_COLOR)
+    .setColor(Constants.EMBED_FAIL_COLOR)
     .setTitle("your white gem has shattered")
     .setDescription(
       "<:nypsi_gem_white:1046933670436552725> the power exerted by your white gem to save your streak has unfortunately caused it to shatter...",
     );
 
   const resetEmbed = new CustomEmbed()
-    .setColor(Constants.TRANSPARENT_EMBED_COLOR)
+    .setColor(Constants.EMBED_FAIL_COLOR)
     .setTitle("you have lost your vote streak!")
     .setDescription(
       "you have lost your vote streak by not doing voting in over a day.\ncalendars can be used to protect your streaks from being reset",

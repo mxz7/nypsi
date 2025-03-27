@@ -56,7 +56,7 @@ export async function createReactionRole(options: {
   messageDescription: string;
   mode: ReactionRoleMode;
 }) {
-  const embed = new CustomEmbed().setColor(Constants.TRANSPARENT_EMBED_COLOR);
+  const embed = new CustomEmbed().setColor(Constants.PURPLE);
 
   if (options.title) embed.setHeader(options.title);
   embed.setDescription(options.messageDescription);
@@ -127,7 +127,7 @@ export async function sendReactionRole(
   reactionRole: ReactionRole & { roles: ReactionRoleRoles[] },
   channel: GuildTextBasedChannel,
 ) {
-  const embed = new CustomEmbed().setColor(Constants.TRANSPARENT_EMBED_COLOR);
+  const embed = new CustomEmbed().setColor(Constants.PURPLE);
 
   if (reactionRole.title) embed.setHeader(reactionRole.title);
   if (reactionRole.color) embed.setColor(reactionRole.color as ColorResolvable);

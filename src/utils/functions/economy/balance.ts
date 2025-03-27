@@ -1095,9 +1095,9 @@ export async function calcNetWorth(
         payload: {
           content: "",
           embed: new CustomEmbed(
-            null,
+            id,
             `$${Number(query.netWorth).toLocaleString()} ➔ $${Math.floor(worth).toLocaleString()}`,
-          ).setColor(Constants.TRANSPARENT_EMBED_COLOR),
+          ),
         },
       };
 

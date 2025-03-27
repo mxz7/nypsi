@@ -590,9 +590,7 @@ export async function commandGemCheck(member: GuildMember, commandCategory: Comm
           embed: new CustomEmbed(
             member,
             `${getItems()[gem].emoji} you've found a gem! i wonder what powers it holds...`,
-          )
-            .setTitle("you've found a gem")
-            .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+          ).setTitle("you've found a gem"),
         },
       });
     }
@@ -614,9 +612,7 @@ export async function commandGemCheck(member: GuildMember, commandCategory: Comm
               `${
                 getItems()["pink_gem"].emoji
               } you've found a gem! i wonder what powers it holds...`,
-            )
-              .setTitle("you've found a gem")
-              .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+            ).setTitle("you've found a gem"),
           },
         });
       }
@@ -637,9 +633,7 @@ export async function commandGemCheck(member: GuildMember, commandCategory: Comm
               `${
                 getItems()["purple_gem"].emoji
               } you've found a gem! i wonder what powers it holds...`,
-            )
-              .setTitle("you've found a gem")
-              .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+            ).setTitle("you've found a gem"),
           },
         });
       }
@@ -693,8 +687,7 @@ export async function gemBreak(userId: string, chance: number, gem: string) {
     addNotificationToQueue({
       memberId: userId,
       payload: {
-        embed: new CustomEmbed()
-          .setColor(Constants.TRANSPARENT_EMBED_COLOR)
+        embed: new CustomEmbed(userId)
           .setTitle("a very exciting moment")
           .setFooter({ text: "use /craft to view the progress" })
           .setDescription(
@@ -728,8 +721,7 @@ export async function gemBreak(userId: string, chance: number, gem: string) {
     addNotificationToQueue({
       memberId: userId,
       payload: {
-        embed: new CustomEmbed()
-          .setColor(Constants.TRANSPARENT_EMBED_COLOR)
+        embed: new CustomEmbed(userId)
           .setTitle(`your ${getItems()[gem].name} has shattered`)
           .setDescription(
             `${

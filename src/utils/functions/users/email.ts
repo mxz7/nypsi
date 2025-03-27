@@ -73,14 +73,12 @@ export async function checkPurchases(id: string) {
           memberId: id,
           payload: {
             content: "thank you for your donation",
-            embed: new CustomEmbed()
-              .setDescription(
-                `thank you very much for your donation of ${Intl.NumberFormat("en-GB", {
-                  style: "currency",
-                  currency: "GBP",
-                }).format(item.cost.toNumber())}`,
-              )
-              .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+            embed: new CustomEmbed(id).setDescription(
+              `thank you very much for your donation of ${Intl.NumberFormat("en-GB", {
+                style: "currency",
+                currency: "GBP",
+              }).format(item.cost.toNumber())}`,
+            ),
           },
         };
 
@@ -108,9 +106,7 @@ export async function checkPurchases(id: string) {
               memberId: id,
               payload: {
                 content: "thank you for your purchase",
-                embed: new CustomEmbed()
-                  .setDescription(`you have been **unbanned**`)
-                  .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+                embed: new CustomEmbed(id).setDescription(`you have been **unbanned**`),
               },
             };
 
@@ -124,13 +120,11 @@ export async function checkPurchases(id: string) {
               memberId: id,
               payload: {
                 content: "thank you for your purchase",
-                embed: new CustomEmbed()
-                  .setDescription(
-                    `you have received ${item.amount}x ${getItems()[item.item].emoji} ${
-                      getItems()[item.item].name
-                    }`,
-                  )
-                  .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+                embed: new CustomEmbed(id).setDescription(
+                  `you have received ${item.amount}x ${getItems()[item.item].emoji} ${
+                    getItems()[item.item].name
+                  }`,
+                ),
               },
             };
 

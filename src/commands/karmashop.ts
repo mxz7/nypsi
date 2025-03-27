@@ -397,9 +397,7 @@ async function run(
             `${
               getItems()["purple_gem"].emoji
             } you've found a gem! i wonder what powers it holds...`,
-          )
-            .setTitle("you've found a gem")
-            .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+          ).setTitle("you've found a gem"),
         },
       });
     }
