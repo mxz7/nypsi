@@ -237,7 +237,7 @@
     "emoji": "🧁",
     "target": 10000000,
     "description": "bake 10,000,000 cookies",
-    "prize": ["lucky_scratch_card:3", "nypsi_crate:3", "tag:cupcake"]
+    "prize": ["lucky_scratch_card:3", "nypsi_crate:3", "rain:1", "tag:cupcake"]
   },
   "wizard_i": {
     "id": "wizard_i",
@@ -277,7 +277,7 @@
     "emoji": "🧙‍♂️",
     "target": 1000,
     "description": "buy 1,000 items from karma shop",
-    "prize": ["nypsi_crate:1", "legendary_scratch_card:2"]
+    "prize": ["nypsi_crate:1", "legendary_scratch_card:2", "rain:1"]
   },
   "robber_i": {
     "id": "robber_i",
@@ -801,6 +801,7 @@
       "legendary_scratch_card:5",
       "platinum_credit:2",
       "omega_crate:1",
+      "rain:1",
       "tag:nypsi"
     ]
   },
@@ -881,7 +882,7 @@
     "emoji": "🍀",
     "target": 150,
     "description": "win the lottery 150 times",
-    "prize": ["nypsi_crate:3", "platinum_credit:4", "omega_crate:2"]
+    "prize": ["nypsi_crate:3", "platinum_credit:4", "omega_crate:2", "rain:1"]
   },
   "wordle_i": {
     "id": "wordle_i",
@@ -1041,7 +1042,7 @@
     "emoji": "🐲",
     "target": 250,
     "description": "complete the dragons tower 250 times",
-    "prize": ["legendary_scratch_card:3", "nypsi_crate:2", "lucky_scratch_card:5"]
+    "prize": ["legendary_scratch_card:3", "nypsi_crate:2", "lucky_scratch_card:5", "rain:1s"]
   },
   "scratchies_pro_i": {
     "id": "scratchies_pro_i",
@@ -1160,7 +1161,7 @@
     "emoji": "📦",
     "target": 250,
     "description": "win 250 loot drops",
-    "prize": ["nypsi_crate:1", "legendary_scratch_card:3", "omega_crate:1"]
+    "prize": ["nypsi_crate:1", "legendary_scratch_card:3", "omega_crate:1", "rain:1"]
   },
   "blackjack_pro_i": {
     "id": "blackjack_pro_i",
@@ -1280,7 +1281,7 @@
     "emoji": "👷🏻‍♂️",
     "target": 100000000000,
     "description": "earn $100,000,000,000 from your workers",
-    "prize": ["legendary_scratch_card:2", "nypsi_crate:3", "tag:capitalist"]
+    "prize": ["legendary_scratch_card:2", "nypsi_crate:3", "rain:1", "tag:capitalist"]
   },
   "discordian_i": {
     "id": "discordian_i",
@@ -1400,7 +1401,7 @@
     "emoji": "🔧",
     "target": 250,
     "description": "upgrade a car 250 times",
-    "prize": ["legendary_scratch_card:3", "omega_crate:1", "tag:mechanic"]
+    "prize": ["legendary_scratch_card:3", "omega_crate:1", "rain:1", "tag:mechanic"]
   },
   "animal_lover_i": {
     "id": "animal_lover_i",
