@@ -93,7 +93,7 @@ module.exports = new ItemUse(
 
     if (res.customId === "start-rain") {
       if (await redis.exists(`nypsi:lootrain:channel:${message.channelId}`))
-        return send({
+        return res.reply({
           embeds: [
             new ErrorEmbed(
               "there is already a rain happening in this channel doofus. do you want to destroy nypsi!?",
@@ -114,6 +114,7 @@ module.exports = new ItemUse(
               "https://cdn.nypsi.xyz/static/i_saw_that.jpeg",
             ),
           ],
+          flags: MessageFlags.Ephemeral,
         });
       }
 
