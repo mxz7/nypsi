@@ -3653,8 +3653,8 @@
   },
   "rain": {
     "id": "rain",
-    "name": "loot drop rain",
-    "plural": "loot drop rains",
+    "name": "loot rain",
+    "plural": "loot rains",
     "article": "a",
     "emoji": "💦",
     "longDesc": "spawns loot drops in a channel for 90 (or 3 minutes in [https://nypsi.xyz/discord](the official server)",
