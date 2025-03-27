@@ -307,6 +307,7 @@ async function typeFastGame(client: NypsiClient, channelId: string, prize: strin
         1000
       ).toFixed(2)}s\`!!`;
 
+      res.react("🏆");
       await msg.edit({ embeds: [embed] });
 
       return res.author.id;
