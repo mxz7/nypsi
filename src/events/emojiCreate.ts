@@ -1,6 +1,6 @@
 import { GuildEmoji } from "discord.js";
 import { CustomEmbed } from "../models/EmbedBuilders";
-import { isLogsEnabled } from "../utils/functions/moderation/logs";
+import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
 
 export default async function emojiCreate(emoji: GuildEmoji) {
   if (await isLogsEnabled(emoji.guild)) {
@@ -15,5 +15,7 @@ export default async function emojiCreate(emoji: GuildEmoji) {
     embed.setHeader("emoji created");
     embed.setDescription(`\`${emoji.name}\` - \`${emoji.id}\`\ncreated by \`${creator}\``);
     embed.setImage(emoji.url);
+
+    addLog(emoji.guild, "emoji", embed);
   }
 }
