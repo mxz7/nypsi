@@ -15,6 +15,7 @@ products.set("4ec1ebe6b4", { name: "gem_crate", cost: 14.99 });
 products.set("d18331a5bb", { name: "gem_shard", cost: 0 });
 products.set("1d78b621a5", { name: "unecoban", cost: 19.99 });
 products.set("0aec346b01", { name: "omega_crate", cost: 9.99 });
+products.set("23110fff7b", { name: "rain", cost: 4.99 });
 
 export default {
   redis: {
