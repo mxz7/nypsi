@@ -2833,7 +2833,7 @@
     "emoji": "<:nypsi_dave:1226524341294858394>",
     "longDesc": "meow meow meow meow meow meow meow",
     "rarity": 6,
-    "role": "collectable",
+    "role": "cat",
     "sell": 50000000,
     "in_crates": true
   },
@@ -3596,5 +3596,53 @@
     "sell": 50000,
     "in_crates": true,
     "aliases": ["pseed"]
+  },
+  "maxwell": {
+    "id": "maxwell",
+    "name": "maxwell",
+    "plural": "maxwells",
+    "article": "a",
+    "emoji": "<:maxwell:1354791827286392852>",
+    "longDesc": "please do not bend",
+    "rarity": 6,
+    "role": "cat",
+    "sell": 40000000,
+    "in_crates": true
+  },
+  "zazu": {
+    "id": "zazu",
+    "name": "zazu",
+    "plural": "zazus",
+    "article": "a",
+    "emoji": "<:zazu:1354793554307973241>",
+    "longDesc": "zaza",
+    "rarity": 6,
+    "role": "cat",
+    "sell": 40000000,
+    "in_crates": true
+  },
+  "oye": {
+    "id": "oye",
+    "name": "oye",
+    "plural": "oyes",
+    "article": "an",
+    "emoji": "<:oye:1354795171497115839>",
+    "longDesc": "he judges",
+    "rarity": 6,
+    "role": "cat",
+    "sell": 40000000,
+    "in_crates": true
+  },
+  "ethel": {
+    "id": "ethel",
+    "name": "ethel",
+    "plural": "ethels",
+    "article": "an",
+    "emoji": "<a:ethel:1354796584357068800>",
+    "longDesc": "o ii a e oia ee ia ai",
+    "rarity": 6,
+    "role": "cat",
+    "sell": 40000000,
+    "in_crates": true
   }
 }
