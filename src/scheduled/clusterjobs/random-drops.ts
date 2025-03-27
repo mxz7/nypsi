@@ -566,7 +566,7 @@ export async function startRandomDrop(client: NypsiClient, channelId: string, ra
 
   const games = [fastClickGame, clickSpecificGame, typeFastGame];
 
-  logger.info(`random drop started in ${channelId}`);
+  logger.info(`random drop started in ${channelId} ${rain ? "(rain)" : ""}`);
   const winner = await games[Math.floor(Math.random() * games.length)](
     client,
     channelId,
@@ -582,7 +582,7 @@ export async function startRandomDrop(client: NypsiClient, channelId: string, ra
     logger.info(
       `random drop in ${channelId} winner: ${winner} (${await getLastKnownUsername(
         winner,
-      )}) prize: ${prize}`,
+      )}) prize: ${prize} ${rain ? "(rain)" : ""}`,
     );
 
     if (!rain) {
@@ -601,11 +601,13 @@ export async function startRandomDrop(client: NypsiClient, channelId: string, ra
 }
 
 export async function startLootRain(channel: GuildTextBasedChannel, user: User) {
-  let length = 90;
-  if (channel.guildId === Constants.NYPSI_SERVER_ID) length = 180;
+  let length = 60;
+  if (channel.guildId === Constants.NYPSI_SERVER_ID) length = 120;
 
+  logger.info(`starting loot rain in ${channel.id}`);
   if (await redis.exists(`nypsi:lootrain:channel:${channel.id}`)) return;
   await redis.set(`nypsi:lootrain:channel:${channel.id}`, "meow", "EX", length * 2);
+  await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, channel.id);
 
   let active = true;
 
@@ -620,6 +622,8 @@ export async function startLootRain(channel: GuildTextBasedChannel, user: User) 
   setTimeout(() => {
     active = false;
     redis.del(`nypsi:lootrain:channel:${channel.id}`);
+    redis.srem(Constants.redis.nypsi.USERS_PLAYING, channel.id);
+    logger.info(`${channel.id} loot rain has ended`);
   }, length * 1000);
 
   const spawn = async () => {
@@ -632,7 +636,7 @@ export async function startLootRain(channel: GuildTextBasedChannel, user: User) 
       return;
     }
 
-    setTimeout(spawn, Math.floor(Math.random() * 4000) + 3000);
+    setTimeout(spawn, Math.floor(Math.random() * 3000) + 4000);
 
     startRandomDrop(channel.client as NypsiClient, channel.id, user.username);
   };

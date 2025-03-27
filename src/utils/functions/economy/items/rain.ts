@@ -12,6 +12,7 @@ import {
   MessageActionRowComponentBuilder,
   MessageFlags,
 } from "discord.js";
+import redis from "../../../../init/redis";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
@@ -52,9 +53,9 @@ module.exports = new ItemUse(
       }
     };
 
-    let length = 90;
+    let length = 1;
 
-    if (message.guild.id === Constants.NYPSI_SERVER_ID) length = 180;
+    if (message.guild.id === Constants.NYPSI_SERVER_ID) length = 2;
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
@@ -67,11 +68,11 @@ module.exports = new ItemUse(
       embeds: [
         new CustomEmbed(
           message.member,
-          `💦 confirm to start a loot rain for **${length} seconds**` +
+          `💦 confirm to start a loot rain for **${length} minutes**` +
             (message.guildId !== Constants.NYPSI_SERVER_ID
               ? "\n\nyou can **double** the length of your loot rain by using it in the **[official nypsi server](https://nypsi.xyz/discord)**"
               : ""),
-        ).setHeader(`${message.author.username}'s loot rain`),
+        ).setHeader(`${message.author.username}'s loot rain`, message.author.avatarURL()),
       ],
       components: [row],
     });
@@ -91,6 +92,16 @@ module.exports = new ItemUse(
     }
 
     if (res.customId === "start-rain") {
+      if (await redis.exists(`nypsi:lootrain:channel:${message.channelId}`))
+        return send({
+          embeds: [
+            new ErrorEmbed(
+              "there is already a rain happening in this channel doofus. do you want to destroy nypsi!?",
+            ),
+          ],
+          flags: MessageFlags.Ephemeral,
+        });
+
       const inventory = await getInventory(message.member);
 
       if (
@@ -112,7 +123,10 @@ module.exports = new ItemUse(
         inventory.find((i) => i.item === "rain").amount - 1,
       );
 
-      res.reply({
+      row.components.forEach((c) => c.setDisabled(true));
+
+      await res.update({ components: [row] });
+      res.followUp({
         embeds: [new CustomEmbed(message.member, "✅ your loot rain will start soon")],
         flags: MessageFlags.Ephemeral,
       });
