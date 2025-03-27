@@ -448,7 +448,6 @@ export async function updateAuctionWatch(member: GuildMember, itemName: string, 
       },
     },
     update: {
-      userId: member.user.id,
       itemId: itemName,
       maxCost: itemCost,
     },
