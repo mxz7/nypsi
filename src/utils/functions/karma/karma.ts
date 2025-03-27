@@ -32,8 +32,7 @@ export async function getKarma(member: GuildMember | string): Promise<number> {
     }
     return 1;
   } else {
-    await redis.set(`${Constants.redis.cache.user.KARMA}:${id}`, query.karma);
-    await redis.expire(`${Constants.redis.cache.user.KARMA}:${id}`, 86400);
+    await redis.set(`${Constants.redis.cache.user.KARMA}:${id}`, query.karma, "EX", 86400);
     return query.karma;
   }
 }

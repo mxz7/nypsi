@@ -96,10 +96,11 @@ export async function hasGuild(guild: Guild | string): Promise<boolean> {
   });
 
   if (query) {
-    await redis.set(`${Constants.redis.cache.guild.EXISTS}:${guildId}`, "1");
-    await redis.expire(
+    await redis.set(
       `${Constants.redis.cache.guild.EXISTS}:${guildId}`,
-      Math.floor(ms("24 hour") / 1000),
+      "1",
+      "EX",
+      ms("24 hour") / 1000,
     );
     return true;
   } else {
@@ -135,10 +136,11 @@ export async function createGuild(guild: Guild | string) {
     },
   });
 
-  await redis.set(`${Constants.redis.cache.guild.EXISTS}:${guildId}`, 1);
-  await redis.expire(
+  await redis.set(
     `${Constants.redis.cache.guild.EXISTS}:${guildId}`,
-    Math.floor(ms("24 hour") / 1000),
+    1,
+    "EX",
+    ms("24 hour") / 1000,
   );
 }
 
@@ -177,8 +179,12 @@ export async function getPrefix(guild: Guild | string): Promise<string[]> {
       });
     }
 
-    await redis.set(`${Constants.redis.cache.guild.PREFIX}:${guildId}`, query.prefixes.join(" "));
-    await redis.expire(`${Constants.redis.cache.guild.PREFIX}:${guildId}`, 3600);
+    await redis.set(
+      `${Constants.redis.cache.guild.PREFIX}:${guildId}`,
+      query.prefixes.join(" "),
+      "EX",
+      ms("24 hour") / 1000,
+    );
 
     return query.prefixes;
   } catch (e) {

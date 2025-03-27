@@ -45,12 +45,20 @@ export async function hasVoted(member: GuildMember | string) {
   const lastVote = await getLastVote(id);
 
   if (Date.now() - lastVote.getTime() < ms("12 hours")) {
-    redis.set(`${Constants.redis.cache.economy.VOTE}:${id}`, lastVote.getTime());
-    redis.expire(`${Constants.redis.cache.economy.VOTE}:${id}`, ms("30 minutes") / 1000);
+    redis.set(
+      `${Constants.redis.cache.economy.VOTE}:${id}`,
+      lastVote.getTime(),
+      "EX",
+      ms("1 hour") / 1000,
+    );
     return true;
   } else {
-    redis.set(`${Constants.redis.cache.economy.VOTE}:${id}`, lastVote.getTime());
-    redis.expire(`${Constants.redis.cache.economy.VOTE}:${id}`, ms("1 hour") / 1000);
+    redis.set(
+      `${Constants.redis.cache.economy.VOTE}:${id}`,
+      lastVote.getTime(),
+      "EX",
+      ms("1 hour") / 1000,
+    );
     return false;
   }
 }

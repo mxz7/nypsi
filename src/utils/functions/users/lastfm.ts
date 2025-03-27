@@ -26,8 +26,12 @@ export async function getLastfmUsername(member: GuildMember | string) {
     });
 
     if (query && query.lastfmUsername) {
-      await redis.set(`${Constants.redis.cache.user.LASTFM}:${id}`, query.lastfmUsername);
-      await redis.expire(`${Constants.redis.cache.user.LASTFM}:${id}`, ms("1 hour") / 1000);
+      await redis.set(
+        `${Constants.redis.cache.user.LASTFM}:${id}`,
+        query.lastfmUsername,
+        "EX",
+        ms("1 hour") / 1000,
+      );
       return query.lastfmUsername;
     } else {
       return undefined;

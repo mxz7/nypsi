@@ -49,8 +49,12 @@ export async function getDmSettings(member: GuildMember | string) {
     });
   }
 
-  await redis.set(`${Constants.redis.cache.user.DM_SETTINGS}:${id}`, JSON.stringify(query));
-  await redis.expire(`${Constants.redis.cache.user.DM_SETTINGS}:${id}`, ms("12 hour") / 1000);
+  await redis.set(
+    `${Constants.redis.cache.user.DM_SETTINGS}:${id}`,
+    JSON.stringify(query),
+    "EX",
+    ms("12 hour") / 1000,
+  );
 
   return query;
 }
@@ -111,8 +115,12 @@ export async function getPreferences(member: GuildMember | string): Promise<Pref
     });
   }
 
-  await redis.set(`${Constants.redis.cache.user.PREFERENCES}:${id}`, JSON.stringify(query));
-  await redis.expire(`${Constants.redis.cache.user.PREFERENCES}:${id}`, ms("12 hour") / 1000);
+  await redis.set(
+    `${Constants.redis.cache.user.PREFERENCES}:${id}`,
+    JSON.stringify(query),
+    "EX",
+    ms("12 hour") / 1000,
+  );
 
   return query;
 }

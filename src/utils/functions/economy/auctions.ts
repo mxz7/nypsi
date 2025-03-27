@@ -429,8 +429,12 @@ export async function getAuctionAverage(item: string) {
   const sum = filtered.reduce((a, b) => a + b, 0);
   const avg = Math.floor(sum / filtered.length) || 0;
 
-  await redis.set(`${Constants.redis.cache.economy.AUCTION_AVG}:${item}`, avg);
-  await redis.expire(`${Constants.redis.cache.economy.AUCTION_AVG}:${item}`, ms("3 hour") / 1000);
+  await redis.set(
+    `${Constants.redis.cache.economy.AUCTION_AVG}:${item}`,
+    avg,
+    "EX",
+    ms("3 hour") / 1000,
+  );
 
   return avg;
 }
@@ -536,11 +540,7 @@ async function checkWatchers(
 
     addNotificationToQueue(payload);
 
-    await redis.set(`${Constants.redis.cooldown.AUCTION_WATCH}:${userId}`, "true");
-    await redis.expire(
-      `${Constants.redis.cooldown.AUCTION_WATCH}:${userId}`,
-      ms("5 minutes") / 1000,
-    );
+    await redis.set(`${Constants.redis.cooldown.AUCTION_WATCH}:${userId}`, "true", "EX", 300);
   }
 }
 
@@ -1398,10 +1398,11 @@ export async function getItemHistoryGraph(itemId: string) {
   const res = await itemHistoryWorker(itemId);
 
   if (typeof res === "string") {
-    await redis.set(`${Constants.redis.cache.economy.AUCTION_ITEM_GRAPH_DATA}:${itemId}`, res);
-    await redis.expire(
+    await redis.set(
       `${Constants.redis.cache.economy.AUCTION_ITEM_GRAPH_DATA}:${itemId}`,
-      Math.floor(ms("1 day") / 1000),
+      res,
+      "EX",
+      ms("1 day") / 1000,
     );
   }
 

@@ -96,9 +96,7 @@ export async function getGuildLevelByUser(member: GuildMember | string) {
     await redis.set(
       `${Constants.redis.cache.economy.GUILD_LEVEL}:${guild.guildName.toLowerCase()}`,
       guild.level,
-    );
-    await redis.expire(
-      `${Constants.redis.cache.economy.GUILD_LEVEL}:${guild.guildName.toLowerCase()}`,
+      "EX",
       Math.floor(ms("1 hour") / 1000),
     );
 
@@ -119,9 +117,7 @@ export async function getGuildLevelByUser(member: GuildMember | string) {
     await redis.set(
       `${Constants.redis.cache.economy.GUILD_LEVEL}:${guild.guildName.toLowerCase()}`,
       guild.level,
-    );
-    await redis.expire(
-      `${Constants.redis.cache.economy.GUILD_LEVEL}:${guild.guildName.toLowerCase()}`,
+      "EX",
       Math.floor(ms("1 hour") / 1000),
     );
 
@@ -183,12 +179,20 @@ export async function getGuildByUser(member: GuildMember | string) {
     });
 
     if (!query || !query.guild) {
-      await redis.set(`${Constants.redis.cache.economy.GUILD_USER}:${id}`, "noguild");
-      await redis.expire(`${Constants.redis.cache.economy.GUILD_USER}:${id}`, ms("1 hour") / 1000);
+      await redis.set(
+        `${Constants.redis.cache.economy.GUILD_USER}:${id}`,
+        "noguild",
+        "EX",
+        ms("1 hour") / 1000,
+      );
       return undefined;
     } else {
-      await redis.set(`${Constants.redis.cache.economy.GUILD_USER}:${id}`, query.guild.guildName);
-      await redis.expire(`${Constants.redis.cache.economy.GUILD_USER}:${id}`, ms("1 hour") / 1000);
+      await redis.set(
+        `${Constants.redis.cache.economy.GUILD_USER}:${id}`,
+        query.guild.guildName,
+        "EX",
+        ms("1 hour") / 1000,
+      );
     }
 
     return query.guild;
@@ -346,9 +350,7 @@ export async function getRequiredForGuildUpgrade(
       xp: Math.floor(xp),
       members: guild.members.length,
     }),
-  );
-  await redis.expire(
-    `${Constants.redis.cache.economy.GUILD_REQUIREMENTS}:${name}`,
+    "EX",
     ms("1 hour") / 1000,
   );
 
@@ -600,9 +602,7 @@ export async function getGuildUpgradesByUser(
     await redis.set(
       `${Constants.redis.cache.economy.GUILD_UPGRADES}:${guild.guildName}`,
       JSON.stringify(guild.upgrades),
-    );
-    await redis.expire(
-      `${Constants.redis.cache.economy.GUILD_UPGRADES}:${guild.guildName}`,
+      "EX",
       Math.floor(ms("6 hours") / 1000),
     );
 
@@ -625,9 +625,7 @@ export async function getGuildUpgradesByUser(
   await redis.set(
     `${Constants.redis.cache.economy.GUILD_UPGRADES}:${guild.guildName}`,
     JSON.stringify(guild.upgrades),
-  );
-  await redis.expire(
-    `${Constants.redis.cache.economy.GUILD_UPGRADES}:${guild.guildName}`,
+    "EX",
     Math.floor(ms("6 hours") / 1000),
   );
 

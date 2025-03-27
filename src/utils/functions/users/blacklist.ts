@@ -20,12 +20,10 @@ export async function isUserBlacklisted(id: string) {
   });
 
   if (!query || !query.blacklisted) {
-    await redis.set(`${Constants.redis.cache.user.BLACKLIST}:${id}`, "f");
-    await redis.expire(`${Constants.redis.cache.user.BLACKLIST}:${id}`, ms("7 day") / 1000);
+    await redis.set(`${Constants.redis.cache.user.BLACKLIST}:${id}`, "f", "EX", ms("7 day") / 1000);
     return false;
   } else {
-    await redis.set(`${Constants.redis.cache.user.BLACKLIST}:${id}`, "t");
-    await redis.expire(`${Constants.redis.cache.user.BLACKLIST}:${id}`, ms("7 day") / 1000);
+    await redis.set(`${Constants.redis.cache.user.BLACKLIST}:${id}`, "t", "EX", ms("7 day") / 1000);
     return true;
   }
 }

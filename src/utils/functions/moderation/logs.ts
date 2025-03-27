@@ -118,12 +118,10 @@ export async function isLogsEnabled(guild: Guild) {
   checkingLogsEnabled = false;
 
   if (!query || !query.logs) {
-    await redis.set(`${Constants.redis.cache.guild.LOGS}:${guild.id}`, "f");
-    await redis.expire(`${Constants.redis.cache.guild.LOGS}:${guild.id}`, 36000);
+    await redis.set(`${Constants.redis.cache.guild.LOGS}:${guild.id}`, "f", "EX", 36000);
     return false;
   } else {
-    await redis.set(`${Constants.redis.cache.guild.LOGS}:${guild.id}`, "t");
-    await redis.expire(`${Constants.redis.cache.guild.LOGS}:${guild.id}`, 36000);
+    await redis.set(`${Constants.redis.cache.guild.LOGS}:${guild.id}`, "t", "EX", 36000);
   }
 
   return true;
@@ -156,8 +154,7 @@ export async function getLogsChannelHook(guild: Guild) {
     })) as WebhookClient;
   }
 
-  await redis.set(`nypsi:query:islogsenabled:searching:${guild.id}`, "t");
-  await redis.expire(`nypsi:query:islogsenabled:searching:${guild.id}`, 60);
+  await redis.set(`nypsi:query:islogsenabled:searching:${guild.id}`, "t", "EX", 60);
 
   const query = await prisma.guild.findUnique({
     where: {

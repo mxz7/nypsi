@@ -56,8 +56,12 @@ export async function getLastCommand(member: GuildMember | string): Promise<Date
     return new Date(0);
   }
 
-  await redis.set(`${Constants.redis.cache.user.LAST_COMMAND}:${id}`, query.lastCommand.getTime());
-  await redis.expire(`${Constants.redis.cache.user.LAST_COMMAND}:${id}`, ms("30 minutes") / 1000);
+  await redis.set(
+    `${Constants.redis.cache.user.LAST_COMMAND}:${id}`,
+    query.lastCommand.getTime(),
+    "EX",
+    ms("30 minutes") / 1000,
+  );
 
   return query.lastCommand;
 }

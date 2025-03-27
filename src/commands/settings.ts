@@ -912,10 +912,11 @@ async function run(
       if (await redis.exists(`cd:rob:${message.author.id}`))
         return send({ embeds: [new ErrorEmbed("you have robbed somebody recently")] });
       await setPassive(message.member, true);
-      await redis.set(`cd:passive_toggle:${message.author.id}`, "boobs");
-      await redis.expire(
+      await redis.set(
         `cd:passive_toggle:${message.author.id}`,
-        Math.floor(ms("20 minutes") / 1000),
+        "boobs",
+        "EX",
+        ms("20 minutes") / 1000,
       );
       return send({
         embeds: [
@@ -930,10 +931,11 @@ async function run(
         return send({ embeds: [new ErrorEmbed("you have already toggled passive mode recently")] });
       }
       await setPassive(message.member, false);
-      await redis.set(`cd:passive_toggle:${message.author.id}`, "boobs");
-      await redis.expire(
+      await redis.set(
         `cd:passive_toggle:${message.author.id}`,
-        Math.floor(ms("20 minutes") / 1000),
+        "boobs",
+        "EX",
+        ms("20 minutes") / 1000,
       );
       return send({
         embeds: [

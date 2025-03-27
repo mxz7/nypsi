@@ -31,16 +31,18 @@ export async function hasProfile(member: GuildMember | string) {
   });
 
   if (query) {
-    await redis.set(`${Constants.redis.cache.user.EXISTS}:${id}`, "true");
-    await redis.expire(
+    await redis.set(
       `${Constants.redis.cache.user.EXISTS}:${id}`,
+      "true",
+      "EX",
       Math.floor(ms("7 day") / 1000),
     );
     return true;
   } else {
-    await redis.set(`${Constants.redis.cache.user.EXISTS}:${id}`, "false");
-    await redis.expire(
+    await redis.set(
       `${Constants.redis.cache.user.EXISTS}:${id}`,
+      "false",
+      "EX",
       Math.floor(ms("7 day") / 1000),
     );
     return false;

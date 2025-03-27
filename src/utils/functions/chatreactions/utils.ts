@@ -122,10 +122,11 @@ export async function createReactionProfile(guild: Guild) {
     },
   });
 
-  await redis.set(`${Constants.redis.cache.chatReaction.EXISTS}:${guild.id}`, "t");
-  await redis.expire(
+  await redis.set(
     `${Constants.redis.cache.chatReaction.EXISTS}:${guild.id}`,
-    Math.floor(ms("12 hours") / 1000),
+    "t",
+    "EX",
+    ms("12 hours") / 1000,
   );
 }
 
@@ -141,10 +142,11 @@ export async function hasReactionProfile(guild: Guild) {
   });
 
   if (query) {
-    await redis.set(`${Constants.redis.cache.chatReaction.EXISTS}:${guild.id}`, "t");
-    await redis.expire(
+    await redis.set(
       `${Constants.redis.cache.chatReaction.EXISTS}:${guild.id}`,
-      Math.floor(ms("12 hours") / 1000),
+      "t",
+      "EX",
+      ms("12 hours") / 1000,
     );
 
     return true;

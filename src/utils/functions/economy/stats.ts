@@ -240,8 +240,7 @@ export async function getLeaderboardPositions(userId: string) {
 
 export async function checkLeaderboardPositions(users: string[], leaderboard: string) {
   if (await redis.exists("nypsi:lb:cooldown:" + leaderboard)) return;
-  await redis.set("nypsi:lb:cooldown" + leaderboard, "69");
-  await redis.expire("nypsi:lb:cooldown" + leaderboard, 600);
+  await redis.set("nypsi:lb:cooldown" + leaderboard, "69", "EX", 600);
 
   await prisma.leaderboards.deleteMany({
     where: {
