@@ -138,26 +138,24 @@ export async function getClaimable(member: GuildMember | string, plantId: string
   const farm = await getFarm(id);
   const plantData = getPlantsData()[plantId];
 
+  const growthTime = dayjs().subtract(plantData.growthTime, "seconds").valueOf();
+  const hourlyTime = dayjs()
+    .subtract(60 / plantData.hourly, "minutes")
+    .valueOf();
+  const waterTime = dayjs()
+    .subtract(plantData.water.every * 1.5, "seconds")
+    .valueOf();
+  const fertiliseTime = dayjs()
+    .subtract(plantData.fertilise.every * 1.5, "seconds")
+    .valueOf();
+
   const plants = farm.filter(
     (plant) =>
       plant.plantId === plantId &&
-      plant.plantedAt.valueOf() < dayjs().subtract(plantData.growthTime, "seconds").valueOf() &&
-      plant.harvestedAt.valueOf() <
-        dayjs()
-          .subtract(60 / plantData.hourly, "minutes")
-          .valueOf() &&
-      plant.harvestedAt.valueOf() <
-        dayjs()
-          .subtract(60 / plantData.hourly, "minutes")
-          .valueOf() &&
-      plant.wateredAt.valueOf() >
-        dayjs()
-          .subtract(plantData.water.every * 1.5, "seconds")
-          .valueOf() &&
-      plant.fertilisedAt.valueOf() >
-        dayjs()
-          .subtract(plantData.fertilise.every * 1.5, "seconds")
-          .valueOf(),
+      plant.plantedAt.valueOf() < growthTime &&
+      plant.harvestedAt.valueOf() < hourlyTime &&
+      plant.wateredAt.valueOf() > waterTime &&
+      plant.fertilisedAt.valueOf() > fertiliseTime,
   );
 
   if (plants.length === 0) return 0;
