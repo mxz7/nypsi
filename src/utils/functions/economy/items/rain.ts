@@ -68,7 +68,7 @@ module.exports = new ItemUse(
         new CustomEmbed(
           message.member,
           `💦 confirm to start a loot rain for **${length} seconds**` +
-            (message.guildId === Constants.NYPSI_SERVER_ID
+            (message.guildId !== Constants.NYPSI_SERVER_ID
               ? "\n\nyou can **double** the length of your loot rain by using it in the **[official nypsi server](https://nypsi.xyz/discord)**"
               : ""),
         ).setHeader(`${message.author.username}'s loot rain`),
