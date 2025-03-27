@@ -3657,7 +3657,7 @@
     "plural": "loot rains",
     "article": "a",
     "emoji": "💦",
-    "longDesc": "spawns loot drops in a channel for 90 (or 3 minutes in [the official server](https://nypsi.xyz/discord)",
+    "longDesc": "spawns loot drops in a channel for 90 seconds (or 3 minutes in [the official server](https://nypsi.xyz/discord)",
     "rarity": 6,
     "role": "item",
     "sell": 10000000,
