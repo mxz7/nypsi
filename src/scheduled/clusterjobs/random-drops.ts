@@ -636,4 +636,6 @@ export async function startLootRain(channel: GuildTextBasedChannel, user: User) 
 
     startRandomDrop(channel.client as NypsiClient, channel.id, user.username);
   };
+
+  spawn();
 }
