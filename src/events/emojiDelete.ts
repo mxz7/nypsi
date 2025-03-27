@@ -1,6 +1,6 @@
 import { GuildEmoji } from "discord.js";
 import { CustomEmbed } from "../models/EmbedBuilders";
-import { isLogsEnabled } from "../utils/functions/moderation/logs";
+import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
 
 export default async function emojiDelete(emoji: GuildEmoji) {
   if (await isLogsEnabled(emoji.guild)) {
@@ -9,5 +9,7 @@ export default async function emojiDelete(emoji: GuildEmoji) {
     embed.setHeader("emoji deleted");
     embed.setDescription(`\`${emoji.name}\` - \`${emoji.id}\``);
     embed.setImage(emoji.url);
+
+    addLog(emoji.guild, "emoji", embed);
   }
 }
