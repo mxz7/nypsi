@@ -141,7 +141,7 @@ async function run(
     });
   }
 
-  await addCooldown(cmd.name, message.member, 3);
+  await addCooldown(cmd.name, message.member, 2);
 
   if (selected.id.includes("gun")) {
     return send({
