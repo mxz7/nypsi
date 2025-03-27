@@ -17,7 +17,7 @@ import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
-import { CustomEmbed, ErrorEmbed } from "../../../models/EmbedBuilders";
+import { CustomEmbed, ErrorEmbed, getColor } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { logger, transaction } from "../../logger";
 import { getAllGroupAccountIds } from "../moderation/alts";
@@ -271,9 +271,9 @@ export async function bumpAuction(id: number, client: NypsiClient) {
   )
     return null;
 
-  const embed = new CustomEmbed()
-    .setColor(Constants.TRANSPARENT_EMBED_COLOR)
-    .setHeader(`${query.owner.user.lastKnownUsername}'s auction`);
+  const embed = new CustomEmbed(query.ownerId).setHeader(
+    `${query.owner.user.lastKnownUsername}'s auction`,
+  );
 
   const items = getItems();
 
@@ -514,13 +514,11 @@ async function checkWatchers(
 
   const payload = {
     payload: {
-      embed: new CustomEmbed()
-        .setColor(Constants.TRANSPARENT_EMBED_COLOR)
-        .setDescription(
-          `an auction has started for ${getItems()[itemName].emoji} **[${
-            getItems()[itemName].name
-          }](https://nypsi.xyz/item/${itemName})**`,
-        ),
+      embed: new CustomEmbed().setDescription(
+        `an auction has started for ${getItems()[itemName].emoji} **[${
+          getItems()[itemName].name
+        }](https://nypsi.xyz/item/${itemName})**`,
+      ),
       components: new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setStyle(ButtonStyle.Link).setURL(messageUrl).setLabel("jump"),
       ),
@@ -534,6 +532,7 @@ async function checkWatchers(
     if (await redis.exists(`${Constants.redis.cooldown.AUCTION_WATCH}:${userId}`)) continue;
 
     payload.memberId = userId;
+    payload.payload.embed.setColor(getColor(userId));
 
     addNotificationToQueue(payload);
 
@@ -787,8 +786,7 @@ export async function buyFullAuction(
 
       if ((await getTier(auction.ownerId)) !== 4) taxedAmount = Math.floor(moneyReceived * tax);
 
-      const embedDm = new CustomEmbed()
-        .setColor(Constants.TRANSPARENT_EMBED_COLOR)
+      const embedDm = new CustomEmbed(auction.ownerId)
         .setDescription(
           `${total.toLocaleString()}x of your ${items[auction.itemId].emoji} ${
             items[auction.itemId].name
@@ -1040,8 +1038,7 @@ export async function buyAuctionOne(
 
         if ((await getTier(auction.ownerId)) !== 4) taxedAmount = Math.floor(moneyReceived * tax);
 
-        const embedDm = new CustomEmbed()
-          .setColor(Constants.TRANSPARENT_EMBED_COLOR)
+        const embedDm = new CustomEmbed(auction.ownerId)
           .setDescription(
             `${total.toLocaleString()}x of your ${items[auction.itemId].emoji} ${
               items[auction.itemId].name
@@ -1322,8 +1319,7 @@ export async function buyAuctionMulti(
 
         if ((await getTier(auction.ownerId)) !== 4) taxedAmount = Math.floor(moneyReceived * tax);
 
-        const embedDm = new CustomEmbed()
-          .setColor(Constants.TRANSPARENT_EMBED_COLOR)
+        const embedDm = new CustomEmbed(auction.ownerId)
           .setDescription(
             `${total.toLocaleString()}x of your ${items[auction.itemId].emoji} ${
               items[auction.itemId].name

@@ -32,9 +32,8 @@ export default async function interactionCreate(interaction: Interaction) {
   if (interaction.createdTimestamp < Date.now() - 2500) return;
 
   if (!interaction.guild) {
-    const embed = new CustomEmbed()
+    const embed = new CustomEmbed(interaction.user.id)
       .setHeader("nypsi")
-      .setColor(Constants.TRANSPARENT_EMBED_COLOR)
       .setDescription(
         "unfortunately you can't do commands in direct messages ):\n\n" +
           `if you need support or help for nypsi, please join the official nypsi server: ${Constants.NYPSI_SERVER_INVITE_LINK}`,

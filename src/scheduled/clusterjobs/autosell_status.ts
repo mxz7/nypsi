@@ -69,9 +69,7 @@ async function autosellThing() {
     addNotificationToQueue({
       memberId: user,
       payload: {
-        embed: new CustomEmbed(null, msg.join("\n"))
-          .setColor(Constants.TRANSPARENT_EMBED_COLOR)
-          .setHeader("autosell"),
+        embed: new CustomEmbed(user, msg.join("\n")).setHeader("autosell"),
       },
     });
   }

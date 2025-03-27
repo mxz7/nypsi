@@ -1,7 +1,6 @@
 import dayjs = require("dayjs");
 import prisma from "../../init/database";
 import { CustomEmbed } from "../../models/EmbedBuilders";
-import Constants from "../../utils/Constants";
 import { addProgress } from "../../utils/functions/economy/achievements";
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { getItems } from "../../utils/functions/economy/utils";
@@ -34,13 +33,9 @@ async function checkCraftItems() {
           content: `you have finished crafting ${item.amount} ${getItems()[item.itemId].emoji} ${
             getItems()[item.itemId].name
           }`,
-          embed: new CustomEmbed()
-            .setDescription(
-              `\`${item.amount}x\` ${getItems()[item.itemId].emoji} ${
-                getItems()[item.itemId].name
-              }`,
-            )
-            .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+          embed: new CustomEmbed(item.userId).setDescription(
+            `\`${item.amount}x\` ${getItems()[item.itemId].emoji} ${getItems()[item.itemId].name}`,
+          ),
         },
       });
     }

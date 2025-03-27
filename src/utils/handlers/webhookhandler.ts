@@ -273,14 +273,13 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
       addNotificationToQueue({
         memberId: user,
         payload: {
-          embed: new CustomEmbed()
+          embed: new CustomEmbed(user)
             .setDescription(
               `${
                 getItems()["blue_gem"].emoji
               } you've found a gem! i wonder what powers it holds...`,
             )
-            .setTitle("you've found a gem")
-            .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+            .setTitle("you've found a gem"),
         },
       });
     }
@@ -409,9 +408,7 @@ async function handleKofiData(data: KofiResponse) {
               memberId: user.id,
               payload: {
                 content: "thank you for your purchase",
-                embed: new CustomEmbed()
-                  .setDescription(`you have been **unbanned**`)
-                  .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+                embed: new CustomEmbed(user.id).setDescription(`you have been **unbanned**`),
               },
             };
 
@@ -439,13 +436,11 @@ async function handleKofiData(data: KofiResponse) {
               memberId: user.id,
               payload: {
                 content: "thank you for your purchase",
-                embed: new CustomEmbed()
-                  .setDescription(
-                    `you have received ${shopItem.quantity} ${getItems()[item.name].emoji} **${
-                      getItems()[item.name].name
-                    }**`,
-                  )
-                  .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+                embed: new CustomEmbed(user.id).setDescription(
+                  `you have received ${shopItem.quantity} ${getItems()[item.name].emoji} **${
+                    getItems()[item.name].name
+                  }**`,
+                ),
               },
             };
 
@@ -477,14 +472,13 @@ async function handleKofiData(data: KofiResponse) {
             addNotificationToQueue({
               memberId: user.id,
               payload: {
-                embed: new CustomEmbed()
+                embed: new CustomEmbed(user.id)
                   .setDescription(
                     `${
                       getItems()["pink_gem"].emoji
                     } you've found a gem! i wonder what powers it holds...`,
                   )
-                  .setTitle("you've found a gem")
-                  .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+                  .setTitle("you've found a gem"),
               },
             });
           }
@@ -496,14 +490,13 @@ async function handleKofiData(data: KofiResponse) {
             addNotificationToQueue({
               memberId: user.id,
               payload: {
-                embed: new CustomEmbed()
+                embed: new CustomEmbed(user.id)
                   .setDescription(
                     `${
                       getItems()["blue_gem"].emoji
                     } you've found a gem! i wonder what powers it holds...`,
                   )
-                  .setTitle("you've found a gem")
-                  .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+                  .setTitle("you've found a gem"),
               },
             });
           }
@@ -533,14 +526,13 @@ async function handleKofiData(data: KofiResponse) {
             addNotificationToQueue({
               memberId: user.id,
               payload: {
-                embed: new CustomEmbed()
+                embed: new CustomEmbed(user.id)
                   .setDescription(
                     `${
                       getItems()["green_gem"].emoji
                     } you've found a gem! i wonder what powers it holds...`,
                   )
-                  .setTitle("you've found a gem")
-                  .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+                  .setTitle("you've found a gem"),
               },
             });
           }
@@ -554,14 +546,13 @@ async function handleKofiData(data: KofiResponse) {
             addNotificationToQueue({
               memberId: user.id,
               payload: {
-                embed: new CustomEmbed()
+                embed: new CustomEmbed(user.id)
                   .setDescription(
                     `${
                       getItems()["white_gem"].emoji
                     } you've found a gem! i wonder what powers it holds...`,
                   )
-                  .setTitle("you've found a gem")
-                  .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+                  .setTitle("you've found a gem"),
               },
             });
           }

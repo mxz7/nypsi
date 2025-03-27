@@ -6,7 +6,7 @@ import {
 } from "discord.js";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
-import { CustomEmbed } from "../../models/EmbedBuilders";
+import { CustomEmbed, getColor } from "../../models/EmbedBuilders";
 import { Job } from "../../types/Jobs";
 import { NotificationPayload } from "../../types/Notification";
 import Constants from "../../utils/Constants";
@@ -18,7 +18,7 @@ const data: NotificationPayload = {
   payload: {
     embed: new CustomEmbed()
       .setDescription("it has been more than 12 hours since you last voted")
-      .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+      .setColor(Constants.PURPLE),
 
     components: new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
@@ -77,6 +77,7 @@ export default {
         user.user.Economy.lastVote.getTime() <= dayjs().subtract(12, "hours").toDate().getTime()
       ) {
         data.memberId = user.userId;
+        data.payload.embed.setColor(getColor(user.userId));
 
         addNotificationToQueue(data);
 

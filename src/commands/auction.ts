@@ -753,7 +753,7 @@ async function run(
       await addInventoryItem(auction.ownerId, auction.itemId, Number(auction.itemAmount));
 
       if ((await getDmSettings(auction.ownerId)).auction) {
-        const embed = new CustomEmbed().setColor(Constants.TRANSPARENT_EMBED_COLOR);
+        const embed = new CustomEmbed().setColor(Constants.EMBED_FAIL_COLOR);
 
         embed.setDescription(
           `your auction for ${auction.itemAmount}x ${items[auction.itemId].emoji} ${

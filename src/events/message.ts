@@ -126,9 +126,8 @@ export default async function messageCreate(message: Message) {
         dmCooldown.delete(message.author.id);
       }, 30000);
 
-      const embed = new CustomEmbed()
+      const embed = new CustomEmbed(message.author.id)
         .setHeader("support")
-        .setColor(Constants.TRANSPARENT_EMBED_COLOR)
         .setDescription(
           `if you need support, join the [**official nypsi server**](${Constants.NYPSI_SERVER_INVITE_LINK}) or click the button below to talk to a staff member` +
             "\n\nthis is **NOT** support for if you have been punished in an unrelated server" +
@@ -199,9 +198,10 @@ export default async function messageCreate(message: Message) {
             embeds: [new CustomEmbed().setDescription("failed to create support request")],
           });
         } else {
-          const embed = new CustomEmbed()
-            .setHeader(message.author.username, message.author.avatarURL())
-            .setColor(Constants.TRANSPARENT_EMBED_COLOR);
+          const embed = new CustomEmbed(message.author.id).setHeader(
+            message.author.username,
+            message.author.avatarURL(),
+          );
 
           if (message.attachments.first()) {
             if (message.attachments.first().contentType.startsWith("image/")) {
@@ -225,9 +225,10 @@ export default async function messageCreate(message: Message) {
         }
       }
     } else {
-      const embed = new CustomEmbed()
-        .setHeader(message.author.username, message.author.avatarURL())
-        .setColor(Constants.TRANSPARENT_EMBED_COLOR);
+      const embed = new CustomEmbed().setHeader(
+        message.author.username,
+        message.author.avatarURL(),
+      );
 
       if (message.content) {
         embed.setDescription(message.content);
@@ -257,9 +258,8 @@ export default async function messageCreate(message: Message) {
       }
     }
 
-    const embed = new CustomEmbed()
+    const embed = new CustomEmbed(message.author.id)
       .setHeader("nypsi")
-      .setColor(Constants.TRANSPARENT_EMBED_COLOR)
       .setDescription(
         "unfortunately you can't do commands in direct messages ):\n\n" +
           `if you need support or help for nypsi, please join the official nypsi server: ${Constants.NYPSI_SERVER_INVITE_LINK}`,

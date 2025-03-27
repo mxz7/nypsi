@@ -77,7 +77,7 @@ export function runCountdowns(client: NypsiClient) {
       const embed = new CustomEmbed();
 
       embed.setDescription(message);
-      embed.setColor(Constants.TRANSPARENT_EMBED_COLOR);
+      embed.setColor(Constants.PURPLE);
       embed.disableFooter();
 
       const res = await client.cluster.broadcastEval(

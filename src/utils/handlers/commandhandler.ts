@@ -796,7 +796,7 @@ export async function runCommand(
 
     const embed = new CustomEmbed(null, `\`\`\`${msg}\`\`\``)
       .setHeader(`command watch (${message.author.id} - ${command.name})`)
-      .setColor(Constants.TRANSPARENT_EMBED_COLOR);
+      .setColor(Constants.PURPLE);
 
     hook.send({ embeds: [embed] }).then(() => {
       hook.destroy();
