@@ -888,7 +888,8 @@
       "id:apple_seed:7",
       "id:strawberry_seed:10",
       "id:orange_seed:15",
-      "id:pineapple_seed:5"
+      "id:pineapple_seed:5",
+      "id:rain:2"
     ]
   },
   "calendar": {
@@ -2180,7 +2181,8 @@
       "id:banana_seed:1",
       "id:fertiliser:50",
       "id:toe:10",
-      "id:unbreaking:2"
+      "id:unbreaking:2",
+      "id:mango_seed:4"
     ]
   },
   "lucky_scratch_card": {
@@ -2272,7 +2274,9 @@
       "id:ferrari_skin:10",
       "id:reroll_token:4",
       "id:veilside_rx7_skin:5",
-      "id:stick:40"
+      "id:stick:40",
+      "id:rain:10",
+      "id:apple_seed:50"
     ],
     "random_drop_chance": 40
   },
@@ -2317,8 +2321,7 @@
       "id:stick:20",
       "id:unbreaking:10",
       "id:apple_seed:30",
-      "id:pineapple_seed:15",
-      "id:strawberry_seed:13"
+      "id:rain:5"
     ]
   },
   "corner_shop_scratchie": {
@@ -2615,7 +2618,7 @@
       "id:ferrari_skin:15",
       "id:steve:75",
       "id:coffee:40",
-      "id:cookie:3",
+      "id:cookie:1",
       "id:legendary_scratch_card:90",
       "id:lucky_cheese",
       "money:100000000",
@@ -2627,7 +2630,8 @@
       "id:apple_seed:50",
       "id:strawberry_seed:50",
       "id:mango_seed:25",
-      "id:coconut_seed:25"
+      "id:coconut_seed:25",
+      "id:rain:7"
     ]
   },
   "infinity_tag": {
@@ -3646,5 +3650,18 @@
     "sell": 25000000,
     "in_crates": true,
     "random_drop_chance": 5
+  },
+  "rain": {
+    "id": "rain",
+    "name": "loot drop rain",
+    "plural": "loot drop rains",
+    "article": "a",
+    "emoji": "💦",
+    "longDesc": "spawns loot drops in a channel for 90 (or 3 minutes in [https://nypsi.xyz/discord](the official server)",
+    "rarity": 6,
+    "role": "item",
+    "sell": 25000000,
+    "in_crates": true,
+    "random_drop_chance": 0.75
   }
 }
