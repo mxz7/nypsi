@@ -326,7 +326,11 @@ export async function openCrate(
             crateItemsModified.push(i);
           } else if (items[i].rarity == 1) {
             for (let x = 0; x < 2; x++) {
-              if (items[i].role == "collectable" || items[i].role === "flower") {
+              if (
+                items[i].role == "collectable" ||
+                items[i].role === "flower" ||
+                items[i].role === "cat"
+              ) {
                 const chance = Math.floor(Math.random() * 3);
 
                 if (chance == 2) {
