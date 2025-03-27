@@ -4,7 +4,9 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
+  GuildTextBasedChannel,
   MessageActionRowComponentBuilder,
+  User,
 } from "discord.js";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
@@ -19,6 +21,7 @@ import { addTaskProgress } from "../../utils/functions/economy/tasks";
 import { createUser, getItems, isEcoBanned, userExists } from "../../utils/functions/economy/utils";
 import { getPrefix } from "../../utils/functions/guilds/utils";
 import { percentChance, shuffle } from "../../utils/functions/random";
+import sleep from "../../utils/functions/sleep";
 import { getZeroWidth } from "../../utils/functions/string";
 import { getLastKnownUsername } from "../../utils/functions/users/tag";
 import { createProfile, hasProfile } from "../../utils/functions/users/utils";
@@ -150,7 +153,7 @@ async function randomDrop(client: NypsiClient) {
   }
 }
 
-async function fastClickGame(client: NypsiClient, channelId: string, prize: string) {
+async function fastClickGame(client: NypsiClient, channelId: string, prize: string, rain?: string) {
   const cluster = await findChannelCluster(client, channelId);
 
   if (typeof cluster.cluster !== "number") return;
@@ -179,6 +182,11 @@ async function fastClickGame(client: NypsiClient, channelId: string, prize: stri
           : ""
       }`,
     );
+
+  if (rain) {
+    embed.setFooter({ text: `${rain}'s rain` });
+    winEmbed.setFooter({ text: `${rain}'s rain` });
+  }
 
   const buttonId = randomUUID();
 
@@ -238,7 +246,7 @@ async function fastClickGame(client: NypsiClient, channelId: string, prize: stri
   return winnerId;
 }
 
-async function typeFastGame(client: NypsiClient, channelId: string, prize: string) {
+async function typeFastGame(client: NypsiClient, channelId: string, prize: string, rain?: string) {
   const cluster = await findChannelCluster(client, channelId);
 
   if (typeof cluster.cluster !== "number") return;
@@ -270,6 +278,10 @@ async function typeFastGame(client: NypsiClient, channelId: string, prize: strin
           : ""
       }`,
     );
+
+  if (rain) {
+    embed.setFooter({ text: `${rain}'s rain` });
+  }
 
   const winner = await client.cluster.broadcastEval(
     async (c, { embed, channelId, cluster, chosenWord }) => {
@@ -322,7 +334,12 @@ async function typeFastGame(client: NypsiClient, channelId: string, prize: strin
   return winnerId;
 }
 
-async function clickSpecificGame(client: NypsiClient, channelId: string, prize: string) {
+async function clickSpecificGame(
+  client: NypsiClient,
+  channelId: string,
+  prize: string,
+  rain?: string,
+) {
   const cluster = await findChannelCluster(client, channelId);
 
   if (typeof cluster.cluster !== "number") return;
@@ -429,6 +446,12 @@ async function clickSpecificGame(client: NypsiClient, channelId: string, prize: 
       }`,
     );
 
+  if (rain) {
+    embed.setFooter({ text: `${rain}'s rain` });
+    winEmbed.setFooter({ text: `${rain}'s rain` });
+    failEmbed.setFooter({ text: `${rain}'s rain` });
+  }
+
   const ids = [];
   while (ids.length < 5) ids.push(randomUUID());
 
@@ -532,7 +555,7 @@ async function clickSpecificGame(client: NypsiClient, channelId: string, prize: 
   return winnerId;
 }
 
-export async function startRandomDrop(client: NypsiClient, channelId: string) {
+export async function startRandomDrop(client: NypsiClient, channelId: string, rain?: string) {
   const items = Array.from(Object.values(getItems()))
     .filter((i) => i.random_drop_chance && percentChance(i.random_drop_chance))
     .map((i) => `item:${i.id}`);
@@ -544,7 +567,12 @@ export async function startRandomDrop(client: NypsiClient, channelId: string) {
   const games = [fastClickGame, clickSpecificGame, typeFastGame];
 
   logger.info(`random drop started in ${channelId}`);
-  const winner = await games[Math.floor(Math.random() * games.length)](client, channelId, prize);
+  const winner = await games[Math.floor(Math.random() * games.length)](
+    client,
+    channelId,
+    prize,
+    rain,
+  );
 
   if (winner) {
     if (!(await hasProfile(winner))) await createProfile(winner);
@@ -557,8 +585,10 @@ export async function startRandomDrop(client: NypsiClient, channelId: string) {
       )}) prize: ${prize}`,
     );
 
-    addProgress(winner, "lootdrops_pro", 1);
-    addTaskProgress(winner, "lootdrops");
+    if (!rain) {
+      addProgress(winner, "lootdrops_pro", 1);
+      addTaskProgress(winner, "lootdrops");
+    }
 
     if (prize.startsWith("item:")) {
       let amount = 1;
@@ -568,4 +598,42 @@ export async function startRandomDrop(client: NypsiClient, channelId: string) {
       await addInventoryItem(winner, prize.substring(5), amount);
     }
   }
+}
+
+export async function startLootRain(channel: GuildTextBasedChannel, user: User) {
+  let length = 90;
+  if (channel.guildId === Constants.NYPSI_SERVER_ID) length = 180;
+
+  if (await redis.exists(`nypsi:lootrain:channel:${channel.id}`)) return;
+  await redis.set(`nypsi:lootrain:channel:${channel.id}`, "meow", "EX", length * 2);
+
+  let active = true;
+
+  await channel.send({
+    embeds: [
+      new CustomEmbed(null, `**${user.username}'s loot rain is starting!!!**`).setColor(0xffffff),
+    ],
+  });
+
+  await sleep(1000);
+
+  setTimeout(() => {
+    active = false;
+    redis.del(`nypsi:lootrain:channel:${channel.id}`);
+  }, length * 1000);
+
+  const spawn = async () => {
+    if (!active) {
+      channel.send({
+        embeds: [
+          new CustomEmbed(null, `**${user.username}'s loot rain has ended.**`).setColor(0xffffff),
+        ],
+      });
+      return;
+    }
+
+    setTimeout(spawn, Math.floor(Math.random() * 4000) + 3000);
+
+    startRandomDrop(channel.client as NypsiClient, channel.id, user.username);
+  };
 }
