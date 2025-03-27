@@ -22,8 +22,12 @@ export async function getTaxRefreshTime() {
 async function updateTax() {
   const tax = parseFloat((Math.random() * 7 + 2.2).toFixed(3)) / 100;
 
-  await redis.set(Constants.redis.nypsi.TAX, tax.toFixed(3));
-  await redis.expire(Constants.redis.nypsi.TAX, Math.floor(ms("6 hours") / 1000));
+  await redis.set(
+    Constants.redis.nypsi.TAX,
+    tax.toFixed(3),
+    "EX",
+    Math.floor(ms("6 hours") / 1000),
+  );
 
   return tax;
 }

@@ -187,12 +187,20 @@ export async function userExists(member: GuildMember | string): Promise<boolean>
   });
 
   if (query) {
-    await redis.set(`${Constants.redis.cache.economy.EXISTS}:${id}`, "true");
-    await redis.expire(`${Constants.redis.cache.economy.EXISTS}:${id}`, ms("7 day") / 1000);
+    await redis.set(
+      `${Constants.redis.cache.economy.EXISTS}:${id}`,
+      "true",
+      "EX",
+      ms("7 day") / 1000,
+    );
     return true;
   } else {
-    await redis.set(`${Constants.redis.cache.economy.EXISTS}:${id}`, "false");
-    await redis.expire(`${Constants.redis.cache.economy.EXISTS}:${id}`, ms("7 day") / 1000);
+    await redis.set(
+      `${Constants.redis.cache.economy.EXISTS}:${id}`,
+      "false",
+      "EX",
+      ms("7 day") / 1000,
+    );
     return false;
   }
 }
@@ -590,8 +598,7 @@ export async function isHandcuffed(id: string): Promise<boolean> {
 }
 
 export async function addHandcuffs(id: string) {
-  await redis.set(`economy:handcuffed:${id}`, Date.now());
-  await redis.expire(`economy:handcuffed:${id}`, 60);
+  await redis.set(`economy:handcuffed:${id}`, Date.now(), "EX", 60);
 }
 
 export async function getLastDaily(member: GuildMember | string) {

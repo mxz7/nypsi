@@ -40,10 +40,8 @@ export async function getReactionRolesByGuild(guild: Guild) {
   await redis.set(
     `${Constants.redis.cache.guild.REACTION_ROLES}:${guild.id}`,
     JSON.stringify(query),
-  );
-  await redis.expire(
-    `${Constants.redis.cache.guild.REACTION_ROLES}:${guild.id}`,
-    Math.floor(ms("1 hour") / 1000),
+    "EX",
+    ms("1 hour") / 1000,
   );
 
   return query;

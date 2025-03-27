@@ -79,8 +79,12 @@ module.exports = new ItemUse(
       });
     }
 
-    await redis.set(`${Constants.redis.cooldown.ROB_RADIO}:${radioTarget.user.id}`, Date.now());
-    await redis.expire(`${Constants.redis.cooldown.ROB_RADIO}:${radioTarget.user.id}`, 900);
+    await redis.set(
+      `${Constants.redis.cooldown.ROB_RADIO}:${radioTarget.user.id}`,
+      Date.now(),
+      "EX",
+      900,
+    );
 
     const inventory = await getInventory(message.member);
 

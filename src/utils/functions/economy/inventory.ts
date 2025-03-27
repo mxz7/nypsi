@@ -66,13 +66,16 @@ export async function getInventory(
 
   if (!query || query.length == 0) {
     if (!(await userExists(id))) await createUser(id);
-    await redis.set(`${Constants.redis.cache.economy.INVENTORY}:${id}`, "[]");
-    await redis.expire(`${Constants.redis.cache.economy.INVENTORY}:${id}`, 180);
+    await redis.set(`${Constants.redis.cache.economy.INVENTORY}:${id}`, "[]", "EX", 180);
     return [];
   }
 
-  await redis.set(`${Constants.redis.cache.economy.INVENTORY}:${id}`, JSON.stringify(query));
-  await redis.expire(`${Constants.redis.cache.economy.INVENTORY}:${id}`, 180);
+  await redis.set(
+    `${Constants.redis.cache.economy.INVENTORY}:${id}`,
+    JSON.stringify(query),
+    "EX",
+    180,
+  );
 
   return query;
 }
@@ -83,8 +86,7 @@ async function doAutosellThing(userId: string, itemId: string, amount: number): 
     return doAutosellThing(userId, itemId, amount);
   }
 
-  await redis.set(`${Constants.redis.nypsi.AUTO_SELL_PROCESS}:${userId}`, "t");
-  await redis.expire(`${Constants.redis.nypsi.AUTO_SELL_PROCESS}:${userId}`, 69);
+  await redis.set(`${Constants.redis.nypsi.AUTO_SELL_PROCESS}:${userId}`, "t", "EX", 69);
 
   const item = getItems()[itemId];
 
@@ -780,9 +782,10 @@ export async function getAutosellItems(member: GuildMember | string) {
     })
     .then((q) => q.autosell);
 
-  await redis.set(`${Constants.redis.cache.economy.AUTO_SELL}:${id}`, JSON.stringify(query));
-  await redis.expire(
+  await redis.set(
     `${Constants.redis.cache.economy.AUTO_SELL}:${id}`,
+    JSON.stringify(query),
+    "EX",
     Math.floor(ms("1 hour") / 1000),
   );
 
@@ -834,9 +837,10 @@ export async function getSellFilter(member: GuildMember | string) {
     })
     .then((q) => q.sellallFilter);
 
-  await redis.set(`${Constants.redis.cache.economy.SELL_FILTER}:${id}`, JSON.stringify(query));
-  await redis.expire(
+  await redis.set(
     `${Constants.redis.cache.economy.SELL_FILTER}:${id}`,
+    JSON.stringify(query),
+    "EX",
     Math.floor(ms("1 hour") / 1000),
   );
 

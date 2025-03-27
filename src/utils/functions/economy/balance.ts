@@ -645,9 +645,7 @@ export async function hasPadlock(member: GuildMember): Promise<boolean> {
   await redis.set(
     `${Constants.redis.cache.economy.PADLOCK}:${member.user.id}`,
     query.padlock ? "y" : "n",
-  );
-  await redis.expire(
-    `${Constants.redis.cache.economy.PADLOCK}:${member.user.id}`,
+    "EX",
     Math.floor(ms("6 hours") / 1000),
   );
 
@@ -688,8 +686,12 @@ export async function getDefaultBet(member: GuildMember): Promise<number> {
     },
   });
 
-  await redis.set(`${Constants.redis.cache.economy.DEFAULT_BET}:${id}`, query.defaultBet);
-  await redis.expire(`${Constants.redis.cache.economy.DEFAULT_BET}:${id}`, 3600);
+  await redis.set(
+    `${Constants.redis.cache.economy.DEFAULT_BET}:${id}`,
+    query.defaultBet,
+    "EX",
+    Math.floor(ms("6 hours") / 1000),
+  );
 
   return query.defaultBet;
 }
@@ -853,8 +855,12 @@ export async function calcNetWorth(
   const breakdownItems = new Map<string, number>();
 
   if (!query) {
-    await redis.set(`${Constants.redis.cache.economy.NETWORTH}:${id}`, worth);
-    await redis.expire(`${Constants.redis.cache.economy.NETWORTH}:${id}`, ms("1 hour") / 1000);
+    await redis.set(
+      `${Constants.redis.cache.economy.NETWORTH}:${id}`,
+      worth,
+      "EX",
+      ms("1 hour") / 1000,
+    );
 
     return { amount: worth };
   }
@@ -1073,8 +1079,12 @@ export async function calcNetWorth(
 
   breakdownItems.set("farm", farmBreakdown);
 
-  await redis.set(`${Constants.redis.cache.economy.NETWORTH}:${id}`, Math.floor(worth));
-  await redis.expire(`${Constants.redis.cache.economy.NETWORTH}:${id}`, ms("2 hour") / 1000);
+  await redis.set(
+    `${Constants.redis.cache.economy.NETWORTH}:${id}`,
+    Math.floor(worth),
+    "EX",
+    ms("2 hour") / 1000,
+  );
 
   await prisma.economy.update({
     where: {

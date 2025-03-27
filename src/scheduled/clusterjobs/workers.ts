@@ -114,9 +114,7 @@ async function doWorkerThing() {
       await redis.set(
         `${Constants.redis.nypsi.STEVE_EARNED}:${worker.userId}`,
         JSON.stringify(steveStorage),
-      );
-      await redis.expire(
-        `${Constants.redis.nypsi.STEVE_EARNED}:${worker.userId}`,
+        "EX",
         ms("24 hours") / 1000,
       );
     } else if (incrementAmount != 0) {

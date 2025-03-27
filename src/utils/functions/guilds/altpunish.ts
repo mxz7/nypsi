@@ -1,8 +1,8 @@
 import { Guild } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
-import ms = require("ms");
 import Constants from "../../Constants";
+import ms = require("ms");
 
 export async function isAltPunish(guild: Guild) {
   if (await redis.exists(`${Constants.redis.cache.guild.ALT_PUNISH}:${guild.id}`)) {
@@ -23,16 +23,18 @@ export async function isAltPunish(guild: Guild) {
     .then((q) => q.alt_punish);
 
   if (res) {
-    await redis.set(`${Constants.redis.cache.guild.ALT_PUNISH}:${guild.id}`, "t");
-    await redis.expire(
+    await redis.set(
       `${Constants.redis.cache.guild.ALT_PUNISH}:${guild.id}`,
-      ms("3 hours") / 1000,
+      "t",
+      "EX",
+      ms("24 hour") / 1000,
     );
   } else {
-    await redis.set(`${Constants.redis.cache.guild.ALT_PUNISH}:${guild.id}`, "f");
-    await redis.expire(
+    await redis.set(
       `${Constants.redis.cache.guild.ALT_PUNISH}:${guild.id}`,
-      ms("3 hours") / 1000,
+      "f",
+      "EX",
+      ms("24 hour") / 1000,
     );
   }
 

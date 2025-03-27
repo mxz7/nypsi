@@ -249,8 +249,12 @@ export async function getPrestige(member: GuildMember | string): Promise<number>
     },
   });
 
-  await redis.set(`${Constants.redis.cache.economy.PRESTIGE}:${id}`, query.prestige);
-  await redis.expire(`${Constants.redis.cache.economy.PRESTIGE}:${id}`, ms("1 hour") / 1000);
+  await redis.set(
+    `${Constants.redis.cache.economy.PRESTIGE}:${id}`,
+    query.prestige,
+    "EX",
+    ms("6 hour") / 1000,
+  );
 
   return query.prestige;
 }
@@ -298,8 +302,12 @@ export async function getLevel(member: GuildMember | string): Promise<number> {
     },
   });
 
-  await redis.set(`${Constants.redis.cache.economy.LEVEL}:${id}`, query.level);
-  await redis.expire(`${Constants.redis.cache.economy.LEVEL}:${id}`, ms("12 hours") / 1000);
+  await redis.set(
+    `${Constants.redis.cache.economy.LEVEL}:${id}`,
+    query.level,
+    "EX",
+    ms("12 hours") / 1000,
+  );
 
   return query.level;
 }

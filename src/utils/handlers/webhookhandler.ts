@@ -212,8 +212,12 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
     return;
   }
 
-  await redis.set(`${Constants.redis.cache.economy.VOTE}:${user}`, "true");
-  await redis.expire(`${Constants.redis.cache.economy.VOTE}:${user}`, ms("1 hour") / 1000);
+  await redis.set(
+    `${Constants.redis.cache.economy.VOTE}:${user}`,
+    "true",
+    "EX",
+    ms("1 hour") / 1000,
+  );
 
   let level = await getRawLevel(user);
 

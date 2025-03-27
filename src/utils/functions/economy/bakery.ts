@@ -87,10 +87,11 @@ export async function getBakeryUpgrades(member: GuildMember | string) {
     },
   });
 
-  await redis.set(`${Constants.redis.cache.economy.BAKERY_UPGRADES}:${id}`, JSON.stringify(query));
-  await redis.expire(
+  await redis.set(
     `${Constants.redis.cache.economy.BAKERY_UPGRADES}:${id}`,
-    Math.floor(ms("1 hour") / 1000),
+    JSON.stringify(query),
+    "EX",
+    ms("3 hour") / 1000,
   );
 
   return query;

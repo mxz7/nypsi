@@ -9,6 +9,7 @@ import { findGuildCluster } from "../clusters";
 import { formatDate } from "../date";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import dayjs = require("dayjs");
+import ms = require("ms");
 
 export async function isPremium(member: GuildMember | string): Promise<boolean> {
   let id: string;
@@ -45,17 +46,19 @@ export async function isPremium(member: GuildMember | string): Promise<boolean> 
           userId: id,
         },
       });
-      await redis.set(`${Constants.redis.cache.premium.LEVEL}:${id}`, 0);
-      await redis.expire(`${Constants.redis.cache.premium.LEVEL}:${id}`, 300);
+      await redis.set(`${Constants.redis.cache.premium.LEVEL}:${id}`, 0, "EX", ms("1 hour") / 1000);
       return false;
     }
 
-    await redis.set(`${Constants.redis.cache.premium.LEVEL}:${id}`, query.level);
-    await redis.expire(`${Constants.redis.cache.premium.LEVEL}:${id}`, 300);
+    await redis.set(
+      `${Constants.redis.cache.premium.LEVEL}:${id}`,
+      query.level,
+      "EX",
+      ms("1 hour") / 1000,
+    );
     return true;
   } else {
-    await redis.set(`${Constants.redis.cache.premium.LEVEL}:${id}`, 0);
-    await redis.expire(`${Constants.redis.cache.premium.LEVEL}:${id}`, 300);
+    await redis.set(`${Constants.redis.cache.premium.LEVEL}:${id}`, 0, "EX", ms("1 hour") / 1000);
     return false;
   }
 }
@@ -80,8 +83,12 @@ export async function getTier(member: GuildMember | string): Promise<number> {
     },
   });
 
-  await redis.set(`${Constants.redis.cache.premium.LEVEL}:${id}`, query?.level || 0);
-  await redis.expire(`${Constants.redis.cache.premium.LEVEL}:${id}`, 300);
+  await redis.set(
+    `${Constants.redis.cache.premium.LEVEL}:${id}`,
+    query?.level || 0,
+    "EX",
+    ms("1 hour") / 1000,
+  );
 
   return query?.level || 0;
 }

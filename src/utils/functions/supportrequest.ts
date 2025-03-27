@@ -31,8 +31,7 @@ export async function getSupportRequest(id: string): Promise<SupportRequest> {
   });
 
   if (query) {
-    await redis.set(`${Constants.redis.cache.SUPPORT}:${id}`, JSON.stringify(query));
-    await redis.expire(`${Constants.redis.cache.SUPPORT}:${id}`, 900);
+    await redis.set(`${Constants.redis.cache.SUPPORT}:${id}`, JSON.stringify(query), "EX", 900);
     return query;
   } else {
     return null;

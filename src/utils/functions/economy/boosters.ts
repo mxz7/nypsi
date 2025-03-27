@@ -179,8 +179,9 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
   await redis.set(
     `${Constants.redis.cache.economy.BOOSTERS}:${id}`,
     JSON.stringify(Object.fromEntries(map)),
+    "EX",
+    300,
   );
-  await redis.expire(`${Constants.redis.cache.economy.BOOSTERS}:${id}`, 300);
 
   return map;
 }

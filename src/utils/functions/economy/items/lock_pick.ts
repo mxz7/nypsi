@@ -136,10 +136,8 @@ module.exports = new ItemUse(
     await redis.set(
       `${Constants.redis.cache.guild.RECENTLY_ATTACKED}:${message.guildId}:${message.member.id}`,
       "t",
-    );
-    await redis.expire(
-      `${Constants.redis.cache.guild.RECENTLY_ATTACKED}:${message.guildId}:${message.member.id}`,
-      Math.floor(ms("1 hour") / 1000),
+      "EX",
+      ms("1 hour") / 1000,
     );
 
     const inventory = await getInventory(message.member);

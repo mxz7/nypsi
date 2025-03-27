@@ -71,18 +71,19 @@ export async function openKarmaShop(client: NypsiClient, now = false) {
     await createNextDate();
     await redis.set(Constants.redis.nypsi.KARMA_LAST_OPEN, Date.now());
 
-    await redis.set(Constants.redis.nypsi.KARMA_SHOP_OPEN, "t");
-    await redis.expire(Constants.redis.nypsi.KARMA_SHOP_OPEN, Math.floor(ms("1 hour") / 1000));
+    await redis.set(Constants.redis.nypsi.KARMA_SHOP_OPEN, "t", "EX", ms("1 hour") / 1000);
 
     logger.info("karma shop has been opened");
 
-    const clusters = await client.cluster.broadcastEval(async (client, {guildId}) => {
-      const guild = await client.guilds.cache.get(guildId);
+    const clusters = await client.cluster.broadcastEval(
+      async (client, { guildId }) => {
+        const guild = await client.guilds.cache.get(guildId);
 
-      if (guild) return (client as unknown as NypsiClient).cluster.id;
-      return "not-found";
-    },
-    { context: { guildId: Constants.NYPSI_SERVER_ID } });
+        if (guild) return (client as unknown as NypsiClient).cluster.id;
+        return "not-found";
+      },
+      { context: { guildId: Constants.NYPSI_SERVER_ID } },
+    );
 
     let cluster: number;
 

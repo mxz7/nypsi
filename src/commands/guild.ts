@@ -355,9 +355,10 @@ async function run(
 
     await createGuild(name, message.member);
 
-    await redis.set(`${Constants.redis.cooldown.GUILD_CREATE}:${message.author.id}`, "t");
-    await redis.expire(
+    await redis.set(
       `${Constants.redis.cooldown.GUILD_CREATE}:${message.author.id}`,
+      "t",
+      "EX",
       ms("2 days") / 1000,
     );
 
