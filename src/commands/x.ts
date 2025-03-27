@@ -1917,6 +1917,32 @@ async function run(
     // idk how this should be done lol i might get back to it
 
     console.log(map);
+  } else if (args[0].toLowerCase() === "setstreaks") {
+    if (message.author.id !== Constants.TEKOH_ID) return;
+
+    const query = await prisma.economy.findMany({
+      where: {
+        AND: [{ monthVote: { gt: 1 } }, { lastVote: { gt: dayjs().subtract(3, "days").toDate() } }],
+      },
+      select: {
+        userId: true,
+        voteStreak: true,
+        monthVote: true,
+      },
+    });
+
+    for (const user of query) {
+      await prisma.economy.update({
+        where: {
+          userId: user.userId,
+        },
+        data: {
+          voteStreak: user.voteStreak + Math.floor(user.monthVote / 2),
+        },
+      });
+    }
+
+    message.react("✅");
   }
 }
 
