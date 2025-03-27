@@ -119,5 +119,15 @@
     "type": "item",
     "value": "reroll_token",
     "limit": 1
+  },
+  "rain": {
+    "name": "loot rain",
+    "emoji": "💦",
+    "id": "rain",
+    "cost": 1500,
+    "items_left": 1,
+    "type": "item",
+    "value": "rain",
+    "limit": 1
   }
 }
