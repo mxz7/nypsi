@@ -617,7 +617,7 @@ export async function startLootRain(channel: GuildTextBasedChannel, user: User) 
     ],
   });
 
-  await sleep(1000);
+  await sleep(5000);
 
   setTimeout(() => {
     active = false;
