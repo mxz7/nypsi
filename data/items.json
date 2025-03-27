@@ -408,7 +408,7 @@
     "buy": 0,
     "sell": 10000,
     "in_crates": true,
-    "random_drop_chance": 70
+    "random_drop_chance": 20
   },
   "terrible_fishing_rod": {
     "id": "terrible_fishing_rod",
@@ -451,7 +451,7 @@
     "buy": 0,
     "sell": 10000,
     "in_crates": true,
-    "random_drop_chance": 70
+    "random_drop_chance": 20
   },
   "bitcoin": {
     "id": "bitcoin",
@@ -517,7 +517,7 @@
     "buy": 0,
     "sell": 10000,
     "in_crates": true,
-    "random_drop_chance": 70
+    "random_drop_chance": 20
   },
   "baby_rabbit": {
     "id": "baby_rabbit",
@@ -2035,7 +2035,8 @@
     "rarity": 3,
     "in_crates": true,
     "crate_runs": 2,
-    "items": ["role:worker-upgrade"]
+    "items": ["role:worker-upgrade"],
+    "random_drop_chance": 60
   },
   "boosters_crate": {
     "id": "boosters_crate",
@@ -2937,7 +2938,8 @@
     "rarity": 1,
     "role": "car_part",
     "sell": 10000,
-    "in_crates": true
+    "in_crates": true,
+    "random_drop_chance": 30
   },
   "engine_upgrade": {
     "id": "engine_upgrade",
@@ -3543,7 +3545,8 @@
     "buy": 0,
     "sell": 50000,
     "in_crates": true,
-    "aliases": ["mseed"]
+    "aliases": ["mseed"],
+    "random_drop_chance": 5
   },
   "coconut": {
     "id": "coconut",
@@ -3571,7 +3574,8 @@
     "buy": 0,
     "sell": 50000,
     "in_crates": true,
-    "aliases": ["cseed"]
+    "aliases": ["cseed"],
+    "random_drop_chance": 7
   },
   "pineapple": {
     "id": "pineapple",
@@ -3612,7 +3616,8 @@
     "rarity": 5,
     "role": "cat",
     "sell": 25000000,
-    "in_crates": true
+    "in_crates": true,
+    "random_drop_chance": 3
   },
   "zazu": {
     "id": "zazu",
@@ -3624,7 +3629,8 @@
     "rarity": 5,
     "role": "cat",
     "sell": 25000000,
-    "in_crates": true
+    "in_crates": true,
+    "random_drop_chance": 3
   },
   "oye": {
     "id": "oye",
@@ -3636,7 +3642,8 @@
     "rarity": 5,
     "role": "cat",
     "sell": 25000000,
-    "in_crates": true
+    "in_crates": true,
+    "random_drop_chance": 3
   },
   "ethel": {
     "id": "ethel",
