@@ -3595,7 +3595,8 @@
     "buy": 0,
     "sell": 50000,
     "in_crates": true,
-    "aliases": ["pseed"]
+    "aliases": ["pseed"],
+    "random_drop_chance": 7
   },
   "maxwell": {
     "id": "maxwell",
