@@ -10,6 +10,7 @@ import {
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
+  MessageFlags,
 } from "discord.js";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
@@ -111,7 +112,10 @@ module.exports = new ItemUse(
         inventory.find((i) => i.item === "rain").amount - 1,
       );
 
-      res.reply({ embeds: [new CustomEmbed(message.member, "✅ your loot rain will start soon")] });
+      res.reply({
+        embeds: [new CustomEmbed(message.member, "✅ your loot rain will start soon")],
+        flags: MessageFlags.Ephemeral,
+      });
       startLootRain(message.channel as GuildTextBasedChannel, message.author);
     }
   },
