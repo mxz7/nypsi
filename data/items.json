@@ -3670,5 +3670,19 @@
     "sell": 10000000,
     "in_crates": true,
     "random_drop_chance": 0.75
+  },
+  "charger_skin": {
+    "id": "charger_skin",
+    "name": "dodge charger skin",
+    "plural": "dodge charger skins",
+    "article": "a",
+    "aliases": ["charger", "dodge"],
+    "emoji": "<:dodge_charger:1355262888675377383>",
+    "longDesc": "range rover skin for custom cars",
+    "role": "car_skin",
+    "sell": 100000,
+    "in_crates": false,
+    "rarity": 69,
+    "random_drop_chance": 7
   }
 }
