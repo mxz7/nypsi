@@ -166,7 +166,7 @@ export async function getOffersAverage(item: string) {
 
   const offers = await prisma.offer.findMany({
     where: {
-      AND: [{ sold: true }, { itemId: item }, { soldAt: { gt: Constants.SEASON_START } }],
+      AND: [{ sold: true }, { itemId: item }],
     },
     select: {
       money: true,

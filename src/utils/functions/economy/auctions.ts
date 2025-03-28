@@ -395,7 +395,7 @@ export async function getAuctionAverage(item: string) {
 
   const auctions = await prisma.auction.findMany({
     where: {
-      AND: [{ sold: true }, { itemId: item }, { createdAt: { gt: Constants.SEASON_START } }],
+      AND: [{ sold: true }, { itemId: item }],
     },
     select: {
       bin: true,
