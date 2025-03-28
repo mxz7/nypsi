@@ -417,7 +417,7 @@ async function run(
 
     const itemValue = await calcItemValue(selected.id);
 
-    if (cost / amount < itemValue / 2) {
+    if (cost / amount < (itemValue || 1000) / 2) {
       embed.setDescription(
         `**are you sure you want to auction at this price?**\nyou are selling this item for $${Math.floor(cost / amount).toLocaleString()} each\nthe average worth for this item is $${itemValue.toLocaleString()}`,
       );
@@ -1034,7 +1034,7 @@ async function run(
 
     let msg: Message<boolean>;
 
-    if (cost / amount < itemValue / 2) {
+    if (cost / amount < (itemValue || 1000) / 2) {
       const embed = new CustomEmbed(message.member).setHeader(
         "create an auction",
         message.author.avatarURL(),

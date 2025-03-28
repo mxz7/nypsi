@@ -130,9 +130,13 @@ async function run(
   ]);
 
   if (selected.sell || selected.buy) {
-    desc.push(`**worth** $${Math.floor(value).toLocaleString()}`);
+    desc.push(
+      `**worth** ${value ? `$${Math.floor(value).toLocaleString()}` : "[unvalued](https://nypsi.xyz/docs/economy/items/worth#unvalued"}`,
+    );
   } else {
-    desc.push(`\n**worth** $${Math.floor(value).toLocaleString()}`);
+    desc.push(
+      `\n**worth** ${value ? `$${Math.floor(value).toLocaleString()}` : "[unvalued](https://nypsi.xyz/docs/economy/items/worth#unvalued"}`,
+    );
   }
 
   if (total && selected.id !== "lottery_ticket") {
