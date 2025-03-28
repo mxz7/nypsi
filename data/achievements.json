@@ -435,46 +435,6 @@
     "description": "open 10,000 crates",
     "prize": ["nypsi_crate:2"]
   },
-  "wholesome_i": {
-    "id": "wholesome_i",
-    "name": "wholesome **I**",
-    "emoji": "💖",
-    "target": 1,
-    "description": "have 1 suggested image accepted",
-    "prize": ["lucky_scratch_card:1", "teddy:1"]
-  },
-  "wholesome_ii": {
-    "id": "wholesome_ii",
-    "name": "wholesome **II**",
-    "emoji": "💖",
-    "target": 5,
-    "description": "have 5 suggested images accepted",
-    "prize": ["lucky_scratch_card:2", "teddy:2"]
-  },
-  "wholesome_iii": {
-    "id": "wholesome_iii",
-    "name": "wholesome **III**",
-    "emoji": "💖",
-    "target": 15,
-    "description": "have 15 suggested images accepted",
-    "prize": ["lucky_scratch_card:3", "teddy:3"]
-  },
-  "wholesome_iv": {
-    "id": "wholesome_iv",
-    "name": "wholesome **IV**",
-    "emoji": "💖",
-    "target": 25,
-    "description": "have 25 suggested images accepted",
-    "prize": ["lucky_scratch_card:4", "teddy:4"]
-  },
-  "wholesome_v": {
-    "id": "wholesome_v",
-    "name": "wholesome **V**",
-    "emoji": "💖",
-    "target": 50,
-    "description": "have 50 suggested images accepted",
-    "prize": ["lucky_scratch_card:5", "teddy:5"]
-  },
   "racer_i": {
     "id": "racer_i",
     "name": "racer **I**",
