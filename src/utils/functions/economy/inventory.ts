@@ -866,7 +866,7 @@ export async function calcItemValue(item: string) {
 
     if (!offersAvg && auctionAvg) return auctionAvg;
     if (!auctionAvg && offersAvg) return offersAvg;
-    if (!auctionAvg && !offersAvg) return getItems()[item].sell || 1000;
+    if (!auctionAvg && !offersAvg) return undefined;
 
     itemValue = Math.floor(
       [offersAvg, auctionAvg, auctionAvg, auctionAvg].reduce((a, b) => a + b) / 4,

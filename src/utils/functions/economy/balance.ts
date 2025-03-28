@@ -874,7 +874,7 @@ export async function calcNetWorth(
   );
 
   for (const auction of query.Auction)
-    worth += (await calcItemValue(auction.itemId)) * Number(auction.itemAmount);
+    worth += ((await calcItemValue(auction.itemId)) || 0) * Number(auction.itemAmount);
 
   if (breakdown) breakdownItems.set("balance", worth);
 
@@ -898,7 +898,7 @@ export async function calcNetWorth(
     const offersAvg = await getOffersAverage(item.id);
 
     if (auctionAvg && offersAvg) {
-      value += Math.floor((await calcItemValue(item.id)) * upgrade.amount);
+      value += Math.floor(((await calcItemValue(item.id)) || 0) * upgrade.amount);
     } else if (auctionAvg) {
       value += upgrade.amount * auctionAvg;
     } else if (offersAvg) {
@@ -934,7 +934,7 @@ export async function calcNetWorth(
       ]);
 
       if (auctionAvg && offerAvg) {
-        const value = await calcItemValue(item.item);
+        const value = (await calcItemValue(item.item)) || 0;
 
         worth += Math.floor(value * Number(item.amount));
         if (breakdown) breakdownItems.set(item.item, value * Number(item.amount));
@@ -964,9 +964,9 @@ export async function calcNetWorth(
 
     for (const upgrade of car.upgrades) {
       garageBreakdown +=
-        (await calcItemValue(
+        ((await calcItemValue(
           Object.values(getItems()).find((i) => i.upgrades === upgrade.type).id,
-        )) * upgrade.amount;
+        )) || 0) * upgrade.amount;
     }
   }
 
@@ -992,8 +992,8 @@ export async function calcNetWorth(
         ]);
 
         if (auctionAvg && offersAvg) {
-          worth += Math.floor((await calcItemValue(itemId)) * upgrade.amount);
-          workersBreakdown += Math.floor((await calcItemValue(itemId)) * upgrade.amount);
+          worth += Math.floor(((await calcItemValue(itemId)) || 0) * upgrade.amount);
+          workersBreakdown += Math.floor(((await calcItemValue(itemId)) || 0) * upgrade.amount);
         } else if (auctionAvg) {
           worth += upgrade.amount * auctionAvg;
           workersBreakdown += upgrade.amount * auctionAvg;
@@ -1047,10 +1047,10 @@ export async function calcNetWorth(
     const seed = Object.keys(getItems()).find((i) => getItems()[i].plantId === farm.plantId);
 
     const seedValue =
-      farms.filter((i) => i.plantId === farm.plantId).length * (await calcItemValue(seed));
+      farms.filter((i) => i.plantId === farm.plantId).length * ((await calcItemValue(seed)) || 0);
     const harvestValue =
       (await getClaimable(id, farm.plantId, false)) *
-      (await calcItemValue(getPlantsData()[farm.plantId].item));
+      ((await calcItemValue(getPlantsData()[farm.plantId].item)) || 0);
 
     let upgradesValue = 0;
 
@@ -1063,10 +1063,11 @@ export async function calcNetWorth(
         upgrades[Object.keys(upgrades).find((u) => upgrades[u].id == userUpgrade.upgradeId)];
 
       if (upgrade.type_single) {
-        upgradesValue += userUpgrade.amount * (await calcItemValue(upgrade.type_single.item));
+        upgradesValue +=
+          userUpgrade.amount * ((await calcItemValue(upgrade.type_single.item)) || 0);
       } else if (upgrade.type_upgradable) {
         for (let i = 0; i < userUpgrade.amount; i++) {
-          upgradesValue += await calcItemValue(upgrade.type_upgradable.items[i]);
+          upgradesValue += (await calcItemValue(upgrade.type_upgradable.items[i])) || 0;
         }
       }
     }
