@@ -993,7 +993,13 @@ async function run(
       return send({ embeds: [new ErrorEmbed(`you dont have this many ${selected.name}`)] });
     }
 
-    const cost = formatNumber(args.length === 2 ? args[1] : args[2]);
+    let cost: number;
+
+    try {
+      cost = formatNumber(args.length === 2 ? args[1] : args[2]);
+    } catch {
+      return send({ embeds: [new ErrorEmbed("/auction create <item> <amount> <cost>")] });
+    }
 
     if (!cost) {
       return send({ embeds: [new ErrorEmbed("invalid amount")] });
