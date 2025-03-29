@@ -1,5 +1,6 @@
 import dayjs = require("dayjs");
 import prisma from "../../init/database";
+import redis from "../../init/redis";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import { Job } from "../../types/Jobs";
 import { NotificationPayload } from "../../types/Notification";
@@ -13,6 +14,11 @@ export default {
   name: "streaks",
   cron: "0 0 * * *",
   async run(log) {
+    if (await redis.exists("nypsi:streakpause")) {
+      log("streaks paused");
+      return;
+    }
+
     const dailyStreak = await doDailyStreaks();
 
     log(`${dailyStreak} daily streak notifications sent`);
