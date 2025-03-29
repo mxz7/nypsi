@@ -9,6 +9,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
+import { sort } from "fast-sort";
 import { readdir } from "fs/promises";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
@@ -213,7 +214,7 @@ async function run(
 
     const currentBoosters: string[] = [];
 
-    for (const boosterId of boosters.keys()) {
+    for (const boosterId of sort(Array.from(boosters.keys())).asc((i) => i)) {
       if (boosters.get(boosterId).length == 1) {
         currentBoosters.push(
           `**${items[boosterId].name}** ${items[boosterId].emoji} - expires <t:${Math.round(
