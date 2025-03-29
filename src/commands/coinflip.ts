@@ -315,7 +315,7 @@ async function run(
 
     if (item) {
       itemAmount = parseInt(args[1] || "1");
-      if (isNaN(itemAmount)) {
+      if (isNaN(itemAmount) || itemAmount <= 0) {
         itemAmount = 1;
       }
     } else {
