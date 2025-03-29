@@ -3,7 +3,6 @@ import { Prisma } from "@prisma/client";
 import { Collection, Guild, GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
-import Constants from "../../Constants";
 import PageManager from "../page";
 import sleep from "../sleep";
 import { formatTime } from "../string";
@@ -1575,15 +1574,11 @@ export async function topVote(guild: Guild, userId?: string) {
 export async function topVoteGlobal(userId: string, amount = 100) {
   const query = await prisma.economy.findMany({
     where: {
-      AND: [
-        { user: { blacklisted: false } },
-        { OR: [{ monthVote: { gt: 0 } }, { seasonVote: { gt: 0 } }] },
-      ],
+      AND: [{ user: { blacklisted: false } }, { monthVote: { gt: 0 } }],
     },
     select: {
       userId: true,
       monthVote: true,
-      seasonVote: true,
       banned: true,
       user: {
         select: {
@@ -1591,7 +1586,7 @@ export async function topVoteGlobal(userId: string, amount = 100) {
         },
       },
     },
-    orderBy: [{ seasonVote: "desc" }, { lastVote: "asc" }, { user: { lastKnownUsername: "asc" } }],
+    orderBy: [{ monthVote: "desc" }, { lastVote: "asc" }, { user: { lastKnownUsername: "asc" } }],
     take: amount,
   });
 
@@ -1623,11 +1618,7 @@ export async function topVoteGlobal(userId: string, amount = 100) {
       user.userId,
       user.user.lastKnownUsername,
       (await getPreferences(user.userId)).leaderboards,
-    )} ${
-      dayjs().subtract(1, "month").isAfter(Constants.SEASON_START)
-        ? `${user.seasonVote.toLocaleString()} | ${user.monthVote.toLocaleString()}`
-        : user.monthVote.toLocaleString()
-    }`;
+    )} ${user.monthVote.toLocaleString()}`;
 
     count++;
   }
