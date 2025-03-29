@@ -1,0 +1,26 @@
+export type LootPool = {
+  nothing?: number; // weight
+  money?: {
+    [amount: number]: number // amount: weight
+  };
+  xp?: {
+    [amount: number]: number // amount: weight
+  };
+  karma?: {
+    [amount: number]: number // amount: weight
+  };
+  items?: {
+    [item: string]: {
+      weight?: number;
+      count?: number
+    } | number // item: weight, count assumed to be 1
+  };
+}
+
+export type LootPoolResult = { // describes ONE loot pool drop
+    money?: number;
+    xp?: number;
+    karma?: number;
+    item?: string;
+    count?: number; // used only with item, optional
+}
