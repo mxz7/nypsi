@@ -542,29 +542,27 @@ export async function getTotalAmountOfItem(itemId: string) {
 }
 
 export function selectItem(search: string) {
-  let selected: Item;
+  search = search.toLowerCase();
   const items = getItems();
 
-  for (const itemName of Array.from(Object.keys(items))) {
-    const aliases = items[itemName].aliases ? items[itemName].aliases : [];
-    if (search == itemName) {
-      selected = items[itemName];
-      break;
-    } else if (search == itemName.split("_").join("")) {
-      selected = items[itemName];
-      break;
+  for (const item of Array.from(Object.values(items))) {
+    const aliases = item.aliases || [];
+    if (search === item.id) {
+      return item;
+    } else if (search === item.name) {
+      return item;
+    } else if (search === item.id.split("_").join("")) {
+      return item;
     } else if (aliases.indexOf(search) != -1) {
-      selected = items[itemName];
-      break;
-    } else if (search == items[itemName].name) {
-      selected = items[itemName];
-      break;
-    } else if (search == items[itemName].plural) {
-      selected = items[itemName];
+      return item;
+    } else if (search === item.name.split(" ").join("")) {
+      return item;
+    } else if (search === item.plural) {
+      return item;
     }
   }
 
-  return selected;
+  return undefined;
 }
 
 export async function commandGemCheck(member: GuildMember, commandCategory: CommandCategory) {
