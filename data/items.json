@@ -3684,5 +3684,17 @@
     "in_crates": false,
     "rarity": 69,
     "random_drop_chance": 7
+  },
+  "xiaojie": {
+    "id": "xiaojie",
+    "name": "xiaojie",
+    "plural": "xiaojies",
+    "article": "a",
+    "emoji": "<:xiaojie:1355614181751263292>",
+    "longDesc": "bleh",
+    "rarity": 5,
+    "role": "cat",
+    "sell": 25000000,
+    "in_crates": true
   }
 }
