@@ -1791,6 +1791,139 @@ export async function topChatReactionGlobal(userId: string, daily: boolean, amou
   return { pages, pos };
 }
 
+export async function topVoteStreak(guild: Guild, userId?: string) {
+  let members: Collection<string, GuildMember>;
+
+  if (guild.memberCount == guild.members.cache.size) {
+    members = guild.members.cache;
+  } else {
+    members = await guild.members.fetch();
+  }
+
+  if (!members) members = guild.members.cache;
+
+  const query = await prisma.economy.findMany({
+    where: {
+      AND: [{ voteStreak: { gt: 0 } }, { userId: { in: Array.from(members.keys()) } }],
+    },
+    select: {
+      userId: true,
+      voteStreak: true,
+      banned: true,
+    },
+    orderBy: [{ voteStreak: "desc" }, { lastVote: "asc" }],
+    take: 100,
+  });
+
+  const out = [];
+
+  let count = 0;
+
+  const userIds = query.map((i) => i.userId);
+
+  for (const user of query) {
+    if (user.banned && dayjs().isBefore(user.banned)) {
+      userIds.splice(userIds.indexOf(user.userId), 1);
+      continue;
+    }
+
+    let pos = (count + 1).toString();
+
+    if (pos == "1") {
+      pos = "🥇";
+    } else if (pos == "2") {
+      pos = "🥈";
+    } else if (pos == "3") {
+      pos = "🥉";
+    } else {
+      pos += ".";
+    }
+
+    out[count] = `${pos} ${await formatUsername(
+      user.userId,
+      members.get(user.userId).user.username,
+      true,
+    )} ${user.voteStreak.toLocaleString()}`;
+
+    count++;
+  }
+
+  const pages = PageManager.createPages(out);
+
+  let pos = 0;
+
+  if (userId) {
+    pos = userIds.indexOf(userId) + 1;
+  }
+
+  return { pages, pos };
+}
+
+export async function topVoteStreakGlobal(userId: string, amount = 100) {
+  const query = await prisma.economy.findMany({
+    where: {
+      voteStreak: { gt: 0 },
+    },
+    select: {
+      userId: true,
+      voteStreak: true,
+      banned: true,
+      user: {
+        select: {
+          lastKnownUsername: true,
+        },
+      },
+    },
+    orderBy: [{ voteStreak: "desc" }, { lastVote: "asc" }],
+    take: amount,
+  });
+
+  const out = [];
+
+  let count = 0;
+
+  const userIds = query.map((i) => i.userId);
+
+  for (const user of query) {
+    if (user.banned && dayjs().isBefore(user.banned)) {
+      userIds.splice(userIds.indexOf(user.userId), 1);
+      continue;
+    }
+
+    let pos = (count + 1).toString();
+
+    if (pos == "1") {
+      pos = "🥇";
+    } else if (pos == "2") {
+      pos = "🥈";
+    } else if (pos == "3") {
+      pos = "🥉";
+    } else {
+      pos += ".";
+    }
+
+    out[count] = `${pos} ${await formatUsername(
+      user.userId,
+      user.user.lastKnownUsername,
+      (await getPreferences(user.userId)).leaderboards,
+    )} ${user.voteStreak.toLocaleString()}`;
+
+    count++;
+  }
+
+  const pages = PageManager.createPages(out);
+
+  let pos = 0;
+
+  if (userId) {
+    pos = userIds.indexOf(userId) + 1;
+  }
+
+  checkLeaderboardPositions(userIds, "votestreak");
+
+  return { pages, pos };
+}
+
 export async function formatUsername(id: string, username: string, privacy: boolean) {
   if (!privacy) return "[**[hidden]**](https://nypsi.xyz/docs/economy/user-settings/hidden)";
 
