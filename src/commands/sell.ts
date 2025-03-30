@@ -356,6 +356,8 @@ async function run(
   } else {
     const inventory = await getInventory(message.member);
 
+    if (args[0].toLowerCase() === "item") args.shift();
+
     const selected = selectItem(args[0].toLowerCase());
 
     if (!selected) {
