@@ -158,10 +158,22 @@
       "redbull": 10,
       "rick_astley": 40,
       "xp_potion": 10,
-      "wooden_pickaxe": 55,
-      "iron_pickaxe": 30,
-      "fishing_rod": 40,
-      "terrible_gun": 50,
+      "wooden_pickaxe": {
+        "weight": 55,
+        "count": 5
+      },
+      "iron_pickaxe": {
+        "weight": 30,
+        "count": 5
+      },
+      "fishing_rod": {
+        "weight": 40,
+        "count": 5
+      },
+      "terrible_gun": {
+        "weight": 50,
+        "count": 5
+      },
       "mineshaft_chest": 15,
       "basic_crate": 15,
       "workers_crate": 3,
@@ -194,10 +206,22 @@
       "dave": 1,
       "super_cursor": 40,
       "oven": 35,
-      "diamond_pickaxe": 40,
-      "iron_pickaxe": 70,
-      "fishing_rod": 75,
-      "gun": 75,
+      "diamond_pickaxe": {
+        "weight": 40,
+        "count": 5
+      },
+      "iron_pickaxe": {
+        "weight": 70,
+        "count": 5
+      },
+      "fishing_rod": {
+        "weight": 75,
+        "count": 5
+      },
+      "gun": {
+        "weight": 75,
+        "count": 5
+      },
       "basic_crate": 70,
       "69420_crate": 65,
       "bronze_credit": 0.5,
@@ -238,10 +262,22 @@
       "lamborghini": 1,
       "engine_upgrade_part": 50,
       "mini_cooper": 60,
-      "diamond_pickaxe": 50,
-      "iron_pickaxe": 75,
-      "incredible_fishing_rod": 50,
-      "incredible_gun": 75,
+      "diamond_pickaxe": {
+        "weight": 50,
+        "count": 5
+      },
+      "iron_pickaxe": {
+        "weight": 75,
+        "count": 5
+      },
+      "incredible_fishing_rod": {
+        "weight": 50,
+        "count": 5
+      },
+      "incredible_gun": {
+        "weight": 75,
+        "count": 5
+      },
       "basic_crate": 95,
       "69420_crate": 90,
       "nypsi_crate": 10,
@@ -250,6 +286,53 @@
       "omega_crate": 0.05,
       "apple_seed": 7,
       "stick": 5
+    }
+  },
+  "karma_scratch_card": {
+    "money": {
+      "3000000": 100
+    },
+    "xp": {
+      "750": 100
+    },
+    "karma": {
+      "50": 100
+    },
+    "items": {
+      "super_cursor": 100,
+      "oven": 100,
+      "bob": 100,
+      "diamond_pickaxe": {
+        "weight": 80,
+        "count": 5
+      },
+      "incredible_fishing_rod": {
+        "weight": 95,
+        "count": 5
+      },
+      "incredible_gun": {
+        "weight": 90,
+        "count": 5
+      },
+      "69420_crate": 100,
+      "nypsi_crate": 40,
+      "bronze_credit": 1,
+      "pink_gem": 0.7,
+      "gem_shard": 75,
+      "quarry_scrap": 75,
+      "karma_scratch_card": 5,
+      "omega_crate": 1,
+      "karma_tag": 5,
+      "reroll_token": 5,
+      "lucky_cheese": 50,
+      "xp_potion": 50,
+      "double_xp": 15,
+      "multi_potion": 40,
+      "veilside_rx7_skin": 10,
+      "stick": 20,
+      "unbreaking": 10,
+      "apple_seed": 30,
+      "rain": 5
     }
   },
   "legendary_scratch_card": {
@@ -266,8 +349,14 @@
       "nether_portal": 50,
       "highroller": 80,
       "lucky_7": 70,
-      "incredible_fishing_rod": 100,
-      "incredible_gun": 100,
+      "incredible_fishing_rod": {
+        "weight": 100,
+        "count": 5
+      },
+      "incredible_gun": {
+        "weight": 100,
+        "count": 5
+      },
       "turbo_upgrade_part": 40,
       "wheel_upgrade_part": 40,
       "lamborghini": 45,

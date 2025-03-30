@@ -9,27 +9,32 @@ import {
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { Item } from "../../../types/Economy";
-import { addToGuildXP, getGuildName } from "../../../utils/functions/economy/guilds";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
-import { addKarma } from "../karma/karma";
 import { percentChance, shuffle } from "../random";
 import { addProgress } from "./achievements";
-import { addBalance } from "./balance";
-import { addInventoryItem, itemExists } from "./inventory";
+import { itemExists } from "./inventory";
 import { addStat } from "./stats";
 import { addTaskProgress } from "./tasks";
-import { getItems } from "./utils";
-import { addXp } from "./xp";
+import { getItems, getLootPools } from "./utils";
 import ms = require("ms");
+import util = require("util");
+import { LootPoolResult } from "../../../types/LootPool";
+import { describeLootPoolResult, giveLootPoolResult, rollLootPool } from "./loot_pools";
+
+type AreaCell = {
+  clicks: number;
+  result: LootPoolResult;
+};
 
 export default class ScratchCard {
   private item: Item;
-  public area: string[][];
+  public area: AreaCell[][];
   private member: GuildMember;
   public remainingClicks: number;
   public won: boolean;
   public state: "playing" | "finished";
+
 
   constructor(member: GuildMember, item: Item) {
     this.item = item;
@@ -48,7 +53,7 @@ export default class ScratchCard {
     return this;
   }
 
-  public async setArea(area?: string[][]) {
+  public async setArea(area?: AreaCell[][]) {
     this.area = area || (await this.createScratchArea(this.item)) || [];
 
     return this;
@@ -65,32 +70,32 @@ export default class ScratchCard {
       for (const col of row) {
         const button = new ButtonBuilder().setCustomId(index.join("-"));
 
-        if (col.endsWith(":xx")) {
+        if (col.clicks === 2) {
           button.setDisabled(true);
           button.setStyle(ButtonStyle.Success);
-          if (col.startsWith("id:")) {
-            button.setEmoji(items[col.split(":")[1]].emoji);
-          } else if (col.startsWith("xp:")) {
+          if (Object.hasOwn(col.result, "item")) {
+            button.setEmoji(items[col.result.item].emoji);
+          } else if (Object.hasOwn(col.result, "xp")) {
             button.setEmoji("✨");
-          } else if (col.startsWith("money:")) {
+          } else if (Object.hasOwn(col.result, "money")) {
             button.setEmoji("💰");
-          } else if (col.startsWith("karma:")) {
+          } else if (Object.hasOwn(col.result, "karma")) {
             button.setEmoji("🔮");
           } else {
             button.setLabel("\u200B");
             button.setStyle(ButtonStyle.Danger);
           }
-        } else if (col.endsWith(":x")) {
+        } else if (col.clicks === 1) {
           button.setDisabled(true);
           button.setStyle(ButtonStyle.Secondary);
           if (end) button.setStyle(ButtonStyle.Danger);
-          if (col.startsWith("id:")) {
-            button.setEmoji(items[col.split(":")[1]].emoji);
-          } else if (col.startsWith("xp:")) {
+          if (Object.hasOwn(col.result, "item")) {
+            button.setEmoji(items[col.result.item].emoji);
+          } else if (Object.hasOwn(col.result, "xp")) {
             button.setEmoji("✨");
-          } else if (col.startsWith("money:")) {
+          } else if (Object.hasOwn(col.result, "money")) {
             button.setEmoji("💰");
-          } else if (col.startsWith("karma:")) {
+          } else if (Object.hasOwn(col.result, "karma")) {
             button.setEmoji("🔮");
           } else {
             button.setLabel("\u200B");
@@ -99,19 +104,18 @@ export default class ScratchCard {
         } else if (end) {
           button.setStyle(ButtonStyle.Secondary);
           button.setDisabled(true);
-          if (col.endsWith(":xx")) button.setStyle(ButtonStyle.Success);
-          if (col.endsWith(":x")) button.setStyle(ButtonStyle.Danger);
-          if (col.startsWith("id:")) {
-            button.setEmoji(items[col.split(":")[1]].emoji);
-          } else if (col.startsWith("xp:")) {
+          if (col.clicks === 2) button.setStyle(ButtonStyle.Success);
+          if (col.clicks === 1) button.setStyle(ButtonStyle.Danger);
+          if (Object.hasOwn(col.result, "item")) {
+            button.setEmoji(items[col.result.item].emoji);
+          } else if (Object.hasOwn(col.result, "xp")) {
             button.setEmoji("✨");
-          } else if (col.startsWith("money:")) {
+          } else if (Object.hasOwn(col.result, "money")) {
             button.setEmoji("💰");
-          } else if (col.startsWith("karma:")) {
+          } else if (Object.hasOwn(col.result, "karma")) {
             button.setEmoji("🔮");
           } else {
             button.setLabel("\u200B");
-            if (col.endsWith(":x")) button.setStyle(ButtonStyle.Danger);
           }
         } else {
           button.setStyle(ButtonStyle.Secondary);
@@ -133,24 +137,24 @@ export default class ScratchCard {
   public async clicked(interaction: ButtonInteraction) {
     const [y, x] = interaction.customId.split("-").map((i) => parseInt(i));
     try {
-      if (this.area[y][x].endsWith(":x")) return;
+      if (this.area[y][x].clicks === 1) return;
     } catch (e) {
       logger.error(`scratch card weird error meow meow 1`, { area: this.area, y, x });
       console.error(e);
 
       return;
     }
-    this.area[y][x] += ":x";
+    this.area[y][x].clicks = 1;
     this.remainingClicks--;
 
-    if (this.area[y][x].includes("nothing")) return;
+    if (Object.keys(this.area[y][x].result).length === 0) return;
 
     const checkHorizontal = (xCheck = 0, horizontalMatches = 1): boolean => {
       if (horizontalMatches === 3) return true;
       if (x === xCheck) return checkHorizontal(xCheck + 1, horizontalMatches);
-      if (!this.area[y][xCheck].endsWith(":x")) return false;
+      if (this.area[y][xCheck].clicks !== 1) return false;
 
-      if (this.area[y][x].split(":")[1] !== this.area[y][xCheck].split(":")[1]) return false;
+      if(!util.isDeepStrictEqual(this.area[y][x].result, this.area[y][xCheck].result)) return false;
 
       return checkHorizontal(xCheck + 1, horizontalMatches + 1);
     };
@@ -171,7 +175,7 @@ export default class ScratchCard {
       }
 
       for (let i = start; i < start + 3; i++) {
-        this.area[i][x] += "x";
+        this.area[i][x].clicks += 1;
       }
 
       return true;
@@ -181,48 +185,24 @@ export default class ScratchCard {
       await addProgress(this.member.user.id, "scratchies_pro", 1);
       await addTaskProgress(this.member.user.id, "scratch_cards");
       this.won = true;
-      const clickedType = this.area[y][x].split(":")[0];
-      const clickedItem = this.area[y][x].split(":")[1];
-      if (clickedItem.includes("_gem")) await addProgress(this.member.user.id, "gem_hunter", 1);
 
       const embed = new CustomEmbed(this.member)
-        .setColor(Constants.EMBED_SUCCESS_COLOR)
-        .setHeader(
-          `${this.member.user.username}'s ${this.item.name}`,
-          this.member.user.avatarURL(),
-        );
-      if (clickedType === "xp") {
-        await addXp(this.member, parseInt(clickedItem));
-        embed.setDescription(`you found **${parseInt(clickedItem).toLocaleString()}**xp!`);
-        const guild = await getGuildName(this.member);
-        if (guild) await addToGuildXP(guild, parseInt(clickedItem), this.member);
-      } else if (clickedType === "money") {
-        await addBalance(this.member, parseInt(clickedItem));
-        addStat(this.member, "earned-scratch", parseInt(clickedItem));
-        embed.setDescription(`you found $**${parseInt(clickedItem).toLocaleString()}**`);
-      } else if (clickedType === "karma") {
-        await addKarma(this.member, parseInt(clickedItem));
-        embed.setDescription(`you found **${parseInt(clickedItem).toLocaleString()}** karma 🔮`);
-      } else {
-        let amount = 1;
-        if (
-          clickedItem.includes("gun") ||
-          clickedItem.includes("fishing_rod") ||
-          clickedItem.includes("pickaxe")
-        ) {
-          amount = 5;
-        }
+      .setColor(Constants.EMBED_SUCCESS_COLOR)
+      .setHeader(
+        `${this.member.user.username}'s ${this.item.name}`,
+        this.member.user.avatarURL(),
+      );
 
-        if (clickedItem.includes("_gem")) {
-          await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t", "EX", 86400);
-        }
+      const prize = this.area[y][x].result;
+      await giveLootPoolResult(this.member.user.id, prize);
+      embed.setDescription(`you found ${describeLootPoolResult(prize)}!`);
 
-        await addInventoryItem(this.member, clickedItem, amount);
-        embed.setDescription(
-          `you found ${getItems()[clickedItem].article} ${getItems()[clickedItem].emoji} **${
-            getItems()[clickedItem].name
-          }**!`,
-        );
+      if(Object.hasOwn(prize, "money")) {
+        addStat(this.member, "earned-scratch", prize.money);
+      }
+      if (Object.hasOwn(prize, "item") && prize.item.includes("_gem")) {
+        await addProgress(this.member.user.id, "gem_hunter", 1);
+        await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t", "EX", 86400);
       }
 
       setTimeout(() => {
@@ -233,7 +213,7 @@ export default class ScratchCard {
 
     if (checkHorizontal()) {
       for (let i = 0; i < 3; i++) {
-        this.area[y][i] += "x";
+        this.area[y][i].clicks += 1;
       }
 
       await giveReward();
@@ -245,29 +225,44 @@ export default class ScratchCard {
   private async createScratchArea(item: Item) {
     if (item.role !== "scratch-card") return false;
 
-    let arr: string[][] = [];
+    let arr: AreaCell[][] = [];
 
     for (let i = 0; i < 5; i++) {
-      arr[i] = ["nothing", "nothing", "nothing"];
+      arr[i] = [
+        { clicks: 0, result: {} },
+        { clicks: 0, result: {} },
+        { clicks: 0, result: {} }
+      ];
     }
 
-    const items: `${string}:${string}`[] = [];
+    const items: LootPoolResult[] = [];
 
-    for (const scratchItem of item.items) {
-      const type = scratchItem.split(":")[0];
-      const value = scratchItem.split(":")[1];
-      const chance = scratchItem.split(":")[2];
+    const poolName = Object.keys(item.loot_pools)[0];
 
-      if (chance && !percentChance(parseFloat(chance))) continue;
-
-      if (value.includes("_gem") && (await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) continue;
-
-      if (getItems()[value]?.unique) {
-        if (await itemExists(value)) continue;
+    const pool = getLootPools()[poolName];
+    let unweightedPool = structuredClone(pool);
+    for(const amount in unweightedPool.money) {
+      unweightedPool.money[amount] = 100;
+    }
+    for(const amount in unweightedPool.xp) {
+      unweightedPool.xp[amount] = 100;
+    }
+    for(const amount in unweightedPool.karma) {
+      unweightedPool.karma[amount] = 100;
+    }
+    for(const item in unweightedPool.items) {
+      if(typeof unweightedPool.items[item] === "number") {
+        unweightedPool.items[item] = 100;
+      } else {
+        unweightedPool.items[item].weight = 100;
       }
-
-      items.push(`${type}:${value}`);
     }
+
+    const excluded_items = Object.keys(pool.items)
+      .filter(e => 
+        (getItems()[e].unique && itemExists(e)) || 
+        (e.includes("_gem") && redis.exists(Constants.redis.nypsi.GEM_GIVEN))
+      );
 
     let totalCount = 2;
     let createVert = -1;
@@ -291,22 +286,24 @@ export default class ScratchCard {
         pos = Math.floor(Math.random() * 5);
       }
 
-      const item = items[Math.floor(Math.random() * items.length)];
-      if ((arr[pos][0] !== "nothing" && pos !== 2) || hCount === 1) createVert = pos;
-      arr[pos] = [item, item, item];
+      const item = rollLootPool(pool, excluded_items);
+      if ((Object.keys(arr[pos][0].result).length !== 0 && pos !== 2) || hCount === 1) createVert = pos;
+      arr[pos][0].result = item;
+      arr[pos][1].result = item;
+      arr[pos][2].result = item;
     }
 
     if (createVert !== -1 && totalCount !== 1) {
-      const item = items[Math.floor(Math.random() * items.length)];
+      const item = rollLootPool(pool, excluded_items);
       const x = Math.floor(Math.random() * 3);
 
       if (createVert > 2) {
         for (let i = 0; i < 3; i++) {
-          arr[i][x] = item;
+          arr[i][x].result = item;
         }
       } else {
         for (let i = 2; i < 5; i++) {
-          arr[i][x] = item;
+          arr[i][x].result = item;
         }
       }
     } else {
@@ -315,16 +312,13 @@ export default class ScratchCard {
 
     let nothingCount = 0;
 
-    arr.forEach((arr2) => arr2.forEach((i) => (i === "nothing" ? nothingCount++ : null)));
+    arr.forEach((arr2) => arr2.forEach((i) => (Object.keys(i.result).length === 0 ? nothingCount++ : null)));
 
     for (let i = 0; i < nothingCount + 7; i++) {
       const index = [Math.floor(Math.random() * 5), Math.floor(Math.random() * 3)];
 
-      if (arr[index[0]][index[1]] === "nothing") {
-        arr[index[0]][index[1]] = item.items[Math.floor(Math.random() * item.items.length)]
-          .split(":")
-          .slice(0, 2)
-          .join(":");
+      if (Object.keys(arr[index[0]][index[1]].result).length === 0) {
+        arr[index[0]][index[1]].result = rollLootPool(unweightedPool, excluded_items)
       }
     }
 
