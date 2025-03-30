@@ -1,4 +1,10 @@
 import dayjs = require("dayjs");
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  MessageActionRowComponentBuilder,
+} from "discord.js";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { CustomEmbed } from "../../models/EmbedBuilders";
@@ -147,12 +153,13 @@ async function doVoteStreaks() {
     },
     select: {
       userId: true,
-      dailyStreak: true,
+      voteStreak: true,
       user: {
         select: {
           DMSettings: {
             select: {
               other: true,
+              voteReminder: true,
             },
           },
         },
@@ -193,14 +200,40 @@ async function doVoteStreaks() {
       "you have lost your vote streak by not doing voting in over a day.\ncalendars can be used to protect your streaks from being reset",
     );
 
+  const voteRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+    new ButtonBuilder()
+      .setStyle(ButtonStyle.Link)
+      .setURL("https://top.gg/bot/678711738845102087/vote")
+      .setLabel("top.gg"),
+  );
+
+  const remindersRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+    new ButtonBuilder()
+      .setStyle(ButtonStyle.Link)
+      .setURL("https://top.gg/bot/678711738845102087/vote")
+      .setLabel("top.gg"),
+    new ButtonBuilder()
+      .setStyle(ButtonStyle.Secondary)
+      .setLabel("enable vote reminders")
+      .setCustomId("enable-vote-reminders"),
+  );
+
   const notifications: NotificationPayload[] = [];
   const promises: (() => Promise<any>)[] = [];
 
   for (const user of users) {
     promises.push(async () => {
       if (user.Inventory.find((i) => i.item == "calendar")?.amount > 0) {
-        if (user.user.DMSettings.other)
-          notifications.push({ memberId: user.userId, payload: { embed: calendarSavedEmbed } });
+        if (user.user.DMSettings.other) {
+          if (user.user.DMSettings.voteReminder) {
+            notifications.push({
+              memberId: user.userId,
+              payload: { embed: calendarSavedEmbed, components: voteRow },
+            });
+          } else {
+            notifications.push({ memberId: user.userId, payload: { embed: calendarSavedEmbed } });
+          }
+        }
 
         await setInventoryItem(
           user.userId,
@@ -213,7 +246,16 @@ async function doVoteStreaks() {
         const gemSaveChance = Math.floor(Math.random() * 10);
 
         if (gemSaveChance < 5) {
-          notifications.push({ memberId: user.userId, payload: { embed: gemSavedEmbed } });
+          if (user.user.DMSettings.other) {
+            if (user.user.DMSettings.voteReminder) {
+              notifications.push({
+                memberId: user.userId,
+                payload: { embed: gemSavedEmbed, components: voteRow },
+              });
+            } else {
+              notifications.push({ memberId: user.userId, payload: { embed: gemSavedEmbed } });
+            }
+          }
 
           if (percentChance(7)) {
             await setInventoryItem(
@@ -222,14 +264,34 @@ async function doVoteStreaks() {
               Number(user.Inventory.find((i) => i.item === "white_gem").amount) - 1,
             );
 
-            notifications.push({ memberId: user.userId, payload: { embed: whiteGemBrokeEmbed } });
+            if (user.user.DMSettings.other) {
+              if (user.user.DMSettings.voteReminder) {
+                notifications.push({
+                  memberId: user.userId,
+                  payload: { embed: whiteGemBrokeEmbed, components: voteRow },
+                });
+              } else {
+                notifications.push({
+                  memberId: user.userId,
+                  payload: { embed: whiteGemBrokeEmbed },
+                });
+              }
+            }
           }
           return;
         }
       }
 
-      if (user.user.DMSettings.other && user.dailyStreak >= 7)
-        notifications.push({ memberId: user.userId, payload: { embed: resetEmbed } });
+      if (user.user.DMSettings.other && user.voteStreak >= 3) {
+        if (user.user.DMSettings.voteReminder) {
+          notifications.push({
+            memberId: user.userId,
+            payload: { embed: resetEmbed, components: voteRow },
+          });
+        } else {
+          notifications.push({ memberId: user.userId, payload: { embed: resetEmbed } });
+        }
+      }
 
       await prisma.economy.update({
         where: {
