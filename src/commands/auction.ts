@@ -415,7 +415,7 @@ async function run(
       max += await getTier(message.member);
     }
 
-    const itemValue = await calcItemValue(selected.id);
+    const itemValue = (await calcItemValue(selected.id)) || 0;
 
     if (cost / amount < (itemValue || 1000) / 2) {
       embed.setDescription(
@@ -1030,7 +1030,7 @@ async function run(
       });
     }
 
-    const itemValue = await calcItemValue(selected.id);
+    const itemValue = (await calcItemValue(selected.id)) || 0;
 
     let msg: Message<boolean>;
 
