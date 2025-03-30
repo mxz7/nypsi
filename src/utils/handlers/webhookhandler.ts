@@ -225,12 +225,6 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
 
   const amount = Math.floor(15000 * (level / 13 + 1));
 
-  let xp = 15;
-
-  xp += Math.floor((await getRawLevel(user)) * 0.3);
-
-  if (xp > 100) xp = 100;
-
   const determineCrateAmount = (value: number) => {
     let amount = 0;
 
@@ -252,7 +246,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
     await Promise.all([
       addBalance(user, amount),
       addKarma(user, 10),
-      addXp(user, xp),
+      addXp(user, 100),
       addBooster(user, "vote_booster"),
       redis.del(`${Constants.redis.cache.economy.VOTE}:${user}`),
       redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${user}`),
@@ -304,7 +298,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
           : "") +
         `you have voted **${votes.monthVote}** time${votes.monthVote > 1 ? "s" : ""} this month`,
     )
-    .setFooter({ text: `+${xp}xp | streak: ${votes.voteStreak.toLocaleString()}` });
+    .setFooter({ text: `+100xp | streak: ${votes.voteStreak.toLocaleString()}` });
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder()
