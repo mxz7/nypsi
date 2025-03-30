@@ -19,6 +19,7 @@ import Constants from "../Constants";
 import { addProgress, setProgress } from "../functions/economy/achievements";
 import { addBalance } from "../functions/economy/balance";
 import { addBooster } from "../functions/economy/boosters";
+import { addToGuildXP, getGuildByUser } from "../functions/economy/guilds";
 import { addInventoryItem, calcItemValue } from "../functions/economy/inventory";
 import { getRawLevel } from "../functions/economy/levelling";
 import { addStat } from "../functions/economy/stats";
@@ -220,6 +221,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
   );
 
   let level = await getRawLevel(user);
+  const guild = await getGuildByUser(user);
 
   if (level > 100) level = 100;
 
@@ -257,6 +259,8 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
     ]).catch((e) => {
       logger.error("vote error", e);
     });
+
+    if (guild) await addToGuildXP(guild.guildName, 100, user);
   } catch (e) {
     logger.error("vote error", e);
   }
