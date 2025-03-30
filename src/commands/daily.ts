@@ -1,10 +1,14 @@
 import dayjs = require("dayjs");
 import {
+  ActionRowBuilder,
   BaseMessageOptions,
+  ButtonBuilder,
+  ButtonStyle,
   CommandInteraction,
   InteractionEditReplyOptions,
   InteractionReplyOptions,
   Message,
+  MessageActionRowComponentBuilder,
 } from "discord.js";
 import redis from "../init/redis";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
@@ -20,6 +24,7 @@ import {
   getLastDaily,
   userExists,
 } from "../utils/functions/economy/utils";
+import { hasVoted } from "../utils/functions/economy/vote";
 import { percentChance } from "../utils/functions/random";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -102,7 +107,19 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
 
   const embed = await doDaily(message.member);
 
-  return send({ embeds: [embed] });
+  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+    new ButtonBuilder()
+      .setStyle(ButtonStyle.Link)
+      .setURL("https://top.gg/bot/678711738845102087/vote")
+      .setLabel("vote for more rewards")
+      .setEmoji("<:topgg:1355915569286610964>"),
+  );
+
+  if (!(await hasVoted(message.member))) {
+    return send({ embeds: [embed], components: [row] });
+  } else {
+    return send({ embeds: [embed] });
+  }
 }
 
 cmd.setRun(run);
