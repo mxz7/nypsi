@@ -2706,7 +2706,7 @@
     "rarity": 7,
     "article": "a",
     "in_crates": false,
-    "random_drop_chance": 3
+    "random_drop_chance": 1.75
   },
   "big_tiddy_goth_gf": {
     "id": "big_tiddy_goth_gf",
