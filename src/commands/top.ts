@@ -500,6 +500,24 @@ async function run(
       `top wordle wins ${global ? "[global]" : `for ${message.guild.name}`}`,
       global ? "https://nypsi.xyz/leaderboard/wordle" : null,
     );
+  } else if (args[0].toLowerCase().includes("votestreak")) {
+    let global = false;
+
+    if (args[1]?.toLowerCase() == "global") global = true;
+
+    let data: { pages: Map<number, string[]>; pos: number };
+
+    if (global) {
+      data = await topVoteStreakGlobal(message.author.id);
+    } else {
+      data = await topVoteStreak(message.guild, message.author.id);
+    }
+
+    return show(
+      data.pages,
+      data.pos,
+      `top vote streak ${global ? "[global]" : `for ${message.guild.name}`}`,
+    );
   } else if (args[0].toLowerCase().includes("vote")) {
     let global = false;
 
@@ -599,24 +617,6 @@ async function run(
     }
 
     return show(data.pages, data.pos, title, url);
-  } else if (args[0].toLowerCase().includes("votestreak")) {
-    let global = false;
-
-    if (args[1]?.toLowerCase() == "global") global = true;
-
-    let data: { pages: Map<number, string[]>; pos: number };
-
-    if (global) {
-      data = await topVoteStreakGlobal(message.author.id);
-    } else {
-      data = await topVoteStreak(message.guild, message.author.id);
-    }
-
-    return show(
-      data.pages,
-      data.pos,
-      `top vote streak ${global ? "[global]" : `for ${message.guild.name}`}`,
-    );
   } else {
     const selected =
       selectItem(args.join(" ").toLowerCase()) ||
