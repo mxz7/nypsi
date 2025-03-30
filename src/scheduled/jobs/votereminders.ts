@@ -24,7 +24,8 @@ const data: NotificationPayload = {
       new ButtonBuilder()
         .setStyle(ButtonStyle.Link)
         .setURL("https://top.gg/bot/678711738845102087/vote")
-        .setLabel("top.gg"),
+        .setLabel("top.gg")
+        .setEmoji("<:topgg:1355915569286610964>"),
     ),
   },
 };
