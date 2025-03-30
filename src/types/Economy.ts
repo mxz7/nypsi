@@ -9,6 +9,7 @@ export interface Item {
   buy?: number;
   sell?: number;
   role: string;
+  default_count?: number;
   booster_desc?: string;
   aliases?: string[];
   speed?: number;
@@ -35,7 +36,6 @@ export interface Item {
     [pool: string]: number
   }; // used for crates and scratches, indicates which pools to run and how many times
   clicks?: number; // amount of clicks for scratch cards
-  random_drop_chance?: number; // chance to appear in random drop pool
   tagId?: string;
   upgrades?: CarUpgradeType;
   plantId: string; // for seeds

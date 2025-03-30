@@ -22,5 +22,5 @@ export type LootPoolResult = { // describes ONE loot pool drop
     xp?: number;
     karma?: number;
     item?: string;
-    count?: number; // used only with item, optional
+    count?: number; // must be present if item is present
 }
