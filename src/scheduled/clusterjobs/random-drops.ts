@@ -12,13 +12,15 @@ import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { NypsiClient } from "../../models/Client";
 import { CustomEmbed } from "../../models/EmbedBuilders";
+import { LootPoolResult } from "../../types/LootPool";
 import Constants from "../../utils/Constants";
 import { findChannelCluster } from "../../utils/functions/clusters";
 import { MStoTime } from "../../utils/functions/date";
 import { addProgress } from "../../utils/functions/economy/achievements";
-import { addInventoryItem } from "../../utils/functions/economy/inventory";
+import { itemExists } from "../../utils/functions/economy/inventory";
+import { describeLootPoolResult, giveLootPoolResult, rollLootPool } from "../../utils/functions/economy/loot_pools";
 import { addTaskProgress } from "../../utils/functions/economy/tasks";
-import { createUser, getItems, isEcoBanned, userExists } from "../../utils/functions/economy/utils";
+import { createUser, getItems, getLootPools, isEcoBanned, userExists } from "../../utils/functions/economy/utils";
 import { getPrefix } from "../../utils/functions/guilds/utils";
 import { percentChance, shuffle } from "../../utils/functions/random";
 import sleep from "../../utils/functions/sleep";
@@ -108,23 +110,11 @@ async function randomDrop(client: NypsiClient) {
 
       await redis.set(`nypsi:lootdrop:channel:cd:${channelId}`, "69", "EX", cooldownSeconds);
 
-      let items = Array.from(Object.values(getItems()))
-        .filter((i) => i.random_drop_chance && percentChance(i.random_drop_chance))
-        .map((i) => `item:${i.id}`);
+      const pool = getLootPools().random_drop;
+      const excluded_items = Object.keys(pool.items)
+        .filter(e => getItems()[e].unique && itemExists(e));
 
-      const uniqueItems = new Set<string>();
-
-      for (const item of items) {
-        if (item.startsWith("item:") && getItems()[item.substring(5)].unique) {
-          uniqueItems.add(item);
-        }
-      }
-
-      if (uniqueItems.size > 0) items = items.filter((i) => !uniqueItems.has(i));
-
-      if (items.length === 0) return;
-
-      const prize = items[Math.floor(Math.random() * items.length)];
+      const prize = rollLootPool(pool, excluded_items);
 
       const games = [fastClickGame, clickSpecificGame, typeFastGame];
 
@@ -140,22 +130,7 @@ async function randomDrop(client: NypsiClient) {
         if (!(await userExists(winner))) await createUser(winner);
         if ((await isEcoBanned(winner).catch(() => ({ banned: false }))).banned) return;
 
-        logger.info(
-          `random drop in ${channelId} winner: ${winner} (${await getLastKnownUsername(
-            winner,
-          )}) prize: ${prize}`,
-        );
-
-        addProgress(winner, "lootdrops_pro", 1);
-        addTaskProgress(winner, "lootdrops");
-
-        if (prize.startsWith("item:")) {
-          let amount = 1;
-
-          if (getItems()[prize.substring(5)].role === "tool") amount = 15;
-
-          await addInventoryItem(winner, prize.substring(5), amount);
-        }
+        giveLootPoolResult(winner, prize);
       }
 
       if (count >= max) return;
@@ -165,7 +140,7 @@ async function randomDrop(client: NypsiClient) {
   await pAll(functions, { concurrency: 2 });
 }
 
-async function fastClickGame(client: NypsiClient, channelId: string, prize: string, rain?: string) {
+async function fastClickGame(client: NypsiClient, channelId: string, prize: LootPoolResult, rain?: string) {
   const cluster = await findChannelCluster(client, channelId);
 
   if (typeof cluster.cluster !== "number") return;
@@ -174,25 +149,13 @@ async function fastClickGame(client: NypsiClient, channelId: string, prize: stri
     .setColor(0xffffff)
     .setHeader("loot drop", client.user.avatarURL())
     .setDescription(
-      `first to click the button wins ${
-        prize.startsWith("item:")
-          ? `${getItems()[prize.substring(5)].article} ${getItems()[prize.substring(5)].emoji} **${
-              getItems()[prize.substring(5)].name
-            }**`
-          : ""
-      }`,
+      `first to click the button wins ${describeLootPoolResult(prize)}`,
     );
   const winEmbed = new CustomEmbed()
     .setColor(Constants.EMBED_SUCCESS_COLOR)
     .setHeader(`you've won a loot drop!`)
     .setDescription(
-      `you've won ${
-        prize.startsWith("item:")
-          ? `${getItems()[prize.substring(5)].article} ${getItems()[prize.substring(5)].emoji} **${
-              getItems()[prize.substring(5)].name
-            }**`
-          : ""
-      }`,
+      `you've won ${describeLootPoolResult(prize)}`,
     );
 
   if (rain) {
@@ -258,7 +221,7 @@ async function fastClickGame(client: NypsiClient, channelId: string, prize: stri
   return winnerId;
 }
 
-async function typeFastGame(client: NypsiClient, channelId: string, prize: string, rain?: string) {
+async function typeFastGame(client: NypsiClient, channelId: string, prize: LootPoolResult, rain?: string) {
   const cluster = await findChannelCluster(client, channelId);
 
   if (typeof cluster.cluster !== "number") return;
@@ -282,13 +245,7 @@ async function typeFastGame(client: NypsiClient, channelId: string, prize: strin
     .setColor(0xffffff)
     .setHeader("loot drop", client.user.avatarURL())
     .setDescription(
-      `first to type \`${displayWord}\` wins ${
-        prize.startsWith("item:")
-          ? `${getItems()[prize.substring(5)].article} ${getItems()[prize.substring(5)].emoji} **${
-              getItems()[prize.substring(5)].name
-            }**`
-          : ""
-      }`,
+      `first to type \`${displayWord}\` wins ${describeLootPoolResult(prize)}`,
     );
 
   if (rain) {
@@ -349,7 +306,7 @@ async function typeFastGame(client: NypsiClient, channelId: string, prize: strin
 async function clickSpecificGame(
   client: NypsiClient,
   channelId: string,
-  prize: string,
+  prize: LootPoolResult,
   rain?: string,
 ) {
   const cluster = await findChannelCluster(client, channelId);
@@ -427,25 +384,13 @@ async function clickSpecificGame(
     .setDescription(
       `first to click the **${chosenValue.name}** ${
         chosenType.type.includes("emoji") ? "emoji" : "button"
-      } wins ${
-        prize.startsWith("item:")
-          ? `${getItems()[prize.substring(5)].article} ${getItems()[prize.substring(5)].emoji} **${
-              getItems()[prize.substring(5)].name
-            }**`
-          : ""
-      }`,
+      } wins ${describeLootPoolResult(prize)}`,
     );
   const winEmbed = new CustomEmbed()
     .setColor(Constants.EMBED_SUCCESS_COLOR)
     .setHeader(`you've won a loot drop!`)
     .setDescription(
-      `you've won ${
-        prize.startsWith("item:")
-          ? `${getItems()[prize.substring(5)].article} ${getItems()[prize.substring(5)].emoji} **${
-              getItems()[prize.substring(5)].name
-            }**`
-          : ""
-      }`,
+      `you've won ${describeLootPoolResult(prize)}`,
     );
   const failEmbed = new CustomEmbed()
     .setColor(Constants.EMBED_FAIL_COLOR)
@@ -568,13 +513,12 @@ async function clickSpecificGame(
 }
 
 export async function startRandomDrop(client: NypsiClient, channelId: string, rain?: string) {
-  const items = Array.from(Object.values(getItems()))
-    .filter((i) => i.random_drop_chance && percentChance(i.random_drop_chance))
-    .map((i) => `item:${i.id}`);
 
-  if (items.length === 0) return;
+  const pool = getLootPools().random_drop;
+  const excluded_items = Object.keys(pool.items)
+    .filter(e => getItems()[e].unique && itemExists(e));
 
-  const prize = items[Math.floor(Math.random() * items.length)];
+  const prize = rollLootPool(pool, excluded_items);
 
   const games = [fastClickGame, clickSpecificGame, typeFastGame];
 
@@ -602,13 +546,7 @@ export async function startRandomDrop(client: NypsiClient, channelId: string, ra
       addTaskProgress(winner, "lootdrops");
     }
 
-    if (prize.startsWith("item:")) {
-      let amount = 1;
-
-      if (getItems()[prize.substring(5)].role === "tool") amount = 15;
-
-      await addInventoryItem(winner, prize.substring(5), amount);
-    }
+    await giveLootPoolResult(winner, prize);
   }
 }
 

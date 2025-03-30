@@ -46,7 +46,45 @@ export function getBasicLootPool(): LootPool {
     return lootPool;
 }
 
-function rollLootPool(loot_pool: LootPool, excluded_items: string[]): LootPoolResult {
+export async function giveLootPoolResult(member: string | GuildMember, result: LootPoolResult) {
+  if(Object.hasOwn(result, "money")) {
+    await addBalance(member, result.money);
+  }
+  if(Object.hasOwn(result, "xp")) {
+    await addXp(member, result.xp);
+    const guild = await getGuildName(member);
+    if (guild) {
+      await addToGuildXP(guild, result.xp, member);
+    }
+  }
+  if(Object.hasOwn(result, "karma")) {
+    await addKarma(member, result.karma);
+  }
+  if(Object.hasOwn(result, "item")) {
+    await addInventoryItem(member, result.item, Object.hasOwn(result, "count") ? result.count : 1);
+  }
+}
+
+export function describeLootPoolResult(result: LootPoolResult): string {
+  if(Object.hasOwn(result, "money")) {
+    return `$${result.money.toLocaleString()}`
+  }
+  if(Object.hasOwn(result, "xp")) {
+    return `**${result.xp}xp`
+  }
+  if(Object.hasOwn(result, "karma")) {
+    return `${result.karma} karma 🔮`
+  }
+  if(Object.hasOwn(result, "item")) {
+    const item = getItems()[result.item];
+    const article = result.count === 1 ? item.article : `\`x${result.count ?? 1}\``;
+    return `${article} ${item.emoji} **${item.name}**`
+  }
+  logger.error("could not describe loot pool result")
+  return ""; // this shouldnt be reached
+}
+
+export function rollLootPool(loot_pool: LootPool, excluded_items: string[]): LootPoolResult {
     const totalWeight = getTotalWeight(loot_pool, excluded_items);
     let randomValue = Math.random() * totalWeight;
 
@@ -171,22 +209,7 @@ export async function openCrate(
   }
 
   for(const i of crateItems) {
-    if(Object.hasOwn(i, "money")) {
-      await addBalance(member, i.money);
-    }
-    if(Object.hasOwn(i, "xp")) {
-      await addXp(member, i.xp);
-      const guild = await getGuildName(member);
-      if (guild) {
-        await addToGuildXP(guild, i.xp, member);
-      }
-    }
-    if(Object.hasOwn(i, "karma")) {
-      await addKarma(member, i.karma);
-    }
-    if(Object.hasOwn(i, "item")) {
-      await addInventoryItem(member, i.item, Object.hasOwn(i, "count") ? i.count : 1);
-    }
+    await giveLootPoolResult(member, i);
   }
   return crateItems;
 }

@@ -292,9 +292,18 @@
   },
   "random_drop": {
     "items": {
-      "diamond_pickaxe": 20,
-      "incredible_fishing_rod": 20,
-      "incredible_gun": 20,
+      "diamond_pickaxe": {
+        "weight": 20,
+        "count": 15
+      },
+      "incredible_fishing_rod": {
+        "weight": 20,
+        "count": 15
+      },
+      "incredible_gun": {
+        "weight": 20,
+        "count": 15
+      },
       "mineshaft_chest": 40,
       "basic_crate": 100,
       "69420_crate": 100,
