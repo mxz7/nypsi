@@ -17,7 +17,8 @@ import PageManager from "../../page";
 import { getTier, isPremium } from "../../premium/premium";
 import sleep from "../../sleep";
 import { addProgress } from "../achievements";
-import { calcItemValue, getInventory, openCrate, selectItem } from "../inventory";
+import { calcItemValue, getInventory, selectItem } from "../inventory";
+import { openCrate } from "../loot_pools";
 import { addStat } from "../stats";
 import { addTaskProgress } from "../tasks";
 import { getItems } from "../utils";
@@ -111,7 +112,19 @@ module.exports = new ItemUse(
 
     const msg = await send({ embeds: [embed] });
 
-    const foundItems = new Map<string, number>();
+    const foundAll = {
+      money: 0,
+      xp: 0,
+      karma: 0,
+      items: {}
+    } as {
+      money: number;
+      xp: number;
+      karma: number;
+      items: {
+        [item: string]: number
+      }
+    };
 
     await Promise.all([
       addProgress(message.author.id, "unboxer", amount),
@@ -121,12 +134,14 @@ module.exports = new ItemUse(
 
     for (let i = 0; i < amount; i++) {
       const found = await openCrate(message.member, selected);
-
-      for (const [key, value] of found.entries()) {
-        if (foundItems.has(key)) {
-          foundItems.set(key, foundItems.get(key) + value);
+      for (const product of found) {
+        foundAll.money += product.money ?? 0;
+        foundAll.xp += product.xp ?? 0;
+        foundAll.karma += product.karma ?? 0;
+        if (Object.hasOwn(foundAll.items, product.item)) {
+          foundAll.items[product.item] += product.count ?? 1;
         } else {
-          foundItems.set(key, value);
+          foundAll.items[product.item] = product.count ?? 1;
         }
       }
     }
@@ -135,27 +150,27 @@ module.exports = new ItemUse(
 
     desc.push("you found: ");
 
-    if (foundItems.has("money")) {
-      desc.push(`- $${foundItems.get("money").toLocaleString()}`);
-      foundItems.delete("money");
+    if (foundAll.money > 0) {
+      desc.push(`- $${foundAll.money.toLocaleString()}`);
     }
 
-    if (foundItems.has("xp")) {
-      embed.setFooter({ text: `+${foundItems.get("xp").toLocaleString()}xp` });
-      foundItems.delete("xp");
+    if (foundAll.xp > 0 || foundAll.karma > 0) {
+      const xpText = foundAll.xp > 0 ? `+${foundAll.xp.toLocaleString()}xp` : "";
+      const karmaText = foundAll.karma > 0 ? `+${foundAll.karma.toLocaleString()}🔮` : "";
+      const joiner = foundAll.xp > 0 && foundAll.karma > 0 ? "    " : "";
+      embed.setFooter({ text: `${xpText}${joiner}${karmaText}` });
     }
 
     const values = new Map<string, number>();
+    const items = Object.keys(foundAll.items);
 
-    for (const [item, amount] of foundItems.entries()) {
-      values.set(item, ((await calcItemValue(item).catch(() => 0)) || 0) * amount);
+    for (const itemKey in foundAll.items) {
+      values.set(itemKey, ((await calcItemValue(itemKey).catch(() => 0)) || 0) * foundAll.items[itemKey]);
     }
+    inPlaceSort(items).desc(i => values.get(i));
 
-    for (const [item, amount] of inPlaceSort(Array.from(foundItems.entries())).desc([
-      (i) => values.get(i[0]),
-      (i) => i[1],
-    ])) {
-      desc.push(`- \`${amount}x\` ${getItems()[item].emoji} ${getItems()[item].name}`);
+    for (const item of items) {
+      desc.push(`- \`${foundAll.items[item]}x\` ${getItems()[item].emoji} ${getItems()[item].name}`);
     }
 
     const pages = PageManager.createPages(desc, 15);
