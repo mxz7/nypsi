@@ -231,7 +231,10 @@ async function doVoteStreaks() {
               payload: { embed: calendarSavedEmbed, components: voteRow },
             });
           } else {
-            notifications.push({ memberId: user.userId, payload: { embed: calendarSavedEmbed } });
+            notifications.push({
+              memberId: user.userId,
+              payload: { embed: calendarSavedEmbed, components: remindersRow },
+            });
           }
         }
 
@@ -253,7 +256,10 @@ async function doVoteStreaks() {
                 payload: { embed: gemSavedEmbed, components: voteRow },
               });
             } else {
-              notifications.push({ memberId: user.userId, payload: { embed: gemSavedEmbed } });
+              notifications.push({
+                memberId: user.userId,
+                payload: { embed: gemSavedEmbed, components: remindersRow },
+              });
             }
           }
 
@@ -273,7 +279,7 @@ async function doVoteStreaks() {
               } else {
                 notifications.push({
                   memberId: user.userId,
-                  payload: { embed: whiteGemBrokeEmbed },
+                  payload: { embed: whiteGemBrokeEmbed, components: remindersRow },
                 });
               }
             }
@@ -289,7 +295,10 @@ async function doVoteStreaks() {
             payload: { embed: resetEmbed, components: voteRow },
           });
         } else {
-          notifications.push({ memberId: user.userId, payload: { embed: resetEmbed } });
+          notifications.push({
+            memberId: user.userId,
+            payload: { embed: resetEmbed, components: remindersRow },
+          });
         }
       }
 
