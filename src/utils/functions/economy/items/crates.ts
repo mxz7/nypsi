@@ -138,10 +138,12 @@ module.exports = new ItemUse(
         foundAll.money += product.money ?? 0;
         foundAll.xp += product.xp ?? 0;
         foundAll.karma += product.karma ?? 0;
-        if (Object.hasOwn(foundAll.items, product.item)) {
-          foundAll.items[product.item] += product.count ?? 1;
-        } else {
-          foundAll.items[product.item] = product.count ?? 1;
+        if(Object.hasOwn(product, "item")) {
+          if (Object.hasOwn(foundAll.items, product.item)) {
+            foundAll.items[product.item] += product.count ?? 1;
+          } else {
+            foundAll.items[product.item] = product.count ?? 1;
+          }
         }
       }
     }

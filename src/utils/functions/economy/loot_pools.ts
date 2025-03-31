@@ -158,7 +158,7 @@ function getTotalWeight(loot_pool: LootPool, excluded_items: string[]): number {
     if(Object.hasOwn(loot_pool, "items")) {
         for(const item in loot_pool.items) {
             if(item in excluded_items) { continue; }
-            totalWeight += getItemWeight(loot_pool.items.item);
+            totalWeight += getItemWeight(loot_pool.items[item]);
         }
     }
     return totalWeight;
