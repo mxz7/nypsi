@@ -412,7 +412,7 @@
       "gem_shard": 25,
       "omega_crate": 0.1,
       "hanafuda_tag": 0.001,
-      "reroll_token": 3,
+      "reroll_token": 1.75,
       "engine_upgrade_part": 30,
       "turbo_upgrade_part": 10,
       "wheel_upgrade_part": 10,
