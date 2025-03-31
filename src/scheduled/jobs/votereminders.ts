@@ -56,6 +56,7 @@ export default {
             Economy: {
               select: {
                 lastVote: true,
+                voteStreak: true,
               },
             },
           },
@@ -79,6 +80,9 @@ export default {
       ) {
         data.memberId = user.userId;
         data.payload.embed.setColor(getColor(user.userId));
+        data.payload.embed.setFooter({
+          text: `streak: ${user.user.Economy.voteStreak.toLocaleString()}`,
+        });
 
         addNotificationToQueue(data);
 
