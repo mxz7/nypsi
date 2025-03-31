@@ -163,7 +163,10 @@ export default class ScratchCard {
       let start = y;
 
       for (let i = 0; i < 1; i++) {
-        if (this.area[start - 1] && this.area[start - 1][x] === this.area[y][x]) {
+        if (
+          this.area[start - 1] &&
+          util.isDeepStrictEqual(this.area[start - 1][x], this.area[y][x])
+        ) {
           start--;
           i--;
         }
@@ -171,7 +174,7 @@ export default class ScratchCard {
 
       for (let i = start; i < start + 3; i++) {
         if (!this.area[i]) return false;
-        if (this.area[i][x] !== this.area[y][x]) return false;
+        if (!util.isDeepStrictEqual(this.area[i][x], this.area[y][x])) return false;
       }
 
       for (let i = start; i < start + 3; i++) {
