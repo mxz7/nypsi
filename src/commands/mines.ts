@@ -364,7 +364,7 @@ async function prepareGame(
   let incrementAmount = 0.6;
 
   if (chosenMinesCount == 0) {
-    bombCount = Math.floor(Math.random() * 5) + 4;
+    bombCount = Math.floor(Math.random() * 3.569696969) + 4;
   } else {
     bombCount = chosenMinesCount;
     incrementAmount = mineIncrements.get(bombCount);
