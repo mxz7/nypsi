@@ -118,17 +118,18 @@ async function randomDrop(client: NypsiClient) {
       const games = [fastClickGame, clickSpecificGame, typeFastGame];
 
       logger.info(`random drop started in ${channelId}`);
-      const winner = await games[Math.floor(Math.random() * games.length)](
-        client,
-        channelId,
-        prize,
-      );
+      const winner = await games[Math.floor(Math.random() * games.length)](client, channelId, prize);
 
       if (winner) {
         if (!(await hasProfile(winner))) await createProfile(winner);
         if (!(await userExists(winner))) await createUser(winner);
         if ((await isEcoBanned(winner).catch(() => ({ banned: false }))).banned) return;
 
+        logger.info(
+          `random drop in ${channelId} winner: ${winner} (${await getLastKnownUsername(
+            winner,
+          )}) prize: ${JSON.stringify(prize)}`,
+        );
         giveLootPoolResult(winner, prize);
       }
 
@@ -537,7 +538,7 @@ export async function startRandomDrop(client: NypsiClient, channelId: string, ra
     logger.info(
       `random drop in ${channelId} winner: ${winner} (${await getLastKnownUsername(
         winner,
-      )}) prize: ${prize} ${rain ? "(rain)" : ""}`,
+      )}) prize: ${JSON.stringify(prize)} ${rain ? "(rain)" : ""}`,
     );
 
     if (!rain) {

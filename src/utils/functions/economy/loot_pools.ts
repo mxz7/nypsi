@@ -77,7 +77,7 @@ export function describeLootPoolResult(result: LootPoolResult): string {
   }
   if(Object.hasOwn(result, "item")) {
     const item = getItems()[result.item];
-    const article = result.count === 1 ? item.article : `\`x${result.count ?? 1}\``;
+    const article = result.count === 1 ? item.article : `\`${result.count ?? 1}x\``;
     return `${article} ${item.emoji} **${item.name}**`
   }
   logger.error("could not describe loot pool result")
