@@ -111,9 +111,8 @@ async function randomDrop(client: NypsiClient) {
       await redis.set(`nypsi:lootdrop:channel:cd:${channelId}`, "69", "EX", cooldownSeconds);
 
       const pool = getLootPools().random_drop;
-      const excluded_items = Object.keys(pool.items)
+      const excluded_items = Object.keys(pool.items ?? {})
         .filter(e => getItems()[e].unique && itemExists(e));
-
       const prize = rollLootPool(pool, excluded_items);
 
       const games = [fastClickGame, clickSpecificGame, typeFastGame];
@@ -515,7 +514,7 @@ async function clickSpecificGame(
 export async function startRandomDrop(client: NypsiClient, channelId: string, rain?: string) {
 
   const pool = getLootPools().random_drop;
-  const excluded_items = Object.keys(pool.items)
+  const excluded_items = Object.keys(pool.items ?? {})
     .filter(e => getItems()[e].unique && itemExists(e));
 
   const prize = rollLootPool(pool, excluded_items);

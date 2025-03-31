@@ -261,7 +261,7 @@ export default class ScratchCard {
       }
     }
 
-    const excluded_items = Object.keys(pool.items)
+    const excluded_items = Object.keys(pool.items ?? {})
       .filter(e => 
         (getItems()[e].unique && itemExists(e)) || 
         (e.includes("_gem") && redis.exists(Constants.redis.nypsi.GEM_GIVEN))

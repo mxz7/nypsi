@@ -165,10 +165,9 @@ function getTotalWeight(loot_pool: LootPool, excluded_items: string[]): number {
 }
 
 function getItemWeight(data: { weight?: number, count?: number } | number): number {
-  const defaultWeight = 100;
-  if(typeof data === "number") { return defaultWeight; }
+  if(typeof data === "number") { return data; }
   if(Object.hasOwn(data, "weight")) { return data.weight; }
-  return defaultWeight;
+  return 100; // default weight
 }
 
 function getItemCount(data: { weight?: number, count?: number } | number, itemId: string): number {
@@ -201,7 +200,7 @@ export async function openCrate(
 
   for(const poolName in item.loot_pools) {
     const pool = getLootPools()[poolName];
-    const excluded_items = Object.keys(pool.items)
+    const excluded_items = Object.keys(pool.items ?? {})
       .filter(e => getItems()[e].unique && itemExists(e));
     for(let i = 0; i < item.loot_pools[poolName]; i++) {
       crateItems.push(rollLootPool(pool, excluded_items));
