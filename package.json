@@ -22,7 +22,7 @@
     "bufferutil": "4.0.9",
     "bullmq": "^5.44.4",
     "chalk": "4.1.2",
-    "cron": "^4.1.1",
+    "cron": "^4.1.3",
     "crypto-js": "4.2.0",
     "dayjs": "1.11.13",
     "discord-hybrid-sharding": "2.2.6",
