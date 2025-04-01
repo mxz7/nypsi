@@ -29,7 +29,7 @@ import { setProgress } from "./achievements";
 import { addBalance, calcMaxBet, getBalance } from "./balance";
 import { addToGuildXP, getGuildByUser, getGuildName } from "./guilds";
 import { addInventoryItem } from "./inventory";
-import { getBasicLootPool } from "./loot_pools";
+import { getDefaultLootPool } from "./loot_pools";
 import { addStat } from "./stats";
 import { addTaskProgress } from "./tasks";
 import { addXp } from "./xp";
@@ -77,7 +77,11 @@ export function loadItems(crypto = true) {
   plantUpgrades = JSON.parse(plantsFile).upgrades;
   lootPools = JSON.parse(lootPoolsFile);
 
-  lootPools.basic_crate = getBasicLootPool();
+  lootPools.basic_crate = getDefaultLootPool(i => i.in_crates);
+  lootPools.basic_crate.money = { 50000: 100, 100000: 100, 500000: 100 };
+  lootPools.basic_crate.xp = { 50: 100, 100: 100, 250: 100 };
+  lootPools.workers_crate = getDefaultLootPool(i => i.role === "worker-upgrade");
+  lootPools.boosters_crate = getDefaultLootPool(i => i.role === "booster");
 
   Object.values(userUpgrades).forEach((i) => {
     maxPrestige += i.max;

@@ -9,27 +9,17 @@ import { addXp } from "./xp";
 import { addInventoryItem, getInventory, itemExists, setInventoryItem } from "./inventory";
 import { addKarma } from "../karma/karma";
 
-export function getBasicLootPool(): LootPool {
+export function getDefaultLootPool(predicate?: (item: Item) => boolean): LootPool {
     let lootPool: LootPool = {
-        money: {
-            50000: 100,
-            100000: 100,
-            500000: 100
-        },
-        xp: {
-            50: 100,
-            100: 100,
-            250: 100
-        },
         items: {}
     }
     const items = getItems()
     const rarityToWeight = [1000, 400, 100, 100/3, 20/3, 2, 0.05]
     for(const i in items) {
         const item = items[i];
-        
-        if(!item.in_crates || item.rarity > rarityToWeight.length) { continue; }
-    
+        if(predicate && !predicate(item)) { continue; }
+        if(item.rarity > rarityToWeight.length) { continue; }
+
         let weight = rarityToWeight[item.rarity];
         if (item.rarity === 6 && item.role === "tag") {
             weight *= 0.01;
