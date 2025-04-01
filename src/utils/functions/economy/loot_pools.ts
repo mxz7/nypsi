@@ -1,12 +1,9 @@
 import { GuildMember } from "discord.js";
 import { Item } from "../../../types/Economy";
-import { LootPool, LootPoolResult } from "../../../types/LootPool";
+import { LootPool, LootPoolItemEntry, LootPoolResult } from "../../../types/LootPool";
 import { logger } from "../../logger";
-import { percentChance } from "../random";
-import { addProgress } from "./achievements";
 import { addBalance } from "./balance";
 import { addToGuildXP, getGuildName } from "./guilds";
-import { addStat } from "./stats";
 import { getItems, getLootPools } from "./utils";
 import { addXp } from "./xp";
 import { addInventoryItem, getInventory, itemExists, setInventoryItem } from "./inventory";
@@ -164,19 +161,24 @@ function getTotalWeight(loot_pool: LootPool, excluded_items: string[]): number {
     return totalWeight;
 }
 
-function getItemWeight(data: { weight?: number, count?: number } | number): number {
+function getItemWeight(data: LootPoolItemEntry): number {
   if(typeof data === "number") { return data; }
   if(Object.hasOwn(data, "weight")) { return data.weight; }
   return 100; // default weight
 }
 
-function getItemCount(data: { weight?: number, count?: number } | number, itemId: string): number {
+function getItemCount(data: LootPoolItemEntry, itemId: string): number {
   const item = getItems()[itemId];
   if(typeof data !== "object" || !Object.hasOwn(data, "count")) {
     if(!Object.hasOwn(item, "default_count")) { return 1; }
     return item.default_count;
   }
-  return data.count;
+  if(typeof data.count === "number") {
+    return data.count;
+  }
+  return Math.floor(
+    Math.random() * (data.count.max - data.count.min + 1) + data.count.min
+  );
 }
 
 export async function openCrate(

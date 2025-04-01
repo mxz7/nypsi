@@ -10,17 +10,23 @@ export type LootPool = {
     [amount: number]: number // amount: weight
   };
   items?: {
-    [item: string]: {
-      weight?: number;
-      count?: number
-    } | number // item: weight, count assumed to be 1
+    [item: string]: LootPoolItemEntry
   };
 }
 
+export type LootPoolItemEntry = {
+  weight?: number;
+  count?: {
+    min: number;
+    max: number;
+  } | number;
+} | number // item: weight, count assumed to be 1
+
+
 export type LootPoolResult = { // describes ONE loot pool drop
-    money?: number;
-    xp?: number;
-    karma?: number;
-    item?: string;
-    count?: number; // must be present if item is present
+  money?: number;
+  xp?: number;
+  karma?: number;
+  item?: string;
+  count?: number; // must be present if item is present
 }

@@ -79,7 +79,13 @@
       "pink_gem": 100,
       "white_gem": 33.3,
       "crystal_heart": 6.66,
-      "gem_shard": 33.3
+      "gem_shard": {
+        "weight": 33.3,
+        "count": {
+          "min": 5,
+          "max": 19
+        }
+      }
     }
   },
   "omega_crate": {
