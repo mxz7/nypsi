@@ -57,15 +57,18 @@ export function describeLootPoolResult(result: LootPoolResult): string {
     return `$${result.money.toLocaleString()}`
   }
   if(Object.hasOwn(result, "xp")) {
-    return `**${result.xp}xp`
+    return `**${result.xp}**xp`
   }
   if(Object.hasOwn(result, "karma")) {
-    return `${result.karma} karma 🔮`
+    return `**${result.karma}** karma 🔮`
   }
   if(Object.hasOwn(result, "item")) {
     const item = getItems()[result.item];
     const article = result.count === 1 ? item.article : `\`${result.count ?? 1}x\``;
     return `${article} ${item.emoji} **${item.name}**`
+  }
+  if(Object.keys(result).length === 0) {
+    return "**nothing**"
   }
   logger.error("could not describe loot pool result")
   return ""; // this shouldnt be reached
