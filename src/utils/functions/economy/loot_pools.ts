@@ -24,7 +24,7 @@ export function getDefaultLootPool(predicate?: (item: Item) => boolean): LootPoo
     if (item.rarity === 6 && item.role === "tag") {
       weight *= 0.01;
     }
-    if(item.rarity in [0, 1] && item.role in ["collectable", "flower", "cat"]) {
+    if(item.rarity in [0, 1] && ["collectable", "flower", "cat"].includes(item.role)) {
       weight *= 2/3;
     }
 
