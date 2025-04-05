@@ -76,13 +76,15 @@ export function describeLootPoolResult(result: LootPoolResult): string {
 
 export async function rollLootPool(
   loot_pool: LootPool,
-  exclusionPredicate: (itemId: string) => Promise<boolean> // only works on items
+  exclusionPredicate?: (itemId: string) => Promise<boolean> // only works on items
 ): Promise<LootPoolResult> {
 
   let excludedItems = [] as string[];
-  const poolItems = Object.keys(loot_pool.items ?? {});
-  const exclusionResults = await Promise.all(poolItems.map(exclusionPredicate));
-  excludedItems = poolItems.filter((e, i) => exclusionResults[i]);
+  if(exclusionPredicate) {
+    const poolItems = Object.keys(loot_pool.items ?? {});
+    const exclusionResults = await Promise.all(poolItems.map(exclusionPredicate));
+    excludedItems = poolItems.filter((e, i) => exclusionResults[i]);
+  }
   let randomValue = Math.random() * getTotalWeight(loot_pool, excludedItems);
 
   if(Object.hasOwn(loot_pool, "nothing")) {
