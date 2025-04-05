@@ -61,7 +61,7 @@ async function run(
       );
 
       if (profile.removed) {
-        delete row.components[1];
+        row.components.splice(1, 1);
       }
 
       if (msg) msg.edit({ embeds: [embed], components: [row] });
