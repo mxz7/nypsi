@@ -243,7 +243,7 @@ export default class ScratchCard {
     const poolName = Object.keys(item.loot_pools)[0];
 
     const pool = getLootPools()[poolName];
-    let unweightedPool = structuredClone(pool);
+    const unweightedPool = structuredClone(pool);
     delete unweightedPool.nothing;
     for(const amount in unweightedPool.money) {
       unweightedPool.money[amount] = 100;

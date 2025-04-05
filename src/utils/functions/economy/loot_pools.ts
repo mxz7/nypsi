@@ -10,7 +10,7 @@ import { addInventoryItem, getInventory, itemExists, setInventoryItem } from "./
 import { addKarma } from "../karma/karma";
 
 export function getDefaultLootPool(predicate?: (item: Item) => boolean): LootPool {
-  let lootPool: LootPool = {
+  const lootPool: LootPool = {
     items: {}
   }
   const items = getItems()
@@ -121,7 +121,7 @@ export async function rollLootPool(
     for(const itemKey in loot_pool.items) {
       if(excludedItems.includes(itemKey)) { continue; }
       const itemLootData = loot_pool.items[itemKey];
-      let itemWeight = getItemWeight(itemLootData);
+      const itemWeight = getItemWeight(itemLootData);
       if(randomValue < itemWeight) {
         return { item: itemKey, count: getItemCount(itemLootData, itemKey) };
       }
