@@ -27,6 +27,7 @@ import { getLastKnownUsername } from "../../utils/functions/users/tag";
 import { createProfile, hasProfile } from "../../utils/functions/users/utils";
 import { logger } from "../../utils/logger";
 import dayjs = require("dayjs");
+import pAll = require("p-all");
 
 const max = 3;
 const cooldownSeconds = 900;
@@ -96,61 +97,72 @@ async function randomDrop(client: NypsiClient) {
 
   let count = 0;
 
+  const functions = [];
+
   for (const channelId of shuffle(channels)) {
-    if (await redis.exists(`nypsi:lootdrop:channel:cd:${channelId}`)) continue;
+    functions.push(async () => {
+      if (await redis.exists(`nypsi:lootdrop:channel:cd:${channelId}`)) return;
+      if (count >= max) return;
 
-    count++;
+      count++;
 
-    await redis.set(`nypsi:lootdrop:channel:cd:${channelId}`, "69", "EX", cooldownSeconds);
+      await redis.set(`nypsi:lootdrop:channel:cd:${channelId}`, "69", "EX", cooldownSeconds);
 
-    let items = Array.from(Object.values(getItems()))
-      .filter((i) => i.random_drop_chance && percentChance(i.random_drop_chance))
-      .map((i) => `item:${i.id}`);
+      let items = Array.from(Object.values(getItems()))
+        .filter((i) => i.random_drop_chance && percentChance(i.random_drop_chance))
+        .map((i) => `item:${i.id}`);
 
-    const uniqueItems = new Set<string>();
+      const uniqueItems = new Set<string>();
 
-    for (const item of items) {
-      if (item.startsWith("item:") && getItems()[item.substring(5)].unique) {
-        uniqueItems.add(item);
+      for (const item of items) {
+        if (item.startsWith("item:") && getItems()[item.substring(5)].unique) {
+          uniqueItems.add(item);
+        }
       }
-    }
 
-    if (uniqueItems.size > 0) items = items.filter((i) => !uniqueItems.has(i));
+      if (uniqueItems.size > 0) items = items.filter((i) => !uniqueItems.has(i));
 
-    if (items.length === 0) continue;
+      if (items.length === 0) return;
 
-    const prize = items[Math.floor(Math.random() * items.length)];
+      const prize = items[Math.floor(Math.random() * items.length)];
 
-    const games = [fastClickGame, clickSpecificGame, typeFastGame];
+      const games = [fastClickGame, clickSpecificGame, typeFastGame];
 
-    logger.info(`random drop started in ${channelId}`);
-    const winner = await games[Math.floor(Math.random() * games.length)](client, channelId, prize);
-
-    if (winner) {
-      if (!(await hasProfile(winner))) await createProfile(winner);
-      if (!(await userExists(winner))) await createUser(winner);
-      if ((await isEcoBanned(winner).catch(() => ({ banned: false }))).banned) continue;
-
-      logger.info(
-        `random drop in ${channelId} winner: ${winner} (${await getLastKnownUsername(
-          winner,
-        )}) prize: ${prize}`,
+      logger.info(`random drop started in ${channelId}`);
+      const winner = await games[Math.floor(Math.random() * games.length)](
+        client,
+        channelId,
+        prize,
       );
 
-      addProgress(winner, "lootdrops_pro", 1);
-      addTaskProgress(winner, "lootdrops");
+      if (winner) {
+        if (!(await hasProfile(winner))) await createProfile(winner);
+        if (!(await userExists(winner))) await createUser(winner);
+        if ((await isEcoBanned(winner).catch(() => ({ banned: false }))).banned) return;
 
-      if (prize.startsWith("item:")) {
-        let amount = 1;
+        logger.info(
+          `random drop in ${channelId} winner: ${winner} (${await getLastKnownUsername(
+            winner,
+          )}) prize: ${prize}`,
+        );
 
-        if (getItems()[prize.substring(5)].role === "tool") amount = 15;
+        addProgress(winner, "lootdrops_pro", 1);
+        addTaskProgress(winner, "lootdrops");
 
-        await addInventoryItem(winner, prize.substring(5), amount);
+        if (prize.startsWith("item:")) {
+          let amount = 1;
+
+          if (getItems()[prize.substring(5)].role === "tool") amount = 15;
+
+          await addInventoryItem(winner, prize.substring(5), amount);
+        }
       }
-    }
 
-    if (count >= max) break;
+      if (count >= max) return;
+    });
   }
+
+  await pAll(functions, { concurrency: 2 });
 }
 
 async function fastClickGame(client: NypsiClient, channelId: string, prize: string, rain?: string) {
