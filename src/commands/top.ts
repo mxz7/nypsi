@@ -418,13 +418,13 @@ async function run(
       `top net worth ${global ? "[global]" : `for ${message.guild.name}`}`,
       global ? "https://nypsi.xyz/leaderboard/net-worth" : null,
     );
-  } else if (args[0].toLowerCase().includes("guild")) {
+  } else if (args[0].toLowerCase() === "guild" || args[0].toLowerCase() === "guilds") {
     const userGuild = await getGuildByUser(message.member);
 
     const data = await topGuilds(userGuild?.guildName);
 
     return show(data.pages, data.pos, "top guilds", "https://nypsi.xyz/leaderboard/guilds");
-  } else if (args[0].toLowerCase().includes("streak")) {
+  } else if (args[0].toLowerCase() === "streak" || args[0].toLowerCase() === "dailystreak") {
     let global = false;
 
     if (args[1]?.toLowerCase() == "global") global = true;
@@ -443,7 +443,7 @@ async function run(
       `top daily streak ${global ? "[global]" : `for ${message.guild.name}`}`,
       global ? "https://nypsi.xyz/leaderboard/streak" : null,
     );
-  } else if (args[0].toLowerCase().includes("lott")) {
+  } else if (args[0].toLowerCase() === "lottery") {
     let global = false;
 
     if (args[1]?.toLowerCase() == "global") global = true;
@@ -462,7 +462,7 @@ async function run(
       `top lottery wins ${global ? "[global]" : `for ${message.guild.name}`}`,
       global ? "https://nypsi.xyz/leaderboard/lottery" : null,
     );
-  } else if (args[0].toLowerCase().includes("wordle-time")) {
+  } else if (args[0].toLowerCase() === "wordle-time" || args[0].toLowerCase() === "wordletime") {
     let global = false;
 
     if (args[1]?.toLowerCase() == "global") global = true;
@@ -481,7 +481,7 @@ async function run(
       `fastest wordle wins ${global ? "[global]" : `for ${message.guild.name}`}`,
       global ? "https://nypsi.xyz/leaderboard/wordle" : null,
     );
-  } else if (args[0].toLowerCase().includes("wordle")) {
+  } else if (args[0].toLowerCase() === "wordle") {
     let global = false;
 
     if (args[1]?.toLowerCase() == "global") global = true;
@@ -500,7 +500,7 @@ async function run(
       `top wordle wins ${global ? "[global]" : `for ${message.guild.name}`}`,
       global ? "https://nypsi.xyz/leaderboard/wordle" : null,
     );
-  } else if (args[0].toLowerCase().includes("votestreak")) {
+  } else if (args[0].toLowerCase() === "votestreak") {
     let global = false;
 
     if (args[1]?.toLowerCase() == "global") global = true;
@@ -518,7 +518,7 @@ async function run(
       data.pos,
       `top vote streak ${global ? "[global]" : `for ${message.guild.name}`}`,
     );
-  } else if (args[0].toLowerCase().includes("vote")) {
+  } else if (args[0].toLowerCase() === "vote") {
     let global = false;
 
     if (args[1]?.toLowerCase() == "global") global = true;
