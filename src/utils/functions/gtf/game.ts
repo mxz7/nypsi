@@ -84,7 +84,7 @@ export async function startGTFGame(
     `${Constants.redis.cache.COUNTRY_DATA}:${id.toLowerCase()}`,
     JSON.stringify(country),
     "EX",
-    ms("7 days") / 1000,
+    ms("21 days") / 1000,
   );
 
   const embed = new CustomEmbed(message.member, "guess the country of the flag below")
