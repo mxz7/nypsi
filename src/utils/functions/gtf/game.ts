@@ -63,7 +63,7 @@ export async function startGTFGame(
     if (!res.ok) {
       logger.error(`failed to fetch valid country (${id})`, {
         res,
-        json: await res.json().catch(),
+        json: await res.json().catch(() => {}),
       });
       if (message instanceof Message)
         return message.channel.send({
