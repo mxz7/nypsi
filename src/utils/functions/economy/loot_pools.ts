@@ -74,9 +74,16 @@ export function describeLootPoolResult(result: LootPoolResult): string {
   return ""; // this shouldnt be reached
 }
 
-export function rollLootPool(loot_pool: LootPool, excluded_items: string[]): LootPoolResult {
-  const totalWeight = getTotalWeight(loot_pool, excluded_items);
-  let randomValue = Math.random() * totalWeight;
+export async function rollLootPool(
+  loot_pool: LootPool,
+  exclusionPredicate: (itemId: string) => Promise<boolean> // only works on items
+): Promise<LootPoolResult> {
+
+  let excludedItems = [] as string[];
+  const poolItems = Object.keys(loot_pool.items ?? {});
+  const exclusionResults = await Promise.all(poolItems.map(exclusionPredicate));
+  excludedItems = poolItems.filter((e, i) => exclusionResults[i]);
+  let randomValue = Math.random() * getTotalWeight(loot_pool, excludedItems);
 
   if(Object.hasOwn(loot_pool, "nothing")) {
     if(randomValue < loot_pool.nothing) {
@@ -110,7 +117,7 @@ export function rollLootPool(loot_pool: LootPool, excluded_items: string[]): Loo
   }
   if(Object.hasOwn(loot_pool, "items")) {
     for(const itemKey in loot_pool.items) {
-      if(itemKey in excluded_items) { continue; }
+      if(excludedItems.includes(itemKey)) { continue; }
       const itemLootData = loot_pool.items[itemKey];
       let itemWeight = getItemWeight(itemLootData);
       if(randomValue < itemWeight) {
@@ -124,7 +131,10 @@ export function rollLootPool(loot_pool: LootPool, excluded_items: string[]): Loo
   return {}; // this shouldnt be reached
 }
 
-function getTotalWeight(loot_pool: LootPool, excluded_items: string[]): number {
+function getTotalWeight(
+  loot_pool: LootPool,
+  excludedItems: string[]
+): number {
   let totalWeight = 0;
 
   if(Object.hasOwn(loot_pool, "nothing")) {
@@ -147,7 +157,7 @@ function getTotalWeight(loot_pool: LootPool, excluded_items: string[]): number {
   }
   if(Object.hasOwn(loot_pool, "items")) {
     for(const item in loot_pool.items) {
-      if(item in excluded_items) { continue; }
+      if(excludedItems.includes(item)) { continue; }
       totalWeight += getItemWeight(loot_pool.items[item]);
     }
   }
@@ -195,15 +205,12 @@ export async function openCrate(
 
   for(const poolName in item.loot_pools) {
     const pool = getLootPools()[poolName];
-    const excluded_items = Object.keys(pool.items ?? {})
-      .filter(e => getItems()[e].unique && itemExists(e));
     for(let i = 0; i < item.loot_pools[poolName]; i++) {
-      crateItems.push(rollLootPool(pool, excluded_items));
+      const item = await rollLootPool(pool, async e => getItems()[e].unique && await itemExists(e));
+      await giveLootPoolResult(member, item);
+      crateItems.push(item);
     }
   }
 
-  for(const i of crateItems) {
-    await giveLootPoolResult(member, i);
-  }
   return crateItems;
 }

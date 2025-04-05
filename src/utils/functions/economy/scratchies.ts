@@ -262,11 +262,9 @@ export default class ScratchCard {
       }
     }
 
-    const excluded_items = Object.keys(pool.items ?? {})
-      .filter(e => 
-        (getItems()[e].unique && itemExists(e)) || 
-        (e.includes("_gem") && redis.exists(Constants.redis.nypsi.GEM_GIVEN))
-      );
+    const excludedItems = async (e: string) => 
+      (getItems()[e].unique && await itemExists(e)) ||
+      (e.includes("_gem") && !!await redis.exists(Constants.redis.nypsi.GEM_GIVEN));
 
     let totalCount = 2;
     let createVert = -1;
@@ -290,7 +288,7 @@ export default class ScratchCard {
         pos = Math.floor(Math.random() * 5);
       }
 
-      const item = rollLootPool(pool, excluded_items);
+      const item = await rollLootPool(pool, excludedItems);
       if ((Object.keys(arr[pos][0].result).length !== 0 && pos !== 2) || hCount === 1) createVert = pos;
       arr[pos][0].result = item;
       arr[pos][1].result = item;
@@ -298,7 +296,7 @@ export default class ScratchCard {
     }
 
     if (createVert !== -1 && totalCount !== 1) {
-      const item = rollLootPool(pool, excluded_items);
+      const item = await rollLootPool(pool, excludedItems);
       const x = Math.floor(Math.random() * 3);
 
       if (createVert > 2) {
@@ -322,7 +320,7 @@ export default class ScratchCard {
       const index = [Math.floor(Math.random() * 5), Math.floor(Math.random() * 3)];
 
       if (Object.keys(arr[index[0]][index[1]].result).length === 0) {
-        arr[index[0]][index[1]].result = rollLootPool(unweightedPool, excluded_items)
+        arr[index[0]][index[1]].result = await rollLootPool(unweightedPool, excludedItems)
       }
     }
 
