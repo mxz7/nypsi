@@ -397,7 +397,7 @@ model Game {
   outcome  String
   date     DateTime @default(now())
 
-  economy Economy? @relation(fields: [userId], references: [userId])
+  economy Economy? @relation(fields: [userId], references: [userId], onDelete: SetNull)
 
   @@index([userId, game])
 }
@@ -476,7 +476,7 @@ model FlagGame {
   time    Int? // milliseconds
 
   userId String
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
@@ -507,8 +507,8 @@ model Offer {
   soldAt     DateTime?
   createdAt  DateTime  @default(now())
 
-  target Economy? @relation(fields: [targetId], references: [userId], name: "target")
-  owner  Economy? @relation(fields: [ownerId], references: [userId], name: "owner")
+  target Economy? @relation(fields: [targetId], references: [userId], name: "target", onDelete: Cascade)
+  owner  Economy? @relation(fields: [ownerId], references: [userId], name: "owner", onDelete: Cascade)
 
   @@index([itemId])
 }
@@ -569,7 +569,7 @@ model ChatFilter {
 
   percentMatch Int?
 
-  guild Guild @relation(fields: [guildId], references: [id])
+  guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
 
   @@id([guildId, content])
 }
@@ -717,7 +717,7 @@ model GuildEvidenceCredit {
 
   bytes BigInt
 
-  guild Guild @relation(fields: [guildId], references: [id])
+  guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
 }
 
 model Alt {
@@ -843,7 +843,7 @@ model Purchases {
   cost   Decimal
 
   userId String?
-  user   User?   @relation(fields: [userId], references: [id])
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 // data for creating graphs
@@ -889,7 +889,7 @@ model Captcha {
 
   solvedIp String?
 
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model BotMetrics {
