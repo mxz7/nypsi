@@ -19,11 +19,13 @@ import { CustomEmbed, ErrorEmbed, getColor } from "../../../models/EmbedBuilders
 // @ts-expect-error doesnt like getting from json file
 import { countries } from "../../../../data/lists.json";
 import prisma from "../../../init/database";
+import redis from "../../../init/redis";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { MStoTime } from "../date";
 import { addProgress } from "../economy/achievements";
 import { addTaskProgress } from "../economy/tasks";
+import ms = require("ms");
 
 interface CountryData {
   name: {
@@ -45,25 +47,42 @@ export async function startGTFGame(
 ) {
   const id = countries[Math.floor(Math.random() * countries.length)];
 
-  const res: Response | { ok: false } = await fetch(
-    `https://restcountries.com/v3.1/alpha/${id.toLowerCase()}`,
-  ).catch(() => ({
-    ok: false,
-  }));
+  let country: CountryData;
 
-  if (!res.ok) {
-    logger.error(`failed to fetch valid country (${id})`, res);
-    if (message instanceof Message)
-      return message.channel.send({ embeds: [new ErrorEmbed(`failed to fetch a valid country`)] });
-    else
-      return message
-        .reply({ embeds: [new ErrorEmbed(`failed to fetch a valid country`)] })
-        .catch(() =>
-          message.channel.send({ embeds: [new ErrorEmbed(`failed to fetch a valid country`)] }),
-        );
+  const cache = await redis.get(`${Constants.redis.cache.COUNTRY_DATA}:${id.toLowerCase()}`);
+
+  if (cache) {
+    country = JSON.parse(cache) as CountryData;
+  } else {
+    const res: Response | { ok: false } = await fetch(
+      `https://restcountries.com/v3.1/alpha/${id.toLowerCase()}`,
+    ).catch(() => ({
+      ok: false,
+    }));
+
+    if (!res.ok) {
+      logger.error(`failed to fetch valid country (${id})`, res);
+      if (message instanceof Message)
+        return message.channel.send({
+          embeds: [new ErrorEmbed(`failed to fetch a valid country`)],
+        });
+      else
+        return message
+          .reply({ embeds: [new ErrorEmbed(`failed to fetch a valid country`)] })
+          .catch(() =>
+            message.channel.send({ embeds: [new ErrorEmbed(`failed to fetch a valid country`)] }),
+          );
+    }
+
+    country = await res.json().then((r) => r[0]);
   }
 
-  const country: CountryData = await res.json().then((r) => r[0]);
+  await redis.set(
+    `${Constants.redis.cache.COUNTRY_DATA}:${id.toLowerCase()}`,
+    JSON.stringify(country),
+    "EX",
+    ms("7 days") / 1000,
+  );
 
   const embed = new CustomEmbed(message.member, "guess the country of the flag below")
     .setHeader(`${message.author.username}'s guess the flag game`, message.author.avatarURL())

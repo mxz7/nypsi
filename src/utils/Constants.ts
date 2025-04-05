@@ -28,6 +28,7 @@ export default {
     },
     cache: {
       IMAGE: "nypsi:image",
+      COUNTRY_DATA: "nypsi_cache:countrydata",
       minecraft: {
         UUID: "cache:minecraft:uuid",
         NAME_HISTORY: "cache:minecraft:namehistory",
