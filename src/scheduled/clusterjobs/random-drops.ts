@@ -602,7 +602,7 @@ export async function startRandomDrop(client: NypsiClient, channelId: string, ra
 
 export async function startLootRain(channel: GuildTextBasedChannel, user: User) {
   let length = 60;
-  if (channel.guildId === Constants.NYPSI_SERVER_ID) length = 120;
+  if (Constants.LOOT_RAIN_ALLOWED_CHANNELS.includes(channel.id)) length = 120;
 
   logger.info(`starting loot rain in ${channel.id}`);
   if (await redis.exists(`nypsi:lootrain:channel:${channel.id}`)) return;
