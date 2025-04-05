@@ -55,7 +55,7 @@ module.exports = new ItemUse(
 
     let length = 1;
 
-    if (message.guild.id === Constants.NYPSI_SERVER_ID) length = 2;
+    if (Constants.LOOT_RAIN_ALLOWED_CHANNELS.includes(message.channelId)) length = 2;
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
