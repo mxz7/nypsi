@@ -253,7 +253,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
       redis.del(`${Constants.redis.cache.economy.VOTE}:${user}`),
       redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${user}`),
       addStat(user, "earned-vote", amount),
-      addInventoryItem(user, "lottery_ticket", 1),
+      addInventoryItem(user, "lottery_ticket", crateAmount),
       createAuraTransaction(user, Constants.BOT_USER_ID, 50),
       addInventoryItem(user, "vote_crate", crateAmount),
     ]).catch((e) => {
@@ -296,7 +296,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
         `+ $**${amount.toLocaleString()}**\n` +
         "+ **3**% multiplier\n" +
         `+ **${crateAmount}** vote crate${crateAmount != 1 ? "s" : ""}` +
-        "\n+ **1** lottery ticket\n\n" +
+        `\n+ **${crateAmount}** lottery ticket${crateAmount !== 1 ? "s" : ""}\n\n` +
         (newCrateAmount && votes.voteStreak > 5
           ? `you will now receive **${crateAmount}** crates each vote thanks to your streak\n\n`
           : "") +
