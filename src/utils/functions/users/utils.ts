@@ -4,6 +4,9 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
+import { getGuildByUser } from "../economy/guilds";
+import { deleteOffer, getTargetedOffers } from "../economy/offers";
+import { deleteImage } from "../image";
 import { deleteAllAvatars } from "./history";
 import ms = require("ms");
 
@@ -274,71 +277,17 @@ export async function dataDelete(userId: string) {
   logger.info(`deleting data for ${userId}...`);
   await deleteAllAvatars(userId);
 
-  await prisma.inventory.deleteMany({
-    where: {
-      userId: userId,
-    },
-  });
+  const guild = await getGuildByUser(userId);
 
-  await prisma.booster.deleteMany({
-    where: {
-      userId: userId,
-    },
-  });
+  if (guild && guild.ownerId === userId) {
+    if (guild.avatarId) await deleteImage(guild.avatarId);
+  }
 
-  await prisma.economyGuildMember.deleteMany({
-    where: {
-      userId: userId,
-    },
-  });
+  const offers = await getTargetedOffers(userId);
 
-  await prisma.wordleGame.deleteMany({
-    where: {
-      userId: userId,
-    },
-  });
-
-  await prisma.username.deleteMany({
-    where: {
-      userId: userId,
-    },
-  });
-
-  await prisma.mention.deleteMany({
-    where: {
-      targetId: userId,
-    },
-  });
-
-  await prisma.premiumCommand.deleteMany({
-    where: {
-      owner: userId,
-    },
-  });
-
-  await prisma.chatReactionStats.deleteMany({
-    where: {
-      userId: userId,
-    },
-  });
-
-  await prisma.auctionWatch.deleteMany({ where: { userId } });
-
-  await prisma.economy
-    .delete({
-      where: {
-        userId: userId,
-      },
-    })
-    .catch(() => {});
-
-  await prisma.premium
-    .delete({
-      where: {
-        userId: userId,
-      },
-    })
-    .catch(() => {});
+  for (const offer of offers) {
+    await deleteOffer(offer);
+  }
 
   await prisma.user
     .delete({
@@ -348,9 +297,11 @@ export async function dataDelete(userId: string) {
     })
     .catch(() => {});
 
-  logger.info(`data deleted for ${userId}`);
+  exec(`redis-cli KEYS "*${userId}*" | xargs redis-cli DEL`);
 
-  return new Promise((resolve) => {
-    exec(`redis-cli KEYS "*${userId}*" | xargs redis-cli DEL`, () => resolve(0));
-  });
+  if (guild) {
+    exec(`redis-cli KEYS "*${guild.guildName}*" | xargs redis-cli DEL`);
+  }
+
+  logger.info(`data deleted for ${userId}`);
 }
