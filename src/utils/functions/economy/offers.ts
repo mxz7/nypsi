@@ -117,7 +117,7 @@ export async function setBlockedList(userId: string, list: string[]) {
     .then((r) => r.offersBlock);
 }
 
-export async function deleteOffer(offer: Offer, client: NypsiClient) {
+export async function deleteOffer(offer: Offer, client?: NypsiClient) {
   offer = await prisma.offer.findUnique({ where: { messageId: offer.messageId } });
   if (offer.sold || !offer) return false;
 
@@ -125,21 +125,24 @@ export async function deleteOffer(offer: Offer, client: NypsiClient) {
 
   await addBalance(offer.ownerId, Number(offer.money));
 
-  (async () => {
-    const user = await client.users.fetch(offer.targetId);
-    if (!user) return true;
+  if (client) {
+    (async () => {
+      const user = await client.users.fetch(offer.targetId);
+      if (!user) return true;
 
-    const channel = await user.createDM();
+      const channel = await user.createDM();
 
-    const msg = await channel.messages.fetch(offer.messageId);
-    if (!msg) return true;
-    const embed = new EmbedBuilder(msg.embeds[0]);
+      const msg = await channel.messages.fetch(offer.messageId);
+      if (!msg) return true;
+      const embed = new EmbedBuilder(msg.embeds[0]);
 
-    embed.data.description = embed.data.description.split("\n")[0] + "\n\n**no longer valid**";
-    embed.setColor(Constants.EMBED_FAIL_COLOR);
+      embed.data.description = embed.data.description.split("\n")[0] + "\n\n**no longer valid**";
+      embed.setColor(Constants.EMBED_FAIL_COLOR);
 
-    await msg.edit({ components: [], embeds: [embed] });
-  })();
+      await msg.edit({ components: [], embeds: [embed] });
+    })();
+  }
+
   return true;
 }
 
