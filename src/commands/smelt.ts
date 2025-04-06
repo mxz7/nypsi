@@ -187,7 +187,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
 
   setTimeout(() => {
     embed.setDescription(
-      `${max === 64 ? "<:nypsi_furnace:959445132585869373>" : "<a:super_furnace:1314953706609049671>"} you have smelted: \n${res}`,
+      `${max === 64 ? "<:furnace:1354808306698293379>" : "<a:super_furnace:1314953706609049671>"} you have smelted: \n${res}`,
     );
     edit({ embeds: [embed] }, msg);
   }, 2000);
