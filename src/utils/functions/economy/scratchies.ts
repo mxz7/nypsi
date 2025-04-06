@@ -35,7 +35,6 @@ export default class ScratchCard {
   public won: boolean;
   public state: "playing" | "finished";
 
-
   constructor(member: GuildMember, item: Item) {
     this.item = item;
     this.member = member;
@@ -154,7 +153,8 @@ export default class ScratchCard {
       if (x === xCheck) return checkHorizontal(xCheck + 1, horizontalMatches);
       if (this.area[y][xCheck].clicks !== 1) return false;
 
-      if(!util.isDeepStrictEqual(this.area[y][x].result, this.area[y][xCheck].result)) return false;
+      if (!util.isDeepStrictEqual(this.area[y][x].result, this.area[y][xCheck].result))
+        return false;
 
       return checkHorizontal(xCheck + 1, horizontalMatches + 1);
     };
@@ -190,17 +190,17 @@ export default class ScratchCard {
       this.won = true;
 
       const embed = new CustomEmbed(this.member)
-      .setColor(Constants.EMBED_SUCCESS_COLOR)
-      .setHeader(
-        `${this.member.user.username}'s ${this.item.name}`,
-        this.member.user.avatarURL(),
-      );
+        .setColor(Constants.EMBED_SUCCESS_COLOR)
+        .setHeader(
+          `${this.member.user.username}'s ${this.item.name}`,
+          this.member.user.avatarURL(),
+        );
 
       const prize = this.area[y][x].result;
       await giveLootPoolResult(this.member.user.id, prize);
       embed.setDescription(`you found ${describeLootPoolResult(prize)}!`);
 
-      if(Object.hasOwn(prize, "money")) {
+      if (Object.hasOwn(prize, "money")) {
         addStat(this.member, "earned-scratch", prize.money);
       }
       if (Object.hasOwn(prize, "item") && prize.item.includes("_gem")) {
@@ -234,7 +234,7 @@ export default class ScratchCard {
       arr[i] = [
         { clicks: 0, result: {} },
         { clicks: 0, result: {} },
-        { clicks: 0, result: {} }
+        { clicks: 0, result: {} },
       ];
     }
 
@@ -245,26 +245,26 @@ export default class ScratchCard {
     const pool = getLootPools()[poolName];
     const unweightedPool = structuredClone(pool);
     delete unweightedPool.nothing;
-    for(const amount in unweightedPool.money) {
+    for (const amount in unweightedPool.money) {
       unweightedPool.money[amount] = 100;
     }
-    for(const amount in unweightedPool.xp) {
+    for (const amount in unweightedPool.xp) {
       unweightedPool.xp[amount] = 100;
     }
-    for(const amount in unweightedPool.karma) {
+    for (const amount in unweightedPool.karma) {
       unweightedPool.karma[amount] = 100;
     }
-    for(const item in unweightedPool.items) {
-      if(typeof unweightedPool.items[item] === "number") {
+    for (const item in unweightedPool.items) {
+      if (typeof unweightedPool.items[item] === "number") {
         unweightedPool.items[item] = 100;
       } else {
         unweightedPool.items[item].weight = 100;
       }
     }
 
-    const excludedItems = async (e: string) => 
-      (getItems()[e].unique && await itemExists(e)) ||
-      (e.includes("_gem") && !!await redis.exists(Constants.redis.nypsi.GEM_GIVEN));
+    const excludedItems = async (e: string) =>
+      (getItems()[e].unique && (await itemExists(e))) ||
+      (e.includes("_gem") && !!(await redis.exists(Constants.redis.nypsi.GEM_GIVEN)));
 
     let totalCount = 2;
     let createVert = -1;
@@ -289,7 +289,8 @@ export default class ScratchCard {
       }
 
       const item = await rollLootPool(pool, excludedItems);
-      if ((Object.keys(arr[pos][0].result).length !== 0 && pos !== 2) || hCount === 1) createVert = pos;
+      if ((Object.keys(arr[pos][0].result).length !== 0 && pos !== 2) || hCount === 1)
+        createVert = pos;
       arr[pos][0].result = item;
       arr[pos][1].result = item;
       arr[pos][2].result = item;
@@ -314,13 +315,15 @@ export default class ScratchCard {
 
     let nothingCount = 0;
 
-    arr.forEach((arr2) => arr2.forEach((i) => (Object.keys(i.result).length === 0 ? nothingCount++ : null)));
+    arr.forEach((arr2) =>
+      arr2.forEach((i) => (Object.keys(i.result).length === 0 ? nothingCount++ : null)),
+    );
 
     for (let i = 0; i < nothingCount + 7; i++) {
       const index = [Math.floor(Math.random() * 5), Math.floor(Math.random() * 3)];
 
       if (Object.keys(arr[index[0]][index[1]].result).length === 0) {
-        arr[index[0]][index[1]].result = await rollLootPool(unweightedPool, excludedItems)
+        arr[index[0]][index[1]].result = await rollLootPool(unweightedPool, excludedItems);
       }
     }
 

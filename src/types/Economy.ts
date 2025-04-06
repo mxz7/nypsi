@@ -33,7 +33,7 @@ export interface Item {
   in_crates: boolean;
   account_locked?: boolean;
   loot_pools?: {
-    [pool: string]: number
+    [pool: string]: number;
   }; // used for crates and scratches, indicates which pools to run and how many times
   clicks?: number; // amount of clicks for scratch cards
   tagId?: string;

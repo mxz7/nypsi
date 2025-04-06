@@ -116,14 +116,14 @@ module.exports = new ItemUse(
       money: 0,
       xp: 0,
       karma: 0,
-      items: {}
+      items: {},
     } as {
       money: number;
       xp: number;
       karma: number;
       items: {
-        [item: string]: number
-      }
+        [item: string]: number;
+      };
     };
 
     await Promise.all([
@@ -138,7 +138,7 @@ module.exports = new ItemUse(
         foundAll.money += product.money ?? 0;
         foundAll.xp += product.xp ?? 0;
         foundAll.karma += product.karma ?? 0;
-        if(Object.hasOwn(product, "item")) {
+        if (Object.hasOwn(product, "item")) {
           if (Object.hasOwn(foundAll.items, product.item)) {
             foundAll.items[product.item] += product.count ?? 1;
           } else {
@@ -167,12 +167,17 @@ module.exports = new ItemUse(
     const items = Object.keys(foundAll.items);
 
     for (const itemKey in foundAll.items) {
-      values.set(itemKey, ((await calcItemValue(itemKey).catch(() => 0)) || 0) * foundAll.items[itemKey]);
+      values.set(
+        itemKey,
+        ((await calcItemValue(itemKey).catch(() => 0)) || 0) * foundAll.items[itemKey],
+      );
     }
-    inPlaceSort(items).desc(i => values.get(i));
+    inPlaceSort(items).desc((i) => values.get(i));
 
     for (const item of items) {
-      desc.push(`- \`${foundAll.items[item]}x\` ${getItems()[item].emoji} ${getItems()[item].name}`);
+      desc.push(
+        `- \`${foundAll.items[item]}x\` ${getItems()[item].emoji} ${getItems()[item].name}`,
+      );
     }
 
     const pages = PageManager.createPages(desc, 15);

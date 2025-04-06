@@ -18,9 +18,19 @@ import { findChannelCluster } from "../../utils/functions/clusters";
 import { MStoTime } from "../../utils/functions/date";
 import { addProgress } from "../../utils/functions/economy/achievements";
 import { itemExists } from "../../utils/functions/economy/inventory";
-import { describeLootPoolResult, giveLootPoolResult, rollLootPool } from "../../utils/functions/economy/loot_pools";
+import {
+  describeLootPoolResult,
+  giveLootPoolResult,
+  rollLootPool,
+} from "../../utils/functions/economy/loot_pools";
 import { addTaskProgress } from "../../utils/functions/economy/tasks";
-import { createUser, getItems, getLootPools, isEcoBanned, userExists } from "../../utils/functions/economy/utils";
+import {
+  createUser,
+  getItems,
+  getLootPools,
+  isEcoBanned,
+  userExists,
+} from "../../utils/functions/economy/utils";
 import { getPrefix } from "../../utils/functions/guilds/utils";
 import { percentChance, shuffle } from "../../utils/functions/random";
 import sleep from "../../utils/functions/sleep";
@@ -111,12 +121,19 @@ async function randomDrop(client: NypsiClient) {
       await redis.set(`nypsi:lootdrop:channel:cd:${channelId}`, "69", "EX", cooldownSeconds);
 
       const pool = getLootPools().random_drop;
-      const prize = await rollLootPool(pool, async e => getItems()[e].unique && await itemExists(e));
+      const prize = await rollLootPool(
+        pool,
+        async (e) => getItems()[e].unique && (await itemExists(e)),
+      );
 
       const games = [fastClickGame, clickSpecificGame, typeFastGame];
 
       logger.info(`random drop started in ${channelId}`);
-      const winner = await games[Math.floor(Math.random() * games.length)](client, channelId, prize);
+      const winner = await games[Math.floor(Math.random() * games.length)](
+        client,
+        channelId,
+        prize,
+      );
 
       if (winner) {
         if (!(await hasProfile(winner))) await createProfile(winner);
@@ -138,7 +155,12 @@ async function randomDrop(client: NypsiClient) {
   await pAll(functions, { concurrency: 2 });
 }
 
-async function fastClickGame(client: NypsiClient, channelId: string, prize: LootPoolResult, rain?: string) {
+async function fastClickGame(
+  client: NypsiClient,
+  channelId: string,
+  prize: LootPoolResult,
+  rain?: string,
+) {
   const cluster = await findChannelCluster(client, channelId);
 
   if (typeof cluster.cluster !== "number") return;
@@ -146,15 +168,11 @@ async function fastClickGame(client: NypsiClient, channelId: string, prize: Loot
   const embed = new CustomEmbed()
     .setColor(0xffffff)
     .setHeader("loot drop", client.user.avatarURL())
-    .setDescription(
-      `first to click the button wins ${describeLootPoolResult(prize)}`,
-    );
+    .setDescription(`first to click the button wins ${describeLootPoolResult(prize)}`);
   const winEmbed = new CustomEmbed()
     .setColor(Constants.EMBED_SUCCESS_COLOR)
     .setHeader(`you've won a loot drop!`)
-    .setDescription(
-      `you've won ${describeLootPoolResult(prize)}`,
-    );
+    .setDescription(`you've won ${describeLootPoolResult(prize)}`);
 
   if (rain) {
     embed.setFooter({ text: `${rain}'s rain` });
@@ -219,7 +237,12 @@ async function fastClickGame(client: NypsiClient, channelId: string, prize: Loot
   return winnerId;
 }
 
-async function typeFastGame(client: NypsiClient, channelId: string, prize: LootPoolResult, rain?: string) {
+async function typeFastGame(
+  client: NypsiClient,
+  channelId: string,
+  prize: LootPoolResult,
+  rain?: string,
+) {
   const cluster = await findChannelCluster(client, channelId);
 
   if (typeof cluster.cluster !== "number") return;
@@ -242,9 +265,7 @@ async function typeFastGame(client: NypsiClient, channelId: string, prize: LootP
   const embed = new CustomEmbed()
     .setColor(0xffffff)
     .setHeader("loot drop", client.user.avatarURL())
-    .setDescription(
-      `first to type \`${displayWord}\` wins ${describeLootPoolResult(prize)}`,
-    );
+    .setDescription(`first to type \`${displayWord}\` wins ${describeLootPoolResult(prize)}`);
 
   if (rain) {
     embed.setFooter({ text: `${rain}'s rain` });
@@ -387,9 +408,7 @@ async function clickSpecificGame(
   const winEmbed = new CustomEmbed()
     .setColor(Constants.EMBED_SUCCESS_COLOR)
     .setHeader(`you've won a loot drop!`)
-    .setDescription(
-      `you've won ${describeLootPoolResult(prize)}`,
-    );
+    .setDescription(`you've won ${describeLootPoolResult(prize)}`);
   const failEmbed = new CustomEmbed()
     .setColor(Constants.EMBED_FAIL_COLOR)
     .setHeader(`uh oh ):`)
@@ -511,9 +530,11 @@ async function clickSpecificGame(
 }
 
 export async function startRandomDrop(client: NypsiClient, channelId: string, rain?: string) {
-
   const pool = getLootPools().random_drop;
-  const prize = await rollLootPool(pool, async e => getItems()[e].unique && await itemExists(e));
+  const prize = await rollLootPool(
+    pool,
+    async (e) => getItems()[e].unique && (await itemExists(e)),
+  );
 
   const games = [fastClickGame, clickSpecificGame, typeFastGame];
 

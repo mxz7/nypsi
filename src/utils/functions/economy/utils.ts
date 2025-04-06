@@ -47,7 +47,7 @@ let tags: { [key: string]: Tag };
 let tasks: { [key: string]: Task };
 let plants: { [key: string]: Plant };
 let plantUpgrades: { [key: string]: PlantUpgrade };
-let lootPools: { [key: string]: LootPool }
+let lootPools: { [key: string]: LootPool };
 
 export let maxPrestige = 0;
 
@@ -77,11 +77,11 @@ export function loadItems(crypto = true) {
   plantUpgrades = JSON.parse(plantsFile).upgrades;
   lootPools = JSON.parse(lootPoolsFile);
 
-  lootPools.basic_crate = getDefaultLootPool(i => i.in_crates);
+  lootPools.basic_crate = getDefaultLootPool((i) => i.in_crates);
   lootPools.basic_crate.money = { 50000: 100, 100000: 100, 500000: 100 };
   lootPools.basic_crate.xp = { 50: 100, 100: 100, 250: 100 };
-  lootPools.workers_crate = getDefaultLootPool(i => i.role === "worker-upgrade");
-  lootPools.boosters_crate = getDefaultLootPool(i => i.role === "booster");
+  lootPools.workers_crate = getDefaultLootPool((i) => i.role === "worker-upgrade");
+  lootPools.boosters_crate = getDefaultLootPool((i) => i.role === "booster");
 
   Object.values(userUpgrades).forEach((i) => {
     maxPrestige += i.max;

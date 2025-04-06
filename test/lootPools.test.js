@@ -6,7 +6,7 @@ const lootPools = JSON.parse(readFileSync("data/loot_pools.json"));
 for (const poolId in lootPools) {
   test(poolId, () => {
     const pool = lootPools[poolId];
-    if(pool.nothing) {
+    if (pool.nothing) {
       expect(Number(pool.nothing)).toBeGreaterThan(0);
     }
     for (const amount in pool.money) {
@@ -24,10 +24,10 @@ for (const poolId in lootPools) {
     for (const itemKey in pool.items) {
       const itemValue = pool.items[itemKey];
       expect(items[itemKey]).toBeDefined();
-      if(typeof itemValue === "number") {
+      if (typeof itemValue === "number") {
         expect(Number(itemValue)).toBeGreaterThan(0);
       }
-      if(typeof itemValue === "object" && itemValue.weight) {
+      if (typeof itemValue === "object" && itemValue.weight) {
         expect(Number(itemValue.weight)).toBeGreaterThan(0);
       }
     }
