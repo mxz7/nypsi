@@ -15,6 +15,7 @@ import {
   PlantUpgrade,
   UserUpgrade,
 } from "../../../types/Economy";
+import { LootPool } from "../../../types/LootPool";
 import { Tag } from "../../../types/Tags";
 import { Task } from "../../../types/Tasks";
 import { Worker, WorkerUpgrades } from "../../../types/Workers";
@@ -28,6 +29,7 @@ import { setProgress } from "./achievements";
 import { addBalance, calcMaxBet, getBalance } from "./balance";
 import { addToGuildXP, getGuildByUser, getGuildName } from "./guilds";
 import { addInventoryItem } from "./inventory";
+import { getDefaultLootPool } from "./loot_pools";
 import { addStat } from "./stats";
 import { addTaskProgress } from "./tasks";
 import { addXp } from "./xp";
@@ -45,6 +47,7 @@ let tags: { [key: string]: Tag };
 let tasks: { [key: string]: Task };
 let plants: { [key: string]: Plant };
 let plantUpgrades: { [key: string]: PlantUpgrade };
+let lootPools: { [key: string]: LootPool };
 
 export let maxPrestige = 0;
 
@@ -59,6 +62,7 @@ export function loadItems(crypto = true) {
   const userUpgradesFile: any = fs.readFileSync("./data/upgrades.json");
   const tasksFile: any = fs.readFileSync("./data/tasks.json");
   const plantsFile: any = fs.readFileSync("./data/plants.json");
+  const lootPoolsFile: any = fs.readFileSync("./data/loot_pools.json");
 
   items = JSON.parse(itemsFile);
   achievements = JSON.parse(achievementsFile);
@@ -71,6 +75,13 @@ export function loadItems(crypto = true) {
   tasks = JSON.parse(tasksFile);
   plants = JSON.parse(plantsFile).plants;
   plantUpgrades = JSON.parse(plantsFile).upgrades;
+  lootPools = JSON.parse(lootPoolsFile);
+
+  lootPools.basic_crate = getDefaultLootPool((i) => i.in_crates);
+  lootPools.basic_crate.money = { 50000: 100, 100000: 100, 500000: 100 };
+  lootPools.basic_crate.xp = { 50: 100, 100: 100, 250: 100 };
+  lootPools.workers_crate = getDefaultLootPool((i) => i.role === "worker-upgrade");
+  lootPools.boosters_crate = getDefaultLootPool((i) => i.role === "booster");
 
   Object.values(userUpgrades).forEach((i) => {
     maxPrestige += i.max;
@@ -97,6 +108,7 @@ export function loadItems(crypto = true) {
   logger.info(`${Object.keys(userUpgrades).length} user upgrades loaded`);
   logger.info(`${Object.keys(tasks).length} tasks loaded`);
   logger.info(`${Object.keys(plants).length} plants loaded`);
+  logger.info(`${Object.keys(lootPools).length} loot pools loaded`);
   logger.info(`max prestige set at P${maxPrestige}`);
 
   if (crypto) {
@@ -549,6 +561,10 @@ export function getPlantsData() {
 
 export function getPlantUpgrades() {
   return plantUpgrades;
+}
+
+export function getLootPools() {
+  return lootPools;
 }
 
 export async function deleteUser(member: GuildMember | string) {

@@ -374,6 +374,7 @@
     "plural": "wooden pickaxes",
     "emoji": "<:wooden_pickaxe:1354810301081714752>",
     "longDesc": "allows you to mine",
+    "default_count": 5,
     "aliases": ["wpickaxe", "wpick"],
     "role": "tool",
     "rarity": 0,
@@ -388,6 +389,7 @@
     "plural": "iron pickaxes",
     "emoji": "<:iron_pickaxe:1354809169198186607>",
     "longDesc": "allows you to mine",
+    "default_count": 10,
     "aliases": ["ironpick", "ipick"],
     "role": "tool",
     "rarity": 1,
@@ -402,13 +404,13 @@
     "plural": "diamond pickaxes",
     "emoji": "<:diamond_pickaxe:1354807692782211223>",
     "longDesc": "allows you to mine",
+    "default_count": 10,
     "aliases": ["diamondpick", "dpick"],
     "role": "tool",
     "rarity": 3,
     "buy": 0,
     "sell": 10000,
-    "in_crates": true,
-    "random_drop_chance": 20
+    "in_crates": true
   },
   "terrible_fishing_rod": {
     "id": "terrible_fishing_rod",
@@ -417,6 +419,7 @@
     "plural": "terrible fishing rods",
     "emoji": "🎣",
     "longDesc": "allows you to fish",
+    "default_count": 5,
     "aliases": ["tfishing", "tfish"],
     "role": "tool",
     "rarity": 0,
@@ -431,6 +434,7 @@
     "plural": "fishing rods",
     "emoji": "🎣",
     "longDesc": "allows you to fish with better luck",
+    "default_count": 10,
     "aliases": ["fishing"],
     "role": "tool",
     "rarity": 1,
@@ -445,13 +449,13 @@
     "plural": "incredible fishing rods",
     "emoji": "🎣",
     "longDesc": "allows you to fish with amazing luck",
+    "default_count": 10,
     "aliases": ["ifishing", "ifish"],
     "role": "tool",
     "rarity": 3,
     "buy": 0,
     "sell": 10000,
-    "in_crates": true,
-    "random_drop_chance": 20
+    "in_crates": true
   },
   "bitcoin": {
     "id": "bitcoin",
@@ -484,6 +488,7 @@
     "plural": "terrible guns",
     "emoji": "🔫",
     "longDesc": "allows you to hunt",
+    "default_count": 10,
     "aliases": ["tgun"],
     "role": "tool",
     "rarity": 0,
@@ -498,6 +503,7 @@
     "plural": "guns",
     "emoji": "🔫",
     "longDesc": "allows you to hunt with better luck",
+    "default_count": 10,
     "role": "tool",
     "rarity": 1,
     "buy": 0,
@@ -511,13 +517,13 @@
     "plural": "incredible guns",
     "emoji": "🔫",
     "longDesc": "allows you to hunt with amazing luck",
+    "default_count": 10,
     "aliases": ["igun", "ak47"],
     "role": "tool",
     "rarity": 3,
     "buy": 0,
     "sell": 10000,
-    "in_crates": true,
-    "random_drop_chance": 20
+    "in_crates": true
   },
   "baby_rabbit": {
     "id": "baby_rabbit",
@@ -778,18 +784,9 @@
     "aliases": ["mineshaft", "chest"],
     "rarity": 3,
     "in_crates": false,
-    "crate_runs": 5,
-    "items": [
-      "id:efficiency:90",
-      "id:fortune:90",
-      "id:unbreaking:5",
-      "id:diamond_pickaxe:85",
-      "id:ancient_debris:90",
-      "id:emerald",
-      "id:diamond",
-      "id:obsidian:50"
-    ],
-    "random_drop_chance": 40
+    "loot_pools": {
+      "mineshaft_chest": 5
+    }
   },
   "vote_crate": {
     "id": "vote_crate",
@@ -800,7 +797,9 @@
     "role": "crate",
     "longDesc": "open to receive one random item",
     "aliases": ["vote", "crate"],
-    "crate_runs": 1,
+    "loot_pools": {
+      "basic_crate": 1
+    },
     "in_crates": false
   },
   "basic_crate": {
@@ -813,9 +812,10 @@
     "longDesc": "open to receive two random items",
     "rarity": 1,
     "aliases": ["basic"],
-    "crate_runs": 2,
-    "in_crates": true,
-    "random_drop_chance": 100
+    "loot_pools": {
+      "basic_crate": 2
+    },
+    "in_crates": true
   },
   "69420_crate": {
     "id": "69420_crate",
@@ -827,9 +827,11 @@
     "longDesc": "open to receive two random items and $69,420",
     "rarity": 1,
     "aliases": ["69420"],
-    "crate_runs": 2,
-    "in_crates": true,
-    "random_drop_chance": 100
+    "loot_pools": {
+      "69420_crate_money": 1,
+      "basic_crate": 2
+    },
+    "in_crates": true
   },
   "nypsi_crate": {
     "id": "nypsi_crate",
@@ -842,55 +844,10 @@
     "sell": 3000000,
     "rarity": 4,
     "aliases": ["nypsi"],
-    "crate_runs": 5,
-    "in_crates": true,
-    "random_drop_chance": 50,
-    "items": [
-      "id:unbreaking:20",
-      "id:highroller:30",
-      "id:double_xp:25",
-      "id:xp_potion:50",
-      "id:omega_crate:1",
-      "id:boosters_crate:75",
-      "id:workers_crate:75",
-      "id:silver_credit:0.5",
-      "id:bronze_credit:1",
-      "id:nypsi_crate:10",
-      "id:gem_shard:10",
-      "id:clown_tag:0.1",
-      "id:steve:50",
-      "id:coffee:50",
-      "id:cookie:5",
-      "id:legendary_scratch_card:15",
-      "id:lucky_cheese:10",
-      "money:10000000",
-      "money:50000000:45",
-      "xp:1000",
-      "id:multi_potion:40",
-      "id:lucky_7:7",
-      "id:lucky_scratch_card:40",
-      "id:redbull:25",
-      "id:incredible_gun:50",
-      "id:incredible_fishing_rod:50",
-      "id:cursor:65",
-      "id:grandma:65",
-      "id:lamborghini:5",
-      "id:orphan:50",
-      "id:hook:32",
-      "id:magnet:8",
-      "id:big_tiddy_goth_gf:75",
-      "id:viagra:30",
-      "id:looting:30",
-      "id:super_cursor:20",
-      "id:bob:80",
-      "id:stolen_credit_card",
-      "id:banana_seed:10",
-      "id:apple_seed:7",
-      "id:strawberry_seed:10",
-      "id:orange_seed:15",
-      "id:pineapple_seed:5",
-      "id:rain:2"
-    ]
+    "loot_pools": {
+      "nypsi_crate": 5
+    },
+    "in_crates": true
   },
   "calendar": {
     "id": "calendar",
@@ -1476,7 +1433,6 @@
       "time": 1800
     },
     "in_crates": true,
-    "random_drop_chance": 15,
     "aliases": ["unb"]
   },
   "efficiency": {
@@ -1756,8 +1712,7 @@
     "rarity": 2,
     "sell": 100000,
     "role": "bakery-upgrade",
-    "in_crates": true,
-    "random_drop_chance": 75
+    "in_crates": true
   },
   "grandpa": {
     "id": "grandpa",
@@ -1783,8 +1738,7 @@
     "rarity": 3,
     "sell": 1000000,
     "role": "bakery-upgrade",
-    "in_crates": true,
-    "random_drop_chance": 60
+    "in_crates": true
   },
   "highroller": {
     "id": "highroller",
@@ -1889,8 +1843,7 @@
     "craft": {
       "time": 172800,
       "ingredients": ["gem_shard:10"]
-    },
-    "random_drop_chance": 5
+    }
   },
   "purple_gem": {
     "id": "purple_gem",
@@ -1941,8 +1894,7 @@
     "craft": {
       "time": 172800,
       "ingredients": ["gem_shard:5"]
-    },
-    "random_drop_chance": 5
+    }
   },
   "white_gem": {
     "id": "white_gem",
@@ -2020,8 +1972,7 @@
       "time": 21600,
       "ingredients": ["cursor:3"]
     },
-    "in_crates": true,
-    "random_drop_chance": 75
+    "in_crates": true
   },
   "workers_crate": {
     "id": "workers_crate",
@@ -2034,9 +1985,9 @@
     "aliases": ["workerscrate", "wcrate"],
     "rarity": 3,
     "in_crates": true,
-    "crate_runs": 2,
-    "items": ["role:worker-upgrade"],
-    "random_drop_chance": 60
+    "loot_pools": {
+      "workers_crate": 2
+    }
   },
   "boosters_crate": {
     "id": "boosters_crate",
@@ -2049,9 +2000,9 @@
     "aliases": ["boosterscrate", "boostercrate", "bcrate"],
     "rarity": 3,
     "in_crates": true,
-    "crate_runs": 2,
-    "items": ["role:booster"],
-    "random_drop_chance": 70
+    "loot_pools": {
+      "boosters_crate": 2
+    }
   },
   "gem_crate": {
     "id": "gem_crate",
@@ -2064,16 +2015,9 @@
     "aliases": ["gemcrate", "gcrate", "gemscrate"],
     "rarity": 69,
     "in_crates": false,
-    "crate_runs": 1,
-    "items": [
-      "id:white_gem",
-      "id:blue_gem",
-      "id:green_gem",
-      "id:purple_gem",
-      "id:pink_gem",
-      "id:crystal_heart",
-      "id:gem_shard"
-    ]
+    "loot_pools": {
+      "gem_crate": 1
+    }
   },
   "bronze_credit": {
     "id": "bronze_credit",
@@ -2086,8 +2030,7 @@
     "longDesc": "use to receive 7 days of bronze (as long as you don't have a better tier currently)",
     "aliases": ["bronze"],
     "rarity": 69,
-    "in_crates": false,
-    "random_drop_chance": 7
+    "in_crates": false
   },
   "silver_credit": {
     "id": "silver_credit",
@@ -2104,8 +2047,7 @@
     "craft": {
       "ingredients": ["bronze_credit:3"],
       "time": 86400
-    },
-    "random_drop_chance": 2
+    }
   },
   "gold_credit": {
     "id": "gold_credit",
@@ -2154,37 +2096,9 @@
     "in_crates": false,
     "sell": 75000,
     "clicks": 3,
-    "items": [
-      "money:1000000",
-      "xp:300",
-      "karma:75",
-      "id:galvanised_square_steel:50",
-      "id:calendar:35",
-      "id:bob",
-      "id:streak_token:50",
-      "id:grandma:60",
-      "id:grandpa:75",
-      "id:dave:1",
-      "id:super_cursor:40",
-      "id:oven:35",
-      "id:diamond_pickaxe:40",
-      "id:iron_pickaxe:70",
-      "id:fishing_rod:75",
-      "id:gun:75",
-      "id:basic_crate:70",
-      "id:69420_crate:65",
-      "id:bronze_credit:0.5",
-      "id:quarry_scrap:4",
-      "id:gem_shard:0.5",
-      "id:blue_gem:0.5",
-      "id:lucky_cheese:5",
-      "id:reroll_token:0.05",
-      "id:banana_seed:1",
-      "id:fertiliser:50",
-      "id:toe:10",
-      "id:unbreaking:2",
-      "id:mango_seed:4"
-    ]
+    "loot_pools": {
+      "daily_scratch_card": 1
+    }
   },
   "lucky_scratch_card": {
     "id": "lucky_scratch_card",
@@ -2199,40 +2113,9 @@
     "in_crates": true,
     "sell": 100000,
     "clicks": 6,
-    "items": [
-      "money:2500000",
-      "xp:500",
-      "id:calendar:60",
-      "id:bob",
-      "id:lucky_7:7",
-      "id:multi_potion:30",
-      "id:coffee:40",
-      "id:streak_token",
-      "id:grandma:70",
-      "id:grandpa:60",
-      "id:cursor:70",
-      "id:super_cursor:50",
-      "id:range_rover_skin:10",
-      "id:pontiac_skin:10",
-      "id:hook:25",
-      "id:oven:30",
-      "id:lamborghini:1",
-      "id:engine_upgrade_part:50",
-      "id:mini_cooper:60",
-      "id:diamond_pickaxe:50",
-      "id:iron_pickaxe:75",
-      "id:incredible_fishing_rod:50",
-      "id:incredible_gun:75",
-      "id:basic_crate:95",
-      "id:69420_crate:90",
-      "id:nypsi_crate:10",
-      "id:bronze_credit:0.7",
-      "id:gem_shard:0.9",
-      "id:omega_crate:0.05",
-      "id:apple_seed:7",
-      "id:stick:5"
-    ],
-    "random_drop_chance": 90
+    "loot_pools": {
+      "lucky_scratch_card": 1
+    }
   },
   "legendary_scratch_card": {
     "id": "legendary_scratch_card",
@@ -2247,39 +2130,9 @@
     "in_crates": true,
     "sell": 1000000,
     "clicks": 10,
-    "items": [
-      "money:10000000",
-      "karma:250",
-      "id:double_xp",
-      "id:super_cursor",
-      "id:steve",
-      "id:nether_portal:50",
-      "id:highroller:80",
-      "id:lucky_7:70",
-      "id:incredible_fishing_rod",
-      "id:incredible_gun",
-      "id:turbo_upgrade_part:40",
-      "id:wheel_upgrade_part:40",
-      "id:lamborghini:45",
-      "id:quarry_scrap",
-      "id:nypsi_crate:50",
-      "id:platinum_credit:0.5",
-      "id:bronze_credit:3",
-      "id:silver_credit:2",
-      "id:gold_credit:1",
-      "id:purple_gem:3",
-      "id:gem_shard:50",
-      "id:gem_crate:2",
-      "id:omega_crate:2",
-      "id:cat_tag:0.1",
-      "id:ferrari_skin:10",
-      "id:reroll_token:4",
-      "id:veilside_rx7_skin:5",
-      "id:stick:40",
-      "id:rain:10",
-      "id:apple_seed:50"
-    ],
-    "random_drop_chance": 40
+    "loot_pools": {
+      "legendary_scratch_card": 1
+    }
   },
   "karma_scratch_card": {
     "id": "karma_scratch_card",
@@ -2294,36 +2147,9 @@
     "in_crates": false,
     "sell": 100000,
     "clicks": 9,
-    "items": [
-      "money:3000000",
-      "xp:750",
-      "karma:50",
-      "id:super_cursor",
-      "id:oven",
-      "id:bob",
-      "id:diamond_pickaxe:80",
-      "id:incredible_fishing_rod:95",
-      "id:incredible_gun:90",
-      "id:69420_crate",
-      "id:nypsi_crate:40",
-      "id:bronze_credit:1",
-      "id:pink_gem:0.7",
-      "id:gem_shard:75",
-      "id:quarry_scrap:75",
-      "id:karma_scratch_card:5",
-      "id:omega_crate:1",
-      "id:karma_tag:5",
-      "id:reroll_token:5",
-      "id:lucky_cheese:50",
-      "id:xp_potion:50",
-      "id:double_xp:15",
-      "id:multi_potion:40",
-      "id:veilside_rx7_skin:10",
-      "id:stick:20",
-      "id:unbreaking:10",
-      "id:apple_seed:30",
-      "id:rain:5"
-    ]
+    "loot_pools": {
+      "karma_scratch_card": 1
+    }
   },
   "corner_shop_scratchie": {
     "id": "corner_shop_scratchie",
@@ -2339,40 +2165,9 @@
     "buy": 100000,
     "sell": 50000,
     "clicks": 4,
-    "items": [
-      "money:500000",
-      "xp:250",
-      "id:lawyer",
-      "id:diamond",
-      "id:cookie",
-      "id:worm",
-      "id:galvanised_square_steel",
-      "id:blue_rocks:65",
-      "karma:15:85",
-      "id:ancient_debris:60",
-      "id:stolen_credit_card:90",
-      "id:grandma:20",
-      "id:grandpa:10",
-      "id:super_cursor:5",
-      "id:lightning_mcqueen:40",
-      "id:redbull:10",
-      "id:rick_astley:40",
-      "id:xp_potion:10",
-      "id:wooden_pickaxe:55",
-      "id:iron_pickaxe:30",
-      "id:fishing_rod:40",
-      "id:terrible_gun:50",
-      "id:mineshaft_chest:15",
-      "id:basic_crate:15",
-      "id:workers_crate:3",
-      "id:boosters_crate:3",
-      "id:quarry_scrap:3",
-      "id:big_tiddy_goth_gf:20",
-      "id:69420_crate:40",
-      "id:banana_seed:1",
-      "id:fertiliser:3",
-      "id:toe:50"
-    ]
+    "loot_pools": {
+      "corner_shop_scratchie": 1
+    }
   },
   "bob": {
     "id": "bob",
@@ -2399,8 +2194,7 @@
     "rarity": 3,
     "buy": 0,
     "sell": 500000,
-    "in_crates": false,
-    "random_drop_chance": 25
+    "in_crates": false
   },
   "quarry_scrap": {
     "id": "quarry_scrap",
@@ -2587,53 +2381,10 @@
     "sell": 25000000,
     "rarity": 6,
     "aliases": ["omega"],
-    "crate_runs": 4,
-    "in_crates": true,
-    "random_drop_chance": 0.1,
-    "items": [
-      "id:infinity_tag:70",
-      "id:unbreaking:90",
-      "id:highroller",
-      "id:turbo_upgrade_part:75",
-      "id:wheel_upgrade_part:50",
-      "id:double_xp",
-      "id:gem_crate:25",
-      "id:boosters_crate:75",
-      "id:workers_crate:75",
-      "id:white_gem:5",
-      "id:platinum_credit:1",
-      "id:gold_credit:3",
-      "id:silver_credit:4",
-      "id:bronze_credit:15",
-      "id:nypsi_crate:75",
-      "id:pink_gem:40",
-      "id:blue_gem:55",
-      "id:purple_gem:40",
-      "id:green_gem:75",
-      "id:gem_shard:90",
-      "id:palm_tree:10",
-      "id:goat_tag:0.1",
-      "id:cat_tag:0.5",
-      "id:clown_tag:2",
-      "id:bugatti_skin:15",
-      "id:ferrari_skin:15",
-      "id:steve:75",
-      "id:coffee:40",
-      "id:cookie:1",
-      "id:legendary_scratch_card:90",
-      "id:lucky_cheese",
-      "money:150000000",
-      "money:69000000:90",
-      "xp:10000",
-      "id:multi_potion",
-      "id:lucky_7:95",
-      "id:reroll_token:20",
-      "id:apple_seed:50",
-      "id:strawberry_seed:50",
-      "id:mango_seed:25",
-      "id:coconut_seed:25",
-      "id:rain:7"
-    ]
+    "loot_pools": {
+      "omega_crate": 4
+    },
+    "in_crates": true
   },
   "infinity_tag": {
     "id": "infinity_tag",
@@ -2672,8 +2423,7 @@
     "role": "tag",
     "sell": 5000000,
     "in_crates": false,
-    "tagId": "hanafuda",
-    "random_drop_chance": 0.001
+    "tagId": "hanafuda"
   },
   "xp_booster": {
     "id": "xp_booster",
@@ -2705,8 +2455,7 @@
     "aliases": ["reroll"],
     "rarity": 7,
     "article": "a",
-    "in_crates": false,
-    "random_drop_chance": 1.75
+    "in_crates": false
   },
   "big_tiddy_goth_gf": {
     "id": "big_tiddy_goth_gf",
@@ -2938,8 +2687,7 @@
     "rarity": 1,
     "role": "car_part",
     "sell": 10000,
-    "in_crates": true,
-    "random_drop_chance": 30
+    "in_crates": true
   },
   "engine_upgrade": {
     "id": "engine_upgrade",
@@ -2969,8 +2717,7 @@
     "rarity": 5,
     "role": "car_part",
     "sell": 10000,
-    "in_crates": true,
-    "random_drop_chance": 10
+    "in_crates": true
   },
   "turbo_upgrade": {
     "id": "turbo_upgrade",
@@ -3000,8 +2747,7 @@
     "rarity": 5,
     "role": "car_part",
     "sell": 10000,
-    "in_crates": true,
-    "random_drop_chance": 10
+    "in_crates": true
   },
   "wheel_upgrade": {
     "id": "wheel_upgrade",
@@ -3044,8 +2790,7 @@
     "role": "car_skin",
     "sell": 100000,
     "in_crates": true,
-    "rarity": 5,
-    "random_drop_chance": 15
+    "rarity": 5
   },
   "ferrari_skin": {
     "id": "ferrari_skin",
@@ -3058,8 +2803,7 @@
     "role": "car_skin",
     "sell": 100000,
     "in_crates": true,
-    "rarity": 5,
-    "random_drop_chance": 5
+    "rarity": 5
   },
   "bugatti_skin": {
     "id": "bugatti_skin",
@@ -3085,8 +2829,7 @@
     "role": "car_skin",
     "sell": 100000,
     "in_crates": true,
-    "rarity": 5,
-    "random_drop_chance": 15
+    "rarity": 5
   },
   "veilside_rx7_skin": {
     "id": "veilside_rx7_skin",
@@ -3099,8 +2842,7 @@
     "role": "car_skin",
     "sell": 100000,
     "in_crates": false,
-    "rarity": 10,
-    "random_drop_chance": 10
+    "rarity": 10
   },
   "ford_transit_skin": {
     "id": "ford_transit_skin",
@@ -3113,8 +2855,7 @@
     "role": "car_skin",
     "sell": 100000,
     "in_crates": false,
-    "rarity": 10,
-    "random_drop_chance": 10
+    "rarity": 10
   },
   "banana": {
     "id": "banana",
@@ -3213,8 +2954,7 @@
     "buy": 0,
     "sell": 50000,
     "in_crates": true,
-    "aliases": ["oseed"],
-    "random_drop_chance": 20
+    "aliases": ["oseed"]
   },
   "fertiliser": {
     "id": "fertiliser",
@@ -3399,8 +3139,7 @@
     "longDesc": "ewwwww smelly",
     "role": "collectable",
     "rarity": 1,
-    "in_crates": true,
-    "random_drop_chance": 10
+    "in_crates": true
   },
   "foot": {
     "id": "foot",
@@ -3441,8 +3180,7 @@
     "role": "collectable",
     "sell": 50000000,
     "in_crates": false,
-    "unique": true,
-    "random_drop_chance": 5
+    "unique": true
   },
   "rose": {
     "id": "rose",
@@ -3454,8 +3192,7 @@
     "rarity": 5,
     "role": "flower",
     "sell": 1000000,
-    "in_crates": true,
-    "random_drop_chance": 10
+    "in_crates": true
   },
   "tulip": {
     "id": "tulip",
@@ -3467,8 +3204,7 @@
     "rarity": 5,
     "role": "flower",
     "sell": 1000000,
-    "in_crates": true,
-    "random_drop_chance": 5
+    "in_crates": true
   },
   "sunflower": {
     "id": "sunflower",
@@ -3516,8 +3252,7 @@
     "rarity": 5,
     "role": "flower",
     "sell": 100000,
-    "in_crates": true,
-    "random_drop_chance": 3
+    "in_crates": true
   },
   "mango": {
     "id": "mango",
@@ -3545,8 +3280,7 @@
     "buy": 0,
     "sell": 50000,
     "in_crates": true,
-    "aliases": ["mseed"],
-    "random_drop_chance": 5
+    "aliases": ["mseed"]
   },
   "coconut": {
     "id": "coconut",
@@ -3574,8 +3308,7 @@
     "buy": 0,
     "sell": 50000,
     "in_crates": true,
-    "aliases": ["cseed"],
-    "random_drop_chance": 7
+    "aliases": ["cseed"]
   },
   "pineapple": {
     "id": "pineapple",
@@ -3603,8 +3336,7 @@
     "buy": 0,
     "sell": 50000,
     "in_crates": true,
-    "aliases": ["pseed"],
-    "random_drop_chance": 7
+    "aliases": ["pseed"]
   },
   "maxwell": {
     "id": "maxwell",
@@ -3616,8 +3348,7 @@
     "rarity": 5,
     "role": "cat",
     "sell": 25000000,
-    "in_crates": true,
-    "random_drop_chance": 3
+    "in_crates": true
   },
   "zazu": {
     "id": "zazu",
@@ -3629,8 +3360,7 @@
     "rarity": 5,
     "role": "cat",
     "sell": 25000000,
-    "in_crates": true,
-    "random_drop_chance": 3
+    "in_crates": true
   },
   "oye": {
     "id": "oye",
@@ -3642,8 +3372,7 @@
     "rarity": 5,
     "role": "cat",
     "sell": 25000000,
-    "in_crates": true,
-    "random_drop_chance": 3
+    "in_crates": true
   },
   "ethel": {
     "id": "ethel",
@@ -3655,8 +3384,7 @@
     "rarity": 5,
     "role": "cat",
     "sell": 25000000,
-    "in_crates": true,
-    "random_drop_chance": 5
+    "in_crates": true
   },
   "rain": {
     "id": "rain",
@@ -3668,8 +3396,7 @@
     "rarity": 6,
     "role": "item",
     "sell": 10000000,
-    "in_crates": true,
-    "random_drop_chance": 0.75
+    "in_crates": true
   },
   "charger_skin": {
     "id": "charger_skin",
@@ -3682,8 +3409,7 @@
     "role": "car_skin",
     "sell": 100000,
     "in_crates": false,
-    "rarity": 69,
-    "random_drop_chance": 7
+    "rarity": 69
   },
   "xiaojie": {
     "id": "xiaojie",

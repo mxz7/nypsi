@@ -2,6 +2,7 @@ const { readFileSync } = require("fs");
 const { exp } = require("mathjs");
 
 const items = JSON.parse(readFileSync("data/items.json"));
+const lootPools = JSON.parse(readFileSync("data/loot_pools.json"));
 
 for (const item of Object.values(items)) {
   test(item.id, () => {
@@ -29,23 +30,14 @@ for (const item of Object.values(items)) {
 
     if (item.role === "scratch-card") {
       expect(typeof item.clicks).toBe("number");
-
-      for (const reward of item.items) {
-        if (reward.startsWith("money") || reward.startsWith("xp") || reward.startsWith("karma")) {
-          expect(Number(reward.split(":")[1])).toBeGreaterThan(0);
-        } else {
-          expect(Boolean(items[reward.split(":")[1]])).toBe(true);
-        }
-
-        if (reward.split(":")[2]) {
-          expect(Number(reward.split(":")[2])).toBeGreaterThan(0);
-          expect(Number(reward.split(":")[2])).toBeLessThanOrEqual(100);
-        }
-      }
     }
 
-    if (item.role === "crate") {
-      expect(Number(item.crate_runs)).toBeGreaterThan(0);
+    if (item.role === "scratch-card" || item.role === "crate") {
+      for (const poolKey in item.loot_pools) {
+        expect(typeof poolKey).toBe("string");
+        expect(lootPools[poolKey]).toBeDefined();
+        expect(Number(item.loot_pools[poolKey])).toBeGreaterThan(0);
+      }
     }
 
     if (item.role === "car") expect(typeof item.speed).toBe("number");
@@ -60,7 +52,6 @@ for (const item of Object.values(items)) {
     if (item.sell) expect(typeof item.sell).toBe("number");
     if (item.aliases) expect(Array.isArray(item.aliases)).toBe(true);
     if (item.plural) expect(typeof item.plural).toBe("string");
-    if (item.random_drop_chance) expect(typeof item.random_drop_chance).toBe("number");
 
     if (item.craft) {
       expect(typeof item.craft).toBe("object");

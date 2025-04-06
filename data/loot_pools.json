@@ -1,0 +1,447 @@
+{
+  "basic_crate": {},
+  "workers_crate": {},
+  "boosters_crate": {},
+  "69420_crate_money": {
+    "money": {
+      "69420": 100
+    }
+  },
+  "nypsi_crate": {
+    "money": {
+      "10000000": 100,
+      "50000000": 45
+    },
+    "xp": {
+      "1000": 100
+    },
+    "items": {
+      "unbreaking": 20,
+      "highroller": 30,
+      "double_xp": 25,
+      "xp_potion": 50,
+      "omega_crate": 1,
+      "boosters_crate": 75,
+      "workers_crate": 75,
+      "silver_credit": 0.5,
+      "bronze_credit": 1,
+      "nypsi_crate": 10,
+      "gem_shard": 10,
+      "clown_tag": 0.1,
+      "steve": 50,
+      "coffee": 50,
+      "cookie": 5,
+      "legendary_scratch_card": 15,
+      "lucky_cheese": 10,
+      "multi_potion": 40,
+      "lucky_7": 7,
+      "lucky_scratch_card": 40,
+      "redbull": 25,
+      "incredible_gun": 50,
+      "incredible_fishing_rod": 50,
+      "cursor": 65,
+      "grandma": 65,
+      "lamborghini": 5,
+      "orphan": 50,
+      "hook": 32,
+      "magnet": 8,
+      "big_tiddy_goth_gf": 75,
+      "viagra": 30,
+      "looting": 30,
+      "super_cursor": 20,
+      "bob": 80,
+      "stolen_credit_card": 100,
+      "banana_seed": 10,
+      "apple_seed": 7,
+      "strawberry_seed": 10,
+      "orange_seed": 15,
+      "pineapple_seed": 5,
+      "rain": 2
+    }
+  },
+  "mineshaft_chest": {
+    "items": {
+      "efficiency": 90,
+      "fortune": 90,
+      "unbreaking": 5,
+      "diamond_pickaxe": 85,
+      "ancient_debris": 90,
+      "emerald": 100,
+      "diamond": 100,
+      "obsidian": 50
+    }
+  },
+  "gem_crate": {
+    "items": {
+      "blue_gem": 100,
+      "green_gem": 100,
+      "purple_gem": 100,
+      "pink_gem": 100,
+      "white_gem": 33.3,
+      "crystal_heart": 6.66,
+      "gem_shard": {
+        "weight": 33.3,
+        "count": {
+          "min": 5,
+          "max": 19
+        }
+      }
+    }
+  },
+  "omega_crate": {
+    "money": {
+      "150000000": 100,
+      "69000000": 90
+    },
+    "xp": {
+      "10000": 100
+    },
+    "items": {
+      "infinity_tag": 70,
+      "unbreaking": 90,
+      "highroller": 100,
+      "turbo_upgrade_part": 75,
+      "wheel_upgrade_part": 50,
+      "double_xp": 100,
+      "gem_crate": 25,
+      "boosters_crate": 75,
+      "workers_crate": 75,
+      "white_gem": 5,
+      "platinum_credit": 1,
+      "gold_credit": 3,
+      "silver_credit": 4,
+      "bronze_credit": 15,
+      "nypsi_crate": 75,
+      "pink_gem": 40,
+      "blue_gem": 55,
+      "purple_gem": 40,
+      "green_gem": 75,
+      "gem_shard": 90,
+      "palm_tree": 10,
+      "goat_tag": 0.1,
+      "cat_tag": 0.5,
+      "clown_tag": 2,
+      "bugatti_skin": 15,
+      "ferrari_skin": 15,
+      "steve": 75,
+      "coffee": 40,
+      "cookie": 1,
+      "legendary_scratch_card": 90,
+      "lucky_cheese": 100,
+      "multi_potion": 100,
+      "lucky_7": 95,
+      "reroll_token": 20,
+      "apple_seed": 50,
+      "strawberry_seed": 50,
+      "mango_seed": 25,
+      "coconut_seed": 25,
+      "rain": 7
+    }
+  },
+  "corner_shop_scratchie": {
+    "money": {
+      "500000": 100
+    },
+    "xp": {
+      "250": 100
+    },
+    "karma": {
+      "15": 85
+    },
+    "items": {
+      "lawyer": 100,
+      "diamond": 100,
+      "cookie": 100,
+      "worm": 100,
+      "galvanised_square_steel": 100,
+      "blue_rocks": 65,
+      "ancient_debris": 60,
+      "stolen_credit_card": 90,
+      "grandma": 20,
+      "grandpa": 10,
+      "super_cursor": 5,
+      "lightning_mcqueen": 40,
+      "redbull": 10,
+      "rick_astley": 40,
+      "xp_potion": 10,
+      "wooden_pickaxe": {
+        "weight": 55,
+        "count": 5
+      },
+      "iron_pickaxe": {
+        "weight": 30,
+        "count": 5
+      },
+      "fishing_rod": {
+        "weight": 40,
+        "count": 5
+      },
+      "terrible_gun": {
+        "weight": 50,
+        "count": 5
+      },
+      "mineshaft_chest": 15,
+      "basic_crate": 15,
+      "workers_crate": 3,
+      "boosters_crate": 3,
+      "quarry_scrap": 3,
+      "big_tiddy_goth_gf": 20,
+      "69420_crate": 40,
+      "banana_seed": 1,
+      "fertiliser": 3,
+      "toe": 50
+    }
+  },
+  "daily_scratch_card": {
+    "money": {
+      "1000000": 100
+    },
+    "xp": {
+      "500": 100
+    },
+    "karma": {
+      "75": 100
+    },
+    "items": {
+      "galvanised_square_steel": 50,
+      "calendar": 35,
+      "bob": 100,
+      "streak_token": 50,
+      "grandma": 60,
+      "grandpa": 75,
+      "dave": 1,
+      "super_cursor": 40,
+      "oven": 35,
+      "diamond_pickaxe": {
+        "weight": 40,
+        "count": 5
+      },
+      "iron_pickaxe": {
+        "weight": 70,
+        "count": 5
+      },
+      "fishing_rod": {
+        "weight": 75,
+        "count": 5
+      },
+      "gun": {
+        "weight": 75,
+        "count": 5
+      },
+      "basic_crate": 70,
+      "69420_crate": 65,
+      "bronze_credit": 0.5,
+      "quarry_scrap": 4,
+      "gem_shard": 0.5,
+      "blue_gem": 0.5,
+      "lucky_cheese": 5,
+      "reroll_token": 0.05,
+      "banana_seed": 1,
+      "fertiliser": 50,
+      "toe": 10,
+      "unbreaking": 2,
+      "mango_seed": 4
+    }
+  },
+  "lucky_scratch_card": {
+    "money": {
+      "2500000": 100
+    },
+    "xp": {
+      "500": 100
+    },
+    "items": {
+      "calendar": 60,
+      "bob": 100,
+      "lucky_7": 7,
+      "multi_potion": 30,
+      "coffee": 40,
+      "streak_token": 100,
+      "grandma": 70,
+      "grandpa": 60,
+      "cursor": 70,
+      "super_cursor": 50,
+      "range_rover_skin": 10,
+      "pontiac_skin": 10,
+      "hook": 25,
+      "oven": 30,
+      "lamborghini": 1,
+      "engine_upgrade_part": 50,
+      "mini_cooper": 60,
+      "diamond_pickaxe": {
+        "weight": 50,
+        "count": 5
+      },
+      "iron_pickaxe": {
+        "weight": 75,
+        "count": 5
+      },
+      "incredible_fishing_rod": {
+        "weight": 50,
+        "count": 5
+      },
+      "incredible_gun": {
+        "weight": 75,
+        "count": 5
+      },
+      "basic_crate": 95,
+      "69420_crate": 90,
+      "nypsi_crate": 10,
+      "bronze_credit": 0.7,
+      "gem_shard": 0.9,
+      "omega_crate": 0.05,
+      "apple_seed": 7,
+      "stick": 5
+    }
+  },
+  "karma_scratch_card": {
+    "money": {
+      "3000000": 100
+    },
+    "xp": {
+      "750": 100
+    },
+    "karma": {
+      "50": 100
+    },
+    "items": {
+      "super_cursor": 100,
+      "oven": 100,
+      "bob": 100,
+      "diamond_pickaxe": {
+        "weight": 80,
+        "count": 5
+      },
+      "incredible_fishing_rod": {
+        "weight": 95,
+        "count": 5
+      },
+      "incredible_gun": {
+        "weight": 90,
+        "count": 5
+      },
+      "69420_crate": 100,
+      "nypsi_crate": 40,
+      "bronze_credit": 1,
+      "pink_gem": 0.7,
+      "gem_shard": 75,
+      "quarry_scrap": 75,
+      "karma_scratch_card": 5,
+      "omega_crate": 1,
+      "karma_tag": 5,
+      "reroll_token": 5,
+      "lucky_cheese": 50,
+      "xp_potion": 50,
+      "double_xp": 15,
+      "multi_potion": 40,
+      "veilside_rx7_skin": 10,
+      "stick": 20,
+      "unbreaking": 10,
+      "apple_seed": 30,
+      "rain": 5
+    }
+  },
+  "legendary_scratch_card": {
+    "money": {
+      "10000000": 100
+    },
+    "karma": {
+      "250": 100
+    },
+    "items": {
+      "double_xp": 100,
+      "super_cursor": 100,
+      "steve": 100,
+      "nether_portal": 50,
+      "highroller": 80,
+      "lucky_7": 70,
+      "incredible_fishing_rod": {
+        "weight": 100,
+        "count": 5
+      },
+      "incredible_gun": {
+        "weight": 100,
+        "count": 5
+      },
+      "turbo_upgrade_part": 40,
+      "wheel_upgrade_part": 40,
+      "lamborghini": 45,
+      "quarry_scrap": 100,
+      "nypsi_crate": 50,
+      "platinum_credit": 0.5,
+      "bronze_credit": 3,
+      "silver_credit": 2,
+      "gold_credit": 1,
+      "purple_gem": 3,
+      "gem_shard": 50,
+      "gem_crate": 2,
+      "omega_crate": 2,
+      "cat_tag": 0.1,
+      "ferrari_skin": 10,
+      "reroll_token": 4,
+      "veilside_rx7_skin": 5,
+      "stick": 40,
+      "rain": 10,
+      "apple_seed": 50
+    }
+  },
+  "random_drop": {
+    "items": {
+      "diamond_pickaxe": {
+        "weight": 20,
+        "count": 15
+      },
+      "incredible_fishing_rod": {
+        "weight": 20,
+        "count": 15
+      },
+      "incredible_gun": {
+        "weight": 20,
+        "count": 15
+      },
+      "mineshaft_chest": 40,
+      "basic_crate": 100,
+      "69420_crate": 100,
+      "nypsi_crate": 50,
+      "unbreaking": 15,
+      "grandma": 75,
+      "oven": 60,
+      "green_gem": 5,
+      "blue_gem": 5,
+      "super_cursor": 75,
+      "workers_crate": 60,
+      "boosters_crate": 70,
+      "bronze_credit": 7,
+      "silver_credit": 2,
+      "lucky_scratch_card": 90,
+      "legendary_scratch_card": 40,
+      "gem_shard": 25,
+      "omega_crate": 0.1,
+      "hanafuda_tag": 0.001,
+      "reroll_token": 1.75,
+      "engine_upgrade_part": 30,
+      "turbo_upgrade_part": 10,
+      "wheel_upgrade_part": 10,
+      "pontiac_skin": 15,
+      "ferrari_skin": 5,
+      "rx7_skin": 15,
+      "veilside_rx7_skin": 10,
+      "ford_transit_skin": 10,
+      "orange_seed": 20,
+      "toe": 10,
+      "mona_lisa": 5,
+      "rose": 10,
+      "tulip": 5,
+      "cherry_blossom": 3,
+      "mango_seed": 5,
+      "coconut_seed": 7,
+      "pineapple_seed": 7,
+      "maxwell": 3,
+      "zazu": 3,
+      "oye": 3,
+      "ethel": 5,
+      "rain": 0.75,
+      "charger_skin": 7
+    }
+  }
+}
