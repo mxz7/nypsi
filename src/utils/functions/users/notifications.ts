@@ -5,6 +5,7 @@ import redis from "../../../init/redis";
 import { InlineNotificationPayload, NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
 import { dmQueue } from "../../queues/queues";
+import { createUser, userExists } from "../economy/utils";
 import ms = require("ms");
 
 declare function require(name: string): any;
@@ -108,6 +109,8 @@ export async function getPreferences(member: GuildMember | string): Promise<Pref
   });
 
   if (!query) {
+    if (!(await userExists(id))) await createUser(id);
+
     query = await prisma.preferences.create({
       data: {
         userId: id,
