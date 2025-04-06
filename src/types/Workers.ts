@@ -14,8 +14,8 @@ export interface Worker {
         rolls: number;
         multiply_chance: boolean;
         multiply_rolls: boolean;
-      }
-    }
+      };
+    };
   };
 }
 
@@ -32,7 +32,7 @@ export interface WorkerUpgrades {
 }
 
 export interface WorkerByproducts {
-  [item: string]: number
+  [item: string]: number;
 }
 
 export type PossibleUpgrade =
@@ -45,6 +45,6 @@ export type PossibleUpgrade =
 export type SteveData = {
   money: number;
   byproducts: {
-    [index: string]: number; 
-  } 
+    [index: string]: number;
+  };
 };
