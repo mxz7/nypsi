@@ -145,6 +145,8 @@ async function randomDrop(client: NypsiClient) {
             winner,
           )}) prize: ${JSON.stringify(prize)}`,
         );
+        addProgress(winner, "lootdrops_pro", 1);
+        addTaskProgress(winner, "lootdrops");
         giveLootPoolResult(winner, prize);
       }
 
