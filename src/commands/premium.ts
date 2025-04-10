@@ -596,9 +596,11 @@ async function run(
 
       const embed = new CustomEmbed(message.member, pages.get(1).join("\n"));
 
-      const msg = await send({ embeds: [embed] });
+      if (pages.size === 1) {
+        return await send({ embeds: [embed] });
+      }
 
-      if (pages.size === 1) return;
+      const msg = await send({ embeds: [embed] });
 
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
