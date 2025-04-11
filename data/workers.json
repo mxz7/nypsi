@@ -56,7 +56,7 @@
       "id": "compactors",
       "name": "compactors",
       "upgrades": "per_interval",
-      "effect": 0.2,
+      "effect": 0.05,
       "stack_limit": 20,
       "base_cost": 40000,
       "for": "scrapyard"
@@ -160,7 +160,7 @@
       "plural": "claw cranes",
       "upgrades": "byproduct_chance",
       "byproduct": "wheel_upgrade_part",
-      "effect": 0.0014,
+      "effect": 0.0007,
       "stack_limit": 10,
       "for": "scrapyard"
     },
@@ -170,7 +170,7 @@
       "plural": "magnets",
       "upgrades": "byproduct_chance",
       "byproduct": "turbo_upgrade_part",
-      "effect": 0.0014,
+      "effect": 0.00105,
       "stack_limit": 10,
       "for": "scrapyard"
     }
@@ -269,9 +269,9 @@
       "prestige_requirement": 60,
       "cost": 175000,
       "base": {
-        "per_item": 4,
+        "per_item": 5,
         "max_storage": 200,
-        "per_interval": 50,
+        "per_interval": 125,
         "byproducts": {
           "hook": {
             "chance": 0.0035,
@@ -280,13 +280,13 @@
             "multiply_rolls": true
           },
           "wheel_upgrade_part": {
-            "chance": 0.00035,
+            "chance": 0.000175,
             "rolls": 0.008,
             "multiply_chance": false,
             "multiply_rolls": true
           },
           "turbo_upgrade_part": {
-            "chance": 0.00035,
+            "chance": 0.0002625,
             "rolls": 0.008,
             "multiply_chance": false,
             "multiply_rolls": true
