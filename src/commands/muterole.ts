@@ -1,4 +1,4 @@
-import { CommandInteraction, PermissionFlagsBits, Role, ThreadChannel } from "discord.js";
+import { CommandInteraction, GuildBasedChannel, PermissionFlagsBits, Role } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getPrefix } from "../utils/functions/guilds/utils";
@@ -101,64 +101,60 @@ async function run(
       embeds: [new CustomEmbed(message.member, "✅ muterole has been reset")],
     });
   } else if (args[0].toLowerCase() == "update") {
-    let channelError = false;
-    try {
-      let muteRole = await message.guild.roles.cache.get(await getMuteRole(message.guild));
+    let muteRole: Role | void;
 
-      if ((await getMuteRole(message.guild)) == "") {
-        muteRole = await message.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted");
+    const guildMuteRole = await getMuteRole(message.guild);
+
+    if (!guildMuteRole || guildMuteRole == "default")
+      muteRole = message.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted");
+    else muteRole = await message.guild.roles.fetch(guildMuteRole).catch(() => {});
+
+    if (!muteRole) {
+      try {
+        muteRole = await message.guild.roles.create({
+          name: "muted",
+        });
+      } catch {
+        return message.channel.send({
+          embeds: [new ErrorEmbed("error creating new mute role, please check my permissions")],
+        });
       }
+    }
 
-      if (!muteRole) {
-        const newMuteRole = await message.guild.roles
-          .create({
-            name: "muted",
-          })
-          .catch(() => {
-            channelError = true;
-          });
-
-        if (newMuteRole instanceof Role) {
-          muteRole = newMuteRole;
-        }
-      }
-
-      await message.guild.channels.cache.forEach(async (channel) => {
-        if (channel instanceof ThreadChannel) return;
-        await channel.permissionOverwrites
-          .edit(muteRole, {
-            SendMessages: false,
-            Speak: false,
-            AddReactions: false,
-            SendMessagesInThreads: false,
-            CreatePublicThreads: false,
-            CreatePrivateThreads: false,
-          })
-          .catch(() => {
-            channelError = true;
-          });
-      });
-    } catch (e) {
+    if (!muteRole) {
       return message.channel.send({
-        embeds: [
-          new ErrorEmbed(
-            "error creating mute role - make sure i have `manage roles` permission and `manage channels`",
-          ),
-        ],
+        embeds: [new ErrorEmbed("error creating new mute role, please check my permissions")],
       });
     }
-    if (channelError) {
+
+    let failedChannels: GuildBasedChannel[];
+
+    for (const channel of message.guild.channels.cache.values()) {
+      if (channel.isThread()) continue;
+      await channel.permissionOverwrites
+        .edit(muteRole, {
+          SendMessages: false,
+          Speak: false,
+          AddReactions: false,
+          SendMessagesInThreads: false,
+          CreatePublicThreads: false,
+          CreatePrivateThreads: false,
+        })
+        .catch(() => failedChannels.push(channel));
+    }
+
+    if (failedChannels.length > 0) {
       return message.channel.send({
         embeds: [
           new ErrorEmbed(
-            "error creating mute role - make sure i have `manage roles` permission and `manage channels`",
+            `couldn't update the following channels: ${failedChannels.map((c) => c.toString()).join(", ")}`,
           ),
         ],
       });
     }
 
     return message.channel.send({
-      embeds: [new CustomEmbed(message.member, "✅ permissions were updated")],
+      embeds: [new CustomEmbed(message.member, `✅ permissions updated for all channels`)],
     });
   } else if (args[0].toLowerCase() == "timeout") {
     await setMuteRole(message.guild, "timeout");
