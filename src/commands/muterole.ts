@@ -127,7 +127,7 @@ async function run(
       });
     }
 
-    let failedChannels: GuildBasedChannel[];
+    let failedChannels: GuildBasedChannel[] = [];
 
     for (const channel of message.guild.channels.cache.values()) {
       if (channel.isThread()) continue;
