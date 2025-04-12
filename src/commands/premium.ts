@@ -1,14 +1,10 @@
 import {
-  ActionRowBuilder,
   BaseMessageOptions,
-  ButtonBuilder,
-  ButtonStyle,
   ColorResolvable,
   CommandInteraction,
   InteractionEditReplyOptions,
   InteractionReplyOptions,
   Message,
-  MessageActionRowComponentBuilder,
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
@@ -600,16 +596,9 @@ async function run(
         return await send({ embeds: [embed] });
       }
 
-      const msg = await send({ embeds: [embed] });
+      const row = PageManager.defaultRow();
 
-      const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder()
-          .setCustomId("⬅")
-          .setLabel("back")
-          .setStyle(ButtonStyle.Primary)
-          .setDisabled(true),
-        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
-      );
+      const msg = await send({ embeds: [embed], components: [row] });
 
       const manager = new PageManager({
         embed,
