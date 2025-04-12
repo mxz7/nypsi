@@ -13,23 +13,6 @@ import Constants from "../../utils/Constants";
 import { addNotificationToQueue } from "../../utils/functions/users/notifications";
 import dayjs = require("dayjs");
 
-const data: NotificationPayload = {
-  memberId: "boob",
-  payload: {
-    embed: new CustomEmbed()
-      .setDescription("it has been more than 12 hours since you last voted")
-      .setColor(Constants.PURPLE),
-
-    components: new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder()
-        .setStyle(ButtonStyle.Link)
-        .setURL("https://top.gg/bot/678711738845102087/vote")
-        .setLabel("top.gg")
-        .setEmoji("<:topgg:1355915569286610964>"),
-    ),
-  },
-};
-
 const queued = new Set<string>();
 
 export default {
@@ -75,16 +58,27 @@ export default {
 
       amount++;
 
+      const payload: NotificationPayload = {
+        memberId: user.userId,
+        payload: {
+          embed: new CustomEmbed()
+            .setDescription("it has been more than 12 hours since you last voted")
+            .setColor(getColor(user.userId))
+            .setFooter({ text: `streak: ${user.user.Economy.voteStreak.toLocaleString()}` }),
+          components: new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+            new ButtonBuilder()
+              .setStyle(ButtonStyle.Link)
+              .setURL("https://top.gg/bot/678711738845102087/vote")
+              .setLabel("top.gg")
+              .setEmoji("<:topgg:1355915569286610964>"),
+          ),
+        },
+      };
+
       if (
         user.user.Economy.lastVote.getTime() <= dayjs().subtract(12, "hours").toDate().getTime()
       ) {
-        data.memberId = user.userId;
-        data.payload.embed.setColor(getColor(user.userId));
-        data.payload.embed.setFooter({
-          text: `streak: ${user.user.Economy.voteStreak.toLocaleString()}`,
-        });
-
-        addNotificationToQueue(data);
+        await addNotificationToQueue(payload);
 
         await redis.sadd(Constants.redis.nypsi.VOTE_REMINDER_RECEIVED, user.userId);
       } else {
@@ -93,8 +87,7 @@ export default {
           () => {
             queued.delete(user.userId);
             redis.sadd(Constants.redis.nypsi.VOTE_REMINDER_RECEIVED, user.userId);
-            data.memberId = user.userId;
-            addNotificationToQueue(data);
+            addNotificationToQueue(payload);
           },
           user.user.Economy.lastVote.getTime() - dayjs().subtract(12, "hours").toDate().getTime(),
         );

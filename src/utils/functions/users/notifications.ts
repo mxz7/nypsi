@@ -149,7 +149,7 @@ export async function updatePreferences(member: GuildMember | string, data: Pref
 }
 
 export function addNotificationToQueue(...payload: NotificationPayload[]) {
-  dmQueue.addBulk(
+  return dmQueue.addBulk(
     payload.map((data) => ({
       data,
       name: data.memberId,
