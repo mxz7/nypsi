@@ -146,6 +146,8 @@ async function randomDrop(client: NypsiClient) {
           )}) prize: ${JSON.stringify(prize)}`,
         );
         giveLootPoolResult(winner, prize);
+        addProgress(winner, "lootdrops_pro", 1);
+        addTaskProgress(winner, "lootdrops");
       }
 
       if (count >= max) return;
