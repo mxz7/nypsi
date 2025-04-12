@@ -74,7 +74,7 @@ const recentlyUsedUserAliases = new Map<string, Map<string, string>>();
 
 setInterval(() => {
   recentlyUsedUserAliases.clear();
-}, ms("15 minutes"));
+}, ms("2 hours"));
 
 const karmaCooldown = new Set<string>();
 const xpCooldown = new Set<string>();
