@@ -24,7 +24,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { startRandomDrop } from "../scheduled/clusterjobs/random-drops";
 import Constants from "../utils/Constants";
 import { b, c } from "../utils/functions/anticheat";
-import { giveCaptcha } from "../utils/functions/captcha";
+import { getCaptchaHistory, giveCaptcha } from "../utils/functions/captcha";
 import { MStoTime } from "../utils/functions/date";
 import { updateBalance, updateBankBalance } from "../utils/functions/economy/balance";
 import { initCrashGame } from "../utils/functions/economy/crash";
@@ -1544,10 +1544,7 @@ async function run(
           `admin: ${message.author.id} (${message.author.username}) viewed ${user.id} captcha history`,
         );
 
-        const history = await prisma.captcha.findMany({
-          where: { userId: user.id },
-          orderBy: { createdAt: "desc" },
-        });
+        const history = await getCaptchaHistory(user.id);
 
         const embed = new CustomEmbed(message.member);
 

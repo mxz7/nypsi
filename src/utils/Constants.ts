@@ -60,6 +60,7 @@ export default {
         avatar: "cache:user:avatar",
         views: "cache:user:views",
         aura: "cache:user:aura",
+        CAPTCHA_HISTORY: "cache:user:captcha:history",
       },
       guild: {
         EXISTS: "cache:guild:exists",
