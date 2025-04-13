@@ -12,19 +12,19 @@ import { addProgress } from "../utils/functions/economy/achievements";
 import { getMember } from "../utils/functions/member";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cache = new Map<string, string>();
+const cache = new Map<string, { content: string; emoji: string }>();
 
 const values = [
-  "flat as a pancake.",
-  "HOLLYYYYYY LAY THAT THING ON MY FACE RIGHT NOW",
-  "i bet it jiggles",
-  "can i spank it?",
-  "dump truck",
-  "damn you're an ironing board",
-  "volumptuous",
-  "I WANNA EAT IT",
-  "let me bite.",
-  "hahahahhahha there's nothing there",
+  { content: "flat as a pancake.", emoji: "🥞" },
+  { content: "HOLLYYYYYY LAY THAT THING ON MY FACE RIGHT NOW", emoji: "🍑" },
+  { content: "i bet it jiggles", emoji: "🍑" },
+  { content: "can i spank it?", emoji: "🍑👋" },
+  { content: "dump truck", emoji: "🍑" },
+  { content: "damn you're an ironing board", emoji: "😹🫵" },
+  { content: "volumptuous", emoji: "🍑" },
+  { content: "I WANNA EAT IT", emoji: "🍑😋" },
+  { content: "let me bite.", emoji: "🍑🤤" },
+  { content: "hahahahhahha there's nothing there", emoji: "😹🫵" },
 ];
 
 const cmd = new Command("ass", "accurate prediction of your ass size", "fun").setAliases([
@@ -93,7 +93,7 @@ async function run(
     }
   }
 
-  let value: string;
+  let value: { content: string; emoji: string };
 
   if (cache.has(member.user.id)) {
     value = cache.get(member.user.id);
@@ -108,7 +108,7 @@ async function run(
 
   const embed = new CustomEmbed(message.member)
     .setHeader("ass determiner", member.user.avatarURL())
-    .setDescription(member.user.toString() + `\n${value}`);
+    .setDescription(member.user.toString() + `\n${value.emoji} ${value.content}`);
 
   send({ embeds: [embed] });
 
