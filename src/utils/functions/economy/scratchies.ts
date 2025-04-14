@@ -13,7 +13,7 @@ import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { percentChance, shuffle } from "../random";
 import { addProgress } from "./achievements";
-import { itemExists } from "./inventory";
+import { isGem, itemExists } from "./inventory";
 import { addStat } from "./stats";
 import { addTaskProgress } from "./tasks";
 import { getItems, getLootPools } from "./utils";
@@ -203,8 +203,7 @@ export default class ScratchCard {
       if (Object.hasOwn(prize, "money")) {
         addStat(this.member, "earned-scratch", prize.money);
       }
-      if (Object.hasOwn(prize, "item") && prize.item.includes("_gem")) {
-        await addProgress(this.member.user.id, "gem_hunter", 1);
+      if (Object.hasOwn(prize, "item") && isGem(prize.item)) {
         await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t", "EX", 86400);
       }
 
@@ -264,7 +263,7 @@ export default class ScratchCard {
 
     const excludedItems = async (e: string) =>
       (getItems()[e].unique && (await itemExists(e))) ||
-      (e.includes("_gem") && !!(await redis.exists(Constants.redis.nypsi.GEM_GIVEN)));
+      (isGem(e) && !!(await redis.exists(Constants.redis.nypsi.GEM_GIVEN)));
 
     let totalCount = 2;
     let createVert = -1;
