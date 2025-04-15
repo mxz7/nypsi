@@ -2,7 +2,7 @@ import dayjs = require("dayjs");
 import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import { addProgress } from "./achievements";
-import { addInventoryItem } from "./inventory";
+import { addInventoryItem, isGem } from "./inventory";
 import { getItems } from "./utils";
 
 export async function getCraftingItems(member: GuildMember | string, deleteOld = true) {
@@ -44,7 +44,7 @@ export async function getCraftingItems(member: GuildMember | string, deleteOld =
         });
 
         await addInventoryItem(id, item.itemId, item.amount);
-        if (item.itemId.includes("_gem") || item.itemId === "crystal_heart")
+        if (isGem(item.itemId))
           await addProgress(id, "gem_hunter", item.amount);
       }
     }
