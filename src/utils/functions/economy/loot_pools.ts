@@ -3,9 +3,10 @@ import { Item } from "../../../types/Economy";
 import { LootPool, LootPoolItemEntry, LootPoolResult } from "../../../types/LootPool";
 import { logger } from "../../logger";
 import { addKarma } from "../karma/karma";
+import { addProgress } from "./achievements";
 import { addBalance } from "./balance";
 import { addToGuildXP, getGuildName } from "./guilds";
-import { addInventoryItem, getInventory, itemExists, setInventoryItem } from "./inventory";
+import { addInventoryItem, getInventory, isGem, itemExists, setInventoryItem } from "./inventory";
 import { getItems, getLootPools } from "./utils";
 import { addXp } from "./xp";
 
@@ -53,6 +54,10 @@ export async function giveLootPoolResult(member: string | GuildMember, result: L
   }
   if (Object.hasOwn(result, "item")) {
     await addInventoryItem(member, result.item, Object.hasOwn(result, "count") ? result.count : 1);
+    if (isGem(result.item)) {
+      // @ts-expect-error
+      await addProgress(member?.user?.id ?? member, "gem_hunter", result.count ?? 1);
+    }
   }
 }
 

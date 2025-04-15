@@ -357,6 +357,10 @@ export async function commandGemCheck(member: GuildMember, commandCategory: Comm
   }
 }
 
+export function isGem(itemId: string) {
+  return itemId.includes("_gem") || itemId === "crystal_heart";
+}
+
 export async function gemBreak(userId: string, chance: number, gem: string) {
   if (!percentChance(chance)) return;
 
