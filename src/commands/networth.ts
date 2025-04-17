@@ -114,21 +114,24 @@ async function run(
   }
 
   inPlaceSort(itemValues).desc((i) => i.value);
+  let pages: Map<number, string[]> = new Map();
 
-  const pages = PageManager.createPages(
-    itemValues.map(
-      (i) =>
-        `\`${inventory.find((inv) => inv.item === i.itemId).amount.toLocaleString()}x\` ${
-          getItems()[i.itemId].emoji
-        } ${getItems()[i.itemId].name}: $**${i.value.toLocaleString()}** (${(
-          (i.value / net.amount) *
-          100
-        ).toFixed(2)}%)`,
-    ),
-  );
+  if (itemValues.length > 0) {
+    pages = PageManager.createPages(
+      itemValues.map(
+        (i) =>
+          `\`${inventory.find((inv) => inv.item === i.itemId).amount.toLocaleString()}x\` ${
+            getItems()[i.itemId].emoji
+          } ${getItems()[i.itemId].name}: $**${i.value.toLocaleString()}** (${(
+            (i.value / net.amount) *
+            100
+          ).toFixed(2)}%)`,
+      ),
+    );
+  }
 
   embed.setDescription(mainValues);
-  if (itemValues && itemValues.length > 1)
+  if (itemValues && itemValues.length > 0)
     embed.addField(
       `inventory (${itemValues
         .map((i) => (i.value / net.amount) * 100)
