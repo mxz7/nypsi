@@ -125,7 +125,10 @@
       "ferrari_skin": 15,
       "steve": 75,
       "coffee": 40,
-      "cookie": 1,
+      "cookie": {
+        "weight": 1,
+        "count": 5000
+      },
       "legendary_scratch_card": 90,
       "lucky_cheese": 100,
       "multi_potion": 100,
