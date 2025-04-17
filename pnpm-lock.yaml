@@ -24,8 +24,8 @@ importers:
         specifier: 3.1.6
         version: 3.1.6
       '@twemoji/parser':
-        specifier: ^15.1.1
-        version: 15.1.1
+        specifier: ^16.0.0
+        version: 16.0.0
       '@zeyrbot/urbandictionary':
         specifier: ^1.0.3
         version: 1.0.3
@@ -1233,8 +1233,8 @@ packages:
   '@top-gg/sdk@3.1.6':
     resolution: {integrity: sha512-qWWYDKAwJHaKaA/5EyLYMzfR76MwCbmKVMSXTPMd9FZFPHuLWJHO+m7Q8dWpWtcnunHa6evRAwlB3p83cht7Ww==}
 
-  '@twemoji/parser@15.1.1':
-    resolution: {integrity: sha512-CChRzIu6ngkCJOmURBlYEdX5DZSu+bBTtqR60XjBkFrmvplKW7OQsea+i8XwF4bLVlUXBO7ZmHhRPDzfQyLwwg==}
+  '@twemoji/parser@16.0.0':
+    resolution: {integrity: sha512-jmuIjkp3OIaEemwMy3sArBwZSuZkRqmueGwRe2Zk4cFzbUJISFBJSZLDUUBNIgq3c+nY49ideYN2OiII6JUqwA==}
 
   '@types/babel__core@7.20.5':
     resolution: {integrity: sha512-qoQprZvz5wQFJwMDqeseRXWv3rqMvhgpbXFfVyWhbx9X47POIA6i/+dXefEmZKoAgOaTdaIgNSMqMIU61yRyzA==}
@@ -4606,7 +4606,7 @@ snapshots:
       raw-body: 2.5.2
       undici: 5.28.5
 
-  '@twemoji/parser@15.1.1': {}
+  '@twemoji/parser@16.0.0': {}
 
   '@types/babel__core@7.20.5':
     dependencies:
