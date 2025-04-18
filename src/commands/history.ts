@@ -16,9 +16,10 @@ import {
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
-import { getMember } from "../utils/functions/member";
+import { getExactMember } from "../utils/functions/member";
 import { getCases } from "../utils/functions/moderation/cases";
 
+import prisma from "../init/database";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("history", "view punishment history for a given user", "moderation")
@@ -87,7 +88,21 @@ async function run(
     return send({ embeds: [embed] });
   }
 
-  const member = (await getMember(message.guild, args.join(" "))) || args[0];
+  let member = (await getExactMember(message.guild, args.join(" "))) || args[0];
+
+  if (!member) {
+    const user = await prisma.user.findFirst({
+      where: {
+        lastKnownUsername: args[0].toLowerCase(),
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (user?.id) member = user.id;
+    else return send({ embeds: [new ErrorEmbed("invalid user")] });
+  }
 
   const cases = await getCases(
     message.guild,
