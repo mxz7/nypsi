@@ -45,8 +45,6 @@ async function run(
         break;
     }
   }, 500);
-
-  message.react("✅");
 }
 
 cmd.setRun(run);
