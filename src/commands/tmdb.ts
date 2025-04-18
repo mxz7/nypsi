@@ -149,7 +149,7 @@ async function run(
       .setURL(`https://themoviedb.org/movie/${movie.id}`)
       .setThumbnail(`https://image.tmdb.org/t/p/w1280${movie.poster_path}`)
       .setDescription(
-        `*${movie.tagline}*\n\n` +
+        `${movie.tagline ? `> *${movie.tagline}*\n\n` : ""}` +
           `> ${movie.overview}\n\n` +
           `**${Math.round(movie.vote_average * 10)}%** user score\n\n` +
           `-# *${movie.release_date}*\n` +
@@ -219,7 +219,7 @@ async function run(
       .setURL(`https://themoviedb.org/tv/${tv.id}`)
       .setThumbnail(`https://image.tmdb.org/t/p/w1280${tv.poster_path}`)
       .setDescription(
-        `*${tv.tagline}*\n\n` +
+        `${tv.tagline ? `*${tv.tagline}*\n\n` : ""}` +
           `> ${tv.overview}\n\n` +
           `**${Math.round(tv.vote_average * 10)}%** user score\n\n` +
           `-# *${tv.first_air_date} - ${tv.status === "Ended" ? tv.last_air_date : "ongoing"}*\n` +
