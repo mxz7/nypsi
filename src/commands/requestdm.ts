@@ -24,14 +24,27 @@ async function run(
 
   args.shift();
 
-  addNotificationToQueue({
+  const job = await addNotificationToQueue({
     memberId: user,
     payload: {
       content: args.join(" "),
     },
-  });
+  }).then((r) => r[0]);
 
   if (!(message instanceof Message)) return;
+
+  const interval = setInterval(async () => {
+    switch (await job.getState()) {
+      case "completed":
+        clearInterval(interval);
+        message.react("✅");
+        break;
+      case "failed":
+        clearInterval(interval);
+        message.react("❌");
+        break;
+    }
+  }, 500);
 
   message.react("✅");
 }

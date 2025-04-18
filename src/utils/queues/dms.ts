@@ -20,13 +20,19 @@ const connection = new Redis({ maxRetriesPerRequest: null });
 export const dmQueueWorker = new Worker<NotificationPayload, boolean>(
   "dms",
   async (job) => {
-    return await requestDM({
+    const res = await requestDM({
       content: job.data.payload.content,
       memberId: job.data.memberId,
       components: job.data.payload.components,
       embed: job.data.payload.embed,
       client: manager,
     });
+
+    if (res) {
+      return true;
+    } else {
+      throw new Error(`failed to dm ${job.data.memberId}`);
+    }
   },
   {
     removeOnComplete: { count: 0 },
@@ -136,11 +142,13 @@ async function requestDM(options: RequestDMOptions): Promise<boolean> {
         await options.client.cluster.broadcastEval(
           async (c, { needed, memberId, payload }) => {
             const client = c as unknown as NypsiClient;
-            if (client.cluster.id != needed) return { success: false, reason: "wrong cluster" };
+            if (client.cluster.id != needed)
+              return { success: false, reason: "wrong cluster", cluster: client.cluster.id };
 
             const user = await client.users.fetch(memberId).catch(() => {});
 
-            if (!user) return { success: false, reason: "user not found" };
+            if (!user)
+              return { success: false, reason: "user not found", cluster: client.cluster.id };
 
             let fail = false;
 
@@ -149,9 +157,9 @@ async function requestDM(options: RequestDMOptions): Promise<boolean> {
             });
 
             if (fail) {
-              return { success: false, reason: "failed to send" };
+              return { success: false, reason: "failed to send", cluster: client.cluster.id };
             }
-            return { success: true };
+            return { success: true, cluster: client.cluster.id };
           },
           {
             context: {
@@ -162,7 +170,7 @@ async function requestDM(options: RequestDMOptions): Promise<boolean> {
           },
         );
 
-      if (res.filter((i) => i.success)) {
+      if (res.filter((i) => i.success).length > 0) {
         logger.info(`::success DM sent: ${options.memberId} (${shard})`);
         return true;
       } else {
@@ -233,11 +241,13 @@ async function requestDM(options: RequestDMOptions): Promise<boolean> {
         await options.client.broadcastEval(
           async (c, { needed, memberId, payload }) => {
             const client = c as unknown as NypsiClient;
-            if (client.cluster.id != needed) return { success: false, reason: "wrong cluster" };
+            if (client.cluster.id != needed)
+              return { success: false, reason: "wrong cluster", cluster: client.cluster.id };
 
             const user = await client.users.fetch(memberId).catch(() => {});
 
-            if (!user) return { success: false, reason: "user not found" };
+            if (!user)
+              return { success: false, reason: "user not found", cluster: client.cluster.id };
 
             let fail = false;
 
@@ -246,7 +256,7 @@ async function requestDM(options: RequestDMOptions): Promise<boolean> {
             });
 
             if (fail) {
-              return { success: false, reason: "failed to send" };
+              return { success: false, reason: "failed to send", cluster: client.cluster.id };
             }
             return { success: true };
           },
@@ -259,7 +269,7 @@ async function requestDM(options: RequestDMOptions): Promise<boolean> {
           },
         );
 
-      if (res.filter((i) => i.success)) {
+      if (res.filter((i) => i.success).length > 0) {
         logger.info(`::success DM sent: ${options.memberId} (${shard})`);
         return true;
       } else {
