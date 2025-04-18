@@ -18,16 +18,21 @@ const prisma = new PrismaClient().$extends({
 
         redis.lpush(Constants.redis.nypsi.HOURLY_DB_REPORT, timeTaken);
         if (timeTaken > 1000 && !parentPort) {
+          let loggerArgs: typeof args;
           if (
             JSON.stringify(
               args,
               (key, value) => (typeof value === "bigint" ? value.toString() : value),
               "\n",
-            ).split("\n").length > 250
+            ).split("\n").length <= 250
           ) {
-            logger.warn(`query ${model}.${operation} took ${timeTaken.toFixed(2)}ms`);
+            loggerArgs = args;
+          }
+
+          if (timeTaken > 15000) {
+            logger.warn(`query ${model}.${operation} took ${timeTaken.toFixed(2)}ms`, loggerArgs);
           } else {
-            logger.warn(`query ${model}.${operation} took ${timeTaken.toFixed(2)}ms`, args);
+            logger.debug(`query ${model}.${operation} took ${timeTaken.toFixed(2)}ms`, loggerArgs);
           }
         }
 
