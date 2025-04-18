@@ -71,17 +71,27 @@ async function run(
     embed.addField("attachments", attachments.join("\n"));
   }
 
-  Promise.all([
-    sendToRequestChannel(support.userId, embed, message.client as NypsiClient),
-    addNotificationToQueue({
-      payload: {
-        content: "you have received a message from your support ticket",
-        embed: embed,
-      },
-      memberId: support.userId,
-    }),
-    message.delete(),
-  ]);
+  const job = await addNotificationToQueue({
+    payload: {
+      content: "you have received a message from your support ticket",
+      embed: embed,
+    },
+    memberId: support.userId,
+  }).then((r) => r[0]);
+
+  const interval = setInterval(async () => {
+    switch (await job.getState()) {
+      case "completed":
+        clearInterval(interval);
+        message.delete();
+        sendToRequestChannel(support.userId, embed, message.client as NypsiClient);
+        break;
+      case "failed":
+        clearInterval(interval);
+        message.reply({ embeds: [new ErrorEmbed("failed to send message")] });
+        break;
+    }
+  }, 500);
 }
 
 cmd.setRun(run);
