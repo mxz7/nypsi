@@ -20,7 +20,7 @@
     "@twemoji/parser": "^16.0.0",
     "@zeyrbot/urbandictionary": "^1.0.3",
     "bufferutil": "4.0.9",
-    "bullmq": "^5.48.1",
+    "bullmq": "^5.49.1",
     "chalk": "4.1.2",
     "cron": "^4.3.0",
     "crypto-js": "4.2.0",
