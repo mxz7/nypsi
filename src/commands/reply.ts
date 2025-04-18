@@ -80,7 +80,8 @@ async function run(
   }).then((r) => r[0]);
 
   const interval = setInterval(async () => {
-    switch (await job.getState()) {
+    const state = await job.getState();
+    switch (state) {
       case "unknown":
       case "completed":
         clearInterval(interval);

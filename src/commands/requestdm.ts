@@ -35,7 +35,7 @@ async function run(
 
   const interval = setInterval(async () => {
     const state = await job.getState();
-    console.log(state);
+
     switch (state) {
       case "completed":
         clearInterval(interval);
