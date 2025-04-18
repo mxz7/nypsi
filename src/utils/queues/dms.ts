@@ -36,6 +36,22 @@ export const dmQueueWorker = new Worker<NotificationPayload, boolean>(
   },
 );
 
+dmQueueWorker.on("paused", () => {
+  logger.info("dm queue paused");
+});
+
+dmQueueWorker.on("resumed", () => {
+  logger.info("dm queue resumed");
+});
+
+dmQueueWorker.on("error", (err) => {
+  logger.error("dm queue error", err);
+});
+
+dmQueueWorker.on("stalled", (jobId) => {
+  logger.debug(`job stalled: ${jobId}`);
+});
+
 dmQueueWorker.pause();
 
 interface RequestDMOptions {
