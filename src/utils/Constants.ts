@@ -27,6 +27,12 @@ export default {
       SUPPORT: "cd:support",
     },
     cache: {
+      tmdb: {
+        MOVIE_SEARCH: "cache:tmdb:movie:search",
+        TV_SEARCH: "cache:tmdb:tv:search",
+        MOVIE: "cache:tmdb:movie",
+        TV: "cache:tmdb:tv",
+      },
       IMAGE: "nypsi:image",
       COUNTRY_DATA: "nypsi_cache:countrydata",
       minecraft: {
