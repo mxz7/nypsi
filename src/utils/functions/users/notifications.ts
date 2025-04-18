@@ -153,7 +153,6 @@ export function addNotificationToQueue(...payload: NotificationPayload[]) {
     payload.map((data) => ({
       data,
       name: data.memberId,
-      opts: { removeOnComplete: true, removeOnFail: true },
     })),
   );
 }

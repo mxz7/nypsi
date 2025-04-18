@@ -81,6 +81,7 @@ async function run(
 
   const interval = setInterval(async () => {
     switch (await job.getState()) {
+      case "unknown":
       case "completed":
         clearInterval(interval);
         message.delete();

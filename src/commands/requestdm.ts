@@ -34,7 +34,9 @@ async function run(
   if (!(message instanceof Message)) return;
 
   const interval = setInterval(async () => {
-    switch (await job.getState()) {
+    const state = await job.getState();
+    console.log(state);
+    switch (state) {
       case "completed":
         clearInterval(interval);
         message.react("✅");
@@ -42,6 +44,10 @@ async function run(
       case "failed":
         clearInterval(interval);
         message.react("❌");
+        break;
+      case "unknown":
+        clearInterval(interval);
+        message.react("❓");
         break;
     }
   }, 500);

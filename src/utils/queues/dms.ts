@@ -35,8 +35,8 @@ export const dmQueueWorker = new Worker<NotificationPayload, boolean>(
     }
   },
   {
-    removeOnComplete: { count: 0 },
-    removeOnFail: { count: 0 },
+    removeOnComplete: { count: 100 },
+    removeOnFail: { count: 100 },
     connection,
     concurrency: 3,
   },
