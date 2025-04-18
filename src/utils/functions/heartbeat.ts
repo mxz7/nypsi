@@ -2,6 +2,7 @@ import { Cluster } from "discord-hybrid-sharding";
 import redis from "../../init/redis";
 import Constants from "../Constants";
 import { logger } from "../logger";
+import { dmQueueWorker } from "../queues/dms";
 
 const failedHeartbeats = new Map<number, number>();
 
@@ -28,7 +29,9 @@ export async function addFailedHeartbeat(cluster: Cluster) {
   if (failedHeartbeats.has(cluster.id)) {
     if (failedHeartbeats.get(cluster.id) >= 5) {
       logger.info(`respawning cluster ${cluster.id} due to missing heartbeats`);
+      await dmQueueWorker.pause();
       await cluster.respawn().then((c) => c.emit("ready"));
+      dmQueueWorker.resume();
       failedHeartbeats.delete(cluster.id);
     } else {
       failedHeartbeats.set(cluster.id, failedHeartbeats.get(cluster.id) + 1);

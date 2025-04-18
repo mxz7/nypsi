@@ -13,7 +13,6 @@ import { NypsiClient } from "../../models/Client";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import { NotificationPayload } from "../../types/Notification";
 import { isUserBlacklisted } from "../functions/users/blacklist";
-import { getDmSettings, updateDmSettings } from "../functions/users/notifications";
 import { logger } from "../logger";
 
 const connection = new Redis({ maxRetriesPerRequest: null });
@@ -257,13 +256,4 @@ async function requestDM(options: RequestDMOptions): Promise<boolean> {
   }
 
   return false;
-}
-
-async function checkVoteReminder(userId: string) {
-  const dmSettings = await getDmSettings(userId);
-
-  if (dmSettings.voteReminder) {
-    dmSettings.voteReminder = false;
-    await updateDmSettings(userId, dmSettings);
-  }
 }
