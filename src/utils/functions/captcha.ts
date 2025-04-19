@@ -203,6 +203,11 @@ export async function verifyUser(
     where: { id: res.id },
   });
 
+  if (!check) {
+    await redis.del(`${Constants.redis.nypsi.LOCKED_OUT}:${message.author.id}`);
+    return true;
+  }
+
   if (check.solved) {
     await redis.del(`${Constants.redis.nypsi.LOCKED_OUT}:${message.author.id}`);
     await redis.del(`${Constants.redis.cache.user.CAPTCHA_HISTORY}:${message.author.id}`);
