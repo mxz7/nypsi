@@ -149,7 +149,7 @@ async function run(
       .setURL(`https://themoviedb.org/movie/${movie.id}`)
       .setThumbnail(`https://image.tmdb.org/t/p/w1280${movie.poster_path}`)
       .setDescription(
-        `${movie.tagline ? `> *${movie.tagline}*\n\n` : ""}` +
+        `${movie.tagline ? `*${movie.tagline}*\n\n` : ""}` +
           `> ${movie.overview}\n\n` +
           `**${Math.round(movie.vote_average * 10)}%** user score\n\n` +
           `-# *${movie.release_date}*\n` +
