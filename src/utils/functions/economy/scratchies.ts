@@ -9,18 +9,18 @@ import {
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { Item } from "../../../types/Economy";
+import { LootPoolResult } from "../../../types/LootPool";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { percentChance, shuffle } from "../random";
 import { addProgress } from "./achievements";
 import { isGem, itemExists } from "./inventory";
+import { describeLootPoolResult, giveLootPoolResult, rollLootPool } from "./loot_pools";
 import { addStat } from "./stats";
 import { addTaskProgress } from "./tasks";
 import { getItems, getLootPools } from "./utils";
 import ms = require("ms");
 import util = require("util");
-import { LootPoolResult } from "../../../types/LootPool";
-import { describeLootPoolResult, giveLootPoolResult, rollLootPool } from "./loot_pools";
 
 type AreaCell = {
   clicks: number;
@@ -138,7 +138,12 @@ export default class ScratchCard {
     try {
       if (this.area[y][x].clicks === 1) return;
     } catch (e) {
-      logger.error(`scratch card weird error meow meow 1`, { area: this.area, y, x });
+      logger.error(`scratch card weird error meow meow 1`, {
+        area: this.area,
+        y: y,
+        x: x,
+        customId: interaction.customId,
+      });
       console.error(e);
 
       return;
