@@ -20,6 +20,7 @@ import { getExactMember } from "../utils/functions/member";
 import { getCases } from "../utils/functions/moderation/cases";
 
 import prisma from "../init/database";
+import Constants from "../utils/Constants";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("history", "view punishment history for a given user", "moderation")
@@ -88,20 +89,26 @@ async function run(
     return send({ embeds: [embed] });
   }
 
-  let member = (await getExactMember(message.guild, args.join(" "))) || args[0];
+  let member: GuildMember | string = await getExactMember(message.guild, args.join(" "));
+
+  console.log(member);
 
   if (!member) {
-    const user = await prisma.user.findFirst({
-      where: {
-        lastKnownUsername: args[0].toLowerCase(),
-      },
-      select: {
-        id: true,
-      },
-    });
+    if (args[0].match(Constants.SNOWFLAKE_REGEX)) {
+      member = args[0];
+    } else {
+      const user = await prisma.user.findFirst({
+        where: {
+          lastKnownUsername: args[0].toLowerCase(),
+        },
+        select: {
+          id: true,
+        },
+      });
 
-    if (user?.id) member = user.id;
-    else return send({ embeds: [new ErrorEmbed("invalid user")] });
+      if (user?.id) member = user.id;
+      else return send({ embeds: [new ErrorEmbed("invalid user")] });
+    }
   }
 
   const cases = await getCases(
