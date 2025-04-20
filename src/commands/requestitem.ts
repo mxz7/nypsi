@@ -49,7 +49,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 import { logger } from "../utils/logger";
 
 const cmd = new Command("requestitems", "create and manage your item requests", "money").setAliases(
-  ["requestitems", "request"],
+  ["requestitem", "request"],
 );
 
 cmd.slashEnabled = false;
