@@ -28,25 +28,25 @@ import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Comman
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Item } from "../types/Economy";
 import Constants from "../utils/Constants";
+import { addBalance, getBalance, removeBalance } from "../utils/functions/economy/balance";
 import {
   addInventoryItem,
   getInventory,
   selectItem,
   setInventoryItem,
 } from "../utils/functions/economy/inventory";
-import { getRawLevel } from "../utils/functions/economy/levelling";
-import { createUser, formatBet, getItems, userExists } from "../utils/functions/economy/utils";
-import { getTier, isPremium } from "../utils/functions/premium/premium";
-import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
-import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { logger } from "../utils/logger";
-import { addBalance, getBalance, removeBalance } from "../utils/functions/economy/balance";
 import {
   bumpItemRequest,
   createItemRequest,
   deleteItemRequest,
   getItemRequests,
 } from "../utils/functions/economy/item_requests";
+import { getRawLevel } from "../utils/functions/economy/levelling";
+import { createUser, formatBet, getItems, userExists } from "../utils/functions/economy/utils";
+import { getTier, isPremium } from "../utils/functions/premium/premium";
+import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { logger } from "../utils/logger";
 
 const cmd = new Command("requestitems", "create and manage your item requests", "money").setAliases(
   ["requestitems", "request"],
@@ -125,7 +125,7 @@ async function run(
   const items = getItems();
 
   let inventory = await getInventory(message.member);
-  const balance = await getBalance(message.member);
+  let balance = await getBalance(message.member);
 
   const createItemRequestProcess = async (msg: NypsiMessage) => {
     const embed = new CustomEmbed(message.member).setHeader(
