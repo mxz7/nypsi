@@ -398,8 +398,9 @@ async function run(
         balance = await getBalance(message.member);
 
         if (offeredMoney > balance) {
-          return message.channel.send({
+          return interaction.followUp({
             embeds: [new CustomEmbed(message.member, "sneaky bitch")],
+            ephemeral: true,
           });
         }
 
@@ -408,8 +409,9 @@ async function run(
             !inventory.find((i) => i.item == item.item.id) ||
             inventory.find((i) => i.item == item.item.id).amount < item.amount
           ) {
-            return message.channel.send({
+            return interaction.followUp({
               embeds: [new CustomEmbed(message.member, "sneaky bitch")],
+              ephemeral: true,
             });
           }
         }
@@ -423,8 +425,9 @@ async function run(
         }
 
         if (itemRequests.length >= max)
-          return message.channel.send({
+          return interaction.followUp({
             embeds: [new CustomEmbed(message.member, "sneaky bitch")],
+            ephemeral: true,
           });
 
         for (const item of offeredItems) {
