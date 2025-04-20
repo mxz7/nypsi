@@ -671,7 +671,7 @@ async function run(
             ephemeral: true,
           });
         } else {
-          logger.error('failed to delete auction', {request: auctions[currentPage]});
+          logger.error("failed to delete auction", { request: auctions[currentPage] });
           await interaction.followUp({
             embeds: [new CustomEmbed(message.member, "failed to delete that auction")],
             ephemeral: true,

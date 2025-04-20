@@ -123,8 +123,8 @@ export async function deleteItemRequest(id: number, client: NypsiClient, repeatC
 
 export async function createItemRequest(
   member: GuildMember,
-  requestedItems: {item: Item, amount: number}[],
-  offeredItems: {item: Item, amount: number}[],
+  requestedItems: { item: Item; amount: number }[],
+  offeredItems: { item: Item; amount: number }[],
   offeredMoney: number,
 ) {
   const embed = new CustomEmbed(member).setHeader(
@@ -137,14 +137,14 @@ export async function createItemRequest(
   embed.setFields(
     {
       name: "requesting",
-      value: `${requestedItems.length > 0 ? requestedItems.map(item => `**${item.amount.toLocaleString()}x** ${item.item.emoji} [${item.item.name}](https://nypsi.xyz/item/${item.item.id})`).join('\n') : "none"}`,
+      value: `${requestedItems.length > 0 ? requestedItems.map((item) => `**${item.amount.toLocaleString()}x** ${item.item.emoji} [${item.item.name}](https://nypsi.xyz/item/${item.item.id})`).join("\n") : "none"}`,
       inline: false,
     },
     {
       name: "offering",
-      value: `${offeredMoney > 0 ? `$${offeredMoney.toLocaleString()}` : ""}\n${offeredItems.map(item => `**${item.amount.toLocaleString()}x** ${item.item.emoji} [${item.item.name}](https://nypsi.xyz/item/${item.item.id})`).join('\n')}`,
+      value: `${offeredMoney > 0 ? `$${offeredMoney.toLocaleString()}` : ""}\n${offeredItems.map((item) => `**${item.amount.toLocaleString()}x** ${item.item.emoji} [${item.item.name}](https://nypsi.xyz/item/${item.item.id})`).join("\n")}`,
       inline: false,
-    }
+    },
   );
 
   const buttonRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -257,14 +257,14 @@ export async function bumpItemRequest(id: number, client: NypsiClient) {
   embed.setFields(
     {
       name: "requesting",
-      value: `${query.requestedItems.length > 0 ? query.requestedItems.map(item => `**${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} [${items[item.split(":")[0]].name}](https://nypsi.xyz/item/${item.split(":")[0]})`).join('\n') : "none"}`,
+      value: `${query.requestedItems.length > 0 ? query.requestedItems.map((item) => `**${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} [${items[item.split(":")[0]].name}](https://nypsi.xyz/item/${item.split(":")[0]})`).join("\n") : "none"}`,
       inline: false,
     },
     {
       name: "offering",
-      value: `${query.offeredMoney > 0 ? `$${query.offeredMoney.toLocaleString()}` : ""}\n${query.offeredItems.map(item => `**${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} [${items[item.split(":")[0]].name}](https://nypsi.xyz/item/${item.split(":")[0]})`).join('\n')}`,
+      value: `${query.offeredMoney > 0 ? `$${query.offeredMoney.toLocaleString()}` : ""}\n${query.offeredItems.map((item) => `**${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} [${items[item.split(":")[0]].name}](https://nypsi.xyz/item/${item.split(":")[0]})`).join("\n")}`,
       inline: false,
-    }
+    },
   );
 
   const buttonRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -367,7 +367,12 @@ export async function fulfillItemRequest(
   }
 
   beingFulfilled.add(itemRequest.id);
-  await redis.set(`${Constants.redis.nypsi.item_request_fulfilling}:${itemRequest.id}`, "d", "EX", 600);
+  await redis.set(
+    `${Constants.redis.nypsi.item_request_fulfilling}:${itemRequest.id}`,
+    "d",
+    "EX",
+    600,
+  );
   setTimeout(() => {
     beingFulfilled.delete(itemRequest.id);
   }, ms("5 minutes"));
@@ -410,7 +415,10 @@ export async function fulfillItemRequest(
   const items = getItems();
 
   for (const item of itemRequest.requestedItems) {
-    if (!inventory.find((i) => i.item == item.split(":")[0]) || inventory.find((i) => i.item == item.split(":")[0]).amount < parseInt(item.split(":")[1])) {
+    if (
+      !inventory.find((i) => i.item == item.split(":")[0]) ||
+      inventory.find((i) => i.item == item.split(":")[0]).amount < parseInt(item.split(":")[1])
+    ) {
       beingFulfilled.delete(itemRequest.id);
       await redis.del(`${Constants.redis.nypsi.item_request_fulfilling}:${itemRequest.id}`);
       return await interaction.reply({
@@ -452,19 +460,23 @@ export async function fulfillItemRequest(
   }
 
   const fulfillerInventory = await getInventory(interaction.user.id);
-  
+
   for (const item of itemRequest.requestedItems) {
     const itemId = item.split(":")[0];
     const amount = parseInt(item.split(":")[1]);
 
-    await setInventoryItem(interaction.user.id, itemId, fulfillerInventory.find((i) => i.item == itemId).amount - amount)
+    await setInventoryItem(
+      interaction.user.id,
+      itemId,
+      fulfillerInventory.find((i) => i.item == itemId).amount - amount,
+    );
     await addInventoryItem(itemRequest.ownerId, itemId, amount);
   }
-  
+
   for (const item of itemRequest.offeredItems) {
     const itemId = item.split(":")[0];
     const amount = parseInt(item.split(":")[1]);
-    
+
     await addInventoryItem(interaction.user.id, itemId, amount);
   }
 
@@ -472,10 +484,7 @@ export async function fulfillItemRequest(
     await addBalance(interaction.user.id, Number(itemRequest.offeredMoney) - taxedAmount);
   }
 
-
-  logger.info(
-    `item request fulfilled owner: ${itemRequest.ownerId} to: ${interaction.user.id}`,
-  );
+  logger.info(`item request fulfilled owner: ${itemRequest.ownerId} to: ${interaction.user.id}`);
 
   const formattedRequested: string[] = [];
   const formattedOffered: string[] = [];
@@ -484,7 +493,8 @@ export async function fulfillItemRequest(
     formattedRequested.push(item.replace(":", " x "));
   }
 
-  formattedRequested[formattedRequested.length - 1] = `${formattedRequested[formattedRequested.length - 1]} (item request)`
+  formattedRequested[formattedRequested.length - 1] =
+    `${formattedRequested[formattedRequested.length - 1]} (item request)`;
 
   if (itemRequest.offeredMoney > 0) {
     formattedOffered.push(`$${(Number(itemRequest.offeredMoney) - taxedAmount).toLocaleString()}`);
@@ -493,8 +503,9 @@ export async function fulfillItemRequest(
   for (const item of itemRequest.offeredItems) {
     formattedOffered.push(item.replace(":", " x "));
   }
-  
-  formattedOffered[formattedOffered.length - 1] = `${formattedOffered[formattedOffered.length - 1]} (item request)`
+
+  formattedOffered[formattedOffered.length - 1] =
+    `${formattedOffered[formattedOffered.length - 1]} (item request)`;
 
   transactionMulti(
     await interaction.client.users.fetch(itemRequest.ownerId),
@@ -506,12 +517,10 @@ export async function fulfillItemRequest(
     await interaction.client.users.fetch(itemRequest.ownerId),
     formattedRequested,
   );
-  
-  
+
   if ((await getDmSettings(itemRequest.ownerId)).auction) {
-    
     const embedDm = new CustomEmbed(itemRequest.ownerId).setDescription(
-      `your item request has been fulfilled\n\nyou have received:\n${itemRequest.requestedItems.map(item => `- **${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} ${items[item.split(":")[0]].name}`).join('\n')}`
+      `your item request has been fulfilled\n\nyou have received:\n${itemRequest.requestedItems.map((item) => `- **${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} ${items[item.split(":")[0]].name}`).join("\n")}`,
     );
 
     addNotificationToQueue({
