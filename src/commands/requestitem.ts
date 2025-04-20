@@ -395,8 +395,7 @@ async function run(
 
       if (res == "create") {
         inventory = await getInventory(message.member);
-
-        const balance = await getBalance(message.member);
+        balance = await getBalance(message.member);
 
         if (offeredMoney > balance) {
           return message.channel.send({
