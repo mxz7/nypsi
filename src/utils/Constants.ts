@@ -171,10 +171,12 @@ export default {
       CRASH_STATUS: "nypsi:crash:status",
       FARM_STATUS_DM: "nypsi:farm:status:dm",
       auction_buying: "nypsi:auction:buying",
+      item_request_fulfilling: "nypsi:itemrequest:fulfilling",
     },
   },
   ANNOUNCEMENTS_CHANNEL_ID: "747057465245564939",
   AUCTION_CHANNEL_ID: "1008467335973179482",
+  REQUESTS_CHANNEL_ID: "819640200699052052",
   AUCTION_MANAGEMENT_ROLE_IDS: [
     "747056620688900139",
     "747059949770768475",

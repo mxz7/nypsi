@@ -17,8 +17,8 @@
     },
     "auction": {
       "id": "auction",
-      "name": "auction notifications",
-      "description": "get a dm when someone buys your auctions"
+      "name": "auction/item request notifications",
+      "description": "get a dm when someone buys your auctions or fulfills your item requests"
     },
     "voteReminder": {
       "id": "voteReminder",

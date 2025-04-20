@@ -413,6 +413,27 @@ export function transaction(from: User, to: User, value: string) {
   }
 }
 
+export function transactionMulti(from: User, to: User, values: string[]) {
+  let formatted = "";
+
+  for (const value of values) {
+    formatted += `- **${value}**\n`;
+  }
+
+  if (!nextLogMsg.get("pay")) {
+    nextLogMsg.set(
+      "pay",
+      `**${from.username}** (${from.id}) -> **${to.username}** (${to.id})\n${formatted}`,
+    );
+  } else {
+    nextLogMsg.set(
+      "pay",
+      nextLogMsg.get("pay") +
+        `**${from.username}** (${from.id}) -> **${to.username}** (${to.id})\n${formatted}`,
+    );
+  }
+}
+
 export function gamble(
   user: User,
   game: string,
