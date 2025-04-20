@@ -716,8 +716,8 @@ async function run(
     const roles = message.member.roles.cache;
 
     let allow = false;
-    for (const role_id of Constants.AUCTION_MANAGEMENT_ROLE_IDS) {
-      if (roles.has(role_id)) allow = true;
+    for (const roleId of Constants.AUCTION_MANAGEMENT_ROLE_IDS) {
+      if (roles.has(roleId)) allow = true;
     }
 
     if (!allow) return;

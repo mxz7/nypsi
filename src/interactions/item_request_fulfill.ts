@@ -11,14 +11,17 @@ export default {
   async run(interaction) {
     if (!interaction.isButton()) return;
     if ((await isEcoBanned(interaction.user.id)).banned) return;
-    const itemRequest = await prisma.itemRequest.findFirst({
+    const itemRequest = await prisma.itemRequest.findUnique({
       where: {
-        AND: [{ messageId: interaction.message.id }],
+        messageId: interaction.message.id,
       },
     });
 
     if (!itemRequest) {
-      await interaction.reply({ embeds: [new ErrorEmbed("invalid item request")], ephemeral: true });
+      await interaction.reply({
+        embeds: [new ErrorEmbed("invalid item request")],
+        ephemeral: true,
+      });
       await interaction.message.delete();
       return;
     }
@@ -38,7 +41,10 @@ export default {
         ephemeral: true,
       });
     } else {
-      await interaction.reply({ embeds: [new ErrorEmbed("invalid item request")], ephemeral: true });
+      await interaction.reply({
+        embeds: [new ErrorEmbed("invalid item request")],
+        ephemeral: true,
+      });
       await interaction.message.delete();
     }
   },

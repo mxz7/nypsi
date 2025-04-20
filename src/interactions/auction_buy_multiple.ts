@@ -21,9 +21,9 @@ export default {
   async run(interaction) {
     if (!interaction.isButton()) return;
     if ((await isEcoBanned(interaction.user.id)).banned) return;
-    const auction = await prisma.auction.findFirst({
+    const auction = await prisma.auction.findUnique({
       where: {
-        AND: [{ messageId: interaction.message.id }],
+        messageId: interaction.message.id,
       },
     });
 

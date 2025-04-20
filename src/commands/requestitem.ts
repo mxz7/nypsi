@@ -35,22 +35,22 @@ import {
   setInventoryItem,
 } from "../utils/functions/economy/inventory";
 import { getRawLevel } from "../utils/functions/economy/levelling";
-import {
-  createUser,
-  formatBet,
-  getItems,
-  userExists,
-} from "../utils/functions/economy/utils";
+import { createUser, formatBet, getItems, userExists } from "../utils/functions/economy/utils";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
 import { addBalance, getBalance } from "../utils/functions/economy/balance";
-import { bumpItemRequest, createItemRequest, deleteItemRequest, getItemRequests } from "../utils/functions/economy/item_requests";
+import {
+  bumpItemRequest,
+  createItemRequest,
+  deleteItemRequest,
+  getItemRequests,
+} from "../utils/functions/economy/item_requests";
 
-const cmd = new Command("requestitems", "create and manage your item requests", "money").setAliases([
-  "requestitems", "request"
-]);
+const cmd = new Command("requestitems", "create and manage your item requests", "money").setAliases(
+  ["requestitems", "request"],
+);
 
 cmd.slashEnabled = false;
 
@@ -125,7 +125,7 @@ async function run(
   const items = getItems();
 
   let inventory = await getInventory(message.member);
-  const balance = await getBalance(message.member)
+  const balance = await getBalance(message.member);
 
   const createItemRequestProcess = async (msg: NypsiMessage) => {
     const embed = new CustomEmbed(message.member).setHeader(
@@ -133,49 +133,78 @@ async function run(
       message.author.avatarURL(),
     );
 
-
-    const offeredItems: { item: Item, amount: number }[] = [];
+    const offeredItems: { item: Item; amount: number }[] = [];
     let offeredMoney = 0;
 
-    
-    const requestedItems: { item: Item, amount: number }[] = [];
+    const requestedItems: { item: Item; amount: number }[] = [];
 
     const updateRequestEmbed = async (showButtons: boolean) => {
-      
       embed.setFields(
         {
           name: "requesting",
-          value: `${requestedItems.length > 0 ? requestedItems.map(item => `**${item.amount.toLocaleString()}x** ${item.item.emoji} ${item.item.name}`).join('\n') : "none"}`,
+          value: `${requestedItems.length > 0 ? requestedItems.map((item) => `**${item.amount.toLocaleString()}x** ${item.item.emoji} ${item.item.name}`).join("\n") : "none"}`,
           inline: false,
         },
         {
           name: "offering",
-          value: `${offeredMoney > 0 ? `$${offeredMoney.toLocaleString()}` : ""}${offeredItems.length > 0 ? `\n${offeredItems.map(item => `**${item.amount.toLocaleString()}x** ${item.item.emoji} ${item.item.name}`).join('\n')}` : offeredMoney > 0 ? "" : "\nnone"}`,
+          value: `${offeredMoney > 0 ? `$${offeredMoney.toLocaleString()}` : ""}${offeredItems.length > 0 ? `\n${offeredItems.map((item) => `**${item.amount.toLocaleString()}x** ${item.item.emoji} ${item.item.name}`).join("\n")}` : offeredMoney > 0 ? "" : "\nnone"}`,
           inline: false,
-        }
+        },
       );
-      
+
       const topRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder().setCustomId("addRequestedItem").setLabel("request item").setStyle(ButtonStyle.Secondary).setDisabled(requestedItems.length >= 3),
-        new ButtonBuilder().setCustomId("addOfferedItem").setLabel("offer item").setStyle(ButtonStyle.Secondary).setDisabled(offeredItems.length >= 3),
-        new ButtonBuilder().setCustomId("addOfferedMoney").setLabel("offer money").setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder()
+          .setCustomId("addRequestedItem")
+          .setLabel("request item")
+          .setStyle(ButtonStyle.Secondary)
+          .setDisabled(requestedItems.length >= 3),
+        new ButtonBuilder()
+          .setCustomId("addOfferedItem")
+          .setLabel("offer item")
+          .setStyle(ButtonStyle.Secondary)
+          .setDisabled(offeredItems.length >= 3),
+        new ButtonBuilder()
+          .setCustomId("addOfferedMoney")
+          .setLabel("offer money")
+          .setStyle(ButtonStyle.Secondary),
       );
-      
+
       const middleRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder().setCustomId("deleteRequestedItem").setLabel("delete item request").setStyle(ButtonStyle.Danger).setDisabled(requestedItems.length == 0),
-        new ButtonBuilder().setCustomId("deleteOfferedItem").setLabel("delete item offer").setStyle(ButtonStyle.Danger).setDisabled(offeredItems.length == 0),
-        new ButtonBuilder().setCustomId("deleteOfferedMoney").setLabel("delete money offer").setStyle(ButtonStyle.Danger).setDisabled(offeredMoney == 0),
+        new ButtonBuilder()
+          .setCustomId("deleteRequestedItem")
+          .setLabel("delete item request")
+          .setStyle(ButtonStyle.Danger)
+          .setDisabled(requestedItems.length == 0),
+        new ButtonBuilder()
+          .setCustomId("deleteOfferedItem")
+          .setLabel("delete item offer")
+          .setStyle(ButtonStyle.Danger)
+          .setDisabled(offeredItems.length == 0),
+        new ButtonBuilder()
+          .setCustomId("deleteOfferedMoney")
+          .setLabel("delete money offer")
+          .setStyle(ButtonStyle.Danger)
+          .setDisabled(offeredMoney == 0),
       );
 
       const bottomRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder().setCustomId("create").setLabel("create").setStyle(ButtonStyle.Success).setDisabled(requestedItems.length == 0 || (offeredItems.length == 0 && offeredMoney == 0)),
+        new ButtonBuilder()
+          .setCustomId("create")
+          .setLabel("create")
+          .setStyle(ButtonStyle.Success)
+          .setDisabled(
+            requestedItems.length == 0 || (offeredItems.length == 0 && offeredMoney == 0),
+          ),
       );
-      
-      await edit({ embeds: [embed], components: showButtons ? [topRow, middleRow, bottomRow]: [] }, msg);
-    }
-    
+
+      await edit(
+        { embeds: [embed], components: showButtons ? [topRow, middleRow, bottomRow] : [] },
+        msg,
+      );
+    };
+
     await updateRequestEmbed(true);
-    
+
     const filter = (i: Interaction) => i.user.id == message.author.id;
 
     const pageManager: any = async () => {
@@ -184,10 +213,11 @@ async function run(
       const response = await msg
         .awaitMessageComponent({ filter, componentType: ComponentType.Button, time: 60000 })
         .then(async (collected) => {
-          if (!collected.customId.startsWith("add")) await collected.deferUpdate().catch(() => {
-            fail = true;
-            return pageManager();
-          });
+          if (!collected.customId.startsWith("add"))
+            await collected.deferUpdate().catch(() => {
+              fail = true;
+              return pageManager();
+            });
           return { res: collected.customId, interaction: collected };
         })
         .catch(async () => {
@@ -205,46 +235,48 @@ async function run(
 
         if (res) {
           await res.deferReply({ ephemeral: true });
-          
+
           const item = res.fields.fields.get("item").value;
           const amount = res.fields.fields.get("amount").value;
 
           const selected = selectItem(item);
 
           if (!selected || selected.account_locked) {
-            res.editReply({ embeds: [new ErrorEmbed("couldnt find that item")], options: { ephemeral: true }})
-          } 
+            res.editReply({
+              embeds: [new ErrorEmbed("couldnt find that item")],
+              options: { ephemeral: true },
+            });
+          } else if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
+            res.editReply({
+              embeds: [new ErrorEmbed("invalid amount")],
+              options: { ephemeral: true },
+            });
+          } else {
+            const index = requestedItems.findIndex((entry) => entry.item === selected);
 
-          else if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
-            res.editReply({ embeds: [new ErrorEmbed("invalid amount")], options: { ephemeral: true }})
-          }
-
-          else {
-            const index = requestedItems.findIndex(entry => entry.item === selected);
-  
             if (index !== -1) {
-              requestedItems[index] = { item: selected, amount: parseInt(amount)};
+              requestedItems[index] = { item: selected, amount: parseInt(amount) };
             } else {
-              requestedItems.push({ item: selected, amount: parseInt(amount)});
+              requestedItems.push({ item: selected, amount: parseInt(amount) });
             }
-            
+
             await res.deleteReply();
           }
         }
-        
+
         await updateRequestEmbed(true);
         return pageManager();
-      } 
-      
+      }
+
       if (res == "addOfferedItem") {
         const res = await addOfferedItem(interaction).catch(() => {});
 
         if (res) {
           await res.deferReply({ ephemeral: true });
-          
+
           const item = res.fields.fields.get("item").value;
           let amount = res.fields.fields.get("amount").value;
-          
+
           if (amount.toLowerCase() === "all") {
             amount = inventory.find((i) => i.item == selected.id).amount.toString();
           }
@@ -252,66 +284,74 @@ async function run(
           const selected = selectItem(item);
 
           if (!selected || selected.account_locked) {
-            res.editReply({ embeds: [new ErrorEmbed("couldnt find that item")], options: { ephemeral: true }})
-          } 
+            res.editReply({
+              embeds: [new ErrorEmbed("couldnt find that item")],
+              options: { ephemeral: true },
+            });
+          } else if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
+            res.editReply({
+              embeds: [new ErrorEmbed("invalid amount")],
+              options: { ephemeral: true },
+            });
+          } else if (
+            !inventory.find((i) => i.item == selected.id) ||
+            inventory.find((i) => i.item == selected.id).amount < parseInt(amount)
+          ) {
+            res.editReply({
+              embeds: [new ErrorEmbed(`you do not have enough ${selected.plural}`)],
+              options: { ephemeral: true },
+            });
+          } else {
+            const index = offeredItems.findIndex((entry) => entry.item === selected);
 
-          else if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
-            res.editReply({ embeds: [new ErrorEmbed("invalid amount")], options: { ephemeral: true }})
-          }
-          
-          else if (!inventory.find((i) => i.item == selected.id) || inventory.find((i) => i.item == selected.id).amount < parseInt(amount)) {
-            res.editReply({ embeds: [new ErrorEmbed(`you do not have enough ${selected.plural}`)], options: { ephemeral: true }})
-          }
-
-          else {
-            const index = offeredItems.findIndex(entry => entry.item === selected);
-  
             if (index !== -1) {
-              offeredItems[index] = { item: selected, amount: parseInt(amount)};
+              offeredItems[index] = { item: selected, amount: parseInt(amount) };
             } else {
-              offeredItems.push({ item: selected, amount: parseInt(amount)});
+              offeredItems.push({ item: selected, amount: parseInt(amount) });
             }
-          
+
             await res.deleteReply();
           }
         }
-        
+
         await updateRequestEmbed(true);
         return pageManager();
-      } 
-      
+      }
+
       if (res == "addOfferedMoney") {
         const res = await addOfferedMoney(interaction).catch(() => {});
 
         if (res) {
           await res.deferReply({ ephemeral: true });
-          
+
           let amount = res.fields.fields.get("amount").value;
-          
+
           if (amount.toLowerCase() === "all") {
             amount = balance.toString();
-          }
-
-          else if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
-            res.editReply({ embeds: [new ErrorEmbed("invalid amount")], options: { ephemeral: true }})
-          }
-          
-          
-          else if (parseInt(amount) > balance) {
-            res.editReply({ embeds: [new ErrorEmbed("you do not have enough money")], options: { ephemeral: true }})
-          }
-
-          else {
+          } else if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
+            res.editReply({
+              embeds: [new ErrorEmbed("invalid amount")],
+              options: { ephemeral: true },
+            });
+          } else if (parseInt(amount) > balance) {
+            res.editReply({
+              embeds: [new ErrorEmbed("you do not have enough money")],
+              options: { ephemeral: true },
+            });
+          } else {
             const cost = await formatBet(amount.toLowerCase(), message.member).catch(() => {});
-            
-            if (!cost) res.editReply({ embeds: [new ErrorEmbed("invalid amount")], options: { ephemeral: true }})
+
+            if (!cost)
+              res.editReply({
+                embeds: [new ErrorEmbed("invalid amount")],
+                options: { ephemeral: true },
+              });
             else offeredMoney = cost;
-          
+
             await res.deleteReply();
           }
-          
         }
-        
+
         await updateRequestEmbed(true);
         return pageManager();
       }
@@ -322,7 +362,7 @@ async function run(
         } else {
           const item = await deleteItem(msg, requestedItems);
           if (item) {
-            const index = offeredItems.findIndex(entry => entry.item.id === item);
+            const index = offeredItems.findIndex((entry) => entry.item.id === item);
             requestedItems.splice(index, 1);
           }
         }
@@ -330,14 +370,14 @@ async function run(
         await updateRequestEmbed(true);
         return pageManager();
       }
-      
+
       if (res == "deleteOfferedItem") {
         if (offeredItems.length == 1) {
           offeredItems.pop();
         } else {
           const item = await deleteItem(msg, offeredItems);
           if (item) {
-            const index = offeredItems.findIndex(entry => entry.item.id === item);
+            const index = offeredItems.findIndex((entry) => entry.item.id === item);
             offeredItems.splice(index, 1);
           }
         }
@@ -356,29 +396,38 @@ async function run(
       if (res == "create") {
         inventory = await getInventory(message.member);
 
-        for (const item of offeredItems) {
+        const balance = await getBalance(message.member);
 
+        if (offeredMoney > balance) {
+          return message.channel.send({
+            embeds: [new CustomEmbed(message.member, "sneaky bitch")],
+          });
+        }
+
+        for (const item of offeredItems) {
           if (
             !inventory.find((i) => i.item == item.item.id) ||
             inventory.find((i) => i.item == item.item.id).amount < item.amount
           ) {
-            return message.channel.send({ embeds: [new CustomEmbed(message.member, "sneaky bitch")] });
+            return message.channel.send({
+              embeds: [new CustomEmbed(message.member, "sneaky bitch")],
+            });
           }
-  
         }
 
         const itemRequests = await getItemRequests(message.member);
-        
+
         let max = 3;
-    
+
         if (await isPremium(message.member)) {
           max += await getTier(message.member);
         }
 
         if (itemRequests.length >= max)
-          return message.channel.send({ embeds: [new CustomEmbed(message.member, "sneaky bitch")] });
+          return message.channel.send({
+            embeds: [new CustomEmbed(message.member, "sneaky bitch")],
+          });
 
-        
         for (const item of offeredItems) {
           await setInventoryItem(
             message.member,
@@ -387,7 +436,12 @@ async function run(
           );
         }
 
-        const url = await createItemRequest(message.member, requestedItems, offeredItems, offeredMoney).catch((err) => console.log(err));
+        const url = await createItemRequest(
+          message.member,
+          requestedItems,
+          offeredItems,
+          offeredMoney,
+        ).catch((err) => console.log(err));
 
         if (url) {
           embed.setDescription(`[your item request has been created](${url})`);
@@ -401,8 +455,8 @@ async function run(
     };
 
     return pageManager();
-  }
-  
+  };
+
   async function addRequestedItem(interaction: ButtonInteraction) {
     const id = `request-item-${Math.floor(Math.random() * 69420)}`;
     const modal = new ModalBuilder().setCustomId(id).setTitle("request item");
@@ -414,7 +468,7 @@ async function run(
           .setLabel("what item do you want to request?")
           .setStyle(TextInputStyle.Short)
           .setRequired(true)
-          .setMaxLength(25)
+          .setMaxLength(25),
       ),
       new ActionRowBuilder<TextInputBuilder>().addComponents(
         new TextInputBuilder()
@@ -422,7 +476,7 @@ async function run(
           .setLabel("how many do you want to request?")
           .setStyle(TextInputStyle.Short)
           .setRequired(true)
-          .setMaxLength(10)
+          .setMaxLength(10),
       ),
     );
 
@@ -445,7 +499,7 @@ async function run(
           .setLabel("what item do you want to offer?")
           .setStyle(TextInputStyle.Short)
           .setRequired(true)
-          .setMaxLength(25)
+          .setMaxLength(25),
       ),
       new ActionRowBuilder<TextInputBuilder>().addComponents(
         new TextInputBuilder()
@@ -453,7 +507,7 @@ async function run(
           .setLabel("how many do you want to offer?")
           .setStyle(TextInputStyle.Short)
           .setRequired(true)
-          .setMaxLength(10)
+          .setMaxLength(10),
       ),
     );
 
@@ -476,7 +530,7 @@ async function run(
           .setLabel("how much money do you want to offer?")
           .setStyle(TextInputStyle.Short)
           .setRequired(true)
-          .setMaxLength(15)
+          .setMaxLength(15),
       ),
     );
 
@@ -488,8 +542,7 @@ async function run(
     return await interaction.awaitModalSubmit({ filter, time: 30000 }).catch(() => {});
   }
 
-
-  const deleteItem = async (msg: NypsiMessage, items: {item: Item, amount: number}[]) => {
+  const deleteItem = async (msg: NypsiMessage, items: { item: Item; amount: number }[]) => {
     const embed = new CustomEmbed(message.member).setHeader(
       "create an item request",
       message.author.avatarURL(),
@@ -497,7 +550,6 @@ async function run(
 
     embed.setDescription("which item would you like to delete?");
 
-    
     const options: StringSelectMenuOptionBuilder[] = [];
 
     for (const item of items) {
@@ -515,7 +567,7 @@ async function run(
         .setPlaceholder("item you want to delete")
         .setOptions(options),
     );
-    
+
     const backRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder().setCustomId("back").setLabel("back").setStyle(ButtonStyle.Danger),
     );
@@ -536,9 +588,9 @@ async function run(
       });
 
     if (!res) return;
-    
+
     return res;
-  }
+  };
 
   const manageItemRequests = async (msg?: NypsiMessage) => {
     const itemRequests = await getItemRequests(message.member);
@@ -557,12 +609,12 @@ async function run(
       embed.setFields(
         {
           name: "requesting",
-          value: `${itemRequests[page].requestedItems.length > 0 ? itemRequests[page].requestedItems.map(item => `**${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} [${items[item.split(":")[0]].name}](https://nypsi.xyz/item/${item.split(":")[0]})`).join('\n') : "none"}`,
+          value: `${itemRequests[page].requestedItems.length > 0 ? itemRequests[page].requestedItems.map((item) => `**${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} [${items[item.split(":")[0]].name}](https://nypsi.xyz/item/${item.split(":")[0]})`).join("\n") : "none"}`,
           inline: true,
         },
         {
           name: "offering",
-          value: `${itemRequests[page].offeredMoney > 0 ? `$${itemRequests[page].offeredMoney.toLocaleString()}` : ""}\n${itemRequests[page].offeredItems.map(item => `**${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} [${items[item.split(":")[0]].name}](https://nypsi.xyz/item/${item.split(":")[0]})`).join('\n')}`,
+          value: `${itemRequests[page].offeredMoney > 0 ? `$${itemRequests[page].offeredMoney.toLocaleString()}` : ""}\n${itemRequests[page].offeredItems.map((item) => `**${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} [${items[item.split(":")[0]].name}](https://nypsi.xyz/item/${item.split(":")[0]})`).join("\n")}`,
           inline: true,
         },
         {
@@ -703,7 +755,6 @@ async function run(
         await edit({ embeds: [embed], components: [row] }, msg);
         return pageManager();
       } else if (res == "del") {
-
         const res = await deleteItemRequest(
           itemRequests[currentPage].id,
           message.client as NypsiClient,
@@ -713,12 +764,15 @@ async function run(
           for (const item of itemRequests[currentPage].offeredItems) {
             const itemId = item.split(":")[0];
             const amount = parseInt(item.split(":")[1]);
-            
+
             await addInventoryItem(itemRequests[currentPage].ownerId, itemId, amount);
           }
-  
+
           if (itemRequests[currentPage].offeredMoney > 0) {
-            await addBalance(itemRequests[currentPage].ownerId, Number(itemRequests[currentPage].offeredMoney))
+            await addBalance(
+              itemRequests[currentPage].ownerId,
+              Number(itemRequests[currentPage].offeredMoney),
+            );
           }
 
           await interaction.followUp({
@@ -734,7 +788,10 @@ async function run(
 
         return manageItemRequests(msg);
       } else if (res === "bump") {
-        const bumpRes = await bumpItemRequest(itemRequests[currentPage].id, message.client as NypsiClient);
+        const bumpRes = await bumpItemRequest(
+          itemRequests[currentPage].id,
+          message.client as NypsiClient,
+        );
 
         if (!bumpRes) {
           await interaction.followUp({
@@ -747,7 +804,9 @@ async function run(
           return pageManager();
         } else {
           await interaction.followUp({
-            embeds: [new CustomEmbed(message.member, `[your item request has been bumped](${bumpRes})`)],
+            embeds: [
+              new CustomEmbed(message.member, `[your item request has been bumped](${bumpRes})`),
+            ],
             ephemeral: true,
           });
           displayItemRequests(currentPage);
@@ -767,8 +826,8 @@ async function run(
     const roles = message.member.roles.cache;
 
     let allow = false;
-    for (const role_id of Constants.AUCTION_MANAGEMENT_ROLE_IDS) {
-      if (roles.has(role_id)) allow = true;
+    for (const roleId of Constants.AUCTION_MANAGEMENT_ROLE_IDS) {
+      if (roles.has(roleId)) allow = true;
     }
 
     if (!allow) return;
@@ -783,7 +842,8 @@ async function run(
       },
     });
 
-    if (!itemRequest) return message.channel.send({ embeds: [new ErrorEmbed("invalid item request bro")] });
+    if (!itemRequest)
+      return message.channel.send({ embeds: [new ErrorEmbed("invalid item request bro")] });
 
     logger.info(
       `admin: ${message.author.id} (${message.author.username}) deleted item request`,
@@ -800,16 +860,16 @@ async function run(
       await deleteItemRequest(itemRequest.id, message.client as NypsiClient);
 
       if (!(await userExists(itemRequest.ownerId))) return;
-      
+
       for (const item of itemRequest.offeredItems) {
         const itemId = item.split(":")[0];
         const amount = parseInt(item.split(":")[1]);
-        
+
         await addInventoryItem(itemRequest.ownerId, itemId, amount);
       }
 
       if (itemRequest.offeredMoney > 0) {
-        await addBalance(itemRequest.ownerId, Number(itemRequest.offeredMoney))
+        await addBalance(itemRequest.ownerId, Number(itemRequest.offeredMoney));
       }
 
       if ((await getDmSettings(itemRequest.ownerId)).auction) {
@@ -826,7 +886,10 @@ async function run(
 
         addNotificationToQueue({
           memberId: itemRequest.ownerId,
-          payload: { embed: embed, content: "your item request has been removed by a staff member" },
+          payload: {
+            embed: embed,
+            content: "your item request has been removed by a staff member",
+          },
         });
       }
     }
