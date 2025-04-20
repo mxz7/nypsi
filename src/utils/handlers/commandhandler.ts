@@ -1015,7 +1015,7 @@ export async function runCommand(
       const pos = await hasSeenNews(message.author.id);
 
       const embed = new CustomEmbed(message.member, `${news.text}\n\n*${formatDate(news.date)}*`)
-        .setHeader("news", message.author.avatarURL())
+        .setHeader("news", message.client.user.avatarURL())
         .setFooter({ text: `you are #${pos} to see this` });
 
       embeds.push(embed);
