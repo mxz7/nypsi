@@ -40,7 +40,7 @@ import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
-import { addBalance, getBalance } from "../utils/functions/economy/balance";
+import { addBalance, getBalance, removeBalance } from "../utils/functions/economy/balance";
 import {
   bumpItemRequest,
   createItemRequest,
@@ -434,6 +434,8 @@ async function run(
             inventory.find((i) => i.item == item.item.id).amount - item.amount,
           );
         }
+
+        if (offeredMoney > 0) await removeBalance(message.member, offeredMoney);
 
         const url = await createItemRequest(
           message.member,
