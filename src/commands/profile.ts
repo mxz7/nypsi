@@ -311,7 +311,7 @@ async function run(
               new CustomEmbed(
                 message.member,
                 "you're at max prestige. well done. nerd. <3",
-              ).setImage("https://i.imgur.com/vB3UGgi.png"),
+              ).setImage("https://file.maxz.dev/If87xT6LC_.png"),
             ],
           });
           return awaitButton();

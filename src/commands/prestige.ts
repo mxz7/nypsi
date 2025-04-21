@@ -92,7 +92,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
     return send({
       embeds: [
         new CustomEmbed(message.member, "you're at max prestige. well done. nerd. <3").setImage(
-          "https://i.imgur.com/vB3UGgi.png",
+          "https://file.maxz.dev/If87xT6LC_.png",
         ),
       ],
     });
