@@ -771,7 +771,7 @@ async function run(
           await res.editReply({
             embeds: [
               new ErrorEmbed("nice try LOSER HAHAHAHHAHAHAHAHAAHHAHAHAH wanker.").setImage(
-                "https://giphy.com/clips/thefastsaga-fast-and-furious-saga-fate-of-the-Pv2AsOz7eYUkAqh1d5",
+                "https://file.maxz.dev/t9mTPwW23j.gif",
               ),
             ],
           });
