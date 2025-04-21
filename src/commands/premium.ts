@@ -312,12 +312,12 @@ async function run(
       } else if (!guildMember.roles.cache.find((i) => i.name === guildMember.user.id)) {
         await sleep(250);
 
-        const seperatorRole = guildMember.guild.roles.cache.get("1329425677614845972");
+        const separatorRole = guildMember.guild.roles.cache.get("1329425677614845972");
 
         const role = await guildMember.guild.roles.create({
           name: guildMember.user.id,
           color: colour,
-          position: seperatorRole.position + 1,
+          position: separatorRole.position + 1,
         });
 
         await guildMember.roles.add(role);
@@ -476,12 +476,12 @@ async function run(
           await role.edit({ color: color as ColorResolvable });
         }
       } else {
-        const seperatorRole = message.guild.roles.cache.get("1329425677614845972");
+        const separatorRole = message.guild.roles.cache.get("1329425677614845972");
 
         const role = await message.guild.roles.create({
           name: message.author.id,
           color: color as ColorResolvable,
-          position: seperatorRole.position + 1,
+          position: separatorRole.position + 1,
         });
 
         await message.member.roles.add(role);
