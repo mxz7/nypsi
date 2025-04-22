@@ -8,7 +8,7 @@ import { logger } from "../../logger";
 import { isBooster } from "../premium/boosters";
 import { getTier } from "../premium/premium";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
-import { getAuctionAverage } from "./auctions";
+import { getMarketAverage } from "./market";
 import { getBoosters } from "./boosters";
 import { calcCarCost } from "./cars";
 import { getClaimable, getFarm, getFarmUpgrades } from "./farm";
@@ -795,13 +795,22 @@ export async function calcNetWorth(
       bank: true,
       Inventory: true,
       netWorth: true,
-      Auction: {
+      MarketBuyOrder: {
+        select: {
+          price: true,
+          itemAmount: true,
+        },
+        where: {
+          completed: false,
+        },
+      },
+      MarketSellOrder: {
         select: {
           itemId: true,
           itemAmount: true,
         },
         where: {
-          sold: false,
+          completed: false,
         },
       },
       OffersGiven: {
@@ -873,8 +882,11 @@ export async function calcNetWorth(
       : 0,
   );
 
-  for (const auction of query.Auction)
-    worth += ((await calcItemValue(auction.itemId)) || 0) * Number(auction.itemAmount);
+  for (const sellOrder of query.MarketSellOrder)
+    worth += ((await calcItemValue(sellOrder.itemId)) || 0) * Number(sellOrder.itemAmount);
+  
+  for (const buyOrder of query.MarketBuyOrder)
+    worth += Number(buyOrder.price * buyOrder.itemAmount);
 
   if (breakdown) breakdownItems.set("balance", worth);
 
@@ -894,7 +906,7 @@ export async function calcNetWorth(
 
     let value = 0;
 
-    const auctionAvg = await getAuctionAverage(item.id);
+    const auctionAvg = await getMarketAverage(item.id);
     const offersAvg = await getOffersAverage(item.id);
 
     if (auctionAvg && offersAvg) {
@@ -929,7 +941,7 @@ export async function calcNetWorth(
         breakdownItems.set(item.item, getItems()[item.item].sell * Number(item.amount));
     } else {
       const [auctionAvg, offerAvg] = await Promise.all([
-        getAuctionAverage(item.item),
+        getMarketAverage(item.item),
         getOffersAverage(item.item),
       ]);
 
@@ -987,7 +999,7 @@ export async function calcNetWorth(
         if (!itemId) continue;
 
         const [auctionAvg, offersAvg] = await Promise.all([
-          getAuctionAverage(itemId),
+          getMarketAverage(itemId),
           getOffersAverage(itemId),
         ]);
 

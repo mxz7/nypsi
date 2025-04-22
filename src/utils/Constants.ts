@@ -20,7 +20,7 @@ products.set("23110fff7b", { name: "rain", cost: 4.99 });
 export default {
   redis: {
     cooldown: {
-      AUCTION_WATCH: "cd:auctionwatch",
+      MARKET_WATCH: "cd:marketwatch",
       GUILD_CREATE: "cd:guildcreate",
       ROB_RADIO: "cd:rob-radio",
       SEX_CHASTITY: "cd:sex-chastity",
@@ -97,9 +97,9 @@ export default {
         TASKS: "cache:economy:tasks",
         AUTO_SELL: "cache:economy:autosell",
         SELL_FILTER: "cache:economy:sellallfilter",
-        AUCTION_AVG: "cache:economy:auctionavg",
+        MARKET_AVG: "cache:economy:marketavg",
         OFFER_AVG: "cache:economy:offeravg",
-        AUCTION_ITEM_GRAPH_DATA: "cache:economy:auction:historydata",
+        MARKET_ITEM_GRAPH_DATA: "cache:economy:market:historydata",
         BAKERY_UPGRADES: "cache:economy:bakery:upgrades",
         BALANCE: "cache:economy:balance",
         BANNED: "cache:economy:banned",
@@ -170,11 +170,12 @@ export default {
       HOURLY_COMMAND_PREPROCESS: "nypso:preprocess",
       CRASH_STATUS: "nypsi:crash:status",
       FARM_STATUS_DM: "nypsi:farm:status:dm",
-      auction_buying: "nypsi:auction:buying",
+      MARKET_BUYING: "nypsi:market:buying",
+      MARKET_SELLING: "nypsi:market:selling",
     },
   },
   ANNOUNCEMENTS_CHANNEL_ID: "747057465245564939",
-  AUCTION_CHANNEL_ID: "1008467335973179482",
+  AUCTION_CHANNEL_ID: "1266551210828234813", // 1008467335973179482
   AUCTION_MANAGEMENT_ROLE_IDS: [
     "747056620688900139",
     "747059949770768475",
@@ -184,7 +185,7 @@ export default {
   BOOST_REWARDS_LINK:
     "https://discord.com/channels/747056029795221513/1031950370206924903/1092078265948188842",
   BOOST_ROLE_ID: "747066190530347089",
-  BOT_USER_ID: "678711738845102087",
+  BOT_USER_ID: "848756349587554314", // 678711738845102087
   BRONZE_ROLE_ID: "819870590718181391",
   COLOUR_REGEX: /^#([A-Fa-f0-9]{6})$/,
   MEMBER_MENTION_REGEX: /<@!?[0-9]+>/,
@@ -195,13 +196,13 @@ export default {
   KARMA_SHOP_ROLE_ID: "1088800175532806187",
   KOFI_PRODUCTS: products,
   MAX_GUILD_LEVEL: 420,
-  NYPSI_SERVER_ID: "747056029795221513",
+  NYPSI_SERVER_ID: "1041027158778331277", // 747056029795221513
   NYPSI_SERVER_INVITE_LINK: "https://discord.gg/hJTDNST",
   PLATINUM_ROLE_ID: "819870959325413387",
   SILVER_ROLE_ID: "819870727834566696",
   SUPPORT_CHANNEL_ID: "1015299117934723173",
   SUPPORT_ROLE_ID: "1091314758986256424",
-  TEKOH_ID: "672793821850894347",
+  TEKOH_ID: "499720078770831360", // 672793821850894347
   PROGRESSION: {
     VOTE_CRATE: new Map([
       [1, 1],

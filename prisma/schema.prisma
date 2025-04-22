@@ -206,7 +206,7 @@ model Economy {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @id
 
-  auctionWatch       AuctionWatch[]
+  MarketWatch        MarketWatch[]
   Boosters           Booster[]
   EconomyWorker      EconomyWorker[]
   Inventory          Inventory[]
@@ -214,7 +214,8 @@ model Economy {
   Game               Game[]
   Stats              Stats[]
   BakeryUpgrade      BakeryUpgrade[]
-  Auction            Auction[]
+  MarketBuyOrder     MarketBuyOrder[]
+  MarketSellOrder    MarketSellOrder[]
   EconomyGuild       EconomyGuild?
   EconomyGuildMember EconomyGuildMember?
   OffersReceived     Offer[]             @relation(name: "target")
@@ -311,7 +312,7 @@ model Upgrades {
   @@id([userId, upgradeId])
 }
 
-model AuctionWatch {
+model MarketWatch {
   userId  String
   itemId  String
   maxCost BigInt @default(0)
@@ -481,15 +482,28 @@ model FlagGame {
   @@index([userId])
 }
 
-model Auction {
+model MarketBuyOrder {
   id         Int      @id @default(autoincrement())
   ownerId    String
   itemId     String
   itemAmount BigInt   @default(1)
-  bin        BigInt
-  messageId  String   @unique
+  price      BigInt
   createdAt  DateTime @default(now())
-  sold       Boolean  @default(false)
+  completed  Boolean  @default(false)
+
+  owner Economy @relation(fields: [ownerId], references: [userId], onDelete: Cascade)
+
+  @@index([itemId])
+}
+
+model MarketSellOrder {
+  id         Int      @id @default(autoincrement())
+  ownerId    String
+  itemId     String
+  itemAmount BigInt   @default(1)
+  price      BigInt
+  createdAt  DateTime @default(now())
+  completed  Boolean  @default(false)
 
   owner Economy @relation(fields: [ownerId], references: [userId], onDelete: Cascade)
 

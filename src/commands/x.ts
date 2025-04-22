@@ -111,13 +111,14 @@ async function run(
                   members: true,
                 },
               },
-              Auction: true,
+              MarketBuyOrder: true,
+              MarketSellOrder: true,
               BakeryUpgrade: true,
               EconomyGuildMember: true,
               OffersGiven: true,
               Upgrades: true,
               OffersReceived: true,
-              auctionWatch: true,
+              MarketWatch: true,
               CustomCar: {
                 include: {
                   upgrades: true,
@@ -1025,9 +1026,15 @@ async function run(
             },
           });
 
-          await prisma.auction.deleteMany({
+          await prisma.marketBuyOrder.deleteMany({
             where: {
-              AND: [{ ownerId: user.id }, { sold: false }],
+              AND: [{ ownerId: user.id }, { completed: false }],
+            },
+          });
+
+          await prisma.marketSellOrder.deleteMany({
+            where: {
+              AND: [{ ownerId: user.id }, { completed: false }],
             },
           });
 

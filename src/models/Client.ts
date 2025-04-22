@@ -24,7 +24,7 @@ import userUpdate from "../events/userUpdate";
 import redis from "../init/redis";
 import { doAutosellSitrep } from "../scheduled/clusterjobs/autosell_status";
 import { runBirthdays } from "../scheduled/clusterjobs/birthdays";
-import { runAuctionChecks } from "../scheduled/clusterjobs/checkauctions";
+import { runMarketChecks } from "../scheduled/clusterjobs/checkmarket";
 import { updateCounters } from "../scheduled/clusterjobs/counters";
 import { runCraftItemsJob } from "../scheduled/clusterjobs/crafted";
 import { runLogs, runModerationChecks } from "../scheduled/clusterjobs/moderationchecks";
@@ -238,7 +238,7 @@ export class NypsiClient extends Client {
 
     runPremiumCrateInterval(this);
     runModerationChecks(this);
-    runAuctionChecks(this);
+    runMarketChecks(this);
     runCountdowns(this);
     runChristmas(this);
     updateCounters(this);

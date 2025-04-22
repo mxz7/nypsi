@@ -14,7 +14,7 @@ import { sort } from "fast-sort";
 import prisma from "../init/database";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { countItemOnAuction, findAuctions } from "../utils/functions/economy/auctions";
+import { countItemOnMarket, getMarketItemBuyOrders } from "../utils/functions/economy/market";
 import {
   calcItemValue,
   getInventory,
@@ -122,10 +122,10 @@ async function run(
     }
   }
 
-  const [total, inventory, inAuction, value] = await Promise.all([
+  const [total, inventory, inMarket, value] = await Promise.all([
     getTotalAmountOfItem(selected.id),
     getInventory(message.member),
-    countItemOnAuction(selected.id),
+    countItemOnMarket(selected.id),
     calcItemValue(selected.id),
   ]);
 
@@ -143,23 +143,23 @@ async function run(
     desc.push(`\n**in world** ${total.toLocaleString()}`);
   }
 
-  if (inAuction) {
-    const auctions = await findAuctions(selected.id);
+  if (inMarket) {
+    const sellOrders = await getMarketItemBuyOrders(selected.id);
     let cheapest: number;
 
-    if (auctions.length > 0) {
-      const cheapestItem = sort(auctions).asc((a) => a.bin / a.itemAmount)[0];
+    if (sellOrders.length > 0) {
+      const cheapestItem = sort(sellOrders).asc((a) => a.price)[0];
 
-      cheapest = Math.floor(Number(cheapestItem.bin / cheapestItem.itemAmount));
+      cheapest = Number(cheapestItem.price);
     }
 
     if (total) {
       desc.push(
-        `**in auction** ${inAuction.toLocaleString()}${cheapest ? ` ($${cheapest.toLocaleString()})` : ""}`,
+        `**in market** ${inMarket.toLocaleString()}${cheapest ? ` ($${cheapest.toLocaleString()})` : ""}`,
       );
     } else {
       desc.push(
-        `\n**in auction** ${inAuction.toLocaleString()}${cheapest ? ` ($${cheapest.toLocaleString()})` : ""}`,
+        `\n**in market** ${inMarket.toLocaleString()}${cheapest ? ` ($${cheapest.toLocaleString()})` : ""}`,
       );
     }
   }
@@ -216,7 +216,7 @@ async function run(
 
   if (
     !(
-      (await prisma.auction.count({ where: { AND: [{ itemId: selected.id }, { sold: true }] } })) <
+      (await prisma.marketSellOrder.count({ where: { AND: [{ itemId: selected.id }, { completed: true }] } })) <
         5 &&
       (await prisma.offer.count({ where: { AND: [{ itemId: selected.id }, { sold: true }] } })) <
         5 &&
