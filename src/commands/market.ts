@@ -108,6 +108,42 @@ cmd.slashData
           .setRequired(true),
       ),
   )
+  .addSubcommand((buy) =>
+    buy
+      .setName("buy")
+      .setDescription("buy from the market")
+      .addStringOption((option) =>
+        option
+          .setName("item-market-buy")
+          .setDescription("which do you want to buy?")
+          .setAutocomplete(true)
+          .setRequired(true),
+      )
+      .addStringOption((option) =>
+        option
+          .setName("amount")
+          .setDescription("how many of this item?")
+          .setRequired(true),
+      )
+  )
+  .addSubcommand((sell) =>
+    sell
+      .setName("sell")
+      .setDescription("sell to the market")
+      .addStringOption((option) =>
+        option
+          .setName("item-market-sell")
+          .setDescription("which do you want to sell?")
+          .setAutocomplete(true)
+          .setRequired(true),
+      )
+      .addStringOption((option) =>
+        option
+          .setName("amount")
+          .setDescription("how many of this item?")
+          .setRequired(true),
+      )
+  )
   .addSubcommand((watch) =>
     watch
       .setName("watch")
@@ -698,11 +734,40 @@ async function run(
       return send({ embeds: [new ErrorEmbed("invalid amount")] });
     }
 
-    if (await getPriceForMarketTransaction(item.id, parseInt(amount), "buy", message.member.id) == 1) {
+    if (await getPriceForMarketTransaction(item.id, parseInt(amount), "buy", message.member.id) == -1) {
       return send({ embeds: [new ErrorEmbed(`not enough ${item.plural ? item.plural : item.name} on the market`)] });
     }
 
     return await confirmTransaction("buy", item, parseInt(amount), message.member.id);
+  } else if (args[0].toLowerCase().includes("sell")) {
+    if (args.length === 1) return send({ embeds: [new ErrorEmbed("/market sell <item> <amount>")] });
+
+    const item = selectItem(args[1]);
+
+    if (!item) return send({ embeds: [new ErrorEmbed("invalid item")] });
+
+    const amount = args[2] ?? "1";
+    
+    if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
+      return send({ embeds: [new ErrorEmbed("invalid amount")] });
+    }
+    
+    if (await getPriceForMarketTransaction(item.id, parseInt(amount), "sell", message.member.id) == -1) {
+      return send({ embeds: [new ErrorEmbed(`not enough ${item.plural ? item.plural : item.name} on the market`)] });
+    }
+
+    const inventory = await getInventory(message.member)
+        
+    if (
+      !inventory.find((i) => i.item == item.id) ||
+      inventory.find((i) => i.item == item.id).amount < 1
+    ) {
+      return send({
+        embeds: [new ErrorEmbed(`you do not have this many ${item.plural ? item.plural : item.name}`)],
+      });
+    }
+
+    return await confirmTransaction("sell", item, parseInt(amount), message.member.id);
   }
 
   async function itemView(item: Item, msg?: NypsiMessage) {
@@ -819,6 +884,16 @@ async function run(
           await updateEmbed();
           return pageManager();
         }
+        
+        const price = await getPriceForMarketTransaction(item.id, 1, "sell", message.member.id);
+        if (price == -1) {
+          await interaction.editReply({
+            embeds: [new ErrorEmbed("not enough items")],
+            options: { ephemeral: true },
+          });
+          await updateEmbed();
+          return pageManager();
+        }
 
         return confirmTransaction("buy", item, 1, message.member.id, msg);
       } else if (res == "buyMulti") {
@@ -844,6 +919,16 @@ async function run(
           if (!formattedAmount) {
             await res.editReply({
               embeds: [new ErrorEmbed("invalid amount")],
+              options: { ephemeral: true },
+            });
+            await updateEmbed();
+            return pageManager();
+          }
+          
+          const price = await getPriceForMarketTransaction(item.id, formattedAmount, "buy", message.member.id);
+          if (price == -1) {
+            await res.editReply({
+              embeds: [new ErrorEmbed("not enough items")],
               options: { ephemeral: true },
             });
             await updateEmbed();
@@ -881,6 +966,16 @@ async function run(
           await updateEmbed();
           return pageManager();
         }
+        
+        const price = await getPriceForMarketTransaction(item.id, 1, "sell", message.member.id);
+        if (price == -1) {
+          await interaction.editReply({
+            embeds: [new ErrorEmbed("not enough items")],
+            options: { ephemeral: true },
+          });
+          await updateEmbed();
+          return pageManager();
+        }
 
         return confirmTransaction("sell", item, 1, message.member.id, msg);
       } else if (res == "sellMulti") {
@@ -911,7 +1006,16 @@ async function run(
             await updateEmbed();
             return pageManager();
           }
-
+          
+          const price = await getPriceForMarketTransaction(item.id, formattedAmount, "sell", message.member.id);
+          if (price == -1) {
+            await res.editReply({
+              embeds: [new ErrorEmbed("not enough items")],
+              options: { ephemeral: true },
+            });
+            await updateEmbed();
+            return pageManager();
+          }
         
           const inventory = await getInventory(message.member)
         
@@ -951,7 +1055,9 @@ async function run(
       getEmojiImage(item.emoji),
     );
 
-    const price = await getPriceForMarketTransaction(item.id, amount, type, userId)
+    const fromCommand = !msg;
+
+    const price = await getPriceForMarketTransaction(item.id, amount, type, userId);
 
     embed.setDescription(`are you sure you want to ${type} ${amount} ${amount == 1 || !item.plural ? item.name : item.plural} for $${price.toLocaleString()}?`);
 
@@ -995,19 +1101,33 @@ async function run(
         const res = type == "buy" ? (await marketBuy(item, amount, price, message.member)): (await marketSell(item, amount, price, message.member));
         
         if (!res) {
+          if (fromCommand) {
+            return await msg.edit({ embeds: [new ErrorEmbed("unknown error occurred")], components: [] });
+          }
+
           await interaction.editReply({
             embeds: [new ErrorEmbed("unknown error occurred")],
             options: { ephemeral: true },
           });
+
           return itemView(item, msg);
         }
 
         if (res && res !== "success") {
+          if (fromCommand) {
+            return await edit({ embeds: [new ErrorEmbed(res.toString())], components: [] }, msg);
+          }
           await interaction.editReply({
             embeds: [new ErrorEmbed(res.toString())],
             options: { ephemeral: true },
           });
           return itemView(item, msg);
+        }
+        
+        if (fromCommand) {
+          embed.setDescription(`✅ ${type == "buy" ? "bought" : "sold"} ${amount} ${amount == 1 || !item.plural ? item.name : item.plural} for $${price.toLocaleString()}`);
+          await interaction.deleteReply();
+          return await msg.edit({ embeds: [embed], components: [] });
         }
 
         await interaction.editReply({
@@ -1016,10 +1136,13 @@ async function run(
         });
         return itemView(item, msg);
       } else if (res == "cancel") {
+        
+        if (fromCommand) await edit({ embeds: [embed], components: [] }, msg);
         await interaction.editReply({
           embeds: [new CustomEmbed(message.member, "✅ cancelled")],
           options: { ephemeral: true },
         });
+        if (fromCommand) return;
         return itemView(item, msg);
       }
     };

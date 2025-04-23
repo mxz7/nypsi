@@ -331,7 +331,7 @@ export async function marketBuy(
     inTransaction.delete(item.id);
   }, ms("10 minutes"));
 
-  const sellOrders = await getMarketItemOrders(item.id, "buy", member.id);
+  const sellOrders = await getMarketItemOrders(item.id, "sell", member.id);
 
   const usedOrders: {
     id: number,
@@ -560,7 +560,7 @@ export async function marketSell(
   if (storedPrice !== sellPrice) {
     await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${item.id}`);
     inTransaction.delete(item.id);
-    return `since viewing the market, the sell price has changed from $${storedPrice.toLocaleString()} to $${sellPrice.toLocaleString()}. please press purchase again with this updated price in mind`;
+    return `since viewing the market, the sell price has changed from $${storedPrice.toLocaleString()} to $${sellPrice.toLocaleString()}. please press sell again with this updated price in mind`;
   }
 
   const inventory = await getInventory(member)
@@ -735,7 +735,7 @@ export async function marketSell(
           addNotificationToQueue({
             memberId: order.ownerId,
             payload: {
-              content: `${total.toLocaleString()}x of your sell order items have been bought`,
+              content: `${total.toLocaleString()}x of your buy order items have been fulfilled`,
               embed: embedDm,
             },
           });
