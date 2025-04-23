@@ -32,6 +32,7 @@ import {
   getMarketWatch,
   getPriceForMarketTransaction,
   marketBuy,
+  marketSell,
   setMarketWatch,
   updateMarketWatch,
 } from "../utils/functions/economy/market";
@@ -396,7 +397,7 @@ async function run(
           
           if (type == "buy") {
 
-            if (await getBalance(message.member) < parseInt(amount) * cost) {
+            if ((await getBalance(message.member)) < parseInt(amount) * cost) {
             
               await res.editReply({
                 embeds: [new ErrorEmbed("you dont have enough money")],
@@ -768,6 +769,7 @@ async function run(
       const topRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setCustomId("buyOne").setLabel("buy one").setStyle(ButtonStyle.Primary).setDisabled(totalSellOrderCount == 0),
         new ButtonBuilder().setCustomId("buyMulti").setLabel("buy multiple").setStyle(ButtonStyle.Primary).setDisabled(totalSellOrderCount <= 1),
+        new ButtonBuilder().setCustomId("refresh").setLabel("refresh").setStyle(ButtonStyle.Secondary),
       );
   
       const bottomRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -809,8 +811,8 @@ async function run(
       const { res, interaction } = response;
 
       if (res == "buyOne") {
-        if (await getBalance(message.member) < await getPriceForMarketTransaction(item.id, 1, "buy", message.member.id)) {
-          await await interaction.editReply({
+        if ((await getBalance(message.member)) < await getPriceForMarketTransaction(item.id, 1, "buy", message.member.id)) {
+          await interaction.editReply({
             embeds: [new ErrorEmbed("insufficient funds")],
             options: { ephemeral: true },
           });
@@ -848,7 +850,7 @@ async function run(
             return pageManager();
           }
 
-          if (await getBalance(message.member) < await getPriceForMarketTransaction(item.id, formattedAmount, "buy", message.member.id)) {
+          if ((await getBalance(message.member)) < await getPriceForMarketTransaction(item.id, formattedAmount, "buy", message.member.id)) {
             await interaction.editReply({
               embeds: [new ErrorEmbed("insufficient funds")],
               options: { ephemeral: true },
@@ -866,14 +868,77 @@ async function run(
         await updateEmbed();
         return pageManager();
       } else if (res == "sellOne") {
-        await updateEmbed();
-        return pageManager();
+        const inventory = await getInventory(message.member)
+        
+        if (
+          !inventory.find((i) => i.item == item.id) ||
+          inventory.find((i) => i.item == item.id).amount < 1
+        ) {
+          await interaction.editReply({
+            embeds: [new ErrorEmbed(`you do not have this many ${item.plural ? item.plural : item.name}`)],
+            options: { ephemeral: true },
+          });
+          await updateEmbed();
+          return pageManager();
+        }
+
+        return confirmTransaction("sell", item, 1, message.member.id, msg);
       } else if (res == "sellMulti") {
+        const res = await quantitySelectionModal(item, "sell", interaction as ButtonInteraction);
+
+        
+        if (res) {
+          await res.deferReply({ ephemeral: true });
+
+          const amount = res.fields.fields.get("amount").value;
+
+          if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
+            await res.editReply({
+              embeds: [new ErrorEmbed("invalid amount")],
+              options: { ephemeral: true },
+            });
+            await updateEmbed();
+            return pageManager();
+          }
+
+          const formattedAmount = await formatBet(amount.toLowerCase(), message.member).catch(() => {});
+
+          if (!formattedAmount) {
+            await res.editReply({
+              embeds: [new ErrorEmbed("invalid amount")],
+              options: { ephemeral: true },
+            });
+            await updateEmbed();
+            return pageManager();
+          }
+
+        
+          const inventory = await getInventory(message.member)
+        
+          if (
+            !inventory.find((i) => i.item == item.id) ||
+            inventory.find((i) => i.item == item.id).amount < 1
+          ) {
+            await interaction.editReply({
+              embeds: [new ErrorEmbed(`you do not have this many ${item.plural ? item.plural : item.name}`)],
+              options: { ephemeral: true },
+            });
+            await updateEmbed();
+            return pageManager();
+          }
+
+          await res.deleteReply();
+
+          return confirmTransaction("sell", item, formattedAmount, message.member.id, msg);
+        }
 
 
         await updateEmbed();
         return pageManager();
-      }
+      } else if (res == "refresh") {
+        await updateEmbed();
+        return pageManager();
+      } 
     };
 
     return pageManager();
@@ -927,7 +992,7 @@ async function run(
 
       if (res == "confirm") {
 
-        const res = await marketBuy(item, amount, price, message.member);
+        const res = type == "buy" ? (await marketBuy(item, amount, price, message.member)): (await marketSell(item, amount, price, message.member));
         
         if (!res) {
           await interaction.editReply({
