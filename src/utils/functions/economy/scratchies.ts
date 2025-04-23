@@ -242,8 +242,6 @@ export default class ScratchCard {
       ];
     }
 
-    const items: LootPoolResult[] = [];
-
     const poolName = Object.keys(item.loot_pools)[0];
 
     const pool = getLootPools()[poolName];

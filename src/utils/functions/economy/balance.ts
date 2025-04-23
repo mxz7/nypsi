@@ -29,7 +29,6 @@ import { hasVoted } from "./vote";
 import { calcWorkerValues } from "./workers";
 import ms = require("ms");
 import _ = require("lodash");
-import { OrderType } from "@prisma/client";
 
 export async function getBalance(member: GuildMember | string) {
   let id: string;

@@ -53,8 +53,6 @@ import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { NypsiClient } from "../models/Client";
 import { addBalance, getBalance, removeBalance } from "../utils/functions/economy/balance";
-import e = require("express");
-import { or } from "mathjs";
 import { getEmojiImage } from "../utils/functions/image";
 import { Item } from "../types/Economy";
 import { OrderType } from "@prisma/client";

@@ -5,7 +5,6 @@ import redis from "../../../init/redis";
 import s3 from "../../../init/s3";
 import Constants from "../../Constants";
 import { hasProfile } from "./utils";
-import ms = require("ms");
 
 export async function isTracking(member: GuildMember | string): Promise<boolean> {
   let id: string;

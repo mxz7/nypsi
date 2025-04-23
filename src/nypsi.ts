@@ -115,7 +115,6 @@ import { recentCommands } from "./utils/functions/users/commands";
 import { loadCommands } from "./utils/handlers/commandhandler";
 import { loadInteractions } from "./utils/handlers/interactions";
 import { logger } from "./utils/logger";
-import ms = require("ms");
 
 loadCommands();
 loadInteractions();

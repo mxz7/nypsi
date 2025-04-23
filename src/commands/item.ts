@@ -24,7 +24,6 @@ import {
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getEmojiImage } from "../utils/functions/image";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { OrderType } from "@prisma/client";
 
 const cmd = new Command("item", "view information about an item", "money").setAliases(["i"]);
 

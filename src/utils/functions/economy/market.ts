@@ -1,12 +1,6 @@
 import { MarketWatch, OrderType } from "@prisma/client";
 import {
-  ActionRowBuilder,
-  ButtonInteraction,
   GuildMember,
-  ModalBuilder,
-  ModalSubmitInteraction,
-  TextInputBuilder,
-  TextInputStyle,
 } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
@@ -25,10 +19,9 @@ import { addInventoryItem } from "./inventory";
 import { addStat } from "./stats";
 import { createUser, getItems, userExists } from "./utils";
 import ms = require("ms");
-import dayjs = require("dayjs");
 import { Item } from "../../../types/Economy";
 
-const inTransaction = new Set<String>();
+const inTransaction = new Set<string>();
 const dmQueue = new Map<string, { buyers: Map<string, number> }>();
 
 export async function getMarketOrders(member: GuildMember | string, type: OrderType) {

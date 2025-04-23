@@ -54,7 +54,6 @@ import { addNotificationToQueue } from "../utils/functions/users/notifications";
 import { addTag, getTags, removeTag } from "../utils/functions/users/tags";
 import { hasProfile } from "../utils/functions/users/utils";
 import { logger } from "../utils/logger";
-import ms = require("ms");
 
 const cmd = new Command("x", "admincmd", "none").setPermissions(["bot owner"]);
 
