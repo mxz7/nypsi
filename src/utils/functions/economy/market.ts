@@ -508,7 +508,7 @@ export async function marketBuy(
   ]);
 
   logger.info(
-    `market item purchased ${amount} ${item.id}`, { usedOrders: usedOrders  }
+    `market ${member.id} purchased ${amount} ${item.id}`, { usedOrders: usedOrders  }
   );
   
   await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${item.id}`);
@@ -753,7 +753,7 @@ export async function marketSell(
   ]);
 
   logger.info(
-    `market item sold ${amount} ${item.id}`, { usedOrders: usedOrders  }
+    `market ${member.id} sold ${amount} ${item.id}`, { usedOrders: usedOrders  }
   );
   
   await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${item.id}`);

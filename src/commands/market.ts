@@ -58,7 +58,7 @@ import { getEmojiImage } from "../utils/functions/image";
 import { Item } from "../types/Economy";
 import { OrderType } from "@prisma/client";
 
-const cmd = new Command("market", "create and manage your item auctions", "money");
+const cmd = new Command("market", "create and manage your item auctions", "money").setAliases(["mk"]);
 
 cmd.slashEnabled = true;
 cmd.slashData
@@ -612,9 +612,6 @@ async function run(
     return res;
   };
 
-
-  if (args[0]?.toLowerCase() === "create") args.shift();
-
   if (args.length == 0) {
     return viewMarket();
   } else if (args[0].toLowerCase() == "watch") {
@@ -901,12 +898,11 @@ async function run(
         const res = await quantitySelectionModal(item, "buy", interaction as ButtonInteraction);
 
         if (res) {
-          await res.deferReply({ ephemeral: true });
 
           const amount = res.fields.fields.get("amount").value;
 
           if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
-            await res.editReply({
+            await res.reply({
               embeds: [new ErrorEmbed("invalid amount")],
               options: { ephemeral: true },
             });
@@ -917,7 +913,7 @@ async function run(
           const formattedAmount = await formatBet(amount.toLowerCase(), message.member).catch(() => {});
 
           if (!formattedAmount) {
-            await res.editReply({
+            await res.reply({
               embeds: [new ErrorEmbed("invalid amount")],
               options: { ephemeral: true },
             });
@@ -927,7 +923,7 @@ async function run(
           
           const price = await getPriceForMarketTransaction(item.id, formattedAmount, "buy", message.member.id);
           if (price == -1) {
-            await res.editReply({
+            await res.reply({
               embeds: [new ErrorEmbed("not enough items")],
               options: { ephemeral: true },
             });
@@ -936,7 +932,7 @@ async function run(
           }
 
           if ((await getBalance(message.member)) < await getPriceForMarketTransaction(item.id, formattedAmount, "buy", message.member.id)) {
-            await interaction.editReply({
+            await interaction.reply({
               embeds: [new ErrorEmbed("insufficient funds")],
               options: { ephemeral: true },
             });
@@ -944,7 +940,7 @@ async function run(
             return pageManager();
           }
 
-          await res.deleteReply();
+          await res.deferUpdate();
 
           return confirmTransaction("buy", item, formattedAmount, message.member.id, msg);
           
@@ -983,12 +979,10 @@ async function run(
 
         
         if (res) {
-          await res.deferReply({ ephemeral: true });
-
           const amount = res.fields.fields.get("amount").value;
 
           if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
-            await res.editReply({
+            await res.reply({
               embeds: [new ErrorEmbed("invalid amount")],
               options: { ephemeral: true },
             });
@@ -999,7 +993,7 @@ async function run(
           const formattedAmount = await formatBet(amount.toLowerCase(), message.member).catch(() => {});
 
           if (!formattedAmount) {
-            await res.editReply({
+            await res.reply({
               embeds: [new ErrorEmbed("invalid amount")],
               options: { ephemeral: true },
             });
@@ -1009,7 +1003,7 @@ async function run(
           
           const price = await getPriceForMarketTransaction(item.id, formattedAmount, "sell", message.member.id);
           if (price == -1) {
-            await res.editReply({
+            await res.reply({
               embeds: [new ErrorEmbed("not enough items")],
               options: { ephemeral: true },
             });
@@ -1031,7 +1025,7 @@ async function run(
             return pageManager();
           }
 
-          await res.deleteReply();
+          await res.deferUpdate();
 
           return confirmTransaction("sell", item, formattedAmount, message.member.id, msg);
         }
@@ -1080,10 +1074,6 @@ async function run(
       const response = await msg
         .awaitMessageComponent({ filter, time: 60000 })
         .then(async (collected) => {
-          await collected.deferReply({ ephemeral: true }).catch(() => {
-            fail = true;
-            return pageManager();
-          });
           return { res: collected.customId, interaction: collected };
         })
         .catch(async () => {
@@ -1102,10 +1092,11 @@ async function run(
         
         if (!res) {
           if (fromCommand) {
+            await interaction.deferUpdate();
             return await msg.edit({ embeds: [new ErrorEmbed("unknown error occurred")], components: [] });
           }
 
-          await interaction.editReply({
+          await interaction.reply({
             embeds: [new ErrorEmbed("unknown error occurred")],
             options: { ephemeral: true },
           });
@@ -1115,6 +1106,7 @@ async function run(
 
         if (res && res !== "success") {
           if (fromCommand) {
+            await interaction.deferUpdate();
             return await edit({ embeds: [new ErrorEmbed(res.toString())], components: [] }, msg);
           }
           await interaction.editReply({
@@ -1126,7 +1118,7 @@ async function run(
         
         if (fromCommand) {
           embed.setDescription(`✅ ${type == "buy" ? "bought" : "sold"} ${amount} ${amount == 1 || !item.plural ? item.name : item.plural} for $${price.toLocaleString()}`);
-          await interaction.deleteReply();
+          await interaction.deferUpdate();
           return await msg.edit({ embeds: [embed], components: [] });
         }
 

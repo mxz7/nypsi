@@ -51,7 +51,7 @@ export default {
         items[i].emoji.startsWith(":")
           ? ""
           : `${items[i].emoji} `
-      }${items[i].name} [${combinedQuantities.find((c) => c.itemId = i).itemAmount.toLocaleString()} on market]`,
+      }${items[i].name} [${combinedQuantities.find((c) => c.itemId = i).itemAmount.toLocaleString()} in buy orders]`,
       value: i,
     }));
 
