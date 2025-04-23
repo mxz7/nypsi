@@ -111,8 +111,7 @@ async function run(
                   members: true,
                 },
               },
-              MarketBuyOrder: true,
-              MarketSellOrder: true,
+              MarketOrder: true,
               BakeryUpgrade: true,
               EconomyGuildMember: true,
               OffersGiven: true,
@@ -1026,13 +1025,7 @@ async function run(
             },
           });
 
-          await prisma.marketBuyOrder.deleteMany({
-            where: {
-              AND: [{ ownerId: user.id }, { completed: false }],
-            },
-          });
-
-          await prisma.marketSellOrder.deleteMany({
+          await prisma.marketOrder.deleteMany({
             where: {
               AND: [{ ownerId: user.id }, { completed: false }],
             },

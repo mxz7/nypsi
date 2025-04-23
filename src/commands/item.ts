@@ -14,7 +14,7 @@ import { sort } from "fast-sort";
 import prisma from "../init/database";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { countItemOnMarket, getMarketItemBuyOrders } from "../utils/functions/economy/market";
+import { countItemOnMarket, getMarketItemOrders } from "../utils/functions/economy/market";
 import {
   calcItemValue,
   getInventory,
@@ -24,6 +24,7 @@ import {
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getEmojiImage } from "../utils/functions/image";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { OrderType } from "@prisma/client";
 
 const cmd = new Command("item", "view information about an item", "money").setAliases(["i"]);
 
@@ -125,7 +126,7 @@ async function run(
   const [total, inventory, inMarket, value] = await Promise.all([
     getTotalAmountOfItem(selected.id),
     getInventory(message.member),
-    countItemOnMarket(selected.id),
+    countItemOnMarket(selected.id, "sell"),
     calcItemValue(selected.id),
   ]);
 
@@ -144,7 +145,7 @@ async function run(
   }
 
   if (inMarket) {
-    const sellOrders = await getMarketItemBuyOrders(selected.id);
+    const sellOrders = await getMarketItemOrders(selected.id, "buy");
     let cheapest: number;
 
     if (sellOrders.length > 0) {
@@ -216,7 +217,7 @@ async function run(
 
   if (
     !(
-      (await prisma.marketSellOrder.count({ where: { AND: [{ itemId: selected.id }, { completed: true }] } })) <
+      (await prisma.marketOrder.count({ where: { AND: [{ itemId: selected.id }, { completed: true }, { orderType: "sell" }] } })) <
         5 &&
       (await prisma.offer.count({ where: { AND: [{ itemId: selected.id }, { sold: true }] } })) <
         5 &&

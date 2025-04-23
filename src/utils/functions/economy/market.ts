@@ -1,4 +1,4 @@
-import { MarketWatch } from "@prisma/client";
+import { MarketWatch, OrderType } from "@prisma/client";
 import {
   ActionRowBuilder,
   ButtonInteraction,
@@ -27,12 +27,11 @@ import { createUser, getItems, userExists } from "./utils";
 import ms = require("ms");
 import dayjs = require("dayjs");
 import { Item } from "../../../types/Economy";
-import { NypsiMessage } from "../../../models/Command";
 
-const beingBought = new Set<String>();
+const inTransaction = new Set<String>();
 const dmQueue = new Map<string, { buyers: Map<string, number> }>();
 
-export async function getMarketBuyOrders(member: GuildMember | string) {
+export async function getMarketOrders(member: GuildMember | string, type: OrderType) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -40,9 +39,9 @@ export async function getMarketBuyOrders(member: GuildMember | string) {
     id = member;
   }
 
-  const query = await prisma.marketBuyOrder.findMany({
+  const query = await prisma.marketOrder.findMany({
     where: {
-      AND: [{ ownerId: id }, { completed: false }],
+      AND: [{ ownerId: id }, { completed: false }, { orderType: type }],
     },
     orderBy: { createdAt: "asc" },
   });
@@ -50,42 +49,13 @@ export async function getMarketBuyOrders(member: GuildMember | string) {
   return query;
 }
 
-export async function getMarketSellOrders(member: GuildMember | string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
 
-  const query = await prisma.marketSellOrder.findMany({
+export async function getMarketItemOrders(itemId: string, type: OrderType, filterOutUserId?: string) {
+  const query = await prisma.marketOrder.findMany({
     where: {
-      AND: [{ ownerId: id }, { completed: false }],
-    },
-    orderBy: { createdAt: "asc" },
-  });
-
-  return query;
-}
-
-export async function getMarketItemBuyOrders(itemId: string, filterOutUserId?: string) {
-  const query = await prisma.marketBuyOrder.findMany({
-    where: {
-      AND: [{ itemId: itemId }, { completed: false }],
+      AND: [{ itemId: itemId }, { completed: false }, { orderType: type }],
     },
     orderBy: [{ price: "desc" }, { createdAt: "asc" }],
-  });
-
-  if (filterOutUserId) return query.filter((m) => m.ownerId !== filterOutUserId);
-  return query;
-}
-
-export async function getMarketItemSellOrders(itemId: string, filterOutUserId?: string) {
-  const query = await prisma.marketSellOrder.findMany({
-    where: {
-      AND: [{ itemId: itemId }, { completed: false }],
-    },
-    orderBy: [{ price: "asc" }, { createdAt: "asc" }],
   });
 
   if (filterOutUserId) return query.filter((m) => m.ownerId !== filterOutUserId);
@@ -96,22 +66,9 @@ export async function getMarketAverage(item: string) {
   if (await redis.exists(`${Constants.redis.cache.economy.MARKET_AVG}:${item}`))
     return parseInt(await redis.get(`${Constants.redis.cache.economy.MARKET_AVG}:${item}`));
 
-  const buyOrders = await prisma.marketBuyOrder.findMany({
+  const orders = await prisma.marketOrder.findMany({
     where: {
-      AND: [{ completed: true }, { itemId: item }],
-    },
-    select: {
-      price: true,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-    take: 50,
-  });
-  
-  const sellOrders = await prisma.marketSellOrder.findMany({
-    where: {
-      AND: [{ completed: true }, { itemId: item }],
+      AND: [{ completed: true }, { itemId: item } ],
     },
     select: {
       price: true,
@@ -124,13 +81,7 @@ export async function getMarketAverage(item: string) {
 
   const costs: number[] = [];
 
-  for (const order of buyOrders) {
-    if (costs.length >= 500) break;
-
-    costs.push(Number(order.price));
-  }
-
-  for (const order of sellOrders) {
+  for (const order of orders) {
     if (costs.length >= 500) break;
 
     costs.push(Number(order.price));
@@ -139,7 +90,7 @@ export async function getMarketAverage(item: string) {
   let filtered = filterOutliers(costs);
 
   if (!filtered) {
-    logger.warn("failed to filter outliers (market)", { costs, item, buyOrders, sellOrders });
+    logger.warn("failed to filter outliers (market)", { costs, item, orders });
     filtered = costs;
   }
 
@@ -257,10 +208,10 @@ async function checkWatchers(
   }
 }
 
-export async function countItemOnMarket(itemId: string) {
-  const amount = await prisma.marketSellOrder.aggregate({
+export async function countItemOnMarket(itemId: string, type: OrderType) {
+  const amount = await prisma.marketOrder.aggregate({
     where: {
-      AND: [{ completed: false }, { itemId: itemId }],
+      AND: [{ completed: false }, { itemId: itemId }, { orderType: type }],
     },
     _sum: {
       itemAmount: true,
@@ -270,9 +221,9 @@ export async function countItemOnMarket(itemId: string) {
   return amount?._sum?.itemAmount || 0;
 }
 
-export async function deleteMarketBuyOrder(id: number, client: NypsiClient, repeatCount = 1) {
+export async function deleteMarketOrder(id: number, client: NypsiClient, repeatCount = 1) {
   
-  const buyOrder = await prisma.marketBuyOrder
+  const order = await prisma.marketOrder
     .findFirst({
       where: {
         AND: [{ id: id }, { completed: false }],
@@ -280,117 +231,39 @@ export async function deleteMarketBuyOrder(id: number, client: NypsiClient, repe
     })
     .catch(() => {});
 
-  if (!buyOrder) return false;
+  if (!order) return false;
 
   if (
-    beingBought.has(buyOrder.itemId) ||
-    (await redis.exists(`${Constants.redis.nypsi.MARKET_SELLING}:${id}`))
+    inTransaction.has(order.itemId) ||
+    (await redis.exists(`${Constants.redis.nypsi.MARKET_TRANSACTION}:${id}`))
   ) {
     return new Promise((resolve) => {
-      logger.debug(`repeating buy order delete - ${id}`);
+      logger.debug(`repeating market order delete - ${id}`);
       setTimeout(async () => {
         if (repeatCount > 100) {
-          beingBought.delete(buyOrder.itemId);
-          await redis.del(`${Constants.redis.nypsi.MARKET_SELLING}:${id}`);
+          inTransaction.delete(order.itemId);
+          await redis.del(`${Constants.redis.nypsi.MARKET_TRANSACTION}:${id}`);
         }
-        resolve(deleteMarketBuyOrder(id, client, repeatCount + 1));
+        resolve(deleteMarketOrder(id, client, repeatCount + 1));
       }, 1000);
     });
   }
 
-  await prisma.marketBuyOrder.delete({
+  await prisma.marketOrder.delete({
     where: {
       id: id,
     }
   });
 
-  return Boolean(buyOrder);
+  return Boolean(order);
 }
 
-export async function deleteMarketSellOrder(id: number, client: NypsiClient, repeatCount = 1) {
-  
-  const sellOrder = await prisma.marketSellOrder
-    .findFirst({
-      where: {
-        AND: [{ id: id }, { completed: false }],
-      },
-    })
-    .catch(() => {});
-
-  if (!sellOrder) return false;
-
-  if (
-    beingBought.has(sellOrder.itemId) ||
-    (await redis.exists(`${Constants.redis.nypsi.MARKET_BUYING}:${id}`))
-  ) {
-    return new Promise((resolve) => {
-      logger.debug(`repeating sell order delete - ${id}`);
-      setTimeout(async () => {
-        if (repeatCount > 100) {
-          beingBought.delete(sellOrder.itemId);
-          await redis.del(`${Constants.redis.nypsi.MARKET_BUYING}:${id}`);
-        }
-        resolve(deleteMarketSellOrder(id, client, repeatCount + 1));
-      }, 1000);
-    });
-  }
-
-  await prisma.marketSellOrder.delete({
-    where: {
-      id: id,
-    }
-  });
-
-  return Boolean(sellOrder);
-}
-
-async function showMarketConfirmation(interaction: ButtonInteraction, cost: number) {
-  const id = `market-confirm-${Math.floor(Math.random() * 69420)}`;
-
-  const modal = new ModalBuilder().setCustomId(id).setTitle("confirmation");
-
-  modal.addComponents(
-    new ActionRowBuilder<TextInputBuilder>().addComponents(
-      new TextInputBuilder()
-        .setCustomId("confirmation")
-        .setLabel("type 'yes' to confirm")
-        .setPlaceholder(`this will cost $${cost.toLocaleString()}`)
-        .setStyle(TextInputStyle.Short)
-        .setRequired(true)
-        .setMaxLength(3),
-    ),
-  );
-
-  await interaction.showModal(modal);
-
-  const filter = (i: ModalSubmitInteraction) =>
-    i.user.id == interaction.user.id && i.customId === id;
-
-  const res = await interaction.awaitModalSubmit({ filter, time: 30000 }).catch(() => {});
-
-  if (!res) return;
-
-  if (!res.isModalSubmit()) return;
-
-  if (res.fields.fields.first().value.toLowerCase() != "yes") {
-    res.reply({
-      embeds: [new CustomEmbed().setDescription("✅ cancelled purchase")],
-      ephemeral: true,
-    });
-    return false;
-  }
-  res.reply({ embeds: [new CustomEmbed(null, "✅ confirmation accepted")], ephemeral: true });
-
-  return true;
-}
-
-
-export async function getPriceForMarketBuy(itemId: string, amount: number, filterOutUserId: string) {
-  const sellOrders = await getMarketItemSellOrders(itemId, filterOutUserId);
+export async function getPriceForMarketTransaction(itemId: string, amount: number, type: OrderType, filterOutUserId: string) {
+  const orders = await getMarketItemOrders(itemId, (type == "buy" ? "sell" : "buy"), filterOutUserId);
 
   let cost = 0;
 
-  for (const order of sellOrders) {
+  for (const order of orders) {
     if (amount >= order.itemAmount) {
       cost += Number(order.price * order.itemAmount);
       amount -= Number(order.itemAmount);
@@ -411,13 +284,13 @@ export async function marketBuy(
   member: GuildMember,
   repeatCount = 1,
 ) {
-  if (beingBought.has(item.id)) {
+  if (inTransaction.has(item.id)) {
     return new Promise((resolve) => {
       logger.debug(
         `repeating market buy - ${amount}x ${item.id}`,
       );
       setTimeout(async () => {
-        if (repeatCount > 100) beingBought.delete(item.id);
+        if (repeatCount > 100) inTransaction.delete(item.id);
         resolve(
           marketBuy(
             item,
@@ -431,38 +304,38 @@ export async function marketBuy(
     });
   }
 
-  beingBought.add(item.id);
-  await redis.set(`${Constants.redis.nypsi.MARKET_BUYING}:${item.id}`, "d", "EX", 600);
+  inTransaction.add(item.id);
+  await redis.set(`${Constants.redis.nypsi.MARKET_TRANSACTION}:${item.id}`, "d", "EX", 600);
 
   if (!(await userExists(member.id))) await createUser(member.id);
 
-  const buyPrice = await getPriceForMarketBuy(item.id, amount, member.id);
+  const buyPrice = await getPriceForMarketTransaction(item.id, amount, "buy", member.id);
 
   if (buyPrice == -1) {
-    await redis.del(`${Constants.redis.nypsi.MARKET_BUYING}:${item.id}`);
-    beingBought.delete(item.id);
+    await redis.del(`${Constants.redis.nypsi.MARKET_TRANSACTION}:${item.id}`);
+    inTransaction.delete(item.id);
     return "not enough items"
   }
 
   if (storedPrice !== buyPrice) {
-    await redis.del(`${Constants.redis.nypsi.MARKET_BUYING}:${item.id}`);
-    beingBought.delete(item.id);
+    await redis.del(`${Constants.redis.nypsi.MARKET_TRANSACTION}:${item.id}`);
+    inTransaction.delete(item.id);
     return `since viewing the market, the price has changed from $${storedPrice.toLocaleString()} to $${buyPrice.toLocaleString()}. please press purchase again with this updated price in mind`;
   }
 
   console.log({buyPrice, balance: await getBalance(member)});
 
   if (await getBalance(member) < buyPrice) {
-    await redis.del(`${Constants.redis.nypsi.MARKET_BUYING}:${item.id}`);
-    beingBought.delete(item.id);
+    await redis.del(`${Constants.redis.nypsi.MARKET_TRANSACTION}:${item.id}`);
+    inTransaction.delete(item.id);
     return "you cannot afford this";
   }
 
   setTimeout(() => {
-    beingBought.delete(item.id);
+    inTransaction.delete(item.id);
   }, ms("10 minutes"));
 
-  const sellOrders = await getMarketItemSellOrders(item.id, member.id);
+  const sellOrders = await getMarketItemOrders(item.id, "buy", member.id);
 
   const usedOrders: {
     id: number,
@@ -500,8 +373,8 @@ export async function marketBuy(
   console.log({sellOrders, usedOrders})
 
   if (total > 0) {
-    await redis.del(`${Constants.redis.nypsi.MARKET_BUYING}:${item.id}`);
-    beingBought.delete(item.id);
+    await redis.del(`${Constants.redis.nypsi.MARKET_TRANSACTION}:${item.id}`);
+    inTransaction.delete(item.id);
     return "not enough items"
   }
 
@@ -518,23 +391,24 @@ export async function marketBuy(
       (order.price < 10_000 && order.itemAmount === 1) ||
       accounts.includes(member.id)
     ) {
-      await prisma.marketSellOrder.delete({
+      await prisma.marketOrder.delete({
         where: {
           id: order.id,
         },
       });
     } else if (order.itemAmount > order.buyAmount) {
-      await prisma.marketSellOrder.create({
+      await prisma.marketOrder.create({
         data: {
           completed: true,
           itemId: item.id,
           itemAmount: order.buyAmount,
           price: order.price,
+          orderType: "sell",
           ownerId: order.ownerId,
         },
       });
 
-      await prisma.marketSellOrder
+      await prisma.marketOrder
         .update({
           where: {
             id: order.id,
@@ -545,7 +419,7 @@ export async function marketBuy(
         })
         .catch(() => {});
     } else {
-      await prisma.marketSellOrder
+      await prisma.marketOrder
         .update({
           where: {
             id: order.id,
@@ -643,8 +517,8 @@ export async function marketBuy(
     `market item purchased ${amount} ${item.id}`, { usedOrders: usedOrders  }
   );
   
-  await redis.del(`${Constants.redis.nypsi.MARKET_BUYING}:${item.id}`);
-  beingBought.delete(item.id);
+  await redis.del(`${Constants.redis.nypsi.MARKET_TRANSACTION}:${item.id}`);
+  inTransaction.delete(item.id);
 
   return "success";
 }

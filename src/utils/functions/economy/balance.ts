@@ -29,6 +29,7 @@ import { hasVoted } from "./vote";
 import { calcWorkerValues } from "./workers";
 import ms = require("ms");
 import _ = require("lodash");
+import { OrderType } from "@prisma/client";
 
 export async function getBalance(member: GuildMember | string) {
   let id: string;
@@ -795,19 +796,12 @@ export async function calcNetWorth(
       bank: true,
       Inventory: true,
       netWorth: true,
-      MarketBuyOrder: {
+      MarketOrder: {
         select: {
           price: true,
           itemAmount: true,
-        },
-        where: {
-          completed: false,
-        },
-      },
-      MarketSellOrder: {
-        select: {
           itemId: true,
-          itemAmount: true,
+          orderType: true,
         },
         where: {
           completed: false,
@@ -882,10 +876,10 @@ export async function calcNetWorth(
       : 0,
   );
 
-  for (const sellOrder of query.MarketSellOrder)
+  for (const sellOrder of query.MarketOrder.filter((i) => i.orderType == "sell"))
     worth += ((await calcItemValue(sellOrder.itemId)) || 0) * Number(sellOrder.itemAmount);
   
-  for (const buyOrder of query.MarketBuyOrder)
+  for (const buyOrder of query.MarketOrder.filter((i) => i.orderType == "buy"))
     worth += Number(buyOrder.price * buyOrder.itemAmount);
 
   if (breakdown) breakdownItems.set("balance", worth);

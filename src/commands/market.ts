@@ -26,13 +26,11 @@ import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Comman
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import {
-  deleteMarketBuyOrder,
-  deleteMarketSellOrder,
+  deleteMarketOrder,
   deleteMarketWatch,
-  getMarketItemBuyOrders,
-  getMarketItemSellOrders,
+  getMarketItemOrders,
   getMarketWatch,
-  getPriceForMarketBuy,
+  getPriceForMarketTransaction,
   marketBuy,
   setMarketWatch,
   updateMarketWatch,
@@ -59,6 +57,7 @@ import e = require("express");
 import { or } from "mathjs";
 import { getEmojiImage } from "../utils/functions/image";
 import { Item } from "../types/Economy";
+import { OrderType } from "@prisma/client";
 
 const cmd = new Command("market", "create and manage your item auctions", "money");
 
@@ -201,14 +200,14 @@ async function run(
 
   const viewMarket = async (msg?: NypsiMessage) => {
     
-    const recentBuyOrders = await prisma.marketBuyOrder.findMany({
-      where: { completed: false },
+    const recentBuyOrders = await prisma.marketOrder.findMany({
+      where: { AND: [{ completed: false }, { orderType: "buy" }]},
       orderBy: { createdAt: "desc" },
       take: 5,
     });
     
-    const recentSellOrders = await prisma.marketSellOrder.findMany({
-      where: { completed: false },
+    const recentSellOrders = await prisma.marketOrder.findMany({
+      where: { AND: [{ completed: false }, { orderType: "sell" }] },
       orderBy: { createdAt: "desc" },
       take: 5,
     });
@@ -282,33 +281,23 @@ async function run(
 
   }
 
-  const manageOrders = async (type: string, msg?: NypsiMessage) => {    
+  const manageOrders = async (type: OrderType, msg?: NypsiMessage) => {    
     const embed = new CustomEmbed(message.member).setHeader(
       `${type} orders`,
       message.author.avatarURL(),
     );    
 
-    let orders = (type == "buy") ? await prisma.marketBuyOrder.findMany({
+    let orders = await prisma.marketOrder.findMany({
       where: {
-        AND: [{ ownerId: message.member.id }, { completed: false }],
-      },
-      orderBy: { createdAt: "desc" },
-    }) : await prisma.marketSellOrder.findMany({
-      where: {
-        AND: [{ ownerId: message.member.id }, { completed: false }],
+        AND: [{ ownerId: message.member.id }, { completed: false }, { orderType: type }],
       },
       orderBy: { createdAt: "desc" },
     });
 
     const updateEmbed = async() => {
-      orders = (type == "buy") ? await prisma.marketBuyOrder.findMany({
+      orders = await prisma.marketOrder.findMany({
         where: {
-          AND: [{ ownerId: message.member.id }, { completed: false }],
-        },
-        orderBy: { createdAt: "desc" },
-      }) : await prisma.marketSellOrder.findMany({
-        where: {
-          AND: [{ ownerId: message.member.id }, { completed: false }],
+          AND: [{ ownerId: message.member.id }, { completed: false }, { orderType: type }],
         },
         orderBy: { createdAt: "desc" },
       });
@@ -421,12 +410,13 @@ async function run(
 
             await removeBalance(message.member, parseInt(amount) * cost);
 
-            await prisma.marketBuyOrder.create({
+            await prisma.marketOrder.create({
               data: {
                 ownerId: message.member.id,
                 itemId: selected.id,
                 itemAmount: parseInt(amount),
                 price: cost,
+                orderType: "buy",
               },
             });
             
@@ -452,12 +442,13 @@ async function run(
 
             await setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - parseInt(amount));
 
-            await prisma.marketSellOrder.create({
+            await prisma.marketOrder.create({
               data: {
                 ownerId: message.member.id,
                 itemId: selected.id,
                 itemAmount: parseInt(amount),
                 price: cost,
+                orderType: "sell",
               },
             });
             
@@ -471,20 +462,15 @@ async function run(
         const res = orders.length == 1 ? orders[0].id.toString() : await deleteOrder(type, msg, orders);
 
         if (res) {
-          if (type == "buy") {
-            const order = await prisma.marketBuyOrder.findFirst({ where: { AND: [{ id: parseInt(res) }, { completed: false }] } });
-            
-            const result = await deleteMarketBuyOrder(parseInt(res), message.client as NypsiClient);
 
-            if (result) {
+          const order = await prisma.marketOrder.findFirst({ where: { AND: [{ id: parseInt(res) }, { completed: false }, { orderType: type }] } });
+
+          const result = await deleteMarketOrder(parseInt(res), message.client as NypsiClient);
+
+          if (result) {
+            if (type == "buy") {
               await addBalance(message.member, Number(order.itemAmount * order.price));
-            }
-          } else if (type == "sell") {
-            const order = await prisma.marketSellOrder.findFirst({ where: { AND: [{ id: parseInt(res) }, { completed: false }] } });
-            
-            const result = await deleteMarketSellOrder(parseInt(res), message.client as NypsiClient);
-
-            if (result) {
+            } else {
               await addInventoryItem(message.member, order.itemId, Number(order.itemAmount));
             }
           }
@@ -713,7 +699,7 @@ async function run(
       return send({ embeds: [new ErrorEmbed("invalid amount")] });
     }
 
-    if (await getPriceForMarketBuy(item.id, parseInt(amount), message.member.id) == 1) {
+    if (await getPriceForMarketTransaction(item.id, parseInt(amount), "buy", message.member.id) == 1) {
       return send({ embeds: [new ErrorEmbed(`not enough ${item.plural ? item.plural : item.name} on the market`)] });
     }
 
@@ -727,8 +713,8 @@ async function run(
     );
 
     const updateEmbed = async() => {
-      const buyOrders = await getMarketItemBuyOrders(item.id, message.member.id);
-      const sellOrders = await getMarketItemSellOrders(item.id, message.member.id);
+      const buyOrders = await getMarketItemOrders(item.id, "buy", message.member.id);
+      const sellOrders = await getMarketItemOrders(item.id, "sell", message.member.id);
 
       const totalBuyOrderCount = buyOrders.reduce((sum, item) => sum + Number(item.itemAmount), 0);
       const totalSellOrderCount = sellOrders.reduce((sum, item) => sum + Number(item.itemAmount), 0);
@@ -825,7 +811,7 @@ async function run(
       const { res, interaction } = response;
 
       if (res == "buyOne") {
-        if (await getBalance(message.member) < await getPriceForMarketBuy(item.id, 1, message.member.id)) {
+        if (await getBalance(message.member) < await getPriceForMarketTransaction(item.id, 1, "buy", message.member.id)) {
           await await interaction.editReply({
             embeds: [new ErrorEmbed("insufficient funds")],
             options: { ephemeral: true },
@@ -864,7 +850,7 @@ async function run(
             return pageManager();
           }
 
-          if (await getBalance(message.member) < await getPriceForMarketBuy(item.id, formattedAmount, message.member.id)) {
+          if (await getBalance(message.member) < await getPriceForMarketTransaction(item.id, formattedAmount, "buy", message.member.id)) {
             await interaction.editReply({
               embeds: [new ErrorEmbed("insufficient funds")],
               options: { ephemeral: true },
@@ -896,13 +882,13 @@ async function run(
   }
 
   
-  async function confirmTransaction(type: string, item: Item, amount: number, userId: string, msg?: NypsiMessage) {
+  async function confirmTransaction(type: OrderType, item: Item, amount: number, userId: string, msg?: NypsiMessage) {
     const embed = new CustomEmbed(message.member).setHeader(
       `${item.name} market confirmation`,
       getEmojiImage(item.emoji),
     );
 
-    const price = (type == "buy") ? await getPriceForMarketBuy(item.id, amount, userId) : -1; // todo: make selling
+    const price = await getPriceForMarketTransaction(item.id, amount, type, userId)
 
     embed.setDescription(`are you sure you want to ${type} ${amount} ${amount == 1 || !item.plural ? item.name : item.plural} for $${price.toLocaleString()}?`);
 

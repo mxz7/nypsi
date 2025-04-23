@@ -610,8 +610,7 @@ async function run(
       prisma.premiumCommand.count(),
       prisma.username.count(),
       prisma.wordleGame.count(),
-      prisma.marketBuyOrder.count(),
-      prisma.marketSellOrder.count(),
+      prisma.marketOrder.count(),
       prisma.moderationBan.count(),
       prisma.moderationMute.count(),
       prisma.moderationCase.count(),
@@ -633,13 +632,12 @@ async function run(
         `**premium command** ${res[9].toLocaleString()}\n` +
         `**username** ${res[10].toLocaleString()}\n` +
         `**wordle games** ${res[11].toLocaleString()}\n` +
-        `**market buy orders** ${res[12].toLocaleString()}\n` +
-        `**market sell orders** ${res[13].toLocaleString()}\n` +
-        `**bans** ${res[14].toLocaleString()}\n` +
-        `**mutes** ${res[15].toLocaleString()}\n` +
-        `**cases** ${res[16].toLocaleString()}\n` +
-        `**mentions** ${res[17].toLocaleString()}\n` +
-        `**graph data** ${res[18].toLocaleString()}`,
+        `**market orders** ${res[12].toLocaleString()}\n` +
+        `**bans** ${res[13].toLocaleString()}\n` +
+        `**mutes** ${res[14].toLocaleString()}\n` +
+        `**cases** ${res[15].toLocaleString()}\n` +
+        `**mentions** ${res[16].toLocaleString()}\n` +
+        `**graph data** ${res[17].toLocaleString()}`,
     );
 
     return send({ embeds: [embed] });

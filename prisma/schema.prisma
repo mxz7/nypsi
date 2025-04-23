@@ -214,8 +214,7 @@ model Economy {
   Game               Game[]
   Stats              Stats[]
   BakeryUpgrade      BakeryUpgrade[]
-  MarketBuyOrder     MarketBuyOrder[]
-  MarketSellOrder    MarketSellOrder[]
+  MarketOrder        MarketOrder[]
   EconomyGuild       EconomyGuild?
   EconomyGuildMember EconomyGuildMember?
   OffersReceived     Offer[]             @relation(name: "target")
@@ -482,26 +481,18 @@ model FlagGame {
   @@index([userId])
 }
 
-model MarketBuyOrder {
-  id         Int      @id @default(autoincrement())
-  ownerId    String
-  itemId     String
-  itemAmount BigInt   @default(1)
-  price      BigInt
-  createdAt  DateTime @default(now())
-  completed  Boolean  @default(false)
-
-  owner Economy @relation(fields: [ownerId], references: [userId], onDelete: Cascade)
-
-  @@index([itemId])
+enum OrderType {
+  buy
+  sell
 }
 
-model MarketSellOrder {
+model MarketOrder {
   id         Int      @id @default(autoincrement())
   ownerId    String
   itemId     String
   itemAmount BigInt   @default(1)
   price      BigInt
+  orderType  OrderType
   createdAt  DateTime @default(now())
   completed  Boolean  @default(false)
 

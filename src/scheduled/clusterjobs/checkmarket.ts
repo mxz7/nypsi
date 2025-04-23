@@ -3,12 +3,12 @@ import ms = require("ms");
 import prisma from "../../init/database";
 import { NypsiClient } from "../../models/Client";
 import { CustomEmbed } from "../../models/EmbedBuilders";
-import { deleteMarketBuyOrder, deleteMarketSellOrder } from "../../utils/functions/economy/market";
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { getItems, userExists } from "../../utils/functions/economy/utils";
 import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
 import { logger } from "../../utils/logger";
 import { addBalance } from "../../utils/functions/economy/balance";
+import { deleteMarketOrder } from "../../utils/functions/economy/market";
 
 export async function runMarketChecks(client: NypsiClient) {
   setInterval(async () => {
@@ -16,9 +16,9 @@ export async function runMarketChecks(client: NypsiClient) {
 
     const items = getItems();
 
-    const buyOrders = await prisma.marketBuyOrder.findMany({
+    const buyOrders = await prisma.marketOrder.findMany({
       where: {
-        AND: [{ createdAt: { lte: limit } }, { completed: false }],
+        AND: [{ createdAt: { lte: limit } }, { completed: false }, { orderType: "buy" }],
       },
       select: {
         ownerId: true,
@@ -29,9 +29,9 @@ export async function runMarketChecks(client: NypsiClient) {
       },
     });
 
-    const sellOrders = await prisma.marketSellOrder.findMany({
+    const sellOrders = await prisma.marketOrder.findMany({
       where: {
-        AND: [{ createdAt: { lte: limit } }, { completed: false }],
+        AND: [{ createdAt: { lte: limit } }, { completed: false }, { orderType: "sell" }],
       },
       select: {
         ownerId: true,
@@ -42,7 +42,7 @@ export async function runMarketChecks(client: NypsiClient) {
     });
 
     for (const order of buyOrders) {
-      await deleteMarketBuyOrder(order.id, client);
+      await deleteMarketOrder(order.id, client);
 
       if (!(await userExists(order.ownerId))) continue;
 
@@ -68,7 +68,7 @@ export async function runMarketChecks(client: NypsiClient) {
     }
 
     for (const order of sellOrders) {
-      await deleteMarketSellOrder(order.id, client);
+      await deleteMarketOrder(order.id, client);
 
       if (!(await userExists(order.ownerId))) continue;
 
@@ -99,24 +99,14 @@ export async function runMarketChecks(client: NypsiClient) {
 
     limit = dayjs().subtract(180, "days").toDate();
 
-    const { count: deletedCompletedSellOrders } = await prisma.marketSellOrder.deleteMany({
+    const { count: deletedCompletedOrders } = await prisma.marketOrder.deleteMany({
       where: {
         AND: [{ completed: true }, { createdAt: { lte: limit } }],
       },
     });
 
-    if (deletedCompletedSellOrders > 0) {
-      logger.info(`${deletedCompletedSellOrders.toLocaleString()} completed sell orders deleted`);
-    }
-    
-    const { count: deletedCompletedBuyOrders } = await prisma.marketBuyOrder.deleteMany({
-      where: {
-        AND: [{ completed: true }, { createdAt: { lte: limit } }],
-      },
-    });
-
-    if (deletedCompletedBuyOrders > 0) {
-      logger.info(`${deletedCompletedBuyOrders.toLocaleString()} completed buy orders deleted`);
+    if (deletedCompletedOrders > 0) {
+      logger.info(`${deletedCompletedOrders.toLocaleString()} completed market orders deleted`);
     }
 
     const { count: deletedSoldOffers } = await prisma.offer.deleteMany({
