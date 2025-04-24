@@ -26,6 +26,7 @@ import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Comman
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import {
+  checkMarketWatchers,
   deleteMarketOrder,
   deleteMarketWatch,
   getMarketItemOrders,
@@ -255,18 +256,24 @@ async function run(
 
   const items = getItems();
 
-  const viewMarket = async (msg?: NypsiMessage) => {
+  const viewMarket = async (viewRecent: boolean = true, msg?: NypsiMessage) => {
     
-    const recentBuyOrders = await prisma.marketOrder.findMany({
+    const buyOrders = viewRecent ? await prisma.marketOrder.findMany({
       where: { AND: [{ completed: false }, { orderType: "buy" }]},
       orderBy: { createdAt: "desc" },
       take: 5,
+    }) : await prisma.marketOrder.findMany({
+      where: { AND: [{ completed: false }, { orderType: "buy" }, { ownerId: message.member.id }]},
+      orderBy: { createdAt: "desc" },
     });
     
-    const recentSellOrders = await prisma.marketOrder.findMany({
-      where: { AND: [{ completed: false }, { orderType: "sell" }] },
+    const sellOrders = viewRecent ? await prisma.marketOrder.findMany({
+      where: { AND: [{ completed: false }, { orderType: "sell" }]},
       orderBy: { createdAt: "desc" },
       take: 5,
+    }) : await prisma.marketOrder.findMany({
+      where: { AND: [{ completed: false }, { orderType: "sell" }, { ownerId: message.member.id }]},
+      orderBy: { createdAt: "desc" },
     });
 
     
@@ -275,32 +282,37 @@ async function run(
       message.author.avatarURL(),
     );
 
-    embed.setDescription("most recent orders");
+    embed.setDescription(viewRecent ? "most recent orders" : "your orders");
 
     embed.setFields(
       {
         name: "buy orders",
-        value: `${recentBuyOrders.length == 0 ? "none" : recentBuyOrders.map((b) => `- **${b.itemAmount.toLocaleString()}x** ${items[b.itemId].emoji} ${
+        value: `${buyOrders.length == 0 ? "none" : buyOrders.map((b) => `- **${b.itemAmount.toLocaleString()}x** ${items[b.itemId].emoji} ${
           items[b.itemId].name} @ $${b.price.toLocaleString()} ea.`).join("\n")}`,
         inline: true,
       },
       {
         name: "sell orders",
-        value: `${recentSellOrders.length == 0 ? "none" : recentSellOrders.map((b) => `- **${b.itemAmount.toLocaleString()}x** ${items[b.itemId].emoji} ${
+        value: `${sellOrders.length == 0 ? "none" : sellOrders.map((b) => `- **${b.itemAmount.toLocaleString()}x** ${items[b.itemId].emoji} ${
           items[b.itemId].name} @ $${b.price.toLocaleString()} ea.`).join("\n")}`,
         inline: true,
       },
     );
 
-    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+    const topRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder().setCustomId("viewRecent").setLabel("recent orders").setStyle(viewRecent ? ButtonStyle.Success : ButtonStyle.Secondary),
+      new ButtonBuilder().setCustomId("viewOwn").setLabel("your orders").setStyle(viewRecent ? ButtonStyle.Secondary : ButtonStyle.Success),
+    );
+
+    const bottomRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder().setCustomId("mBuy").setLabel("manage buy orders").setStyle(ButtonStyle.Primary),
       new ButtonBuilder().setCustomId("mSell").setLabel("manage sell orders").setStyle(ButtonStyle.Primary),
     );
 
     if (msg) {
-      msg = await msg.edit({ embeds: [embed], components: [row] });
+      msg = await msg.edit({ embeds: [embed], components: [topRow, bottomRow] });
     } else {
-      msg = (await send({ embeds: [embed], components: [row] })) as NypsiMessage;
+      msg = (await send({ embeds: [embed], components: [topRow, bottomRow] })) as NypsiMessage;
     }
     
     const filter = (i: Interaction) => i.user.id == message.author.id;
@@ -331,6 +343,10 @@ async function run(
         return manageOrders("buy", msg);
       } else if (res == "mSell") {
         return manageOrders("sell", msg);
+      } else if (res == "viewRecent") {
+        return viewMarket(true, msg);
+      } else if (res == "viewOwn") {
+        return viewMarket(false, msg);
       }
     };
 
@@ -476,10 +492,10 @@ async function run(
                 orderType: "buy",
               },
             });
+
+            checkMarketWatchers(selected.id, parseInt(amount), message.member.id, type, cost);
             
             await res.editReply({ embeds: [new CustomEmbed(message.member, "✅ your buy order has been created")], options: { ephemeral: true }});
-
-            
           }
           else if (type == "sell") {
             const inventory = await getInventory(message.member);
@@ -508,6 +524,8 @@ async function run(
                 orderType: "sell",
               },
             });
+
+            checkMarketWatchers(selected.id, parseInt(amount), message.member.id, type, cost);
             
             await res.editReply({ embeds: [new CustomEmbed(message.member, "✅ your sell order has been created")], options: { ephemeral: true }});
           }
@@ -536,7 +554,7 @@ async function run(
         await updateEmbed();
         return pageManager();
       } else if (res == "b") {
-        return viewMarket(msg);
+        return viewMarket(true, msg);
       }
     };
 
@@ -637,40 +655,61 @@ async function run(
   if (args.length == 0) {
     return viewMarket();
   } else if (args[0].toLowerCase() == "watch") {
-    let current = await getMarketWatch(message.member);
+    let currentBuy = (await getMarketWatch(message.member)).filter((i) => i.orderType == "buy");
+    let currentSell = (await getMarketWatch(message.member)).filter((i) => i.orderType == "sell");
     let max = 5;
 
     if (await isPremium(message.member)) max *= await getTier(message.member);
 
-    if (current.length > max)
-      current = await setMarketWatch(message.member, current.splice(0, max));
+    if (currentBuy.length > max)
+      currentBuy = await setMarketWatch(message.member, currentBuy.splice(0, max));
+
+    if (currentSell.length > max)
+      currentSell = await setMarketWatch(message.member, currentSell.splice(0, max));
 
     const items = getItems();
 
     if (args.length == 1) {
-      if (current.length == 0) {
+      if (currentBuy.length == 0 && currentSell.length == 0) {
         return send({
           embeds: [
-            new CustomEmbed(message.member, "you are not currently watching for any sell orders"),
+            new CustomEmbed(message.member, "you are not currently watching for any orders"),
           ],
         });
       }
 
-      return send({
-        embeds: [
-          new CustomEmbed(
-            message.member,
-            `you are currently watching: \n\n${current
-              .map(
-                (i) =>
-                  `- ${items[i.itemId].emoji} ${items[i.itemId].name}${
-                    i.maxCost > 0 ? `: $${i.maxCost.toLocaleString()}` : ""
-                  }`,
-              )
-              .join("\n")}`,
-          ).setHeader("market watch", message.author.avatarURL()),
-        ],
-      });
+      const embed = new CustomEmbed(
+        message.member,
+        `you are currently watching: \n`
+      ).setHeader("market watch", message.author.avatarURL());
+
+      
+      embed.setFields(
+        {
+          name: "buy orders",
+          value: `${currentBuy.length == 0 ? "none" : currentBuy
+            .map(
+              (i) =>
+                `- ${items[i.itemId].emoji} ${items[i.itemId].name}${
+                  i.priceThreshold > 0 ? `: min of $${i.priceThreshold.toLocaleString()}` : ""
+                }`,
+            ).join("\n")}`,
+          inline: true,
+        },
+        {
+          name: "sell orders",
+          value: `${currentSell.length == 0 ? "none" : currentSell
+            .map(
+              (i) =>
+                `- ${items[i.itemId].emoji} ${items[i.itemId].name}${
+                  i.priceThreshold > 0 ? `: max of $${i.priceThreshold.toLocaleString()}` : ""
+                }`,
+            ).join("\n")}`,
+          inline: true,
+        },
+      );
+
+      return send({embeds: [embed]});
     }
 
     const selected = selectItem(args[1].toLowerCase());
@@ -688,13 +727,36 @@ async function run(
 
     let desc = "";
 
-    if (current.find((i) => i.itemId === selected.id) && !args[2]) {
-      desc = `✅ removed ${selected.emoji} ${selected.name}`;
+    if (args.length == 2) {
+      if (currentBuy.find((i) => i.itemId === selected.id)) {
 
-      current = await deleteMarketWatch(message.member, selected.id);
+        desc = `✅ removed ${selected.emoji} ${selected.name}`;
+
+        currentBuy = await deleteMarketWatch(message.member, "buy", selected.id);
+      }
+
+      if (currentSell.find((i) => i.itemId === selected.id)) {
+
+        desc = `✅ removed ${selected.emoji} ${selected.name}`;
+
+        currentSell = await deleteMarketWatch(message.member, "sell", selected.id);
+      }
+
+      if (desc == "") return send({
+        embeds: [new ErrorEmbed("/market watch <item> <buy/sell> <amount>")],
+      });
     } else {
-      if (current.length >= max && !current.find((i) => i.itemId === selected.id)) {
-        let desc = `you have reached the limit of market watches (**${max}**)`;
+
+      let type: OrderType;
+
+      if (args[2].startsWith("b")) type = "buy";
+      else if (args[2].startsWith("s")) type = "sell";
+      else return send({
+        embeds: [new ErrorEmbed("invalid order type (buy/sell)")],
+      });
+
+      if ((type == "buy" ? currentBuy : currentSell).length >= max && !(type == "buy" ? currentBuy : currentSell).find((i) => i.itemId === selected.id)) {
+        let desc = `you have reached the limit of ${type} order market watches (**${max}**)`;
 
         if (max == 1) {
           desc += "\n\nyou can upgrade this with premium membership (`/premium`)";
@@ -705,11 +767,21 @@ async function run(
 
       desc = `✅ added ${selected.emoji} ${selected.name}`;
 
-      current = await updateMarketWatch(
-        message.member,
-        selected.id,
-        args[2] ? formatNumber(args[2]) : undefined,
-      );
+      if (type == "buy") {
+        currentBuy = (await updateMarketWatch(
+          message.member,
+          selected.id,
+          type,
+          args[3] ? formatNumber(args[3]) : undefined,
+        )).filter((i) => i.orderType == type);
+      } else {
+        currentSell = (await updateMarketWatch(
+          message.member,
+          selected.id,
+          type,
+          args[3] ? formatNumber(args[3]) : undefined,
+        )).filter((i) => i.orderType == type);
+      }
     }
 
     const embed = new CustomEmbed(message.member, desc).setHeader(
@@ -717,18 +789,32 @@ async function run(
       message.author.avatarURL(),
     );
 
-    if (current.length > 0) {
-      embed.addField(
-        "currently watching",
-        current
-          .map(
-            (i) =>
-              `- ${items[i.itemId].emoji} ${items[i.itemId].name}${
-                i.maxCost > 0 ? `: $${i.maxCost.toLocaleString()}` : ""
-              }`,
-          )
-          .join("\n"),
+    if (currentBuy.length > 0 || currentSell.length > 0) {
+      embed.setFields(
+        {
+          name: "buy orders",
+          value: `${currentBuy.length == 0 ? "none" : currentBuy
+            .map(
+              (i) =>
+                `- ${items[i.itemId].emoji} ${items[i.itemId].name}${
+                  i.priceThreshold > 0 ? `: min of $${i.priceThreshold.toLocaleString()}` : ""
+                }`,
+            ).join("\n")}`,
+          inline: true,
+        },
+        {
+          name: "sell orders",
+          value: `${currentSell.length == 0 ? "none" : currentSell
+            .map(
+              (i) =>
+                `- ${items[i.itemId].emoji} ${items[i.itemId].name}${
+                  i.priceThreshold > 0 ? `: max of $${i.priceThreshold.toLocaleString()}` : ""
+                }`,
+            ).join("\n")}`,
+          inline: true,
+        },
       );
+
     }
 
     return send({ embeds: [embed] });
@@ -831,10 +917,10 @@ async function run(
           orderType: "buy",
         },
       });
+
+      checkMarketWatchers(selected.id, parseInt(amount), message.member.id, type, cost);
       
       return send({ embeds: [new CustomEmbed(message.member, "✅ your buy order has been created")]});
-
-      
     }
     else if (type == "sell") {
       const inventory = await getInventory(message.member);
@@ -857,6 +943,8 @@ async function run(
           orderType: "sell",
         },
       });
+
+      checkMarketWatchers(selected.id, parseInt(amount), message.member.id, type, cost);
       
       return send({ embeds: [new CustomEmbed(message.member, "✅ your sell order has been created")]});
     }
@@ -951,10 +1039,6 @@ async function run(
       const response = await msg
         .awaitMessageComponent({ filter, time: 60000 })
         .then(async (collected) => {
-          if (!collected.customId.toLowerCase().includes("multi")) await collected.deferUpdate().catch(() => {
-            fail = true;
-            return pageManager();
-          });
           return { res: collected.customId, interaction: collected };
         })
         .catch(async () => {
@@ -969,23 +1053,25 @@ async function run(
 
       if (res == "buyOne") {
         if ((await getBalance(message.member)) < await getPriceForMarketTransaction(item.id, 1, "buy", message.member.id)) {
-          await interaction.editReply({
+          await interaction.reply({
             embeds: [new ErrorEmbed("insufficient funds")],
-            options: { ephemeral: true },
+            ephemeral: true,
           });
           await updateEmbed();
           return pageManager();
         }
         
-        const price = await getPriceForMarketTransaction(item.id, 1, "sell", message.member.id);
+        const price = await getPriceForMarketTransaction(item.id, 1, "buy", message.member.id);
         if (price == -1) {
-          await interaction.editReply({
+          await interaction.reply({
             embeds: [new ErrorEmbed("not enough items")],
-            options: { ephemeral: true },
+            ephemeral: true,
           });
           await updateEmbed();
           return pageManager();
         }
+
+        await interaction.deferUpdate();
 
         return confirmTransaction("buy", item, 1, message.member.id, msg);
       } else if (res == "buyMulti") {
@@ -999,7 +1085,7 @@ async function run(
           if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
             await res.reply({
               embeds: [new ErrorEmbed("invalid amount")],
-              options: { ephemeral: true },
+              ephemeral: true,
             });
             await updateEmbed();
             return pageManager();
@@ -1010,7 +1096,7 @@ async function run(
           if (!formattedAmount) {
             await res.reply({
               embeds: [new ErrorEmbed("invalid amount")],
-              options: { ephemeral: true },
+              ephemeral: true,
             });
             await updateEmbed();
             return pageManager();
@@ -1020,7 +1106,7 @@ async function run(
           if (price == -1) {
             await res.reply({
               embeds: [new ErrorEmbed("not enough items")],
-              options: { ephemeral: true },
+              ephemeral: true,
             });
             await updateEmbed();
             return pageManager();
@@ -1029,7 +1115,7 @@ async function run(
           if ((await getBalance(message.member)) < await getPriceForMarketTransaction(item.id, formattedAmount, "buy", message.member.id)) {
             await interaction.reply({
               embeds: [new ErrorEmbed("insufficient funds")],
-              options: { ephemeral: true },
+              ephemeral: true,
             });
             await updateEmbed();
             return pageManager();
@@ -1050,9 +1136,9 @@ async function run(
           !inventory.find((i) => i.item == item.id) ||
           inventory.find((i) => i.item == item.id).amount < 1
         ) {
-          await interaction.editReply({
+          await interaction.reply({
             embeds: [new ErrorEmbed(`you do not have this many ${item.plural ? item.plural : item.name}`)],
-            options: { ephemeral: true },
+            ephemeral: true,
           });
           await updateEmbed();
           return pageManager();
@@ -1060,13 +1146,15 @@ async function run(
         
         const price = await getPriceForMarketTransaction(item.id, 1, "sell", message.member.id);
         if (price == -1) {
-          await interaction.editReply({
+          await interaction.reply({
             embeds: [new ErrorEmbed("not enough items")],
-            options: { ephemeral: true },
+            ephemeral: true,
           });
           await updateEmbed();
           return pageManager();
         }
+
+        await interaction.deferUpdate();
 
         return confirmTransaction("sell", item, 1, message.member.id, msg);
       } else if (res == "sellMulti") {
@@ -1079,7 +1167,7 @@ async function run(
           if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
             await res.reply({
               embeds: [new ErrorEmbed("invalid amount")],
-              options: { ephemeral: true },
+              ephemeral: true,
             });
             await updateEmbed();
             return pageManager();
@@ -1090,7 +1178,7 @@ async function run(
           if (!formattedAmount) {
             await res.reply({
               embeds: [new ErrorEmbed("invalid amount")],
-              options: { ephemeral: true },
+              ephemeral: true,
             });
             await updateEmbed();
             return pageManager();
@@ -1100,7 +1188,7 @@ async function run(
           if (price == -1) {
             await res.reply({
               embeds: [new ErrorEmbed("not enough items")],
-              options: { ephemeral: true },
+              ephemeral: true,
             });
             await updateEmbed();
             return pageManager();
@@ -1129,6 +1217,7 @@ async function run(
         await updateEmbed();
         return pageManager();
       } else if (res == "refresh") {
+        await interaction.deferUpdate();
         await updateEmbed();
         return pageManager();
       } 
@@ -1144,7 +1233,7 @@ async function run(
       getEmojiImage(item.emoji),
     );
 
-    const fromCommand = !msg;
+    const fromCommand = !(msg);
 
     const price = await getPriceForMarketTransaction(item.id, amount, type, userId);
 
@@ -1204,30 +1293,29 @@ async function run(
             await interaction.deferUpdate();
             return await edit({ embeds: [new ErrorEmbed(res.toString())], components: [] }, msg);
           }
-          await interaction.editReply({
+          await interaction.reply({
             embeds: [new ErrorEmbed(res.toString())],
-            options: { ephemeral: true },
+            ephemeral: true,
           });
           return itemView(item, msg);
         }
         
         if (fromCommand) {
-          embed.setDescription(`✅ ${type == "buy" ? "bought" : "sold"} ${amount} ${amount == 1 || !item.plural ? item.name : item.plural} for $${price.toLocaleString()}`);
+          embed.setDescription(`✅ ${type == "buy" ? "bought" : "sold"} ${amount} ${item.emoji} ${amount == 1 || !item.plural ? item.name : item.plural} for $${price.toLocaleString()}`);
           await interaction.deferUpdate();
           return await msg.edit({ embeds: [embed], components: [] });
         }
 
-        await interaction.editReply({
-          embeds: [new CustomEmbed(message.member, "✅ completed")],
-          options: { ephemeral: true },
+        await interaction.reply({
+          embeds: [new CustomEmbed(message.member, `✅ ${type == "buy" ? "bought" : "sold"} ${amount} ${item.emoji} ${amount == 1 || !item.plural ? item.name : item.plural} for $${price.toLocaleString()}`)],
+          ephemeral: true,
         });
         return itemView(item, msg);
       } else if (res == "cancel") {
-        
         if (fromCommand) await edit({ embeds: [embed], components: [] }, msg);
-        await interaction.editReply({
+        await interaction.reply({
           embeds: [new CustomEmbed(message.member, "✅ cancelled")],
-          options: { ephemeral: true },
+          ephemeral: true,
         });
         if (fromCommand) return;
         return itemView(item, msg);

@@ -314,11 +314,12 @@ model Upgrades {
 model MarketWatch {
   userId  String
   itemId  String
-  maxCost BigInt @default(0)
+  orderType OrderType
+  priceThreshold BigInt @default(0)
 
   Economy Economy? @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
-  @@id([userId, itemId])
+  @@id([userId, itemId, orderType])
 }
 
 model BakeryUpgrade {

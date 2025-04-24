@@ -100,22 +100,24 @@ export async function getMarketAverage(item: string) {
   return avg;
 }
 
-export async function updateMarketWatch(member: GuildMember, itemName: string, itemCost?: number) {
+export async function updateMarketWatch(member: GuildMember, itemName: string, type: OrderType, priceThreshold?: number) {
   await prisma.marketWatch.upsert({
     where: {
-      userId_itemId: {
+      userId_itemId_orderType: {
         userId: member.user.id,
         itemId: itemName,
+        orderType: type,
       },
     },
     update: {
       itemId: itemName,
-      maxCost: itemCost,
+      priceThreshold: priceThreshold,
     },
     create: {
       userId: member.user.id,
       itemId: itemName,
-      maxCost: itemCost,
+      priceThreshold: priceThreshold,
+      orderType: type,
     },
   });
 
@@ -129,12 +131,13 @@ export async function setMarketWatch(member: GuildMember, items: MarketWatch[]) 
   return items;
 }
 
-export async function deleteMarketWatch(member: GuildMember, itemId: string) {
+export async function deleteMarketWatch(member: GuildMember, type: OrderType, itemId: string) {
   await prisma.marketWatch.delete({
     where: {
-      userId_itemId: {
+      userId_itemId_orderType: {
         userId: member.user.id,
         itemId: itemId,
+        orderType: type
       },
     },
   });
@@ -155,19 +158,21 @@ export async function getMarketWatch(member: GuildMember) {
     .then((q) => q.MarketWatch);
 }
 
-async function checkWatchers( // todo: make this actually do something
-  itemName: string,
-  messageUrl: string,
+export async function checkMarketWatchers(
+  itemId: string,
+  amount: number,
   creatorId: string,
+  type: OrderType,
   cost: number,
 ) {
   const users = await prisma.marketWatch
     .findMany({
       where: {
         AND: [
-          { itemId: itemName },
+          { itemId: itemId },
           { userId: { not: creatorId } },
-          { OR: [{ maxCost: { gte: Math.floor(cost) } }, { maxCost: 0 }] },
+          { orderType: type },
+          { OR: [{ priceThreshold: (type == "buy" ? { lte: Math.floor(cost) } : { gte: Math.floor(cost) }) }, { priceThreshold: 0 }] },
         ],
       },
       select: {
@@ -179,9 +184,9 @@ async function checkWatchers( // todo: make this actually do something
   const payload = {
     payload: {
       embed: new CustomEmbed().setDescription(
-        `a sell order has been for ${getItems()[itemName].emoji} **[${
-          getItems()[itemName].name
-        }](https://nypsi.xyz/item/${itemName})**`,
+        `a ${type} order has made been for ${amount} ${getItems()[itemId].emoji} **[${
+          amount == 1 || !getItems()[itemId].plural ? getItems()[itemId].name : getItems()[itemId].plural
+        }](https://nypsi.xyz/item/${itemId})**`,
       ),
     },
     memberId: "boob",
@@ -254,9 +259,6 @@ export async function deleteMarketOrder(id: number, client: NypsiClient, repeatC
 export async function getPriceForMarketTransaction(itemId: string, amount: number, type: OrderType, filterOutUserId: string) {
   const orders = await getMarketItemOrders(itemId, (type == "buy" ? "sell" : "buy"), filterOutUserId);
 
-
-  console.log({ itemId, amount, type, filterOutUserId });
-
   let cost = 0;
 
   for (const order of orders) {
@@ -269,8 +271,6 @@ export async function getPriceForMarketTransaction(itemId: string, amount: numbe
       break;
     }
   }
-
-  console.log({ amount, cost })
   
   return amount == 0 ? cost : -1;
 }

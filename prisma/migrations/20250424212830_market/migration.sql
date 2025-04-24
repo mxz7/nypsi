@@ -1,8 +1,15 @@
 -- CreateEnum
 CREATE TYPE "OrderType" AS ENUM ('buy', 'sell');
 
--- RenameTable
-ALTER TABLE "AuctionWatch" RENAME TO "MarketWatch";
+-- CreateTable
+CREATE TABLE "MarketWatch" (
+    "userId" TEXT NOT NULL,
+    "itemId" TEXT NOT NULL,
+    "orderType" "OrderType" NOT NULL,
+    "priceThreshold" BIGINT NOT NULL DEFAULT 0,
+
+    CONSTRAINT "MarketWatch_pkey" PRIMARY KEY ("userId","itemId","orderType")
+);
 
 -- CreateTable
 CREATE TABLE "MarketOrder" (
