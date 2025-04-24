@@ -65,36 +65,58 @@ cmd.slashData
   .addSubcommand((manage) =>
     manage.setName("manage").setDescription("manage your buy and sell orders"),
   )
-  .addSubcommand((create) =>
+  .addSubcommandGroup((create) => 
     create
       .setName("create")
       .setDescription("create a buy or sell order")
-      .addStringOption((option) =>
-        option
-          .setName("type")
-          .setDescription("are you making a buy or sell order?")
-          .setAutocomplete(true)
-          .setRequired(true),
+      .addSubcommand((buy) =>
+        buy
+          .setName("buy")
+          .setDescription("create a buy order")
+          .addStringOption((option) =>
+            option
+              .setName("item-global")
+              .setDescription("which item would you like to buy?")
+              .setAutocomplete(true)
+              .setRequired(true),
+          )
+          .addStringOption((option) =>
+            option
+              .setName("amount")
+              .setDescription("how many of this item?")
+              .setRequired(true),
+          )
+          .addStringOption((option) =>
+            option
+              .setName("price")
+              .setDescription("how much do you want to buy each item for?")
+              .setRequired(true),
+          ),
       )
-      .addStringOption((option) =>
-        option
-          .setName("item")
-          .setDescription("which item are you making an order for?")
-          .setAutocomplete(true)
-          .setRequired(true),
+      .addSubcommand((sell) =>
+        sell
+          .setName("sell")
+          .setDescription("create a sell order")
+          .addStringOption((option) =>
+            option
+              .setName("item")
+              .setDescription("which item would you like to sell?")
+              .setAutocomplete(true)
+              .setRequired(true),
+          )
+          .addStringOption((option) =>
+            option
+              .setName("amount")
+              .setDescription("how many of this item?")
+              .setRequired(true),
+          )
+          .addStringOption((option) =>
+            option
+              .setName("price")
+              .setDescription("how much do you want to sell each item for?")
+              .setRequired(true),
+          ),
       )
-      .addStringOption((option) =>
-        option
-          .setName("amount")
-          .setDescription("how many of this item?")
-          .setRequired(true),
-      )
-      .addStringOption((option) =>
-        option
-          .setName("cost")
-          .setDescription("how much do you want to price each item at?")
-          .setRequired(true),
-      ),
   )
   .addSubcommand((view) =>
     view
@@ -765,7 +787,80 @@ async function run(
     }
 
     return await confirmTransaction("sell", item, parseInt(amount), message.member.id);
-  }
+  } else if (args[0].toLowerCase().includes("create") || args[0].toLowerCase() == "c") {
+    if (args.length < 5) return send({ embeds: [new ErrorEmbed("/market create <buy/sell> <item> <amount> <price>")] });
+
+    const [type, item, amount, price] = args.slice(1, 5);
+
+    const selected = selectItem(item);
+
+    if (type != "buy" && type != "sell") {
+      return send({ embeds: [new ErrorEmbed("invalid order type (buy/sell)")] });
+    }
+
+    if (!selected || selected.account_locked) {
+      return send({ embeds: [new ErrorEmbed("couldnt find that item")] });
+    }
+    
+    if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
+      return send({ embeds: [new ErrorEmbed("invalid amount")] });
+    }
+    
+    if (!parseInt(price) || isNaN(parseInt(price)) || parseInt(price) < 1) {
+      return send({ embeds: [new ErrorEmbed("invalid price")] });
+    }
+    
+    const cost = await formatBet(price.toLowerCase(), message.member).catch(() => {});
+    
+    if (!cost) return send({ embeds: [new ErrorEmbed("invalid price")] });
+    
+    if (type == "buy") {
+
+      if ((await getBalance(message.member)) < parseInt(amount) * cost) {
+        return send({ embeds: [new ErrorEmbed("you dont have enough money")] });
+      }
+
+      await removeBalance(message.member, parseInt(amount) * cost);
+
+      await prisma.marketOrder.create({
+        data: {
+          ownerId: message.member.id,
+          itemId: selected.id,
+          itemAmount: parseInt(amount),
+          price: cost,
+          orderType: "buy",
+        },
+      });
+      
+      return send({ embeds: [new CustomEmbed(message.member, "✅ your buy order has been created")]});
+
+      
+    }
+    else if (type == "sell") {
+      const inventory = await getInventory(message.member);
+
+      if (
+        !inventory.find((i) => i.item == selected.id) ||
+        inventory.find((i) => i.item == selected.id).amount < parseInt(amount)
+      ) {
+        return send({ embeds: [new ErrorEmbed(`you dont have enough ${selected.plural ? selected.plural : selected.name}`)] });
+      }
+
+      await setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - parseInt(amount));
+
+      await prisma.marketOrder.create({
+        data: {
+          ownerId: message.member.id,
+          itemId: selected.id,
+          itemAmount: parseInt(amount),
+          price: cost,
+          orderType: "sell",
+        },
+      });
+      
+      return send({ embeds: [new CustomEmbed(message.member, "✅ your sell order has been created")]});
+    }
+  } else return viewMarket();
 
   async function itemView(item: Item, msg?: NypsiMessage) {
     const embed = new CustomEmbed(message.member).setHeader(
