@@ -761,22 +761,3 @@ export async function marketSell(
 
   return "success";
 }
-
-export async function getItemHistoryGraph(itemId: string) { // todo: make this actually do something
-  if (await redis.exists(`${Constants.redis.cache.economy.MARKET_ITEM_GRAPH_DATA}:${itemId}`)) {
-    return await redis.get(`${Constants.redis.cache.economy.MARKET_ITEM_GRAPH_DATA}:${itemId}`);
-  }
-
-  const res = await itemHistoryWorker(itemId);
-
-  if (typeof res === "string") {
-    await redis.set(
-      `${Constants.redis.cache.economy.MARKET_ITEM_GRAPH_DATA}:${itemId}`,
-      res,
-      "EX",
-      ms("1 day") / 1000,
-    );
-  }
-
-  return res;
-}

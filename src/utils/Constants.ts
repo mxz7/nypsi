@@ -99,7 +99,6 @@ export default {
         SELL_FILTER: "cache:economy:sellallfilter",
         MARKET_AVG: "cache:economy:marketavg",
         OFFER_AVG: "cache:economy:offeravg",
-        MARKET_ITEM_GRAPH_DATA: "cache:economy:market:historydata",
         BAKERY_UPGRADES: "cache:economy:bakery:upgrades",
         BALANCE: "cache:economy:balance",
         BANNED: "cache:economy:banned",
