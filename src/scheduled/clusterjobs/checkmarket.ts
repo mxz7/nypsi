@@ -56,7 +56,7 @@ export async function runMarketChecks(client: NypsiClient) {
         } has expired. you have been given back your money`,
       );
 
-      if ((await getDmSettings(order.ownerId)).auction) {
+      if ((await getDmSettings(order.ownerId)).market) {
         addNotificationToQueue({
           memberId: order.ownerId,
           payload: {
@@ -82,7 +82,7 @@ export async function runMarketChecks(client: NypsiClient) {
         } has expired. you have been given back your item${order.itemAmount > 1 ? "s" : ""}`,
       );
 
-      if ((await getDmSettings(order.ownerId)).auction) {
+      if ((await getDmSettings(order.ownerId)).market) {
         addNotificationToQueue({
           memberId: order.ownerId,
           payload: {
