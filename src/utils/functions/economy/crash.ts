@@ -350,7 +350,7 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
     }
   }
 
-  logger.debug(`crash: ${interaction.user.username} remving balance`);
+  logger.debug(`crash: ${interaction.user.username} removing balance`);
   await removeBalance(interaction.user.id, bet);
 
   status = await getCrashStatus();

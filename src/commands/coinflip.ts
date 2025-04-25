@@ -526,7 +526,7 @@ async function run(
 
       if (playing.has(i.user.id)) {
         i.reply({
-          embeds: [new ErrorEmbed("you already have an outsanding coinflip game")],
+          embeds: [new ErrorEmbed("you already have an outstanding coinflip game")],
           ephemeral: true,
         });
         return false;

@@ -125,7 +125,7 @@ cmd.slashData
       .addSubcommand((add) =>
         add
           .setName("add")
-          .setDescription("add a role to the persistance list")
+          .setDescription("add a role to the persistence list")
           .addRoleOption((option) =>
             option.setName("role").setDescription("role to add to list").setRequired(true),
           ),
@@ -133,7 +133,7 @@ cmd.slashData
       .addSubcommand((remove) =>
         remove
           .setName("remove")
-          .setDescription("remove a role from the persistance list")
+          .setDescription("remove a role from the persistence list")
           .addRoleOption((option) =>
             option.setName("role").setDescription("role to remove from the list").setRequired(true),
           ),
@@ -209,7 +209,7 @@ async function run(
             "/role autojoin remove <role> - remove a role from the autojoin list\n" +
             "/role autojoin list - show all current autojoin roles\n" +
             "/role persist add <role> - add a role to be added back to a user after they leave, if they had it. (data deleted after 30 days)\n" +
-            "/role persist remove <role> - remove a role from the persistance list\n" +
+            "/role persist remove <role> - remove a role from the persistence list\n" +
             "/role persist list - show all current persistent roles\n" +
             "/role members <role> - show members in a role",
         ),

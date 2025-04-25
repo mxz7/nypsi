@@ -214,6 +214,7 @@ model Economy {
   Stats              Stats[]
   BakeryUpgrade      BakeryUpgrade[]
   MarketOrder        MarketOrder[]
+  ItemRequest        ItemRequest[]
   EconomyGuild       EconomyGuild?
   EconomyGuildMember EconomyGuildMember?
   OffersReceived     Offer[]             @relation(name: "target")
@@ -499,6 +500,22 @@ model MarketOrder {
   owner Economy @relation(fields: [ownerId], references: [userId], onDelete: Cascade)
 
   @@index([itemId])
+}
+
+model ItemRequest {
+  id              Int      @id @default(autoincrement())
+  ownerId         String
+
+  requestedItems  String[]
+
+  offeredItems    String[]
+  offeredMoney    BigInt
+
+  messageId       String   @unique
+  createdAt       DateTime @default(now())
+  completed       Boolean  @default(false)
+
+  owner Economy @relation(fields: [ownerId], references: [userId], onDelete: Cascade)
 }
 
 model Offer {
