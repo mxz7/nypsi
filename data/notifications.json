@@ -15,10 +15,10 @@
       "name": "premium notifications",
       "description": "get dm notifications for updates on your premium membership"
     },
-    "auction": {
-      "id": "auction",
-      "name": "auction notifications",
-      "description": "get a dm when someone buys your auctions"
+    "market": {
+      "id": "market",
+      "name": "market notifications",
+      "description": "get a dm when someone buys or fills your market order"
     },
     "voteReminder": {
       "id": "voteReminder",
@@ -97,11 +97,6 @@
       "id": "duelRequests",
       "name": "duel requests",
       "description": "receive coinflip/chatreaction requests"
-    },
-    "auctionConfirm": {
-      "id": "auctionConfirm",
-      "name": "auction confirmation",
-      "description": "require auction confirmation on items more expensive than: ${VALUE} (0 = never)"
     },
     "offers": {
       "id": "offers",

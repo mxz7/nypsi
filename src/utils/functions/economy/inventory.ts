@@ -577,17 +577,17 @@ export async function calcItemValue(item: string) {
   ) {
     itemValue = getItems()[item].sell || 1000;
   } else {
-    const [auctionAvg, offersAvg] = await Promise.all([
+    const [marketAvg, offersAvg] = await Promise.all([
       getMarketAverage(item),
       getOffersAverage(item),
     ]);
 
-    if (!offersAvg && auctionAvg) return auctionAvg;
-    if (!auctionAvg && offersAvg) return offersAvg;
-    if (!auctionAvg && !offersAvg) return undefined;
+    if (!offersAvg && marketAvg) return marketAvg;
+    if (!marketAvg && offersAvg) return offersAvg;
+    if (!marketAvg && !offersAvg) return undefined;
 
     itemValue = Math.floor(
-      [offersAvg, auctionAvg, auctionAvg, auctionAvg].reduce((a, b) => a + b) / 4,
+      [offersAvg, marketAvg, marketAvg, marketAvg].reduce((a, b) => a + b) / 4,
     );
   }
 

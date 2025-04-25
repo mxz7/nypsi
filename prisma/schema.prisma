@@ -110,7 +110,7 @@ model DMSettings {
   rob            Boolean         @default(true)
   lottery        Boolean         @default(true)
   premium        Boolean         @default(true)
-  auction        Boolean         @default(true)
+  market         Boolean         @default(true)
   voteReminder   Boolean         @default(false)
   worker         WorkerDmSetting @default(OnlyWhenFull)
   booster        Boolean         @default(false)
@@ -140,7 +140,6 @@ model Preferences {
   userId String @id
 
   duelRequests   Boolean @default(true)
-  auctionConfirm Int     @default(25000000)
   offers         Int     @default(3)
   leaderboards   Boolean @default(true)
   tips           Boolean @default(true)

@@ -1,6 +1,12 @@
 -- CreateEnum
 CREATE TYPE "OrderType" AS ENUM ('buy', 'sell');
 
+-- AlterTable
+ALTER TABLE "DMSettings" RENAME COLUMN "auction" TO "market";
+
+-- AlterTable
+ALTER TABLE "Preferences" DROP COLUMN "auctionConfirm";
+
 -- CreateTable
 CREATE TABLE "MarketWatch" (
     "userId" TEXT NOT NULL,

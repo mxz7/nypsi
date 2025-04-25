@@ -26,10 +26,12 @@ import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Comman
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import {
+  checkMarketOverlap,
   checkMarketWatchers,
   deleteMarketOrder,
   deleteMarketWatch,
   getMarketItemOrders,
+  getMarketOrders,
   getMarketWatch,
   getPriceForMarketTransaction,
   marketBuy,
@@ -59,64 +61,42 @@ import { getEmojiImage } from "../utils/functions/image";
 import { Item } from "../types/Economy";
 import { OrderType } from "@prisma/client";
 
-const cmd = new Command("market", "create and manage your item auctions", "money").setAliases(["mk"]);
+const cmd = new Command("market", "create and manage your orders on the market", "money").setAliases(["mk"]);
 
 cmd.slashEnabled = true;
 cmd.slashData
   .addSubcommand((manage) =>
     manage.setName("manage").setDescription("manage your buy and sell orders"),
   )
-  .addSubcommandGroup((create) => 
+  .addSubcommand((create) =>
     create
       .setName("create")
       .setDescription("create a buy or sell order")
-      .addSubcommand((buy) =>
-        buy
-          .setName("buy")
-          .setDescription("create a buy order")
-          .addStringOption((option) =>
-            option
-              .setName("item-global")
-              .setDescription("which item would you like to buy?")
-              .setAutocomplete(true)
-              .setRequired(true),
-          )
-          .addStringOption((option) =>
-            option
-              .setName("amount")
-              .setDescription("how many of this item?")
-              .setRequired(true),
-          )
-          .addStringOption((option) =>
-            option
-              .setName("price")
-              .setDescription("how much do you want to buy each item for?")
-              .setRequired(true),
-          ),
+      .addStringOption((option) =>
+        option
+          .setName("item-global")
+          .setDescription("which item?")
+          .setAutocomplete(true)
+          .setRequired(true),
       )
-      .addSubcommand((sell) =>
-        sell
-          .setName("sell")
-          .setDescription("create a sell order")
-          .addStringOption((option) =>
-            option
-              .setName("item")
-              .setDescription("which item would you like to sell?")
-              .setAutocomplete(true)
-              .setRequired(true),
-          )
-          .addStringOption((option) =>
-            option
-              .setName("amount")
-              .setDescription("how many of this item?")
-              .setRequired(true),
-          )
-          .addStringOption((option) =>
-            option
-              .setName("price")
-              .setDescription("how much do you want to sell each item for?")
-              .setRequired(true),
-          ),
+      .addStringOption((option) =>
+        option
+          .setName("order-type")
+          .setDescription("do you want to buy or sell this item?")
+          .setRequired(true)
+          .setAutocomplete(true),
+      )
+      .addStringOption((option) =>
+        option
+          .setName("amount")
+          .setDescription("how many of this item?")
+          .setRequired(true),
+      )
+      .addStringOption((option) =>
+        option
+          .setName("price")
+          .setDescription("how much do you want to sell each item for?")
+          .setRequired(true),
       )
   )
   .addSubcommand((view) =>
@@ -175,13 +155,20 @@ cmd.slashData
         option
           .setName("item-global")
           .setDescription("item you want to toggle on/off")
-          .setRequired(false)
+          .setRequired(true)
           .setAutocomplete(true),
       )
       .addStringOption((option) =>
         option
-          .setName("max-cost")
-          .setDescription("max cost you want to be notified for")
+          .setName("order-type")
+          .setDescription("are you watching for a buy order or sell order?")
+          .setRequired(true)
+          .setAutocomplete(true),
+      )
+      .addStringOption((option) =>
+        option
+          .setName("price")
+          .setDescription("min/max price you want to be notified for")
           .setRequired(false),
       ),
   );
@@ -240,7 +227,7 @@ async function run(
     return;
   }
 
-  await addCooldown(cmd.name, message.member, 5);
+  await addCooldown(cmd.name, message.member, 3);
 
   if (message.author.createdTimestamp > dayjs().subtract(1, "day").valueOf()) {
     return send({
@@ -256,7 +243,7 @@ async function run(
 
   const items = getItems();
 
-  const viewMarket = async (viewRecent: boolean = true, msg?: NypsiMessage) => {
+  const viewMarket = async (viewRecent = true, msg?: NypsiMessage) => {
     
     const buyOrders = viewRecent ? await prisma.marketOrder.findMany({
       where: { AND: [{ completed: false }, { orderType: "buy" }]},
@@ -337,7 +324,7 @@ async function run(
       if (fail) return;
       if (!response) return;
 
-      const { res, interaction } = response;
+      const { res } = response;
 
       if (res == "mBuy") {
         return manageOrders("buy", msg);
@@ -472,9 +459,19 @@ async function run(
           if (type == "buy") {
 
             if ((await getBalance(message.member)) < parseInt(amount) * cost) {
-            
               await res.editReply({
                 embeds: [new ErrorEmbed("you dont have enough money")],
+                options: { ephemeral: true },
+              });
+              await updateEmbed();
+              return pageManager();
+            }
+
+            const userItemSellOrders = (await getMarketOrders(message.member, "sell")).filter((i) => i.itemId = selected.id);
+
+            if (userItemSellOrders && userItemSellOrders.reduce((a, b) => a.price < b.price ? a : b).price < cost) {
+              await res.editReply({
+                embeds: [new ErrorEmbed("you cannot make a buy order for more than your lowest sell order for this item")],
                 options: { ephemeral: true },
               });
               await updateEmbed();
@@ -493,7 +490,8 @@ async function run(
               },
             });
 
-            checkMarketWatchers(selected.id, parseInt(amount), message.member.id, type, cost);
+            await checkMarketOverlap(message.member, selected.id, type);
+            await checkMarketWatchers(selected.id, parseInt(amount), message.member.id, type, cost);
             
             await res.editReply({ embeds: [new CustomEmbed(message.member, "✅ your buy order has been created")], options: { ephemeral: true }});
           }
@@ -513,6 +511,17 @@ async function run(
               return pageManager();
             }
 
+            const userItemBuyOrders = (await getMarketOrders(message.member, "buy")).filter((i) => i.itemId = selected.id);
+
+            if (userItemBuyOrders && userItemBuyOrders.reduce((a, b) => a.price > b.price ? a : b).price > cost) {
+              await res.editReply({
+                embeds: [new ErrorEmbed("you cannot make a sell order for less than your highest buy order for this item")],
+                options: { ephemeral: true },
+              });
+              await updateEmbed();
+              return pageManager();
+            }
+
             await setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - parseInt(amount));
 
             await prisma.marketOrder.create({
@@ -525,7 +534,8 @@ async function run(
               },
             });
 
-            checkMarketWatchers(selected.id, parseInt(amount), message.member.id, type, cost);
+            await checkMarketOverlap(message.member, selected.id, type);
+            await checkMarketWatchers(selected.id, parseInt(amount), message.member.id, type, cost);
             
             await res.editReply({ embeds: [new CustomEmbed(message.member, "✅ your sell order has been created")], options: { ephemeral: true }});
           }
@@ -874,9 +884,9 @@ async function run(
 
     return await confirmTransaction("sell", item, parseInt(amount), message.member.id);
   } else if (args[0].toLowerCase().includes("create") || args[0].toLowerCase() == "c") {
-    if (args.length < 5) return send({ embeds: [new ErrorEmbed("/market create <buy/sell> <item> <amount> <price>")] });
+    if (args.length < 5) return send({ embeds: [new ErrorEmbed("/market create <item> <buy/sell> <amount> <price>")] });
 
-    const [type, item, amount, price] = args.slice(1, 5);
+    const [item, type, amount, price] = args.slice(1, 5);
 
     const selected = selectItem(item);
 
@@ -906,6 +916,12 @@ async function run(
         return send({ embeds: [new ErrorEmbed("you dont have enough money")] });
       }
 
+      const userItemSellOrders = (await getMarketOrders(message.member, "sell")).filter((i) => i.itemId = selected.id);
+
+      if (userItemSellOrders && userItemSellOrders.reduce((a, b) => a.price < b.price ? a : b).price < cost) {
+        return send({ embeds: [new ErrorEmbed("you cannot make a buy order for more than your lowest sell order for this item")] });
+      }
+
       await removeBalance(message.member, parseInt(amount) * cost);
 
       await prisma.marketOrder.create({
@@ -918,7 +934,9 @@ async function run(
         },
       });
 
-      checkMarketWatchers(selected.id, parseInt(amount), message.member.id, type, cost);
+      await checkMarketOverlap(message.member, selected.id, type);
+      await checkMarketWatchers(selected.id, parseInt(amount), message.member.id, type, cost);
+
       
       return send({ embeds: [new CustomEmbed(message.member, "✅ your buy order has been created")]});
     }
@@ -930,6 +948,12 @@ async function run(
         inventory.find((i) => i.item == selected.id).amount < parseInt(amount)
       ) {
         return send({ embeds: [new ErrorEmbed(`you dont have enough ${selected.plural ? selected.plural : selected.name}`)] });
+      }
+      
+      const userItemBuyOrders = (await getMarketOrders(message.member, "buy")).filter((i) => i.itemId = selected.id);
+
+      if (userItemBuyOrders && userItemBuyOrders.reduce((a, b) => a.price > b.price ? a : b).price > cost) {
+        return send({ embeds: [new ErrorEmbed("you cannot make a sell order for less than your highest buy order for this item")] });
       }
 
       await setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - parseInt(amount));
@@ -944,7 +968,8 @@ async function run(
         },
       });
 
-      checkMarketWatchers(selected.id, parseInt(amount), message.member.id, type, cost);
+      await checkMarketOverlap(message.member, selected.id, type);
+      await checkMarketWatchers(selected.id, parseInt(amount), message.member.id, type, cost);
       
       return send({ embeds: [new CustomEmbed(message.member, "✅ your sell order has been created")]});
     }
@@ -957,8 +982,8 @@ async function run(
     );
 
     const updateEmbed = async() => {
-      const buyOrders = await getMarketItemOrders(item.id, "buy", message.member.id);
-      const sellOrders = await getMarketItemOrders(item.id, "sell", message.member.id);
+      const buyOrders = await getMarketItemOrders(item.id, "buy");
+      const sellOrders = await getMarketItemOrders(item.id, "sell");
 
       const totalBuyOrderCount = buyOrders.reduce((sum, item) => sum + Number(item.itemAmount), 0);
       const totalSellOrderCount = sellOrders.reduce((sum, item) => sum + Number(item.itemAmount), 0);
