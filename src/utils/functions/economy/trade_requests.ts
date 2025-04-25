@@ -1,4 +1,4 @@
-import { ItemRequest } from "@prisma/client";
+import { TradeRequest } from "@prisma/client";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -27,7 +27,7 @@ import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 
 const beingFulfilled = new Set<number>();
 
-export async function getItemRequests(member: GuildMember | string) {
+export async function getTradeRequests(member: GuildMember | string) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -35,7 +35,7 @@ export async function getItemRequests(member: GuildMember | string) {
     id = member;
   }
 
-  const query = await prisma.itemRequest.findMany({
+  const query = await prisma.tradeRequest.findMany({
     where: {
       AND: [{ ownerId: id }, { completed: false }],
     },
@@ -44,34 +44,34 @@ export async function getItemRequests(member: GuildMember | string) {
   return query;
 }
 
-export async function getItemRequestByMessage(id: string) {
-  const itemRequest = await prisma.itemRequest.findUnique({
+export async function getTradeRequestByMessage(id: string) {
+  const tradeRequest = await prisma.tradeRequest.findUnique({
     where: {
       messageId: id,
     },
   });
 
-  return itemRequest;
+  return tradeRequest;
 }
 
-export async function deleteItemRequest(id: number, client: NypsiClient, repeatCount = 1) {
+export async function deleteTradeRequest(id: number, client: NypsiClient, repeatCount = 1) {
   if (
     beingFulfilled.has(id) ||
-    (await redis.exists(`${Constants.redis.nypsi.item_request_fulfilling}:${id}`))
+    (await redis.exists(`${Constants.redis.nypsi.TRADE_FULFILLING}:${id}`))
   ) {
     return new Promise((resolve) => {
-      logger.debug(`repeating item request delete - ${id}`);
+      logger.debug(`repeating trade request delete - ${id}`);
       setTimeout(async () => {
         if (repeatCount > 100) {
           beingFulfilled.delete(id);
-          await redis.del(`${Constants.redis.nypsi.item_request_fulfilling}:${id}`);
+          await redis.del(`${Constants.redis.nypsi.TRADE_FULFILLING}:${id}`);
         }
-        resolve(deleteItemRequest(id, client, repeatCount + 1));
+        resolve(deleteTradeRequest(id, client, repeatCount + 1));
       }, 1000);
     });
   }
 
-  const itemRequest = await prisma.itemRequest
+  const tradeRequest = await prisma.tradeRequest
     .findFirst({
       where: {
         AND: [{ id: id }, { completed: false }],
@@ -82,10 +82,10 @@ export async function deleteItemRequest(id: number, client: NypsiClient, repeatC
     })
     .catch(() => {});
 
-  if (itemRequest) {
-    await prisma.itemRequest.delete({
+  if (tradeRequest) {
+    await prisma.tradeRequest.delete({
       where: {
-        messageId: itemRequest.messageId,
+        messageId: tradeRequest.messageId,
       },
       select: {
         id: true,
@@ -112,23 +112,23 @@ export async function deleteItemRequest(id: number, client: NypsiClient, repeatC
         context: {
           guildId: Constants.NYPSI_SERVER_ID,
           channelId: Constants.REQUESTS_CHANNEL_ID,
-          id: itemRequest.messageId,
+          id: tradeRequest.messageId,
         },
       },
     );
   }
 
-  return Boolean(itemRequest);
+  return Boolean(tradeRequest);
 }
 
-export async function createItemRequest(
+export async function createTradeRequest(
   member: GuildMember,
   requestedItems: { item: Item; amount: number }[],
   offeredItems: { item: Item; amount: number }[],
   offeredMoney: number,
 ) {
   const embed = new CustomEmbed(member).setHeader(
-    `${member.user.username}'s item request`,
+    `${member.user.username}'s trade request`,
     member.user.avatarURL(),
   );
 
@@ -148,7 +148,7 @@ export async function createItemRequest(
   );
 
   const buttonRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("fr").setLabel("fulfill request").setStyle(ButtonStyle.Success),
+    new ButtonBuilder().setCustomId("fr").setLabel("fulfill trade request").setStyle(ButtonStyle.Success),
   );
 
   const clusters = await (member.client as NypsiClient).cluster.broadcastEval(
@@ -202,7 +202,7 @@ export async function createItemRequest(
       return res.filter((i) => Boolean(i))[0];
     });
 
-  await prisma.itemRequest.create({
+  await prisma.tradeRequest.create({
     data: {
       requestedItems: requestedItems.map((i) => `${i.item.id}:${i.amount}`),
       offeredItems: offeredItems.map((i) => `${i.item.id}:${i.amount}`),
@@ -215,8 +215,8 @@ export async function createItemRequest(
   return url;
 }
 
-export async function bumpItemRequest(id: number, client: NypsiClient) {
-  const query = await prisma.itemRequest.findUnique({
+export async function bumpTradeRequest(id: number, client: NypsiClient) {
+  const query = await prisma.tradeRequest.findUnique({
     where: {
       id: id,
     },
@@ -247,7 +247,7 @@ export async function bumpItemRequest(id: number, client: NypsiClient) {
     return null;
 
   const embed = new CustomEmbed(query.ownerId).setHeader(
-    `${query.owner.user.lastKnownUsername}'s item request`,
+    `${query.owner.user.lastKnownUsername}'s trade request`,
   );
 
   const items = getItems();
@@ -268,7 +268,7 @@ export async function bumpItemRequest(id: number, client: NypsiClient) {
   );
 
   const buttonRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("fr").setLabel("fulfill request").setStyle(ButtonStyle.Success),
+    new ButtonBuilder().setCustomId("fr").setLabel("fulfill trade request").setStyle(ButtonStyle.Success),
   );
 
   const clusters = await client.cluster.broadcastEval(
@@ -332,7 +332,7 @@ export async function bumpItemRequest(id: number, client: NypsiClient) {
       return res.filter((i) => Boolean(i))[0];
     });
 
-  await prisma.itemRequest.update({
+  await prisma.tradeRequest.update({
     where: {
       id,
     },
@@ -345,20 +345,20 @@ export async function bumpItemRequest(id: number, client: NypsiClient) {
   return messageUrl;
 }
 
-export async function fulfillItemRequest(
+export async function fulfillTradeRequest(
   interaction: ButtonInteraction,
-  itemRequest: ItemRequest,
+  tradeRequest: TradeRequest,
   repeatCount = 1,
 ) {
-  if (beingFulfilled.has(itemRequest.id)) {
+  if (beingFulfilled.has(tradeRequest.id)) {
     return new Promise((resolve) => {
-      logger.debug(`repeating fulfill item request - ${itemRequest.ownerId}`);
+      logger.debug(`repeating fulfill trade request - ${tradeRequest.ownerId}`);
       setTimeout(async () => {
-        if (repeatCount > 100) beingFulfilled.delete(itemRequest.id);
+        if (repeatCount > 100) beingFulfilled.delete(tradeRequest.id);
         resolve(
-          fulfillItemRequest(
+          fulfillTradeRequest(
             interaction,
-            await prisma.itemRequest.findUnique({ where: { id: itemRequest.id } }),
+            await prisma.tradeRequest.findUnique({ where: { id: tradeRequest.id } }),
             repeatCount + 1,
           ),
         );
@@ -366,42 +366,42 @@ export async function fulfillItemRequest(
     });
   }
 
-  beingFulfilled.add(itemRequest.id);
+  beingFulfilled.add(tradeRequest.id);
   await redis.set(
-    `${Constants.redis.nypsi.item_request_fulfilling}:${itemRequest.id}`,
+    `${Constants.redis.nypsi.TRADE_FULFILLING}:${tradeRequest.id}`,
     "d",
     "EX",
     600,
   );
   setTimeout(() => {
-    beingFulfilled.delete(itemRequest.id);
+    beingFulfilled.delete(tradeRequest.id);
   }, ms("5 minutes"));
 
   if (interaction.createdTimestamp < Date.now() - 5000) {
-    beingFulfilled.delete(itemRequest.id);
-    await redis.del(`${Constants.redis.nypsi.item_request_fulfilling}:${itemRequest.id}`);
+    beingFulfilled.delete(tradeRequest.id);
+    await redis.del(`${Constants.redis.nypsi.TRADE_FULFILLING}:${tradeRequest.id}`);
     return;
   }
 
   if (!(await userExists(interaction.user.id))) await createUser(interaction.user.id);
 
-  itemRequest = await prisma.itemRequest.findFirst({
+  tradeRequest = await prisma.tradeRequest.findFirst({
     where: {
       AND: [{ messageId: interaction.message.id }],
     },
   });
 
-  if (!itemRequest) {
-    await interaction.reply({ embeds: [new ErrorEmbed("invalid item request")], ephemeral: true });
+  if (!tradeRequest) {
+    await interaction.reply({ embeds: [new ErrorEmbed("invalid trade request")], ephemeral: true });
     await interaction.message.delete();
-    beingFulfilled.delete(itemRequest.id);
-    await redis.del(`${Constants.redis.nypsi.item_request_fulfilling}:${itemRequest.id}`);
+    beingFulfilled.delete(tradeRequest.id);
+    await redis.del(`${Constants.redis.nypsi.TRADE_FULFILLING}:${tradeRequest.id}`);
     return;
   }
 
-  if (itemRequest.completed) {
-    beingFulfilled.delete(itemRequest.id);
-    await redis.del(`${Constants.redis.nypsi.item_request_fulfilling}:${itemRequest.id}`);
+  if (tradeRequest.completed) {
+    beingFulfilled.delete(tradeRequest.id);
+    await redis.del(`${Constants.redis.nypsi.TRADE_FULFILLING}:${tradeRequest.id}`);
     return await interaction.reply({
       embeds: [new ErrorEmbed("too slow ):").removeTitle()],
       ephemeral: true,
@@ -414,13 +414,13 @@ export async function fulfillItemRequest(
 
   const items = getItems();
 
-  for (const item of itemRequest.requestedItems) {
+  for (const item of tradeRequest.requestedItems) {
     if (
       !inventory.find((i) => i.item == item.split(":")[0]) ||
       inventory.find((i) => i.item == item.split(":")[0]).amount < parseInt(item.split(":")[1])
     ) {
-      beingFulfilled.delete(itemRequest.id);
-      await redis.del(`${Constants.redis.nypsi.item_request_fulfilling}:${itemRequest.id}`);
+      beingFulfilled.delete(tradeRequest.id);
+      await redis.del(`${Constants.redis.nypsi.TRADE_FULFILLING}:${tradeRequest.id}`);
       return await interaction.reply({
         embeds: [new ErrorEmbed("you do not have the required items")],
         ephemeral: true,
@@ -428,19 +428,19 @@ export async function fulfillItemRequest(
     }
   }
 
-  const accounts = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, itemRequest.ownerId);
+  const accounts = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, tradeRequest.ownerId);
 
   if (accounts.includes(interaction.user.id)) {
-    await prisma.itemRequest.delete({
+    await prisma.tradeRequest.delete({
       where: {
-        id: itemRequest.id,
+        id: tradeRequest.id,
       },
     });
   } else {
-    await prisma.itemRequest
+    await prisma.tradeRequest
       .update({
         where: {
-          id: itemRequest.id,
+          id: tradeRequest.id,
         },
         data: {
           completed: true,
@@ -454,14 +454,14 @@ export async function fulfillItemRequest(
 
   let taxedAmount = 0;
 
-  if ((await getTier(itemRequest.ownerId)) !== 4) {
-    taxedAmount = Math.floor(Number(itemRequest.offeredMoney) * tax);
+  if ((await getTier(tradeRequest.ownerId)) !== 4) {
+    taxedAmount = Math.floor(Number(tradeRequest.offeredMoney) * tax);
     addToNypsiBank(taxedAmount);
   }
 
   const fulfillerInventory = await getInventory(interaction.user.id);
 
-  for (const item of itemRequest.requestedItems) {
+  for (const item of tradeRequest.requestedItems) {
     const itemId = item.split(":")[0];
     const amount = parseInt(item.split(":")[1]);
 
@@ -470,63 +470,63 @@ export async function fulfillItemRequest(
       itemId,
       fulfillerInventory.find((i) => i.item == itemId).amount - amount,
     );
-    await addInventoryItem(itemRequest.ownerId, itemId, amount);
+    await addInventoryItem(tradeRequest.ownerId, itemId, amount);
   }
 
-  for (const item of itemRequest.offeredItems) {
+  for (const item of tradeRequest.offeredItems) {
     const itemId = item.split(":")[0];
     const amount = parseInt(item.split(":")[1]);
 
     await addInventoryItem(interaction.user.id, itemId, amount);
   }
 
-  if (itemRequest.offeredMoney > 0) {
-    await addBalance(interaction.user.id, Number(itemRequest.offeredMoney) - taxedAmount);
+  if (tradeRequest.offeredMoney > 0) {
+    await addBalance(interaction.user.id, Number(tradeRequest.offeredMoney) - taxedAmount);
   }
 
-  logger.info(`item request fulfilled owner: ${itemRequest.ownerId} to: ${interaction.user.id}`);
+  logger.info(`trade request fulfilled owner: ${tradeRequest.ownerId} to: ${interaction.user.id}`);
 
   const formattedRequested: string[] = [];
   const formattedOffered: string[] = [];
 
-  for (const item of itemRequest.requestedItems) {
+  for (const item of tradeRequest.requestedItems) {
     formattedRequested.push(item.replace(":", " x "));
   }
 
   formattedRequested[formattedRequested.length - 1] =
-    `${formattedRequested[formattedRequested.length - 1]} (item request)`;
+    `${formattedRequested[formattedRequested.length - 1]} (trade request)`;
 
-  if (itemRequest.offeredMoney > 0) {
-    formattedOffered.push(`$${(Number(itemRequest.offeredMoney) - taxedAmount).toLocaleString()}`);
+  if (tradeRequest.offeredMoney > 0) {
+    formattedOffered.push(`$${(Number(tradeRequest.offeredMoney) - taxedAmount).toLocaleString()}`);
   }
 
-  for (const item of itemRequest.offeredItems) {
+  for (const item of tradeRequest.offeredItems) {
     formattedOffered.push(item.replace(":", " x "));
   }
 
   formattedOffered[formattedOffered.length - 1] =
-    `${formattedOffered[formattedOffered.length - 1]} (item request)`;
+    `${formattedOffered[formattedOffered.length - 1]} (trade request)`;
 
   transactionMulti(
-    await interaction.client.users.fetch(itemRequest.ownerId),
+    await interaction.client.users.fetch(tradeRequest.ownerId),
     interaction.user,
     formattedOffered,
   );
   transactionMulti(
     interaction.user,
-    await interaction.client.users.fetch(itemRequest.ownerId),
+    await interaction.client.users.fetch(tradeRequest.ownerId),
     formattedRequested,
   );
 
-  if ((await getDmSettings(itemRequest.ownerId)).auction) {
-    const embedDm = new CustomEmbed(itemRequest.ownerId).setDescription(
-      `your item request has been fulfilled\n\nyou have received:\n${itemRequest.requestedItems.map((item) => `- **${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} ${items[item.split(":")[0]].name}`).join("\n")}`,
+  if ((await getDmSettings(tradeRequest.ownerId)).market) {
+    const embedDm = new CustomEmbed(tradeRequest.ownerId).setDescription(
+      `your trade request has been fulfilled\n\nyou have received:\n${tradeRequest.requestedItems.map((item) => `- **${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} ${items[item.split(":")[0]].name}`).join("\n")}`,
     );
 
     addNotificationToQueue({
-      memberId: itemRequest.ownerId,
+      memberId: tradeRequest.ownerId,
       payload: {
-        content: `your item request has been fulfilled`,
+        content: `your trade request has been fulfilled`,
         embed: embedDm,
       },
     });
@@ -544,8 +544,8 @@ export async function fulfillItemRequest(
     embed.setFooter({ text: embed.data.footer.text });
   }
 
-  await redis.del(`${Constants.redis.nypsi.item_request_fulfilling}:${itemRequest.id}`);
-  beingFulfilled.delete(itemRequest.id);
+  await redis.del(`${Constants.redis.nypsi.TRADE_FULFILLING}:${tradeRequest.id}`);
+  beingFulfilled.delete(tradeRequest.id);
   await interaction
     .update({ embeds: [embed], components: [] })
     .catch(() => interaction.message.edit({ embeds: [embed], components: [] }));

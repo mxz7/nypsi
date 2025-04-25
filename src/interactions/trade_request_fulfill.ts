@@ -3,7 +3,7 @@ import prisma from "../init/database";
 import { ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
 import { isEcoBanned, userExists } from "../utils/functions/economy/utils";
-import { fulfillItemRequest } from "../utils/functions/economy/item_requests";
+import { fulfillTradeRequest } from "../utils/functions/economy/trade_requests";
 
 export default {
   name: "fr",
@@ -11,38 +11,38 @@ export default {
   async run(interaction) {
     if (!interaction.isButton()) return;
     if ((await isEcoBanned(interaction.user.id)).banned) return;
-    const itemRequest = await prisma.itemRequest.findUnique({
+    const tradeRequest = await prisma.tradeRequest.findUnique({
       where: {
         messageId: interaction.message.id,
       },
     });
 
-    if (!itemRequest) {
+    if (!tradeRequest) {
       await interaction.reply({
-        embeds: [new ErrorEmbed("invalid item request")],
+        embeds: [new ErrorEmbed("invalid trade request")],
         ephemeral: true,
       });
       await interaction.message.delete();
       return;
     }
 
-    if (itemRequest && !itemRequest?.completed && (await userExists(itemRequest.ownerId))) {
-      if (itemRequest.ownerId == interaction.user.id) {
+    if (tradeRequest && !tradeRequest?.completed && (await userExists(tradeRequest.ownerId))) {
+      if (tradeRequest.ownerId == interaction.user.id) {
         return await interaction.reply({
-          embeds: [new ErrorEmbed("you cannot fulfill your own item request")],
+          embeds: [new ErrorEmbed("you cannot fulfill your own trade request")],
           ephemeral: true,
         });
       }
 
-      return fulfillItemRequest(interaction as ButtonInteraction, itemRequest);
-    } else if (itemRequest?.completed) {
+      return fulfillTradeRequest(interaction as ButtonInteraction, tradeRequest);
+    } else if (tradeRequest?.completed) {
       return await interaction.reply({
         embeds: [new ErrorEmbed("too slow ):").removeTitle()],
         ephemeral: true,
       });
     } else {
       await interaction.reply({
-        embeds: [new ErrorEmbed("invalid item request")],
+        embeds: [new ErrorEmbed("invalid trade request")],
         ephemeral: true,
       });
       await interaction.message.delete();

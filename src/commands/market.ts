@@ -573,7 +573,7 @@ async function run(
 
   async function createOrderModal(type: string, interaction: ButtonInteraction) {
     const id = `market-${type}-order-${Math.floor(Math.random() * 69420)}`;
-    const modal = new ModalBuilder().setCustomId(id).setTitle("request item");
+    const modal = new ModalBuilder().setCustomId(id).setTitle(`create ${type} order`);
 
     modal.addComponents(
       new ActionRowBuilder<TextInputBuilder>().addComponents(

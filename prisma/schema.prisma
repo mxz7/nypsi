@@ -214,7 +214,7 @@ model Economy {
   Stats              Stats[]
   BakeryUpgrade      BakeryUpgrade[]
   MarketOrder        MarketOrder[]
-  ItemRequest        ItemRequest[]
+  TradeRequest       TradeRequest[]
   EconomyGuild       EconomyGuild?
   EconomyGuildMember EconomyGuildMember?
   OffersReceived     Offer[]             @relation(name: "target")
@@ -502,7 +502,7 @@ model MarketOrder {
   @@index([itemId])
 }
 
-model ItemRequest {
+model TradeRequest {
   id              Int      @id @default(autoincrement())
   ownerId         String
 

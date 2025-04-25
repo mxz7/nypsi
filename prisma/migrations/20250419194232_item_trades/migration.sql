@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE "ItemRequest" (
+CREATE TABLE "TradeRequest" (
     "id" SERIAL NOT NULL,
     "ownerId" TEXT NOT NULL,
     "requestedItems" TEXT[],
@@ -9,11 +9,11 @@ CREATE TABLE "ItemRequest" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "completed" BOOLEAN NOT NULL DEFAULT false,
 
-    CONSTRAINT "ItemRequest_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "TradeRequest_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "ItemRequest_messageId_key" ON "ItemRequest"("messageId");
+CREATE UNIQUE INDEX "TradeRequest_messageId_key" ON "TradeRequest"("messageId");
 
 -- AddForeignKey
-ALTER TABLE "ItemRequest" ADD CONSTRAINT "ItemRequest_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "Economy"("userId") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "TradeRequest" ADD CONSTRAINT "TradeRequest_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "Economy"("userId") ON DELETE CASCADE ON UPDATE CASCADE;

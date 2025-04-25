@@ -36,11 +36,11 @@ import {
   setInventoryItem,
 } from "../utils/functions/economy/inventory";
 import {
-  bumpItemRequest,
-  createItemRequest,
-  deleteItemRequest,
-  getItemRequests,
-} from "../utils/functions/economy/item_requests";
+  bumpTradeRequest,
+  createTradeRequest,
+  deleteTradeRequest,
+  getTradeRequests,
+} from "../utils/functions/economy/trade_requests";
 import { getRawLevel } from "../utils/functions/economy/levelling";
 import { createUser, formatBet, getItems, userExists } from "../utils/functions/economy/utils";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
@@ -48,9 +48,7 @@ import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
 
-const cmd = new Command("requestitems", "create and manage your item requests", "money").setAliases(
-  ["requestitem", "request"],
-);
+const cmd = new Command("trade", "create and manage your trades", "money").setAliases(["trades"]);
 
 cmd.slashEnabled = false;
 
@@ -118,7 +116,7 @@ async function run(
 
   if ((await getRawLevel(message.member)) < 1) {
     return send({
-      embeds: [new ErrorEmbed("you must be level 1 before you create an item request")],
+      embeds: [new ErrorEmbed("you must be level 1 before you create a trade request")],
     });
   }
 
@@ -127,9 +125,9 @@ async function run(
   let inventory = await getInventory(message.member);
   let balance = await getBalance(message.member);
 
-  const createItemRequestProcess = async (msg: NypsiMessage) => {
+  const createTradeRequestProcess = async (msg: NypsiMessage) => {
     const embed = new CustomEmbed(message.member).setHeader(
-      "create an item request",
+      "create a trade request",
       message.author.avatarURL(),
     );
 
@@ -193,7 +191,7 @@ async function run(
           .setLabel("create")
           .setStyle(ButtonStyle.Success)
           .setDisabled(
-            requestedItems.length == 0 || (offeredItems.length == 0 && offeredMoney == 0),
+            requestedItems.length == 0 || offeredItems.length == 0,
           ),
       );
 
@@ -416,7 +414,7 @@ async function run(
           }
         }
 
-        const itemRequests = await getItemRequests(message.member);
+        const tradeRequests = await getTradeRequests(message.member);
 
         let max = 3;
 
@@ -424,7 +422,7 @@ async function run(
           max += await getTier(message.member);
         }
 
-        if (itemRequests.length >= max)
+        if (tradeRequests.length >= max)
           return interaction.followUp({
             embeds: [new CustomEmbed(message.member, "sneaky bitch")],
             ephemeral: true,
@@ -440,7 +438,7 @@ async function run(
 
         if (offeredMoney > 0) await removeBalance(message.member, offeredMoney);
 
-        const url = await createItemRequest(
+        const url = await createTradeRequest(
           message.member,
           requestedItems,
           offeredItems,
@@ -448,10 +446,10 @@ async function run(
         ).catch((err) => console.log(err));
 
         if (url) {
-          embed.setDescription(`[your item request has been created](${url})`);
+          embed.setDescription(`[your trade request has been created](${url})`);
           embed.setFields();
         } else {
-          embed.setDescription("there was an error while creating your item request");
+          embed.setDescription("there was an error while creating your trade request");
         }
 
         return await edit({ embeds: [embed], components: [] }, msg);
@@ -548,7 +546,7 @@ async function run(
 
   const deleteItem = async (msg: NypsiMessage, items: { item: Item; amount: number }[]) => {
     const embed = new CustomEmbed(message.member).setHeader(
-      "create an item request",
+      "create a trade request",
       message.author.avatarURL(),
     );
 
@@ -596,34 +594,34 @@ async function run(
     return res;
   };
 
-  const manageItemRequests = async (msg?: NypsiMessage) => {
-    const itemRequests = await getItemRequests(message.member);
+  const manageTradeRequests = async (msg?: NypsiMessage) => {
+    const tradeRequests = await getTradeRequests(message.member);
 
     const embed = new CustomEmbed(message.member).setHeader(
-      "your item requests",
+      "your trade requests",
       message.author.avatarURL(),
     );
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>();
 
     let currentPage = 0;
-    const maxPage = itemRequests.length - 1;
+    const maxPage = tradeRequests.length - 1;
 
-    const displayItemRequests = (page: number) => {
+    const displayTradeRequests = (page: number) => {
       embed.setFields(
         {
           name: "requesting",
-          value: `${itemRequests[page].requestedItems.length > 0 ? itemRequests[page].requestedItems.map((item) => `**${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} [${items[item.split(":")[0]].name}](https://nypsi.xyz/item/${item.split(":")[0]})`).join("\n") : "none"}`,
+          value: `${tradeRequests[page].requestedItems.length > 0 ? tradeRequests[page].requestedItems.map((item) => `**${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} [${items[item.split(":")[0]].name}](https://nypsi.xyz/item/${item.split(":")[0]})`).join("\n") : "none"}`,
           inline: true,
         },
         {
           name: "offering",
-          value: `${itemRequests[page].offeredMoney > 0 ? `$${itemRequests[page].offeredMoney.toLocaleString()}` : ""}\n${itemRequests[page].offeredItems.map((item) => `**${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} [${items[item.split(":")[0]].name}](https://nypsi.xyz/item/${item.split(":")[0]})`).join("\n")}`,
+          value: `${tradeRequests[page].offeredMoney > 0 ? `$${tradeRequests[page].offeredMoney.toLocaleString()}` : ""}\n${tradeRequests[page].offeredItems.map((item) => `**${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} [${items[item.split(":")[0]].name}](https://nypsi.xyz/item/${item.split(":")[0]})`).join("\n")}`,
           inline: true,
         },
         {
           name: "created",
-          value: `<t:${Math.floor(itemRequests[page].createdAt.getTime() / 1000)}:R>`,
+          value: `<t:${Math.floor(tradeRequests[page].createdAt.getTime() / 1000)}:R>`,
           inline: true,
         },
       );
@@ -631,26 +629,26 @@ async function run(
     };
 
     const updateButtons = async (page: number) => {
-      if (itemRequests.length > 0) {
+      if (tradeRequests.length > 0) {
         row.setComponents(
           new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary),
           new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
           new ButtonBuilder().setCustomId("del").setLabel("delete").setStyle(ButtonStyle.Danger),
         );
 
-        if (itemRequests.length == 1) {
+        if (tradeRequests.length == 1) {
           row.components[0].setDisabled(true);
           row.components[1].setDisabled(true);
         } else {
           if (page === 0) {
             row.components[0].setDisabled(true);
-          } else if (page === itemRequests.length - 1) {
+          } else if (page === tradeRequests.length - 1) {
             row.components[1].setDisabled(true);
           }
         }
 
         if (
-          dayjs(itemRequests[page].createdAt).isAfter(
+          dayjs(tradeRequests[page].createdAt).isAfter(
             dayjs().subtract((await isPremium(message.author.id)) ? 1 : 12, "hour"),
           )
         ) {
@@ -678,25 +676,25 @@ async function run(
         max += await getTier(message.member);
       }
 
-      if (itemRequests.length < max) {
+      if (tradeRequests.length < max) {
         row.addComponents(
           new ButtonBuilder()
-            .setLabel("create item request")
+            .setLabel("create trade request")
             .setCustomId("y")
             .setStyle(ButtonStyle.Success),
         );
       }
     };
 
-    if (itemRequests.length == 0) {
-      embed.setDescription("you don't currently have any item requests");
-    } else if (itemRequests.length > 1) {
-      displayItemRequests(0);
+    if (tradeRequests.length == 0) {
+      embed.setDescription("you don't currently have any trade requests");
+    } else if (tradeRequests.length > 1) {
+      displayTradeRequests(0);
     } else {
       row.addComponents(
         new ButtonBuilder().setCustomId("del").setLabel("delete").setStyle(ButtonStyle.Danger),
       );
-      displayItemRequests(0);
+      displayTradeRequests(0);
     }
 
     await updateButtons(0);
@@ -732,7 +730,7 @@ async function run(
       const { res, interaction } = response;
 
       if (res == "y") {
-        return createItemRequestProcess(msg);
+        return createTradeRequestProcess(msg);
       } else if (res == "⬅") {
         if (currentPage == 0) {
           return pageManager();
@@ -740,7 +738,7 @@ async function run(
 
         currentPage--;
 
-        displayItemRequests(currentPage);
+        displayTradeRequests(currentPage);
 
         await updateButtons(currentPage);
 
@@ -753,67 +751,67 @@ async function run(
 
         currentPage++;
 
-        displayItemRequests(currentPage);
+        displayTradeRequests(currentPage);
         await updateButtons(currentPage);
 
         await edit({ embeds: [embed], components: [row] }, msg);
         return pageManager();
       } else if (res == "del") {
-        const res = await deleteItemRequest(
-          itemRequests[currentPage].id,
+        const res = await deleteTradeRequest(
+          tradeRequests[currentPage].id,
           message.client as NypsiClient,
         ).catch(() => {});
 
         if (res) {
-          for (const item of itemRequests[currentPage].offeredItems) {
+          for (const item of tradeRequests[currentPage].offeredItems) {
             const itemId = item.split(":")[0];
             const amount = parseInt(item.split(":")[1]);
 
-            await addInventoryItem(itemRequests[currentPage].ownerId, itemId, amount);
+            await addInventoryItem(tradeRequests[currentPage].ownerId, itemId, amount);
           }
 
-          if (itemRequests[currentPage].offeredMoney > 0) {
+          if (tradeRequests[currentPage].offeredMoney > 0) {
             await addBalance(
-              itemRequests[currentPage].ownerId,
-              Number(itemRequests[currentPage].offeredMoney),
+              tradeRequests[currentPage].ownerId,
+              Number(tradeRequests[currentPage].offeredMoney),
             );
           }
 
           await interaction.followUp({
-            embeds: [new CustomEmbed(message.member, "✅ your item request has been deleted")],
+            embeds: [new CustomEmbed(message.member, "✅ your trade request has been deleted")],
             ephemeral: true,
           });
         } else {
           await interaction.followUp({
-            embeds: [new CustomEmbed(message.member, "failed to delete that item request")],
+            embeds: [new CustomEmbed(message.member, "failed to delete that trade request")],
             ephemeral: true,
           });
         }
-
-        return manageItemRequests(msg);
+ 
+        return manageTradeRequests(msg);
       } else if (res === "bump") {
-        const bumpRes = await bumpItemRequest(
-          itemRequests[currentPage].id,
+        const bumpRes = await bumpTradeRequest(
+          tradeRequests[currentPage].id,
           message.client as NypsiClient,
         );
 
         if (!bumpRes) {
           await interaction.followUp({
-            embeds: [new ErrorEmbed("this item request has already been bumped recently")],
+            embeds: [new ErrorEmbed("this trade request has already been bumped recently")],
             ephemeral: true,
           });
-          displayItemRequests(currentPage);
+          displayTradeRequests(currentPage);
           await updateButtons(currentPage);
           await msg.edit({ embeds: [embed], components: [row] });
           return pageManager();
         } else {
           await interaction.followUp({
             embeds: [
-              new CustomEmbed(message.member, `[your item request has been bumped](${bumpRes})`),
+              new CustomEmbed(message.member, `[your trade request has been bumped](${bumpRes})`),
             ],
             ephemeral: true,
           });
-          displayItemRequests(currentPage);
+          displayTradeRequests(currentPage);
           await updateButtons(currentPage);
           await msg.edit({ embeds: [embed], components: [row] });
           return pageManager();
@@ -840,47 +838,47 @@ async function run(
       return message.channel.send({ embeds: [new ErrorEmbed("use the message id dumbass")] });
     }
 
-    const itemRequest = await prisma.itemRequest.findUnique({
+    const tradeRequest = await prisma.tradeRequest.findUnique({
       where: {
         messageId: args[1],
       },
     });
 
-    if (!itemRequest)
-      return message.channel.send({ embeds: [new ErrorEmbed("invalid item request bro")] });
+    if (!tradeRequest)
+      return message.channel.send({ embeds: [new ErrorEmbed("invalid trade request bro")] });
 
     logger.info(
-      `admin: ${message.author.id} (${message.author.username}) deleted item request`,
-      itemRequest,
+      `admin: ${message.author.id} (${message.author.username}) deleted trade request`,
+      tradeRequest,
     );
 
-    if (itemRequest.completed) {
-      await prisma.itemRequest.delete({
+    if (tradeRequest.completed) {
+      await prisma.tradeRequest.delete({
         where: {
-          messageId: itemRequest.messageId,
+          messageId: tradeRequest.messageId,
         },
       });
     } else {
-      await deleteItemRequest(itemRequest.id, message.client as NypsiClient);
+      await deleteTradeRequest(tradeRequest.id, message.client as NypsiClient);
 
-      if (!(await userExists(itemRequest.ownerId))) return;
+      if (!(await userExists(tradeRequest.ownerId))) return;
 
-      for (const item of itemRequest.offeredItems) {
+      for (const item of tradeRequest.offeredItems) {
         const itemId = item.split(":")[0];
         const amount = parseInt(item.split(":")[1]);
 
-        await addInventoryItem(itemRequest.ownerId, itemId, amount);
+        await addInventoryItem(tradeRequest.ownerId, itemId, amount);
       }
 
-      if (itemRequest.offeredMoney > 0) {
-        await addBalance(itemRequest.ownerId, Number(itemRequest.offeredMoney));
+      if (tradeRequest.offeredMoney > 0) {
+        await addBalance(tradeRequest.ownerId, Number(tradeRequest.offeredMoney));
       }
 
-      if ((await getDmSettings(itemRequest.ownerId)).auction) {
+      if ((await getDmSettings(tradeRequest.ownerId)).market) {
         const embed = new CustomEmbed().setColor(Constants.EMBED_FAIL_COLOR);
 
         embed.setDescription(
-          `your item request has been removed by a staff. your items have been returned.`,
+          `your trade request has been removed by a staff. your items have been returned.`,
         );
 
         if (args.length > 2) {
@@ -889,10 +887,10 @@ async function run(
         }
 
         addNotificationToQueue({
-          memberId: itemRequest.ownerId,
+          memberId: tradeRequest.ownerId,
           payload: {
             embed: embed,
-            content: "your item request has been removed by a staff member",
+            content: "your trade request has been removed by a staff member",
           },
         });
       }
@@ -901,7 +899,7 @@ async function run(
     await (message as Message).react("✅");
 
     return;
-  } else return manageItemRequests();
+  } else return manageTradeRequests();
 }
 
 cmd.setRun(run);
