@@ -56,7 +56,12 @@ if (!isMainThread) {
       },
     });
 
-    if (marketBuyOrders.length < 2 && marketSellOrders.length < 2 && offers.length < 2 && itemCount.length < 2) {
+    if (
+      marketBuyOrders.length < 2 &&
+      marketSellOrders.length < 2 &&
+      offers.length < 2 &&
+      itemCount.length < 2
+    ) {
       parentPort.postMessage(null);
       process.exit(0);
     }
@@ -228,18 +233,18 @@ if (!isMainThread) {
       if (marketBuyOrderAverages.has(dateString)) {
         graphData.data.datasets[0].data.push(
           marketBuyOrderAverages.get(dateString).reduce((a, b) => a + b) /
-          marketBuyOrderAverages.get(dateString).length,
+            marketBuyOrderAverages.get(dateString).length,
         );
       } else if (index > 0) {
         graphData.data.datasets[0].data.push(graphData.data.datasets[0].data[index - 1]);
       } else {
         graphData.data.datasets[0].data.push(0);
       }
-      
+
       if (marketSellOrderAverages.has(dateString)) {
         graphData.data.datasets[1].data.push(
           marketSellOrderAverages.get(dateString).reduce((a, b) => a + b) /
-          marketSellOrderAverages.get(dateString).length,
+            marketSellOrderAverages.get(dateString).length,
         );
       } else if (index > 0) {
         graphData.data.datasets[1].data.push(graphData.data.datasets[1].data[index - 1]);

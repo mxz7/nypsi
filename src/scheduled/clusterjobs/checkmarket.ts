@@ -46,7 +46,7 @@ export async function runMarketChecks(client: NypsiClient) {
 
       if (!(await userExists(order.ownerId))) continue;
 
-      await addBalance(order.ownerId, Number(order.price * order.itemAmount))
+      await addBalance(order.ownerId, Number(order.price * order.itemAmount));
 
       const embed = new CustomEmbed(order.ownerId);
 

@@ -190,9 +190,7 @@ async function run(
           .setCustomId("create")
           .setLabel("create")
           .setStyle(ButtonStyle.Success)
-          .setDisabled(
-            requestedItems.length == 0 || offeredItems.length == 0,
-          ),
+          .setDisabled(requestedItems.length == 0 || offeredItems.length == 0),
       );
 
       await edit(
@@ -787,7 +785,7 @@ async function run(
             ephemeral: true,
           });
         }
- 
+
         return manageTradeRequests(msg);
       } else if (res === "bump") {
         const bumpRes = await bumpTradeRequest(

@@ -170,7 +170,7 @@ export default {
       CRASH_STATUS: "nypsi:crash:status",
       FARM_STATUS_DM: "nypsi:farm:status:dm",
       MARKET_IN_TRANSACTION: "nypsi:market:intransaction",
-      TRADE_FULFILLING: "nypsi:trade:fulfilling"
+      TRADE_FULFILLING: "nypsi:trade:fulfilling",
     },
   },
   ANNOUNCEMENTS_CHANNEL_ID: "747057465245564939",

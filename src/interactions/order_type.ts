@@ -15,8 +15,8 @@ export default {
       {
         name: "sell order",
         value: "sell",
-      }
-    ]
+      },
+    ];
 
     return await interaction.respond(formatted);
   },

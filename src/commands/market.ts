@@ -61,7 +61,11 @@ import { getEmojiImage } from "../utils/functions/image";
 import { Item } from "../types/Economy";
 import { OrderType } from "@prisma/client";
 
-const cmd = new Command("market", "create and manage your orders on the market", "money").setAliases(["mk"]);
+const cmd = new Command(
+  "market",
+  "create and manage your orders on the market",
+  "money",
+).setAliases(["mk"]);
 
 cmd.slashEnabled = true;
 cmd.slashData
@@ -87,17 +91,14 @@ cmd.slashData
           .setAutocomplete(true),
       )
       .addStringOption((option) =>
-        option
-          .setName("amount")
-          .setDescription("how many of this item?")
-          .setRequired(true),
+        option.setName("amount").setDescription("how many of this item?").setRequired(true),
       )
       .addStringOption((option) =>
         option
           .setName("price")
           .setDescription("how much do you want to sell each item for?")
           .setRequired(true),
-      )
+      ),
   )
   .addSubcommand((view) =>
     view
@@ -123,11 +124,8 @@ cmd.slashData
           .setRequired(true),
       )
       .addStringOption((option) =>
-        option
-          .setName("amount")
-          .setDescription("how many of this item?")
-          .setRequired(true),
-      )
+        option.setName("amount").setDescription("how many of this item?").setRequired(true),
+      ),
   )
   .addSubcommand((sell) =>
     sell
@@ -141,11 +139,8 @@ cmd.slashData
           .setRequired(true),
       )
       .addStringOption((option) =>
-        option
-          .setName("amount")
-          .setDescription("how many of this item?")
-          .setRequired(true),
-      )
+        option.setName("amount").setDescription("how many of this item?").setRequired(true),
+      ),
   )
   .addSubcommand((watch) =>
     watch
@@ -244,26 +239,32 @@ async function run(
   const items = getItems();
 
   const viewMarket = async (viewRecent = true, msg?: NypsiMessage) => {
-    
-    const buyOrders = viewRecent ? await prisma.marketOrder.findMany({
-      where: { AND: [{ completed: false }, { orderType: "buy" }]},
-      orderBy: { createdAt: "desc" },
-      take: 5,
-    }) : await prisma.marketOrder.findMany({
-      where: { AND: [{ completed: false }, { orderType: "buy" }, { ownerId: message.member.id }]},
-      orderBy: { createdAt: "desc" },
-    });
-    
-    const sellOrders = viewRecent ? await prisma.marketOrder.findMany({
-      where: { AND: [{ completed: false }, { orderType: "sell" }]},
-      orderBy: { createdAt: "desc" },
-      take: 5,
-    }) : await prisma.marketOrder.findMany({
-      where: { AND: [{ completed: false }, { orderType: "sell" }, { ownerId: message.member.id }]},
-      orderBy: { createdAt: "desc" },
-    });
+    const buyOrders = viewRecent
+      ? await prisma.marketOrder.findMany({
+          where: { AND: [{ completed: false }, { orderType: "buy" }] },
+          orderBy: { createdAt: "desc" },
+          take: 5,
+        })
+      : await prisma.marketOrder.findMany({
+          where: {
+            AND: [{ completed: false }, { orderType: "buy" }, { ownerId: message.member.id }],
+          },
+          orderBy: { createdAt: "desc" },
+        });
 
-    
+    const sellOrders = viewRecent
+      ? await prisma.marketOrder.findMany({
+          where: { AND: [{ completed: false }, { orderType: "sell" }] },
+          orderBy: { createdAt: "desc" },
+          take: 5,
+        })
+      : await prisma.marketOrder.findMany({
+          where: {
+            AND: [{ completed: false }, { orderType: "sell" }, { ownerId: message.member.id }],
+          },
+          orderBy: { createdAt: "desc" },
+        });
+
     const embed = new CustomEmbed(message.member).setHeader(
       "the market",
       message.author.avatarURL(),
@@ -274,26 +275,58 @@ async function run(
     embed.setFields(
       {
         name: "buy orders",
-        value: `${buyOrders.length == 0 ? "none" : buyOrders.map((b) => `- **${b.itemAmount.toLocaleString()}x** ${items[b.itemId].emoji} ${
-          items[b.itemId].name} @ $${b.price.toLocaleString()} ea.`).join("\n")}`,
+        value: `${
+          buyOrders.length == 0
+            ? "none"
+            : buyOrders
+                .map(
+                  (b) =>
+                    `- **${b.itemAmount.toLocaleString()}x** ${items[b.itemId].emoji} ${
+                      items[b.itemId].name
+                    } @ $${b.price.toLocaleString()} ea.`,
+                )
+                .join("\n")
+        }`,
         inline: true,
       },
       {
         name: "sell orders",
-        value: `${sellOrders.length == 0 ? "none" : sellOrders.map((b) => `- **${b.itemAmount.toLocaleString()}x** ${items[b.itemId].emoji} ${
-          items[b.itemId].name} @ $${b.price.toLocaleString()} ea.`).join("\n")}`,
+        value: `${
+          sellOrders.length == 0
+            ? "none"
+            : sellOrders
+                .map(
+                  (b) =>
+                    `- **${b.itemAmount.toLocaleString()}x** ${items[b.itemId].emoji} ${
+                      items[b.itemId].name
+                    } @ $${b.price.toLocaleString()} ea.`,
+                )
+                .join("\n")
+        }`,
         inline: true,
       },
     );
 
     const topRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("viewRecent").setLabel("recent orders").setStyle(viewRecent ? ButtonStyle.Success : ButtonStyle.Secondary),
-      new ButtonBuilder().setCustomId("viewOwn").setLabel("your orders").setStyle(viewRecent ? ButtonStyle.Secondary : ButtonStyle.Success),
+      new ButtonBuilder()
+        .setCustomId("viewRecent")
+        .setLabel("recent orders")
+        .setStyle(viewRecent ? ButtonStyle.Success : ButtonStyle.Secondary),
+      new ButtonBuilder()
+        .setCustomId("viewOwn")
+        .setLabel("your orders")
+        .setStyle(viewRecent ? ButtonStyle.Secondary : ButtonStyle.Success),
     );
 
     const bottomRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("mBuy").setLabel("manage buy orders").setStyle(ButtonStyle.Primary),
-      new ButtonBuilder().setCustomId("mSell").setLabel("manage sell orders").setStyle(ButtonStyle.Primary),
+      new ButtonBuilder()
+        .setCustomId("mBuy")
+        .setLabel("manage buy orders")
+        .setStyle(ButtonStyle.Primary),
+      new ButtonBuilder()
+        .setCustomId("mSell")
+        .setLabel("manage sell orders")
+        .setStyle(ButtonStyle.Primary),
     );
 
     if (msg) {
@@ -301,7 +334,7 @@ async function run(
     } else {
       msg = (await send({ embeds: [embed], components: [topRow, bottomRow] })) as NypsiMessage;
     }
-    
+
     const filter = (i: Interaction) => i.user.id == message.author.id;
 
     const pageManager: any = async () => {
@@ -338,14 +371,13 @@ async function run(
     };
 
     return pageManager();
+  };
 
-  }
-
-  const manageOrders = async (type: OrderType, msg?: NypsiMessage) => {    
+  const manageOrders = async (type: OrderType, msg?: NypsiMessage) => {
     const embed = new CustomEmbed(message.member).setHeader(
       `${type} orders`,
       message.author.avatarURL(),
-    );    
+    );
 
     let orders = await prisma.marketOrder.findMany({
       where: {
@@ -354,7 +386,7 @@ async function run(
       orderBy: { createdAt: "desc" },
     });
 
-    const updateEmbed = async() => {
+    const updateEmbed = async () => {
       orders = await prisma.marketOrder.findMany({
         where: {
           AND: [{ ownerId: message.member.id }, { completed: false }, { orderType: type }],
@@ -363,28 +395,35 @@ async function run(
       });
 
       embed.setFields({
-          name: `your ${type} orders`,
-          value: `${orders.length == 0 ? "none" : orders.map((b) => `- **${b.itemAmount.toLocaleString()}x** ${items[b.itemId].emoji} ${items[b.itemId].name} @ $${b.price.toLocaleString()} ea.`).join("\n")}`,
+        name: `your ${type} orders`,
+        value: `${orders.length == 0 ? "none" : orders.map((b) => `- **${b.itemAmount.toLocaleString()}x** ${items[b.itemId].emoji} ${items[b.itemId].name} @ $${b.price.toLocaleString()} ea.`).join("\n")}`,
       });
-  
+
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder().setCustomId("newOrder").setLabel("create order").setStyle(ButtonStyle.Primary),
-        new ButtonBuilder().setCustomId("delOrder").setLabel("delete order").setStyle(ButtonStyle.Danger).setDisabled(orders.length == 0),
+        new ButtonBuilder()
+          .setCustomId("newOrder")
+          .setLabel("create order")
+          .setStyle(ButtonStyle.Primary),
+        new ButtonBuilder()
+          .setCustomId("delOrder")
+          .setLabel("delete order")
+          .setStyle(ButtonStyle.Danger)
+          .setDisabled(orders.length == 0),
       );
-  
+
       const bottomRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setCustomId("b").setLabel("back").setStyle(ButtonStyle.Secondary),
       );
-  
+
       if (msg) {
         msg = await msg.edit({ embeds: [embed], components: [row, bottomRow] });
       } else {
         msg = (await send({ embeds: [embed], components: [row, bottomRow] })) as NypsiMessage;
       }
-    }
+    };
 
     await updateEmbed();
-    
+
     const filter = (i: Interaction) => i.user.id == message.author.id;
 
     const pageManager: any = async () => {
@@ -415,7 +454,7 @@ async function run(
 
         if (res) {
           await res.deferReply({ ephemeral: true });
-          
+
           const item = res.fields.fields.get("item").value;
           const amount = res.fields.fields.get("amount").value;
           const price = res.fields.fields.get("price").value;
@@ -444,9 +483,9 @@ async function run(
             await updateEmbed();
             return pageManager();
           }
-          
+
           const cost = await formatBet(price.toLowerCase(), message.member).catch(() => {});
-          
+
           if (!cost) {
             await res.editReply({
               embeds: [new ErrorEmbed("invalid price")],
@@ -455,9 +494,8 @@ async function run(
             await updateEmbed();
             return pageManager();
           }
-          
-          if (type == "buy") {
 
+          if (type == "buy") {
             if ((await getBalance(message.member)) < parseInt(amount) * cost) {
               await res.editReply({
                 embeds: [new ErrorEmbed("you dont have enough money")],
@@ -467,11 +505,20 @@ async function run(
               return pageManager();
             }
 
-            const userItemSellOrders = (await getMarketOrders(message.member, "sell")).filter((i) => i.itemId = selected.id);
+            const userItemSellOrders = (await getMarketOrders(message.member, "sell")).filter(
+              (i) => (i.itemId = selected.id),
+            );
 
-            if (userItemSellOrders && userItemSellOrders.reduce((a, b) => a.price < b.price ? a : b).price < cost) {
+            if (
+              userItemSellOrders &&
+              userItemSellOrders.reduce((a, b) => (a.price < b.price ? a : b)).price < cost
+            ) {
               await res.editReply({
-                embeds: [new ErrorEmbed("you cannot make a buy order for more than your lowest sell order for this item")],
+                embeds: [
+                  new ErrorEmbed(
+                    "you cannot make a buy order for more than your lowest sell order for this item",
+                  ),
+                ],
                 options: { ephemeral: true },
               });
               await updateEmbed();
@@ -492,37 +539,55 @@ async function run(
 
             await checkMarketOverlap(message.member, selected.id, type);
             await checkMarketWatchers(selected.id, parseInt(amount), message.member.id, type, cost);
-            
-            await res.editReply({ embeds: [new CustomEmbed(message.member, "✅ your buy order has been created")], options: { ephemeral: true }});
-          }
-          else if (type == "sell") {
+
+            await res.editReply({
+              embeds: [new CustomEmbed(message.member, "✅ your buy order has been created")],
+              options: { ephemeral: true },
+            });
+          } else if (type == "sell") {
             const inventory = await getInventory(message.member);
 
             if (
               !inventory.find((i) => i.item == selected.id) ||
               inventory.find((i) => i.item == selected.id).amount < parseInt(amount)
             ) {
-            
               await res.editReply({
-                embeds: [new ErrorEmbed(`you dont have enough ${selected.plural ? selected.plural : selected.name}`)],
+                embeds: [
+                  new ErrorEmbed(
+                    `you dont have enough ${selected.plural ? selected.plural : selected.name}`,
+                  ),
+                ],
                 options: { ephemeral: true },
               });
               await updateEmbed();
               return pageManager();
             }
 
-            const userItemBuyOrders = (await getMarketOrders(message.member, "buy")).filter((i) => i.itemId = selected.id);
+            const userItemBuyOrders = (await getMarketOrders(message.member, "buy")).filter(
+              (i) => (i.itemId = selected.id),
+            );
 
-            if (userItemBuyOrders && userItemBuyOrders.reduce((a, b) => a.price > b.price ? a : b).price > cost) {
+            if (
+              userItemBuyOrders &&
+              userItemBuyOrders.reduce((a, b) => (a.price > b.price ? a : b)).price > cost
+            ) {
               await res.editReply({
-                embeds: [new ErrorEmbed("you cannot make a sell order for less than your highest buy order for this item")],
+                embeds: [
+                  new ErrorEmbed(
+                    "you cannot make a sell order for less than your highest buy order for this item",
+                  ),
+                ],
                 options: { ephemeral: true },
               });
               await updateEmbed();
               return pageManager();
             }
 
-            await setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - parseInt(amount));
+            await setInventoryItem(
+              message.member,
+              selected.id,
+              inventory.find((i) => i.item == selected.id).amount - parseInt(amount),
+            );
 
             await prisma.marketOrder.create({
               data: {
@@ -536,19 +601,24 @@ async function run(
 
             await checkMarketOverlap(message.member, selected.id, type);
             await checkMarketWatchers(selected.id, parseInt(amount), message.member.id, type, cost);
-            
-            await res.editReply({ embeds: [new CustomEmbed(message.member, "✅ your sell order has been created")], options: { ephemeral: true }});
+
+            await res.editReply({
+              embeds: [new CustomEmbed(message.member, "✅ your sell order has been created")],
+              options: { ephemeral: true },
+            });
           }
         }
 
         await updateEmbed();
         return pageManager();
       } else if (res == "delOrder") {
-        const res = orders.length == 1 ? orders[0].id.toString() : await deleteOrder(type, msg, orders);
+        const res =
+          orders.length == 1 ? orders[0].id.toString() : await deleteOrder(type, msg, orders);
 
         if (res) {
-
-          const order = await prisma.marketOrder.findFirst({ where: { AND: [{ id: parseInt(res) }, { completed: false }, { orderType: type }] } });
+          const order = await prisma.marketOrder.findFirst({
+            where: { AND: [{ id: parseInt(res) }, { completed: false }, { orderType: type }] },
+          });
 
           const result = await deleteMarketOrder(parseInt(res), message.client as NypsiClient);
 
@@ -569,7 +639,7 @@ async function run(
     };
 
     return pageManager();
-  }
+  };
 
   async function createOrderModal(type: string, interaction: ButtonInteraction) {
     const id = `market-${type}-order-${Math.floor(Math.random() * 69420)}`;
@@ -610,7 +680,11 @@ async function run(
     return await interaction.awaitModalSubmit({ filter, time: 30000 }).catch(() => {});
   }
 
-  const deleteOrder = async (type: string, msg: NypsiMessage, orders: { itemId: string; itemAmount: bigint; price: bigint; id: number }[]) => {
+  const deleteOrder = async (
+    type: string,
+    msg: NypsiMessage,
+    orders: { itemId: string; itemAmount: bigint; price: bigint; id: number }[],
+  ) => {
     const embed = new CustomEmbed(message.member).setHeader(
       `delete ${type} order`,
       message.author.avatarURL(),
@@ -627,7 +701,9 @@ async function run(
         new StringSelectMenuOptionBuilder()
           .setValue(order.id.toString())
           .setEmoji(items[order.itemId].emoji as APIMessageComponentEmoji)
-          .setLabel(`${order.itemAmount.toLocaleString()}x ${items[order.itemId].name} @ $${order.price.toLocaleString()} ea.`),
+          .setLabel(
+            `${order.itemAmount.toLocaleString()}x ${items[order.itemId].name} @ $${order.price.toLocaleString()} ea.`,
+          ),
       );
     }
 
@@ -688,38 +764,47 @@ async function run(
         });
       }
 
-      const embed = new CustomEmbed(
-        message.member,
-        `you are currently watching: \n`
-      ).setHeader("market watch", message.author.avatarURL());
+      const embed = new CustomEmbed(message.member, `you are currently watching: \n`).setHeader(
+        "market watch",
+        message.author.avatarURL(),
+      );
 
-      
       embed.setFields(
         {
           name: "buy orders",
-          value: `${currentBuy.length == 0 ? "none" : currentBuy
-            .map(
-              (i) =>
-                `- ${items[i.itemId].emoji} ${items[i.itemId].name}${
-                  i.priceThreshold > 0 ? `: min of $${i.priceThreshold.toLocaleString()}` : ""
-                }`,
-            ).join("\n")}`,
+          value: `${
+            currentBuy.length == 0
+              ? "none"
+              : currentBuy
+                  .map(
+                    (i) =>
+                      `- ${items[i.itemId].emoji} ${items[i.itemId].name}${
+                        i.priceThreshold > 0 ? `: min of $${i.priceThreshold.toLocaleString()}` : ""
+                      }`,
+                  )
+                  .join("\n")
+          }`,
           inline: true,
         },
         {
           name: "sell orders",
-          value: `${currentSell.length == 0 ? "none" : currentSell
-            .map(
-              (i) =>
-                `- ${items[i.itemId].emoji} ${items[i.itemId].name}${
-                  i.priceThreshold > 0 ? `: max of $${i.priceThreshold.toLocaleString()}` : ""
-                }`,
-            ).join("\n")}`,
+          value: `${
+            currentSell.length == 0
+              ? "none"
+              : currentSell
+                  .map(
+                    (i) =>
+                      `- ${items[i.itemId].emoji} ${items[i.itemId].name}${
+                        i.priceThreshold > 0 ? `: max of $${i.priceThreshold.toLocaleString()}` : ""
+                      }`,
+                  )
+                  .join("\n")
+          }`,
           inline: true,
         },
       );
 
-      return send({embeds: [embed]});
+      return send({ embeds: [embed] });
     }
 
     const selected = selectItem(args[1].toLowerCase());
@@ -739,33 +824,35 @@ async function run(
 
     if (args.length == 2) {
       if (currentBuy.find((i) => i.itemId === selected.id)) {
-
         desc = `✅ removed ${selected.emoji} ${selected.name}`;
 
         currentBuy = await deleteMarketWatch(message.member, "buy", selected.id);
       }
 
       if (currentSell.find((i) => i.itemId === selected.id)) {
-
         desc = `✅ removed ${selected.emoji} ${selected.name}`;
 
         currentSell = await deleteMarketWatch(message.member, "sell", selected.id);
       }
 
-      if (desc == "") return send({
-        embeds: [new ErrorEmbed("/market watch <item> <buy/sell> <amount>")],
-      });
+      if (desc == "")
+        return send({
+          embeds: [new ErrorEmbed("/market watch <item> <buy/sell> <amount>")],
+        });
     } else {
-
       let type: OrderType;
 
       if (args[2].startsWith("b")) type = "buy";
       else if (args[2].startsWith("s")) type = "sell";
-      else return send({
-        embeds: [new ErrorEmbed("invalid order type (buy/sell)")],
-      });
+      else
+        return send({
+          embeds: [new ErrorEmbed("invalid order type (buy/sell)")],
+        });
 
-      if ((type == "buy" ? currentBuy : currentSell).length >= max && !(type == "buy" ? currentBuy : currentSell).find((i) => i.itemId === selected.id)) {
+      if (
+        (type == "buy" ? currentBuy : currentSell).length >= max &&
+        !(type == "buy" ? currentBuy : currentSell).find((i) => i.itemId === selected.id)
+      ) {
         let desc = `you have reached the limit of ${type} order market watches (**${max}**)`;
 
         if (max == 1) {
@@ -778,19 +865,23 @@ async function run(
       desc = `✅ added ${selected.emoji} ${selected.name}`;
 
       if (type == "buy") {
-        currentBuy = (await updateMarketWatch(
-          message.member,
-          selected.id,
-          type,
-          args[3] ? formatNumber(args[3]) : undefined,
-        )).filter((i) => i.orderType == type);
+        currentBuy = (
+          await updateMarketWatch(
+            message.member,
+            selected.id,
+            type,
+            args[3] ? formatNumber(args[3]) : undefined,
+          )
+        ).filter((i) => i.orderType == type);
       } else {
-        currentSell = (await updateMarketWatch(
-          message.member,
-          selected.id,
-          type,
-          args[3] ? formatNumber(args[3]) : undefined,
-        )).filter((i) => i.orderType == type);
+        currentSell = (
+          await updateMarketWatch(
+            message.member,
+            selected.id,
+            type,
+            args[3] ? formatNumber(args[3]) : undefined,
+          )
+        ).filter((i) => i.orderType == type);
       }
     }
 
@@ -803,32 +894,45 @@ async function run(
       embed.setFields(
         {
           name: "buy orders",
-          value: `${currentBuy.length == 0 ? "none" : currentBuy
-            .map(
-              (i) =>
-                `- ${items[i.itemId].emoji} ${items[i.itemId].name}${
-                  i.priceThreshold > 0 ? `: min of $${i.priceThreshold.toLocaleString()}` : ""
-                }`,
-            ).join("\n")}`,
+          value: `${
+            currentBuy.length == 0
+              ? "none"
+              : currentBuy
+                  .map(
+                    (i) =>
+                      `- ${items[i.itemId].emoji} ${items[i.itemId].name}${
+                        i.priceThreshold > 0 ? `: min of $${i.priceThreshold.toLocaleString()}` : ""
+                      }`,
+                  )
+                  .join("\n")
+          }`,
           inline: true,
         },
         {
           name: "sell orders",
-          value: `${currentSell.length == 0 ? "none" : currentSell
-            .map(
-              (i) =>
-                `- ${items[i.itemId].emoji} ${items[i.itemId].name}${
-                  i.priceThreshold > 0 ? `: max of $${i.priceThreshold.toLocaleString()}` : ""
-                }`,
-            ).join("\n")}`,
+          value: `${
+            currentSell.length == 0
+              ? "none"
+              : currentSell
+                  .map(
+                    (i) =>
+                      `- ${items[i.itemId].emoji} ${items[i.itemId].name}${
+                        i.priceThreshold > 0 ? `: max of $${i.priceThreshold.toLocaleString()}` : ""
+                      }`,
+                  )
+                  .join("\n")
+          }`,
           inline: true,
         },
       );
-
     }
 
     return send({ embeds: [embed] });
-  } else if (args[0].toLowerCase().includes("search") || args[0].toLowerCase().includes("find") || args[0].toLowerCase().includes("view")) {
+  } else if (
+    args[0].toLowerCase().includes("search") ||
+    args[0].toLowerCase().includes("find") ||
+    args[0].toLowerCase().includes("view")
+  ) {
     if (args.length === 1) return send({ embeds: [new ErrorEmbed("/market search <item>")] });
 
     const item = selectItem(args.slice(1).join(" "));
@@ -844,47 +948,67 @@ async function run(
     if (!item) return send({ embeds: [new ErrorEmbed("invalid item")] });
 
     const amount = args[2] ?? "1";
-    
+
     if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
       return send({ embeds: [new ErrorEmbed("invalid amount")] });
     }
 
-    if (await getPriceForMarketTransaction(item.id, parseInt(amount), "buy", message.member.id) == -1) {
-      return send({ embeds: [new ErrorEmbed(`not enough ${item.plural ? item.plural : item.name} on the market`)] });
+    if (
+      (await getPriceForMarketTransaction(item.id, parseInt(amount), "buy", message.member.id)) ==
+      -1
+    ) {
+      return send({
+        embeds: [
+          new ErrorEmbed(`not enough ${item.plural ? item.plural : item.name} on the market`),
+        ],
+      });
     }
 
     return await confirmTransaction("buy", item, parseInt(amount), message.member.id);
   } else if (args[0].toLowerCase().includes("sell")) {
-    if (args.length === 1) return send({ embeds: [new ErrorEmbed("/market sell <item> <amount>")] });
+    if (args.length === 1)
+      return send({ embeds: [new ErrorEmbed("/market sell <item> <amount>")] });
 
     const item = selectItem(args[1]);
 
     if (!item) return send({ embeds: [new ErrorEmbed("invalid item")] });
 
     const amount = args[2] ?? "1";
-    
+
     if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
       return send({ embeds: [new ErrorEmbed("invalid amount")] });
     }
-    
-    if (await getPriceForMarketTransaction(item.id, parseInt(amount), "sell", message.member.id) == -1) {
-      return send({ embeds: [new ErrorEmbed(`not enough ${item.plural ? item.plural : item.name} on the market`)] });
+
+    if (
+      (await getPriceForMarketTransaction(item.id, parseInt(amount), "sell", message.member.id)) ==
+      -1
+    ) {
+      return send({
+        embeds: [
+          new ErrorEmbed(`not enough ${item.plural ? item.plural : item.name} on the market`),
+        ],
+      });
     }
 
-    const inventory = await getInventory(message.member)
-        
+    const inventory = await getInventory(message.member);
+
     if (
       !inventory.find((i) => i.item == item.id) ||
       inventory.find((i) => i.item == item.id).amount < 1
     ) {
       return send({
-        embeds: [new ErrorEmbed(`you do not have this many ${item.plural ? item.plural : item.name}`)],
+        embeds: [
+          new ErrorEmbed(`you do not have this many ${item.plural ? item.plural : item.name}`),
+        ],
       });
     }
 
     return await confirmTransaction("sell", item, parseInt(amount), message.member.id);
   } else if (args[0].toLowerCase().includes("create") || args[0].toLowerCase() == "c") {
-    if (args.length < 5) return send({ embeds: [new ErrorEmbed("/market create <item> <buy/sell> <amount> <price>")] });
+    if (args.length < 5)
+      return send({
+        embeds: [new ErrorEmbed("/market create <item> <buy/sell> <amount> <price>")],
+      });
 
     const [item, type, amount, price] = args.slice(1, 5);
 
@@ -897,29 +1021,39 @@ async function run(
     if (!selected || selected.account_locked) {
       return send({ embeds: [new ErrorEmbed("couldnt find that item")] });
     }
-    
+
     if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
       return send({ embeds: [new ErrorEmbed("invalid amount")] });
     }
-    
+
     if (!parseInt(price) || isNaN(parseInt(price)) || parseInt(price) < 1) {
       return send({ embeds: [new ErrorEmbed("invalid price")] });
     }
-    
-    const cost = await formatBet(price.toLowerCase(), message.member).catch(() => {});
-    
-    if (!cost) return send({ embeds: [new ErrorEmbed("invalid price")] });
-    
-    if (type == "buy") {
 
+    const cost = await formatBet(price.toLowerCase(), message.member).catch(() => {});
+
+    if (!cost) return send({ embeds: [new ErrorEmbed("invalid price")] });
+
+    if (type == "buy") {
       if ((await getBalance(message.member)) < parseInt(amount) * cost) {
         return send({ embeds: [new ErrorEmbed("you dont have enough money")] });
       }
 
-      const userItemSellOrders = (await getMarketOrders(message.member, "sell")).filter((i) => i.itemId = selected.id);
+      const userItemSellOrders = (await getMarketOrders(message.member, "sell")).filter(
+        (i) => (i.itemId = selected.id),
+      );
 
-      if (userItemSellOrders && userItemSellOrders.reduce((a, b) => a.price < b.price ? a : b).price < cost) {
-        return send({ embeds: [new ErrorEmbed("you cannot make a buy order for more than your lowest sell order for this item")] });
+      if (
+        userItemSellOrders &&
+        userItemSellOrders.reduce((a, b) => (a.price < b.price ? a : b)).price < cost
+      ) {
+        return send({
+          embeds: [
+            new ErrorEmbed(
+              "you cannot make a buy order for more than your lowest sell order for this item",
+            ),
+          ],
+        });
       }
 
       await removeBalance(message.member, parseInt(amount) * cost);
@@ -937,26 +1071,47 @@ async function run(
       await checkMarketOverlap(message.member, selected.id, type);
       await checkMarketWatchers(selected.id, parseInt(amount), message.member.id, type, cost);
 
-      
-      return send({ embeds: [new CustomEmbed(message.member, "✅ your buy order has been created")]});
-    }
-    else if (type == "sell") {
+      return send({
+        embeds: [new CustomEmbed(message.member, "✅ your buy order has been created")],
+      });
+    } else if (type == "sell") {
       const inventory = await getInventory(message.member);
 
       if (
         !inventory.find((i) => i.item == selected.id) ||
         inventory.find((i) => i.item == selected.id).amount < parseInt(amount)
       ) {
-        return send({ embeds: [new ErrorEmbed(`you dont have enough ${selected.plural ? selected.plural : selected.name}`)] });
+        return send({
+          embeds: [
+            new ErrorEmbed(
+              `you dont have enough ${selected.plural ? selected.plural : selected.name}`,
+            ),
+          ],
+        });
       }
-      
-      const userItemBuyOrders = (await getMarketOrders(message.member, "buy")).filter((i) => i.itemId = selected.id);
 
-      if (userItemBuyOrders && userItemBuyOrders.reduce((a, b) => a.price > b.price ? a : b).price > cost) {
-        return send({ embeds: [new ErrorEmbed("you cannot make a sell order for less than your highest buy order for this item")] });
+      const userItemBuyOrders = (await getMarketOrders(message.member, "buy")).filter(
+        (i) => (i.itemId = selected.id),
+      );
+
+      if (
+        userItemBuyOrders &&
+        userItemBuyOrders.reduce((a, b) => (a.price > b.price ? a : b)).price > cost
+      ) {
+        return send({
+          embeds: [
+            new ErrorEmbed(
+              "you cannot make a sell order for less than your highest buy order for this item",
+            ),
+          ],
+        });
       }
 
-      await setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - parseInt(amount));
+      await setInventoryItem(
+        message.member,
+        selected.id,
+        inventory.find((i) => i.item == selected.id).amount - parseInt(amount),
+      );
 
       await prisma.marketOrder.create({
         data: {
@@ -970,8 +1125,10 @@ async function run(
 
       await checkMarketOverlap(message.member, selected.id, type);
       await checkMarketWatchers(selected.id, parseInt(amount), message.member.id, type, cost);
-      
-      return send({ embeds: [new CustomEmbed(message.member, "✅ your sell order has been created")]});
+
+      return send({
+        embeds: [new CustomEmbed(message.member, "✅ your sell order has been created")],
+      });
     }
   } else return viewMarket();
 
@@ -981,81 +1138,135 @@ async function run(
       getEmojiImage(item.emoji),
     );
 
-    const updateEmbed = async() => {
+    const updateEmbed = async () => {
       const buyOrders = await getMarketItemOrders(item.id, "buy");
       const sellOrders = await getMarketItemOrders(item.id, "sell");
 
       const totalBuyOrderCount = buyOrders.reduce((sum, item) => sum + Number(item.itemAmount), 0);
-      const totalSellOrderCount = sellOrders.reduce((sum, item) => sum + Number(item.itemAmount), 0);
-  
-      const formattedBuyOrders = buyOrders.reduce<{ itemAmount: number; price: number }[]>((acc, order) => {
-        const existingItem = acc.find(item => item.price === Number(order.price));
-    
-        if (existingItem) {
+      const totalSellOrderCount = sellOrders.reduce(
+        (sum, item) => sum + Number(item.itemAmount),
+        0,
+      );
+
+      const formattedBuyOrders = buyOrders.reduce<{ itemAmount: number; price: number }[]>(
+        (acc, order) => {
+          const existingItem = acc.find((item) => item.price === Number(order.price));
+
+          if (existingItem) {
             existingItem.itemAmount += Number(order.itemAmount);
-        } else {
+          } else {
             acc.push({
-                itemAmount: Number(order.itemAmount),
-                price: Number(order.price),
+              itemAmount: Number(order.itemAmount),
+              price: Number(order.price),
             });
-        }
-    
-        return acc;
-      }, []);
-      
-      const formattedSellOrders = sellOrders.reduce<{ itemAmount: number; price: number }[]>((acc, order) => {
-        const existingItem = acc.find(item => item.price === Number(order.price));
-    
-        if (existingItem) {
+          }
+
+          return acc;
+        },
+        [],
+      );
+
+      const formattedSellOrders = sellOrders.reduce<{ itemAmount: number; price: number }[]>(
+        (acc, order) => {
+          const existingItem = acc.find((item) => item.price === Number(order.price));
+
+          if (existingItem) {
             existingItem.itemAmount += Number(order.itemAmount);
-        } else {
+          } else {
             acc.push({
-                itemAmount: Number(order.itemAmount),
-                price: Number(order.price),
+              itemAmount: Number(order.itemAmount),
+              price: Number(order.price),
             });
-        }
-    
-        return acc;
-      }, []);
-      
-      const extraBuyOrderCount = formattedBuyOrders.slice(5).reduce((sum, item) => sum + Number(item.itemAmount), 0);
-      const extraSellOrderCount = formattedSellOrders.slice(5).reduce((sum, item) => sum + Number(item.itemAmount), 0);
-  
+          }
+
+          return acc;
+        },
+        [],
+      );
+
+      const extraBuyOrderCount = formattedBuyOrders
+        .slice(5)
+        .reduce((sum, item) => sum + Number(item.itemAmount), 0);
+      const extraSellOrderCount = formattedSellOrders
+        .slice(5)
+        .reduce((sum, item) => sum + Number(item.itemAmount), 0);
+
       embed.setFields(
         {
           name: "buy orders",
-          value: `${buyOrders.length == 0 ? "none" : formattedBuyOrders.slice(0, 5).map((b) => `- **${b.itemAmount.toLocaleString()}x** ${item.emoji} ${
-            item.name} @ $${b.price.toLocaleString()} ea.`).join("\n")}${extraBuyOrderCount > 0 ? `\n*+ ${extraBuyOrderCount} more items*` : ""}`,
+          value: `${
+            buyOrders.length == 0
+              ? "none"
+              : formattedBuyOrders
+                  .slice(0, 5)
+                  .map(
+                    (b) =>
+                      `- **${b.itemAmount.toLocaleString()}x** ${item.emoji} ${
+                        item.name
+                      } @ $${b.price.toLocaleString()} ea.`,
+                  )
+                  .join("\n")
+          }${extraBuyOrderCount > 0 ? `\n*+ ${extraBuyOrderCount} more items*` : ""}`,
           inline: true,
         },
         {
           name: "sell orders",
-          value: `${sellOrders.length == 0 ? "none" : formattedSellOrders.slice(0, 5).map((b) => `- **${b.itemAmount.toLocaleString()}x** ${item.emoji} ${
-            item.name} @ $${b.price.toLocaleString()} ea.`).join("\n")}${extraSellOrderCount > 0 ? `\n*+ ${extraSellOrderCount} more items*` : ""}`,
+          value: `${
+            sellOrders.length == 0
+              ? "none"
+              : formattedSellOrders
+                  .slice(0, 5)
+                  .map(
+                    (b) =>
+                      `- **${b.itemAmount.toLocaleString()}x** ${item.emoji} ${
+                        item.name
+                      } @ $${b.price.toLocaleString()} ea.`,
+                  )
+                  .join("\n")
+          }${extraSellOrderCount > 0 ? `\n*+ ${extraSellOrderCount} more items*` : ""}`,
           inline: true,
         },
       );
-  
+
       const topRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder().setCustomId("buyOne").setLabel("buy one").setStyle(ButtonStyle.Primary).setDisabled(totalSellOrderCount == 0),
-        new ButtonBuilder().setCustomId("buyMulti").setLabel("buy multiple").setStyle(ButtonStyle.Primary).setDisabled(totalSellOrderCount <= 1),
-        new ButtonBuilder().setCustomId("refresh").setLabel("refresh").setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder()
+          .setCustomId("buyOne")
+          .setLabel("buy one")
+          .setStyle(ButtonStyle.Primary)
+          .setDisabled(totalSellOrderCount == 0),
+        new ButtonBuilder()
+          .setCustomId("buyMulti")
+          .setLabel("buy multiple")
+          .setStyle(ButtonStyle.Primary)
+          .setDisabled(totalSellOrderCount <= 1),
+        new ButtonBuilder()
+          .setCustomId("refresh")
+          .setLabel("refresh")
+          .setStyle(ButtonStyle.Secondary),
       );
-  
+
       const bottomRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder().setCustomId("sellOne").setLabel("sell one").setStyle(ButtonStyle.Primary).setDisabled(totalBuyOrderCount == 0),
-        new ButtonBuilder().setCustomId("sellMulti").setLabel("sell multiple").setStyle(ButtonStyle.Primary).setDisabled(totalBuyOrderCount <= 1),
+        new ButtonBuilder()
+          .setCustomId("sellOne")
+          .setLabel("sell one")
+          .setStyle(ButtonStyle.Primary)
+          .setDisabled(totalBuyOrderCount == 0),
+        new ButtonBuilder()
+          .setCustomId("sellMulti")
+          .setLabel("sell multiple")
+          .setStyle(ButtonStyle.Primary)
+          .setDisabled(totalBuyOrderCount <= 1),
       );
-  
+
       if (msg) {
         msg = await msg.edit({ embeds: [embed], components: [topRow, bottomRow] });
       } else {
         msg = (await send({ embeds: [embed], components: [topRow, bottomRow] })) as NypsiMessage;
       }
-    }
+    };
 
     await updateEmbed();
-    
+
     const filter = (i: Interaction) => i.user.id == message.author.id;
 
     const pageManager: any = async () => {
@@ -1077,7 +1288,10 @@ async function run(
       const { res, interaction } = response;
 
       if (res == "buyOne") {
-        if ((await getBalance(message.member)) < await getPriceForMarketTransaction(item.id, 1, "buy", message.member.id)) {
+        if (
+          (await getBalance(message.member)) <
+          (await getPriceForMarketTransaction(item.id, 1, "buy", message.member.id))
+        ) {
           await interaction.reply({
             embeds: [new ErrorEmbed("insufficient funds")],
             ephemeral: true,
@@ -1085,7 +1299,7 @@ async function run(
           await updateEmbed();
           return pageManager();
         }
-        
+
         const price = await getPriceForMarketTransaction(item.id, 1, "buy", message.member.id);
         if (price == -1) {
           await interaction.reply({
@@ -1100,11 +1314,9 @@ async function run(
 
         return confirmTransaction("buy", item, 1, message.member.id, msg);
       } else if (res == "buyMulti") {
-        
         const res = await quantitySelectionModal(item, "buy", interaction as ButtonInteraction);
 
         if (res) {
-
           const amount = res.fields.fields.get("amount").value;
 
           if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
@@ -1116,7 +1328,9 @@ async function run(
             return pageManager();
           }
 
-          const formattedAmount = await formatBet(amount.toLowerCase(), message.member).catch(() => {});
+          const formattedAmount = await formatBet(amount.toLowerCase(), message.member).catch(
+            () => {},
+          );
 
           if (!formattedAmount) {
             await res.reply({
@@ -1126,8 +1340,13 @@ async function run(
             await updateEmbed();
             return pageManager();
           }
-          
-          const price = await getPriceForMarketTransaction(item.id, formattedAmount, "buy", message.member.id);
+
+          const price = await getPriceForMarketTransaction(
+            item.id,
+            formattedAmount,
+            "buy",
+            message.member.id,
+          );
           if (price == -1) {
             await res.reply({
               embeds: [new ErrorEmbed("not enough items")],
@@ -1137,7 +1356,10 @@ async function run(
             return pageManager();
           }
 
-          if ((await getBalance(message.member)) < await getPriceForMarketTransaction(item.id, formattedAmount, "buy", message.member.id)) {
+          if (
+            (await getBalance(message.member)) <
+            (await getPriceForMarketTransaction(item.id, formattedAmount, "buy", message.member.id))
+          ) {
             await interaction.reply({
               embeds: [new ErrorEmbed("insufficient funds")],
               ephemeral: true,
@@ -1149,26 +1371,27 @@ async function run(
           await res.deferUpdate();
 
           return confirmTransaction("buy", item, formattedAmount, message.member.id, msg);
-          
         }
 
         await updateEmbed();
         return pageManager();
       } else if (res == "sellOne") {
-        const inventory = await getInventory(message.member)
-        
+        const inventory = await getInventory(message.member);
+
         if (
           !inventory.find((i) => i.item == item.id) ||
           inventory.find((i) => i.item == item.id).amount < 1
         ) {
           await interaction.reply({
-            embeds: [new ErrorEmbed(`you do not have this many ${item.plural ? item.plural : item.name}`)],
+            embeds: [
+              new ErrorEmbed(`you do not have this many ${item.plural ? item.plural : item.name}`),
+            ],
             ephemeral: true,
           });
           await updateEmbed();
           return pageManager();
         }
-        
+
         const price = await getPriceForMarketTransaction(item.id, 1, "sell", message.member.id);
         if (price == -1) {
           await interaction.reply({
@@ -1185,7 +1408,6 @@ async function run(
       } else if (res == "sellMulti") {
         const res = await quantitySelectionModal(item, "sell", interaction as ButtonInteraction);
 
-        
         if (res) {
           const amount = res.fields.fields.get("amount").value;
 
@@ -1198,7 +1420,9 @@ async function run(
             return pageManager();
           }
 
-          const formattedAmount = await formatBet(amount.toLowerCase(), message.member).catch(() => {});
+          const formattedAmount = await formatBet(amount.toLowerCase(), message.member).catch(
+            () => {},
+          );
 
           if (!formattedAmount) {
             await res.reply({
@@ -1208,8 +1432,13 @@ async function run(
             await updateEmbed();
             return pageManager();
           }
-          
-          const price = await getPriceForMarketTransaction(item.id, formattedAmount, "sell", message.member.id);
+
+          const price = await getPriceForMarketTransaction(
+            item.id,
+            formattedAmount,
+            "sell",
+            message.member.id,
+          );
           if (price == -1) {
             await res.reply({
               embeds: [new ErrorEmbed("not enough items")],
@@ -1218,15 +1447,19 @@ async function run(
             await updateEmbed();
             return pageManager();
           }
-        
-          const inventory = await getInventory(message.member)
-        
+
+          const inventory = await getInventory(message.member);
+
           if (
             !inventory.find((i) => i.item == item.id) ||
             inventory.find((i) => i.item == item.id).amount < 1
           ) {
             await interaction.editReply({
-              embeds: [new ErrorEmbed(`you do not have this many ${item.plural ? item.plural : item.name}`)],
+              embeds: [
+                new ErrorEmbed(
+                  `you do not have this many ${item.plural ? item.plural : item.name}`,
+                ),
+              ],
               options: { ephemeral: true },
             });
             await updateEmbed();
@@ -1238,31 +1471,37 @@ async function run(
           return confirmTransaction("sell", item, formattedAmount, message.member.id, msg);
         }
 
-
         await updateEmbed();
         return pageManager();
       } else if (res == "refresh") {
         await interaction.deferUpdate();
         await updateEmbed();
         return pageManager();
-      } 
+      }
     };
 
     return pageManager();
   }
 
-  
-  async function confirmTransaction(type: OrderType, item: Item, amount: number, userId: string, msg?: NypsiMessage) {
+  async function confirmTransaction(
+    type: OrderType,
+    item: Item,
+    amount: number,
+    userId: string,
+    msg?: NypsiMessage,
+  ) {
     const embed = new CustomEmbed(message.member).setHeader(
       `${item.name} market confirmation`,
       getEmojiImage(item.emoji),
     );
 
-    const fromCommand = !(msg);
+    const fromCommand = !msg;
 
     const price = await getPriceForMarketTransaction(item.id, amount, type, userId);
 
-    embed.setDescription(`are you sure you want to ${type} ${amount} ${amount == 1 || !item.plural ? item.name : item.plural} for $${price.toLocaleString()}?`);
+    embed.setDescription(
+      `are you sure you want to ${type} ${amount} ${amount == 1 || !item.plural ? item.name : item.plural} for $${price.toLocaleString()}?`,
+    );
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder().setCustomId("confirm").setLabel("confirm").setStyle(ButtonStyle.Primary),
@@ -1274,7 +1513,7 @@ async function run(
     } else {
       msg = (await send({ embeds: [embed], components: [row] })) as NypsiMessage;
     }
-    
+
     const filter = (i: Interaction) => i.user.id == message.author.id;
 
     const pageManager: any = async () => {
@@ -1296,13 +1535,18 @@ async function run(
       const { res, interaction } = response;
 
       if (res == "confirm") {
+        const res =
+          type == "buy"
+            ? await marketBuy(item, amount, price, message.member)
+            : await marketSell(item, amount, price, message.member);
 
-        const res = type == "buy" ? (await marketBuy(item, amount, price, message.member)): (await marketSell(item, amount, price, message.member));
-        
         if (!res) {
           if (fromCommand) {
             await interaction.deferUpdate();
-            return await msg.edit({ embeds: [new ErrorEmbed("unknown error occurred")], components: [] });
+            return await msg.edit({
+              embeds: [new ErrorEmbed("unknown error occurred")],
+              components: [],
+            });
           }
 
           await interaction.reply({
@@ -1324,15 +1568,22 @@ async function run(
           });
           return itemView(item, msg);
         }
-        
+
         if (fromCommand) {
-          embed.setDescription(`✅ ${type == "buy" ? "bought" : "sold"} ${amount} ${item.emoji} ${amount == 1 || !item.plural ? item.name : item.plural} for $${price.toLocaleString()}`);
+          embed.setDescription(
+            `✅ ${type == "buy" ? "bought" : "sold"} ${amount} ${item.emoji} ${amount == 1 || !item.plural ? item.name : item.plural} for $${price.toLocaleString()}`,
+          );
           await interaction.deferUpdate();
           return await msg.edit({ embeds: [embed], components: [] });
         }
 
         await interaction.reply({
-          embeds: [new CustomEmbed(message.member, `✅ ${type == "buy" ? "bought" : "sold"} ${amount} ${item.emoji} ${amount == 1 || !item.plural ? item.name : item.plural} for $${price.toLocaleString()}`)],
+          embeds: [
+            new CustomEmbed(
+              message.member,
+              `✅ ${type == "buy" ? "bought" : "sold"} ${amount} ${item.emoji} ${amount == 1 || !item.plural ? item.name : item.plural} for $${price.toLocaleString()}`,
+            ),
+          ],
           ephemeral: true,
         });
         return itemView(item, msg);
@@ -1348,9 +1599,7 @@ async function run(
     };
 
     return pageManager();
-
   }
-  
 
   async function quantitySelectionModal(item: Item, type: string, interaction: ButtonInteraction) {
     const id = `market-quantity-${Math.floor(Math.random() * 69420)}`;

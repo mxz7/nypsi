@@ -148,7 +148,10 @@ export async function createTradeRequest(
   );
 
   const buttonRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("fr").setLabel("fulfill trade request").setStyle(ButtonStyle.Success),
+    new ButtonBuilder()
+      .setCustomId("fr")
+      .setLabel("fulfill trade request")
+      .setStyle(ButtonStyle.Success),
   );
 
   const clusters = await (member.client as NypsiClient).cluster.broadcastEval(
@@ -268,7 +271,10 @@ export async function bumpTradeRequest(id: number, client: NypsiClient) {
   );
 
   const buttonRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("fr").setLabel("fulfill trade request").setStyle(ButtonStyle.Success),
+    new ButtonBuilder()
+      .setCustomId("fr")
+      .setLabel("fulfill trade request")
+      .setStyle(ButtonStyle.Success),
   );
 
   const clusters = await client.cluster.broadcastEval(
@@ -367,12 +373,7 @@ export async function fulfillTradeRequest(
   }
 
   beingFulfilled.add(tradeRequest.id);
-  await redis.set(
-    `${Constants.redis.nypsi.TRADE_FULFILLING}:${tradeRequest.id}`,
-    "d",
-    "EX",
-    600,
-  );
+  await redis.set(`${Constants.redis.nypsi.TRADE_FULFILLING}:${tradeRequest.id}`, "d", "EX", 600);
   setTimeout(() => {
     beingFulfilled.delete(tradeRequest.id);
   }, ms("5 minutes"));

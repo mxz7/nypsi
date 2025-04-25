@@ -16,15 +16,18 @@ export default {
       orderBy: { createdAt: "asc" },
     });
 
-    const combinedQuantities: {itemId: string, itemAmount: bigint}[] = Object.values(
-      buyOrders.reduce<Record<string, {itemId: string, itemAmount: bigint}>>((acc, { itemId, itemAmount }) => {
-        if (!acc[itemId]) {
-          acc[itemId] = { itemId, itemAmount };
-        } else {
-          acc[itemId].itemAmount += itemAmount;
-        }
-        return acc;
-      }, {})
+    const combinedQuantities: { itemId: string; itemAmount: bigint }[] = Object.values(
+      buyOrders.reduce<Record<string, { itemId: string; itemAmount: bigint }>>(
+        (acc, { itemId, itemAmount }) => {
+          if (!acc[itemId]) {
+            acc[itemId] = { itemId, itemAmount };
+          } else {
+            acc[itemId].itemAmount += itemAmount;
+          }
+          return acc;
+        },
+        {},
+      ),
     );
 
     if (combinedQuantities.length == 0) return;
@@ -51,7 +54,7 @@ export default {
         items[i].emoji.startsWith(":")
           ? ""
           : `${items[i].emoji} `
-      }${items[i].name} [${combinedQuantities.find((c) => c.itemId = i).itemAmount.toLocaleString()} in buy orders]`,
+      }${items[i].name} [${combinedQuantities.find((c) => (c.itemId = i)).itemAmount.toLocaleString()} in buy orders]`,
       value: i,
     }));
 
