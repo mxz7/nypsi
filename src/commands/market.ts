@@ -21,13 +21,10 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
-import prisma from "../init/database";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import {
-  checkMarketOverlap,
-  checkMarketWatchers,
   createMarketOrder,
   deleteMarketOrder,
   deleteMarketWatch,
@@ -506,9 +503,6 @@ async function run(
 
             await createMarketOrder(message.member.id, selected.id, parseInt(amount), cost, "buy");
 
-            await checkMarketOverlap(message.member, selected.id, type);
-            await checkMarketWatchers(selected.id, parseInt(amount), message.member.id, type, cost);
-
             await res.editReply({
               embeds: [new CustomEmbed(message.member, "✅ your buy order has been created")],
               options: { ephemeral: true },
@@ -559,9 +553,6 @@ async function run(
             );
 
             await createMarketOrder(message.member.id, selected.id, parseInt(amount), cost, "sell");
-
-            await checkMarketOverlap(message.member, selected.id, type);
-            await checkMarketWatchers(selected.id, parseInt(amount), message.member.id, type, cost);
 
             await res.editReply({
               embeds: [new CustomEmbed(message.member, "✅ your sell order has been created")],
@@ -1019,9 +1010,6 @@ async function run(
 
       await createMarketOrder(message.member.id, selected.id, parseInt(amount), cost, "buy");
 
-      await checkMarketOverlap(message.member, selected.id, type);
-      await checkMarketWatchers(selected.id, parseInt(amount), message.member.id, type, cost);
-
       return send({
         embeds: [new CustomEmbed(message.member, "✅ your buy order has been created")],
       });
@@ -1065,9 +1053,6 @@ async function run(
       );
 
       await createMarketOrder(message.member.id, selected.id, parseInt(amount), cost, "sell");
-
-      await checkMarketOverlap(message.member, selected.id, type);
-      await checkMarketWatchers(selected.id, parseInt(amount), message.member.id, type, cost);
 
       return send({
         embeds: [new CustomEmbed(message.member, "✅ your sell order has been created")],
