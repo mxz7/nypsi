@@ -3422,5 +3422,18 @@
     "role": "cat",
     "sell": 25000000,
     "in_crates": true
+  },
+  "gold_star": {
+    "id": "gold_star",
+    "name": "gold star",
+    "plural": "gold stars",
+    "aliases": ["star"],
+    "article": "a",
+    "emoji": "<:gold_star:1365700407942316172>",
+    "longDesc": "good job little buddy, you found a bug! heres a gold star!",
+    "rarity": 69,
+    "role": "trophy",
+    "in_crates": false,
+    "account_locked": true
   }
 }
