@@ -34,6 +34,7 @@ import {
   getMarketOrders,
   getMarketWatch,
   getPriceForMarketTransaction,
+  getRecentMarketOrders,
   marketBuy,
   marketSell,
   setMarketWatch,
@@ -88,7 +89,10 @@ cmd.slashData
           .setName("order-type")
           .setDescription("do you want to buy or sell this item?")
           .setRequired(true)
-          .setAutocomplete(true),
+          .setChoices(
+            { name: "buy order", value: "buy" },
+            { name: "sell order", value: "sell" },
+          )
       )
       .addStringOption((option) =>
         option.setName("amount").setDescription("how many of this item?").setRequired(true),
@@ -158,7 +162,10 @@ cmd.slashData
           .setName("order-type")
           .setDescription("are you watching for a buy order or sell order?")
           .setRequired(true)
-          .setAutocomplete(true),
+          .setChoices(
+            { name: "buy order", value: "buy" },
+            { name: "sell order", value: "sell" },
+          )
       )
       .addStringOption((option) =>
         option
@@ -239,31 +246,9 @@ async function run(
   const items = getItems();
 
   const viewMarket = async (viewRecent = true, msg?: NypsiMessage) => {
-    const buyOrders = viewRecent
-      ? await prisma.marketOrder.findMany({
-          where: { AND: [{ completed: false }, { orderType: "buy" }] },
-          orderBy: { createdAt: "desc" },
-          take: 5,
-        })
-      : await prisma.marketOrder.findMany({
-          where: {
-            AND: [{ completed: false }, { orderType: "buy" }, { ownerId: message.member.id }],
-          },
-          orderBy: { createdAt: "desc" },
-        });
+    const buyOrders = viewRecent ? await getRecentMarketOrders("buy") : (await getMarketOrders(message.member, "buy")).reverse();
 
-    const sellOrders = viewRecent
-      ? await prisma.marketOrder.findMany({
-          where: { AND: [{ completed: false }, { orderType: "sell" }] },
-          orderBy: { createdAt: "desc" },
-          take: 5,
-        })
-      : await prisma.marketOrder.findMany({
-          where: {
-            AND: [{ completed: false }, { orderType: "sell" }, { ownerId: message.member.id }],
-          },
-          orderBy: { createdAt: "desc" },
-        });
+    const sellOrders = viewRecent ? await getRecentMarketOrders("sell") : (await getMarketOrders(message.member, "sell")).reverse();
 
     const embed = new CustomEmbed(message.member).setHeader(
       "the market",
@@ -379,20 +364,10 @@ async function run(
       message.author.avatarURL(),
     );
 
-    let orders = await prisma.marketOrder.findMany({
-      where: {
-        AND: [{ ownerId: message.member.id }, { completed: false }, { orderType: type }],
-      },
-      orderBy: { createdAt: "desc" },
-    });
+    let orders = (await getMarketOrders(message.member, type)).reverse()
 
     const updateEmbed = async () => {
-      orders = await prisma.marketOrder.findMany({
-        where: {
-          AND: [{ ownerId: message.member.id }, { completed: false }, { orderType: type }],
-        },
-        orderBy: { createdAt: "desc" },
-      });
+      orders = (await getMarketOrders(message.member, type)).reverse()
 
       embed.setFields({
         name: `your ${type} orders`,
@@ -506,11 +481,11 @@ async function run(
             }
 
             const userItemSellOrders = (await getMarketOrders(message.member, "sell")).filter(
-              (i) => (i.itemId = selected.id),
+              (i) => (i.itemId == selected.id),
             );
 
             if (
-              userItemSellOrders &&
+              userItemSellOrders.length > 0 &&
               userItemSellOrders.reduce((a, b) => (a.price < b.price ? a : b)).price < cost
             ) {
               await res.editReply({
@@ -564,11 +539,11 @@ async function run(
             }
 
             const userItemBuyOrders = (await getMarketOrders(message.member, "buy")).filter(
-              (i) => (i.itemId = selected.id),
+              (i) => (i.itemId == selected.id),
             );
 
             if (
-              userItemBuyOrders &&
+              userItemBuyOrders.length > 0 &&
               userItemBuyOrders.reduce((a, b) => (a.price > b.price ? a : b)).price > cost
             ) {
               await res.editReply({
@@ -1040,11 +1015,11 @@ async function run(
       }
 
       const userItemSellOrders = (await getMarketOrders(message.member, "sell")).filter(
-        (i) => (i.itemId = selected.id),
+        (i) => (i.itemId == selected.id),
       );
 
       if (
-        userItemSellOrders &&
+        userItemSellOrders.length > 0 &&
         userItemSellOrders.reduce((a, b) => (a.price < b.price ? a : b)).price < cost
       ) {
         return send({
@@ -1091,11 +1066,11 @@ async function run(
       }
 
       const userItemBuyOrders = (await getMarketOrders(message.member, "buy")).filter(
-        (i) => (i.itemId = selected.id),
+        (i) => (i.itemId == selected.id),
       );
 
       if (
-        userItemBuyOrders &&
+        userItemBuyOrders.length > 0 &&
         userItemBuyOrders.reduce((a, b) => (a.price > b.price ? a : b)).price > cost
       ) {
         return send({

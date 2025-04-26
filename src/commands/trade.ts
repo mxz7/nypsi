@@ -39,6 +39,7 @@ import {
   bumpTradeRequest,
   createTradeRequest,
   deleteTradeRequest,
+  getTradeRequestByMessage,
   getTradeRequests,
 } from "../utils/functions/economy/trade_requests";
 import { getRawLevel } from "../utils/functions/economy/levelling";
@@ -836,11 +837,7 @@ async function run(
       return message.channel.send({ embeds: [new ErrorEmbed("use the message id dumbass")] });
     }
 
-    const tradeRequest = await prisma.tradeRequest.findUnique({
-      where: {
-        messageId: args[1],
-      },
-    });
+    const tradeRequest = await getTradeRequestByMessage(args[1]);
 
     if (!tradeRequest)
       return message.channel.send({ embeds: [new ErrorEmbed("invalid trade request bro")] });

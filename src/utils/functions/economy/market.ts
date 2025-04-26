@@ -39,6 +39,14 @@ export async function getMarketOrders(member: GuildMember | string | undefined, 
   return query;
 }
 
+export async function getRecentMarketOrders(type: OrderType) {
+  return await prisma.marketOrder.findMany({
+    where: { AND: [{ completed: false }, { orderType: type }] },
+    orderBy: { createdAt: "desc" },
+    take: 5,
+  })
+}
+
 export async function getMarketItemOrders(
   itemId: string,
   type: OrderType,
@@ -247,14 +255,14 @@ export async function deleteMarketOrder(id: number, client: NypsiClient, repeatC
 
   if (
     inTransaction.has(order.itemId) ||
-    (await redis.exists(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${id}`))
+    (await redis.exists(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${order.itemId}`))
   ) {
     return new Promise((resolve) => {
       logger.debug(`repeating market order delete - ${id}`);
       setTimeout(async () => {
         if (repeatCount > 100) {
           inTransaction.delete(order.itemId);
-          await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${id}`);
+          await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${order.itemId}`);
         }
         resolve(deleteMarketOrder(id, client, repeatCount + 1));
       }, 1000);
@@ -300,7 +308,10 @@ export async function checkMarketOverlap(
   createdOrderType: OrderType,
   repeatCount?: number,
 ) {
-  if (inTransaction.has(itemId)) {
+  if (
+    inTransaction.has(itemId) ||
+    (await redis.exists(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`))
+  ) {
     return new Promise((resolve) => {
       logger.debug(`repeating market overlap check - ${itemId}`);
       setTimeout(async () => {
@@ -388,7 +399,10 @@ export async function marketBuy(
   member: GuildMember,
   repeatCount = 1,
 ) {
-  if (inTransaction.has(item.id)) {
+  if (
+    inTransaction.has(item.id) ||
+    (await redis.exists(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${item.id}`))
+  ) {
     return new Promise((resolve) => {
       logger.debug(`repeating market buy - ${amount}x ${item.id}`);
       setTimeout(async () => {
@@ -630,7 +644,10 @@ export async function marketSell(
   member: GuildMember,
   repeatCount = 1,
 ) {
-  if (inTransaction.has(item.id)) {
+  if (
+    inTransaction.has(item.id) ||
+    (await redis.exists(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${item.id}`))
+  ) {
     return new Promise((resolve) => {
       logger.debug(`repeating market sell - ${amount}x ${item.id}`);
       setTimeout(async () => {

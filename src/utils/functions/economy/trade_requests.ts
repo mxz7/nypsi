@@ -356,7 +356,10 @@ export async function fulfillTradeRequest(
   tradeRequest: TradeRequest,
   repeatCount = 1,
 ) {
-  if (beingFulfilled.has(tradeRequest.id)) {
+  if (
+    beingFulfilled.has(tradeRequest.id) || 
+    (await redis.exists(`${Constants.redis.nypsi.TRADE_FULFILLING}:${tradeRequest.id}`))
+  ) {
     return new Promise((resolve) => {
       logger.debug(`repeating fulfill trade request - ${tradeRequest.ownerId}`);
       setTimeout(async () => {
