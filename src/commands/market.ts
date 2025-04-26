@@ -28,9 +28,11 @@ import Constants from "../utils/Constants";
 import {
   checkMarketOverlap,
   checkMarketWatchers,
+  createMarketOrder,
   deleteMarketOrder,
   deleteMarketWatch,
   getMarketItemOrders,
+  getMarketOrder,
   getMarketOrders,
   getMarketWatch,
   getPriceForMarketTransaction,
@@ -502,15 +504,7 @@ async function run(
 
             await removeBalance(message.member, parseInt(amount) * cost);
 
-            await prisma.marketOrder.create({
-              data: {
-                ownerId: message.member.id,
-                itemId: selected.id,
-                itemAmount: parseInt(amount),
-                price: cost,
-                orderType: "buy",
-              },
-            });
+            await createMarketOrder(message.member.id, selected.id, parseInt(amount), cost, "buy");
 
             await checkMarketOverlap(message.member, selected.id, type);
             await checkMarketWatchers(selected.id, parseInt(amount), message.member.id, type, cost);
@@ -564,15 +558,7 @@ async function run(
               inventory.find((i) => i.item == selected.id).amount - parseInt(amount),
             );
 
-            await prisma.marketOrder.create({
-              data: {
-                ownerId: message.member.id,
-                itemId: selected.id,
-                itemAmount: parseInt(amount),
-                price: cost,
-                orderType: "sell",
-              },
-            });
+            await createMarketOrder(message.member.id, selected.id, parseInt(amount), cost, "sell");
 
             await checkMarketOverlap(message.member, selected.id, type);
             await checkMarketWatchers(selected.id, parseInt(amount), message.member.id, type, cost);
@@ -591,9 +577,7 @@ async function run(
           orders.length == 1 ? orders[0].id.toString() : await deleteOrder(type, msg, orders);
 
         if (res) {
-          const order = await prisma.marketOrder.findFirst({
-            where: { AND: [{ id: parseInt(res) }, { completed: false }, { orderType: type }] },
-          });
+          const order = await getMarketOrder(parseInt(res));
 
           const result = await deleteMarketOrder(parseInt(res), message.client as NypsiClient);
 
@@ -1033,15 +1017,7 @@ async function run(
 
       await removeBalance(message.member, parseInt(amount) * cost);
 
-      await prisma.marketOrder.create({
-        data: {
-          ownerId: message.member.id,
-          itemId: selected.id,
-          itemAmount: parseInt(amount),
-          price: cost,
-          orderType: "buy",
-        },
-      });
+      await createMarketOrder(message.member.id, selected.id, parseInt(amount), cost, "buy");
 
       await checkMarketOverlap(message.member, selected.id, type);
       await checkMarketWatchers(selected.id, parseInt(amount), message.member.id, type, cost);
@@ -1088,15 +1064,7 @@ async function run(
         inventory.find((i) => i.item == selected.id).amount - parseInt(amount),
       );
 
-      await prisma.marketOrder.create({
-        data: {
-          ownerId: message.member.id,
-          itemId: selected.id,
-          itemAmount: parseInt(amount),
-          price: cost,
-          orderType: "sell",
-        },
-      });
+      await createMarketOrder(message.member.id, selected.id, parseInt(amount), cost, "sell");
 
       await checkMarketOverlap(message.member, selected.id, type);
       await checkMarketWatchers(selected.id, parseInt(amount), message.member.id, type, cost);

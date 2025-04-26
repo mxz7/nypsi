@@ -39,6 +39,12 @@ export async function getMarketOrders(member: GuildMember | string | undefined, 
   return query;
 }
 
+export async function getMarketOrder(id: number) {
+  return await prisma.marketOrder.findFirst({
+    where: { id: id },
+  });
+}
+
 export async function getRecentMarketOrders(type: OrderType) {
   return await prisma.marketOrder.findMany({
     where: { AND: [{ completed: false }, { orderType: type }] },
@@ -106,6 +112,18 @@ export async function getMarketAverage(item: string) {
   );
 
   return avg;
+}
+
+export async function createMarketOrder(ownerId: string, itemId: string, amount: number, price: number, orderType: OrderType) {
+    await prisma.marketOrder.create({
+      data: {
+        ownerId: ownerId,
+        itemId: itemId,
+        itemAmount: amount,
+        price: price,
+        orderType: orderType,
+      },
+    });
 }
 
 export async function updateMarketWatch(
