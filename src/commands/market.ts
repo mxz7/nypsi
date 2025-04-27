@@ -361,6 +361,12 @@ async function run(
       message.author.avatarURL(),
     );
 
+    
+    let max = 5;
+
+    if (await isPremium(message.member)) max *= await getTier(message.member);
+
+
     let orders = (await getMarketOrders(message.member, type)).reverse();
 
     const updateEmbed = async () => {
@@ -375,7 +381,8 @@ async function run(
         new ButtonBuilder()
           .setCustomId("newOrder")
           .setLabel("create order")
-          .setStyle(ButtonStyle.Primary),
+          .setStyle(ButtonStyle.Primary)
+          .setDisabled(orders.length >= max),
         new ButtonBuilder()
           .setCustomId("delOrder")
           .setLabel("delete order")
@@ -422,6 +429,18 @@ async function run(
       const { res, interaction } = response;
 
       if (res == "newOrder") {
+
+        
+        if ((await getMarketOrders(message.member, type)).length >= max) {
+          await interaction.reply({
+            embeds: [new ErrorEmbed(`you are at the max number of ${type} orders`)],
+            ephemeral: true
+          });
+          await updateEmbed();
+          return pageManager();
+        }
+
+
         const res = await createOrderModal(type, interaction as ButtonInteraction);
 
         if (res) {
@@ -724,14 +743,16 @@ async function run(
     return res;
   };
 
+  
+  let max = 5;
+
+  if (await isPremium(message.member)) max *= await getTier(message.member);
+
   if (args.length == 0) {
     return viewMarket();
   } else if (args[0].toLowerCase() == "watch") {
     let currentBuy = (await getMarketWatch(message.member)).filter((i) => i.orderType == "buy");
     let currentSell = (await getMarketWatch(message.member)).filter((i) => i.orderType == "sell");
-    let max = 5;
-
-    if (await isPremium(message.member)) max *= await getTier(message.member);
 
     if (currentBuy.length > max)
       currentBuy = await setMarketWatch(message.member, currentBuy.splice(0, max));
@@ -1009,6 +1030,10 @@ async function run(
     if (type != "buy" && type != "sell") {
       return send({ embeds: [new ErrorEmbed("invalid order type (**b**uy/**s**ell)")] });
     }
+    
+    if ((await getMarketOrders(message.member, type)).length >= max) return send({
+      embeds: [new ErrorEmbed(`you are at the max number of ${type} orders`)]
+    })
 
     if (!selected || selected.account_locked) {
       return send({ embeds: [new ErrorEmbed("couldnt find that item")] });
