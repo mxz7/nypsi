@@ -140,7 +140,7 @@ export async function createMarketOrder(
   if (member instanceof GuildMember) {
     ownerId = member.user.id;
     username = member.user.username;
-    avatar = member.user.displayAvatarURL();
+    avatar = member.user.avatarURL();
   } else {
     ownerId = member;
   }
