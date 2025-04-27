@@ -322,7 +322,7 @@ async function run(
           const seperatorRole = guildMember.guild.roles.cache.get("1329425677614845972");
 
           const role = await guildMember.guild.roles.create({
-            name: guildMember.user.id,
+            name: "custom",
             color: colour,
             position: seperatorRole.position + 1,
           });
