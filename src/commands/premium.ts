@@ -212,11 +212,9 @@ async function run(
           await guildMember.roles.remove(Constants.BRONZE_ROLE_ID);
         }
 
-        if (guildMember.roles.cache.find((i) => i.name === guildMember.user.id)) {
+        if (guildMember.roles.cache.find((i) => i.name === "custom")) {
           await sleep(250);
-          await guildMember.guild.roles.delete(
-            guildMember.roles.cache.find((i) => i.name === guildMember.user.id),
-          );
+          await guildMember.roles.remove(guildMember.roles.cache.find((i) => i.name === "custom"));
         }
       }
 
