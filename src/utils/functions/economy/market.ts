@@ -152,10 +152,28 @@ export async function createMarketOrder(
     },
     select: {
       createdAt: true,
+      id: true,
     },
   });
 
-  const sold = await checkMarketOverlap(member, itemId, orderType);
+  const checkSold = await checkMarketOverlap(member, itemId, orderType);
+  let sold = false;
+
+  if (checkSold) {
+    const { completed, itemAmount } = await prisma.marketOrder.findFirst({
+      where: {
+        id: order.id,
+      },
+      select: {
+        completed: true,
+        itemAmount: true,
+      },
+    });
+
+    if (completed) sold = true;
+    else if (Number(itemAmount) !== amount) amount = Number(itemAmount);
+  }
+
   if (!username) username = await getLastKnownUsername(ownerId);
   if (!avatar) avatar = await getLastKnownAvatar(ownerId);
 
@@ -167,13 +185,13 @@ export async function createMarketOrder(
   let description: string;
 
   if (sold) {
-    description = `fulfilled <t:${Math.floor(Date.now() / 1000)}:R>`;
+    description = `fulfilled <t:${Math.floor(Date.now() / 1000)}:R>\n\n`;
   } else {
-    description = `created <t:${Math.floor(order.createdAt.getTime() / 1000)}:R>`;
+    description = `created <t:${Math.floor(order.createdAt.getTime() / 1000)}:R>\n\n`;
   }
 
   if (orderType === "buy") {
-    embed.setColor("#7ECFFF");
+    embed.setColor("#79A2F6");
     description += `buying **${amount}x** ${getItems()[itemId].emoji} **[${getItems()[itemId].name}](https://nypsi.xyz/item/${itemId})** for $${(price * amount).toLocaleString()}`;
     row.addComponents(
       new ButtonBuilder().setCustomId("market-full").setLabel("sell").setStyle(ButtonStyle.Success),
@@ -193,6 +211,8 @@ export async function createMarketOrder(
         .setStyle(ButtonStyle.Secondary),
     );
   }
+
+  embed.setDescription(description);
 
   if (amount > 1) embed.setFooter({ text: `$${price.toLocaleString()} each` });
 
