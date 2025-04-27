@@ -967,21 +967,32 @@ async function run(
 
     return await confirmTransaction("sell", item, parseInt(amount), message.member.id);
   } else if (args[0].toLowerCase().includes("create") || args[0].toLowerCase() == "c") {
-    if (args.length < 5)
+    if (args.length < 4)
       return send({
         embeds: [new ErrorEmbed("/market create <item> <buy/sell> <amount> <price>")],
       });
 
-    const [item, type, amount, price] = args.slice(1, 5);
+    let type = args[1];
+    const item = args[2];
+    let amount = args[3];
+    let price = args[4];
 
     const selected = selectItem(item);
 
+    if (type === "b") type = "buy";
+    else if (type === "s") type = "sell";
+
     if (type != "buy" && type != "sell") {
-      return send({ embeds: [new ErrorEmbed("invalid order type (buy/sell)")] });
+      return send({ embeds: [new ErrorEmbed("invalid order type (**b**uy/**s**ell)")] });
     }
 
     if (!selected || selected.account_locked) {
       return send({ embeds: [new ErrorEmbed("couldnt find that item")] });
+    }
+
+    if (!price) {
+      price = amount;
+      amount = "1";
     }
 
     if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
