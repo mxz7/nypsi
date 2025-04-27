@@ -173,6 +173,7 @@ async function run(
 
   const checkRoles = async () => {
     if (doingRoles) return;
+    if (message.guildId !== Constants.NYPSI_SERVER_ID) return;
     doingRoles = true;
 
     let members = await message.guild.members.fetch();
@@ -304,33 +305,75 @@ async function run(
       const colour = await getEmbedColor(guildMember.user.id);
 
       if (colour === "default") {
-        if (guildMember.roles.cache.find((i) => i.name === guildMember.user.id)) {
+        if (guildMember.roles.cache.find((i) => i.name === "custom")) {
           await sleep(250);
-          const role = guildMember.roles.cache.find((i) => i.name === guildMember.user.id);
-          await guildMember.guild.roles.delete(role);
+          await guildMember.roles.remove(guildMember.roles.cache.find((i) => i.name === "custom"));
         }
-      } else if (!guildMember.roles.cache.find((i) => i.name === guildMember.user.id)) {
+      } else if (!guildMember.roles.cache.find((i) => i.name === "custom")) {
         await sleep(250);
 
-        const seperatorRole = guildMember.guild.roles.cache.get("1329425677614845972");
+        const existingRole = guildMember.guild.roles.cache.find(
+          (i) => i.name === "custom" && i.hexColor === colour,
+        );
 
-        const role = await guildMember.guild.roles.create({
-          name: guildMember.user.id,
-          color: colour,
-          position: seperatorRole.position + 1,
-        });
+        if (existingRole) {
+          await guildMember.roles.add(existingRole);
+        } else {
+          const seperatorRole = guildMember.guild.roles.cache.get("1329425677614845972");
 
-        await guildMember.roles.add(role);
+          const role = await guildMember.guild.roles.create({
+            name: guildMember.user.id,
+            color: colour,
+            position: seperatorRole.position + 1,
+          });
+
+          await guildMember.roles.add(role);
+        }
       } else {
-        const role = guildMember.roles.cache.find((i) => i.name === guildMember.user.id);
+        const role = guildMember.roles.cache.find((i) => i.name === "custom");
 
         if (role.hexColor !== colour) {
-          await sleep(250);
+          if (role.members.size === 1) {
+            await sleep(250);
+            await guildMember.guild.roles.edit(role, { color: colour });
+          } else {
+            await sleep(250);
+            await guildMember.roles.remove(role);
 
-          await guildMember.guild.roles.edit(role, { color: colour });
+            const existingRole = guildMember.guild.roles.cache.find(
+              (i) => i.name === "custom" && i.hexColor === colour,
+            );
+
+            if (existingRole) {
+              await sleep(250);
+              await guildMember.roles.add(existingRole);
+            } else {
+              const seperatorRole = guildMember.guild.roles.cache.get("1329425677614845972");
+
+              await sleep(250);
+
+              const role = await guildMember.guild.roles.create({
+                name: "custom",
+                color: colour,
+                position: seperatorRole.position + 1,
+              });
+
+              await sleep(250);
+
+              await guildMember.roles.add(role);
+            }
+          }
         }
       }
     }
+
+    for (const role of message.guild.roles.cache
+      .filter((i) => i.name === "custom" && i.members.size === 0)
+      .values()) {
+      await sleep(250);
+      await role.delete("no members");
+    }
+
     doingRoles = false;
   };
 
