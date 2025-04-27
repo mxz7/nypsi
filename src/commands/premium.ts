@@ -325,6 +325,7 @@ async function run(
             name: "custom",
             color: colour,
             position: seperatorRole.position + 1,
+            permissions: [],
           });
 
           await guildMember.roles.add(role);
@@ -356,6 +357,7 @@ async function run(
                 name: "custom",
                 color: colour,
                 position: seperatorRole.position + 1,
+                permissions: [],
               });
 
               await sleep(250);
