@@ -1,4 +1,5 @@
 import dayjs = require("dayjs");
+import { OrderType } from "@prisma/client";
 import {
   ActionRowBuilder,
   APIMessageComponentEmoji,
@@ -21,9 +22,19 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
+import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { Item } from "../types/Economy";
 import Constants from "../utils/Constants";
+import { addBalance, getBalance, removeBalance } from "../utils/functions/economy/balance";
+import {
+  addInventoryItem,
+  getInventory,
+  selectItem,
+  setInventoryItem,
+} from "../utils/functions/economy/inventory";
+import { getRawLevel } from "../utils/functions/economy/levelling";
 import {
   createMarketOrder,
   deleteMarketOrder,
@@ -40,26 +51,15 @@ import {
   updateMarketWatch,
 } from "../utils/functions/economy/market";
 import {
-  addInventoryItem,
-  getInventory,
-  selectItem,
-  setInventoryItem,
-} from "../utils/functions/economy/inventory";
-import { getRawLevel } from "../utils/functions/economy/levelling";
-import {
   createUser,
   formatBet,
   formatNumber,
   getItems,
   userExists,
 } from "../utils/functions/economy/utils";
+import { getEmojiImage } from "../utils/functions/image";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { NypsiClient } from "../models/Client";
-import { addBalance, getBalance, removeBalance } from "../utils/functions/economy/balance";
-import { getEmojiImage } from "../utils/functions/image";
-import { Item } from "../types/Economy";
-import { OrderType } from "@prisma/client";
 
 const cmd = new Command(
   "market",
@@ -88,10 +88,7 @@ cmd.slashData
           .setName("order-type")
           .setDescription("do you want to buy or sell this item?")
           .setRequired(true)
-          .setChoices(
-            { name: "buy order", value: "buy" },
-            { name: "sell order", value: "sell" },
-          )
+          .setChoices({ name: "buy order", value: "buy" }, { name: "sell order", value: "sell" }),
       )
       .addStringOption((option) =>
         option.setName("amount").setDescription("how many of this item?").setRequired(true),
@@ -161,10 +158,7 @@ cmd.slashData
           .setName("order-type")
           .setDescription("are you watching for a buy order or sell order?")
           .setRequired(true)
-          .setChoices(
-            { name: "buy order", value: "buy" },
-            { name: "sell order", value: "sell" },
-          )
+          .setChoices({ name: "buy order", value: "buy" }, { name: "sell order", value: "sell" }),
       )
       .addStringOption((option) =>
         option
@@ -245,9 +239,13 @@ async function run(
   const items = getItems();
 
   const viewMarket = async (viewRecent = true, msg?: NypsiMessage) => {
-    const buyOrders = viewRecent ? await getRecentMarketOrders("buy") : (await getMarketOrders(message.member, "buy")).reverse();
+    const buyOrders = viewRecent
+      ? await getRecentMarketOrders("buy")
+      : (await getMarketOrders(message.member, "buy")).reverse();
 
-    const sellOrders = viewRecent ? await getRecentMarketOrders("sell") : (await getMarketOrders(message.member, "sell")).reverse();
+    const sellOrders = viewRecent
+      ? await getRecentMarketOrders("sell")
+      : (await getMarketOrders(message.member, "sell")).reverse();
 
     const embed = new CustomEmbed(message.member).setHeader(
       "the market",
@@ -363,10 +361,10 @@ async function run(
       message.author.avatarURL(),
     );
 
-    let orders = (await getMarketOrders(message.member, type)).reverse()
+    let orders = (await getMarketOrders(message.member, type)).reverse();
 
     const updateEmbed = async () => {
-      orders = (await getMarketOrders(message.member, type)).reverse()
+      orders = (await getMarketOrders(message.member, type)).reverse();
 
       embed.setFields({
         name: `your ${type} orders`,
@@ -480,7 +478,7 @@ async function run(
             }
 
             const userItemSellOrders = (await getMarketOrders(message.member, "sell")).filter(
-              (i) => (i.itemId == selected.id),
+              (i) => i.itemId == selected.id,
             );
 
             if (
@@ -501,7 +499,14 @@ async function run(
 
             await removeBalance(message.member, parseInt(amount) * cost);
 
-            await createMarketOrder(message.member.id, selected.id, parseInt(amount), cost, "buy");
+            await createMarketOrder(
+              message.member.id,
+              selected.id,
+              parseInt(amount),
+              cost,
+              "buy",
+              message.client as NypsiClient,
+            );
 
             await res.editReply({
               embeds: [new CustomEmbed(message.member, "✅ your buy order has been created")],
@@ -527,7 +532,7 @@ async function run(
             }
 
             const userItemBuyOrders = (await getMarketOrders(message.member, "buy")).filter(
-              (i) => (i.itemId == selected.id),
+              (i) => i.itemId == selected.id,
             );
 
             if (
@@ -552,7 +557,14 @@ async function run(
               inventory.find((i) => i.item == selected.id).amount - parseInt(amount),
             );
 
-            await createMarketOrder(message.member.id, selected.id, parseInt(amount), cost, "sell");
+            await createMarketOrder(
+              message.member.id,
+              selected.id,
+              parseInt(amount),
+              cost,
+              "sell",
+              message.client as NypsiClient,
+            );
 
             await res.editReply({
               embeds: [new CustomEmbed(message.member, "✅ your sell order has been created")],
@@ -990,7 +1002,7 @@ async function run(
       }
 
       const userItemSellOrders = (await getMarketOrders(message.member, "sell")).filter(
-        (i) => (i.itemId == selected.id),
+        (i) => i.itemId == selected.id,
       );
 
       if (
@@ -1008,7 +1020,14 @@ async function run(
 
       await removeBalance(message.member, parseInt(amount) * cost);
 
-      await createMarketOrder(message.member.id, selected.id, parseInt(amount), cost, "buy");
+      await createMarketOrder(
+        message.member.id,
+        selected.id,
+        parseInt(amount),
+        cost,
+        "buy",
+        message.client as NypsiClient,
+      );
 
       return send({
         embeds: [new CustomEmbed(message.member, "✅ your buy order has been created")],
@@ -1030,7 +1049,7 @@ async function run(
       }
 
       const userItemBuyOrders = (await getMarketOrders(message.member, "buy")).filter(
-        (i) => (i.itemId == selected.id),
+        (i) => i.itemId == selected.id,
       );
 
       if (
@@ -1052,7 +1071,14 @@ async function run(
         inventory.find((i) => i.item == selected.id).amount - parseInt(amount),
       );
 
-      await createMarketOrder(message.member.id, selected.id, parseInt(amount), cost, "sell");
+      await createMarketOrder(
+        message.member.id,
+        selected.id,
+        parseInt(amount),
+        cost,
+        "sell",
+        message.client as NypsiClient,
+      );
 
       return send({
         embeds: [new CustomEmbed(message.member, "✅ your sell order has been created")],

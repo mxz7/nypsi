@@ -1,9 +1,17 @@
 import { MarketWatch, OrderType } from "@prisma/client";
-import { GuildMember } from "discord.js";
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  GuildMember,
+  MessageActionRowComponentBuilder,
+} from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed, getColor } from "../../../models/EmbedBuilders";
+import { Item } from "../../../types/Economy";
+import { NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
 import { logger, transaction } from "../../logger";
 import { getAllGroupAccountIds } from "../moderation/alts";
@@ -11,13 +19,12 @@ import { filterOutliers } from "../outliers";
 import { getTier } from "../premium/premium";
 import { addToNypsiBank, getTax } from "../tax";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
+import { getLastKnownAvatar, getLastKnownUsername } from "../users/tag";
 import { addBalance, getBalance, removeBalance } from "./balance";
 import { addInventoryItem, getInventory, setInventoryItem } from "./inventory";
 import { addStat } from "./stats";
 import { createUser, getItems, userExists } from "./utils";
 import ms = require("ms");
-import { Item } from "../../../types/Economy";
-import { getLastKnownUsername } from "../users/tag";
 
 const inTransaction = new Set<string>();
 const dmQueue = new Map<string, { buyers: Map<string, number> }>();
@@ -51,7 +58,7 @@ export async function getRecentMarketOrders(type: OrderType) {
     where: { AND: [{ completed: false }, { orderType: type }] },
     orderBy: { createdAt: "desc" },
     take: 5,
-  })
+  });
 }
 
 export async function getMarketItemOrders(
@@ -115,26 +122,112 @@ export async function getMarketAverage(item: string) {
   return avg;
 }
 
-export async function createMarketOrder(member: GuildMember | string, itemId: string, amount: number, price: number, orderType: OrderType) {
-    let ownerId: string;
-    if (member instanceof GuildMember) {
-      ownerId = member.user.id;
-    } else {
-      ownerId = member;
-    }
+export async function createMarketOrder(
+  member: GuildMember | string,
+  itemId: string,
+  amount: number,
+  price: number,
+  orderType: OrderType,
+  client: NypsiClient,
+) {
+  let ownerId: string;
+  let username: string;
+  let avatar: string;
 
-    await prisma.marketOrder.create({
-      data: {
-        ownerId: ownerId,
-        itemId: itemId,
-        itemAmount: amount,
-        price: price,
-        orderType: orderType,
-      },
-    });
-    
-  await checkMarketOverlap(member, itemId, orderType);
-  await checkMarketWatchers(itemId, amount, member, orderType, price);
+  if (member instanceof GuildMember) {
+    ownerId = member.user.id;
+    username = member.user.username;
+    avatar = member.user.displayAvatarURL();
+  } else {
+    ownerId = member;
+  }
+
+  const order = await prisma.marketOrder.create({
+    data: {
+      ownerId: ownerId,
+      itemId: itemId,
+      itemAmount: amount,
+      price: price,
+      orderType: orderType,
+    },
+    select: {
+      createdAt: true,
+    },
+  });
+
+  const sold = await checkMarketOverlap(member, itemId, orderType);
+  if (!username) username = await getLastKnownUsername(ownerId);
+  if (!avatar) avatar = await getLastKnownAvatar(ownerId);
+
+  const embed = new CustomEmbed(member);
+  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>();
+
+  embed.setHeader(username, avatar, `https://nypsi.xyz/user/${ownerId}`);
+
+  let description: string;
+
+  if (sold) {
+    description = `fulfilled <t:${Math.floor(Date.now() / 1000)}:R>`;
+  } else {
+    description = `created <t:${Math.floor(order.createdAt.getTime() / 1000)}:R>`;
+  }
+
+  if (orderType === "buy") {
+    embed.setColor("#7ECFFF");
+    description += `buying **${amount}x** ${getItems()[itemId].emoji} **[${getItems()[itemId].name}](https://nypsi.xyz/item/${itemId})** for $${(price * amount).toLocaleString()}`;
+    row.addComponents(
+      new ButtonBuilder().setCustomId("market-full").setLabel("sell").setStyle(ButtonStyle.Success),
+      new ButtonBuilder()
+        .setCustomId("market-partial")
+        .setLabel("sell some")
+        .setStyle(ButtonStyle.Secondary),
+    );
+  } else if (orderType === "sell") {
+    embed.setColor("#BB9BF8");
+    description += `selling **${amount}x** ${getItems()[itemId].emoji} **[${getItems()[itemId].name}](https://nypsi.xyz/item/${itemId})** for $${(price * amount).toLocaleString()}`;
+    row.addComponents(
+      new ButtonBuilder().setCustomId("market-full").setLabel("buy").setStyle(ButtonStyle.Success),
+      new ButtonBuilder()
+        .setCustomId("market-partial")
+        .setLabel("buy some")
+        .setStyle(ButtonStyle.Secondary),
+    );
+  }
+
+  if (amount > 1) embed.setFooter({ text: `$${price.toLocaleString()} each` });
+
+  const payload = {
+    embeds: [embed],
+    components: sold ? [] : [row],
+  };
+
+  const res = await client.cluster.broadcastEval(
+    async (client, { payload, channelId }) => {
+      const channel = client.channels.cache.get(channelId);
+
+      if (!channel) return false;
+      if (!channel.isSendable()) return false;
+
+      try {
+        const msg = await channel.send(payload);
+
+        return msg.url;
+      } catch {
+        return false;
+      }
+    },
+    {
+      context: { payload, channelId: Constants.AUCTION_CHANNEL_ID },
+    },
+  );
+
+  const url = res.filter((i) => Boolean(i))[0];
+
+  if (!url) return false;
+
+  checkMarketWatchers(itemId, amount, member, orderType, price, url);
+
+  return true;
 }
 
 export async function updateMarketWatch(
@@ -149,7 +242,7 @@ export async function updateMarketWatch(
   } else {
     userId = member;
   }
-  
+
   await prisma.marketWatch.upsert({
     where: {
       userId_itemId_orderType: {
@@ -187,7 +280,11 @@ export async function setMarketWatch(member: GuildMember | string, items: Market
   return items;
 }
 
-export async function deleteMarketWatch(member: GuildMember | string, type: OrderType, itemId: string) {
+export async function deleteMarketWatch(
+  member: GuildMember | string,
+  type: OrderType,
+  itemId: string,
+) {
   let userId: string;
   if (member instanceof GuildMember) {
     userId = member.user.id;
@@ -234,6 +331,7 @@ export async function checkMarketWatchers(
   member: GuildMember | string,
   type: OrderType,
   cost: number,
+  url: string,
 ) {
   let creatorId: string;
   if (member instanceof GuildMember) {
@@ -266,7 +364,7 @@ export async function checkMarketWatchers(
     })
     .then((q) => q.map((i) => i.userId));
 
-  const payload = {
+  const payload: NotificationPayload = {
     payload: {
       embed: new CustomEmbed().setDescription(
         `a ${type} order has made been for ${amount} ${getItems()[itemId].emoji} **[${
@@ -274,6 +372,9 @@ export async function checkMarketWatchers(
             ? getItems()[itemId].name
             : getItems()[itemId].plural
         }](https://nypsi.xyz/item/${itemId})**`,
+      ),
+      components: new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("jump").setURL(url),
       ),
     },
     memberId: "boob",
@@ -371,7 +472,7 @@ export async function checkMarketOverlap(
   itemId: string,
   createdOrderType: OrderType,
   repeatCount?: number,
-) {
+): Promise<boolean> {
   if (
     inTransaction.has(itemId) ||
     (await redis.exists(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`))
@@ -388,7 +489,7 @@ export async function checkMarketOverlap(
   const buyOrders = await getMarketItemOrders(itemId, "buy");
   const sellOrders = await getMarketItemOrders(itemId, "sell");
 
-  if (buyOrders.length == 0 || sellOrders.length == 0) return;
+  if (buyOrders.length == 0 || sellOrders.length == 0) return false;
 
   const highestBuyOrder = buyOrders.reduce((prev, current) =>
     current.price > prev.price ? current : prev,
@@ -398,7 +499,7 @@ export async function checkMarketOverlap(
     current.price < prev.price ? current : prev,
   );
 
-  if (highestBuyOrder.price < lowestSellOrder.price) return;
+  if (highestBuyOrder.price < lowestSellOrder.price) return false;
 
   const sellOrdersBelowPrice = sellOrders.filter((i) => i.price <= highestBuyOrder.price);
   const buyOrdersAbovePrice = buyOrders.filter((i) => i.price >= lowestSellOrder.price);
@@ -420,12 +521,9 @@ export async function checkMarketOverlap(
     await completeBuy(member, itemId, countBetweenPrices, sellOrdersBelowPrice);
 
     for (const order of sellOrdersBelowPrice) {
-      await completeSell(
-        order.ownerId,
-        itemId,
-        Math.min(amount, Number(order.itemAmount)),
-        [await prisma.marketOrder.findUnique({ where: { id: highestBuyOrder.id } })],
-      );
+      await completeSell(order.ownerId, itemId, Math.min(amount, Number(order.itemAmount)), [
+        await prisma.marketOrder.findUnique({ where: { id: highestBuyOrder.id } }),
+      ]);
       amount -= Math.min(amount, Number(order.itemAmount));
     }
 
@@ -436,12 +534,9 @@ export async function checkMarketOverlap(
     await completeSell(member, itemId, countBetweenPrices, buyOrdersAbovePrice);
 
     for (const order of buyOrdersAbovePrice) {
-      await completeBuy(
-        order.ownerId,
-        itemId,
-        Math.min(amount, Number(order.itemAmount)),
-        [await prisma.marketOrder.findUnique({ where: { id: lowestSellOrder.id } })],
-      );
+      await completeBuy(order.ownerId, itemId, Math.min(amount, Number(order.itemAmount)), [
+        await prisma.marketOrder.findUnique({ where: { id: lowestSellOrder.id } }),
+      ]);
       amount -= Math.min(amount, Number(order.itemAmount));
     }
 
@@ -454,6 +549,7 @@ export async function checkMarketOverlap(
 
   await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
   inTransaction.delete(itemId);
+  return true;
 }
 
 export async function marketBuy(
@@ -654,17 +750,17 @@ async function completeBuy(
 
     await addBalance(order.ownerId, order.buyAmount * order.price - taxedAmount);
     await addStat(order.ownerId, "earned-market", order.buyAmount * order.price - taxedAmount);
-    
+
     const username = await getLastKnownUsername(userId);
-  
+
     transaction(
-      { username: await getLastKnownUsername(order.ownerId), id: order.ownerId},
-      { username: username, id: userId},
+      { username: await getLastKnownUsername(order.ownerId), id: order.ownerId },
+      { username: username, id: userId },
       `${itemId} x ${order.buyAmount} (market buy)`,
     );
     transaction(
-      { username: username, id: userId},
-      { username: await getLastKnownUsername(order.ownerId), id: order.ownerId},
+      { username: username, id: userId },
+      { username: await getLastKnownUsername(order.ownerId), id: order.ownerId },
       `$${(order.buyAmount * order.price - taxedAmount).toLocaleString()} (market buy)`,
     );
 
@@ -929,13 +1025,13 @@ async function completeSell(
     const username = await getLastKnownUsername(userId);
 
     transaction(
-      { username: await getLastKnownUsername(order.ownerId), id: order.ownerId},
-      { username: username, id: userId},
+      { username: await getLastKnownUsername(order.ownerId), id: order.ownerId },
+      { username: username, id: userId },
       `$${(order.sellAmount * order.price - taxedAmount).toLocaleString()} (market sell)`,
     );
     transaction(
-      { username: await getLastKnownUsername(userId), id: userId},
-      { username: username, id: order.ownerId},
+      { username: await getLastKnownUsername(userId), id: userId },
+      { username: username, id: order.ownerId },
       `${itemId} x ${order.sellAmount} (market sell)`,
     );
 
