@@ -1,6 +1,7 @@
 import { AutocompleteHandler } from "../types/InteractionHandler";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getUserAliases } from "../utils/functions/premium/aliases";
+import { logger } from "../utils/logger";
 
 export default {
   name: "alias",
@@ -17,6 +18,11 @@ export default {
       value: i.alias,
     }));
 
-    return await interaction.respond(formatted);
+    return await interaction.respond(formatted).catch(() => {
+      logger.warn(`failed to respond to autocomplete in time`, {
+        userId: interaction.user.id,
+        command: interaction.commandName,
+      });
+    });
   },
 } as AutocompleteHandler;

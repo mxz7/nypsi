@@ -1,5 +1,6 @@
 import { AutocompleteHandler } from "../types/InteractionHandler";
 import { getReactionRolesByGuild } from "../utils/functions/guilds/reactionroles";
+import { logger } from "../utils/logger";
 
 export default {
   name: "reaction-role",
@@ -17,14 +18,21 @@ export default {
         rr.title?.includes(focused.value),
     );
 
-    return interaction.respond(
-      filtered.map((rr) => {
-        let title = rr.title;
+    return interaction
+      .respond(
+        filtered.map((rr) => {
+          let title = rr.title;
 
-        if (title?.length > 20) title = title.substring(0, 20) + "...";
+          if (title?.length > 20) title = title.substring(0, 20) + "...";
 
-        return { name: title ? `${title} (${rr.messageId})` : rr.messageId, value: rr.messageId };
-      }),
-    );
+          return { name: title ? `${title} (${rr.messageId})` : rr.messageId, value: rr.messageId };
+        }),
+      )
+      .catch(() => {
+        logger.warn(`failed to respond to autocomplete in time`, {
+          userId: interaction.user.id,
+          command: interaction.commandName,
+        });
+      });
   },
 } as AutocompleteHandler;
