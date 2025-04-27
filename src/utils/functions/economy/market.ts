@@ -27,7 +27,10 @@ import { createUser, getItems, userExists } from "./utils";
 import ms = require("ms");
 
 const inTransaction = new Set<string>();
-const dmQueue = new Map<string, { buyers: Map<string, number> }>();
+/**
+ * items is map of itemId -> map of userId -> amount
+ */
+const dmQueue = new Map<string, { earned: number; items: Map<string, Map<string, number>> }>();
 
 export async function getMarketOrders(member: GuildMember | string | undefined, type: OrderType) {
   let id: string;
@@ -785,43 +788,59 @@ async function completeBuy(
     );
 
     if ((await getDmSettings(order.ownerId)).market) {
-      if (dmQueue.has(`${order.ownerId}-${itemId}`)) {
-        if (dmQueue.get(`${order.ownerId}-${itemId}`).buyers.has(userId)) {
-          dmQueue
-            .get(`${order.ownerId}-${itemId}`)
-            .buyers.set(
-              username,
-              dmQueue.get(`${order.ownerId}-${itemId}`).buyers.get(username) + amount,
-            );
+      if (dmQueue.has(`${order.ownerId}-sell`)) {
+        if (dmQueue.get(`${order.ownerId}-sell`).items.has(itemId)) {
+          if (dmQueue.get(`${order.ownerId}-sell`).items.get(itemId).has(userId)) {
+            dmQueue
+              .get(`${order.ownerId}-sell`)
+              .items.get(itemId)
+              .set(
+                userId,
+                dmQueue.get(`${order.ownerId}-sell`).items.get(itemId).get(userId) + amount,
+              );
+          } else {
+            dmQueue.get(`${order.ownerId}-sell`).items.get(itemId).set(userId, amount);
+          }
         } else {
-          dmQueue.get(`${order.ownerId}-${itemId}`).buyers.set(username, amount);
+          dmQueue.get(`${order.ownerId}-sell`).items.set(itemId, new Map([[userId, amount]]));
         }
+
+        dmQueue.get(`${order.ownerId}-sell`).earned += order.buyAmount * order.price - taxedAmount;
       } else {
-        dmQueue.set(`${order.ownerId}-${itemId}`, {
-          buyers: new Map([[username, amount]]),
+        dmQueue.set(`${order.ownerId}-sell`, {
+          items: new Map([[itemId, new Map([[userId, amount]])]]),
+          earned: order.buyAmount * order.price - taxedAmount,
         });
 
         setTimeout(async () => {
-          if (!dmQueue.has(`${order.ownerId}-${itemId}`)) return;
-          const buyers = dmQueue.get(`${order.ownerId}-${itemId}`).buyers;
-          const total = Array.from(buyers.values()).reduce((a, b) => a + b);
-          const moneyReceived = Math.floor(order.buyAmount * order.price);
+          if (!dmQueue.has(`${order.ownerId}-sell`)) return;
+          let total = 0;
+          const data = dmQueue.get(`${order.ownerId}-sell`);
+
+          let description = "";
+
+          for (const [item, buyers] of data.items) {
+            description += `${items[item].emoji} **${items[item].name}**:\n`;
+
+            for (const [buyer, amount] of buyers) {
+              const username = await getLastKnownUsername(buyer);
+              description += `- **${username}**: ${amount.toLocaleString()}\n`;
+              total += amount;
+            }
+
+            description += "\n";
+          }
 
           const embedDm = new CustomEmbed(order.ownerId)
-            .setDescription(
-              `${total.toLocaleString()}x of your ${items[itemId].emoji} ${
-                items[itemId].name
-              } sell order(s) has been bought by: \n${Array.from(buyers.entries())
-                .map((i) => `**${i[0]}**: ${i[1]}`)
-                .join("\n")}`,
-            )
-            .setFooter({ text: `+$${(moneyReceived - taxedAmount).toLocaleString()}` });
-          dmQueue.delete(`${order.ownerId}-${itemId}`);
+            .setDescription(description)
+            .setFooter({ text: `+$${data.earned.toLocaleString()}` });
+
+          dmQueue.delete(`${order.ownerId}-sell`);
 
           addNotificationToQueue({
             memberId: order.ownerId,
             payload: {
-              content: `${total.toLocaleString()}x of your sell order items have been bought`,
+              content: `${total.toLocaleString()}x of your sell order items have been fulfilled`,
               embed: embedDm,
             },
           });
@@ -1039,8 +1058,8 @@ async function completeSell(
 
     totalTax += taxedAmount;
 
-    addInventoryItem(order.ownerId, itemId, Number(amount)),
-      await addStat(order.ownerId, "spent-market", order.sellAmount * order.price - taxedAmount);
+    await addInventoryItem(order.ownerId, itemId, Number(amount));
+    await addStat(order.ownerId, "spent-market", order.sellAmount * order.price - taxedAmount);
 
     const username = await getLastKnownUsername(userId);
 
@@ -1056,35 +1075,54 @@ async function completeSell(
     );
 
     if ((await getDmSettings(order.ownerId)).market) {
-      if (dmQueue.has(`${order.ownerId}-${itemId}`)) {
-        if (dmQueue.get(`${order.ownerId}-${itemId}`).buyers.has(userId)) {
-          dmQueue
-            .get(`${order.ownerId}-${itemId}`)
-            .buyers.set(
-              username,
-              dmQueue.get(`${order.ownerId}-${itemId}`).buyers.get(username) + amount,
-            );
+      if (dmQueue.has(`${order.ownerId}-sell`)) {
+        if (dmQueue.get(`${order.ownerId}-sell`).items.has(itemId)) {
+          if (dmQueue.get(`${order.ownerId}-sell`).items.get(itemId).has(userId)) {
+            dmQueue
+              .get(`${order.ownerId}-sell`)
+              .items.get(itemId)
+              .set(
+                userId,
+                dmQueue.get(`${order.ownerId}-sell`).items.get(itemId).get(userId) + amount,
+              );
+          } else {
+            dmQueue.get(`${order.ownerId}-sell`).items.get(itemId).set(userId, amount);
+          }
         } else {
-          dmQueue.get(`${order.ownerId}-${itemId}`).buyers.set(username, amount);
+          dmQueue.get(`${order.ownerId}-sell`).items.set(itemId, new Map([[userId, amount]]));
         }
+
+        dmQueue.get(`${order.ownerId}-sell`).earned += order.sellAmount * order.price - taxedAmount;
       } else {
-        dmQueue.set(`${order.ownerId}-${itemId}`, {
-          buyers: new Map([[username, amount]]),
+        dmQueue.set(`${order.ownerId}-sell`, {
+          items: new Map([[itemId, new Map([[userId, amount]])]]),
+          earned: order.sellAmount * order.price - taxedAmount,
         });
 
         setTimeout(async () => {
-          if (!dmQueue.has(`${order.ownerId}-${itemId}`)) return;
-          const buyers = dmQueue.get(`${order.ownerId}-${itemId}`).buyers;
-          const total = Array.from(buyers.values()).reduce((a, b) => a + b);
+          if (!dmQueue.has(`${order.ownerId}-buy`)) return;
+          let total = 0;
+          const data = dmQueue.get(`${order.ownerId}-buy`);
 
-          const embedDm = new CustomEmbed(order.ownerId).setDescription(
-            `${total.toLocaleString()}x of your ${items[itemId].emoji} ${
-              items[itemId].name
-            } buy order(s) has been fulfilled by: \n${Array.from(buyers.entries())
-              .map((i) => `**${i[0]}**: ${i[1]}`)
-              .join("\n")}`,
-          );
-          dmQueue.delete(`${order.ownerId}-${itemId}`);
+          let description = "";
+
+          for (const [item, buyers] of data.items) {
+            description += `${items[item].emoji} **${items[item].name}**:\n`;
+
+            for (const [buyer, amount] of buyers) {
+              const username = await getLastKnownUsername(buyer);
+              description += `- **${username}**: ${amount.toLocaleString()}\n`;
+              total += amount;
+            }
+
+            description += "\n";
+          }
+
+          const embedDm = new CustomEmbed(order.ownerId)
+            .setDescription(description)
+            .setFooter({ text: `+$${data.earned.toLocaleString()}` });
+
+          dmQueue.delete(`${order.ownerId}-buy`);
 
           addNotificationToQueue({
             memberId: order.ownerId,
