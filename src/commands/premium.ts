@@ -192,7 +192,6 @@ async function run(
       }
 
       if (!(await isPremium(guildMember))) {
-        // i dont want plat role lol
         if (roleIds.includes(Constants.PLATINUM_ROLE_ID)) {
           await sleep(250);
           await guildMember.roles.remove(Constants.PLATINUM_ROLE_ID);
