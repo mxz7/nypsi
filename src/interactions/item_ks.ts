@@ -1,6 +1,7 @@
 import { AutocompleteHandler } from "../types/InteractionHandler";
 import { getKarma } from "../utils/functions/karma/karma";
 import { getKarmaShopItems, isKarmaShopOpen } from "../utils/functions/karma/karmashop";
+import { logger } from "../utils/logger";
 
 export default {
   name: "item-karmashop",
@@ -36,6 +37,11 @@ export default {
       value: i,
     }));
 
-    return await interaction.respond(formatted);
+    return await interaction.respond(formatted).catch(() => {
+      logger.warn(`failed to respond to autocomplete in time`, {
+        userId: interaction.user.id,
+        command: interaction.commandName,
+      });
+    });
   },
 } as AutocompleteHandler;

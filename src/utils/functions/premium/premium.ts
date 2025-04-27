@@ -261,9 +261,9 @@ export async function expireUser(member: string, client?: NypsiClient | ClusterM
         if (!member) return;
 
         await member.roles.remove(roleId);
-        const role = guild.roles.cache.find((i) => i.name === memberId);
+        const role = guild.roles.cache.find((i) => i.name === "custom");
 
-        if (role) await role.delete().catch(() => {});
+        if (role) member.roles.remove(role);
       },
       {
         context: { guildId: Constants.NYPSI_SERVER_ID, cluster, memberId: member, roleId },

@@ -139,12 +139,13 @@ export default class ScratchCard {
       if (this.area[y][x].clicks === 1) return;
     } catch (e) {
       logger.error(`scratch card weird error meow meow 1`, {
-        area: this.area,
         y: y,
         x: x,
         customId: interaction.customId,
+        area: this.area,
       });
       console.error(e);
+      console.error(interaction);
 
       return;
     }

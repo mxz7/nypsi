@@ -444,7 +444,7 @@ export async function reset() {
   await prisma.economyWorkerUpgrades.deleteMany();
   await prisma.economyWorker.deleteMany();
   logger.info("deleting inventory");
-  await prisma.inventory.deleteMany();
+  await prisma.inventory.deleteMany({ where: { NOT: { item: "gold_star" } }});
   logger.info("deleting crafting");
   await prisma.crafting.deleteMany();
   await prisma.$executeRaw`TRUNCATE TABLE "Crafting" RESTART IDENTITY;`;
