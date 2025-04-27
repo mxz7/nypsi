@@ -246,11 +246,19 @@ export async function createMarketOrder(
 
   const url = res.filter((i) => Boolean(i))[0];
 
-  if (!url) return false;
+  const response: { sold: boolean; amount: number; url?: string } = {
+    sold,
+    amount,
+  };
+
+  if (!url) {
+    return response;
+  }
 
   checkMarketWatchers(itemId, amount, member, orderType, price, url);
 
-  return true;
+  response.url = url;
+  return response;
 }
 
 export async function updateMarketWatch(

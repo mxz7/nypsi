@@ -499,7 +499,7 @@ async function run(
 
             await removeBalance(message.member, parseInt(amount) * cost);
 
-            await createMarketOrder(
+            const createRes = await createMarketOrder(
               message.member.id,
               selected.id,
               parseInt(amount),
@@ -508,8 +508,20 @@ async function run(
               message.client as NypsiClient,
             );
 
+            let description: string;
+
+            if (createRes.sold) {
+              description = `✅ your buy order has been instantly fulfilled`;
+            } else if (createRes.amount < parseInt(amount)) {
+              description = `✅ your buy order has been partially fulfilled`;
+            } else {
+              description = `✅ your buy order has been created`;
+            }
+
+            if (createRes.url) description = `[${description}](${createRes.url})`;
+
             await res.editReply({
-              embeds: [new CustomEmbed(message.member, "✅ your buy order has been created")],
+              embeds: [new CustomEmbed(message.member, description)],
               options: { ephemeral: true },
             });
           } else if (type == "sell") {
@@ -557,7 +569,7 @@ async function run(
               inventory.find((i) => i.item == selected.id).amount - parseInt(amount),
             );
 
-            await createMarketOrder(
+            const createRes = await createMarketOrder(
               message.member.id,
               selected.id,
               parseInt(amount),
@@ -566,8 +578,20 @@ async function run(
               message.client as NypsiClient,
             );
 
+            let description: string;
+
+            if (createRes.sold) {
+              description = `✅ your sell order has been instantly fulfilled`;
+            } else if (createRes.amount < parseInt(amount)) {
+              description = `✅ your sell order has been partially fulfilled`;
+            } else {
+              description = `✅ your sell order has been created`;
+            }
+
+            if (createRes.url) description = `[${description}](${createRes.url})`;
+
             await res.editReply({
-              embeds: [new CustomEmbed(message.member, "✅ your sell order has been created")],
+              embeds: [new CustomEmbed(message.member, description)],
               options: { ephemeral: true },
             });
           }
@@ -1031,7 +1055,7 @@ async function run(
 
       await removeBalance(message.member, parseInt(amount) * cost);
 
-      await createMarketOrder(
+      const createRes = await createMarketOrder(
         message.member.id,
         selected.id,
         parseInt(amount),
@@ -1040,8 +1064,20 @@ async function run(
         message.client as NypsiClient,
       );
 
+      let description: string;
+
+      if (createRes.sold) {
+        description = `✅ your buy order has been instantly fulfilled`;
+      } else if (createRes.amount < parseInt(amount)) {
+        description = `✅ your buy order has been partially fulfilled`;
+      } else {
+        description = `✅ your buy order has been created`;
+      }
+
+      if (createRes.url) description = `[${description}](${createRes.url})`;
+
       return send({
-        embeds: [new CustomEmbed(message.member, "✅ your buy order has been created")],
+        embeds: [new CustomEmbed(message.member, description)],
       });
     } else if (type == "sell") {
       const inventory = await getInventory(message.member);
@@ -1082,7 +1118,7 @@ async function run(
         inventory.find((i) => i.item == selected.id).amount - parseInt(amount),
       );
 
-      await createMarketOrder(
+      const createRes = await createMarketOrder(
         message.member.id,
         selected.id,
         parseInt(amount),
@@ -1091,8 +1127,20 @@ async function run(
         message.client as NypsiClient,
       );
 
+      let description: string;
+
+      if (createRes.sold) {
+        description = `✅ your sell order has been instantly fulfilled`;
+      } else if (createRes.amount < parseInt(amount)) {
+        description = `✅ your sell order has been partially fulfilled`;
+      } else {
+        description = `✅ your sell order has been created`;
+      }
+
+      if (createRes.url) description = `[${description}](${createRes.url})`;
+
       return send({
-        embeds: [new CustomEmbed(message.member, "✅ your sell order has been created")],
+        embeds: [new CustomEmbed(message.member, description)],
       });
     }
   } else return viewMarket();
