@@ -131,19 +131,28 @@ async function run(
     return send({ embeds: [new ErrorEmbed("invalid payment")] });
   }
 
-  if (amount > (await getBalance(message.member))) {
-    return send({ embeds: [new ErrorEmbed("you cannot afford this payment")] });
-  }
-
   if (amount <= 0) {
     return send({ embeds: [new ErrorEmbed("invalid payment")] });
+  }
+
+  let tax = await getTax();
+
+  if (
+    ((await isPremium(message.member)) && (await getTier(message.member)) === 4) ||
+    ((await isPremium(target)) && (await getTier(target)) === 4)
+  ) {
+    tax = 0;
+  }
+
+  if (amount > (await getBalance(message.member))) {
+    return send({ embeds: [new ErrorEmbed("you cannot afford this payment")] });
   }
 
   if (target.user.id == message.client.user.id) {
     await addCooldown(cmd.name, message.member, 10);
     await removeBalance(message.member, amount);
-    addStat(message.author.id, "spent-bank", amount);
     await addToNypsiBank(amount);
+    addStat(message.author.id, "spent-bank", amount);
 
     return send({
       embeds: [
@@ -156,15 +165,6 @@ async function run(
   }
 
   await addCooldown(cmd.name, message.member, 10);
-
-  let tax = await getTax();
-
-  if (
-    ((await isPremium(message.member)) && (await getTier(message.member)) === 4) ||
-    ((await isPremium(target)) && (await getTier(target)) === 4)
-  ) {
-    tax = 0;
-  }
 
   await removeBalance(message.member, amount);
   addStat(message.author.id, "spent-pay", amount);
