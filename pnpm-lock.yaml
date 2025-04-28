@@ -33,8 +33,8 @@ importers:
         specifier: 4.0.9
         version: 4.0.9
       bullmq:
-        specifier: ^5.50.0
-        version: 5.50.0
+        specifier: ^5.51.1
+        version: 5.51.1
       chalk:
         specifier: 4.1.2
         version: 4.1.2
@@ -1553,8 +1553,8 @@ packages:
     resolution: {integrity: sha512-WDtdLmJvAuNNPzByAYpRo2rF1Mmradw6gvWsQKf63476DDXmomT9zUiGypLcG4ibIM67vhAj8jJRdbmEws2Aqw==}
     engines: {node: '>=6.14.2'}
 
-  bullmq@5.50.0:
-    resolution: {integrity: sha512-SWxQRLGIa91ikHV1BF8c72HFC5e9GNm3qSOyDOan2+E7jxhgMxTOc6NxF6ahYUWcAI7LvijLctyQXAnJXBoEGw==}
+  bullmq@5.51.1:
+    resolution: {integrity: sha512-JEZokH5Sb6p66HRjbfQjPNYuSilDRcB8UREmJzOBqTTaJFza8I92vsBF3J/zmtzd7KVv3dxhZyH9CYSLOJALRA==}
 
   bytes@3.1.2:
     resolution: {integrity: sha512-/Nf7TyzTx6S3yRJObOAV7956r8cr2+Oj8AC5dt8wSP3BQAoeX58NoHyCU8P8zGkNXStjTSi6fzO6F0pBdcYbEg==}
@@ -5017,7 +5017,7 @@ snapshots:
     dependencies:
       node-gyp-build: 4.8.4
 
-  bullmq@5.50.0:
+  bullmq@5.51.1:
     dependencies:
       cron-parser: 4.9.0
       ioredis: 5.6.1
