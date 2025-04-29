@@ -12,7 +12,7 @@ import { ItemUse } from "../../../../models/ItemUse";
 import { MStoTime } from "../../date";
 import sleep from "../../sleep";
 import { getCraftingItems } from "../crafting";
-import { getInventory, setInventoryItem } from "../inventory";
+import { getInventory, removeInventoryItem } from "../inventory";
 import { formatNumber, getItems } from "../utils";
 import dayjs = require("dayjs");
 
@@ -84,11 +84,7 @@ module.exports = new ItemUse(
     if (inventory.find((i) => i.item === "bob").amount < amount)
       return send({ embeds: [new ErrorEmbed("you dont have this many bobs")] });
 
-    await setInventoryItem(
-      message.member,
-      "bob",
-      inventory.find((i) => i.item === "bob").amount - amount,
-    );
+    await removeInventoryItem(message.member, "bob", amount);
 
     const breakdown: string[] = [];
 

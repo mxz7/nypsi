@@ -16,7 +16,7 @@ import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import Constants from "../../../Constants";
 import sleep from "../../sleep";
-import { addInventoryItem, getInventory, setInventoryItem } from "../inventory";
+import { addInventoryItem, getInventory, removeInventoryItem } from "../inventory";
 import { getUpgrades, setUpgrade } from "../levelling";
 import { addStat } from "../stats";
 import { getUpgradesData } from "../utils";
@@ -159,11 +159,7 @@ module.exports = new ItemUse(
           chosen,
           upgrades.find((i) => i.upgradeId === chosen).amount - 1,
         );
-        await setInventoryItem(
-          message.member,
-          "reroll_token",
-          inventory.find((i) => i.item === "reroll_token").amount - 1,
-        );
+        await removeInventoryItem(message.member, "reroll_token", 1);
         await addStat(message.member, "reroll_token", 1);
 
         const upgradesPool: string[] = [];

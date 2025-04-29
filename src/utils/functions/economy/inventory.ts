@@ -180,6 +180,50 @@ export async function addInventoryItem(
   );
 }
 
+export async function removeInventoryItem(
+  member: GuildMember | string,
+  itemId: string,
+  amount: number,
+) {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
+  if (amount <= 0) return;
+
+  if (!(await userExists(id))) await createUser(id);
+
+  if (!getItems()[itemId]) {
+    console.trace();
+    return logger.error(`invalid item: ${itemId}`);
+  }
+
+  await prisma.inventory.upsert({
+    where: {
+      userId_item: {
+        userId: id,
+        item: itemId,
+      },
+    },
+    update: {
+      amount: { decrement: amount },
+    },
+    create: {
+      userId: id,
+      item: itemId,
+      amount: amount,
+    },
+  });
+
+  await redis.del(
+    `${Constants.redis.cache.economy.INVENTORY}:${id}`,
+    `${Constants.redis.cache.economy.ITEM_EXISTS}:${itemId}`,
+  );
+}
+
 export async function setInventoryItem(
   member: GuildMember | string,
   itemId: string,
@@ -377,23 +421,11 @@ export async function gemBreak(userId: string, chance: number, gem: string) {
 
   if (uniqueGemCount === 5 && percentChance(50) && (await getDmSettings(userId)).other) {
     await Promise.all([
-      setInventoryItem(userId, "pink_gem", inventory.find((i) => i.item === "pink_gem").amount - 1),
-      setInventoryItem(
-        userId,
-        "purple_gem",
-        inventory.find((i) => i.item === "purple_gem").amount - 1,
-      ),
-      setInventoryItem(userId, "blue_gem", inventory.find((i) => i.item === "blue_gem").amount - 1),
-      setInventoryItem(
-        userId,
-        "green_gem",
-        inventory.find((i) => i.item === "green_gem").amount - 1,
-      ),
-      setInventoryItem(
-        userId,
-        "white_gem",
-        inventory.find((i) => i.item === "white_gem").amount - 1,
-      ),
+      removeInventoryItem(userId, "pink_gem", 1),
+      removeInventoryItem(userId, "purple_gem", 1),
+      removeInventoryItem(userId, "blue_gem", 1),
+      removeInventoryItem(userId, "green_gem", 1),
+      removeInventoryItem(userId, "white_gem", 1),
       prisma.crafting.create({
         data: {
           amount: 1,
@@ -423,7 +455,7 @@ export async function gemBreak(userId: string, chance: number, gem: string) {
     return;
   }
 
-  await setInventoryItem(userId, gem, inventory.find((i) => i.item === gem).amount - 1);
+  await removeInventoryItem(userId, gem, 1);
 
   const shardMax = new Map<string, number>([
     ["green_gem", 3],

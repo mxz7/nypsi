@@ -20,7 +20,7 @@ import {
   addInventoryItem,
   gemBreak,
   getInventory,
-  setInventoryItem,
+  removeInventoryItem,
 } from "../utils/functions/economy/inventory";
 import { addStat } from "../utils/functions/economy/stats";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
@@ -210,11 +210,7 @@ async function doFish(
   }
 
   if (!unbreaking) {
-    await setInventoryItem(
-      member,
-      fishingRod,
-      inventory.find((i) => i.item == fishingRod).amount - 1,
-    );
+    await removeInventoryItem(member, fishingRod, 1);
   }
 
   const user = await message.client.users.fetch(message.member.user.id);

@@ -25,8 +25,8 @@ import {
 import {
   addInventoryItem,
   getInventory,
+  removeInventoryItem,
   selectItem,
-  setInventoryItem,
 } from "../utils/functions/economy/inventory";
 import { createGame } from "../utils/functions/economy/stats";
 import { createUser, formatBet, isEcoBanned, userExists } from "../utils/functions/economy/utils";
@@ -135,11 +135,7 @@ async function run(
         });
       }
 
-      await setInventoryItem(
-        player2,
-        item.id,
-        player2Inventory.find((i) => i.item === item.id).amount - itemAmount,
-      );
+      await removeInventoryItem(player2, item.id, itemAmount);
     }
 
     // its big to make sure that theres little to no deviation in chance cus of rounding
@@ -465,11 +461,7 @@ async function run(
         });
       }
 
-      await setInventoryItem(
-        message.member,
-        item.id,
-        userInventory.find((i) => i.item === item.id).amount - itemAmount,
-      );
+      await removeInventoryItem(message.member, item.id, itemAmount);
 
       requestEmbed.setDescription(
         `**${
@@ -730,11 +722,7 @@ async function run(
         });
       }
 
-      await setInventoryItem(
-        message.member,
-        item.id,
-        userInventory.find((i) => i.item === item.id).amount - itemAmount,
-      );
+      await removeInventoryItem(message.member, item.id, itemAmount);
 
       requestEmbed.setDescription(
         `**${

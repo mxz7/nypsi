@@ -4,7 +4,7 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
 import { addProgress } from "./achievements";
-import { addInventoryItem, getInventory, setInventoryItem } from "./inventory";
+import { addInventoryItem, getInventory, removeInventoryItem } from "./inventory";
 import { getPlantsData, getPlantUpgrades } from "./utils";
 import dayjs = require("dayjs");
 import ms = require("ms");
@@ -342,11 +342,7 @@ export async function fertiliseFarm(userId: string): Promise<{
     },
   });
 
-  await setInventoryItem(
-    userId,
-    fertiliser.item,
-    fertiliser.amount - Math.ceil(possible.length / 3),
-  );
+  await removeInventoryItem(userId, fertiliser.item, Math.ceil(possible.length / 3));
   await redis.del(`${Constants.redis.cache.economy.farm}:${userId}`);
 
   return { done: possible.length, dead };

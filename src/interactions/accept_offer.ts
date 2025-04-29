@@ -9,7 +9,7 @@ import { addBalance } from "../utils/functions/economy/balance";
 import {
   addInventoryItem,
   getInventory,
-  setInventoryItem,
+  removeInventoryItem,
 } from "../utils/functions/economy/inventory";
 import { checkOffer } from "../utils/functions/economy/offers";
 import { addStat } from "../utils/functions/economy/stats";
@@ -96,11 +96,7 @@ export default {
       });
     }
 
-    await setInventoryItem(
-      interaction.user.id,
-      offer.itemId,
-      inventory.find((i) => i.item === offer.itemId).amount - Number(offer.itemAmount),
-    );
+    await removeInventoryItem(interaction.user.id, offer.itemId, Number(offer.itemAmount));
 
     const tax = await getTax();
     let taxedAmount = 0;

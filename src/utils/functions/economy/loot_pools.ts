@@ -6,7 +6,13 @@ import { addKarma } from "../karma/karma";
 import { addProgress } from "./achievements";
 import { addBalance } from "./balance";
 import { addToGuildXP, getGuildName } from "./guilds";
-import { addInventoryItem, getInventory, isGem, itemExists, setInventoryItem } from "./inventory";
+import {
+  addInventoryItem,
+  getInventory,
+  isGem,
+  itemExists,
+  removeInventoryItem,
+} from "./inventory";
 import { getItems, getLootPools } from "./utils";
 import { addXp } from "./xp";
 
@@ -213,7 +219,7 @@ export async function openCrate(
     return [];
   }
 
-  await setInventoryItem(member, item.id, inventory.find((i) => i.item == item.id).amount - 1);
+  await removeInventoryItem(member, item.id, 1);
 
   const crateItems: LootPoolResult[] = [];
 

@@ -35,7 +35,7 @@ import {
   setCarName,
   setSkin,
 } from "../utils/functions/economy/cars";
-import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
+import { getInventory, removeInventoryItem } from "../utils/functions/economy/inventory";
 import { addStat } from "../utils/functions/economy/stats";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils.js";
 import { getEmojiImage } from "../utils/functions/image";
@@ -325,11 +325,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
 
           addProgress(message.author.id, "mechanic", 1);
           await addCarUpgrade(message.author.id, cars[index].id, getItems()[upgrade].upgrades);
-          await setInventoryItem(
-            message.author.id,
-            upgrade,
-            inventory.find((i) => i.item === upgrade).amount - 1,
-          );
+          await removeInventoryItem(message.author.id, upgrade, 1);
 
           return showCars(await getGarage(message.author.id), index, msg, interaction);
         }

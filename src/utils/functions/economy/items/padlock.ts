@@ -9,7 +9,7 @@ import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Comman
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import { hasPadlock, setPadlock } from "../balance";
-import { getInventory, setInventoryItem } from "../inventory";
+import { removeInventoryItem } from "../inventory";
 
 module.exports = new ItemUse(
   "padlock",
@@ -50,14 +50,8 @@ module.exports = new ItemUse(
       });
     }
 
-    const inventory = await getInventory(message.member);
-
     await Promise.all([
-      setInventoryItem(
-        message.member,
-        "padlock",
-        inventory.find((i) => i.item == "padlock").amount - 1,
-      ),
+      removeInventoryItem(message.member, "padlock", 1),
       setPadlock(message.member, true),
     ]);
 

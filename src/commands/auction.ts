@@ -37,8 +37,8 @@ import {
   addInventoryItem,
   calcItemValue,
   getInventory,
+  removeInventoryItem,
   selectItem,
-  setInventoryItem,
 } from "../utils/functions/economy/inventory";
 import { getRawLevel } from "../utils/functions/economy/levelling";
 import {
@@ -472,11 +472,7 @@ async function run(
     if (auctions.length >= max)
       return message.channel.send({ embeds: [new CustomEmbed(message.member, "sneaky bitch")] });
 
-    await setInventoryItem(
-      message.member,
-      selected.id,
-      inventory.find((i) => i.item == selected.id).amount - amount,
-    );
+    await removeInventoryItem(message.member, selected.id, amount);
 
     const url = await createAuction(message.member, selected.id, amount, cost).catch(() => {});
 
@@ -1089,11 +1085,7 @@ async function run(
       }
     }
 
-    await setInventoryItem(
-      message.member,
-      selected.id,
-      inventory.find((i) => i.item == selected.id).amount - amount,
-    );
+    await removeInventoryItem(message.member, selected.id, amount);
 
     const url = await createAuction(message.member, selected.id, amount, cost).catch((e) => {
       console.log(e);

@@ -7,7 +7,7 @@ import {
 } from "discord.js";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
 import { ItemUse } from "../../../../models/ItemUse";
-import { getInventory, setInventoryItem } from "../inventory";
+import { getInventory, removeInventoryItem } from "../inventory";
 import { doDaily } from "../utils";
 
 module.exports = new ItemUse(
@@ -45,11 +45,7 @@ module.exports = new ItemUse(
 
     const inventory = await getInventory(message.member);
 
-    await setInventoryItem(
-      message.member,
-      "streak_token",
-      inventory.find((i) => i.item == "streak_token").amount - 1,
-    );
+    await removeInventoryItem(message.member, "streak_token", 1);
 
     const embed = await doDaily(message.member);
 

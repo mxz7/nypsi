@@ -11,7 +11,7 @@ import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import sleep from "../../sleep";
 import { increaseBaseBankStorage } from "../balance";
-import { getInventory, setInventoryItem } from "../inventory";
+import { getInventory, removeInventoryItem } from "../inventory";
 import { formatNumber } from "../utils";
 
 module.exports = new ItemUse(
@@ -70,11 +70,7 @@ module.exports = new ItemUse(
     const addedAmount = randomInt(10_000 * amount, 250_000 * amount);
 
     await Promise.all([
-      setInventoryItem(
-        message.member,
-        "stolen_credit_card",
-        inventory.find((i) => i.item == "stolen_credit_card").amount - amount,
-      ),
+      removeInventoryItem(message.member, "stolen_credit_card", amount),
       increaseBaseBankStorage(message.member, addedAmount),
     ]);
 

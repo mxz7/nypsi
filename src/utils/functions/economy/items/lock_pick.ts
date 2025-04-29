@@ -17,7 +17,7 @@ import sleep from "../../sleep";
 import { isUserBlacklisted } from "../../users/blacklist";
 import { getDmSettings } from "../../users/notifications";
 import { hasPadlock, setPadlock } from "../balance";
-import { getInventory, setInventoryItem } from "../inventory";
+import { getInventory, removeInventoryItem } from "../inventory";
 import { isPassive } from "../passive";
 import ms = require("ms");
 
@@ -143,11 +143,7 @@ module.exports = new ItemUse(
     const inventory = await getInventory(message.member);
 
     await Promise.all([
-      setInventoryItem(
-        message.member,
-        "lock_pick",
-        inventory.find((i) => i.item == "lock_pick").amount - 1,
-      ),
+      removeInventoryItem(message.member, "lock_pick", 1),
       setPadlock(lockPickTarget, false),
     ]);
 

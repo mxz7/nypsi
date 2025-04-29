@@ -18,7 +18,7 @@ import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import { startLootRain } from "../../../../scheduled/clusterjobs/random-drops";
 import Constants from "../../../Constants";
-import { getInventory, setInventoryItem } from "../inventory";
+import { getInventory, removeInventoryItem } from "../inventory";
 
 module.exports = new ItemUse(
   "rain",
@@ -118,11 +118,7 @@ module.exports = new ItemUse(
         });
       }
 
-      await setInventoryItem(
-        message.member,
-        "rain",
-        inventory.find((i) => i.item === "rain").amount - 1,
-      );
+      await removeInventoryItem(message.member, "rain", 1);
 
       row.components.forEach((c) => c.setDisabled(true));
 

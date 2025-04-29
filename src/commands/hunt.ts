@@ -19,7 +19,7 @@ import {
   addInventoryItem,
   gemBreak,
   getInventory,
-  setInventoryItem,
+  removeInventoryItem,
 } from "../utils/functions/economy/inventory";
 import { addStat } from "../utils/functions/economy/stats";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
@@ -182,7 +182,7 @@ async function doHunt(
   }
 
   if (!unbreaking) {
-    await setInventoryItem(member, gun, inventory.find((i) => i.item == gun).amount - 1);
+    await removeInventoryItem(member, gun, 1);
   }
 
   let chosenPlace: string;

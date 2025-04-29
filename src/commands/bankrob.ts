@@ -15,7 +15,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
 import { addBalance, getBalance, removeBalance } from "../utils/functions/economy/balance.js";
-import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory.js";
+import { getInventory, removeInventoryItem } from "../utils/functions/economy/inventory.js";
 import { createGame } from "../utils/functions/economy/stats.js";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { createUser, userExists } from "../utils/functions/economy/utils.js";
@@ -197,11 +197,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
       ) {
         lawyer = true;
 
-        await setInventoryItem(
-          message.member,
-          "lawyer",
-          inventory.find((i) => i.item == "lawyer").amount - 1,
-        );
+        await removeInventoryItem(message.member, "lawyer", 1);
       }
 
       const minLoss = Math.floor(loss * 0.4);

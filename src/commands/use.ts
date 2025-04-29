@@ -17,7 +17,11 @@ import { ItemUse } from "../models/ItemUse";
 import { addBakeryUpgrade, getBakeryUpgrades } from "../utils/functions/economy/bakery";
 import { addBooster, getBoosters } from "../utils/functions/economy/boosters";
 import { addFarm, getFarm } from "../utils/functions/economy/farm";
-import { getInventory, selectItem, setInventoryItem } from "../utils/functions/economy/inventory";
+import {
+  getInventory,
+  removeInventoryItem,
+  selectItem,
+} from "../utils/functions/economy/inventory";
 import { addStat } from "../utils/functions/economy/stats";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
 import {
@@ -201,11 +205,7 @@ async function run(
     await Promise.all([
       addBooster(message.member, selected.id, amount),
       addStat(message.member, selected.id, amount),
-      setInventoryItem(
-        message.member,
-        selected.id,
-        inventory.find((i) => i.item == selected.id).amount - amount,
-      ),
+      removeInventoryItem(message.member, selected.id, amount),
     ]);
 
     boosters = await getBoosters(message.member);
@@ -354,11 +354,7 @@ async function run(
       await addWorkerUpgrade(message.member, upgrade.for, upgrade.id);
     }
 
-    await setInventoryItem(
-      message.member,
-      selected.id,
-      inventory.find((i) => i.item == selected.id).amount - amount,
-    );
+    await removeInventoryItem(message.member, selected.id, amount);
     await addStat(message.member, selected.id, amount);
 
     return send({
@@ -407,13 +403,9 @@ async function run(
         });
     }
 
+    await removeInventoryItem(message.member, selected.id, amount);
     await addBakeryUpgrade(message.member, selected.id, amount);
 
-    setInventoryItem(
-      message.member,
-      selected.id,
-      inventory.find((i) => i.item == selected.id).amount - amount,
-    );
     addStat(message.member, selected.id, amount);
 
     const upgrades = await getBakeryUpgrades(message.member);
@@ -444,11 +436,7 @@ async function run(
     if (tags.find((i) => i.tagId === selected.tagId))
       return send({ embeds: [new ErrorEmbed("you already have this tag")] });
 
-    await setInventoryItem(
-      message.member,
-      selected.id,
-      inventory.find((i) => i.item === selected.id).amount - 1,
-    );
+    await removeInventoryItem(message.member, selected.id, 1);
 
     await addTag(message.author.id, selected.tagId);
 
@@ -478,11 +466,7 @@ async function run(
     if (inventory.find((i) => i.item === selected.id).amount < amount)
       return send({ embeds: [new ErrorEmbed(`you don't have this many ${selected.name}`)] });
 
-    await setInventoryItem(
-      message.member,
-      selected.id,
-      inventory.find((i) => i.item === selected.id).amount - amount,
-    );
+    await removeInventoryItem(message.member, selected.id, amount);
     await addFarm(message.member, selected.plantId, amount);
 
     const farm = await getFarm(message.member);

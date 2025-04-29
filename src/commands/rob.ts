@@ -19,7 +19,7 @@ import {
   setPadlock,
 } from "../utils/functions/economy/balance";
 import { addToGuildXP, getGuildByUser, getGuildName } from "../utils/functions/economy/guilds";
-import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
+import { getInventory, removeInventoryItem } from "../utils/functions/economy/inventory";
 import { isPassive } from "../utils/functions/economy/passive";
 import { addStat, createGame } from "../utils/functions/economy/stats";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
@@ -351,11 +351,7 @@ async function run(
         inventory.find((i) => i.item == "lawyer").amount > 0
       ) {
         await Promise.all([
-          setInventoryItem(
-            message.member,
-            "lawyer",
-            inventory.find((i) => i.item == "lawyer").amount - 1,
-          ),
+          removeInventoryItem(message.member, "lawyer", 1),
           addStat(message.member, "lawyer"),
         ]);
 

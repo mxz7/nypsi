@@ -19,7 +19,7 @@ import {
   addInventoryItem,
   gemBreak,
   getInventory,
-  setInventoryItem,
+  removeInventoryItem,
 } from "../utils/functions/economy/inventory";
 import { addStat } from "../utils/functions/economy/stats";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
@@ -212,7 +212,7 @@ async function doMine(
   }
 
   if (!unbreakable) {
-    await setInventoryItem(member, pickaxe, inventory.find((i) => i.item == pickaxe).amount - 1);
+    await removeInventoryItem(member, pickaxe, 1);
   }
 
   let chosenArea: string;
