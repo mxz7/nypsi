@@ -201,7 +201,7 @@ export async function removeInventoryItem(
     return logger.error(`invalid item: ${itemId}`);
   }
 
-  await prisma.inventory.upsert({
+  const query = await prisma.inventory.upsert({
     where: {
       userId_item: {
         userId: id,
@@ -216,7 +216,23 @@ export async function removeInventoryItem(
       item: itemId,
       amount: amount,
     },
+    select: {
+      amount: true,
+    },
   });
+
+  if (query.amount <= 0) {
+    await prisma.inventory
+      .delete({
+        where: {
+          userId_item: {
+            userId: id,
+            item: itemId,
+          },
+        },
+      })
+      .catch(() => {});
+  }
 
   await redis.del(
     `${Constants.redis.cache.economy.INVENTORY}:${id}`,
