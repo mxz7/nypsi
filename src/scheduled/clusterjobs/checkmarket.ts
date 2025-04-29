@@ -16,7 +16,7 @@ export async function runMarketChecks(client: NypsiClient) {
 
     const items = getItems();
 
-    const buyOrders = await prisma.marketOrder.findMany({
+    const buyOrders = await prisma.market.findMany({
       where: {
         AND: [{ createdAt: { lte: limit } }, { completed: false }, { orderType: "buy" }],
       },
@@ -29,7 +29,7 @@ export async function runMarketChecks(client: NypsiClient) {
       },
     });
 
-    const sellOrders = await prisma.marketOrder.findMany({
+    const sellOrders = await prisma.market.findMany({
       where: {
         AND: [{ createdAt: { lte: limit } }, { completed: false }, { orderType: "sell" }],
       },
@@ -99,7 +99,7 @@ export async function runMarketChecks(client: NypsiClient) {
 
     limit = dayjs().subtract(180, "days").toDate();
 
-    const { count: deletedCompletedOrders } = await prisma.marketOrder.deleteMany({
+    const { count: deletedCompletedOrders } = await prisma.market.deleteMany({
       where: {
         AND: [{ completed: true }, { createdAt: { lte: limit } }],
       },

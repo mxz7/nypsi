@@ -22,7 +22,7 @@ if (!isMainThread) {
   (async () => {
     const itemId: string = workerData[0];
 
-    const marketBuyOrders = await prisma.marketOrder.findMany({
+    const marketBuyOrders = await prisma.market.findMany({
       where: {
         AND: [{ itemId, completed: true }, { orderType: "buy" }],
       },
@@ -33,7 +33,7 @@ if (!isMainThread) {
       },
     });
 
-    const marketSellOrders = await prisma.marketOrder.findMany({
+    const marketSellOrders = await prisma.market.findMany({
       where: {
         AND: [{ itemId, completed: true }, { orderType: "sell" }],
       },

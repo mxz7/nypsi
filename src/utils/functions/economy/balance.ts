@@ -795,7 +795,7 @@ export async function calcNetWorth(
       bank: true,
       Inventory: true,
       netWorth: true,
-      MarketOrder: {
+      Market: {
         select: {
           price: true,
           itemAmount: true,
@@ -875,10 +875,10 @@ export async function calcNetWorth(
       : 0,
   );
 
-  for (const sellOrder of query.MarketOrder.filter((i) => i.orderType == "sell"))
+  for (const sellOrder of query.Market.filter((i) => i.orderType == "sell"))
     worth += ((await calcItemValue(sellOrder.itemId)) || 0) * Number(sellOrder.itemAmount);
 
-  for (const buyOrder of query.MarketOrder.filter((i) => i.orderType == "buy"))
+  for (const buyOrder of query.Market.filter((i) => i.orderType == "buy"))
     worth += Number(buyOrder.price * buyOrder.itemAmount);
 
   if (breakdown) breakdownItems.set("balance", worth);

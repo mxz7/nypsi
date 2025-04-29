@@ -167,7 +167,7 @@ async function run(
                     members: true,
                   },
                 },
-                MarketOrder: true,
+                Market: true,
                 BakeryUpgrade: true,
                 EconomyGuildMember: true,
                 OffersGiven: true,

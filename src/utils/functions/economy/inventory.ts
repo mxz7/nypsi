@@ -245,7 +245,7 @@ export async function getTotalAmountOfItem(itemId: string) {
     },
   });
 
-  const market = await prisma.marketOrder.aggregate({
+  const market = await prisma.market.aggregate({
     where: {
       AND: [{ completed: false }, { itemId: itemId }, { orderType: "sell" }],
     },
@@ -645,7 +645,7 @@ export async function itemExists(itemId: string) {
     return true;
   }
 
-  const market = await prisma.marketOrder.findFirst({
+  const market = await prisma.market.findFirst({
     where: {
       completed: false,
       itemId: itemId,

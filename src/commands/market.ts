@@ -452,9 +452,16 @@ async function run(
 
           const selected = selectItem(item);
 
-          if (!selected || selected.account_locked) {
+          if (!selected) {
             await res.editReply({
               embeds: [new ErrorEmbed("couldnt find that item")],
+              options: { ephemeral: true },
+            });
+            await updateEmbed();
+            return pageManager();
+          } else if (selected.account_locked) {
+            await res.editReply({
+              embeds: [new ErrorEmbed("this item cannot be traded")],
               options: { ephemeral: true },
             });
             await updateEmbed();
@@ -1035,9 +1042,13 @@ async function run(
       embeds: [new ErrorEmbed(`you are at the max number of ${type} orders`)]
     })
 
-    if (!selected || selected.account_locked) {
+    if (!selected ) {
       return send({ embeds: [new ErrorEmbed("couldnt find that item")] });
     }
+
+    if (selected.account_locked) {
+      return send({ embeds: [new ErrorEmbed("this item cannot be traded")] });
+    } 
 
     if (!price) {
       price = amount;

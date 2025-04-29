@@ -9,7 +9,7 @@ export default {
     const focused = interaction.options.getFocused(true);
     focused.value = focused.value.toLowerCase();
 
-    const sellOrders = await prisma.marketOrder.findMany({
+    const sellOrders = await prisma.market.findMany({
       where: {
         AND: [{ completed: false }, { orderType: "sell" }],
       },

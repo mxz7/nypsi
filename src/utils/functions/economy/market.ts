@@ -40,7 +40,7 @@ export async function getMarketOrders(member: GuildMember | string | undefined, 
     id = member;
   }
 
-  const query = await prisma.marketOrder.findMany({
+  const query = await prisma.market.findMany({
     where: {
       AND: [member ? { ownerId: id } : {}, { completed: false }, { orderType: type }],
     },
@@ -51,13 +51,13 @@ export async function getMarketOrders(member: GuildMember | string | undefined, 
 }
 
 export async function getMarketOrder(id: number) {
-  return await prisma.marketOrder.findFirst({
+  return await prisma.market.findFirst({
     where: { id: id },
   });
 }
 
 export async function getRecentMarketOrders(type: OrderType) {
-  return await prisma.marketOrder.findMany({
+  return await prisma.market.findMany({
     where: { AND: [{ completed: false }, { orderType: type }] },
     orderBy: { createdAt: "desc" },
     take: 5,
@@ -69,7 +69,7 @@ export async function getMarketItemOrders(
   type: OrderType,
   filterOutUserId?: string,
 ) {
-  const query = await prisma.marketOrder.findMany({
+  const query = await prisma.market.findMany({
     where: {
       AND: [{ itemId: itemId }, { completed: false }, { orderType: type }],
     },
@@ -84,7 +84,7 @@ export async function getMarketAverage(item: string) {
   if (await redis.exists(`${Constants.redis.cache.economy.MARKET_AVG}:${item}`))
     return parseInt(await redis.get(`${Constants.redis.cache.economy.MARKET_AVG}:${item}`));
 
-  const orders = await prisma.marketOrder.findMany({
+  const orders = await prisma.market.findMany({
     where: {
       AND: [{ completed: true }, { itemId: item }],
     },
@@ -145,7 +145,7 @@ export async function createMarketOrder(
     ownerId = member;
   }
 
-  const order = await prisma.marketOrder.create({
+  const order = await prisma.market.create({
     data: {
       ownerId: ownerId,
       itemId: itemId,
@@ -163,7 +163,7 @@ export async function createMarketOrder(
   let sold = false;
 
   if (checkSold) {
-    const { completed, itemAmount } = await prisma.marketOrder.findFirst({
+    const { completed, itemAmount } = await prisma.market.findFirst({
       where: {
         id: order.id,
       },
@@ -426,7 +426,7 @@ export async function checkMarketWatchers(
 }
 
 export async function countItemOnMarket(itemId: string, type: OrderType) {
-  const amount = await prisma.marketOrder.aggregate({
+  const amount = await prisma.market.aggregate({
     where: {
       AND: [{ completed: false }, { itemId: itemId }, { orderType: type }],
     },
@@ -439,7 +439,7 @@ export async function countItemOnMarket(itemId: string, type: OrderType) {
 }
 
 export async function deleteMarketOrder(id: number, client: NypsiClient, repeatCount = 1) {
-  const order = await prisma.marketOrder
+  const order = await prisma.market
     .findFirst({
       where: {
         AND: [{ id: id }, { completed: false }],
@@ -465,7 +465,7 @@ export async function deleteMarketOrder(id: number, client: NypsiClient, repeatC
     });
   }
 
-  await prisma.marketOrder.delete({
+  await prisma.market.delete({
     where: {
       id: id,
     },
@@ -553,7 +553,7 @@ export async function checkMarketOverlap(
 
     for (const order of sellOrdersBelowPrice) {
       await completeSell(order.ownerId, itemId, Math.min(amount, Number(order.itemAmount)), [
-        await prisma.marketOrder.findUnique({ where: { id: highestBuyOrder.id } }),
+        await prisma.market.findUnique({ where: { id: highestBuyOrder.id } }),
       ]);
       amount -= Math.min(amount, Number(order.itemAmount));
     }
@@ -566,7 +566,7 @@ export async function checkMarketOverlap(
 
     for (const order of buyOrdersAbovePrice) {
       await completeBuy(order.ownerId, itemId, Math.min(amount, Number(order.itemAmount)), [
-        await prisma.marketOrder.findUnique({ where: { id: lowestSellOrder.id } }),
+        await prisma.market.findUnique({ where: { id: lowestSellOrder.id } }),
       ]);
       amount -= Math.min(amount, Number(order.itemAmount));
     }
@@ -731,13 +731,13 @@ async function completeBuy(
     const accounts = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, order.ownerId);
 
     if ((order.price < 10_000 && order.itemAmount === 1) || accounts.includes(userId)) {
-      await prisma.marketOrder.delete({
+      await prisma.market.delete({
         where: {
           id: order.id,
         },
       });
     } else if (order.itemAmount > order.buyAmount) {
-      await prisma.marketOrder.create({
+      await prisma.market.create({
         data: {
           completed: true,
           itemId: itemId,
@@ -748,7 +748,7 @@ async function completeBuy(
         },
       });
 
-      await prisma.marketOrder
+      await prisma.market
         .update({
           where: {
             id: order.id,
@@ -759,7 +759,7 @@ async function completeBuy(
         })
         .catch(() => {});
     } else {
-      await prisma.marketOrder
+      await prisma.market
         .update({
           where: {
             id: order.id,
@@ -1018,13 +1018,13 @@ async function completeSell(
     const accounts = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, order.ownerId);
 
     if ((order.price < 10_000 && order.itemAmount === 1) || accounts.includes(userId)) {
-      await prisma.marketOrder.delete({
+      await prisma.market.delete({
         where: {
           id: order.id,
         },
       });
     } else if (order.itemAmount > order.sellAmount) {
-      await prisma.marketOrder.create({
+      await prisma.market.create({
         data: {
           completed: true,
           itemId: itemId,
@@ -1035,7 +1035,7 @@ async function completeSell(
         },
       });
 
-      await prisma.marketOrder
+      await prisma.market
         .update({
           where: {
             id: order.id,
@@ -1046,7 +1046,7 @@ async function completeSell(
         })
         .catch(() => {});
     } else {
-      await prisma.marketOrder
+      await prisma.market
         .update({
           where: {
             id: order.id,

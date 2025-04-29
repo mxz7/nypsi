@@ -18,7 +18,7 @@ CREATE TABLE "MarketWatch" (
 );
 
 -- CreateTable
-CREATE TABLE "MarketOrder" (
+CREATE TABLE "Market" (
     "id" SERIAL NOT NULL,
     "ownerId" TEXT NOT NULL,
     "itemId" TEXT NOT NULL,
@@ -32,10 +32,13 @@ CREATE TABLE "MarketOrder" (
 );
 
 -- CreateIndex
-CREATE INDEX "MarketOrder_itemId_idx" ON "MarketOrder"("itemId");
+CREATE INDEX "Market_itemId_idx" ON "Market"("itemId");
+
+-- CreateIndex
+CREATE INDEX "Market_ownerId_idx" ON "Market"("ownerId");
 
 -- AddForeignKey
 ALTER TABLE "MarketWatch" ADD CONSTRAINT "MarketWatch_userId_fkey" FOREIGN KEY ("userId") REFERENCES "Economy"("userId") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "MarketOrder" ADD CONSTRAINT "MarketOrder_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "Economy"("userId") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Market" ADD CONSTRAINT "Market_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "Economy"("userId") ON DELETE CASCADE ON UPDATE CASCADE;

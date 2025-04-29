@@ -610,7 +610,7 @@ async function run(
       prisma.premiumCommand.count(),
       prisma.username.count(),
       prisma.wordleGame.count(),
-      prisma.marketOrder.count(),
+      prisma.market.count(),
       prisma.moderationBan.count(),
       prisma.moderationMute.count(),
       prisma.moderationCase.count(),

@@ -216,7 +216,7 @@ async function run(
 
   if (
     !(
-      (await prisma.marketOrder.count({
+      (await prisma.market.count({
         where: { AND: [{ itemId: selected.id }, { completed: true }, { orderType: "sell" }] },
       })) < 5 &&
       (await prisma.offer.count({ where: { AND: [{ itemId: selected.id }, { sold: true }] } })) <
