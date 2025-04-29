@@ -28,7 +28,11 @@ import { getCaptchaHistory, giveCaptcha } from "../utils/functions/captcha";
 import { MStoTime } from "../utils/functions/date";
 import { updateBalance, updateBankBalance } from "../utils/functions/economy/balance";
 import { initCrashGame } from "../utils/functions/economy/crash";
-import { addInventoryItem, setInventoryItem } from "../utils/functions/economy/inventory";
+import {
+  addInventoryItem,
+  removeInventoryItem,
+  setInventoryItem,
+} from "../utils/functions/economy/inventory";
 import { setLevel, setPrestige } from "../utils/functions/economy/levelling";
 import { getEcoBanTime, getItems, isEcoBanned, setEcoBan } from "../utils/functions/economy/utils";
 import { updateXp } from "../utils/functions/economy/xp";
@@ -733,7 +737,12 @@ async function run(
         }
 
         await res.editReply({
-          embeds: [new CustomEmbed(message.member, "<item_id> <amount>")],
+          embeds: [
+            new CustomEmbed(
+              message.member,
+              "<item_id> <amount>\n\nprefix amount with `+` or `-` to increment/decrement",
+            ),
+          ],
         });
 
         const msg = await message.channel
@@ -758,31 +767,41 @@ async function run(
           return waitForButton();
         }
 
-        if (!parseInt(msg.content.split(" ")[1]) && parseInt(msg.content.split(" ")[1]) != 0) {
-          await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid number")] });
+        let mode: "increment" | "decrement" | "set" = "set";
+
+        if (msg.content.split(" ")[1].startsWith("-")) {
+          mode = "decrement";
+        } else if (msg.content.split(" ")[1].startsWith("+")) {
+          mode = "increment";
+        }
+
+        let amount: number;
+
+        if (mode !== "set") {
+          amount = parseInt(
+            msg.content.split(" ")[1].substring(1, msg.content.split(" ")[1].length),
+          );
+        } else {
+          amount = parseInt(msg.content.split(" ")[1]);
+        }
+
+        if (isNaN(amount) || amount < 0) {
+          await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid amount")] });
           return waitForButton();
         }
 
-        if (
-          (["crate", "scratch-card"].includes(getItems()[msg.content.split(" ")[0]].role) ||
-            msg.content.split(" ").includes("credit")) &&
-          (await getAdminLevel(message.author.id)) < 10
-        ) {
-          await res.editReply({
-            embeds: [
-              new ErrorEmbed("nice try LOSER HAHAHAHHAHAHAHAHAAHHAHAHAH wanker.").setImage(
-                "https://file.maxz.dev/t9mTPwW23j.gif",
-              ),
-            ],
-          });
-          return waitForButton();
+        if (mode === "set") {
+          await setInventoryItem(
+            user.id,
+            msg.content.split(" ")[0],
+            parseInt(msg.content.split(" ")[1]),
+          );
+        } else if (mode === "increment") {
+          await addInventoryItem(user.id, msg.content.split(" ")[0], amount);
+        } else if (mode === "decrement") {
+          await removeInventoryItem(user.id, msg.content.split(" ")[0], amount);
         }
 
-        await setInventoryItem(
-          user.id,
-          msg.content.split(" ")[0],
-          parseInt(msg.content.split(" ")[1]),
-        );
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-karma") {
