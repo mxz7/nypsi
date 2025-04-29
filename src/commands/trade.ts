@@ -238,13 +238,18 @@ async function run(
 
           const selected = selectItem(item);
 
-          if (!selected || selected.account_locked) {
-            res.editReply({
+          if (!selected) {
+            await res.editReply({
               embeds: [new ErrorEmbed("couldnt find that item")],
               options: { ephemeral: true },
             });
+          } else if (selected.account_locked) {
+            await res.editReply({
+              embeds: [new ErrorEmbed("this item cannot be traded")],
+              options: { ephemeral: true },
+            });
           } else if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
-            res.editReply({
+            await res.editReply({
               embeds: [new ErrorEmbed("invalid amount")],
               options: { ephemeral: true },
             });
@@ -280,13 +285,18 @@ async function run(
 
           const selected = selectItem(item);
 
-          if (!selected || selected.account_locked) {
-            res.editReply({
+          if (!selected) {
+            await res.editReply({
               embeds: [new ErrorEmbed("couldnt find that item")],
               options: { ephemeral: true },
             });
+          } else if (selected.account_locked) {
+            await res.editReply({
+              embeds: [new ErrorEmbed("this item cannot be traded")],
+              options: { ephemeral: true },
+            });
           } else if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
-            res.editReply({
+            await res.editReply({
               embeds: [new ErrorEmbed("invalid amount")],
               options: { ephemeral: true },
             });
@@ -294,7 +304,7 @@ async function run(
             !inventory.find((i) => i.item == selected.id) ||
             inventory.find((i) => i.item == selected.id).amount < parseInt(amount)
           ) {
-            res.editReply({
+            await res.editReply({
               embeds: [new ErrorEmbed(`you do not have enough ${selected.plural}`)],
               options: { ephemeral: true },
             });
@@ -326,12 +336,12 @@ async function run(
           if (amount.toLowerCase() === "all") {
             amount = balance.toString();
           } else if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
-            res.editReply({
+            await res.editReply({
               embeds: [new ErrorEmbed("invalid amount")],
               options: { ephemeral: true },
             });
           } else if (parseInt(amount) > balance) {
-            res.editReply({
+            await res.editReply({
               embeds: [new ErrorEmbed("you do not have enough money")],
               options: { ephemeral: true },
             });
@@ -339,7 +349,7 @@ async function run(
             const cost = await formatBet(amount.toLowerCase(), message.member).catch(() => {});
 
             if (!cost)
-              res.editReply({
+              await res.editReply({
                 embeds: [new ErrorEmbed("invalid amount")],
                 options: { ephemeral: true },
               });
