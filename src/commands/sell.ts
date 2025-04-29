@@ -399,6 +399,10 @@ async function run(
       return send({ embeds: [new ErrorEmbed(`you don't have enough ${selected.name}`)] });
     }
 
+    if (selected.id === "gold_star") {
+      return send({ embeds: [new ErrorEmbed("you can never get rid of gold stars 😈")] });
+    }
+
     await addCooldown(cmd.name, message.member, 5);
 
     await removeInventoryItem(message.member, selected.id, amount);
