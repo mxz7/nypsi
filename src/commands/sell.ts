@@ -390,7 +390,7 @@ async function run(
 
     if (
       !inventory.find((i) => i.item == selected.id) ||
-      inventory.find((i) => i.item == selected.id).amount == 0
+      inventory.find((i) => i.item == selected.id).amount < 1
     ) {
       return send({ embeds: [new ErrorEmbed("you dont have any " + selected.name)] });
     }

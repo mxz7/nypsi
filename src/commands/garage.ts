@@ -315,7 +315,10 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
           const upgrade = interaction.customId.substring(4);
           const inventory = await getInventory(message.author.id);
 
-          if (!inventory.find((i) => i.item === upgrade)) {
+          if (
+            !inventory.find((i) => i.item === upgrade) ||
+            inventory.find((i) => i.item === upgrade).amount < 1
+          ) {
             await interaction.reply({
               embeds: [new ErrorEmbed("you don't have this upgrade. sneaky bitch")],
               ephemeral: true,

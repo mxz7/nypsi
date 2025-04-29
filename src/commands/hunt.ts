@@ -193,7 +193,7 @@ async function doHunt(
     if (chosenPlace == "nether") {
       if (
         !inventory.find((i) => i.item == "nether_portal") ||
-        inventory.find((i) => i.item == "nether_portal").amount == 0
+        inventory.find((i) => i.item == "nether_portal").amount < 1
       ) {
         return choseArea();
       }

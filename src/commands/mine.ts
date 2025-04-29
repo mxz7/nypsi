@@ -223,14 +223,14 @@ async function doMine(
     if (chosenArea == "nether") {
       if (
         !inventory.find((i) => i.item == "nether_portal") ||
-        inventory.find((i) => i.item == "nether_portal").amount == 0
+        inventory.find((i) => i.item == "nether_portal").amount < 1
       ) {
         return choseArea();
       }
     } else if (chosenArea === "end") {
       if (
         !inventory.find((i) => i.item == "end_portal") ||
-        inventory.find((i) => i.item == "end_portal").amount == 0
+        inventory.find((i) => i.item == "end_portal").amount < 1
       ) {
         return choseArea();
       }

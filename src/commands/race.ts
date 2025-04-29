@@ -229,7 +229,11 @@ class Race {
           embeds: [new ErrorEmbed("you cannot afford the entry fee for this race")],
         });
 
-      if (!inventory.find((i) => i.item === "cycle")) inventory.push({ amount: 1, item: "cycle" });
+      if (
+        !inventory.find((i) => i.item === "cycle") ||
+        inventory.find((i) => i.item === "cycle").amount < 1
+      )
+        inventory.push({ amount: 1, item: "cycle" });
 
       const cars: (RaceUserItem | RaceUserCar)[] = [
         ...garage.map((car) => ({
