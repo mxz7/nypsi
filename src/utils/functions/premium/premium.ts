@@ -42,31 +42,19 @@ export async function isPremium(member: GuildMember | string): Promise<boolean> 
 
   if (query) {
     if (query.level == 0) {
-      await prisma.premium.delete({
-        where: {
-          userId: id,
-        },
-      });
-      await redis.set(`${Constants.redis.cache.premium.LEVEL}:${id}`, 0, "EX", ms("1 hour") / 1000);
+      await redis.del(`${Constants.redis.cache.premium.LEVEL}:${id}`);
       return false;
     }
 
-    const currentDate = new Date();
-
-    if (currentDate <= query.expireDate) {
-      await redis.set(
-        `${Constants.redis.cache.premium.LEVEL}:${id}`,
-        query.level,
-        "EX",
-        ms("1 hour") / 1000,
-      );
-      return true;
-    }
-
-    await redis.set(`${Constants.redis.cache.premium.LEVEL}:${id}`, 0, "EX", ms("1 hour") / 1000);
-    return false;
+    await redis.set(
+      `${Constants.redis.cache.premium.LEVEL}:${id}`,
+      query.level,
+      "EX",
+      ms("1 hour") / 1000,
+    );
+    return true;
   } else {
-    await redis.set(`${Constants.redis.cache.premium.LEVEL}:${id}`, 0, "EX", ms("1 hour") / 1000);
+    await redis.del(`${Constants.redis.cache.premium.LEVEL}:${id}`);
     return false;
   }
 }
@@ -88,23 +76,15 @@ export async function getTier(member: GuildMember | string): Promise<number> {
     },
     select: {
       level: true,
-      expireDate: true,
     },
   });
 
   if (!query) {
-    await redis.set(
-      `${Constants.redis.cache.premium.LEVEL}:${id}`,
-      0,
-      "EX",
-      ms("1 hour") / 1000,
-    );
+    await redis.del(`${Constants.redis.cache.premium.LEVEL}:${id}`);
     return 0;
   }
 
-  const currentDate = new Date();
-
-  if (currentDate <= query.expireDate) {
+  if (query.level > 0) {
     await redis.set(
       `${Constants.redis.cache.premium.LEVEL}:${id}`,
       query.level,
@@ -114,12 +94,7 @@ export async function getTier(member: GuildMember | string): Promise<number> {
     return query.level;
   }
 
-  await redis.set(
-    `${Constants.redis.cache.premium.LEVEL}:${id}`,
-    0,
-    "EX",
-    ms("1 hour") / 1000,
-  );
+  await redis.del(`${Constants.redis.cache.premium.LEVEL}:${id}`);
   return 0;
 }
 
@@ -249,13 +224,6 @@ export async function expireUser(member: string, client?: NypsiClient | ClusterM
       level: 0,
     },
   });
-
-  await redis.set(
-    `${Constants.redis.cache.premium.LEVEL}:${member}`,
-    0,
-    "EX",
-    ms("30 days") / 1000,
-  );
 
   let roleId: string;
 
