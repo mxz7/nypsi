@@ -36,6 +36,7 @@ export async function isPremium(member: GuildMember | string): Promise<boolean> 
     select: {
       userId: true,
       level: true,
+      expireDate: true,
     },
   });
 
@@ -50,13 +51,20 @@ export async function isPremium(member: GuildMember | string): Promise<boolean> 
       return false;
     }
 
-    await redis.set(
-      `${Constants.redis.cache.premium.LEVEL}:${id}`,
-      query.level,
-      "EX",
-      ms("1 hour") / 1000,
-    );
-    return true;
+    const currentDate = new Date();
+
+    if (currentDate <= query.expireDate) {
+      await redis.set(
+        `${Constants.redis.cache.premium.LEVEL}:${id}`,
+        query.level,
+        "EX",
+        ms("1 hour") / 1000,
+      );
+      return true;
+    }
+
+    await redis.set(`${Constants.redis.cache.premium.LEVEL}:${id}`, 0, "EX", ms("1 hour") / 1000);
+    return false;
   } else {
     await redis.set(`${Constants.redis.cache.premium.LEVEL}:${id}`, 0, "EX", ms("1 hour") / 1000);
     return false;
@@ -80,17 +88,39 @@ export async function getTier(member: GuildMember | string): Promise<number> {
     },
     select: {
       level: true,
+      expireDate: true,
     },
   });
 
+  if (!query) {
+    await redis.set(
+      `${Constants.redis.cache.premium.LEVEL}:${id}`,
+      0,
+      "EX",
+      ms("1 hour") / 1000,
+    );
+    return 0;
+  }
+
+  const currentDate = new Date();
+
+  if (currentDate <= query.expireDate) {
+    await redis.set(
+      `${Constants.redis.cache.premium.LEVEL}:${id}`,
+      query.level,
+      "EX",
+      ms("1 hour") / 1000,
+    );
+    return query.level;
+  }
+
   await redis.set(
     `${Constants.redis.cache.premium.LEVEL}:${id}`,
-    query?.level || 0,
+    0,
     "EX",
     ms("1 hour") / 1000,
   );
-
-  return query?.level || 0;
+  return 0;
 }
 
 export async function addMember(member: GuildMember | string, level: number, expires?: Date) {
@@ -210,21 +240,22 @@ export async function renewUser(member: string) {
 export async function expireUser(member: string, client?: NypsiClient | ClusterManager) {
   logger.info(`expiring ${member}'s premium`);
   const level = await getTier(member);
-  await prisma.premiumCommand
-    .delete({
-      where: {
-        owner: member,
-      },
-    })
-    .catch(() => {
-      // doesnt need to find one
-    });
-
-  await prisma.premium.delete({
+  
+  await prisma.premium.update({
     where: {
       userId: member,
     },
+    data: {
+      level: 0,
+    },
   });
+
+  await redis.set(
+    `${Constants.redis.cache.premium.LEVEL}:${member}`,
+    0,
+    "EX",
+    ms("30 days") / 1000,
+  );
 
   let roleId: string;
 
