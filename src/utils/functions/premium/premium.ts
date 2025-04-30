@@ -274,8 +274,6 @@ export async function expireUser(member: string, client?: NypsiClient | ClusterM
       break;
   }
 
-  await redis.del(`${Constants.redis.cache.premium.LEVEL}:${member}`);
-
   if (client) {
     const cluster = await findGuildCluster(client, Constants.NYPSI_SERVER_ID);
 
