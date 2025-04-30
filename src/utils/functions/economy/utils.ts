@@ -465,7 +465,12 @@ export async function reset() {
   await prisma.farm.deleteMany();
   await prisma.farmUpgrades.deleteMany();
   await prisma.$executeRaw`TRUNCATE TABLE "Farm" RESTART IDENTITY;`;
-
+  logger.info("deleting premium with tier 0");
+  await prisma.premium.deleteMany({
+    where: {
+      level: 0,
+    },
+  });
   logger.info("deleting banned/blacklisted");
   await prisma.economy.deleteMany({
     where: {
