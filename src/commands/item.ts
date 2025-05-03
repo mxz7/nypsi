@@ -9,17 +9,16 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
-import { sort } from "fast-sort";
 import prisma from "../init/database";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { countItemOnMarket, getMarketItemOrders } from "../utils/functions/economy/market";
 import {
   calcItemValue,
   getInventory,
   getTotalAmountOfItem,
   selectItem,
 } from "../utils/functions/economy/inventory";
+import { countItemOnMarket } from "../utils/functions/economy/market";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getEmojiImage } from "../utils/functions/image";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -145,27 +144,15 @@ async function run(
       desc.push(`\n**in world** ${total.toLocaleString()}`);
     }
 
-    if (inAuction) {
-      const auctions = await findAuctions(selected.id);
-      let cheapest: number;
-
-  if (inMarket) {
-    const sellOrders = await getMarketItemOrders(selected.id, "buy");
-    let cheapest: number;
-
-    if (sellOrders.length > 0) {
-      const cheapestItem = sort(sellOrders).asc((a) => a.price)[0];
-
-      cheapest = Number(cheapestItem.price);
+    if (inMarket) {
+      desc.push(`\n**in market** ${inMarket.toLocaleString()}`);
     }
 
-    if (total) {
-      desc.push(
-        `**in market** ${inMarket.toLocaleString()}${cheapest ? ` ($${cheapest.toLocaleString()})` : ""}`,
-      );
-    } else {
-      desc.push(
-        `\n**in market** ${inMarket.toLocaleString()}${cheapest ? ` ($${cheapest.toLocaleString()})` : ""}`,
+    if (selected.role) {
+      embed.addField(
+        "role",
+        `\`${selected.role}${selected.role == "car" ? ` (${selected.speed})` : ""}\``,
+        true,
       );
     }
 
@@ -215,7 +202,7 @@ async function run(
   if (
     !(
       (await prisma.market.count({
-        where: { AND: [{ itemId: selected.id }, { completed: true }, { orderType: "sell" }] },
+        where: { AND: [{ itemId: selected.id }, { completed: true }] },
       })) < 5 &&
       (await prisma.offer.count({ where: { AND: [{ itemId: selected.id }, { sold: true }] } })) <
         5 &&
