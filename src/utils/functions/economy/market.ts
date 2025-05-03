@@ -21,7 +21,7 @@ import { addToNypsiBank, getTax } from "../tax";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getLastKnownAvatar, getLastKnownUsername } from "../users/tag";
 import { addBalance, getBalance, removeBalance } from "./balance";
-import { addInventoryItem, getInventory, setInventoryItem } from "./inventory";
+import { addInventoryItem, getInventory, removeInventoryItem } from "./inventory";
 import { addStat } from "./stats";
 import { createUser, getItems, userExists } from "./utils";
 import ms = require("ms");
@@ -774,7 +774,7 @@ export async function completeOrder(
 }
 
 export async function marketSell(
-  item: Item,
+  itemId: string,
   amount: number,
   storedPrice: number,
   member: GuildMember | string,
@@ -788,64 +788,59 @@ export async function marketSell(
   }
 
   if (
-    inTransaction.has(item.id) ||
-    (await redis.exists(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${item.id}`))
+    inTransaction.has(itemId) ||
+    (await redis.exists(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`))
   ) {
     return new Promise((resolve) => {
-      logger.debug(`repeating market sell - ${amount}x ${item.id}`);
+      logger.debug(`repeating market sell - ${amount}x ${itemId}`);
       setTimeout(async () => {
-        if (repeatCount > 100) inTransaction.delete(item.id);
-        resolve(marketSell(item, amount, storedPrice, member, repeatCount + 1));
+        if (repeatCount > 100) inTransaction.delete(itemId);
+        resolve(marketSell(itemId, amount, storedPrice, member, repeatCount + 1));
       }, 50);
     });
   }
 
-  inTransaction.add(item.id);
+  inTransaction.add(itemId);
   setTimeout(() => {
-    inTransaction.delete(item.id);
+    inTransaction.delete(itemId);
   }, ms("10 minutes"));
 
-  await redis.set(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${item.id}`, "d", "EX", 600);
+  await redis.set(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`, "d", "EX", 600);
 
   if (!(await userExists(userId))) await createUser(userId);
 
-  const sellPrice = await getPriceForMarketTransaction(item.id, amount, "sell", userId);
+  const sellPrice = await getPriceForMarketTransaction(itemId, amount, "sell", userId);
 
   if (sellPrice == -1) {
-    await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${item.id}`);
-    inTransaction.delete(item.id);
+    await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
+    inTransaction.delete(itemId);
     return "not enough items";
   }
 
   if (storedPrice !== sellPrice) {
-    await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${item.id}`);
-    inTransaction.delete(item.id);
+    await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
+    inTransaction.delete(itemId);
     return `since viewing the market, the sell price has changed from $${storedPrice.toLocaleString()} to $${sellPrice.toLocaleString()}. please press sell again with this updated price in mind`;
   }
 
   const inventory = await getInventory(member);
 
   if (
-    !inventory.find((i) => i.item == item.id) ||
-    inventory.find((i) => i.item == item.id).amount < amount
+    !inventory.find((i) => i.item == itemId) ||
+    inventory.find((i) => i.item == itemId).amount < amount
   ) {
-    await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${item.id}`);
-    inTransaction.delete(item.id);
-    return `you do not have this many ${item.plural ? item.plural : item.name}`;
+    await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
+    inTransaction.delete(itemId);
+    return `you do not have this many ${getItems()[itemId].plural ? getItems()[itemId].plural : getItems()[itemId].name}`;
   }
 
-  const buyOrders = await getMarketItemOrders(item.id, "buy", userId);
-
-  const totalTax = await completeSell(member, item.id, amount, buyOrders);
-
-  if (totalTax == "not enough items") return "not enough items";
-
-  if (totalTax > 0) addToNypsiBank(totalTax);
+  for (const order of orders) {
+  }
 
   await Promise.all([
-    setInventoryItem(
+    removeInventoryItem(
       member,
-      item.id,
+      itemId,
       (await getInventory(member)).find((i) => i.item == item.id).amount - Number(amount),
     ),
     addBalance(member, sellPrice - totalTax),
