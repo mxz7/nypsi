@@ -36,13 +36,12 @@ export async function isPremium(member: GuildMember | string): Promise<boolean> 
     select: {
       userId: true,
       level: true,
-      expireDate: true,
     },
   });
 
   if (query) {
     if (query.level == 0) {
-      await redis.del(`${Constants.redis.cache.premium.LEVEL}:${id}`);
+      await redis.set(`${Constants.redis.cache.premium.LEVEL}:${id}`, 0, "EX", ms("1 hour") / 1000);
       return false;
     }
 
@@ -54,7 +53,7 @@ export async function isPremium(member: GuildMember | string): Promise<boolean> 
     );
     return true;
   } else {
-    await redis.del(`${Constants.redis.cache.premium.LEVEL}:${id}`);
+    await redis.set(`${Constants.redis.cache.premium.LEVEL}:${id}`, 0, "EX", ms("1 hour") / 1000);
     return false;
   }
 }
@@ -79,23 +78,14 @@ export async function getTier(member: GuildMember | string): Promise<number> {
     },
   });
 
-  if (!query) {
-    await redis.del(`${Constants.redis.cache.premium.LEVEL}:${id}`);
-    return 0;
-  }
+  await redis.set(
+    `${Constants.redis.cache.premium.LEVEL}:${id}`,
+    query?.level || 0,
+    "EX",
+    ms("1 hour") / 1000,
+  );
 
-  if (query.level > 0) {
-    await redis.set(
-      `${Constants.redis.cache.premium.LEVEL}:${id}`,
-      query.level,
-      "EX",
-      ms("1 hour") / 1000,
-    );
-    return query.level;
-  }
-
-  await redis.del(`${Constants.redis.cache.premium.LEVEL}:${id}`);
-  return 0;
+  return query?.level || 0;
 }
 
 export async function addMember(member: GuildMember | string, level: number, expires?: Date) {
@@ -215,7 +205,7 @@ export async function renewUser(member: string) {
 export async function expireUser(member: string, client?: NypsiClient | ClusterManager) {
   logger.info(`expiring ${member}'s premium`);
   const level = await getTier(member);
-  
+
   await prisma.premium.update({
     where: {
       userId: member,
@@ -241,6 +231,8 @@ export async function expireUser(member: string, client?: NypsiClient | ClusterM
       roleId = "819870959325413387";
       break;
   }
+
+  await redis.del(`${Constants.redis.cache.premium.LEVEL}:${member}`);
 
   if (client) {
     const cluster = await findGuildCluster(client, Constants.NYPSI_SERVER_ID);
