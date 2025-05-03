@@ -26,7 +26,7 @@ async function run(
     return message.channel.send({
       embeds: [
         new ErrorEmbed(
-          "**auto.scam**\n" + "**auto.transfer**\n" + "**notify**\n" + "<message content>",
+          "**auto.scam**\n" + "**auto.transfer**\n" + "**auto.buyunban**\n" +"**notify**\n" + "<message content>",
         ),
       ],
     });
