@@ -41,11 +41,6 @@ export async function isPremium(member: GuildMember | string): Promise<boolean> 
 
   if (query) {
     if (query.level == 0) {
-      await prisma.premium.delete({
-        where: {
-          userId: id,
-        },
-      });
       await redis.set(`${Constants.redis.cache.premium.LEVEL}:${id}`, 0, "EX", ms("1 hour") / 1000);
       return false;
     }
@@ -210,19 +205,13 @@ export async function renewUser(member: string) {
 export async function expireUser(member: string, client?: NypsiClient | ClusterManager) {
   logger.info(`expiring ${member}'s premium`);
   const level = await getTier(member);
-  await prisma.premiumCommand
-    .delete({
-      where: {
-        owner: member,
-      },
-    })
-    .catch(() => {
-      // doesnt need to find one
-    });
 
-  await prisma.premium.delete({
+  await prisma.premium.update({
     where: {
       userId: member,
+    },
+    data: {
+      level: 0,
     },
   });
 
