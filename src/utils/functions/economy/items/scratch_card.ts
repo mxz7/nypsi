@@ -22,7 +22,7 @@ import { a } from "../../anticheat";
 import { giveCaptcha, isLockedOut, verifyUser } from "../../captcha";
 import { percentChance } from "../../random";
 import { recentCommands } from "../../users/commands";
-import { getInventory, selectItem, setInventoryItem } from "../inventory";
+import { getInventory, removeInventoryItem, selectItem } from "../inventory";
 import ScratchCard from "../scratchies";
 import { addStat, createGame } from "../stats";
 
@@ -68,7 +68,7 @@ async function prepare(
 
   if (
     !inventory.find((i) => i.item == selected.id) ||
-    inventory.find((i) => i.item == selected.id).amount == 0
+    inventory.find((i) => i.item == selected.id).amount < 1
   ) {
     return send({ embeds: [new ErrorEmbed(`you dont have ${selected.article} ${selected.name}`)] });
   }
@@ -76,11 +76,7 @@ async function prepare(
   if (selected.role !== "scratch-card")
     return send({ embeds: [new ErrorEmbed("that is not a scratch card")] });
 
-  await setInventoryItem(
-    message.member,
-    selected.id,
-    inventory.find((i) => i.item == selected.id).amount - 1,
-  );
+  await removeInventoryItem(message.member, selected.id, 1);
   await addStat(message.member, selected.id);
 
   await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);

@@ -11,7 +11,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import {
   addInventoryItem,
   getInventory,
-  setInventoryItem,
+  removeInventoryItem,
 } from "../utils/functions/economy/inventory";
 import { addStat } from "../utils/functions/economy/stats";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
@@ -140,13 +140,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
   const promises = [];
 
   for (const ore of Array.from(smelted.keys())) {
-    promises.push(
-      setInventoryItem(
-        message.member,
-        ore,
-        inventory.find((i) => i.item == ore).amount - smelted.get(ore),
-      ),
-    );
+    promises.push(removeInventoryItem(message.member, ore, smelted.get(ore)));
 
     const ingot = items[ore].ingot;
 
@@ -155,16 +149,8 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
     promises.push(addInventoryItem(message.member, ingot, smelted.get(ore)));
   }
 
-  promises.push(
-    setInventoryItem(message.member, "coal", inventory.find((i) => i.item == "coal").amount - coal),
-  );
-  promises.push(
-    setInventoryItem(
-      message.member,
-      max === 64 ? "furnace" : "super_furnace",
-      inventory.find((i) => i.item == (max === 64 ? "furnace" : "super_furnace")).amount - 1,
-    ),
-  );
+  promises.push(removeInventoryItem(message.member, "coal", coal));
+  promises.push(removeInventoryItem(message.member, max === 64 ? "furnace" : "super_furnace", 1));
 
   await Promise.all(promises);
 

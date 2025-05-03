@@ -12,8 +12,8 @@ import Constants from "../utils/Constants";
 import {
   addInventoryItem,
   getInventory,
+  removeInventoryItem,
   selectItem,
-  setInventoryItem,
 } from "../utils/functions/economy/inventory";
 import { getRawLevel } from "../utils/functions/economy/levelling";
 import { createUser, isEcoBanned, userExists } from "../utils/functions/economy/utils";
@@ -152,7 +152,7 @@ async function run(
 
   if (
     !inventory.find((i) => i.item == selected.id) ||
-    inventory.find((i) => i.item == selected.id).amount == 0
+    inventory.find((i) => i.item == selected.id).amount < 1
   ) {
     return send({
       embeds: [
@@ -190,11 +190,7 @@ async function run(
 
   await Promise.all([
     addInventoryItem(target, selected.id, amount),
-    setInventoryItem(
-      message.member,
-      selected.id,
-      inventory.find((i) => i.item == selected.id).amount - amount,
-    ),
+    removeInventoryItem(message.member, selected.id, amount),
   ]);
 
   if ((await getDmSettings(target)).payment) {

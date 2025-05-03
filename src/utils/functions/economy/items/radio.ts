@@ -13,7 +13,7 @@ import { ItemUse } from "../../../../models/ItemUse";
 import Constants from "../../../Constants";
 import { getMember } from "../../member";
 import sleep from "../../sleep";
-import { getInventory, setInventoryItem } from "../inventory";
+import { getInventory, removeInventoryItem } from "../inventory";
 import { isPassive } from "../passive";
 
 module.exports = new ItemUse(
@@ -88,11 +88,7 @@ module.exports = new ItemUse(
 
     const inventory = await getInventory(message.member);
 
-    await setInventoryItem(
-      message.member,
-      "radio",
-      inventory.find((i) => i.item == "radio").amount - 1,
-    );
+    await removeInventoryItem(message.member, "radio", 1);
 
     const msg = await send({
       embeds: [new CustomEmbed(message.member, "putting report out on police scanner...")],

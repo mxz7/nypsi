@@ -11,7 +11,7 @@ import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import { getDisabledCommands } from "../../guilds/disabledcommands";
 import { getMember } from "../../member";
-import { getInventory, setInventoryItem } from "../inventory";
+import { getInventory, removeInventoryItem } from "../inventory";
 import { isPassive } from "../passive";
 import { addHandcuffs, createUser, isHandcuffed, userExists } from "../utils";
 
@@ -87,11 +87,7 @@ module.exports = new ItemUse(
     const inventory = await getInventory(message.member);
 
     await Promise.all([
-      setInventoryItem(
-        message.member,
-        "handcuffs",
-        inventory.find((i) => i.item == "handcuffs").amount - 1,
-      ),
+      removeInventoryItem(message.member, "handcuffs", 1),
       addHandcuffs(handcuffsTarget.id),
     ]);
 

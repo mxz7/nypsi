@@ -1,12 +1,10 @@
 import { CommandInteraction } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
-import { addBalance, getBalance, getSellMulti } from "../utils/functions/economy/balance.js";
-import { addStat } from "../utils/functions/economy/stats";
 import { createUser, userExists } from "../utils/functions/economy/utils.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
+import { isBooster } from "../utils/functions/premium/boosters";
 import { getTier, isPremium } from "../utils/functions/premium/premium.js";
-import { getLastWeekly, setLastWeekly } from "../utils/functions/premium/weekly.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 
 const cmd = new Command("weekly", "get your weekly bonus (premium only)", "money");
@@ -19,7 +17,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
     return;
   }
 
-  await addCooldown(cmd.name, message.member, 90);
+  await addCooldown(cmd.name, message.member, 5);
 
   if (!(await userExists(message.member))) {
     await createUser(message.member);
@@ -30,7 +28,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
   const notValidForYou = () => {
     const embed = new CustomEmbed(
       message.member,
-      `${prefix}weekly is for SILVER tier and higher`,
+      "you need [**premium**](https://ko-fi.com/tekoh/tiers) to get weekly rewards",
     ).setFooter({
       text: `${prefix}patreon`,
     });
@@ -38,60 +36,24 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
     return message.channel.send({ embeds: [embed] });
   };
 
-  if (!(await isPremium(message.author.id))) {
+  if (!(await isPremium(message.author.id)) && !(await isBooster(message.author.id))) {
     return notValidForYou();
   } else {
-    if ((await getTier(message.author.id)) < 2) {
+    if ((await getTier(message.author.id)) < 2 && !(await isBooster(message.author.id))) {
       return notValidForYou();
     }
 
     const now = new Date();
-    const lastWeekly = await getLastWeekly(message.author.id);
-    const diff = now.getTime() - lastWeekly.getTime();
+    const saturday = new Date();
+    saturday.setDate(now.getDate() + ((6 - 1 - now.getDay() + 7) % 7) + 1);
+    saturday.setHours(0, 10, 0, 0);
 
-    if (diff >= 604800000) {
-      await setLastWeekly(message.author.id, now);
+    const embed = new CustomEmbed(
+      message.member,
+      `you will automatically receive your weekly rewards <t:${Math.floor(saturday.getTime() / 1000)}:R>`,
+    );
 
-      let amount = 150000;
-      const multi = (await getSellMulti(message.member)).multi;
-
-      let description = `$${(
-        await getBalance(message.member)
-      ).toLocaleString()}\n + $**${amount.toLocaleString()}**`;
-
-      if (multi > 0) {
-        amount = amount + Math.round(amount * multi);
-        description = `$${(
-          await getBalance(message.member)
-        ).toLocaleString()}\n + $**${amount.toLocaleString()}** (+**${Math.floor(
-          multi * 100,
-        ).toLocaleString()}**% bonus)`;
-      }
-
-      await addBalance(message.member, amount);
-      addStat(message.author.id, "earned-weekly", amount);
-
-      const embed = new CustomEmbed(message.member, description);
-
-      return message.channel.send({ embeds: [embed] }).then((msg) => {
-        setTimeout(async () => {
-          embed.setDescription(
-            `new balance: $**${(await getBalance(message.member)).toLocaleString()}**`,
-          );
-          msg.edit({ embeds: [embed] });
-        }, 2000);
-      });
-    } else {
-      const timeRemaining = Math.abs(604800000 - diff);
-      const dd = timeUntil(new Date().getTime() + timeRemaining);
-
-      const embed = new CustomEmbed(
-        message.member,
-        "you have already used your weekly reward! come back in **" + dd + "**",
-      );
-
-      return message.channel.send({ embeds: [embed] });
-    }
+    return message.channel.send({ embeds: [embed] });
   }
 }
 

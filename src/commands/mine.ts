@@ -19,7 +19,7 @@ import {
   addInventoryItem,
   gemBreak,
   getInventory,
-  setInventoryItem,
+  removeInventoryItem,
 } from "../utils/functions/economy/inventory";
 import { addStat } from "../utils/functions/economy/stats";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
@@ -212,7 +212,7 @@ async function doMine(
   }
 
   if (!unbreakable) {
-    await setInventoryItem(member, pickaxe, inventory.find((i) => i.item == pickaxe).amount - 1);
+    await removeInventoryItem(member, pickaxe, 1);
   }
 
   let chosenArea: string;
@@ -223,14 +223,14 @@ async function doMine(
     if (chosenArea == "nether") {
       if (
         !inventory.find((i) => i.item == "nether_portal") ||
-        inventory.find((i) => i.item == "nether_portal").amount == 0
+        inventory.find((i) => i.item == "nether_portal").amount < 1
       ) {
         return choseArea();
       }
     } else if (chosenArea === "end") {
       if (
         !inventory.find((i) => i.item == "end_portal") ||
-        inventory.find((i) => i.item == "end_portal").amount == 0
+        inventory.find((i) => i.item == "end_portal").amount < 1
       ) {
         return choseArea();
       }

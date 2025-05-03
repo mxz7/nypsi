@@ -22,7 +22,7 @@ import {
   setExpireDate,
   setTier,
 } from "../../premium/premium";
-import { getInventory, setInventoryItem } from "../inventory";
+import { getInventory, removeInventoryItem } from "../inventory";
 import dayjs = require("dayjs");
 
 const PLAT_TIER = 4;
@@ -68,18 +68,11 @@ module.exports = new ItemUse(
       });
 
     if (currentTier == PLAT_TIER) {
-      const [profile, inventory] = await Promise.all([
-        getPremiumProfile(message.author.id),
-        getInventory(message.member),
-      ]);
+      const profile = await getPremiumProfile(message.author.id);
 
       const credits = await getCredits(message.author.id);
       await setCredits(message.author.id, credits + 7);
-      await setInventoryItem(
-        message.member,
-        "platinum_credit",
-        inventory.find((i) => i.item === "platinum_credit").amount - 1,
-      );
+      await removeInventoryItem(message.member, "platinum_credit", 1);
 
       return send({
         embeds: [
@@ -100,7 +93,7 @@ module.exports = new ItemUse(
       await setCredits(message.author.id, 7);
 
       const inventory = await getInventory(message.member);
-      await setInventoryItem(
+      await removeInventoryItem(
         message.member,
         "platinum_credit",
         inventory.find((i) => i.item === "platinum_credit").amount - 1,
@@ -149,11 +142,7 @@ module.exports = new ItemUse(
         return res.editReply({ embeds: [new ErrorEmbed("lol!")] });
       }
 
-      await setInventoryItem(
-        message.member,
-        "platinum_credit",
-        inventory.find((i) => i.item === "platinum_credit").amount - 1,
-      );
+      await removeInventoryItem(message.member, "platinum_credit", 1);
 
       await setTier(message.author.id, PLAT_TIER);
       await setExpireDate(message.author.id, new Date());

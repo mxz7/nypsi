@@ -11,7 +11,7 @@ import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import Constants from "../../../Constants";
 import { getMember } from "../../member";
-import { getInventory, setInventoryItem } from "../inventory";
+import { getInventory, removeInventoryItem } from "../inventory";
 
 module.exports = new ItemUse(
   "rick_astley",
@@ -62,11 +62,7 @@ module.exports = new ItemUse(
         embeds: [new ErrorEmbed(`${target.user.username} already has a rick roll queued`)],
       });
 
-    await setInventoryItem(
-      message.member,
-      "rick_astley",
-      inventory.find((i) => i.item === "rick_astley").amount - 1,
-    );
+    await removeInventoryItem(message.member, "rick_astley", 1);
 
     await redis.set(`${Constants.redis.nypsi.RICKROLL}:${target.user.id}`, message.author.id);
 

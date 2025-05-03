@@ -18,6 +18,7 @@ import { addBalance, getSellMulti } from "../utils/functions/economy/balance";
 import {
   getInventory,
   getSellFilter,
+  removeInventoryItem,
   selectItem,
   setInventoryItem,
   setSellFilter,
@@ -389,7 +390,7 @@ async function run(
 
     if (
       !inventory.find((i) => i.item == selected.id) ||
-      inventory.find((i) => i.item == selected.id).amount == 0
+      inventory.find((i) => i.item == selected.id).amount < 1
     ) {
       return send({ embeds: [new ErrorEmbed("you dont have any " + selected.name)] });
     }
@@ -398,13 +399,13 @@ async function run(
       return send({ embeds: [new ErrorEmbed(`you don't have enough ${selected.name}`)] });
     }
 
+    if (selected.id === "gold_star") {
+      return send({ embeds: [new ErrorEmbed("you can never get rid of gold stars 😈")] });
+    }
+
     await addCooldown(cmd.name, message.member, 5);
 
-    await setInventoryItem(
-      message.member,
-      selected.id,
-      inventory.find((i) => i.item == selected.id).amount - amount,
-    );
+    await removeInventoryItem(message.member, selected.id, amount);
 
     let sellWorth = Math.floor(selected.sell * amount);
 

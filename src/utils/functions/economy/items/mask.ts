@@ -9,7 +9,7 @@ import redis from "../../../../init/redis";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
-import { getInventory, setInventoryItem } from "../inventory";
+import { removeInventoryItem } from "../inventory";
 
 module.exports = new ItemUse(
   "mask",
@@ -66,12 +66,7 @@ module.exports = new ItemUse(
       embed.setDescription("you're wearing your **mask** and can now rob a store again");
     }
 
-    const inventory = await getInventory(message.member);
-    await setInventoryItem(
-      message.member,
-      "mask",
-      inventory.find((i) => i.item == "mask").amount - 1,
-    );
+    await removeInventoryItem(message.member, "mask", 1);
 
     return send({ embeds: [embed] });
   },

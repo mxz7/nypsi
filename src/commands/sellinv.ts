@@ -223,6 +223,7 @@ async function calcValues(message: Message | (NypsiCommandInteraction & CommandI
   const selected = new Map<string, number>();
 
   for (const item of inventory) {
+    if (item.item === "gold_star") continue;
     selected.set(item.item, inventory.find((i) => i.item == item.item).amount);
   }
 

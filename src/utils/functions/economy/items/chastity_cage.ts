@@ -13,7 +13,7 @@ import { ItemUse } from "../../../../models/ItemUse";
 import Constants from "../../../Constants";
 import { getMember } from "../../member";
 import sleep from "../../sleep";
-import { getInventory, setInventoryItem } from "../inventory";
+import { getInventory, removeInventoryItem } from "../inventory";
 
 module.exports = new ItemUse(
   "chastity_cage",
@@ -100,11 +100,7 @@ module.exports = new ItemUse(
 
     const inventory = await getInventory(message.member);
 
-    await setInventoryItem(
-      message.member,
-      "chastity_cage",
-      inventory.find((i) => i.item == "chastity_cage").amount - 1,
-    );
+    await removeInventoryItem(message.member, "chastity_cage", 1);
 
     const msg = await send({
       embeds: [new CustomEmbed(message.member, "locking chastity cage...")],

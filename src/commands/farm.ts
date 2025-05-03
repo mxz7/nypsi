@@ -23,7 +23,7 @@ import {
   getFarmUpgrades,
   waterFarm,
 } from "../utils/functions/economy/farm";
-import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
+import { getInventory, removeInventoryItem } from "../utils/functions/economy/inventory";
 import {
   createUser,
   getItems,
@@ -353,7 +353,7 @@ async function run(
             count = Math.min(itemCount, upgrade.type_single.stack_limit - userUpgradeCount);
           }
 
-          await setInventoryItem(message.member, item.id, itemCount - count);
+          await removeInventoryItem(message.member, item.id, count);
           await addFarmUpgrade(message.member, selected, upgradeId, count);
 
           const { embed, rows } = await renderUpgrades(selected);
@@ -389,7 +389,7 @@ async function run(
             return listen();
           }
 
-          await setInventoryItem(message.member, nextLevelItem.id, itemCount - 1);
+          await removeInventoryItem(message.member, nextLevelItem.id, 1);
           await addFarmUpgrade(message.member, selected, upgradeId, 1);
 
           if (interaction.customId.endsWith("-max")) {
@@ -406,7 +406,7 @@ async function run(
 
               if (itemCount === 0) break;
 
-              await setInventoryItem(message.member, nextLevelItem.id, itemCount - 1);
+              await removeInventoryItem(message.member, nextLevelItem.id, 1);
               await addFarmUpgrade(message.member, selected, upgradeId, 1);
             }
           }

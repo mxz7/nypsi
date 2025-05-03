@@ -15,7 +15,11 @@ import { inPlaceSort } from "fast-sort";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getCraftingItems, newCraftItem } from "../utils/functions/economy/crafting";
-import { getInventory, selectItem, setInventoryItem } from "../utils/functions/economy/inventory";
+import {
+  getInventory,
+  removeInventoryItem,
+  selectItem,
+} from "../utils/functions/economy/inventory";
 import { addStat } from "../utils/functions/economy/stats";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
@@ -477,13 +481,7 @@ async function run(
       const item = ingredient.split(":")[0];
       const ingredientAmount = parseInt(ingredient.split(":")[1]);
 
-      promises.push(
-        setInventoryItem(
-          message.member,
-          item,
-          inventory.find((i) => i.item == item).amount - amount * ingredientAmount,
-        ),
-      );
+      promises.push(removeInventoryItem(message.member, item, amount * ingredientAmount));
 
       promises.push(addStat(message.member, item, amount).catch(() => {}));
     }

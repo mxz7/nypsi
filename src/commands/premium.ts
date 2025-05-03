@@ -510,23 +510,50 @@ async function run(
     await setEmbedColor(message.author.id, color.toLowerCase());
 
     if (message.guildId === Constants.NYPSI_SERVER_ID) {
-      if (message.member.roles.cache.find((i) => i.name === message.author.id)) {
-        const role = message.member.roles.cache.find((i) => i.name === message.author.id);
-        if (color === "default") {
-          await role.delete();
+      let existingRole = message.member.roles.cache.find((i) => i.name === "custom");
+
+      if (existingRole) {
+        if (existingRole.members.size > 1) {
+          await message.member.roles.remove(existingRole);
+
+          existingRole = message.guild.roles.cache.find(
+            (i) => i.name === "custom" && i.hexColor === color,
+          );
+
+          if (existingRole) {
+            await message.member.roles.add(existingRole);
+          } else {
+            const seperatorRole = message.guild.roles.cache.get("1329425677614845972");
+            const newRole = await message.guild.roles.create({
+              name: "custom",
+              color: color as ColorResolvable,
+              position: seperatorRole.position + 1,
+              permissions: [],
+            });
+
+            await message.member.roles.add(newRole);
+          }
         } else {
-          await role.edit({ color: color as ColorResolvable });
+          await existingRole.edit({ color: color as ColorResolvable });
         }
       } else {
-        const separatorRole = message.guild.roles.cache.get("1329425677614845972");
+        existingRole = message.guild.roles.cache.find(
+          (i) => i.name === "custom" && i.hexColor === color,
+        );
 
-        const role = await message.guild.roles.create({
-          name: message.author.id,
-          color: color as ColorResolvable,
-          position: separatorRole.position + 1,
-        });
+        if (existingRole) {
+          await message.member.roles.add(existingRole);
+        } else {
+          const seperatorRole = message.guild.roles.cache.get("1329425677614845972");
+          const newRole = await message.guild.roles.create({
+            name: "custom",
+            color: color as ColorResolvable,
+            position: seperatorRole.position + 1,
+            permissions: [],
+          });
 
-        await message.member.roles.add(role);
+          await message.member.roles.add(newRole);
+        }
       }
     }
 

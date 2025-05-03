@@ -144,25 +144,14 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel, 
         global: false,
       }));
 
-      if (update.daily || update.global) {
+      if (update.global) {
+        const { pos } = await topChatReactionGlobal(message.author.id, false, 1000);
+
         const embed = new CustomEmbed(message.member);
-
-        let desc = "";
-
-        if (update.global) {
-          const { pos } = await topChatReactionGlobal(message.author.id, false);
-          desc += `you've set a new **personal best** ${pos ? ` (#${pos})` : ""}\n\n`;
-        }
-
-        if (update.daily) {
-          const { pos } = await topChatReactionGlobal(message.author.id, true);
-          desc += `you've set a new **daily** personal best ${pos ? ` (#${pos})` : ""}`;
-        }
-
-        if (desc) embed.setDescription(desc);
+        embed.setDescription(`you've set a new **personal best** ${pos ? ` (#${pos})` : ""}`);
 
         setTimeout(() => {
-          if (desc) message.reply({ embeds: [embed] });
+          message.reply({ embeds: [embed] });
         }, 1000);
       }
     }

@@ -13,7 +13,7 @@ import {
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { ErrorEmbed } from "../models/EmbedBuilders";
 import { runBakery } from "../utils/functions/economy/bakery";
-import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
+import { getInventory, removeInventoryItem } from "../utils/functions/economy/inventory";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -117,7 +117,7 @@ async function doBake(
   }
 
   await addCooldown(cmd.name, member, 60);
-  await setInventoryItem(member, "coal", inventory.find((i) => i.item === "coal").amount - 1);
+  await removeInventoryItem(member, "coal", 1);
 
   const response = await runBakery(member);
 

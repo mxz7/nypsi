@@ -11,7 +11,7 @@ import { CustomEmbed } from "../../models/EmbedBuilders";
 import { Job } from "../../types/Jobs";
 import { NotificationPayload } from "../../types/Notification";
 import Constants from "../../utils/Constants";
-import { setInventoryItem } from "../../utils/functions/economy/inventory";
+import { removeInventoryItem } from "../../utils/functions/economy/inventory";
 import { percentChance } from "../../utils/functions/random";
 import { addNotificationToQueue } from "../../utils/functions/users/notifications";
 import pAll = require("p-all");
@@ -98,11 +98,7 @@ async function doDailyStreaks() {
         if (user.user.DMSettings.other)
           notifications.push({ memberId: user.userId, payload: { embed: calendarSavedEmbed } });
 
-        await setInventoryItem(
-          user.userId,
-          "calendar",
-          Number(user.Inventory.find((i) => i.item === "calendar").amount) - 1,
-        );
+        await removeInventoryItem(user.userId, "calendar", 1);
 
         return;
       } else if (user.Inventory.find((i) => i.item == "white_gem")?.amount > 0n) {
@@ -112,11 +108,7 @@ async function doDailyStreaks() {
           notifications.push({ memberId: user.userId, payload: { embed: gemSavedEmbed } });
 
           if (percentChance(7)) {
-            await setInventoryItem(
-              user.userId,
-              "calendar",
-              Number(user.Inventory.find((i) => i.item === "white_gem").amount) - 1,
-            );
+            await removeInventoryItem(user.userId, "calendar", 1);
 
             notifications.push({ memberId: user.userId, payload: { embed: whiteGemBrokeEmbed } });
           }
@@ -239,11 +231,7 @@ async function doVoteStreaks() {
           }
         }
 
-        await setInventoryItem(
-          user.userId,
-          "calendar",
-          Number(user.Inventory.find((i) => i.item === "calendar").amount) - 1,
-        );
+        await removeInventoryItem(user.userId, "calendar", 1);
 
         return;
       } else if (user.Inventory.find((i) => i.item == "white_gem")?.amount > 0n) {
@@ -265,11 +253,7 @@ async function doVoteStreaks() {
           }
 
           if (percentChance(7)) {
-            await setInventoryItem(
-              user.userId,
-              "calendar",
-              Number(user.Inventory.find((i) => i.item === "white_gem").amount) - 1,
-            );
+            await removeInventoryItem(user.userId, "calendar", 1);
 
             if (user.user.DMSettings.other) {
               if (user.user.DMSettings.voteReminder) {

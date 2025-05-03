@@ -22,7 +22,7 @@ import {
   setExpireDate,
   setTier,
 } from "../../premium/premium";
-import { getInventory, setInventoryItem } from "../inventory";
+import { getInventory, removeInventoryItem } from "../inventory";
 import dayjs = require("dayjs");
 
 const SILVER_TIER = 2;
@@ -66,19 +66,12 @@ module.exports = new ItemUse(
       return send({ embeds: [new ErrorEmbed("your current premium tier is higher than silver")] });
 
     if (currentTier == SILVER_TIER) {
-      const [profile, inventory] = await Promise.all([
-        getPremiumProfile(message.author.id),
-        getInventory(message.member),
-      ]);
+      const profile = await getPremiumProfile(message.author.id);
 
       const credits = await getCredits(message.author.id);
       await setCredits(message.author.id, credits + 7);
 
-      await setInventoryItem(
-        message.member,
-        "silver_credit",
-        inventory.find((i) => i.item === "silver_credit").amount - 1,
-      );
+      await removeInventoryItem(message.member, "silver_credit", 1);
 
       return send({
         embeds: [
@@ -96,12 +89,7 @@ module.exports = new ItemUse(
     } else if (currentTier === 0) {
       await addMember(message.author.id, SILVER_TIER, new Date());
       await setCredits(message.author.id, 7);
-      const inventory = await getInventory(message.member);
-      await setInventoryItem(
-        message.member,
-        "silver_credit",
-        inventory.find((i) => i.item === "silver_credit").amount - 1,
-      );
+      await removeInventoryItem(message.member, "silver_credit", 1);
 
       return send({
         embeds: [
@@ -145,11 +133,7 @@ module.exports = new ItemUse(
         return res.editReply({ embeds: [new ErrorEmbed("lol!")] });
       }
 
-      await setInventoryItem(
-        message.member,
-        "silver_credit",
-        inventory.find((i) => i.item === "silver_credit").amount - 1,
-      );
+      await removeInventoryItem(message.member, "silver_credit", 1);
 
       await setTier(message.author.id, SILVER_TIER);
       await setExpireDate(message.author.id, new Date());

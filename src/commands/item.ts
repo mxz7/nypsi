@@ -9,7 +9,6 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
-
 import { sort } from "fast-sort";
 import prisma from "../init/database";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
@@ -129,19 +128,26 @@ async function run(
     calcItemValue(selected.id),
   ]);
 
-  if (selected.sell || selected.buy) {
-    desc.push(
-      `**worth** ${value ? `$${Math.floor(value).toLocaleString()}` : "[unvalued](https://nypsi.xyz/docs/economy/items/worth#unvalued)"}`,
-    );
+  if (selected.account_locked) {
+    desc.push("**account locked**");
   } else {
-    desc.push(
-      `\n**worth** ${value ? `$${Math.floor(value).toLocaleString()}` : "[unvalued](https://nypsi.xyz/docs/economy/items/worth#unvalued)"}`,
-    );
-  }
+    if (selected.sell || selected.buy) {
+      desc.push(
+        `**worth** ${value ? `$${Math.floor(value).toLocaleString()}` : "[unvalued](https://nypsi.xyz/docs/economy/items/worth#unvalued)"}`,
+      );
+    } else {
+      desc.push(
+        `\n**worth** ${value ? `$${Math.floor(value).toLocaleString()}` : "[unvalued](https://nypsi.xyz/docs/economy/items/worth#unvalued)"}`,
+      );
+    }
 
-  if (total && selected.id !== "lottery_ticket") {
-    desc.push(`\n**in world** ${total.toLocaleString()}`);
-  }
+    if (total && selected.id !== "lottery_ticket") {
+      desc.push(`\n**in world** ${total.toLocaleString()}`);
+    }
+
+    if (inAuction) {
+      const auctions = await findAuctions(selected.id);
+      let cheapest: number;
 
   if (inMarket) {
     const sellOrders = await getMarketItemOrders(selected.id, "buy");
@@ -162,38 +168,30 @@ async function run(
         `\n**in market** ${inMarket.toLocaleString()}${cheapest ? ` ($${cheapest.toLocaleString()})` : ""}`,
       );
     }
-  }
 
-  if (selected.role) {
-    embed.addField(
-      "role",
-      `\`${selected.role}${selected.role == "car" ? ` (${selected.speed})` : ""}\``,
-      true,
-    );
-  }
+    const rarityMap = new Map<number, string>();
 
-  const rarityMap = new Map<number, string>();
+    rarityMap.set(0, "common");
+    rarityMap.set(1, "uncommon");
+    rarityMap.set(2, "rare");
+    rarityMap.set(3, "very rare");
+    rarityMap.set(4, "exotic");
+    rarityMap.set(5, "impossible");
+    rarityMap.set(6, "literally not possible within your lifetime");
 
-  rarityMap.set(0, "common");
-  rarityMap.set(1, "uncommon");
-  rarityMap.set(2, "rare");
-  rarityMap.set(3, "very rare");
-  rarityMap.set(4, "exotic");
-  rarityMap.set(5, "impossible");
-  rarityMap.set(6, "literally not possible within your lifetime");
+    if (rarityMap.get(selected.rarity)) {
+      embed.addField("rarity", `\`${rarityMap.get(selected.rarity)}\``, true);
+    }
 
-  if (rarityMap.get(selected.rarity)) {
-    embed.addField("rarity", `\`${rarityMap.get(selected.rarity)}\``, true);
-  }
-
-  if (inventory.find((i) => i.item == selected.id)) {
-    embed.setFooter({
-      text: `you have ${inventory.find((i) => i.item == selected.id).amount.toLocaleString()} ${
-        inventory.find((i) => i.item == selected.id).amount > 1
-          ? selected.plural || selected.name
-          : selected.name
-      }`,
-    });
+    if (inventory.find((i) => i.item == selected.id)) {
+      embed.setFooter({
+        text: `you have ${inventory.find((i) => i.item == selected.id).amount.toLocaleString()} ${
+          inventory.find((i) => i.item == selected.id).amount > 1
+            ? selected.plural || selected.name
+            : selected.name
+        }`,
+      });
+    }
   }
 
   embed.setDescription(desc.join("\n"));
