@@ -84,7 +84,6 @@ export async function getMarketItemOrders(
     orderBy: [{ price: "desc" }, { createdAt: "asc" }],
   });
 
-  if (filterOutUserId) return query.filter((m) => m.ownerId !== filterOutUserId);
   return query;
 }
 
