@@ -14,8 +14,17 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { getExactMember, getMember } from "../utils/functions/member";
 import { getLastKnownAvatar, getLastKnownUsername } from "../utils/functions/users/tag";
-import { castVoteKick, getZProfile, invite, removeVoteKick, z } from "../utils/functions/z";
+import {
+  castVoteKick,
+  checkZPeoples,
+  getZProfile,
+  invite,
+  removeVoteKick,
+  z,
+} from "../utils/functions/z";
 import { addCooldown, onCooldown } from "../utils/handlers/cooldownhandler";
+
+let checking = false;
 
 const cmd = new Command("z", "z", "none");
 
@@ -163,6 +172,10 @@ async function run(
   let member: GuildMember;
 
   if (args.length === 0) {
+    if (!checking) {
+      checking = true;
+      checkZPeoples(message.guild).then(() => (checking = false));
+    }
     member = message.member;
   } else if (args[0].toLowerCase() === "invite") {
     if (!profile.hasInvite)
