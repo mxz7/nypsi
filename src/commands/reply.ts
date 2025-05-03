@@ -54,6 +54,11 @@ async function run(
           "you must provide evidence the old account username and user ID, as well as prove that it is your account\n\n" +
           "if you're unable to prove that it's your account, we cannot do anything.",
       );
+    } else if (args[0].toLowerCase() === "auto.buyunban") {
+      embed.setDescription(
+        "if you are **banned/muted from the nypsi discord server** then you can be unbanned by making a custom donation of £20 to https://ko-fi.com/tekoh\n\n" +
+        "if you are **banned from nypsi economy** you can buy an unban from https://ko-fi.com/s/1d78b621a5",
+      );
     } else if (args[0].toLowerCase() === "notify") {
       const res = await toggleNotify(support.userId, message.author.id);
       if (res) return message.react("✅");
