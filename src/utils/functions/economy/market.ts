@@ -559,28 +559,39 @@ export async function deleteMarketOrder(id: number, client: NypsiClient, repeatC
   return Boolean(order);
 }
 
-export async function getPriceForMarketTransaction(
+export async function getMarketTransactionData(
   itemId: string,
   amount: number,
   type: OrderType,
   filterOutUserId: string,
 ) {
-  const orders = await getMarketItemOrders(itemId, type == "buy" ? "sell" : "buy", filterOutUserId);
+  const allOrders = await prisma.market.findMany({
+    where: {
+      AND: [
+        { itemId, completed: false },
+        { orderType: type },
+        { ownerId: { not: filterOutUserId } },
+      ],
+    },
+  });
+  const orders: Market[] = [];
 
   let cost = 0;
 
-  for (const order of orders) {
+  for (const order of allOrders) {
     if (amount >= order.itemAmount) {
       cost += Number(order.price * order.itemAmount);
       amount -= Number(order.itemAmount);
+      orders.push(order);
     } else {
       cost += Number(order.price) * amount;
       amount = 0;
+      orders.push(order);
       break;
     }
   }
 
-  return amount == 0 ? cost : -1;
+  return { cost: amount == 0 ? cost : -1, orders: orders };
 }
 
 export async function completeOrder(
@@ -783,19 +794,13 @@ export async function completeOrder(
 }
 
 export async function marketSell(
+  userId: string,
   itemId: string,
   amount: number,
   storedPrice: number,
-  member: GuildMember | string,
+  client: NypsiClient,
   repeatCount = 1,
-) {
-  let userId: string;
-  if (member instanceof GuildMember) {
-    userId = member.user.id;
-  } else {
-    userId = member;
-  }
-
+): Promise<{ status: string; remaining?: number }> {
   if (
     inTransaction.has(itemId) ||
     (await redis.exists(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`))
@@ -804,7 +809,7 @@ export async function marketSell(
       logger.debug(`repeating market sell - ${amount}x ${itemId}`);
       setTimeout(async () => {
         if (repeatCount > 100) inTransaction.delete(itemId);
-        resolve(marketSell(itemId, amount, storedPrice, member, repeatCount + 1));
+        resolve(marketSell(userId, itemId, amount, storedPrice, client, repeatCount + 1));
       }, 50);
     });
   }
@@ -818,21 +823,24 @@ export async function marketSell(
 
   if (!(await userExists(userId))) await createUser(userId);
 
-  const sellPrice = await getPriceForMarketTransaction(itemId, amount, "sell", userId);
+  // looking for buy orders
+  const { cost: sellPrice, orders } = await getMarketTransactionData(itemId, amount, "buy", userId);
 
   if (sellPrice == -1) {
     await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
     inTransaction.delete(itemId);
-    return "not enough items";
+    return { status: "not enough items" };
   }
 
   if (storedPrice !== sellPrice) {
     await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
     inTransaction.delete(itemId);
-    return `since viewing the market, the sell price has changed from $${storedPrice.toLocaleString()} to $${sellPrice.toLocaleString()}. please press sell again with this updated price in mind`;
+    return {
+      status: `since viewing the market, the sell price has changed from $${storedPrice.toLocaleString()} to $${sellPrice.toLocaleString()}. please press sell again with this updated price in mind`,
+    };
   }
 
-  const inventory = await getInventory(member);
+  const inventory = await getInventory(userId);
 
   if (
     !inventory.find((i) => i.item == itemId) ||
@@ -840,28 +848,52 @@ export async function marketSell(
   ) {
     await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
     inTransaction.delete(itemId);
-    return `you do not have this many ${getItems()[itemId].plural ? getItems()[itemId].plural : getItems()[itemId].name}`;
+    return {
+      status: `you do not have this many ${getItems()[itemId].plural ? getItems()[itemId].plural : getItems()[itemId].name}`,
+    };
   }
 
-  for (const order of orders) {
+  let remaining = amount;
+
+  try {
+    await prisma.$transaction(async (prisma) => {
+      for (const order of orders) {
+        let amount: bigint;
+        if (order.itemAmount > remaining) {
+          amount = order.itemAmount;
+          remaining = 0;
+        } else {
+          amount = order.itemAmount;
+          remaining -= Number(order.itemAmount);
+        }
+
+        const res = await completeOrder(
+          order.id,
+          userId,
+          amount,
+          client,
+          prisma as Prisma.TransactionClient,
+        );
+        if (!res) break;
+      }
+    });
+  } catch (e) {
+    console.error(e);
+    logger.error("market sell transaction failed", e);
   }
 
-  await Promise.all([
-    removeInventoryItem(
-      member,
-      itemId,
-      (await getInventory(member)).find((i) => i.item == item.id).amount - Number(amount),
-    ),
-    addBalance(member, sellPrice - totalTax),
-    addStat(member, "earned-market", sellPrice - totalTax),
-  ]);
+  await removeInventoryItem(userId, itemId, amount - remaining);
 
-  logger.info(`market ${userId} sold ${amount} ${item.id}`);
+  logger.info(`market ${userId} sold ${amount} ${itemId}`);
 
-  await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${item.id}`);
-  inTransaction.delete(item.id);
+  await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
+  inTransaction.delete(itemId);
 
-  return "success";
+  if (remaining) {
+    return { status: "partial", remaining };
+  }
+
+  return { status: "success" };
 }
 
 export async function marketBuy(
