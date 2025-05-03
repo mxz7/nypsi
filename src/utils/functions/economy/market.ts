@@ -303,6 +303,7 @@ export async function checkMarketOrder(order: Market, client: NypsiClient, repea
   try {
     await prisma.$transaction(async (prisma) => {
       for (const validOrder of validOrders) {
+        if (order.itemAmount === 0n) break;
         let amount: bigint;
 
         if (validOrder.itemAmount > order.itemAmount) {
@@ -319,6 +320,7 @@ export async function checkMarketOrder(order: Market, client: NypsiClient, repea
           },
           data: {
             itemAmount: order.itemAmount,
+            completed: order.itemAmount === 0n ? true : undefined,
           },
         });
 
