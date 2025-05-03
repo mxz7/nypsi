@@ -134,6 +134,7 @@ export default class ScratchCard {
   }
 
   public async clicked(interaction: ButtonInteraction) {
+    if (interaction.customId === "retry") return;
     const [y, x] = interaction.customId.split("-").map((i) => parseInt(i));
     try {
       if (this.area[y][x].clicks === 1) return;
