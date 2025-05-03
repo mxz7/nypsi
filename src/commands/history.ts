@@ -91,8 +91,6 @@ async function run(
 
   let member: GuildMember | string = await getExactMember(message.guild, args.join(" "));
 
-  console.log(member);
-
   if (!member) {
     if (args[0].match(Constants.SNOWFLAKE_REGEX)) {
       member = args[0];
