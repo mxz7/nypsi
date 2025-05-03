@@ -504,7 +504,7 @@ export async function checkMarketWatchers(
 export async function countItemOnMarket(itemId: string, type: OrderType) {
   const amount = await prisma.market.aggregate({
     where: {
-      AND: [{ completed: false }, { itemId: itemId }, { orderType: type }],
+      AND: [{ itemId: itemId }, { completed: false }, { orderType: type }],
     },
     _sum: {
       itemAmount: true,
