@@ -69,9 +69,17 @@ export async function getMarketItemOrders(
   type: OrderType,
   filterOutUserId?: string,
 ) {
+  const filters: Prisma.MarketWhereInput[] = [
+    { itemId },
+    { completed: false },
+    { orderType: type },
+  ];
+
+  if (filterOutUserId) filters.push({ ownerId: { not: filterOutUserId } });
+
   const query = await prisma.market.findMany({
     where: {
-      AND: [{ itemId: itemId }, { completed: false }, { orderType: type }],
+      AND: filters,
     },
     orderBy: [{ price: "desc" }, { createdAt: "asc" }],
   });
