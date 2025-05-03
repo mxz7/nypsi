@@ -1,4 +1,4 @@
-import { MarketWatch, OrderType } from "@prisma/client";
+import { Market, MarketWatch, OrderType, Prisma, PrismaClient } from "@prisma/client";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -153,13 +153,9 @@ export async function createMarketOrder(
       price: price,
       orderType: orderType,
     },
-    select: {
-      createdAt: true,
-      id: true,
-    },
   });
 
-  const checkSold = await checkMarketOverlap(member, itemId, orderType);
+  const checkSold = await checkMarketOrder(order, client);
   let sold = false;
 
   if (checkSold) {
@@ -259,6 +255,86 @@ export async function createMarketOrder(
 
   response.url = url;
   return response;
+}
+
+export async function checkMarketOrder(order: Market, client: NypsiClient, repeatCount = 0) {
+  if (
+    inTransaction.has(order.itemId) ||
+    (await redis.exists(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${order.itemId}`))
+  ) {
+    return new Promise((resolve) => {
+      logger.debug(`repeating market overlap check - ${order.itemId} (${repeatCount})`);
+      setTimeout(async () => {
+        if (repeatCount > 100) inTransaction.delete(order.itemId);
+        resolve(checkMarketOrder(order, client, repeatCount + 1));
+      }, 10);
+    });
+  }
+
+  inTransaction.add(order.itemId);
+  await redis.set(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${order.itemId}`, "t", "EX", 60);
+
+  const validOrders = await prisma.market.findMany({
+    where: {
+      AND: [
+        { itemId: order.itemId },
+        { completed: false },
+        { orderType: order.orderType === "buy" ? "sell" : "buy" },
+        { price: order.orderType === "buy" ? { lte: order.price } : { gte: order.price } },
+      ],
+    },
+
+    orderBy: { createdAt: "desc" },
+  });
+
+  if (validOrders.length === 0) {
+    inTransaction.delete(order.itemId);
+    await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${order.itemId}`);
+    return false;
+  }
+
+  try {
+    await prisma.$transaction(async (prisma) => {
+      for (const validOrder of validOrders) {
+        let amount: bigint;
+
+        if (validOrder.itemAmount > order.itemAmount) {
+          amount = order.itemAmount;
+          order.itemAmount = 0n;
+        } else {
+          amount = validOrder.itemAmount;
+          order.itemAmount -= validOrder.itemAmount;
+        }
+
+        await prisma.market.update({
+          where: {
+            id: order.id,
+          },
+          data: {
+            itemAmount: order.itemAmount,
+          },
+        });
+
+        const res = await completeOrder(
+          validOrder.id,
+          order.ownerId,
+          amount,
+          client,
+          prisma as Prisma.TransactionClient,
+        );
+        if (!res) break;
+      }
+    });
+  } catch (e) {
+    console.error(e);
+    logger.error("error in completing market order", e);
+  }
+
+  inTransaction.delete(order.itemId);
+  await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${order.itemId}`);
+
+  if (order.itemAmount === 0n) return true;
+  else return order.itemAmount;
 }
 
 export async function updateMarketWatch(
@@ -498,89 +574,290 @@ export async function getPriceForMarketTransaction(
   return amount == 0 ? cost : -1;
 }
 
-export async function checkMarketOverlap(
+export async function completeOrder(
+  orderId: number,
+  buyerId: string,
+  amount: bigint,
+  client: NypsiClient,
+  prisma: PrismaClient | Prisma.TransactionClient,
+  checkLock?: { itemId: string },
+  repeatCount = 0,
+) {
+  if (checkLock) {
+    if (
+      inTransaction.has(checkLock.itemId) ||
+      (await redis.exists(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${checkLock.itemId}`))
+    ) {
+      return new Promise((resolve) => {
+        logger.debug(
+          `repeating market overlap check (completeOrder) - ${checkLock.itemId} (${repeatCount})`,
+        );
+        setTimeout(async () => {
+          if (repeatCount > 100) inTransaction.delete(checkLock.itemId);
+          resolve(
+            completeOrder(orderId, buyerId, amount, client, prisma, checkLock, repeatCount + 1),
+          );
+        }, 10);
+      });
+    }
+
+    inTransaction.add(checkLock.itemId);
+    await redis.set(
+      `${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${checkLock.itemId}`,
+      "t",
+      "EX",
+      60,
+    );
+  }
+
+  const order = await prisma.market.findFirst({
+    where: { AND: [{ id: orderId }, { completed: false }] },
+  });
+
+  if (!order || order.itemAmount < amount) {
+    if (checkLock) {
+      await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${checkLock.itemId}`);
+      inTransaction.delete(checkLock.itemId);
+    }
+
+    return false;
+  }
+
+  let isAlt = false;
+
+  const accounts = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, order.ownerId);
+
+  if (accounts.includes(buyerId) || order.price < 10_000) isAlt = true;
+
+  if (order.itemAmount === amount) {
+    if (isAlt) {
+      await prisma.market.delete({
+        where: { id: order.id },
+      });
+    } else {
+      await prisma.market.update({
+        where: { id: order.id },
+        data: { completed: true },
+      });
+    }
+  } else {
+    if (!isAlt) {
+      await prisma.market.create({
+        data: {
+          itemId: order.itemId,
+          orderType: order.orderType,
+          ownerId: order.ownerId,
+          itemAmount: amount,
+          price: order.price,
+          completed: true,
+        },
+      });
+    }
+
+    await prisma.market.update({
+      where: { id: order.id },
+      data: { itemAmount: { decrement: amount } },
+    });
+  }
+
+  const tax = await getTax();
+  let taxedAmount = 0;
+
+  if ((await getTier(order.ownerId)) !== 4) {
+    taxedAmount += Math.floor(Number(amount) * Number(order.price) * tax);
+  }
+
+  await addToNypsiBank(taxedAmount);
+
+  if (order.orderType === "buy") {
+    await addInventoryItem(order.ownerId, order.itemId, Number(amount));
+    await addBalance(buyerId, Number(amount) * Number(order.price) - taxedAmount);
+  } else {
+    await addInventoryItem(buyerId, order.itemId, Number(amount));
+    await addBalance(order.ownerId, Number(amount) * Number(order.price) - taxedAmount);
+  }
+
+  if (checkLock) {
+    await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${checkLock.itemId}`);
+    inTransaction.delete(checkLock.itemId);
+  }
+
+  // send logs and dms
+  (async () => {
+    const username = await getLastKnownUsername(buyerId);
+
+    transaction(
+      { username: await getLastKnownUsername(order.ownerId), id: order.ownerId },
+      { username: username, id: buyerId },
+      `${order.itemId} x ${amount} (market buy)`,
+    );
+    transaction(
+      { username: username, id: buyerId },
+      { username: await getLastKnownUsername(order.ownerId), id: order.ownerId },
+      `$${(Number(amount) * Number(order.price) - taxedAmount).toLocaleString()} (market buy)`,
+    );
+
+    if ((await getDmSettings(order.ownerId)).market) {
+      if (dmQueue.has(`${order.ownerId}-${order.orderType}`)) {
+        if (dmQueue.get(`${order.ownerId}-${order.orderType}`).items.has(order.itemId)) {
+          if (
+            dmQueue.get(`${order.ownerId}-${order.orderType}`).items.get(order.itemId).has(buyerId)
+          ) {
+            dmQueue
+              .get(`${order.ownerId}-${order.orderType}`)
+              .items.get(order.itemId)
+              .set(
+                buyerId,
+                dmQueue
+                  .get(`${order.ownerId}-${order.orderType}`)
+                  .items.get(order.itemId)
+                  .get(buyerId) + Number(amount),
+              );
+          } else {
+            dmQueue
+              .get(`${order.ownerId}-${order.orderType}`)
+              .items.get(order.itemId)
+              .set(buyerId, Number(amount));
+          }
+        } else {
+          dmQueue
+            .get(`${order.ownerId}-${order.orderType}`)
+            .items.set(order.itemId, new Map([[buyerId, Number(amount)]]));
+        }
+
+        dmQueue.get(`${order.ownerId}-${order.orderType}`).earned +=
+          Number(amount) * Number(order.price) - taxedAmount;
+      } else {
+        dmQueue.set(`${order.ownerId}-${order.orderType}`, {
+          items: new Map([[order.itemId, new Map([[buyerId, Number(amount)]])]]),
+          earned: Number(amount) * Number(order.price) - taxedAmount,
+        });
+
+        setTimeout(async () => {
+          if (!dmQueue.has(`${order.ownerId}-${order.orderType}`)) return;
+          let total = 0;
+          const data = dmQueue.get(`${order.ownerId}-${order.orderType}`);
+
+          let description = "";
+
+          for (const [item, buyers] of data.items) {
+            description += `${getItems()[item].emoji} **${getItems()[item].name}**:\n`;
+
+            for (const [buyer, amount] of buyers) {
+              const username = await getLastKnownUsername(buyer);
+              description += `- **${username}**: ${amount.toLocaleString()}\n`;
+              total += amount;
+            }
+
+            description += "\n";
+          }
+
+          const embedDm = new CustomEmbed(order.ownerId)
+            .setDescription(description)
+            .setFooter({ text: `+$${data.earned.toLocaleString()}` });
+
+          dmQueue.delete(`${order.ownerId}-${order.orderType}`);
+
+          addNotificationToQueue({
+            memberId: order.ownerId,
+            payload: {
+              content: `${total.toLocaleString()}x of your ${order.orderType} order items have been fulfilled`,
+              embed: embedDm,
+            },
+          });
+        }, ms("10 minutes"));
+      }
+    }
+  })();
+
+  return true;
+}
+
+export async function marketSell(
+  item: Item,
+  amount: number,
+  storedPrice: number,
   member: GuildMember | string,
-  itemId: string,
-  createdOrderType: OrderType,
-  repeatCount?: number,
-): Promise<boolean> {
+  repeatCount = 1,
+) {
+  let userId: string;
+  if (member instanceof GuildMember) {
+    userId = member.user.id;
+  } else {
+    userId = member;
+  }
+
   if (
-    inTransaction.has(itemId) ||
-    (await redis.exists(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`))
+    inTransaction.has(item.id) ||
+    (await redis.exists(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${item.id}`))
   ) {
     return new Promise((resolve) => {
-      logger.debug(`repeating market overlap check - ${itemId}`);
+      logger.debug(`repeating market sell - ${amount}x ${item.id}`);
       setTimeout(async () => {
-        if (repeatCount > 100) inTransaction.delete(itemId);
-        resolve(checkMarketOverlap(member, itemId, createdOrderType, repeatCount + 1));
+        if (repeatCount > 100) inTransaction.delete(item.id);
+        resolve(marketSell(item, amount, storedPrice, member, repeatCount + 1));
       }, 50);
     });
   }
 
-  const buyOrders = await getMarketItemOrders(itemId, "buy");
-  const sellOrders = await getMarketItemOrders(itemId, "sell");
-
-  if (buyOrders.length == 0 || sellOrders.length == 0) return false;
-
-  const highestBuyOrder = buyOrders.reduce((prev, current) =>
-    current.price > prev.price ? current : prev,
-  );
-
-  const lowestSellOrder = sellOrders.reduce((prev, current) =>
-    current.price < prev.price ? current : prev,
-  );
-
-  if (highestBuyOrder.price < lowestSellOrder.price) return false;
-
-  const sellOrdersBelowPrice = sellOrders.filter((i) => i.price <= highestBuyOrder.price);
-  const buyOrdersAbovePrice = buyOrders.filter((i) => i.price >= lowestSellOrder.price);
-  const countBetweenPrices = Math.min(
-    sellOrdersBelowPrice.reduce((sum, item) => sum + Number(item.itemAmount), 0),
-    Number(highestBuyOrder.itemAmount),
-  );
-
-  inTransaction.add(itemId);
-  await redis.set(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`, "d", "EX", 600);
-
+  inTransaction.add(item.id);
   setTimeout(() => {
-    inTransaction.delete(itemId);
+    inTransaction.delete(item.id);
   }, ms("10 minutes"));
 
-  let amount = countBetweenPrices;
+  await redis.set(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${item.id}`, "d", "EX", 600);
 
-  if (createdOrderType == "buy") {
-    await completeBuy(member, itemId, countBetweenPrices, sellOrdersBelowPrice);
+  if (!(await userExists(userId))) await createUser(userId);
 
-    for (const order of sellOrdersBelowPrice) {
-      await completeSell(order.ownerId, itemId, Math.min(amount, Number(order.itemAmount)), [
-        await prisma.market.findUnique({ where: { id: highestBuyOrder.id } }),
-      ]);
-      amount -= Math.min(amount, Number(order.itemAmount));
-    }
+  const sellPrice = await getPriceForMarketTransaction(item.id, amount, "sell", userId);
 
-    await addToNypsiBank(
-      Number(highestBuyOrder.price - lowestSellOrder.price) * countBetweenPrices,
-    );
-  } else {
-    await completeSell(member, itemId, countBetweenPrices, buyOrdersAbovePrice);
-
-    for (const order of buyOrdersAbovePrice) {
-      await completeBuy(order.ownerId, itemId, Math.min(amount, Number(order.itemAmount)), [
-        await prisma.market.findUnique({ where: { id: lowestSellOrder.id } }),
-      ]);
-      amount -= Math.min(amount, Number(order.itemAmount));
-    }
-
-    await addToNypsiBank(
-      Number(highestBuyOrder.price - lowestSellOrder.price) * countBetweenPrices,
-    );
+  if (sellPrice == -1) {
+    await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${item.id}`);
+    inTransaction.delete(item.id);
+    return "not enough items";
   }
 
-  logger.info(`market ${itemId} fixed overlap`);
+  if (storedPrice !== sellPrice) {
+    await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${item.id}`);
+    inTransaction.delete(item.id);
+    return `since viewing the market, the sell price has changed from $${storedPrice.toLocaleString()} to $${sellPrice.toLocaleString()}. please press sell again with this updated price in mind`;
+  }
 
-  await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
-  inTransaction.delete(itemId);
-  return true;
+  const inventory = await getInventory(member);
+
+  if (
+    !inventory.find((i) => i.item == item.id) ||
+    inventory.find((i) => i.item == item.id).amount < amount
+  ) {
+    await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${item.id}`);
+    inTransaction.delete(item.id);
+    return `you do not have this many ${item.plural ? item.plural : item.name}`;
+  }
+
+  const buyOrders = await getMarketItemOrders(item.id, "buy", userId);
+
+  const totalTax = await completeSell(member, item.id, amount, buyOrders);
+
+  if (totalTax == "not enough items") return "not enough items";
+
+  if (totalTax > 0) addToNypsiBank(totalTax);
+
+  await Promise.all([
+    setInventoryItem(
+      member,
+      item.id,
+      (await getInventory(member)).find((i) => i.item == item.id).amount - Number(amount),
+    ),
+    addBalance(member, sellPrice - totalTax),
+    addStat(member, "earned-market", sellPrice - totalTax),
+  ]);
+
+  logger.info(`market ${userId} sold ${amount} ${item.id}`);
+
+  await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${item.id}`);
+  inTransaction.delete(item.id);
+
+  return "success";
 }
 
 export async function marketBuy(
@@ -659,490 +936,4 @@ export async function marketBuy(
   inTransaction.delete(item.id);
 
   return "success";
-}
-
-async function completeBuy(
-  member: GuildMember | string,
-  itemId: string,
-  amount: number,
-  sellOrders: {
-    id: number;
-    createdAt: Date;
-    completed: boolean;
-    itemId: string;
-    orderType: OrderType;
-    ownerId: string;
-    itemAmount: bigint;
-    price: bigint;
-  }[],
-) {
-  let userId: string;
-  if (member instanceof GuildMember) {
-    userId = member.user.id;
-  } else {
-    userId = member;
-  }
-
-  const items = getItems();
-  const tax = await getTax();
-
-  let totalTax = 0;
-
-  const usedOrders: {
-    id: number;
-    price: number;
-    buyAmount: number;
-    itemAmount: number;
-    ownerId: string;
-  }[] = [];
-
-  let total = amount;
-
-  for (const order of sellOrders) {
-    if (total >= order.itemAmount) {
-      usedOrders.push({
-        id: order.id,
-        price: Number(order.price),
-        buyAmount: Number(order.itemAmount),
-        itemAmount: Number(order.itemAmount),
-        ownerId: order.ownerId,
-      });
-      total -= Number(order.itemAmount);
-    } else {
-      usedOrders.push({
-        id: order.id,
-        price: Number(order.price),
-        buyAmount: total,
-        itemAmount: Number(order.itemAmount),
-        ownerId: order.ownerId,
-      });
-      total = 0;
-      break;
-    }
-  }
-
-  if (total > 0) {
-    await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
-    inTransaction.delete(itemId);
-    return "not enough items";
-  }
-
-  for (const order of usedOrders) {
-    const accounts = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, order.ownerId);
-
-    if ((order.price < 10_000 && order.itemAmount === 1) || accounts.includes(userId)) {
-      await prisma.market.delete({
-        where: {
-          id: order.id,
-        },
-      });
-    } else if (order.itemAmount > order.buyAmount) {
-      await prisma.market.create({
-        data: {
-          completed: true,
-          itemId: itemId,
-          itemAmount: order.buyAmount,
-          price: order.price,
-          orderType: "sell",
-          ownerId: order.ownerId,
-        },
-      });
-
-      await prisma.market
-        .update({
-          where: {
-            id: order.id,
-          },
-          data: {
-            itemAmount: { decrement: order.buyAmount },
-          },
-        })
-        .catch(() => {});
-    } else {
-      await prisma.market
-        .update({
-          where: {
-            id: order.id,
-          },
-          data: {
-            completed: true,
-          },
-        })
-        .catch(() => {});
-    }
-
-    let taxedAmount = 0;
-
-    if ((await getTier(order.ownerId)) !== 4) {
-      taxedAmount += Math.floor(order.buyAmount * order.price * tax);
-    }
-
-    totalTax += taxedAmount;
-
-    await addBalance(order.ownerId, order.buyAmount * order.price - taxedAmount);
-    await addStat(order.ownerId, "earned-market", order.buyAmount * order.price - taxedAmount);
-
-    const username = await getLastKnownUsername(userId);
-
-    transaction(
-      { username: await getLastKnownUsername(order.ownerId), id: order.ownerId },
-      { username: username, id: userId },
-      `${itemId} x ${order.buyAmount} (market buy)`,
-    );
-    transaction(
-      { username: username, id: userId },
-      { username: await getLastKnownUsername(order.ownerId), id: order.ownerId },
-      `$${(order.buyAmount * order.price - taxedAmount).toLocaleString()} (market buy)`,
-    );
-
-    if ((await getDmSettings(order.ownerId)).market) {
-      if (dmQueue.has(`${order.ownerId}-sell`)) {
-        if (dmQueue.get(`${order.ownerId}-sell`).items.has(itemId)) {
-          if (dmQueue.get(`${order.ownerId}-sell`).items.get(itemId).has(userId)) {
-            dmQueue
-              .get(`${order.ownerId}-sell`)
-              .items.get(itemId)
-              .set(
-                userId,
-                dmQueue.get(`${order.ownerId}-sell`).items.get(itemId).get(userId) + amount,
-              );
-          } else {
-            dmQueue.get(`${order.ownerId}-sell`).items.get(itemId).set(userId, amount);
-          }
-        } else {
-          dmQueue.get(`${order.ownerId}-sell`).items.set(itemId, new Map([[userId, amount]]));
-        }
-
-        dmQueue.get(`${order.ownerId}-sell`).earned += order.buyAmount * order.price - taxedAmount;
-      } else {
-        dmQueue.set(`${order.ownerId}-sell`, {
-          items: new Map([[itemId, new Map([[userId, amount]])]]),
-          earned: order.buyAmount * order.price - taxedAmount,
-        });
-
-        setTimeout(async () => {
-          if (!dmQueue.has(`${order.ownerId}-sell`)) return;
-          let total = 0;
-          const data = dmQueue.get(`${order.ownerId}-sell`);
-
-          let description = "";
-
-          for (const [item, buyers] of data.items) {
-            description += `${items[item].emoji} **${items[item].name}**:\n`;
-
-            for (const [buyer, amount] of buyers) {
-              const username = await getLastKnownUsername(buyer);
-              description += `- **${username}**: ${amount.toLocaleString()}\n`;
-              total += amount;
-            }
-
-            description += "\n";
-          }
-
-          const embedDm = new CustomEmbed(order.ownerId)
-            .setDescription(description)
-            .setFooter({ text: `+$${data.earned.toLocaleString()}` });
-
-          dmQueue.delete(`${order.ownerId}-sell`);
-
-          addNotificationToQueue({
-            memberId: order.ownerId,
-            payload: {
-              content: `${total.toLocaleString()}x of your sell order items have been fulfilled`,
-              embed: embedDm,
-            },
-          });
-        }, ms("10 minutes"));
-      }
-    }
-  }
-
-  return totalTax;
-}
-
-export async function marketSell(
-  item: Item,
-  amount: number,
-  storedPrice: number,
-  member: GuildMember | string,
-  repeatCount = 1,
-) {
-  let userId: string;
-  if (member instanceof GuildMember) {
-    userId = member.user.id;
-  } else {
-    userId = member;
-  }
-
-  if (
-    inTransaction.has(item.id) ||
-    (await redis.exists(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${item.id}`))
-  ) {
-    return new Promise((resolve) => {
-      logger.debug(`repeating market sell - ${amount}x ${item.id}`);
-      setTimeout(async () => {
-        if (repeatCount > 100) inTransaction.delete(item.id);
-        resolve(marketSell(item, amount, storedPrice, member, repeatCount + 1));
-      }, 50);
-    });
-  }
-
-  inTransaction.add(item.id);
-  await redis.set(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${item.id}`, "d", "EX", 600);
-
-  if (!(await userExists(userId))) await createUser(userId);
-
-  const sellPrice = await getPriceForMarketTransaction(item.id, amount, "sell", userId);
-
-  if (sellPrice == -1) {
-    await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${item.id}`);
-    inTransaction.delete(item.id);
-    return "not enough items";
-  }
-
-  if (storedPrice !== sellPrice) {
-    await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${item.id}`);
-    inTransaction.delete(item.id);
-    return `since viewing the market, the sell price has changed from $${storedPrice.toLocaleString()} to $${sellPrice.toLocaleString()}. please press sell again with this updated price in mind`;
-  }
-
-  const inventory = await getInventory(member);
-
-  if (
-    !inventory.find((i) => i.item == item.id) ||
-    inventory.find((i) => i.item == item.id).amount < amount
-  ) {
-    await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${item.id}`);
-    inTransaction.delete(item.id);
-    return `you do not have this many ${item.plural ? item.plural : item.name}`;
-  }
-
-  setTimeout(() => {
-    inTransaction.delete(item.id);
-  }, ms("10 minutes"));
-
-  const buyOrders = await getMarketItemOrders(item.id, "buy", userId);
-
-  const totalTax = await completeSell(member, item.id, amount, buyOrders);
-
-  if (totalTax == "not enough items") return "not enough items";
-
-  if (totalTax > 0) addToNypsiBank(totalTax);
-
-  await Promise.all([
-    setInventoryItem(
-      member,
-      item.id,
-      (await getInventory(member)).find((i) => i.item == item.id).amount - Number(amount),
-    ),
-    addBalance(member, sellPrice - totalTax),
-    addStat(member, "earned-market", sellPrice - totalTax),
-  ]);
-
-  logger.info(`market ${userId} sold ${amount} ${item.id}`);
-
-  await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${item.id}`);
-  inTransaction.delete(item.id);
-
-  return "success";
-}
-
-async function completeSell(
-  member: GuildMember | string,
-  itemId: string,
-  amount: number,
-  buyOrders: {
-    id: number;
-    createdAt: Date;
-    completed: boolean;
-    itemId: string;
-    orderType: OrderType;
-    ownerId: string;
-    itemAmount: bigint;
-    price: bigint;
-  }[],
-) {
-  let userId: string;
-  if (member instanceof GuildMember) {
-    userId = member.user.id;
-  } else {
-    userId = member;
-  }
-
-  const usedOrders: {
-    id: number;
-    price: number;
-    sellAmount: number;
-    itemAmount: number;
-    ownerId: string;
-  }[] = [];
-
-  let total = amount;
-
-  for (const order of buyOrders) {
-    if (total >= order.itemAmount) {
-      usedOrders.push({
-        id: order.id,
-        price: Number(order.price),
-        sellAmount: Number(order.itemAmount),
-        itemAmount: Number(order.itemAmount),
-        ownerId: order.ownerId,
-      });
-      total -= Number(order.itemAmount);
-    } else {
-      usedOrders.push({
-        id: order.id,
-        price: Number(order.price),
-        sellAmount: total,
-        itemAmount: Number(order.itemAmount),
-        ownerId: order.ownerId,
-      });
-      total = 0;
-      break;
-    }
-  }
-
-  if (total > 0) {
-    await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
-    inTransaction.delete(itemId);
-    return "not enough items";
-  }
-
-  const items = getItems();
-
-  const tax = await getTax();
-
-  let totalTax = 0;
-
-  for (const order of usedOrders) {
-    const accounts = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, order.ownerId);
-
-    if ((order.price < 10_000 && order.itemAmount === 1) || accounts.includes(userId)) {
-      await prisma.market.delete({
-        where: {
-          id: order.id,
-        },
-      });
-    } else if (order.itemAmount > order.sellAmount) {
-      await prisma.market.create({
-        data: {
-          completed: true,
-          itemId: itemId,
-          itemAmount: order.sellAmount,
-          price: order.price,
-          orderType: "buy",
-          ownerId: order.ownerId,
-        },
-      });
-
-      await prisma.market
-        .update({
-          where: {
-            id: order.id,
-          },
-          data: {
-            itemAmount: { decrement: order.sellAmount },
-          },
-        })
-        .catch(() => {});
-    } else {
-      await prisma.market
-        .update({
-          where: {
-            id: order.id,
-          },
-          data: {
-            completed: true,
-          },
-        })
-        .catch(() => {});
-    }
-
-    let taxedAmount = 0;
-
-    if ((await getTier(member)) !== 4) {
-      taxedAmount += Math.floor(order.sellAmount * order.price * tax);
-    }
-
-    totalTax += taxedAmount;
-
-    await addInventoryItem(order.ownerId, itemId, Number(amount));
-    await addStat(order.ownerId, "spent-market", order.sellAmount * order.price - taxedAmount);
-
-    const username = await getLastKnownUsername(userId);
-
-    transaction(
-      { username: await getLastKnownUsername(order.ownerId), id: order.ownerId },
-      { username: username, id: userId },
-      `$${(order.sellAmount * order.price - taxedAmount).toLocaleString()} (market sell)`,
-    );
-    transaction(
-      { username: await getLastKnownUsername(userId), id: userId },
-      { username: username, id: order.ownerId },
-      `${itemId} x ${order.sellAmount} (market sell)`,
-    );
-
-    if ((await getDmSettings(order.ownerId)).market) {
-      if (dmQueue.has(`${order.ownerId}-sell`)) {
-        if (dmQueue.get(`${order.ownerId}-sell`).items.has(itemId)) {
-          if (dmQueue.get(`${order.ownerId}-sell`).items.get(itemId).has(userId)) {
-            dmQueue
-              .get(`${order.ownerId}-sell`)
-              .items.get(itemId)
-              .set(
-                userId,
-                dmQueue.get(`${order.ownerId}-sell`).items.get(itemId).get(userId) + amount,
-              );
-          } else {
-            dmQueue.get(`${order.ownerId}-sell`).items.get(itemId).set(userId, amount);
-          }
-        } else {
-          dmQueue.get(`${order.ownerId}-sell`).items.set(itemId, new Map([[userId, amount]]));
-        }
-
-        dmQueue.get(`${order.ownerId}-sell`).earned += order.sellAmount * order.price - taxedAmount;
-      } else {
-        dmQueue.set(`${order.ownerId}-sell`, {
-          items: new Map([[itemId, new Map([[userId, amount]])]]),
-          earned: order.sellAmount * order.price - taxedAmount,
-        });
-
-        setTimeout(async () => {
-          if (!dmQueue.has(`${order.ownerId}-buy`)) return;
-          let total = 0;
-          const data = dmQueue.get(`${order.ownerId}-buy`);
-
-          let description = "";
-
-          for (const [item, buyers] of data.items) {
-            description += `${items[item].emoji} **${items[item].name}**:\n`;
-
-            for (const [buyer, amount] of buyers) {
-              const username = await getLastKnownUsername(buyer);
-              description += `- **${username}**: ${amount.toLocaleString()}\n`;
-              total += amount;
-            }
-
-            description += "\n";
-          }
-
-          const embedDm = new CustomEmbed(order.ownerId)
-            .setDescription(description)
-            .setFooter({ text: `+$${data.earned.toLocaleString()}` });
-
-          dmQueue.delete(`${order.ownerId}-buy`);
-
-          addNotificationToQueue({
-            memberId: order.ownerId,
-            payload: {
-              content: `${total.toLocaleString()}x of your buy order items have been fulfilled`,
-              embed: embedDm,
-            },
-          });
-        }, ms("10 minutes"));
-      }
-    }
-  }
-
-  return totalTax;
 }
