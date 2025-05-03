@@ -56,7 +56,7 @@ async function run(
       );
     } else if (args[0].toLowerCase() === "auto.buyunban") {
       embed.setDescription(
-        "if you are **banned/muted from the nypsi discord server** then you can be unbanned by making a custom donation of £20 to https://ko-fi.com/tekoh\n\n" +
+        "if you are **banned/muted from the nypsi discord server** then you can be unbanned/unmuted by making a custom donation of £20 to https://ko-fi.com/tekoh\n\n" +
         "if you are **banned from nypsi economy** you can buy an unban from https://ko-fi.com/s/1d78b621a5",
       );
     } else if (args[0].toLowerCase() === "notify") {
