@@ -1021,18 +1021,18 @@ async function run(
     if (imageRes.status !== 200)
       return message.channel.send({ embeds: [new ErrorEmbed("failed to download image")] });
 
-    const arrayBuffer = await imageRes.arrayBuffer();
-
-    const buffer = await sharp(arrayBuffer)
-      .resize({ width: 256, height: 256, fit: "cover" })
-      .toBuffer();
-
     const contentType = imageRes.headers.get("content-type");
 
     if (!["jpeg", "jpg", "gif", "png", "webp"].includes(contentType.split("/")[1]))
       return message.channel.send({
         embeds: [new ErrorEmbed("invalid file type. must be an image")],
       });
+
+    const arrayBuffer = await imageRes.arrayBuffer();
+
+    const buffer = await sharp(arrayBuffer, { animated: contentType.split("/")[1] === "gif" })
+      .resize({ width: 256, height: 256, fit: "cover" })
+      .toBuffer();
 
     if (guild.avatarId) {
       await deleteImage(guild.avatarId);
