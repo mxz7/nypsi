@@ -185,6 +185,12 @@
     "description": "prestige 70 tag",
     "emoji": "🤍"
   },
+  "p80": {
+    "id": "p80",
+    "name": "prestige 80",
+    "description": "prestige 80 tag",
+    "emoji": "💚"
+  },
   "mechanic": {
     "id": "mechanic",
     "name": "mechanic",
