@@ -34,12 +34,12 @@ export default async function messageUpdate(message: Message, newMessage: Messag
     }
   }
 
-  if (!message.member.permissions.has(PermissionFlagsBits.Administrator)) {
-    const res = await checkMessageContent(message.guild, message.content, true, message);
+  if (!newMessage.member.permissions.has(PermissionFlagsBits.Administrator)) {
+    const res = await checkMessageContent(message.guild, newMessage.content, true, newMessage);
 
     if (!res) {
-      addMuteViolation(message.guild, message.member);
-      await checkAutoMute(message);
+      addMuteViolation(newMessage.guild, newMessage.member);
+      await checkAutoMute(newMessage);
       return;
     }
   }
