@@ -2,10 +2,12 @@ import { CommandInteraction, Message } from "discord.js";
 import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import Constants from "../utils/Constants";
 import {
   getSupportRequestByChannelId,
   handleAttachments,
   sendToRequestChannel,
+  summariseRequest,
   toggleNotify,
 } from "../utils/functions/supportrequest";
 import { addNotificationToQueue } from "../utils/functions/users/notifications";
@@ -26,7 +28,12 @@ async function run(
     return message.channel.send({
       embeds: [
         new ErrorEmbed(
-          "**auto.scam**\n" + "**auto.transfer**\n" + "**auto.buyunban**\n" +"**notify**\n" + "<message content>",
+          "**auto.scam**\n" +
+            "**auto.transfer**\n" +
+            "**auto.buyunban**\n" +
+            "**notify**\n" +
+            "**summary**\n" +
+            "<message content>",
         ),
       ],
     });
@@ -57,11 +64,26 @@ async function run(
     } else if (args[0].toLowerCase() === "auto.buyunban") {
       embed.setDescription(
         "if you are **banned/muted from the nypsi discord server** then you can be unbanned/unmuted by making a custom donation of £20 to https://ko-fi.com/tekoh\n\n" +
-        "if you are **banned from nypsi economy** you can buy an unban from https://ko-fi.com/s/1d78b621a5",
+          "if you are **banned from nypsi economy** you can buy an unban from https://ko-fi.com/s/1d78b621a5",
       );
     } else if (args[0].toLowerCase() === "notify") {
       const res = await toggleNotify(support.userId, message.author.id);
       if (res) return message.react("✅");
+    } else if (args[0].toLowerCase() === "summary") {
+      const summary = await summariseRequest(support.userId);
+
+      if (!summary) {
+        return message.channel.send({ embeds: [new ErrorEmbed("failed to generate summary")] });
+      }
+
+      return message.channel.send({
+        embeds: [
+          new CustomEmbed()
+            .setDescription(summary)
+            .setColor(Constants.PURPLE)
+            .setHeader("summary", message.client.user.avatarURL()),
+        ],
+      });
     } else embed.setDescription(args.join(" "));
   }
 
@@ -91,7 +113,12 @@ async function run(
       case "completed":
         clearInterval(interval);
         message.delete();
-        sendToRequestChannel(support.userId, embed, message.client as NypsiClient);
+        sendToRequestChannel(
+          support.userId,
+          embed,
+          message.author.id,
+          message.client as NypsiClient,
+        );
         break;
       case "failed":
         clearInterval(interval);
