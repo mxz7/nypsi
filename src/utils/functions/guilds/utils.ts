@@ -123,9 +123,12 @@ export async function getPeaks(guild: Guild) {
 
 export async function createGuild(guild: Guild | string) {
   let guildId: string;
+  let isDev = false;
 
   if (guild instanceof Guild) {
     guildId = guild.id;
+
+    if (guild.client.user.id !== Constants.BOT_USER_ID) isDev = true;
   } else {
     guildId = guild;
   }
@@ -133,6 +136,7 @@ export async function createGuild(guild: Guild | string) {
   await prisma.guild.create({
     data: {
       id: guildId,
+      prefixes: isDev ? ["£"] : undefined,
     },
   });
 
