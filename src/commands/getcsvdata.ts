@@ -1,4 +1,4 @@
-import { CommandInteraction, Message } from "discord.js";
+import { CommandInteraction } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import Constants from "../utils/Constants";
 import graphToCsv from "../utils/functions/workers/graphtocsv";

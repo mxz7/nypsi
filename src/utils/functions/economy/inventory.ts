@@ -12,7 +12,7 @@ import sleep from "../sleep";
 import { getTax } from "../tax";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { addProgress } from "./achievements";
-import { getAuctionAverage } from "./auctions";
+import { getMarketAverage } from "./market";
 import { addBalance, getSellMulti } from "./balance";
 import { getOffersAverage } from "./offers";
 import { addStat } from "./stats";
@@ -305,16 +305,16 @@ export async function getTotalAmountOfItem(itemId: string) {
     },
   });
 
-  const auctions = await prisma.auction.aggregate({
+  const market = await prisma.market.aggregate({
     where: {
-      AND: [{ sold: false }, { itemId }],
+      AND: [{ completed: false }, { itemId: itemId }, { orderType: "sell" }],
     },
     _sum: {
       itemAmount: true,
     },
   });
 
-  return Number(query._sum.amount) + Number(auctions._sum.itemAmount);
+  return Number(query._sum.amount) + Number(market._sum.itemAmount);
 }
 
 export function selectItem(search: string) {
@@ -626,17 +626,17 @@ export async function calcItemValue(item: string) {
   ) {
     itemValue = getItems()[item].sell || 1000;
   } else {
-    const [auctionAvg, offersAvg] = await Promise.all([
-      getAuctionAverage(item),
+    const [marketAvg, offersAvg] = await Promise.all([
+      getMarketAverage(item),
       getOffersAverage(item),
     ]);
 
-    if (!offersAvg && auctionAvg) return auctionAvg;
-    if (!auctionAvg && offersAvg) return offersAvg;
-    if (!auctionAvg && !offersAvg) return undefined;
+    if (!offersAvg && marketAvg) return marketAvg;
+    if (!marketAvg && offersAvg) return offersAvg;
+    if (!marketAvg && !offersAvg) return undefined;
 
     itemValue = Math.floor(
-      [offersAvg, auctionAvg, auctionAvg, auctionAvg].reduce((a, b) => a + b) / 4,
+      [offersAvg, marketAvg, marketAvg, marketAvg].reduce((a, b) => a + b) / 4,
     );
   }
 
@@ -694,14 +694,15 @@ export async function itemExists(itemId: string) {
     return true;
   }
 
-  const auction = await prisma.auction.findFirst({
+  const market = await prisma.market.findFirst({
     where: {
-      sold: false,
+      completed: false,
       itemId: itemId,
+      orderType: "sell",
     },
   });
 
-  if (auction) {
+  if (market) {
     await redis.set(`${Constants.redis.cache.economy.ITEM_EXISTS}:${itemId}`, "t");
     return true;
   }

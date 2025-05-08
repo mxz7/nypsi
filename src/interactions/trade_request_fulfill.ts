@@ -2,43 +2,49 @@ import { ButtonInteraction } from "discord.js";
 import prisma from "../init/database";
 import { ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
-import { buyFullAuction } from "../utils/functions/economy/auctions";
 import { isEcoBanned, userExists } from "../utils/functions/economy/utils";
+import { fulfillTradeRequest } from "../utils/functions/economy/trade_requests";
 
 export default {
-  name: "b",
+  name: "fr",
   type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;
     if ((await isEcoBanned(interaction.user.id)).banned) return;
-    const auction = await prisma.auction.findFirst({
+    const tradeRequest = await prisma.tradeRequest.findUnique({
       where: {
-        AND: [{ messageId: interaction.message.id }],
+        messageId: interaction.message.id,
       },
     });
 
-    if (!auction) {
-      await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], ephemeral: true });
+    if (!tradeRequest) {
+      await interaction.reply({
+        embeds: [new ErrorEmbed("invalid trade request")],
+        ephemeral: true,
+      });
       await interaction.message.delete();
       return;
     }
 
-    if (auction && !auction?.sold && (await userExists(auction.ownerId))) {
-      if (auction.ownerId == interaction.user.id) {
+    if (tradeRequest && !tradeRequest?.completed && (await userExists(tradeRequest.ownerId))) {
+      if (tradeRequest.ownerId == interaction.user.id) {
         return await interaction.reply({
-          embeds: [new ErrorEmbed("you cannot buy your own auction")],
+          embeds: [new ErrorEmbed("you cannot fulfill your own trade request")],
           ephemeral: true,
         });
       }
 
-      return buyFullAuction(interaction as ButtonInteraction, auction);
-    } else if (auction?.sold || Number(auction.itemAmount) === 0) {
+      return fulfillTradeRequest(interaction as ButtonInteraction, tradeRequest);
+    } else if (tradeRequest?.completed) {
       return await interaction.reply({
         embeds: [new ErrorEmbed("too slow ):").removeTitle()],
         ephemeral: true,
       });
     } else {
-      await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], ephemeral: true });
+      await interaction.reply({
+        embeds: [new ErrorEmbed("invalid trade request")],
+        ephemeral: true,
+      });
       await interaction.message.delete();
     }
   },

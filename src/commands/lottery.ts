@@ -11,7 +11,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { getInventory } from "../utils/functions/economy/inventory";
 import {
-  getApproximatPrizePool,
+  getApproximatePrizePool,
   getDailyLottoTickets,
   setDailyLotteryTickets,
 } from "../utils/functions/economy/lottery";
@@ -84,7 +84,7 @@ async function run(
     );
     const embed = new CustomEmbed(message.member);
 
-    const pool = await getApproximatPrizePool();
+    const pool = await getApproximatePrizePool();
     const autoBuy = await getDailyLottoTickets(message.author.id);
 
     embed.setHeader("lottery", message.author.avatarURL());

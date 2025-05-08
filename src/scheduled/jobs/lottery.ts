@@ -1,4 +1,3 @@
-import ms = require("ms");
 import { flavors } from "@catppuccin/palette";
 import { exec } from "child_process";
 import { ColorResolvable, WebhookClient } from "discord.js";

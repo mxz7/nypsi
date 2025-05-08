@@ -40,7 +40,6 @@ import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
 import dayjs = require("dayjs");
-import ms = require("ms");
 
 const cmd = new Command("karmashop", "buy stuff with your karma", "money").setAliases(["ks"]);
 

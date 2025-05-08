@@ -1,7 +1,7 @@
 import prisma from "../../../init/database";
 import { getItems } from "./utils";
 
-export async function getApproximatPrizePool() {
+export async function getApproximatePrizePool() {
   const tickets = await prisma.inventory.aggregate({
     where: {
       item: "lottery_ticket",
