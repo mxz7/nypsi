@@ -727,7 +727,7 @@ export async function topGuilds(guildName?: string) {
     out.push(
       `${position} **[${guild.guildName}](https://nypsi.xyz/guild/${encodeURIComponent(
         guild.guildName.replaceAll(" ", "-"),
-      )})** level ${guild.level}`,
+      )}?ref=bot-lb)** level ${guild.level}`,
     );
   }
 
@@ -1916,9 +1916,10 @@ export async function topVoteStreakGlobal(userId: string, amount = 100) {
 }
 
 export async function formatUsername(id: string, username: string, privacy: boolean) {
-  if (!privacy) return "[**[hidden]**](https://nypsi.xyz/docs/economy/user-settings/hidden)";
+  if (!privacy)
+    return "[**[hidden]**](https://nypsi.xyz/docs/economy/user-settings/hidden?ref=bot-lb)";
 
-  let out = `[${username}](https://nypsi.xyz/user/${encodeURIComponent(id)})`;
+  let out = `[${username}](https://nypsi.xyz/user/${encodeURIComponent(id)}?ref=bot-lb)`;
 
   const tag = await getActiveTag(id);
 

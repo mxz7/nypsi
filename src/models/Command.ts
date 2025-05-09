@@ -32,13 +32,13 @@ export class Command {
 
     switch (category) {
       case "money":
-        this.docs = "https://nypsi.xyz/docs";
+        this.docs = "https://nypsi.xyz/docs?ref=bot-help";
         break;
       case "music":
-        this.docs = "https://nypsi.xyz/docs/music";
+        this.docs = "https://nypsi.xyz/docs/music?ref=bot-help";
         break;
       case "moderation":
-        this.docs = "https://nypsi.xyz/docs";
+        this.docs = "https://nypsi.xyz/docs?ref=bot-help";
         break;
     }
 

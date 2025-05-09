@@ -49,7 +49,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
 
   const embed = new CustomEmbed(
     message.member,
-    "https://nypsi.xyz/docs\n\n" +
+    "https://nypsi.xyz/docs?ref=bot-wiki\n\n" +
       "nypsi documentation / wiki is fully open source, meaning you can contribute and add to it! it may not be in the best shape right now and have all of the information, but it's always being improved and kept up to date",
   ).setHeader("nypsi documentation", message.author.avatarURL());
 

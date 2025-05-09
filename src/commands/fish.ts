@@ -107,7 +107,7 @@ async function doFish(
     return send({
       embeds: [
         new ErrorEmbed(
-          "you need a fishing rod to fish\n[how do i get a fishing rod?](https://nypsi.xyz/docs/economy/fish-hunt-mine)",
+          "you need a fishing rod to fish\n[how do i get a fishing rod?](https://nypsi.xyz/docs/economy/fish-hunt-mine?ref=bot-help)",
         ),
       ],
       ephemeral: true,
@@ -218,7 +218,7 @@ async function doFish(
   const embed = new CustomEmbed(member).setHeader(
     user.username,
     user.avatarURL(),
-    `https://nypsi.xyz/user/${user.id}`,
+    `https://nypsi.xyz/user/${user.id}?ref=bot-fish`,
   );
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
