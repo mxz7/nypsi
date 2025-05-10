@@ -1,7 +1,7 @@
 import { User } from "discord.js";
 import { NypsiClient } from "../models/Client";
 import { clearMemberCache } from "../utils/functions/member";
-import { addNewUsername, isTracking } from "../utils/functions/users/history";
+import { addNewUsername, fetchUsernameHistory, isTracking } from "../utils/functions/users/history";
 import { updateLastKnownUsername } from "../utils/functions/users/tag";
 import { hasProfile } from "../utils/functions/users/utils";
 
@@ -17,6 +17,10 @@ export default async function userUpdate(oldUser: User, newUser: User) {
       await updateLastKnownUsername(newUser.id, newUser.username);
 
       if (!(await isTracking(newUser.id))) return;
+      const usernames = await fetchUsernameHistory(newUser.id, 1);
+      if (!usernames.find((i) => i.value === oldUser.username)) {
+        await addNewUsername(newUser.id, oldUser.username);
+      }
       await addNewUsername(newUser.id, newUser.username);
     }
   }
