@@ -22,15 +22,10 @@ import messageUpdate from "../events/messageUpdate";
 import roleDelete from "../events/roleDelete";
 import userUpdate from "../events/userUpdate";
 import redis from "../init/redis";
-import { doAutosellSitrep } from "../scheduled/clusterjobs/autosell_status";
 import { runBirthdays } from "../scheduled/clusterjobs/birthdays";
 import { runAuctionChecks } from "../scheduled/clusterjobs/checkauctions";
-import { updateCounters } from "../scheduled/jobs/counters";
-import { runCraftItemsJob } from "../scheduled/clusterjobs/crafted";
 import { runLogs, runModerationChecks } from "../scheduled/clusterjobs/moderationchecks";
 import startRandomDrops from "../scheduled/clusterjobs/random-drops";
-import { runPremiumCrateInterval } from "../scheduled/clusterjobs/weeklycrates";
-import { runWorkerInterval } from "../scheduled/clusterjobs/workers";
 import Constants from "../utils/Constants";
 import { doChatReactions } from "../utils/functions/chatreactions/utils";
 import { initCrashGame } from "../utils/functions/economy/crash";
@@ -236,17 +231,12 @@ export class NypsiClient extends Client {
 
     if (this.cluster.id != 0) return;
 
-    runPremiumCrateInterval(this);
     runModerationChecks(this);
     runAuctionChecks(this);
     runCountdowns(this);
     runChristmas(this);
-    updateCounters(this);
     openKarmaShop(this);
     startRandomDrops(this);
     runLogs();
-    runWorkerInterval();
-    runCraftItemsJob();
-    doAutosellSitrep();
   }
 }
