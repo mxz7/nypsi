@@ -13,6 +13,7 @@ import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Comman
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { getExactMember, getMember } from "../utils/functions/member";
+import PageManager from "../utils/functions/page";
 import { getLastKnownAvatar, getLastKnownUsername } from "../utils/functions/users/tag";
 import {
   castVoteKick,
@@ -191,6 +192,46 @@ async function run(
     }
 
     return invite(message.author.id, member.id, message.guild);
+  } else if (args[0].toLowerCase() === "members") {
+    const users = await prisma.z.findMany({
+      select: { userId: true, removed: true },
+      orderBy: { user: { lastKnownUsername: "asc" } },
+    });
+
+    const desc: string[] = [];
+
+    for (const user of users) {
+      desc.push(
+        user.removed
+          ? `~~${await getLastKnownUsername(user.userId)}~~`
+          : await getLastKnownUsername(user.userId),
+      );
+    }
+
+    const pages = PageManager.createPages(desc);
+
+    const embed = new CustomEmbed(message.member, pages.get(1).join("\n")).setHeader(
+      "z members",
+      message.guild.iconURL(),
+    );
+
+    if (pages.size === 0) return message.channel.send({ embeds: [new ErrorEmbed("no members")] });
+
+    if (pages.size === 1) return message.channel.send({ embeds: [embed] });
+
+    const row = PageManager.defaultRow();
+
+    const msg = await message.channel.send({ embeds: [embed], components: [row] });
+
+    const manager = new PageManager({
+      message: msg,
+      embed,
+      row,
+      pages,
+      userId: message.author.id,
+    });
+
+    return manager.listen();
   } else {
     member = await getMember(message.guild, args.join(" "));
   }
