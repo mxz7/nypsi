@@ -98,7 +98,7 @@ export async function checkZPeoples(guild: Guild) {
   });
 
   for (const { userId } of users) {
-    if (!(await guild.members.fetch(userId).catch(() => {}))) return;
+    if (!(await guild.members.fetch(userId).catch(() => {}))) continue;
     if (!channel.permissionOverwrites.cache.has(userId)) {
       await sleep(250);
       await channel.permissionOverwrites.create(userId, {
