@@ -25,7 +25,7 @@ import redis from "../init/redis";
 import { doAutosellSitrep } from "../scheduled/clusterjobs/autosell_status";
 import { runBirthdays } from "../scheduled/clusterjobs/birthdays";
 import { runAuctionChecks } from "../scheduled/clusterjobs/checkauctions";
-import { updateCounters } from "../scheduled/clusterjobs/counters";
+import { updateCounters } from "../scheduled/jobs/counters";
 import { runCraftItemsJob } from "../scheduled/clusterjobs/crafted";
 import { runLogs, runModerationChecks } from "../scheduled/clusterjobs/moderationchecks";
 import startRandomDrops from "../scheduled/clusterjobs/random-drops";

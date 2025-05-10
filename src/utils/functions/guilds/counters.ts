@@ -1,12 +1,15 @@
 import { GuildCounter, TrackingType } from "@prisma/client";
+import { ClusterManager } from "discord-hybrid-sharding";
 import { ChannelType, Guild, PermissionFlagsBits } from "discord.js";
 import prisma from "../../../init/database";
 import { NypsiClient } from "../../../models/Client";
 import { logger } from "../../logger";
 import { getItems } from "../economy/utils";
 
-export async function updateChannel(data: GuildCounter, client: NypsiClient) {
-  const clusterHas = await client.cluster.broadcastEval(
+export async function updateChannel(data: GuildCounter, client: NypsiClient | ClusterManager) {
+  const clusterThing = client instanceof ClusterManager ? client : client.cluster;
+
+  const clusterHas = await clusterThing.broadcastEval(
     async (c, { channelId }) => {
       const client = c as unknown as NypsiClient;
       const channel = client.channels.cache.get(channelId);
@@ -44,7 +47,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
   let value: string;
 
   if (data.tracks === TrackingType.HUMANS) {
-    value = await client.cluster
+    value = await clusterThing
       .broadcastEval(
         async (c, { channelId, shard }) => {
           const client = c as unknown as NypsiClient;
@@ -68,7 +71,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
         }
       });
   } else if (data.tracks === TrackingType.MEMBERS) {
-    value = await client.cluster
+    value = await clusterThing
       .broadcastEval(
         async (c, { channelId, shard }) => {
           const client = c as unknown as NypsiClient;
@@ -89,7 +92,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
         }
       });
   } else if (data.tracks === TrackingType.BOOSTS) {
-    value = await client.cluster
+    value = await clusterThing
       .broadcastEval(
         async (c, { channelId, shard }) => {
           const client = c as unknown as NypsiClient;
@@ -110,7 +113,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
         }
       });
   } else if (data.tracks === TrackingType.RICHEST_MEMBER) {
-    const members = await client.cluster
+    const members = await clusterThing
       .broadcastEval(
         async (c, { channelId, shard }) => {
           const client = c as unknown as NypsiClient;
@@ -152,7 +155,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
 
     value = topMember?.user?.lastKnownUsername || "null";
   } else if (data.tracks === TrackingType.TOTAL_BALANCE) {
-    const members = await client.cluster
+    const members = await clusterThing
       .broadcastEval(
         async (c, { channelId, shard }) => {
           const client = c as unknown as NypsiClient;
@@ -193,7 +196,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
       logger.warn(`invalid item: ${JSON.stringify(data)}`);
       return;
     }
-    const members = await client.cluster
+    const members = await clusterThing
       .broadcastEval(
         async (c, { channelId, shard }) => {
           const client = c as unknown as NypsiClient;
@@ -238,7 +241,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
     return;
   }
 
-  const res = await client.cluster.broadcastEval(
+  const res = await clusterThing.broadcastEval(
     async (c, { shard, channelId, format }) => {
       const client = c as unknown as NypsiClient;
 
