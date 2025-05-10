@@ -98,6 +98,7 @@ export async function checkZPeoples(guild: Guild) {
   });
 
   for (const { userId } of users) {
+    if (!(await guild.members.fetch(userId).catch(() => {}))) return;
     if (!channel.permissionOverwrites.cache.has(userId)) {
       await sleep(250);
       await channel.permissionOverwrites.create(userId, {
@@ -242,6 +243,9 @@ export async function removeVoteKick(userId: string, targetId: string) {
 export async function invite(userId: string, targetId: string, guild: Guild) {
   const user = await getZProfile(userId);
   const target = await getZProfile(targetId);
+  const discordTarget = await guild.members.fetch(targetId).catch(() => {});
+
+  if (!discordTarget) return "target not found";
 
   if (!user) return "no user profile";
   if (!user.hasInvite) return "no invite";
@@ -274,7 +278,7 @@ export async function invite(userId: string, targetId: string, guild: Guild) {
     return;
   }
 
-  await channel.permissionOverwrites.create(targetId, {
+  await channel.permissionOverwrites.create(discordTarget, {
     ViewChannel: true,
   });
 
