@@ -9,6 +9,9 @@
     "build": "tsc",
     "watch": "tsc --build --watch"
   },
+  "prisma": {
+    "seed": "ts-node --transpile-only prisma/seed.ts"
+  },
   "author": "mxz7",
   "license": "ISC",
   "dependencies": {
@@ -39,7 +42,8 @@
     "openai": "^4.97.0",
     "p-all": "3.0.0",
     "sharp": "^0.34.1",
-    "string-similarity": "4.0.4"
+    "string-similarity": "4.0.4",
+    "ts-node": "^10.9.2"
   },
   "devDependencies": {
     "@types/crypto-js": "4.2.2",
