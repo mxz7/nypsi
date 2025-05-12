@@ -10,6 +10,7 @@ import { ItemUse } from "../../../../models/ItemUse";
 import { getInventory, removeInventoryItem, selectItem } from "../inventory";
 import { doDaily } from "../utils";
 import { ErrorEmbed } from "../../../../models/EmbedBuilders";
+import { getTier, isPremium } from "../../premium/premium";
 
 module.exports = new ItemUse(
   "streak_token",
@@ -58,6 +59,14 @@ module.exports = new ItemUse(
     } else if (parseInt(args[1])) {
       amount = parseInt(args[1]);
     }
+
+    let max = 3;
+
+    if (await isPremium(message.member)) {
+      max = 5 + (await getTier(message.member)) * 5
+    }
+        
+    if (amount > max) amount = max;
 
     if (amount > (inventory.find((i) => i.item === selected.id)?.amount || 0))
       return send({ embeds: [new ErrorEmbed(`you don't have ${amount} ${selected.name}`)] });
