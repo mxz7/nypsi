@@ -35,6 +35,7 @@ import { addTaskProgress } from "./tasks";
 import { addXp } from "./xp";
 import ms = require("ms");
 import math = require("mathjs");
+import pAll = require("p-all");
 
 let items: { [key: string]: Item };
 let achievements: { [key: string]: AchievementData };
@@ -444,7 +445,7 @@ export async function reset() {
   await prisma.economyWorkerUpgrades.deleteMany();
   await prisma.economyWorker.deleteMany();
   logger.info("deleting inventory");
-  await prisma.inventory.deleteMany({ where: { NOT: { item: "gold_star" } }});
+  await prisma.inventory.deleteMany({ where: { NOT: { item: "gold_star" } } });
   logger.info("deleting crafting");
   await prisma.crafting.deleteMany();
   await prisma.$executeRaw`TRUNCATE TABLE "Crafting" RESTART IDENTITY;`;
@@ -642,7 +643,7 @@ export async function getLastDaily(member: GuildMember | string) {
   return query.lastDaily;
 }
 
-export async function updateLastDaily(member: GuildMember | string) {
+export async function updateLastDaily(member: GuildMember | string, amount = 1) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -656,7 +657,7 @@ export async function updateLastDaily(member: GuildMember | string) {
     },
     data: {
       lastDaily: new Date(),
-      dailyStreak: { increment: 1 },
+      dailyStreak: { increment: amount },
     },
   });
 }
@@ -681,84 +682,99 @@ export async function getDailyStreak(member: GuildMember | string) {
   return query.dailyStreak;
 }
 
-export async function doDaily(member: GuildMember) {
-  const streak = (await getDailyStreak(member)) + 1;
+export async function doDaily(member: GuildMember, amount = 1) {
+  const currentStreak = await getDailyStreak(member);
 
-  let total = Math.floor(math.square(streak * 7) + 25_000);
+  let totalMoney = 0;
+  let totalXp = 0;
 
-  if (total > 1_000_000) total = 1_000_000;
+  const totalRewards = new Map<string, number>();
 
-  let xp = 1;
-  let crate = 0;
+  for (let i = 1; i <= amount; i++) {
+    const streak = currentStreak + i;
 
-  if (streak > 5) {
-    xp = Math.floor((streak - 5) / 10);
+    let money = Math.floor(math.square(streak * 7) + 25_000);
+
+    if (money > 1_000_000) money = 1_000_000;
+
+    let xp = 1;
+
+    if (streak > 5) {
+      xp = Math.floor((streak - 5) / 10);
+    }
+
+    if (xp > 69) xp = 69;
+
+    totalMoney += money;
+    totalXp += xp;
+
+    if (streak % 7 == 0) {
+      let crate = 1;
+
+      crate += Math.floor(math.sqrt(streak / 1.3) as number);
+
+      if (crate > 10) crate = 10;
+
+      totalRewards.set("basic_crate", (totalRewards.get("basic_crate") ?? 0) + crate);
+    }
+
+    if (streak % 69 == 0) {
+      totalRewards.set("69420_crate", (totalRewards.get("69420_crate") ?? 0) + 5);
+    }
+
+    if (streak % 100 == 0) {
+      totalRewards.set("nypsi_crate", (totalRewards.get("nypsi_crate") ?? 0) + 1);
+    }
+
+    if (streak % 500 == 0) {
+      totalRewards.set("gem_crate", (totalRewards.get("gem_crate") ?? 0) + 1);
+    }
   }
-
-  if (xp > 69) xp = 69;
 
   const promises = [];
   const rewards: string[] = [
-    `+$**${total.toLocaleString()}**`,
-    `+ ${items["daily_scratch_card"].emoji} daily scratch card`,
+    `+$**${totalMoney.toLocaleString()}**`,
+    `+ ${amount > 1 ? `**${amount.toLocaleString()}** ` : ""}${items["daily_scratch_card"].emoji} daily scratch card${amount > 1 ? "s" : ""}`,
   ];
 
-  if (streak > 0 && streak % 7 == 0) {
-    crate++;
+  for (const [itemId, amount] of totalRewards) {
+    promises.push(async () => {
+      await addInventoryItem(member, itemId, amount);
+    });
 
-    crate += Math.floor(math.sqrt(streak / 1.3) as number);
-
-    if (crate > 10) crate = 10;
-
-    promises.push(addInventoryItem(member, "basic_crate", crate));
-
-    rewards.push(`+ **${crate.toLocaleString()}** 📦 basic crate${crate > 1 ? "s" : ""}`);
+    rewards.push(
+      `+ **${amount.toLocaleString()}** ${items[itemId].emoji} ${amount > 1 && items[itemId].plural ? items[itemId].plural : items[itemId].name}`,
+    );
   }
 
-  if (streak > 1 && streak % 69 == 0) {
-    promises.push(addInventoryItem(member, "69420_crate", 5));
+  promises.push(async () => {
+    await addBalance(member, totalMoney);
+    await updateLastDaily(member, amount);
+    await addInventoryItem(member, "daily_scratch_card", amount);
+  });
 
-    rewards.push("+ **5** 🎁 69420 crates");
-  }
-
-  if (streak > 1 && streak % 100 == 0) {
-    promises.push(addInventoryItem(member, "nypsi_crate", 1));
-
-    rewards.push(`+ **1** ${items["nypsi_crate"].emoji} nypsi crate`);
-  }
-
-  if (streak > 1 && streak % 500 == 0) {
-    promises.push(addInventoryItem(member, "gem_crate", 1));
-
-    rewards.push(`+ **1** ${items["gem_crate"].emoji} gem crate`);
-  }
-
-  promises.push(addBalance(member, total));
-  promises.push(updateLastDaily(member));
-  promises.push(addInventoryItem(member, "daily_scratch_card", 1));
-  addStat(member.user.id, "earned-daily", total);
-
-  await Promise.all(promises);
+  await pAll(promises, { concurrency: 3 });
 
   const embed = new CustomEmbed(member);
   embed.setHeader("daily", member.user.avatarURL());
-  embed.setDescription(`daily streak: \`${streak}\``);
+  embed.setDescription(`daily streak: \`${currentStreak}\` -> \`${currentStreak + amount}\``);
 
   embed.addField("rewards", rewards.join("\n"));
 
-  if (xp > 0) {
-    await addXp(member, xp);
-    embed.setFooter({ text: `+${xp}xp` });
+  if (totalXp > 0) {
+    await addXp(member, totalXp);
+    embed.setFooter({ text: `+${totalXp.toLocaleString()}xp` });
 
     const guild = await getGuildName(member);
 
     if (guild) {
-      await addToGuildXP(guild, xp, member);
+      await addToGuildXP(guild, totalXp, member);
     }
   }
 
-  await setProgress(member.id, "streaker", streak);
-  addTaskProgress(member.id, "daily_streaks");
+  addStat(member.user.id, "earned-daily", totalMoney);
+  setProgress(member.id, "streaker", currentStreak + amount);
+  addTaskProgress(member.id, "daily_streaks", amount);
 
   return embed;
 }
