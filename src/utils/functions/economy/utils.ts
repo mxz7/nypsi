@@ -35,6 +35,7 @@ import { addTaskProgress } from "./tasks";
 import { addXp } from "./xp";
 import ms = require("ms");
 import math = require("mathjs");
+import pAll = require("p-all");
 
 let items: { [key: string]: Item };
 let achievements: { [key: string]: AchievementData };
@@ -737,18 +738,22 @@ export async function doDaily(member: GuildMember, amount = 1) {
   ];
 
   for (const [itemId, amount] of totalRewards) {
-    promises.push(addInventoryItem(member, itemId, amount));
+    promises.push(async () => {
+      await addInventoryItem(member, itemId, amount);
+    });
+
     rewards.push(
       `+ **${amount.toLocaleString()}** ${items[itemId].emoji} ${amount > 1 && items[itemId].plural ? items[itemId].plural : items[itemId].name}`,
     );
   }
 
-  promises.push(addBalance(member, totalMoney));
-  promises.push(updateLastDaily(member, amount));
-  promises.push(addInventoryItem(member, "daily_scratch_card", amount));
-  addStat(member.user.id, "earned-daily", totalMoney);
+  promises.push(async () => {
+    await addBalance(member, totalMoney);
+    await updateLastDaily(member, amount);
+    await addInventoryItem(member, "daily_scratch_card", amount);
+  });
 
-  await Promise.all(promises);
+  await pAll(promises, { concurrency: 3 });
 
   const embed = new CustomEmbed(member);
   embed.setHeader("daily", member.user.avatarURL());
@@ -767,7 +772,8 @@ export async function doDaily(member: GuildMember, amount = 1) {
     }
   }
 
-  await setProgress(member.id, "streaker", currentStreak + amount);
+  addStat(member.user.id, "earned-daily", totalMoney);
+  setProgress(member.id, "streaker", currentStreak + amount);
   addTaskProgress(member.id, "daily_streaks", amount);
 
   return embed;
