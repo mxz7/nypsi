@@ -20,6 +20,7 @@ import {
   addInventoryItem,
   gemBreak,
   getInventory,
+  isGem,
   removeInventoryItem,
 } from "../utils/functions/economy/inventory";
 import { addStat } from "../utils/functions/economy/stats";
@@ -345,6 +346,9 @@ async function doFish(
       }
 
       await addInventoryItem(member, chosen, amount);
+      
+      if (isGem(chosen))
+        await addProgress(member.id, "gem_hunter", amount);
 
       foundItems.set(chosen, foundItems.has(chosen) ? foundItems.get(chosen) + amount : amount);
     }
