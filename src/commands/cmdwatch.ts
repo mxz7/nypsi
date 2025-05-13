@@ -6,7 +6,7 @@ import { getAdminLevel } from "../utils/functions/users/admin";
 import { logger } from "../utils/logger";
 import { userExists } from "../utils/functions/economy/utils";
 import { ErrorEmbed } from "../models/EmbedBuilders";
-import { commandExists } from "../utils/handlers/commandhandler";
+import { commandAliasExists, commandExists, getCommandFromAlias } from "../utils/handlers/commandhandler";
 
 const cmd = new Command("cmdwatch", "watch commands", "none");
 
@@ -23,19 +23,16 @@ async function run(
   if (!(message instanceof Message)) return; // never gonna give you up. never gonna let you down. never gonna run around. and. DESERT YOU
 
   const userId = args[0];
-  //switch to let
-  const cmd = args[1];
+  let cmd = args[1];
 
   if (!(await userExists(userId))) {
     return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });
   }
 
   if (!commandExists(cmd)) {
-    //todo: check for valid alias and switch to that (needs pr #1866 first)
-
-    // if (commandAliasExists(cmd)) {
-    //   cmd = getCommandFromAlias(cmd);
-    // } else
+    if (commandAliasExists(cmd)) {
+      cmd = getCommandFromAlias(cmd);
+    } else
     return message.channel.send({ embeds: [new ErrorEmbed("invalid command")] });
   }
 
