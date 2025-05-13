@@ -30,7 +30,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
       message.member,
       "you need [**premium**](https://ko-fi.com/tekoh/tiers) to get weekly rewards",
     ).setFooter({
-      text: `${prefix}patreon`,
+      text: `${prefix}premium`,
     });
 
     return message.channel.send({ embeds: [embed] });

@@ -477,7 +477,7 @@ async function run(
           message.member,
           `you've planted ${amount} ${amount > 1 ? selected.plural : selected.name} in your farm` +
             (farm.length === amount
-              ? "\n\nif you're new to farming, it's recommended you read the [farm care guide](https://nypsi.xyz/docs/economy/farm#caring-for-your-farm) to make sure you don't kill your plants"
+              ? "\n\nif you're new to farming, it's recommended you read the [farm care guide](https://nypsi.xyz/docs/economy/farm?ref=bot-help#caring-for-your-farm) to make sure you don't kill your plants"
               : ""),
         ),
       ],

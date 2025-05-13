@@ -162,7 +162,7 @@ async function run(
         "game rules",
         "a 5x5 grid of white squares will be created\n" +
           "once youve chosen your square, it will become green if there was no mine, if there was, you will lose your bet\n" +
-          "if you don't choose an amount of mines, you will be given 3-6 mines, giving you 0.5x per square",
+          "if you don't choose an amount of mines, you will be given 3-6 mines, giving you 0.6x per square",
       );
 
     return send({ embeds: [embed] });
@@ -560,13 +560,13 @@ async function playGame(
 
       if (res) {
         logger.info(
-          `${this.member.user.username} (${message.author.id}) given captcha randomly in mines`,
+          `${message.member.user.username} (${message.author.id}) given captcha randomly in mines`,
         );
         const hook = new WebhookClient({
           url: process.env.ANTICHEAT_HOOK,
         });
         await hook.send({
-          content: `[${getTimestamp()}] ${this.member.user.username} (${message.author.id}) given captcha randomly in mines`,
+          content: `[${getTimestamp()}] ${message.member.user.username} (${message.author.id}) given captcha randomly in mines`,
         });
         hook.destroy();
       }

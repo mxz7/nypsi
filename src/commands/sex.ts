@@ -202,7 +202,7 @@ async function run(
             tag ? `[${getTagsData()[tag.tagId].emoji}] ` : ""
           }${await getLastKnownUsername(milf.userId)}**](https://nypsi.xyz/user/${
             milf.userId
-          }) a *private* message 😉😏`,
+          }?ref=bot-milf) a *private* message 😉😏`,
       ).setHeader("milf finder");
 
       if (milf.description != "") {
@@ -214,7 +214,7 @@ async function run(
           }**\n\n` +
             `[**${tag ? `[${getTagsData()[tag.tagId].emoji}] ` : ""}${await getLastKnownUsername(
               milf.userId,
-            )}**](https://nypsi.xyz/user/${milf.userId}) - ${milf.description}\n\n` +
+            )}**](https://nypsi.xyz/user/${milf.userId}?ref=bot-milf) - ${milf.description}\n\n` +
             "go ahead and send them a *private* message 😉😏",
         );
       }
@@ -239,7 +239,7 @@ async function run(
           authorTag ? `[${getTagsData()[authorTag.tagId].emoji}] ` : ""
         }**${message.author.username}**](https://nypsi.xyz/user/${
           message.author.id
-        }) a *private* message 😉😏`,
+        }?ref=bot-milf) a *private* message 😉😏`,
       )
         .setHeader("milf finder")
         .setColor(Constants.EMBED_SUCCESS_COLOR);
@@ -270,7 +270,7 @@ async function run(
           }**\n\n` +
             `[${authorTag ? `[${getTagsData()[authorTag.tagId].emoji}] ` : ""}**${
               message.author.username
-            }**](https://nypsi.xyz/user/${message.author.id}) - ${description}\n\n` +
+            }**](https://nypsi.xyz/user/${message.author.id}?ref=bot-milf) - ${description}\n\n` +
             "go ahead and send them a *private* message 😉😏",
         );
       }

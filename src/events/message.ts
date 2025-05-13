@@ -213,7 +213,12 @@ export default async function messageCreate(message: Message) {
 
           embed.setDescription(helpMessage);
 
-          await sendToRequestChannel(message.author.id, embed, message.client as NypsiClient);
+          await sendToRequestChannel(
+            message.author.id,
+            embed,
+            message.author.id,
+            message.client as NypsiClient,
+          );
 
           return modalSubmit.editReply({
             embeds: [
@@ -248,6 +253,7 @@ export default async function messageCreate(message: Message) {
       const res = await sendToRequestChannel(
         message.author.id,
         embed,
+        message.author.id,
         message.client as NypsiClient,
       );
 

@@ -16,7 +16,7 @@ import {
 import { exec } from "node:child_process";
 import prisma from "../init/database";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
-import { CustomEmbed } from "../models/EmbedBuilders.js";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { isAltPunish } from "../utils/functions/guilds/altpunish";
 import { getPrefix } from "../utils/functions/guilds/utils";
@@ -32,10 +32,10 @@ import {
 } from "../utils/functions/moderation/alts";
 import { newBan } from "../utils/functions/moderation/ban";
 import { getMuteRole, isMuted, newMute } from "../utils/functions/moderation/mute";
-
 import { getLastKnownAvatar, getLastKnownUsername } from "../utils/functions/users/tag";
 import { getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
+import { createUser, userExists } from "../utils/functions/economy/utils";
 
 const cmd = new Command("alts", "view a user's alts", "moderation")
   .setAliases(["alt", "account", "accounts"])
@@ -100,7 +100,7 @@ async function run(
       .setHeader("alts help")
       .addField(
         "info",
-        "keep track of a user's alts in one easy place\n\nalts of a user can be automatically punished with their main\naccount when one is punished (/settings server alt-punish)\n[more info](https://nypsi.xyz/docs/moderation/alt-punish)",
+        "keep track of a user's alts in one easy place\n\nalts of a user can be automatically punished with their main\naccount when one is punished (/settings server alt-punish)\n[more info](https://nypsi.xyz/docs/moderation/alt-punish?ref=bot-alts)",
       )
       .addField("usage", `${prefix}alts @user\n${prefix}alts <user ID or tag>`);
 
@@ -108,12 +108,21 @@ async function run(
   }
 
   let memberId = (await getMember(message.guild, args.join(" ")))?.user.id;
+  let inServer = true;
 
   if (!memberId) {
     if (args[0].match(Constants.SNOWFLAKE_REGEX)) {
       memberId = args[0];
+      inServer = false;
     }
   }
+
+  if (!memberId) {
+    return send({ embeds: [new ErrorEmbed("invalid user")] });
+  }
+
+  if (!(await userExists(memberId)))
+    await createUser(inServer ? (await getMember(message.guild, args.join(" "))) : args[0]);
 
   if (await isAlt(message.guild, memberId)) {
     memberId = await getMainAccountId(message.guild, memberId);

@@ -426,7 +426,7 @@ async function run(
         if (interaction.customId !== "y") {
           msg.edit({ components: [] });
           return interaction.reply({
-            embeds: [new CustomEmbed(message.member, "✅ coinflip  cancelled")],
+            embeds: [new CustomEmbed(message.member, "✅ coinflip cancelled")],
           });
         }
 
@@ -696,7 +696,7 @@ async function run(
         if (interaction.customId !== "y") {
           msg.edit({ components: [] });
           return interaction.reply({
-            embeds: [new CustomEmbed(message.member, "✅ coinflip  cancelled")],
+            embeds: [new CustomEmbed(message.member, "✅ coinflip cancelled")],
           });
         }
 

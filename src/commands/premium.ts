@@ -18,6 +18,7 @@ import { getEmbedColor, setEmbedColor } from "../utils/functions/premium/color";
 import { getCommand, getUserCommand, setCommand } from "../utils/functions/premium/command";
 import {
   addMember,
+  expireUser,
   getCredits,
   getPremiumProfile,
   getTier,
@@ -32,8 +33,13 @@ import sleep from "../utils/functions/sleep";
 import { cleanString } from "../utils/functions/string";
 import { getTotalSpend } from "../utils/functions/users/email";
 import { addTag, getTags, removeTag } from "../utils/functions/users/tags";
-import { commandExists } from "../utils/handlers/commandhandler";
+import {
+  commandAliasExists,
+  commandExists,
+  getCommandFromAlias,
+} from "../utils/handlers/commandhandler";
 import dayjs = require("dayjs");
+import { NypsiClient } from "../models/Client";
 
 let doingRoles = false;
 
@@ -62,7 +68,7 @@ const commandFilter = [
 
 const cmd = new Command("premium", "view your premium status", "info")
   .setAliases(["patreon", "donate", "prem", "kofi"])
-  .setDocs("https://nypsi.xyz/docs/premium");
+  .setDocs("https://nypsi.xyz/docs/premium?ref=bot-help");
 
 cmd.slashEnabled = true;
 cmd.slashData
@@ -462,17 +468,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            "you must be a BRONZE tier patreon for this command\n\nhttps://www.patreon.com/nypsi",
-          ),
-        ],
-      });
-    }
-
-    if ((await getTier(message.author.id)) < 1) {
-      return send({
-        embeds: [
-          new ErrorEmbed(
-            "you must be at least BRONZE tier for this command, you are BRONZE\n\nhttps://www.patreon.com/nypsi",
+            "you must be **BRONZE** tier to set a custom color",
           ),
         ],
       });
@@ -615,7 +611,7 @@ async function run(
         return send({ embeds: [new ErrorEmbed("spammy content 🙄")] });
       }
 
-      if (commandExists(commandTrigger))
+      if (commandExists(commandTrigger) || commandAliasExists(commandTrigger))
         return send({ embeds: [new ErrorEmbed("this is already a nypsi command")] });
 
       const cmd = await getCommand(commandTrigger);
@@ -699,9 +695,17 @@ async function run(
       const trigger = cleanString(
         message.options.getString("alias").toLowerCase().normalize("NFD").split(" ")[0],
       );
-      const command = cleanString(
-        message.options.getString("command").toLowerCase().normalize("NFD"),
-      );
+
+      if (commandExists(trigger) || commandAliasExists(trigger)) {
+        return send({ embeds: [new ErrorEmbed("this command already exists")] });
+      }
+
+      let command = message.options
+        .getString("command")
+        .toLowerCase()
+        .replace(/[^a-z0-9.\s]/g, "")
+        .replace(/^(\S+)/, (firstWord) => firstWord.replace(/\./g, ""))
+        .normalize("NFD");
 
       for (const word of commandFilter) {
         if (trigger.includes(word) || command.toLowerCase().includes(word)) {
@@ -712,16 +716,15 @@ async function run(
       if (aliases.find((i) => i.alias === trigger))
         return send({ embeds: [new ErrorEmbed("you already have this alias set")] });
 
-      if (!commandExists(command.split(" ")[0])) {
-        return send({
-          embeds: [
-            new ErrorEmbed(
-              `\`${
-                command.split(" ")[0]
-              }\` is not a command. use $help <alias> to find the actual command name`,
-            ),
-          ],
-        });
+      const commandName = command.split(" ")[0];
+
+      if (!commandExists(commandName)) {
+        if (commandAliasExists(commandName)) {
+          command = command.replace(commandName, getCommandFromAlias(commandName));
+        } else
+          return send({
+            embeds: [new ErrorEmbed(`\`${commandName}\` is not a command`)],
+          });
       }
 
       await addUserAlias(message.author.id, trigger, command);
@@ -869,9 +872,9 @@ async function run(
       return send({ embeds: [new ErrorEmbed("invalid syntax bro")] });
     }
 
-    setExpireDate(args[1], new Date(0));
+    await expireUser(args[1], message.client as NypsiClient);
 
-    return send({ embeds: [new CustomEmbed(message.member, "✅ membership will expire soon")] });
+    return send({ embeds: [new CustomEmbed(message.member, "✅ membership expired")] });
   } else if (args[0].toLowerCase() == "color") {
     return setColor();
   } else if (args[0].toLowerCase() === "mycmd") {

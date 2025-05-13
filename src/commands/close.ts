@@ -8,6 +8,7 @@ import Constants from "../utils/Constants";
 import {
   getSupportRequestByChannelId,
   sendToRequestChannel,
+  summariseRequest,
 } from "../utils/functions/supportrequest";
 import { addNotificationToQueue } from "../utils/functions/users/notifications";
 import ms = require("ms");
@@ -21,7 +22,24 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
 
   const embed = new CustomEmbed().setDescription("this support request has been closed");
 
-  await sendToRequestChannel(support.userId, embed, message.client as NypsiClient);
+  const messageCount = await prisma.supportRequestMessage.count({
+    where: {
+      supportRequestId: support.userId,
+    },
+  });
+
+  if (messageCount > 50) {
+    const summary = await summariseRequest(support.userId);
+
+    if (summary) embed.addField("summary", summary);
+  }
+
+  await sendToRequestChannel(
+    support.userId,
+    embed,
+    message.author.id,
+    message.client as NypsiClient,
+  );
 
   embed.setDescription("your support request has been closed");
 

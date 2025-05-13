@@ -25,8 +25,8 @@ async function run(
       message.react("✅");
     }
   } else {
-    reloadCommand(args);
-    if (message instanceof Message) message.react("✅");
+    const res = reloadCommand(args);
+    if (message instanceof Message) message.react(res ? "✅" : "❌");
   }
 }
 

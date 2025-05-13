@@ -69,7 +69,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 
 const cmd = new Command("chatreaction", "see who can type the fastest", "fun")
   .setAliases(["cr", "reaction"])
-  .setDocs("https://nypsi.xyz/docs/chat-reactions/setup");
+  .setDocs("https://nypsi.xyz/docs/chat-reactions/setup?ref=bot-help");
 
 cmd.slashEnabled = true;
 cmd.slashData
@@ -322,9 +322,9 @@ async function run(
     }
 
     const leaderboards = await getServerLeaderboard(message.guild);
-    const timeLeaderboard = await topChatReaction(message.guild, false).then((r) =>
-      r.pages.get(1).join("\n"),
-    );
+    const timeLeaderboard = await topChatReaction(message.guild, false)
+      .then((r) => r.pages.get(1).join("\n"))
+      .catch(() => "no times recorded");
 
     if (timeLeaderboard) leaderboards.set("time", timeLeaderboard);
 
@@ -1120,7 +1120,7 @@ async function run(
         } else {
           if (settings.randomChannels.length >= max) {
             const embed = new ErrorEmbed(
-              `you have reached the maximum amount of random channels (${max})\nyou can subscribe on [patreon](https://patreon.com/join/nypsi) to have more`,
+              `you have reached the maximum amount of random channels (${max})\nyou can subscribe on [ko-fi](https://ko-fi.com/tekoh/tiers) to have more`,
             );
 
             if (max > 1) {
@@ -1285,7 +1285,7 @@ async function run(
         const error = new ErrorEmbed(`wordlist is at max size (${maxSize})`);
 
         if (maxSize == 100) {
-          error.setFooter({ text: "become a patreon ($patreon) to double this limit" });
+          error.setFooter({ text: "get a premium membership ($premium) to double this limit" });
         }
 
         return send({ embeds: [error] });

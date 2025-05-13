@@ -852,6 +852,17 @@ model SupportRequest {
   userId    String   @id
   channelId String   @unique
   notify    String[]
+
+  SupportRequestMessage SupportRequestMessage[]
+}
+
+model SupportRequestMessage {
+  id               String @id @default(uuid())
+  supportRequestId String
+  userId           String
+  content          String
+
+  supportRequest SupportRequest @relation(fields: [supportRequestId], references: [userId], onDelete: Cascade)
 }
 
 model Purchases {

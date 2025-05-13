@@ -359,6 +359,10 @@ async function run(
 
     if (args[0].toLowerCase() === "item") args.shift();
 
+    if (args.length == 0) {
+      return send({ embeds: [new ErrorEmbed(`/sell item <item>`)] });
+    }
+
     const selected = selectItem(args[0].toLowerCase());
 
     if (!selected) {

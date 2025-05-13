@@ -10,6 +10,8 @@ import { formatDate } from "../date";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import dayjs = require("dayjs");
 import ms = require("ms");
+import { clearExpiredUserAliases } from "../../handlers/commandhandler";
+import { getLastKnownUsername } from "../users/tag";
 
 export async function isPremium(member: GuildMember | string): Promise<boolean> {
   let id: string;
@@ -41,11 +43,6 @@ export async function isPremium(member: GuildMember | string): Promise<boolean> 
 
   if (query) {
     if (query.level == 0) {
-      await prisma.premium.delete({
-        where: {
-          userId: id,
-        },
-      });
       await redis.set(`${Constants.redis.cache.premium.LEVEL}:${id}`, 0, "EX", ms("1 hour") / 1000);
       return false;
     }
@@ -101,9 +98,18 @@ export async function addMember(member: GuildMember | string, level: number, exp
     id = member;
   }
 
-  await prisma.premium.create({
-    data: {
+  await prisma.premium.upsert({
+    where: {
       userId: id,
+    },
+    create: {
+      userId: id,
+      level: level,
+      startDate: new Date(),
+      expireDate: expires || dayjs().add(31, "day").toDate(),
+      lastWeekly: new Date(0),
+    },
+    update: {
       level: level,
       startDate: new Date(),
       expireDate: expires || dayjs().add(31, "day").toDate(),
@@ -129,6 +135,7 @@ export async function addMember(member: GuildMember | string, level: number, exp
   }
 
   await redis.del(`${Constants.redis.cache.premium.LEVEL}:${id}`);
+  await redis.del(`${Constants.redis.cache.premium.ALIASES}:${member}`);
 }
 
 export async function getPremiumProfile(member: GuildMember | string) {
@@ -210,19 +217,13 @@ export async function renewUser(member: string) {
 export async function expireUser(member: string, client?: NypsiClient | ClusterManager) {
   logger.info(`expiring ${member}'s premium`);
   const level = await getTier(member);
-  await prisma.premiumCommand
-    .delete({
-      where: {
-        owner: member,
-      },
-    })
-    .catch(() => {
-      // doesnt need to find one
-    });
 
-  await prisma.premium.delete({
+  await prisma.premium.update({
     where: {
       userId: member,
+    },
+    data: {
+      level: 0,
     },
   });
 
@@ -244,6 +245,9 @@ export async function expireUser(member: string, client?: NypsiClient | ClusterM
   }
 
   await redis.del(`${Constants.redis.cache.premium.LEVEL}:${member}`);
+  await redis.del(`${Constants.redis.cache.premium.ALIASES}:${member}`);
+
+  clearExpiredUserAliases(await getLastKnownUsername(member));
 
   if (client) {
     const cluster = await findGuildCluster(client, Constants.NYPSI_SERVER_ID);

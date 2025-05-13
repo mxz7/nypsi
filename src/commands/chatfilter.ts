@@ -78,19 +78,7 @@ async function run(
     });
 
     return manager.listen();
-  }
-
-  if (args[0].toLowerCase() == "help") {
-    const embed = new CustomEmbed(message.member).setHeader("chat filter help");
-
-    embed.setDescription(
-      `${prefix}**filter add/+ <word>** *add a word to the chat filter*\n${prefix}**filter del/- <word>** *remove a word from the chat filter*\n${prefix}**filter reset** *reset the chat filter*\n${prefix}**filter test** *test the chat filter*\n\nyou can use the [web dashboard](https://nypsi.xyz/me/guilds/${message.guildId}) for percentage matching`,
-    );
-
-    return message.channel.send({ embeds: [embed] });
-  }
-
-  if (args[0].toLowerCase() == "add" || args[0].toLowerCase() == "+") {
+  } else if (args[0].toLowerCase() == "add" || args[0].toLowerCase() == "+") {
     if (args.length == 1) {
       return message.channel.send({
         embeds: [
@@ -134,9 +122,7 @@ async function run(
       "✅ added `" + word + "` to the filter",
     ).setHeader("chat filter");
     return message.channel.send({ embeds: [embed] });
-  }
-
-  if (args[0].toLowerCase() == "del" || args[0].toLowerCase() == "-") {
+  } else if (args[0].toLowerCase() == "del" || args[0].toLowerCase() == "-") {
     if (args.length == 1) {
       return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}filter del/- <word>`)] });
     }
@@ -158,9 +144,7 @@ async function run(
       .setFooter({ text: `you can use ${prefix}filter reset to reset the filter` });
 
     return message.channel.send({ embeds: [embed] });
-  }
-
-  if (args[0].toLowerCase() == "reset") {
+  } else if (args[0].toLowerCase() == "reset") {
     filter = [];
 
     for (const word of filter) {
@@ -172,9 +156,10 @@ async function run(
     );
 
     return message.channel.send({ embeds: [embed] });
-  }
-
-  if (args[0].toLowerCase() == "test") {
+  } else if (args[0].toLowerCase() == "test") {
+    if (args.length == 1) {
+      return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}filter test <text>`)] });
+    }
     const content = args.slice(1, args.length).join(" ").toLowerCase().normalize("NFD");
     const check = await checkMessageContent(message.guild, content, false);
     let embed;
@@ -184,6 +169,14 @@ async function run(
     } else {
       embed = new ErrorEmbed(`\`${content}\` was not found in the filter`);
     }
+
+    return message.channel.send({ embeds: [embed] });
+  } else {
+    const embed = new CustomEmbed(message.member).setHeader("chat filter help");
+
+    embed.setDescription(
+      `${prefix}**filter add/+ <word>** *add a word to the chat filter*\n${prefix}**filter del/- <word>** *remove a word from the chat filter*\n${prefix}**filter reset** *reset the chat filter*\n${prefix}**filter test** *test the chat filter*\n\nyou can use the [web dashboard](https://nypsi.xyz/me/guilds/${message.guildId}) for percentage matching`,
+    );
 
     return message.channel.send({ embeds: [embed] });
   }

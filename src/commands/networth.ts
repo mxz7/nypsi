@@ -148,7 +148,7 @@ async function run(
       .setDisabled(true),
     new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
   );
-  if (pages.size == 1) return message.channel.send({ embeds: [embed] });
+  if (pages.size <= 1) return message.channel.send({ embeds: [embed] });
   const msg = await message.channel.send({ embeds: [embed], components: [row] });
 
   addView(target.user.id, message.author.id, `profile in ${message.guild.id}`);

@@ -278,6 +278,7 @@ async function run(
       let count = 0;
       let done = false;
       let fail = false;
+      let cancelled = false;
 
       massOperations.add(message.guild.id);
 
@@ -292,6 +293,15 @@ async function run(
                 "failed while adding roles. make sure my role is above the target role and that i have suitable permissions",
               ),
             ],
+          });
+        }
+
+        if (cancelled) {
+          massOperations.delete(message.guild.id);
+          clearInterval(i);
+
+          return message.channel.send({
+            embeds: [new ErrorEmbed("operation cancelled")],
           });
         }
 
@@ -313,14 +323,18 @@ async function run(
 
         const remaining = MStoTime((members.length - count) * 1.25 * 1000, true);
 
-        return msg.edit({
-          embeds: [
-            new CustomEmbed(
-              message.member,
-              `adding ${role.toString()} to ${members.length.toLocaleString()} members...\n\nprogress: ${count.toLocaleString()}/${members.length.toLocaleString()}\n\`${remaining}\` remaining`,
-            ),
-          ],
-        });
+        return msg
+          .edit({
+            embeds: [
+              new CustomEmbed(
+                message.member,
+                `adding ${role.toString()} to ${members.length.toLocaleString()} members...\n\nprogress: ${count.toLocaleString()}/${members.length.toLocaleString()}\n\`${remaining}\` remaining`,
+              ),
+            ],
+          })
+          .catch(() => {
+            cancelled = true;
+          });
       }, 5000);
 
       for (const member of members) {
@@ -427,6 +441,7 @@ async function run(
       let count = 0;
       let done = false;
       let fail = false;
+      let cancelled = false;
 
       const i = setInterval(async () => {
         if (fail) {
@@ -439,6 +454,15 @@ async function run(
                 "failed while removing roles. make sure my role is above the target role and that i have suitable permissions",
               ),
             ],
+          });
+        }
+
+        if (cancelled) {
+          massOperations.delete(message.guild.id);
+          clearInterval(i);
+
+          return message.channel.send({
+            embeds: [new ErrorEmbed("operation cancelled")],
           });
         }
 
@@ -460,14 +484,18 @@ async function run(
 
         const remaining = MStoTime((members.length - count) * 0.75 * 1000, true);
 
-        return msg.edit({
-          embeds: [
-            new CustomEmbed(
-              message.member,
-              `removing ${role.toString()} from ${members.length.toLocaleString()} members...\n\nprogress: ${count.toLocaleString()}/${members.length.toLocaleString()}\n\`${remaining}\` remaining`,
-            ),
-          ],
-        });
+        return msg
+          .edit({
+            embeds: [
+              new CustomEmbed(
+                message.member,
+                `removing ${role.toString()} from ${members.length.toLocaleString()} members...\n\nprogress: ${count.toLocaleString()}/${members.length.toLocaleString()}\n\`${remaining}\` remaining`,
+              ),
+            ],
+          })
+          .catch(() => {
+            cancelled = true;
+          });
       }, 5000);
 
       for (const member of members) {

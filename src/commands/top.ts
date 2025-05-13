@@ -48,8 +48,12 @@ import {
 import { getItems } from "../utils/functions/economy/utils.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import PageManager from "../utils/functions/page";
-import { commands } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
+import {
+  commandAliasExists,
+  commandExists,
+  getCommandFromAlias,
+} from "../utils/handlers/commandhandler";
 
 const cmd = new Command("top", "view top etc. in the server", "money").setAliases([
   "baltop",
@@ -349,6 +353,11 @@ async function run(
     );
   } else if (args[0].toLowerCase() == "item") {
     const items = getItems();
+
+    if (args.length == 1) {
+      return send({ embeds: [new ErrorEmbed("/top item <item>")] });
+    }
+
     const searchTag = args[1].toLowerCase();
 
     let item: Item;
@@ -596,10 +605,12 @@ async function run(
         title = `top command uses for ${message.guild.name}`;
       }
     } else {
-      const cmd = args[1]?.toLowerCase();
+      let cmd = args[1]?.toLowerCase();
 
-      if (!commands.has(cmd)) {
-        return send({ embeds: [new ErrorEmbed(`couldn't find ${cmd}`)] });
+      if (!commandExists(cmd)) {
+        if (commandAliasExists(cmd)) {
+          cmd = getCommandFromAlias(cmd);
+        } else return send({ embeds: [new ErrorEmbed(`couldn't find ${cmd}`)] });
       }
       let global = false;
 

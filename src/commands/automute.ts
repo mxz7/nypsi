@@ -93,7 +93,7 @@ async function run(
       ],
     });
   } else {
-    if (!parseInt(args[0])) {
+    if (args.length == 1 || !parseInt(args[0])) {
       return message.channel.send({
         embeds: [
           new ErrorEmbed(
@@ -109,6 +109,8 @@ async function run(
       return message.channel.send({ embeds: [new ErrorEmbed("invalid level")] });
     } else if (level > 9) {
       return message.channel.send({ embeds: [new ErrorEmbed("cannot have more than 10 levels")] });
+    } else if (level > levels.length) {
+      return message.channel.send({ embeds: [new ErrorEmbed("cannot skip a vl")] });
     }
 
     if (args[1].toLowerCase() == "delete") {

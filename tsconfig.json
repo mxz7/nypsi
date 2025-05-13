@@ -7,5 +7,10 @@
     "strictFunctionTypes": true,
     "skipLibCheck": true,
     "noImplicitAny": true
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "prisma"
+  ]
 }

@@ -7,6 +7,8 @@ import { NypsiClient } from "../../models/Client";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import Constants from "../Constants";
 import { uploadImage } from "./image";
+import { prompt } from "./openai";
+import { getLastKnownUsername } from "./users/tag";
 import pAll = require("p-all");
 
 export async function getSupportRequestByChannelId(id: string) {
@@ -115,17 +117,34 @@ export async function createSupportRequest(id: string, client: NypsiClient, user
 
   const embed = new CustomEmbed()
     .setColor(Constants.PURPLE)
-    .setDescription(`support request for [${username} (${id})](https://nypsi.xyz/user/${id})`);
+    .setDescription(
+      `support request for [${username} (${id})](https://nypsi.xyz/user/${id}?ref=bot-support)`,
+    );
 
-  await sendToRequestChannel(id, embed, client);
+  await sendToRequestChannel(id, embed, id, client);
 
   return true;
 }
 
-export async function sendToRequestChannel(id: string, embed: CustomEmbed, client: NypsiClient) {
+export async function sendToRequestChannel(
+  id: string,
+  embed: CustomEmbed,
+  userId: string,
+  client: NypsiClient,
+) {
   const request = await getSupportRequest(id);
 
   if (!request?.channelId) return false;
+
+  if (embed.data.description) {
+    await prisma.supportRequestMessage.create({
+      data: {
+        userId,
+        content: embed.data.description,
+        supportRequestId: id,
+      },
+    });
+  }
 
   const clusterHas = await client.cluster.broadcastEval(
     async (c, { channelId }) => {
@@ -253,4 +272,32 @@ export async function toggleNotify(id: string, userId: string) {
   await redis.del(`${Constants.redis.cache.SUPPORT}:${id}`);
 
   return true;
+}
+
+export async function summariseRequest(id: string) {
+  const request = await getSupportRequest(id);
+
+  if (!request) return false;
+
+  const messages = await prisma.supportRequestMessage.findMany({
+    where: {
+      supportRequestId: id,
+    },
+    select: {
+      userId: true,
+      content: true,
+    },
+  });
+
+  let transcript = "";
+
+  for (const message of messages) {
+    transcript += `${await getLastKnownUsername(message.userId)}: ${message.content}\n\n`;
+  }
+
+  const res = await prompt(
+    `You are a summarising assistant. The following transcript is in the format of "<username>: <message content>". Some of the responses may be in an unknown language, translate them to English. Your response should only be the summary of the transcription, avoid including 'the transcript' or 'requesting support' in your summary. Summarise the following transcript:\n\n${transcript}`,
+  );
+
+  return res;
 }

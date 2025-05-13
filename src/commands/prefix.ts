@@ -22,19 +22,7 @@ async function run(
     return;
   }
 
-  if (args.length == 0) {
-    const embed = new CustomEmbed(
-      message.member,
-      "current prefixes: \n" +
-        prefix.map((i) => "`" + i + "`").join("\n") +
-        `\n\n${prefix[0]}**prefix add <prefix>** *add a prefix*\n` +
-        `${prefix[0]}**prefix del <prefix>** *remove a prefix*`,
-    ).setHeader("prefix", message.guild.iconURL());
-
-    return message.channel.send({ embeds: [embed] });
-  }
-
-  if (args[0].toLowerCase() === "add") {
+  if (args[0]?.toLowerCase() === "add") {
     if (prefix.length >= 5)
       return message.channel.send({ embeds: [new ErrorEmbed("you can have a max of 5 prefixes")] });
 
@@ -61,7 +49,7 @@ async function run(
     return message.channel.send({
       embeds: [new CustomEmbed(message.member, `added \`${args[1]}\` as a prefix`)],
     });
-  } else if (args[0].toLowerCase() === "del") {
+  } else if (args[0]?.toLowerCase() === "del") {
     if (prefix.length === 1)
       return message.channel.send({
         embeds: [new ErrorEmbed("are you really trying to remove your ONLY prefix???")],
@@ -83,6 +71,16 @@ async function run(
     await setPrefix(message.guild, prefix);
 
     return message.channel.send({ embeds: [new CustomEmbed(message.member, "✅ removed")] });
+  } else {
+    const embed = new CustomEmbed(
+      message.member,
+      "current prefixes: \n" +
+        prefix.map((i) => "`" + i + "`").join("\n") +
+        `\n\n${prefix[0]}**prefix add <prefix>** *add a prefix*\n` +
+        `${prefix[0]}**prefix del <prefix>** *remove a prefix*`,
+    ).setHeader("prefix", message.guild.iconURL());
+
+    return message.channel.send({ embeds: [embed] });
   }
 }
 
