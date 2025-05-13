@@ -108,13 +108,21 @@ async function run(
   }
 
   let memberId = (await getMember(message.guild, args.join(" ")))?.user.id;
+  let inServer = true;
+
+  if (!memberId) {
+    if (args[0].match(Constants.SNOWFLAKE_REGEX)) {
+      memberId = args[0];
+      inServer = false;
+    }
+  }
 
   if (!memberId) {
     return send({ embeds: [new ErrorEmbed("invalid user")] });
   }
 
   if (!(await userExists(memberId)))
-    await createUser(await getMember(message.guild, args.join(" ")));
+    await createUser(inServer ? (await getMember(message.guild, args.join(" "))) : args[0]);
 
   if (await isAlt(message.guild, memberId)) {
     memberId = await getMainAccountId(message.guild, memberId);
