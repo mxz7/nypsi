@@ -9,6 +9,9 @@
     "build": "tsc",
     "watch": "tsc --build --watch"
   },
+  "prisma": {
+    "seed": "ts-node --transpile-only prisma/seed.ts"
+  },
   "author": "mxz7",
   "license": "ISC",
   "dependencies": {
@@ -59,6 +62,7 @@
     "jest": "^29.7.0",
     "prettier": "3.5.3",
     "prisma": "6.7.0",
+    "ts-node": "^10.9.2",
     "typescript": "5.8.3"
   },
   "repository": {
