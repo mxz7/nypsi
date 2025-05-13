@@ -573,6 +573,10 @@ export async function getMarketTransactionData(
         { ownerId: { not: filterOutUserId } },
       ],
     },
+    orderBy: [
+      { price: type == "buy" ? "desc" : "asc" },
+      { createdAt: "asc" },
+    ],
   });
   const orders: Market[] = [];
 
@@ -860,7 +864,7 @@ export async function marketSell(
       for (const order of orders) {
         let amount: bigint;
         if (order.itemAmount > remaining) {
-          amount = order.itemAmount;
+          amount = BigInt(remaining);
           remaining = 0;
         } else {
           amount = order.itemAmount;
@@ -897,79 +901,95 @@ export async function marketSell(
 }
 
 export async function marketBuy(
-  item: Item,
+  userId: string,
+  itemId: string,
   amount: number,
   storedPrice: number,
-  member: GuildMember | string,
+  client: NypsiClient,
   repeatCount = 1,
-) {
-  let userId: string;
-  if (member instanceof GuildMember) {
-    userId = member.user.id;
-  } else {
-    userId = member;
-  }
-
+): Promise<{ status: string; remaining?: number }> {
   if (
-    inTransaction.has(item.id) ||
-    (await redis.exists(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${item.id}`))
+    inTransaction.has(itemId) ||
+    (await redis.exists(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`))
   ) {
     return new Promise((resolve) => {
-      logger.debug(`repeating market buy - ${amount}x ${item.id}`);
+      logger.debug(`repeating market buy - ${amount}x ${itemId}`);
       setTimeout(async () => {
-        if (repeatCount > 100) inTransaction.delete(item.id);
-        resolve(marketBuy(item, amount, storedPrice, member, repeatCount + 1));
+        if (repeatCount > 100) inTransaction.delete(itemId);
+        resolve(marketBuy(userId, itemId, amount, storedPrice, client, repeatCount + 1));
       }, 50);
     });
   }
 
-  inTransaction.add(item.id);
-  await redis.set(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${item.id}`, "d", "EX", 600);
+  inTransaction.add(itemId);
+  setTimeout(() => {
+    inTransaction.delete(itemId);
+  }, ms("10 minutes"));
+
+  await redis.set(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`, "d", "EX", 600);
 
   if (!(await userExists(userId))) await createUser(userId);
 
-  const buyPrice = await getPriceForMarketTransaction(item.id, amount, "buy", userId);
+  // looking for sell orders
+  const { cost: buyPrice, orders } = await getMarketTransactionData(itemId, amount, "sell", userId);
 
   if (buyPrice == -1) {
-    await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${item.id}`);
-    inTransaction.delete(item.id);
-    return "not enough items";
+    await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
+    inTransaction.delete(itemId);
+    return { status: "not enough items" };
   }
 
   if (storedPrice !== buyPrice) {
-    await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${item.id}`);
-    inTransaction.delete(item.id);
-    return `since viewing the market, the price has changed from $${storedPrice.toLocaleString()} to $${buyPrice.toLocaleString()}. please press purchase again with this updated price in mind`;
+    await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
+    inTransaction.delete(itemId);
+    return {
+      status: `since viewing the market, the buy price has changed from $${storedPrice.toLocaleString()} to $${buyPrice.toLocaleString()}. please press buy again with this updated price in mind`,
+    };
+  }
+  
+  if ((await getBalance(userId)) < buyPrice) {
+    return { status: "insufficient funds" };
   }
 
-  if ((await getBalance(member)) < buyPrice) {
-    await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${item.id}`);
-    inTransaction.delete(item.id);
-    return "you cannot afford this";
+  let remaining = amount;
+
+  try {
+    await prisma.$transaction(async (prisma) => {
+      for (const order of orders) {
+        let amount: bigint;
+        if (order.itemAmount > remaining) {
+          amount = BigInt(remaining);
+          remaining = 0;
+        } else {
+          amount = order.itemAmount;
+          remaining -= Number(order.itemAmount);
+        }
+
+        const res = await completeOrder(
+          order.id,
+          userId,
+          amount,
+          client,
+          prisma as Prisma.TransactionClient,
+        );
+        if (!res) break;
+      }
+    });
+  } catch (e) {
+    console.error(e);
+    logger.error("market buy transaction failed", e);
   }
 
-  setTimeout(() => {
-    inTransaction.delete(item.id);
-  }, ms("10 minutes"));
+  await removeBalance(userId, buyPrice);
 
-  const sellOrders = await getMarketItemOrders(item.id, "sell", userId);
+  logger.info(`market ${userId} bought ${amount} ${itemId}`);
 
-  const totalTax = await completeBuy(member, item.id, amount, sellOrders);
+  await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
+  inTransaction.delete(itemId);
 
-  if (totalTax == "not enough items") return "not enough items";
+  if (remaining) {
+    return { status: "partial", remaining };
+  }
 
-  if (totalTax > 0) addToNypsiBank(totalTax);
-
-  await Promise.all([
-    addInventoryItem(member, item.id, Number(amount)),
-    removeBalance(member, buyPrice),
-    addStat(member, "spent-market", buyPrice - totalTax),
-  ]);
-
-  logger.info(`market ${userId} purchased ${amount} ${item.id}`);
-
-  await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${item.id}`);
-  inTransaction.delete(item.id);
-
-  return "success";
+  return { status: "success" };
 }

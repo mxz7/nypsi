@@ -42,8 +42,8 @@ import {
   getMarketItemOrders,
   getMarketOrder,
   getMarketOrders,
+  getMarketTransactionData,
   getMarketWatch,
-  getPriceForMarketTransaction,
   getRecentMarketOrders,
   marketBuy,
   marketSell,
@@ -126,6 +126,11 @@ cmd.slashData
       .addStringOption((option) =>
         option.setName("amount").setDescription("how many of this item?").setRequired(true),
       ),
+  )
+  .addSubcommand((help) =>
+    help
+      .setName("help")
+      .setDescription("view the market help menu")
   )
   .addSubcommand((sell) =>
     sell
@@ -391,7 +396,7 @@ async function run(
       );
 
       const bottomRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder().setCustomId("b").setLabel("back").setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder().setCustomId("back").setLabel("back").setStyle(ButtonStyle.Secondary),
       );
 
       if (msg) {
@@ -645,7 +650,7 @@ async function run(
 
         await updateEmbed();
         return pageManager();
-      } else if (res == "b") {
+      } else if (res == "back") {
         return viewMarket(true, msg);
       }
     };
@@ -968,7 +973,7 @@ async function run(
     }
 
     if (
-      (await getPriceForMarketTransaction(item.id, parseInt(amount), "buy", message.member.id)) ==
+      (await getMarketTransactionData(item.id, parseInt(amount), "sell", message.member.id)).cost ==
       -1
     ) {
       return send({
@@ -994,7 +999,7 @@ async function run(
     }
 
     if (
-      (await getPriceForMarketTransaction(item.id, parseInt(amount), "sell", message.member.id)) ==
+      (await getMarketTransactionData(item.id, parseInt(amount), "buy", message.member.id)).cost ==
       -1
     ) {
       return send({
@@ -1024,14 +1029,14 @@ async function run(
         embeds: [new ErrorEmbed("/market create <item> <buy/sell> <amount> <price>")],
       });
 
-    let type = args[1];
-    const item = args[2];
+    const item = args[1];
+    let type = args[2];
     let amount = args[3];
     let price = args[4];
 
     const selected = selectItem(item);
 
-    if (type === "b") type = "buy";
+    if (type === "back") type = "buy";
     else if (type === "s") type = "sell";
 
     if (type != "buy" && type != "sell") {
@@ -1179,6 +1184,19 @@ async function run(
         embeds: [new CustomEmbed(message.member, description)],
       });
     }
+  } else if (args[0].toLowerCase().includes("help")) {
+    const embed = new CustomEmbed(message.member).setHeader("market help");
+
+    embed.setDescription("the market is a place for players to buy and sell items safely and efficiently");
+
+    embed.addFields(
+      { name: "usage", value: "/market manage\n/market create <item> <buy/sell> <amount> <price>\n/market <buy/sell> <item> [amount]\n/market search <item>\n/market watch <item> <buy/sell> [price]" },
+      { name: "buy/sell orders", value: "orders are based on what you want with an item. if you want to buy an item, create a buy order, and vice versa" },
+      { name: "fulfilling orders", value: `there are multiple ways to fulfill orders. you can view orders as they come in and fulfill them directly through the [**official nypsi server**](${Constants.NYPSI_SERVER_INVITE_LINK}), or you can use \`/market search <item>\` or \`/market <buy/sell>\` to fulfill multiple orders at once` },
+      { name: "need more help?", value: `visit the [**docs**](${"https://nypsi.xyz/docs/economy/items/market/?ref=bot-market"}) or ask a community or staff member in the [**official nypsi server**](${Constants.NYPSI_SERVER_INVITE_LINK})`},
+    )
+
+    return send({ embeds: [embed] });
   } else return viewMarket();
 
   async function itemView(item: Item, msg?: NypsiMessage) {
@@ -1339,7 +1357,7 @@ async function run(
       if (res == "buyOne") {
         if (
           (await getBalance(message.member)) <
-          (await getPriceForMarketTransaction(item.id, 1, "buy", message.member.id))
+          (await getMarketTransactionData(item.id, 1, "sell", message.member.id)).cost
         ) {
           await interaction.reply({
             embeds: [new ErrorEmbed("insufficient funds")],
@@ -1349,7 +1367,7 @@ async function run(
           return pageManager();
         }
 
-        const price = await getPriceForMarketTransaction(item.id, 1, "buy", message.member.id);
+        const price = (await getMarketTransactionData(item.id, 1, "sell", message.member.id)).cost;
         if (price == -1) {
           await interaction.reply({
             embeds: [new ErrorEmbed("not enough items")],
@@ -1390,12 +1408,12 @@ async function run(
             return pageManager();
           }
 
-          const price = await getPriceForMarketTransaction(
+          const price = (await getMarketTransactionData(
             item.id,
             formattedAmount,
-            "buy",
+            "sell",
             message.member.id,
-          );
+          )).cost;
           if (price == -1) {
             await res.reply({
               embeds: [new ErrorEmbed("not enough items")],
@@ -1407,7 +1425,7 @@ async function run(
 
           if (
             (await getBalance(message.member)) <
-            (await getPriceForMarketTransaction(item.id, formattedAmount, "buy", message.member.id))
+            (await getMarketTransactionData(item.id, formattedAmount, "sell", message.member.id)).cost
           ) {
             await interaction.reply({
               embeds: [new ErrorEmbed("insufficient funds")],
@@ -1441,7 +1459,7 @@ async function run(
           return pageManager();
         }
 
-        const price = await getPriceForMarketTransaction(item.id, 1, "sell", message.member.id);
+        const price = (await getMarketTransactionData(item.id, 1, "buy", message.member.id)).cost;
         if (price == -1) {
           await interaction.reply({
             embeds: [new ErrorEmbed("not enough items")],
@@ -1482,12 +1500,12 @@ async function run(
             return pageManager();
           }
 
-          const price = await getPriceForMarketTransaction(
+          const price = (await getMarketTransactionData(
             item.id,
             formattedAmount,
-            "sell",
+            "buy",
             message.member.id,
-          );
+          )).cost;
           if (price == -1) {
             await res.reply({
               embeds: [new ErrorEmbed("not enough items")],
@@ -1546,7 +1564,7 @@ async function run(
 
     const fromCommand = !msg;
 
-    const price = await getPriceForMarketTransaction(item.id, amount, type, userId);
+    const price = (await getMarketTransactionData(item.id, amount, type == "buy" ? "sell" : "buy", userId)).cost;
 
     embed.setDescription(
       `are you sure you want to ${type} ${amount} ${amount == 1 || !item.plural ? item.name : item.plural} for $${price.toLocaleString()}?`,
@@ -1586,8 +1604,8 @@ async function run(
       if (res == "confirm") {
         const res =
           type == "buy"
-            ? await marketBuy(item, amount, price, message.member)
-            : await marketSell(item, amount, price, message.member);
+            ? await marketBuy(message.member.id, item.id, amount, price, msg.client as NypsiClient)
+            : await marketSell(message.member.id, item.id, amount, price, msg.client as NypsiClient);
 
         if (!res) {
           if (fromCommand) {
@@ -1606,7 +1624,7 @@ async function run(
           return itemView(item, msg);
         }
 
-        if (res && res !== "success") {
+        if (res && res.status !== "success") {
           if (fromCommand) {
             await interaction.deferUpdate();
             return await edit({ embeds: [new ErrorEmbed(res.toString())], components: [] }, msg);

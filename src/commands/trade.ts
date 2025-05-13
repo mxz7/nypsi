@@ -452,7 +452,7 @@ async function run(
           requestedItems,
           offeredItems,
           offeredMoney,
-        ).catch((err) => console.log(err));
+        ).catch((err) => logger.error(err));
 
         if (url) {
           embed.setDescription(`[your trade request has been created](${url})`);
