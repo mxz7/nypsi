@@ -426,7 +426,7 @@ async function run(
         if (interaction.customId !== "y") {
           msg.edit({ components: [] });
           return interaction.reply({
-            embeds: [new CustomEmbed(message.member, "✅ coinflip  cancelled")],
+            embeds: [new CustomEmbed(message.member, "✅ coinflip cancelled")],
           });
         }
 
@@ -518,7 +518,7 @@ async function run(
 
       if (playing.has(i.user.id)) {
         i.reply({
-          embeds: [new ErrorEmbed("you already have an outsanding coinflip game")],
+          embeds: [new ErrorEmbed("you already have an outstanding coinflip game")],
           ephemeral: true,
         });
         return false;
@@ -696,7 +696,7 @@ async function run(
         if (interaction.customId !== "y") {
           msg.edit({ components: [] });
           return interaction.reply({
-            embeds: [new CustomEmbed(message.member, "✅ coinflip  cancelled")],
+            embeds: [new CustomEmbed(message.member, "✅ coinflip cancelled")],
           });
         }
 

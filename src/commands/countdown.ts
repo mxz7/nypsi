@@ -58,7 +58,7 @@ async function run(
       let error = `you have reached the maximum amount of countdowns for this server (${max})`;
 
       if (max == 1) {
-        error += "\n\nbecome a patreon to upgrade this limit (https://patreon.com/join/nypsi)";
+        error += "\n\nget a premium membership to upgrade this limit (https://ko-fi.com/tekoh/tiers)";
       } else if (max != 5) {
         error +=
           "\n\nyou can upgrade your subscription to get access to more countdowns per server";
@@ -119,7 +119,7 @@ async function run(
       return message.channel.send({
         embeds: [
           new ErrorEmbed("thats more than 2 years away man. i might not live that long").setFooter({
-            text: "so become a patreon 😏",
+            text: "so become a premium member 😏",
           }),
         ],
       });

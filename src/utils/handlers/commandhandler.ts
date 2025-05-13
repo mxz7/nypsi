@@ -87,6 +87,20 @@ export { aliasesSize, commandsSize };
 
 let restarting = false;
 
+export function clearExpiredUserAliases(expiredName: string) {
+  for (const [outerKey, aliasMap] of recentlyUsedUserAliases.entries()) {
+    for (const [alias, username] of Array.from(aliasMap.entries())) {
+      if (username == expiredName) {
+        aliasMap.delete(alias);
+      }
+    }
+
+    if (aliasMap.size === 0) {
+      recentlyUsedUserAliases.delete(outerKey);
+    }
+  }
+}
+
 export function loadCommands() {
   const commandFiles = fs.readdirSync("./dist/commands/").filter((file) => file.endsWith(".js"));
 
@@ -142,16 +156,16 @@ export function loadCommands() {
 }
 
 export function reloadCommand(commandsArray: string[]) {
-  const reloadTable = [];
-
-  for (const cmd of commandsArray) {
+  for (let cmd of commandsArray) {
     try {
+      if (!commandExists(cmd) && commandAliasExists(cmd)) cmd = getCommandFromAlias(cmd);
+
       commands.delete(cmd);
       try {
         delete require.cache[require.resolve(`../../commands/${cmd}`)];
       } catch (e) {
         logger.error("error deleting from cache");
-        return;
+        return false;
       }
 
       let commandData: Command | number = 0;
@@ -177,21 +191,18 @@ export function reloadCommand(commandsArray: string[]) {
             }
           }
         }
-        reloadTable.push([commandData.name, "✅"]);
         commandsSize = commands.size;
       } else {
-        reloadTable.push([cmd, "❌"]);
         commandsSize = commands.size;
       }
     } catch (e) {
-      reloadTable.push([cmd, "❌"]);
       logger.error(e);
     }
   }
   aliasesSize = aliases.size;
   commandsSize = commands.size;
 
-  return;
+  return true;
 }
 
 async function helpCmd(message: NypsiMessage, args: string[]) {
