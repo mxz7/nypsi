@@ -1,6 +1,11 @@
 import { PrismaClient } from "@prisma/client";
 import * as fs from "fs";
 import { Item } from "../src/types/Economy";
+import Redis from "ioredis";
+
+const redis = new Redis({
+  showFriendlyErrorStack: true,
+});
 
 const prisma = new PrismaClient()
 
@@ -63,6 +68,8 @@ async function main() {
       });
     }
   }
+
+  await redis.flushdb();
 }
 
 main().catch((err) => {
