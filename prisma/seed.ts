@@ -24,6 +24,7 @@ async function main() {
         lastKnownUsername: "",  
         lastCommand: new Date(0),
         adminLevel: 69,
+        karma: Math.floor(Math.random() * 5000),
       },
     });
 
