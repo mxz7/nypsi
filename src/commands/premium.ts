@@ -32,7 +32,11 @@ import sleep from "../utils/functions/sleep";
 import { cleanString } from "../utils/functions/string";
 import { getTotalSpend } from "../utils/functions/users/email";
 import { addTag, getTags, removeTag } from "../utils/functions/users/tags";
-import { commandExists } from "../utils/handlers/commandhandler";
+import {
+  commandAliasExists,
+  commandExists,
+  getCommandFromAlias,
+} from "../utils/handlers/commandhandler";
 import dayjs = require("dayjs");
 
 let doingRoles = false;
@@ -699,9 +703,17 @@ async function run(
       const trigger = cleanString(
         message.options.getString("alias").toLowerCase().normalize("NFD").split(" ")[0],
       );
-      const command = cleanString(
-        message.options.getString("command").toLowerCase().normalize("NFD"),
-      );
+
+      if (commandExists(trigger) || commandAliasExists(trigger)) {
+        return send({ embeds: [new ErrorEmbed("this command already exists")] });
+      }
+
+      let command = message.options
+        .getString("command")
+        .toLowerCase()
+        .replace(/[^a-z0-9.\s]/g, "")
+        .replace(/^(\S+)/, (firstWord) => firstWord.replace(/\./g, ""))
+        .normalize("NFD");
 
       for (const word of commandFilter) {
         if (trigger.includes(word) || command.toLowerCase().includes(word)) {
@@ -712,16 +724,15 @@ async function run(
       if (aliases.find((i) => i.alias === trigger))
         return send({ embeds: [new ErrorEmbed("you already have this alias set")] });
 
-      if (!commandExists(command.split(" ")[0])) {
-        return send({
-          embeds: [
-            new ErrorEmbed(
-              `\`${
-                command.split(" ")[0]
-              }\` is not a command. use $help <alias> to find the actual command name`,
-            ),
-          ],
-        });
+      const commandName = command.split(" ")[0];
+
+      if (!commandExists(commandName)) {
+        if (commandAliasExists(commandName)) {
+          command = command.replace(commandName, getCommandFromAlias(commandName));
+        } else
+          return send({
+            embeds: [new ErrorEmbed(`\`${commandName}\` is not a command`)],
+          });
       }
 
       await addUserAlias(message.author.id, trigger, command);

@@ -66,7 +66,7 @@ import { createProfile, hasProfile } from "../functions/users/utils";
 import dayjs = require("dayjs");
 import ms = require("ms");
 
-export const commands = new Map<string, Command>();
+const commands = new Map<string, Command>();
 const aliases = new Map<string, string>();
 const hourlyCommandCount = new Map<string, number>();
 const commandUses = new Map<string, number>();
@@ -698,6 +698,7 @@ export async function runCommand(
           .slice(1, Infinity)
           .join(" ")}`;
       } else if (recentlyUsedUserAliases.get(message.channel.id)?.has(cmd)) {
+        if (!cmd) return;
         const owner = recentlyUsedUserAliases.get(message.channel.id).get(cmd);
 
         return message.channel.send({
@@ -1148,11 +1149,15 @@ export async function runCommand(
 }
 
 export function commandExists(cmd: string) {
-  if (commands.has(cmd)) {
-    return true;
-  } else {
-    return false;
-  }
+  return commands.has(cmd);
+}
+
+export function commandAliasExists(alias: string) {
+  return aliases.has(alias);
+}
+
+export function getCommandFromAlias(alias: string) {
+  return aliases.get(alias);
 }
 
 function getCmdName(cmd: string): string {
