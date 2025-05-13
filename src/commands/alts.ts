@@ -110,10 +110,11 @@ async function run(
   let memberId = (await getMember(message.guild, args.join(" ")))?.user.id;
 
   if (!memberId) {
-    return send({ embeds: [new ErrorEmbed("invalid user")] })
+    return send({ embeds: [new ErrorEmbed("invalid user")] });
   }
 
-  if (!(await userExists(memberId))) await createUser((await getMember(message.guild, args.join(" "))));
+  if (!(await userExists(memberId)))
+    await createUser(await getMember(message.guild, args.join(" ")));
 
   if (await isAlt(message.guild, memberId)) {
     memberId = await getMainAccountId(message.guild, memberId);

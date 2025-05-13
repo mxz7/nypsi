@@ -351,7 +351,7 @@ async function run(
     const items = getItems();
 
     if (args.length == 1) {
-      return send({ embeds: [new ErrorEmbed("/top item <item>")] })
+      return send({ embeds: [new ErrorEmbed("/top item <item>")] });
     }
 
     const searchTag = args[1].toLowerCase();

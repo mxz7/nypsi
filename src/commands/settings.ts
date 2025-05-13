@@ -964,8 +964,19 @@ async function run(
     } else if (args[1]?.toLowerCase() == "passive") {
       return doPassiveMode();
     } else {
-      const subcommands = ["notifications", "preferences", "defaultbet", "lastfm", "email", "passive"];
-      return send({ embeds: [new CustomEmbed(message.member, subcommands.map((c) => `/settings me ${c}`).join("\n"))] });
+      const subcommands = [
+        "notifications",
+        "preferences",
+        "defaultbet",
+        "lastfm",
+        "email",
+        "passive",
+      ];
+      return send({
+        embeds: [
+          new CustomEmbed(message.member, subcommands.map((c) => `/settings me ${c}`).join("\n")),
+        ],
+      });
     }
   } else if (args[0].toLowerCase() == "server") {
     if (args[1]?.toLowerCase() == "slash-only") {
@@ -975,7 +986,14 @@ async function run(
       return altPunish();
     } else {
       const subcommands = ["slash-only", "alt-punish"];
-      return send({ embeds: [new CustomEmbed(message.member, subcommands.map((c) => `/settings server ${c}`).join("\n"))] });
+      return send({
+        embeds: [
+          new CustomEmbed(
+            message.member,
+            subcommands.map((c) => `/settings server ${c}`).join("\n"),
+          ),
+        ],
+      });
     }
   }
 }

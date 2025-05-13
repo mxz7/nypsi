@@ -24,7 +24,13 @@ async function run(
   const user = await message.client.users.fetch(member.user.id, { force: true });
 
   if (!user.banner) {
-    return message.channel.send({ embeds: [new ErrorEmbed(`${member == message.member ? "you do" : `${user.username} does`} not have a banner`)] });
+    return message.channel.send({
+      embeds: [
+        new ErrorEmbed(
+          `${member == message.member ? "you do" : `${user.username} does`} not have a banner`,
+        ),
+      ],
+    });
   }
 
   const banner = user.bannerURL({ size: 512 });
