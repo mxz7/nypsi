@@ -21,7 +21,11 @@ export async function getUserAliases(member: GuildMember | string) {
 
   const query = await prisma.userAlias.findMany({
     where: {
-      userId: id,
+      premium: {
+        level: {
+          gt: 0,
+        },
+      },
     },
   });
 

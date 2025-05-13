@@ -18,6 +18,7 @@ import { getEmbedColor, setEmbedColor } from "../utils/functions/premium/color";
 import { getCommand, getUserCommand, setCommand } from "../utils/functions/premium/command";
 import {
   addMember,
+  expireUser,
   getCredits,
   getPremiumProfile,
   getTier,
@@ -38,6 +39,7 @@ import {
   getCommandFromAlias,
 } from "../utils/handlers/commandhandler";
 import dayjs = require("dayjs");
+import { NypsiClient } from "../models/Client";
 
 let doingRoles = false;
 
@@ -466,17 +468,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            "you must be a BRONZE tier patreon for this command\n\nhttps://www.patreon.com/nypsi",
-          ),
-        ],
-      });
-    }
-
-    if ((await getTier(message.author.id)) < 1) {
-      return send({
-        embeds: [
-          new ErrorEmbed(
-            "you must be at least BRONZE tier for this command, you are BRONZE\n\nhttps://www.patreon.com/nypsi",
+            "you must be **BRONZE** tier to set a custom color",
           ),
         ],
       });
@@ -619,7 +611,7 @@ async function run(
         return send({ embeds: [new ErrorEmbed("spammy content 🙄")] });
       }
 
-      if (commandExists(commandTrigger))
+      if (commandExists(commandTrigger) || commandAliasExists(commandTrigger))
         return send({ embeds: [new ErrorEmbed("this is already a nypsi command")] });
 
       const cmd = await getCommand(commandTrigger);
@@ -880,9 +872,9 @@ async function run(
       return send({ embeds: [new ErrorEmbed("invalid syntax bro")] });
     }
 
-    setExpireDate(args[1], new Date(0));
+    await expireUser(args[1], message.client as NypsiClient);
 
-    return send({ embeds: [new CustomEmbed(message.member, "✅ membership will expire soon")] });
+    return send({ embeds: [new CustomEmbed(message.member, "✅ membership expired")] });
   } else if (args[0].toLowerCase() == "color") {
     return setColor();
   } else if (args[0].toLowerCase() === "mycmd") {
