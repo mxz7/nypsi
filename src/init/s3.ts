@@ -11,12 +11,27 @@ const s3 = new S3Client({
   },
 });
 
+// backblaze doesn't support these headers
 s3.middlewareStack.add(
   (next, context) => async (args) => {
-    // @ts-expect-error
-    delete args.request.headers["x-amz-checksum-crc32"];
-    // @ts-expect-error
-    delete args.request.headers["x-amz-checksum-sha256"];
+    // @ts-expect-error stupid aws sdk I FUCKING HATE AWS
+    const headers = args.request.headers;
+
+    // List of unsupported checksum headers
+    const checksumHeaders = [
+      "x-amz-checksum-crc32",
+      "x-amz-checksum-crc32c",
+      "x-amz-checksum-crc64nvme",
+      "x-amz-checksum-sha1",
+      "x-amz-checksum-sha256",
+      "x-amz-checksum-algorithm",
+      "x-amz-checksum-mode",
+    ];
+
+    for (const header of checksumHeaders) {
+      delete headers[header];
+    }
+
     return next(args);
   },
   {
