@@ -199,7 +199,7 @@ async function run(
   const showUser = async (id: string) => {
     const res = await (message.client as NypsiClient).cluster.broadcastEval(
       async (c, { userId }) => {
-        const g = await c.users.fetch(userId);
+        const g = await c.users.fetch(userId).catch(() => undefined as User);
 
         return g;
       },
@@ -209,15 +209,14 @@ async function run(
     let user: User;
 
     for (const i of res) {
-      if ((i as any).username) {
+      if ((i as any)?.username) {
         user = i as User;
         break;
       }
     }
 
     if (!user) {
-      message.react("❌");
-      user = {} as User;
+      return message.channel.send({ embeds: [new ErrorEmbed("invalid id")] });
     }
 
     const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [

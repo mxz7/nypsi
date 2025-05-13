@@ -560,13 +560,13 @@ async function playGame(
 
       if (res) {
         logger.info(
-          `${this.member.user.username} (${message.author.id}) given captcha randomly in mines`,
+          `${message.member.user.username} (${message.author.id}) given captcha randomly in mines`,
         );
         const hook = new WebhookClient({
           url: process.env.ANTICHEAT_HOOK,
         });
         await hook.send({
-          content: `[${getTimestamp()}] ${this.member.user.username} (${message.author.id}) given captcha randomly in mines`,
+          content: `[${getTimestamp()}] ${message.member.user.username} (${message.author.id}) given captcha randomly in mines`,
         });
         hook.destroy();
       }

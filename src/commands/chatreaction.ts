@@ -322,9 +322,9 @@ async function run(
     }
 
     const leaderboards = await getServerLeaderboard(message.guild);
-    const timeLeaderboard = await topChatReaction(message.guild, false).then((r) =>
-      r.pages.get(1).join("\n"),
-    );
+    const timeLeaderboard = await topChatReaction(message.guild, false)
+      .then((r) => r.pages.get(1).join("\n"))
+      .catch(() => "no times recorded");
 
     if (timeLeaderboard) leaderboards.set("time", timeLeaderboard);
 

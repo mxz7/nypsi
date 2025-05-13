@@ -63,9 +63,9 @@ module.exports = new ItemUse(
     let max = 3;
 
     if (await isPremium(message.member)) {
-      max = 5 + (await getTier(message.member)) * 5
+      max = 5 + (await getTier(message.member)) * 5;
     }
-        
+
     if (amount > max) amount = max;
 
     if (amount > (inventory.find((i) => i.item === selected.id)?.amount || 0))

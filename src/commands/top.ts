@@ -353,6 +353,11 @@ async function run(
     );
   } else if (args[0].toLowerCase() == "item") {
     const items = getItems();
+
+    if (args.length == 1) {
+      return send({ embeds: [new ErrorEmbed("/top item <item>")] });
+    }
+
     const searchTag = args[1].toLowerCase();
 
     let item: Item;
