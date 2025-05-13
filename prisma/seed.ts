@@ -1,18 +1,17 @@
 import { PrismaClient } from "@prisma/client";
-import { sampleSize } from 'lodash';
 import * as fs from "fs";
 import { Item } from "../src/types/Economy";
 
 const prisma = new PrismaClient()
 
-const admins = ["672793821850894347", "499720078770831360"];
+const admins = ["672793821850894347", "499720078770831360", "223953495982735363"];
 
 async function main() {
   const items: { [key: string]: Item } = JSON.parse(fs.readFileSync("./data/items.json") as any);
   
   const tradeableItems = Object.values(items).filter(item => !item.account_locked);
 
-  // create user account for admins with 50 random items with 1-100 quantity
+  // create user account for admins with all items of quantity 50
   for (const adminId of admins) {
     await prisma.user.upsert({
       where: { id: adminId },
@@ -44,29 +43,22 @@ async function main() {
       },
     });
 
-    const randomItems = sampleSize(
-      Array.from({ length: tradeableItems.length }, (_, i) => i),
-      50
-    );
 
-    for (const index of randomItems) {
-      const randomItem = tradeableItems[index];
-      const amount = 1 + Math.floor(Math.random() * 100);
-      
+    for (const item of tradeableItems) {
       await prisma.inventory.upsert({
         where: {
           userId_item: {
             userId: adminId,
-            item: randomItem.id,
+            item: item.id,
           },
         },
         update: {
-          amount: amount,
+          amount: 50,
         },
         create: {
           userId: adminId,
-          item: randomItem.id,
-          amount: amount,
+          item: item.id,
+          amount: 50,
         },
       });
     }
