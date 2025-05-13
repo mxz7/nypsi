@@ -6,6 +6,8 @@
     "module": "commonjs",
     "strictFunctionTypes": true,
     "skipLibCheck": true,
+    "incremental": true,
+    "tsBuildInfoFile": ".tsbuildinfo",
     "noImplicitAny": true
   }
 }

@@ -4,6 +4,8 @@ logs/
 dist/
 out/
 
+.tsbuildinfo
+
 *.env
 *.db
 *.db-shm
