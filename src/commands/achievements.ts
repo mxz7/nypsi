@@ -259,6 +259,10 @@ async function run(
 
   const showSpecificAchievement = async () => {
     args.shift();
+    
+    if (args.length == 0) {
+      return send({ embeds: [new ErrorEmbed("/achievements view <achievement>")] });
+    }
 
     let selected: AchievementData;
 

@@ -45,7 +45,7 @@ async function run(
     return;
   }
 
-  if (args.length > 0 && args[0].toLowerCase() == "-clear") {
+  if (args.length > 0 && args[0].toLowerCase() == "clear") {
     await clearAvatarHistory(message.member);
     return message.channel.send({
       embeds: [new CustomEmbed(message.member, "✅ your avatar history has been cleared")],

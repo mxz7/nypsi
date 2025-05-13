@@ -951,25 +951,31 @@ async function run(
   if (args.length == 0) {
     return send({ embeds: [new CustomEmbed(message.member, "/settings me\n/settings server")] });
   } else if (args[0].toLowerCase() == "me") {
-    if (args[1].toLowerCase() == "notifications") {
+    if (args[1]?.toLowerCase() == "notifications") {
       return showDmSettings();
-    } else if (args[1].toLowerCase() == "preferences") {
+    } else if (args[1]?.toLowerCase() == "preferences") {
       return showPreferences();
-    } else if (args[1].toLowerCase() == "defaultbet") {
+    } else if (args[1]?.toLowerCase() == "defaultbet") {
       return defaultBet();
-    } else if (args[1].toLowerCase() == "lastfm") {
+    } else if (args[1]?.toLowerCase() == "lastfm") {
       return setLastFm();
-    } else if (args[1].toLowerCase() == "email") {
+    } else if (args[1]?.toLowerCase() == "email") {
       return doEmail();
-    } else if (args[1].toLowerCase() == "passive") {
+    } else if (args[1]?.toLowerCase() == "passive") {
       return doPassiveMode();
+    } else {
+      const subcommands = ["notifications", "preferences", "defaultbet", "lastfm", "email", "passive"];
+      return send({ embeds: [new CustomEmbed(message.member, subcommands.map((c) => `/settings me ${c}`).join("\n"))] });
     }
   } else if (args[0].toLowerCase() == "server") {
-    if (args[1].toLowerCase() == "slash-only") {
+    if (args[1]?.toLowerCase() == "slash-only") {
       return slashOnly();
     }
-    if (args[1].toLowerCase() == "alt-punish") {
+    if (args[1]?.toLowerCase() == "alt-punish") {
       return altPunish();
+    } else {
+      const subcommands = ["slash-only", "alt-punish"];
+      return send({ embeds: [new CustomEmbed(message.member, subcommands.map((c) => `/settings server ${c}`).join("\n"))] });
     }
   }
 }

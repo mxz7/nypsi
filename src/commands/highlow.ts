@@ -446,13 +446,13 @@ async function playGame(
 
       if (res) {
         logger.info(
-          `${this.member.user.username} (${message.author.id}) given captcha randomly in high low`,
+          `${message.member.user.username} (${message.author.id}) given captcha randomly in high low`,
         );
         const hook = new WebhookClient({
           url: process.env.ANTICHEAT_HOOK,
         });
         await hook.send({
-          content: `[${getTimestamp()}] ${this.member.user.username} (${message.author.id}) given captcha randomly in high low`,
+          content: `[${getTimestamp()}] ${message.member.user.username} (${message.author.id}) given captcha randomly in high low`,
         });
         hook.destroy();
       }

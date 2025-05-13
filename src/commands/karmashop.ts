@@ -428,6 +428,12 @@ async function run(
       });
     }
 
+    if (args.length == 1) {
+      return send({
+        embeds: [new ErrorEmbed("/karmashop buy <item>")],
+      });
+    }
+
     const searchTag = args[1].toLowerCase();
 
     let selected;

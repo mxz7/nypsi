@@ -36,14 +36,14 @@ async function run(
 
   const embed = new CustomEmbed(
     target,
-    upgrades
-      .map(
+    upgrades.length > 0 ?
+      upgrades.map(
         (u) =>
           `\`${u.amount.toLocaleString()}${getBakeryUpgradesData()[u.upgradeId].max ? `/${getBakeryUpgradesData()[u.upgradeId].max}` : "x"}\` ${getBakeryUpgradesData()[u.upgradeId].emoji} ${
             getBakeryUpgradesData()[u.upgradeId].name
           }`,
       )
-      .join("\n"),
+      .join("\n") : "no upgrades",
   ).setHeader(
     target.user.id === message.author.id ? "your bakery" : `${target.user.username}'s bakery`,
     target.user.avatarURL(),
