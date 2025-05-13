@@ -68,8 +68,8 @@ async function main() {
       });
     }
   }
-
-  await redis.flushdb();
+  await redis.flushdb('ASYNC');
+  process.exit(0);
 }
 
 main().catch((err) => {
