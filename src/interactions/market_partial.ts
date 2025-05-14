@@ -1,18 +1,19 @@
+import { OrderType } from "@prisma/client";
 import {
   ActionRowBuilder,
   ButtonInteraction,
+  MessageFlags,
   ModalBuilder,
   ModalSubmitInteraction,
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
 import prisma from "../init/database";
+import { NypsiClient } from "../models/Client";
 import { ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
-import { isEcoBanned, userExists } from "../utils/functions/economy/utils";
-import { OrderType } from "@prisma/client";
 import { marketBuy, marketSell } from "../utils/functions/economy/market";
-import { NypsiClient } from "../models/Client";
+import { isEcoBanned, userExists } from "../utils/functions/economy/utils";
 
 const userFulfilling = new Map<string, number>();
 
@@ -22,60 +23,110 @@ export default {
   async run(interaction) {
     if (!interaction.isButton()) return;
     if ((await isEcoBanned(interaction.user.id)).banned) return;
-    const order = await prisma.market.findFirst({
+    let order = await prisma.market.findUnique({
       where: {
-        AND: [{ messageId: interaction.message.id }],
+        messageId: interaction.message.id,
       },
     });
 
-    if (order && !order.completed && (await userExists(order.ownerId))) {
-      if (order.ownerId == interaction.user.id) {
-        return await interaction.reply({
-          embeds: [new ErrorEmbed("you cannot fulfill your own order")],
-          ephemeral: true,
-        });
-      }
+    if (!order || !(await userExists(order.ownerId))) {
+      await interaction.reply({
+        embeds: [new ErrorEmbed("invalid order")],
+        flags: MessageFlags.Ephemeral,
+      });
+      await interaction.message.delete();
+      return;
+    }
 
-      const res = await showMultiModal(interaction, order.orderType == "buy" ? "sell" : "buy", Number(order.itemAmount)).catch(() => {});
-      if (userFulfilling.has(interaction.user.id)) return;
-      userFulfilling.set(interaction.user.id, order.id);
+    if (order.completed || order.itemAmount <= 0n) {
+      await interaction.reply({
+        embeds: [new ErrorEmbed("too slow ):")],
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
 
-      if (!res || !res.isModalSubmit()) return userFulfilling.delete(interaction.user.id);
-
-      const amount = Math.min(parseInt(res.fields.fields.first().value), Number(order.itemAmount));
-
-      if (!amount || amount < 1) {
-        userFulfilling.delete(interaction.user.id);
-        return res.reply({ embeds: [new ErrorEmbed("invalid amount")], ephemeral: true });
-      }
-
-      userFulfilling.delete(interaction.user.id);
-      
-      const marketRes = order.orderType == "buy"
-        ? await marketSell(interaction.user.id, order.itemId, amount, Number(order.price) * amount, interaction.client as NypsiClient, order)
-        : await marketBuy(interaction.user.id, order.itemId, amount, Number(order.price) * amount, interaction.client as NypsiClient, order);
-        
-      if (marketRes && marketRes.status !== "success" && marketRes.status !== "partial") {
-        return await res.reply({
-          embeds: [new ErrorEmbed(marketRes.status)],
-          ephemeral: true,
-        });
-      } else return interaction.deferUpdate();
-    } else if (order?.completed || Number(order.itemAmount) === 0) {
-      userFulfilling.delete(interaction.user.id);
+    if (order.ownerId == interaction.user.id) {
       return await interaction.reply({
-        embeds: [new ErrorEmbed("too slow ):").removeTitle()],
+        embeds: [new ErrorEmbed("you cannot fulfill your own order")],
+        ephemeral: true,
+      });
+    }
+
+    const res = await showMultiModal(
+      interaction,
+      order.orderType == "buy" ? "sell" : "buy",
+      Number(order.itemAmount),
+    ).catch(() => {});
+
+    if (userFulfilling.has(interaction.user.id)) return;
+    userFulfilling.set(interaction.user.id, order.id);
+
+    if (!res || !res.isModalSubmit()) return userFulfilling.delete(interaction.user.id);
+
+    const amount = Math.min(parseInt(res.fields.fields.first().value), Number(order.itemAmount));
+
+    if (!amount || amount < 1) {
+      userFulfilling.delete(interaction.user.id);
+      return res.reply({ embeds: [new ErrorEmbed("invalid amount")], ephemeral: true });
+    }
+
+    userFulfilling.delete(interaction.user.id);
+
+    order = await prisma.market.findUnique({ where: { messageId: interaction.message.id } });
+
+    if (!order || !(await userExists(order.ownerId))) {
+      await interaction.reply({
+        embeds: [new ErrorEmbed("invalid order")],
+        flags: MessageFlags.Ephemeral,
+      });
+      await interaction.message.delete();
+      return;
+    }
+
+    if (order.completed || order.itemAmount <= 0n) {
+      await interaction.reply({
+        embeds: [new ErrorEmbed("too slow ):")],
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
+
+    const marketRes =
+      order.orderType == "buy"
+        ? await marketSell(
+            interaction.user.id,
+            order.itemId,
+            amount,
+            Number(order.price) * amount,
+            interaction.client as NypsiClient,
+            order,
+          )
+        : await marketBuy(
+            interaction.user.id,
+            order.itemId,
+            amount,
+            Number(order.price) * amount,
+            interaction.client as NypsiClient,
+            order,
+          );
+
+    if (marketRes && marketRes.status !== "success" && marketRes.status !== "partial") {
+      return await res.reply({
+        embeds: [new ErrorEmbed(marketRes.status)],
         ephemeral: true,
       });
     } else {
-      userFulfilling.delete(interaction.user.id);
-      await interaction.reply({ embeds: [new ErrorEmbed("invalid order")], ephemeral: true });
-      await interaction.message.delete();
+      return interaction.deferUpdate();
     }
   },
 } as InteractionHandler;
 
-async function showMultiModal(interaction: ButtonInteraction, action: OrderType, maxAmount: number) {
+async function showMultiModal(
+  interaction: ButtonInteraction,
+  action: OrderType,
+  maxAmount: number,
+) {
   const id = `market-confirm-${Math.floor(Math.random() * 69420)}`;
   const modal = new ModalBuilder().setCustomId(id).setTitle(`${action} multiple`);
 
