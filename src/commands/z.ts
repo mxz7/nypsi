@@ -4,7 +4,6 @@ import {
   ButtonStyle,
   CommandInteraction,
   ComponentType,
-  GuildMember,
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
@@ -170,14 +169,14 @@ async function run(
     listen();
   };
 
-  let member: GuildMember;
+  let memberId: string;
 
   if (args.length === 0) {
     if (!checking) {
       checking = true;
       checkZPeoples(message.guild).then(() => (checking = false));
     }
-    member = message.member;
+    memberId = message.author.id;
   } else if (args[0].toLowerCase() === "invite") {
     if (!profile.hasInvite)
       return message.channel.send({
@@ -233,14 +232,22 @@ async function run(
 
     return manager.listen();
   } else {
-    member = await getMember(message.guild, args.join(" "));
+    memberId = await getMember(message.guild, args.join(" ")).then((i) => i.user.id);
+
+    if (!memberId) {
+      memberId = args[0];
+    }
+
+    if (!memberId.match(Constants.SNOWFLAKE_REGEX)) {
+      return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });
+    }
   }
 
-  if (!member) {
+  if (!memberId) {
     return (message as Message).react("💤");
   }
 
-  showProfile(await getZProfile(member.id));
+  showProfile(await getZProfile(memberId));
 }
 
 cmd.setRun(run);
