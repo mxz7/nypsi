@@ -862,7 +862,7 @@ export async function marketSell(
   amount: number,
   storedPrice: number,
   client: NypsiClient,
-  order?: { id: number; itemAmount: bigint; price: bigint },
+  orderId?: number,
   repeatCount = 1,
 ): Promise<{ status: string; remaining?: number }> {
   if (
@@ -873,7 +873,7 @@ export async function marketSell(
       logger.debug(`repeating market sell - ${amount}x ${itemId}`);
       setTimeout(async () => {
         if (repeatCount > 100) inTransaction.delete(itemId);
-        resolve(marketSell(userId, itemId, amount, storedPrice, client, order, repeatCount + 1));
+        resolve(marketSell(userId, itemId, amount, storedPrice, client, orderId, repeatCount + 1));
       }, 50);
     });
   }
@@ -888,9 +888,19 @@ export async function marketSell(
   if (!(await userExists(userId))) await createUser(userId);
 
   // looking for buy orders
-  const { cost: sellPrice, orders } = order
-    ? { cost: Number(order.price) * amount, orders: [order] }
+  const { cost: sellPrice, orders } = orderId
+    ? await prisma.market
+        .findUnique({ where: { id: orderId } })
+        .then((order) => ({ cost: Number(order.price) * amount, orders: [order] }))
     : await getMarketTransactionData(itemId, amount, "buy", userId);
+
+  if (orderId) {
+    if (orders[0].completed || orders[0].itemAmount < amount) {
+      await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
+      inTransaction.delete(itemId);
+      return { status: "too slow ):" };
+    }
+  }
 
   if (sellPrice == -1) {
     await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
@@ -968,7 +978,7 @@ export async function marketBuy(
   amount: number,
   storedPrice: number,
   client: NypsiClient,
-  order?: { id: number; itemAmount: bigint; price: bigint },
+  orderId?: number,
   repeatCount = 1,
 ): Promise<{ status: string; remaining?: number }> {
   if (
@@ -979,7 +989,7 @@ export async function marketBuy(
       logger.debug(`repeating market buy - ${amount}x ${itemId}`);
       setTimeout(async () => {
         if (repeatCount > 100) inTransaction.delete(itemId);
-        resolve(marketBuy(userId, itemId, amount, storedPrice, client, order, repeatCount + 1));
+        resolve(marketBuy(userId, itemId, amount, storedPrice, client, orderId, repeatCount + 1));
       }, 50);
     });
   }
@@ -994,9 +1004,19 @@ export async function marketBuy(
   if (!(await userExists(userId))) await createUser(userId);
 
   // looking for sell orders
-  const { cost: buyPrice, orders } = order
-    ? { cost: Number(order.price) * amount, orders: [order] }
+  const { cost: buyPrice, orders } = orderId
+    ? await prisma.market
+        .findUnique({ where: { id: orderId } })
+        .then((order) => ({ cost: Number(order.price) * amount, orders: [order] }))
     : await getMarketTransactionData(itemId, amount, "sell", userId);
+
+  if (orderId) {
+    if (orders[0].completed || orders[0].itemAmount < amount) {
+      await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
+      inTransaction.delete(itemId);
+      return { status: "too slow ):" };
+    }
+  }
 
   if (buyPrice == -1) {
     await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
