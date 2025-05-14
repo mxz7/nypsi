@@ -488,14 +488,15 @@ enum OrderType {
 }
 
 model Market {
-  id         Int      @id @default(autoincrement())
+  id         Int        @id @default(autoincrement())
   ownerId    String
   itemId     String
-  itemAmount BigInt   @default(1)
+  itemAmount BigInt     @default(1)
   price      BigInt
   orderType  OrderType
-  createdAt  DateTime @default(now())
-  completed  Boolean  @default(false)
+  messageId  String     @unique
+  createdAt  DateTime   @default(now())
+  completed  Boolean    @default(false)
 
   owner Economy @relation(fields: [ownerId], references: [userId], onDelete: Cascade)
 

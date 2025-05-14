@@ -25,6 +25,7 @@ CREATE TABLE "Market" (
     "itemAmount" BIGINT NOT NULL DEFAULT 1,
     "price" BIGINT NOT NULL,
     "orderType" "OrderType" NOT NULL,
+    "messageId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "completed" BOOLEAN NOT NULL DEFAULT false,
 
@@ -36,6 +37,9 @@ CREATE INDEX "Market_itemId_idx" ON "Market"("itemId");
 
 -- CreateIndex
 CREATE INDEX "Market_ownerId_idx" ON "Market"("ownerId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Market_messageId_key" ON "Market"("messageId");
 
 -- AddForeignKey
 ALTER TABLE "MarketWatch" ADD CONSTRAINT "MarketWatch_userId_fkey" FOREIGN KEY ("userId") REFERENCES "Economy"("userId") ON DELETE CASCADE ON UPDATE CASCADE;

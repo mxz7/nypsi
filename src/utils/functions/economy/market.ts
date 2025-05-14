@@ -5,12 +5,12 @@ import {
   ButtonStyle,
   GuildMember,
   MessageActionRowComponentBuilder,
+  TextChannel,
 } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed, getColor } from "../../../models/EmbedBuilders";
-import { Item } from "../../../types/Economy";
 import { NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
 import { logger, transaction } from "../../logger";
@@ -22,9 +22,9 @@ import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getLastKnownAvatar, getLastKnownUsername } from "../users/tag";
 import { addBalance, getBalance, removeBalance } from "./balance";
 import { addInventoryItem, getInventory, removeInventoryItem } from "./inventory";
-import { addStat } from "./stats";
 import { createUser, getItems, userExists } from "./utils";
 import ms = require("ms");
+import { randomUUID } from "crypto";
 
 const inTransaction = new Set<string>();
 /**
@@ -141,13 +141,9 @@ export async function createMarketOrder(
   client: NypsiClient,
 ) {
   let ownerId: string;
-  let username: string;
-  let avatar: string;
 
   if (member instanceof GuildMember) {
     ownerId = member.user.id;
-    username = member.user.username;
-    avatar = member.user.avatarURL();
   } else {
     ownerId = member;
   }
@@ -159,6 +155,7 @@ export async function createMarketOrder(
       itemAmount: amount,
       price: price,
       orderType: orderType,
+      messageId: randomUUID(),
     },
   });
 
@@ -180,74 +177,30 @@ export async function createMarketOrder(
     else if (Number(itemAmount) !== amount) amount = Number(itemAmount);
   }
 
-  if (!username) username = await getLastKnownUsername(ownerId);
-  if (!avatar) avatar = await getLastKnownAvatar(ownerId);
+  const payload = await getMarketOrderEmbed(order);
 
-  const embed = new CustomEmbed(member);
-  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>();
-
-  embed.setHeader(username, avatar, `https://nypsi.xyz/user/${ownerId}`);
-
-  let description: string;
-
-  if (sold) {
-    description = `fulfilled <t:${Math.floor(Date.now() / 1000)}:R>\n\n`;
-  } else {
-    description = `created <t:${Math.floor(order.createdAt.getTime() / 1000)}:R>\n\n`;
-  }
-
-  if (orderType === "buy") {
-    embed.setColor("#79A2F6");
-    description += `buying **${amount}x** ${getItems()[itemId].emoji} **[${getItems()[itemId].name}](https://nypsi.xyz/item/${itemId})** for $${(price * amount).toLocaleString()}`;
-    row.addComponents(
-      new ButtonBuilder().setCustomId("market-full").setLabel("sell").setStyle(ButtonStyle.Success),
-      new ButtonBuilder()
-        .setCustomId("market-partial")
-        .setLabel("sell some")
-        .setStyle(ButtonStyle.Secondary),
-    );
-  } else if (orderType === "sell") {
-    embed.setColor("#BB9BF8");
-    description += `selling **${amount}x** ${getItems()[itemId].emoji} **[${getItems()[itemId].name}](https://nypsi.xyz/item/${itemId})** for $${(price * amount).toLocaleString()}`;
-    row.addComponents(
-      new ButtonBuilder().setCustomId("market-full").setLabel("buy").setStyle(ButtonStyle.Success),
-      new ButtonBuilder()
-        .setCustomId("market-partial")
-        .setLabel("buy some")
-        .setStyle(ButtonStyle.Secondary),
-    );
-  }
-
-  embed.setDescription(description);
-
-  if (amount > 1) embed.setFooter({ text: `$${price.toLocaleString()} each` });
-
-  const payload = {
-    embeds: [embed],
-    components: sold ? [] : [row],
-  };
-
-  const res = await client.cluster.broadcastEval(
+  const { url, id } = await client.cluster.broadcastEval(
     async (client, { payload, channelId }) => {
       const channel = client.channels.cache.get(channelId);
 
-      if (!channel) return false;
-      if (!channel.isSendable()) return false;
+      if (!channel) return;
+      if (!channel.isSendable()) return;
 
       try {
         const msg = await channel.send(payload);
 
-        return msg.url;
+        return { url: msg.url, id: msg.id };
       } catch {
-        return false;
+        return;
       }
     },
     {
       context: { payload, channelId: Constants.AUCTION_CHANNEL_ID },
     },
-  );
-
-  const url = res.filter((i) => Boolean(i))[0];
+  )
+  .then((res) => {
+    return res.filter((i) => Boolean(i))[0];
+  });
 
   const response: { sold: boolean; amount: number; url?: string } = {
     sold,
@@ -258,10 +211,89 @@ export async function createMarketOrder(
     return response;
   }
 
+  await prisma.market.update({
+    where: {
+      id: order.id
+    },
+    data: {
+      messageId: id
+    }
+  });
+
   checkMarketWatchers(itemId, amount, member, orderType, price, url);
 
   response.url = url;
   return response;
+}
+
+async function getMarketOrderEmbed(order: {
+  itemId: string,
+  ownerId: string,
+  itemAmount: bigint,
+  orderType: OrderType,
+  completed: boolean,
+  createdAt: Date,
+  price: bigint
+}) {
+  const embed = new CustomEmbed(order.ownerId);
+  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>();
+
+  embed.setHeader(await getLastKnownUsername(order.ownerId), await getLastKnownAvatar(order.ownerId), `https://nypsi.xyz/user/${order.ownerId}`);
+
+  let description: string;
+
+  if (order.completed) {
+    description = `fulfilled <t:${Math.floor(Date.now() / 1000)}:R>\n\n`;
+  } else {
+    description = `created <t:${Math.floor(order.createdAt.getTime() / 1000)}:R>\n\n`;
+  }
+
+  if (order.orderType === "buy") {
+    embed.setColor("#79A2F6");
+    description += `buying **${order.itemAmount}x** ${getItems()[order.itemId].emoji} **[${getItems()[order.itemId].name}](https://nypsi.xyz/item/${order.itemId})** for $${(order.price * order.itemAmount).toLocaleString()}`;
+    row.addComponents(new ButtonBuilder().setCustomId("market-full").setLabel("sell").setStyle(ButtonStyle.Success));
+    if (order.itemAmount >= 10)
+      row.addComponents(
+        new ButtonBuilder()
+          .setCustomId("market-partial")
+          .setLabel("sell some")
+          .setStyle(ButtonStyle.Secondary)
+        );
+    else if (order.itemAmount > 1) 
+      row.addComponents(
+        new ButtonBuilder()
+          .setCustomId("market-one")
+          .setLabel("sell one")
+          .setStyle(ButtonStyle.Secondary)
+        );
+  } else if (order.orderType === "sell") {
+    embed.setColor("#BB9BF8");
+    description += `selling **${order.itemAmount}x** ${getItems()[order.itemId].emoji} **[${getItems()[order.itemId].name}](https://nypsi.xyz/item/${order.itemId})** for $${(order.price * order.itemAmount).toLocaleString()}`;
+    row.addComponents(new ButtonBuilder().setCustomId("market-full").setLabel("buy").setStyle(ButtonStyle.Success));
+    if (order.itemAmount >= 10)
+      row.addComponents(
+        new ButtonBuilder()
+          .setCustomId("market-partial")
+          .setLabel("buy some")
+          .setStyle(ButtonStyle.Secondary)
+        );
+    else if (order.itemAmount > 1) 
+      row.addComponents(
+        new ButtonBuilder()
+          .setCustomId("market-one")
+          .setLabel("buy one")
+          .setStyle(ButtonStyle.Secondary)
+        );
+  }
+
+  embed.setDescription(description);
+
+  if (order.itemAmount > 1) embed.setFooter({ text: `$${order.price.toLocaleString()} each` });
+
+  return {
+    embeds: [embed],
+    components: order.completed ? [] : [row],
+  };
 }
 
 export async function checkMarketOrder(order: Market, client: NypsiClient, repeatCount = 0) {
@@ -673,6 +705,7 @@ export async function completeOrder(
           ownerId: order.ownerId,
           itemAmount: amount,
           price: order.price,
+          messageId: randomUUID(),
           completed: true,
         },
       });
@@ -794,6 +827,14 @@ export async function completeOrder(
     }
   })();
 
+  const msg = await (client.channels.cache.get(Constants.AUCTION_CHANNEL_ID) as TextChannel).messages.fetch(order.messageId);
+
+  if (msg) await msg.edit(await getMarketOrderEmbed(
+    await prisma.market.findFirst({
+      where: { id: orderId },
+    })
+  ));
+
   return true;
 }
 
@@ -803,6 +844,7 @@ export async function marketSell(
   amount: number,
   storedPrice: number,
   client: NypsiClient,
+  order?: { id: number, itemAmount: bigint, price: bigint },
   repeatCount = 1,
 ): Promise<{ status: string; remaining?: number }> {
   if (
@@ -813,7 +855,7 @@ export async function marketSell(
       logger.debug(`repeating market sell - ${amount}x ${itemId}`);
       setTimeout(async () => {
         if (repeatCount > 100) inTransaction.delete(itemId);
-        resolve(marketSell(userId, itemId, amount, storedPrice, client, repeatCount + 1));
+        resolve(marketSell(userId, itemId, amount, storedPrice, client, order, repeatCount + 1));
       }, 50);
     });
   }
@@ -828,7 +870,7 @@ export async function marketSell(
   if (!(await userExists(userId))) await createUser(userId);
 
   // looking for buy orders
-  const { cost: sellPrice, orders } = await getMarketTransactionData(itemId, amount, "buy", userId);
+  const { cost: sellPrice, orders } = order ? ({cost: Number(order.price) * amount, orders: [order] }) : (await getMarketTransactionData(itemId, amount, "buy", userId));
 
   if (sellPrice == -1) {
     await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
@@ -906,6 +948,7 @@ export async function marketBuy(
   amount: number,
   storedPrice: number,
   client: NypsiClient,
+  order?: { id: number, itemAmount: bigint, price: bigint },
   repeatCount = 1,
 ): Promise<{ status: string; remaining?: number }> {
   if (
@@ -916,7 +959,7 @@ export async function marketBuy(
       logger.debug(`repeating market buy - ${amount}x ${itemId}`);
       setTimeout(async () => {
         if (repeatCount > 100) inTransaction.delete(itemId);
-        resolve(marketBuy(userId, itemId, amount, storedPrice, client, repeatCount + 1));
+        resolve(marketBuy(userId, itemId, amount, storedPrice, client, order, repeatCount + 1));
       }, 50);
     });
   }
@@ -931,7 +974,7 @@ export async function marketBuy(
   if (!(await userExists(userId))) await createUser(userId);
 
   // looking for sell orders
-  const { cost: buyPrice, orders } = await getMarketTransactionData(itemId, amount, "sell", userId);
+  const { cost: buyPrice, orders } = order ? ({cost: Number(order.price) * amount, orders: [order] }) : (await getMarketTransactionData(itemId, amount, "sell", userId));
 
   if (buyPrice == -1) {
     await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
