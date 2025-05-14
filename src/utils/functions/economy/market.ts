@@ -227,15 +227,7 @@ export async function createMarketOrder(
   return response;
 }
 
-async function getMarketOrderEmbed(order: {
-  itemId: string;
-  ownerId: string;
-  itemAmount: bigint;
-  orderType: OrderType;
-  completed: boolean;
-  createdAt: Date;
-  price: bigint;
-}) {
+async function getMarketOrderEmbed(order: Market) {
   const embed = new CustomEmbed(order.ownerId);
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>();
 
