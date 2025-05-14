@@ -811,7 +811,9 @@ export async function completeOrder(
 
           const embedDm = new CustomEmbed(order.ownerId)
             .setDescription(description)
-            .setFooter({ text: `+$${data.earned.toLocaleString()}` });
+
+          if (order.orderType == "sell")
+            embedDm.setFooter({ text: `+$${data.earned.toLocaleString()}` });
 
           dmQueue.delete(`${order.ownerId}-${order.orderType}`);
 
