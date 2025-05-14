@@ -1,4 +1,5 @@
 import { Market, MarketWatch, OrderType, Prisma, PrismaClient } from "@prisma/client";
+import { randomUUID } from "crypto";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -24,7 +25,6 @@ import { addBalance, getBalance, removeBalance } from "./balance";
 import { addInventoryItem, getInventory, removeInventoryItem } from "./inventory";
 import { createUser, getItems, userExists } from "./utils";
 import ms = require("ms");
-import { randomUUID } from "crypto";
 
 const inTransaction = new Set<string>();
 /**
@@ -179,28 +179,29 @@ export async function createMarketOrder(
 
   const payload = await getMarketOrderEmbed(order);
 
-  const { url, id } = await client.cluster.broadcastEval(
-    async (client, { payload, channelId }) => {
-      const channel = client.channels.cache.get(channelId);
+  const { url, id } = await client.cluster
+    .broadcastEval(
+      async (client, { payload, channelId }) => {
+        const channel = client.channels.cache.get(channelId);
 
-      if (!channel) return;
-      if (!channel.isSendable()) return;
+        if (!channel) return;
+        if (!channel.isSendable()) return;
 
-      try {
-        const msg = await channel.send(payload);
+        try {
+          const msg = await channel.send(payload);
 
-        return { url: msg.url, id: msg.id };
-      } catch {
-        return;
-      }
-    },
-    {
-      context: { payload, channelId: Constants.AUCTION_CHANNEL_ID },
-    },
-  )
-  .then((res) => {
-    return res.filter((i) => Boolean(i))[0];
-  });
+          return { url: msg.url, id: msg.id };
+        } catch {
+          return;
+        }
+      },
+      {
+        context: { payload, channelId: Constants.AUCTION_CHANNEL_ID },
+      },
+    )
+    .then((res) => {
+      return res.filter((i) => Boolean(i))[0];
+    });
 
   const response: { sold: boolean; amount: number; url?: string } = {
     sold,
@@ -213,11 +214,11 @@ export async function createMarketOrder(
 
   await prisma.market.update({
     where: {
-      id: order.id
+      id: order.id,
     },
     data: {
-      messageId: id
-    }
+      messageId: id,
+    },
   });
 
   checkMarketWatchers(itemId, amount, member, orderType, price, url);
@@ -227,18 +228,22 @@ export async function createMarketOrder(
 }
 
 async function getMarketOrderEmbed(order: {
-  itemId: string,
-  ownerId: string,
-  itemAmount: bigint,
-  orderType: OrderType,
-  completed: boolean,
-  createdAt: Date,
-  price: bigint
+  itemId: string;
+  ownerId: string;
+  itemAmount: bigint;
+  orderType: OrderType;
+  completed: boolean;
+  createdAt: Date;
+  price: bigint;
 }) {
   const embed = new CustomEmbed(order.ownerId);
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>();
 
-  embed.setHeader(await getLastKnownUsername(order.ownerId), await getLastKnownAvatar(order.ownerId), `https://nypsi.xyz/user/${order.ownerId}`);
+  embed.setHeader(
+    await getLastKnownUsername(order.ownerId),
+    await getLastKnownAvatar(order.ownerId),
+    `https://nypsi.xyz/user/${order.ownerId}`,
+  );
 
   let description: string;
 
@@ -251,39 +256,43 @@ async function getMarketOrderEmbed(order: {
   if (order.orderType === "buy") {
     embed.setColor("#79A2F6");
     description += `buying **${order.itemAmount}x** ${getItems()[order.itemId].emoji} **[${getItems()[order.itemId].name}](https://nypsi.xyz/item/${order.itemId})** for $${(order.price * order.itemAmount).toLocaleString()}`;
-    row.addComponents(new ButtonBuilder().setCustomId("market-full").setLabel("sell").setStyle(ButtonStyle.Success));
+    row.addComponents(
+      new ButtonBuilder().setCustomId("market-full").setLabel("sell").setStyle(ButtonStyle.Success),
+    );
     if (order.itemAmount >= 10)
       row.addComponents(
         new ButtonBuilder()
           .setCustomId("market-partial")
           .setLabel("sell some")
-          .setStyle(ButtonStyle.Secondary)
-        );
-    else if (order.itemAmount > 1) 
+          .setStyle(ButtonStyle.Secondary),
+      );
+    else if (order.itemAmount > 1)
       row.addComponents(
         new ButtonBuilder()
           .setCustomId("market-one")
           .setLabel("sell one")
-          .setStyle(ButtonStyle.Secondary)
-        );
+          .setStyle(ButtonStyle.Secondary),
+      );
   } else if (order.orderType === "sell") {
     embed.setColor("#BB9BF8");
     description += `selling **${order.itemAmount}x** ${getItems()[order.itemId].emoji} **[${getItems()[order.itemId].name}](https://nypsi.xyz/item/${order.itemId})** for $${(order.price * order.itemAmount).toLocaleString()}`;
-    row.addComponents(new ButtonBuilder().setCustomId("market-full").setLabel("buy").setStyle(ButtonStyle.Success));
+    row.addComponents(
+      new ButtonBuilder().setCustomId("market-full").setLabel("buy").setStyle(ButtonStyle.Success),
+    );
     if (order.itemAmount >= 10)
       row.addComponents(
         new ButtonBuilder()
           .setCustomId("market-partial")
           .setLabel("buy some")
-          .setStyle(ButtonStyle.Secondary)
-        );
-    else if (order.itemAmount > 1) 
+          .setStyle(ButtonStyle.Secondary),
+      );
+    else if (order.itemAmount > 1)
       row.addComponents(
         new ButtonBuilder()
           .setCustomId("market-one")
           .setLabel("buy one")
-          .setStyle(ButtonStyle.Secondary)
-        );
+          .setStyle(ButtonStyle.Secondary),
+      );
   }
 
   embed.setDescription(description);
@@ -332,6 +341,8 @@ export async function checkMarketOrder(order: Market, client: NypsiClient, repea
     return false;
   }
 
+  let excessMoney = 0n;
+
   try {
     await prisma.$transaction(async (prisma) => {
       for (const validOrder of validOrders) {
@@ -363,6 +374,11 @@ export async function checkMarketOrder(order: Market, client: NypsiClient, repea
           client,
           prisma as Prisma.TransactionClient,
         );
+
+        if (validOrder.price > order.price) {
+          excessMoney += (validOrder.price - order.price) * amount;
+        }
+
         if (!res) break;
       }
     });
@@ -370,6 +386,8 @@ export async function checkMarketOrder(order: Market, client: NypsiClient, repea
     console.error(e);
     logger.error("error in completing market order", e);
   }
+
+  await addToNypsiBank(Number(excessMoney));
 
   inTransaction.delete(order.itemId);
   await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${order.itemId}`);
@@ -605,10 +623,7 @@ export async function getMarketTransactionData(
         { ownerId: { not: filterOutUserId } },
       ],
     },
-    orderBy: [
-      { price: type == "buy" ? "desc" : "asc" },
-      { createdAt: "asc" },
-    ],
+    orderBy: [{ price: type == "buy" ? "desc" : "asc" }, { createdAt: "asc" }],
   });
   const orders: Market[] = [];
 
@@ -809,8 +824,7 @@ export async function completeOrder(
             description += "\n";
           }
 
-          const embedDm = new CustomEmbed(order.ownerId)
-            .setDescription(description)
+          const embedDm = new CustomEmbed(order.ownerId).setDescription(description);
 
           if (order.orderType == "sell")
             embedDm.setFooter({ text: `+$${data.earned.toLocaleString()}` });
@@ -829,13 +843,18 @@ export async function completeOrder(
     }
   })();
 
-  const msg = await (client.channels.cache.get(Constants.AUCTION_CHANNEL_ID) as TextChannel).messages.fetch(order.messageId);
+  const msg = await (
+    client.channels.cache.get(Constants.AUCTION_CHANNEL_ID) as TextChannel
+  ).messages.fetch(order.messageId);
 
-  if (msg) await msg.edit(await getMarketOrderEmbed(
-    await prisma.market.findFirst({
-      where: { id: orderId },
-    })
-  ));
+  if (msg)
+    await msg.edit(
+      await getMarketOrderEmbed(
+        await prisma.market.findFirst({
+          where: { id: orderId },
+        }),
+      ),
+    );
 
   return true;
 }
@@ -846,7 +865,7 @@ export async function marketSell(
   amount: number,
   storedPrice: number,
   client: NypsiClient,
-  order?: { id: number, itemAmount: bigint, price: bigint },
+  order?: { id: number; itemAmount: bigint; price: bigint },
   repeatCount = 1,
 ): Promise<{ status: string; remaining?: number }> {
   if (
@@ -872,7 +891,9 @@ export async function marketSell(
   if (!(await userExists(userId))) await createUser(userId);
 
   // looking for buy orders
-  const { cost: sellPrice, orders } = order ? ({cost: Number(order.price) * amount, orders: [order] }) : (await getMarketTransactionData(itemId, amount, "buy", userId));
+  const { cost: sellPrice, orders } = order
+    ? { cost: Number(order.price) * amount, orders: [order] }
+    : await getMarketTransactionData(itemId, amount, "buy", userId);
 
   if (sellPrice == -1) {
     await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
@@ -950,7 +971,7 @@ export async function marketBuy(
   amount: number,
   storedPrice: number,
   client: NypsiClient,
-  order?: { id: number, itemAmount: bigint, price: bigint },
+  order?: { id: number; itemAmount: bigint; price: bigint },
   repeatCount = 1,
 ): Promise<{ status: string; remaining?: number }> {
   if (
@@ -976,7 +997,9 @@ export async function marketBuy(
   if (!(await userExists(userId))) await createUser(userId);
 
   // looking for sell orders
-  const { cost: buyPrice, orders } = order ? ({cost: Number(order.price) * amount, orders: [order] }) : (await getMarketTransactionData(itemId, amount, "sell", userId));
+  const { cost: buyPrice, orders } = order
+    ? { cost: Number(order.price) * amount, orders: [order] }
+    : await getMarketTransactionData(itemId, amount, "sell", userId);
 
   if (buyPrice == -1) {
     await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
@@ -991,7 +1014,7 @@ export async function marketBuy(
       status: `since viewing the market, the buy price has changed from $${storedPrice.toLocaleString()} to $${buyPrice.toLocaleString()}. please press buy again with this updated price in mind`,
     };
   }
-  
+
   if ((await getBalance(userId)) < buyPrice) {
     return { status: "insufficient funds" };
   }
