@@ -232,7 +232,7 @@ async function run(
 
     return manager.listen();
   } else {
-    memberId = await getMember(message.guild, args.join(" ")).then((i) => i.user.id);
+    memberId = await getMember(message.guild, args.join(" ")).then((i) => i?.user.id);
 
     if (!memberId) {
       memberId = args[0];
