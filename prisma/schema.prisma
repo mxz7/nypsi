@@ -415,7 +415,6 @@ model Stats {
 model Premium {
   level      Int
   embedColor String   @default("default")
-  lastWeekly DateTime
   startDate  DateTime
   expireDate DateTime
   credit     Int      @default(0)
