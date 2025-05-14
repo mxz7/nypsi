@@ -139,10 +139,11 @@ enum LevelDmSetting {
 model Preferences {
   userId String @id
 
-  duelRequests   Boolean @default(true)
-  offers         Int     @default(3)
-  leaderboards   Boolean @default(true)
-  tips           Boolean @default(true)
+  duelRequests  Boolean @default(true)
+  offers        Int     @default(3)
+  leaderboards  Boolean @default(true)
+  tips          Boolean @default(true)
+  marketConfirm BigInt  @default(25000000)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -312,10 +313,10 @@ model Upgrades {
 }
 
 model MarketWatch {
-  userId  String
-  itemId  String
-  orderType OrderType
-  priceThreshold BigInt @default(0)
+  userId         String
+  itemId         String
+  orderType      OrderType
+  priceThreshold BigInt    @default(0)
 
   Economy Economy? @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
@@ -488,15 +489,15 @@ enum OrderType {
 }
 
 model Market {
-  id         Int        @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   ownerId    String
   itemId     String
-  itemAmount BigInt     @default(1)
+  itemAmount BigInt    @default(1)
   price      BigInt
   orderType  OrderType
-  messageId  String     @unique
-  createdAt  DateTime   @default(now())
-  completed  Boolean    @default(false)
+  messageId  String    @unique
+  createdAt  DateTime  @default(now())
+  completed  Boolean   @default(false)
 
   owner Economy @relation(fields: [ownerId], references: [userId], onDelete: Cascade)
 
@@ -505,17 +506,17 @@ model Market {
 }
 
 model TradeRequest {
-  id              Int      @id @default(autoincrement())
-  ownerId         String
+  id      Int    @id @default(autoincrement())
+  ownerId String
 
-  requestedItems  String[]
+  requestedItems String[]
 
-  offeredItems    String[]
-  offeredMoney    BigInt
+  offeredItems String[]
+  offeredMoney BigInt
 
-  messageId       String   @unique
-  createdAt       DateTime @default(now())
-  completed       Boolean  @default(false)
+  messageId String   @unique
+  createdAt DateTime @default(now())
+  completed Boolean  @default(false)
 
   owner Economy @relation(fields: [ownerId], references: [userId], onDelete: Cascade)
 }

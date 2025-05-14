@@ -3,10 +3,15 @@ import { randomUUID } from "crypto";
 import {
   ActionRowBuilder,
   ButtonBuilder,
+  ButtonInteraction,
   ButtonStyle,
   GuildMember,
   MessageActionRowComponentBuilder,
+  ModalBuilder,
+  ModalSubmitInteraction,
   TextChannel,
+  TextInputBuilder,
+  TextInputStyle,
 } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
@@ -1052,4 +1057,44 @@ export async function marketBuy(
   }
 
   return { status: "success" };
+}
+
+export async function showMarketConfirmationModal(interaction: ButtonInteraction, cost: bigint) {
+  const id = `market-confirm-${Math.floor(Math.random() * 69420)}`;
+
+  const modal = new ModalBuilder().setCustomId(id).setTitle("confirmation");
+
+  modal.addComponents(
+    new ActionRowBuilder<TextInputBuilder>().addComponents(
+      new TextInputBuilder()
+        .setCustomId("confirmation")
+        .setLabel("type 'yes' to confirm")
+        .setPlaceholder(`this will cost $${cost.toLocaleString()}`)
+        .setStyle(TextInputStyle.Short)
+        .setRequired(true)
+        .setMaxLength(3),
+    ),
+  );
+
+  await interaction.showModal(modal);
+
+  const filter = (i: ModalSubmitInteraction) =>
+    i.user.id == interaction.user.id && i.customId === id;
+
+  const res = await interaction.awaitModalSubmit({ filter, time: 30000 }).catch(() => {});
+
+  if (!res) return;
+
+  if (!res.isModalSubmit()) return;
+
+  if (res.fields.fields.first().value.toLowerCase() != "yes") {
+    res.reply({
+      embeds: [new CustomEmbed().setDescription("✅ cancelled purchase")],
+      ephemeral: true,
+    });
+    return false;
+  }
+  res.reply({ embeds: [new CustomEmbed(null, "✅ confirmation accepted")], ephemeral: true });
+
+  return true;
 }
