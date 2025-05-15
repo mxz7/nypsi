@@ -4,6 +4,7 @@ import prisma from "../init/database";
 import { NypsiClient } from "../models/Client";
 import { ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
+import { calcItemValue } from "../utils/functions/economy/inventory";
 import {
   marketBuy,
   marketSell,
@@ -54,8 +55,14 @@ export default {
 
     if (!res) return;
 
-    if ((await getPreferences(interaction.user.id)).marketConfirm > order.price) {
-      const res = await showMarketConfirmationModal(interaction, order.price);
+    let value = Number(order.price);
+
+    if (order.orderType === "buy") {
+      value = await calcItemValue(order.itemId);
+    }
+
+    if ((await getPreferences(interaction.user.id)).marketConfirm > value) {
+      const res = await showMarketConfirmationModal(interaction, value);
 
       if (!res) return;
     } else {

@@ -1079,7 +1079,7 @@ export async function marketBuy(
   return { status: "success" };
 }
 
-export async function showMarketConfirmationModal(interaction: ButtonInteraction, cost: bigint) {
+export async function showMarketConfirmationModal(interaction: ButtonInteraction, cost: number) {
   const id = `market-confirm-${Math.floor(Math.random() * 69420)}`;
 
   const modal = new ModalBuilder().setCustomId(id).setTitle("confirmation");
