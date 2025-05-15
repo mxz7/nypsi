@@ -5,7 +5,7 @@ CREATE TYPE "OrderType" AS ENUM ('buy', 'sell');
 ALTER TABLE "DMSettings" RENAME COLUMN "auction" TO "market";
 
 -- AlterTable
-ALTER TABLE "Preferences" DROP COLUMN "auctionConfirm";
+ALTER TABLE "Preferences" RENAME COLUMN "auctionConfirm" TO "marketConfirm";
 
 -- CreateTable
 CREATE TABLE "MarketWatch" (
