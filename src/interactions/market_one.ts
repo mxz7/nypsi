@@ -80,7 +80,7 @@ export default {
             1,
             Number(order.price),
             interaction.client as NypsiClient,
-            order,
+            order.id,
           )
         : await marketBuy(
             interaction.user.id,
@@ -88,7 +88,7 @@ export default {
             1,
             Number(order.price),
             interaction.client as NypsiClient,
-            order,
+            order.id,
           );
 
     if (orderResponse && orderResponse.status !== "success" && orderResponse.status !== "partial") {

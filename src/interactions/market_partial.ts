@@ -100,7 +100,7 @@ export default {
             amount,
             Number(order.price) * amount,
             interaction.client as NypsiClient,
-            order,
+            order.id,
           )
         : await marketBuy(
             interaction.user.id,
@@ -108,7 +108,7 @@ export default {
             amount,
             Number(order.price) * amount,
             interaction.client as NypsiClient,
-            order,
+            order.id,
           );
 
     if (marketRes && marketRes.status !== "success" && marketRes.status !== "partial") {
