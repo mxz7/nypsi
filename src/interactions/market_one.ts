@@ -18,25 +18,52 @@ export default {
   type: "interaction",
   async run(interaction) {
     const doChecks = async (order: Market) => {
-      if (order.ownerId == interaction.user.id) {
-        await interaction.reply({
-          embeds: [new ErrorEmbed("you cannot fulfill your own order")],
-          ephemeral: true,
-        });
-        return false;
-      }
-
       if (!order || !(await userExists(order.ownerId))) {
-        await interaction.reply({ embeds: [new ErrorEmbed("invalid order")], ephemeral: true });
+        const embed = new ErrorEmbed("invalid order");
+
+        await interaction
+          .reply({
+            embeds: [embed],
+            flags: MessageFlags.Ephemeral,
+          })
+          .catch(() =>
+            interaction
+              .followUp({ embeds: [embed], flags: MessageFlags.Ephemeral })
+              .catch(() => {}),
+          );
+
         await interaction.message.delete();
         return false;
       }
 
+      if (order.ownerId === interaction.user.id) {
+        const embed = new ErrorEmbed("you cannot fulfill your own order. idiot.");
+
+        await interaction
+          .reply({
+            embeds: [embed],
+            flags: MessageFlags.Ephemeral,
+          })
+          .catch(() =>
+            interaction
+              .followUp({ embeds: [embed], flags: MessageFlags.Ephemeral })
+              .catch(() => {}),
+          );
+        return false;
+      }
+
       if (order.completed || order.itemAmount <= 0n) {
-        await interaction.reply({
-          embeds: [new ErrorEmbed("too slow ):")],
-          flags: MessageFlags.Ephemeral,
-        });
+        const embed = new ErrorEmbed("too slow ):");
+        await interaction
+          .reply({
+            embeds: [embed],
+            flags: MessageFlags.Ephemeral,
+          })
+          .catch(() =>
+            interaction
+              .followUp({ embeds: [embed], flags: MessageFlags.Ephemeral })
+              .catch(() => {}),
+          );
         return false;
       }
 
@@ -61,7 +88,7 @@ export default {
       value = await calcItemValue(order.itemId);
     }
 
-    if ((await getPreferences(interaction.user.id)).marketConfirm > value) {
+    if ((await getPreferences(interaction.user.id)).marketConfirm < value) {
       const res = await showMarketConfirmationModal(interaction, value);
 
       if (!res) return;
