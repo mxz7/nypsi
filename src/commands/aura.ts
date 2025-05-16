@@ -9,6 +9,7 @@ import {
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
+  MessageFlags,
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
@@ -75,7 +76,7 @@ async function run(
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) send({ embeds: [res.embed], ephemeral: true });
+    if (res.respond) send({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
     return;
   }
 
@@ -84,7 +85,7 @@ async function run(
   if (message.author.createdTimestamp > Date.now() - ms("2 weeks")) {
     return send({
       embeds: [new ErrorEmbed("your account is too new for aura 🙄")],
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 
@@ -195,7 +196,7 @@ async function run(
     target = await getMember(message.guild, args[0]);
 
     if (!target) {
-      return send({ embeds: [new ErrorEmbed("invalid user")], ephemeral: true });
+      return send({ embeds: [new ErrorEmbed("invalid user")], flags: MessageFlags.Ephemeral });
     }
 
     if (!(await hasProfile(target)))

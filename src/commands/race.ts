@@ -14,6 +14,7 @@ import {
   MessageActionRowComponentBuilder,
   MessageCreateOptions,
   MessageEditOptions,
+  MessageFlags,
   StringSelectMenuBuilder,
   StringSelectMenuOptionBuilder,
   User,
@@ -200,7 +201,7 @@ class Race {
     if (interaction.customId === "join") {
       if (!(await userExists(interaction.user.id)))
         return interaction.reply({
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
           embeds: [new ErrorEmbed("you cannot afford the entry fee for this race")],
         });
 
@@ -219,13 +220,13 @@ class Race {
 
       if (maxBet < this.bet)
         return interaction.reply({
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
           embeds: [new ErrorEmbed(`your max bet for races is $${maxBet.toLocaleString()}`)],
         });
 
       if (balance < this.bet)
         return interaction.reply({
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
           embeds: [new ErrorEmbed("you cannot afford the entry fee for this race")],
         });
 
@@ -277,13 +278,13 @@ class Race {
 
       if (this.started)
         return interaction.reply({
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
           embeds: [new ErrorEmbed("the race has already started")],
         });
 
       const msg = await interaction
         .reply({
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
           embeds: [
             new CustomEmbed(interaction.user.id, "choose a car").setHeader(
               this.embed.data.author.name,
@@ -306,7 +307,7 @@ class Race {
 
       if ((await getBalance(interaction.user.id)) < this.bet)
         return carInteraction.reply({
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
           embeds: [new ErrorEmbed("you cannot afford the entry fee for this race")],
         });
 
@@ -317,7 +318,7 @@ class Race {
 
       if (this.limit > -1 && cars.find((i) => i.car.id === chosen).speed > this.limit)
         return carInteraction.reply({
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
           embeds: [new ErrorEmbed("this car is faster than the speed limit for this race")],
         });
 
@@ -343,13 +344,13 @@ class Race {
     } else if (interaction.customId === "start") {
       if (interaction.user.id !== this.ownerId)
         return interaction.reply({
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
           embeds: [new ErrorEmbed("you are not the race owner")],
         });
 
       if (this.members.length < 2)
         return interaction.reply({
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
           embeds: [new ErrorEmbed("there are not enough racers")],
         });
 

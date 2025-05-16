@@ -9,6 +9,7 @@ import {
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
+  MessageFlags,
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { ErrorEmbed } from "../models/EmbedBuilders";
@@ -69,7 +70,7 @@ async function doBake(
   if (await onCooldown(cmd.name, member)) {
     const res = await getResponse(cmd.name, member);
 
-    if (res.respond) send({ embeds: [res.embed], ephemeral: true });
+    if (res.respond) send({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
     return;
   }
 
@@ -101,7 +102,7 @@ async function doBake(
           "you need a furnace to bake. furnaces can be found in crates or bought from the shop",
         ),
       ],
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 
@@ -112,7 +113,7 @@ async function doBake(
           "you need coal to bake. coal can be found when mining or bought from the shop",
         ),
       ],
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 

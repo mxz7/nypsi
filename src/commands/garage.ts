@@ -11,6 +11,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
   MessageEditOptions,
+  MessageFlags,
   ModalBuilder,
   StringSelectMenuBuilder,
   StringSelectMenuInteraction,
@@ -239,7 +240,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
             await sleep(1000);
             if (interaction.replied || interaction.deferred) {
               interaction.followUp({
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
                 embeds: [
                   new CustomEmbed(
                     message.member,
@@ -257,7 +258,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
 
           if (balance < cost) {
             await interaction.reply({
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
               embeds: [new ErrorEmbed("you cannot afford this")],
             });
             return showCars(cars, index, msg, undefined, false);
@@ -295,17 +296,17 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
 
           for (const word of filter) {
             if (cleanString(name).includes(word)) {
-              return res.reply({ ephemeral: true, embeds: [new ErrorEmbed("invalid name")] });
+              return res.reply({ flags: MessageFlags.Ephemeral, embeds: [new ErrorEmbed("invalid name")] });
             }
           }
 
           if (name.length > 30)
-            return res.reply({ ephemeral: true, embeds: [new ErrorEmbed("invalid name")] });
+            return res.reply({ flags: MessageFlags.Ephemeral, embeds: [new ErrorEmbed("invalid name")] });
           if (name.length < 3)
-            return res.reply({ ephemeral: true, embeds: [new ErrorEmbed("invalid name")] });
+            return res.reply({ flags: MessageFlags.Ephemeral, embeds: [new ErrorEmbed("invalid name")] });
 
           res.reply({
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
             embeds: [new CustomEmbed(message.member, "car name updated")],
           });
 
@@ -321,7 +322,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
           ) {
             await interaction.reply({
               embeds: [new ErrorEmbed("you don't have this upgrade. sneaky bitch")],
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             });
             return showCars(cars, index, msg, interaction, false);
           }

@@ -12,6 +12,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
   MessageEditOptions,
+  MessageFlags,
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
@@ -82,7 +83,7 @@ async function run(
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) send({ embeds: [res.embed], ephemeral: true });
+    if (res.respond) send({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
     return;
   }
 

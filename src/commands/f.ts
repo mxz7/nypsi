@@ -4,6 +4,7 @@ import {
   ButtonStyle,
   CommandInteraction,
   MessageActionRowComponentBuilder,
+  MessageFlags,
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
@@ -60,7 +61,7 @@ async function run(
     if (i.customId == customId) {
       if (reactions.includes(i.user.id)) {
         return await i
-          .reply({ embeds: [new ErrorEmbed("you can only do this once")], ephemeral: true })
+          .reply({ embeds: [new ErrorEmbed("you can only do this once")], flags: MessageFlags.Ephemeral })
           .catch(() => {});
       }
 

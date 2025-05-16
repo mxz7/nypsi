@@ -4,6 +4,7 @@ import {
   InteractionEditReplyOptions,
   InteractionReplyOptions,
   Message,
+  MessageFlags,
   PermissionFlagsBits,
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
@@ -142,7 +143,7 @@ async function run(
       await message.delete();
       await message.member.send({ embeds: [embed] }).catch(() => {});
     } else {
-      await message.reply({ embeds: [embed], ephemeral: true });
+      await message.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
     }
   } else {
     await send({ embeds: [embed] });

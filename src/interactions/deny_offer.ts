@@ -1,4 +1,4 @@
-import { EmbedBuilder } from "discord.js";
+import { EmbedBuilder, MessageFlags } from "discord.js";
 import prisma from "../init/database";
 import redis from "../init/redis";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
@@ -20,7 +20,7 @@ export default {
         embeds: [
           new CustomEmbed(interaction.user.id, "please wait until your offer has been processed"),
         ],
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 
@@ -46,7 +46,7 @@ export default {
       return interaction.reply({ embeds: [new ErrorEmbed("they are banned.")] });
     }
 
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     await prisma.offer.delete({
       where: {

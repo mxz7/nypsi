@@ -9,6 +9,7 @@ import {
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
+  MessageFlags,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
@@ -64,7 +65,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) send({ embeds: [res.embed], ephemeral: true });
+    if (res.respond) send({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
     return;
   }
 
@@ -121,12 +122,12 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
     msg.edit({ components: [] });
     return reaction.reply({
       embeds: [new CustomEmbed(message.member, "✅ cancelled")],
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 
   if (reaction.customId == "✅") {
-    await reaction.deferReply({ ephemeral: true });
+    await reaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     const { selected, taxedAmount, desc, amounts, total, taxEnabled, multi } =
       await calcValues(message);

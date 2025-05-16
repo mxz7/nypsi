@@ -16,6 +16,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
   MessageEditOptions,
+  MessageFlags,
   WebhookClient,
 } from "discord.js";
 import redis from "../init/redis.js";
@@ -148,7 +149,7 @@ async function run(
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) send({ embeds: [res.embed], ephemeral: true });
+    if (res.respond) send({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
     return;
   }
 
@@ -872,7 +873,7 @@ async function playGame(
                   `${GEM_EMOJI} you found a **gem**!!\nit has been added to your inventory, i wonder what powers it has`,
                 ),
               ],
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             });
           else
             response.reply({
@@ -882,7 +883,7 @@ async function playGame(
                   `${GEM_EMOJI} you found a **gem**!!\nit has been added to your inventory, i wonder what powers it has`,
                 ),
               ],
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             });
         }
       }

@@ -9,6 +9,7 @@ import {
   GuildMember,
   Message,
   MessageActionRowComponentBuilder,
+  MessageFlags,
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
@@ -98,7 +99,7 @@ async function run(
       if (generating)
         return interaction.reply({
           embeds: [new ErrorEmbed("circle already being generated")],
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
 
       generating = true;

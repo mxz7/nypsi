@@ -1,4 +1,4 @@
-import { ButtonInteraction } from "discord.js";
+import { ButtonInteraction, MessageFlags } from "discord.js";
 import prisma from "../init/database";
 import { ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
@@ -21,7 +21,7 @@ export default {
       if (auction.ownerId == interaction.user.id) {
         return await interaction.reply({
           embeds: [new ErrorEmbed("you cannot buy your own auction")],
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
       }
 
@@ -29,10 +29,10 @@ export default {
     } else if (auction.sold || Number(auction.itemAmount) === 0) {
       return await interaction.reply({
         embeds: [new ErrorEmbed("too slow ):").removeTitle()],
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     } else {
-      await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], ephemeral: true });
+      await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], flags: MessageFlags.Ephemeral });
       await interaction.message.delete();
     }
   },

@@ -7,6 +7,7 @@ import {
   InteractionResponse,
   Message,
   MessageEditOptions,
+  MessageFlags,
   PermissionFlagsBits,
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
@@ -121,7 +122,7 @@ async function run(
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) send({ embeds: [res.embed], ephemeral: true });
+    if (res.respond) send({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
     return;
   }
 
@@ -134,7 +135,7 @@ async function run(
       if (!(message instanceof Message)) {
         return send({
           embeds: [new CustomEmbed(message.member, "✅ messages deleted")],
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
       }
     } else {
@@ -250,7 +251,7 @@ async function run(
     } else {
       await send({
         embeds: [new CustomEmbed(message.member, "deleting messages...")],
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 
@@ -294,7 +295,7 @@ async function run(
     } else {
       await send({
         embeds: [new CustomEmbed(message.member, "deleting messages...")],
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 
@@ -339,7 +340,7 @@ async function run(
     } else {
       msg = await send({
         embeds: [new CustomEmbed(message.member, "deleting messages...")],
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 
@@ -521,7 +522,7 @@ async function run(
 
     return send({
       embeds: [new CustomEmbed(message.member, `✅ ${collecteda.size} messages cleaned up`)],
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     }).then((m) => {
       setTimeout(() => {
         m.delete().catch(() => {});

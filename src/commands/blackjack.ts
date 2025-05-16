@@ -16,6 +16,7 @@ import {
   MessageActionRowComponentBuilder,
   MessageCreateOptions,
   MessageEditOptions,
+  MessageFlags,
   WebhookClient,
 } from "discord.js";
 import redis from "../init/redis";
@@ -98,7 +99,7 @@ async function run(
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) send({ embeds: [res.embed], ephemeral: true });
+    if (res.respond) send({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
     return;
   }
 

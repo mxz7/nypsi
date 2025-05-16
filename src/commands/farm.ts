@@ -8,6 +8,7 @@ import {
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
+  MessageFlags,
   StringSelectMenuBuilder,
   StringSelectMenuOptionBuilder,
 } from "discord.js";
@@ -87,7 +88,7 @@ async function run(
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) send({ embeds: [res.embed], ephemeral: true });
+    if (res.respond) send({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
     return;
   }
 
@@ -325,7 +326,7 @@ async function run(
               embeds: [
                 new ErrorEmbed(`you don't have any ${item.plural ? item.plural : item.name}`),
               ],
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             });
             return listen();
           }
@@ -342,7 +343,7 @@ async function run(
                   `you already have the max amount of ${item.plural ? item.plural : item.name}`,
                 ),
               ],
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             });
             return listen();
           }
@@ -374,7 +375,7 @@ async function run(
           if (userUpgradeLevel == upgrade.type_upgradable.items.length) {
             await interaction.reply({
               embeds: [new ErrorEmbed(`you are already at the max level for this upgrade`)],
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             });
             return listen();
           }
@@ -384,7 +385,7 @@ async function run(
               embeds: [
                 new ErrorEmbed(`you don't have ${nextLevelItem.article} ${nextLevelItem.name}`),
               ],
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             });
             return listen();
           }

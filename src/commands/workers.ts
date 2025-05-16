@@ -12,6 +12,7 @@ import {
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
+  MessageFlags,
   StringSelectMenuBuilder,
   StringSelectMenuOptionBuilder,
 } from "discord.js";
@@ -119,7 +120,7 @@ async function run(
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) send({ embeds: [res.embed], ephemeral: true });
+    if (res.respond) send({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
     return;
   }
 
@@ -314,12 +315,12 @@ async function run(
           await res
             .reply({
               embeds: [new ErrorEmbed("you cannot afford this worker")],
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             })
             .catch(() =>
               res.followUp({
                 embeds: [new ErrorEmbed("you cannot afford this worker")],
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
               }),
             );
           return pageManager();
@@ -457,12 +458,12 @@ async function run(
           await res
             .reply({
               embeds: [new ErrorEmbed("you have maxed out this upgrade")],
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             })
             .catch(() =>
               res.followUp({
                 embeds: [new ErrorEmbed("you have maxed out this upgrade")],
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
               }),
             );
 
@@ -491,12 +492,12 @@ async function run(
           await res
             .reply({
               embeds: [new ErrorEmbed(`you cannot afford this ($${cost.toLocaleString()})`)],
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             })
             .catch(() =>
               res.followUp({
                 embeds: [new ErrorEmbed(`you cannot afford this ($${cost.toLocaleString()})`)],
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
               }),
             );
 
