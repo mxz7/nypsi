@@ -466,11 +466,7 @@ async function run(
   const setColor = async () => {
     if (!(await isPremium(message.author.id))) {
       return send({
-        embeds: [
-          new ErrorEmbed(
-            "you must be **BRONZE** tier to set a custom color",
-          ),
-        ],
+        embeds: [new ErrorEmbed("you must be **BRONZE** tier to set a custom color")],
       });
     }
 

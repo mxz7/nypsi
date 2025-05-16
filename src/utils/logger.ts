@@ -398,7 +398,11 @@ export function setClusterId(id: string) {
   logger.meta = { cluster: id };
 }
 
-export function transaction(from: { username: string, id: string }, to: { username: string, id: string }, value: string) {
+export function transaction(
+  from: { username: string; id: string },
+  to: { username: string; id: string },
+  value: string,
+) {
   if (!nextLogMsg.get("pay")) {
     nextLogMsg.set(
       "pay",

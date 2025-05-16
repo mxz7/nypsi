@@ -357,7 +357,7 @@ export async function fulfillTradeRequest(
   repeatCount = 1,
 ) {
   if (
-    beingFulfilled.has(tradeRequest.id) || 
+    beingFulfilled.has(tradeRequest.id) ||
     (await redis.exists(`${Constants.redis.nypsi.TRADE_FULFILLING}:${tradeRequest.id}`))
   ) {
     return new Promise((resolve) => {

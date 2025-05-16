@@ -127,11 +127,7 @@ cmd.slashData
         option.setName("amount").setDescription("how many of this item?").setRequired(true),
       ),
   )
-  .addSubcommand((help) =>
-    help
-      .setName("help")
-      .setDescription("view the market help menu")
-  )
+  .addSubcommand((help) => help.setName("help").setDescription("view the market help menu"))
   .addSubcommand((sell) =>
     sell
       .setName("sell")
@@ -366,11 +362,9 @@ async function run(
       message.author.avatarURL(),
     );
 
-    
     let max = 5;
 
     if (await isPremium(message.member)) max *= await getTier(message.member);
-
 
     let orders = (await getMarketOrders(message.member, type)).reverse();
 
@@ -434,17 +428,14 @@ async function run(
       const { res, interaction } = response;
 
       if (res == "newOrder") {
-
-        
         if ((await getMarketOrders(message.member, type)).length >= max) {
           await interaction.reply({
             embeds: [new ErrorEmbed(`you are at the max number of ${type} orders`)],
-            ephemeral: true
+            ephemeral: true,
           });
           await updateEmbed();
           return pageManager();
         }
-
 
         const res = await createOrderModal(type, interaction as ButtonInteraction);
 
@@ -755,7 +746,6 @@ async function run(
     return res;
   };
 
-  
   let max = 5;
 
   if (await isPremium(message.member)) max *= await getTier(message.member);
@@ -1042,18 +1032,19 @@ async function run(
     if (type != "buy" && type != "sell") {
       return send({ embeds: [new ErrorEmbed("invalid order type (**b**uy/**s**ell)")] });
     }
-    
-    if ((await getMarketOrders(message.member, type)).length >= max) return send({
-      embeds: [new ErrorEmbed(`you are at the max number of ${type} orders`)]
-    })
 
-    if (!selected ) {
+    if ((await getMarketOrders(message.member, type)).length >= max)
+      return send({
+        embeds: [new ErrorEmbed(`you are at the max number of ${type} orders`)],
+      });
+
+    if (!selected) {
       return send({ embeds: [new ErrorEmbed("couldnt find that item")] });
     }
 
     if (selected.account_locked) {
       return send({ embeds: [new ErrorEmbed("this item cannot be traded")] });
-    } 
+    }
 
     if (!price) {
       price = amount;
@@ -1187,14 +1178,30 @@ async function run(
   } else if (args[0].toLowerCase().includes("help")) {
     const embed = new CustomEmbed(message.member).setHeader("market help");
 
-    embed.setDescription("the market is a place for players to buy and sell items safely and efficiently");
+    embed.setDescription(
+      "the market is a place for players to buy and sell items safely and efficiently",
+    );
 
     embed.addFields(
-      { name: "usage", value: "/market manage\n/market create <item> <buy/sell> <amount> <price>\n/market <buy/sell> <item> [amount]\n/market search <item>\n/market watch <item> <buy/sell> [price]" },
-      { name: "buy/sell orders", value: "orders are based on what you want with an item. if you want to buy an item, create a buy order, and vice versa" },
-      { name: "fulfilling orders", value: `there are multiple ways to fulfill orders. you can view orders as they come in and fulfill them directly through the [**official nypsi server**](${Constants.NYPSI_SERVER_INVITE_LINK}), or you can use \`/market search <item>\` or \`/market <buy/sell>\` to fulfill multiple orders at once` },
-      { name: "need more help?", value: `visit the [**docs**](${"https://nypsi.xyz/docs/economy/items/market/?ref=bot-market"}) or ask a community or staff member in the [**official nypsi server**](${Constants.NYPSI_SERVER_INVITE_LINK})`},
-    )
+      {
+        name: "usage",
+        value:
+          "/market manage\n/market create <item> <buy/sell> <amount> <price>\n/market <buy/sell> <item> [amount]\n/market search <item>\n/market watch <item> <buy/sell> [price]",
+      },
+      {
+        name: "buy/sell orders",
+        value:
+          "orders are based on what you want with an item. if you want to buy an item, create a buy order, and vice versa",
+      },
+      {
+        name: "fulfilling orders",
+        value: `there are multiple ways to fulfill orders. you can view orders as they come in and fulfill them directly through the [**official nypsi server**](${Constants.NYPSI_SERVER_INVITE_LINK}), or you can use \`/market search <item>\` or \`/market <buy/sell>\` to fulfill multiple orders at once`,
+      },
+      {
+        name: "need more help?",
+        value: `visit the [**docs**](${"https://nypsi.xyz/docs/economy/items/market/?ref=bot-market"}) or ask a community or staff member in the [**official nypsi server**](${Constants.NYPSI_SERVER_INVITE_LINK})`,
+      },
+    );
 
     return send({ embeds: [embed] });
   } else return viewMarket();
@@ -1408,12 +1415,9 @@ async function run(
             return pageManager();
           }
 
-          const price = (await getMarketTransactionData(
-            item.id,
-            formattedAmount,
-            "sell",
-            message.member.id,
-          )).cost;
+          const price = (
+            await getMarketTransactionData(item.id, formattedAmount, "sell", message.member.id)
+          ).cost;
           if (price == -1) {
             await res.reply({
               embeds: [new ErrorEmbed("not enough items")],
@@ -1425,7 +1429,8 @@ async function run(
 
           if (
             (await getBalance(message.member)) <
-            (await getMarketTransactionData(item.id, formattedAmount, "sell", message.member.id)).cost
+            (await getMarketTransactionData(item.id, formattedAmount, "sell", message.member.id))
+              .cost
           ) {
             await interaction.reply({
               embeds: [new ErrorEmbed("insufficient funds")],
@@ -1500,12 +1505,9 @@ async function run(
             return pageManager();
           }
 
-          const price = (await getMarketTransactionData(
-            item.id,
-            formattedAmount,
-            "buy",
-            message.member.id,
-          )).cost;
+          const price = (
+            await getMarketTransactionData(item.id, formattedAmount, "buy", message.member.id)
+          ).cost;
           if (price == -1) {
             await res.reply({
               embeds: [new ErrorEmbed("not enough items")],
@@ -1564,7 +1566,9 @@ async function run(
 
     const fromCommand = !msg;
 
-    const price = (await getMarketTransactionData(item.id, amount, type == "buy" ? "sell" : "buy", userId)).cost;
+    const price = (
+      await getMarketTransactionData(item.id, amount, type == "buy" ? "sell" : "buy", userId)
+    ).cost;
 
     embed.setDescription(
       `are you sure you want to ${type} ${amount} ${amount == 1 || !item.plural ? item.name : item.plural} for $${price.toLocaleString()}?`,
@@ -1605,7 +1609,13 @@ async function run(
         const res =
           type == "buy"
             ? await marketBuy(message.member.id, item.id, amount, price, msg.client as NypsiClient)
-            : await marketSell(message.member.id, item.id, amount, price, msg.client as NypsiClient);
+            : await marketSell(
+                message.member.id,
+                item.id,
+                amount,
+                price,
+                msg.client as NypsiClient,
+              );
 
         if (!res) {
           if (fromCommand) {

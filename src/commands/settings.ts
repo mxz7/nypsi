@@ -547,9 +547,7 @@ async function run(
 
         // @ts-expect-error grr
         if (typeof settings[selected] == "number" || typeof settings[selected] === "bigint") {
-          const modal = new ModalBuilder()
-            .setCustomId("settings-update")
-            .setTitle("update amount");
+          const modal = new ModalBuilder().setCustomId("settings-update").setTitle("update amount");
 
           modal.addComponents(
             new ActionRowBuilder<TextInputBuilder>().addComponents(

@@ -122,7 +122,7 @@ async function run(
   }
 
   if (!(await userExists(memberId)))
-    await createUser(inServer ? (await getMember(message.guild, args.join(" "))) : args[0]);
+    await createUser(inServer ? await getMember(message.guild, args.join(" ")) : args[0]);
 
   if (await isAlt(message.guild, memberId)) {
     memberId = await getMainAccountId(message.guild, memberId);

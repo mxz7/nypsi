@@ -495,7 +495,7 @@ model Market {
   itemAmount BigInt    @default(1)
   price      BigInt
   orderType  OrderType
-  messageId  String?    @unique
+  messageId  String?   @unique
   createdAt  DateTime  @default(now())
   completed  Boolean   @default(false)
 

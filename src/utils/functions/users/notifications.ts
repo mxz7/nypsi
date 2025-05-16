@@ -98,11 +98,14 @@ export async function getPreferences(member: GuildMember | string): Promise<Pref
   }
 
   if (await redis.exists(`${Constants.redis.cache.user.PREFERENCES}:${id}`)) {
-    return JSON.parse(await redis.get(
-      `${Constants.redis.cache.user.PREFERENCES}:${id}`
-    ), (key, value) => {
-      return (key !== "userId" && typeof value === "string" && !isNaN(value)) ? BigInt(value) : value; 
-    }) as Preferences;
+    return JSON.parse(
+      await redis.get(`${Constants.redis.cache.user.PREFERENCES}:${id}`),
+      (key, value) => {
+        return key !== "userId" && typeof value === "string" && !isNaN(value)
+          ? BigInt(value)
+          : value;
+      },
+    ) as Preferences;
   }
 
   let query = await prisma.preferences.findUnique({

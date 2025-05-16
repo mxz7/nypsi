@@ -6,7 +6,11 @@ import { getAdminLevel } from "../utils/functions/users/admin";
 import { logger } from "../utils/logger";
 import { userExists } from "../utils/functions/economy/utils";
 import { ErrorEmbed } from "../models/EmbedBuilders";
-import { commandAliasExists, commandExists, getCommandFromAlias } from "../utils/handlers/commandhandler";
+import {
+  commandAliasExists,
+  commandExists,
+  getCommandFromAlias,
+} from "../utils/handlers/commandhandler";
 
 const cmd = new Command("cmdwatch", "watch commands", "none");
 
@@ -32,8 +36,7 @@ async function run(
   if (!commandExists(cmd)) {
     if (commandAliasExists(cmd)) {
       cmd = getCommandFromAlias(cmd);
-    } else
-    return message.channel.send({ embeds: [new ErrorEmbed("invalid command")] });
+    } else return message.channel.send({ embeds: [new ErrorEmbed("invalid command")] });
   }
 
   if (await redis.exists(`${Constants.redis.nypsi.COMMAND_WATCH}:${userId}:${cmd}`)) {

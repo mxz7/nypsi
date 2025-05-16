@@ -27,7 +27,11 @@ async function run(
 
   if (!(await isPremium(message.author.id))) {
     return message.channel.send({
-      embeds: [new ErrorEmbed("you must be have a premium membership for this command").setFooter({ text: "$premium" })],
+      embeds: [
+        new ErrorEmbed("you must be have a premium membership for this command").setFooter({
+          text: "$premium",
+        }),
+      ],
     });
   }
 
