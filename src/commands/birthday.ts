@@ -4,8 +4,10 @@ import {
   ButtonBuilder,
   ButtonStyle,
   Channel,
+  Collection,
   CommandInteraction,
   ComponentType,
+  GuildMember,
   InteractionEditReplyOptions,
   InteractionReplyOptions,
   Message,
@@ -17,6 +19,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { setBirthdayChannel } from "../utils/functions/guilds/birthday";
 import {
   getBirthday,
+  getTodaysBirthdays,
   isBirthdayEnabled,
   setBirthday,
   setBirthdayEnabled,
@@ -108,6 +111,21 @@ async function run(
           "/**birthday channel <channel>** *set a channel to be used as the birthday announcement channel*\n" +
           "/**birthday disable** *disable birthday announcements in your server*",
     );
+
+    const todaysBirthdays = await getTodaysBirthdays();
+
+    if (todaysBirthdays.length > 0) {
+      const members = await message.guild.members
+        .fetch({ user: todaysBirthdays.map((i) => i.id) })
+        .catch(() => new Collection<string, GuildMember>());
+
+      if (members.size > 0) {
+        embed.addField(
+          "today's birthdays",
+          Array.from(members.mapValues((i) => i.toString()).values()).join("\n"),
+        );
+      }
+    }
 
     return send({ embeds: [embed] });
   }
