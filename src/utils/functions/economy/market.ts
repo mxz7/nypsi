@@ -160,7 +160,6 @@ export async function createMarketOrder(
       itemAmount: amount,
       price: price,
       orderType: orderType,
-      messageId: randomUUID(),
     },
   });
 
@@ -717,7 +716,6 @@ export async function completeOrder(
           ownerId: order.ownerId,
           itemAmount: amount,
           price: order.price,
-          messageId: randomUUID(),
           completed: true,
         },
       });

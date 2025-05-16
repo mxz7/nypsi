@@ -98,6 +98,11 @@
       "name": "duel requests",
       "description": "receive coinflip/chatreaction requests"
     },
+    "marketConfirm": {
+      "id": "marketConfirm",
+      "name": "market confirmation",
+      "description": "require buying from market confirmation on items more expensive than: ${VALUE} (0 = never)"
+    },
     "offers": {
       "id": "offers",
       "name": "receive offers",

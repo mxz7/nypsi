@@ -7,6 +7,7 @@ import Constants from "../../Constants";
 import { dmQueue } from "../../queues/queues";
 import { createUser, userExists } from "../economy/utils";
 import ms = require("ms");
+import { isNaN } from "lodash";
 
 declare function require(name: string): any;
 
@@ -97,9 +98,11 @@ export async function getPreferences(member: GuildMember | string): Promise<Pref
   }
 
   if (await redis.exists(`${Constants.redis.cache.user.PREFERENCES}:${id}`)) {
-    return (await JSON.parse(
-      await redis.get(`${Constants.redis.cache.user.PREFERENCES}:${id}`),
-    )) as Preferences;
+    return JSON.parse(await redis.get(
+      `${Constants.redis.cache.user.PREFERENCES}:${id}`
+    ), (key, value) => {
+      return (key !== "userId" && typeof value === "string" && !isNaN(value)) ? BigInt(value) : value; 
+    }) as Preferences;
   }
 
   let query = await prisma.preferences.findUnique({

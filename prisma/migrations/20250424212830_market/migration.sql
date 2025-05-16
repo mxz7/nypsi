@@ -6,6 +6,7 @@ ALTER TABLE "DMSettings" RENAME COLUMN "auction" TO "market";
 
 -- AlterTable
 ALTER TABLE "Preferences" RENAME COLUMN "auctionConfirm" TO "marketConfirm";
+ALTER TABLE "Preferences" ALTER COLUMN "marketConfirm" SET DATA TYPE BIGINT;
 
 -- CreateTable
 CREATE TABLE "MarketWatch" (
@@ -25,7 +26,7 @@ CREATE TABLE "Market" (
     "itemAmount" BIGINT NOT NULL DEFAULT 1,
     "price" BIGINT NOT NULL,
     "orderType" "OrderType" NOT NULL,
-    "messageId" TEXT NOT NULL,
+    "messageId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "completed" BOOLEAN NOT NULL DEFAULT false,
 
