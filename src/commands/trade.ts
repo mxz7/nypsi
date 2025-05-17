@@ -15,6 +15,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
   MessageEditOptions,
+  MessageFlags,
   ModalBuilder,
   ModalSubmitInteraction,
   StringSelectMenuBuilder,
@@ -103,7 +104,7 @@ async function run(
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) send({ embeds: [res.embed], ephemeral: true });
+    if (res.respond) send({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
     return;
   }
 
@@ -231,7 +232,7 @@ async function run(
         const res = await addRequestedItem(interaction).catch(() => {});
 
         if (res) {
-          await res.deferReply({ ephemeral: true });
+          await res.deferReply({ flags: MessageFlags.Ephemeral });
 
           const item = res.fields.fields.get("item").value;
           const amount = res.fields.fields.get("amount").value;
@@ -241,17 +242,17 @@ async function run(
           if (!selected) {
             await res.editReply({
               embeds: [new ErrorEmbed("couldnt find that item")],
-              options: { ephemeral: true },
+              options: { flags: MessageFlags.Ephemeral },
             });
           } else if (selected.account_locked) {
             await res.editReply({
               embeds: [new ErrorEmbed("this item cannot be traded")],
-              options: { ephemeral: true },
+              options: { flags: MessageFlags.Ephemeral },
             });
           } else if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
             await res.editReply({
               embeds: [new ErrorEmbed("invalid amount")],
-              options: { ephemeral: true },
+              options: { flags: MessageFlags.Ephemeral },
             });
           } else {
             const index = requestedItems.findIndex((entry) => entry.item === selected);
@@ -274,7 +275,7 @@ async function run(
         const res = await addOfferedItem(interaction).catch(() => {});
 
         if (res) {
-          await res.deferReply({ ephemeral: true });
+          await res.deferReply({ flags: MessageFlags.Ephemeral });
 
           const item = res.fields.fields.get("item").value;
           let amount = res.fields.fields.get("amount").value;
@@ -288,17 +289,17 @@ async function run(
           if (!selected) {
             await res.editReply({
               embeds: [new ErrorEmbed("couldnt find that item")],
-              options: { ephemeral: true },
+              options: { flags: MessageFlags.Ephemeral },
             });
           } else if (selected.account_locked) {
             await res.editReply({
               embeds: [new ErrorEmbed("this item cannot be traded")],
-              options: { ephemeral: true },
+              options: { flags: MessageFlags.Ephemeral },
             });
           } else if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
             await res.editReply({
               embeds: [new ErrorEmbed("invalid amount")],
-              options: { ephemeral: true },
+              options: { flags: MessageFlags.Ephemeral },
             });
           } else if (
             !inventory.find((i) => i.item == selected.id) ||
@@ -306,7 +307,7 @@ async function run(
           ) {
             await res.editReply({
               embeds: [new ErrorEmbed(`you do not have enough ${selected.plural}`)],
-              options: { ephemeral: true },
+              options: { flags: MessageFlags.Ephemeral },
             });
           } else {
             const index = offeredItems.findIndex((entry) => entry.item === selected);
@@ -329,7 +330,7 @@ async function run(
         const res = await addOfferedMoney(interaction).catch(() => {});
 
         if (res) {
-          await res.deferReply({ ephemeral: true });
+          await res.deferReply({ flags: MessageFlags.Ephemeral });
 
           let amount = res.fields.fields.get("amount").value;
 
@@ -338,12 +339,12 @@ async function run(
           } else if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
             await res.editReply({
               embeds: [new ErrorEmbed("invalid amount")],
-              options: { ephemeral: true },
+              options: { flags: MessageFlags.Ephemeral },
             });
           } else if (parseInt(amount) > balance) {
             await res.editReply({
               embeds: [new ErrorEmbed("you do not have enough money")],
-              options: { ephemeral: true },
+              options: { flags: MessageFlags.Ephemeral },
             });
           } else {
             const cost = await formatBet(amount.toLowerCase(), message.member).catch(() => {});
@@ -351,7 +352,7 @@ async function run(
             if (!cost)
               await res.editReply({
                 embeds: [new ErrorEmbed("invalid amount")],
-                options: { ephemeral: true },
+                options: { flags: MessageFlags.Ephemeral },
               });
             else offeredMoney = cost;
 
@@ -407,7 +408,7 @@ async function run(
         if (offeredMoney > balance) {
           return interaction.followUp({
             embeds: [new CustomEmbed(message.member, "sneaky bitch")],
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
 
@@ -418,7 +419,7 @@ async function run(
           ) {
             return interaction.followUp({
               embeds: [new CustomEmbed(message.member, "sneaky bitch")],
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             });
           }
         }
@@ -434,7 +435,7 @@ async function run(
         if (tradeRequests.length >= max)
           return interaction.followUp({
             embeds: [new CustomEmbed(message.member, "sneaky bitch")],
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
 
         for (const item of offeredItems) {
@@ -788,12 +789,12 @@ async function run(
 
           await interaction.followUp({
             embeds: [new CustomEmbed(message.member, "✅ your trade request has been deleted")],
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         } else {
           await interaction.followUp({
             embeds: [new CustomEmbed(message.member, "failed to delete that trade request")],
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
 
@@ -807,7 +808,7 @@ async function run(
         if (!bumpRes) {
           await interaction.followUp({
             embeds: [new ErrorEmbed("this trade request has already been bumped recently")],
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
           displayTradeRequests(currentPage);
           await updateButtons(currentPage);
@@ -818,7 +819,7 @@ async function run(
             embeds: [
               new CustomEmbed(message.member, `[your trade request has been bumped](${bumpRes})`),
             ],
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
           displayTradeRequests(currentPage);
           await updateButtons(currentPage);

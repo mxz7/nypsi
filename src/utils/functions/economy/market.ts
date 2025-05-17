@@ -7,6 +7,7 @@ import {
   ButtonStyle,
   GuildMember,
   MessageActionRowComponentBuilder,
+  MessageFlags,
   ModalBuilder,
   ModalSubmitInteraction,
   TextChannel,
@@ -1108,11 +1109,11 @@ export async function showMarketConfirmationModal(interaction: ButtonInteraction
   if (res.fields.fields.first().value.toLowerCase() != "yes") {
     res.reply({
       embeds: [new CustomEmbed().setDescription("✅ cancelled purchase")],
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
     return false;
   }
-  res.reply({ embeds: [new CustomEmbed(null, "✅ confirmation accepted")], ephemeral: true });
+  res.reply({ embeds: [new CustomEmbed(null, "✅ confirmation accepted")], flags: MessageFlags.Ephemeral });
 
   return true;
 }

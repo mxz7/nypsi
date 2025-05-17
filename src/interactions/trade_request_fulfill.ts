@@ -20,7 +20,7 @@ export default {
     if (!tradeRequest) {
       await interaction.reply({
         embeds: [new ErrorEmbed("invalid trade request")],
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       await interaction.message.delete();
       return;
@@ -30,7 +30,7 @@ export default {
       if (tradeRequest.ownerId == interaction.user.id) {
         return await interaction.reply({
           embeds: [new ErrorEmbed("you cannot fulfill your own trade request")],
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
       }
 
@@ -43,7 +43,7 @@ export default {
     } else {
       await interaction.reply({
         embeds: [new ErrorEmbed("invalid trade request")],
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       await interaction.message.delete();
     }

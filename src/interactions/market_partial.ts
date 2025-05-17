@@ -49,7 +49,7 @@ export default {
     if (order.ownerId == interaction.user.id) {
       return await interaction.reply({
         embeds: [new ErrorEmbed("you cannot fulfill your own order")],
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 
@@ -68,7 +68,7 @@ export default {
 
     if (!amount || amount < 1) {
       userFulfilling.delete(interaction.user.id);
-      return res.reply({ embeds: [new ErrorEmbed("invalid amount")], ephemeral: true });
+      return res.reply({ embeds: [new ErrorEmbed("invalid amount")], flags: MessageFlags.Ephemeral });
     }
 
     userFulfilling.delete(interaction.user.id);
@@ -114,7 +114,7 @@ export default {
     if (marketRes && marketRes.status !== "success" && marketRes.status !== "partial") {
       return await res.reply({
         embeds: [new ErrorEmbed(marketRes.status)],
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     } else {
       return interaction.deferUpdate();

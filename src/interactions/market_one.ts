@@ -128,7 +128,7 @@ export default {
     if (orderResponse && orderResponse.status !== "success" && orderResponse.status !== "partial") {
       return await interaction.followUp({
         embeds: [new ErrorEmbed(orderResponse.status)],
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     } else return interaction.deferUpdate();
   },

@@ -7,6 +7,7 @@ import {
   EmbedBuilder,
   GuildMember,
   MessageActionRowComponentBuilder,
+  MessageFlags,
 } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
@@ -396,7 +397,7 @@ export async function fulfillTradeRequest(
   });
 
   if (!tradeRequest) {
-    await interaction.reply({ embeds: [new ErrorEmbed("invalid trade request")], ephemeral: true });
+    await interaction.reply({ embeds: [new ErrorEmbed("invalid trade request")], flags: MessageFlags.Ephemeral });
     await interaction.message.delete();
     beingFulfilled.delete(tradeRequest.id);
     await redis.del(`${Constants.redis.nypsi.TRADE_FULFILLING}:${tradeRequest.id}`);
@@ -408,7 +409,7 @@ export async function fulfillTradeRequest(
     await redis.del(`${Constants.redis.nypsi.TRADE_FULFILLING}:${tradeRequest.id}`);
     return await interaction.reply({
       embeds: [new ErrorEmbed("too slow ):").removeTitle()],
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 
@@ -427,7 +428,7 @@ export async function fulfillTradeRequest(
       await redis.del(`${Constants.redis.nypsi.TRADE_FULFILLING}:${tradeRequest.id}`);
       return await interaction.reply({
         embeds: [new ErrorEmbed("you do not have the required items")],
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
   }

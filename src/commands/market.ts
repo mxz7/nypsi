@@ -15,6 +15,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
   MessageEditOptions,
+  MessageFlags,
   ModalBuilder,
   ModalSubmitInteraction,
   StringSelectMenuBuilder,
@@ -219,7 +220,7 @@ async function run(
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) send({ embeds: [res.embed], ephemeral: true });
+    if (res.respond) send({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
     return;
   }
 
@@ -431,7 +432,7 @@ async function run(
         if ((await getMarketOrders(message.member, type)).length >= max) {
           await interaction.reply({
             embeds: [new ErrorEmbed(`you are at the max number of ${type} orders`)],
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
           await updateEmbed();
           return pageManager();
@@ -440,7 +441,7 @@ async function run(
         const res = await createOrderModal(type, interaction as ButtonInteraction);
 
         if (res) {
-          await res.deferReply({ ephemeral: true });
+          await res.deferReply({ flags: MessageFlags.Ephemeral });
 
           const item = res.fields.fields.get("item").value;
           const amount = res.fields.fields.get("amount").value;
@@ -451,28 +452,28 @@ async function run(
           if (!selected) {
             await res.editReply({
               embeds: [new ErrorEmbed("couldnt find that item")],
-              options: { ephemeral: true },
+              options: { flags: MessageFlags.Ephemeral },
             });
             await updateEmbed();
             return pageManager();
           } else if (selected.account_locked) {
             await res.editReply({
               embeds: [new ErrorEmbed("this item cannot be traded")],
-              options: { ephemeral: true },
+              options: { flags: MessageFlags.Ephemeral },
             });
             await updateEmbed();
             return pageManager();
           } else if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
             await res.editReply({
               embeds: [new ErrorEmbed("invalid amount")],
-              options: { ephemeral: true },
+              options: { flags: MessageFlags.Ephemeral },
             });
             await updateEmbed();
             return pageManager();
           } else if (!parseInt(price) || isNaN(parseInt(price)) || parseInt(price) < 1) {
             await res.editReply({
               embeds: [new ErrorEmbed("invalid price")],
-              options: { ephemeral: true },
+              options: { flags: MessageFlags.Ephemeral },
             });
             await updateEmbed();
             return pageManager();
@@ -483,7 +484,7 @@ async function run(
           if (!cost) {
             await res.editReply({
               embeds: [new ErrorEmbed("invalid price")],
-              options: { ephemeral: true },
+              options: { flags: MessageFlags.Ephemeral },
             });
             await updateEmbed();
             return pageManager();
@@ -493,7 +494,7 @@ async function run(
             if ((await getBalance(message.member)) < parseInt(amount) * cost) {
               await res.editReply({
                 embeds: [new ErrorEmbed("you dont have enough money")],
-                options: { ephemeral: true },
+                options: { flags: MessageFlags.Ephemeral },
               });
               await updateEmbed();
               return pageManager();
@@ -513,7 +514,7 @@ async function run(
                     "you cannot make a buy order for more than your lowest sell order for this item",
                   ),
                 ],
-                options: { ephemeral: true },
+                options: { flags: MessageFlags.Ephemeral },
               });
               await updateEmbed();
               return pageManager();
@@ -544,7 +545,7 @@ async function run(
 
             await res.editReply({
               embeds: [new CustomEmbed(message.member, description)],
-              options: { ephemeral: true },
+              options: { flags: MessageFlags.Ephemeral },
             });
           } else if (type == "sell") {
             const inventory = await getInventory(message.member);
@@ -559,7 +560,7 @@ async function run(
                     `you dont have enough ${selected.plural ? selected.plural : selected.name}`,
                   ),
                 ],
-                options: { ephemeral: true },
+                options: { flags: MessageFlags.Ephemeral },
               });
               await updateEmbed();
               return pageManager();
@@ -579,7 +580,7 @@ async function run(
                     "you cannot make a sell order for less than your highest buy order for this item",
                   ),
                 ],
-                options: { ephemeral: true },
+                options: { flags: MessageFlags.Ephemeral },
               });
               await updateEmbed();
               return pageManager();
@@ -614,7 +615,7 @@ async function run(
 
             await res.editReply({
               embeds: [new CustomEmbed(message.member, description)],
-              options: { ephemeral: true },
+              options: { flags: MessageFlags.Ephemeral },
             });
           }
         }
@@ -1368,7 +1369,7 @@ async function run(
         ) {
           await interaction.reply({
             embeds: [new ErrorEmbed("insufficient funds")],
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
           await updateEmbed();
           return pageManager();
@@ -1378,7 +1379,7 @@ async function run(
         if (price == -1) {
           await interaction.reply({
             embeds: [new ErrorEmbed("not enough items")],
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
           await updateEmbed();
           return pageManager();
@@ -1396,7 +1397,7 @@ async function run(
           if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
             await res.reply({
               embeds: [new ErrorEmbed("invalid amount")],
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             });
             await updateEmbed();
             return pageManager();
@@ -1409,7 +1410,7 @@ async function run(
           if (!formattedAmount) {
             await res.reply({
               embeds: [new ErrorEmbed("invalid amount")],
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             });
             await updateEmbed();
             return pageManager();
@@ -1421,7 +1422,7 @@ async function run(
           if (price == -1) {
             await res.reply({
               embeds: [new ErrorEmbed("not enough items")],
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             });
             await updateEmbed();
             return pageManager();
@@ -1434,7 +1435,7 @@ async function run(
           ) {
             await interaction.reply({
               embeds: [new ErrorEmbed("insufficient funds")],
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             });
             await updateEmbed();
             return pageManager();
@@ -1458,7 +1459,7 @@ async function run(
             embeds: [
               new ErrorEmbed(`you do not have this many ${item.plural ? item.plural : item.name}`),
             ],
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
           await updateEmbed();
           return pageManager();
@@ -1468,7 +1469,7 @@ async function run(
         if (price == -1) {
           await interaction.reply({
             embeds: [new ErrorEmbed("not enough items")],
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
           await updateEmbed();
           return pageManager();
@@ -1486,7 +1487,7 @@ async function run(
           if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
             await res.reply({
               embeds: [new ErrorEmbed("invalid amount")],
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             });
             await updateEmbed();
             return pageManager();
@@ -1499,7 +1500,7 @@ async function run(
           if (!formattedAmount) {
             await res.reply({
               embeds: [new ErrorEmbed("invalid amount")],
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             });
             await updateEmbed();
             return pageManager();
@@ -1511,7 +1512,7 @@ async function run(
           if (price == -1) {
             await res.reply({
               embeds: [new ErrorEmbed("not enough items")],
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             });
             await updateEmbed();
             return pageManager();
@@ -1529,7 +1530,7 @@ async function run(
                   `you do not have this many ${item.plural ? item.plural : item.name}`,
                 ),
               ],
-              options: { ephemeral: true },
+              options: { flags: MessageFlags.Ephemeral },
             });
             await updateEmbed();
             return pageManager();
@@ -1628,7 +1629,7 @@ async function run(
 
           await interaction.reply({
             embeds: [new ErrorEmbed("unknown error occurred")],
-            options: { ephemeral: true },
+            options: { flags: MessageFlags.Ephemeral },
           });
 
           return itemView(item, msg);
@@ -1641,7 +1642,7 @@ async function run(
           }
           await interaction.reply({
             embeds: [new ErrorEmbed(res.toString())],
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
           return itemView(item, msg);
         }
@@ -1661,14 +1662,14 @@ async function run(
               `✅ ${type == "buy" ? "bought" : "sold"} ${amount} ${item.emoji} ${amount == 1 || !item.plural ? item.name : item.plural} for $${price.toLocaleString()}`,
             ),
           ],
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
         return itemView(item, msg);
       } else if (res == "cancel") {
         if (fromCommand) await edit({ embeds: [embed], components: [] }, msg);
         await interaction.reply({
           embeds: [new CustomEmbed(message.member, "✅ cancelled")],
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
         if (fromCommand) return;
         return itemView(item, msg);

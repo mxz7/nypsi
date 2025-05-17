@@ -124,7 +124,7 @@ export default {
     if (res && res.status !== "success" && res.status !== "partial") {
       return await interaction.reply({
         embeds: [new ErrorEmbed(res.status)],
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     } else return interaction.deferUpdate();
   },
