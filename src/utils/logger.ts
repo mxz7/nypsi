@@ -398,7 +398,11 @@ export function setClusterId(id: string) {
   logger.meta = { cluster: id };
 }
 
-export function transaction(from: User, to: User, value: string) {
+export function transaction(
+  from: { username: string; id: string },
+  to: { username: string; id: string },
+  value: string,
+) {
   if (!nextLogMsg.get("pay")) {
     nextLogMsg.set(
       "pay",
@@ -409,6 +413,27 @@ export function transaction(from: User, to: User, value: string) {
       "pay",
       nextLogMsg.get("pay") +
         `**${from.username}** (${from.id}) -> **${to.username}** (${to.id})\n- **${value}**\n`,
+    );
+  }
+}
+
+export function transactionMulti(from: User, to: User, values: string[]) {
+  let formatted = "";
+
+  for (const value of values) {
+    formatted += `- **${value}**\n`;
+  }
+
+  if (!nextLogMsg.get("pay")) {
+    nextLogMsg.set(
+      "pay",
+      `**${from.username}** (${from.id}) -> **${to.username}** (${to.id})\n${formatted}`,
+    );
+  } else {
+    nextLogMsg.set(
+      "pay",
+      nextLogMsg.get("pay") +
+        `**${from.username}** (${from.id}) -> **${to.username}** (${to.id})\n${formatted}`,
     );
   }
 }

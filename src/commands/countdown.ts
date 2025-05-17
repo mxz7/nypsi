@@ -58,7 +58,8 @@ async function run(
       let error = `you have reached the maximum amount of countdowns for this server (${max})`;
 
       if (max == 1) {
-        error += "\n\nget a premium membership to upgrade this limit (https://ko-fi.com/tekoh/tiers)";
+        error +=
+          "\n\nget a premium membership to upgrade this limit (https://ko-fi.com/tekoh/tiers)";
       } else if (max != 5) {
         error +=
           "\n\nyou can upgrade your subscription to get access to more countdowns per server";

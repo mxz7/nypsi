@@ -329,12 +329,12 @@ async function run(
         if (existingRole) {
           await guildMember.roles.add(existingRole);
         } else {
-          const seperatorRole = guildMember.guild.roles.cache.get("1329425677614845972");
+          const separatorRole = guildMember.guild.roles.cache.get("1329425677614845972");
 
           const role = await guildMember.guild.roles.create({
             name: "custom",
             color: colour,
-            position: seperatorRole.position + 1,
+            position: separatorRole.position + 1,
             permissions: [],
           });
 

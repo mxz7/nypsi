@@ -23,7 +23,7 @@ import roleDelete from "../events/roleDelete";
 import userUpdate from "../events/userUpdate";
 import redis from "../init/redis";
 import { runBirthdays } from "../scheduled/clusterjobs/birthdays";
-import { runAuctionChecks } from "../scheduled/clusterjobs/checkauctions";
+import { runMarketChecks } from "../scheduled/clusterjobs/checkmarket";
 import { runLogs, runModerationChecks } from "../scheduled/clusterjobs/moderationchecks";
 import startRandomDrops from "../scheduled/clusterjobs/random-drops";
 import Constants from "../utils/Constants";
@@ -232,7 +232,7 @@ export class NypsiClient extends Client {
     if (this.cluster.id != 0) return;
 
     runModerationChecks(this);
-    runAuctionChecks(this);
+    runMarketChecks(this);
     runCountdowns(this);
     runChristmas(this);
     openKarmaShop(this);

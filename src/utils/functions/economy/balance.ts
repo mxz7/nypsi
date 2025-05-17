@@ -8,7 +8,7 @@ import { logger } from "../../logger";
 import { isBooster } from "../premium/boosters";
 import { getTier } from "../premium/premium";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
-import { getAuctionAverage } from "./auctions";
+import { getMarketAverage } from "./market";
 import { getBoosters } from "./boosters";
 import { calcCarCost } from "./cars";
 import { getClaimable, getFarm, getFarmUpgrades } from "./farm";
@@ -795,13 +795,15 @@ export async function calcNetWorth(
       bank: true,
       Inventory: true,
       netWorth: true,
-      Auction: {
+      Market: {
         select: {
-          itemId: true,
+          price: true,
           itemAmount: true,
+          itemId: true,
+          orderType: true,
         },
         where: {
-          sold: false,
+          completed: false,
         },
       },
       OffersGiven: {
@@ -873,8 +875,11 @@ export async function calcNetWorth(
       : 0,
   );
 
-  for (const auction of query.Auction)
-    worth += ((await calcItemValue(auction.itemId)) || 0) * Number(auction.itemAmount);
+  for (const sellOrder of query.Market.filter((i) => i.orderType == "sell"))
+    worth += ((await calcItemValue(sellOrder.itemId)) || 0) * Number(sellOrder.itemAmount);
+
+  for (const buyOrder of query.Market.filter((i) => i.orderType == "buy"))
+    worth += Number(buyOrder.price * buyOrder.itemAmount);
 
   if (breakdown) breakdownItems.set("balance", worth);
 
@@ -894,13 +899,13 @@ export async function calcNetWorth(
 
     let value = 0;
 
-    const auctionAvg = await getAuctionAverage(item.id);
+    const marketAvg = await getMarketAverage(item.id);
     const offersAvg = await getOffersAverage(item.id);
 
-    if (auctionAvg && offersAvg) {
+    if (marketAvg && offersAvg) {
       value += Math.floor(((await calcItemValue(item.id)) || 0) * upgrade.amount);
-    } else if (auctionAvg) {
-      value += upgrade.amount * auctionAvg;
+    } else if (marketAvg) {
+      value += upgrade.amount * marketAvg;
     } else if (offersAvg) {
       value += upgrade.amount * offersAvg;
     } else {
@@ -928,12 +933,12 @@ export async function calcNetWorth(
       if (breakdown)
         breakdownItems.set(item.item, getItems()[item.item].sell * Number(item.amount));
     } else {
-      const [auctionAvg, offerAvg] = await Promise.all([
-        getAuctionAverage(item.item),
+      const [marketAvg, offerAvg] = await Promise.all([
+        getMarketAverage(item.item),
         getOffersAverage(item.item),
       ]);
 
-      if (auctionAvg && offerAvg) {
+      if (marketAvg && offerAvg) {
         const value = (await calcItemValue(item.item)) || 0;
 
         worth += Math.floor(value * Number(item.amount));
@@ -941,9 +946,9 @@ export async function calcNetWorth(
       } else if (offerAvg) {
         worth += offerAvg * Number(item.amount);
         if (breakdown) breakdownItems.set(item.item, offerAvg * Number(item.amount));
-      } else if (auctionAvg) {
-        worth += auctionAvg * Number(item.amount);
-        if (breakdown) breakdownItems.set(item.item, auctionAvg * Number(item.amount));
+      } else if (marketAvg) {
+        worth += marketAvg * Number(item.amount);
+        if (breakdown) breakdownItems.set(item.item, marketAvg * Number(item.amount));
       } else if (getItems()[item.item].sell) {
         worth += getItems()[item.item].sell * Number(item.amount);
         if (breakdown)
@@ -986,17 +991,17 @@ export async function calcNetWorth(
         );
         if (!itemId) continue;
 
-        const [auctionAvg, offersAvg] = await Promise.all([
-          getAuctionAverage(itemId),
+        const [marketAvg, offersAvg] = await Promise.all([
+          getMarketAverage(itemId),
           getOffersAverage(itemId),
         ]);
 
-        if (auctionAvg && offersAvg) {
+        if (marketAvg && offersAvg) {
           worth += Math.floor(((await calcItemValue(itemId)) || 0) * upgrade.amount);
           workersBreakdown += Math.floor(((await calcItemValue(itemId)) || 0) * upgrade.amount);
-        } else if (auctionAvg) {
-          worth += upgrade.amount * auctionAvg;
-          workersBreakdown += upgrade.amount * auctionAvg;
+        } else if (marketAvg) {
+          worth += upgrade.amount * marketAvg;
+          workersBreakdown += upgrade.amount * marketAvg;
         } else if (offersAvg) {
           worth += upgrade.amount * offersAvg;
           workersBreakdown += upgrade.amount * offersAvg;

@@ -7,14 +7,14 @@ const redis = new Redis({
   showFriendlyErrorStack: true,
 });
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 const admins = ["672793821850894347", "499720078770831360", "223953495982735363"];
 
 async function main() {
   const items: { [key: string]: Item } = JSON.parse(fs.readFileSync("./data/items.json") as any);
-  
-  const tradeableItems = Object.values(items).filter(item => !item.account_locked);
+
+  const tradeableItems = Object.values(items).filter((item) => !item.account_locked);
 
   // create user account for admins with all items of quantity 50
   for (const adminId of admins) {
@@ -25,7 +25,7 @@ async function main() {
       },
       create: {
         id: adminId,
-        lastKnownUsername: "",  
+        lastKnownUsername: "",
         lastCommand: new Date(0),
         adminLevel: 69,
         karma: Math.floor(Math.random() * 5000),
@@ -48,7 +48,6 @@ async function main() {
       },
     });
 
-
     for (const item of tradeableItems) {
       await prisma.inventory.upsert({
         where: {
@@ -68,10 +67,10 @@ async function main() {
       });
     }
   }
-  await redis.flushdb('ASYNC');
+  await redis.flushdb("ASYNC");
   process.exit(0);
 }
 
 main().catch((err) => {
   console.error(err);
-})
+});

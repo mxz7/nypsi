@@ -180,7 +180,7 @@ async function run(
 
   const embed = new CustomEmbed(message.member);
 
-  if (caseId) embed.setHeader(`ummute [${caseId}]`, message.guild.iconURL());
+  if (caseId) embed.setHeader(`unmute [${caseId}]`, message.guild.iconURL());
 
   const ids = await getAllGroupAccountIds(message.guild, target.user.id);
 
@@ -206,7 +206,7 @@ async function run(
     }
   }
 
-  let altsUnmted = 0;
+  let altsUnmuted = 0;
 
   if (punishAlts) {
     for (const id of ids) {
@@ -219,13 +219,13 @@ async function run(
         muteRole,
         true,
       );
-      if (unmuted) altsUnmted++;
+      if (unmuted) altsUnmuted++;
     }
   }
 
-  if (altsUnmted > 0)
-    msg = `\`${target.user.username}\` + ${altsUnmted} ${
-      altsUnmted != 1 ? "alts have" : "alt has"
+  if (altsUnmuted > 0)
+    msg = `\`${target.user.username}\` + ${altsUnmuted} ${
+      altsUnmuted != 1 ? "alts have" : "alt has"
     } been unmuted`;
   else msg = `\`${target.user.username}\` has been unmuted`;
 

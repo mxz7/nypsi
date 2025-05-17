@@ -30,7 +30,6 @@ import { percentChance } from "../utils/functions/random";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
-import ms = require("ms");
 
 const cmd = new Command("daily", "get your daily bonus", "money");
 

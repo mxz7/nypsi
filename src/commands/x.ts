@@ -58,7 +58,6 @@ import { addNotificationToQueue } from "../utils/functions/users/notifications";
 import { addTag, getTags, removeTag } from "../utils/functions/users/tags";
 import { hasProfile } from "../utils/functions/users/utils";
 import { logger } from "../utils/logger";
-import ms = require("ms");
 
 const cmd = new Command("x", "admincmd", "none").setPermissions(["bot owner"]);
 
@@ -115,13 +114,13 @@ async function run(
                   members: true,
                 },
               },
-              Auction: true,
+              Market: true,
               BakeryUpgrade: true,
               EconomyGuildMember: true,
               OffersGiven: true,
               Upgrades: true,
               OffersReceived: true,
-              auctionWatch: true,
+              MarketWatch: true,
               CustomCar: {
                 include: {
                   upgrades: true,
@@ -1043,9 +1042,9 @@ async function run(
             },
           });
 
-          await prisma.auction.deleteMany({
+          await prisma.market.deleteMany({
             where: {
-              AND: [{ ownerId: user.id }, { sold: false }],
+              AND: [{ ownerId: user.id }, { completed: false }],
             },
           });
 
