@@ -1,6 +1,7 @@
 import {
   ActionRowBuilder,
   ButtonInteraction,
+  MessageFlags,
   ModalBuilder,
   ModalSubmitInteraction,
   TextInputBuilder,
@@ -31,7 +32,7 @@ export default {
       if (auction.ownerId == interaction.user.id) {
         return await interaction.reply({
           embeds: [new ErrorEmbed("you cannot buy your own auction")],
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
       }
 
@@ -45,13 +46,13 @@ export default {
 
       if (!amount || amount < 1) {
         userBuying.delete(interaction.user.id);
-        return res.reply({ embeds: [new ErrorEmbed("invalid amount")], ephemeral: true });
+        return res.reply({ embeds: [new ErrorEmbed("invalid amount")], flags: MessageFlags.Ephemeral });
       }
 
       userBuying.delete(interaction.user.id);
 
       if (auction.itemAmount == BigInt(amount)) {
-        res.deferReply({ ephemeral: true });
+        res.deferReply({ flags: MessageFlags.Ephemeral });
         res.deleteReply();
         return buyFullAuction(interaction as ButtonInteraction, auction);
       }
@@ -62,11 +63,11 @@ export default {
       userBuying.delete(interaction.user.id);
       return await interaction.reply({
         embeds: [new ErrorEmbed("too slow ):").removeTitle()],
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     } else {
       userBuying.delete(interaction.user.id);
-      await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], ephemeral: true });
+      await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], flags: MessageFlags.Ephemeral });
       await interaction.message.delete();
     }
   },

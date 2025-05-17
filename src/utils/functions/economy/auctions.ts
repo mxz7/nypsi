@@ -8,6 +8,7 @@ import {
   EmbedBuilder,
   GuildMember,
   MessageActionRowComponentBuilder,
+  MessageFlags,
   ModalBuilder,
   ModalSubmitInteraction,
   TextInputBuilder,
@@ -601,11 +602,11 @@ async function showAuctionConfirmation(interaction: ButtonInteraction, cost: num
   if (res.fields.fields.first().value.toLowerCase() != "yes") {
     res.reply({
       embeds: [new CustomEmbed().setDescription("✅ cancelled purchase")],
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
     return false;
   }
-  res.reply({ embeds: [new CustomEmbed(null, "✅ confirmation accepted")], ephemeral: true });
+  res.reply({ embeds: [new CustomEmbed(null, "✅ confirmation accepted")], flags: MessageFlags.Ephemeral });
 
   return true;
 }
@@ -650,7 +651,7 @@ export async function buyFullAuction(
     await redis.del(`${Constants.redis.nypsi.auction_buying}:${auction.id}`);
     return await interaction.reply({
       embeds: [new ErrorEmbed("you cannot afford this")],
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 
@@ -677,7 +678,7 @@ export async function buyFullAuction(
       await redis.del(`${Constants.redis.nypsi.auction_buying}:${auction.id}`);
       return await interaction.followUp({
         embeds: [new ErrorEmbed("you cannot afford this")],
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
     beingBought.add(auction.id);
@@ -691,7 +692,7 @@ export async function buyFullAuction(
   });
 
   if (!auction) {
-    await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], ephemeral: true });
+    await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], flags: MessageFlags.Ephemeral });
     await interaction.message.delete();
     beingBought.delete(auction.id);
     await redis.del(`${Constants.redis.nypsi.auction_buying}:${auction.id}`);
@@ -703,7 +704,7 @@ export async function buyFullAuction(
     await redis.del(`${Constants.redis.nypsi.auction_buying}:${auction.id}`);
     return await interaction.reply({
       embeds: [new ErrorEmbed("too slow ):").removeTitle()],
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 
@@ -716,7 +717,7 @@ export async function buyFullAuction(
     await redis.del(`${Constants.redis.nypsi.auction_buying}:${auction.id}`);
     return await interaction.reply({
       embeds: [new ErrorEmbed("you cannot afford this")],
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 
@@ -875,7 +876,7 @@ export async function buyAuctionOne(
   ) {
     return await interaction.reply({
       embeds: [new ErrorEmbed("you cannot afford this")],
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 
@@ -893,7 +894,7 @@ export async function buyAuctionOne(
   });
 
   if (!auction) {
-    await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], ephemeral: true });
+    await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], flags: MessageFlags.Ephemeral });
     await interaction.message.delete();
     beingBought.delete(auction.id);
     await redis.del(`${Constants.redis.nypsi.auction_buying}:${auction.id}`);
@@ -905,7 +906,7 @@ export async function buyAuctionOne(
     await redis.del(`${Constants.redis.nypsi.auction_buying}:${auction.id}`);
     return await interaction.reply({
       embeds: [new ErrorEmbed("too slow ):").removeTitle()],
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 
@@ -916,7 +917,7 @@ export async function buyAuctionOne(
     await redis.del(`${Constants.redis.nypsi.auction_buying}:${auction.id}`);
     return await interaction.reply({
       embeds: [new ErrorEmbed("you cannot afford this")],
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 
@@ -1144,7 +1145,7 @@ export async function buyAuctionMulti(
     beingBought.delete(auction.id);
     return await interaction.reply({
       embeds: [new ErrorEmbed("you cannot afford this")],
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 
@@ -1159,7 +1160,7 @@ export async function buyAuctionMulti(
   });
 
   if (!auction) {
-    await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], ephemeral: true });
+    await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], flags: MessageFlags.Ephemeral });
     await interaction.message.delete();
     beingBought.delete(auction.id);
     await redis.del(`${Constants.redis.nypsi.auction_buying}:${auction.id}`);
@@ -1171,7 +1172,7 @@ export async function buyAuctionMulti(
     await redis.del(`${Constants.redis.nypsi.auction_buying}:${auction.id}`);
     return await interaction.reply({
       embeds: [new ErrorEmbed("too slow ):").removeTitle()],
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 
@@ -1180,7 +1181,7 @@ export async function buyAuctionMulti(
     await redis.del(`${Constants.redis.nypsi.auction_buying}:${auction.id}`);
     return await interaction.reply({
       embeds: [new ErrorEmbed("not enough items")],
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 
@@ -1191,7 +1192,7 @@ export async function buyAuctionMulti(
     await redis.del(`${Constants.redis.nypsi.auction_buying}:${auction.id}`);
     return await interaction.reply({
       embeds: [new ErrorEmbed("you cannot afford this")],
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 

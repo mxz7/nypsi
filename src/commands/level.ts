@@ -3,6 +3,7 @@ import {
   InteractionEditReplyOptions,
   InteractionReplyOptions,
   Message,
+  MessageFlags,
 } from "discord.js";
 import { Command } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
@@ -54,7 +55,7 @@ cmd.setRun(async (message) => {
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) send({ embeds: [res.embed], ephemeral: true });
+    if (res.respond) send({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
     return;
   }
 

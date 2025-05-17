@@ -15,6 +15,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
   MessageEditOptions,
+  MessageFlags,
   WebhookClient,
 } from "discord.js";
 import redis from "../init/redis";
@@ -164,7 +165,7 @@ async function run(
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) send({ embeds: [res.embed], ephemeral: true });
+    if (res.respond) send({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
     return;
   }
 
@@ -750,8 +751,8 @@ async function playGame(
     for (const item of row) {
       if (["c", "gc"].includes(item)) {
         if (response.deferred || response.replied)
-          await response.followUp({ embeds: [new ErrorEmbed("invalid square")], ephemeral: true });
-        else await response.reply({ embeds: [new ErrorEmbed("invalid square")], ephemeral: true });
+          await response.followUp({ embeds: [new ErrorEmbed("invalid square")], flags: MessageFlags.Ephemeral });
+        else await response.reply({ embeds: [new ErrorEmbed("invalid square")], flags: MessageFlags.Ephemeral });
         return playGame(message, msg, args);
       }
     }
@@ -782,7 +783,7 @@ async function playGame(
                     `${GEM_EMOJI} you found a **gem**!!\nit has been added to your inventory, i wonder what powers it has`,
                   ),
                 ],
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
               });
             else
               response.reply({
@@ -792,7 +793,7 @@ async function playGame(
                     `${GEM_EMOJI} you found a **gem**!!\nit has been added to your inventory, i wonder what powers it has`,
                   ),
                 ],
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
               });
           }
         }

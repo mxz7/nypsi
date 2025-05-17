@@ -13,6 +13,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
   MessageEditOptions,
+  MessageFlags,
   StringSelectMenuBuilder,
   StringSelectMenuOptionBuilder,
 } from "discord.js";
@@ -168,7 +169,7 @@ async function run(
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) send({ embeds: [res.embed], ephemeral: true });
+    if (res.respond) send({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
     return;
   }
 
@@ -453,7 +454,7 @@ async function run(
         msg.edit({ components: [] });
         return reaction.reply({
           embeds: [new CustomEmbed(message.member, "✅ cancelled")],
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
       }
     }
@@ -664,12 +665,12 @@ async function run(
 
           await interaction.followUp({
             embeds: [new CustomEmbed(message.member, "✅ your auction has been deleted")],
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         } else {
           await interaction.followUp({
             embeds: [new CustomEmbed(message.member, "failed to delete that auction")],
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
 
@@ -680,7 +681,7 @@ async function run(
         if (!bumpRes) {
           await interaction.followUp({
             embeds: [new ErrorEmbed("this auction has already been bumped recently")],
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
           displayAuction(currentPage);
           await updateButtons(currentPage);
@@ -689,7 +690,7 @@ async function run(
         } else {
           await interaction.followUp({
             embeds: [new CustomEmbed(message.member, `[your auction has been bumped](${bumpRes})`)],
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
           displayAuction(currentPage);
           await updateButtons(currentPage);
@@ -1071,7 +1072,7 @@ async function run(
         msg.edit({ components: [] });
         return reaction.reply({
           embeds: [new CustomEmbed(message.member, "✅ cancelled")],
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
       }
 

@@ -6,6 +6,7 @@ import {
   ComponentType,
   Message,
   MessageActionRowComponentBuilder,
+  MessageFlags,
 } from "discord.js";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 
@@ -106,7 +107,7 @@ export default class PageManager<T> {
       //         "this may or may not be fixed in the future",
       //     ).setColor(Constants.EMBED_FAIL_COLOR),
       //   ],
-      //   ephemeral: true,
+      //   flags: MessageFlags.Ephemeral,
       // });
 
       // return false;
@@ -114,7 +115,7 @@ export default class PageManager<T> {
       await (i as ButtonInteraction).reply({
         embeds: [this.embed],
         components: [this.row],
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
 
       const manager = new PageManager({

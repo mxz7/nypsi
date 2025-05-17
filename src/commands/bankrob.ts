@@ -9,6 +9,7 @@ import {
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
+  MessageFlags,
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
@@ -69,7 +70,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
   };
 
   if ((await getBalance(message.member)) < 5_000) {
-    return send({ embeds: [new ErrorEmbed("you must have at least $5k")], ephemeral: true });
+    return send({ embeds: [new ErrorEmbed("you must have at least $5k")], flags: MessageFlags.Ephemeral });
   }
 
   const getMaxValues = async (bankBalance: number) => {

@@ -1,4 +1,4 @@
-import { Interaction } from "discord.js";
+import { Interaction, MessageFlags } from "discord.js";
 import { readdir } from "fs/promises";
 import redis from "../../init/redis";
 import { CustomEmbed, ErrorEmbed } from "../../models/EmbedBuilders";
@@ -77,7 +77,7 @@ export async function runInteraction(interaction: Interaction) {
     if (!reactionRole) return;
 
     setTimeout(() => {
-      interaction.deferReply({ ephemeral: true }).catch(() => {});
+      interaction.deferReply({ flags: MessageFlags.Ephemeral }).catch(() => {});
     }, 1000);
 
     const member = await interaction.guild.members.fetch(interaction.user.id);
@@ -100,7 +100,7 @@ export async function runInteraction(interaction: Interaction) {
               embeds: [
                 new ErrorEmbed(`you require ${role || reactionRole.whitelist[0]} to use this`),
               ],
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             })
             .catch(() =>
               interaction.editReply({
@@ -124,7 +124,7 @@ export async function runInteraction(interaction: Interaction) {
           return interaction
             .reply({
               embeds: [new ErrorEmbed(`to use this, you need one of:\n\n${roles.join("\n")}`)],
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             })
             .catch(() =>
               interaction.editReply({
@@ -140,7 +140,7 @@ export async function runInteraction(interaction: Interaction) {
       return interaction
         .reply({
           embeds: [new ErrorEmbed(`couldn't find role with id \`${customId}\``)],
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         })
         .catch(() =>
           interaction.editReply({
@@ -161,7 +161,7 @@ export async function runInteraction(interaction: Interaction) {
             embeds: [
               new ErrorEmbed(`failed to remove ${role.toString()}, i may not have permissions`),
             ],
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           })
           .catch(() =>
             interaction.editReply({
@@ -188,7 +188,7 @@ export async function runInteraction(interaction: Interaction) {
 
       if (!role) {
         return interaction
-          .reply({ embeds: [new ErrorEmbed("role is not valid")], ephemeral: true })
+          .reply({ embeds: [new ErrorEmbed("role is not valid")], flags: MessageFlags.Ephemeral })
           .catch(() => interaction.editReply({ embeds: [new ErrorEmbed("role is not valid")] }));
       }
 
@@ -200,7 +200,7 @@ export async function runInteraction(interaction: Interaction) {
             embeds: [
               new ErrorEmbed(`failed to add ${role.toString()}, i may not have permissions`),
             ],
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           })
           .catch(() =>
             interaction.editReply({
@@ -220,7 +220,7 @@ export async function runInteraction(interaction: Interaction) {
 
     if (responseDesc.length > 0) {
       return interaction
-        .reply({ embeds: [new CustomEmbed(member, responseDesc.join("\n"))], ephemeral: true })
+        .reply({ embeds: [new CustomEmbed(member, responseDesc.join("\n"))], flags: MessageFlags.Ephemeral })
         .catch(() =>
           interaction.editReply({ embeds: [new CustomEmbed(member, responseDesc.join("\n"))] }),
         );

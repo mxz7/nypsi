@@ -10,6 +10,7 @@ import {
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
+  MessageFlags,
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
@@ -286,7 +287,7 @@ async function run(
         if (!res) {
           await i.reply({
             embeds: [new CustomEmbed(message.member, "you have no more heals left")],
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
       } else {
@@ -296,7 +297,7 @@ async function run(
         if (!res) {
           await i.reply({
             embeds: [new CustomEmbed(target, "you have no more heals left")],
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
       }

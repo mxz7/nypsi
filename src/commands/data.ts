@@ -11,6 +11,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
   MessageEditOptions,
+  MessageFlags,
 } from "discord.js";
 import { promisify } from "util";
 import { gzip } from "zlib";
@@ -100,7 +101,7 @@ async function run(
     if (await onCooldown(cmd.name + "_view", message.member)) {
       const embed = new ErrorEmbed("you have already received your data recently.");
 
-      return send({ embeds: [embed], ephemeral: true });
+      return send({ embeds: [embed], flags: MessageFlags.Ephemeral });
     }
 
     const embed = new CustomEmbed(message.member).setHeader(

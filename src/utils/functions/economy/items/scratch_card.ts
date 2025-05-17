@@ -8,6 +8,7 @@ import {
   InteractionEditReplyOptions,
   InteractionReplyOptions,
   Message,
+  MessageFlags,
   WebhookClient,
 } from "discord.js";
 import redis from "../../../../init/redis";
@@ -55,7 +56,7 @@ async function prepare(
   };
 
   if (await redis.sismember(Constants.redis.nypsi.USERS_PLAYING, message.author.id)) {
-    return send({ embeds: [new ErrorEmbed("you have an active game")], ephemeral: true });
+    return send({ embeds: [new ErrorEmbed("you have an active game")], flags: MessageFlags.Ephemeral });
   }
 
   let inventory = await getInventory(message.member);

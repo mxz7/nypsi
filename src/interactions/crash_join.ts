@@ -1,3 +1,4 @@
+import { MessageFlags } from "discord.js";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
@@ -19,7 +20,7 @@ export default {
         `${Constants.redis.nypsi.RESTART}:${(interaction.client as NypsiClient).cluster.id}`,
       )) == "t"
     ) {
-      return interaction.reply({ embeds: [new ErrorEmbed("nypsi is rebooting")], ephemeral: true });
+      return interaction.reply({ embeds: [new ErrorEmbed("nypsi is rebooting")], flags: MessageFlags.Ephemeral });
     }
 
     if (await redis.get("nypsi:maintenance")) {
@@ -30,7 +31,7 @@ export default {
             "fun & moderation commands are still available to you. maintenance mode only prevents certain commands to prevent loss of progress",
           ).setTitle("⚠️ nypsi is under maintenance"),
         ],
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 

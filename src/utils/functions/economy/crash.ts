@@ -5,6 +5,7 @@ import {
   ButtonStyle,
   Message,
   MessageActionRowComponentBuilder,
+  MessageFlags,
   ModalActionRowComponentBuilder,
   ModalBuilder,
   TextBasedChannel,
@@ -188,7 +189,7 @@ export async function crashOut(interaction: ButtonInteraction) {
 const addCrashPlayerMutex = new Set<string>();
 export async function addCrashPlayer(interaction: ButtonInteraction) {
   if (!ready)
-    return interaction.reply({ embeds: [new ErrorEmbed("crash not ready yet")], ephemeral: true });
+    return interaction.reply({ embeds: [new ErrorEmbed("crash not ready yet")], flags: MessageFlags.Ephemeral });
 
   if (addCrashPlayerMutex.has(interaction.user.id)) {
     logger.debug(`crash mutex already has ${interaction.user.id}`);
@@ -216,7 +217,7 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
     addCrashPlayerMutex.delete(interaction.user.id);
     return interaction.reply({
       embeds: [new ErrorEmbed("you have already joined")],
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 
@@ -271,7 +272,7 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
     addCrashPlayerMutex.delete(interaction.user.id);
     return modalInteraction.reply({
       embeds: [new ErrorEmbed("this game has already started")],
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 
@@ -279,7 +280,7 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
     addCrashPlayerMutex.delete(interaction.user.id);
     return modalInteraction.reply({
       embeds: [new ErrorEmbed("this game is full")],
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 
@@ -287,7 +288,7 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
     addCrashPlayerMutex.delete(interaction.user.id);
     return interaction.reply({
       embeds: [new ErrorEmbed("you have already joined")],
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 
@@ -299,14 +300,14 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
 
   if (!bet || bet <= 0) {
     addCrashPlayerMutex.delete(interaction.user.id);
-    return modalInteraction.reply({ embeds: [new ErrorEmbed("invalid bet")], ephemeral: true });
+    return modalInteraction.reply({ embeds: [new ErrorEmbed("invalid bet")], flags: MessageFlags.Ephemeral });
   }
 
   if (bet > (await getBalance(interaction.user.id))) {
     addCrashPlayerMutex.delete(interaction.user.id);
     return modalInteraction.reply({
       embeds: [new ErrorEmbed("you cannot afford this bet")],
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 
@@ -318,7 +319,7 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
           `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`,
         ),
       ],
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 
@@ -327,7 +328,7 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
       if (parseFloat(autoStop) <= 1) {
         addCrashPlayerMutex.delete(interaction.user.id);
         return modalInteraction.reply({
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
           embeds: [new ErrorEmbed("your autostop must be higher than 1")],
         });
       }
@@ -335,7 +336,7 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
       if (parseFloat(autoStop) > 100) {
         addCrashPlayerMutex.delete(interaction.user.id);
         return modalInteraction.reply({
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
           embeds: [new ErrorEmbed("invalid autostop")],
         });
       }
@@ -344,7 +345,7 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
     if (isNaN(parseFloat(autoStop))) {
       addCrashPlayerMutex.delete(interaction.user.id);
       return modalInteraction.reply({
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
         embeds: [new ErrorEmbed("invalid autostop")],
       });
     }
@@ -361,7 +362,7 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
     await addBalance(interaction.user.id, bet);
     return interaction.reply({
       embeds: [new ErrorEmbed("you have already joined")],
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 
@@ -393,7 +394,7 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
           `**bet** $${bet.toLocaleString()}${autoStop ? `\n**auto stop** \`${parseFloat((Math.floor(parseFloat(autoStop) * 100) / 100).toFixed(2)).toFixed(2)}x\`` : ""}`,
       ),
     ],
-    ephemeral: true,
+    flags: MessageFlags.Ephemeral,
   });
 }
 
