@@ -4,6 +4,7 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
 import ms = require("ms");
+import { isPremium } from "./premium";
 
 export async function getUserAliases(member: GuildMember | string) {
   let id: string;
@@ -19,15 +20,11 @@ export async function getUserAliases(member: GuildMember | string) {
     ) as UserAlias[];
   }
 
-  const query = await prisma.userAlias.findMany({
+  const query = (await isPremium(id)) ? await prisma.userAlias.findMany({
     where: {
-      premium: {
-        level: {
-          gt: 0,
-        },
-      },
+      userId: id,
     },
-  });
+  }) : [];
 
   await redis.set(
     `${Constants.redis.cache.premium.ALIASES}:${id}`,

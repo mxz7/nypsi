@@ -4,6 +4,7 @@ import prisma from "../../init/database";
 import { NypsiClient } from "../../models/Client";
 import { MStoTime } from "../../utils/functions/date";
 import { getOrdinalSuffix } from "../../utils/functions/string";
+import { getTodaysBirthdays } from "../../utils/functions/users/birthday";
 import { logger } from "../../utils/logger";
 import ms = require("ms");
 
@@ -21,10 +22,7 @@ async function doBirthdays(client: NypsiClient) {
     },
   });
 
-  const birthdayMembers: { id: string; birthday: Date }[] =
-    await prisma.$queryRaw`SELECT id, birthday FROM "User"
-  WHERE date_part('day', birthday) = date_part('day', CURRENT_DATE)
-  AND date_part('month', birthday) = date_part('month', CURRENT_DATE)`;
+  const birthdayMembers = await getTodaysBirthdays(false);
 
   for (const guildData of guilds) {
     try {

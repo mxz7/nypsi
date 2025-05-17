@@ -10,6 +10,7 @@ import {
   Interaction,
   Message,
   MessageActionRowComponentBuilder,
+  MessageFlags,
   PermissionFlagsBits,
   Routes,
   WebhookClient,
@@ -965,7 +966,7 @@ export async function runCommand(
     } else {
       return message.reply({
         embeds: [new ErrorEmbed("please wait. you are currently levelling up")],
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
   }
@@ -1084,9 +1085,9 @@ export async function runCommand(
       if (message instanceof Message) {
         message.reply({ embeds });
       } else {
-        message.followUp({ embeds: embeds, ephemeral: true }).catch(() => {
+        message.followUp({ embeds: embeds, flags: MessageFlags.Ephemeral }).catch(() => {
           setTimeout(() => {
-            message.followUp({ embeds: embeds, ephemeral: true }).catch(() => {});
+            message.followUp({ embeds: embeds, flags: MessageFlags.Ephemeral }).catch(() => {});
           }, 2500);
         });
       }

@@ -126,6 +126,7 @@ export default {
       z: {
         profile: "cache:z:profile",
       },
+      BIRTHDAYS: "cache:nypsi:birthdays:today",
     },
     nypsi: {
       MENTION_QUEUE: "nypsi:mention:queue",

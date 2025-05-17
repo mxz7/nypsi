@@ -10,6 +10,7 @@ import {
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
+  MessageFlags,
 } from "discord.js";
 import { sort } from "fast-sort";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
@@ -118,7 +119,7 @@ async function run(
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) send({ embeds: [res.embed], ephemeral: true });
+    if (res.respond) send({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
     return;
   }
 
@@ -320,7 +321,7 @@ async function run(
         if (await onCooldown("prestige", message.member)) {
           const res = await getResponse("prestige", message.member);
 
-          if (res.respond) await reaction.reply({ embeds: [embed], ephemeral: true });
+          if (res.respond) await reaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
           return awaitButton();
         }
 
@@ -459,7 +460,7 @@ async function run(
       if (await onCooldown("p-upg", message.member)) {
         const res = await getResponse("p-upg", message.member);
 
-        if (res.respond) await reaction.reply({ embeds: [res.embed], ephemeral: true });
+        if (res.respond) await reaction.reply({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
         return awaitButton();
       }
 
@@ -492,7 +493,7 @@ async function run(
       if (await onCooldown("p-mul", message.member)) {
         const res = await getResponse("p-mul", message.member);
 
-        if (res.respond) await reaction.reply({ embeds: [res.embed], ephemeral: true });
+        if (res.respond) await reaction.reply({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
         return awaitButton();
       }
 
@@ -528,7 +529,7 @@ async function run(
       if (await onCooldown("p-tag", message.member)) {
         const res = await getResponse("p-tag", message.member);
 
-        if (res.respond) await reaction.reply({ embeds: [res.embed], ephemeral: true });
+        if (res.respond) await reaction.reply({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
         return awaitButton();
       }
 

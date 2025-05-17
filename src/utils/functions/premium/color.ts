@@ -28,9 +28,9 @@ export async function getEmbedColor(member: string): Promise<`#${string}` | "def
 
   if (cache) return cache as `#${string}` | "default";
 
-  const query = await prisma.premium.findUnique({
+  const query = await prisma.premium.findFirst({
     where: {
-      userId: member,
+      AND: [{ userId: member }, { level: { gt: 0 } }],
     },
     select: {
       embedColor: true,

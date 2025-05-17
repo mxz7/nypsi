@@ -14,6 +14,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
   MessageEditOptions,
+  MessageFlags,
   PermissionFlagsBits,
   TextChannel,
 } from "discord.js";
@@ -249,7 +250,7 @@ async function run(
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) send({ embeds: [res.embed], ephemeral: true });
+    if (res.respond) send({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
     return;
   }
 
@@ -431,7 +432,7 @@ async function run(
       if (await onCooldown(cmd.name, message.member)) {
         const res = await getResponse(cmd.name, message.member);
 
-        if (res.respond) send({ embeds: [res.embed], ephemeral: true });
+        if (res.respond) send({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
         return;
       }
 
@@ -468,7 +469,7 @@ async function run(
         if (voted.includes(interaction.user.id)) {
           await interaction.reply({
             embeds: [new ErrorEmbed("you have already voted start")],
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
           return;
         }
@@ -526,7 +527,7 @@ async function run(
     if (!(message instanceof Message)) {
       return send({
         embeds: [new CustomEmbed(message.member, "✅ chat reaction started")],
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
   } else if (args[0].toLowerCase() == "stats") {
@@ -659,7 +660,7 @@ async function run(
 
       if (wager > (await calcMaxBet(message.member)) * 10)
         return send({
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
           embeds: [
             new ErrorEmbed(
               `your max bet is $**${((await calcMaxBet(message.member)) * 10).toLocaleString()}**`,
@@ -799,7 +800,7 @@ async function run(
         if (!(await userExists(i.user.id)) || (await getBalance(i.user.id)) < wager) {
           if (i.isRepliable())
             await i.reply({
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
               embeds: [new ErrorEmbed("you cannot afford this wager")],
             });
           return false;
@@ -808,7 +809,7 @@ async function run(
         if ((await calcMaxBet(i.user.id)) * 10 < wager) {
           if (i.isRepliable())
             i.reply({
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
               embeds: [
                 new ErrorEmbed(
                   `your max bet is $**${((await calcMaxBet(i.user.id)) * 10).toLocaleString()}**`,

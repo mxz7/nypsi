@@ -66,8 +66,8 @@ export class CustomEmbed extends EmbedBuilder {
   }
 
   addField(title: string, text: string, inline = false) {
-    if (text.length > 1000) {
-      text = text.substring(0, 1000);
+    if (text.length > 1024) {
+      text = text.substring(0, 1024);
     }
 
     if (this.data?.fields) {

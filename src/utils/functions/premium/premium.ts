@@ -4,14 +4,14 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import Constants from "../../Constants";
+import { clearExpiredUserAliases } from "../../handlers/commandhandler";
 import { logger } from "../../logger";
 import { findGuildCluster } from "../clusters";
 import { formatDate } from "../date";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
+import { getLastKnownUsername } from "../users/tag";
 import dayjs = require("dayjs");
 import ms = require("ms");
-import { clearExpiredUserAliases } from "../../handlers/commandhandler";
-import { getLastKnownUsername } from "../users/tag";
 
 export async function isPremium(member: GuildMember | string): Promise<boolean> {
   let id: string;
@@ -107,13 +107,11 @@ export async function addMember(member: GuildMember | string, level: number, exp
       level: level,
       startDate: new Date(),
       expireDate: expires || dayjs().add(31, "day").toDate(),
-      lastWeekly: new Date(0),
     },
     update: {
       level: level,
       startDate: new Date(),
       expireDate: expires || dayjs().add(31, "day").toDate(),
-      lastWeekly: new Date(0),
     },
   });
 

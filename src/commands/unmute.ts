@@ -5,6 +5,7 @@ import {
   InteractionEditReplyOptions,
   InteractionReplyOptions,
   Message,
+  MessageFlags,
   PermissionFlagsBits,
   Role,
 } from "discord.js";
@@ -198,7 +199,7 @@ async function run(
         await message.delete();
         res = await message.member.send({ embeds: [embed] }).catch(() => {});
       } else {
-        res = await message.reply({ embeds: [embed], ephemeral: true });
+        res = await message.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
       }
     } else {
       res = await send({ embeds: [embed] });
@@ -242,7 +243,7 @@ async function run(
         await message.delete();
         await message.member.send({ embeds: [embed] }).catch(() => {});
       } else {
-        await message.reply({ embeds: [embed], ephemeral: true });
+        await message.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
       }
     } else {
       await send({ embeds: [embed] });

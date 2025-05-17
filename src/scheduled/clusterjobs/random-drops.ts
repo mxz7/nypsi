@@ -6,6 +6,7 @@ import {
   ButtonStyle,
   GuildTextBasedChannel,
   MessageActionRowComponentBuilder,
+  MessageFlags,
   User,
 } from "discord.js";
 import prisma from "../../init/database";
@@ -225,7 +226,7 @@ async function fastClickGame(
 
       res
         .update({ embeds: [embed], components: [row] })
-        .then(() => res.followUp({ embeds: [winEmbed], ephemeral: true }));
+        .then(() => res.followUp({ embeds: [winEmbed], flags: MessageFlags.Ephemeral }));
 
       return res.user.id;
     },
@@ -488,7 +489,7 @@ async function clickSpecificGame(
           filter: (i) => {
             if (losers.includes(i.user.id)) return;
             if (i.customId !== winningId) {
-              i.reply({ embeds: [failEmbed], ephemeral: true });
+              i.reply({ embeds: [failEmbed], flags: MessageFlags.Ephemeral });
               losers.push(i.user.id);
               return false;
             }
@@ -515,7 +516,7 @@ async function clickSpecificGame(
 
       res
         .update({ embeds: [embed], components: [row] })
-        .then(() => res.followUp({ embeds: [winEmbed], ephemeral: true }));
+        .then(() => res.followUp({ embeds: [winEmbed], flags: MessageFlags.Ephemeral }));
 
       return res.user.id;
     },

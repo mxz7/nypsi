@@ -7,6 +7,7 @@ import {
   GuildMember,
   Message,
   MessageActionRowComponentBuilder,
+  MessageFlags,
   WebhookClient,
 } from "discord.js";
 import prisma from "../../init/database";
@@ -236,7 +237,7 @@ export async function verifyUser(
     message instanceof Message
       ? await message.reply({ embeds: [embed], components: [row] })
       : await message
-          .reply({ embeds: [embed], components: [row], ephemeral: true })
+          .reply({ embeds: [embed], components: [row], flags: MessageFlags.Ephemeral })
           .then(() => message.fetchReply());
 
   const query = await prisma.captcha.update({

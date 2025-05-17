@@ -7,6 +7,7 @@ import {
   CommandInteraction,
   Message,
   MessageActionRowComponentBuilder,
+  MessageFlags,
 } from "discord.js";
 import { nanoid } from "nanoid";
 import s3 from "../init/s3";
@@ -167,18 +168,18 @@ async function run(
 
           interaction.followUp({
             embeds: [new CustomEmbed(message.member, "✅ successfully deleted this avatar")],
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         } else {
           await interaction
             .reply({
               embeds: [new CustomEmbed(message.member, "failed to delete this avatar")],
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             })
             .catch(() => {
               interaction.followUp({
                 embeds: [new CustomEmbed(message.member, "failed to delete this avatar")],
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
               });
             });
         }

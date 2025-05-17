@@ -10,6 +10,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
   MessageEditOptions,
+  MessageFlags,
 } from "discord.js";
 import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
@@ -118,7 +119,7 @@ async function run(
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) send({ embeds: [res.embed], ephemeral: true });
+    if (res.respond) send({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
     return;
   }
 
@@ -282,12 +283,12 @@ async function run(
         if (res) {
           await interaction.followUp({
             embeds: [new CustomEmbed(message.member, "✅ your offer has been deleted")],
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         } else {
           await interaction.followUp({
             embeds: [new CustomEmbed(message.member, "failed to delete that offer")],
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
 

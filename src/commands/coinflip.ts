@@ -11,6 +11,7 @@ import {
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
+  MessageFlags,
 } from "discord.js";
 import { randomInt } from "node:crypto";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
@@ -91,7 +92,7 @@ async function run(
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) send({ embeds: [res.embed], ephemeral: true });
+    if (res.respond) send({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
     return;
   }
 
@@ -519,7 +520,7 @@ async function run(
       if (playing.has(i.user.id)) {
         i.reply({
           embeds: [new ErrorEmbed("you already have an outstanding coinflip game")],
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
         return false;
       }
@@ -543,7 +544,7 @@ async function run(
           );
 
           const confirmMsg = await i
-            .reply({ embeds: [confirmEmbed], components: [row], ephemeral: true })
+            .reply({ embeds: [confirmEmbed], components: [row], flags: MessageFlags.Ephemeral })
             .then((m) => m.fetch());
 
           const confirmInteraction = await confirmMsg
@@ -562,7 +563,7 @@ async function run(
             if (confirmInteraction.isRepliable())
               confirmInteraction.reply({
                 embeds: [new ErrorEmbed("you cannot afford this bet")],
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
               });
             return false;
           }
@@ -768,7 +769,7 @@ async function run(
       if (playing.has(i.user.id)) {
         i.reply({
           embeds: [new ErrorEmbed("you already have an outstanding coinflip game")],
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
         return false;
       }
@@ -781,7 +782,7 @@ async function run(
       if (!(await userExists(i.user.id))) {
         if (i.isRepliable())
           await i.reply({
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
             embeds: [new ErrorEmbed("you cannot afford this bet")],
           });
         return false;
@@ -792,7 +793,7 @@ async function run(
           if (i.isRepliable())
             i.reply({
               embeds: [new ErrorEmbed("you cannot afford this bet")],
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             });
           return false;
         }
@@ -811,7 +812,7 @@ async function run(
           );
 
           const confirmMsg = await i
-            .reply({ embeds: [confirmEmbed], components: [row], ephemeral: true })
+            .reply({ embeds: [confirmEmbed], components: [row], flags: MessageFlags.Ephemeral })
             .then((m) => m.fetch());
 
           const confirmInteraction = await confirmMsg
@@ -830,7 +831,7 @@ async function run(
             if (confirmInteraction.isRepliable())
               confirmInteraction.reply({
                 embeds: [new ErrorEmbed("you cannot afford this bet")],
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
               });
             return false;
           }
@@ -853,7 +854,7 @@ async function run(
           if (i.isRepliable())
             i.reply({
               embeds: [new ErrorEmbed(`you don't have enough ${item.name}`)],
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             });
           return false;
         }

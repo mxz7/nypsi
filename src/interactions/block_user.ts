@@ -1,3 +1,4 @@
+import { MessageFlags } from "discord.js";
 import prisma from "../init/database";
 import redis from "../init/redis";
 import { CustomEmbed } from "../models/EmbedBuilders";
@@ -19,7 +20,7 @@ export default {
         embeds: [
           new CustomEmbed(interaction.user.id, "please wait until your offer has been processed"),
         ],
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 
@@ -35,7 +36,7 @@ export default {
       return await redis.del(`${Constants.redis.nypsi.OFFER_PROCESS}:${interaction.user.id}`);
     }
 
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     const current = await getBlockedList(interaction.user.id);
 

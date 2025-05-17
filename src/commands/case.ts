@@ -11,6 +11,7 @@ import {
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
+  MessageFlags,
   PermissionFlagsBits,
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
@@ -189,7 +190,7 @@ async function run(
         if (caseData.deleted) {
           await interaction.reply({
             embeds: [new ErrorEmbed("case is already marked as deleted")],
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
           return listen();
         }
@@ -197,7 +198,7 @@ async function run(
 
         await interaction.reply({
           embeds: [new CustomEmbed(message.member, "✅ case marked as deleted")],
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
 
         return displayCase(caseMsg);
@@ -205,7 +206,7 @@ async function run(
         if (!caseData.deleted) {
           await interaction.reply({
             embeds: [new ErrorEmbed("case is not marked as deleted")],
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
           return listen();
         }
@@ -214,7 +215,7 @@ async function run(
 
         await interaction.reply({
           embeds: [new CustomEmbed(message.member, "✅ case restored")],
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
 
         return displayCase(caseMsg);
@@ -303,7 +304,7 @@ async function run(
           if (!perms)
             return interaction.reply({
               embeds: [new ErrorEmbed("you don't have permission to do this")],
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             });
 
           await deleteEvidence(message.guild, caseData.caseId);
@@ -316,7 +317,7 @@ async function run(
           if (check.evidence)
             return interaction.reply({
               embeds: [new ErrorEmbed("this case already has evidence")],
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             });
 
           const [used, max] = await Promise.all([

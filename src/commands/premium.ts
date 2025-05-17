@@ -6,6 +6,7 @@ import {
   InteractionReplyOptions,
   Message,
 } from "discord.js";
+import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
@@ -26,7 +27,6 @@ import {
   levelString,
   renewUser,
   setCredits,
-  setExpireDate,
   setTier,
 } from "../utils/functions/premium/premium";
 import sleep from "../utils/functions/sleep";
@@ -39,7 +39,6 @@ import {
   getCommandFromAlias,
 } from "../utils/handlers/commandhandler";
 import dayjs = require("dayjs");
-import { NypsiClient } from "../models/Client";
 
 let doingRoles = false;
 
@@ -308,9 +307,17 @@ async function run(
       const colour = await getEmbedColor(guildMember.user.id);
 
       if (colour === "default") {
-        if (guildMember.roles.cache.find((i) => i.name === "custom")) {
+        const role = guildMember.roles.cache.find((i) => i.name === "custom");
+
+        if (role) {
           await sleep(250);
-          await guildMember.roles.remove(guildMember.roles.cache.find((i) => i.name === "custom"));
+          if (role.members.size === 1) {
+            await guildMember.guild.roles.delete(role.id);
+          } else {
+            await guildMember.roles.remove(
+              guildMember.roles.cache.find((i) => i.name === "custom"),
+            );
+          }
         }
       } else if (!guildMember.roles.cache.find((i) => i.name === "custom")) {
         await sleep(250);
@@ -512,9 +519,9 @@ async function run(
             (i) => i.name === "custom" && i.hexColor === color,
           );
 
-          if (existingRole) {
+          if (existingRole && color !== "default") {
             await message.member.roles.add(existingRole);
-          } else {
+          } else if (color !== "default") {
             const seperatorRole = message.guild.roles.cache.get("1329425677614845972");
             const newRole = await message.guild.roles.create({
               name: "custom",
@@ -525,17 +532,19 @@ async function run(
 
             await message.member.roles.add(newRole);
           }
-        } else {
+        } else if (color !== "default") {
           await existingRole.edit({ color: color as ColorResolvable });
+        } else {
+          await message.member.roles.remove(existingRole);
         }
       } else {
         existingRole = message.guild.roles.cache.find(
           (i) => i.name === "custom" && i.hexColor === color,
         );
 
-        if (existingRole) {
+        if (existingRole && color !== "default") {
           await message.member.roles.add(existingRole);
-        } else {
+        } else if (color !== "default") {
           const seperatorRole = message.guild.roles.cache.get("1329425677614845972");
           const newRole = await message.guild.roles.create({
             name: "custom",
