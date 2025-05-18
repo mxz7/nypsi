@@ -188,7 +188,7 @@ export async function createMarketOrder(
     amount,
   };
 
-  if (order.completed) return response;
+  if (sold) return response;
 
   const payload = await getMarketOrderEmbed(order);
 
@@ -306,7 +306,11 @@ export async function getMarketOrderEmbed(order: Market) {
   };
 }
 
-export async function checkMarketOrder(order: Market, client: NypsiClient, repeatCount = 0) {
+export async function checkMarketOrder(
+  order: Market,
+  client: NypsiClient,
+  repeatCount = 0,
+): Promise<boolean | bigint> {
   if (
     inTransaction.has(order.itemId) ||
     (await redis.exists(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${order.itemId}`))
