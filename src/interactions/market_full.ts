@@ -1,6 +1,7 @@
 import { Market } from "@prisma/client";
 import { MessageFlags } from "discord.js";
 import prisma from "../init/database";
+import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
@@ -72,6 +73,13 @@ export default {
 
     if (!interaction.isButton()) return;
     if ((await isEcoBanned(interaction.user.id)).banned) return;
+    if (await redis.exists("nypsi:maintenance")) {
+      interaction.reply({
+        embeds: [new CustomEmbed(interaction.user.id, "nypsi is currently in maintenance mode")],
+      });
+      return;
+    }
+
     let order = await prisma.market.findUnique({
       where: {
         messageId: interaction.message.id,

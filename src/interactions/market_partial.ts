@@ -14,6 +14,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
 import { marketBuy, marketSell } from "../utils/functions/economy/market";
 import { getItems, isEcoBanned, userExists } from "../utils/functions/economy/utils";
+import redis from "../init/redis";
 
 const userFulfilling = new Map<string, number>();
 
@@ -23,6 +24,13 @@ export default {
   async run(interaction) {
     if (!interaction.isButton()) return;
     if ((await isEcoBanned(interaction.user.id)).banned) return;
+    if (await redis.exists("nypsi:maintenance")) {
+      interaction.reply({
+        embeds: [new CustomEmbed(interaction.user.id, "nypsi is currently in maintenance mode")],
+      });
+      return;
+    }
+
     let order = await prisma.market.findUnique({
       where: {
         messageId: interaction.message.id,
