@@ -54,7 +54,7 @@ cmd.slashData
     commands.setName("commands").setDescription("view your command usage stats"),
   )
   .addSubcommand((bot) => bot.setName("bot").setDescription("view nypsi's stats"))
-  .addSubcommand((auction) => auction.setName("auction").setDescription("view your auction stats"))
+  .addSubcommand((market) => market.setName("market").setDescription("view your market stats"))
   .addSubcommand((lb) =>
     lb.setName("leaderboards").setDescription("view your leaderboard positions"),
   )
@@ -690,23 +690,31 @@ async function run(
     });
   };
 
-  const auctionStats = async () => {
+  const marketStats = async () => {
     const stats = await getStats(message.member);
 
-    return send({
-      embeds: [
-        new CustomEmbed(
-          message.member,
-          `you have created **${findStatAmount(stats, "auction-created")}** auction${
-            findStatAmount(stats, "auction-created") === "1" ? "" : "s"
-          } and sold **${findStatAmount(stats, "auction-sold-items")}** item${
-            findStatAmount(stats, "auction-sold-items") === "1" ? "" : "s"
-          }\n\nyou have bought **${findStatAmount(stats, "auction-bought-items")}** item${
-            findStatAmount(stats, "auction-bought-items") === "1" ? "" : "s"
-          } through auctions`,
-        ),
-      ],
-    });
+    const embed = new CustomEmbed(message.member);
+    
+    embed.setDescription(`you have bought **${findStatAmount(stats, "market-bought-items")}** item${
+            findStatAmount(stats, "market-bought-items") === "1" ? "" : "s"
+          } and sold **${findStatAmount(stats, "market-sold-items")}** item${
+            findStatAmount(stats, "market-sold-items") === "1" ? "" : "s"
+          }`);
+
+    embed.addFields(
+      {
+        name: "buy orders",
+        value: `**${findStatAmount(stats, "market-created-buy")}** created\n**${findStatAmount(stats, "market-fulfilled-buy")}** items sold`,
+        inline: true,
+      },
+      {
+        name: "sell orders",
+        value: `**${findStatAmount(stats, "market-created-sell")}** created\n**${findStatAmount(stats, "market-fulfilled-sell")}** items bought`,
+        inline: true,
+      },
+    );
+
+    return send({ embeds: [embed] });
   };
 
   const sellStats = async () => {
@@ -863,8 +871,8 @@ async function run(
     return itemStats();
   } else if (args[0].toLowerCase().includes("scratch")) {
     return scratchStats();
-  } else if (args[0].toLowerCase().includes("auction")) {
-    return auctionStats();
+  } else if (args[0].toLowerCase().includes("market")) {
+    return marketStats();
   } else if (
     args[0].toLowerCase().includes("lb") ||
     args[0].toLowerCase().includes("leaderboard")

@@ -112,7 +112,7 @@ export async function deleteTradeRequest(id: number, client: NypsiClient, repeat
       {
         context: {
           guildId: Constants.NYPSI_SERVER_ID,
-          channelId: Constants.REQUESTS_CHANNEL_ID,
+          channelId: Constants.TRADES_CHANNEL_ID,
           id: tradeRequest.messageId,
         },
       },
@@ -195,7 +195,7 @@ export async function createTradeRequest(
       {
         context: {
           guildId: Constants.NYPSI_SERVER_ID,
-          channelId: Constants.REQUESTS_CHANNEL_ID,
+          channelId: Constants.TRADES_CHANNEL_ID,
           embed: embed.toJSON(),
           row: buttonRow.toJSON(),
           cluster: cluster,
@@ -332,7 +332,7 @@ export async function bumpTradeRequest(id: number, client: NypsiClient) {
       {
         context: {
           guildId: Constants.NYPSI_SERVER_ID,
-          channelId: Constants.REQUESTS_CHANNEL_ID,
+          channelId: Constants.TRADES_CHANNEL_ID,
           messageId: query.messageId,
           row: buttonRow.toJSON(),
           embed: embed.toJSON(),

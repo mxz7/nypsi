@@ -30,6 +30,7 @@ import { addBalance, getBalance, removeBalance } from "./balance";
 import { addInventoryItem, getInventory, removeInventoryItem } from "./inventory";
 import { createUser, getItems, userExists } from "./utils";
 import ms = require("ms");
+import { addStat } from "./stats";
 
 const inTransaction = new Set<string>();
 /**
@@ -207,7 +208,7 @@ export async function createMarketOrder(
         }
       },
       {
-        context: { payload, channelId: Constants.AUCTION_CHANNEL_ID },
+        context: { payload, channelId: Constants.MARKET_CHANNEL_ID },
       },
     )
     .then((res) => {
@@ -228,6 +229,7 @@ export async function createMarketOrder(
   });
 
   checkMarketWatchers(itemId, amount, member, orderType, price, url);
+  addStat(member, `market-created-${orderType}`);
 
   response.url = url;
   return response;
@@ -626,7 +628,7 @@ export async function deleteMarketOrder(id: number, client: NypsiClient, repeatC
       {
         context: {
           guildId: Constants.NYPSI_SERVER_ID,
-          channelId: Constants.AUCTION_CHANNEL_ID,
+          channelId: Constants.MARKET_CHANNEL_ID,
           messageId: order.messageId,
         },
       },
@@ -772,9 +774,15 @@ export async function completeOrder(
   if (order.orderType === "buy") {
     await addInventoryItem(order.ownerId, order.itemId, Number(amount));
     await addBalance(buyerId, Number(amount) * Number(order.price) - taxedAmount);
+
+    addStat(order.ownerId, "market-fulfilled-buy", Number(amount));
+    addStat(buyerId, "market-sold-items", Number(amount));
   } else {
     await addInventoryItem(buyerId, order.itemId, Number(amount));
     await addBalance(order.ownerId, Number(amount) * Number(order.price) - taxedAmount);
+
+    addStat(order.ownerId, "market-fulfilled-sell", Number(amount));
+    addStat(buyerId, "market-bought-items", Number(amount));
   }
 
   if (checkLock) {
@@ -889,7 +897,7 @@ export async function completeOrder(
         },
         {
           context: {
-            channelId: Constants.AUCTION_CHANNEL_ID,
+            channelId: Constants.MARKET_CHANNEL_ID,
             messageId: order.messageId,
             embed,
           },
@@ -1120,8 +1128,6 @@ export async function marketBuy(
   try {
     await prisma.$transaction(async (prisma) => {
       for (const order of orders) {
-        console.log("d");
-
         let amount: bigint;
         if (order.itemAmount > remaining) {
           amount = BigInt(remaining);
@@ -1138,7 +1144,7 @@ export async function marketBuy(
           client,
           prisma as Prisma.TransactionClient,
         );
-        console.log("e");
+
         if (!res) break;
       }
     });
