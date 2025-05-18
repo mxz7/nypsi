@@ -444,10 +444,17 @@ async function run(
           await res.deferReply({ flags: MessageFlags.Ephemeral });
 
           const item = res.fields.fields.get("item").value;
-          const amount = res.fields.fields.get("amount").value;
+          let amount = res.fields.fields.get("amount").value;
           const price = res.fields.fields.get("price").value;
 
           const selected = selectItem(item);
+
+          if (amount.toLowerCase() === "all") {
+            amount = (
+              (await getInventory(message.author.id)).find((i) => i.item == selected.id)?.amount ||
+              1
+            ).toString();
+          }
 
           if (!selected) {
             await res.editReply({
@@ -1050,6 +1057,12 @@ async function run(
     if (!price) {
       price = amount;
       amount = "1";
+    }
+
+    if (amount.toLowerCase() === "all") {
+      amount = (
+        (await getInventory(message.author.id)).find((i) => i.item == selected.id)?.amount || 1
+      ).toString();
     }
 
     if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
