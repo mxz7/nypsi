@@ -1031,11 +1031,23 @@ export async function marketBuy(
 
   if (!(await userExists(userId))) await createUser(userId);
 
+  let order: Market;
+
+  if (orderId) {
+    order = await prisma.market.findUnique({
+      where: { id: orderId },
+    });
+
+    if (!order || order.itemAmount < amount) {
+      await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
+      inTransaction.delete(itemId);
+      return { status: "too slow ):", remaining: -1 };
+    }
+  }
+
   // looking for sell orders
   const { cost: buyPrice, orders } = orderId
-    ? await prisma.market
-        .findUnique({ where: { id: orderId } })
-        .then((order) => ({ cost: Number(order.price) * amount, orders: [order] }))
+    ? { cost: Number(order.price) * amount, orders: [order] }
     : await getMarketTransactionData(itemId, amount, "sell", userId);
 
   if (orderId) {
