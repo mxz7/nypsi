@@ -5,7 +5,8 @@ import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
-import { calcItemValue } from "../utils/functions/economy/inventory";
+import { getBalance } from "../utils/functions/economy/balance";
+import { calcItemValue, getInventory } from "../utils/functions/economy/inventory";
 import {
   marketBuy,
   marketSell,
@@ -66,6 +67,42 @@ export default {
               .catch(() => {}),
           );
         return false;
+      }
+
+      if (order.orderType === "sell") {
+        const balance = await getBalance(interaction.user.id);
+
+        if (balance < Number(order.price)) {
+          const embed = new ErrorEmbed("you can't afford this");
+          await interaction
+            .reply({
+              embeds: [embed],
+              flags: MessageFlags.Ephemeral,
+            })
+            .catch(() =>
+              interaction
+                .followUp({ embeds: [embed], flags: MessageFlags.Ephemeral })
+                .catch(() => {}),
+            );
+          return false;
+        }
+      } else {
+        const inventory = await getInventory(interaction.user.id);
+
+        if ((inventory.find((i) => i.item)?.amount || 0) < 1) {
+          const embed = new ErrorEmbed("you don't have enough of this item");
+          await interaction
+            .reply({
+              embeds: [embed],
+              flags: MessageFlags.Ephemeral,
+            })
+            .catch(() =>
+              interaction
+                .followUp({ embeds: [embed], flags: MessageFlags.Ephemeral })
+                .catch(() => {}),
+            );
+          return false;
+        }
       }
 
       return true;
