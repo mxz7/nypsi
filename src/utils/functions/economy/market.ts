@@ -871,30 +871,32 @@ export async function completeOrder(
     }
   })();
 
-  if (order.messageId) {
-    const embed = await getMarketOrderEmbed(order);
+  (async () => {
+    if (order.messageId) {
+      const embed = await getMarketOrderEmbed(order);
 
-    await client.cluster.broadcastEval(
-      async (client, { channelId, messageId, embed }) => {
-        const channel = client.channels.cache.get(channelId) as TextChannel;
+      await client.cluster.broadcastEval(
+        async (client, { channelId, messageId, embed }) => {
+          const channel = client.channels.cache.get(channelId) as TextChannel;
 
-        if (!channel || !channel.isTextBased()) return "no-channel";
+          if (!channel || !channel.isTextBased()) return "no-channel";
 
-        const msg = await channel.messages.fetch(messageId).catch(() => {});
+          const msg = await channel.messages.fetch(messageId).catch(() => {});
 
-        if (!msg) return "no-msg";
+          if (!msg) return "no-msg";
 
-        await msg.edit(embed).catch(() => {});
-      },
-      {
-        context: {
-          channelId: Constants.AUCTION_CHANNEL_ID,
-          messageId: order.messageId,
-          embed,
+          await msg.edit(embed).catch(() => {});
         },
-      },
-    );
-  }
+        {
+          context: {
+            channelId: Constants.AUCTION_CHANNEL_ID,
+            messageId: order.messageId,
+            embed,
+          },
+        },
+      );
+    }
+  })();
 
   return true;
 }
@@ -1013,6 +1015,11 @@ export async function marketSell(
   } catch (e) {
     console.error(e);
     logger.error("market sell transaction failed", e);
+
+    await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
+    inTransaction.delete(itemId);
+
+    return { status: "internal error", remaining: -1 };
   }
 
   await removeInventoryItem(userId, itemId, amount - remaining);
@@ -1113,6 +1120,8 @@ export async function marketBuy(
   try {
     await prisma.$transaction(async (prisma) => {
       for (const order of orders) {
+        console.log("d");
+
         let amount: bigint;
         if (order.itemAmount > remaining) {
           amount = BigInt(remaining);
@@ -1129,12 +1138,17 @@ export async function marketBuy(
           client,
           prisma as Prisma.TransactionClient,
         );
+        console.log("e");
         if (!res) break;
       }
     });
   } catch (e) {
     console.error(e);
     logger.error("market buy transaction failed", e);
+
+    await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
+    inTransaction.delete(itemId);
+
     return { status: "internal error", remaining: -1 };
   }
 
