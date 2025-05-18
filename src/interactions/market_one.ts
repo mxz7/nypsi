@@ -135,11 +135,11 @@ export default {
 
     let deferred = false;
 
-    if (order.orderType == "buy") {
+    if (order.orderType == "sell") {
       const value = Number(order.price * order.itemAmount);
 
       if ((await getPreferences(interaction.user.id)).marketConfirm < value) {
-        const res = await showMarketConfirmationModal(interaction, "sell", value);
+        const res = await showMarketConfirmationModal(interaction, "buy", value);
 
         if (!res) return;
       } else {
@@ -148,8 +148,8 @@ export default {
       }
     } else {
       const worth = await calcItemValue(order.itemId);
-      if (worth * 1.25 < Number(order.price)) {
-        const res = await showMarketConfirmationModal(interaction, "buy", worth);
+      if (worth * 1.25 > Number(order.price)) {
+        const res = await showMarketConfirmationModal(interaction, "sell", worth);
 
         if (!res) return;
       } else {
