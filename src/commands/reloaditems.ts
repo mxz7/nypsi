@@ -10,7 +10,7 @@ import { getAdminLevel } from "../utils/functions/users/admin";
 const cmd = new Command("reloaditems", "reload items", "none").setPermissions(["bot owner"]);
 
 async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) {
-  if ((await getAdminLevel(this.member)) < 3) return;
+  if ((await getAdminLevel(message.member)) < 3) return;
 
   loadItems();
   (message.client as NypsiClient).cluster.send("reload_items");

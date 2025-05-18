@@ -10,7 +10,7 @@ async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
-  if ((await getAdminLevel(message.author.id)) < 3) return;
+  if ((await getAdminLevel(message.member)) < 3) return;
 
   if (args.length == 0) {
     return message.channel.send({ content: "dumbass" });

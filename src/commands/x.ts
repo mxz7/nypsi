@@ -898,7 +898,7 @@ async function run(
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "blacklist") {
-        if ((await getAdminLevel(message.author.id)) < 3) {
+        if ((await getAdminLevel(message.member)) < 3) {
           await res.editReply({
             embeds: [new ErrorEmbed("you require admin level **3** to do this")],
           });
@@ -1337,7 +1337,7 @@ async function run(
         });
         return waitForButton();
       } else if (res.customId === "del-cmd") {
-        if ((await getAdminLevel(message.author.id)) < 3) {
+        if ((await getAdminLevel(message.member)) < 3) {
           await res.editReply({
             embeds: [new ErrorEmbed("you require admin level **3** to do this")],
           });
@@ -1352,7 +1352,7 @@ async function run(
         });
         return waitForButton();
       } else if (res.customId === "del-aliases") {
-        if ((await getAdminLevel(message.author.id)) < 3) {
+        if ((await getAdminLevel(message.member) < 3) {
           await res.editReply({
             embeds: [new ErrorEmbed("you require admin level **3** to do this")],
           });
@@ -1521,7 +1521,7 @@ async function run(
         });
         return waitForButton();
       } else if (res.customId === "ac-clear") {
-        if ((await getAdminLevel(message.author.id)) < 3) {
+        if ((await getAdminLevel(message.member)) < 3) {
           await res.editReply({
             embeds: [new ErrorEmbed("you require admin level **3** to do this")],
           });
@@ -1902,7 +1902,7 @@ async function run(
     await redis.del(Constants.redis.nypsi.CRASH_STATUS);
     await initCrashGame(message.client as NypsiClient);
   } else if (args[0].toLowerCase() === "findalts") {
-    if ((await getAdminLevel(message.author.id)) < 3) {
+    if ((await getAdminLevel(message.member)) < 3) {
       return message.channel.send({
         embeds: [new ErrorEmbed("you require admin level **3** to do this")],
       });

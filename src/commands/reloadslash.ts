@@ -11,7 +11,7 @@ async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
-  if ((await getAdminLevel(this.member)) < 3) return;
+  if ((await getAdminLevel(message.member)) < 3) return;
 
   if (args.length == 0) {
     await uploadSlashCommandsToGuild(message.guild.id, message.client.user.id);
