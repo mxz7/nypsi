@@ -252,7 +252,7 @@ async function getMarketOrderEmbed(order: Market) {
   }
 
   if (order.orderType === "buy") {
-    embed.setColor("#79A2F6");
+    embed.setColor("#b4befe");
     description += `buying **${order.itemAmount}x** ${getItems()[order.itemId].emoji} **[${getItems()[order.itemId].name}](https://nypsi.xyz/item/${order.itemId})** for $${(order.price * order.itemAmount).toLocaleString()}`;
     row.addComponents(
       new ButtonBuilder().setCustomId("market-full").setLabel("sell").setStyle(ButtonStyle.Success),
@@ -272,7 +272,7 @@ async function getMarketOrderEmbed(order: Market) {
           .setStyle(ButtonStyle.Secondary),
       );
   } else if (order.orderType === "sell") {
-    embed.setColor("#BB9BF8");
+    embed.setColor("#a6e3a1");
     description += `selling **${order.itemAmount}x** ${getItems()[order.itemId].emoji} **[${getItems()[order.itemId].name}](https://nypsi.xyz/item/${order.itemId})** for $${(order.price * order.itemAmount).toLocaleString()}`;
     row.addComponents(
       new ButtonBuilder().setCustomId("market-full").setLabel("buy").setStyle(ButtonStyle.Success),
