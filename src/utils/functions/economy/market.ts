@@ -844,9 +844,11 @@ export async function completeOrder(
 
   const msg = await (
     client.channels.cache.get(Constants.AUCTION_CHANNEL_ID) as TextChannel
-  ).messages.fetch(order.messageId);
+  ).messages
+    .fetch(order.messageId)
+    .catch(() => {});
 
-  if (msg) await msg.edit(await getMarketOrderEmbed(order));
+  if (msg) await msg.edit(await getMarketOrderEmbed(order)).catch(() => {});
 
   return true;
 }
