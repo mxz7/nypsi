@@ -634,6 +634,23 @@ async function run(
           orders.length == 1 ? orders[0].id.toString() : await deleteOrder(type, msg, orders);
 
         if (res) {
+          if (res == "delAll") {
+            for (const order of orders) {
+              const result = await deleteMarketOrder(order.id, message.client as NypsiClient);
+
+              if (result) {
+                if (type == "buy") {
+                  await addBalance(message.member, Number(order.itemAmount * order.price));
+                } else {
+                  await addInventoryItem(message.member, order.itemId, Number(order.itemAmount));
+                }
+              }
+            }
+
+            await updateEmbed();
+            return pageManager();
+          }
+
           const order = await getMarketOrder(parseInt(res));
 
           const result = await deleteMarketOrder(parseInt(res), message.client as NypsiClient);
@@ -722,6 +739,15 @@ async function run(
           ),
       );
     }
+
+    options.push(
+      new StringSelectMenuOptionBuilder()
+        .setValue("delAll")
+        .setEmoji("🗑")
+        .setLabel(
+          `delete all`,
+        ),
+    );
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new StringSelectMenuBuilder()

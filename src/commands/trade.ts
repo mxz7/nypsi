@@ -292,8 +292,6 @@ async function run(
             }
           }
 
-          const selected = selectItem(item);
-
           if (!selected) {
             await res.editReply({
               embeds: [new ErrorEmbed("couldnt find that item")],
