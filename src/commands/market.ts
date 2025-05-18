@@ -1391,7 +1391,11 @@ async function run(
         const price = (await getMarketTransactionData(item.id, 1, "sell", message.member.id)).cost;
         if (price == -1) {
           await interaction.reply({
-            embeds: [new ErrorEmbed("not enough items\npsst.. you can't buy your own")],
+            embeds: [
+              new ErrorEmbed("not enough items").setFooter({
+                text: "psst.. you can't buy your own",
+              }),
+            ],
             flags: MessageFlags.Ephemeral,
           });
           await updateEmbed();
@@ -1434,7 +1438,11 @@ async function run(
           ).cost;
           if (price == -1) {
             await res.reply({
-              embeds: [new ErrorEmbed("not enough items\npsst.. you can't buy your own")],
+              embeds: [
+                new ErrorEmbed("not enough items").setFooter({
+                  text: "psst.. you can't buy your own",
+                }),
+              ],
               flags: MessageFlags.Ephemeral,
             });
             await updateEmbed();
