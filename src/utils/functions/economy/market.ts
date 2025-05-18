@@ -1208,7 +1208,11 @@ export async function marketBuy(
   return { status: "success", remaining };
 }
 
-export async function showMarketConfirmationModal(interaction: ButtonInteraction, action: OrderType, cost: number) {
+export async function showMarketConfirmationModal(
+  interaction: ButtonInteraction,
+  action: OrderType,
+  cost: number,
+) {
   const id = `market-confirm-${Math.floor(Math.random() * 69420)}`;
 
   const modal = new ModalBuilder().setCustomId(id).setTitle("confirmation");
@@ -1218,7 +1222,11 @@ export async function showMarketConfirmationModal(interaction: ButtonInteraction
       new TextInputBuilder()
         .setCustomId("confirmation")
         .setLabel("type 'yes' to confirm")
-        .setPlaceholder(action == "buy" ? `this will cost $${cost.toLocaleString()}` : `the average worth of this item is ${cost.toLocaleString()}`)
+        .setPlaceholder(
+          action == "buy"
+            ? `this will cost $${cost.toLocaleString()}`
+            : `the average worth of this item is $${cost.toLocaleString()}`,
+        )
         .setStyle(TextInputStyle.Short)
         .setRequired(true)
         .setMaxLength(3),
