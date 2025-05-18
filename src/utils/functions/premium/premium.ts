@@ -250,27 +250,31 @@ export async function expireUser(member: string, client?: NypsiClient | ClusterM
   if (client) {
     const cluster = await findGuildCluster(client, Constants.NYPSI_SERVER_ID);
 
-    await (client instanceof NypsiClient ? client.cluster : client).broadcastEval(
-      async (c, { cluster, guildId, memberId, roleId }) => {
-        if ((c as NypsiClient).cluster.id !== cluster) return;
+    await (client instanceof NypsiClient ? client.cluster : client)
+      .broadcastEval(
+        async (c, { cluster, guildId, memberId, roleId }) => {
+          if ((c as NypsiClient).cluster.id !== cluster) return;
 
-        const guild = c.guilds.cache.get(guildId);
+          const guild = c.guilds.cache.get(guildId);
 
-        if (!guild) return;
+          if (!guild) return;
 
-        const member = await guild.members.fetch(memberId);
+          const member = await guild.members.fetch(memberId).catch(() => {});
 
-        if (!member) return;
+          if (!member) return;
 
-        await member.roles.remove(roleId);
-        const role = guild.roles.cache.find((i) => i.name === "custom");
+          await member.roles.remove(roleId);
+          const role = guild.roles.cache.find((i) => i.name === "custom");
 
-        if (role) member.roles.remove(role);
-      },
-      {
-        context: { guildId: Constants.NYPSI_SERVER_ID, cluster, memberId: member, roleId },
-      },
-    );
+          if (role) member.roles.remove(role);
+        },
+        {
+          context: { guildId: Constants.NYPSI_SERVER_ID, cluster, memberId: member, roleId },
+        },
+      )
+      .catch(() => {
+        logger.warn("premium expire failed to remove role", { userId: member });
+      });
   }
 
   if ((await getDmSettings(member)).premium) {
