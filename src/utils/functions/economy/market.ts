@@ -955,7 +955,7 @@ export async function marketSell(
 
   await removeInventoryItem(userId, itemId, amount - remaining);
 
-  logger.info(`market ${userId} sold ${amount} ${itemId}`);
+  logger.info(`market: ${userId} sold ${amount} ${itemId}`);
 
   await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
   inTransaction.delete(itemId);
@@ -1066,7 +1066,7 @@ export async function marketBuy(
 
   await removeBalance(userId, buyPrice);
 
-  logger.info(`market ${userId} bought ${amount} ${itemId}`);
+  logger.info(`market: ${userId} bought ${amount} ${itemId}`);
 
   await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
   inTransaction.delete(itemId);
