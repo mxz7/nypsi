@@ -1702,7 +1702,7 @@ async function run(
       new ActionRowBuilder<TextInputBuilder>().addComponents(
         new TextInputBuilder()
           .setCustomId("amount")
-          .setLabel(`how many ${item.plural ? item.plural : item.name} would you like to ${type}?`)
+          .setLabel(`how many would you like to ${type}?`)
           .setStyle(TextInputStyle.Short)
           .setRequired(true)
           .setMaxLength(10),
