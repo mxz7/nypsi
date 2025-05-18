@@ -1,17 +1,18 @@
 import dayjs = require("dayjs");
 import ms = require("ms");
 import prisma from "../../init/database";
-import { NypsiClient } from "../../models/Client";
 import { CustomEmbed } from "../../models/EmbedBuilders";
+import { Job } from "../../types/Jobs";
+import { addBalance } from "../../utils/functions/economy/balance";
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
+import { deleteMarketOrder } from "../../utils/functions/economy/market";
 import { getItems, userExists } from "../../utils/functions/economy/utils";
 import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
-import { logger } from "../../utils/logger";
-import { addBalance } from "../../utils/functions/economy/balance";
-import { deleteMarketOrder } from "../../utils/functions/economy/market";
 
-export async function runMarketChecks(client: NypsiClient) {
-  setInterval(async () => {
+export default {
+  name: "checkmarket",
+  cron: "0 */7 * * *",
+  async run(log, manager) {
     let limit = dayjs().subtract(14, "days").toDate();
 
     const items = getItems();
@@ -42,7 +43,7 @@ export async function runMarketChecks(client: NypsiClient) {
     });
 
     for (const order of buyOrders) {
-      await deleteMarketOrder(order.id, client);
+      await deleteMarketOrder(order.id, manager);
 
       if (!(await userExists(order.ownerId))) continue;
 
@@ -68,7 +69,7 @@ export async function runMarketChecks(client: NypsiClient) {
     }
 
     for (const order of sellOrders) {
-      await deleteMarketOrder(order.id, client);
+      await deleteMarketOrder(order.id, manager);
 
       if (!(await userExists(order.ownerId))) continue;
 
@@ -94,7 +95,7 @@ export async function runMarketChecks(client: NypsiClient) {
     }
 
     if (sellOrders.length > 0) {
-      logger.info(`${sellOrders.length} sell orders expired`);
+      log(`${sellOrders.length} sell orders expired`);
     }
 
     limit = dayjs().subtract(180, "days").toDate();
@@ -106,7 +107,7 @@ export async function runMarketChecks(client: NypsiClient) {
     });
 
     if (deletedCompletedOrders > 0) {
-      logger.info(`${deletedCompletedOrders.toLocaleString()} completed market orders deleted`);
+      log(`${deletedCompletedOrders.toLocaleString()} completed market orders deleted`);
     }
 
     const { count: deletedSoldOffers } = await prisma.offer.deleteMany({
@@ -116,7 +117,7 @@ export async function runMarketChecks(client: NypsiClient) {
     });
 
     if (deletedSoldOffers > 0) {
-      logger.info(`${deletedSoldOffers.toLocaleString()} sold offers deleted`);
+      log(`${deletedSoldOffers.toLocaleString()} sold offers deleted`);
     }
-  }, ms("3 hours"));
-}
+  },
+} satisfies Job;

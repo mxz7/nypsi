@@ -23,7 +23,7 @@ import roleDelete from "../events/roleDelete";
 import userUpdate from "../events/userUpdate";
 import redis from "../init/redis";
 import { runBirthdays } from "../scheduled/clusterjobs/birthdays";
-import { runMarketChecks } from "../scheduled/clusterjobs/checkmarket";
+import { runMarketChecks } from "../scheduled/jobs/checkmarket";
 import { runLogs, runModerationChecks } from "../scheduled/clusterjobs/moderationchecks";
 import startRandomDrops from "../scheduled/clusterjobs/random-drops";
 import Constants from "../utils/Constants";

@@ -1,4 +1,5 @@
 import { Market, MarketWatch, OrderType, Prisma, PrismaClient } from "@prisma/client";
+import { ClusterManager } from "discord-hybrid-sharding";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -28,9 +29,9 @@ import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getLastKnownAvatar, getLastKnownUsername } from "../users/tag";
 import { addBalance, getBalance, removeBalance } from "./balance";
 import { addInventoryItem, getInventory, removeInventoryItem } from "./inventory";
+import { addStat } from "./stats";
 import { createUser, getItems, userExists } from "./utils";
 import ms = require("ms");
-import { addStat } from "./stats";
 
 const inTransaction = new Set<string>();
 /**
@@ -573,7 +574,11 @@ export async function countItemOnMarket(itemId: string, type: OrderType) {
   return amount?._sum?.itemAmount || 0;
 }
 
-export async function deleteMarketOrder(id: number, client: NypsiClient, repeatCount = 1) {
+export async function deleteMarketOrder(
+  id: number,
+  client: NypsiClient | ClusterManager,
+  repeatCount = 1,
+) {
   const order = await prisma.market
     .findFirst({
       where: {
@@ -607,7 +612,7 @@ export async function deleteMarketOrder(id: number, client: NypsiClient, repeatC
   });
 
   if (order.messageId) {
-    await client.cluster.broadcastEval(
+    await (client instanceof ClusterManager ? client : client.cluster).broadcastEval(
       async (client, { channelId, guildId, messageId }) => {
         const guild = client.guilds.cache.get(guildId);
 
