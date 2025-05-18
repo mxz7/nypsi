@@ -871,13 +871,30 @@ export async function completeOrder(
     }
   })();
 
-  const msg = await (
-    client.channels.cache.get(Constants.AUCTION_CHANNEL_ID) as TextChannel
-  ).messages
-    .fetch(order.messageId)
-    .catch(() => {});
+  if (order.messageId) {
+    const embed = await getMarketOrderEmbed(order);
 
-  if (msg) await msg.edit(await getMarketOrderEmbed(order)).catch(() => {});
+    await client.cluster.broadcastEval(
+      async (client, { channelId, messageId }) => {
+        const channel = client.channels.cache.get(channelId) as TextChannel;
+
+        if (!channel || !channel.isTextBased()) return "no-channel";
+
+        const msg = await channel.messages.fetch(messageId).catch(() => {});
+
+        if (!msg) return "no-msg";
+
+        await msg.edit(embed).catch(() => {});
+      },
+      {
+        context: {
+          channelId: Constants.AUCTION_CHANNEL_ID,
+          messageId: order.messageId,
+          embed,
+        },
+      },
+    );
+  }
 
   return true;
 }
