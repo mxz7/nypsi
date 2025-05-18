@@ -129,7 +129,7 @@ async function run(
   ]);
 
   if (selected.account_locked) {
-    desc.push("**account locked**");
+    desc.push("\n**account locked**");
   } else {
     if (selected.sell || selected.buy) {
       desc.push(
