@@ -167,7 +167,7 @@ export async function createMarketOrder(
   let sold = false;
 
   if (checkSold) {
-    const { completed, itemAmount } = await prisma.market.findFirst({
+    const { completed, itemAmount } = await prisma.market.findUnique({
       where: {
         id: order.id,
       },
@@ -180,6 +180,13 @@ export async function createMarketOrder(
     if (completed) sold = true;
     else if (Number(itemAmount) !== amount) amount = Number(itemAmount);
   }
+
+  const response: { sold: boolean; amount: number; url?: string } = {
+    sold,
+    amount,
+  };
+
+  if (order.completed) return response;
 
   const payload = await getMarketOrderEmbed(order);
 
@@ -206,11 +213,6 @@ export async function createMarketOrder(
     .then((res) => {
       return res.filter((i) => Boolean(i))[0];
     });
-
-  const response: { sold: boolean; amount: number; url?: string } = {
-    sold,
-    amount,
-  };
 
   if (!url) {
     return response;
