@@ -56,7 +56,7 @@ export async function getMarketOrders(member: GuildMember | string | undefined, 
 }
 
 export async function getMarketOrder(id: number) {
-  return await prisma.market.findFirst({
+  return await prisma.market.findUnique({
     where: { id: id },
   });
 }

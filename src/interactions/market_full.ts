@@ -72,9 +72,9 @@ export default {
 
     if (!interaction.isButton()) return;
     if ((await isEcoBanned(interaction.user.id)).banned) return;
-    let order = await prisma.market.findFirst({
+    let order = await prisma.market.findUnique({
       where: {
-        AND: [{ messageId: interaction.message.id }],
+        messageId: interaction.message.id,
       },
     });
 
