@@ -343,30 +343,20 @@ export async function checkMarketOrder(order: Market, client: NypsiClient, repea
   }
 
   let excessMoney = 0n;
+  let remaining = order.itemAmount;
 
   try {
     await prisma.$transaction(async (prisma) => {
       for (const validOrder of validOrders) {
-        if (order.itemAmount === 0n) break;
         let amount: bigint;
 
-        if (validOrder.itemAmount > order.itemAmount) {
-          amount = order.itemAmount;
-          order.itemAmount = 0n;
+        if (validOrder.itemAmount > remaining) {
+          amount = remaining;
+          remaining = 0n;
         } else {
           amount = validOrder.itemAmount;
-          order.itemAmount -= validOrder.itemAmount;
+          remaining -= validOrder.itemAmount;
         }
-
-        await prisma.market.update({
-          where: {
-            id: order.id,
-          },
-          data: {
-            itemAmount: order.itemAmount,
-            completed: order.itemAmount === 0n ? true : undefined,
-          },
-        });
 
         const res = await completeOrder(
           validOrder.id,
@@ -382,6 +372,39 @@ export async function checkMarketOrder(order: Market, client: NypsiClient, repea
 
         if (!res) break;
       }
+
+      if (remaining === 0n) {
+        await prisma.market.update({
+          where: {
+            id: order.id,
+          },
+          data: {
+            completed: true,
+          },
+        });
+      } else if (remaining < order.itemAmount) {
+        await prisma.market.update({
+          where: {
+            id: order.id,
+          },
+          data: {
+            itemAmount: remaining,
+          },
+        });
+
+        if (order.price > 10_000) {
+          await prisma.market.create({
+            data: {
+              ownerId: order.ownerId,
+              itemId: order.itemId,
+              itemAmount: order.itemAmount - remaining,
+              orderType: order.orderType,
+              price: order.price,
+              completed: true,
+            },
+          });
+        }
+      }
     });
   } catch (e) {
     console.error(e);
@@ -394,7 +417,7 @@ export async function checkMarketOrder(order: Market, client: NypsiClient, repea
   await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${order.itemId}`);
 
   if (order.itemAmount === 0n) return true;
-  else return order.itemAmount;
+  else return remaining;
 }
 
 export async function updateMarketWatch(
@@ -687,7 +710,7 @@ export async function completeOrder(
   prisma: PrismaClient | Prisma.TransactionClient,
   checkLock?: { itemId: string },
   repeatCount = 0,
-) {
+): Promise<boolean> {
   if (checkLock) {
     if (
       inTransaction.has(checkLock.itemId) ||
