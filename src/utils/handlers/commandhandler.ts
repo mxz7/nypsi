@@ -66,6 +66,7 @@ import { getLastKnownUsername } from "../functions/users/tag";
 import { createProfile, hasProfile } from "../functions/users/utils";
 import dayjs = require("dayjs");
 import ms = require("ms");
+import { getAdminLevel } from "../functions/users/admin";
 
 const commands = new Map<string, Command>();
 const aliases = new Map<string, string>();
@@ -857,7 +858,7 @@ export async function runCommand(
     }
 
     if (await redis.get("nypsi:maintenance")) {
-      if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
+      if ((await getAdminLevel(this.member)) > 0 && message instanceof Message) {
         message.react("💀");
       } else {
         if (message instanceof Message) {

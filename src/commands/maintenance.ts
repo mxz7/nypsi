@@ -8,7 +8,7 @@ import { getAdminLevel } from "../utils/functions/users/admin";
 const cmd = new Command("maintenance", "maintenance", "none").setPermissions(["bot owner"]);
 
 async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) {
-  if ((await getAdminLevel(message.author.id)) < 69) return;
+  if ((await getAdminLevel(message.author.id)) < 3) return;
 
   if ((await redis.get("nypsi:maintenance")) == "t") {
     await redis.del("nypsi:maintenance");

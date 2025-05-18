@@ -1,9 +1,9 @@
 import { CommandInteraction, Message } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
-import Constants from "../utils/Constants";
 import { loadCommands, reloadCommand } from "../utils/handlers/commandhandler";
 import { reloadInteractions } from "../utils/handlers/interactions";
 import { logger } from "../utils/logger";
+import { getAdminLevel } from "../utils/functions/users/admin";
 
 const cmd = new Command("reload", "reload commands", "none").setPermissions(["bot owner"]);
 
@@ -11,7 +11,7 @@ async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
-  if (message.author.id != Constants.TEKOH_ID) return;
+  if ((await getAdminLevel(this.member)) < 3) return;
 
   if (args.length == 0) {
     loadCommands();

@@ -49,6 +49,7 @@ import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
+import { getAdminLevel } from "../utils/functions/users/admin";
 
 const cmd = new Command("trade", "create and manage your trades", "money").setAliases(["trades"]);
 
@@ -99,7 +100,7 @@ async function run(
 
   if (!(await userExists(message.author.id))) await createUser(message.author.id);
 
-  if (message.client.user.id !== Constants.BOT_USER_ID && message.author.id !== Constants.TEKOH_ID)
+  if (message.client.user.id !== Constants.BOT_USER_ID && (await getAdminLevel(this.member)) < 1)
     return send({ embeds: [new ErrorEmbed("lol")] });
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);

@@ -26,6 +26,7 @@ import { recentCommands } from "../../users/commands";
 import { getInventory, removeInventoryItem, selectItem } from "../inventory";
 import ScratchCard from "../scratchies";
 import { addStat, createGame } from "../stats";
+import { getAdminLevel } from "../../users/admin";
 
 async function prepare(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
@@ -202,7 +203,7 @@ async function prepare(
           await a(message.author.id, message.author.username, message.content);
 
           if (await redis.get("nypsi:maintenance")) {
-            if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
+            if ((await getAdminLevel(this.member)) > 0 && message instanceof Message) {
               message.react("💀");
             } else {
               msg.edit({

@@ -3,14 +3,14 @@ import { exec } from "node:child_process";
 import prisma from "../init/database";
 import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
-import Constants from "../utils/Constants";
 import { getTasksData, loadItems } from "../utils/functions/economy/utils";
 import { logger } from "../utils/logger";
+import { getAdminLevel } from "../utils/functions/users/admin";
 
 const cmd = new Command("reloaditems", "reload items", "none").setPermissions(["bot owner"]);
 
 async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) {
-  if (message.author.id != Constants.TEKOH_ID) return;
+  if ((await getAdminLevel(this.member)) < 3) return;
 
   loadItems();
   (message.client as NypsiClient).cluster.send("reload_items");

@@ -49,6 +49,7 @@ import { addHourlyCommand } from "../utils/handlers/commandhandler.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { gamble, getTimestamp, logger } from "../utils/logger.js";
 import ms = require("ms");
+import { getAdminLevel } from "../utils/functions/users/admin.js";
 
 const games = new Map<
   string,
@@ -506,7 +507,7 @@ async function playGame(
       }
 
       if (await redis.get("nypsi:maintenance")) {
-        if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
+        if ((await getAdminLevel(this.member)) > 0 && message instanceof Message) {
           message.react("💀");
         } else {
           return m.edit({

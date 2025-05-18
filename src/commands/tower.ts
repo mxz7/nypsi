@@ -52,6 +52,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 import { gamble, getTimestamp, logger } from "../utils/logger";
 import _ = require("lodash");
 import ms = require("ms");
+import { getAdminLevel } from "../utils/functions/users/admin";
 
 const cmd = new Command("tower", "play dragon tower", "money").setAliases([
   "dragon",
@@ -602,7 +603,7 @@ async function playGame(
       }
 
       if (await redis.get("nypsi:maintenance")) {
-        if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
+        if ((await getAdminLevel(this.member)) > 0 && message instanceof Message) {
           message.react("💀");
         } else {
           return msg.edit({

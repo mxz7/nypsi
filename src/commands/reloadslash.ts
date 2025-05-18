@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
-import Constants from "../utils/Constants";
 import { uploadSlashCommands, uploadSlashCommandsToGuild } from "../utils/handlers/commandhandler";
+import { getAdminLevel } from "../utils/functions/users/admin";
 
 const cmd = new Command("reloadslash", "reload data for slash commands", "none").setPermissions([
   "bot owner",
@@ -11,7 +11,7 @@ async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
-  if (message.author.id != Constants.TEKOH_ID) return;
+  if ((await getAdminLevel(this.member)) < 3) return;
 
   if (args.length == 0) {
     await uploadSlashCommandsToGuild(message.guild.id, message.client.user.id);
