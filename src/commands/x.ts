@@ -1931,6 +1931,25 @@ async function run(
     // idk how this should be done lol i might get back to it
 
     console.log(map);
+  } else if (args[0].toLowerCase() === "migrate") {
+    if (message.author.id !== Constants.TEKOH_ID) return;
+
+    const auctions = await prisma.auction.findMany();
+
+    for (const auction of auctions) {
+      logger.debug(`market: migrating auction ${auction.id}...`);
+      await prisma.market.create({
+        data: {
+          orderType: "sell",
+          ownerId: auction.ownerId,
+          itemId: auction.itemId,
+          itemAmount: auction.itemAmount,
+          price: Math.round(Number(auction.bin) / Number(auction.itemAmount)),
+          completed: auction.sold,
+          createdAt: auction.createdAt,
+        },
+      });
+    }
   }
 }
 

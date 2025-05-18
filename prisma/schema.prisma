@@ -225,6 +225,7 @@ model Economy {
   CustomCar          CustomCar[]
   Farm               Farm[]
   FarmUpgrades       FarmUpgrades[]
+  Auction            Auction[]
 }
 
 model Farm {
@@ -533,6 +534,22 @@ model Offer {
 
   target Economy? @relation(fields: [targetId], references: [userId], name: "target", onDelete: Cascade)
   owner  Economy? @relation(fields: [ownerId], references: [userId], name: "owner", onDelete: Cascade)
+
+  @@index([itemId])
+}
+
+// can probably be safely deleted after migration
+model Auction {
+  id         Int      @id @default(autoincrement())
+  ownerId    String
+  itemId     String
+  itemAmount BigInt   @default(1)
+  bin        BigInt
+  messageId  String   @unique
+  createdAt  DateTime @default(now())
+  sold       Boolean  @default(false)
+
+  owner Economy @relation(fields: [ownerId], references: [userId], onDelete: Cascade)
 
   @@index([itemId])
 }
