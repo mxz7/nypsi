@@ -34,6 +34,7 @@ import {
   setInventoryItem,
 } from "../utils/functions/economy/inventory";
 import { setLevel, setPrestige } from "../utils/functions/economy/levelling";
+import { getMarketOrderEmbed } from "../utils/functions/economy/market";
 import { getEcoBanTime, getItems, isEcoBanned, setEcoBan } from "../utils/functions/economy/utils";
 import { updateXp } from "../utils/functions/economy/xp";
 import { addKarma, getKarma, removeKarma } from "../utils/functions/karma/karma";
@@ -1949,6 +1950,51 @@ async function run(
           createdAt: auction.createdAt,
         },
       });
+    }
+
+    const unSold = await prisma.market.findMany({
+      where: { AND: [{ completed: false }, { messageId: null }] },
+    });
+
+    for (const order of unSold) {
+      try {
+        const payload = await getMarketOrderEmbed(order);
+
+        const { url, id } = await (message.client as NypsiClient).cluster
+          .broadcastEval(
+            async (client, { payload, channelId }) => {
+              const channel = client.channels.cache.get(channelId);
+
+              if (!channel) return;
+              if (!channel.isSendable()) return;
+
+              try {
+                const msg = await channel.send(payload);
+
+                return { url: msg.url, id: msg.id };
+              } catch {
+                return;
+              }
+            },
+            {
+              context: { payload, channelId: Constants.MARKET_CHANNEL_ID },
+            },
+          )
+          .then((res) => {
+            return res.filter((i) => Boolean(i))[0];
+          });
+
+        await prisma.market.update({
+          where: {
+            id: order.id,
+          },
+          data: {
+            messageId: id,
+          },
+        });
+      } catch {
+        logger.warn("market: failed to send message", { order });
+      }
     }
   }
 }
