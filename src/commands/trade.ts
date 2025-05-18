@@ -338,7 +338,7 @@ async function run(
         if (res) {
           await res.deferReply({ flags: MessageFlags.Ephemeral });
 
-          let amount = res.fields.fields.get("amount").value;
+          const amount = res.fields.fields.get("amount").value;
 
           if (amount.toLowerCase() === "all") {
             offeredMoney = await getBalance(message.author.id);
