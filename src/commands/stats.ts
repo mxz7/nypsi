@@ -706,12 +706,12 @@ async function run(
     embed.addFields(
       {
         name: "buy orders",
-        value: `**${findStatAmount(stats, "market-created-buy")}** created\n**${findStatAmount(stats, "market-fulfilled-buy")}** items sold`,
+        value: `**${findStatAmount(stats, "market-created-buy")}** created\n**${findStatAmount(stats, "market-fulfilled-buy")}** items bought`,
         inline: true,
       },
       {
         name: "sell orders",
-        value: `**${findStatAmount(stats, "market-created-sell")}** created\n**${findStatAmount(stats, "market-fulfilled-sell")}** items bought`,
+        value: `**${findStatAmount(stats, "market-created-sell")}** created\n**${findStatAmount(stats, "market-fulfilled-sell")}** items sold`,
         inline: true,
       },
     );
