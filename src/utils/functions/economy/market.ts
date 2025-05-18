@@ -604,6 +604,35 @@ export async function deleteMarketOrder(id: number, client: NypsiClient, repeatC
     },
   });
 
+  if (order.messageId) {
+    await client.cluster.broadcastEval(
+      async (client, { channelId, guildId, messageId }) => {
+        const guild = client.guilds.cache.get(guildId);
+
+        if (!guild) return "no-guild";
+
+        const channel = guild.channels.cache.get(channelId);
+
+        if (!channel) return "no-channel";
+
+        if (!channel.isTextBased()) return "invalid-channel";
+
+        const message = await channel.messages.fetch(messageId).catch(() => {});
+
+        if (!message) return "no-message";
+
+        await message.delete().catch(() => {});
+      },
+      {
+        context: {
+          guildId: Constants.NYPSI_SERVER_ID,
+          channelId: Constants.AUCTION_CHANNEL_ID,
+          messageId: order.messageId,
+        },
+      },
+    );
+  }
+
   return Boolean(order);
 }
 
