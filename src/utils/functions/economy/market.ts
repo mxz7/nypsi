@@ -697,6 +697,7 @@ export async function completeOrder(
   if (accounts.includes(buyerId) || order.price < 10_000) isAlt = true;
 
   if (order.itemAmount === amount) {
+    order.completed = true;
     if (isAlt) {
       await prisma.market.delete({
         where: { id: order.id },
@@ -725,6 +726,7 @@ export async function completeOrder(
       where: { id: order.id },
       data: { itemAmount: { decrement: amount } },
     });
+    order.itemAmount -= amount;
   }
 
   const tax = await getTax();
@@ -842,14 +844,7 @@ export async function completeOrder(
     client.channels.cache.get(Constants.AUCTION_CHANNEL_ID) as TextChannel
   ).messages.fetch(order.messageId);
 
-  if (msg)
-    await msg.edit(
-      await getMarketOrderEmbed(
-        await prisma.market.findFirst({
-          where: { id: orderId },
-        }),
-      ),
-    );
+  if (msg) await msg.edit(await getMarketOrderEmbed(order));
 
   return true;
 }
@@ -1034,6 +1029,8 @@ export async function marketBuy(
   }
 
   if ((await getBalance(userId)) < buyPrice) {
+    await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
+    inTransaction.delete(itemId);
     return { status: "insufficient funds", remaining: -1 };
   }
 
@@ -1064,6 +1061,7 @@ export async function marketBuy(
   } catch (e) {
     console.error(e);
     logger.error("market buy transaction failed", e);
+    return { status: "internal error", remaining: -1 };
   }
 
   await removeBalance(userId, buyPrice);

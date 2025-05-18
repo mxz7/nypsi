@@ -76,21 +76,21 @@ export default {
 
     userFulfilling.delete(interaction.user.id);
 
+    await res.deferReply({ flags: MessageFlags.Ephemeral });
+
     order = await prisma.market.findUnique({ where: { messageId: interaction.message.id } });
 
     if (!order || !(await userExists(order.ownerId))) {
-      await interaction.reply({
+      await res.editReply({
         embeds: [new ErrorEmbed("invalid order")],
-        flags: MessageFlags.Ephemeral,
       });
       await interaction.message.delete();
       return;
     }
 
     if (order.completed || order.itemAmount <= 0n) {
-      await interaction.reply({
+      await res.editReply({
         embeds: [new ErrorEmbed("too slow ):")],
-        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -115,15 +115,14 @@ export default {
           );
 
     if (marketRes && marketRes.status !== "success" && marketRes.status !== "partial") {
-      return await res.reply({
+      return await res.editReply({
         embeds: [new ErrorEmbed(marketRes.status)],
-        flags: MessageFlags.Ephemeral,
       });
     } else {
-      return interaction.editReply({
+      return res.editReply({
         embeds: [
           new CustomEmbed(interaction.user.id).setDescription(
-            `✅ you've ${order.orderType === "sell" ? "bought" : "sold"} **${amount - marketRes.remaining}x** ${getItems()[order.itemId]} **[${getItems()[order.itemId].name}](https://nypsi.xyz/item/${order.itemId})** for $${(order.price * order.itemAmount).toLocaleString()}`,
+            `✅ you've ${order.orderType === "sell" ? "bought" : "sold"} **${(amount - marketRes.remaining).toLocaleString()}x** ${getItems()[order.itemId].emoji} **[${getItems()[order.itemId].name}](https://nypsi.xyz/item/${order.itemId})** for $${((amount - marketRes.remaining) * Number(order.price)).toLocaleString()}`,
           ),
         ],
       });

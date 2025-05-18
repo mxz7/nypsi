@@ -126,15 +126,14 @@ export default {
           );
 
     if (orderResponse && orderResponse.status !== "success" && orderResponse.status !== "partial") {
-      return await interaction.followUp({
+      return await interaction.editReply({
         embeds: [new ErrorEmbed(orderResponse.status)],
-        flags: MessageFlags.Ephemeral,
       });
     } else {
       return interaction.editReply({
         embeds: [
           new CustomEmbed(interaction.user.id).setDescription(
-            `✅ you've ${order.orderType === "sell" ? "bought" : "sold"} **1x** ${getItems()[order.itemId]} **[${getItems()[order.itemId].name}](https://nypsi.xyz/item/${order.itemId})** for $${(order.price * order.itemAmount).toLocaleString()}`,
+            `✅ you've ${order.orderType === "sell" ? "bought" : "sold"} **1x** ${getItems()[order.itemId].emoji} **[${getItems()[order.itemId].name}](https://nypsi.xyz/item/${order.itemId})** for $${order.price.toLocaleString()}`,
           ),
         ],
       });
