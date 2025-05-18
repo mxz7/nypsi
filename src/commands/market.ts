@@ -1648,10 +1648,10 @@ async function run(
           return itemView(item, msg);
         }
 
-        if (res && res.status !== "success") {
+        if (res && res.status !== "success" && res.status !== "partial") {
           if (fromCommand) {
             await interaction.deferUpdate();
-            return await edit({ embeds: [new ErrorEmbed(res.toString())], components: [] }, msg);
+            return await edit({ embeds: [new ErrorEmbed(res.status)], components: [] }, msg);
           }
           await interaction.reply({
             embeds: [new ErrorEmbed(res.toString())],
