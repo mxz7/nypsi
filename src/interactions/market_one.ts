@@ -88,11 +88,14 @@ export default {
       value = await calcItemValue(order.itemId);
     }
 
+    let deferred = false;
+
     if ((await getPreferences(interaction.user.id)).marketConfirm < value) {
       const res = await showMarketConfirmationModal(interaction, value);
 
       if (!res) return;
     } else {
+      deferred = true;
       await interaction.deferReply({ flags: MessageFlags.Ephemeral });
     }
 
@@ -126,17 +129,35 @@ export default {
           );
 
     if (orderResponse && orderResponse.status !== "success" && orderResponse.status !== "partial") {
-      return await interaction.editReply({
-        embeds: [new ErrorEmbed(orderResponse.status)],
-      });
+      if (deferred) {
+        return interaction.editReply({
+          embeds: [new ErrorEmbed(orderResponse.status)],
+        });
+      } else {
+        return interaction.followUp({
+          embeds: [new ErrorEmbed(orderResponse.status)],
+          flags: MessageFlags.Ephemeral,
+        });
+      }
     } else {
-      return interaction.editReply({
-        embeds: [
-          new CustomEmbed(interaction.user.id).setDescription(
-            `✅ you've ${order.orderType === "sell" ? "bought" : "sold"} **1x** ${getItems()[order.itemId].emoji} **[${getItems()[order.itemId].name}](https://nypsi.xyz/item/${order.itemId})** for $${order.price.toLocaleString()}`,
-          ),
-        ],
-      });
+      if (deferred) {
+        return interaction.editReply({
+          embeds: [
+            new CustomEmbed(interaction.user.id).setDescription(
+              `✅ you've ${order.orderType === "sell" ? "bought" : "sold"} **1x** ${getItems()[order.itemId].emoji} **[${getItems()[order.itemId].name}](https://nypsi.xyz/item/${order.itemId})** for $${order.price.toLocaleString()}`,
+            ),
+          ],
+        });
+      } else {
+        return interaction.followUp({
+          embeds: [
+            new CustomEmbed(interaction.user.id).setDescription(
+              `✅ you've ${order.orderType === "sell" ? "bought" : "sold"} **1x** ${getItems()[order.itemId].emoji} **[${getItems()[order.itemId].name}](https://nypsi.xyz/item/${order.itemId})** for $${order.price.toLocaleString()}`,
+            ),
+          ],
+          flags: MessageFlags.Ephemeral,
+        });
+      }
     }
   },
 } as InteractionHandler;

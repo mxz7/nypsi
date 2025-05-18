@@ -86,11 +86,14 @@ export default {
       value = (await calcItemValue(order.itemId)) * Number(order.itemAmount);
     }
 
+    let deferred = false;
+
     if ((await getPreferences(interaction.user.id)).marketConfirm < value) {
       const res = await showMarketConfirmationModal(interaction, value);
 
       if (!res) return;
     } else {
+      deferred = true;
       await interaction.deferReply({ flags: MessageFlags.Ephemeral });
     }
 
@@ -122,17 +125,35 @@ export default {
           );
 
     if (res && res.status !== "success" && res.status !== "partial") {
-      return await interaction.editReply({
-        embeds: [new ErrorEmbed(res.status)],
-      });
+      if (deferred) {
+        return interaction.editReply({
+          embeds: [new ErrorEmbed(res.status)],
+        });
+      } else {
+        return await interaction.followUp({
+          embeds: [new ErrorEmbed(res.status)],
+          flags: MessageFlags.Ephemeral,
+        });
+      }
     } else {
-      return interaction.editReply({
-        embeds: [
-          new CustomEmbed(interaction.user.id).setDescription(
-            `✅ you've ${order.orderType === "sell" ? "bought" : "sold"} **${(Number(order.itemAmount) - res.remaining).toLocaleString()}x** ${getItems()[order.itemId].emoji} **[${getItems()[order.itemId].name}](https://nypsi.xyz/item/${order.itemId})** for $${(order.price * order.itemAmount).toLocaleString()}`,
-          ),
-        ],
-      });
+      if (deferred) {
+        return interaction.editReply({
+          embeds: [
+            new CustomEmbed(interaction.user.id).setDescription(
+              `✅ you've ${order.orderType === "sell" ? "bought" : "sold"} **${(Number(order.itemAmount) - res.remaining).toLocaleString()}x** ${getItems()[order.itemId].emoji} **[${getItems()[order.itemId].name}](https://nypsi.xyz/item/${order.itemId})** for $${(order.price * order.itemAmount).toLocaleString()}`,
+            ),
+          ],
+        });
+      } else {
+        return interaction.followUp({
+          embeds: [
+            new CustomEmbed(interaction.user.id).setDescription(
+              `✅ you've ${order.orderType === "sell" ? "bought" : "sold"} **${(Number(order.itemAmount) - res.remaining).toLocaleString()}x** ${getItems()[order.itemId].emoji} **[${getItems()[order.itemId].name}](https://nypsi.xyz/item/${order.itemId})** for $${(order.price * order.itemAmount).toLocaleString()}`,
+            ),
+          ],
+          flags: MessageFlags.Ephemeral,
+        });
+      }
     }
   },
 } as InteractionHandler;
