@@ -1352,7 +1352,7 @@ async function run(
         });
         return waitForButton();
       } else if (res.customId === "del-aliases") {
-        if ((await getAdminLevel(message.member) < 3) {
+        if ((await getAdminLevel(message.member)) < 3) {
           await res.editReply({
             embeds: [new ErrorEmbed("you require admin level **3** to do this")],
           });

@@ -752,8 +752,15 @@ async function playGame(
     for (const item of row) {
       if (["c", "gc"].includes(item)) {
         if (response.deferred || response.replied)
-          await response.followUp({ embeds: [new ErrorEmbed("invalid square")], flags: MessageFlags.Ephemeral });
-        else await response.reply({ embeds: [new ErrorEmbed("invalid square")], flags: MessageFlags.Ephemeral });
+          await response.followUp({
+            embeds: [new ErrorEmbed("invalid square")],
+            flags: MessageFlags.Ephemeral,
+          });
+        else
+          await response.reply({
+            embeds: [new ErrorEmbed("invalid square")],
+            flags: MessageFlags.Ephemeral,
+          });
         return playGame(message, msg, args);
       }
     }

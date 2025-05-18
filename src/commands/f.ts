@@ -61,7 +61,10 @@ async function run(
     if (i.customId == customId) {
       if (reactions.includes(i.user.id)) {
         return await i
-          .reply({ embeds: [new ErrorEmbed("you can only do this once")], flags: MessageFlags.Ephemeral })
+          .reply({
+            embeds: [new ErrorEmbed("you can only do this once")],
+            flags: MessageFlags.Ephemeral,
+          })
           .catch(() => {});
       }
 

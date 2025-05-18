@@ -20,11 +20,13 @@ export async function getUserAliases(member: GuildMember | string) {
     ) as UserAlias[];
   }
 
-  const query = (await isPremium(id)) ? await prisma.userAlias.findMany({
-    where: {
-      userId: id,
-    },
-  }) : [];
+  const query = (await isPremium(id))
+    ? await prisma.userAlias.findMany({
+        where: {
+          userId: id,
+        },
+      })
+    : [];
 
   await redis.set(
     `${Constants.redis.cache.premium.ALIASES}:${id}`,

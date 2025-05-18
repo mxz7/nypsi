@@ -694,12 +694,14 @@ async function run(
     const stats = await getStats(message.member);
 
     const embed = new CustomEmbed(message.member);
-    
-    embed.setDescription(`you have bought **${findStatAmount(stats, "market-bought-items")}** item${
-            findStatAmount(stats, "market-bought-items") === "1" ? "" : "s"
-          } and sold **${findStatAmount(stats, "market-sold-items")}** item${
-            findStatAmount(stats, "market-sold-items") === "1" ? "" : "s"
-          }`);
+
+    embed.setDescription(
+      `you have bought **${findStatAmount(stats, "market-bought-items")}** item${
+        findStatAmount(stats, "market-bought-items") === "1" ? "" : "s"
+      } and sold **${findStatAmount(stats, "market-sold-items")}** item${
+        findStatAmount(stats, "market-sold-items") === "1" ? "" : "s"
+      }`,
+    );
 
     embed.addFields(
       {

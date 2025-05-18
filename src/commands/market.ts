@@ -742,12 +742,7 @@ async function run(
     }
 
     options.push(
-      new StringSelectMenuOptionBuilder()
-        .setValue("delAll")
-        .setEmoji("🗑")
-        .setLabel(
-          `delete all`,
-        ),
+      new StringSelectMenuOptionBuilder().setValue("delAll").setEmoji("🗑").setLabel(`delete all`),
     );
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
