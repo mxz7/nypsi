@@ -1660,21 +1660,23 @@ async function run(
           return itemView(item, msg);
         }
 
-        if (fromCommand) {
+        if (res.status === "partial") {
           embed.setDescription(
             `✅ ${type == "buy" ? "bought" : "sold"} ${amount} ${item.emoji} ${amount == 1 || !item.plural ? item.name : item.plural} for $${price.toLocaleString()}`,
           );
+        } else {
+          embed.setDescription(
+            `✅ ${type == "buy" ? "bought" : "sold"} ${amount.toLocaleString()} ${item.emoji} ${amount == 1 || !item.plural ? item.name : item.plural} for $${price.toLocaleString()}`,
+          );
+        }
+
+        if (fromCommand) {
           await interaction.deferUpdate();
           return await msg.edit({ embeds: [embed], components: [] });
         }
 
         await interaction.reply({
-          embeds: [
-            new CustomEmbed(
-              message.member,
-              `✅ ${type == "buy" ? "bought" : "sold"} ${amount} ${item.emoji} ${amount == 1 || !item.plural ? item.name : item.plural} for $${price.toLocaleString()}`,
-            ),
-          ],
+          embeds: [embed],
           flags: MessageFlags.Ephemeral,
         });
         return itemView(item, msg);
