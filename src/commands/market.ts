@@ -1027,7 +1027,7 @@ async function run(
 
     const selected = selectItem(item);
 
-    if (type === "back") type = "buy";
+    if (type === "b") type = "buy";
     else if (type === "s") type = "sell";
 
     if (type != "buy" && type != "sell") {
