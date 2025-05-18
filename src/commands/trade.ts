@@ -280,8 +280,16 @@ async function run(
           const item = res.fields.fields.get("item").value;
           let amount = res.fields.fields.get("amount").value;
 
+          inventory = await getInventory(message.author.id);
+
+          const selected = selectItem(item);
+
           if (amount.toLowerCase() === "all") {
-            amount = inventory.find((i) => i.item == selected.id).amount.toString();
+            if (!inventory.find((i) => i.item === selected.id)) {
+              amount = "1";
+            } else {
+              amount = inventory.find((i) => i.item == selected.id).amount.toString();
+            }
           }
 
           const selected = selectItem(item);
@@ -335,7 +343,8 @@ async function run(
           let amount = res.fields.fields.get("amount").value;
 
           if (amount.toLowerCase() === "all") {
-            amount = balance.toString();
+            offeredMoney = await getBalance(message.author.id);
+            await res.deleteReply();
           } else if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
             await res.editReply({
               embeds: [new ErrorEmbed("invalid amount")],
