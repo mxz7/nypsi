@@ -198,10 +198,9 @@ export default async function messageCreate(message: Message) {
             embeds: [new CustomEmbed().setDescription("failed to create support request")],
           });
         } else {
-          const embed = new CustomEmbed(message.author.id).setHeader(
-            message.author.username,
-            message.author.avatarURL(),
-          );
+          const embed = new CustomEmbed()
+            .setHeader(message.author.username, message.author.avatarURL())
+            .setColor("#111111");
 
           if (message.attachments.first()) {
             if (message.attachments.first().contentType.startsWith("image/")) {
@@ -230,10 +229,9 @@ export default async function messageCreate(message: Message) {
         }
       }
     } else {
-      const embed = new CustomEmbed().setHeader(
-        message.author.username,
-        message.author.avatarURL(),
-      );
+      const embed = new CustomEmbed()
+        .setHeader(message.author.username, message.author.avatarURL())
+        .setColor("#111111");
 
       if (message.content) {
         embed.setDescription(message.content);
