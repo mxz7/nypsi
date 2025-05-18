@@ -875,7 +875,7 @@ export async function completeOrder(
     const embed = await getMarketOrderEmbed(order);
 
     await client.cluster.broadcastEval(
-      async (client, { channelId, messageId }) => {
+      async (client, { channelId, messageId, embed }) => {
         const channel = client.channels.cache.get(channelId) as TextChannel;
 
         if (!channel || !channel.isTextBased()) return "no-channel";
