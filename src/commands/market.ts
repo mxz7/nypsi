@@ -1253,8 +1253,8 @@ async function run(
     );
 
     const updateEmbed = async () => {
-      const buyOrders = await getMarketItemOrders(item.id, "buy");
-      const sellOrders = await getMarketItemOrders(item.id, "sell");
+      const buyOrders = await getMarketItemOrders(item.id, "buy").then((r) => r.reverse());
+      const sellOrders = await getMarketItemOrders(item.id, "sell").then((r) => r.reverse());
 
       const totalBuyOrderCount = buyOrders.reduce((sum, item) => sum + Number(item.itemAmount), 0);
       const totalSellOrderCount = sellOrders.reduce(
