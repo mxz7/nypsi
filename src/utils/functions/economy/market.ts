@@ -854,11 +854,11 @@ export async function completeOrder(
           let description = "";
 
           for (const [item, buyers] of data.items) {
-            description += `${getItems()[item].emoji} **${getItems()[item].name}**:\n`;
+            description += `- ${getItems()[item].emoji} **${getItems()[item].name}**:\n`;
 
             for (const [buyer, amount] of buyers) {
               const username = await getLastKnownUsername(buyer);
-              description += `- **${username}**: ${amount.toLocaleString()}\n`;
+              description += `  - **${username}**: ${amount.toLocaleString()}\n`;
               total += amount;
             }
 

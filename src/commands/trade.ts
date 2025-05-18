@@ -36,6 +36,7 @@ import {
   selectItem,
   setInventoryItem,
 } from "../utils/functions/economy/inventory";
+import { getRawLevel } from "../utils/functions/economy/levelling";
 import {
   bumpTradeRequest,
   createTradeRequest,
@@ -43,13 +44,12 @@ import {
   getTradeRequestByMessage,
   getTradeRequests,
 } from "../utils/functions/economy/trade_requests";
-import { getRawLevel } from "../utils/functions/economy/levelling";
 import { createUser, formatBet, getItems, userExists } from "../utils/functions/economy/utils";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
+import { getAdminLevel } from "../utils/functions/users/admin";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
-import { getAdminLevel } from "../utils/functions/users/admin";
 
 const cmd = new Command("trade", "create and manage your trades", "money").setAliases(["trades"]);
 
@@ -100,7 +100,7 @@ async function run(
 
   if (!(await userExists(message.author.id))) await createUser(message.author.id);
 
-  if (message.client.user.id !== Constants.BOT_USER_ID && (await getAdminLevel(this.member)) < 1)
+  if (message.client.user.id !== Constants.BOT_USER_ID && (await getAdminLevel(message.member)) < 1)
     return send({ embeds: [new ErrorEmbed("lol")] });
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);

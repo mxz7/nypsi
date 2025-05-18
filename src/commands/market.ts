@@ -60,8 +60,8 @@ import {
 } from "../utils/functions/economy/utils";
 import { getEmojiImage } from "../utils/functions/image";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
-import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { getAdminLevel } from "../utils/functions/users/admin";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command(
   "market",
@@ -216,7 +216,7 @@ async function run(
 
   if (!(await userExists(message.author.id))) await createUser(message.author.id);
 
-  if (message.client.user.id !== Constants.BOT_USER_ID && (await getAdminLevel(this.member)) < 1)
+  if (message.client.user.id !== Constants.BOT_USER_ID && (await getAdminLevel(message.member)) < 1)
     return send({ embeds: [new ErrorEmbed("lol")] });
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);

@@ -46,13 +46,13 @@ import {
 import { addXp, calcEarnedGambleXp } from "../utils/functions/economy/xp";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { percentChance } from "../utils/functions/random";
+import { getAdminLevel } from "../utils/functions/users/admin";
 import { recentCommands } from "../utils/functions/users/commands";
 import { addHourlyCommand } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { gamble, getTimestamp, logger } from "../utils/logger";
 import _ = require("lodash");
 import ms = require("ms");
-import { getAdminLevel } from "../utils/functions/users/admin";
 
 const cmd = new Command("tower", "play dragon tower", "money").setAliases([
   "dragon",
@@ -603,7 +603,7 @@ async function playGame(
       }
 
       if (await redis.get("nypsi:maintenance")) {
-        if ((await getAdminLevel(this.member)) > 0 && message instanceof Message) {
+        if ((await getAdminLevel(message.member)) > 0 && message instanceof Message) {
           message.react("💀");
         } else {
           return msg.edit({
