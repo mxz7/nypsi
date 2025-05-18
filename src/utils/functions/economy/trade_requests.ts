@@ -13,18 +13,18 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed, ErrorEmbed } from "../../../models/EmbedBuilders";
+import { Item } from "../../../types/Economy";
 import Constants from "../../Constants";
 import { logger, transactionMulti } from "../../logger";
 import { getAllGroupAccountIds } from "../moderation/alts";
 import { getTier, isPremium } from "../premium/premium";
 import { addToNypsiBank, getTax } from "../tax";
+import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { addBalance } from "./balance";
 import { addInventoryItem, getInventory, setInventoryItem } from "./inventory";
 import { createUser, getItems, userExists } from "./utils";
 import ms = require("ms");
 import dayjs = require("dayjs");
-import { Item } from "../../../types/Economy";
-import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 
 const beingFulfilled = new Set<number>();
 
@@ -174,17 +174,17 @@ export async function createTradeRequest(
     }
   }
 
-  const { url, id } = await (member.client as NypsiClient).cluster
+  const messageResponse = await (member.client as NypsiClient).cluster
     .broadcastEval(
       async (client, { guildId, channelId, embed, row, cluster }) => {
-        if ((client as unknown as NypsiClient).cluster.id != cluster) return;
-        const guild = await client.guilds.cache.get(guildId);
+        if ((client as unknown as NypsiClient).cluster.id != cluster) return "no-cluster";
+        const guild = client.guilds.cache.get(guildId);
 
-        if (!guild) return;
+        if (!guild) return "no-guild";
 
-        const channel = await guild.channels.cache.get(channelId);
+        const channel = guild.channels.cache.get(channelId);
 
-        if (!channel) return;
+        if (!channel) return "no-channel";
 
         if (channel.isTextBased()) {
           const msg = await channel.send({ embeds: [embed], components: [row] });
@@ -206,17 +206,22 @@ export async function createTradeRequest(
       return res.filter((i) => Boolean(i))[0];
     });
 
+  if (typeof messageResponse === "string") {
+    logger.error(`failed creating trade request: ${messageResponse}`);
+    return;
+  }
+
   await prisma.tradeRequest.create({
     data: {
       requestedItems: requestedItems.map((i) => `${i.item.id}:${i.amount}`),
       offeredItems: offeredItems.map((i) => `${i.item.id}:${i.amount}`),
       offeredMoney: BigInt(offeredMoney),
-      messageId: id,
+      messageId: messageResponse.id,
       ownerId: member.user.id,
     },
   });
 
-  return url;
+  return messageResponse.url;
 }
 
 export async function bumpTradeRequest(id: number, client: NypsiClient) {
@@ -397,7 +402,10 @@ export async function fulfillTradeRequest(
   });
 
   if (!tradeRequest) {
-    await interaction.reply({ embeds: [new ErrorEmbed("invalid trade request")], flags: MessageFlags.Ephemeral });
+    await interaction.reply({
+      embeds: [new ErrorEmbed("invalid trade request")],
+      flags: MessageFlags.Ephemeral,
+    });
     await interaction.message.delete();
     beingFulfilled.delete(tradeRequest.id);
     await redis.del(`${Constants.redis.nypsi.TRADE_FULFILLING}:${tradeRequest.id}`);
