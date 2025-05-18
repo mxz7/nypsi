@@ -6,7 +6,7 @@ import { NypsiClient } from "../models/Client";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
 import { getBalance } from "../utils/functions/economy/balance";
-import { calcItemValue, getInventory } from "../utils/functions/economy/inventory";
+import { getInventory } from "../utils/functions/economy/inventory";
 import {
   marketBuy,
   marketSell,
@@ -130,7 +130,7 @@ export default {
     let value = Number(order.price);
 
     if (order.orderType === "buy") {
-      value = await calcItemValue(order.itemId);
+      value = Number(order.price);
     }
 
     let deferred = false;
