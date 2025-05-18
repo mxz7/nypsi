@@ -2,7 +2,7 @@ import { Market } from "@prisma/client";
 import { MessageFlags } from "discord.js";
 import prisma from "../init/database";
 import { NypsiClient } from "../models/Client";
-import { ErrorEmbed } from "../models/EmbedBuilders";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
 import { calcItemValue } from "../utils/functions/economy/inventory";
 import {
@@ -10,7 +10,7 @@ import {
   marketSell,
   showMarketConfirmationModal,
 } from "../utils/functions/economy/market";
-import { isEcoBanned, userExists } from "../utils/functions/economy/utils";
+import { getItems, isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { getPreferences } from "../utils/functions/users/notifications";
 
 export default {
@@ -126,6 +126,14 @@ export default {
         embeds: [new ErrorEmbed(res.status)],
         flags: MessageFlags.Ephemeral,
       });
-    } else return interaction.deferUpdate();
+    } else {
+      return interaction.editReply({
+        embeds: [
+          new CustomEmbed(interaction.user.id).setDescription(
+            `✅ you've ${order.orderType === "sell" ? "bought" : "sold"} **${Number(order.itemAmount) - res.remaining}x** ${getItems()[order.itemId]} **[${getItems()[order.itemId].name}](https://nypsi.xyz/item/${order.itemId})** for $${(order.price * order.itemAmount).toLocaleString()}`,
+          ),
+        ],
+      });
+    }
   },
 } as InteractionHandler;

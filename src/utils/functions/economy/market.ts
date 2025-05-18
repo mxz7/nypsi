@@ -1,5 +1,4 @@
 import { Market, MarketWatch, OrderType, Prisma, PrismaClient } from "@prisma/client";
-import { randomUUID } from "crypto";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -863,7 +862,7 @@ export async function marketSell(
   client: NypsiClient,
   orderId?: number,
   repeatCount = 1,
-): Promise<{ status: string; remaining?: number }> {
+): Promise<{ status: string; remaining: number }> {
   if (
     inTransaction.has(itemId) ||
     (await redis.exists(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`))
@@ -897,14 +896,14 @@ export async function marketSell(
     if (orders[0].completed || orders[0].itemAmount < amount) {
       await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
       inTransaction.delete(itemId);
-      return { status: "too slow ):" };
+      return { status: "too slow ):", remaining: -1 };
     }
   }
 
   if (sellPrice == -1) {
     await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
     inTransaction.delete(itemId);
-    return { status: "not enough items" };
+    return { status: "not enough items", remaining: -1 };
   }
 
   if (storedPrice !== sellPrice) {
@@ -912,6 +911,7 @@ export async function marketSell(
     inTransaction.delete(itemId);
     return {
       status: `since viewing the market, the sell price has changed from $${storedPrice.toLocaleString()} to $${sellPrice.toLocaleString()}. please press sell again with this updated price in mind`,
+      remaining: -1,
     };
   }
 
@@ -925,6 +925,7 @@ export async function marketSell(
     inTransaction.delete(itemId);
     return {
       status: `you do not have this many ${getItems()[itemId].plural ? getItems()[itemId].plural : getItems()[itemId].name}`,
+      remaining: -1,
     };
   }
 
@@ -968,7 +969,7 @@ export async function marketSell(
     return { status: "partial", remaining };
   }
 
-  return { status: "success" };
+  return { status: "success", remaining };
 }
 
 export async function marketBuy(
@@ -979,7 +980,7 @@ export async function marketBuy(
   client: NypsiClient,
   orderId?: number,
   repeatCount = 1,
-): Promise<{ status: string; remaining?: number }> {
+): Promise<{ status: string; remaining: number }> {
   if (
     inTransaction.has(itemId) ||
     (await redis.exists(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`))
@@ -1013,14 +1014,14 @@ export async function marketBuy(
     if (orders[0].completed || orders[0].itemAmount < amount) {
       await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
       inTransaction.delete(itemId);
-      return { status: "too slow ):" };
+      return { status: "too slow ):", remaining: -1 };
     }
   }
 
   if (buyPrice == -1) {
     await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
     inTransaction.delete(itemId);
-    return { status: "not enough items" };
+    return { status: "not enough items", remaining: -1 };
   }
 
   if (storedPrice !== buyPrice) {
@@ -1028,11 +1029,12 @@ export async function marketBuy(
     inTransaction.delete(itemId);
     return {
       status: `since viewing the market, the buy price has changed from $${storedPrice.toLocaleString()} to $${buyPrice.toLocaleString()}. please press buy again with this updated price in mind`,
+      remaining: -1,
     };
   }
 
   if ((await getBalance(userId)) < buyPrice) {
-    return { status: "insufficient funds" };
+    return { status: "insufficient funds", remaining: -1 };
   }
 
   let remaining = amount;
@@ -1075,7 +1077,7 @@ export async function marketBuy(
     return { status: "partial", remaining };
   }
 
-  return { status: "success" };
+  return { status: "success", remaining };
 }
 
 export async function showMarketConfirmationModal(interaction: ButtonInteraction, cost: number) {
@@ -1113,7 +1115,10 @@ export async function showMarketConfirmationModal(interaction: ButtonInteraction
     });
     return false;
   }
-  res.reply({ embeds: [new CustomEmbed(null, "✅ confirmation accepted")], flags: MessageFlags.Ephemeral });
+  res.reply({
+    embeds: [new CustomEmbed(null, "✅ confirmation accepted")],
+    flags: MessageFlags.Ephemeral,
+  });
 
   return true;
 }

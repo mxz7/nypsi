@@ -10,10 +10,10 @@ import {
 } from "discord.js";
 import prisma from "../init/database";
 import { NypsiClient } from "../models/Client";
-import { ErrorEmbed } from "../models/EmbedBuilders";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
 import { marketBuy, marketSell } from "../utils/functions/economy/market";
-import { isEcoBanned, userExists } from "../utils/functions/economy/utils";
+import { getItems, isEcoBanned, userExists } from "../utils/functions/economy/utils";
 
 const userFulfilling = new Map<string, number>();
 
@@ -68,7 +68,10 @@ export default {
 
     if (!amount || amount < 1) {
       userFulfilling.delete(interaction.user.id);
-      return res.reply({ embeds: [new ErrorEmbed("invalid amount")], flags: MessageFlags.Ephemeral });
+      return res.reply({
+        embeds: [new ErrorEmbed("invalid amount")],
+        flags: MessageFlags.Ephemeral,
+      });
     }
 
     userFulfilling.delete(interaction.user.id);
@@ -117,7 +120,13 @@ export default {
         flags: MessageFlags.Ephemeral,
       });
     } else {
-      return interaction.deferUpdate();
+      return interaction.editReply({
+        embeds: [
+          new CustomEmbed(interaction.user.id).setDescription(
+            `✅ you've ${order.orderType === "sell" ? "bought" : "sold"} **${amount - marketRes.remaining}x** ${getItems()[order.itemId]} **[${getItems()[order.itemId].name}](https://nypsi.xyz/item/${order.itemId})** for $${(order.price * order.itemAmount).toLocaleString()}`,
+          ),
+        ],
+      });
     }
   },
 } as InteractionHandler;
