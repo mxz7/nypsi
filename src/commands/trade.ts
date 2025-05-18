@@ -460,6 +460,11 @@ async function run(
           embed.setFields();
         } else {
           embed.setDescription("there was an error while creating your trade request");
+          if (offeredMoney > 0) await addBalance(message.member, offeredMoney);
+
+          for (const item of offeredItems) {
+            await addInventoryItem(message.member, item.item.id, item.amount);
+          }
         }
 
         return await edit({ embeds: [embed], components: [] }, msg);
