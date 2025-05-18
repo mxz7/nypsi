@@ -190,6 +190,8 @@ export async function createMarketOrder(
 
   if (sold) return response;
 
+  order.itemAmount = BigInt(amount);
+
   const payload = await getMarketOrderEmbed(order);
 
   const { url, id } = await client.cluster
@@ -420,7 +422,7 @@ export async function checkMarketOrder(
   inTransaction.delete(order.itemId);
   await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${order.itemId}`);
 
-  if (order.itemAmount === 0n) return true;
+  if (remaining === 0n) return true;
   else return remaining;
 }
 
