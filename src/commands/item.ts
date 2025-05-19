@@ -95,7 +95,7 @@ async function run(
 
   const desc: string[] = [];
 
-  desc.push(`[\`${selected.id}\`](https://nypsi.xyz/item/${selected.id})`);
+  desc.push(`[\`${selected.id}\`](https://nypsi.xyz/item/${selected.id}?ref=bot-item)`);
   desc.push(`\n> ${selected.longDesc}\n`);
 
   if (selected.booster_desc) {
@@ -215,7 +215,7 @@ async function run(
         .setStyle(ButtonStyle.Link)
         .setLabel("leaderboard")
         .setEmoji("🏆")
-        .setURL(`https://nypsi.xyz/leaderboard/${selected.id}`),
+        .setURL(`https://nypsi.xyz/leaderboard/${selected.id}?ref=bot-item`),
     );
 
   if (
@@ -232,7 +232,7 @@ async function run(
         .setStyle(ButtonStyle.Link)
         .setLabel("history")
         .setEmoji("📈")
-        .setURL("https://nypsi.xyz/item/history/" + selected.id),
+        .setURL(`https://nypsi.xyz/item/history/${selected.id}?ref=bot-item`),
     );
   }
 

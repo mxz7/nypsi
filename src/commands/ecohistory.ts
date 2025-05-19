@@ -65,7 +65,9 @@ async function run(
     return send({ embeds: [new ErrorEmbed("this command requires premium membership. /premium")] });
   }
 
-  return send({ embeds: [new CustomEmbed(message.member, "moved to https://nypsi.xyz/me")] });
+  return send({
+    embeds: [new CustomEmbed(message.member, "moved to https://nypsi.xyz/me?ref=bot-ecohistory")],
+  });
 
   // if (args.length == 0) {
   //   return send({

@@ -138,7 +138,7 @@ async function run(
   embed.setHeader(
     "your inventory",
     message.author.avatarURL(),
-    `https://nypsi.xyz/user/${message.author.id}#inventory`,
+    `https://nypsi.xyz/user/${message.author.id}?ref=bot-inv`,
   );
 
   const updatePage = (page: Item[], embed: CustomEmbed) => {

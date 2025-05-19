@@ -138,7 +138,7 @@ async function run(
         let out =
           `**id** [\`${game.id.toString(36)}\`](https://nypsi.xyz/game/${game.id.toString(
             36,
-          )}) \`(${game.id})\`\n` +
+          )}?ref=bot-game) \`(${game.id})\`\n` +
           `**user** \`${
             game.economy.user.Preferences?.leaderboards
               ? game.economy.user.lastKnownUsername
@@ -240,13 +240,13 @@ async function run(
     const embed = new CustomEmbed(game.userId).setHeader(
       username ? `${username}'s ${game.game} game` : `id: ${game.id.toString(36)}`,
       username === "[hidden]" ? message.author.avatarURL() : await getLastKnownAvatar(game.userId),
-      `https://nypsi.xyz/game/${game.id.toString(36)}`,
+      `https://nypsi.xyz/game/${game.id.toString(36)}?ref=bot-game`,
     );
 
     let components: ActionRowBuilder<MessageActionRowComponentBuilder>[];
 
     const desc =
-      `**id** [\`${game.id.toString(36)}\`](https://nypsi.xyz/game/${game.id.toString(36)}) \`(${
+      `**id** [\`${game.id.toString(36)}\`](https://nypsi.xyz/game/${game.id.toString(36)}?ref=bot-game) \`(${
         game.id
       })\`\n` +
       `**user** \`${username || "[redacted]"}\`\n` +

@@ -210,7 +210,7 @@ async function doHunt(
   const embed = new CustomEmbed(member).setHeader(
     user.username,
     user.avatarURL(),
-    `https://nypsi.xyz/user/${user.id}`,
+    `https://nypsi.xyz/user/${user.id}?ref=bot-hunt`,
   );
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(

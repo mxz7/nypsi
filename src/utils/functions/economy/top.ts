@@ -1181,7 +1181,7 @@ export async function topWordleTime(guild: Guild, userId: string) {
         user.userId,
         await getLastKnownUsername(user.userId),
         true,
-      )} [\`${formatTime(user.time)}\`](https://nypsi.xyz/wordle/${user.gameId?.toString(36)})`,
+      )} [\`${formatTime(user.time)}\`](https://nypsi.xyz/wordle/${user.gameId?.toString(36)}?ref=bot-lb)`,
     );
   }
 
@@ -1232,7 +1232,7 @@ ORDER BY time ASC limit 100`;
         user.userId,
         await getLastKnownUsername(user.userId),
         true,
-      )} [\`${formatTime(user.time)}\`](https://nypsi.xyz/wordle/${user.gameId?.toString(36)})`,
+      )} [\`${formatTime(user.time)}\`](https://nypsi.xyz/wordle/${user.gameId?.toString(36)}?ref=bot-lb)`,
     );
   }
 

@@ -119,7 +119,7 @@ async function run(
     const embed = new CustomEmbed(game.userId).setHeader(
       username ? `${username}'s wordle game` : `id: ${game.id.toString(36)}`,
       username === "[hidden]" ? message.author.avatarURL() : await getLastKnownAvatar(game.userId),
-      `https://nypsi.xyz/wordle/${game.id.toString(36)}`,
+      `https://nypsi.xyz/wordle/${game.id.toString(36)}?ref=bot-wordle`,
     );
 
     games.set(game.id.toString(36), {
