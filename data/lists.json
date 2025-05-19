@@ -116,7 +116,7 @@
     "**guilds** are a fundamental part of nypsi. they allow you to work as a team and to earn a lot of crates. you can learn more about guilds [here](https://nypsi.xyz/docs/economy/guilds?ref=bot-tip)",
     "to level up you need to have money in your bank and enough xp. you can view the requirements in **$profile**. once you get to level 100 you can prestige",
     "prestiging may sound scary, but it's not like other games you might be familiar with. when you prestige in nypsi you don't lose anything, your level just goes down by 100, and you gain a **personal upgrade**. these upgrades will persist through seasons and can be changed with a [**reroll token**](https://nypsi.xyz/item/reroll_token)",
-    "need a bigger bank? use [**stolen credit cards**](https://nypsi.xyz/item/stolen_credit_card) to upgrade your bank capacity",
+    "need a bigger bank? use [**stolen credit cards**](https://nypsi.xyz/item/stolen_credit_card?ref=bot-tip) to upgrade your bank capacity",
     "nypsi has a **seasonal economy**. this means the majority of stuff resets every 6 months. you can view the current season with **$season**\n\nprestige, achievements, daily streak and premium do not reset",
     "want to get a boost over other players? take a visit to our [**online store**](https://ko-fi.com/tekoh) where you can buy premium or crates, as well as supporting the bot <3",
     "have a rare item? don't sell it with **$sell**!!!!!! put it on auction with **$auction** to sell it to another player for a lot more money",

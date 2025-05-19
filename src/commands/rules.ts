@@ -9,7 +9,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
     embeds: [
       new CustomEmbed(
         message.member,
-        "rules for the **bot** and the [official nypsi discord server](https://nypsi.xyz/discord) can be found below\n\nhttps://nypsi.xyz/rules",
+        "rules for the **bot** and the [official nypsi discord server](https://nypsi.xyz/discord) can be found below\n\nhttps://nypsi.xyz/rules?ref=bot-rules",
       ),
     ],
   });

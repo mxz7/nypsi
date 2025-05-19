@@ -60,7 +60,7 @@ export async function createOffer(
       taxedAmount != 0 ? ` (${(tax * 100).toFixed(1)}% tax)` : ""
     } for your **${itemAmount.toLocaleString()}x** ${getItems()[itemId].emoji} **[${
       getItems()[itemId].name
-    }](https://nypsi.xyz/item/${itemId})**\n\ndo you accept?`,
+    }](https://nypsi.xyz/item/${itemId}?ref=bot-offer)**\n\ndo you accept?`,
   ).setHeader(`${owner.user.username}'s offer`, owner.user.avatarURL());
 
   if (itemAmount > 1 && money > 1000) {

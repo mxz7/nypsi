@@ -18,15 +18,15 @@
 
 ## add to your server
 
-invite link can be found at: [`nypsi.xyz/invite`](https://nypsi.xyz/invite)
+invite link can be found at: [`nypsi.xyz/invite`](https://nypsi.xyz/invite?ref=nypsi-git)
 
 ## documentation
 
-the documentation can be found at [`nypsi.xyz/docs`](https://nypsi.xyz/docs)
+the documentation can be found at [`nypsi.xyz/docs`](https://nypsi.xyz/docs?ref=nypsi-git)
 
 ## self host
 
-[setup tutorial](https://nypsi.xyz/docs/self-host)
+[setup tutorial](https://nypsi.xyz/docs/self-host?ref=nypsi-git)
 
 ## top.gg
 
@@ -42,7 +42,7 @@ gimme ur moneis ):< - haha joking but seriously check out the online shop!! it a
 
 ## features
 
-better showcase of features can be found on the bot's website: [`nypsi.xyz`](https://nypsi.xyz)
+better showcase of features can be found on the bot's website: [`nypsi.xyz`](https://nypsi.xyz?ref=nypsi-git)
 
 ### reaction roles
 

@@ -95,7 +95,7 @@ async function run(
 
   const desc: string[] = [];
 
-  desc.push(`[\`${selected.id}\`](https://nypsi.xyz/item/${selected.id})`);
+  desc.push(`[\`${selected.id}\`](https://nypsi.xyz/item/${selected.id}?ref=bot-item)`);
   desc.push(`\n> ${selected.longDesc}\n`);
 
   if (selected.booster_desc) {
@@ -183,7 +183,8 @@ async function run(
     rarityMap.set(3, "very rare");
     rarityMap.set(4, "exotic");
     rarityMap.set(5, "impossible");
-    rarityMap.set(6, "literally not possible within your lifetime");
+    rarityMap.set(6, "more impossible");
+    rarityMap.set(7, "even more impossible");
 
     if (rarityMap.get(selected.rarity)) {
       embed.addField("rarity", `\`${rarityMap.get(selected.rarity)}\``, true);
@@ -215,7 +216,7 @@ async function run(
         .setStyle(ButtonStyle.Link)
         .setLabel("leaderboard")
         .setEmoji("🏆")
-        .setURL(`https://nypsi.xyz/leaderboard/${selected.id}`),
+        .setURL(`https://nypsi.xyz/leaderboard/${selected.id}?ref=bot-item`),
     );
 
   if (
@@ -232,7 +233,7 @@ async function run(
         .setStyle(ButtonStyle.Link)
         .setLabel("history")
         .setEmoji("📈")
-        .setURL("https://nypsi.xyz/item/history/" + selected.id),
+        .setURL(`https://nypsi.xyz/item/history/${selected.id}?ref=bot-item`),
     );
   }
 
