@@ -28,9 +28,11 @@ async function run(
 
   const msg = message.channel.send({ content: "searching..." });
 
-  await execCmd(
+  const success = await execCmd(
     `grep -rh "${args.join(" ").replaceAll('"', "").replaceAll("\\", "")}" out > ${path}`,
-  );
+  ).catch((err) => logger.error("failed to complete logsearch", err));
+
+  if (!success) return (await msg).edit({ content: "failed to search logs" });
 
   logger.debug("processing");
   (await msg).edit({ content: "processing..." });

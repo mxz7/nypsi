@@ -88,7 +88,9 @@ async function run(
           Body: Buffer.from(arrayBuffer),
           ContentType: `image/${ext}`,
         }),
-      );
+      ).catch((err) => {
+          logger.error(`error uploading avatar of ${message.author.id} (${message.author.username})`, err);
+      });
 
       await addNewAvatar(message.author.id, `https://cdn.nypsi.xyz/${key}`);
       logger.debug(`uploaded new avatar for ${message.author.id}`);

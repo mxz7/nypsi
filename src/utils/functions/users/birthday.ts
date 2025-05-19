@@ -47,7 +47,7 @@ export async function getTodaysBirthdays(useCache = true) {
 
   console.log(ttl);
 
-  await redis.set(Constants.redis.cache.BIRTHDAYS, JSON.stringify(birthdayMembers), "EX", ttl);
+  if (ttl > 0) await redis.set(Constants.redis.cache.BIRTHDAYS, JSON.stringify(birthdayMembers), "EX", ttl);
 
   return birthdayMembers;
 }
