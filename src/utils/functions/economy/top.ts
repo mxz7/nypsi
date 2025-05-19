@@ -1712,7 +1712,26 @@ export async function topChatReaction(guild: Guild, daily: boolean, userId?: str
   return { pages, pos };
 }
 
-export async function topChatReactionGlobal(userId: string, daily: boolean, amount = 100) {
+export function topChatReactionGlobal(
+  userId: string,
+  daily: boolean,
+  amount: number,
+  posOnly: true,
+): Promise<number>;
+
+export function topChatReactionGlobal(
+  userId: string,
+  daily: boolean,
+  amount?: number,
+  posOnly?: false,
+): Promise<{ pages: Map<number, string[]>; pos: number }>;
+
+export async function topChatReactionGlobal(
+  userId: string,
+  daily: boolean,
+  amount = 100,
+  posOnly: boolean = false,
+): Promise<number | { pages: Map<number, string[]>; pos: number }> {
   const query = await prisma.chatReactionLeaderboards.findMany({
     where: {
       AND: [
@@ -1737,8 +1756,12 @@ export async function topChatReactionGlobal(userId: string, daily: boolean, amou
       },
     },
     orderBy: [{ time: "asc" }, { user: { lastKnownUsername: "asc" } }],
-    take: 100,
+    take: amount,
   });
+
+  if (posOnly) {
+    return query.findIndex((i) => i.userId === userId);
+  }
 
   const usersFinal = [];
 
