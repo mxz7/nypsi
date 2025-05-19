@@ -376,16 +376,21 @@ async function run(
               embeds: [new ErrorEmbed("invalid file type. must be an image")],
             });
 
-          await createEvidence(
+          const res = await createEvidence(
             message.guild,
             caseData.caseId,
             message.author.id,
             attachment.url,
             attachment.contentType,
           );
+          
+          if (res) evidencePrompt.delete().catch(() => {});
+          else { 
+            evidencePrompt.edit({ embeds: [new ErrorEmbed("failed to upload evidence")] });
+            setInterval(() => evidencePrompt.delete().catch(() => {}), 3000);
+          }
 
           evidenceMessage.delete().catch(() => {});
-          evidencePrompt.delete().catch(() => {});
           caseData = await getCase(message.guild, caseData.caseId);
           showEvidence(null, evidenceMsg);
           displayCase(caseMsg);

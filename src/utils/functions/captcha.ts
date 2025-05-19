@@ -61,7 +61,7 @@ async function isVerified(id: string) {
   return await redis.exists(`${Constants.redis.nypsi.CAPTCHA_VERIFIED}:${id}`);
 }
 
-export async function passedCaptcha(member: GuildMember, check: Captcha) {
+export async function passedCaptcha(member: GuildMember, check: Captcha, force = false) {
   const hook = new WebhookClient({
     url: process.env.ANTICHEAT_HOOK,
   });
@@ -77,22 +77,32 @@ export async function passedCaptcha(member: GuildMember, check: Captcha) {
     );
   }
 
-  const timeTakenToSolve = check.solvedAt.getTime() - check.createdAt.getTime();
+  if (force) {
+    await hook.send(
+      `[${getTimestamp()}] **${member.user.username}** (${
+        member.user.id
+      }) has forcefully passed a captcha [${await redis.get(
+        `${Constants.redis.cache.user.captcha_pass}:${member.user.id}`,
+      )}]`
+    );
+  } else {
+    const timeTakenToSolve = check.solvedAt.getTime() - check.createdAt.getTime();
 
-  await hook.send(
-    `[${getTimestamp()}] **${member.user.username}** (${
-      member.user.id
-    }) has passed a captcha [${await redis.get(
-      `${Constants.redis.cache.user.captcha_pass}:${member.user.id}`,
-    )}]\n` +
-      "```" +
-      `received: ${check.received}\n` +
-      `received at: ${dayjs(check.createdAt).format("HH:mm:ss")}\n` +
-      `visits (${check.visits.length}): ${check.visits.map((i) => dayjs(i).format("HH:mm:ss")).join(" ")}\n` +
-      `solved at: ${dayjs(check.solvedAt).format("HH:mm:ss")}\n` +
-      `time taken: ${MStoTime(timeTakenToSolve)}\n` +
-      "```",
-  );
+    await hook.send(
+      `[${getTimestamp()}] **${member.user.username}** (${
+        member.user.id
+      }) has passed a captcha [${await redis.get(
+        `${Constants.redis.cache.user.captcha_pass}:${member.user.id}`,
+      )}]\n` +
+        "```" +
+        `received: ${check.received}\n` +
+        `received at: ${dayjs(check.createdAt).format("HH:mm:ss")}\n` +
+        `visits (${check.visits.length}): ${check.visits.map((i) => dayjs(i).format("HH:mm:ss")).join(" ")}\n` +
+        `solved at: ${dayjs(check.solvedAt).format("HH:mm:ss")}\n` +
+        `time taken: ${MStoTime(timeTakenToSolve)}\n` +
+        "```",
+    );
+  }
 
   let ttl = Math.floor(ms("30 minutes") / 1000);
 
@@ -107,7 +117,7 @@ export async function passedCaptcha(member: GuildMember, check: Captcha) {
     ttl,
   );
 
-  if (check.solvedIp) {
+  if (!force && check.solvedIp) {
     let otherUsers = await prisma.captcha.findMany({
       where: {
         solvedIp: check.solvedIp,
