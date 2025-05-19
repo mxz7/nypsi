@@ -183,7 +183,8 @@ async function run(
     rarityMap.set(3, "very rare");
     rarityMap.set(4, "exotic");
     rarityMap.set(5, "impossible");
-    rarityMap.set(6, "literally not possible within your lifetime");
+    rarityMap.set(6, "more impossible");
+    rarityMap.set(7, "even more impossible");
 
     if (rarityMap.get(selected.rarity)) {
       embed.addField("rarity", `\`${rarityMap.get(selected.rarity)}\``, true);

@@ -386,7 +386,8 @@ async function helpCmd(message: NypsiMessage, args: string[]) {
         rarityMap.set(3, "very rare");
         rarityMap.set(4, "exotic");
         rarityMap.set(5, "impossible");
-        rarityMap.set(6, "literally not possible within your lifetime");
+        rarityMap.set(6, "more impossible");
+        rarityMap.set(7, "even more impossible");
 
         let rarity = rarityMap.get(selectedItem.rarity);
 
