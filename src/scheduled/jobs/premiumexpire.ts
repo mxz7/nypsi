@@ -8,7 +8,7 @@ export default {
   async run(log, manager) {
     const query = await prisma.premium.findMany({
       where: {
-        AND: [{ credit: { lt: 1 } }, { expireDate: { lt: new Date() } }],
+        AND: [{ credit: { lt: 1 } }, { expireDate: { lt: new Date() } }, { level: { gt: 0 } }],
       },
       select: {
         userId: true,
