@@ -296,7 +296,11 @@ export async function summariseRequest(id: string) {
   }
 
   const res = await prompt(
-    `You are a summarising assistant. The following transcript is in the format of "<username>: <message content>". Some of the responses may be in an unknown language, translate them to English. Your response should only be the summary of the transcription, avoid including 'the transcript' or 'requesting support' in your summary. Summarise the following transcript:\n\n${transcript}`,
+    "You are a summarising assistant. " +
+      'The following transcript is in the format of "<username>: <message content>". ' +
+      "Some of the responses may be in an unknown language, translate them to English. " +
+      "Your response should only be the summary of the transcription, please keep it as concise as possible. " +
+      `Summarise the following transcript:\n\n${transcript}`,
   );
 
   return res;
