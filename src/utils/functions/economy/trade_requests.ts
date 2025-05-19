@@ -138,12 +138,12 @@ export async function createTradeRequest(
   embed.setFields(
     {
       name: "requesting",
-      value: `${requestedItems.length > 0 ? requestedItems.map((item) => `**${item.amount.toLocaleString()}x** ${item.item.emoji} [${item.item.name}](https://nypsi.xyz/item/${item.item.id})`).join("\n") : "none"}`,
+      value: `${requestedItems.length > 0 ? requestedItems.map((item) => `**${item.amount.toLocaleString()}x** ${item.item.emoji} [${item.item.name}](https://nypsi.xyz/item/${item.item.id}?ref=bot-trade)`).join("\n") : "none"}`,
       inline: false,
     },
     {
       name: "offering",
-      value: `${offeredMoney > 0 ? `$${offeredMoney.toLocaleString()}` : ""}\n${offeredItems.map((item) => `**${item.amount.toLocaleString()}x** ${item.item.emoji} [${item.item.name}](https://nypsi.xyz/item/${item.item.id})`).join("\n")}`,
+      value: `${offeredMoney > 0 ? `$${offeredMoney.toLocaleString()}` : ""}\n${offeredItems.map((item) => `**${item.amount.toLocaleString()}x** ${item.item.emoji} [${item.item.name}](https://nypsi.xyz/item/${item.item.id}?ref=bot-trade)`).join("\n")}`,
       inline: false,
     },
   );
@@ -266,12 +266,12 @@ export async function bumpTradeRequest(id: number, client: NypsiClient) {
   embed.setFields(
     {
       name: "requesting",
-      value: `${query.requestedItems.length > 0 ? query.requestedItems.map((item) => `**${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} [${items[item.split(":")[0]].name}](https://nypsi.xyz/item/${item.split(":")[0]})`).join("\n") : "none"}`,
+      value: `${query.requestedItems.length > 0 ? query.requestedItems.map((item) => `**${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} [${items[item.split(":")[0]].name}](https://nypsi.xyz/item/${item.split(":")[0]}?ref=bot-trade)`).join("\n") : "none"}`,
       inline: false,
     },
     {
       name: "offering",
-      value: `${query.offeredMoney > 0 ? `$${query.offeredMoney.toLocaleString()}` : ""}\n${query.offeredItems.map((item) => `**${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} [${items[item.split(":")[0]].name}](https://nypsi.xyz/item/${item.split(":")[0]})`).join("\n")}`,
+      value: `${query.offeredMoney > 0 ? `$${query.offeredMoney.toLocaleString()}` : ""}\n${query.offeredItems.map((item) => `**${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} [${items[item.split(":")[0]].name}](https://nypsi.xyz/item/${item.split(":")[0]}?ref=bot-trade)`).join("\n")}`,
       inline: false,
     },
   );

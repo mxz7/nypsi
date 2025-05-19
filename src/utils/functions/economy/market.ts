@@ -245,7 +245,7 @@ export async function getMarketOrderEmbed(order: Market) {
   embed.setHeader(
     await getLastKnownUsername(order.ownerId),
     await getLastKnownAvatar(order.ownerId),
-    `https://nypsi.xyz/user/${order.ownerId}`,
+    `https://nypsi.xyz/user/${order.ownerId}?ref=bot-market`,
   );
 
   let description: string;
@@ -258,7 +258,7 @@ export async function getMarketOrderEmbed(order: Market) {
 
   if (order.orderType === "buy") {
     embed.setColor("#b4befe");
-    description += `buying **${order.itemAmount.toLocaleString()}x** ${getItems()[order.itemId].emoji} **[${getItems()[order.itemId].name}](https://nypsi.xyz/item/${order.itemId})** for $${(order.price * order.itemAmount).toLocaleString()}`;
+    description += `buying **${order.itemAmount.toLocaleString()}x** ${getItems()[order.itemId].emoji} **[${getItems()[order.itemId].name}](https://nypsi.xyz/item/${order.itemId}?ref=bot-market)** for $${(order.price * order.itemAmount).toLocaleString()}`;
     row.addComponents(
       new ButtonBuilder().setCustomId("market-full").setLabel("sell").setStyle(ButtonStyle.Success),
     );
@@ -278,7 +278,7 @@ export async function getMarketOrderEmbed(order: Market) {
       );
   } else if (order.orderType === "sell") {
     embed.setColor("#a6e3a1");
-    description += `selling **${order.itemAmount.toLocaleString()}x** ${getItems()[order.itemId].emoji} **[${getItems()[order.itemId].name}](https://nypsi.xyz/item/${order.itemId})** for $${(order.price * order.itemAmount).toLocaleString()}`;
+    description += `selling **${order.itemAmount.toLocaleString()}x** ${getItems()[order.itemId].emoji} **[${getItems()[order.itemId].name}](https://nypsi.xyz/item/${order.itemId}?ref=bot-market)** for $${(order.price * order.itemAmount).toLocaleString()}`;
     row.addComponents(
       new ButtonBuilder().setCustomId("market-full").setLabel("buy").setStyle(ButtonStyle.Success),
     );
@@ -567,7 +567,7 @@ export async function checkMarketWatchers(
           amount == 1 || !getItems()[itemId].plural
             ? getItems()[itemId].name
             : getItems()[itemId].plural
-        }](https://nypsi.xyz/item/${itemId})**`,
+        }](https://nypsi.xyz/item/${itemId}?ref=bot-market)**`,
       ),
       components: new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("jump").setURL(url),
