@@ -144,7 +144,8 @@ export async function updateUser(user: User, command: string) {
             ContentType: `image/${ext}`,
           }),
         ).catch((err) => {
-            logger.error(`failed to upload new avatar for ${user.id} (${username})`, err);
+            console.error(err);
+            logger.error(`failed to upload new avatar for ${user.id} (${username})`, {err});
           });
 
         if (!res) return;

@@ -30,7 +30,10 @@ async function run(
 
   const success = await execCmd(
     `grep -rh "${args.join(" ").replaceAll('"', "").replaceAll("\\", "")}" out > ${path}`,
-  ).catch((err) => logger.error("failed to complete logsearch", err));
+  ).catch((err) => {
+    console.error(err);
+    logger.error("failed to complete logsearch", {err});
+  });
 
   if (!success) return (await msg).edit({ content: "failed to search logs" });
 

@@ -35,8 +35,12 @@ async function run(
       return;
     }
 
-    const captcha = await prisma.captcha.findUnique({
-      where: { id: res.id },
+    const captcha = await prisma.captcha.update({
+      where: {id : res.id },
+      data: {
+        solved: true,
+        solvedAt: new Date(),
+      }
     });
     
     await redis.del(`${Constants.redis.nypsi.LOCKED_OUT}:${target.id}`);

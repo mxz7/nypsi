@@ -68,7 +68,8 @@ export async function deleteEvidence(guild: Guild, caseId: number) {
         Bucket: process.env.S3_BUCKET,
       }),
     ).catch((err) => {
-      logger.error(`failed to delete evidence for case ${caseId} in ${guild.id}`, err);
+      console.error(err);
+      logger.error(`failed to delete evidence for case ${caseId} in ${guild.id}`, {err});
     });
 }
 
@@ -87,7 +88,8 @@ export async function deleteAllEvidence(guild: Guild) {
   });
 
   await s3.send(cmd).catch((err) => {
-    logger.error(`failed to delete all evidence in ${guild.id}`, err);
+    console.error(err);
+    logger.error(`failed to delete all evidence in ${guild.id}`, {err});
   });
 
   await prisma.moderationEvidence.deleteMany({
@@ -133,7 +135,8 @@ export async function createEvidence(
       ContentType: contentType,
     }),
   ).catch((err) => {
-    logger.error(`failed to upload evidence for case ${caseId} in ${guild.id}`, err);
+    console.error(err);
+    logger.error(`failed to upload evidence for case ${caseId} in ${guild.id}`, {err});
   });
 
   if (!success) return false;
