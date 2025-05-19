@@ -52,8 +52,9 @@ async function run(
           "- the agreement of terms\n" +
           "- the payment\n" +
           "- the refusal when the terms are met\n\n" +
-          "if you're unable to provide sufficient evidence, then unfortunately nothing can be done.\n\n" +
-          "*please send evidence in chronological order*",
+          "**please label each screenshot and send it together in one message, chronologically**\n\n" +
+          "the easier you make it for our staff, the more likely it is you will get a positive outcome.\n" +
+          "*if you're unable to provide sufficient evidence, then unfortunately nothing can be done.*",
       );
     } else if (args[0].toLowerCase() === "auto.transfer") {
       embed.setDescription(
