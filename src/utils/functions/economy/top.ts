@@ -1730,7 +1730,7 @@ export async function topChatReactionGlobal(
   userId: string,
   daily: boolean,
   amount = 100,
-  posOnly: boolean = false,
+  posOnly = false,
 ): Promise<number | { pages: Map<number, string[]>; pos: number }> {
   const query = await prisma.chatReactionLeaderboards.findMany({
     where: {
