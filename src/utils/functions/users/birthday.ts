@@ -40,14 +40,16 @@ export async function getTodaysBirthdays(useCache = true) {
   WHERE date_part('day', birthday) = date_part('day', CURRENT_DATE)
   AND date_part('month', birthday) = date_part('month', CURRENT_DATE)`;
 
-  const ttl = dayjs().diff(
-    dayjs().add(1, "day").set("hour", 0).set("minute", 0).set("second", 0).set("millisecond", 0),
-    "second",
-  );
+  const ttl = dayjs()
+    .add(1, "day")
+    .set("hour", 0)
+    .set("minute", 0)
+    .set("second", 0)
+    .set("millisecond", 0)
+    .diff(dayjs(), "second");
 
-  console.log(ttl);
-
-  if (ttl > 0) await redis.set(Constants.redis.cache.BIRTHDAYS, JSON.stringify(birthdayMembers), "EX", ttl);
+  if (ttl > 0)
+    await redis.set(Constants.redis.cache.BIRTHDAYS, JSON.stringify(birthdayMembers), "EX", ttl);
 
   return birthdayMembers;
 }
