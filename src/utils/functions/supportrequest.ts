@@ -6,6 +6,7 @@ import redis from "../../init/redis";
 import { NypsiClient } from "../../models/Client";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import Constants from "../Constants";
+import { logger } from "../logger";
 import { uploadImage } from "./image";
 import { prompt } from "./openai";
 import { getLastKnownUsername } from "./users/tag";
@@ -299,9 +300,51 @@ export async function summariseRequest(id: string) {
     "You are a summarising assistant. " +
       'The following transcript is in the format of "<username>: <message content>". ' +
       "Some of the responses may be in an unknown language, translate them to English. " +
-      "Your response should only be the summary of the transcription, please keep it as concise as possible. " +
-      `Summarise the following transcript:\n\n${transcript}`,
+      "Your response should only be the summary of the transcription, please keep it as concise as possible. ",
+    transcript,
   );
 
   return res;
+}
+
+export async function isRequestSuitable(content: string) {
+  try {
+    const aiResponse = await prompt(
+      "# Role\n" +
+        "You are part of a support team for the Discord bot 'nypsi'. " +
+        "Your job is to determine if the user's message is suitable for a support request to be sent forwarded to a human. " +
+        "The content may not be in English or may be bad English, do your best to understand it. " +
+        "If you are unsure, lean on being accepting of the support request.\n" +
+        "# Your response\n" +
+        "## First line \n" +
+        "- Respond with 'yes' for a suitable support request.\n" +
+        "- Respond with 'no' for an unsuitable support request.\n" +
+        "- Respond with 'needs more' where the user hasn't described their problem enough.\n" +
+        "## Second line\n" +
+        "The second line of the request should be a concise reason for your decision. " +
+        "Avoid ending your reason with 'which is/not' suitable for support' this is understood from the given context." +
+        "# Examples\n" +
+        "## Suitable requests\n" +
+        "- Asking for help with an issue\n" +
+        "- Reporting some type of bug\n" +
+        "- Asking for some information about the bot\n" +
+        "## Unsuitable requests\n" +
+        "- Begging or asking for items or money\n" +
+        "- Asking how long is left on their punishment\n" +
+        "- Asking for a feature\n" +
+        "## Needs more\n" +
+        "- The user says they need help but doesn't say what they need help with\n",
+      content,
+    );
+
+    const [decision, reason] = aiResponse.split("\n");
+
+    return {
+      decision,
+      reason,
+    };
+  } catch (e) {
+    logger.error("supportrequest: error while checking if suitable", { e, content });
+    return { decision: "yes", reason: "ahhh" };
+  }
 }

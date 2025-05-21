@@ -3,10 +3,11 @@ import { logger } from "../logger";
 
 const openAiClient = new OpenAI({ apiKey: process.env.OPENAI_KEY });
 
-export async function prompt(text: string) {
+export async function prompt(instructions: string, text: string) {
   try {
     const response = await openAiClient.responses.create({
       model: "gpt-4.1-nano",
+      instructions,
       input: text,
     });
 

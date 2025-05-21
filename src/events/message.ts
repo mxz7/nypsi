@@ -36,6 +36,7 @@ import {
   createSupportRequest,
   getSupportRequest,
   handleAttachments,
+  isRequestSuitable,
   sendToRequestChannel,
 } from "../utils/functions/supportrequest";
 import { createAuraTransaction } from "../utils/functions/users/aura";
@@ -187,6 +188,36 @@ export default async function messageCreate(message: Message) {
 
         if (a) return;
 
+        const aiResponse = await isRequestSuitable(helpMessage);
+
+        if (aiResponse.decision === "no") {
+          logger.info(
+            `supportrequest: ${message.author.id} (${message.author.username}) denied support request`,
+            { content: helpMessage, aiResponse },
+          );
+
+          return modalSubmit.editReply({
+            embeds: [
+              new CustomEmbed().setDescription(
+                "it looks like this isn't suitable for a support request",
+              ),
+            ],
+          });
+        } else if (aiResponse.decision === "needs more") {
+          logger.info(
+            `supportrequest: ${message.author.id} (${message.author.username}) denied support request`,
+            { content: helpMessage, aiResponse },
+          );
+
+          return modalSubmit.editReply({
+            embeds: [
+              new CustomEmbed().setDescription(
+                "you need to give more information. the easier you make it for our staff to understand what you need, the better we can assist you",
+              ),
+            ],
+          });
+        }
+
         const r = await createSupportRequest(
           message.author.id,
           message.client as NypsiClient,
@@ -201,14 +232,6 @@ export default async function messageCreate(message: Message) {
           const embed = new CustomEmbed()
             .setHeader(message.author.username, message.author.avatarURL())
             .setColor("#111111");
-
-          if (message.attachments.first()) {
-            if (message.attachments.first().contentType.startsWith("image/")) {
-              embed.setImage(message.attachments.first().url);
-            } else {
-              message.content += `\n\n${message.attachments.first().url}`;
-            }
-          }
 
           embed.setDescription(helpMessage);
 
