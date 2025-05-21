@@ -322,7 +322,8 @@ export async function isRequestSuitable(content: string) {
         "- Respond with 'needs more' where the user hasn't described their problem enough.\n" +
         "## Second line\n" +
         "The second line of the request should be a concise reason for your decision. " +
-        "Avoid ending your reason with 'which is/not' suitable for support' this is understood from the given context." +
+        "Avoid ending your reason with 'which is/not' suitable for support' this is understood from the given context. " +
+        "Avoid starting your reason with 'the message', keep it as concise and quickly readable as possible.\n" +
         "# Examples\n" +
         "## Suitable requests\n" +
         "- Asking for help with an issue\n" +
