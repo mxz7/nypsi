@@ -256,7 +256,7 @@ export default async function messageCreate(message: Message) {
         return message.reply({
           embeds: [
             new ErrorEmbed(
-              "you have recently sent a support message, please wait before sending another one.\n\n" +
+              "you have recently sent a message to your support request, please wait before sending another one.\n\n" +
                 "larger and fewer messages keeps it easy to read for our staff",
             ),
           ],
