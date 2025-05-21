@@ -337,7 +337,7 @@ export async function isRequestSuitable(content: string) {
       content,
     );
 
-    const [decision, reason] = aiResponse.split("\n");
+    const [decision, reason] = aiResponse.split("\n").map((i) => i.trim());
 
     return {
       decision,
