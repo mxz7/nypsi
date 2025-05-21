@@ -199,7 +199,7 @@ export default async function messageCreate(message: Message) {
           return modalSubmit.editReply({
             embeds: [
               new CustomEmbed().setDescription(
-                "it looks like this isn't suitable for a support request",
+                "this isn't suitable for a support request. try including more information about what you need help with",
               ),
             ],
           });
