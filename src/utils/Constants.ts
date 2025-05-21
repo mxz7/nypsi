@@ -25,6 +25,7 @@ export default {
       ROB_RADIO: "cd:rob-radio",
       SEX_CHASTITY: "cd:sex-chastity",
       SUPPORT: "cd:support",
+      SUPPORT_MESSAGE: "cd:support:message",
     },
     cache: {
       tmdb: {

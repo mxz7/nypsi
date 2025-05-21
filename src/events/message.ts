@@ -252,6 +252,24 @@ export default async function messageCreate(message: Message) {
         }
       }
     } else {
+      if (await redis.exists(`${Constants.redis.cooldown.SUPPORT_MESSAGE}:${message.author.id}`)) {
+        return message.reply({
+          embeds: [
+            new ErrorEmbed(
+              "you have recently sent a support message, please wait before sending another one.\n\n" +
+                "larger and fewer messages keeps it easy to read for our staff",
+            ),
+          ],
+        });
+      }
+
+      await redis.set(
+        `${Constants.redis.cooldown.SUPPORT_MESSAGE}:${message.author.id}`,
+        1,
+        "EX",
+        3,
+      );
+
       const embed = new CustomEmbed()
         .setHeader(message.author.username, message.author.avatarURL())
         .setColor("#111111");
