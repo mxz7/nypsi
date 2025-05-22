@@ -12,6 +12,33 @@ import { prompt } from "./openai";
 import { getLastKnownUsername } from "./users/tag";
 import pAll = require("p-all");
 
+export const quickResponses = new Map<string, string>();
+
+quickResponses.set(
+  "auto.scam",
+  "for scamming the burden is on you to provide evidence and we just verify it and decide if a punishment is worthy\n\n" +
+    "you need to clearly show:\n" +
+    "- the agreement of terms\n" +
+    "- the payment\n" +
+    "- the refusal when the terms are met\n\n" +
+    "**please label each screenshot and send it together in one message, chronologically**\n\n" +
+    "the easier you make it for our staff, the more likely it is you will get a positive outcome.\n" +
+    "*if you're unable to provide sufficient evidence, then unfortunately nothing can be done.*",
+);
+
+quickResponses.set(
+  "auto.transfer",
+  "it sounds like you're asking about a **profile transfer** where data from one account will be applied to another\n\n" +
+    "you must provide evidence the old account username and user ID, as well as prove that it is your account\n\n" +
+    "if you're unable to prove that it's your account, we cannot do anything.",
+);
+
+quickResponses.set(
+  "auto.buyunban",
+  "if you are **banned/muted from the nypsi discord server** then you can be unbanned/unmuted by making a custom donation of £20 to https://ko-fi.com/tekoh\n\n" +
+    "if you are **banned from nypsi economy** you can buy an unban from https://ko-fi.com/s/1d78b621a5",
+);
+
 export async function getSupportRequestByChannelId(id: string) {
   const query = await prisma.supportRequest.findUnique({
     where: {
@@ -41,7 +68,12 @@ export async function getSupportRequest(id: string): Promise<SupportRequest> {
   }
 }
 
-export async function createSupportRequest(id: string, client: NypsiClient, username: string) {
+export async function createSupportRequest(
+  id: string,
+  client: NypsiClient,
+  username: string,
+  aiResponded: boolean,
+) {
   const clusterHas = await client.cluster.broadcastEval(
     async (c, { channelId }) => {
       const client = c as unknown as NypsiClient;
@@ -119,7 +151,7 @@ export async function createSupportRequest(id: string, client: NypsiClient, user
   const embed = new CustomEmbed()
     .setColor(Constants.PURPLE)
     .setDescription(
-      `support request for [${username} (${id})](https://nypsi.xyz/user/${id}?ref=bot-support)`,
+      `support request for [${username} (${id})](https://nypsi.xyz/user/${id}?ref=bot-support)${aiResponded ? " (AI responded)" : ""}`,
     );
 
   await sendToRequestChannel(id, embed, id, client);
@@ -347,5 +379,30 @@ export async function isRequestSuitable(content: string) {
   } catch (e) {
     logger.error("supportrequest: error while checking if suitable", { e, content });
     return { decision: "yes", reason: "ahhh" };
+  }
+}
+
+export async function getQuickSupportResponse(content: string) {
+  const res = await prompt(
+    "# Role\n\n" +
+      "You are a support agent for the 'nypsi' Discord bot. You are an assistance to the staff members of nypsi, helping save their time by instantly responding to a user's query with instructions on how to give the correct information.\n\n" +
+      "## Your response\n\n" +
+      "Your response should **ONLY** be one of the following:\n" +
+      "- auto.scam\n" +
+      "Should be used when the user is claiming that they have been scammed by another user.\n\n" +
+      "- auto.transfer\n" +
+      "Should be used when the user is asking for a profile transfer, where data from one account is being transferred to another.\n\n" +
+      "- auto.buyunban\n" +
+      "Should be used when the user is asking to be unbanned, or are inquiring on how to be unbanned.\n\n" +
+      "- no\n" +
+      "Used when none of the other options apply, and you are unable to assist the user. Use this when you are unsure.\n\n" +
+      "## Examples\n\n" +
+      "### Unbanned\n\n" +
+      "If the user is asking to be unbanned, or when they are unbanned, respond with 'auto.buyunban'",
+    content,
+  );
+
+  if (quickResponses.has(res)) {
+    return quickResponses.get(res);
   }
 }

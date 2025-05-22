@@ -6,6 +6,7 @@ import Constants from "../utils/Constants";
 import {
   getSupportRequestByChannelId,
   handleAttachments,
+  quickResponses,
   sendToRequestChannel,
   summariseRequest,
   toggleNotify,
@@ -28,9 +29,8 @@ async function run(
     return message.channel.send({
       embeds: [
         new ErrorEmbed(
-          "**auto.scam**\n" +
-            "**auto.transfer**\n" +
-            "**auto.buyunban**\n" +
+          Array.from(quickResponses.keys().map((i) => `**${i}**`)).join("\n") +
+            "\n" +
             "**notify**\n" +
             "**summary**\n" +
             "<message content>",
@@ -45,28 +45,8 @@ async function run(
   );
 
   if (args.length > 0) {
-    if (args[0].toLowerCase() === "auto.scam") {
-      embed.setDescription(
-        "for scamming the burden is on you to provide evidence and we just verify it and decide if a punishment is worthy\n\n" +
-          "you need to clearly show:\n" +
-          "- the agreement of terms\n" +
-          "- the payment\n" +
-          "- the refusal when the terms are met\n\n" +
-          "**please label each screenshot and send it together in one message, chronologically**\n\n" +
-          "the easier you make it for our staff, the more likely it is you will get a positive outcome.\n" +
-          "*if you're unable to provide sufficient evidence, then unfortunately nothing can be done.*",
-      );
-    } else if (args[0].toLowerCase() === "auto.transfer") {
-      embed.setDescription(
-        "it sounds like you're asking about a **profile transfer** where data from one account will be applied to another\n\n" +
-          "you must provide evidence the old account username and user ID, as well as prove that it is your account\n\n" +
-          "if you're unable to prove that it's your account, we cannot do anything.",
-      );
-    } else if (args[0].toLowerCase() === "auto.buyunban") {
-      embed.setDescription(
-        "if you are **banned/muted from the nypsi discord server** then you can be unbanned/unmuted by making a custom donation of £20 to https://ko-fi.com/tekoh\n\n" +
-          "if you are **banned from nypsi economy** you can buy an unban from https://ko-fi.com/s/1d78b621a5",
-      );
+    if (quickResponses.has(args[0].toLowerCase())) {
+      embed.setDescription(quickResponses.get(args[0].toLowerCase()));
     } else if (args[0].toLowerCase() === "notify") {
       const res = await toggleNotify(support.userId, message.author.id);
       if (res) return message.react("✅");

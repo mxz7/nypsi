@@ -34,6 +34,7 @@ import { isPremium } from "../utils/functions/premium/premium";
 import sleep from "../utils/functions/sleep";
 import {
   createSupportRequest,
+  getQuickSupportResponse,
   getSupportRequest,
   handleAttachments,
   isRequestSuitable,
@@ -218,38 +219,61 @@ export default async function messageCreate(message: Message) {
           });
         }
 
+        const quickResponse = await getQuickSupportResponse(helpMessage);
+
         const r = await createSupportRequest(
           message.author.id,
           message.client as NypsiClient,
           message.author.username,
+          Boolean(quickResponse),
         );
 
         if (!r) {
           return modalSubmit.editReply({
             embeds: [new CustomEmbed().setDescription("failed to create support request")],
           });
-        } else {
+        }
+
+        const embed = new CustomEmbed()
+          .setHeader(message.author.username, message.author.avatarURL())
+          .setColor("#111111");
+
+        embed.setDescription(helpMessage);
+
+        await sendToRequestChannel(
+          message.author.id,
+          embed,
+          message.author.id,
+          message.client as NypsiClient,
+        );
+
+        await modalSubmit.editReply({
+          embeds: [
+            new CustomEmbed().setDescription(
+              "✅ created support request, anything you send while this is open will be sent directly to nypsi staff",
+            ),
+          ],
+        });
+
+        if (quickResponse) {
           const embed = new CustomEmbed()
-            .setHeader(message.author.username, message.author.avatarURL())
-            .setColor("#111111");
+            .setHeader("nypsi", message.client.user.avatarURL())
+            .setColor(Constants.PURPLE)
+            .setDescription(quickResponse);
 
-          embed.setDescription(helpMessage);
-
-          await sendToRequestChannel(
+          sendToRequestChannel(
             message.author.id,
             embed,
             message.author.id,
             message.client as NypsiClient,
           );
-
-          return modalSubmit.editReply({
-            embeds: [
-              new CustomEmbed().setDescription(
-                "✅ created support request, anything you send while this is open will be sent directly to nypsi staff",
-              ),
-            ],
+          modalSubmit.followUp({
+            embeds: [embed],
+            content: "you have received a message from your support ticket",
           });
         }
+
+        return;
       }
     } else {
       if (await redis.exists(`${Constants.redis.cooldown.SUPPORT_MESSAGE}:${message.author.id}`)) {
