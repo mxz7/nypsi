@@ -44,7 +44,12 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
   };
 
   return send({
-    embeds: [new CustomEmbed(message.member, "auctions have been moved to be part of /market")],
+    embeds: [
+      new CustomEmbed(
+        message.member,
+        "auctions have been moved to be part of /market\nmore info: https://nypsi.xyz/docs/economy/market",
+      ),
+    ],
   });
 }
 
