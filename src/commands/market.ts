@@ -218,6 +218,7 @@ async function run(
 
   if (message.client.user.id !== Constants.BOT_USER_ID && (await getAdminLevel(message.member)) < 1)
     return send({ embeds: [new ErrorEmbed("lol")] });
+
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
