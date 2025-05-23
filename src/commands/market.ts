@@ -153,14 +153,14 @@ cmd.slashData
         option
           .setName("item-global")
           .setDescription("item you want to toggle on/off")
-          .setRequired(true)
+          .setRequired(false)
           .setAutocomplete(true),
       )
       .addStringOption((option) =>
         option
           .setName("order-type")
           .setDescription("are you watching for a buy order or sell order?")
-          .setRequired(true)
+          .setRequired(false)
           .setChoices({ name: "buy order", value: "buy" }, { name: "sell order", value: "sell" }),
       )
       .addStringOption((option) =>
