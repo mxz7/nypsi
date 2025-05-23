@@ -5,7 +5,7 @@ import redis from "../../../init/redis";
 import Constants from "../../Constants";
 import { addProgress } from "./achievements";
 import { addInventoryItem, getInventory, removeInventoryItem } from "./inventory";
-import { getPlantsData, getPlantUpgrades } from "./utils";
+import { getPlantsData, getPlantUpgrades, getUpgradesData } from "./utils";
 import dayjs = require("dayjs");
 import ms = require("ms");
 
@@ -206,11 +206,11 @@ export async function getClaimable(member: GuildMember | string, plantId: string
 
     const earned = hours * plantData.hourly;
 
-    const prestigeUpgrade = userUpgrades.find(u => u.upgradeId === "farm_output");
+    const prestigeUpgrade = userUpgrades.find((u) => u.upgradeId === "farm_output");
     let outputMulti = 1;
 
     if (prestigeUpgrade) {
-      outputMulti += prestigeUpgrade.amount * 0.02;
+      outputMulti += prestigeUpgrade.amount * getUpgradesData()[prestigeUpgrade.upgradeId].effect;
     }
 
     let storageMulti = 1;

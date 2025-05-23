@@ -74,7 +74,7 @@ cmd.setRun(async (message) => {
                 i.upgradeId
               ].description.replace(
                 "{x}",
-                (i.upgradeId.includes("xp")
+                (i.upgradeId.includes("xp") || i.upgradeId === "farm_output"
                   ? Math.floor(getUpgradesData()[i.upgradeId].effect * i.amount * 100)
                   : getUpgradesData()[i.upgradeId].effect * i.amount
                 ).toPrecision(2),
