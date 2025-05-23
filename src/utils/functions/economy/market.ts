@@ -336,9 +336,9 @@ export async function checkMarketOrder(
         { completed: false },
         { orderType: order.orderType === "buy" ? "sell" : "buy" },
         { price: order.orderType === "buy" ? { lte: order.price } : { gte: order.price } },
+        { ownerId: { not: order.ownerId } },
       ],
     },
-
     orderBy: { createdAt: "desc" },
   });
 
