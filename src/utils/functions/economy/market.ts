@@ -908,7 +908,7 @@ export async function completeOrder(
               embed: embedDm,
             },
           });
-        }, ms("10 minutes"));
+        }, ms("3 minutes"));
       }
     }
   })();
@@ -968,7 +968,7 @@ export async function marketSell(
   inTransaction.add(itemId);
   setTimeout(() => {
     inTransaction.delete(itemId);
-  }, ms("10 minutes"));
+  }, ms("3 minutes"));
 
   await redis.set(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`, "d", "EX", 600);
 
@@ -1103,7 +1103,7 @@ export async function marketBuy(
   inTransaction.add(itemId);
   setTimeout(() => {
     inTransaction.delete(itemId);
-  }, ms("10 minutes"));
+  }, ms("3 minutes"));
 
   await redis.set(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`, "d", "EX", 600);
 
