@@ -141,7 +141,6 @@ export default {
       }
     } else {
       const worth = await calcItemValue(order.itemId);
-      console.log(worth);
       if (worth * 1.25 > Number(order.price)) {
         const res = await showMarketConfirmationModal(interaction, "sell", worth);
 
