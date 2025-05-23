@@ -85,7 +85,7 @@ export function runLogs() {
         })
         .catch(async (e) => {
           console.log(e);
-          logger.error(`error sending logs to webhook (${guild.id})`);
+          logger.error(`error sending logs to webhook (${guild.id}) ${JSON.stringify(e)}`, e);
 
           await prisma.guild.update({
             where: {

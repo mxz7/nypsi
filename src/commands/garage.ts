@@ -296,14 +296,23 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
 
           for (const word of filter) {
             if (cleanString(name).includes(word)) {
-              return res.reply({ flags: MessageFlags.Ephemeral, embeds: [new ErrorEmbed("invalid name")] });
+              return res.reply({
+                flags: MessageFlags.Ephemeral,
+                embeds: [new ErrorEmbed("invalid name")],
+              });
             }
           }
 
           if (name.length > 30)
-            return res.reply({ flags: MessageFlags.Ephemeral, embeds: [new ErrorEmbed("invalid name")] });
+            return res.reply({
+              flags: MessageFlags.Ephemeral,
+              embeds: [new ErrorEmbed("invalid name")],
+            });
           if (name.length < 3)
-            return res.reply({ flags: MessageFlags.Ephemeral, embeds: [new ErrorEmbed("invalid name")] });
+            return res.reply({
+              flags: MessageFlags.Ephemeral,
+              embeds: [new ErrorEmbed("invalid name")],
+            });
 
           res.reply({
             flags: MessageFlags.Ephemeral,

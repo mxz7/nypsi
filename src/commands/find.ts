@@ -2,7 +2,6 @@ import { CommandInteraction, Message, User } from "discord.js";
 import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
-import Constants from "../utils/Constants";
 import { formatDate } from "../utils/functions/date";
 import {
   calcNetWorth,
@@ -22,6 +21,7 @@ import { getTier, isPremium, levelString } from "../utils/functions/premium/prem
 import { getLastCommand } from "../utils/functions/users/commands";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
 import dayjs = require("dayjs");
+import { getAdminLevel } from "../utils/functions/users/admin";
 
 const cmd = new Command("find", "find info", "none").setPermissions(["bot owner"]);
 
@@ -29,7 +29,7 @@ async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
-  if (message.author.id != Constants.TEKOH_ID) return;
+  if ((await getAdminLevel(message.member)) < 3) return;
 
   if (!(message instanceof Message)) return;
 

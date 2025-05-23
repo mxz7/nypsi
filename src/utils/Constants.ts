@@ -20,7 +20,7 @@ products.set("23110fff7b", { name: "rain", cost: 4.99 });
 export default {
   redis: {
     cooldown: {
-      AUCTION_WATCH: "cd:auctionwatch",
+      MARKET_WATCH: "cd:marketwatch",
       GUILD_CREATE: "cd:guildcreate",
       ROB_RADIO: "cd:rob-radio",
       SEX_CHASTITY: "cd:sex-chastity",
@@ -98,9 +98,8 @@ export default {
         TASKS: "cache:economy:tasks",
         AUTO_SELL: "cache:economy:autosell",
         SELL_FILTER: "cache:economy:sellallfilter",
-        AUCTION_AVG: "cache:economy:auctionavg",
+        MARKET_AVG: "cache:economy:marketavg",
         OFFER_AVG: "cache:economy:offeravg",
-        AUCTION_ITEM_GRAPH_DATA: "cache:economy:auction:historydata",
         BAKERY_UPGRADES: "cache:economy:bakery:upgrades",
         BALANCE: "cache:economy:balance",
         BANNED: "cache:economy:banned",
@@ -172,12 +171,14 @@ export default {
       HOURLY_COMMAND_PREPROCESS: "nypso:preprocess",
       CRASH_STATUS: "nypsi:crash:status",
       FARM_STATUS_DM: "nypsi:farm:status:dm",
-      auction_buying: "nypsi:auction:buying",
+      MARKET_IN_TRANSACTION: "nypsi:market:intransaction",
+      TRADE_FULFILLING: "nypsi:trade:fulfilling",
     },
   },
   ANNOUNCEMENTS_CHANNEL_ID: "747057465245564939",
-  AUCTION_CHANNEL_ID: "1008467335973179482",
-  AUCTION_MANAGEMENT_ROLE_IDS: [
+  MARKET_CHANNEL_ID: "1373589195234480189", // 1008467335973179482
+  TRADES_CHANNEL_ID: "1373589206621880400",
+  MARKET_MANAGEMENT_ROLE_IDS: [
     "747056620688900139",
     "747059949770768475",
     "845613231229370429",
@@ -186,7 +187,7 @@ export default {
   BOOST_REWARDS_LINK:
     "https://discord.com/channels/747056029795221513/1031950370206924903/1092078265948188842",
   BOOST_ROLE_ID: "747066190530347089",
-  BOT_USER_ID: "678711738845102087",
+  BOT_USER_ID: "848756349587554314", // 678711738845102087
   BRONZE_ROLE_ID: "819870590718181391",
   COLOUR_REGEX: /^#([A-Fa-f0-9]{6})$/,
   MEMBER_MENTION_REGEX: /<@!?[0-9]+>/,

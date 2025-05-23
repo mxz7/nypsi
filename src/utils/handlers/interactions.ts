@@ -220,7 +220,10 @@ export async function runInteraction(interaction: Interaction) {
 
     if (responseDesc.length > 0) {
       return interaction
-        .reply({ embeds: [new CustomEmbed(member, responseDesc.join("\n"))], flags: MessageFlags.Ephemeral })
+        .reply({
+          embeds: [new CustomEmbed(member, responseDesc.join("\n"))],
+          flags: MessageFlags.Ephemeral,
+        })
         .catch(() =>
           interaction.editReply({ embeds: [new CustomEmbed(member, responseDesc.join("\n"))] }),
         );

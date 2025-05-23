@@ -441,7 +441,7 @@ async function run(
             embeds: [
               new CustomEmbed()
                 .setColor(Constants.EMBED_SUCCESS_COLOR)
-                .setDescription(`elligible to prestige\n\n${level}/100`),
+                .setDescription(`eligible to prestige\n\n${level}/100`),
             ],
           });
           return awaitButton();
@@ -450,7 +450,7 @@ async function run(
             embeds: [
               new CustomEmbed()
                 .setColor(Constants.EMBED_FAIL_COLOR)
-                .setDescription(`not elligible to prestige\n\n${level}/100`),
+                .setDescription(`not eligible to prestige\n\n${level}/100`),
             ],
           });
           return awaitButton();
@@ -460,7 +460,8 @@ async function run(
       if (await onCooldown("p-upg", message.member)) {
         const res = await getResponse("p-upg", message.member);
 
-        if (res.respond) await reaction.reply({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
+        if (res.respond)
+          await reaction.reply({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
         return awaitButton();
       }
 
@@ -493,7 +494,8 @@ async function run(
       if (await onCooldown("p-mul", message.member)) {
         const res = await getResponse("p-mul", message.member);
 
-        if (res.respond) await reaction.reply({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
+        if (res.respond)
+          await reaction.reply({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
         return awaitButton();
       }
 
@@ -529,7 +531,8 @@ async function run(
       if (await onCooldown("p-tag", message.member)) {
         const res = await getResponse("p-tag", message.member);
 
-        if (res.respond) await reaction.reply({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
+        if (res.respond)
+          await reaction.reply({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
         return awaitButton();
       }
 

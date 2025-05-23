@@ -22,7 +22,6 @@ import { deleteMute, getMuteRole, isMuted, newMute } from "../utils/functions/mo
 import sleep from "../utils/functions/sleep";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
 import { logger } from "../utils/logger";
-import ms = require("ms");
 
 const queue = new Set<string>();
 

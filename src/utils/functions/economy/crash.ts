@@ -189,7 +189,10 @@ export async function crashOut(interaction: ButtonInteraction) {
 const addCrashPlayerMutex = new Set<string>();
 export async function addCrashPlayer(interaction: ButtonInteraction) {
   if (!ready)
-    return interaction.reply({ embeds: [new ErrorEmbed("crash not ready yet")], flags: MessageFlags.Ephemeral });
+    return interaction.reply({
+      embeds: [new ErrorEmbed("crash not ready yet")],
+      flags: MessageFlags.Ephemeral,
+    });
 
   if (addCrashPlayerMutex.has(interaction.user.id)) {
     logger.debug(`crash mutex already has ${interaction.user.id}`);
@@ -300,7 +303,10 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
 
   if (!bet || bet <= 0) {
     addCrashPlayerMutex.delete(interaction.user.id);
-    return modalInteraction.reply({ embeds: [new ErrorEmbed("invalid bet")], flags: MessageFlags.Ephemeral });
+    return modalInteraction.reply({
+      embeds: [new ErrorEmbed("invalid bet")],
+      flags: MessageFlags.Ephemeral,
+    });
   }
 
   if (bet > (await getBalance(interaction.user.id))) {
@@ -351,7 +357,7 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
     }
   }
 
-  logger.debug(`crash: ${interaction.user.username} remving balance`);
+  logger.debug(`crash: ${interaction.user.username} removing balance`);
   await removeBalance(interaction.user.id, bet);
 
   status = await getCrashStatus();

@@ -19,7 +19,6 @@ import { MStoTime } from "../utils/functions/date";
 import { startGTFGame } from "../utils/functions/gtf/game";
 import { getMember } from "../utils/functions/member";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import ms = require("ms");
 
 const cmd = new Command("guesstheflag", "play a guess the flag game", "fun").setAliases([
   "gtf",

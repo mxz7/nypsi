@@ -9,8 +9,6 @@ import { logger } from "../../utils/logger";
 import ms = require("ms");
 
 async function doBirthdays(client: NypsiClient) {
-  const day = dayjs().set("hours", 0).set("minute", 0).set("second", 0).set("millisecond", 0);
-
   const guilds = await prisma.guild.findMany({
     where: {
       AND: [

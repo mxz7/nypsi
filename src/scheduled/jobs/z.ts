@@ -1,4 +1,3 @@
-import dayjs = require("dayjs");
 import prisma from "../../init/database";
 import { Job } from "../../types/Jobs";
 

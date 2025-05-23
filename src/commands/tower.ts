@@ -46,6 +46,7 @@ import {
 import { addXp, calcEarnedGambleXp } from "../utils/functions/economy/xp";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { percentChance } from "../utils/functions/random";
+import { getAdminLevel } from "../utils/functions/users/admin";
 import { recentCommands } from "../utils/functions/users/commands";
 import { addHourlyCommand } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -602,7 +603,7 @@ async function playGame(
       }
 
       if (await redis.get("nypsi:maintenance")) {
-        if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
+        if ((await getAdminLevel(message.member)) > 0 && message instanceof Message) {
           message.react("💀");
         } else {
           return msg.edit({
@@ -751,8 +752,15 @@ async function playGame(
     for (const item of row) {
       if (["c", "gc"].includes(item)) {
         if (response.deferred || response.replied)
-          await response.followUp({ embeds: [new ErrorEmbed("invalid square")], flags: MessageFlags.Ephemeral });
-        else await response.reply({ embeds: [new ErrorEmbed("invalid square")], flags: MessageFlags.Ephemeral });
+          await response.followUp({
+            embeds: [new ErrorEmbed("invalid square")],
+            flags: MessageFlags.Ephemeral,
+          });
+        else
+          await response.reply({
+            embeds: [new ErrorEmbed("invalid square")],
+            flags: MessageFlags.Ephemeral,
+          });
         return playGame(message, msg, args);
       }
     }

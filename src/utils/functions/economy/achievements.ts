@@ -23,7 +23,6 @@ import {
   userExists,
 } from "./utils";
 import { addXp } from "./xp";
-import ms = require("ms");
 
 /**
  * returns true if user has met requirements for achievement

@@ -22,6 +22,7 @@ import { getTimestamp, logger } from "../../../logger";
 import { a } from "../../anticheat";
 import { giveCaptcha, isLockedOut, verifyUser } from "../../captcha";
 import { percentChance } from "../../random";
+import { getAdminLevel } from "../../users/admin";
 import { recentCommands } from "../../users/commands";
 import { getInventory, removeInventoryItem, selectItem } from "../inventory";
 import ScratchCard from "../scratchies";
@@ -56,7 +57,10 @@ async function prepare(
   };
 
   if (await redis.sismember(Constants.redis.nypsi.USERS_PLAYING, message.author.id)) {
-    return send({ embeds: [new ErrorEmbed("you have an active game")], flags: MessageFlags.Ephemeral });
+    return send({
+      embeds: [new ErrorEmbed("you have an active game")],
+      flags: MessageFlags.Ephemeral,
+    });
   }
 
   let inventory = await getInventory(message.member);
@@ -202,7 +206,7 @@ async function prepare(
           await a(message.author.id, message.author.username, message.content);
 
           if (await redis.get("nypsi:maintenance")) {
-            if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
+            if ((await getAdminLevel(message.member)) > 0 && message instanceof Message) {
               message.react("💀");
             } else {
               msg.edit({

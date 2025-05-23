@@ -47,6 +47,7 @@ import {
 import { addXp, calcEarnedGambleXp } from "../utils/functions/economy/xp.js";
 import { getTier, isPremium } from "../utils/functions/premium/premium.js";
 import { percentChance } from "../utils/functions/random.js";
+import { getAdminLevel } from "../utils/functions/users/admin.js";
 import { recentCommands } from "../utils/functions/users/commands.js";
 import { addHourlyCommand } from "../utils/handlers/commandhandler.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
@@ -648,7 +649,7 @@ async function playGame(
       }
 
       if (await redis.get("nypsi:maintenance")) {
-        if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
+        if ((await getAdminLevel(message.member)) > 0 && message instanceof Message) {
           message.react("💀");
         } else {
           return msg.edit({

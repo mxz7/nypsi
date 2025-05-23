@@ -193,7 +193,7 @@ async function run(
       );
 
       // @ts-expect-error hate life innit
-      if (typeof settings[settingId] === "number") {
+      if (typeof settings[settingId] === "number" || typeof settings[selected] === "bigint") {
         const boobies = [
           new ButtonBuilder()
             .setCustomId("enable")
@@ -374,7 +374,7 @@ async function run(
         await res.deferUpdate();
 
         // @ts-expect-error doesnt like doing this!
-        if (typeof settings[selected] === "number") {
+        if (typeof settings[selected] === "number" || typeof settings[selected] === "bigint") {
           // @ts-expect-error doesnt like doing this!
           settings[selected] = 0;
         } else {
@@ -423,7 +423,7 @@ async function run(
       );
 
       // @ts-expect-error hate life innit
-      if (typeof settings[settingId] === "number") {
+      if (typeof settings[settingId] === "number" || typeof settings[settingId] === "bigint") {
         const boobies = [
           new ButtonBuilder()
             .setCustomId("enable")
@@ -547,10 +547,8 @@ async function run(
         const selected = options.find((o) => o.data.default).data.value;
 
         // @ts-expect-error grr
-        if (typeof settings[selected] == "number") {
-          const modal = new ModalBuilder()
-            .setCustomId("settings-update")
-            .setTitle("net worth notifications");
+        if (typeof settings[selected] == "number" || typeof settings[selected] === "bigint") {
+          const modal = new ModalBuilder().setCustomId("settings-update").setTitle("update amount");
 
           modal.addComponents(
             new ActionRowBuilder<TextInputBuilder>().addComponents(
@@ -604,7 +602,7 @@ async function run(
         await res.deferUpdate();
 
         // @ts-expect-error doesnt like doing this!
-        if (typeof settings[selected] === "number") {
+        if (typeof settings[selected] === "number" || typeof settings[selected] === "bigint") {
           // @ts-expect-error doesnt like doing this!
           settings[selected] = 0;
         } else {

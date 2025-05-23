@@ -161,12 +161,6 @@ export async function getServerLeaderboard(guild: Guild): Promise<Map<string, st
     }
   }
 
-  const getMember = (id: string) => {
-    const target = members.find((member) => member.user.id == id);
-
-    return target;
-  };
-
   inPlaceSort(usersWins).desc((i) => winsStats.get(i));
   inPlaceSort(usersSecond).desc((i) => secondStats.get(i));
   inPlaceSort(usersThird).desc((i) => thirdStats.get(i));

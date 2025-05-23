@@ -110,7 +110,7 @@ model DMSettings {
   rob            Boolean         @default(true)
   lottery        Boolean         @default(true)
   premium        Boolean         @default(true)
-  auction        Boolean         @default(true)
+  market         Boolean         @default(true)
   voteReminder   Boolean         @default(false)
   worker         WorkerDmSetting @default(OnlyWhenFull)
   booster        Boolean         @default(false)
@@ -139,11 +139,11 @@ enum LevelDmSetting {
 model Preferences {
   userId String @id
 
-  duelRequests   Boolean @default(true)
-  auctionConfirm Int     @default(25000000)
-  offers         Int     @default(3)
-  leaderboards   Boolean @default(true)
-  tips           Boolean @default(true)
+  duelRequests  Boolean @default(true)
+  offers        Int     @default(3)
+  leaderboards  Boolean @default(true)
+  tips          Boolean @default(true)
+  marketConfirm BigInt  @default(25000000)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -206,7 +206,7 @@ model Economy {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @id
 
-  auctionWatch       AuctionWatch[]
+  MarketWatch        MarketWatch[]
   Boosters           Booster[]
   EconomyWorker      EconomyWorker[]
   Inventory          Inventory[]
@@ -214,7 +214,8 @@ model Economy {
   Game               Game[]
   Stats              Stats[]
   BakeryUpgrade      BakeryUpgrade[]
-  Auction            Auction[]
+  Market             Market[]
+  TradeRequest       TradeRequest[]
   EconomyGuild       EconomyGuild?
   EconomyGuildMember EconomyGuildMember?
   OffersReceived     Offer[]             @relation(name: "target")
@@ -224,6 +225,7 @@ model Economy {
   CustomCar          CustomCar[]
   Farm               Farm[]
   FarmUpgrades       FarmUpgrades[]
+  Auction            Auction[]
 }
 
 model Farm {
@@ -311,14 +313,15 @@ model Upgrades {
   @@id([userId, upgradeId])
 }
 
-model AuctionWatch {
-  userId  String
-  itemId  String
-  maxCost BigInt @default(0)
+model MarketWatch {
+  userId         String
+  itemId         String
+  orderType      OrderType
+  priceThreshold BigInt    @default(0)
 
   Economy Economy? @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
-  @@id([userId, itemId])
+  @@id([userId, itemId, orderType])
 }
 
 model BakeryUpgrade {
@@ -480,19 +483,42 @@ model FlagGame {
   @@index([userId])
 }
 
-model Auction {
-  id         Int      @id @default(autoincrement())
+enum OrderType {
+  buy
+  sell
+}
+
+model Market {
+  id         Int       @id @default(autoincrement())
   ownerId    String
   itemId     String
-  itemAmount BigInt   @default(1)
-  bin        BigInt
-  messageId  String   @unique
-  createdAt  DateTime @default(now())
-  sold       Boolean  @default(false)
+  itemAmount BigInt    @default(1)
+  price      BigInt
+  orderType  OrderType
+  messageId  String?   @unique
+  createdAt  DateTime  @default(now())
+  completed  Boolean   @default(false)
 
   owner Economy @relation(fields: [ownerId], references: [userId], onDelete: Cascade)
 
   @@index([itemId])
+  @@index([ownerId])
+}
+
+model TradeRequest {
+  id      Int    @id @default(autoincrement())
+  ownerId String
+
+  requestedItems String[]
+
+  offeredItems String[]
+  offeredMoney BigInt
+
+  messageId String   @unique
+  createdAt DateTime @default(now())
+  completed Boolean  @default(false)
+
+  owner Economy @relation(fields: [ownerId], references: [userId], onDelete: Cascade)
 }
 
 model Offer {
@@ -508,6 +534,22 @@ model Offer {
 
   target Economy? @relation(fields: [targetId], references: [userId], name: "target", onDelete: Cascade)
   owner  Economy? @relation(fields: [ownerId], references: [userId], name: "owner", onDelete: Cascade)
+
+  @@index([itemId])
+}
+
+// can probably be safely deleted after migration
+model Auction {
+  id         Int      @id @default(autoincrement())
+  ownerId    String
+  itemId     String
+  itemAmount BigInt   @default(1)
+  bin        BigInt
+  messageId  String   @unique
+  createdAt  DateTime @default(now())
+  sold       Boolean  @default(false)
+
+  owner Economy @relation(fields: [ownerId], references: [userId], onDelete: Cascade)
 
   @@index([itemId])
 }

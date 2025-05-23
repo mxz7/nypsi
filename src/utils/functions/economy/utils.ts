@@ -437,8 +437,8 @@ export async function reset() {
     if (guild.avatarId) await deleteImage(guild.avatarId);
   }
   await prisma.economyGuild.deleteMany();
-  logger.info("deleting auctions");
-  await prisma.auction.deleteMany({ where: { sold: false } });
+  logger.info("deleting market orders");
+  await prisma.market.deleteMany({ where: { completed: false } });
   logger.info("deleting offers");
   await prisma.offer.deleteMany({ where: { sold: false } });
   logger.info("deleting workers");

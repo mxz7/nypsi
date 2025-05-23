@@ -22,12 +22,23 @@ if (!isMainThread) {
   (async () => {
     const itemId: string = workerData[0];
 
-    const auctions = await prisma.auction.findMany({
+    const marketBuyOrders = await prisma.market.findMany({
       where: {
-        AND: [{ itemId, sold: true }],
+        AND: [{ itemId, completed: true }, { orderType: "buy" }],
       },
       select: {
-        bin: true,
+        price: true,
+        createdAt: true,
+        itemAmount: true,
+      },
+    });
+
+    const marketSellOrders = await prisma.market.findMany({
+      where: {
+        AND: [{ itemId, completed: true }, { orderType: "sell" }],
+      },
+      select: {
+        price: true,
         createdAt: true,
         itemAmount: true,
       },
@@ -45,20 +56,37 @@ if (!isMainThread) {
       },
     });
 
-    if (auctions.length < 2 && offers.length < 2 && itemCount.length < 2) {
+    if (
+      marketBuyOrders.length < 2 &&
+      marketSellOrders.length < 2 &&
+      offers.length < 2 &&
+      itemCount.length < 2
+    ) {
       parentPort.postMessage(null);
       process.exit(0);
     }
 
-    const auctionAverages = new Map<string, number[]>();
+    const marketBuyOrderAverages = new Map<string, number[]>();
 
-    for (const item of auctions) {
+    for (const item of marketBuyOrders) {
       const date = dayjs(item.createdAt).format("YYYY-MM-DD");
 
-      if (auctionAverages.has(date)) {
-        auctionAverages.get(date).push(Number(item.bin / item.itemAmount));
+      if (marketBuyOrderAverages.has(date)) {
+        marketBuyOrderAverages.get(date).push(Number(item.price * item.itemAmount));
       } else {
-        auctionAverages.set(date, [Number(item.bin / item.itemAmount)]);
+        marketBuyOrderAverages.set(date, [Number(item.price * item.itemAmount)]);
+      }
+    }
+
+    const marketSellOrderAverages = new Map<string, number[]>();
+
+    for (const item of marketSellOrders) {
+      const date = dayjs(item.createdAt).format("YYYY-MM-DD");
+
+      if (marketSellOrderAverages.has(date)) {
+        marketSellOrderAverages.get(date).push(Number(item.price * item.itemAmount));
+      } else {
+        marketSellOrderAverages.set(date, [Number(item.price * item.itemAmount)]);
       }
     }
 
@@ -87,7 +115,14 @@ if (!isMainThread) {
         datasets: [
           {
             yAxisID: "y1",
-            label: "auctions",
+            label: "buy orders",
+            data: [],
+            fill: false,
+            lineTension: 0.4,
+          },
+          {
+            yAxisID: "y1",
+            label: "sell orders",
             data: [],
             fill: false,
             lineTension: 0.4,
@@ -159,7 +194,12 @@ if (!isMainThread) {
       },
     };
 
-    for (const key of auctionAverages.keys()) {
+    for (const key of marketBuyOrderAverages.keys()) {
+      if (!graphData.data.labels.includes(dayjs(key).format("YYYY-MM-DD")))
+        graphData.data.labels.push(dayjs(key).format("YYYY-MM-DD"));
+    }
+
+    for (const key of marketSellOrderAverages.keys()) {
       if (!graphData.data.labels.includes(dayjs(key).format("YYYY-MM-DD")))
         graphData.data.labels.push(dayjs(key).format("YYYY-MM-DD"));
     }
@@ -190,10 +230,10 @@ if (!isMainThread) {
     for (const dateString of graphData.data.labels) {
       const index = graphData.data.labels.indexOf(dateString);
 
-      if (auctionAverages.has(dateString)) {
+      if (marketBuyOrderAverages.has(dateString)) {
         graphData.data.datasets[0].data.push(
-          auctionAverages.get(dateString).reduce((a, b) => a + b) /
-            auctionAverages.get(dateString).length,
+          marketBuyOrderAverages.get(dateString).reduce((a, b) => a + b) /
+            marketBuyOrderAverages.get(dateString).length,
         );
       } else if (index > 0) {
         graphData.data.datasets[0].data.push(graphData.data.datasets[0].data[index - 1]);
@@ -201,10 +241,10 @@ if (!isMainThread) {
         graphData.data.datasets[0].data.push(0);
       }
 
-      if (offerAverages.has(dateString)) {
+      if (marketSellOrderAverages.has(dateString)) {
         graphData.data.datasets[1].data.push(
-          offerAverages.get(dateString).reduce((a, b) => a + b) /
-            offerAverages.get(dateString).length,
+          marketSellOrderAverages.get(dateString).reduce((a, b) => a + b) /
+            marketSellOrderAverages.get(dateString).length,
         );
       } else if (index > 0) {
         graphData.data.datasets[1].data.push(graphData.data.datasets[1].data[index - 1]);
@@ -212,12 +252,23 @@ if (!isMainThread) {
         graphData.data.datasets[1].data.push(0);
       }
 
-      if (itemCounts.has(dateString)) {
-        graphData.data.datasets[2].data.push(itemCounts.get(dateString));
+      if (offerAverages.has(dateString)) {
+        graphData.data.datasets[2].data.push(
+          offerAverages.get(dateString).reduce((a, b) => a + b) /
+            offerAverages.get(dateString).length,
+        );
       } else if (index > 0) {
         graphData.data.datasets[2].data.push(graphData.data.datasets[2].data[index - 1]);
       } else {
         graphData.data.datasets[2].data.push(0);
+      }
+
+      if (itemCounts.has(dateString)) {
+        graphData.data.datasets[3].data.push(itemCounts.get(dateString));
+      } else if (index > 0) {
+        graphData.data.datasets[3].data.push(graphData.data.datasets[3].data[index - 1]);
+      } else {
+        graphData.data.datasets[3].data.push(0);
       }
     }
 

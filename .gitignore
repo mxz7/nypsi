@@ -10,6 +10,8 @@ out/
 *.db-wal
 *.DS_STORE
 
+tsconfig.tsbuildinfo
+
 anticheat.ts
 anticheat_old.ts
 anticheat2.ts

@@ -20,7 +20,10 @@ export default {
         `${Constants.redis.nypsi.RESTART}:${(interaction.client as NypsiClient).cluster.id}`,
       )) == "t"
     ) {
-      return interaction.reply({ embeds: [new ErrorEmbed("nypsi is rebooting")], flags: MessageFlags.Ephemeral });
+      return interaction.reply({
+        embeds: [new ErrorEmbed("nypsi is rebooting")],
+        flags: MessageFlags.Ephemeral,
+      });
     }
 
     if (await redis.get("nypsi:maintenance")) {

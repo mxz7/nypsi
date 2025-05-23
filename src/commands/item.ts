@@ -10,17 +10,16 @@ import {
   MessageActionRowComponentBuilder,
   MessageFlags,
 } from "discord.js";
-import { sort } from "fast-sort";
 import prisma from "../init/database";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { countItemOnAuction, findAuctions } from "../utils/functions/economy/auctions";
 import {
   calcItemValue,
   getInventory,
   getTotalAmountOfItem,
   selectItem,
 } from "../utils/functions/economy/inventory";
+import { countItemOnMarket } from "../utils/functions/economy/market";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getEmojiImage } from "../utils/functions/image";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -122,15 +121,15 @@ async function run(
     }
   }
 
-  const [total, inventory, inAuction, value] = await Promise.all([
+  const [total, inventory, inMarket, value] = await Promise.all([
     getTotalAmountOfItem(selected.id),
     getInventory(message.member),
-    countItemOnAuction(selected.id),
+    countItemOnMarket(selected.id, "sell"),
     calcItemValue(selected.id),
   ]);
 
   if (selected.account_locked) {
-    desc.push("**account locked**");
+    desc.push("\n**account locked**");
   } else {
     if (selected.sell || selected.buy) {
       desc.push(
@@ -146,25 +145,8 @@ async function run(
       desc.push(`\n**in world** ${total.toLocaleString()}`);
     }
 
-    if (inAuction) {
-      const auctions = await findAuctions(selected.id);
-      let cheapest: number;
-
-      if (auctions.length > 0) {
-        const cheapestItem = sort(auctions).asc((a) => a.bin / a.itemAmount)[0];
-
-        cheapest = Math.floor(Number(cheapestItem.bin / cheapestItem.itemAmount));
-      }
-
-      if (total) {
-        desc.push(
-          `**in auction** ${inAuction.toLocaleString()}${cheapest ? ` ($${cheapest.toLocaleString()})` : ""}`,
-        );
-      } else {
-        desc.push(
-          `\n**in auction** ${inAuction.toLocaleString()}${cheapest ? ` ($${cheapest.toLocaleString()})` : ""}`,
-        );
-      }
+    if (inMarket) {
+      desc.push(`\n**in market** ${inMarket.toLocaleString()}`);
     }
 
     if (selected.role) {
@@ -221,8 +203,9 @@ async function run(
 
   if (
     !(
-      (await prisma.auction.count({ where: { AND: [{ itemId: selected.id }, { sold: true }] } })) <
-        5 &&
+      (await prisma.market.count({
+        where: { AND: [{ itemId: selected.id }, { completed: true }] },
+      })) < 5 &&
       (await prisma.offer.count({ where: { AND: [{ itemId: selected.id }, { sold: true }] } })) <
         5 &&
       (await prisma.graphMetrics.count({ where: { category: `item-count-${selected.id}` } })) < 5

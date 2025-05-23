@@ -20,7 +20,6 @@ import { getTax } from "../tax";
 import { addBalance } from "./balance";
 import { getInventory } from "./inventory";
 import { createUser, getItems, userExists } from "./utils";
-import dayjs = require("dayjs");
 
 export async function createOffer(
   target: User,

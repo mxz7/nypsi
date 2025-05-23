@@ -168,7 +168,7 @@ async function run(
                     members: true,
                   },
                 },
-                Auction: true,
+                Market: true,
                 BakeryUpgrade: true,
                 EconomyGuildMember: true,
                 OffersGiven: true,
@@ -179,7 +179,7 @@ async function run(
                   },
                 },
                 OffersReceived: true,
-                auctionWatch: true,
+                MarketWatch: true,
                 EconomyWorker: {
                   include: {
                     upgrades: true,

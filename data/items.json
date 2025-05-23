@@ -1922,7 +1922,7 @@
     "longDesc": "it's widely understood throughout history, that nobody truly understands the origin of any gem, including the crystal heart. ancient hieroglyphs depict the crystal heart forming when all gems in existence fuse together. quite a sight to behold.",
     "role": "item",
     "rarity": 4,
-    "sell": 57500000,
+    "sell": 1000000000,
     "in_crates": false,
     "aliases": ["heart", "crystal"]
   },
@@ -3165,7 +3165,7 @@
     "longDesc": "rock",
     "rarity": 6,
     "role": "collectable",
-    "sell": 50000000,
+    "sell": 1000000000,
     "in_crates": true,
     "unique": true
   },

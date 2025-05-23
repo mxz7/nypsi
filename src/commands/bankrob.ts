@@ -70,7 +70,10 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
   };
 
   if ((await getBalance(message.member)) < 5_000) {
-    return send({ embeds: [new ErrorEmbed("you must have at least $5k")], flags: MessageFlags.Ephemeral });
+    return send({
+      embeds: [new ErrorEmbed("you must have at least $5k")],
+      flags: MessageFlags.Ephemeral,
+    });
   }
 
   const getMaxValues = async (bankBalance: number) => {

@@ -34,6 +34,7 @@ import {
   setInventoryItem,
 } from "../utils/functions/economy/inventory";
 import { setLevel, setPrestige } from "../utils/functions/economy/levelling";
+import { getMarketOrderEmbed } from "../utils/functions/economy/market";
 import { getEcoBanTime, getItems, isEcoBanned, setEcoBan } from "../utils/functions/economy/utils";
 import { updateXp } from "../utils/functions/economy/xp";
 import { addKarma, getKarma, removeKarma } from "../utils/functions/karma/karma";
@@ -58,7 +59,6 @@ import { addNotificationToQueue } from "../utils/functions/users/notifications";
 import { addTag, getTags, removeTag } from "../utils/functions/users/tags";
 import { hasProfile } from "../utils/functions/users/utils";
 import { logger } from "../utils/logger";
-import ms = require("ms");
 
 const cmd = new Command("x", "admincmd", "none").setPermissions(["bot owner"]);
 
@@ -115,13 +115,13 @@ async function run(
                   members: true,
                 },
               },
-              Auction: true,
+              Market: true,
               BakeryUpgrade: true,
               EconomyGuildMember: true,
               OffersGiven: true,
               Upgrades: true,
               OffersReceived: true,
-              auctionWatch: true,
+              MarketWatch: true,
               CustomCar: {
                 include: {
                   upgrades: true,
@@ -898,7 +898,7 @@ async function run(
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "blacklist") {
-        if ((await getAdminLevel(message.author.id)) < 3) {
+        if ((await getAdminLevel(message.member)) < 3) {
           await res.editReply({
             embeds: [new ErrorEmbed("you require admin level **3** to do this")],
           });
@@ -1043,9 +1043,9 @@ async function run(
             },
           });
 
-          await prisma.auction.deleteMany({
+          await prisma.market.deleteMany({
             where: {
-              AND: [{ ownerId: user.id }, { sold: false }],
+              AND: [{ ownerId: user.id }, { completed: false }],
             },
           });
 
@@ -1337,7 +1337,7 @@ async function run(
         });
         return waitForButton();
       } else if (res.customId === "del-cmd") {
-        if ((await getAdminLevel(message.author.id)) < 3) {
+        if ((await getAdminLevel(message.member)) < 3) {
           await res.editReply({
             embeds: [new ErrorEmbed("you require admin level **3** to do this")],
           });
@@ -1352,7 +1352,7 @@ async function run(
         });
         return waitForButton();
       } else if (res.customId === "del-aliases") {
-        if ((await getAdminLevel(message.author.id)) < 3) {
+        if ((await getAdminLevel(message.member)) < 3) {
           await res.editReply({
             embeds: [new ErrorEmbed("you require admin level **3** to do this")],
           });
@@ -1521,7 +1521,7 @@ async function run(
         });
         return waitForButton();
       } else if (res.customId === "ac-clear") {
-        if ((await getAdminLevel(message.author.id)) < 3) {
+        if ((await getAdminLevel(message.member)) < 3) {
           await res.editReply({
             embeds: [new ErrorEmbed("you require admin level **3** to do this")],
           });
@@ -1902,7 +1902,7 @@ async function run(
     await redis.del(Constants.redis.nypsi.CRASH_STATUS);
     await initCrashGame(message.client as NypsiClient);
   } else if (args[0].toLowerCase() === "findalts") {
-    if ((await getAdminLevel(message.author.id)) < 3) {
+    if ((await getAdminLevel(message.member)) < 3) {
       return message.channel.send({
         embeds: [new ErrorEmbed("you require admin level **3** to do this")],
       });
@@ -1932,6 +1932,70 @@ async function run(
     // idk how this should be done lol i might get back to it
 
     console.log(map);
+  } else if (args[0].toLowerCase() === "migrate") {
+    if (message.author.id !== Constants.TEKOH_ID) return;
+
+    const auctions = await prisma.auction.findMany();
+
+    for (const auction of auctions) {
+      logger.debug(`market: migrating auction ${auction.id}...`);
+      await prisma.market.create({
+        data: {
+          orderType: "sell",
+          ownerId: auction.ownerId,
+          itemId: auction.itemId,
+          itemAmount: auction.itemAmount,
+          price: Math.round(Number(auction.bin) / Number(auction.itemAmount)),
+          completed: auction.sold,
+          createdAt: auction.createdAt,
+        },
+      });
+    }
+
+    const unSold = await prisma.market.findMany({
+      where: { AND: [{ completed: false }, { messageId: null }] },
+    });
+
+    for (const order of unSold) {
+      try {
+        const payload = await getMarketOrderEmbed(order);
+
+        const { url, id } = await (message.client as NypsiClient).cluster
+          .broadcastEval(
+            async (client, { payload, channelId }) => {
+              const channel = client.channels.cache.get(channelId);
+
+              if (!channel) return;
+              if (!channel.isSendable()) return;
+
+              try {
+                const msg = await channel.send(payload);
+
+                return { url: msg.url, id: msg.id };
+              } catch {
+                return;
+              }
+            },
+            {
+              context: { payload, channelId: Constants.MARKET_CHANNEL_ID },
+            },
+          )
+          .then((res) => {
+            return res.filter((i) => Boolean(i))[0];
+          });
+
+        await prisma.market.update({
+          where: {
+            id: order.id,
+          },
+          data: {
+            messageId: id,
+          },
+        });
+      } catch {
+        logger.warn("market: failed to send message", { order });
+      }
+    }
   }
 }
 

@@ -956,7 +956,7 @@ async function run(
 
     if (args[1]?.toLowerCase() === "remove") {
       if (!guild.avatarId) {
-        return send({ embeds: [new ErrorEmbed("your guld does not have an avatar")] });
+        return send({ embeds: [new ErrorEmbed("your guild does not have an avatar")] });
       }
 
       await deleteImage(guild.avatarId);
@@ -977,7 +977,7 @@ async function run(
         new CustomEmbed(
           message.member,
           "10MB max file size\n\nsend a picture in the channel\n" +
-            "please note that innapropriate images may result in your guild being deleted",
+            "please note that inappropriate images may result in your guild being deleted",
         ).setHeader(
           "guild avatar",
           guild.avatarId ? `https://cdn.nypsi.xyz/${guild.avatarId}` : undefined,
