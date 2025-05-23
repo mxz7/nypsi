@@ -206,6 +206,13 @@ export async function getClaimable(member: GuildMember | string, plantId: string
 
     const earned = hours * plantData.hourly;
 
+    const prestigeUpgrade = userUpgrades.find(u => u.upgradeId === "farm_output");
+    let outputMulti = 1;
+
+    if (prestigeUpgrade) {
+      outputMulti += prestigeUpgrade.amount * 0.02;
+    }
+
     let storageMulti = 1;
 
     for (const upgradeId of Object.keys(upgrades).filter(
@@ -228,8 +235,10 @@ export async function getClaimable(member: GuildMember | string, plantId: string
       storageMulti += 0.2;
     }
 
-    if (earned > plantData.max) items += Math.floor(plantData.max * storageMulti);
-    else items += Math.floor(earned * storageMulti);
+    const adjustedEarned = earned * outputMulti;
+
+    if (adjustedEarned > plantData.max) items += Math.floor(plantData.max * storageMulti);
+    else items += Math.floor(adjustedEarned * storageMulti);
   }
 
   items = Math.floor(items);

@@ -46,5 +46,13 @@
     "description": "+{x}% xp sent to guild",
     "max": 5,
     "chance": 20
+  },
+  "farm_output": {
+    "id": "farm_output",
+    "name": "farm output booster",
+    "effect": 0.02,
+    "description": "+{x}% farm output",
+    "max": 10,
+    "chance": 15
   }
 }
