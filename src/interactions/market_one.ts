@@ -113,6 +113,7 @@ export default {
     if (await redis.exists("nypsi:maintenance")) {
       interaction.reply({
         embeds: [new CustomEmbed(interaction.user.id, "nypsi is currently in maintenance mode")],
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }

@@ -113,6 +113,7 @@ export default {
     if (await redis.exists("nypsi:maintenance")) {
       interaction.reply({
         embeds: [new CustomEmbed(interaction.user.id, "nypsi is currently in maintenance mode")],
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -140,7 +141,7 @@ export default {
       }
     } else {
       const worth = await calcItemValue(order.itemId);
-      console.log(worth)
+      console.log(worth);
       if (worth * 1.25 > Number(order.price)) {
         const res = await showMarketConfirmationModal(interaction, "sell", worth);
 

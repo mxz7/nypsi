@@ -9,12 +9,12 @@ import {
   TextInputStyle,
 } from "discord.js";
 import prisma from "../init/database";
+import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
 import { marketBuy, marketSell } from "../utils/functions/economy/market";
 import { getItems, isEcoBanned, userExists } from "../utils/functions/economy/utils";
-import redis from "../init/redis";
 
 const userFulfilling = new Map<string, number>();
 
@@ -27,6 +27,7 @@ export default {
     if (await redis.exists("nypsi:maintenance")) {
       interaction.reply({
         embeds: [new CustomEmbed(interaction.user.id, "nypsi is currently in maintenance mode")],
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
