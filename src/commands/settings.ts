@@ -193,7 +193,7 @@ async function run(
       );
 
       // @ts-expect-error hate life innit
-      if (typeof settings[settingId] === "number" || typeof settings[selected] === "bigint") {
+      if (typeof settings[settingId] === "number" || typeof settings[settingId] === "bigint") {
         const boobies = [
           new ButtonBuilder()
             .setCustomId("enable")
