@@ -11,21 +11,29 @@ export default {
     const baltop = await topBalanceGlobal(10);
     const guilds = await topGuilds();
 
-    const embed = new CustomEmbed();
+    const balance = new CustomEmbed();
+    const guild = new CustomEmbed();
 
-    embed.setHeader(
-      "top",
+    balance.setHeader(
+      "top balance",
       "https://cdn.discordapp.com/avatars/678711738845102087/cb2dcd61010f2b89ceb1cd5ff15816cf.png?size=256",
+      "https://nypsi.xyz/leaderboard/balance?ref=bot-lb",
+    );
+    guild.setHeader(
+      "top guilds",
+      "https://cdn.discordapp.com/avatars/678711738845102087/cb2dcd61010f2b89ceb1cd5ff15816cf.png?size=256",
+      "https://nypsi.xyz/leaderboard/guilds?ref=bot-lb",
     );
 
-    embed.setColor(flavors.latte.colors.base.hex as ColorResolvable);
+    balance.setColor(flavors.latte.colors.base.hex as ColorResolvable);
+    guild.setColor(flavors.latte.colors.base.hex as ColorResolvable);
 
-    embed.addField("balance", baltop.join("\n"), true);
-    embed.addField("guild", guilds.pages.get(1).join("\n"), true);
+    balance.setDescription(baltop.join("\n"));
+    guild.setDescription(guilds.pages.get(1).join("\n"));
 
     const hook = new WebhookClient({ url: process.env.TOPGLOBAL_HOOK });
 
-    await hook.send({ embeds: [embed] });
+    await hook.send({ embeds: [balance, guild] });
 
     log("sent global baltop");
 
