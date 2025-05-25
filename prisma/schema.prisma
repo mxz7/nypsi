@@ -863,7 +863,7 @@ model Mention {
   url      String
   content  String
 
-  @@index([guildId])
+  @@index([targetId])
 }
 
 model SupportRequest {
