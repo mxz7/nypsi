@@ -139,11 +139,12 @@ enum LevelDmSetting {
 model Preferences {
   userId String @id
 
-  duelRequests  Boolean @default(true)
-  offers        Int     @default(3)
-  leaderboards  Boolean @default(true)
-  tips          Boolean @default(true)
-  marketConfirm BigInt  @default(25000000)
+  duelRequests   Boolean @default(true)
+  offers         Int     @default(3)
+  leaderboards   Boolean @default(true)
+  tips           Boolean @default(true)
+  marketConfirm  BigInt  @default(25000000)
+  mentionsGlobal Boolean @default(false)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
