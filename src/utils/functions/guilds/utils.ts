@@ -8,6 +8,7 @@ import ms = require("ms");
 
 const snipe: Map<string, SnipedMessage> = new Map();
 const eSnipe: Map<string, SnipedMessage> = new Map();
+const peaks = new Map<string, number>();
 
 export { eSnipe, snipe };
 
@@ -46,25 +47,12 @@ export function runSnipeClearIntervals() {
   }, 3600000);
 }
 
-export async function runCheck(guild: Guild) {
+export async function updateGuildPeak(guild: Guild) {
   if (!(await hasGuild(guild))) await createGuild(guild);
 
-  const query = await prisma.guild.findUnique({
-    where: {
-      id: guild.id,
-    },
-    select: {
-      peak: true,
-    },
-  });
+  const peak = await getPeaks(guild);
 
-  if (!query) {
-    return;
-  }
-
-  const currentMembersPeak = query.peak;
-
-  if (guild.memberCount > currentMembersPeak) {
+  if (guild.memberCount > peak) {
     await prisma.guild.update({
       where: {
         id: guild.id,
@@ -73,6 +61,7 @@ export async function runCheck(guild: Guild) {
         peak: guild.memberCount,
       },
     });
+    peaks.set(guild.id, guild.memberCount);
   }
 }
 
@@ -137,8 +126,11 @@ export async function createGuild(guild: Guild | string) {
     data: {
       id: guildId,
       prefixes: isDev ? ["£"] : undefined,
+      peak: guild instanceof Guild ? guild.memberCount : 0,
     },
   });
+
+  peaks.set(guildId, guild instanceof Guild ? guild.memberCount : 0);
 
   await redis.set(
     `${Constants.redis.cache.guild.EXISTS}:${guildId}`,
