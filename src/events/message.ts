@@ -225,7 +225,6 @@ export default async function messageCreate(message: Message) {
           message.author.id,
           message.client as NypsiClient,
           message.author.username,
-          Boolean(quickResponse),
         );
 
         if (!r) {

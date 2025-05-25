@@ -68,12 +68,7 @@ export async function getSupportRequest(id: string): Promise<SupportRequest> {
   }
 }
 
-export async function createSupportRequest(
-  id: string,
-  client: NypsiClient,
-  username: string,
-  aiResponded: boolean,
-) {
+export async function createSupportRequest(id: string, client: NypsiClient, username: string) {
   const clusterHas = await client.cluster.broadcastEval(
     async (c, { channelId }) => {
       const client = c as unknown as NypsiClient;
@@ -151,7 +146,7 @@ export async function createSupportRequest(
   const embed = new CustomEmbed()
     .setColor(Constants.PURPLE)
     .setDescription(
-      `support request for [${username} (${id})](https://nypsi.xyz/user/${id}?ref=bot-support)${aiResponded ? " (AI responded)" : ""}`,
+      `support request for [${username} (${id})](https://nypsi.xyz/user/${id}?ref=bot-support)`,
     );
 
   await sendToRequestChannel(id, embed, id, client);
@@ -343,30 +338,35 @@ export async function isRequestSuitable(content: string) {
   try {
     const aiResponse = await prompt(
       "# Role\n" +
-        "You are part of a support team for the Discord bot 'nypsi'. " +
-        "Your job is to determine if the user's message is suitable for a support request to be sent forwarded to a human. " +
-        "The content may not be in English or may be bad English, do your best to understand it. " +
+        "You are part of a support team for the Discord bot **nypsi**.\n" +
+        "Your job is to determine if the user's message is suitable for a support request to be forwarded to a human.\n" +
+        "The content may not be in English or may be written in poor English — do your best to understand it.\n" +
         "If you are unsure, lean on being accepting of the support request.\n" +
-        "# Your response\n" +
-        "## First line \n" +
-        "- Respond with 'yes' for a suitable support request.\n" +
-        "- Respond with 'no' for an unsuitable support request.\n" +
-        "- Respond with 'needs more' where the user hasn't described their problem enough.\n" +
+        "\n" +
+        "# Your Response\n" +
+        "\n" +
+        "## First line\n" +
+        "- Respond with **`yes`** for a suitable support request.\n" +
+        "- Respond with **`no`** for an unsuitable support request.\n" +
+        "\n" +
         "## Second line\n" +
-        "The second line of the request should be a concise reason for your decision. " +
-        "Avoid ending your reason with 'which is/not' suitable for support' this is understood from the given context. " +
-        "Avoid starting your reason with 'the message', keep it as concise and quickly readable as possible.\n" +
+        "The second line of the response should be a **concise reason** for your decision.\n" +
+        "\n" +
+        '- Avoid ending your reason with "which is/not suitable for support" — this is understood from the context.\n' +
+        '- Avoid starting your reason with "the message" — keep it direct and quickly readable.\n' +
+        "\n" +
         "# Examples\n" +
-        "## Suitable requests\n" +
+        "\n" +
+        "## Suitable Requests\n" +
         "- Asking for help with an issue\n" +
         "- Reporting some type of bug\n" +
         "- Asking for some information about the bot\n" +
-        "## Unsuitable requests\n" +
+        "\n" +
+        "## Unsuitable Requests\n" +
         "- Begging or asking for items or money\n" +
         "- Asking how long is left on their punishment\n" +
         "- Asking for a feature\n" +
-        "## Needs more\n" +
-        "- The user says they need help but doesn't say what they need help with\n",
+        "- Asking to be staff",
       content,
     );
 
