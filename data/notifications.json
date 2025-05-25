@@ -117,6 +117,11 @@
       "id": "tips",
       "name": "tips",
       "description": "send occasional tips when you do commands"
+    },
+    "mentionsGlobal": {
+      "id": "mentionsGlobal",
+      "name": "global pings",
+      "description": "show pings in all servers (that nypsi is in) with $pings"
     }
   }
 }
