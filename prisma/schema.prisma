@@ -552,7 +552,10 @@ model Aura {
 // guild specific tables
 
 model Guild {
-  id               String   @id
+  id   String  @id
+  name String?
+  icon String?
+
   peak             Int      @default(0)
   disabledCommands String[]
   snipeFilter      String[]
