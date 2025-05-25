@@ -12,7 +12,7 @@ import {
   setAutoJoinRoles,
   setPersistentRoles,
 } from "../utils/functions/guilds/roles";
-import { createGuild, hasGuild, updateGuildPeak } from "../utils/functions/guilds/utils";
+import { createGuild, hasGuild, updateGuild } from "../utils/functions/guilds/utils";
 import { clearMemberCache } from "../utils/functions/member";
 import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import { isBanned, newBan } from "../utils/functions/moderation/ban";
@@ -97,7 +97,7 @@ export default async function guildMemberAdd(member: GuildMember) {
     queue.add(member.guild.id);
 
     setTimeout(async () => {
-      await updateGuildPeak(member.guild);
+      await updateGuild(member.guild);
       queue.delete(member.guild.id);
     }, 120000);
   }

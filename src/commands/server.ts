@@ -2,7 +2,7 @@ import { CommandInteraction } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders.js";
 import { formatDate } from "../utils/functions/date";
-import { getPeaks, updateGuildPeak } from "../utils/functions/guilds/utils";
+import { getPeaks, updateGuild } from "../utils/functions/guilds/utils";
 import { logger } from "../utils/logger";
 
 const cmd = new Command("server", "view information about the server", "info").setAliases([
@@ -16,7 +16,7 @@ async function run(
 ) {
   const server = message.guild;
 
-  await updateGuildPeak(server);
+  await updateGuild(server);
 
   const created = formatDate(server.createdAt).toLowerCase();
 

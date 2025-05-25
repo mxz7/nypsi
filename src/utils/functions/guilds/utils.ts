@@ -9,6 +9,8 @@ import ms = require("ms");
 const snipe: Map<string, SnipedMessage> = new Map();
 const eSnipe: Map<string, SnipedMessage> = new Map();
 const peaks = new Map<string, number>();
+const names = new Map<string, string>();
+const icons = new Map<string, string>();
 
 export { eSnipe, snipe };
 
@@ -47,7 +49,7 @@ export function runSnipeClearIntervals() {
   }, 3600000);
 }
 
-export async function updateGuildPeak(guild: Guild) {
+export async function updateGuild(guild: Guild) {
   if (!(await hasGuild(guild))) await createGuild(guild);
 
   const peak = await getPeaks(guild);
@@ -62,6 +64,34 @@ export async function updateGuildPeak(guild: Guild) {
       },
     });
     peaks.set(guild.id, guild.memberCount);
+  }
+
+  const name = await getGuildName(guild.id);
+
+  if (guild.name !== name) {
+    await prisma.guild.update({
+      where: {
+        id: guild.id,
+      },
+      data: {
+        name: guild.name,
+      },
+    });
+    names.set(guild.id, guild.name);
+  }
+
+  const icon = await getGuildIcon(guild.id);
+
+  if (guild.iconURL() !== icon) {
+    await prisma.guild.update({
+      where: {
+        id: guild.id,
+      },
+      data: {
+        icon: guild.iconURL(),
+      },
+    });
+    icons.set(guild.id, guild.iconURL());
   }
 }
 
@@ -98,6 +128,10 @@ export async function hasGuild(guild: Guild | string): Promise<boolean> {
 }
 
 export async function getPeaks(guild: Guild) {
+  if (peaks.has(guild.id)) {
+    return peaks.get(guild.id);
+  }
+
   const query = await prisma.guild.findUnique({
     where: {
       id: guild.id,
@@ -127,6 +161,8 @@ export async function createGuild(guild: Guild | string) {
       id: guildId,
       prefixes: isDev ? ["£"] : undefined,
       peak: guild instanceof Guild ? guild.memberCount : 0,
+      name: guild instanceof Guild ? guild.name : undefined,
+      icon: guild instanceof Guild ? guild.iconURL() : undefined,
     },
   });
 
@@ -201,4 +237,46 @@ export async function setPrefix(guild: Guild, prefix: string[]) {
   });
 
   await redis.del(`${Constants.redis.cache.guild.PREFIX}:${guild.id}`);
+}
+
+export async function getGuildName(id: string) {
+  if (names.has(id)) {
+    return names.get(id);
+  }
+
+  const query = await prisma.guild.findUnique({
+    where: {
+      id: id,
+    },
+    select: {
+      name: true,
+    },
+  });
+
+  if (query) {
+    names.set(id, query?.name);
+  }
+
+  return query?.name;
+}
+
+export async function getGuildIcon(id: string) {
+  if (icons.has(id)) {
+    return icons.get(id);
+  }
+
+  const query = await prisma.guild.findUnique({
+    where: {
+      id: id,
+    },
+    select: {
+      icon: true,
+    },
+  });
+
+  if (query) {
+    icons.set(id, query?.icon);
+  }
+
+  return query?.icon;
 }
