@@ -203,10 +203,10 @@ export async function createTradeRequest(
       },
     )
     .then((res) => {
-      return res.filter((i) => Boolean(i))[0];
+      return res.filter((i) => typeof i !== "string")[0];
     });
 
-  if (typeof messageResponse === "string") {
+  if (!messageResponse.url) {
     logger.error(`failed creating trade request: ${messageResponse}`);
     return;
   }
