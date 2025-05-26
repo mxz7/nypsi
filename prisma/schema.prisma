@@ -256,7 +256,7 @@ model FarmUpgrades {
 }
 
 model CustomCar {
-  id String @id @default(uuid())
+  id Int @id @default(autoincrement())
 
   createdAt DateTime @default(now())
   name      String
@@ -272,7 +272,7 @@ model CarUpgrade {
   type      CarUpgradeType
   amount    Int            @default(1)
 
-  carId String
+  carId Int
   car   CustomCar @relation(fields: [carId], references: [id], onDelete: Cascade)
 
   @@id([carId, type])
