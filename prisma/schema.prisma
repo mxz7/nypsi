@@ -916,7 +916,7 @@ model Session {
 }
 
 model Captcha {
-  id     String @id @default(uuid())
+  id     String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId String
 
   solved   Boolean    @default(false)
