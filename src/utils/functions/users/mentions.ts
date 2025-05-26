@@ -1,5 +1,5 @@
 import { Mention } from "@prisma/client";
-import { Guild, GuildMember } from "discord.js";
+import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 
 export interface MentionQueueItem {
@@ -51,17 +51,10 @@ export async function fetchUserMentions(
   return mentions;
 }
 
-export async function deleteUserMentions(guild: Guild, member: GuildMember | string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
+export async function deleteUserMentions(userId: string, guildId?: string) {
   await prisma.mention.deleteMany({
     where: {
-      AND: [{ guildId: guild.id }, { targetId: id }],
+      AND: [{ guildId: guildId }, { targetId: userId }],
     },
   });
 }
