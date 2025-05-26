@@ -200,10 +200,10 @@ export async function createMarketOrder(
   if (cluster) {
     const { url, id } = await client.cluster
       .broadcastEval(
-        async (client, { payload, channelId }) => {
+        async (client, { payload, channelId, cluster }) => {
           const c = client as unknown as NypsiClient;
 
-          if (c.cluster.id !== cluster.cluster) return;
+          if (c.cluster.id !== cluster) return;
 
           const channel = client.channels.cache.get(channelId);
 
