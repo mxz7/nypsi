@@ -21,7 +21,7 @@ import { isPremium } from "../utils/functions/premium/premium";
 import { decrypt } from "../utils/functions/string";
 import { getLastCommand } from "../utils/functions/users/commands";
 import { deleteUserMentions, fetchUserMentions } from "../utils/functions/users/mentions";
-import { getPreferences } from "../utils/functions/users/notifications";
+import { getPreferences, updatePreferences } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
 
@@ -93,7 +93,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
     return send({ embeds: [embed] });
   }
 
-  const showMentions = async (message?: Message) => {
+  const showMentions = async (msg?: Message) => {
     let limit = 9;
 
     if (await isPremium(message.author.id)) {
@@ -156,19 +156,26 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
       new ButtonBuilder().setCustomId("❌").setLabel("clear").setStyle(ButtonStyle.Danger),
     );
     const row2 = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("toggle-global").setLabel(""),
+      new ButtonBuilder()
+        .setCustomId("toggle-global")
+        .setLabel(preferences.mentionsGlobal ? "all servers" : message.guild.name.substring(0, 80))
+        .setStyle(ButtonStyle.Secondary),
     );
 
     if (pages.size === 1) {
       row.components.splice(0, 2);
     }
 
-    const msg = await send({ embeds: [embed], components: [row] });
+    if (msg) {
+      await msg.edit({ embeds: [embed], components: [row, row2] });
+    } else {
+      msg = await send({ embeds: [embed], components: [row, row2] });
+    }
 
     const manager = new PageManager({
       embed: embed,
       message: msg,
-      row: row,
+      row: [row, row2],
       userId: message.author.id,
       pages: pages,
       updateEmbed(page: string[], embed) {
@@ -186,9 +193,8 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
         manager.embed.setFooter({ text: `page ${manager.currentPage}/${manager.lastPage}` });
         return manager.embed;
       },
-      handleResponses: new Map().set(
-        "❌",
-        async (manager: PageManager<string>, interaction: ButtonInteraction) => {
+      handleResponses: new Map()
+        .set("❌", async (manager: PageManager<string>, interaction: ButtonInteraction) => {
           await interaction.deferUpdate();
           await deleteUserMentions(manager.message.guild, manager.userId);
 
@@ -199,8 +205,17 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
 
           await manager.message.edit({ embeds: [embed], components: [] });
           return;
-        },
-      ),
+        })
+        .set(
+          "toggle-global",
+          async (manager: PageManager<string>, interaction: ButtonInteraction) => {
+            await interaction.deferUpdate();
+            preferences.mentionsGlobal = !preferences.mentionsGlobal;
+            await updatePreferences(message.author.id, preferences);
+
+            return showMentions(manager.message);
+          },
+        ),
     });
 
     return manager.listen();
