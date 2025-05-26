@@ -364,6 +364,8 @@ export async function checkMarketOrder(
           remaining -= validOrder.itemAmount;
         }
 
+        if (amount === 0n) break;
+
         const res = await completeOrder(
           validOrder.id,
           order.ownerId,
