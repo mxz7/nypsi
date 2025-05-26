@@ -862,7 +862,7 @@ model SupportRequest {
 }
 
 model SupportRequestMessage {
-  id               String @id @default(uuid())
+  id               Int    @id @default(autoincrement())
   supportRequestId String
   userId           String
   content          String
