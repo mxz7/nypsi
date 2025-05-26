@@ -440,6 +440,8 @@ export async function reset() {
   await prisma.market.deleteMany({ where: { completed: false } });
   logger.info("deleting offers");
   await prisma.offer.deleteMany({ where: { sold: false } });
+  logger.info("deleting trades");
+  await prisma.tradeRequest.deleteMany({ where: { completed: false } });
   logger.info("deleting workers");
   await prisma.economyWorkerUpgrades.deleteMany();
   await prisma.economyWorker.deleteMany();
