@@ -21,6 +21,7 @@ import { CustomEmbed, getColor } from "../../../models/EmbedBuilders";
 import { NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
 import { logger, transaction } from "../../logger";
+import { findChannelCluster } from "../clusters";
 import { getAllGroupAccountIds } from "../moderation/alts";
 import { filterOutliers } from "../outliers";
 import { getTier } from "../premium/premium";
@@ -194,47 +195,57 @@ export async function createMarketOrder(
 
   const payload = await getMarketOrderEmbed(order);
 
-  const { url, id } = await client.cluster
-    .broadcastEval(
-      async (client, { payload, channelId }) => {
-        const channel = client.channels.cache.get(channelId);
+  const cluster = await findChannelCluster(client, Constants.MARKET_CHANNEL_ID);
 
-        if (!channel) return;
-        if (!channel.isSendable()) return;
+  if (cluster) {
+    const { url, id } = await client.cluster
+      .broadcastEval(
+        async (client, { payload, channelId }) => {
+          const c = client as unknown as NypsiClient;
 
-        try {
-          const msg = await channel.send(payload);
+          if (c.cluster.id !== cluster.cluster) return;
 
-          return { url: msg.url, id: msg.id };
-        } catch {
-          return;
-        }
+          const channel = client.channels.cache.get(channelId);
+
+          if (!channel) return;
+          if (!channel.isSendable()) return;
+
+          try {
+            const msg = await channel.send(payload);
+
+            return { url: msg.url, id: msg.id };
+          } catch {
+            return;
+          }
+        },
+        {
+          context: { payload, channelId: Constants.MARKET_CHANNEL_ID, cluster: cluster.cluster },
+        },
+      )
+      .then((res) => {
+        return res.filter((i) => Boolean(i))[0];
+      });
+
+    if (!url) {
+      return response;
+    }
+
+    await prisma.market.update({
+      where: {
+        id: order.id,
       },
-      {
-        context: { payload, channelId: Constants.MARKET_CHANNEL_ID },
+      data: {
+        messageId: id,
       },
-    )
-    .then((res) => {
-      return res.filter((i) => Boolean(i))[0];
     });
 
-  if (!url) {
-    return response;
+    response.url = url;
+
+    checkMarketWatchers(itemId, amount, member, orderType, price, url);
   }
 
-  await prisma.market.update({
-    where: {
-      id: order.id,
-    },
-    data: {
-      messageId: id,
-    },
-  });
-
-  checkMarketWatchers(itemId, amount, member, orderType, price, url);
   addStat(member, `market-created-${orderType}`);
 
-  response.url = url;
   return response;
 }
 
