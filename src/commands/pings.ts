@@ -14,12 +14,14 @@ import {
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { createUser, userExists } from "../utils/functions/economy/utils";
+import { getGuildName } from "../utils/functions/guilds/utils";
 import { getKarma } from "../utils/functions/karma/karma";
 import PageManager from "../utils/functions/page";
 import { isPremium } from "../utils/functions/premium/premium";
 import { decrypt } from "../utils/functions/string";
 import { getLastCommand } from "../utils/functions/users/commands";
 import { deleteUserMentions, fetchUserMentions } from "../utils/functions/users/mentions";
+import { getPreferences, updatePreferences } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
 
@@ -91,98 +93,135 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
     return send({ embeds: [embed] });
   }
 
-  let limit = 9;
+  const showMentions = async (msg?: Message) => {
+    let limit = 9;
 
-  if (await isPremium(message.author.id)) {
-    limit = 207;
-  }
+    if (await isPremium(message.author.id)) {
+      limit = 207;
+    }
 
-  const mentions = await fetchUserMentions(message.guild, message.member, limit);
+    const preferences = await getPreferences(message.author.id);
 
-  if (!mentions || mentions.length == 0) {
-    return send({ embeds: [new CustomEmbed(message.member, "no recent mentions")] });
-  }
+    const mentions = await fetchUserMentions(
+      message.member,
+      preferences.mentionsGlobal ? true : message.guild.id,
+      limit,
+    );
 
-  const pages = PageManager.createPages(
-    mentions.map(
-      (i) =>
-        `<t:${Math.floor(i.date.getTime() / 1000)}:R>|6|9|**${i.userTag}**: ${decrypt(
-          i.content,
-        )}\n[jump](${i.url})`,
-    ),
-    3,
-  );
+    if (!mentions || mentions.length == 0) {
+      return send({ embeds: [new CustomEmbed(message.member, "no recent mentions")] });
+    }
 
-  const embed = new CustomEmbed(message.member).setHeader(
-    "recent mentions",
-    message.author.avatarURL(),
-  );
+    const values: string[] = [];
 
-  for (const i of pages.get(1)) {
-    const fieldName = i.split("|6|9|")[0];
-    const fieldValue = i.split("|6|9|").splice(-1, 1).join("");
-    embed.addField(fieldName, fieldValue);
-  }
+    for (const mention of mentions) {
+      let title = `<t:${Math.floor(mention.date.getTime() / 1000)}:R>`;
 
-  if (pages.size >= 2) {
-    embed.setFooter({ text: `page 1/${pages.size}` });
-  }
-
-  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder()
-      .setCustomId("⬅")
-      .setLabel("back")
-      .setStyle(ButtonStyle.Primary)
-      .setDisabled(true),
-    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
-    new ButtonBuilder().setCustomId("❌").setLabel("clear").setStyle(ButtonStyle.Danger),
-  );
-
-  if (pages.size === 1) {
-    row.components.splice(0, 2);
-  }
-
-  const msg = await send({ embeds: [embed], components: [row] });
-
-  const manager = new PageManager({
-    embed: embed,
-    message: msg,
-    row: row,
-    userId: message.author.id,
-    pages: pages,
-    updateEmbed(page: string[], embed) {
-      embed.data.fields.length = 0;
-
-      for (const line of page) {
-        const fieldName = line.split("|6|9|")[0];
-        const fieldValue = line.split("|6|9|").splice(-1, 1).join("");
-        embed.addField(fieldName, fieldValue);
+      if (preferences.mentionsGlobal) {
+        const name = await getGuildName(mention.guildId);
+        title += ` (${name ?? mention.guildId})`;
       }
 
-      return embed;
-    },
-    onPageUpdate(manager) {
-      manager.embed.setFooter({ text: `page ${manager.currentPage}/${manager.lastPage}` });
-      return manager.embed;
-    },
-    handleResponses: new Map().set(
-      "❌",
-      async (manager: PageManager<string>, interaction: ButtonInteraction) => {
-        await interaction.deferUpdate();
-        await deleteUserMentions(manager.message.guild, manager.userId);
+      title += "|6|9|";
 
+      title += `**${mention.userTag}**: ${decrypt(mention.content)}\n` + `[jump](${mention.url})`;
+
+      values.push(title);
+    }
+
+    const pages = PageManager.createPages(values, 3);
+
+    const embed = new CustomEmbed(message.member).setHeader(
+      "recent mentions",
+      message.author.avatarURL(),
+    );
+
+    for (const i of pages.get(1)) {
+      const fieldName = i.split("|6|9|")[0];
+      const fieldValue = i.split("|6|9|").splice(-1, 1).join("");
+      embed.addField(fieldName, fieldValue);
+    }
+
+    if (pages.size >= 2) {
+      embed.setFooter({ text: `page 1/${pages.size}` });
+    }
+
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId("⬅")
+        .setLabel("back")
+        .setStyle(ButtonStyle.Primary)
+        .setDisabled(true),
+      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+      new ButtonBuilder().setCustomId("❌").setLabel("clear").setStyle(ButtonStyle.Danger),
+    );
+    const row2 = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId("toggle-global")
+        .setLabel(preferences.mentionsGlobal ? "all servers" : message.guild.name.substring(0, 80))
+        .setStyle(ButtonStyle.Secondary),
+    );
+
+    if (pages.size === 1) {
+      row.components.splice(0, 2);
+    }
+
+    if (msg) {
+      await msg.edit({ embeds: [embed], components: [row, row2] });
+    } else {
+      msg = await send({ embeds: [embed], components: [row, row2] });
+    }
+
+    const manager = new PageManager({
+      embed: embed,
+      message: msg,
+      row: [row, row2],
+      userId: message.author.id,
+      pages: pages,
+      updateEmbed(page: string[], embed) {
         embed.data.fields.length = 0;
 
-        embed.setDescription("✅ mentions cleared");
-        embed.disableFooter();
+        for (const line of page) {
+          const fieldName = line.split("|6|9|")[0];
+          const fieldValue = line.split("|6|9|").splice(-1, 1).join("");
+          embed.addField(fieldName, fieldValue);
+        }
 
-        await manager.message.edit({ embeds: [embed], components: [] });
-        return;
+        return embed;
       },
-    ),
-  });
+      onPageUpdate(manager) {
+        manager.embed.setFooter({ text: `page ${manager.currentPage}/${manager.lastPage}` });
+        return manager.embed;
+      },
+      handleResponses: new Map()
+        .set("❌", async (manager: PageManager<string>, interaction: ButtonInteraction) => {
+          await interaction.deferUpdate();
+          await deleteUserMentions(manager.message.guild, manager.userId);
 
-  return manager.listen();
+          embed.data.fields.length = 0;
+
+          embed.setDescription("✅ mentions cleared");
+          embed.disableFooter();
+
+          await manager.message.edit({ embeds: [embed], components: [] });
+          return;
+        })
+        .set(
+          "toggle-global",
+          async (manager: PageManager<string>, interaction: ButtonInteraction) => {
+            await interaction.deferUpdate();
+            preferences.mentionsGlobal = !preferences.mentionsGlobal;
+            await updatePreferences(message.author.id, preferences);
+
+            return showMentions(manager.message);
+          },
+        ),
+    });
+
+    return manager.listen();
+  };
+
+  showMentions();
 }
 
 cmd.setRun(run);

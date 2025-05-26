@@ -139,11 +139,12 @@ enum LevelDmSetting {
 model Preferences {
   userId String @id
 
-  duelRequests  Boolean @default(true)
-  offers        Int     @default(3)
-  leaderboards  Boolean @default(true)
-  tips          Boolean @default(true)
-  marketConfirm BigInt  @default(25000000)
+  duelRequests   Boolean @default(true)
+  offers         Int     @default(3)
+  leaderboards   Boolean @default(true)
+  tips           Boolean @default(true)
+  marketConfirm  BigInt  @default(25000000)
+  mentionsGlobal Boolean @default(false)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -551,7 +552,10 @@ model Aura {
 // guild specific tables
 
 model Guild {
-  id               String   @id
+  id   String  @id
+  name String?
+  icon String?
+
   peak             Int      @default(0)
   disabledCommands String[]
   snipeFilter      String[]
@@ -846,7 +850,7 @@ model Mention {
   url      String
   content  String
 
-  @@index([guildId])
+  @@index([targetId])
 }
 
 model SupportRequest {
