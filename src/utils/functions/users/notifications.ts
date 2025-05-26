@@ -1,5 +1,6 @@
 import { DMSettings, Preferences } from "@prisma/client";
 import { GuildMember } from "discord.js";
+import { isNaN } from "lodash";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { InlineNotificationPayload, NotificationPayload } from "../../../types/Notification";
@@ -7,7 +8,6 @@ import Constants from "../../Constants";
 import { dmQueue } from "../../queues/queues";
 import { createUser, userExists } from "../economy/utils";
 import ms = require("ms");
-import { isNaN } from "lodash";
 
 declare function require(name: string): any;
 
@@ -126,7 +126,7 @@ export async function getPreferences(member: GuildMember | string): Promise<Pref
 
   await redis.set(
     `${Constants.redis.cache.user.PREFERENCES}:${id}`,
-    JSON.stringify(query),
+    JSON.stringify(query, (key, value) => (typeof key === "bigint" ? Number(key) : value)),
     "EX",
     ms("12 hour") / 1000,
   );
