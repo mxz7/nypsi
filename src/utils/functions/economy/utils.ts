@@ -461,6 +461,7 @@ export async function reset() {
   logger.info("deleting cars");
   await prisma.carUpgrade.deleteMany();
   await prisma.customCar.deleteMany();
+  await prisma.$executeRaw`TRUNCATE TABLE "CustomCar" RESTART IDENTITY;`;
   logger.info("deleting tasks");
   await prisma.task.deleteMany();
   logger.info("deleting farms");
