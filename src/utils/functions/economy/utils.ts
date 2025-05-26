@@ -421,7 +421,6 @@ export async function setEcoBan(id: string, date?: Date) {
 }
 
 export async function reset() {
-  logger.info("deleting lottery");
   logger.info("deleting boosters");
   await prisma.booster.deleteMany();
   await prisma.$executeRaw`TRUNCATE TABLE "Booster" RESTART IDENTITY;`;
