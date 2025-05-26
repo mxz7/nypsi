@@ -12,7 +12,9 @@ import { CustomEmbed } from "../../models/EmbedBuilders";
 
 interface PageManagerOptions<T> {
   message: Message;
-  row: ActionRowBuilder<MessageActionRowComponentBuilder>;
+  row:
+    | ActionRowBuilder<MessageActionRowComponentBuilder>
+    | ActionRowBuilder<MessageActionRowComponentBuilder>[];
   arr?: T[];
   pages?: Map<number, T[]>;
   pageLength?: number;
@@ -59,7 +61,7 @@ export default class PageManager<T> {
 
   public pages: Map<number, T[]>;
   public message: Message;
-  public row: ActionRowBuilder<MessageActionRowComponentBuilder>;
+  public rows: ActionRowBuilder<MessageActionRowComponentBuilder>[];
   public currentPage = 1;
   public lastPage: number;
   public userId: string;
@@ -80,7 +82,7 @@ export default class PageManager<T> {
     this.pages = opts.arr ? PageManager.createPages(opts.arr, opts.pageLength) : opts.pages;
     this.lastPage = this.pages.size;
     this.message = opts.message;
-    this.row = opts.row;
+    this.rows = Array.isArray(opts.row) ? opts.row : [opts.row];
     this.updatePageFunc = opts.updateEmbed;
     this.userId = opts.userId;
     this.embed = opts.embed;
@@ -114,14 +116,14 @@ export default class PageManager<T> {
 
       await (i as ButtonInteraction).reply({
         embeds: [this.embed],
-        components: [this.row],
+        components: this.rows,
         flags: MessageFlags.Ephemeral,
       });
 
       const manager = new PageManager({
         embed: this.embed,
         message: await i.fetchReply(),
-        row: this.row,
+        row: this.rows,
         userId: i.user.id,
         pages: this.pages,
         updateEmbed: this.updatePageFunc,
@@ -163,19 +165,19 @@ export default class PageManager<T> {
     }
 
     if (manager.currentPage == 1) {
-      manager.row.components[0].setDisabled(true);
-      manager.row.components[1].setDisabled(false);
+      manager.rows[0].components[0].setDisabled(true);
+      manager.rows[0].components[1].setDisabled(false);
     } else if (manager.currentPage == manager.lastPage) {
-      manager.row.components[1].setDisabled(true);
-      manager.row.components[0].setDisabled(false);
+      manager.rows[0].components[1].setDisabled(true);
+      manager.rows[0].components[0].setDisabled(false);
     } else {
-      manager.row.components[1].setDisabled(false);
-      manager.row.components[0].setDisabled(false);
+      manager.rows[0].components[1].setDisabled(false);
+      manager.rows[0].components[0].setDisabled(false);
     }
 
     await interaction
-      .update({ embeds: [manager.embed], components: [manager.row] })
-      .catch(() => this.message.edit({ embeds: [manager.embed], components: [manager.row] }));
+      .update({ embeds: [manager.embed], components: manager.rows })
+      .catch(() => this.message.edit({ embeds: [manager.embed], components: manager.rows }));
     return manager.listen();
   }
 

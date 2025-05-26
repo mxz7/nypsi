@@ -248,15 +248,15 @@ async function run(
         manager.updatePageFunc(manager.pages.get(1), manager.embed);
         manager.currentPage = 1;
         manager.lastPage = manager.pages.size;
-        manager.row.components[0].setDisabled(true);
-        if (manager.lastPage == 1) manager.row.components[1].setDisabled(true);
+        manager.rows[0].components[0].setDisabled(true);
+        if (manager.lastPage == 1) manager.rows[0].components[1].setDisabled(true);
         manager.embed.setFooter({
           text: `page 1/${manager.lastPage}${currentFilter ? ` | filter: ${currentFilter}` : ""}`,
         });
 
         await manager.message.edit({
           embeds: [manager.embed],
-          components: [manager.row],
+          components: manager.rows,
         });
         return manager.listen();
       },
