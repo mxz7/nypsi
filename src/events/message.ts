@@ -259,7 +259,7 @@ export default async function messageCreate(message: Message) {
             .setHeader("nypsi", message.client.user.avatarURL())
             .setColor(Constants.PURPLE)
             .setDescription(quickResponse)
-            .setFooter({ text: "this is an automatic message. please report any issues you find" });
+            .setFooter({ text: "this is an automatic message. please tell us if this doesn't match your query" });
 
           sendToRequestChannel(
             message.author.id,
