@@ -655,12 +655,14 @@ export async function updateLastDaily(member: GuildMember | string, updateLast =
     where: {
       userId: id,
     },
-    data: updateLast ? {
-      lastDaily: new Date(),
-      dailyStreak: { increment: amount },
-    } : {
-      dailyStreak: { increment: amount },
-    },
+    data: updateLast
+      ? {
+          lastDaily: new Date(),
+          dailyStreak: { increment: amount },
+        }
+      : {
+          dailyStreak: { increment: amount },
+        },
   });
 }
 

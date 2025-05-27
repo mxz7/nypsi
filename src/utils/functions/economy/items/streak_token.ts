@@ -79,16 +79,16 @@ module.exports = new ItemUse(
     await removeInventoryItem(message.member, "streak_token", amount);
 
     const embed = await doDaily(message.member, false, amount);
-    
+
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
         .setStyle(ButtonStyle.Secondary)
         .setCustomId("run-daily")
-        .setLabel("you haven't done /daily!")
+        .setLabel("you haven't done /daily!"),
     );
-    
+
     const lastDaily = await getLastDaily(message.member);
-  
+
     if (dayjs(lastDaily.getTime()).isBefore(dayjs(), "day")) {
       return send({ embeds: [embed], components: [row] });
     }

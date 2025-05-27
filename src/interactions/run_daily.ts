@@ -1,8 +1,23 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, GuildMember, MessageActionRowComponentBuilder, MessageFlags } from "discord.js";
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  GuildMember,
+  MessageActionRowComponentBuilder,
+  MessageFlags,
+} from "discord.js";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
-import { createUser, doDaily, getDailyStreak, getItems, getLastDaily, isEcoBanned, userExists } from "../utils/functions/economy/utils";
+import {
+  createUser,
+  doDaily,
+  getDailyStreak,
+  getItems,
+  getLastDaily,
+  isEcoBanned,
+  userExists,
+} from "../utils/functions/economy/utils";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
 import { percentChance } from "../utils/functions/random";
 import Constants from "../utils/Constants";
@@ -32,7 +47,9 @@ export default {
 
     if (!dayjs(lastDaily.getTime()).isBefore(dayjs(), "day")) {
       const next = dayjs().add(1, "day").startOf("day").unix();
-      const embed = new ErrorEmbed(`your next daily bonus is available <t:${next}:R>`).removeTitle();
+      const embed = new ErrorEmbed(
+        `your next daily bonus is available <t:${next}:R>`,
+      ).removeTitle();
       embed.setFooter({ text: `current streak: ${await getDailyStreak(interaction.user.id)}` });
       return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
     }
