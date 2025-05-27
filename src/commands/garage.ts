@@ -137,7 +137,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
       pages.push({
         selectMenuOption: new StringSelectMenuOptionBuilder()
           .setLabel(car.name)
-          .setValue(car.id)
+          .setValue(car.id.toString())
           .setEmoji(getCarEmoji(car)),
         buttonRow: row,
         image: getEmojiImage(getCarEmoji(car)),
@@ -223,7 +223,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
           else
             return showCars(
               cars,
-              cars.findIndex((car) => car.id === interaction.values[0]),
+              cars.findIndex((car) => car.id.toString() === interaction.values[0]),
               msg,
               interaction,
             );

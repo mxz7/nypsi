@@ -496,7 +496,7 @@ class Race {
             });
           }
 
-          addStat(member.user.id, member.car.car.id, 1),
+          addStat(member.user.id, member.car.car.id.toString(), 1),
             await createGame({
               userId: member.user.id,
               bet: this.bet,
