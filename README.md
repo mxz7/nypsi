@@ -77,7 +77,7 @@ better showcase of features can be found on the bot's website: [`nypsi.xyz`](htt
 
 #### fun commands
 
-- there are a lot of fun commands available for use, including `$reddit` which allows you to grab a random image from any subreddit, as well as `$ddos` which will generate a _fake_ ip address
+- there are a lot of fun commands available for use, including `$pp` which allows you to see your extremely accurate pp size, as well as `$ddos` which will generate a _fake_ ip address
 - very simple method of creating small/large polls with the `$poll` command
 
 #### guilds
