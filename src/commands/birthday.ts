@@ -113,7 +113,7 @@ async function run(
         : "/**birthday set <YYYY-MM-DD>** *set your birthday*\n" +
           "/**birthday toggle** *enable/disable your birthday from being announced in servers*\n" +
           "/**birthday channel <channel>** *set a channel to be used as the birthday announcement channel*\n" +
-          "/**birthday disable** *disable birthday announcements in your server*" +
+          "/**birthday disable** *disable birthday announcements in your server*\n" +
           "/**birthday upcoming** *view upcoming birthdays in the server*",
     );
 
