@@ -521,10 +521,13 @@ async function run(
     }
 
     await addCooldown(cmd.name, message.member, 20);
-    
+
     const filter = (i: Interaction) => i.user.id == message.author.id;
 
-    const embed = new CustomEmbed(message.member, `are you sure you want to leave **${guild.guildName}**?`);
+    const embed = new CustomEmbed(
+      message.member,
+      `are you sure you want to leave **${guild.guildName}**?`,
+    );
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder().setCustomId("✅").setLabel("confirm").setStyle(ButtonStyle.Success),
@@ -694,10 +697,13 @@ async function run(
     }
 
     await addCooldown(cmd.name, message.member, 30);
-    
+
     const filter = (i: Interaction) => i.user.id == message.author.id;
 
-    const embed = new CustomEmbed(message.member, `**are you sure you want to delete your guild?**\n\nthis cannot be undone!`);
+    const embed = new CustomEmbed(
+      message.member,
+      `**are you sure you want to delete your guild?**\n\nthis cannot be undone!`,
+    );
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder().setCustomId("✅").setLabel("confirm").setStyle(ButtonStyle.Success),
