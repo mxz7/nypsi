@@ -56,7 +56,14 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel, 
 
   const filter = async (m: Message) => {
     m.content = m.content.replaceAll("’", "'").replaceAll("”", "'").replaceAll("‘", "'");
-    console.log({content: m.content, actual: word.actual.toLowerCase(), one: m.content.toLowerCase() == word.actual.toLowerCase(), two: !winners.find((i) => i.user.id === m.author.id), three: !m.member.user.bot, four: blacklisted.indexOf(m.author.id) == -1});
+    console.log({
+      content: m.content,
+      actual: word.actual.toLowerCase(),
+      one: m.content.toLowerCase() == word.actual.toLowerCase(),
+      two: !winners.find((i) => i.user.id === m.author.id),
+      three: !m.member.user.bot,
+      four: blacklisted.indexOf(m.author.id) == -1,
+    });
     return (
       m.content.toLowerCase() == word.actual.toLowerCase() &&
       !winners.find((i) => i.user.id === m.author.id) &&

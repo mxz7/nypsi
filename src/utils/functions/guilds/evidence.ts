@@ -1,8 +1,4 @@
-import {
-  DeleteObjectCommand,
-  DeleteObjectsCommand,
-  PutObjectCommand,
-} from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, DeleteObjectsCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { Guild } from "discord.js";
 import { nanoid } from "nanoid";
 import prisma from "../../../init/database";
