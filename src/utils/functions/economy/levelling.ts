@@ -523,49 +523,47 @@ export async function doLevelUp(member: GuildMember | string) {
         if (items.has("basic_crate")) items.set("basic_crate", items.get("basic_crate") + crates);
         else items.set("basic_crate", crates);
 
-        rewardsText.has(rawLevel)
-          ? rewardsText
-              .get(rawLevel)
-              .push(`- \`${crates}x\` 📦 basic crate${crates > 1 ? "s" : ""}`)
-          : rewardsText.set(rawLevel, [`- \`${crates}x\` 📦 basic crate${crates > 1 ? "s" : ""}`]);
+        if (rewardsText.has(rawLevel))
+          rewardsText.get(rawLevel).push(`- \`${crates}x\` 📦 basic crate${crates > 1 ? "s" : ""}`);
+        else rewardsText.set(rawLevel, [`- \`${crates}x\` 📦 basic crate${crates > 1 ? "s" : ""}`]);
       }
 
       if (rawLevel % 200 === 0) {
         if (items.has("nypsi_crate")) items.set("nypsi_crate", items.get("nypsi_crate") + 1);
         else items.set("nypsi_crate", 1);
 
-        rewardsText.has(rawLevel)
-          ? rewardsText.get(rawLevel).push("- `1x` <:xnypsi:1135923012458254416> nypsi crate")
-          : rewardsText.set(rawLevel, ["- `1x` <:xnypsi:1135923012458254416> nypsi crate"]);
+        if (rewardsText.has(rawLevel))
+          rewardsText.get(rawLevel).push("- `1x` <:xnypsi:1135923012458254416> nypsi crate");
+        else rewardsText.set(rawLevel, ["- `1x` <:xnypsi:1135923012458254416> nypsi crate"]);
       }
 
       if (rawLevel % 69 === 0) {
         if (items.has("69420_crate")) items.set("69420_crate", items.get("69420_crate") + 5);
         else items.set("69420_crate", 5);
 
-        rewardsText.has(rawLevel)
-          ? rewardsText.get(rawLevel).push("- `5x` 🎁 69420 crate")
-          : rewardsText.set(rawLevel, ["- `5x` 🎁 69420 crate"]);
+        if (rewardsText.has(rawLevel)) rewardsText.get(rawLevel).push("- `5x` 🎁 69420 crate");
+        else rewardsText.set(rawLevel, ["- `5x` 🎁 69420 crate"]);
       }
 
       if (rawLevel % 750 === 0) {
         if (items.has("bronze_credit")) items.set("bronze_credit", items.get("bronze_credit") + 1);
         else items.set("bronze_credit", 1);
 
-        rewardsText.has(rawLevel)
-          ? rewardsText
-              .get(rawLevel)
-              .push("- `1x` <:nypsi_bronze:1108083689478443058> bronze credit")
-          : rewardsText.set(rawLevel, ["- `1x` <:nypsi_bronze:1108083689478443058> bronze credit"]);
+        if (rewardsText.has(rawLevel))
+          rewardsText
+            .get(rawLevel)
+            .push("- `1x` <:nypsi_bronze:1108083689478443058> bronze credit");
+        else
+          rewardsText.set(rawLevel, ["- `1x` <:nypsi_bronze:1108083689478443058> bronze credit"]);
       }
 
       if (rawLevel % 1500 === 0) {
         if (items.has("omega_crate")) items.set("omega_crate", items.get("omega_crate") + 1);
         else items.set("omega_crate", 1);
 
-        rewardsText.has(rawLevel)
-          ? rewardsText.get(rawLevel).push("- `1x` <:nypsi_omega:1139279162276855890> omega crate")
-          : rewardsText.set(rawLevel, ["- `1x` <:nypsi_omega:1139279162276855890> omega crate"]);
+        if (rewardsText.has(rawLevel))
+          rewardsText.get(rawLevel).push("- `1x` <:nypsi_omega:1139279162276855890> omega crate");
+        else rewardsText.set(rawLevel, ["- `1x` <:nypsi_omega:1139279162276855890> omega crate"]);
       }
     }
 

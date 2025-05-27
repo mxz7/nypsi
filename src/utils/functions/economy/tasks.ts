@@ -154,7 +154,7 @@ export async function getTasks(userId: string): Promise<PrismaTask[]> {
       taskGeneration.delete(userId);
       return getTasks(userId);
     }
-  } catch (e) {
+  } catch {
     await redis.del(`${Constants.redis.cache.economy.TASKS}:${userId}`);
     taskGeneration.delete(userId);
     return getTasks(userId);

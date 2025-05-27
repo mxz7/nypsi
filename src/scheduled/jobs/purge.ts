@@ -29,7 +29,7 @@ export default {
           .map((i) => {
             try {
               return JSON.parse(i) as { time: number };
-            } catch (e) {
+            } catch {
               return undefined;
             }
           }),

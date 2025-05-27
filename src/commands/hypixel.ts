@@ -55,7 +55,7 @@ async function run(
 
     try {
       uuid = await fetch(uuidURL).then((uuidURL) => uuidURL.json());
-    } catch (e) {
+    } catch {
       return message.channel.send({ embeds: [new ErrorEmbed("invalid account")] });
     }
 

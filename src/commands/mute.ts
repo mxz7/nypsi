@@ -154,7 +154,7 @@ async function run(
               channelError = true;
             });
         });
-      } catch (e) {
+      } catch {
         return send({
           embeds: [
             new ErrorEmbed(

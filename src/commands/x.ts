@@ -846,7 +846,10 @@ async function run(
         logger.info(
           `admin: ${message.author.id} (${message.author.username}) set ${user.id} karma to ${msg.content}`,
         );
-        remove ? await removeKarma(user.id, amount) : addKarma(user.id, amount);
+
+        if (remove) await removeKarma(user.id, amount);
+        else await addKarma(user.id, amount);
+
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "ecoban") {
