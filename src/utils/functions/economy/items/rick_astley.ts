@@ -11,7 +11,7 @@ import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import Constants from "../../../Constants";
 import { getMember } from "../../member";
-import { getInventory, removeInventoryItem } from "../inventory";
+import { removeInventoryItem } from "../inventory";
 
 module.exports = new ItemUse(
   "rick_astley",
@@ -54,8 +54,6 @@ module.exports = new ItemUse(
     const target = await getMember(message.guild, args.slice(1, args.length).join(" "));
 
     if (!target) return send({ embeds: [new ErrorEmbed("invalid member")] });
-
-    const inventory = await getInventory(message.member);
 
     if (await redis.exists(`${Constants.redis.nypsi.RICKROLL}:${target.user.id}`))
       return send({

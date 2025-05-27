@@ -263,11 +263,18 @@ export async function getUserAchievement(userId: string, achievementId: string) 
 const addProgressMutex = new Set<string>();
 
 export async function addProgress(
-  userId: string,
+  member: GuildMember | string,
   achievementStartName: string,
   amount: number,
   repeat = 0,
 ) {
+  let userId: string;
+  if (member instanceof GuildMember) {
+    userId = member.user.id;
+  } else {
+    userId = member;
+  }
+
   if (addProgressMutex.has(userId)) {
     if (repeat > 10) addProgressMutex.delete(userId);
     await sleep(100);

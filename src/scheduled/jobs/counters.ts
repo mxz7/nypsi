@@ -1,4 +1,3 @@
-import ms = require("ms");
 import pAll = require("p-all");
 import prisma from "../../init/database";
 import { Job } from "../../types/Jobs";

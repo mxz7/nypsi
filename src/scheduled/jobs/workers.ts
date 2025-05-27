@@ -28,7 +28,7 @@ import ms = require("ms");
 export default {
   name: "workers",
   cron: "0 * * * *",
-  async run(log, manager) {
+  async run(log) {
     const start = performance.now();
     const query = await prisma.economyWorker.findMany({
       include: {
@@ -70,7 +70,6 @@ export default {
           steveStorage = { money: 0, byproducts: {} };
         }
 
-        let totalEarned = 0;
         const { amountEarned, byproductAmounts } = await evaluateWorker(
           worker.userId,
           baseWorkers[worker.workerId],
@@ -97,7 +96,6 @@ export default {
           });
         }
 
-        totalEarned += amountEarned;
         steveStorage.money += amountEarned;
 
         await addBalance(worker.userId, amountEarned);

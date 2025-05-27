@@ -1,4 +1,3 @@
-import dayjs = require("dayjs");
 import prisma from "../../init/database";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import { Job } from "../../types/Jobs";
@@ -10,7 +9,7 @@ import { addNotificationToQueue, getDmSettings } from "../../utils/functions/use
 export default {
   name: "crafted",
   cron: "0 * * * *",
-  async run(log, manager) {
+  async run() {
     const query = await prisma.crafting.findMany({
       where: {
         finished: { lt: new Date() },

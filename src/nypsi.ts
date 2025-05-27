@@ -103,7 +103,7 @@ const client = new NypsiClient({
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildModeration,
     GatewayIntentBits.GuildMembers,
-    GatewayIntentBits.GuildEmojisAndStickers,
+    GatewayIntentBits.GuildExpressions,
     GatewayIntentBits.GuildWebhooks,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.GuildMessageReactions,

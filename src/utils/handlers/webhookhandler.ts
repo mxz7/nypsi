@@ -1,6 +1,5 @@
 import { Prisma } from "@prisma/client";
 import * as topgg from "@top-gg/sdk";
-import { ClusterManager } from "discord-hybrid-sharding";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -61,12 +60,12 @@ const webhook = new topgg.Webhook(process.env.TOPGG_AUTH);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-export function listen(manager: ClusterManager) {
+export function listen() {
   app.post(
     "/topgg",
     webhook.listener((vote) => {
       logger.info(`received vote: ${vote.user}`);
-      doVote(vote, manager);
+      doVote(vote);
     }),
   );
 
@@ -147,7 +146,7 @@ export function listen(manager: ClusterManager) {
   logger.info(`listening on port ${process.env.EXPRESS_PORT || 5000}`);
 }
 
-async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
+async function doVote(vote: topgg.WebhookPayload) {
   const { user } = vote;
 
   await redis.srem(Constants.redis.nypsi.VOTE_REMINDER_RECEIVED, user);

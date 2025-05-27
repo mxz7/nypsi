@@ -13,7 +13,7 @@ import { ItemUse } from "../../../../models/ItemUse";
 import Constants from "../../../Constants";
 import { getMember } from "../../member";
 import sleep from "../../sleep";
-import { getInventory, removeInventoryItem } from "../inventory";
+import { removeInventoryItem } from "../inventory";
 
 module.exports = new ItemUse(
   "chastity_cage",
@@ -97,8 +97,6 @@ module.exports = new ItemUse(
       "EX",
       10800,
     );
-
-    const inventory = await getInventory(message.member);
 
     await removeInventoryItem(message.member, "chastity_cage", 1);
 

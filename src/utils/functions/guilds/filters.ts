@@ -272,7 +272,7 @@ export async function checkAutoMute(message: Message) {
                 channelError = true;
               });
           });
-        } catch (e) {
+        } catch {
           channelError = true;
           return logger.warn(`error creating mute role ${message.guild.id}`);
         }

@@ -385,7 +385,7 @@ async function run(
       return send({ embeds: [new ErrorEmbed("no data")] });
 
     row.components[0].setDisabled(true);
-    // @ts-ignore stupid discordjs types
+    // @ts-expect-error stupid discordjs types
     embed.setDescription(leaderboards.get((row.components[0] as ButtonBuilder).data.custom_id));
 
     const msg = await send({ embeds: [embed], components: [row] });
@@ -405,12 +405,12 @@ async function run(
 
       embed.setDescription(
         leaderboards.get(
-          // @ts-ignore stupid discordjs types
+          // @ts-expect-error stupid discordjs types
           row.components.find((i) => i.data.custom_id === interaction.customId).data.custom_id,
         ),
       );
       row.components.forEach((i) => i.setDisabled(false));
-      // @ts-ignore stupid discordjs types
+      // @ts-expect-error stupid discordjs types
       row.components.find((i) => i.data.custom_id === interaction.customId).setDisabled(true);
 
       interaction.update({ embeds: [embed], components: [row] });

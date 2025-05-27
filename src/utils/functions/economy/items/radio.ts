@@ -13,7 +13,7 @@ import { ItemUse } from "../../../../models/ItemUse";
 import Constants from "../../../Constants";
 import { getMember } from "../../member";
 import sleep from "../../sleep";
-import { getInventory, removeInventoryItem } from "../inventory";
+import { removeInventoryItem } from "../inventory";
 import { isPassive } from "../passive";
 
 module.exports = new ItemUse(
@@ -85,8 +85,6 @@ module.exports = new ItemUse(
       "EX",
       900,
     );
-
-    const inventory = await getInventory(message.member);
 
     await removeInventoryItem(message.member, "radio", 1);
 
