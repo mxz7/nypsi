@@ -280,7 +280,7 @@ async function run(
         new CustomEmbed(message.member, `birthday announcements set to ${channel.toString()}`),
       ],
     });
-  } else if (args[0].toLowerCase() === "upcoming") {
+  } else if (args[0]?.toLowerCase() === "upcoming") {
     const members = await message.guild.members.fetch().catch(() => {
       return new Collection<string, GuildMember>();
     });
