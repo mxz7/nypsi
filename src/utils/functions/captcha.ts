@@ -83,7 +83,7 @@ export async function passedCaptcha(member: GuildMember, check: Captcha, force =
         member.user.id
       }) has forcefully passed a captcha [${await redis.get(
         `${Constants.redis.cache.user.captcha_pass}:${member.user.id}`,
-      )}]`
+      )}]`,
     );
   } else {
     const timeTakenToSolve = check.solvedAt.getTime() - check.createdAt.getTime();

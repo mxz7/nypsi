@@ -136,16 +136,18 @@ export async function updateUser(user: User, command: string) {
         const ext = newAvatar.split(".").pop().split("?")[0];
         const key = `avatar/${user.id}/${nanoid()}.${ext}`;
 
-        const res = await s3.send(
-          new PutObjectCommand({
-            Bucket: process.env.S3_BUCKET,
-            Key: key,
-            Body: Buffer.from(arrayBuffer),
-            ContentType: `image/${ext}`,
-          }),
-        ).catch((err) => {
+        const res = await s3
+          .send(
+            new PutObjectCommand({
+              Bucket: process.env.S3_BUCKET,
+              Key: key,
+              Body: Buffer.from(arrayBuffer),
+              ContentType: `image/${ext}`,
+            }),
+          )
+          .catch((err) => {
             console.error(err);
-            logger.error(`failed to upload new avatar for ${user.id} (${username})`, {err});
+            logger.error(`failed to upload new avatar for ${user.id} (${username})`, { err });
           });
 
         if (!res) return;

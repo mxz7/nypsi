@@ -1,4 +1,9 @@
-import { DeleteObjectCommand, DeleteObjectsCommand, PutObjectCommand, PutObjectCommandOutput } from "@aws-sdk/client-s3";
+import {
+  DeleteObjectCommand,
+  DeleteObjectsCommand,
+  PutObjectCommand,
+  PutObjectCommandOutput,
+} from "@aws-sdk/client-s3";
 import { Guild } from "discord.js";
 import { nanoid } from "nanoid";
 import prisma from "../../../init/database";
@@ -69,7 +74,7 @@ export async function deleteEvidence(guild: Guild, caseId: number) {
       }),
     ).catch((err) => {
       console.error(err);
-      logger.error(`failed to delete evidence for case ${caseId} in ${guild.id}`, {err});
+      logger.error(`failed to delete evidence for case ${caseId} in ${guild.id}`, { err });
     });
 }
 
@@ -89,7 +94,7 @@ export async function deleteAllEvidence(guild: Guild) {
 
   await s3.send(cmd).catch((err) => {
     console.error(err);
-    logger.error(`failed to delete all evidence in ${guild.id}`, {err});
+    logger.error(`failed to delete all evidence in ${guild.id}`, { err });
   });
 
   await prisma.moderationEvidence.deleteMany({
@@ -127,17 +132,19 @@ export async function createEvidence(
 
   // if (buffer.byteLength < image.length) image = Buffer.from(buffer);
 
-  const success = await s3.send(
-    new PutObjectCommand({
-      Bucket: process.env.S3_BUCKET,
-      Key: key,
-      Body: image,
-      ContentType: contentType,
-    }),
-  ).catch((err) => {
-    console.error(err);
-    logger.error(`failed to upload evidence for case ${caseId} in ${guild.id}`, {err});
-  });
+  const success = await s3
+    .send(
+      new PutObjectCommand({
+        Bucket: process.env.S3_BUCKET,
+        Key: key,
+        Body: image,
+        ContentType: contentType,
+      }),
+    )
+    .catch((err) => {
+      console.error(err);
+      logger.error(`failed to upload evidence for case ${caseId} in ${guild.id}`, { err });
+    });
 
   if (!success) return false;
 
