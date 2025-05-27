@@ -1,4 +1,5 @@
 import dayjs = require("dayjs");
+import { sort } from "fast-sort";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
@@ -52,4 +53,17 @@ export async function getTodaysBirthdays(useCache = true) {
     await redis.set(Constants.redis.cache.BIRTHDAYS, JSON.stringify(birthdayMembers), "EX", ttl);
 
   return birthdayMembers;
+}
+
+export async function getUpcomingBirthdays(userIds: string[]) {
+  const members = await prisma.user.findMany({
+    where: { id: { in: userIds } },
+    select: { id: true, birthday: true, lastKnownUsername: true },
+  });
+
+  const filtered = members.filter(
+    (i) => dayjs(i.birthday).set("year", dayjs().year()).diff(dayjs(), "day") <= 30,
+  );
+
+  return sort(filtered).asc((i) => dayjs(i.birthday).diff(dayjs()));
 }
