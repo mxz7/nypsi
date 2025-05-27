@@ -383,9 +383,9 @@ async function run(
             attachment.url,
             attachment.contentType,
           );
-          
+
           if (res) evidencePrompt.delete().catch(() => {});
-          else { 
+          else {
             evidencePrompt.edit({ embeds: [new ErrorEmbed("failed to upload evidence")] });
             setInterval(() => evidencePrompt.delete().catch(() => {}), 3000);
           }

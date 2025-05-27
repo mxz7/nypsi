@@ -32,7 +32,7 @@ async function run(
     `grep -rh "${args.join(" ").replaceAll('"', "").replaceAll("\\", "")}" out > ${path}`,
   ).catch((err) => {
     console.error(err);
-    logger.error("failed to complete logsearch", {err});
+    logger.error("failed to complete logsearch", { err });
   });
 
   if (!success) return (await msg).edit({ content: "failed to search logs" });

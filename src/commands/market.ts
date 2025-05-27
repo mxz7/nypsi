@@ -441,7 +441,10 @@ async function run(
           return pageManager();
         }
 
-        let res: void | ModalSubmitInteraction | ButtonInteraction = await createOrderModal(type, interaction as ButtonInteraction);
+        let res: void | ModalSubmitInteraction | ButtonInteraction = await createOrderModal(
+          type,
+          interaction as ButtonInteraction,
+        );
 
         if (res) {
           const item = res.fields.fields.get("item").value;
@@ -767,14 +770,13 @@ async function run(
     cost: number,
     worth: number,
     type: OrderType,
-    msg?: NypsiMessage
+    msg?: NypsiMessage,
   ) => {
-    const embed = new CustomEmbed(message.member).setHeader(
-      "confirm",
-      message.author.avatarURL(),
+    const embed = new CustomEmbed(message.member).setHeader("confirm", message.author.avatarURL());
+
+    embed.setDescription(
+      `**are you sure you want to make a ${type} order at this price?**\nyou want to ${type} this item for $${cost.toLocaleString()}\nthe average worth for this item is $${worth.toLocaleString()}`,
     );
-    
-    embed.setDescription(`**are you sure you want to make a ${type} order at this price?**\nyou want to ${type} this item for $${cost.toLocaleString()}\nthe average worth for this item is $${worth.toLocaleString()}`);
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder().setCustomId("✅").setLabel("confirm").setStyle(ButtonStyle.Success),
@@ -817,7 +819,7 @@ async function run(
     }
 
     return { msg: msg, reaction: reaction as ButtonInteraction };
-  }
+  };
 
   const deleteOrder = async (
     type: string,
@@ -1203,7 +1205,7 @@ async function run(
     const cost = await formatBet(price.toLowerCase(), message.member).catch(() => {});
 
     if (!cost) return send({ embeds: [new ErrorEmbed("invalid price")] });
-    
+
     const itemWorth = await calcItemValue(selected.id);
 
     if (type == "buy") {
@@ -1262,7 +1264,7 @@ async function run(
       }
 
       if (createRes.url) description = `[${description}](${createRes.url})`;
-      
+
       if (msg) {
         return msg.edit({
           embeds: [new CustomEmbed(message.member, description)],
@@ -1349,7 +1351,7 @@ async function run(
       }
 
       if (createRes.url) description = `[${description}](${createRes.url})`;
-      
+
       if (msg) {
         return msg.edit({
           embeds: [new CustomEmbed(message.member, description)],

@@ -81,17 +81,22 @@ async function run(
       const ext = avatar.split(".").pop().split("?")[0];
       const key = `avatar/${message.author.id}/${nanoid()}.${ext}`;
 
-      await s3.send(
-        new PutObjectCommand({
-          Bucket: process.env.S3_BUCKET,
-          Key: key,
-          Body: Buffer.from(arrayBuffer),
-          ContentType: `image/${ext}`,
-        }),
-      ).catch((err) => {
-        console.error(err);
-        logger.error(`error uploading avatar of ${message.author.id} (${message.author.username})`, {err});
-      });
+      await s3
+        .send(
+          new PutObjectCommand({
+            Bucket: process.env.S3_BUCKET,
+            Key: key,
+            Body: Buffer.from(arrayBuffer),
+            ContentType: `image/${ext}`,
+          }),
+        )
+        .catch((err) => {
+          console.error(err);
+          logger.error(
+            `error uploading avatar of ${message.author.id} (${message.author.username})`,
+            { err },
+          );
+        });
 
       await addNewAvatar(message.author.id, `https://cdn.nypsi.xyz/${key}`);
       logger.debug(`uploaded new avatar for ${message.author.id}`);

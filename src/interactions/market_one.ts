@@ -128,12 +128,6 @@ export default {
 
     if (!res) return;
 
-    let value = Number(order.price);
-
-    if (order.orderType === "buy") {
-      value = Number(order.price);
-    }
-
     let deferred = false;
 
     if (order.orderType == "sell") {
