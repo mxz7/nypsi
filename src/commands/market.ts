@@ -31,6 +31,7 @@ import Constants from "../utils/Constants";
 import { addBalance, getBalance, removeBalance } from "../utils/functions/economy/balance";
 import {
   addInventoryItem,
+  calcItemValue,
   getInventory,
   selectItem,
   setInventoryItem,
@@ -61,7 +62,7 @@ import {
 import { getEmojiImage } from "../utils/functions/image";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { getAdminLevel } from "../utils/functions/users/admin";
-import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { addCooldown, addExpiry, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command(
   "market",
@@ -440,11 +441,9 @@ async function run(
           return pageManager();
         }
 
-        const res = await createOrderModal(type, interaction as ButtonInteraction);
+        let res: void | ModalSubmitInteraction | ButtonInteraction = await createOrderModal(type, interaction as ButtonInteraction);
 
         if (res) {
-          await res.deferReply({ flags: MessageFlags.Ephemeral });
-
           const item = res.fields.fields.get("item").value;
           let amount = res.fields.fields.get("amount").value;
           const price = res.fields.fields.get("price").value;
@@ -459,28 +458,28 @@ async function run(
           }
 
           if (!selected) {
-            await res.editReply({
+            await res.reply({
               embeds: [new ErrorEmbed("couldnt find that item")],
               options: { flags: MessageFlags.Ephemeral },
             });
             await updateEmbed();
             return pageManager();
           } else if (selected.account_locked) {
-            await res.editReply({
+            await res.reply({
               embeds: [new ErrorEmbed("this item cannot be traded")],
               options: { flags: MessageFlags.Ephemeral },
             });
             await updateEmbed();
             return pageManager();
           } else if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
-            await res.editReply({
+            await res.reply({
               embeds: [new ErrorEmbed("invalid amount")],
               options: { flags: MessageFlags.Ephemeral },
             });
             await updateEmbed();
             return pageManager();
           } else if (!parseInt(price) || isNaN(parseInt(price)) || parseInt(price) < 1) {
-            await res.editReply({
+            await res.reply({
               embeds: [new ErrorEmbed("invalid price")],
               options: { flags: MessageFlags.Ephemeral },
             });
@@ -491,7 +490,7 @@ async function run(
           const cost = await formatBet(price.toLowerCase(), message.member).catch(() => {});
 
           if (!cost) {
-            await res.editReply({
+            await res.reply({
               embeds: [new ErrorEmbed("invalid price")],
               options: { flags: MessageFlags.Ephemeral },
             });
@@ -499,10 +498,33 @@ async function run(
             return pageManager();
           }
 
+          const itemWorth = await calcItemValue(selected.id);
+
           if (type == "buy") {
             if ((await getBalance(message.member)) < parseInt(amount) * cost) {
-              await res.editReply({
+              await res.reply({
                 embeds: [new ErrorEmbed("you dont have enough money")],
+                options: { flags: MessageFlags.Ephemeral },
+              });
+              await updateEmbed();
+              return pageManager();
+            }
+
+            if (cost >= itemWorth * 1.5) {
+              await res.deferUpdate();
+              const confirm = await confirmCreation(cost, itemWorth, "buy", msg);
+              if (!confirm) {
+                await updateEmbed();
+                return pageManager();
+              } else {
+                res = confirm.reaction;
+                await res.deferReply({ flags: MessageFlags.Ephemeral });
+              }
+            } else await res.deferReply({ flags: MessageFlags.Ephemeral });
+
+            if ((await getBalance(message.member)) < parseInt(amount) * cost) {
+              await res.editReply({
+                embeds: [new ErrorEmbed("sneaky bitch")],
                 options: { flags: MessageFlags.Ephemeral },
               });
               await updateEmbed();
@@ -557,7 +579,7 @@ async function run(
               options: { flags: MessageFlags.Ephemeral },
             });
           } else if (type == "sell") {
-            const inventory = await getInventory(message.member);
+            let inventory = await getInventory(message.member);
 
             if (
               !inventory.find((i) => i.item == selected.id) ||
@@ -569,6 +591,32 @@ async function run(
                     `you dont have enough ${selected.plural ? selected.plural : selected.name}`,
                   ),
                 ],
+                options: { flags: MessageFlags.Ephemeral },
+              });
+              await updateEmbed();
+              return pageManager();
+            }
+
+            if (cost <= itemWorth / 1.5) {
+              await res.deferUpdate();
+              const confirm = await confirmCreation(cost, itemWorth, "sell", msg);
+              if (!confirm) {
+                await updateEmbed();
+                return pageManager();
+              } else {
+                res = confirm.reaction;
+                await res.deferReply({ flags: MessageFlags.Ephemeral });
+              }
+            } else await res.deferReply({ flags: MessageFlags.Ephemeral });
+
+            inventory = await getInventory(message.member);
+
+            if (
+              !inventory.find((i) => i.item == selected.id) ||
+              inventory.find((i) => i.item == selected.id).amount < parseInt(amount)
+            ) {
+              await res.editReply({
+                embeds: [new ErrorEmbed("sneaky bitch")],
                 options: { flags: MessageFlags.Ephemeral },
               });
               await updateEmbed();
@@ -713,6 +761,62 @@ async function run(
       i.user.id == interaction.user.id && i.customId === id;
 
     return await interaction.awaitModalSubmit({ filter, time: 30000 }).catch(() => {});
+  }
+
+  const confirmCreation = async (
+    cost: number,
+    worth: number,
+    type: OrderType,
+    msg?: NypsiMessage
+  ) => {
+    const embed = new CustomEmbed(message.member).setHeader(
+      "confirm",
+      message.author.avatarURL(),
+    );
+    
+    embed.setDescription(`**are you sure you want to make a ${type} order at this price?**\nyou want to ${type} this item for $${cost.toLocaleString()}\nthe average worth for this item is $${worth.toLocaleString()}`);
+
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder().setCustomId("✅").setLabel("confirm").setStyle(ButtonStyle.Success),
+      new ButtonBuilder().setCustomId("❌").setLabel("cancel").setStyle(ButtonStyle.Danger),
+    );
+
+    if (msg) {
+      await msg.edit({ embeds: [embed], components: [row] });
+    } else {
+      msg = (await send({ embeds: [embed], components: [row] })) as NypsiMessage;
+    }
+
+    const filter = (i: Interaction) => i.user.id == message.author.id;
+
+    const reaction = await msg.awaitMessageComponent({ filter, time: 30000 }).catch(async () => {
+      await msg.edit({
+        embeds: [embed],
+        components: [
+          new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+            new ButtonBuilder()
+              .setStyle(ButtonStyle.Danger)
+              .setLabel("expired")
+              .setCustomId("boobies")
+              .setDisabled(true),
+          ),
+        ],
+      });
+      addExpiry(cmd.name, message.member, 30);
+    });
+
+    if (!reaction) return false;
+
+    if (reaction.customId === "❌") {
+      msg.edit({ components: [] });
+      await reaction.reply({
+        embeds: [new CustomEmbed(message.member, "✅ cancelled")],
+        flags: MessageFlags.Ephemeral,
+      });
+      return false;
+    }
+
+    return { msg: msg, reaction: reaction as ButtonInteraction };
   }
 
   const deleteOrder = async (
@@ -1099,10 +1203,24 @@ async function run(
     const cost = await formatBet(price.toLowerCase(), message.member).catch(() => {});
 
     if (!cost) return send({ embeds: [new ErrorEmbed("invalid price")] });
+    
+    const itemWorth = await calcItemValue(selected.id);
 
     if (type == "buy") {
       if ((await getBalance(message.member)) < parseInt(amount) * cost) {
         return send({ embeds: [new ErrorEmbed("you dont have enough money")] });
+      }
+
+      let msg: NypsiMessage;
+
+      if (cost >= itemWorth * 1.5) {
+        const res = await confirmCreation(cost, itemWorth, "buy");
+        if (res) msg = res.msg;
+        else return;
+      }
+
+      if ((await getBalance(message.member)) < parseInt(amount) * cost) {
+        return msg.edit({ embeds: [new ErrorEmbed("sneaky bitch")], components: [] });
       }
 
       const userItemSellOrders = (await getMarketOrders(message.member, "sell")).filter(
@@ -1144,12 +1262,19 @@ async function run(
       }
 
       if (createRes.url) description = `[${description}](${createRes.url})`;
-
-      return send({
-        embeds: [new CustomEmbed(message.member, description)],
-      });
+      
+      if (msg) {
+        return msg.edit({
+          embeds: [new CustomEmbed(message.member, description)],
+          components: [],
+        });
+      } else {
+        return send({
+          embeds: [new CustomEmbed(message.member, description)],
+        });
+      }
     } else if (type == "sell") {
-      const inventory = await getInventory(message.member);
+      let inventory = await getInventory(message.member);
 
       if (
         !inventory.find((i) => i.item == selected.id) ||
@@ -1162,6 +1287,23 @@ async function run(
             ),
           ],
         });
+      }
+
+      let msg: NypsiMessage;
+
+      if (cost <= itemWorth / 1.5) {
+        const res = await confirmCreation(cost, itemWorth, "sell");
+        if (res) msg = res.msg;
+        else return;
+      }
+
+      inventory = await getInventory(message.member);
+
+      if (
+        !inventory.find((i) => i.item == selected.id) ||
+        inventory.find((i) => i.item == selected.id).amount < parseInt(amount)
+      ) {
+        return msg.edit({ embeds: [new ErrorEmbed("sneaky bitch")], components: [] });
       }
 
       const userItemBuyOrders = (await getMarketOrders(message.member, "buy")).filter(
@@ -1207,10 +1349,17 @@ async function run(
       }
 
       if (createRes.url) description = `[${description}](${createRes.url})`;
-
-      return send({
-        embeds: [new CustomEmbed(message.member, description)],
-      });
+      
+      if (msg) {
+        return msg.edit({
+          embeds: [new CustomEmbed(message.member, description)],
+          components: [],
+        });
+      } else {
+        return send({
+          embeds: [new CustomEmbed(message.member, description)],
+        });
+      }
     }
   } else if (args[0].toLowerCase().includes("help")) {
     const embed = new CustomEmbed(message.member).setHeader("market help");
