@@ -61,9 +61,12 @@ export async function getUpcomingBirthdays(userIds: string[]) {
     select: { id: true, birthday: true, lastKnownUsername: true },
   });
 
-  const filtered = members.filter(
-    (i) => dayjs(i.birthday).set("year", dayjs().year()).diff(dayjs(), "day") <= 30,
-  );
+  const filtered = members.filter((i) => {
+    const birthday = dayjs(i.birthday).set("year", dayjs().year());
+    const diff = birthday.diff(dayjs(), "day");
 
-  return sort(filtered).asc((i) => dayjs(i.birthday).diff(dayjs()));
+    return diff <= 30 && birthday.isAfter(dayjs());
+  });
+
+  return sort(filtered).asc((i) => dayjs(i.birthday).set("year", dayjs().year()).diff(dayjs()));
 }
