@@ -11,7 +11,7 @@ import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import { getDisabledCommands } from "../../guilds/disabledcommands";
 import { getMember } from "../../member";
-import { getInventory, removeInventoryItem } from "../inventory";
+import { removeInventoryItem } from "../inventory";
 import { isPassive } from "../passive";
 import { addHandcuffs, createUser, isHandcuffed, userExists } from "../utils";
 
@@ -83,8 +83,6 @@ module.exports = new ItemUse(
 
     if (await isPassive(message.member))
       return send({ embeds: [new ErrorEmbed("you are currently in passive mode")] });
-
-    const inventory = await getInventory(message.member);
 
     await Promise.all([
       removeInventoryItem(message.member, "handcuffs", 1),

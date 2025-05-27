@@ -34,7 +34,6 @@ import {
   setInventoryItem,
 } from "../utils/functions/economy/inventory";
 import { setLevel, setPrestige } from "../utils/functions/economy/levelling";
-import { getMarketOrderEmbed } from "../utils/functions/economy/market";
 import { getEcoBanTime, getItems, isEcoBanned, setEcoBan } from "../utils/functions/economy/utils";
 import { updateXp } from "../utils/functions/economy/xp";
 import { addKarma, getKarma, removeKarma } from "../utils/functions/karma/karma";
@@ -1786,7 +1785,7 @@ async function run(
     return message.channel.send({ embeds: [new CustomEmbed(message.member, desc)] });
   };
 
-  const requestProfileTransfer = async (from: User, to: User, force = false) => {
+  const requestProfileTransfer = async (from: User, to: User) => {
     if ((await getAdminLevel(message.author.id)) !== 69)
       return message.channel.send({
         embeds: [new ErrorEmbed("lol xd xdxddxd ahahhaha YOURE GAY dont even TRY")],

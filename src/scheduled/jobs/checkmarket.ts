@@ -1,5 +1,4 @@
 import dayjs = require("dayjs");
-import ms = require("ms");
 import prisma from "../../init/database";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import { Job } from "../../types/Jobs";

@@ -17,7 +17,6 @@ import { addTaskProgress } from "./tasks";
 import { getXp, removeXp } from "./xp";
 import ms = require("ms");
 import dayjs = require("dayjs");
-import _ = require("lodash");
 
 const levellingRewards = new Map<number, { text: string[]; rewards?: string[] }>();
 

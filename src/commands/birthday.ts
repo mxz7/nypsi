@@ -313,7 +313,7 @@ async function run(
       ],
     });
   } else if (args[0].toLowerCase() === "upcoming") {
-    const members = await message.guild.members.fetch().catch((e) => {
+    const members = await message.guild.members.fetch().catch(() => {
       return new Collection<string, GuildMember>();
     });
 

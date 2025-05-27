@@ -2,7 +2,6 @@ import {
   DeleteObjectCommand,
   DeleteObjectsCommand,
   PutObjectCommand,
-  PutObjectCommandOutput,
 } from "@aws-sdk/client-s3";
 import { Guild } from "discord.js";
 import { nanoid } from "nanoid";

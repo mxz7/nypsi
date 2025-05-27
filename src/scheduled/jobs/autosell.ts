@@ -9,7 +9,7 @@ import { CustomEmbed } from "../../models/EmbedBuilders";
 export default {
   name: "autosell",
   cron: "0 * * * *",
-  async run(log) {
+  async run() {
     const users = await redis.lrange(Constants.redis.nypsi.AUTO_SELL_ITEMS_MEMBERS, 0, -1);
     await redis.del(Constants.redis.nypsi.AUTO_SELL_ITEMS_MEMBERS);
 
