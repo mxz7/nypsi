@@ -258,7 +258,8 @@ export default async function messageCreate(message: Message) {
           const embed = new CustomEmbed()
             .setHeader("nypsi", message.client.user.avatarURL())
             .setColor(Constants.PURPLE)
-            .setDescription(quickResponse);
+            .setDescription(quickResponse)
+            .setFooter({ text: "this is an automatic message. please report any issues you find" });
 
           sendToRequestChannel(
             message.author.id,
