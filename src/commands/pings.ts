@@ -196,7 +196,10 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
       handleResponses: new Map()
         .set("❌", async (manager: PageManager<string>, interaction: ButtonInteraction) => {
           await interaction.deferUpdate();
-          await deleteUserMentions(manager.message.guild, manager.userId);
+          await deleteUserMentions(
+            manager.userId,
+            preferences.mentionsGlobal ? undefined : message.guild.id,
+          );
 
           embed.data.fields.length = 0;
 

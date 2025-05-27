@@ -21,7 +21,7 @@ async function run(
   }
 
   if (args.length == 2 && args[0].toLowerCase() == "verify") {
-    const target = (await getMember(message.guild, args[1]));
+    const target = await getMember(message.guild, args[1]);
 
     if (!target) {
       if (message instanceof Message) message.react("❌");
@@ -36,21 +36,21 @@ async function run(
     }
 
     const captcha = await prisma.captcha.update({
-      where: {id : res.id },
+      where: { id: res.id },
       data: {
         solved: true,
         solvedAt: new Date(),
-      }
+      },
     });
-    
+
     await redis.del(`${Constants.redis.nypsi.LOCKED_OUT}:${target.id}`);
     await passedCaptcha(target, captcha, true);
     await redis.del(`${Constants.redis.cache.user.CAPTCHA_HISTORY}:${target.id}`);
-    
+
     if (message instanceof Message) message.react("✅");
     return;
   }
-  
+
   for (const user of args) {
     giveCaptcha(user, 2, true);
     logger.info(`admin: ${message.author.id} (${message.author.username}) gave ${user} captcha`);

@@ -13,6 +13,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
   MessageEditOptions,
+  MessageFlags,
 } from "discord.js";
 import { sort } from "fast-sort";
 import { nanoid } from "nanoid";
@@ -53,7 +54,7 @@ import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import PageManager from "../utils/functions/page";
 import { cleanString } from "../utils/functions/string";
 import { getLastKnownAvatar } from "../utils/functions/users/tag";
-import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { addCooldown, addExpiry, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
 import sharp = require("sharp");
 
@@ -154,6 +155,7 @@ const filter = [
   "inv",
   "create",
   "leave",
+  "exit",
   "stats",
   "top",
   "hitler",
@@ -519,16 +521,56 @@ async function run(
     }
 
     await addCooldown(cmd.name, message.member, 20);
+    
+    const filter = (i: Interaction) => i.user.id == message.author.id;
+
+    const embed = new CustomEmbed(message.member, `are you sure you want to leave **${guild.guildName}**?`);
+
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder().setCustomId("✅").setLabel("confirm").setStyle(ButtonStyle.Success),
+      new ButtonBuilder().setCustomId("❌").setLabel("cancel").setStyle(ButtonStyle.Danger),
+    );
+
+    const msg = await send({ embeds: [embed], components: [row] });
+
+    const reaction = await msg.awaitMessageComponent({ filter, time: 20000 }).catch(async () => {
+      await msg.edit({
+        embeds: [embed],
+        components: [
+          new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+            new ButtonBuilder()
+              .setStyle(ButtonStyle.Danger)
+              .setLabel("expired")
+              .setCustomId("boobies")
+              .setDisabled(true),
+          ),
+        ],
+      });
+    });
+
+    addExpiry(cmd.name, message.member, 20);
+
+    if (!reaction) return;
+
+    if (reaction.customId === "❌") {
+      msg.edit({ components: [] });
+      return reaction.reply({
+        embeds: [new CustomEmbed(message.member, "✅ cancelled")],
+        flags: MessageFlags.Ephemeral,
+      });
+    }
 
     const res = await removeMember(message.author.id, "id");
 
     if (res) {
-      return message.channel.send({
+      return msg.edit({
         embeds: [new CustomEmbed(message.member, `✅ you have left **${guild.guildName}**`)],
+        components: [],
       });
     } else {
-      return message.channel.send({
+      return msg.edit({
         embeds: [new CustomEmbed(message.member, "failed while leaving guild")],
+        components: [],
       });
     }
   }
@@ -652,11 +694,50 @@ async function run(
     }
 
     await addCooldown(cmd.name, message.member, 30);
+    
+    const filter = (i: Interaction) => i.user.id == message.author.id;
+
+    const embed = new CustomEmbed(message.member, `**are you sure you want to delete your guild?**\n\nthis cannot be undone!`);
+
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder().setCustomId("✅").setLabel("confirm").setStyle(ButtonStyle.Success),
+      new ButtonBuilder().setCustomId("❌").setLabel("cancel").setStyle(ButtonStyle.Danger),
+    );
+
+    const msg = await send({ embeds: [embed], components: [row] });
+
+    const reaction = await msg.awaitMessageComponent({ filter, time: 20000 }).catch(async () => {
+      await msg.edit({
+        embeds: [embed],
+        components: [
+          new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+            new ButtonBuilder()
+              .setStyle(ButtonStyle.Danger)
+              .setLabel("expired")
+              .setCustomId("boobies")
+              .setDisabled(true),
+          ),
+        ],
+      });
+    });
+
+    addExpiry(cmd.name, message.member, 20);
+
+    if (!reaction) return;
+
+    if (reaction.customId === "❌") {
+      msg.edit({ components: [] });
+      return reaction.reply({
+        embeds: [new CustomEmbed(message.member, "✅ cancelled")],
+        flags: MessageFlags.Ephemeral,
+      });
+    }
 
     await deleteGuild(guild.guildName);
 
-    return send({
+    return msg.edit({
       embeds: [new CustomEmbed(message.member, `✅ **${guild.guildName}** has been deleted`)],
+      components: [],
     });
   }
 

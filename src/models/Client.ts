@@ -14,6 +14,7 @@ import guildDelete from "../events/guildDelete";
 import guildMemberAdd from "../events/guildMemberAdd";
 import guildMemberRemove from "../events/guildMemberRemove";
 import guildMemberUpdate from "../events/guildMemberUpdate";
+import guildUpdate from "../events/guildUpdate";
 import interactionCreate from "../events/interactionCreate";
 import messageCreate from "../events/message";
 import messageDelete from "../events/messageDelete";
@@ -139,6 +140,8 @@ export class NypsiClient extends Client {
       logger.debug("entitlement update event loaded");
       this.on("entitlementDelete", entitlementDelete.bind(null));
       logger.debug("entitlement delete event loaded");
+      this.on("guildUpdate", guildUpdate.bind(null));
+      logger.debug("guild update event loaded");
 
       this.cluster.on("message", async (message: any) => {
         if (message._type) {

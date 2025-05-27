@@ -645,7 +645,7 @@ export async function getLastDaily(member: GuildMember | string) {
   return query.lastDaily;
 }
 
-export async function updateLastDaily(member: GuildMember | string, amount = 1) {
+export async function updateLastDaily(member: GuildMember | string, updateLast = true, amount = 1) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -657,10 +657,14 @@ export async function updateLastDaily(member: GuildMember | string, amount = 1) 
     where: {
       userId: id,
     },
-    data: {
-      lastDaily: new Date(),
-      dailyStreak: { increment: amount },
-    },
+    data: updateLast
+      ? {
+          lastDaily: new Date(),
+          dailyStreak: { increment: amount },
+        }
+      : {
+          dailyStreak: { increment: amount },
+        },
   });
 }
 
@@ -684,7 +688,7 @@ export async function getDailyStreak(member: GuildMember | string) {
   return query.dailyStreak;
 }
 
-export async function doDaily(member: GuildMember, amount = 1) {
+export async function doDaily(member: GuildMember, updateLast = true, amount = 1) {
   const currentStreak = await getDailyStreak(member);
 
   let totalMoney = 0;
@@ -751,7 +755,7 @@ export async function doDaily(member: GuildMember, amount = 1) {
 
   promises.push(async () => {
     await addBalance(member, totalMoney);
-    await updateLastDaily(member, amount);
+    await updateLastDaily(member, updateLast, amount);
     await addInventoryItem(member, "daily_scratch_card", amount);
   });
 

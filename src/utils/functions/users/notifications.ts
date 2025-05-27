@@ -7,7 +7,6 @@ import Constants from "../../Constants";
 import { dmQueue } from "../../queues/queues";
 import { createUser, userExists } from "../economy/utils";
 import ms = require("ms");
-import { isNaN } from "lodash";
 
 declare function require(name: string): any;
 
@@ -100,11 +99,6 @@ export async function getPreferences(member: GuildMember | string): Promise<Pref
   if (await redis.exists(`${Constants.redis.cache.user.PREFERENCES}:${id}`)) {
     return JSON.parse(
       await redis.get(`${Constants.redis.cache.user.PREFERENCES}:${id}`),
-      (key, value) => {
-        return key !== "userId" && typeof value === "string" && !isNaN(value)
-          ? BigInt(value)
-          : value;
-      },
     ) as Preferences;
   }
 
@@ -126,7 +120,7 @@ export async function getPreferences(member: GuildMember | string): Promise<Pref
 
   await redis.set(
     `${Constants.redis.cache.user.PREFERENCES}:${id}`,
-    JSON.stringify(query),
+    JSON.stringify(query, (key, value) => (typeof value === "bigint" ? Number(value) : value)),
     "EX",
     ms("12 hour") / 1000,
   );

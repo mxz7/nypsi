@@ -271,7 +271,7 @@ export async function invite(userId: string, targetId: string, guild: Guild) {
     `${Constants.redis.cache.z.profile}:${targetId}`,
   );
 
-  const channel = await guild.channels.fetch(Constants.Z_CHANNEL);
+  const channel = guild.channels.cache.get(Constants.Z_CHANNEL);
 
   if (!channel || !channel.isTextBased() || !channel.isSendable() || channel.isThread()) {
     logger.error("z channel not found");
