@@ -26,9 +26,6 @@ importers:
       '@twemoji/parser':
         specifier: ^16.0.0
         version: 16.0.0
-      '@typescript-eslint/eslint-plugin':
-        specifier: ^8.33.0
-        version: 8.33.0(@typescript-eslint/parser@8.33.0(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1)(typescript@5.8.3)
       '@zeyrbot/urbandictionary':
         specifier: ^1.0.3
         version: 1.0.3
@@ -126,6 +123,9 @@ importers:
       '@types/urban-dictionary':
         specifier: 3.0.2
         version: 3.0.2
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^8.33.0
+        version: 8.33.0(@typescript-eslint/parser@8.33.0(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1)(typescript@5.8.3)
       '@typescript-eslint/parser':
         specifier: 8.33.0
         version: 8.33.0(eslint@8.57.1)(typescript@5.8.3)
