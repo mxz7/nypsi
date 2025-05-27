@@ -33,7 +33,7 @@ const cmd = new Command(
   "birthday",
   "set your birthday and set up a birthday announcement channel",
   "info",
-);
+).setAliases(["bday"]);
 
 cmd.slashEnabled = true;
 cmd.slashData
@@ -103,39 +103,7 @@ async function run(
     }
   };
 
-  if (args.length === 0) {
-    const birthday = await getBirthday(message.author.id);
-
-    const embed = new CustomEmbed(
-      message.member,
-      birthday
-        ? `your birthday is ${dayjs(birthday).format("MMMM D, YYYY")}\n\n`
-        : "/**birthday set <YYYY-MM-DD>** *set your birthday*\n" +
-          "/**birthday toggle** *enable/disable your birthday from being announced in servers*\n" +
-          "/**birthday channel <channel>** *set a channel to be used as the birthday announcement channel*\n" +
-          "/**birthday disable** *disable birthday announcements in your server*\n" +
-          "/**birthday upcoming** *view upcoming birthdays in the server*",
-    );
-
-    const todaysBirthdays = await getTodaysBirthdays();
-
-    if (todaysBirthdays.length > 0) {
-      const members = await message.guild.members
-        .fetch({ user: todaysBirthdays.map((i) => i.id) })
-        .catch(() => new Collection<string, GuildMember>());
-
-      if (members.size > 0) {
-        embed.addField(
-          "today's birthdays",
-          Array.from(members.mapValues((i) => i.toString()).values()).join("\n"),
-        );
-      }
-    }
-
-    return send({ embeds: [embed] });
-  }
-
-  if (args[0].toLowerCase() === "set") {
+  if (args[0]?.toLowerCase() === "set") {
     if (args.length === 1) {
       return send({ embeds: [new ErrorEmbed("you forgot your birthday..... idiot.....")] });
     }
@@ -217,7 +185,7 @@ async function run(
       row.components.forEach((b) => b.setDisabled(true));
       interaction.update({ components: [row] });
     }
-  } else if (args[0].toLowerCase() === "toggle") {
+  } else if (args[0]?.toLowerCase() === "toggle") {
     const current = await isBirthdayEnabled(message.author.id);
 
     await setBirthdayEnabled(message.author.id, !current);
@@ -232,7 +200,7 @@ async function run(
         ),
       ],
     });
-  } else if (args[0].toLowerCase() === "disable") {
+  } else if (args[0]?.toLowerCase() === "disable") {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) return;
 
     await setBirthdayChannel(message.guild.id, null);
@@ -245,7 +213,7 @@ async function run(
         ),
       ],
     });
-  } else if (args[0].toLowerCase() === "channel") {
+  } else if (args[0]?.toLowerCase() === "channel") {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) return;
 
     if (args.length === 1)
@@ -312,7 +280,7 @@ async function run(
         new CustomEmbed(message.member, `birthday announcements set to ${channel.toString()}`),
       ],
     });
-  } else if (args[0].toLowerCase() === "upcoming") {
+  } else if (args[0]?.toLowerCase() === "upcoming") {
     const members = await message.guild.members.fetch().catch((e) => {
       return new Collection<string, GuildMember>();
     });
@@ -356,6 +324,36 @@ async function run(
 
     manager.listen();
     return;
+  } else {
+    const birthday = await getBirthday(message.author.id);
+
+    const embed = new CustomEmbed(
+      message.member,
+      birthday
+        ? `your birthday is ${dayjs(birthday).format("MMMM D, YYYY")}\n\n`
+        : "/**birthday set <YYYY-MM-DD>** *set your birthday*\n" +
+          "/**birthday toggle** *enable/disable your birthday from being announced in servers*\n" +
+          "/**birthday channel <channel>** *set a channel to be used as the birthday announcement channel*\n" +
+          "/**birthday disable** *disable birthday announcements in your server*\n" +
+          "/**birthday upcoming** *view upcoming birthdays in the server*",
+    );
+
+    const todaysBirthdays = await getTodaysBirthdays();
+
+    if (todaysBirthdays.length > 0) {
+      const members = await message.guild.members
+        .fetch({ user: todaysBirthdays.map((i) => i.id) })
+        .catch(() => new Collection<string, GuildMember>());
+
+      if (members.size > 0) {
+        embed.addField(
+          "today's birthdays",
+          Array.from(members.mapValues((i) => i.toString()).values()).join("\n"),
+        );
+      }
+    }
+
+    return send({ embeds: [embed] });
   }
 }
 
