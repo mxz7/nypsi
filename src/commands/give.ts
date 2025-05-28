@@ -118,7 +118,7 @@ async function run(
 
   if (!(await userExists(message.member))) await createUser(message.member);
 
-  if (message.author.createdTimestamp > dayjs().subtract(1, "day").valueOf()) {
+  if (message.author.createdTimestamp > dayjs().subtract(14, "day").valueOf()) {
     return send({
       embeds: [new ErrorEmbed("you cannot use this command yet. u might be an alt. or a bot 😳")],
     });
