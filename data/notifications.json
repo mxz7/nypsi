@@ -103,6 +103,11 @@
       "name": "market confirmation",
       "description": "require buying from market confirmation on items more expensive than: ${VALUE} (0 = never)"
     },
+    "marketDelay": {
+      "id": "marketDelay",
+      "name": "market notification delay",
+      "description": "delay your market notifications by: {VALUE}s. this will help you get less dms if you are selling/buying a lot of items"
+    },
     "offers": {
       "id": "offers",
       "name": "receive offers",

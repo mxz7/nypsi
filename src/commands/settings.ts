@@ -352,6 +352,7 @@ async function run(
           if (typeof value !== "number") {
             await modalResponse.reply({
               embeds: [new ErrorEmbed("invalid value. must a number. use 0 to disable")],
+              flags: MessageFlags.Ephemeral,
             });
           } else {
             // @ts-expect-error ts is a loser !
@@ -554,7 +555,9 @@ async function run(
             new ActionRowBuilder<TextInputBuilder>().addComponents(
               new TextInputBuilder()
                 .setCustomId("val")
-                .setLabel("amount to be notified for")
+                .setLabel(
+                  selected === "marketDelay" ? "time in seconds" : "amount to be notified for",
+                )
                 .setPlaceholder("number")
                 .setStyle(TextInputStyle.Short)
                 .setRequired(true)
@@ -579,7 +582,13 @@ async function run(
 
           if (typeof value !== "number") {
             await modalResponse.reply({
-              embeds: [new ErrorEmbed("invalid value. must a number. use 0 to disable")],
+              embeds: [new ErrorEmbed("invalid value. must a number.")],
+              flags: MessageFlags.Ephemeral,
+            });
+          } else if (selected === "marketDelay" && value > 86400) {
+            await modalResponse.reply({
+              embeds: [new ErrorEmbed("must be less than 24 hours")],
+              flags: MessageFlags.Ephemeral,
             });
           } else {
             // @ts-expect-error ts is a loser !
@@ -601,8 +610,14 @@ async function run(
 
         await res.deferUpdate();
 
-        // @ts-expect-error doesnt like doing this!
-        if (typeof settings[selected] === "number" || typeof settings[selected] === "bigint") {
+        if (selected === "marketDelay") {
+          settings[selected] = 300;
+        } else if (
+          // @ts-expect-error doesnt like doing this!
+          typeof settings[selected] === "number" ||
+          // @ts-expect-error doesnt like doing this!
+          typeof settings[selected] === "bigint"
+        ) {
           // @ts-expect-error doesnt like doing this!
           settings[selected] = 0;
         } else {

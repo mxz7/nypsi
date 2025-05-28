@@ -26,7 +26,7 @@ import { getAllGroupAccountIds } from "../moderation/alts";
 import { filterOutliers } from "../outliers";
 import { getTier } from "../premium/premium";
 import { addToNypsiBank, getTax } from "../tax";
-import { addNotificationToQueue, getDmSettings } from "../users/notifications";
+import { addNotificationToQueue, getDmSettings, getPreferences } from "../users/notifications";
 import { getLastKnownAvatar, getLastKnownUsername } from "../users/tag";
 import { addBalance, getBalance, removeBalance } from "./balance";
 import { addInventoryItem, getInventory, removeInventoryItem } from "./inventory";
@@ -888,6 +888,10 @@ export async function completeOrder(
           earned: Number(amount) * Number(order.price) - taxedAmount,
         });
 
+        const marketDelay = await getPreferences(order.ownerId)
+          .then((r) => r.marketDelay)
+          .catch(() => 180);
+
         setTimeout(async () => {
           if (!dmQueue.has(`${order.ownerId}-${order.orderType}`)) return;
           let total = 0;
@@ -921,7 +925,7 @@ export async function completeOrder(
               embed: embedDm,
             },
           });
-        }, ms("3 minutes"));
+        }, marketDelay * 1000);
       }
     }
   })();
