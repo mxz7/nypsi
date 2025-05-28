@@ -208,23 +208,6 @@ export default async function messageCreate(message: Message) {
                 }),
             ],
           });
-        } else if (aiResponse.decision === "needs more") {
-          logger.info(
-            `supportrequest: ${message.author.id} (${message.author.username}) denied support request`,
-            { content: helpMessage, aiResponse },
-          );
-
-          return modalSubmit.editReply({
-            embeds: [
-              new CustomEmbed()
-                .setDescription(
-                  "you need to give more information. the easier you make it for our staff to understand what you need, the better we can assist you",
-                )
-                .setFooter({
-                  text: "this is an automated system, please let us know of any issues",
-                }),
-            ],
-          });
         }
 
         const quickResponse = await getQuickSupportResponse(helpMessage);

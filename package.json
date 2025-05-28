@@ -42,7 +42,8 @@
     "openai": "^4.103.0",
     "p-all": "3.0.0",
     "sharp": "^0.34.2",
-    "string-similarity": "4.0.4"
+    "string-similarity": "4.0.4",
+    "zod": "^3.25.32"
   },
   "devDependencies": {
     "@types/crypto-js": "4.2.2",
