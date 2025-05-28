@@ -398,10 +398,8 @@ export async function isRequestSuitable(
   try {
     const response = await openai.responses.parse({
       model: "gpt-4.1-mini",
-      input: [
-        { role: "system", content: sysPrompt.join("\n") },
-        { role: "user", content },
-      ],
+      instructions: sysPrompt.join("\n"),
+      input: [{ role: "user", content }],
       tools: [{ type: "file_search", vector_store_ids: [process.env.NYPSI_LLMS_VECTOR_STORE] }],
       text: { format: zodTextFormat(isRequestSuitableFormat, "supportrequest_suitable") },
     });
