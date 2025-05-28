@@ -173,6 +173,7 @@ export default {
       FARM_STATUS_DM: "nypsi:farm:status:dm",
       MARKET_IN_TRANSACTION: "nypsi:market:intransaction",
       TRADE_FULFILLING: "nypsi:trade:fulfilling",
+      MARKET_DM: "nypsi:market:dm",
     },
   },
   ANNOUNCEMENTS_CHANNEL_ID: "747057465245564939",
