@@ -590,6 +590,11 @@ async function run(
               embeds: [new ErrorEmbed("must be less than 24 hours")],
               flags: MessageFlags.Ephemeral,
             });
+          } else if (selected === "marketDelay" && value < 60) {
+            await modalResponse.reply({
+              embeds: [new ErrorEmbed("must be more than 1 minute")],
+              flags: MessageFlags.Ephemeral,
+            });
           } else {
             // @ts-expect-error ts is a loser !
             settings[selected] = value;
