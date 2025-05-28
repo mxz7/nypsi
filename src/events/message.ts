@@ -199,9 +199,13 @@ export default async function messageCreate(message: Message) {
 
           return modalSubmit.editReply({
             embeds: [
-              new CustomEmbed().setDescription(
-                "this isn't suitable for a support request. try including more information about what you need help with",
-              ),
+              new CustomEmbed()
+                .setDescription(
+                  "this isn't suitable for a support request. try including more information about what you need help with",
+                )
+                .setFooter({
+                  text: "this is an automated system, please let us know of any issues",
+                }),
             ],
           });
         } else if (aiResponse.decision === "needs more") {
@@ -212,9 +216,13 @@ export default async function messageCreate(message: Message) {
 
           return modalSubmit.editReply({
             embeds: [
-              new CustomEmbed().setDescription(
-                "you need to give more information. the easier you make it for our staff to understand what you need, the better we can assist you",
-              ),
+              new CustomEmbed()
+                .setDescription(
+                  "you need to give more information. the easier you make it for our staff to understand what you need, the better we can assist you",
+                )
+                .setFooter({
+                  text: "this is an automated system, please let us know of any issues",
+                }),
             ],
           });
         }
