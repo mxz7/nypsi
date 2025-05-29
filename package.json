@@ -7,7 +7,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "clean": "rm -rf dist node_modules",
-    "build": "tsc",
+    "build": "tsc --incremental",
     "watch": "tsc --build --watch",
     "lint": "eslint --cache ./src/",
     "validate": "npm run format:check && npm run lint"

@@ -51,7 +51,7 @@ jobs:
         run: npx prisma generate
 
       - name: build
-        run: npx tsc
+        run: pnpm run build
 
       - name: run tests
         run: npx jest
@@ -100,10 +100,10 @@ jobs:
         run: npx prisma generate
 
       - name: build
-        run: npx tsc
+        run: pnpm run build
 
       - name: linting
-        run: npm run lint
+        run: pnpm run lint
 
   deploy:
     if: github.ref == 'refs/heads/main'
@@ -159,7 +159,7 @@ jobs:
         run: npx prisma generate
 
       - name: build
-        run: npx tsc
+        run: pnpm run build
 
       - name: prepare files for deploy
         run: |
