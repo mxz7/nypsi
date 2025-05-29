@@ -10,8 +10,9 @@ out/
 *.db-wal
 *.DS_STORE
 
-tsconfig.tsbuildinfo
-.eslintcache
+*.tsbuildinfo
+*.eslintcache
+*.prettiercache
 
 anticheat.ts
 anticheat_old.ts
