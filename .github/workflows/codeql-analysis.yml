@@ -113,4 +113,4 @@ jobs:
 
       - name: perform codeQL analysis
         uses: github/codeql-action/analyze@v3
-        if: github.event_name != 'pull_request' || steps.lockfile-check.outputs.lockfile_changed == 'true'
+        if: github.event_name != 'pull_request' || (github.event_name == 'pull_request' && steps.changed-files.outputs.any_changed == 'true')
