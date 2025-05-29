@@ -103,7 +103,7 @@ jobs:
         run: npx tsc
 
       - name: linting
-        run: npx eslint ./src/
+        run: npm run lint
 
   deploy:
     if: github.ref == 'refs/heads/main'
