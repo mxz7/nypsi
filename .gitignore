@@ -11,6 +11,7 @@ out/
 *.DS_STORE
 
 tsconfig.tsbuildinfo
+.eslintcache
 
 anticheat.ts
 anticheat_old.ts

@@ -7,7 +7,9 @@
     "format": "prettier --write .",
     "clean": "rm -rf dist node_modules",
     "build": "tsc",
-    "watch": "tsc --build --watch"
+    "watch": "tsc --build --watch",
+    "lint": "eslint --cache ./src/",
+    "validate": "npm run format && npm run lint"
   },
   "prisma": {
     "seed": "ts-node --transpile-only prisma/seed.ts"
