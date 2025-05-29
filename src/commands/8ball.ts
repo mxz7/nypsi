@@ -24,6 +24,7 @@ const answers = [
   "yes.",
   "yes - definitely",
   "you may rely on it",
+  "balls",
 ];
 
 const cmd = new Command("8ball", "ask the 8ball a question", "fun");
