@@ -50,8 +50,16 @@ jobs:
       - name: setup prisma
         run: npx prisma generate
 
+      - name: restore tsbuildinfo
+        uses: actions/cache/restore@v4
+        with:
+          path: tsconfig.tsbuildinfo
+          key: tsbuildinfo-${{ runner.os }}-${{ hashFiles('tsconfig.json', 'pnpm-lock.json') }}
+          restore-keys: |
+            tsbuildinfo-${{ runner.os }}
+
       - name: build
-        run: pnpm run build
+        run: npx tsc --incremental --noEmit
 
       - name: run tests
         run: npx jest
@@ -99,11 +107,42 @@ jobs:
       - name: setup prisma
         run: npx prisma generate
 
+      - name: restore tsbuildinfo
+        uses: actions/cache/restore@v4
+        with:
+          path: tsconfig.tsbuildinfo
+          key: tsbuildinfo-${{ runner.os }}-${{ hashFiles('tsconfig.json', 'pnpm-lock.json') }}
+          restore-keys: |
+            tsbuildinfo-${{ runner.os }}
+
       - name: build
-        run: pnpm run build
+        run: npx tsc --incremental --noEmit
+
+      - name: restore eslintcache
+        uses: actions/cache/restore@v4
+        id: cache
+        with:
+          path: .eslintcache
+          key: eslintcache-${{ runner.os }}-${{ hashFiles('pnpm-lock.json') }}
+          restore-keys: |
+            eslintcache-${{ runner.os }}
 
       - name: linting
         run: pnpm run lint
+
+      - name: clear eslintcache
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push' && steps.cache.outputs.cache-hit
+        run: gh cache delete --repo ${{ github.repository }} ${{ steps.cache.outputs.cache-primary-key }}
+
+      - name: save eslintcache
+        uses: actions/cache/save@v4
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        with:
+          path: .eslintcache
+          key: eslintcache-${{ runner.os }}-${{ hashFiles('pnpm-lock.json') }}
 
   deploy:
     if: github.ref == 'refs/heads/main'
@@ -158,8 +197,30 @@ jobs:
       - name: setup prisma
         run: npx prisma generate
 
+      - name: restore tsbuildinfo
+        uses: actions/cache/restore@v4
+        id: cache
+        with:
+          path: tsconfig.tsbuildinfo
+          key: tsbuildinfo-${{ runner.os }}-${{ hashFiles('tsconfig.json', 'pnpm-lock.json') }}
+          restore-keys: |
+            tsbuildinfo-${{ runner.os }}
+
       - name: build
-        run: pnpm run build
+        run: npx tsc --incremental
+
+      - name: clear tsbuildinfo cache
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: steps.cache.outputs.cache-hit
+        run: gh cache delete --repo ${{ github.repository }} ${{ steps.cache.outputs.cache-primary-key }}
+
+      - name: save tsbuildinfo
+        uses: actions/cache/save@v4
+        with:
+          path: tsconfig.tsbuildinfo
+          key: tsbuildinfo-${{ runner.os }}-${{ hashFiles('tsconfig.json', 'pnpm-lock.json') }}
 
       - name: prepare files for deploy
         run: |
