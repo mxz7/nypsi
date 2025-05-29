@@ -9,4 +9,4 @@ cd ..
 cd ..
 cd ..
 
-# cp -i .env.example .env
+cp -i .env.example .env
