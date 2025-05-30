@@ -1941,15 +1941,17 @@ async function run(
       });
     }
 
-    const res = (await prisma.economy.findMany({
-      where: {
-        offersBlock: { isEmpty: false, }
-      },
-      select: {
-        userId: true,
-        offersBlock: true
-      },
-    })).filter((i) => i.offersBlock.includes(i.userId));
+    const res = (
+      await prisma.economy.findMany({
+        where: {
+          offersBlock: { isEmpty: false },
+        },
+        select: {
+          userId: true,
+          offersBlock: true,
+        },
+      })
+    ).filter((i) => i.offersBlock.includes(i.userId));
 
     for (const data of res) {
       await prisma.economy.update({
@@ -1958,11 +1960,13 @@ async function run(
         },
         data: {
           offersBlock: data.offersBlock.filter((i) => i !== data.userId),
-        }
-      })
+        },
+      });
     }
 
-    return await message.channel.send({ embeds: [new CustomEmbed(message.member, `fixed \`${res.length}\` users`)] });
+    return await message.channel.send({
+      embeds: [new CustomEmbed(message.member, `fixed \`${res.length}\` users`)],
+    });
   }
 }
 
