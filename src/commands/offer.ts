@@ -354,7 +354,7 @@ async function run(
     const selectedItem = selectItem(searchTag);
     const selectedMember = await getMember(message.guild, searchTag);
 
-    if (!selectedItem && !selectedMember)
+    if (!selectedItem && (!selectedMember || selectedMember.id == message.member.id))
       return send({ embeds: [new ErrorEmbed("invalid member or item")] });
 
     let value = "";
