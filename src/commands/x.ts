@@ -1934,6 +1934,39 @@ async function run(
     // idk how this should be done lol i might get back to it
 
     console.log(map);
+  } else if (args[0].toLowerCase() === "fixblock") {
+    if ((await getAdminLevel(message.member)) < 3) {
+      return message.channel.send({
+        embeds: [new ErrorEmbed("you require admin level **3** to do this")],
+      });
+    }
+
+    const res = (
+      await prisma.economy.findMany({
+        where: {
+          offersBlock: { isEmpty: false },
+        },
+        select: {
+          userId: true,
+          offersBlock: true,
+        },
+      })
+    ).filter((i) => i.offersBlock.includes(i.userId));
+
+    for (const data of res) {
+      await prisma.economy.update({
+        where: {
+          userId: data.userId,
+        },
+        data: {
+          offersBlock: data.offersBlock.filter((i) => i !== data.userId),
+        },
+      });
+    }
+
+    return await message.channel.send({
+      embeds: [new CustomEmbed(message.member, `fixed \`${res.length}\` users`)],
+    });
   }
 }
 
