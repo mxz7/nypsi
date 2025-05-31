@@ -421,7 +421,6 @@ export async function setEcoBan(id: string, date?: Date) {
 }
 
 export async function reset() {
-  logger.info("deleting lottery");
   logger.info("deleting boosters");
   await prisma.booster.deleteMany();
   await prisma.$executeRaw`TRUNCATE TABLE "Booster" RESTART IDENTITY;`;
@@ -441,6 +440,8 @@ export async function reset() {
   await prisma.market.deleteMany({ where: { completed: false } });
   logger.info("deleting offers");
   await prisma.offer.deleteMany({ where: { sold: false } });
+  logger.info("deleting trades");
+  await prisma.tradeRequest.deleteMany({ where: { completed: false } });
   logger.info("deleting workers");
   await prisma.economyWorkerUpgrades.deleteMany();
   await prisma.economyWorker.deleteMany();
@@ -460,6 +461,7 @@ export async function reset() {
   logger.info("deleting cars");
   await prisma.carUpgrade.deleteMany();
   await prisma.customCar.deleteMany();
+  await prisma.$executeRaw`TRUNCATE TABLE "CustomCar" RESTART IDENTITY;`;
   logger.info("deleting tasks");
   await prisma.task.deleteMany();
   logger.info("deleting farms");

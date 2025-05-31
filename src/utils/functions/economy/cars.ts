@@ -11,7 +11,7 @@ export type Car = {
     amount: number;
   }[];
   name: string;
-  id: string;
+  id: number;
   skin?: string;
 };
 
@@ -128,7 +128,7 @@ export async function addCar(userId: string) {
   await redis.del(`${Constants.redis.cache.economy.GARAGE}:${userId}`);
 }
 
-export async function addCarUpgrade(userId: string, carId: string, upgradeType: CarUpgradeType) {
+export async function addCarUpgrade(userId: string, carId: number, upgradeType: CarUpgradeType) {
   await prisma.carUpgrade.upsert({
     where: {
       carId_type: {
@@ -158,7 +158,7 @@ export function calcCarCost(amount: number) {
   return base;
 }
 
-export async function setCarName(userId: string, carId: string, name: string) {
+export async function setCarName(userId: string, carId: number, name: string) {
   await prisma.customCar.update({
     where: {
       id: carId,
@@ -171,7 +171,7 @@ export async function setCarName(userId: string, carId: string, name: string) {
   await redis.del(`${Constants.redis.cache.economy.GARAGE}:${userId}`);
 }
 
-export async function setSkin(userId: string, carId: string, skin?: string) {
+export async function setSkin(userId: string, carId: number, skin?: string) {
   await prisma.customCar.update({
     where: {
       id: carId,
