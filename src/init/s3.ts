@@ -13,7 +13,7 @@ const s3 = new S3Client({
 
 // backblaze doesn't support these headers
 s3.middlewareStack.add(
-  (next, context) => async (args) => {
+  (next) => async (args) => {
     // @ts-expect-error stupid aws sdk I FUCKING HATE AWS
     const headers = args.request.headers;
 

@@ -61,8 +61,7 @@ export async function giveLootPoolResult(member: string | GuildMember, result: L
   if (Object.hasOwn(result, "item")) {
     await addInventoryItem(member, result.item, Object.hasOwn(result, "count") ? result.count : 1);
     if (isGem(result.item)) {
-      // @ts-expect-error
-      await addProgress(member?.user?.id ?? member, "gem_hunter", result.count ?? 1);
+      await addProgress(member, "gem_hunter", result.count ?? 1);
     }
   }
 }

@@ -9,7 +9,7 @@ import { addNotificationToQueue, getDmSettings } from "../../utils/functions/use
 export default {
   name: "weeklycrates",
   cron: "15 0 * * 6",
-  async run(log, manager) {
+  async run(log) {
     const query = await prisma.user.findMany({
       where: {
         OR: [{ booster: true }, { Premium: { level: { gt: 1 } } }],

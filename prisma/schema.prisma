@@ -144,6 +144,7 @@ model Preferences {
   leaderboards   Boolean @default(true)
   tips           Boolean @default(true)
   marketConfirm  BigInt  @default(25000000)
+  marketDelay    Int     @default(300) // seconds
   mentionsGlobal Boolean @default(false)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)

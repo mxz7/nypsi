@@ -34,7 +34,6 @@ import {
   setInventoryItem,
 } from "../utils/functions/economy/inventory";
 import { setLevel, setPrestige } from "../utils/functions/economy/levelling";
-import { getMarketOrderEmbed } from "../utils/functions/economy/market";
 import { getEcoBanTime, getItems, isEcoBanned, setEcoBan } from "../utils/functions/economy/utils";
 import { updateXp } from "../utils/functions/economy/xp";
 import { addKarma, getKarma, removeKarma } from "../utils/functions/karma/karma";
@@ -847,7 +846,10 @@ async function run(
         logger.info(
           `admin: ${message.author.id} (${message.author.username}) set ${user.id} karma to ${msg.content}`,
         );
-        remove ? await removeKarma(user.id, amount) : addKarma(user.id, amount);
+
+        if (remove) await removeKarma(user.id, amount);
+        else await addKarma(user.id, amount);
+
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "ecoban") {
@@ -1786,7 +1788,7 @@ async function run(
     return message.channel.send({ embeds: [new CustomEmbed(message.member, desc)] });
   };
 
-  const requestProfileTransfer = async (from: User, to: User, force = false) => {
+  const requestProfileTransfer = async (from: User, to: User) => {
     if ((await getAdminLevel(message.author.id)) !== 69)
       return message.channel.send({
         embeds: [new ErrorEmbed("lol xd xdxddxd ahahhaha YOURE GAY dont even TRY")],
@@ -1932,6 +1934,39 @@ async function run(
     // idk how this should be done lol i might get back to it
 
     console.log(map);
+  } else if (args[0].toLowerCase() === "fixblock") {
+    if ((await getAdminLevel(message.member)) < 3) {
+      return message.channel.send({
+        embeds: [new ErrorEmbed("you require admin level **3** to do this")],
+      });
+    }
+
+    const res = (
+      await prisma.economy.findMany({
+        where: {
+          offersBlock: { isEmpty: false },
+        },
+        select: {
+          userId: true,
+          offersBlock: true,
+        },
+      })
+    ).filter((i) => i.offersBlock.includes(i.userId));
+
+    for (const data of res) {
+      await prisma.economy.update({
+        where: {
+          userId: data.userId,
+        },
+        data: {
+          offersBlock: data.offersBlock.filter((i) => i !== data.userId),
+        },
+      });
+    }
+
+    return await message.channel.send({
+      embeds: [new CustomEmbed(message.member, `fixed \`${res.length}\` users`)],
+    });
   }
 }
 

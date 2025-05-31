@@ -73,6 +73,8 @@ export async function getWords(guild: Guild, type?: ChatReactionWordList) {
     const words = await readFile("data/chatreaction/english_1k.txt").then((r) =>
       r
         .toString()
+        // i love windows
+        .replaceAll("\r", "")
         .split("\n")
         .filter((word) => word.length > 2),
     );
@@ -88,6 +90,8 @@ export async function getWords(guild: Guild, type?: ChatReactionWordList) {
     const words = await readFile("data/chatreaction/english_5k.txt").then((r) =>
       r
         .toString()
+        // i love windows
+        .replaceAll("\r", "")
         .split("\n")
         .filter((word) => word.length > 2),
     );
@@ -103,6 +107,8 @@ export async function getWords(guild: Guild, type?: ChatReactionWordList) {
     const words = await readFile("data/chatreaction/english_10k.txt").then((r) =>
       r
         .toString()
+        // i love windows
+        .replaceAll("\r", "")
         .split("\n")
         .filter((word) => word.length > 2),
     );

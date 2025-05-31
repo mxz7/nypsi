@@ -103,7 +103,7 @@ manager.spawn().then(() => {
   runEconomySetup();
 });
 
-listen(manager);
+listen();
 
 // setTimeout(async () => {
 //   dmQueueWorker.resume();

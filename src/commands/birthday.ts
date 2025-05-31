@@ -17,9 +17,11 @@ import {
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { setBirthdayChannel } from "../utils/functions/guilds/birthday";
+import PageManager from "../utils/functions/page";
 import {
   getBirthday,
   getTodaysBirthdays,
+  getUpcomingBirthdays,
   isBirthdayEnabled,
   setBirthday,
   setBirthdayEnabled,
@@ -31,7 +33,7 @@ const cmd = new Command(
   "birthday",
   "set your birthday and set up a birthday announcement channel",
   "info",
-);
+).setAliases(["bday"]);
 
 cmd.slashEnabled = true;
 cmd.slashData
@@ -62,6 +64,9 @@ cmd.slashData
   )
   .addSubcommand((disable) =>
     disable.setName("disable").setDescription("disable birthday announcements in this server"),
+  )
+  .addSubcommand((upcoming) =>
+    upcoming.setName("upcoming").setDescription("view upcoming birthdays in the server"),
   );
 
 async function run(
@@ -98,38 +103,7 @@ async function run(
     }
   };
 
-  if (args.length === 0) {
-    const birthday = await getBirthday(message.author.id);
-
-    const embed = new CustomEmbed(
-      message.member,
-      birthday
-        ? `your birthday is ${dayjs(birthday).format("MMMM D, YYYY")}\n\n`
-        : "/**birthday set <YYYY-MM-DD>** *set your birthday*\n" +
-          "/**birthday toggle** *enable/disable your birthday from being announced in servers*\n" +
-          "/**birthday channel <channel>** *set a channel to be used as the birthday announcement channel*\n" +
-          "/**birthday disable** *disable birthday announcements in your server*",
-    );
-
-    const todaysBirthdays = await getTodaysBirthdays();
-
-    if (todaysBirthdays.length > 0) {
-      const members = await message.guild.members
-        .fetch({ user: todaysBirthdays.map((i) => i.id) })
-        .catch(() => new Collection<string, GuildMember>());
-
-      if (members.size > 0) {
-        embed.addField(
-          "today's birthdays",
-          Array.from(members.mapValues((i) => i.toString()).values()).join("\n"),
-        );
-      }
-    }
-
-    return send({ embeds: [embed] });
-  }
-
-  if (args[0].toLowerCase() === "set") {
+  if (args[0]?.toLowerCase() === "set") {
     if (args.length === 1) {
       return send({ embeds: [new ErrorEmbed("you forgot your birthday..... idiot.....")] });
     }
@@ -211,7 +185,7 @@ async function run(
       row.components.forEach((b) => b.setDisabled(true));
       interaction.update({ components: [row] });
     }
-  } else if (args[0].toLowerCase() === "toggle") {
+  } else if (args[0]?.toLowerCase() === "toggle") {
     const current = await isBirthdayEnabled(message.author.id);
 
     await setBirthdayEnabled(message.author.id, !current);
@@ -226,7 +200,7 @@ async function run(
         ),
       ],
     });
-  } else if (args[0].toLowerCase() === "disable") {
+  } else if (args[0]?.toLowerCase() === "disable") {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) return;
 
     await setBirthdayChannel(message.guild.id, null);
@@ -239,7 +213,7 @@ async function run(
         ),
       ],
     });
-  } else if (args[0].toLowerCase() === "channel") {
+  } else if (args[0]?.toLowerCase() === "channel") {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) return;
 
     if (args.length === 1)
@@ -306,6 +280,80 @@ async function run(
         new CustomEmbed(message.member, `birthday announcements set to ${channel.toString()}`),
       ],
     });
+  } else if (args[0]?.toLowerCase() === "upcoming") {
+    const members = await message.guild.members.fetch().catch(() => {
+      return new Collection<string, GuildMember>();
+    });
+
+    const birthdays = await getUpcomingBirthdays(members.map((m) => m.id));
+
+    if (birthdays.length === 0) {
+      return send({ embeds: [new ErrorEmbed("no upcoming birthdays")] });
+    }
+
+    const embed = new CustomEmbed(message.member).setHeader(
+      "upcoming birthdays",
+      message.guild.iconURL(),
+    );
+
+    const pages = PageManager.createPages(
+      birthdays.map(
+        (i) =>
+          `**${i.lastKnownUsername}** <t:${dayjs(i.birthday).set("year", dayjs().year()).unix()}:R>`,
+      ),
+    );
+
+    embed.setDescription(pages.get(1).join("\n"));
+
+    if (pages.size === 1) {
+      return send({ embeds: [embed] });
+    }
+
+    const row = PageManager.defaultRow();
+
+    const msg = await send({ embeds: [embed], components: [row] });
+
+    const manager = new PageManager({
+      embed,
+      pages,
+      row,
+      message: msg,
+      userId: message.author.id,
+      allowMessageDupe: true,
+    });
+
+    manager.listen();
+    return;
+  } else {
+    const birthday = await getBirthday(message.author.id);
+
+    const embed = new CustomEmbed(
+      message.member,
+      birthday
+        ? `your birthday is ${dayjs(birthday).format("MMMM D, YYYY")}\n\n`
+        : "/**birthday set <YYYY-MM-DD>** *set your birthday*\n" +
+          "/**birthday toggle** *enable/disable your birthday from being announced in servers*\n" +
+          "/**birthday channel <channel>** *set a channel to be used as the birthday announcement channel*\n" +
+          "/**birthday disable** *disable birthday announcements in your server*\n" +
+          "/**birthday upcoming** *view upcoming birthdays in the server*",
+    );
+
+    const todaysBirthdays = await getTodaysBirthdays();
+
+    if (todaysBirthdays.length > 0) {
+      const members = await message.guild.members
+        .fetch({ user: todaysBirthdays.map((i) => i.id) })
+        .catch(() => new Collection<string, GuildMember>());
+
+      if (members.size > 0) {
+        embed.addField(
+          "today's birthdays",
+          Array.from(members.mapValues((i) => i.toString()).values()).join("\n"),
+        );
+      }
+    }
+
+    return send({ embeds: [embed] });
   }
 }
 

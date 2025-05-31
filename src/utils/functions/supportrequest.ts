@@ -1,6 +1,8 @@
 import { SupportRequest } from "@prisma/client";
 import { Attachment, Collection } from "discord.js";
 import { nanoid } from "nanoid";
+import { zodTextFormat } from "openai/helpers/zod";
+import { z } from "zod";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { NypsiClient } from "../../models/Client";
@@ -8,7 +10,7 @@ import { CustomEmbed } from "../../models/EmbedBuilders";
 import Constants from "../Constants";
 import { logger } from "../logger";
 import { uploadImage } from "./image";
-import { prompt } from "./openai";
+import openai, { prompt } from "./openai";
 import { getLastKnownUsername } from "./users/tag";
 import pAll = require("p-all");
 
@@ -38,6 +40,11 @@ quickResponses.set(
   "if you are **banned/muted from the nypsi discord server** then you can be unbanned/unmuted by making a custom donation of £20 to https://ko-fi.com/tekoh\n\n" +
     "if you are **banned from nypsi economy** you can buy an unban from https://ko-fi.com/s/1d78b621a5",
 );
+
+const isRequestSuitableFormat = z.object({
+  choice: z.enum(["yes", "no"]),
+  reason: z.string(),
+});
 
 export async function getSupportRequestByChannelId(id: string) {
   const query = await prisma.supportRequest.findUnique({
@@ -334,48 +341,66 @@ export async function summariseRequest(id: string) {
   return res;
 }
 
-export async function isRequestSuitable(content: string) {
+export async function isRequestSuitable(
+  content: string,
+): Promise<{ decision: "yes" | "no"; reason: string }> {
+  const sysPrompt = [
+    "# Role",
+    "You are part of a support team for the Discord bot **nypsi**.",
+    "Your job is to determine if the user's message is suitable for a support request to be forwarded to a human.",
+    "The content may not be in English or may be written in poor English — do your best to understand it.",
+    "If you are unsure, lean on being accepting of the support request.",
+    "",
+    "You have access to the nypsi documentation in your context. Use it to help you understand the user's query.",
+    "",
+    "Assume that the user is referring to nypsi or nypsi features with their request, including money.",
+    "",
+    "## Your Response",
+    "",
+    "### Choice",
+    "",
+    "#### yes",
+    "The choice will be 'yes' for a suitable support request.",
+    "",
+    "#### no",
+    "The choice will be 'no' for an unsuitable support request.",
+    "",
+    "### Reason",
+    "",
+    "This should be a **concise reason** for your decision.",
+    "",
+    '* Avoid ending your reason with "which is/not suitable for support" — this is understood from the context.',
+    '* Avoid starting your reason with "the message" — keep it direct and quickly readable.',
+    "",
+    "## Examples",
+    "",
+    "### Suitable Requests",
+    "* Asking for help with an issue",
+    "* Asking for help with commands",
+    "* Reporting some type of bug",
+    "* Asking for some information about the bot",
+    "* Asking how to do something",
+    "* Asking for help with the nypsi discord server",
+    "* Saying that they will send screenshots, videos etc",
+    "",
+    "### Unsuitable Requests",
+    "* Begging/demanding for items or money",
+    "* Asking for a feature",
+    "* Asking to be staff",
+    "* Nonsensical or random words",
+    "* Not asking for anything",
+  ];
+
   try {
-    const aiResponse = await prompt(
-      "# Role\n" +
-        "You are part of a support team for the Discord bot **nypsi**.\n" +
-        "Your job is to determine if the user's message is suitable for a support request to be forwarded to a human.\n" +
-        "The content may not be in English or may be written in poor English — do your best to understand it.\n" +
-        "If you are unsure, lean on being accepting of the support request.\n" +
-        "\n" +
-        "# Your Response\n" +
-        "\n" +
-        "## First line\n" +
-        "- Respond with **`yes`** for a suitable support request.\n" +
-        "- Respond with **`no`** for an unsuitable support request.\n" +
-        "\n" +
-        "## Second line\n" +
-        "The second line of the response should be a **concise reason** for your decision.\n" +
-        "\n" +
-        '- Avoid ending your reason with "which is/not suitable for support" — this is understood from the context.\n' +
-        '- Avoid starting your reason with "the message" — keep it direct and quickly readable.\n' +
-        "\n" +
-        "# Examples\n" +
-        "\n" +
-        "## Suitable Requests\n" +
-        "- Asking for help with an issue\n" +
-        "- Reporting some type of bug\n" +
-        "- Asking for some information about the bot\n" +
-        "\n" +
-        "## Unsuitable Requests\n" +
-        "- Begging or asking for items or money\n" +
-        "- Asking how long is left on their punishment\n" +
-        "- Asking for a feature\n" +
-        "- Asking to be staff",
-      content,
-    );
+    const response = await openai.responses.parse({
+      model: "gpt-4.1-mini",
+      instructions: sysPrompt.join("\n"),
+      input: [{ role: "user", content }],
+      tools: [{ type: "file_search", vector_store_ids: [process.env.NYPSI_LLMS_VECTOR_STORE] }],
+      text: { format: zodTextFormat(isRequestSuitableFormat, "supportrequest_suitable") },
+    });
 
-    const [decision, reason] = aiResponse.split("\n").map((i) => i.trim());
-
-    return {
-      decision,
-      reason,
-    };
+    return { decision: response.output_parsed.choice, reason: response.output_parsed.reason };
   } catch (e) {
     logger.error("supportrequest: error while checking if suitable", { e, content });
     return { decision: "yes", reason: "ahhh" };

@@ -165,7 +165,7 @@ export function reloadCommand(commandsArray: string[]) {
       commands.delete(cmd);
       try {
         delete require.cache[require.resolve(`../../commands/${cmd}`)];
-      } catch (e) {
+      } catch {
         logger.error("error deleting from cache");
         return false;
       }

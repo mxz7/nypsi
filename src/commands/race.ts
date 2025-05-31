@@ -496,14 +496,15 @@ class Race {
             });
           }
 
-          addStat(member.user.id, member.car.car.id.toString(), 1),
-            await createGame({
-              userId: member.user.id,
-              bet: this.bet,
-              game: "race",
-              result: "lose",
-              outcome: this.embed.data.description,
-            });
+          addStat(member.user.id, member.car.car.id.toString(), 1);
+
+          await createGame({
+            userId: member.user.id,
+            bet: this.bet,
+            game: "race",
+            result: "lose",
+            outcome: this.embed.data.description,
+          });
         }
 
         this.embed.setDescription(description);

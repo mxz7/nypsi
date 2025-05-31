@@ -914,9 +914,7 @@ export async function calcNetWorth(
 
     worth += value;
     if (breakdown) {
-      breakdownItems.has("bakery")
-        ? breakdownItems.set("bakery", breakdownItems.get("bakery") + value)
-        : breakdownItems.set("bakery", value);
+      breakdownItems.set("bakery", value + (breakdownItems.get("bakery") ?? 0));
     }
   }
 

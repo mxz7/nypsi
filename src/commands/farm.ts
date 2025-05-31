@@ -33,7 +33,6 @@ import {
   userExists,
 } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import _ = require("lodash");
 import dayjs = require("dayjs");
 
 const cmd = new Command("farm", "view your farms and harvest", "money").setAliases(["fields"]);

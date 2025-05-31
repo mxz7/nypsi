@@ -95,7 +95,7 @@ async function doDailyStreaks() {
   for (const user of users) {
     promises.push(async () => {
       if (user.Inventory.find((i) => i.item == "calendar")?.amount > 0) {
-        if (user.user.DMSettings.other)
+        if (user.user.DMSettings?.other)
           notifications.push({ memberId: user.userId, payload: { embed: calendarSavedEmbed } });
 
         await removeInventoryItem(user.userId, "calendar", 1);
@@ -116,7 +116,7 @@ async function doDailyStreaks() {
         }
       }
 
-      if (user.user.DMSettings.other && user.dailyStreak >= 7)
+      if (user.user.DMSettings?.other && user.dailyStreak >= 7)
         notifications.push({ memberId: user.userId, payload: { embed: resetEmbed } });
 
       await prisma.economy.update({
@@ -217,7 +217,7 @@ async function doVoteStreaks() {
   for (const user of users) {
     promises.push(async () => {
       if (user.Inventory.find((i) => i.item == "calendar")?.amount > 0) {
-        if (user.user.DMSettings.other) {
+        if (user.user.DMSettings?.other) {
           if (user.user.DMSettings.voteReminder) {
             notifications.push({
               memberId: user.userId,
@@ -238,7 +238,7 @@ async function doVoteStreaks() {
         const gemSaveChance = Math.floor(Math.random() * 10);
 
         if (gemSaveChance < 5) {
-          if (user.user.DMSettings.other) {
+          if (user.user.DMSettings?.other) {
             if (user.user.DMSettings.voteReminder) {
               notifications.push({
                 memberId: user.userId,
@@ -255,7 +255,7 @@ async function doVoteStreaks() {
           if (percentChance(7)) {
             await removeInventoryItem(user.userId, "calendar", 1);
 
-            if (user.user.DMSettings.other) {
+            if (user.user.DMSettings?.other) {
               if (user.user.DMSettings.voteReminder) {
                 notifications.push({
                   memberId: user.userId,
@@ -273,7 +273,7 @@ async function doVoteStreaks() {
         }
       }
 
-      if (user.user.DMSettings.other && user.voteStreak >= 3) {
+      if (user.user.DMSettings?.other && user.voteStreak >= 3) {
         if (user.user.DMSettings.voteReminder) {
           notifications.push({
             memberId: user.userId,

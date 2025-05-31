@@ -219,7 +219,7 @@ export async function getPrefix(guild: Guild | string): Promise<string[]> {
     );
 
     return query.prefixes;
-  } catch (e) {
+  } catch {
     if (!(await hasGuild(guild))) await createGuild(guild);
     logger.warn("couldn't fetch prefix for server " + guildId);
     return ["$"];

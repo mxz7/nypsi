@@ -142,7 +142,7 @@ export function runLogs() {
 
       try {
         webhook = new WebhookClient({ url: modlog.modlogs });
-      } catch (e) {
+      } catch {
         logger.error(`invalid webhook`, modlog);
 
         if (invalidWebhookCounts.has(modlog.id)) {

@@ -18,6 +18,7 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed, getColor } from "../../../models/EmbedBuilders";
+import { DMQueue } from "../../../types/Market";
 import { NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
 import { logger, transaction } from "../../logger";
@@ -38,7 +39,7 @@ const inTransaction = new Set<string>();
 /**
  * items is map of itemId -> map of userId -> amount
  */
-const dmQueue = new Map<string, { earned: number; items: Map<string, Map<string, number>> }>();
+// const dmQueue = new Map<string, { earned: number; items: Map<string, Map<string, number>> }>();
 
 export async function getMarketOrders(member: GuildMember | string | undefined, type: OrderType) {
   let id: string;
@@ -853,76 +854,31 @@ export async function completeOrder(
     );
 
     if ((await getDmSettings(order.ownerId)).market) {
-      if (dmQueue.has(`${order.ownerId}-${order.orderType}`)) {
-        if (dmQueue.get(`${order.ownerId}-${order.orderType}`).items.has(order.itemId)) {
-          if (
-            dmQueue.get(`${order.ownerId}-${order.orderType}`).items.get(order.itemId).has(buyerId)
-          ) {
-            dmQueue
-              .get(`${order.ownerId}-${order.orderType}`)
-              .items.get(order.itemId)
-              .set(
-                buyerId,
-                dmQueue
-                  .get(`${order.ownerId}-${order.orderType}`)
-                  .items.get(order.itemId)
-                  .get(buyerId) + Number(amount),
-              );
-          } else {
-            dmQueue
-              .get(`${order.ownerId}-${order.orderType}`)
-              .items.get(order.itemId)
-              .set(buyerId, Number(amount));
-          }
-        } else {
-          dmQueue
-            .get(`${order.ownerId}-${order.orderType}`)
-            .items.set(order.itemId, new Map([[buyerId, Number(amount)]]));
-        }
+      let dmQueue = await redis
+        .hget(`${Constants.redis.nypsi.MARKET_DM}:${order.orderType}`, order.ownerId)
+        .then((r) => (r ? (JSON.parse(r) as DMQueue) : undefined));
 
-        dmQueue.get(`${order.ownerId}-${order.orderType}`).earned +=
-          Number(amount) * Number(order.price) - taxedAmount;
-      } else {
-        dmQueue.set(`${order.ownerId}-${order.orderType}`, {
-          items: new Map([[order.itemId, new Map([[buyerId, Number(amount)]])]]),
-          earned: Number(amount) * Number(order.price) - taxedAmount,
-        });
-
-        setTimeout(async () => {
-          if (!dmQueue.has(`${order.ownerId}-${order.orderType}`)) return;
-          let total = 0;
-          const data = dmQueue.get(`${order.ownerId}-${order.orderType}`);
-
-          let description = "";
-
-          for (const [item, buyers] of data.items) {
-            description += `- ${getItems()[item].emoji} **${getItems()[item].name}**:\n`;
-
-            for (const [buyer, amount] of buyers) {
-              const username = await getLastKnownUsername(buyer);
-              description += `  - **${username}**: ${amount.toLocaleString()}\n`;
-              total += amount;
-            }
-
-            description += "\n";
-          }
-
-          const embedDm = new CustomEmbed(order.ownerId).setDescription(description);
-
-          if (order.orderType == "sell")
-            embedDm.setFooter({ text: `+$${data.earned.toLocaleString()}` });
-
-          dmQueue.delete(`${order.ownerId}-${order.orderType}`);
-
-          addNotificationToQueue({
-            memberId: order.ownerId,
-            payload: {
-              content: `${total.toLocaleString()}x of your ${order.orderType} order items have been fulfilled`,
-              embed: embedDm,
-            },
-          });
-        }, ms("3 minutes"));
+      if (!dmQueue) {
+        dmQueue = { userId: order.ownerId, createdAt: Date.now(), earned: 0, items: {} };
       }
+
+      dmQueue.earned += Number(amount) * Number(order.price) - taxedAmount;
+
+      if (dmQueue.items[order.itemId]) {
+        if (dmQueue.items[order.itemId][buyerId]) {
+          dmQueue.items[order.itemId][buyerId] += Number(amount);
+        } else {
+          dmQueue.items[order.itemId][buyerId] = Number(amount);
+        }
+      } else {
+        dmQueue.items[order.itemId] = { [buyerId]: Number(amount) };
+      }
+
+      await redis.hset(
+        `${Constants.redis.nypsi.MARKET_DM}:${order.orderType}`,
+        order.ownerId,
+        JSON.stringify(dmQueue),
+      );
     }
   })();
 

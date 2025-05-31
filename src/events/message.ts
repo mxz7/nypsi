@@ -199,22 +199,13 @@ export default async function messageCreate(message: Message) {
 
           return modalSubmit.editReply({
             embeds: [
-              new CustomEmbed().setDescription(
-                "this isn't suitable for a support request. try including more information about what you need help with",
-              ),
-            ],
-          });
-        } else if (aiResponse.decision === "needs more") {
-          logger.info(
-            `supportrequest: ${message.author.id} (${message.author.username}) denied support request`,
-            { content: helpMessage, aiResponse },
-          );
-
-          return modalSubmit.editReply({
-            embeds: [
-              new CustomEmbed().setDescription(
-                "you need to give more information. the easier you make it for our staff to understand what you need, the better we can assist you",
-              ),
+              new CustomEmbed()
+                .setDescription(
+                  "this isn't suitable for a support request. try including more information about what you need help with",
+                )
+                .setFooter({
+                  text: "this is an automated system, please let us know of any issues",
+                }),
             ],
           });
         }
@@ -258,7 +249,10 @@ export default async function messageCreate(message: Message) {
           const embed = new CustomEmbed()
             .setHeader("nypsi", message.client.user.avatarURL())
             .setColor(Constants.PURPLE)
-            .setDescription(quickResponse);
+            .setDescription(quickResponse)
+            .setFooter({
+              text: "this is an automatic message. please tell us if this doesn't match your query",
+            });
 
           sendToRequestChannel(
             message.author.id,

@@ -29,7 +29,7 @@ async function run(
   const msg = message.channel.send({ content: "searching..." });
 
   const success = await execCmd(
-    `grep -rh "${args.join(" ").replaceAll('"', "").replaceAll("\\", "")}" out > ${path}`,
+    `grep -rh "${escapeForShellGrep(args.join(" "))}" out > ${path}`,
   ).catch((err) => {
     console.error(err);
     logger.error("failed to complete logsearch", { err });
@@ -85,3 +85,24 @@ async function run(
 cmd.setRun(run);
 
 module.exports = cmd;
+
+function escapeForShellGrep(input: string) {
+  return input
+    .replace(/\\/g, "\\\\") // Escape backslashes
+    .replace(/"/g, '\\"') // Escape double quotes
+    .replace(/\$/g, "\\$") // Escape dollar signs
+    .replace(/`/g, "\\`") // Escape backticks
+    .replace(/!/g, "\\!") // Escape exclamation marks (for history expansion)
+    .replace(/\*/g, "\\*") // Escape asterisks
+    .replace(/\?/g, "\\?") // Escape question marks
+    .replace(/\[/g, "\\[") // Escape left square brackets
+    .replace(/]/g, "\\]") // Escape right square brackets
+    .replace(/\(/g, "\\(") // Escape parentheses
+    .replace(/\)/g, "\\)") // Escape parentheses
+    .replace(/'/g, "'\\''") // Safely escape single quotes inside single quotes
+    .replace(/&/g, "\\&") // Escape ampersands
+    .replace(/;/g, "\\;") // Escape semicolons
+    .replace(/\|/g, "\\|") // Escape pipes
+    .replace(/</g, "\\<") // Escape less-than
+    .replace(/>/g, "\\>"); // Escape greater-than
+}
