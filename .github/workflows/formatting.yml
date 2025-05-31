@@ -40,5 +40,28 @@ jobs:
       - name: install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: restore prettiercache
+        uses: actions/cache/restore@v4
+        id: cache
+        with:
+          path: .prettiercache
+          key: prettiercache-${{ runner.os }}-${{ hashFiles('pnpm-lock.json') }}
+          restore-keys: |
+            prettiercache-${{ runner.os }}
+
       - name: check formatting
-        run: npx prettier --check .
+        run: pnpm run format:check
+
+      - name: clear prettiercache
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push' && steps.cache.outputs.cache-hit
+        run: gh cache delete --repo ${{ github.repository }} ${{ steps.cache.outputs.cache-primary-key }}
+
+      - name: save prettiercache
+        uses: actions/cache/save@v4
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        with:
+          path: .prettiercache
+          key: prettiercache-${{ runner.os }}-${{ hashFiles('pnpm-lock.json') }}

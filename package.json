@@ -4,10 +4,13 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "format": "prettier --write .",
+    "format": "prettier --write --cache --cache-location .prettiercache .",
+    "format:check": "prettier --check --cache --cache-location .prettiercache .",
     "clean": "rm -rf dist node_modules",
-    "build": "tsc",
-    "watch": "tsc --build --watch"
+    "build": "tsc --incremental",
+    "watch": "tsc --build --watch",
+    "lint": "eslint --cache ./src/",
+    "validate": "npm run format:check && npm run lint"
   },
   "prisma": {
     "seed": "ts-node --transpile-only prisma/seed.ts"
