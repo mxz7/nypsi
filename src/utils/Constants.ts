@@ -228,7 +228,7 @@ export default {
       [100, 5],
     ]),
   },
-  SEASON_START: new Date("31/05/2025"),
+  SEASON_START: new Date("2025-06-01"),
   SEASON_NUMBER: 10,
   SNOWFLAKE_REGEX: /^\d{17,19}$/,
   PURPLE: "#8b5cf6" as ColorResolvable,
