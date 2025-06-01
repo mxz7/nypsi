@@ -266,6 +266,8 @@ model CustomCar {
   userId   String
   economy  Economy      @relation(fields: [userId], references: [userId], onDelete: Cascade)
   upgrades CarUpgrade[]
+
+  @@index([userId])
 }
 
 model CarUpgrade {
@@ -343,6 +345,8 @@ model Crafting {
   finished DateTime
 
   economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model Inventory {
@@ -446,6 +450,8 @@ model PremiumCommand {
   uses    Int    @default(0)
 
   premium Premium @relation(fields: [owner], references: [userId], onDelete: Cascade)
+
+  @@index([trigger])
 }
 
 model Username {
@@ -456,6 +462,8 @@ model Username {
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
+
+  @@index([userId])
 }
 
 model WordleGame {
@@ -520,6 +528,8 @@ model TradeRequest {
   completed Boolean  @default(false)
 
   owner Economy @relation(fields: [ownerId], references: [userId], onDelete: Cascade)
+
+  @@index([ownerId])
 }
 
 model Offer {
@@ -615,6 +625,8 @@ model ReactionRole {
 
   guild Guild               @relation(fields: [guildId], references: [id], onDelete: Cascade)
   roles ReactionRoleRoles[]
+
+  @@index([messageId])
 }
 
 enum ReactionRoleMode {
