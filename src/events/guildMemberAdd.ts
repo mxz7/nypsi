@@ -107,10 +107,12 @@ export default async function guildMemberAdd(member: GuildMember) {
 
     for (const id of alts) {
       if (await isBanned(member.guild, id)) {
-        const query = await prisma.moderationBan.findFirst({
+        const query = await prisma.moderationBan.findUnique({
           where: {
-            guildId: member.guild.id,
-            userId: id,
+            userId_guildId: {
+              guildId: member.guild.id,
+              userId: member.user.id,
+            },
           },
           select: {
             expire: true,
