@@ -358,7 +358,7 @@ export async function getGambleMulti(member: GuildMember | string) {
 
   const beforeGems = multi;
 
-  let heart = inventory.has("crystal_heart");
+  const heart = inventory.has("crystal_heart");
 
   if (inventory.has("white_gem")) {
     const chance = Math.floor(Math.random() * 10);
@@ -491,7 +491,7 @@ export async function getSellMulti(member: GuildMember | string) {
   if (multi - beforeBoosters !== 0) breakdown.set("boosters", multi - beforeBoosters);
   const beforeGems = multi;
 
-  let heart = inventory.has("crystal_heart");
+  const heart = inventory.has("crystal_heart");
 
   if (inventory.has("white_gem")) {
     const chance = Math.floor(Math.random() * 10);

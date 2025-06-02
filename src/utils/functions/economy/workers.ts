@@ -168,8 +168,7 @@ export async function calcWorkerValues(
     }
   }
 
-  let heart = false;
-  if (inventory.has("crystal_heart")) heart = true;
+  const heart = inventory.has("crystal_heart");
 
   if (inventory.has("purple_gem")) {
     const chance = Math.floor(Math.random() * 10);
