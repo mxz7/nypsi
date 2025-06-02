@@ -178,7 +178,7 @@ async function run(
       let isZero = 0;
 
       for (const ingredientId of ingredients) {
-        const ownedAmount = inventory.find((i) => i.item == ingredientId)?.amount || 0;
+        const ownedAmount = inventory.count(ingredientId);
 
         owned.set(ingredientId, ownedAmount);
 
@@ -436,7 +436,7 @@ async function run(
     const inventory = await getInventory(message.member);
 
     for (const ingredientId of selected.craft.ingredients) {
-      const ownedAmount = inventory.find((i) => i.item == ingredientId.split(":")[0])?.amount || 0;
+      const ownedAmount = inventory.count(ingredientId.split(":")[0]);
 
       owned.set(ingredientId, ownedAmount);
     }

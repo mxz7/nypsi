@@ -79,9 +79,7 @@ async function run(
   };
 
   const help = async () => {
-    const tickets = await getInventory(message.member).then(
-      (inventory) => inventory.find((item) => item.item === "lottery_ticket")?.amount || 0,
-    );
+    const tickets = (await getInventory(message.member)).count("lottery_ticket");
     const embed = new CustomEmbed(message.member);
 
     const pool = await getApproximatePrizePool();

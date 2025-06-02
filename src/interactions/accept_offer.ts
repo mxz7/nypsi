@@ -66,10 +66,7 @@ export default {
 
     const inventory = await getInventory(interaction.user.id);
 
-    if (
-      !inventory.find((i) => i.item === offer.itemId) ||
-      inventory.find((i) => i.item === offer.itemId).amount < offer.itemAmount
-    ) {
+    if (inventory.count(offer.itemId) < offer.itemAmount) {
       await redis.del(`${Constants.redis.nypsi.OFFER_PROCESS}:${interaction.user.id}`);
       return interaction.reply({
         embeds: [new ErrorEmbed("you don't have the items for this offer")],

@@ -53,10 +53,7 @@ export default {
 
     const crateAmount = determineCrateAmount(await getVoteStreak(interaction.user.id));
 
-    if (
-      !inventory.find((i) => i.item === "vote_crate") ||
-      inventory.find((i) => i.item === "vote_crate")?.amount < crateAmount
-    ) {
+    if (inventory.count("vote_crate") < crateAmount) {
       return interaction.reply({
         embeds: [
           new ErrorEmbed(`you do not have ${crateAmount} ${pluralize("vote crate", crateAmount)}`),

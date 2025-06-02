@@ -70,13 +70,10 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
   let coal = 0;
   const ores = [];
 
-  if (inventory.find((i) => i.item === "super_furnace")?.amount > 0) {
+  if (inventory.has("super_furnace")) {
     hasFurnace = true;
     max = 640;
-  } else if (
-    inventory.find((i) => i.item == "furnace") &&
-    inventory.find((i) => i.item == "furnace").amount > 0
-  ) {
+  } else if (inventory.has("furnace")) {
     hasFurnace = true;
     max = 64;
   }
@@ -91,7 +88,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
     });
   }
 
-  for (const i of inventory) {
+  for (const i of inventory.entries) {
     if (items[i.item].role != "ore") continue;
 
     for (let x = 0; x < i.amount; x++) {
@@ -106,11 +103,8 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
     });
   }
 
-  if (
-    inventory.find((i) => i.item == "coal") &&
-    inventory.find((i) => i.item == "coal").amount > 0
-  ) {
-    coal = inventory.find((i) => i.item == "coal").amount;
+  if (inventory.has("coal")) {
+    coal = inventory.count("coal");
 
     if (coal > ores.length) coal = ores.length;
   }

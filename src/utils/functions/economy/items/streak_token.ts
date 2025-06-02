@@ -60,7 +60,7 @@ module.exports = new ItemUse(
     let amount = 1;
 
     if (args[1]?.toLowerCase() === "all") {
-      amount = inventory.find((i) => i.item === selected.id).amount;
+      amount = inventory.count(selected.id);
     } else if (parseInt(args[1])) {
       amount = parseInt(args[1]);
     }
@@ -73,7 +73,7 @@ module.exports = new ItemUse(
 
     if (amount > max) amount = max;
 
-    if (amount > (inventory.find((i) => i.item === selected.id)?.amount || 0))
+    if (amount > inventory.count(selected.id))
       return send({ embeds: [new ErrorEmbed(`you don't have ${amount} ${selected.name}`)] });
 
     await removeInventoryItem(message.member, "streak_token", amount);

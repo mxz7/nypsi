@@ -125,10 +125,7 @@ module.exports = new ItemUse(
       await res.deferUpdate();
 
       const inventory = await getInventory(message.member);
-      if (
-        !inventory.find((i) => i.item === "bronze_credit") ||
-        inventory.find((i) => i.item === "bronze_credit").amount < 1
-      ) {
+      if (!inventory.has("bronze_credit")) {
         return send({ embeds: [new ErrorEmbed("lol!")] });
       }
       await removeInventoryItem(message.member, "bronze_credit", 1);

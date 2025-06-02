@@ -125,10 +125,7 @@ module.exports = new ItemUse(
       await res.deferUpdate();
 
       const inventory = await getInventory(message.member);
-      if (
-        !inventory.find((i) => i.item === "gold_credit") ||
-        inventory.find((i) => i.item === "gold_credit").amount < 1
-      ) {
+      if (!inventory.has("gold_credit")) {
         return res.editReply({ embeds: [new ErrorEmbed("lol!")] });
       }
       await removeInventoryItem(message.member, "gold_credit", 1);

@@ -10,7 +10,7 @@ const cmd = new Command("garden", "look at all your pretty flowers", "money");
 async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) {
   const inventory = await getInventory(message.member);
 
-  const flowers = inventory.filter((i) => getItems()[i.item].role === "flower");
+  const flowers = inventory.entries.filter((i) => getItems()[i.item].role === "flower");
 
   if (flowers.length === 0)
     return message.channel.send({ embeds: [new ErrorEmbed("you have no flowers ):")] });

@@ -195,7 +195,7 @@ export async function getClaimable(member: GuildMember | string, plantId: string
 
     hours *= intervalMulti;
 
-    if (inventory.find((i) => i.item === "pink_gem")) {
+    if (inventory.has("pink_gem")) {
       const chance = Math.floor(Math.random() * 10);
       if (chance < 3) {
         hours *= 0.8;
@@ -224,14 +224,11 @@ export async function getClaimable(member: GuildMember | string, plantId: string
             ?.amount || 0;
     }
 
-    if (inventory.find((i) => i.item === "green_gem")) {
+    if (inventory.has("green_gem")) {
       storageMulti += 0.2;
     }
 
-    if (
-      inventory.find((i) => i.item === "pink_gem") &&
-      inventory.find((i) => i.item === "purple_gem")
-    ) {
+    if (inventory.has("pink_gem") && inventory.has("purple_gem")) {
       storageMulti += 0.2;
     }
 
@@ -319,9 +316,7 @@ export async function fertiliseFarm(userId: string): Promise<{
 
   const [farm, inventory] = await Promise.all([getFarm(userId), getInventory(userId)]);
 
-  const fertiliser = inventory.find((i) => i.item === "fertiliser");
-
-  if (!fertiliser || fertiliser.amount <= 0) return { dead, msg: "no fertiliser" };
+  if (!inventory.has("fertiliser")) return { dead, msg: "no fertiliser" };
 
   let possible = sort(
     farm.filter(
@@ -340,7 +335,8 @@ export async function fertiliseFarm(userId: string): Promise<{
 
   if (possible.length === 0) return { dead, msg: "no need" };
 
-  if (possible.length > fertiliser.amount * 3) possible = possible.slice(0, fertiliser.amount * 3);
+  if (possible.length > inventory.count("fertiliser") * 3)
+    possible = possible.slice(0, inventory.count("fertiliser") * 3);
 
   await prisma.farm.updateMany({
     where: {
@@ -351,7 +347,7 @@ export async function fertiliseFarm(userId: string): Promise<{
     },
   });
 
-  await removeInventoryItem(userId, fertiliser.item, Math.ceil(possible.length / 3));
+  await removeInventoryItem(userId, "fertiliser", Math.ceil(possible.length / 3));
   await redis.del(`${Constants.redis.cache.economy.farm}:${userId}`);
 
   return { done: possible.length, dead };

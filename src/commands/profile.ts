@@ -199,25 +199,12 @@ async function run(
 
     let gemLine = "";
 
-    const gems: string[] = [];
-    inventory.forEach((i) => {
-      switch (i.item) {
-        case "crystal_heart":
-        case "white_gem":
-        case "pink_gem":
-        case "purple_gem":
-        case "blue_gem":
-        case "green_gem":
-          gems.push(i.item);
-          break;
-      }
-    });
-    if (gems.includes("crystal_heart")) gemLine += `${getItems()["crystal_heart"].emoji}`;
-    if (gems.includes("white_gem")) gemLine += `${getItems()["white_gem"].emoji}`;
-    if (gems.includes("pink_gem")) gemLine += `${getItems()["pink_gem"].emoji}`;
-    if (gems.includes("purple_gem")) gemLine += `${getItems()["purple_gem"].emoji}`;
-    if (gems.includes("blue_gem")) gemLine += `${getItems()["blue_gem"].emoji}`;
-    if (gems.includes("green_gem")) gemLine += `${getItems()["green_gem"].emoji}`;
+    if (inventory.has("crystal_heart")) gemLine += `${getItems()["crystal_heart"].emoji}`;
+    if (inventory.has("white_gem")) gemLine += `${getItems()["white_gem"].emoji}`;
+    if (inventory.has("pink_gem")) gemLine += `${getItems()["pink_gem"].emoji}`;
+    if (inventory.has("purple_gem")) gemLine += `${getItems()["purple_gem"].emoji}`;
+    if (inventory.has("blue_gem")) gemLine += `${getItems()["blue_gem"].emoji}`;
+    if (inventory.has("green_gem")) gemLine += `${getItems()["green_gem"].emoji}`;
 
     const balanceSection =
       `${padlockStatus ? "🔒" : "💰"} $**${formatNumberPretty(balance)}**\n` +

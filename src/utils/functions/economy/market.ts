@@ -986,10 +986,7 @@ export async function marketSell(
 
   const inventory = await getInventory(userId);
 
-  if (
-    !inventory.find((i) => i.item == itemId) ||
-    inventory.find((i) => i.item == itemId).amount < amount
-  ) {
+  if (inventory.count(itemId) < amount) {
     await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
     inTransaction.delete(itemId);
     return {

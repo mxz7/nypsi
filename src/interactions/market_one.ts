@@ -89,8 +89,10 @@ export default {
       } else {
         const inventory = await getInventory(interaction.user.id);
 
-        if ((inventory.find((i) => i.item)?.amount || 0) < 1) {
-          const embed = new ErrorEmbed("you don't have enough of this item");
+        if (!inventory.has(order.itemId)) {
+          const embed = new ErrorEmbed(
+            `you don't have ${getItems()[order.itemId].article} ${getItems()[order.itemId].name}`,
+          );
           await interaction
             .reply({
               embeds: [embed],

@@ -358,10 +358,9 @@ export async function getGambleMulti(member: GuildMember | string) {
 
   const beforeGems = multi;
 
-  let heart = false;
+  let heart = inventory.has("crystal_heart");
 
-  if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) heart = true;
-  if (inventory.find((i) => i.item == "white_gem")?.amount > 0) {
+  if (inventory.has("white_gem")) {
     const chance = Math.floor(Math.random() * 10);
 
     if (chance < 2 && !heart) {
@@ -373,7 +372,7 @@ export async function getGambleMulti(member: GuildMember | string) {
       ];
       multi += Math.floor(Math.random() * choices[Math.floor(Math.random() * choices.length)]);
     }
-  } else if (inventory.find((i) => i.item == "pink_gem")?.amount > 0) {
+  } else if (inventory.has("pink_gem")) {
     const chance = Math.floor(Math.random() * 10);
 
     if (chance < 2 && !heart) {
@@ -492,10 +491,9 @@ export async function getSellMulti(member: GuildMember | string) {
   if (multi - beforeBoosters !== 0) breakdown.set("boosters", multi - beforeBoosters);
   const beforeGems = multi;
 
-  let heart = false;
+  let heart = inventory.has("crystal_heart");
 
-  if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) heart = true;
-  if (inventory.find((i) => i.item == "white_gem")?.amount > 0) {
+  if (inventory.has("white_gem")) {
     const chance = Math.floor(Math.random() * 10);
 
     if (chance < 2 && !heart) {
@@ -507,7 +505,7 @@ export async function getSellMulti(member: GuildMember | string) {
       ];
       multi += Math.floor(Math.random() * choices[Math.floor(Math.random() * choices.length)]);
     }
-  } else if (inventory.find((i) => i.item == "pink_gem")?.amount > 0) {
+  } else if (inventory.has("pink_gem")) {
     const chance = Math.floor(Math.random() * 10);
 
     if (chance < 2 && !heart) {

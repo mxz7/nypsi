@@ -115,20 +115,11 @@ async function doMine(
 
   let pickaxe: string;
 
-  if (
-    inventory.find((i) => i.item == "diamond_pickaxe") &&
-    inventory.find((i) => i.item == "diamond_pickaxe").amount > 0
-  ) {
+  if (inventory.has("diamond_pickaxe")) {
     pickaxe = "diamond_pickaxe";
-  } else if (
-    inventory.find((i) => i.item == "iron_pickaxe") &&
-    inventory.find((i) => i.item == "iron_pickaxe").amount > 0
-  ) {
+  } else if (inventory.has("iron_pickaxe")) {
     pickaxe = "iron_pickaxe";
-  } else if (
-    inventory.find((i) => i.item == "wooden_pickaxe") &&
-    inventory.find((i) => i.item == "wooden_pickaxe").amount > 0
-  ) {
+  } else if (inventory.has("wooden_pickaxe")) {
     pickaxe = "wooden_pickaxe";
   }
 
@@ -194,19 +185,19 @@ async function doMine(
     }
   }
 
-  if (inventory.find((i) => i.item === "purple_gem")?.amount > 0) {
+  if (inventory.has("purple_gem")) {
     if (percentChance(0.2)) {
       gemBreak(message.member.user.id, 0.07, "purple_gem");
       times++;
     }
   }
-  if (inventory.find((i) => i.item === "white_gem")?.amount > 0) {
+  if (inventory.has("white_gem")) {
     if (percentChance(0.2)) {
       gemBreak(message.member.user.id, 0.07, "white_gem");
       times++;
     }
   }
-  if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) {
+  if (inventory.has("crystal_heart")) {
     if (percentChance(0.1)) {
       times++;
     }
@@ -222,17 +213,11 @@ async function doMine(
     chosenArea = areas[Math.floor(Math.random() * areas.length)];
 
     if (chosenArea == "nether") {
-      if (
-        !inventory.find((i) => i.item == "nether_portal") ||
-        inventory.find((i) => i.item == "nether_portal").amount < 1
-      ) {
+      if (inventory.has("nether_portal")) {
         return choseArea();
       }
-    } else if (chosenArea === "end") {
-      if (
-        !inventory.find((i) => i.item == "end_portal") ||
-        inventory.find((i) => i.item == "end_portal").amount < 1
-      ) {
+    } else if (chosenArea === "end_portal") {
+      if (inventory.has("end-portal")) {
         return choseArea();
       }
     }

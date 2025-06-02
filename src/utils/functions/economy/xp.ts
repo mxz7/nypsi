@@ -143,9 +143,8 @@ export async function calcEarnedGambleXp(
   if (booster) min += 5;
   if (tier) min += tier * 2.7;
 
-  if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0)
-    min += Math.floor(Math.random() * 10);
-  if (inventory.find((i) => i.item == "white_gem")?.amount > 0) {
+  if (inventory.has("crystal_heart")) min += Math.floor(Math.random() * 10);
+  if (inventory.has("white_gem")) {
     const chance = Math.floor(Math.random() * 10);
 
     if (chance < 2) {

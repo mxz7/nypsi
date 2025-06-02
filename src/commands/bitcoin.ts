@@ -15,11 +15,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
   const bitcoin = getItems()["bitcoin"];
   const inventory = await getInventory(message.member);
 
-  let bitcoinAmount = 0;
-
-  if (inventory.find((i) => i.item == "bitcoin")) {
-    bitcoinAmount = inventory.find((i) => i.item == "bitcoin").amount;
-  }
+  const bitcoinAmount = inventory.count("bitcoin");
 
   const embed = new CustomEmbed(
     message.member,

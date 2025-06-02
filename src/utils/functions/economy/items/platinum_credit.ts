@@ -130,10 +130,7 @@ module.exports = new ItemUse(
 
       const inventory = await getInventory(message.member);
 
-      if (
-        !inventory.find((i) => i.item === "platinum_credit") ||
-        inventory.find((i) => i.item === "platinum_credit").amount < 1
-      ) {
+      if (!inventory.has("platinum_credit")) {
         return res.editReply({ embeds: [new ErrorEmbed("lol!")] });
       }
 

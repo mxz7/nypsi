@@ -173,11 +173,11 @@ async function run(
       embed.addField("rarity", `\`${rarityMap.get(selected.rarity)}\``, true);
     }
 
-    if (inventory.find((i) => i.item == selected.id)) {
+    if (inventory.has(selected.id)) {
       embed.setFooter({
-        text: `you have ${inventory.find((i) => i.item == selected.id).amount.toLocaleString()} ${pluralize(
+        text: `you have ${inventory.count(selected.id).toLocaleString()} ${pluralize(
           selected,
-          inventory.find((i) => i.item == selected.id).amount,
+          inventory.count(selected.id),
         )}`,
       });
     }

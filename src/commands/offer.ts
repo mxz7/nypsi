@@ -481,10 +481,7 @@ async function run(
 
     const inventory = await getInventory(target);
 
-    if (
-      !inventory.find((i) => i.item === selected.id) ||
-      inventory.find((i) => i.item === selected.id).amount < amount
-    )
+    if (inventory.count(selected.id) < amount)
       return send({
         embeds: [
           new ErrorEmbed(

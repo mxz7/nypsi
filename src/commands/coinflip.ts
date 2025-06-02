@@ -126,10 +126,7 @@ async function run(
 
       await removeBalance(player2, bet);
     } else {
-      if (
-        !player2Inventory.find((i) => i.item === item.id) ||
-        player2Inventory.find((i) => i.item === item.id).amount < itemAmount
-      ) {
+      if (player2Inventory.count(item.id) < itemAmount) {
         await addInventoryItem(player1, item.id, itemAmount);
         return response.editReply({
           embeds: [new ErrorEmbed(`${player2.user.toString()} does not have enough ${item.name}`)],
@@ -444,19 +441,13 @@ async function run(
       const userInventory = await getInventory(message.author.id);
       const targetInventory = await getInventory(target);
 
-      if (
-        !userInventory.find((i) => i.item === item.id) ||
-        userInventory.find((i) => i.item === item.id).amount < itemAmount
-      ) {
+      if (userInventory.count(item.id) < itemAmount) {
         return send({
           embeds: [new ErrorEmbed(`you don't have enough ${item.name}`)],
         });
       }
 
-      if (
-        !targetInventory.find((i) => i.item === item.id) ||
-        targetInventory.find((i) => i.item === item.id).amount < itemAmount
-      ) {
+      if (targetInventory.count(item.id) < itemAmount) {
         return send({
           embeds: [new ErrorEmbed(`**${target.user.username}** doesn't have enough ${item.name}`)],
         });
@@ -714,10 +705,7 @@ async function run(
     } else {
       const userInventory = await getInventory(message.author.id);
 
-      if (
-        !userInventory.find((i) => i.item === item.id) ||
-        userInventory.find((i) => i.item === item.id).amount < itemAmount
-      ) {
+      if (userInventory.count(item.id) < itemAmount) {
         return send({
           embeds: [new ErrorEmbed(`you don't have enough ${item.name}`)],
         });
@@ -847,10 +835,7 @@ async function run(
       } else {
         const inventory = await getInventory(i.user.id);
 
-        if (
-          !inventory.find((i) => i.item === item.id) ||
-          inventory.find((i) => i.item === item.id).amount < itemAmount
-        ) {
+        if (inventory.count(item.id) < itemAmount) {
           if (i.isRepliable())
             i.reply({
               embeds: [new ErrorEmbed(`you don't have enough ${item.name}`)],
