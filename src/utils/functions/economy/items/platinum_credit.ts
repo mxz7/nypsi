@@ -92,12 +92,7 @@ module.exports = new ItemUse(
       await addMember(message.author.id, PLAT_TIER, new Date());
       await setCredits(message.author.id, 7);
 
-      const inventory = await getInventory(message.member);
-      await removeInventoryItem(
-        message.member,
-        "platinum_credit",
-        inventory.find((i) => i.item === "platinum_credit").amount - 1,
-      );
+      await removeInventoryItem(message.member, "platinum_credit", 1);
 
       return send({
         embeds: [
