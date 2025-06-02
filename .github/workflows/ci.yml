@@ -50,8 +50,16 @@ jobs:
       - name: setup prisma
         run: npx prisma generate
 
+      - name: restore tsbuildinfo
+        uses: actions/cache/restore@v4
+        with:
+          path: tsconfig.tsbuildinfo
+          key: tsbuildinfo-${{ runner.os }}-${{ hashFiles('tsconfig.json', 'pnpm-lock.json') }}
+          restore-keys: |
+            tsbuildinfo-${{ runner.os }}
+
       - name: build
-        run: npx tsc
+        run: npx tsc --incremental --noEmit
 
       - name: run tests
         run: npx jest
@@ -99,11 +107,42 @@ jobs:
       - name: setup prisma
         run: npx prisma generate
 
+      - name: restore tsbuildinfo
+        uses: actions/cache/restore@v4
+        with:
+          path: tsconfig.tsbuildinfo
+          key: tsbuildinfo-${{ runner.os }}-${{ hashFiles('tsconfig.json', 'pnpm-lock.json') }}
+          restore-keys: |
+            tsbuildinfo-${{ runner.os }}
+
       - name: build
-        run: npx tsc
+        run: npx tsc --incremental --noEmit
+
+      - name: restore eslintcache
+        uses: actions/cache/restore@v4
+        id: cache
+        with:
+          path: .eslintcache
+          key: eslintcache-${{ runner.os }}-${{ hashFiles('pnpm-lock.json') }}
+          restore-keys: |
+            eslintcache-${{ runner.os }}
 
       - name: linting
-        run: npx eslint ./src/
+        run: pnpm run lint
+
+      - name: clear eslintcache
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push' && steps.cache.outputs.cache-hit
+        run: gh cache delete --repo ${{ github.repository }} ${{ steps.cache.outputs.cache-primary-key }}
+
+      - name: save eslintcache
+        uses: actions/cache/save@v4
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        with:
+          path: .eslintcache
+          key: eslintcache-${{ runner.os }}-${{ hashFiles('pnpm-lock.json') }}
 
   deploy:
     if: github.ref == 'refs/heads/main'
@@ -158,8 +197,30 @@ jobs:
       - name: setup prisma
         run: npx prisma generate
 
+      - name: restore tsbuildinfo
+        uses: actions/cache/restore@v4
+        id: cache
+        with:
+          path: tsconfig.tsbuildinfo
+          key: tsbuildinfo-${{ runner.os }}-${{ hashFiles('tsconfig.json', 'pnpm-lock.json') }}
+          restore-keys: |
+            tsbuildinfo-${{ runner.os }}
+
       - name: build
-        run: npx tsc
+        run: npx tsc --incremental
+
+      - name: clear tsbuildinfo cache
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: steps.cache.outputs.cache-hit
+        run: gh cache delete --repo ${{ github.repository }} ${{ steps.cache.outputs.cache-primary-key }}
+
+      - name: save tsbuildinfo
+        uses: actions/cache/save@v4
+        with:
+          path: tsconfig.tsbuildinfo
+          key: tsbuildinfo-${{ runner.os }}-${{ hashFiles('tsconfig.json', 'pnpm-lock.json') }}
 
       - name: prepare files for deploy
         run: |
@@ -170,17 +231,17 @@ jobs:
           mv data/ deploy/
           mv prisma/ deploy/
           mv tsconfig.json deploy/
-          rm deploy/dist/utils/functions/anticheat.js
 
       - name: deploy
-        uses: nogsantos/scp-deploy@master
+        uses: burnett01/rsync-deployments@7.0.2
         with:
-          src: ./deploy/*
-          host: ${{ secrets.HOST }}
-          remote: ./nypsi/
-          port: 22
-          user: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
+          switches: -rtvh --partial --progress --delete --exclude='dist/utils/functions/anticheat.js' --exclude='node_modules/' --exclude='out/'
+          path: deploy/
+          remote_path: ~/nypsi/
+          remote_host: ${{ secrets.HOST }}
+          remote_port: 22
+          remote_user: ${{ secrets.USERNAME }}
+          remote_key: ${{ secrets.SSH_KEY }}
 
       - name: connect to server & update packages
         uses: appleboy/ssh-action@master
