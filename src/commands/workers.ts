@@ -44,6 +44,7 @@ import {
 } from "../utils/functions/economy/workers";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
+import { pluralize } from "../utils/functions/string";
 import _ = require("lodash");
 
 const cmd = new Command(
@@ -198,7 +199,7 @@ async function run(
             const diff = dayjs().add(hours, "hours").unix() - dayjs().unix();
             hours = diff / 3600;
 
-            desc += `\n\n\`${hours.toLocaleString()} hour${hours > 1 ? "s" : ""}\` until full`;
+            desc += `\n\n\`${hours.toLocaleString()} ${pluralize("hour", hours)}\` until full`;
           }
         }
 
@@ -633,7 +634,7 @@ async function run(
         embeds: [
           new CustomEmbed(
             message.member,
-            `average yield for **${worker.id}** over ${value} run${value === 1 ? "" : "s"} ` +
+            `average yield for **${worker.id}** over ${value} ${pluralize("run", value)} ` +
               `at ${(await getWorker(message.author.id, worker)).stored} ${worker.item_emoji} is **$${(totalEarned / value).toFixed(3)}**` +
               (totalByproducts.size > 0 ? " and:" : "") +
               byproductsDescription,

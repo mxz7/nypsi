@@ -15,6 +15,7 @@ import { addInventoryItem } from "./inventory";
 import { addStat } from "./stats";
 import { addTaskProgress } from "./tasks";
 import { getXp, removeXp } from "./xp";
+import { pluralize } from "../string";
 import ms = require("ms");
 import dayjs = require("dayjs");
 
@@ -524,8 +525,8 @@ export async function doLevelUp(member: GuildMember | string) {
         else items.set("basic_crate", crates);
 
         if (rewardsText.has(rawLevel))
-          rewardsText.get(rawLevel).push(`- \`${crates}x\` 📦 basic crate${crates > 1 ? "s" : ""}`);
-        else rewardsText.set(rawLevel, [`- \`${crates}x\` 📦 basic crate${crates > 1 ? "s" : ""}`]);
+          rewardsText.get(rawLevel).push(`- \`${crates}x\` 📦 ${pluralize("basic crate", crates)}`);
+        else rewardsText.set(rawLevel, [`- \`${crates}x\` 📦 ${pluralize("basic crate", crates)}`]);
       }
 
       if (rawLevel % 200 === 0) {
@@ -541,8 +542,8 @@ export async function doLevelUp(member: GuildMember | string) {
         if (items.has("69420_crate")) items.set("69420_crate", items.get("69420_crate") + 5);
         else items.set("69420_crate", 5);
 
-        if (rewardsText.has(rawLevel)) rewardsText.get(rawLevel).push("- `5x` 🎁 69420 crate");
-        else rewardsText.set(rawLevel, ["- `5x` 🎁 69420 crate"]);
+        if (rewardsText.has(rawLevel)) rewardsText.get(rawLevel).push("- `5x` 🎁 69420 crates");
+        else rewardsText.set(rawLevel, ["- `5x` 🎁 69420 crates"]);
       }
 
       if (rawLevel % 750 === 0) {

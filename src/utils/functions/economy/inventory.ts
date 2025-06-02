@@ -17,6 +17,7 @@ import { addBalance, getSellMulti } from "./balance";
 import { getOffersAverage } from "./offers";
 import { addStat } from "./stats";
 import { createUser, getItems, userExists } from "./utils";
+import { pluralize } from "../string";
 import ms = require("ms");
 
 const gemChanceCooldown = new Set<string>();
@@ -495,9 +496,7 @@ export async function gemBreak(userId: string, chance: number, gem: string) {
           .setDescription(
             `${
               getItems()[gem].emoji
-            } your gem exerted too much power and destroyed itself. shattering into ${amount} piece${
-              amount != 1 ? "s" : ""
-            }`,
+            } your gem exerted too much power and destroyed itself. shattering into ${amount} ${pluralize("piece", amount)}`,
           ),
       },
     });

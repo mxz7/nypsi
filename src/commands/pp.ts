@@ -16,6 +16,7 @@ import { getItems } from "../utils/functions/economy/utils";
 import { getMember } from "../utils/functions/member";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { pluralize } from "../utils/functions/string";
 
 const cache = new Map<string, number>();
 
@@ -130,7 +131,7 @@ async function run(
 
   const embed = new CustomEmbed(
     message.member,
-    `${member.user.toString()}\n${sizeMsg}\n📏 ${size} ${size == 1 ? "inch" : "inches"}`,
+    `${member.user.toString()}\n${sizeMsg}\n📏 ${size} ${pluralize("inch", size, "inches")}`,
   ).setHeader("pp predictor 1337", member.user.avatarURL());
 
   send({ embeds: [embed] });

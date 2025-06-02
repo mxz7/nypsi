@@ -33,6 +33,7 @@ import {
   userExists,
 } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { pluralize } from "../utils/functions/string";
 import dayjs = require("dayjs");
 
 const cmd = new Command("farm", "view your farms and harvest", "money").setAliases(["fields"]);
@@ -170,7 +171,7 @@ async function run(
 
       embed.setDescription(
         `${getItems()[getPlantsData()[plantId].item].emoji} **${getPlantsData()[plantId].name}** farm\n\n` +
-          `you have **${plants.length.toLocaleString()}** ${plants.length > 1 ? getPlantsData()[plantId].type_plural : getPlantsData()[plantId].type}\n` +
+          `you have **${plants.length.toLocaleString()}** ${pluralize(getPlantsData()[plantId], plants.length)}\n` +
           `${
             growing > 0
               ? `${growing.toLocaleString()} growing (next <t:${dayjs().add(nextGrow, "milliseconds").unix()}:R>)\n`
@@ -179,7 +180,7 @@ async function run(
           `${dead > 0 ? `${dead.toLocaleString()} dead\n` : ""}` +
           `${unhealthy > 0 ? `${unhealthy.toLocaleString()} unhealthy\n` : ""}` +
           `${healthy > 0 ? `${healthy.toLocaleString()} healthy\n` : ""}` +
-          `${ready > 0 ? `\n\`${ready.toLocaleString()}x\` ${getItems()[getPlantsData()[plantId].item].emoji} ${getItems()[getPlantsData()[plantId].item].name} ready for harvest` : ""}`,
+          `${ready > 0 ? `\n\`${ready.toLocaleString()}x\` ${getItems()[getPlantsData()[plantId].item].emoji} ${pluralize(getItems()[getPlantsData()[plantId].item], ready)} ready for harvest` : ""}`,
       );
 
       return embed;

@@ -46,7 +46,7 @@ export async function randomPresence(): Promise<ActivitiesOptions> {
     if (days == "ITS CHRISTMAS") {
       chosen.name = "MERRY CHRISTMAS";
     } else {
-      chosen.name = `${days} day${parseInt(days) > 1 ? "s" : ""} until christmas`;
+      chosen.name = `${days} ${pluralize("day", parseInt(days))} until christmas`;
     }
   } else if (chosen.name === "item") {
     const items = Object.values(getItems());

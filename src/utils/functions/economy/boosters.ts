@@ -7,6 +7,7 @@ import { SteveData } from "../../../types/Workers";
 import Constants from "../../Constants";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getItems } from "./utils";
+import { pluralize } from "../string";
 import _ = require("lodash");
 
 async function checkBoosters(member: string | GuildMember, boosters: Map<string, Booster[]>) {
@@ -95,7 +96,7 @@ async function checkBoosters(member: string | GuildMember, boosters: Map<string,
         }
       }
 
-      embed.setHeader(`expired booster${total > 1 ? "s" : ""}:`);
+      embed.setHeader(`expired ${pluralize("booster", total)}:`);
       embed.setDescription(desc);
 
       if (total == 1) {

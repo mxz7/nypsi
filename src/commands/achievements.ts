@@ -310,9 +310,7 @@ async function run(
     });
 
     if (completed > 0) {
-      desc += `**${completed.toLocaleString()}** ${
-        completed == 1 ? "person has" : "people have"
-      } completed this achievement`;
+      desc += `**${completed.toLocaleString()}** ${pluralize("person has", completed, "people have")} completed this achievement`;
     }
 
     embed.setDescription(desc);

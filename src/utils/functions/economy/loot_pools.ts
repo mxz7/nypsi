@@ -15,6 +15,7 @@ import {
 } from "./inventory";
 import { getItems, getLootPools } from "./utils";
 import { addXp } from "./xp";
+import { pluralize } from "../string";
 
 export function getDefaultLootPool(predicate?: (item: Item) => boolean): LootPool {
   const lootPool: LootPool = {
@@ -78,7 +79,7 @@ export function describeLootPoolResult(result: LootPoolResult): string {
   }
   if (Object.hasOwn(result, "item")) {
     const item = getItems()[result.item];
-    const article = result.count === 1 ? item.article : `\`${result.count ?? 1}x\``;
+    const article = pluralize(item.article, result.count, `\`${result.count ?? 1}x\``);
     return `${article} ${item.emoji} **${item.name}**`;
   }
   if (Object.keys(result).length === 0) {

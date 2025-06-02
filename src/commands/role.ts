@@ -26,6 +26,7 @@ import { getMember, getRole } from "../utils/functions/member";
 import PageManager from "../utils/functions/page";
 import sleep from "../utils/functions/sleep";
 import { logger } from "../utils/logger";
+import { pluralize } from "../utils/functions/string";
 
 const cmd = new Command("role", "role utilities", "utility");
 
@@ -313,9 +314,7 @@ async function run(
             embeds: [
               new CustomEmbed(
                 message.member,
-                `added ${role.toString()} to ${count.toLocaleString()} member${
-                  count != 1 ? "s" : ""
-                }`,
+                `added ${role.toString()} to ${count.toLocaleString()} ${pluralize("member", count)}`,
               ),
             ],
           });
@@ -371,9 +370,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          `added ${role.toString()} to ${members.length.toLocaleString()} member${
-            members.length != 1 ? "s" : ""
-          }`,
+          `added ${role.toString()} to ${members.length.toLocaleString()} ${pluralize("member", members.length)}`,
         ),
       ],
     });
@@ -474,9 +471,7 @@ async function run(
             embeds: [
               new CustomEmbed(
                 message.member,
-                `removed ${role.toString()} from ${count.toLocaleString()} member${
-                  count != 1 ? "s" : ""
-                }`,
+                `removed ${role.toString()} from ${count.toLocaleString()} ${pluralize("member", count)}`,
               ),
             ],
           });
@@ -532,9 +527,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          `removed ${role.toString()} from ${members.length.toLocaleString()} member${
-            members.length != 1 ? "s" : ""
-          }`,
+          `removed ${role.toString()} from ${members.length.toLocaleString()} ${pluralize("member", members.length)}`,
         ),
       ],
     });

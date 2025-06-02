@@ -13,6 +13,7 @@ import sleep from "../../sleep";
 import { increaseBaseBankStorage } from "../balance";
 import { getInventory, removeInventoryItem } from "../inventory";
 import { formatNumber } from "../utils";
+import { pluralize } from "../../string";
 
 module.exports = new ItemUse(
   "stolen_credit_card",
@@ -78,7 +79,7 @@ module.exports = new ItemUse(
       embeds: [
         new CustomEmbed(
           message.member,
-          `using ${amount} stolen credit card${amount > 1 ? "s" : ""}...`,
+          `using ${amount} ${pluralize("stolen credit card", amount)}...`,
         ),
       ],
     });
@@ -89,9 +90,7 @@ module.exports = new ItemUse(
       embeds: [
         new CustomEmbed(
           message.member,
-          `using ${amount} stolen credit card${
-            amount > 1 ? "s" : ""
-          }...\n\nsuccessfully added $**${addedAmount.toLocaleString()}** to your bank capacity`,
+          `using ${amount} ${pluralize("stolen credit card", amount)}...\n\nsuccessfully added $**${addedAmount.toLocaleString()}** to your bank capacity`,
         ),
       ],
     });

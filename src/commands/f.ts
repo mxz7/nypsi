@@ -9,6 +9,7 @@ import {
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { pluralize } from "../utils/functions/string";
 
 const cmd = new Command("f", "pay your respects", "fun");
 
@@ -86,9 +87,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          `**${reactions.length.toLocaleString()}** ${
-            reactions.length != 1 ? "people" : "person"
-          } paid their respects to **${content}**`,
+          `**${reactions.length.toLocaleString()}** ${pluralize("person", reactions.length, "people")} paid their respects to **${content}**`,
         ),
       ],
     });

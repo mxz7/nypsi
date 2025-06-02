@@ -740,7 +740,7 @@ export async function doDaily(member: GuildMember, updateLast = true, amount = 1
   const promises = [];
   const rewards: string[] = [
     `+$**${totalMoney.toLocaleString()}**`,
-    `+ ${amount > 1 ? `**${amount.toLocaleString()}** ` : ""}${items["daily_scratch_card"].emoji} daily scratch card${amount > 1 ? "s" : ""}`,
+    `+ ${amount > 1 ? `**${amount.toLocaleString()}** ` : ""}${items["daily_scratch_card"].emoji} ${pluralize(items["daily_scratch_card"], amount)}`,
   ];
 
   for (const [itemId, amount] of totalRewards) {

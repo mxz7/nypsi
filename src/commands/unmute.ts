@@ -17,6 +17,7 @@ import { getExactMember } from "../utils/functions/member";
 import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import { newCase } from "../utils/functions/moderation/cases";
 import { deleteMute, getMuteRole, isMuted } from "../utils/functions/moderation/mute";
+import { pluralize } from "../utils/functions/string";
 
 const cmd = new Command("unmute", "unmute a user", "moderation").setPermissions([
   "MANAGE_MESSAGES",
@@ -105,7 +106,7 @@ async function run(
       return send({
         embeds: [
           new CustomEmbed(message.member).setDescription(
-            `**${accounts[0]}**${accounts.length > 1 ? ` (+ ${accounts.length - 1} alts)` : ""} has been unmuted`,
+            `**${accounts[0]}**${accounts.length > 1 ? ` (+ ${accounts.length - 1} ${pluralize("alt", accounts.length - 1)})` : ""} has been unmuted`,
           ),
         ],
       });
@@ -224,9 +225,7 @@ async function run(
   }
 
   if (altsUnmuted > 0)
-    msg = `\`${target.user.username}\` + ${altsUnmuted} ${
-      altsUnmuted != 1 ? "alts have" : "alt has"
-    } been unmuted`;
+    msg = `\`${target.user.username}\` + ${altsUnmuted} ${pluralize("alt has", altsUnmuted, "alts have")} been unmuted`;
   else msg = `\`${target.user.username}\` has been unmuted`;
 
   embed.setDescription(msg);

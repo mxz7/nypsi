@@ -414,9 +414,7 @@ async function run(
 
     const embed = new CustomEmbed(
       message.member,
-      `you have activated ${amount} ${items[selected.id].emoji} ${items[selected.id].name} upgrade${
-        amount != 1 ? "s" : ""
-      } on your bakery`,
+      `you have activated ${amount} ${items[selected.id].emoji} ${items[selected.id].name} ${pluralize("upgrade", amount)} on your bakery`,
     ).setHeader("use", message.author.avatarURL());
 
     embed.addField(

@@ -1,5 +1,5 @@
 import * as CryptoJS from "crypto-js";
-import { Item, PlantUpgrade } from "../../types/Economy";
+import { Item, Plant, PlantUpgrade } from "../../types/Economy";
 import { WorkerUpgrades } from "../../types/Workers";
 
 export function cleanString(string: string): string {
@@ -83,13 +83,19 @@ export function formatTime(ms: number) {
 
 export function pluralize(text: string, amount: number | bigint, plural?: string): string;
 export function pluralize(item: Item, amount: number | bigint): string;
+export function pluralize(plantType: Plant, amount: number | bigint): string;
 export function pluralize(upgrade: WorkerUpgrades, amount: number | bigint): string;
 export function pluralize(upgrade: PlantUpgrade, amount: number | bigint): string;
 export function pluralize(
-  data: string | Item | WorkerUpgrades | PlantUpgrade,
+  data: string | Item | WorkerUpgrades | PlantUpgrade | Plant,
   amount: number | bigint,
   plural?: string,
 ) {
   if (typeof data == "string") return amount == 1 ? data : (plural ?? `${data}s`);
+
+  if ("type_plural" in data) {
+    return amount == 1 ? data.type : data.type_plural;
+  }
+
   return amount == 1 ? data.name : (data.plural ?? data.name);
 }

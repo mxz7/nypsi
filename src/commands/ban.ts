@@ -17,6 +17,7 @@ import { getExactMember } from "../utils/functions/member";
 import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import { deleteBan, isBanned, newBan } from "../utils/functions/moderation/ban";
 import { newCase } from "../utils/functions/moderation/cases";
+import { pluralize } from "../utils/functions/string";
 
 import dayjs = require("dayjs");
 
@@ -273,9 +274,7 @@ async function run(
   }
 
   if (altsBanned > 0)
-    msg = `\`${target?.user.username || userId}\` + ${altsBanned} ${
-      altsBanned != 1 ? "alts have" : "alt has"
-    } been banned`;
+    msg = `\`${target?.user.username || userId}\` + ${altsBanned} ${pluralize("alt has", altsBanned, "alts have")} been banned`;
   else msg = `\`${target?.user.username || userId}\` has been banned`;
 
   if (temporary) {

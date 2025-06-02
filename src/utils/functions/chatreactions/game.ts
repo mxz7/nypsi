@@ -10,7 +10,7 @@ import { addTaskProgress } from "../economy/tasks";
 import { topChatReactionGlobal } from "../economy/top";
 import { isPremium } from "../premium/premium";
 import sleep from "../sleep";
-import { getZeroWidth } from "../string";
+import { getZeroWidth, pluralize } from "../string";
 import { addToNypsiBank, getTax } from "../tax";
 import { getBlacklisted } from "./blacklisted";
 import { add2ndPlace, add3rdPlace, addLeaderboardEntry, addWin } from "./stats";
@@ -101,7 +101,7 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel, 
     updateWinnersText();
 
     embed.setFields([
-      { name: `winner${winnersText.length > 1 ? "s" : ""}`, value: winnersText.join("\n") },
+      { name: `${pluralize("winner", winnersText.length)}`, value: winnersText.join("\n") },
     ]);
 
     msg = await msg.edit({ embeds: [embed] });

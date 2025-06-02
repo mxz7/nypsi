@@ -53,7 +53,7 @@ import { addKarma, getKarma } from "../functions/karma/karma";
 import { getUserAliases } from "../functions/premium/aliases";
 import { addUse, getCommand } from "../functions/premium/command";
 import { percentChance } from "../functions/random";
-import { cleanString } from "../functions/string";
+import { cleanString, pluralize } from "../functions/string";
 import { getAdminLevel } from "../functions/users/admin";
 import { createAuraTransaction } from "../functions/users/aura";
 import { isUserBlacklisted } from "../functions/users/blacklist";
@@ -760,14 +760,12 @@ export async function runCommand(
         logCommand(message, ["", "", ""]);
 
         const embed = new CustomEmbed(message.member, content).setFooter({
-          text: `${customCommand.uses.toLocaleString()} use${customCommand.uses == 1 ? "" : "s"}`,
+          text: `${customCommand.uses.toLocaleString()} ${pluralize("use", customCommand.uses)}`,
         });
 
         if (ownerTag) {
           embed.setFooter({
-            text: `by ${ownerTag} | ${customCommand.uses.toLocaleString()} use${
-              customCommand.uses == 1 ? "" : "s"
-            }`,
+            text: `by ${ownerTag} | ${customCommand.uses.toLocaleString()} ${pluralize("use", customCommand.uses)}`,
           });
         }
 

@@ -27,6 +27,7 @@ import { recentCommands } from "../../users/commands";
 import { getInventory, removeInventoryItem, selectItem } from "../inventory";
 import ScratchCard from "../scratchies";
 import { addStat, createGame } from "../stats";
+import { pluralize } from "../../string";
 
 async function prepare(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
@@ -90,7 +91,7 @@ async function prepare(
 
   const embed = new CustomEmbed(
     message.member,
-    `**${card.remainingClicks}** click${card.remainingClicks != 1 ? "s" : ""} left`,
+    `**${card.remainingClicks}** ${pluralize("click", card.remainingClicks)} left`,
   ).setHeader(`${message.author.username}'s ${selected.name}`, message.author.avatarURL());
 
   const msg = await send({ embeds: [embed], components: card.getButtons() });
@@ -137,7 +138,7 @@ async function prepare(
       await redis.expire(`anticheat:interactivegame:count:${message.author.id}`, 86400);
 
       embed.setDescription(
-        `**${card.remainingClicks}** click${card.remainingClicks != 1 ? "s" : ""} left`,
+        `**${card.remainingClicks}** ${pluralize("click", card.remainingClicks)} left`,
       );
       embed.setFooter({ text: `id: ${gameId}` });
 
@@ -263,7 +264,7 @@ async function prepare(
 
     if (card.remainingClicks !== 0) {
       embed.setDescription(
-        `**${card.remainingClicks}** click${card.remainingClicks != 1 ? "s" : ""} left`,
+        `**${card.remainingClicks}** ${pluralize("click", card.remainingClicks)} left`,
       );
 
       if (response.deferred || response.replied)

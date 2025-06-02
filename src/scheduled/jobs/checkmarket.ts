@@ -7,6 +7,7 @@ import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { deleteMarketOrder } from "../../utils/functions/economy/market";
 import { getItems, userExists } from "../../utils/functions/economy/utils";
 import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
+import { pluralize } from "../../utils/functions/string";
 
 export default {
   name: "checkmarket",
@@ -79,7 +80,7 @@ export default {
       embed.setDescription(
         `your sell order for ${order.itemAmount}x ${items[order.itemId].emoji} ${
           items[order.itemId].name
-        } has expired. you have been given back your item${order.itemAmount > 1 ? "s" : ""}`,
+        } has expired. you have been given back your ${pluralize("item", order.itemAmount)}`,
       );
 
       if ((await getDmSettings(order.ownerId)).market) {

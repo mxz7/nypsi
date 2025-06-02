@@ -1438,7 +1438,7 @@ async function run(
         embed.setDescription(
           `your ${order.orderType} order for ${order.itemAmount}x ${items[order.itemId].emoji} ${
             items[order.itemId].name
-          } has been removed by a staff member. you have been given back your ${order.orderType == "buy" ? "money" : `item${order.itemAmount > 1 ? "s" : ""}`}`,
+          } has been removed by a staff member. you have been given back your ${order.orderType == "buy" ? "money" : `${pluralize("item", order.itemAmount)}`}`,
         );
 
         if (args.length > 2) {

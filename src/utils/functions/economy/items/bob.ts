@@ -14,6 +14,7 @@ import sleep from "../../sleep";
 import { getCraftingItems } from "../crafting";
 import { getInventory, removeInventoryItem } from "../inventory";
 import { formatNumber, getItems } from "../utils";
+import { pluralize } from "../../string";
 import dayjs = require("dayjs");
 
 module.exports = new ItemUse(
@@ -133,11 +134,7 @@ module.exports = new ItemUse(
       embeds: [
         new CustomEmbed(
           message.member,
-          `<:nypsi_bob:1078776552067694672> bob has removed ${amount} hour${
-            amount > 1 ? "s" : ""
-          } of crafting time from ${crafting.length} item${
-            crafting.length != 1 ? "s" : ""
-          }\n\n${breakdown.join("\n")}`,
+          `<:nypsi_bob:1078776552067694672> bob has removed ${amount} ${pluralize("hour", amount)} of crafting time from ${crafting.length} ${pluralize("item", crafting.length)}\n\n${breakdown.join("\n")}`,
         ),
       ],
     });

@@ -17,6 +17,7 @@ import { getExactMember } from "../utils/functions/member";
 import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import { newCase } from "../utils/functions/moderation/cases";
 import { deleteMute, getMuteRole, isMuted, newMute } from "../utils/functions/moderation/mute";
+import { pluralize } from "../utils/functions/string";
 
 import ms = require("ms");
 import dayjs = require("dayjs");
@@ -359,9 +360,7 @@ async function run(
   }
 
   if (altsMuted > 0)
-    msg = `\`${target.user.username}\` + ${altsMuted} ${
-      altsMuted != 1 ? "alts have" : "alt has"
-    } been muted`;
+    msg = `\`${target.user.username}\` + ${altsMuted} ${pluralize("alt has", altsMuted, "alts have")} been muted`;
   else msg = `\`${target.user.username}\` has been muted`;
 
   if (timedMute) {

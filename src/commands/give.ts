@@ -23,6 +23,7 @@ import { getMember } from "../utils/functions/member";
 import { getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { transaction } from "../utils/logger";
+import { pluralize } from "../utils/functions/string";
 
 const cmd = new Command("give", "give other users items from your inventory", "money");
 
@@ -200,16 +201,14 @@ async function run(
       }`,
     )
       .setHeader(
-        `you have received ${amount == 1 ? `${selected.article || "a"} ${selected.name}` : `${amount.toLocaleString()} ${selected.plural}`}`,
+        `you have received ${pluralize(`${selected.article} ${selected.name}`, amount, `${amount.toLocaleString()} ${selected.plural}`)}`,
       )
       .setFooter({ text: "/settings me notifications" });
 
     await target
       .send({
         embeds: [embed],
-        content: `you have received ${
-          amount == 1 ? "an item" : `${amount.toLocaleString()} items`
-        }`,
+        content: `you have received ${pluralize("an item", amount, `${amount.toLocaleString()} items`)}`,
       })
       .catch(() => {});
   }

@@ -9,6 +9,7 @@ import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Comman
 import { CustomEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import { getInventory } from "../inventory";
+import { pluralize } from "../../string";
 
 module.exports = new ItemUse(
   "bitch",
@@ -49,9 +50,7 @@ module.exports = new ItemUse(
       embeds: [
         new CustomEmbed(
           message.member,
-          `you had fun with your bitch${
-            inventory.find((i) => i.item === "bitch").amount > 1 ? "es" : ""
-          }`,
+          `you had fun with your ${pluralize("bitch", inventory.find((i) => i.item === "bitch").amount)}`,
         ),
       ],
     });
