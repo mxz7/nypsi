@@ -20,3 +20,19 @@ export async function prompt(instructions: string, text: string) {
     return "failed to prompt gpt";
   }
 }
+
+let docs: string;
+
+export async function getDocsRaw() {
+  try {
+    if (!docs) {
+      docs = await fetch("https://nypsi.xyz/llms.txt").then((res) => res.text());
+    }
+
+    return docs;
+  } catch (e) {
+    console.error(e);
+    logger.error(`openai: failed to get llms docs`);
+    return "";
+  }
+}

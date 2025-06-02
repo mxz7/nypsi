@@ -10,7 +10,7 @@ import { CustomEmbed } from "../../models/EmbedBuilders";
 import Constants from "../Constants";
 import { logger } from "../logger";
 import { uploadImage } from "./image";
-import openai, { prompt } from "./openai";
+import openai, { getDocsRaw, prompt } from "./openai";
 import { getLastKnownUsername } from "./users/tag";
 import pAll = require("p-all");
 
@@ -44,6 +44,7 @@ quickResponses.set(
 const isRequestSuitableFormat = z.object({
   choice: z.enum(["yes", "no"]),
   reason: z.string(),
+  answer: z.string().nullable(),
 });
 
 export async function getSupportRequestByChannelId(id: string) {
@@ -343,7 +344,7 @@ export async function summariseRequest(id: string) {
 
 export async function isRequestSuitable(
   content: string,
-): Promise<{ decision: "yes" | "no"; reason: string }> {
+): Promise<{ decision: "yes" | "no"; reason: string; answer?: string }> {
   const sysPrompt = [
     "# Role",
     "You are part of a support team for the Discord bot **nypsi**.",
@@ -372,6 +373,12 @@ export async function isRequestSuitable(
     '* Avoid ending your reason with "which is/not suitable for support" — this is understood from the context.',
     '* Avoid starting your reason with "the message" — keep it direct and quickly readable.',
     "",
+    "### Answer",
+    "",
+    "This should only be used when the choice is 'yes' **AND** when you are able to provide a **DIRECT** answer to the user's question based on the documentation. Do not provide an anser if you can't answer the user's question directly with information from the documentation",
+    "Your answer should be concise and easy to understand for a range of audiences. If suggesting commands, use the '$' dollar sign as a prefix for the command.",
+    "Do not tell the user to 'dm nypsi' or to 'create a support request', they are already doing that.",
+    "",
     "## Examples",
     "",
     "### Suitable Requests",
@@ -389,18 +396,25 @@ export async function isRequestSuitable(
     "* Asking to be staff",
     "* Nonsensical or random words",
     "* Not asking for anything",
+    "",
+    "",
   ];
+
+  sysPrompt.push(await getDocsRaw());
 
   try {
     const response = await openai.responses.parse({
       model: "gpt-4.1-mini",
       instructions: sysPrompt.join("\n"),
       input: [{ role: "user", content }],
-      tools: [{ type: "file_search", vector_store_ids: [process.env.NYPSI_LLMS_VECTOR_STORE] }],
       text: { format: zodTextFormat(isRequestSuitableFormat, "supportrequest_suitable") },
     });
 
-    return { decision: response.output_parsed.choice, reason: response.output_parsed.reason };
+    return {
+      decision: response.output_parsed.choice,
+      reason: response.output_parsed.reason,
+      answer: response.output_parsed.answer,
+    };
   } catch (e) {
     logger.error("supportrequest: error while checking if suitable", { e, content });
     return { decision: "yes", reason: "ahhh" };

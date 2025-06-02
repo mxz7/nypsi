@@ -160,7 +160,8 @@ export default async function messageCreate(message: Message) {
               .setPlaceholder("what do you need help with?")
               .setStyle(TextInputStyle.Paragraph)
               .setRequired(true)
-              .setMinLength(15),
+              .setMinLength(15)
+              .setMaxLength(300),
           ),
         );
 
@@ -191,12 +192,12 @@ export default async function messageCreate(message: Message) {
 
         const aiResponse = await isRequestSuitable(helpMessage);
 
-        if (aiResponse.decision === "no") {
-          logger.info(
-            `supportrequest: ${message.author.id} (${message.author.username}) denied support request`,
-            { content: helpMessage, aiResponse },
-          );
+        logger.info(
+          `supportrequest: ${message.author.id} (${message.author.username}) ai response`,
+          { content: helpMessage, aiResponse },
+        );
 
+        if (aiResponse.decision === "no") {
           return modalSubmit.editReply({
             embeds: [
               new CustomEmbed()
@@ -246,6 +247,25 @@ export default async function messageCreate(message: Message) {
         });
 
         if (quickResponse) {
+          const embed = new CustomEmbed()
+            .setHeader("nypsi", message.client.user.avatarURL())
+            .setColor(Constants.PURPLE)
+            .setDescription(quickResponse)
+            .setFooter({
+              text: "this is an automatic message. please tell us if this doesn't match your query",
+            });
+
+          sendToRequestChannel(
+            message.author.id,
+            embed,
+            message.author.id,
+            message.client as NypsiClient,
+          );
+          modalSubmit.followUp({
+            embeds: [embed],
+            content: "you have received a message from your support ticket",
+          });
+        } else if (aiResponse.answer) {
           const embed = new CustomEmbed()
             .setHeader("nypsi", message.client.user.avatarURL())
             .setColor(Constants.PURPLE)
