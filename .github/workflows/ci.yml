@@ -202,17 +202,26 @@ jobs:
           mv tsconfig.json deploy/
           rm deploy/dist/utils/functions/anticheat.js
 
-      - name: deploy test
-        uses: burnett01/rsync-deployments@7.0.2
-        with:
-          switches: -avzh --partial --progress --delete --dry-run
-          path: deploy/
-          remote_path: ~/nypsi/
-          remote_host: ${{ secrets.HOST }}
-          remote_port: 22
-          remote_user: ${{ secrets.USERNAME }}
-          remote_key: ${{ secrets.SSH_KEY }}
+      # - name: deploy test
+      #   uses: burnett01/rsync-deployments@7.0.2
+      #   with:
+      #     switches: -avzh --partial --progress --delete --dry-run
+      #     path: deploy/
+      #     remote_path: ~/nypsi/
+      #     remote_host: ${{ secrets.HOST }}
+      #     remote_port: 22
+      #     remote_user: ${{ secrets.USERNAME }}
+      #     remote_key: ${{ secrets.SSH_KEY }}
 
+      - name: deploy test
+        uses: nogsantos/scp-deploy@master
+        with:
+          src: ./deploy/*
+          host: ${{ secrets.HOST }}
+          remote: /dev/null
+          port: 22
+          user: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
 
   deploy:
     if: github.ref == 'refs/heads/main'
