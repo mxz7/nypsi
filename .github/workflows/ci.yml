@@ -235,7 +235,7 @@ jobs:
       - name: deploy
         uses: burnett01/rsync-deployments@7.0.2
         with:
-          switches: -rtvh --partial --progress --delete --exclude='dist/utils/functions/anticheat.js' --exclude='node_modules/' --exclude='out/'
+          switches: -rtvh --partial --progress --delete --exclude='dist/utils/functions/anticheat.js' --exclude='node_modules/' --exclude='out/' --exclude='.env'
           path: deploy/
           remote_path: ~/nypsi/
           remote_host: ${{ secrets.HOST }}
