@@ -2448,6 +2448,7 @@
   "reroll_token": {
     "id": "reroll_token",
     "name": "reroll token",
+    "plural": "reroll tokens",
     "emoji": "<:reroll_token:1150463797497184307>",
     "longDesc": "reroll a permanent upgrade into a different one",
     "sell": 25000000,
@@ -2959,6 +2960,7 @@
   "fertiliser": {
     "id": "fertiliser",
     "name": "fertiliser",
+    "plural": "fertilisers",
     "article": "a",
     "emoji": "<:fertiliser:1314233680406777947>",
     "longDesc": "used to grow plants and keep them healthy",

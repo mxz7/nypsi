@@ -33,6 +33,7 @@ import {
   userExists,
 } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { pluralize } from "../utils/functions/string";
 import dayjs = require("dayjs");
 
 const cmd = new Command("farm", "view your farms and harvest", "money").setAliases(["fields"]);
@@ -170,7 +171,7 @@ async function run(
 
       embed.setDescription(
         `${getItems()[getPlantsData()[plantId].item].emoji} **${getPlantsData()[plantId].name}** farm\n\n` +
-          `you have **${plants.length.toLocaleString()}** ${plants.length > 1 ? getPlantsData()[plantId].type_plural : getPlantsData()[plantId].type}\n` +
+          `you have **${plants.length.toLocaleString()}** ${pluralize(getPlantsData()[plantId], plants.length)}\n` +
           `${
             growing > 0
               ? `${growing.toLocaleString()} growing (next <t:${dayjs().add(nextGrow, "milliseconds").unix()}:R>)\n`
@@ -179,7 +180,7 @@ async function run(
           `${dead > 0 ? `${dead.toLocaleString()} dead\n` : ""}` +
           `${unhealthy > 0 ? `${unhealthy.toLocaleString()} unhealthy\n` : ""}` +
           `${healthy > 0 ? `${healthy.toLocaleString()} healthy\n` : ""}` +
-          `${ready > 0 ? `\n\`${ready.toLocaleString()}x\` ${getItems()[getPlantsData()[plantId].item].emoji} ${getItems()[getPlantsData()[plantId].item].name} ready for harvest` : ""}`,
+          `${ready > 0 ? `\n\`${ready.toLocaleString()}x\` ${getItems()[getPlantsData()[plantId].item].emoji} ${pluralize(getItems()[getPlantsData()[plantId].item], ready)} ready for harvest` : ""}`,
       );
 
       return embed;
@@ -214,10 +215,9 @@ async function run(
 
         const owned =
           userUpgrades.find((u) => u.upgradeId == upgradeId && u.plantId === selected)?.amount || 0;
-        const pluralName = upgrade.plural ? upgrade.plural : upgrade.name;
 
         if (upgrade.type_single) {
-          desc += `**${pluralName}** ${owned}/${upgrade.type_single.stack_limit}`;
+          desc += `**${upgrade.plural}** ${owned}/${upgrade.type_single.stack_limit}`;
         } else if (upgrade.type_upgradable) {
           desc += `**${upgrade.name}** ${owned == 0 ? "none" : getItems()[upgrade.type_upgradable.items[owned - 1]].name}`;
         }
@@ -229,7 +229,7 @@ async function run(
         const maxButton = new ButtonBuilder()
           .setCustomId(`up-${upgradeId}-max`)
           .setEmoji("⏫")
-          .setLabel(`add all ${pluralName}`);
+          .setLabel(`add all ${upgrade.plural}`);
 
         if (
           owned < upgrade.type_single?.stack_limit ||
@@ -322,9 +322,7 @@ async function run(
 
           if (itemCount === 0) {
             await interaction.reply({
-              embeds: [
-                new ErrorEmbed(`you don't have any ${item.plural ? item.plural : item.name}`),
-              ],
+              embeds: [new ErrorEmbed(`you don't have any ${item.plural}`)],
               flags: MessageFlags.Ephemeral,
             });
             return listen();
@@ -337,11 +335,7 @@ async function run(
 
           if (userUpgradeCount >= upgrade.type_single.stack_limit) {
             await interaction.reply({
-              embeds: [
-                new ErrorEmbed(
-                  `you already have the max amount of ${item.plural ? item.plural : item.name}`,
-                ),
-              ],
+              embeds: [new ErrorEmbed(`you already have the max amount of ${item.plural}`)],
               flags: MessageFlags.Ephemeral,
             });
             return listen();

@@ -11,6 +11,7 @@ import { addInventoryItem, gemBreak, getInventory } from "./inventory";
 import { addStat } from "./stats";
 import { getBaseUpgrades, getBaseWorkers, getItems } from "./utils";
 import { Worker, WorkerByproducts } from "../../../types/Workers";
+import { pluralize } from "../string";
 
 export async function getWorkers(member: GuildMember | string) {
   let id: string;
@@ -366,9 +367,10 @@ export async function claimFromWorkers(userId: string): Promise<string> {
       : `\n\n${byproducts
           .map(
             (x) =>
-              `you found **${totalByproducts.get(x)}** ${allItems[x].emoji} ${
-                totalByproducts.get(x) > 1 ? allItems[x].plural : allItems[x].name
-              }`,
+              `you found **${totalByproducts.get(x)}** ${allItems[x].emoji} ${pluralize(
+                allItems[x],
+                totalByproducts.get(x),
+              )}`,
           )
           .join("\n")}`)
   );

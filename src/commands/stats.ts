@@ -38,7 +38,7 @@ import { getItems } from "../utils/functions/economy/utils";
 import PageManager from "../utils/functions/page";
 import { getCommandUses } from "../utils/functions/users/commands";
 
-import { formatTime } from "../utils/functions/string";
+import { formatTime, pluralize } from "../utils/functions/string";
 import { getVersion } from "../utils/functions/version";
 import { aliasesSize, commandsSize } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -336,7 +336,7 @@ async function run(
         (i) =>
           `${getItems()[i.itemId].emoji} **${
             getItems()[i.itemId].name
-          }** ${i.amount.toLocaleString()} use${Number(i.amount) != 1 ? "s" : ""}`,
+          }** ${i.amount.toLocaleString()} ${pluralize("use", i.amount)}`,
       ),
     );
 
@@ -696,11 +696,7 @@ async function run(
     const embed = new CustomEmbed(message.member);
 
     embed.setDescription(
-      `you have bought **${findStatAmount(stats, "market-bought-items")}** item${
-        findStatAmount(stats, "market-bought-items") === "1" ? "" : "s"
-      } and sold **${findStatAmount(stats, "market-sold-items")}** item${
-        findStatAmount(stats, "market-sold-items") === "1" ? "" : "s"
-      }`,
+      `you have bought **${findStatAmount(stats, "market-bought-items")}** ${pluralize("item", parseInt(findStatAmount(stats, "market-bought-items")))} and sold **${findStatAmount(stats, "market-sold-items")}** ${pluralize("item", parseInt(findStatAmount(stats, "market-sold-items")))}`,
     );
 
     embed.addFields(

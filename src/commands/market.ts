@@ -64,6 +64,7 @@ import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { getAdminLevel } from "../utils/functions/users/admin";
 import { addCooldown, addExpiry, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
+import { pluralize } from "../utils/functions/string";
 import { logger } from "../utils/logger";
 import prisma from "../init/database";
 
@@ -592,11 +593,7 @@ async function run(
               inventory.find((i) => i.item == selected.id).amount < parseInt(amount)
             ) {
               await res.editReply({
-                embeds: [
-                  new ErrorEmbed(
-                    `you dont have enough ${selected.plural ? selected.plural : selected.name}`,
-                  ),
-                ],
+                embeds: [new ErrorEmbed(`you dont have enough ${selected.plural}`)],
                 options: { flags: MessageFlags.Ephemeral },
               });
               await updateEmbed();
@@ -1111,9 +1108,7 @@ async function run(
       -1
     ) {
       return send({
-        embeds: [
-          new ErrorEmbed(`not enough ${item.plural ? item.plural : item.name} on the market`),
-        ],
+        embeds: [new ErrorEmbed(`not enough ${item.plural} on the market`)],
       });
     }
 
@@ -1137,9 +1132,7 @@ async function run(
       -1
     ) {
       return send({
-        embeds: [
-          new ErrorEmbed(`not enough ${item.plural ? item.plural : item.name} on the market`),
-        ],
+        embeds: [new ErrorEmbed(`not enough ${item.plural} on the market`)],
       });
     }
 
@@ -1150,9 +1143,7 @@ async function run(
       inventory.find((i) => i.item == item.id).amount < 1
     ) {
       return send({
-        embeds: [
-          new ErrorEmbed(`you do not have this many ${item.plural ? item.plural : item.name}`),
-        ],
+        embeds: [new ErrorEmbed(`you do not have this many ${item.plural}`)],
       });
     }
 
@@ -1290,11 +1281,7 @@ async function run(
         inventory.find((i) => i.item == selected.id).amount < parseInt(amount)
       ) {
         return send({
-          embeds: [
-            new ErrorEmbed(
-              `you dont have enough ${selected.plural ? selected.plural : selected.name}`,
-            ),
-          ],
+          embeds: [new ErrorEmbed(`you dont have enough ${selected.plural}`)],
         });
       }
 
@@ -1451,7 +1438,7 @@ async function run(
         embed.setDescription(
           `your ${order.orderType} order for ${order.itemAmount}x ${items[order.itemId].emoji} ${
             items[order.itemId].name
-          } has been removed by a staff member. you have been given back your ${order.orderType == "buy" ? "money" : `item${order.itemAmount > 1 ? "s" : ""}`}`,
+          } has been removed by a staff member. you have been given back your ${order.orderType == "buy" ? "money" : `${pluralize("item", order.itemAmount)}`}`,
         );
 
         if (args.length > 2) {
@@ -1731,9 +1718,7 @@ async function run(
           inventory.find((i) => i.item == item.id).amount < 1
         ) {
           await interaction.reply({
-            embeds: [
-              new ErrorEmbed(`you do not have this many ${item.plural ? item.plural : item.name}`),
-            ],
+            embeds: [new ErrorEmbed(`you do not have this many ${item.plural}`)],
             flags: MessageFlags.Ephemeral,
           });
           await updateEmbed();
@@ -1800,11 +1785,7 @@ async function run(
             inventory.find((i) => i.item == item.id).amount < 1
           ) {
             await interaction.editReply({
-              embeds: [
-                new ErrorEmbed(
-                  `you do not have this many ${item.plural ? item.plural : item.name}`,
-                ),
-              ],
+              embeds: [new ErrorEmbed(`you do not have this many ${item.plural}`)],
               options: { flags: MessageFlags.Ephemeral },
             });
             await updateEmbed();
@@ -1847,7 +1828,7 @@ async function run(
     ).cost;
 
     embed.setDescription(
-      `are you sure you want to ${type} ${amount} ${amount == 1 || !item.plural ? item.name : item.plural} for $${price.toLocaleString()}?`,
+      `are you sure you want to ${type} ${amount} ${pluralize(item, amount)} for $${price.toLocaleString()}?`,
     );
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -1924,11 +1905,11 @@ async function run(
 
         if (res.status === "partial") {
           embed.setDescription(
-            `✅ ${type == "buy" ? "bought" : "sold"} ${amount} ${item.emoji} ${amount == 1 || !item.plural ? item.name : item.plural} for $${price.toLocaleString()}`,
+            `✅ ${type == "buy" ? "bought" : "sold"} ${amount} ${item.emoji} ${pluralize(item, amount)} for $${price.toLocaleString()}`,
           );
         } else {
           embed.setDescription(
-            `✅ ${type == "buy" ? "bought" : "sold"} ${amount.toLocaleString()} ${item.emoji} ${amount == 1 || !item.plural ? item.name : item.plural} for $${price.toLocaleString()}`,
+            `✅ ${type == "buy" ? "bought" : "sold"} ${amount.toLocaleString()} ${item.emoji} ${pluralize(item, amount)} for $${price.toLocaleString()}`,
           );
         }
 

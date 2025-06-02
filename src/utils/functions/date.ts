@@ -1,4 +1,5 @@
 import dayjs = require("dayjs");
+import { pluralize } from "./string";
 
 export function formatDate(date: Date | number | dayjs.Dayjs): string {
   return dayjs(date).format("MMM D YYYY").toLowerCase();
@@ -47,7 +48,7 @@ export function MStoTime(ms: number, long = false) {
   if (days > 0) {
     output = output + days;
     if (long) {
-      output += ` day${days == 1 ? "" : "s"} `;
+      output += ` ${pluralize("day", days)} `;
     } else {
       output += "d ";
     }
@@ -56,7 +57,7 @@ export function MStoTime(ms: number, long = false) {
   if (hours > 0) {
     output = output + hours;
     if (long) {
-      output += ` hour${hours == 1 ? "" : "s"} `;
+      output += ` ${pluralize("hour", hours)} `;
     } else {
       output += "h ";
     }
@@ -65,7 +66,7 @@ export function MStoTime(ms: number, long = false) {
   if (minutes > 0) {
     output = output + minutes;
     if (long) {
-      output += ` minute${minutes == 1 ? "" : "s"} `;
+      output += ` ${pluralize("minute", minutes)} `;
     } else {
       output += "m ";
     }
@@ -74,7 +75,7 @@ export function MStoTime(ms: number, long = false) {
   if (sec > 0) {
     output = output + sec;
     if (long) {
-      output += ` second${sec == 1 ? "" : "s"} `;
+      output += ` ${pluralize("second", sec)} `;
     } else {
       output += "s ";
     }

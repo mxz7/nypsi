@@ -5,6 +5,7 @@ import { NypsiClient } from "../../../models/Client";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { startOpenChatReaction } from "./game";
+import { pluralize } from "../string";
 import ms = require("ms");
 
 const lastGame = new Map<string, number>();
@@ -110,7 +111,7 @@ export function doChatReactions(client: NypsiClient) {
     }
 
     if (count > 0) {
-      logger.info(`::auto ${count} chat reaction${count > 1 ? "s" : ""} started`);
+      logger.info(`::auto ${count} ${pluralize("chat reaction", count)} started`);
     }
   }, ms("5m"));
 }

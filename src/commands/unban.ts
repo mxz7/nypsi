@@ -17,6 +17,7 @@ import { newCase } from "../utils/functions/moderation/cases";
 
 import { deleteBan } from "../utils/functions/moderation/ban";
 import { getIdFromUsername, getLastKnownUsername } from "../utils/functions/users/tag";
+import { pluralize } from "../utils/functions/string";
 
 const cmd = new Command("unban", "unban one or more users", "moderation").setPermissions([
   "BAN_MEMBERS",
@@ -175,9 +176,7 @@ async function run(
   }
 
   if (altsUnbanned > 0)
-    msg = `\`${target}\` + ${altsUnbanned} ${
-      altsUnbanned != 1 ? "alts have" : "alt has"
-    } been unbanned`;
+    msg = `\`${target}\` + ${altsUnbanned} ${pluralize("alt has", altsUnbanned, "alts have")} been unbanned`;
   else msg = `\`${target}\` has been unbanned`;
 
   embed.setDescription(msg);

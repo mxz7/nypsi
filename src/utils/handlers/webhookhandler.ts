@@ -51,6 +51,7 @@ import {
 } from "../functions/users/notifications";
 import { logger } from "../logger";
 import ms = require("ms");
+import { pluralize } from "../functions/string";
 
 loadItems(false);
 
@@ -294,12 +295,12 @@ async function doVote(vote: topgg.WebhookPayload) {
       "you have received the following: \n\n" +
         `+ $**${amount.toLocaleString()}**\n` +
         "+ **3**% multiplier\n" +
-        `+ **${crateAmount}** vote crate${crateAmount != 1 ? "s" : ""}` +
-        `\n+ **${crateAmount}** lottery ticket${crateAmount !== 1 ? "s" : ""}\n\n` +
+        `+ **${crateAmount}** ${pluralize("vote crate", crateAmount)}` +
+        `\n+ **${crateAmount}** ${pluralize("lottery ticket", crateAmount)}\n\n` +
         (newCrateAmount && votes.voteStreak > 5
           ? `you will now receive **${crateAmount}** crates each vote thanks to your streak\n\n`
           : "") +
-        `you have voted **${votes.monthVote}** time${votes.monthVote > 1 ? "s" : ""} this month`,
+        `you have voted **${votes.monthVote}** ${pluralize("time", votes.monthVote)} this month`,
     )
     .setFooter({ text: `+100xp | streak: ${votes.voteStreak.toLocaleString()}` });
 

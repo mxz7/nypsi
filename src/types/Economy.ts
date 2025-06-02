@@ -24,7 +24,7 @@ export interface Item {
     time: number;
   };
   worker_upgrade_id?: string;
-  plural?: string;
+  plural: string;
   article: string;
   craft?: {
     ingredients: string[]; // format: item_id:amount
@@ -128,7 +128,7 @@ export type Plant = {
 export type PlantUpgrade = {
   id: string;
   name: string;
-  plural?: string;
+  plural: string;
   upgrades: string;
   effect: number;
   for?: string[]; // use if upgrade is only for select plants

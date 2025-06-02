@@ -18,6 +18,7 @@ import { getRawLevel } from "../utils/functions/economy/levelling";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getLastVote, getVoteStreak, hasVoted } from "../utils/functions/economy/vote";
 import { getDmSettings } from "../utils/functions/users/notifications";
+import { pluralize } from "../utils/functions/string";
 
 const cmd = new Command("vote", "vote every 12 hours to get rewards", "money");
 
@@ -91,11 +92,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
           dmSettings.voteReminder
             ? ""
             : "\n\nenable vote reminders for an extra **2%** gamble multiplier and **5%** sell multiplier"
-        }\n\nyou've voted **${votes.monthVote}** time${
-          votes.monthVote === 1 ? "" : "s"
-        } this month and **${votes.seasonVote}** time${
-          votes.seasonVote === 1 ? "" : "s"
-        } this season`,
+        }\n\nyou've voted **${votes.monthVote}** ${pluralize("time", votes.monthVote)} this month and **${votes.seasonVote}** ${pluralize("time", votes.seasonVote)} this season`,
       )
       .setFooter({ text: `streak: ${streak.toLocaleString()}` });
 

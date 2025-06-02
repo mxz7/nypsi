@@ -55,6 +55,7 @@ import { getActiveTag, getTags } from "../utils/functions/users/tags";
 import { hasProfile } from "../utils/functions/users/utils";
 import { addView, getViews } from "../utils/functions/users/views";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { pluralize } from "../utils/functions/string";
 
 const cmd = new Command("profile", "view yours or someone's nypsi profile", "money").setAliases([
   "p",
@@ -238,7 +239,7 @@ async function run(
         "guild",
         `[${guild.guildName}](https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}?ref=bot-profile)\n` +
           `level **${guild.level}**\n` +
-          `${guild.members.length} member${guild.members.length > 1 ? "s" : ""}`,
+          `${guild.members.length} ${pluralize("member", guild.members.length)}`,
         true,
       );
 

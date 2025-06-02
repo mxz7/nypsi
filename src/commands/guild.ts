@@ -52,7 +52,7 @@ import { getPrefix } from "../utils/functions/guilds/utils";
 import { deleteImage, uploadImage } from "../utils/functions/image";
 import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import PageManager from "../utils/functions/page";
-import { cleanString } from "../utils/functions/string";
+import { cleanString, pluralize } from "../utils/functions/string";
 import { getLastKnownAvatar } from "../utils/functions/users/tag";
 import { addCooldown, addExpiry, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
@@ -1237,7 +1237,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          `✅ you have bought **${selected.name}** for ${cost} token${cost != 1 ? "s" : ""}`,
+          `✅ you have bought **${selected.name}** for ${cost} ${pluralize("token", cost)}`,
         ),
       ],
     });
@@ -1262,16 +1262,14 @@ async function run(
             (guild.upgrades.find((i) => i.upgradeId === upgrade.id)?.amount || 0) *
               upgrade.increment_per_level,
           )
-        } token${
+        } ${pluralize(
+          "token",
           upgrade.cost +
             Math.floor(
               (guild.upgrades.find((i) => i.upgradeId === upgrade.id)?.amount || 0) *
                 upgrade.increment_per_level,
-            ) !=
-          1
-            ? "s"
-            : ""
-        }`;
+            ),
+        )}`;
 
       if (pages.size === 0) {
         pages.set(1, [{ name, value, inline: true }]);
@@ -1299,7 +1297,7 @@ async function run(
         `https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}?ref=bot-guild`,
       )
       .setFields(...pages.get(1))
-      .setFooter({ text: `you have ${guild.tokens} token${guild.tokens != 1 ? "s" : ""}` });
+      .setFooter({ text: `you have ${guild.tokens} ${pluralize("token", guild.tokens)}` });
 
     if (pages.size === 1) return send({ embeds: [embed] });
 

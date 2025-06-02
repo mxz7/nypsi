@@ -25,6 +25,7 @@ import { addStat } from "../utils/functions/economy/stats";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { pluralize } from "../utils/functions/string";
 
 const cmd = new Command("craft", "craft items", "money");
 
@@ -495,9 +496,10 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          `\`${amount.toLocaleString()}x\` ${selected.emoji} ${
-            amount > 1 ? selected.plural || selected.name : selected.name
-          } will be crafted <t:${Math.floor(craft.finished.getTime() / 1000)}:R>`,
+          `\`${amount.toLocaleString()}x\` ${selected.emoji} ${pluralize(
+            selected,
+            amount,
+          )} will be crafted <t:${Math.floor(craft.finished.getTime() / 1000)}:R>`,
         ),
       ],
     });

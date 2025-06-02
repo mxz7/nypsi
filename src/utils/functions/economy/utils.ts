@@ -36,6 +36,7 @@ import { addXp } from "./xp";
 import ms = require("ms");
 import math = require("mathjs");
 import pAll = require("p-all");
+import { pluralize } from "../string";
 
 let items: { [key: string]: Item };
 let achievements: { [key: string]: AchievementData };
@@ -739,7 +740,7 @@ export async function doDaily(member: GuildMember, updateLast = true, amount = 1
   const promises = [];
   const rewards: string[] = [
     `+$**${totalMoney.toLocaleString()}**`,
-    `+ ${amount > 1 ? `**${amount.toLocaleString()}** ` : ""}${items["daily_scratch_card"].emoji} daily scratch card${amount > 1 ? "s" : ""}`,
+    `+ ${amount > 1 ? `**${amount.toLocaleString()}** ` : ""}${items["daily_scratch_card"].emoji} ${pluralize(items["daily_scratch_card"], amount)}`,
   ];
 
   for (const [itemId, amount] of totalRewards) {
@@ -748,7 +749,7 @@ export async function doDaily(member: GuildMember, updateLast = true, amount = 1
     });
 
     rewards.push(
-      `+ **${amount.toLocaleString()}** ${items[itemId].emoji} ${amount > 1 && items[itemId].plural ? items[itemId].plural : items[itemId].name}`,
+      `+ **${amount.toLocaleString()}** ${items[itemId].emoji} ${pluralize(items[itemId], amount)}`,
     );
   }
 

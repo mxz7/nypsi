@@ -22,6 +22,7 @@ import { openCrate } from "../loot_pools";
 import { addStat } from "../stats";
 import { addTaskProgress } from "../tasks";
 import { getItems } from "../utils";
+import { pluralize } from "../../string";
 
 module.exports = new ItemUse(
   "crates",
@@ -100,13 +101,9 @@ module.exports = new ItemUse(
 
     const embed = new CustomEmbed(
       message.member,
-      `opening **${amount}** ${
-        amount > 1 ? (selected.plural ? selected.plural : selected.name) : selected.name
-      }`,
+      `opening **${amount}** ${pluralize(selected, amount)}`,
     ).setHeader(
-      `${message.author.username}'s ${amount} ${
-        amount > 1 ? (selected.plural ? selected.plural : selected.name) : selected.name
-      }`,
+      `${message.author.username}'s ${amount} ${pluralize(selected, amount)}`,
       message.author.avatarURL(),
     );
 

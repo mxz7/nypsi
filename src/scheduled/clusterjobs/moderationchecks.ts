@@ -8,6 +8,7 @@ import Constants from "../../utils/Constants";
 import { requestUnban } from "../../utils/functions/moderation/ban";
 import { requestUnmute } from "../../utils/functions/moderation/mute";
 import { logger } from "../../utils/logger";
+import { pluralize } from "../../utils/functions/string";
 
 export const unmuteTimeouts = new Set<string>();
 export const unbanTimeouts = new Set<string>();
@@ -206,7 +207,7 @@ export function runLogs() {
 
     if (modLogCount > 0) {
       logger.info(
-        `::auto ${modLogCount.toLocaleString()} modlog${modLogCount != 1 ? "s" : ""} sent`,
+        `::auto ${modLogCount.toLocaleString()} ${pluralize("modlog", modLogCount)} sent`,
       );
     }
   }, 2500);

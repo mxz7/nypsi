@@ -34,6 +34,7 @@ import { addInventoryItem, getInventory, removeInventoryItem } from "./inventory
 import { addStat } from "./stats";
 import { createUser, getItems, userExists } from "./utils";
 import ms = require("ms");
+import { pluralize } from "../string";
 
 const inTransaction = new Set<string>();
 /**
@@ -579,11 +580,7 @@ export async function checkMarketWatchers(
   const payload: NotificationPayload = {
     payload: {
       embed: new CustomEmbed().setDescription(
-        `a ${type} order has made been for ${amount} ${getItems()[itemId].emoji} **[${
-          amount == 1 || !getItems()[itemId].plural
-            ? getItems()[itemId].name
-            : getItems()[itemId].plural
-        }](https://nypsi.xyz/item/${itemId}?ref=bot-market)**`,
+        `a ${type} order has made been for ${amount} ${getItems()[itemId].emoji} **[${pluralize(getItems()[itemId], amount)}](https://nypsi.xyz/item/${itemId}?ref=bot-market)**`,
       ),
       components: new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("jump").setURL(url),
@@ -996,7 +993,7 @@ export async function marketSell(
     await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
     inTransaction.delete(itemId);
     return {
-      status: `you do not have this many ${getItems()[itemId].plural ? getItems()[itemId].plural : getItems()[itemId].name}`,
+      status: `you do not have this many ${getItems()[itemId].plural}`,
       remaining: -1,
     };
   }

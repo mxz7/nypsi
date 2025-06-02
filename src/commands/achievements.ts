@@ -25,6 +25,7 @@ import {
 import { getAchievements, getItems, getTagsData } from "../utils/functions/economy/utils";
 import PageManager from "../utils/functions/page";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { pluralize } from "../utils/functions/string";
 
 const cmd = new Command("achievements", "view your achievement progress", "money").setAliases([
   "ach",
@@ -192,9 +193,7 @@ async function run(
         if (!achData) continue;
 
         if (achData.completed) {
-          str += `\`completed ${daysAgo(achData.completedAt).toLocaleString()} day${
-            daysAgo(achData.completedAt) == 1 ? "" : "s"
-          } ago\``;
+          str += `\`completed ${daysAgo(achData.completedAt).toLocaleString()} ${pluralize("day", daysAgo(achData.completedAt))} ago\``;
         } else {
           str += `\`${achData.progress.toLocaleString()} / ${achievement.target.toLocaleString()} (${(
             (Number(achData.progress) / achievement.target) *
@@ -311,9 +310,7 @@ async function run(
     });
 
     if (completed > 0) {
-      desc += `**${completed.toLocaleString()}** ${
-        completed == 1 ? "person has" : "people have"
-      } completed this achievement`;
+      desc += `**${completed.toLocaleString()}** ${pluralize("person has", completed, "people have")} completed this achievement`;
     }
 
     embed.setDescription(desc);

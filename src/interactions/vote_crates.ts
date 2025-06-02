@@ -18,6 +18,7 @@ import { getVoteStreak } from "../utils/functions/economy/vote";
 import PageManager from "../utils/functions/page";
 import { getEmbedColor } from "../utils/functions/premium/color";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { pluralize } from "../utils/functions/string";
 
 export default {
   name: "vote-crates",
@@ -58,7 +59,7 @@ export default {
     ) {
       return interaction.reply({
         embeds: [
-          new ErrorEmbed(`you do not have ${crateAmount} vote crate${crateAmount != 1 ? "s" : ""}`),
+          new ErrorEmbed(`you do not have ${crateAmount} ${pluralize("vote crate", crateAmount)}`),
         ],
       });
     }
@@ -69,7 +70,7 @@ export default {
 
     const embed = new CustomEmbed()
       .setHeader(
-        `${interaction.user.username}'s ${crateAmount} vote crate${crateAmount > 1 ? "s" : ""}`,
+        `${interaction.user.username}'s ${crateAmount} ${pluralize("vote crate", crateAmount)}`,
         interaction.user.avatarURL(),
       )
       .setColor(colour === "default" ? Constants.PURPLE : colour);

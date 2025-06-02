@@ -23,6 +23,7 @@ import { countItemOnMarket } from "../utils/functions/economy/market";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getEmojiImage } from "../utils/functions/image";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { pluralize } from "../utils/functions/string";
 
 const cmd = new Command("item", "view information about an item", "money").setAliases(["i"]);
 
@@ -174,11 +175,10 @@ async function run(
 
     if (inventory.find((i) => i.item == selected.id)) {
       embed.setFooter({
-        text: `you have ${inventory.find((i) => i.item == selected.id).amount.toLocaleString()} ${
-          inventory.find((i) => i.item == selected.id).amount > 1
-            ? selected.plural || selected.name
-            : selected.name
-        }`,
+        text: `you have ${inventory.find((i) => i.item == selected.id).amount.toLocaleString()} ${pluralize(
+          selected,
+          inventory.find((i) => i.item == selected.id).amount,
+        )}`,
       });
     }
   }

@@ -14,6 +14,7 @@ import { getUpgrades } from "./levelling";
 import { isPassive } from "./passive";
 import { addTaskProgress } from "./tasks";
 import { getBakeryUpgradesData, getItems, getUpgradesData } from "./utils";
+import { pluralize } from "../string";
 import ms = require("ms");
 
 async function getLastBake(member: GuildMember | string) {
@@ -269,23 +270,19 @@ export async function runBakery(member: GuildMember) {
           getBakeryUpgradesData()[upgradeId] ||
           getItems()[upgradeId] || { name: await getGuildName(member) }
         ).name
-      } baked ${earned.get(upgradeId).toLocaleString()} cookie${
-        earned.get(upgradeId) > 1 ? "s" : ""
-      }`,
+      } baked ${earned.get(upgradeId).toLocaleString()} ${pluralize("cookie", earned.get(upgradeId))}`,
     );
   }
 
   if (cakeAmount > 0) {
     embed.setDescription(
-      `you baked **${Math.round(total).toLocaleString()}** cookie${
-        total > 1 ? "s" : ""
-      } 🍪 and **${cakeAmount.toLocaleString()}** cake${cakeAmount > 1 ? "s" : ""} ${
+      `you baked **${Math.round(total).toLocaleString()}** ${pluralize("cookie", total)} 🍪 and **${cakeAmount.toLocaleString()}** ${pluralize("cake", cakeAmount)} ${
         getItems()["cake"].emoji
       } !!`,
     );
   } else {
     embed.setDescription(
-      `you baked **${Math.round(total).toLocaleString()}** cookie${total > 1 ? "s" : ""} 🍪 !!`,
+      `you baked **${Math.round(total).toLocaleString()}** ${pluralize("cookie", total)} 🍪 !!`,
     );
   }
 

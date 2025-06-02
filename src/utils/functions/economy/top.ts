@@ -5,7 +5,7 @@ import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import PageManager from "../page";
 import sleep from "../sleep";
-import { formatTime } from "../string";
+import { formatTime, pluralize } from "../string";
 import { getPreferences } from "../users/notifications";
 import { getLastKnownUsername } from "../users/tag";
 import { getActiveTag } from "../users/tags";
@@ -523,15 +523,11 @@ export async function topItem(guild: Guild, item: string, userId: string) {
       pos += ".";
     }
 
-    const items = getItems();
-
     out[count] = `${pos} ${await formatUsername(
       user.userId,
       members.get(user.userId).user.username,
       true,
-    )} ${user.amount.toLocaleString()} ${
-      user.amount > 1 ? items[item].plural || items[item].name : items[item].name
-    }`;
+    )} ${user.amount.toLocaleString()} ${pluralize(getItems()[item], user.amount)}`;
 
     count++;
   }
@@ -594,15 +590,11 @@ export async function topItemGlobal(item: string, userId: string, amount = 100) 
       pos += ".";
     }
 
-    const items = getItems();
-
     out[count] = `${pos} ${await formatUsername(
       user.userId,
       user.economy.user.lastKnownUsername,
       (await getPreferences(user.userId)).leaderboards,
-    )} ${user.amount.toLocaleString()} ${
-      user.amount > 1 ? items[item].plural || items[item].name : items[item].name
-    }`;
+    )} ${user.amount.toLocaleString()} ${pluralize(getItems()[item], user.amount)}`;
 
     count++;
   }
@@ -1061,7 +1053,7 @@ export async function topWordle(guild: Guild, userId: string) {
         user.userId,
         await getLastKnownUsername(user.userId),
         true,
-      )} ${user._count.userId.toLocaleString()} win${user._count.userId != 1 ? "s" : ""}`,
+      )} ${user._count.userId.toLocaleString()} ${pluralize("win", user._count.userId)}`,
     );
   }
 
@@ -1113,7 +1105,7 @@ export async function topWordleGlobal(userId: string) {
         user.userId,
         await getLastKnownUsername(user.userId),
         true,
-      )} ${user._count.userId.toLocaleString()} win${user._count.userId != 1 ? "s" : ""}`,
+      )} ${user._count.userId.toLocaleString()} ${pluralize("win", user._count.userId)}`,
     );
   }
 
@@ -1302,7 +1294,7 @@ export async function topCommand(guild: Guild, command: string, userId: string) 
       user.userId,
       members.get(user.userId).user.username,
       true,
-    )} ${user.uses.toLocaleString()} ${user.uses > 1 ? "uses" : "use"}`;
+    )} ${user.uses.toLocaleString()} ${pluralize("use", user.uses)}`;
 
     count++;
   }
@@ -1359,7 +1351,7 @@ export async function topCommandGlobal(command: string, userId: string) {
       user.userId,
       user.user.lastKnownUsername,
       (await getPreferences(user.userId)).leaderboards,
-    )} ${user.uses.toLocaleString()} ${user.uses > 1 ? "uses" : "use"}`;
+    )} ${user.uses.toLocaleString()} ${pluralize("use", user.uses)}`;
 
     count++;
   }
@@ -1427,7 +1419,7 @@ export async function topCommandUses(guild: Guild, userId: string) {
       user.userId,
       members.get(user.userId).user.username,
       true,
-    )} ${user._sum.uses.toLocaleString()} ${user._sum.uses > 1 ? "commands" : "command"}`;
+    )} ${user._sum.uses.toLocaleString()} ${pluralize("command", user._sum.uses)}`;
 
     count++;
   }
@@ -1483,7 +1475,7 @@ export async function topCommandUsesGlobal(userId: string) {
       user.userId,
       await getLastKnownUsername(user.userId),
       (await getPreferences(user.userId)).leaderboards,
-    )} ${user._sum.uses.toLocaleString()} ${user._sum.uses > 1 ? "commands" : "command"}`;
+    )} ${user._sum.uses.toLocaleString()} ${pluralize("command", user._sum.uses)}`;
 
     count++;
   }
