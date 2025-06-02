@@ -41,6 +41,7 @@ import PageManager from "../utils/functions/page";
 import { addTag, getTags } from "../utils/functions/users/tags";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
+import { pluralize } from "../utils/functions/string";
 
 const itemFunctions = new Map<string, ItemUse>();
 
@@ -242,12 +243,11 @@ async function run(
 
     if (["cake", "cookie", "lucky_cheese"].includes(selected.id)) {
       addTaskProgress(message.author.id, "eat_cookies", amount);
-      desc = `eating ${amount > 1 ? `${amount} ` : ""}**${
-        amount > 1 ? selected.plural || selected.name : selected.name
-      }**...`;
-      desc2 = `you have eaten ${amount > 1 ? `${amount} ` : "a "}**${
-        amount > 1 ? selected.plural || selected.name : selected.name
-      }** 😋`;
+      desc = `eating ${amount > 1 ? `${amount} ` : ""}**${pluralize(selected, amount)}**...`;
+      desc2 = `you have eaten ${amount > 1 ? `${amount} ` : "a "}**${pluralize(
+        selected,
+        amount,
+      )}** 😋`;
     }
 
     embed.setDescription(desc);
@@ -362,9 +362,10 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          `you have activated ${amount} **${
-            amount != 1 && upgrade.plural ? upgrade.plural : upgrade.name
-          }** on your **${getBaseWorkers()[upgrade.for].name}**\n\n${
+          `you have activated ${amount} **${pluralize(
+            upgrade,
+            amount,
+          )}** on your **${getBaseWorkers()[upgrade.for].name}**\n\n${
             userUpgrade ? userUpgrade.amount + amount : amount
           }/${upgrade.stack_limit}`,
         ).setHeader("use", message.author.avatarURL()),
@@ -476,7 +477,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          `you've planted ${amount} ${amount > 1 ? selected.plural : selected.name} in your farm` +
+          `you've planted ${amount} ${pluralize(selected, amount)} in your farm` +
             (farm.length === amount
               ? "\n\nif you're new to farming, it's recommended you read the [farm care guide](https://nypsi.xyz/docs/economy/farm?ref=bot-help#caring-for-your-farm) to make sure you don't kill your plants"
               : ""),

@@ -5,6 +5,7 @@ import Constants from "../utils/Constants";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
 import { getItems, userExists } from "../utils/functions/economy/utils";
 import { logger } from "../utils/logger";
+import { pluralize } from "../utils/functions/string";
 
 const cmd = new Command(
   "crateall",
@@ -92,12 +93,7 @@ async function run(
   await Promise.all(promises);
 
   return message.channel.send({
-    embeds: [
-      new CustomEmbed(
-        message.member,
-        `**${count}** ${selected.name}${count != 1 ? "s" : ""} given`,
-      ),
-    ],
+    embeds: [new CustomEmbed(message.member, `**${count}** ${pluralize(selected, count)} given`)],
   });
 }
 

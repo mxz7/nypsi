@@ -156,9 +156,7 @@ async function run(
     inventory.find((i) => i.item == selected.id).amount < 1
   ) {
     return send({
-      embeds: [
-        new ErrorEmbed("you dont have any " + (selected.plural ? selected.plural : selected.name)),
-      ],
+      embeds: [new ErrorEmbed("you dont have any " + selected.plural)],
     });
   }
 

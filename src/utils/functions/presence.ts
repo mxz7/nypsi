@@ -4,6 +4,7 @@ import Constants from "../Constants";
 import { daysUntilChristmas } from "./date";
 import { getTotalAmountOfItem } from "./economy/inventory";
 import { getItems } from "./economy/utils";
+import { pluralize } from "./string";
 
 export async function randomPresence(): Promise<ActivitiesOptions> {
   const possibilities: ActivitiesOptions[] = [
@@ -51,7 +52,7 @@ export async function randomPresence(): Promise<ActivitiesOptions> {
     const items = Object.values(getItems());
     const item = items[Math.floor(Math.random() * items.length)];
     const count = await getTotalAmountOfItem(item.id);
-    chosen.name = `${count.toLocaleString()} ${!item.emoji.includes("<") ? `${item.emoji} ` : ""}${count !== 1 ? (item.plural ? item.plural : item.name + "s") : item.name}`;
+    chosen.name = `${count.toLocaleString()} ${!item.emoji.includes("<") ? `${item.emoji} ` : ""}${pluralize(item, count)}`;
   }
 
   return chosen;

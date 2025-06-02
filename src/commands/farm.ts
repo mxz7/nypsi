@@ -214,10 +214,9 @@ async function run(
 
         const owned =
           userUpgrades.find((u) => u.upgradeId == upgradeId && u.plantId === selected)?.amount || 0;
-        const pluralName = upgrade.plural ? upgrade.plural : upgrade.name;
 
         if (upgrade.type_single) {
-          desc += `**${pluralName}** ${owned}/${upgrade.type_single.stack_limit}`;
+          desc += `**${upgrade.plural}** ${owned}/${upgrade.type_single.stack_limit}`;
         } else if (upgrade.type_upgradable) {
           desc += `**${upgrade.name}** ${owned == 0 ? "none" : getItems()[upgrade.type_upgradable.items[owned - 1]].name}`;
         }
@@ -229,7 +228,7 @@ async function run(
         const maxButton = new ButtonBuilder()
           .setCustomId(`up-${upgradeId}-max`)
           .setEmoji("⏫")
-          .setLabel(`add all ${pluralName}`);
+          .setLabel(`add all ${upgrade.plural}`);
 
         if (
           owned < upgrade.type_single?.stack_limit ||
@@ -322,9 +321,7 @@ async function run(
 
           if (itemCount === 0) {
             await interaction.reply({
-              embeds: [
-                new ErrorEmbed(`you don't have any ${item.plural ? item.plural : item.name}`),
-              ],
+              embeds: [new ErrorEmbed(`you don't have any ${item.plural}`)],
               flags: MessageFlags.Ephemeral,
             });
             return listen();
@@ -337,11 +334,7 @@ async function run(
 
           if (userUpgradeCount >= upgrade.type_single.stack_limit) {
             await interaction.reply({
-              embeds: [
-                new ErrorEmbed(
-                  `you already have the max amount of ${item.plural ? item.plural : item.name}`,
-                ),
-              ],
+              embeds: [new ErrorEmbed(`you already have the max amount of ${item.plural}`)],
               flags: MessageFlags.Ephemeral,
             });
             return listen();
