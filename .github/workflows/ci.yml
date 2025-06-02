@@ -207,7 +207,7 @@ jobs:
             tsbuildinfo-${{ runner.os }}
 
       - name: build
-        run: npx tsc --incremental --force --build
+        run: npx tsc --build --incremental --force
 
       - name: clear tsbuildinfo cache
         continue-on-error: true
