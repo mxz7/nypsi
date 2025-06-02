@@ -473,7 +473,7 @@ export async function updateMarketWatch(
     },
   });
 
-  return getMarketWatch(member);
+  return getMarketWatch(member, type);
 }
 
 export async function setMarketWatch(member: GuildMember | string, items: MarketWatch[]) {
@@ -512,10 +512,10 @@ export async function deleteMarketWatch(
     },
   });
 
-  return getMarketWatch(member);
+  return getMarketWatch(member, type);
 }
 
-export async function getMarketWatch(member: GuildMember | string) {
+export async function getMarketWatch(member: GuildMember | string, type: OrderType) {
   let userId: string;
   if (member instanceof GuildMember) {
     userId = member.user.id;
@@ -523,16 +523,18 @@ export async function getMarketWatch(member: GuildMember | string) {
     userId = member;
   }
 
-  return await prisma.economy
-    .findUnique({
-      where: {
-        userId: userId,
-      },
-      select: {
-        MarketWatch: true,
-      },
-    })
-    .then((q) => q.MarketWatch);
+  return (
+    await prisma.economy
+      .findUnique({
+        where: {
+          userId: userId,
+        },
+        select: {
+          MarketWatch: true,
+        },
+      })
+      .then((q) => q.MarketWatch)
+  ).filter((i) => i.orderType == type);
 }
 
 export async function checkMarketWatchers(

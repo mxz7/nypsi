@@ -63,6 +63,9 @@ import { getEmojiImage } from "../utils/functions/image";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { getAdminLevel } from "../utils/functions/users/admin";
 import { addCooldown, addExpiry, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
+import { logger } from "../utils/logger";
+import prisma from "../init/database";
 
 const cmd = new Command(
   "market",
@@ -890,8 +893,8 @@ async function run(
   if (args.length == 0) {
     return viewMarket();
   } else if (args[0].toLowerCase() == "watch") {
-    let currentBuy = (await getMarketWatch(message.member)).filter((i) => i.orderType == "buy");
-    let currentSell = (await getMarketWatch(message.member)).filter((i) => i.orderType == "sell");
+    let currentBuy = await getMarketWatch(message.member, "buy");
+    let currentSell = await getMarketWatch(message.member, "sell");
 
     if (currentBuy.length > max)
       currentBuy = await setMarketWatch(message.member, currentBuy.splice(0, max));
@@ -995,39 +998,43 @@ async function run(
           embeds: [new ErrorEmbed("invalid order type (buy/sell)")],
         });
 
-      if (
-        (type == "buy" ? currentBuy : currentSell).length >= max &&
-        !(type == "buy" ? currentBuy : currentSell).find((i) => i.itemId === selected.id)
-      ) {
-        let desc = `you have reached the limit of ${type} order market watches (**${max}**)`;
+      if (type == "buy" && currentBuy.find((i) => i.itemId === selected.id)) {
+        desc = `✅ removed ${selected.emoji} ${selected.name} from buy orders`;
+        currentBuy = await deleteMarketWatch(message.member, "buy", selected.id);
+      } else if (type == "sell" && currentSell.find((i) => i.itemId === selected.id)) {
+        desc = `✅ removed ${selected.emoji} ${selected.name} from sell orders`;
+        currentSell = await deleteMarketWatch(message.member, "sell", selected.id);
+      } else {
+        if (
+          (type == "buy" ? currentBuy : currentSell).length >= max &&
+          !(type == "buy" ? currentBuy : currentSell).find((i) => i.itemId === selected.id)
+        ) {
+          let desc = `you have reached the limit of ${type} order market watches (**${max}**)`;
 
-        if (max == 1) {
-          desc += "\n\nyou can upgrade this with premium membership (`/premium`)";
+          if (max == 1) {
+            desc += "\n\nyou can upgrade this with premium membership (`/premium`)";
+          }
+
+          return send({ embeds: [new ErrorEmbed(desc)] });
         }
 
-        return send({ embeds: [new ErrorEmbed(desc)] });
-      }
+        desc = `✅ added ${selected.emoji} ${selected.name} to ${type} orders`;
 
-      desc = `✅ added ${selected.emoji} ${selected.name}`;
-
-      if (type == "buy") {
-        currentBuy = (
-          await updateMarketWatch(
+        if (type == "buy") {
+          currentBuy = await updateMarketWatch(
             message.member,
             selected.id,
             type,
             args[3] ? formatNumber(args[3]) : undefined,
-          )
-        ).filter((i) => i.orderType == type);
-      } else {
-        currentSell = (
-          await updateMarketWatch(
+          );
+        } else {
+          currentSell = await updateMarketWatch(
             message.member,
             selected.id,
             type,
             args[3] ? formatNumber(args[3]) : undefined,
-          )
-        ).filter((i) => i.orderType == type);
+          );
+        }
       }
     }
 
@@ -1392,6 +1399,79 @@ async function run(
     );
 
     return send({ embeds: [embed] });
+  } else if (args[0].toLowerCase() == "del") {
+    if (message.guild.id != Constants.NYPSI_SERVER_ID) return viewMarket();
+
+    const roles = message.member.roles.cache;
+
+    let allow = false;
+    for (const role_id of Constants.MARKET_MANAGEMENT_ROLE_IDS) {
+      if (roles.has(role_id)) allow = true;
+    }
+
+    if (!allow) return viewMarket();
+
+    if (args.length == 1) {
+      return message.channel.send({ embeds: [new ErrorEmbed("use the message id dumbass")] });
+    }
+
+    const order = await prisma.market.findUnique({
+      where: {
+        messageId: args[1],
+      },
+    });
+
+    if (!order) return message.channel.send({ embeds: [new ErrorEmbed("invalid order bro")] });
+
+    logger.info(
+      `admin: ${message.author.id} (${message.author.username}) deleted market order`,
+      order,
+    );
+
+    if (order.completed) {
+      await prisma.market.delete({
+        where: {
+          messageId: order.messageId,
+        },
+      });
+    } else {
+      await deleteMarketOrder(order.id, message.client as NypsiClient);
+
+      if (!(await userExists(order.ownerId))) return;
+
+      if (order.orderType == "buy") {
+        await addBalance(order.ownerId, Number(order.itemAmount * order.price));
+      } else {
+        await addInventoryItem(order.ownerId, order.itemId, Number(order.itemAmount));
+      }
+
+      if ((await getDmSettings(order.ownerId)).market) {
+        const embed = new CustomEmbed().setColor(Constants.EMBED_FAIL_COLOR);
+
+        embed.setDescription(
+          `your ${order.orderType} order for ${order.itemAmount}x ${items[order.itemId].emoji} ${
+            items[order.itemId].name
+          } has been removed by a staff member. you have been given back your ${order.orderType == "buy" ? "money" : `item${order.itemAmount > 1 ? "s" : ""}`}`,
+        );
+
+        if (args.length > 2) {
+          args.splice(0, 2);
+          embed.addField("reason", args.join(" "));
+        }
+
+        addNotificationToQueue({
+          memberId: order.ownerId,
+          payload: {
+            embed: embed,
+            content: `your ${order.orderType} order has been removed by a staff member`,
+          },
+        });
+      }
+    }
+
+    await (message as Message).react("✅");
+
+    return;
   } else return viewMarket();
 
   async function itemView(item: Item, msg?: NypsiMessage) {
