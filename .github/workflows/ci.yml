@@ -144,6 +144,76 @@ jobs:
           path: .eslintcache
           key: eslintcache-${{ runner.os }}-${{ hashFiles('pnpm-lock.json') }}
 
+  fakedeploy:
+    name: deploy testing
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: pnpm/action-setup@v4
+        name: install pnpm
+        id: pnpm-install
+        with:
+          version: latest
+          run_install: false
+
+      - name: get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v4
+        name: setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: run setup.sh
+        run: bash ${GITHUB_WORKSPACE}/setup.sh
+
+      - name: setup prisma
+        run: npx prisma generate
+
+      - name: build
+        run: npx tsc --incremental
+
+      - name: prepare files for deploy
+        run: |
+          mkdir deploy
+          mv dist/ deploy/
+          mv package.json deploy/
+          mv pnpm-lock.yaml deploy/
+          mv data/ deploy/
+          mv prisma/ deploy/
+          mv tsconfig.json deploy/
+          rm deploy/dist/utils/functions/anticheat.js
+
+      - name: deploy test
+        uses: burnett01/rsync-deployments@7.0.2
+        with:
+          switches: -avzh --partial --progress --delete --dry-run
+          path: deploy/
+          remote_path: ~/nypsi/
+          remote_host: ${{ secrets.HOST }}
+          remote_port: 22
+          remote_user: ${{ secrets.USERNAME }}
+          remote_key: ${{ secrets.SSH_KEY }}
+
+
   deploy:
     if: github.ref == 'refs/heads/main'
     needs: [lint, test]
@@ -234,14 +304,15 @@ jobs:
           rm deploy/dist/utils/functions/anticheat.js
 
       - name: deploy
-        uses: nogsantos/scp-deploy@master
+        uses: burnett01/rsync-deployments@7.0.2
         with:
-          src: ./deploy/*
-          host: ${{ secrets.HOST }}
-          remote: ./nypsi/
-          port: 22
-          user: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
+          switches: -avzh --partial --progress --delete --dry-run
+          path: deploy/
+          remote_path: ~/nypsi/
+          remote_host: ${{ secrets.HOST }}
+          remote_port: 22
+          remote_user: ${{ secrets.USERNAME }}
+          remote_key: ${{ secrets.SSH_KEY }}
 
       - name: connect to server & update packages
         uses: appleboy/ssh-action@master
