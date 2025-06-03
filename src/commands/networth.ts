@@ -17,6 +17,7 @@ import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { hasProfile } from "../utils/functions/users/utils";
 import { addView } from "../utils/functions/users/views";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { NypsiClient } from "../models/Client";
 
 const cmd = new Command("networth", "view breakdown of your networth", "money").setAliases([
   "net",
@@ -68,7 +69,7 @@ async function run(
     });
 
   const [net, inventory] = await Promise.all([
-    calcNetWorth("cmd", target, true),
+    calcNetWorth("cmd", target, target.client as NypsiClient, true),
     getInventory(target),
   ]);
 

@@ -31,6 +31,7 @@ import { getMember } from "../utils/functions/member";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { NypsiClient } from "../models/Client";
 import ms = require("ms");
 
 const playerCooldown = new Set<string>();
@@ -306,7 +307,12 @@ async function run(
       embed2.setColor(Constants.EMBED_SUCCESS_COLOR);
       embed2.addField("success!!", "you stole $**" + amountMoney.toLocaleString() + "**");
 
-      const earnedXp = await calcEarnedGambleXp(message.member, 1_000_000, 1);
+      const earnedXp = await calcEarnedGambleXp(
+        message.member,
+        message.client as NypsiClient,
+        1_000_000,
+        1,
+      );
       addProgress(message.author.id, "robber", 1);
       addTaskProgress(message.author.id, "thief");
 

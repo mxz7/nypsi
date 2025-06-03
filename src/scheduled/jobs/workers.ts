@@ -28,7 +28,7 @@ import ms = require("ms");
 export default {
   name: "workers",
   cron: "0 * * * *",
-  async run(log) {
+  async run(log, manager) {
     const start = performance.now();
     const query = await prisma.economyWorker.findMany({
       include: {
@@ -41,7 +41,10 @@ export default {
     const baseWorkers = getBaseWorkers();
 
     for (const worker of query) {
-      const { perItem, perInterval, maxStorage, byproductChances } = await calcWorkerValues(worker);
+      const { perItem, perInterval, maxStorage, byproductChances } = await calcWorkerValues(
+        worker,
+        manager,
+      );
 
       if (!hasSteve.has(worker.userId)) {
         const boosters = await getBoosters(worker.userId);
@@ -71,6 +74,7 @@ export default {
         }
 
         const { amountEarned, byproductAmounts } = await evaluateWorker(
+          manager,
           worker.userId,
           baseWorkers[worker.workerId],
           {
@@ -156,7 +160,7 @@ export default {
       const full: string[] = [];
 
       for (const worker of workers) {
-        const { maxStorage } = await calcWorkerValues(worker);
+        const { maxStorage } = await calcWorkerValues(worker, manager);
 
         if (worker.stored >= maxStorage) full.push(worker.workerId);
       }

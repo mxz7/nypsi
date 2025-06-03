@@ -30,7 +30,7 @@ import { addToNypsiBank, getTax } from "../tax";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getLastKnownAvatar, getLastKnownUsername } from "../users/tag";
 import { addBalance, getBalance, removeBalance } from "./balance";
-import { addInventoryItem, getInventory, removeInventoryItem } from "./inventory";
+import { addInventoryItem, getInventory, isGem, removeInventoryItem } from "./inventory";
 import { addStat } from "./stats";
 import { createUser, getItems, userExists } from "./utils";
 import ms = require("ms");
@@ -63,6 +63,17 @@ export async function getMarketOrders(member: GuildMember | string | undefined, 
 export async function getMarketOrder(id: number) {
   return await prisma.market.findUnique({
     where: { id: id },
+  });
+}
+
+export async function setMarketOrderAmount(id: number, amount: number | bigint) {
+  await prisma.market.update({
+    where: {
+      id: id,
+    },
+    data: {
+      itemAmount: amount,
+    },
   });
 }
 
@@ -618,7 +629,7 @@ export async function countItemOnMarket(itemId: string, type: OrderType) {
 
 export async function deleteMarketOrder(
   id: number,
-  client: NypsiClient | ClusterManager,
+  client: NypsiClient | ClusterManager | undefined,
   repeatCount = 1,
 ) {
   const order = await prisma.market
@@ -653,7 +664,7 @@ export async function deleteMarketOrder(
     },
   });
 
-  if (order.messageId) {
+  if (order.messageId && client) {
     await (client instanceof ClusterManager ? client : client.cluster).broadcastEval(
       async (client, { channelId, guildId, messageId }) => {
         const guild = client.guilds.cache.get(guildId);
@@ -827,6 +838,9 @@ export async function completeOrder(
   } else {
     await addInventoryItem(buyerId, order.itemId, Number(amount));
     await addBalance(order.ownerId, Number(amount) * Number(order.price) - taxedAmount);
+
+    if (isGem(order.itemId))
+      await redis.del(`${Constants.redis.cache.economy.HAS_GEM}:${order.ownerId}:${order.itemId}`);
 
     addStat(order.ownerId, "market-fulfilled-sell", Number(amount));
     addStat(buyerId, "market-bought-items", Number(amount));

@@ -468,8 +468,8 @@ async function start(client: NypsiClient) {
 
         if (player.stoppedAt > 1) {
           const [xp, { multi }] = await Promise.all([
-            calcEarnedGambleXp(player.userId, player.bet, player.stoppedAt),
-            getGambleMulti(player.userId),
+            calcEarnedGambleXp(player.userId, client, player.bet, player.stoppedAt),
+            getGambleMulti(player.userId, client),
           ]);
 
           if (multi > 0) player.won = player.won + Math.round(player.won * multi);
@@ -511,8 +511,8 @@ async function start(client: NypsiClient) {
 
         if (player.stoppedAt > 1) {
           const [xp, { multi }] = await Promise.all([
-            calcEarnedGambleXp(player.userId, player.bet, player.stoppedAt),
-            getGambleMulti(player.userId),
+            calcEarnedGambleXp(player.userId, client, player.bet, player.stoppedAt),
+            getGambleMulti(player.userId, client),
           ]);
 
           if (multi > 0) player.won = player.won + Math.round(player.won * multi);

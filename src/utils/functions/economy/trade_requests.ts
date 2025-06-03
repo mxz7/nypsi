@@ -21,10 +21,11 @@ import { getTier, isPremium } from "../premium/premium";
 import { addToNypsiBank, getTax } from "../tax";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { addBalance } from "./balance";
-import { addInventoryItem, getInventory, removeInventoryItem } from "./inventory";
+import { addInventoryItem, getInventory, isGem, removeInventoryItem } from "./inventory";
 import { createUser, getItems, userExists } from "./utils";
 import ms = require("ms");
 import dayjs = require("dayjs");
+import { ClusterManager } from "discord-hybrid-sharding";
 
 const beingFulfilled = new Set<number>();
 
@@ -39,6 +40,9 @@ export async function getTradeRequests(member: GuildMember | string) {
   const query = await prisma.tradeRequest.findMany({
     where: {
       AND: [{ ownerId: id }, { completed: false }],
+    },
+    orderBy: {
+      createdAt: "asc",
     },
   });
 
@@ -55,7 +59,11 @@ export async function getTradeRequestByMessage(id: string) {
   return tradeRequest;
 }
 
-export async function deleteTradeRequest(id: number, client: NypsiClient, repeatCount = 1) {
+export async function deleteTradeRequest(
+  id: number,
+  client: NypsiClient | ClusterManager | undefined,
+  repeatCount = 1,
+) {
   if (
     beingFulfilled.has(id) ||
     (await redis.exists(`${Constants.redis.nypsi.TRADE_FULFILLING}:${id}`))
@@ -93,30 +101,31 @@ export async function deleteTradeRequest(id: number, client: NypsiClient, repeat
       },
     });
 
-    await client.cluster.broadcastEval(
-      async (client, { guildId, channelId, id }) => {
-        const guild = await client.guilds.cache.get(guildId);
+    if (client)
+      await (client instanceof ClusterManager ? client : client.cluster).broadcastEval(
+        async (client, { guildId, channelId, id }) => {
+          const guild = client.guilds.cache.get(guildId);
 
-        if (!guild) return;
+          if (!guild) return;
 
-        const channel = await guild.channels.cache.get(channelId);
+          const channel = guild.channels.cache.get(channelId);
 
-        if (!channel) return;
+          if (!channel) return;
 
-        if (channel.isTextBased()) {
-          const msg = await channel.messages.fetch(id).catch(() => {});
+          if (channel.isTextBased()) {
+            const msg = await channel.messages.fetch(id).catch(() => {});
 
-          if (msg) await msg.delete().catch(() => {});
-        }
-      },
-      {
-        context: {
-          guildId: Constants.NYPSI_SERVER_ID,
-          channelId: Constants.TRADES_CHANNEL_ID,
-          id: tradeRequest.messageId,
+            if (msg) await msg.delete().catch(() => {});
+          }
         },
-      },
-    );
+        {
+          context: {
+            guildId: Constants.NYPSI_SERVER_ID,
+            channelId: Constants.TRADES_CHANNEL_ID,
+            id: tradeRequest.messageId,
+          },
+        },
+      );
   }
 
   return Boolean(tradeRequest);
@@ -482,6 +491,9 @@ export async function fulfillTradeRequest(
     const amount = parseInt(item.split(":")[1]);
 
     await addInventoryItem(interaction.user.id, itemId, amount);
+
+    if (isGem(itemId))
+      await redis.del(`${Constants.redis.cache.economy.HAS_GEM}:${tradeRequest.ownerId}:${itemId}`);
   }
 
   if (tradeRequest.offeredMoney > 0) {

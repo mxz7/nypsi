@@ -56,6 +56,7 @@ import { hasProfile } from "../utils/functions/users/utils";
 import { addView, getViews } from "../utils/functions/users/views";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { pluralize } from "../utils/functions/string";
+import { NypsiClient } from "../models/Client";
 
 const cmd = new Command("profile", "view yours or someone's nypsi profile", "money").setAliases([
   "p",
@@ -177,7 +178,7 @@ async function run(
       getBalance(target),
       getPrestige(target),
       getInventory(target),
-      calcNetWorth("profile", target),
+      calcNetWorth("profile", target, target.client as NypsiClient),
       getBankBalance(target),
       getMaxBankBalance(target),
       hasPadlock(target),
@@ -199,12 +200,13 @@ async function run(
 
     let gemLine = "";
 
-    if (inventory.has("crystal_heart")) gemLine += `${getItems()["crystal_heart"].emoji}`;
-    if (inventory.has("white_gem")) gemLine += `${getItems()["white_gem"].emoji}`;
-    if (inventory.has("pink_gem")) gemLine += `${getItems()["pink_gem"].emoji}`;
-    if (inventory.has("purple_gem")) gemLine += `${getItems()["purple_gem"].emoji}`;
-    if (inventory.has("blue_gem")) gemLine += `${getItems()["blue_gem"].emoji}`;
-    if (inventory.has("green_gem")) gemLine += `${getItems()["green_gem"].emoji}`;
+    if ((await inventory.hasGem("crystal_heart")).any)
+      gemLine += `${getItems()["crystal_heart"].emoji}`;
+    if ((await inventory.hasGem("white_gem")).any) gemLine += `${getItems()["white_gem"].emoji}`;
+    if ((await inventory.hasGem("pink_gem")).any) gemLine += `${getItems()["pink_gem"].emoji}`;
+    if ((await inventory.hasGem("purple_gem")).any) gemLine += `${getItems()["purple_gem"].emoji}`;
+    if ((await inventory.hasGem("blue_gem")).any) gemLine += `${getItems()["blue_gem"].emoji}`;
+    if ((await inventory.hasGem("green_gem")).any) gemLine += `${getItems()["green_gem"].emoji}`;
 
     const balanceSection =
       `${padlockStatus ? "🔒" : "💰"} $**${formatNumberPretty(balance)}**\n` +
@@ -489,8 +491,8 @@ async function run(
 
       await addCooldown("p-mul", message.member, 5);
 
-      const gamble = await getGambleMulti(target);
-      const sell = await getSellMulti(target);
+      const gamble = await getGambleMulti(target, target.client as NypsiClient);
+      const sell = await getSellMulti(target, target.client as NypsiClient);
 
       let gambleBreakdown = "";
       let sellBreakdown = "";

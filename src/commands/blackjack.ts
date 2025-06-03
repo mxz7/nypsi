@@ -439,7 +439,7 @@ class Game {
 
     let winnings = 0;
     let xp = 0;
-    const multi = await getGambleMulti(this.member);
+    const multi = await getGambleMulti(this.member, this.member.client as NypsiClient);
 
     if (result === "win") {
       winnings = this.bet * 2;
@@ -454,6 +454,7 @@ class Game {
 
       xp = await calcEarnedGambleXp(
         this.member,
+        this.member.client as NypsiClient,
         this.bet,
         this.hand.cards.length === 2 && this.hand.total() === 21 ? 2.5 : 2,
       );

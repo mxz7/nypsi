@@ -224,11 +224,11 @@ async function showUser(message: NypsiMessage, user: User) {
             💳 $**${(await getBankBalance(user.id)).toLocaleString()}** / $**${(
               await getMaxBankBalance(user.id)
             ).toLocaleString()}**
-      🌍 $**${(await calcNetWorth("find", user.id)).amount.toLocaleString()}**
+      🌍 $**${(await calcNetWorth("find", user.id, user.client as NypsiClient)).amount.toLocaleString()}**
             **xp** ${(await getXp(user.id)).toLocaleString()}
             **voted** ${voted}
             **prestige** ${await getPrestige(user.id)}
-            **bonus** ${Math.floor((await getGambleMulti(message.member)).multi * 100)}%`,
+            **bonus** ${Math.floor((await getGambleMulti(message.member, message.client as NypsiClient)).multi * 100)}%`,
       true,
     );
   }

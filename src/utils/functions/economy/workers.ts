@@ -12,6 +12,8 @@ import { addStat } from "./stats";
 import { getBaseUpgrades, getBaseWorkers, getItems } from "./utils";
 import { Worker, WorkerByproducts } from "../../../types/Workers";
 import { pluralize } from "../string";
+import { NypsiClient } from "../../../models/Client";
+import { ClusterManager } from "discord-hybrid-sharding";
 
 export async function getWorkers(member: GuildMember | string) {
   let id: string;
@@ -98,6 +100,7 @@ export async function calcWorkerValues(
   worker: EconomyWorker & {
     upgrades: EconomyWorkerUpgrades[];
   },
+  client: NypsiClient | ClusterManager,
 ) {
   const baseUpgrades = getBaseUpgrades();
   const baseWorkers = getBaseWorkers();
@@ -168,42 +171,42 @@ export async function calcWorkerValues(
     }
   }
 
-  const heart = inventory.has("crystal_heart");
+  const heart = (await inventory.hasGem("crystal_heart")).any;
 
-  if (inventory.has("purple_gem")) {
+  if ((await inventory.hasGem("purple_gem")).any) {
     const chance = Math.floor(Math.random() * 10);
 
     if (chance < 5 && !heart) {
       perItemBonus -= perItemBonus * 0.17;
     } else {
-      gemBreak(worker.userId, 0.01, "purple_gem");
+      gemBreak(worker.userId, 0.01, "purple_gem", client);
       perItemBonus += perItemBonus * 0.17;
     }
   }
 
-  if (inventory.has("green_gem")) {
+  if ((await inventory.hasGem("green_gem")).any) {
     maxStoredBonus += maxStoredBonus * 0.2;
   }
 
-  if (inventory.has("blue_gem")) {
+  if ((await inventory.hasGem("blue_gem")).any) {
     const chance = Math.floor(Math.random() * 10);
 
     if (chance < 4 && !heart) {
       perIntervalBonus -= perIntervalBonus * 0.2;
     } else {
-      gemBreak(worker.userId, 0.01, "blue_gem");
+      gemBreak(worker.userId, 0.01, "blue_gem", client);
       perIntervalBonus += perIntervalBonus * 0.17;
     }
   }
 
-  if (inventory.has("white_gem")) {
+  if ((await inventory.hasGem("white_gem")).any) {
     const chance = Math.floor(Math.random() * 10);
 
     if (chance < 4 && !heart) {
       perIntervalBonus -= perIntervalBonus * 0.5;
       perItemBonus -= perItemBonus * 0.5;
     } else {
-      gemBreak(worker.userId, 0.005, "white_gem");
+      gemBreak(worker.userId, 0.005, "white_gem", client);
       perIntervalBonus += perIntervalBonus * 0.7;
       perItemBonus += perItemBonus * 0.7;
     }
@@ -252,6 +255,7 @@ export async function addWorkerUpgrade(
 }
 
 export async function evaluateWorker(
+  client: NypsiClient | ClusterManager,
   userId: string,
   worker: Worker,
   options: {
@@ -282,7 +286,7 @@ export async function evaluateWorker(
   if (options.calculated === undefined) {
     // be lazy in getting the user worker, because it might not be needed
     if (userWorker === undefined) userWorker = await getWorker(userId, worker);
-    ({ perItem, byproductChances } = await calcWorkerValues(userWorker));
+    ({ perItem, byproductChances } = await calcWorkerValues(userWorker, client));
   }
 
   const byproductAmounts = {} as WorkerByproducts;
@@ -305,7 +309,10 @@ export async function evaluateWorker(
   return { amountEarned: Math.floor(perItem * stored), byproductAmounts };
 }
 
-export async function claimFromWorkers(userId: string): Promise<string> {
+export async function claimFromWorkers(
+  userId: string,
+  client: NypsiClient | ClusterManager,
+): Promise<string> {
   const baseWorkers = getBaseWorkers();
   const userWorkers = await getWorkers(userId);
   const allItems = getItems();
@@ -316,6 +323,7 @@ export async function claimFromWorkers(userId: string): Promise<string> {
 
   for (const worker of userWorkers) {
     const { amountEarned, byproductAmounts } = await evaluateWorker(
+      client,
       userId,
       baseWorkers[worker.workerId],
       {

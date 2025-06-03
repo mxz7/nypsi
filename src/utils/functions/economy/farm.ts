@@ -195,7 +195,7 @@ export async function getClaimable(member: GuildMember | string, plantId: string
 
     hours *= intervalMulti;
 
-    if (inventory.has("pink_gem")) {
+    if ((await inventory.hasGem("pink_gem")).any) {
       const chance = Math.floor(Math.random() * 10);
       if (chance < 3) {
         hours *= 0.8;
@@ -224,11 +224,11 @@ export async function getClaimable(member: GuildMember | string, plantId: string
             ?.amount || 0;
     }
 
-    if (inventory.has("green_gem")) {
+    if ((await inventory.hasGem("green_gem")).any) {
       storageMulti += 0.2;
     }
 
-    if (inventory.has("pink_gem") && inventory.has("purple_gem")) {
+    if ((await inventory.hasGem("pink_gem")).any && (await inventory.hasGem("purple_gem")).any) {
       storageMulti += 0.2;
     }
 

@@ -14,11 +14,19 @@ import { pluralize } from "../string";
 import { getTax } from "../tax";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { addProgress } from "./achievements";
+import {
+  deleteMarketOrder,
+  getMarketAverage,
+  getMarketOrders,
+  setMarketOrderAmount,
+} from "./market";
+import { deleteTradeRequest, getTradeRequests } from "./trade_requests";
 import { addBalance, getSellMulti } from "./balance";
-import { getMarketAverage } from "./market";
 import { getOffersAverage } from "./offers";
 import { addStat } from "./stats";
 import { createUser, getItems, userExists } from "./utils";
+import { ClusterManager } from "discord-hybrid-sharding";
+import { NypsiClient } from "../../../models/Client";
 import ms = require("ms");
 
 const gemChanceCooldown = new Set<string>();
@@ -39,11 +47,11 @@ export async function getInventory(member: GuildMember | string): Promise<Invent
   if (cache) {
     try {
       const parsed = JSON.parse(cache);
-      return Inventory.fromJSON(parsed);
+      return Inventory.fromJSON(id, parsed);
     } catch (e) {
       console.error(e);
       logger.error("weird inventory cache error", { error: e });
-      return new Inventory();
+      return new Inventory(id);
     }
   }
 
@@ -72,10 +80,10 @@ export async function getInventory(member: GuildMember | string): Promise<Invent
       "EX",
       180,
     );
-    return new Inventory();
+    return new Inventory(id);
   }
 
-  const inventory = new Inventory(query);
+  const inventory = new Inventory(id, query);
 
   await redis.set(
     `${Constants.redis.cache.economy.INVENTORY}:${id}`,
@@ -89,8 +97,15 @@ export async function getInventory(member: GuildMember | string): Promise<Invent
 
 export class Inventory {
   private items: { [itemId: string]: number };
+  private userId: string;
 
-  constructor(data?: { item: string; amount: number }[]) {
+  constructor(member: GuildMember | string, data?: { item: string; amount: number }[]) {
+    if (member instanceof GuildMember) {
+      this.userId = member.user.id;
+    } else {
+      this.userId = member;
+    }
+
     this.items = {};
     if (data) {
       for (const i of data) {
@@ -120,23 +135,63 @@ export class Inventory {
     return (this.items[itemId] ?? 0) > 0;
   }
 
+  async hasGem(
+    id: "crystal_heart" | "white_gem" | "pink_gem" | "purple_gem" | "blue_gem" | "green_gem",
+  ): Promise<{ any: boolean; inInventory: boolean; inOrders: boolean; inTrades: boolean }> {
+    const cache = await redis.get(`${Constants.redis.cache.economy.HAS_GEM}:${this.userId}:${id}`);
+    if (cache) {
+      return JSON.parse(cache);
+    }
+
+    const inInv = this.has(id);
+
+    const inOrders =
+      (await getMarketOrders(this.userId, "sell")).filter((i) => i.itemId == id).length > 0;
+
+    const inTrades =
+      (await getTradeRequests(this.userId)).filter((i) =>
+        i.offeredItems.find((m) => m.startsWith(id)),
+      ).length > 0;
+
+    const res = {
+      any: inInv || inOrders || inTrades,
+      inInventory: inInv,
+      inOrders: inOrders,
+      inTrades: inTrades,
+    };
+
+    await redis.set(
+      `${Constants.redis.cache.economy.HAS_GEM}:${this.userId}:${id}`,
+      JSON.stringify(res),
+      "EX",
+      180,
+    );
+
+    return res;
+  }
+
   toJSON(): { [itemId: string]: number } {
     return this.items;
   }
 
-  static fromJSON(obj: { [itemId: string]: number }): Inventory {
+  static fromJSON(member: GuildMember | string, obj: { [itemId: string]: number }): Inventory {
     const data = Object.entries(obj).map(([item, amount]) => ({
       item,
       amount,
     }));
-    return new Inventory(data);
+    return new Inventory(member, data);
   }
 }
 
-async function doAutosellThing(userId: string, itemId: string, amount: number): Promise<void> {
+async function doAutosellThing(
+  userId: string,
+  itemId: string,
+  amount: number,
+  client?: NypsiClient,
+): Promise<void> {
   if (await redis.exists(`${Constants.redis.nypsi.AUTO_SELL_PROCESS}:${userId}`)) {
     await sleep(100);
-    return doAutosellThing(userId, itemId, amount);
+    return doAutosellThing(userId, itemId, amount, client);
   }
 
   await redis.set(`${Constants.redis.nypsi.AUTO_SELL_PROCESS}:${userId}`, "t", "EX", 69);
@@ -145,7 +200,7 @@ async function doAutosellThing(userId: string, itemId: string, amount: number): 
 
   let sellWorth = Math.floor(item.sell * amount);
 
-  const multi = (await getSellMulti(userId)).multi;
+  const multi = (await getSellMulti(userId, client)).multi;
 
   if (item.role == "fish" || item.role == "prey" || item.role == "sellable") {
     sellWorth = Math.floor(sellWorth + sellWorth * multi);
@@ -210,7 +265,12 @@ export async function addInventoryItem(
   }
 
   if ((await getAutosellItems(id)).includes(itemId)) {
-    return doAutosellThing(id, itemId, amount);
+    return doAutosellThing(
+      id,
+      itemId,
+      amount,
+      member instanceof GuildMember ? (member.client as NypsiClient) : undefined,
+    );
   }
 
   await prisma.inventory.upsert({
@@ -233,6 +293,7 @@ export async function addInventoryItem(
   await redis.del(
     `${Constants.redis.cache.economy.INVENTORY}:${id}`,
     `${Constants.redis.cache.economy.ITEM_EXISTS}:${itemId}`,
+    ...(isGem(itemId) ? [`${Constants.redis.cache.economy.HAS_GEM}:${id}:${itemId}`] : []),
   );
 }
 
@@ -293,6 +354,7 @@ export async function removeInventoryItem(
   await redis.del(
     `${Constants.redis.cache.economy.INVENTORY}:${id}`,
     `${Constants.redis.cache.economy.ITEM_EXISTS}:${itemId}`,
+    ...(isGem(itemId) ? [`${Constants.redis.cache.economy.HAS_GEM}:${id}:${itemId}`] : []),
   );
 }
 
@@ -346,6 +408,7 @@ export async function setInventoryItem(
   await redis.del(
     `${Constants.redis.cache.economy.INVENTORY}:${id}`,
     `${Constants.redis.cache.economy.ITEM_EXISTS}:${itemId}`,
+    ...(isGem(itemId) ? [`${Constants.redis.cache.economy.HAS_GEM}:${id}:${itemId}`] : []),
   );
 }
 
@@ -477,18 +540,26 @@ export function isGem(itemId: string) {
   return itemId.includes("_gem") || itemId === "crystal_heart";
 }
 
-export async function gemBreak(userId: string, chance: number, gem: string) {
+export async function gemBreak(
+  userId: string,
+  chance: number,
+  gem: "blue_gem" | "purple_gem" | "pink_gem" | "white_gem",
+  client?: NypsiClient | ClusterManager,
+) {
   if (!percentChance(chance)) return;
 
   const inventory = await getInventory(userId);
+  const gemLocation = await inventory.hasGem(gem);
 
-  if (inventory.has("crystal_heart") || !inventory.has(gem)) return;
+  if ((await inventory.hasGem("crystal_heart")).any || !gemLocation.any) return;
 
   let uniqueGemCount = 0;
 
-  inventory.entries.forEach((i) => {
-    if (i.item.includes("_gem")) uniqueGemCount++;
-  });
+  if ((await inventory.hasGem("pink_gem")).any) uniqueGemCount++;
+  if ((await inventory.hasGem("purple_gem")).any) uniqueGemCount++;
+  if ((await inventory.hasGem("blue_gem")).any) uniqueGemCount++;
+  if ((await inventory.hasGem("green_gem")).any) uniqueGemCount++;
+  if ((await inventory.hasGem("white_gem")).any) uniqueGemCount++;
 
   if (uniqueGemCount === 5 && percentChance(50) && (await getDmSettings(userId)).other) {
     await Promise.all([
@@ -526,7 +597,58 @@ export async function gemBreak(userId: string, chance: number, gem: string) {
     return;
   }
 
-  await removeInventoryItem(userId, gem, 1);
+  let footer = "";
+
+  if (gemLocation.inInventory) {
+    await removeInventoryItem(userId, gem, 1);
+  } else if (gemLocation.inOrders) {
+    const orders = (await getMarketOrders(userId, "sell")).filter((i) => i.itemId == gem);
+    if (orders.length == 0) return;
+
+    const order = orders[orders.length - 1];
+
+    if (order.itemAmount > 1) {
+      await setMarketOrderAmount(order.id, order.itemAmount - 1n);
+    } else {
+      const res = await deleteMarketOrder(order.id, client);
+      if (typeof res == "string" || !res) return;
+
+      await addInventoryItem(order.ownerId, order.itemId, Number(order.itemAmount));
+
+      if ((await (await getInventory(userId)).hasGem(gem)).inInventory) {
+        await removeInventoryItem(userId, gem, 1);
+      } else return;
+    }
+
+    footer = `this gem was in a sell order. ${order.itemAmount > 1 ? "one gem has been removed from this order" : "this order has been cancelled"}`;
+  } else if (gemLocation.inTrades) {
+    const trades = (await getTradeRequests(userId)).filter((i) =>
+      i.offeredItems.find((m) => m.startsWith(gem)),
+    );
+    if (trades.length == 0) return;
+
+    const trade = trades[trades.length - 1];
+
+    const res = await deleteTradeRequest(trade.id, client).catch(() => {});
+    if (!res) return;
+
+    for (const item of trade.offeredItems) {
+      const itemId = item.split(":")[0];
+      const amount = parseInt(item.split(":")[1]);
+
+      await addInventoryItem(trade.ownerId, itemId, amount);
+    }
+
+    if (trade.offeredMoney > 0) {
+      await addBalance(trade.ownerId, Number(trade.offeredMoney));
+    }
+
+    if ((await (await getInventory(userId)).hasGem(gem)).inInventory) {
+      await removeInventoryItem(userId, gem, 1);
+    } else return;
+
+    footer = "this gem was in a trade request. your trade request has been cancelled";
+  }
 
   const shardMax = new Map<string, number>([
     ["green_gem", 3],
@@ -540,17 +662,21 @@ export async function gemBreak(userId: string, chance: number, gem: string) {
 
   await addInventoryItem(userId, "gem_shard", amount);
 
+  const embed = new CustomEmbed(userId)
+    .setTitle(`your ${getItems()[gem].name} has shattered`)
+    .setDescription(
+      `${
+        getItems()[gem].emoji
+      } your gem exerted too much power and destroyed itself. shattering into ${amount} ${pluralize("piece", amount)}`,
+    );
+
+  if (footer) embed.setFooter({ text: footer });
+
   if ((await getDmSettings(userId)).other) {
     addNotificationToQueue({
       memberId: userId,
       payload: {
-        embed: new CustomEmbed(userId)
-          .setTitle(`your ${getItems()[gem].name} has shattered`)
-          .setDescription(
-            `${
-              getItems()[gem].emoji
-            } your gem exerted too much power and destroyed itself. shattering into ${amount} ${pluralize("piece", amount)}`,
-          ),
+        embed: embed,
       },
     });
   }
