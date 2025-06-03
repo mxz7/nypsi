@@ -213,11 +213,11 @@ async function doMine(
     chosenArea = areas[Math.floor(Math.random() * areas.length)];
 
     if (chosenArea == "nether") {
-      if (inventory.has("nether_portal")) {
+      if (!inventory.has("nether_portal")) {
         return choseArea();
       }
     } else if (chosenArea === "end_portal") {
-      if (inventory.has("end_portal")) {
+      if (!inventory.has("end_portal")) {
         return choseArea();
       }
     }
