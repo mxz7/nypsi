@@ -1090,14 +1090,45 @@ async function run(
     if (!item) return send({ embeds: [new ErrorEmbed("invalid item")] });
 
     return await itemView(item);
-  } else if (args[0].toLowerCase().includes("buy")) {
+  } else if (args[0].toLowerCase().includes("buy") || args[0].toLowerCase().startsWith("b")) {
     if (args.length === 1) return send({ embeds: [new ErrorEmbed("/market buy <item> <amount>")] });
 
     const item = selectItem(args[1]);
 
     if (!item) return send({ embeds: [new ErrorEmbed("invalid item")] });
 
-    const amount = args[2] ?? "1";
+    let amount = args[2] ?? "1";
+
+    if (amount.toLowerCase() == "all") {
+      amount = (await getMarketItemOrders(item.id, "sell", message.member.id))
+        .reduce((count, order) => Number(order.itemAmount) + count, 0)
+        .toString();
+
+      const marketData = await getMarketTransactionData(
+        item.id,
+        parseInt(amount),
+        "sell",
+        message.member.id,
+      );
+
+      let balance = await getBalance(message.member.id);
+
+      if (marketData.cost > balance) {
+        let validCount = 0;
+
+        for (const order of marketData.orders) {
+          if (balance >= order.itemAmount * order.price) {
+            balance -= Number(order.itemAmount);
+            validCount += Number(order.itemAmount);
+          } else {
+            validCount += Math.floor(balance / Number(order.price));
+            break;
+          }
+        }
+
+        amount = validCount.toString();
+      }
+    }
 
     if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
       return send({ embeds: [new ErrorEmbed("invalid amount")] });
@@ -1113,7 +1144,7 @@ async function run(
     }
 
     return await confirmTransaction("buy", item, parseInt(amount), message.member.id);
-  } else if (args[0].toLowerCase().includes("sell")) {
+  } else if (args[0].toLowerCase().includes("sell") || args[0].toLowerCase().startsWith("s")) {
     if (args.length === 1)
       return send({ embeds: [new ErrorEmbed("/market sell <item> <amount>")] });
 
@@ -1121,7 +1152,19 @@ async function run(
 
     if (!item) return send({ embeds: [new ErrorEmbed("invalid item")] });
 
-    const amount = args[2] ?? "1";
+    const inventory = await getInventory(message.member);
+
+    let amount = args[2] ?? "1";
+
+    if (amount.toLowerCase() == "all") {
+      const invAmount = inventory.find((i) => i.item == item.id).amount ?? 0;
+      const marketAmount = (await getMarketItemOrders(item.id, "buy", message.member.id)).reduce(
+        (count, order) => Number(order.itemAmount) + count,
+        0,
+      );
+
+      amount = Math.min(invAmount, marketAmount).toString();
+    }
 
     if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
       return send({ embeds: [new ErrorEmbed("invalid amount")] });
@@ -1135,8 +1178,6 @@ async function run(
         embeds: [new ErrorEmbed(`not enough ${item.plural} on the market`)],
       });
     }
-
-    const inventory = await getInventory(message.member);
 
     if (
       !inventory.find((i) => i.item == item.id) ||
