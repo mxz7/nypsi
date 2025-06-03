@@ -472,7 +472,9 @@ async function run(
     if (amount > craftable) {
       return send({
         embeds: [
-          new ErrorEmbed(`you can only craft ${craftable.toLocaleString()} ${selected.name}`),
+          new ErrorEmbed(
+            `you can only craft ${craftable.toLocaleString()} ${pluralize(selected, craftable)}`,
+          ),
         ],
       });
     }
