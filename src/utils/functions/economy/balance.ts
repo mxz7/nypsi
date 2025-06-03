@@ -917,6 +917,7 @@ export async function calcNetWorth(
   }
 
   for (const item of query.Inventory) {
+    if (item.amount <= 0) continue;
     if (
       item.item === "cookie" ||
       ["prey", "fish", "sellable", "ore"].includes(getItems()[item.item].role)
