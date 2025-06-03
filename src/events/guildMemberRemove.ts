@@ -9,6 +9,7 @@ import { clearMemberCache } from "../utils/functions/member";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
 import { isBooster, setBooster } from "../utils/functions/premium/boosters";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
+import { getTags, removeTag } from "../utils/functions/users/tags";
 
 export default async function guildMemberRemove(member: GuildMember) {
   clearMemberCache(member.guild.id);
@@ -78,6 +79,12 @@ export default async function guildMemberRemove(member: GuildMember) {
   if (member.guild.id != Constants.NYPSI_SERVER_ID) return;
 
   if (await isBooster(member.user.id)) await setBooster(member.user.id, false);
-  if (member.roles.cache.find((r) => r.name === member.user.id))
-    member.guild.roles.delete(member.user.id);
+
+  const tags = await getTags(member.user.id);
+
+  for (const tag of tags) {
+    if (tag.tagId.includes("year")) {
+      await removeTag(tag.userId, tag.tagId);
+    }
+  }
 }

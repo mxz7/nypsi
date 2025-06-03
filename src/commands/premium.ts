@@ -11,6 +11,8 @@ import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Comman
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { daysAgo, daysUntil, formatDate } from "../utils/functions/date";
+import { getRawLevel } from "../utils/functions/economy/levelling";
+import { userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import PageManager from "../utils/functions/page";
 import { addUserAlias, getUserAliases, removeUserAlias } from "../utils/functions/premium/aliases";
@@ -39,6 +41,7 @@ import {
   getCommandFromAlias,
 } from "../utils/handlers/commandhandler";
 import dayjs = require("dayjs");
+import ms = require("ms");
 
 let doingRoles = false;
 
@@ -187,6 +190,77 @@ async function run(
 
     for (const guildMember of members.values()) {
       if (guildMember.user.id === Constants.TEKOH_ID) continue; // no roles for me teehee
+      if (!(await userExists(guildMember.user.id))) continue;
+
+      const level = await getRawLevel(guildMember.user.id);
+      const tags = await getTags(guildMember.user.id);
+
+      if (level >= 99) {
+        if (
+          guildMember.joinedTimestamp < Date.now() - ms("1 year") &&
+          !tags.some((i) => i.tagId === "year1")
+        ) {
+          await addTag(guildMember.user.id, "year1");
+        } else if (
+          guildMember.joinedTimestamp > Date.now() - ms("1 year") &&
+          tags.some((i) => i.tagId === "year1")
+        ) {
+          await removeTag(guildMember.user.id, "year1");
+        }
+
+        if (
+          guildMember.joinedTimestamp < Date.now() - ms("2 year") &&
+          !tags.some((i) => i.tagId === "year2")
+        ) {
+          await addTag(guildMember.user.id, "year2");
+        } else if (
+          guildMember.joinedTimestamp > Date.now() - ms("2 year") &&
+          tags.some((i) => i.tagId === "year2")
+        ) {
+          await removeTag(guildMember.user.id, "year2");
+        }
+
+        if (
+          guildMember.joinedTimestamp < Date.now() - ms("3 year") &&
+          !tags.some((i) => i.tagId === "year3")
+        ) {
+          await addTag(guildMember.user.id, "year3");
+        } else if (
+          guildMember.joinedTimestamp > Date.now() - ms("3 year") &&
+          tags.some((i) => i.tagId === "year3")
+        ) {
+          await removeTag(guildMember.user.id, "year3");
+        }
+
+        if (
+          guildMember.joinedTimestamp < Date.now() - ms("4 year") &&
+          !tags.some((i) => i.tagId === "year4")
+        ) {
+          await addTag(guildMember.user.id, "year4");
+        } else if (
+          guildMember.joinedTimestamp > Date.now() - ms("4 year") &&
+          tags.some((i) => i.tagId === "year4")
+        ) {
+          await removeTag(guildMember.user.id, "year4");
+        }
+
+        if (
+          guildMember.joinedTimestamp < Date.now() - ms("5 year") &&
+          !tags.some((i) => i.tagId === "year5")
+        ) {
+          await addTag(guildMember.user.id, "year5");
+        } else if (
+          guildMember.joinedTimestamp > Date.now() - ms("5 year") &&
+          tags.some((i) => i.tagId === "year5")
+        ) {
+          await removeTag(guildMember.user.id, "year5");
+        }
+      } else if (tags.some((i) => i.tagId.includes("year"))) {
+        for (const tag of tags) {
+          if (tag.tagId.includes("year")) await removeTag(tag.userId, tag.tagId);
+        }
+      }
+
       const roleIds = Array.from(guildMember.roles.cache.keys());
 
       if (roleIds.includes(Constants.BOOST_ROLE_ID)) {
