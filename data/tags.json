@@ -232,5 +232,35 @@
     "name": "capitalist",
     "description": "found in the super capitalist achievement",
     "emoji": "👷🏻‍♂️"
+  },
+  "1year": {
+    "id": "1year",
+    "name": "1 year",
+    "description": "be in the official nypsi server for over a year",
+    "emoji": "🌻"
+  },
+  "2year": {
+    "id": "2year",
+    "name": "2 year",
+    "description": "be in the official nypsi server for over 2 years",
+    "emoji": "🌹"
+  },
+  "3year": {
+    "id": "3year",
+    "name": "3 year",
+    "description": "be in the official nypsi server for over 3 years",
+    "emoji": "🌷"
+  },
+  "4year": {
+    "id": "4year",
+    "name": "4 year",
+    "description": "be in the official nypsi server for over 4 years",
+    "emoji": "🌸"
+  },
+  "5year": {
+    "id": "5year",
+    "name": "5 year",
+    "description": "be in the official nypsi server for over 5 years",
+    "emoji": "🪷"
   }
 }
