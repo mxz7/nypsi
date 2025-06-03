@@ -183,7 +183,7 @@ async function doHunt(
     chosenPlace = places[Math.floor(Math.random() * places.length)];
 
     if (chosenPlace == "nether") {
-      if (inventory.has("nether_portal")) {
+      if (!inventory.has("nether_portal")) {
         return choseArea();
       }
     }
