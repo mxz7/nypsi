@@ -22,14 +22,11 @@ import {
 } from "./market";
 import { deleteTradeRequest, getTradeRequests } from "./trade_requests";
 import { addBalance, getSellMulti } from "./balance";
-import { getMarketAverage } from "./market";
 import { getOffersAverage } from "./offers";
 import { addStat } from "./stats";
 import { createUser, getItems, userExists } from "./utils";
 import { ClusterManager } from "discord-hybrid-sharding";
 import { NypsiClient } from "../../../models/Client";
-import { pluralize } from "../string";
-import { Item } from "../../../types/Economy";
 import ms = require("ms");
 
 const gemChanceCooldown = new Set<string>();
@@ -50,9 +47,9 @@ export async function getInventory(member: GuildMember | string): Promise<Invent
   if (cache) {
     try {
       const parsed = JSON.parse(cache);
-      return Inventory.fromJSON(parsed);
+      return Inventory.fromJSON(id, parsed);
     } catch {
-      return new Inventory();
+      return new Inventory(id);
     }
   }
 
