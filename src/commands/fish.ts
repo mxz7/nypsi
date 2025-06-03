@@ -88,20 +88,11 @@ async function doFish(
 
   let fishingRod: string;
 
-  if (
-    inventory.find((i) => i.item == "incredible_fishing_rod") &&
-    inventory.find((i) => i.item == "incredible_fishing_rod").amount > 0
-  ) {
+  if (inventory.has("incredible_fishing_rod")) {
     fishingRod = "incredible_fishing_rod";
-  } else if (
-    inventory.find((i) => i.item == "fishing_rod") &&
-    inventory.find((i) => i.item == "fishing_rod").amount > 0
-  ) {
+  } else if (inventory.has("fishing_rod")) {
     fishingRod = "fishing_rod";
-  } else if (
-    inventory.find((i) => i.item == "terrible_fishing_rod") &&
-    inventory.find((i) => i.item == "terrible_fishing_rod").amount > 0
-  ) {
+  } else if (inventory.has("terrible_fishing_rod")) {
     fishingRod = "terrible_fishing_rod";
   }
 
@@ -193,19 +184,19 @@ async function doFish(
     }
   }
 
-  if (inventory.find((i) => i.item === "purple_gem")?.amount > 0) {
+  if (inventory.has("purple_gem")) {
     if (percentChance(0.2)) {
       gemBreak(message.member.user.id, 0.07, "purple_gem");
       times++;
     }
   }
-  if (inventory.find((i) => i.item === "white_gem")?.amount > 0) {
+  if (inventory.has("white_gem")) {
     if (percentChance(0.2)) {
       gemBreak(message.member.user.id, 0.07, "white_gem");
       times++;
     }
   }
-  if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) {
+  if (inventory.has("crystal_heart")) {
     if (percentChance(0.1)) {
       times++;
     }

@@ -101,20 +101,11 @@ async function doHunt(
 
   let gun: string;
 
-  if (
-    inventory.find((i) => i.item == "incredible_gun") &&
-    inventory.find((i) => i.item == "incredible_gun").amount > 0
-  ) {
+  if (inventory.has("incredible_gun")) {
     gun = "incredible_gun";
-  } else if (
-    inventory.find((i) => i.item == "gun") &&
-    inventory.find((i) => i.item == "gun").amount > 0
-  ) {
+  } else if (inventory.has("gun")) {
     gun = "gun";
-  } else if (
-    inventory.find((i) => i.item == "terrible_gun") &&
-    inventory.find((i) => i.item == "terrible_gun").amount > 0
-  ) {
+  } else if (inventory.has("terrible_gun")) {
     gun = "terrible_gun";
   }
 
@@ -164,19 +155,19 @@ async function doHunt(
     }
   }
 
-  if (inventory.find((i) => i.item === "purple_gem")?.amount > 0) {
+  if (inventory.has("purple_gem")) {
     if (percentChance(0.2)) {
       gemBreak(message.member.user.id, 0.07, "purple_gem");
       times++;
     }
   }
-  if (inventory.find((i) => i.item === "white_gem")?.amount > 0) {
+  if (inventory.has("white_gem")) {
     if (percentChance(0.2)) {
       gemBreak(message.member.user.id, 0.07, "white_gem");
       times++;
     }
   }
-  if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) {
+  if (inventory.has("crystal_heart")) {
     if (percentChance(0.1)) {
       times++;
     }
@@ -192,10 +183,7 @@ async function doHunt(
     chosenPlace = places[Math.floor(Math.random() * places.length)];
 
     if (chosenPlace == "nether") {
-      if (
-        !inventory.find((i) => i.item == "nether_portal") ||
-        inventory.find((i) => i.item == "nether_portal").amount < 1
-      ) {
+      if (inventory.has("nether_portal")) {
         return choseArea();
       }
     }

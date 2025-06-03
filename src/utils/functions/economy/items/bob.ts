@@ -72,8 +72,7 @@ module.exports = new ItemUse(
 
     let amount = 1;
 
-    if (args[1] && args[1].toLowerCase() === "all")
-      args[1] = inventory.find((i) => i.item === "bob").amount.toString();
+    if (args[1] && args[1].toLowerCase() === "all") args[1] = inventory.count("bob").toString();
 
     if (args[1]) {
       amount = formatNumber(args[1]);
@@ -82,24 +81,28 @@ module.exports = new ItemUse(
     if (!amount || isNaN(amount) || amount < 1)
       return send({ embeds: [new ErrorEmbed("invalid amount")] });
 
-    if (inventory.find((i) => i.item === "bob").amount < amount)
+    if (inventory.count("bob") < amount)
       return send({ embeds: [new ErrorEmbed("you dont have this many bobs")] });
-
-    await removeInventoryItem(message.member, "bob", amount);
 
     const breakdown: string[] = [];
 
+    let maxUsedAmount = 0;
+
     for (const item of crafting) {
-      const newDate = dayjs(item.finished).subtract(amount, "hour").toDate();
+      const remainingMs = item.finished.getTime() - Date.now();
+      const remainingHours = remainingMs / (1000 * 60 * 60);
+
+      const usableAmount = Math.min(amount, Math.ceil(remainingHours));
+      if (usableAmount <= 0) continue;
+
+      const newDate = dayjs(item.finished).subtract(usableAmount, "hour").toDate();
 
       let oldDateText = MStoTime(item.finished.getTime() - Date.now());
-
       if (Date.now() > item.finished.getTime()) {
         oldDateText = "done";
       }
 
       let newDateText = MStoTime(newDate.getTime() - Date.now());
-
       if (Date.now() > newDate.getTime()) {
         newDateText = "done";
       }
@@ -110,6 +113,10 @@ module.exports = new ItemUse(
         }: \`${oldDateText}\` → \`${newDateText}\``,
       );
 
+      if (usableAmount > maxUsedAmount) {
+        maxUsedAmount = usableAmount;
+      }
+
       await prisma.crafting.update({
         where: {
           id: item.id,
@@ -119,6 +126,11 @@ module.exports = new ItemUse(
         },
       });
     }
+
+    if (maxUsedAmount == 0)
+      return send({ embeds: [new ErrorEmbed("you are not currently crafting anything")] });
+
+    await removeInventoryItem(message.member, "bob", maxUsedAmount);
 
     getCraftingItems(message.member);
 
@@ -134,7 +146,7 @@ module.exports = new ItemUse(
       embeds: [
         new CustomEmbed(
           message.member,
-          `<:nypsi_bob:1078776552067694672> bob has removed ${amount} ${pluralize("hour", amount)} of crafting time from ${crafting.length} ${pluralize("item", crafting.length)}\n\n${breakdown.join("\n")}`,
+          `<:nypsi_bob:1078776552067694672> bob has removed ${maxUsedAmount} ${pluralize("hour", maxUsedAmount)} of crafting time from ${crafting.length} ${pluralize("item", crafting.length)}\n\n${breakdown.join("\n")}`,
         ),
       ],
     });

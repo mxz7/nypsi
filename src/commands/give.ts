@@ -152,17 +152,13 @@ async function run(
     return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[1]}\``)] });
   }
 
-  if (
-    !inventory.find((i) => i.item == selected.id) ||
-    inventory.find((i) => i.item == selected.id).amount < 1
-  ) {
+  if (!inventory.has(selected.id)) {
     return send({
       embeds: [new ErrorEmbed("you dont have any " + selected.plural)],
     });
   }
 
-  if (args[2]?.toLowerCase() === "all")
-    args[2] = inventory.find((i) => i.item === selected.id).amount.toString();
+  if (args[2]?.toLowerCase() === "all") args[2] = inventory.count(selected.id).toString();
 
   let amount = parseInt(args[2]);
 
@@ -173,8 +169,8 @@ async function run(
       return send({ embeds: [new ErrorEmbed("invalid amount")] });
     }
 
-    if (amount > inventory.find((i) => i.item == selected.id).amount) {
-      return send({ embeds: [new ErrorEmbed(`you don't have enough ${selected.name}`)] });
+    if (inventory.count(selected.id) < amount) {
+      return send({ embeds: [new ErrorEmbed(`you don't have enough ${selected.plural}`)] });
     }
   }
 

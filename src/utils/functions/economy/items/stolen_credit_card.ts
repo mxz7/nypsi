@@ -56,7 +56,7 @@ module.exports = new ItemUse(
     let amount = 1;
 
     if (args[1] && args[1].toLowerCase() === "all")
-      args[1] = inventory.find((i) => i.item === "stolen_credit_card").amount.toString();
+      args[1] = inventory.count("stolen_credit_card").toString();
 
     if (args[1]) {
       amount = formatNumber(args[1]);
@@ -65,7 +65,7 @@ module.exports = new ItemUse(
     if (!amount || isNaN(amount) || amount < 1)
       return send({ embeds: [new ErrorEmbed("invalid amount")] });
 
-    if (inventory.find((i) => i.item === "stolen_credit_card").amount < amount)
+    if (inventory.count("stolen_credit_card") < amount)
       return send({ embeds: [new ErrorEmbed("you dont have this many stolen credit cards")] });
 
     const addedAmount = randomInt(10_000 * amount, 250_000 * amount);

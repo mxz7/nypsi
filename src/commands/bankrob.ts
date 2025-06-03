@@ -95,10 +95,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
 
     let lawyer = false;
 
-    if (
-      inventory.find((i) => i.item == "lawyer") &&
-      inventory.find((i) => i.item == "lawyer").amount > 0
-    ) {
+    if (inventory.has("lawyer")) {
       lawyer = true;
       maxLoss = maxLoss * 0.35;
     }
@@ -195,10 +192,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
       const inventory = await getInventory(message.member);
       let lawyer = false;
 
-      if (
-        inventory.find((i) => i.item == "lawyer") &&
-        inventory.find((i) => i.item == "lawyer").amount > 0
-      ) {
+      if (inventory.has("lawyer")) {
         lawyer = true;
 
         await removeInventoryItem(message.member, "lawyer", 1);

@@ -14,7 +14,7 @@ export default {
 
     const items = getItems();
 
-    let options = inventory
+    let options = inventory.entries
       .map((i) => i.item)
       .filter(
         (item) =>

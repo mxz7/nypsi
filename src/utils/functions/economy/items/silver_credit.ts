@@ -126,10 +126,7 @@ module.exports = new ItemUse(
       await res.deferUpdate();
       const inventory = await getInventory(message.member);
 
-      if (
-        !inventory.find((i) => i.item === "silver_credit") ||
-        inventory.find((i) => i.item === "silver_credit").amount < 1
-      ) {
+      if (!inventory.has("silver_credit")) {
         return res.editReply({ embeds: [new ErrorEmbed("lol!")] });
       }
 

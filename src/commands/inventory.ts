@@ -100,7 +100,7 @@ async function run(
 
   await addCooldown(cmd.name, message.member, 3);
 
-  let inventory = await getInventory(message.member);
+  let inventory = (await getInventory(message.member)).entries;
 
   if (inventory.length == 0) {
     return send({
@@ -220,7 +220,7 @@ async function run(
 
         if (!res.isModalSubmit()) return;
 
-        if (currentFilter) inventory = await getInventory(message.member);
+        if (currentFilter) inventory = (await getInventory(message.member)).entries;
 
         inventory = setFilter(inventory, res.fields.fields.first().value.toLowerCase());
 

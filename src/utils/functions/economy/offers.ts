@@ -18,7 +18,7 @@ import { filterOutliers } from "../outliers";
 import { isPremium } from "../premium/premium";
 import { getTax } from "../tax";
 import { addBalance } from "./balance";
-import { getInventory } from "./inventory";
+import { getInventory, Inventory } from "./inventory";
 import { createUser, getItems, userExists } from "./utils";
 
 export async function createOffer(
@@ -146,20 +146,11 @@ export async function deleteOffer(offer: Offer, client?: NypsiClient) {
 }
 
 export async function checkOffer(offer: Offer, client: NypsiClient) {
-  const inventory = await getInventory(offer.targetId).catch(
-    (): {
-      item: string;
-      amount: number;
-    }[] => [],
-  );
+  const inventory = await getInventory(offer.targetId).catch(() => new Inventory());
 
   if (offer.sold) return;
 
-  if (
-    !inventory.find((i) => i.item === offer.itemId) ||
-    inventory.find((i) => i.item === offer.itemId).amount < offer.itemAmount
-  )
-    return deleteOffer(offer, client);
+  if (inventory.count(offer.itemId) < offer.itemAmount) return deleteOffer(offer, client);
 }
 
 export async function getOffersAverage(item: string) {

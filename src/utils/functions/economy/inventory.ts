@@ -18,6 +18,7 @@ import { getOffersAverage } from "./offers";
 import { addStat } from "./stats";
 import { createUser, getItems, userExists } from "./utils";
 import { pluralize } from "../string";
+import { Item } from "../../../types/Economy";
 import ms = require("ms");
 
 const gemChanceCooldown = new Set<string>();
@@ -25,9 +26,7 @@ setInterval(() => {
   gemChanceCooldown.clear();
 }, 60000);
 
-export async function getInventory(
-  member: GuildMember | string,
-): Promise<{ item: string; amount: number }[]> {
+export async function getInventory(member: GuildMember | string): Promise<Inventory> {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -39,9 +38,10 @@ export async function getInventory(
 
   if (cache) {
     try {
-      return JSON.parse(cache) || [];
+      const parsed = JSON.parse(cache);
+      return Inventory.fromJSON(parsed);
     } catch {
-      return [];
+      return new Inventory();
     }
   }
 
@@ -64,18 +64,71 @@ export async function getInventory(
 
   if (!query || query.length == 0) {
     if (!(await userExists(id))) await createUser(id);
-    await redis.set(`${Constants.redis.cache.economy.INVENTORY}:${id}`, "[]", "EX", 180);
-    return [];
+    await redis.set(
+      `${Constants.redis.cache.economy.INVENTORY}:${id}`,
+      JSON.stringify({}),
+      "EX",
+      180,
+    );
+    return new Inventory();
   }
+
+  const inventory = new Inventory(query);
 
   await redis.set(
     `${Constants.redis.cache.economy.INVENTORY}:${id}`,
-    JSON.stringify(query),
+    JSON.stringify(inventory.toJSON()),
     "EX",
     180,
   );
 
-  return query;
+  return inventory;
+}
+
+export class Inventory {
+  private items: { [itemId: string]: number };
+
+  constructor(data?: { item: string; amount: number }[]) {
+    this.items = {};
+    if (data) {
+      for (const i of data) {
+        this.items[i.item] = i.amount;
+      }
+    }
+  }
+
+  get entries(): { item: string; amount: number }[] {
+    return Object.entries(this.items).map(([item, amount]) => ({
+      item,
+      amount,
+    }));
+  }
+
+  count(item: Item): number;
+  count(itemId: string): number;
+  count(item: Item | string): number {
+    const itemId = typeof item === "string" ? item : item.id;
+    return this.items[itemId] ?? 0;
+  }
+
+  has(item: Item): boolean;
+  has(itemId: string): boolean;
+  has(item: Item | string): boolean {
+    const itemId = typeof item === "string" ? item : item.id;
+    return (this.items[itemId] ?? 0) > 0;
+  }
+
+  toJSON(): { [itemId: string]: number } {
+    return this.items;
+  }
+
+  static fromJSON(obj: { [itemId: string]: number }): Inventory {
+    const data = Object.entries(obj).map(([item, amount]) => ({
+      item,
+      amount,
+    }));
+    return new Inventory(data);
+  }
 }
 
 async function doAutosellThing(userId: string, itemId: string, amount: number): Promise<void> {
@@ -427,13 +480,11 @@ export async function gemBreak(userId: string, chance: number, gem: string) {
 
   const inventory = await getInventory(userId);
 
-  if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) return;
-  if (!inventory.find((i) => i.item === gem) || inventory.find((i) => i.item === gem).amount < 1)
-    return;
+  if (inventory.has("crystal_heart") || !inventory.has(gem)) return;
 
   let uniqueGemCount = 0;
 
-  inventory.forEach((i) => {
+  inventory.entries.forEach((i) => {
     if (i.item.includes("_gem")) uniqueGemCount++;
   });
 

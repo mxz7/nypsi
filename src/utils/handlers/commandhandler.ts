@@ -1314,10 +1314,7 @@ export function runCommandUseTimers(client: NypsiClient) {
 
       const inventory = await getInventory(user);
 
-      if (
-        inventory.find((i) => i.item === "purple_gem") &&
-        inventory.find((i) => i.item === "purple_gem").amount > 0
-      ) {
+      if (inventory.has("purple_gem")) {
         if (percentChance(50)) {
           modifier = modifier / 1.77777;
           gemBreak(user, 0.00777, "purple_gem");

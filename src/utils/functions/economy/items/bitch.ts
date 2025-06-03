@@ -50,7 +50,7 @@ module.exports = new ItemUse(
       embeds: [
         new CustomEmbed(
           message.member,
-          `you had fun with your ${pluralize("bitch", inventory.find((i) => i.item === "bitch").amount)}`,
+          `you had fun with your ${pluralize("bitch", inventory.count("bitch"))}`,
         ),
       ],
     });

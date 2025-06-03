@@ -347,10 +347,7 @@ async function run(
 
       const inventory = await getInventory(message.member);
 
-      if (
-        inventory.find((i) => i.item == "lawyer") &&
-        inventory.find((i) => i.item == "lawyer").amount > 0
-      ) {
+      if (inventory.has("lawyer")) {
         await Promise.all([
           removeInventoryItem(message.member, "lawyer", 1),
           addStat(message.member, "lawyer"),

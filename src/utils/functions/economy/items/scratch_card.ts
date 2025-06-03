@@ -72,10 +72,7 @@ async function prepare(
     return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] });
   }
 
-  if (
-    !inventory.find((i) => i.item == selected.id) ||
-    inventory.find((i) => i.item == selected.id).amount < 1
-  ) {
+  if (!inventory.has(selected.id)) {
     return send({ embeds: [new ErrorEmbed(`you dont have ${selected.article} ${selected.name}`)] });
   }
 
@@ -142,10 +139,7 @@ async function prepare(
       );
       embed.setFooter({ text: `id: ${gameId}` });
 
-      if (
-        inventory.find((i) => i.item === selected.id) &&
-        inventory.find((i) => i.item === selected.id)?.amount > 0
-      ) {
+      if (inventory.has(selected.id)) {
         buttons[0].addComponents(
           new ButtonBuilder()
             .setCustomId("retry")

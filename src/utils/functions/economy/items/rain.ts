@@ -104,10 +104,7 @@ module.exports = new ItemUse(
 
       const inventory = await getInventory(message.member);
 
-      if (
-        !inventory.find((i) => i.item === "rain") ||
-        inventory.find((i) => i.item === "rain").amount < 1
-      ) {
+      if (!inventory.has("rain")) {
         return res.reply({
           embeds: [
             new ErrorEmbed("what happened to your rain buddy. YEAH. I SAW THAT").setImage(

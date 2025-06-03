@@ -33,8 +33,8 @@ import {
   addInventoryItem,
   calcItemValue,
   getInventory,
+  removeInventoryItem,
   selectItem,
-  setInventoryItem,
 } from "../utils/functions/economy/inventory";
 import { getRawLevel } from "../utils/functions/economy/levelling";
 import {
@@ -458,9 +458,9 @@ async function run(
           const selected = selectItem(item);
 
           if (amount.toLowerCase() === "all") {
-            amount = (
-              (await getInventory(message.author.id)).find((i) => i.item == selected.id)?.amount ||
-              1
+            amount = Math.max(
+              (await getInventory(message.author.id)).count(selected.id),
+              1,
             ).toString();
           }
 
@@ -588,10 +588,7 @@ async function run(
           } else if (type == "sell") {
             let inventory = await getInventory(message.member);
 
-            if (
-              !inventory.find((i) => i.item == selected.id) ||
-              inventory.find((i) => i.item == selected.id).amount < parseInt(amount)
-            ) {
+            if (inventory.count(selected.id) < parseInt(amount)) {
               await res.editReply({
                 embeds: [new ErrorEmbed(`you dont have enough ${selected.plural}`)],
                 options: { flags: MessageFlags.Ephemeral },
@@ -614,10 +611,7 @@ async function run(
 
             inventory = await getInventory(message.member);
 
-            if (
-              !inventory.find((i) => i.item == selected.id) ||
-              inventory.find((i) => i.item == selected.id).amount < parseInt(amount)
-            ) {
+            if (inventory.count(selected.id) < parseInt(amount)) {
               await res.editReply({
                 embeds: [new ErrorEmbed("sneaky bitch")],
                 options: { flags: MessageFlags.Ephemeral },
@@ -646,11 +640,7 @@ async function run(
               return pageManager();
             }
 
-            await setInventoryItem(
-              message.member,
-              selected.id,
-              inventory.find((i) => i.item == selected.id).amount - parseInt(amount),
-            );
+            await removeInventoryItem(message.member, selected.id, parseInt(amount));
 
             const createRes = await createMarketOrder(
               message.member.id,
@@ -1179,10 +1169,9 @@ async function run(
       });
     }
 
-    if (
-      !inventory.find((i) => i.item == item.id) ||
-      inventory.find((i) => i.item == item.id).amount < 1
-    ) {
+    const inventory = await getInventory(message.member);
+
+    if (inventory.count(item.id) < parseInt(amount)) {
       return send({
         embeds: [new ErrorEmbed(`you do not have this many ${item.plural}`)],
       });
@@ -1228,9 +1217,7 @@ async function run(
     }
 
     if (amount.toLowerCase() === "all") {
-      amount = (
-        (await getInventory(message.author.id)).find((i) => i.item == selected.id)?.amount || 1
-      ).toString();
+      amount = Math.max((await getInventory(message.author.id)).count(selected.id), 1).toString();
     }
 
     if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
@@ -1317,10 +1304,7 @@ async function run(
     } else if (type == "sell") {
       let inventory = await getInventory(message.member);
 
-      if (
-        !inventory.find((i) => i.item == selected.id) ||
-        inventory.find((i) => i.item == selected.id).amount < parseInt(amount)
-      ) {
+      if (inventory.count(selected.id) < parseInt(amount)) {
         return send({
           embeds: [new ErrorEmbed(`you dont have enough ${selected.plural}`)],
         });
@@ -1336,10 +1320,7 @@ async function run(
 
       inventory = await getInventory(message.member);
 
-      if (
-        !inventory.find((i) => i.item == selected.id) ||
-        inventory.find((i) => i.item == selected.id).amount < parseInt(amount)
-      ) {
+      if (inventory.count(selected.id) < parseInt(amount)) {
         return msg.edit({ embeds: [new ErrorEmbed("sneaky bitch")], components: [] });
       }
 
@@ -1360,11 +1341,7 @@ async function run(
         });
       }
 
-      await setInventoryItem(
-        message.member,
-        selected.id,
-        inventory.find((i) => i.item == selected.id).amount - parseInt(amount),
-      );
+      await removeInventoryItem(message.member, selected.id, parseInt(amount));
 
       const createRes = await createMarketOrder(
         message.member.id,
@@ -1754,12 +1731,9 @@ async function run(
       } else if (res == "sellOne") {
         const inventory = await getInventory(message.member);
 
-        if (
-          !inventory.find((i) => i.item == item.id) ||
-          inventory.find((i) => i.item == item.id).amount < 1
-        ) {
+        if (!inventory.has(item.id)) {
           await interaction.reply({
-            embeds: [new ErrorEmbed(`you do not have this many ${item.plural}`)],
+            embeds: [new ErrorEmbed(`you do not have ${item.article} ${item.name}`)],
             flags: MessageFlags.Ephemeral,
           });
           await updateEmbed();
@@ -1821,10 +1795,7 @@ async function run(
 
           const inventory = await getInventory(message.member);
 
-          if (
-            !inventory.find((i) => i.item == item.id) ||
-            inventory.find((i) => i.item == item.id).amount < 1
-          ) {
+          if (inventory.count(item.id) < formattedAmount) {
             await interaction.editReply({
               embeds: [new ErrorEmbed(`you do not have this many ${item.plural}`)],
               options: { flags: MessageFlags.Ephemeral },
