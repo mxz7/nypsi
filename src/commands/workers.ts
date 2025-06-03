@@ -45,6 +45,7 @@ import {
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
 import { pluralize } from "../utils/functions/string";
+import { NypsiClient } from "../models/Client";
 import _ = require("lodash");
 
 const cmd = new Command(
@@ -179,7 +180,10 @@ async function run(
       if (isOwned(worker.id)) {
         const userWorker = userWorkers.find((w) => w.workerId == worker.id);
 
-        const { maxStorage, perInterval, perItem } = await calcWorkerValues(userWorker);
+        const { maxStorage, perInterval, perItem } = await calcWorkerValues(
+          userWorker,
+          message.client as NypsiClient,
+        );
 
         let desc =
           `**inventory** ${userWorker.stored.toLocaleString()} ${
@@ -545,7 +549,7 @@ async function run(
 
     return upgradeWorker(worker);
   } else if (args[0].toLowerCase() == "claim" || args[0].toLowerCase() == "sell") {
-    const desc = await claimFromWorkers(message.author.id);
+    const desc = await claimFromWorkers(message.author.id, message.client as NypsiClient);
 
     const embed = new CustomEmbed(message.member, desc)
       .setHeader("workers", message.author.avatarURL())
@@ -615,6 +619,7 @@ async function run(
       let byproductsDescription = "";
       for (let i = 0; i < value; i++) {
         const { amountEarned, byproductAmounts } = await evaluateWorker(
+          message.client as NypsiClient,
           message.author.id,
           worker,
           {},

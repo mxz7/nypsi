@@ -31,6 +31,7 @@ import { getPrefix } from "../utils/functions/guilds/utils";
 import { shuffle } from "../utils/functions/random";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { gamble } from "../utils/logger.js";
+import { NypsiClient } from "../models/Client";
 
 const staticEmojis = new Map<string, string>();
 const animatedEmojis = new Map<string, string>();
@@ -377,7 +378,7 @@ async function run(
   let multi = 0;
 
   if (win) {
-    multi = (await getGambleMulti(message.member)).multi;
+    multi = (await getGambleMulti(message.member, message.client as NypsiClient)).multi;
     winnings -= bet;
 
     if (multi > 0) {
@@ -442,7 +443,12 @@ async function run(
         embed.addField("**winner!!**", "**you win** $" + winnings.toLocaleString());
       }
 
-      const earnedXp = await calcEarnedGambleXp(message.member, bet, multiplier);
+      const earnedXp = await calcEarnedGambleXp(
+        message.member,
+        message.client as NypsiClient,
+        bet,
+        multiplier,
+      );
 
       if (earnedXp > 0) {
         await addXp(message.member, earnedXp);

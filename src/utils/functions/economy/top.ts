@@ -12,6 +12,7 @@ import { getActiveTag } from "../users/tags";
 import { calcNetWorth } from "./balance";
 import { checkLeaderboardPositions } from "./stats";
 import { getAchievements, getItems, getTagsData } from "./utils";
+import { NypsiClient } from "../../../models/Client";
 import pAll = require("p-all");
 
 export async function topBalance(guild: Guild, userId?: string) {
@@ -251,7 +252,7 @@ export async function topNetWorth(guild: Guild, userId?: string, repeatCount = 1
       }
 
       promises.push(async () => {
-        const net = await calcNetWorth("leaderboard", user.userId);
+        const net = await calcNetWorth("leaderboard", user.userId, guild.client as NypsiClient);
 
         users.push({ userId: user.userId, netWorth: net.amount });
       });

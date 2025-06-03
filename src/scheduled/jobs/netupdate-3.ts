@@ -9,7 +9,7 @@ import { calcNetWorth } from "../../utils/functions/economy/balance";
 export default {
   name: "netupdate-3",
   cron: "0 0 * * *",
-  async run(log) {
+  async run(log, manager) {
     const start = Date.now();
     const query = await prisma.economy.findMany({
       select: {
@@ -27,7 +27,7 @@ export default {
     for (const user of query) {
       if (await redis.exists(`${Constants.redis.cache.economy.NETWORTH}:${user.userId}`)) continue;
 
-      await calcNetWorth("job", user.userId);
+      await calcNetWorth("job", user.userId, manager);
       count++;
     }
 

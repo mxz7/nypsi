@@ -222,22 +222,22 @@ export async function runBakery(member: GuildMember) {
     }
   }
 
-  if (inventory.has("crystal_heart")) {
+  if ((await inventory.hasGem("crystal_heart")).any) {
     if (percentChance(5)) {
       total = total * 2;
       earned.set("crystal_heart", Math.floor(total / 2));
     }
-  } else if (inventory.has("white_gem")) {
+  } else if ((await inventory.hasGem("white_gem")).any) {
     if (percentChance(2)) {
       total = total * 2;
       earned.set("white_gem", Math.floor(total / 2));
     }
-  } else if (inventory.has("purple_gem")) {
+  } else if ((await inventory.hasGem("purple_gem")).any) {
     if (percentChance(0.5)) {
       total = total * 2;
       earned.set("purple_gem", Math.floor(total / 2));
     }
-  } else if (inventory.has("blue_gem")) {
+  } else if ((await inventory.hasGem("blue_gem")).any) {
     if (percentChance(0.1)) {
       total = total * 2;
       earned.set("blue_gem", Math.floor(total / 2));

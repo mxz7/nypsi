@@ -4,6 +4,7 @@ import { CustomEmbed } from "../models/EmbedBuilders.js";
 import { getGambleMulti, getSellMulti } from "../utils/functions/economy/balance";
 import { createUser, userExists } from "../utils/functions/economy/utils.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { NypsiClient } from "../models/Client";
 
 const cmd = new Command("multi", "check your multipliers", "money").setAliases([
   "multis",
@@ -24,8 +25,8 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
   if (!(await userExists(message.member))) await createUser(message.member);
 
   const embed = new CustomEmbed(message.member).setDescription(
-    `gamble multiplier: **${Math.floor((await getGambleMulti(message.member)).multi * 100)}**%\n` +
-      `sell multiplier: **${Math.floor((await getSellMulti(message.member)).multi * 100)}**%`,
+    `gamble multiplier: **${Math.floor((await getGambleMulti(message.member, message.client as NypsiClient)).multi * 100)}**%\n` +
+      `sell multiplier: **${Math.floor((await getSellMulti(message.member, message.client as NypsiClient)).multi * 100)}**%`,
   );
 
   embed.setHeader(`${message.author.username}`, message.author.avatarURL());

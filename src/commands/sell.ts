@@ -30,6 +30,7 @@ import PageManager from "../utils/functions/page";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { addCooldown, addExpiry, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { NypsiClient } from "../models/Client";
 import pAll = require("p-all");
 
 const cmd = new Command("sell", "sell items", "money");
@@ -411,7 +412,7 @@ async function run(
 
     let sellWorth = Math.floor(selected.sell * amount);
 
-    const multi = (await getSellMulti(message.member)).multi;
+    const multi = (await getSellMulti(message.member, message.client as NypsiClient)).multi;
 
     if (selected.role == "fish" || selected.role == "prey" || selected.role == "sellable") {
       sellWorth = Math.floor(sellWorth + sellWorth * multi);
@@ -474,7 +475,7 @@ async function calcValues(message: Message | (NypsiCommandInteraction & CommandI
     }
   }
 
-  const multi = (await getSellMulti(message.member)).multi;
+  const multi = (await getSellMulti(message.member, message.client as NypsiClient)).multi;
 
   let total = 0;
   let taxedAmount = 0;

@@ -1314,10 +1314,10 @@ export function runCommandUseTimers(client: NypsiClient) {
 
       const inventory = await getInventory(user);
 
-      if (inventory.has("purple_gem")) {
+      if ((await inventory.hasGem("purple_gem")).any) {
         if (percentChance(50)) {
           modifier = modifier / 1.77777;
-          gemBreak(user, 0.00777, "purple_gem");
+          gemBreak(user, 0.00777, "purple_gem", client);
         }
       }
 

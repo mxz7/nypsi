@@ -28,6 +28,7 @@ import { createUser, getItems, userExists } from "../utils/functions/economy/uti
 import { addXp, calcEarnedHFMXp } from "../utils/functions/economy/xp";
 import { percentChance } from "../utils/functions/random";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { NypsiClient } from "../models/Client";
 
 const veins = new Map<string, number[]>();
 
@@ -185,19 +186,19 @@ async function doMine(
     }
   }
 
-  if (inventory.has("purple_gem")) {
+  if ((await inventory.hasGem("purple_gem")).any) {
     if (percentChance(0.2)) {
-      gemBreak(message.member.user.id, 0.07, "purple_gem");
+      gemBreak(message.member.user.id, 0.07, "purple_gem", message.client as NypsiClient);
       times++;
     }
   }
-  if (inventory.has("white_gem")) {
+  if ((await inventory.hasGem("white_gem")).any) {
     if (percentChance(0.2)) {
-      gemBreak(message.member.user.id, 0.07, "white_gem");
+      gemBreak(message.member.user.id, 0.07, "white_gem", message.client as NypsiClient);
       times++;
     }
   }
-  if (inventory.has("crystal_heart")) {
+  if ((await inventory.hasGem("crystal_heart")).any) {
     if (percentChance(0.1)) {
       times++;
     }

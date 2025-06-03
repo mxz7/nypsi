@@ -9,6 +9,7 @@ import { getBoosters } from "./boosters";
 import { gemBreak, getInventory } from "./inventory";
 import { doLevelUp, getRawLevel, getUpgrades } from "./levelling";
 import { getItems, getUpgradesData } from "./utils";
+import { NypsiClient } from "../../../models/Client";
 
 export async function getXp(member: GuildMember | string): Promise<number> {
   let id: string;
@@ -109,6 +110,7 @@ export async function removeXp(member: GuildMember | string, amount: number, che
 
 export async function calcEarnedGambleXp(
   member: GuildMember | string,
+  client: NypsiClient,
   bet: number,
   multiplier: number,
 ): Promise<number> {
@@ -143,14 +145,14 @@ export async function calcEarnedGambleXp(
   if (booster) min += 5;
   if (tier) min += tier * 2.7;
 
-  if (inventory.has("crystal_heart")) min += Math.floor(Math.random() * 10);
-  if (inventory.has("white_gem")) {
+  if ((await inventory.hasGem("crystal_heart")).any) min += Math.floor(Math.random() * 10);
+  if ((await inventory.hasGem("white_gem")).any) {
     const chance = Math.floor(Math.random() * 10);
 
     if (chance < 2) {
       min -= Math.floor(Math.random() * 7);
     } else {
-      gemBreak(id, 0.007, "white_gem");
+      gemBreak(id, 0.007, "white_gem", client);
       min += Math.floor(Math.random() * 17) + 1;
     }
   }

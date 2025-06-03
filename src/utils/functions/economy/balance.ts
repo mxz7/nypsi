@@ -27,6 +27,8 @@ import {
 } from "./utils";
 import { hasVoted } from "./vote";
 import { calcWorkerValues } from "./workers";
+import { NypsiClient } from "../../../models/Client";
+import { ClusterManager } from "discord-hybrid-sharding";
 import ms = require("ms");
 import _ = require("lodash");
 
@@ -250,7 +252,7 @@ export async function increaseBaseBankStorage(member: GuildMember, amount: numbe
   });
 }
 
-export async function getGambleMulti(member: GuildMember | string) {
+export async function getGambleMulti(member: GuildMember | string, client: NypsiClient) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -358,27 +360,27 @@ export async function getGambleMulti(member: GuildMember | string) {
 
   const beforeGems = multi;
 
-  const heart = inventory.has("crystal_heart");
+  const heart = (await inventory.hasGem("crystal_heart")).any;
 
-  if (inventory.has("white_gem")) {
+  if ((await inventory.hasGem("white_gem")).any) {
     const chance = Math.floor(Math.random() * 10);
 
     if (chance < 2 && !heart) {
       multi -= Math.floor(Math.random() * 3) + 1;
     } else {
-      gemBreak(id, 0.01, "white_gem");
+      gemBreak(id, 0.01, "white_gem", client);
       const choices = [
         7, 3, 4, 5, 7, 2, 17, 7, 4, 5, 3, 3, 3, 4, 3, 3, 3, 2, 2, 2, 7, 7, 7, 7, 7, 7, 7,
       ];
       multi += Math.floor(Math.random() * choices[Math.floor(Math.random() * choices.length)]);
     }
-  } else if (inventory.has("pink_gem")) {
+  } else if ((await inventory.hasGem("pink_gem")).any) {
     const chance = Math.floor(Math.random() * 10);
 
     if (chance < 2 && !heart) {
       multi -= 3;
     } else {
-      gemBreak(id, 0.07, "pink_gem");
+      gemBreak(id, 0.07, "pink_gem", client);
       const choices = [7, 5, 4, 3, 2, 1, 3, 1, 1, 1, 3, 3, 2, 2, 2, 3, 3, 4, 4];
       multi += Math.floor(Math.random() * choices[Math.floor(Math.random() * choices.length)]);
     }
@@ -394,7 +396,7 @@ export async function getGambleMulti(member: GuildMember | string) {
   return { multi: parseFloat(multi.toFixed(2)), breakdown: breakdownMap };
 }
 
-export async function getSellMulti(member: GuildMember | string) {
+export async function getSellMulti(member: GuildMember | string, client: NypsiClient) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -491,27 +493,27 @@ export async function getSellMulti(member: GuildMember | string) {
   if (multi - beforeBoosters !== 0) breakdown.set("boosters", multi - beforeBoosters);
   const beforeGems = multi;
 
-  const heart = inventory.has("crystal_heart");
+  const heart = (await inventory.hasGem("crystal_heart")).any;
 
-  if (inventory.has("white_gem")) {
+  if ((await inventory.hasGem("white_gem")).any) {
     const chance = Math.floor(Math.random() * 10);
 
     if (chance < 2 && !heart) {
       multi -= Math.floor(Math.random() * 6) + 1;
     } else {
-      gemBreak(id, 0.01, "white_gem");
+      gemBreak(id, 0.01, "white_gem", client);
       const choices = [
         7, 3, 4, 5, 7, 2, 17, 7, 4, 5, 2, 2, 2, 2, 2, 3, 3, 3, 10, 17, 10, 7, 7, 7, 7,
       ];
       multi += Math.floor(Math.random() * choices[Math.floor(Math.random() * choices.length)]);
     }
-  } else if (inventory.has("pink_gem")) {
+  } else if ((await inventory.hasGem("pink_gem")).any) {
     const chance = Math.floor(Math.random() * 10);
 
     if (chance < 2 && !heart) {
       multi -= 3;
     } else {
-      gemBreak(id, 0.07, "pink_gem");
+      gemBreak(id, 0.07, "pink_gem", client);
       const choices = [7, 5, 4, 3, 2, 1, 3, 1, 1, 1, 3, 3, 7, 7, 7, 7, 7, 4, 4, 4, 4, 4, 4, 4];
       multi += choices[Math.floor(Math.random() * choices.length)];
     }
@@ -771,6 +773,7 @@ export async function getRequiredBetForXp(member: GuildMember | string): Promise
 export async function calcNetWorth(
   source: string,
   member: GuildMember | string,
+  client: NypsiClient | ClusterManager,
   breakdown = false,
 ) {
   let id: string;
@@ -1026,7 +1029,7 @@ export async function calcNetWorth(
       }
     }
 
-    const { perItem } = await calcWorkerValues(worker);
+    const { perItem } = await calcWorkerValues(worker, client);
 
     worth += baseWorkers[worker.workerId].cost;
     worth += worker.stored * perItem;

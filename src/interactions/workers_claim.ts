@@ -1,3 +1,4 @@
+import { NypsiClient } from "../models/Client";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
 import Constants from "../utils/Constants";
@@ -11,7 +12,7 @@ export default {
     if (!interaction.isButton()) return;
     if ((await isEcoBanned(interaction.user.id)).banned) return;
     await interaction.deferReply();
-    const desc = await claimFromWorkers(interaction.user.id);
+    const desc = await claimFromWorkers(interaction.user.id, interaction.client as NypsiClient);
 
     const embed = new CustomEmbed()
       .setDescription(desc)

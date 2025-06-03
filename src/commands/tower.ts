@@ -654,7 +654,7 @@ async function playGame(
 
   const win1 = async (interaction: ButtonInteraction) => {
     let winnings = Math.round(game.bet * game.win);
-    const multi = (await getGambleMulti(game.userId)).multi;
+    const multi = (await getGambleMulti(message.member, message.client as NypsiClient)).multi;
 
     if (multi > 0) {
       winnings += Math.round(winnings * multi);
@@ -672,7 +672,12 @@ async function playGame(
 
     game.embed.setColor(Constants.EMBED_SUCCESS_COLOR);
 
-    const earnedXp = await calcEarnedGambleXp(message.member, game.bet, game.win);
+    const earnedXp = await calcEarnedGambleXp(
+      message.member,
+      message.client as NypsiClient,
+      game.bet,
+      game.win,
+    );
 
     if (earnedXp > 0) {
       await addXp(message.member, earnedXp);
