@@ -4,11 +4,13 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { CommandCategory } from "../../../models/Command";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
+import { Item } from "../../../types/Economy";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { getTier, isPremium } from "../premium/premium";
 import { percentChance } from "../random";
 import sleep from "../sleep";
+import { pluralize } from "../string";
 import { getTax } from "../tax";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { addProgress } from "./achievements";
@@ -20,6 +22,7 @@ import {
 } from "./market";
 import { deleteTradeRequest, getTradeRequests } from "./trade_requests";
 import { addBalance, getSellMulti } from "./balance";
+import { getMarketAverage } from "./market";
 import { getOffersAverage } from "./offers";
 import { addStat } from "./stats";
 import { createUser, getItems, userExists } from "./utils";
@@ -47,9 +50,9 @@ export async function getInventory(member: GuildMember | string): Promise<Invent
   if (cache) {
     try {
       const parsed = JSON.parse(cache);
-      return Inventory.fromJSON(id, parsed);
+      return Inventory.fromJSON(parsed);
     } catch {
-      return new Inventory(id);
+      return new Inventory();
     }
   }
 
