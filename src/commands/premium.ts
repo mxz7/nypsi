@@ -198,62 +198,62 @@ async function run(
       if (level >= 99) {
         if (
           guildMember.joinedTimestamp < Date.now() - ms("1 year") &&
-          !tags.some((i) => i.tagId === "1year")
+          !tags.some((i) => i.tagId === "year1")
         ) {
-          await addTag(guildMember.user.id, "1year");
+          await addTag(guildMember.user.id, "year1");
         } else if (
           guildMember.joinedTimestamp > Date.now() - ms("1 year") &&
-          tags.some((i) => i.tagId === "1year")
+          tags.some((i) => i.tagId === "year1")
         ) {
-          await removeTag(guildMember.user.id, "1year");
+          await removeTag(guildMember.user.id, "year1");
         }
 
         if (
           guildMember.joinedTimestamp < Date.now() - ms("2 year") &&
-          !tags.some((i) => i.tagId === "2year")
+          !tags.some((i) => i.tagId === "year2")
         ) {
-          await addTag(guildMember.user.id, "2year");
+          await addTag(guildMember.user.id, "year2");
         } else if (
           guildMember.joinedTimestamp > Date.now() - ms("2 year") &&
-          tags.some((i) => i.tagId === "2year")
+          tags.some((i) => i.tagId === "year2")
         ) {
-          await removeTag(guildMember.user.id, "2year");
+          await removeTag(guildMember.user.id, "year2");
         }
 
         if (
           guildMember.joinedTimestamp < Date.now() - ms("3 year") &&
-          !tags.some((i) => i.tagId === "3year")
+          !tags.some((i) => i.tagId === "year3")
         ) {
-          await addTag(guildMember.user.id, "3year");
+          await addTag(guildMember.user.id, "year3");
         } else if (
           guildMember.joinedTimestamp > Date.now() - ms("3 year") &&
-          tags.some((i) => i.tagId === "3year")
+          tags.some((i) => i.tagId === "year3")
         ) {
-          await removeTag(guildMember.user.id, "3year");
+          await removeTag(guildMember.user.id, "year3");
         }
 
         if (
           guildMember.joinedTimestamp < Date.now() - ms("4 year") &&
-          !tags.some((i) => i.tagId === "4year")
+          !tags.some((i) => i.tagId === "year4")
         ) {
-          await addTag(guildMember.user.id, "4year");
+          await addTag(guildMember.user.id, "year4");
         } else if (
           guildMember.joinedTimestamp > Date.now() - ms("4 year") &&
-          tags.some((i) => i.tagId === "4year")
+          tags.some((i) => i.tagId === "year4")
         ) {
-          await removeTag(guildMember.user.id, "4year");
+          await removeTag(guildMember.user.id, "year4");
         }
 
         if (
           guildMember.joinedTimestamp < Date.now() - ms("5 year") &&
-          !tags.some((i) => i.tagId === "5year")
+          !tags.some((i) => i.tagId === "year5")
         ) {
-          await addTag(guildMember.user.id, "5year");
+          await addTag(guildMember.user.id, "year5");
         } else if (
           guildMember.joinedTimestamp > Date.now() - ms("5 year") &&
-          tags.some((i) => i.tagId === "5year")
+          tags.some((i) => i.tagId === "year5")
         ) {
-          await removeTag(guildMember.user.id, "5year");
+          await removeTag(guildMember.user.id, "year5");
         }
       } else if (tags.some((i) => i.tagId.includes("year"))) {
         for (const tag of tags) {

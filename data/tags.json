@@ -233,33 +233,33 @@
     "description": "found in the super capitalist achievement",
     "emoji": "👷🏻‍♂️"
   },
-  "1year": {
-    "id": "1year",
-    "name": "1 year",
+  "year1": {
+    "id": "year1",
+    "name": "year 1",
     "description": "be in the official nypsi server for over a year",
     "emoji": "🌻"
   },
-  "2year": {
-    "id": "2year",
-    "name": "2 year",
+  "year2": {
+    "id": "year2",
+    "name": "year 2",
     "description": "be in the official nypsi server for over 2 years",
     "emoji": "🌹"
   },
-  "3year": {
-    "id": "3year",
-    "name": "3 year",
+  "year3": {
+    "id": "year3",
+    "name": "year 3",
     "description": "be in the official nypsi server for over 3 years",
     "emoji": "🌷"
   },
-  "4year": {
-    "id": "4year",
-    "name": "4 year",
+  "year4": {
+    "id": "year4",
+    "name": "year 4",
     "description": "be in the official nypsi server for over 4 years",
     "emoji": "🌸"
   },
-  "5year": {
-    "id": "5year",
-    "name": "5 year",
+  "year5": {
+    "id": "year5",
+    "name": "year 5",
     "description": "be in the official nypsi server for over 5 years",
     "emoji": "🪷"
   }
