@@ -48,7 +48,9 @@ export async function getInventory(member: GuildMember | string): Promise<Invent
     try {
       const parsed = JSON.parse(cache);
       return Inventory.fromJSON(id, parsed);
-    } catch {
+    } catch (e) {
+      console.error(e);
+      logger.error("weird inventory cache error", { error: e });
       return new Inventory(id);
     }
   }
