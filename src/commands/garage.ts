@@ -111,7 +111,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
           .setCustomId("rename"),
       );
 
-      const skinItems = inventory.filter((i) => getItems()[i.item].role === "car_skin");
+      const skinItems = inventory.entries.filter((i) => getItems()[i.item].role === "car_skin");
       const skinOptions: { value: string; label: string; emoji: string; default: boolean }[] =
         skinItems.map((i) => ({
           value: i.item,
@@ -126,7 +126,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
           .setCustomId(`upg-${item.id}`)
           .setStyle(ButtonStyle.Success);
 
-        if (inventory.find((i) => i.item === item.id)) {
+        if (inventory.has(item.id)) {
           button.setDisabled(false);
         } else {
           button.setDisabled(true);
@@ -325,10 +325,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
           const upgrade = interaction.customId.substring(4);
           const inventory = await getInventory(message.author.id);
 
-          if (
-            !inventory.find((i) => i.item === upgrade) ||
-            inventory.find((i) => i.item === upgrade).amount < 1
-          ) {
+          if (!inventory.has(upgrade)) {
             await interaction.reply({
               embeds: [new ErrorEmbed("you don't have this upgrade. sneaky bitch")],
               flags: MessageFlags.Ephemeral,

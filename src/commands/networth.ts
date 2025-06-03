@@ -120,7 +120,7 @@ async function run(
     pages = PageManager.createPages(
       itemValues.map(
         (i) =>
-          `\`${inventory.find((inv) => inv.item === i.itemId).amount.toLocaleString()}x\` ${
+          `\`${inventory.count(i.itemId).toLocaleString()}x\` ${
             getItems()[i.itemId].emoji
           } ${getItems()[i.itemId].name}: $**${i.value.toLocaleString()}** (${(
             (i.value / net.amount) *

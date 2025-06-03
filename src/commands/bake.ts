@@ -78,24 +78,7 @@ async function doBake(
 
   const inventory = await getInventory(member);
 
-  let hasFurnace = false;
-  let hasCoal = false;
-
-  if (
-    inventory.find((i) => i.item == "furnace") &&
-    inventory.find((i) => i.item == "furnace").amount > 0
-  ) {
-    hasFurnace = true;
-  }
-
-  if (
-    inventory.find((i) => i.item == "coal") &&
-    inventory.find((i) => i.item == "coal").amount > 0
-  ) {
-    hasCoal = true;
-  }
-
-  if (!hasFurnace) {
+  if (!inventory.has("furnace")) {
     return send({
       embeds: [
         new ErrorEmbed(
@@ -106,7 +89,7 @@ async function doBake(
     });
   }
 
-  if (!hasCoal) {
+  if (!inventory.has("coal")) {
     return send({
       embeds: [
         new ErrorEmbed(

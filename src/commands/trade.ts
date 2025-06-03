@@ -33,8 +33,8 @@ import { addBalance, getBalance, removeBalance } from "../utils/functions/econom
 import {
   addInventoryItem,
   getInventory,
+  removeInventoryItem,
   selectItem,
-  setInventoryItem,
 } from "../utils/functions/economy/inventory";
 import { getRawLevel } from "../utils/functions/economy/levelling";
 import {
@@ -286,11 +286,7 @@ async function run(
           const selected = selectItem(item);
 
           if (amount.toLowerCase() === "all") {
-            if (!inventory.find((i) => i.item === selected.id)) {
-              amount = "1";
-            } else {
-              amount = inventory.find((i) => i.item == selected.id).amount.toString();
-            }
+            amount = Math.max(inventory.count(selected.id), 1).toString();
           }
 
           if (!selected) {
@@ -308,10 +304,7 @@ async function run(
               embeds: [new ErrorEmbed("invalid amount")],
               options: { flags: MessageFlags.Ephemeral },
             });
-          } else if (
-            !inventory.find((i) => i.item == selected.id) ||
-            inventory.find((i) => i.item == selected.id).amount < parseInt(amount)
-          ) {
+          } else if (inventory.count(selected.id) < parseInt(amount)) {
             await res.editReply({
               embeds: [new ErrorEmbed(`you do not have enough ${selected.plural}`)],
               options: { flags: MessageFlags.Ephemeral },
@@ -421,10 +414,7 @@ async function run(
         }
 
         for (const item of offeredItems) {
-          if (
-            !inventory.find((i) => i.item == item.item.id) ||
-            inventory.find((i) => i.item == item.item.id).amount < item.amount
-          ) {
+          if (inventory.count(item.item.id) < item.amount) {
             return interaction.followUp({
               embeds: [new CustomEmbed(message.member, "sneaky bitch")],
               flags: MessageFlags.Ephemeral,
@@ -447,11 +437,7 @@ async function run(
           });
 
         for (const item of offeredItems) {
-          await setInventoryItem(
-            message.member,
-            item.item.id,
-            inventory.find((i) => i.item == item.item.id).amount - item.amount,
-          );
+          await removeInventoryItem(message.member, item.item.id, item.amount);
         }
 
         if (offeredMoney > 0) await removeBalance(message.member, offeredMoney);

@@ -38,9 +38,7 @@ export async function checkSkins(userId: string, cars: Car[]) {
       if (counts.has(car.skin)) counts.set(car.skin, counts.get(car.skin) + 1);
       else counts.set(car.skin, 1);
 
-      const owned = inventory.find((i) => i.item === car.skin)?.amount || 0;
-
-      if (owned < counts.get(car.skin)) {
+      if (inventory.count(car.skin) < counts.get(car.skin)) {
         await setSkin(userId, car.id);
         changed = true;
       }

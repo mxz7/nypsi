@@ -72,8 +72,7 @@ module.exports = new ItemUse(
 
     let amount = 1;
 
-    if (args[1] && args[1].toLowerCase() === "all")
-      args[1] = inventory.find((i) => i.item === "bob").amount.toString();
+    if (args[1] && args[1].toLowerCase() === "all") args[1] = inventory.count("bob").toString();
 
     if (args[1]) {
       amount = formatNumber(args[1]);
@@ -82,7 +81,7 @@ module.exports = new ItemUse(
     if (!amount || isNaN(amount) || amount < 1)
       return send({ embeds: [new ErrorEmbed("invalid amount")] });
 
-    if (inventory.find((i) => i.item === "bob").amount < amount)
+    if (inventory.count("bob") < amount)
       return send({ embeds: [new ErrorEmbed("you dont have this many bobs")] });
 
     const breakdown: string[] = [];

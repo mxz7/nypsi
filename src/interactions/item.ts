@@ -16,7 +16,7 @@ export default {
 
     const items = getItems();
 
-    let options = inventory
+    let options = inventory.entries
       .map((i) => i.item)
       .filter(
         (item) =>
@@ -36,7 +36,7 @@ export default {
         items[i].emoji.startsWith(":")
           ? ""
           : `${items[i].emoji} `
-      }${items[i].name} [${inventory.find((x) => x.item == i).amount.toLocaleString()}]`,
+      }${items[i].name} [${inventory.count(i).toLocaleString()}]`,
       value: i,
     }));
 

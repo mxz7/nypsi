@@ -211,7 +211,7 @@ class Race {
       const [garage, inventory, balance] = await Promise.all([
         getGarage(interaction.user.id),
         getInventory(interaction.user.id).then((i) =>
-          i.filter((i) => getItems()[i.item].role === "car"),
+          i.entries.filter((i) => getItems()[i.item].role === "car"),
         ),
         getBalance(interaction.user.id),
       ]);

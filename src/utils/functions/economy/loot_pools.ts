@@ -211,11 +211,7 @@ export async function openCrate(
 ): Promise<LootPoolResult[]> {
   const inventory = await getInventory(member);
 
-  if (
-    !inventory.find((i) => i.item === item.id) ||
-    inventory.find((i) => i.item === item.id).amount < 1 ||
-    !Object.hasOwn(item, "loot_pools")
-  ) {
+  if (!inventory.has(item.id) || !Object.hasOwn(item, "loot_pools")) {
     return [];
   }
 

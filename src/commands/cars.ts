@@ -61,8 +61,7 @@ async function run(
     if (items[item].role != "car") continue;
     totalCars++;
 
-    if (inventory.find((i) => i.item == item) && inventory.find((i) => i.item == item).amount > 0)
-      totalOwned++;
+    if (inventory.has(item)) totalOwned++;
 
     if (pageOfItems.length == 6) {
       pages.push(pageOfItems);
@@ -87,14 +86,8 @@ async function run(
   }
 
   for (const i of pages[page]) {
-    let owned = false;
     const item = items[i];
-
-    if (
-      inventory.find((i) => i.item == item.id) &&
-      inventory.find((i) => i.item == item.id).amount > 0
-    )
-      owned = true;
+    const owned = inventory.has(item.id);
 
     embed.addField(
       item.id,
@@ -153,14 +146,8 @@ async function run(
         } else {
           currentPage--;
           for (const i of pages[currentPage]) {
-            let owned = false;
             const item = items[i];
-
-            if (
-              inventory.find((i) => i.item == item.id) &&
-              inventory.find((i) => i.item == item.id).amount > 0
-            )
-              owned = true;
+            const owned = inventory.has(item.id);
 
             newEmbed.addField(
               item.id,
@@ -209,14 +196,8 @@ async function run(
         } else {
           currentPage++;
           for (const i of pages[currentPage]) {
-            let owned = false;
             const item = items[i];
-
-            if (
-              inventory.find((i) => i.item == item.id) &&
-              inventory.find((i) => i.item == item.id).amount > 0
-            )
-              owned = true;
+            const owned = inventory.has(item.id);
 
             newEmbed.addField(
               item.id,

@@ -315,9 +315,7 @@ async function run(
         const upgrade = getPlantUpgrades()[upgradeId];
 
         if (upgrade.type_single) {
-          const itemCount =
-            (await getInventory(message.member)).find((i) => i.item === upgrade.type_single.item)
-              ?.amount || 0;
+          const itemCount = (await getInventory(message.member)).count(upgrade.type_single.item);
           const item = getItems()[upgrade.type_single.item];
 
           if (itemCount === 0) {
@@ -361,9 +359,7 @@ async function run(
               (u) => u.upgradeId === upgradeId && u.plantId === selected,
             )?.amount || 0;
           const nextLevelItem = getItems()[upgrade.type_upgradable.items[userUpgradeLevel]];
-          const itemCount =
-            (await getInventory(message.member)).find((i) => i.item === nextLevelItem.id)?.amount ||
-            0;
+          const itemCount = (await getInventory(message.member)).count(nextLevelItem.id);
 
           if (userUpgradeLevel == upgrade.type_upgradable.items.length) {
             await interaction.reply({
@@ -394,9 +390,7 @@ async function run(
                 )?.amount || 0;
               const nextLevelItem = getItems()[upgrade.type_upgradable.items[userUpgradeLevel]];
               if (!nextLevelItem) break;
-              const itemCount =
-                (await getInventory(message.member)).find((i) => i.item === nextLevelItem.id)
-                  ?.amount || 0;
+              const itemCount = (await getInventory(message.member)).count(nextLevelItem.id);
 
               if (itemCount === 0) break;
 

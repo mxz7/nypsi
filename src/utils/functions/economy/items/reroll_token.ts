@@ -68,10 +68,7 @@ module.exports = new ItemUse(
         ],
       });
 
-    if (
-      !inventory.find((i) => i.item === "reroll_token") ||
-      inventory.find((i) => i.item === "reroll_token").amount < 1
-    )
+    if (!inventory.has("reroll_token"))
       return send({ embeds: [new ErrorEmbed("you don't have a reroll token")] });
 
     const embed = new CustomEmbed(
@@ -131,10 +128,7 @@ module.exports = new ItemUse(
           getUpgrades(message.member),
         ]);
 
-        if (
-          !inventory.find((i) => i.item === "reroll_token") ||
-          inventory.find((i) => i.item === "reroll_token").amount < 1
-        )
+        if (!inventory.has("reroll_token"))
           return interaction.reply({ embeds: [new ErrorEmbed("you don't have a reroll token")] });
 
         const chosen = (selectMenu.components[0] as StringSelectMenuBuilder).options.find(

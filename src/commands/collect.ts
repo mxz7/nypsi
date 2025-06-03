@@ -37,7 +37,7 @@ async function run(
   const desc: string[] = [];
 
   for (const item of sort(items).asc((i) => i.name)) {
-    const count = inventory.find((i) => i.item === item.id)?.amount || 0;
+    const count = inventory.count(item.id);
 
     if (count > 0) hasCount++;
 

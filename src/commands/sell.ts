@@ -374,7 +374,7 @@ async function run(
 
     if (args.length != 1) {
       if (args[1].toLowerCase() == "all") {
-        args[1] = (inventory.find((i) => i.item == selected.id)?.amount || 0).toString();
+        args[1] = inventory.count(selected.id).toString();
       } else if (isNaN(parseInt(args[1])) || parseInt(args[1]) <= 0) {
         return send({ embeds: [new ErrorEmbed("invalid amount")] });
       }
@@ -393,14 +393,11 @@ async function run(
       return send({ embeds: [new ErrorEmbed("invalid amount")] });
     }
 
-    if (
-      !inventory.find((i) => i.item == selected.id) ||
-      inventory.find((i) => i.item == selected.id).amount < 1
-    ) {
+    if (!inventory.has(selected.id)) {
       return send({ embeds: [new ErrorEmbed("you dont have any " + selected.name)] });
     }
 
-    if (amount > inventory.find((i) => i.item == selected.id).amount) {
+    if (inventory.count(selected.id) < amount) {
       return send({ embeds: [new ErrorEmbed(`you don't have enough ${selected.name}`)] });
     }
 
@@ -466,14 +463,14 @@ async function calcValues(message: Message | (NypsiCommandInteraction & CommandI
 
   const selected = new Map<string, number>();
 
-  for (const item of inventory.filter((i) => !filter.includes(i.item))) {
+  for (const item of inventory.entries.filter((i) => !filter.includes(i.item))) {
     if (
       items[item.item].role == "fish" ||
       items[item.item].role == "prey" ||
       items[item.item].role == "sellable"
     ) {
       if (items[item.item].id == "cookie" || items[item.item].id == "cake") continue;
-      selected.set(item.item, inventory.find((i) => i.item == item.item).amount);
+      selected.set(item.item, inventory.count(item.item));
     }
   }
 

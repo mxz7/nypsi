@@ -68,10 +68,7 @@ module.exports = new ItemUse(
       return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] });
     }
 
-    if (
-      !inventory.find((i) => i.item == selected.id) ||
-      inventory.find((i) => i.item == selected.id).amount < 1
-    ) {
+    if (!inventory.has(selected.id)) {
       return send({
         embeds: [new ErrorEmbed(`you dont have ${selected.article} ${selected.name}`)],
       });
@@ -80,7 +77,7 @@ module.exports = new ItemUse(
     let amount = 1;
 
     if (args[1]?.toLowerCase() === "all") {
-      amount = inventory.find((i) => i.item === selected.id).amount;
+      amount = inventory.count(selected.id);
     } else if (parseInt(args[1])) {
       amount = parseInt(args[1]);
     }
@@ -96,7 +93,7 @@ module.exports = new ItemUse(
 
     if (amount > max) amount = max;
 
-    if (amount > (inventory.find((i) => i.item === selected.id)?.amount || 0))
+    if (inventory.count(selected.id) < amount)
       return send({ embeds: [new ErrorEmbed(`you don't have ${amount} ${selected.name}`)] });
 
     const embed = new CustomEmbed(

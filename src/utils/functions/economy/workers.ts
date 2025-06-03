@@ -168,10 +168,9 @@ export async function calcWorkerValues(
     }
   }
 
-  let heart = false;
-  if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) heart = true;
+  const heart = inventory.has("crystal_heart");
 
-  if (inventory.find((i) => i.item == "purple_gem")?.amount > 0) {
+  if (inventory.has("purple_gem")) {
     const chance = Math.floor(Math.random() * 10);
 
     if (chance < 5 && !heart) {
@@ -182,11 +181,11 @@ export async function calcWorkerValues(
     }
   }
 
-  if (inventory.find((i) => i.item == "green_gem")?.amount > 0) {
+  if (inventory.has("green_gem")) {
     maxStoredBonus += maxStoredBonus * 0.2;
   }
 
-  if (inventory.find((i) => i.item == "blue_gem")?.amount > 0) {
+  if (inventory.has("blue_gem")) {
     const chance = Math.floor(Math.random() * 10);
 
     if (chance < 4 && !heart) {
@@ -197,7 +196,7 @@ export async function calcWorkerValues(
     }
   }
 
-  if (inventory.find((i) => i.item == "white_gem")?.amount > 0) {
+  if (inventory.has("white_gem")) {
     const chance = Math.floor(Math.random() * 10);
 
     if (chance < 4 && !heart) {

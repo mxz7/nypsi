@@ -21,7 +21,7 @@ import { getTier, isPremium } from "../premium/premium";
 import { addToNypsiBank, getTax } from "../tax";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { addBalance } from "./balance";
-import { addInventoryItem, getInventory, setInventoryItem } from "./inventory";
+import { addInventoryItem, getInventory, removeInventoryItem } from "./inventory";
 import { createUser, getItems, userExists } from "./utils";
 import ms = require("ms");
 import dayjs = require("dayjs");
@@ -428,10 +428,7 @@ export async function fulfillTradeRequest(
   const items = getItems();
 
   for (const item of tradeRequest.requestedItems) {
-    if (
-      !inventory.find((i) => i.item == item.split(":")[0]) ||
-      inventory.find((i) => i.item == item.split(":")[0]).amount < parseInt(item.split(":")[1])
-    ) {
+    if (inventory.count(item.split(":")[0]) < parseInt(item.split(":")[1])) {
       beingFulfilled.delete(tradeRequest.id);
       await redis.del(`${Constants.redis.nypsi.TRADE_FULFILLING}:${tradeRequest.id}`);
       return await interaction.reply({
@@ -472,17 +469,11 @@ export async function fulfillTradeRequest(
     addToNypsiBank(taxedAmount);
   }
 
-  const fulfillerInventory = await getInventory(interaction.user.id);
-
   for (const item of tradeRequest.requestedItems) {
     const itemId = item.split(":")[0];
     const amount = parseInt(item.split(":")[1]);
 
-    await setInventoryItem(
-      interaction.user.id,
-      itemId,
-      fulfillerInventory.find((i) => i.item == itemId).amount - amount,
-    );
+    await removeInventoryItem(interaction.user.id, itemId, amount);
     await addInventoryItem(tradeRequest.ownerId, itemId, amount);
   }
 

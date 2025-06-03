@@ -135,10 +135,7 @@ async function run(
     return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] });
   }
 
-  if (
-    !inventory.find((i) => i.item == selected.id) ||
-    inventory.find((i) => i.item == selected.id).amount < 1
-  ) {
+  if (!inventory.has(selected.id)) {
     return send({ embeds: [new ErrorEmbed(`you dont have ${selected.article} ${selected.name}`)] });
   }
 
@@ -170,8 +167,7 @@ async function run(
     let boosters = await getBoosters(message.member);
     let amount = parseInt(args[1]) || 1;
 
-    if (args[1]?.toLowerCase() === "all")
-      amount = inventory.find((i) => i.item === selected.id)?.amount || 1;
+    if (args[1]?.toLowerCase() === "all") amount = Math.max(inventory.count(selected.id), 1);
 
     if (boosters.has(selected.id)) {
       if (selected.stackable) {
@@ -198,10 +194,7 @@ async function run(
         embeds: [new ErrorEmbed(`**${selected.name}** can only be stacked ${selected.max} times`)],
       });
 
-    if (
-      !inventory.find((i) => i.item === selected.id) ||
-      inventory.find((i) => i.item == selected.id)?.amount < amount
-    )
+    if (inventory.count(selected.id) < amount)
       return send({ embeds: [new ErrorEmbed(`you don't have ${amount}x ${selected.name}`)] });
 
     await Promise.all([
@@ -321,7 +314,7 @@ async function run(
 
     if (args[1]) {
       if (args[1]?.toLowerCase() === "all") {
-        amount = inventory.find((i) => i.item === selected.id)?.amount || 1;
+        amount = Math.max(inventory.count(selected.id), 1);
         if (amount > upgrade.stack_limit) amount = upgrade.stack_limit;
         if (userUpgrade && userUpgrade.amount + amount > upgrade.stack_limit)
           amount = upgrade.stack_limit - userUpgrade.amount;
@@ -345,7 +338,7 @@ async function run(
       return send({ embeds: [new ErrorEmbed("you cannot use this many upgrades")] });
     }
 
-    if (inventory.find((i) => i.item === selected.id).amount < amount)
+    if (inventory.count(selected.id) < amount)
       return send({ embeds: [new ErrorEmbed(`you don't have this many ${selected.name}`)] });
 
     if (!amount || isNaN(amount) || amount < 1)
@@ -379,7 +372,7 @@ async function run(
     let amount = 1;
 
     if (args[1]?.toLowerCase() === "all") {
-      amount = inventory.find((i) => i.item === selected.id)?.amount || 1;
+      amount = Math.max(inventory.count(selected.id), 1);
     } else if (args[1]) {
       amount = formatNumber(args[1]);
     }
@@ -387,7 +380,7 @@ async function run(
     if (!amount || isNaN(amount) || amount < 1)
       return send({ embeds: [new ErrorEmbed("invalid amount")] });
 
-    if (inventory.find((i) => i.item === selected.id).amount < amount)
+    if (inventory.count(selected.id) < amount)
       return send({ embeds: [new ErrorEmbed(`you don't have this many ${selected.name}`)] });
 
     const bakeryUpgrades = await getBakeryUpgrades(message.member);
@@ -455,7 +448,7 @@ async function run(
     let amount = 1;
 
     if (args[1]?.toLowerCase() === "all") {
-      amount = inventory.find((i) => i.item === selected.id)?.amount || 1;
+      amount = Math.max(inventory.count(selected.id), 1);
     } else if (args[1]) {
       amount = formatNumber(args[1]);
     }
@@ -463,7 +456,7 @@ async function run(
     if (!amount || isNaN(amount) || amount < 1)
       return send({ embeds: [new ErrorEmbed("invalid amount")] });
 
-    if (inventory.find((i) => i.item === selected.id).amount < amount)
+    if (inventory.count(selected.id) < amount)
       return send({ embeds: [new ErrorEmbed(`you don't have this many ${selected.name}`)] });
 
     await removeInventoryItem(message.member, selected.id, amount);
