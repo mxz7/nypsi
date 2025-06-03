@@ -138,7 +138,6 @@ export class Inventory {
   ): Promise<{ any: boolean; inInventory: boolean; inOrders: boolean; inTrades: boolean }> {
     const cache = await redis.get(`${Constants.redis.cache.economy.HAS_GEM}:${this.userId}:${id}`);
     if (cache) {
-      console.log(`getting ${id} from cache`);
       return JSON.parse(cache);
     }
 
@@ -166,7 +165,6 @@ export class Inventory {
       180,
     );
 
-    console.log(`generated ${id}`);
     return res;
   }
 
