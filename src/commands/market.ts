@@ -1147,7 +1147,7 @@ async function run(
     let amount = args[2] ?? "1";
 
     if (amount.toLowerCase() == "all") {
-      const invAmount = inventory.find((i) => i.item == item.id).amount ?? 0;
+      const invAmount = inventory.count(item.id);
       const marketAmount = (await getMarketItemOrders(item.id, "buy", message.member.id)).reduce(
         (count, order) => Number(order.itemAmount) + count,
         0,
@@ -1168,8 +1168,6 @@ async function run(
         embeds: [new ErrorEmbed(`not enough ${item.plural} on the market`)],
       });
     }
-
-    const inventory = await getInventory(message.member);
 
     if (inventory.count(item.id) < parseInt(amount)) {
       return send({

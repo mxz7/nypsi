@@ -79,9 +79,7 @@ export default {
 
     if (input.toLowerCase() == "all") {
       if (order.orderType == "buy") {
-        input = (
-          (await getInventory(interaction.user.id)).find((i) => i.item == order.itemId)?.amount ?? 0
-        ).toString();
+        input = (await getInventory(interaction.user.id)).count(order.itemId).toString();
       } else {
         input = Number(order.itemAmount).toString();
 
