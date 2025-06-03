@@ -217,7 +217,7 @@ async function doMine(
         return choseArea();
       }
     } else if (chosenArea === "end_portal") {
-      if (inventory.has("end-portal")) {
+      if (inventory.has("end_portal")) {
         return choseArea();
       }
     }
