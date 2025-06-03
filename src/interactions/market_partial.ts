@@ -15,6 +15,8 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
 import { marketBuy, marketSell } from "../utils/functions/economy/market";
 import { getItems, isEcoBanned, userExists } from "../utils/functions/economy/utils";
+import { getInventory } from "../utils/functions/economy/inventory";
+import { getBalance } from "../utils/functions/economy/balance";
 
 const userFulfilling = new Map<string, number>();
 
@@ -73,15 +75,30 @@ export default {
 
     if (!res || !res.isModalSubmit()) return userFulfilling.delete(interaction.user.id);
 
-    const amount = Math.min(parseInt(res.fields.fields.first().value), Number(order.itemAmount));
+    let input = res.fields.fields.first().value;
 
-    if (!amount || amount < 1) {
+    if (input.toLowerCase() == "all") {
+      if (order.orderType == "buy") {
+        input = (await getInventory(interaction.user.id)).count(order.itemId).toString();
+      } else {
+        input = Number(order.itemAmount).toString();
+
+        const balance = await getBalance(interaction.user.id);
+
+        if (order.itemAmount * order.price > balance)
+          input = Math.floor(balance / Number(order.price)).toString();
+      }
+    }
+
+    if (!parseInt(input) || isNaN(parseInt(input)) || parseInt(input) < 1) {
       userFulfilling.delete(interaction.user.id);
       return res.reply({
         embeds: [new ErrorEmbed("invalid amount")],
         flags: MessageFlags.Ephemeral,
       });
     }
+
+    const amount = Math.min(parseInt(input), Number(order.itemAmount));
 
     userFulfilling.delete(interaction.user.id);
 
