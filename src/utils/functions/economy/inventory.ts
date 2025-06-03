@@ -4,21 +4,21 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { CommandCategory } from "../../../models/Command";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
+import { Item } from "../../../types/Economy";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { getTier, isPremium } from "../premium/premium";
 import { percentChance } from "../random";
 import sleep from "../sleep";
+import { pluralize } from "../string";
 import { getTax } from "../tax";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { addProgress } from "./achievements";
-import { getMarketAverage } from "./market";
 import { addBalance, getSellMulti } from "./balance";
+import { getMarketAverage } from "./market";
 import { getOffersAverage } from "./offers";
 import { addStat } from "./stats";
 import { createUser, getItems, userExists } from "./utils";
-import { pluralize } from "../string";
-import { Item } from "../../../types/Economy";
 import ms = require("ms");
 
 const gemChanceCooldown = new Set<string>();
@@ -40,7 +40,9 @@ export async function getInventory(member: GuildMember | string): Promise<Invent
     try {
       const parsed = JSON.parse(cache);
       return Inventory.fromJSON(parsed);
-    } catch {
+    } catch (e) {
+      console.error(e);
+      logger.error("weird inventory cache error", { error: e });
       return new Inventory();
     }
   }
