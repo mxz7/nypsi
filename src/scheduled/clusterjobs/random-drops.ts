@@ -11,7 +11,7 @@ import {
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { NypsiClient } from "../../models/Client";
-import { CustomEmbed } from "../../models/EmbedBuilders";
+import { CustomEmbed, ErrorEmbed } from "../../models/EmbedBuilders";
 import { LootPoolResult } from "../../types/LootPool";
 import Constants from "../../utils/Constants";
 import { findChannelCluster } from "../../utils/functions/clusters";
@@ -188,7 +188,13 @@ async function fastClickGame(
   );
 
   const winner = await client.cluster.broadcastEval(
-    async (c, { embed, row, channelId, cluster, buttonId, winEmbed }) => {
+    async (c, { embed, row, channelId, cluster, buttonId, winEmbed, bannedEmbed }) => {
+      const path = await import("path");
+
+      const { isEcoBanned } = await import(
+        path.join(process.cwd(), "dist", "utils", "functions", "economy", "utils.js")
+      );
+
       const client = c as unknown as NypsiClient;
 
       if (client.cluster.id != cluster) return;
@@ -204,7 +210,13 @@ async function fastClickGame(
       const started = Date.now();
       const res = await msg
         .awaitMessageComponent({
-          filter: (i) => i.customId === buttonId,
+          filter: async (i) => {
+            if ((await isEcoBanned(i.user.id)).banned) {
+              i.reply({ embeds: [bannedEmbed], flags: 64 });
+              return false;
+            }
+            return i.customId === buttonId;
+          },
           time: 30000,
         })
         .catch(() => {});
@@ -229,7 +241,17 @@ async function fastClickGame(
 
       return res.user.id;
     },
-    { context: { embed, row, channelId, cluster: cluster.cluster, buttonId, winEmbed } },
+    {
+      context: {
+        embed,
+        row,
+        channelId,
+        cluster: cluster.cluster,
+        buttonId,
+        winEmbed,
+        bannedEmbed: new ErrorEmbed("you're banned don't even try loser"),
+      },
+    },
   );
 
   const winnerId = winner.filter((i) => Boolean(i))[0];
@@ -275,6 +297,12 @@ async function typeFastGame(
 
   const winner = await client.cluster.broadcastEval(
     async (c, { embed, channelId, cluster, chosenWord }) => {
+      const path = await import("path");
+
+      const { isEcoBanned } = await import(
+        path.join(process.cwd(), "dist", "utils", "functions", "economy", "utils.js")
+      );
+
       const client = c as unknown as NypsiClient;
 
       if (client.cluster.id != cluster) return;
@@ -290,7 +318,12 @@ async function typeFastGame(
       const started = Date.now();
       const res = await channel
         .awaitMessages({
-          filter: (m) => m.content.toLowerCase() === chosenWord.toLowerCase(),
+          filter: async (m) => {
+            if ((await isEcoBanned(m.member.id)).banned) {
+              return false;
+            }
+            return m.content.toLowerCase() === chosenWord.toLowerCase();
+          },
           time: 30000,
           max: 1,
         })
@@ -467,7 +500,13 @@ async function clickSpecificGame(
   }
 
   const winner = await client.cluster.broadcastEval(
-    async (c, { embed, row, channelId, cluster, winningId, winEmbed, failEmbed }) => {
+    async (c, { embed, row, channelId, cluster, winningId, winEmbed, failEmbed, bannedEmbed }) => {
+      const path = await import("path");
+
+      const { isEcoBanned } = await import(
+        path.join(process.cwd(), "dist", "utils", "functions", "economy", "utils.js")
+      );
+
       const client = c as unknown as NypsiClient;
 
       if (client.cluster.id != cluster) return;
@@ -485,7 +524,11 @@ async function clickSpecificGame(
       const started = Date.now();
       const res = await msg
         .awaitMessageComponent({
-          filter: (i) => {
+          filter: async (i) => {
+            if ((await isEcoBanned(i.user.id)).banned) {
+              i.reply({ embeds: [bannedEmbed], flags: 64 });
+              return false;
+            }
             if (losers.includes(i.user.id)) return;
             if (i.customId !== winningId) {
               i.reply({ embeds: [failEmbed], flags: 64 });
@@ -520,7 +563,16 @@ async function clickSpecificGame(
       return res.user.id;
     },
     {
-      context: { embed, row, channelId, cluster: cluster.cluster, winningId, winEmbed, failEmbed },
+      context: {
+        embed,
+        row,
+        channelId,
+        cluster: cluster.cluster,
+        winningId,
+        winEmbed,
+        failEmbed,
+        bannedEmbed: new ErrorEmbed("you're banned don't even try loser"),
+      },
     },
   );
 
