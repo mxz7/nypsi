@@ -342,7 +342,7 @@ export default async function messageCreate(message: Message) {
         let name = res ? await getGuildName(guildId) : (guildId ?? "DM");
 
         if (res) {
-          const channelName = snapshot.guild.channels.cache.get(channelId).name ?? undefined;
+          const channelName = snapshot.guild?.channels?.cache.get(channelId).name ?? undefined;
           if (channelName) name += ` - #${channelName}`;
         }
 
