@@ -63,6 +63,12 @@ cmd.slashData
   )
   .addSubcommand((spent) =>
     spent.setName("spent").setDescription("view your stats for sources of outgoings"),
+  )
+  .addSubcommand((wordle) =>
+    wordle.setName("wordle").setDescription("view your wordle stats (/wordle play)"),
+  )
+  .addSubcommand((bake) =>
+    bake.setName("bake").setDescription("view your stats amount of cookies baked"),
   );
 
 async function run(
@@ -263,6 +269,9 @@ async function run(
     if ((await fastest)?.time) desc += `**fastest** \`${formatTime((await fastest).time)}\`\n`;
     if ((await average)?._avg?.time)
       desc += `**average** \`${formatTime((await average)._avg.time)}\`\n`;
+
+    if (!desc)
+      return send({ embeds: [new CustomEmbed(message.member, "you have not played wordle")] });
 
     embed.setDescription(desc);
 
@@ -644,8 +653,13 @@ async function run(
     return send({ embeds: [embed] });
   };
 
-  function findStatAmount(stats: { amount: bigint; itemId: string }[], id: string) {
-    return stats.find((i) => i.itemId === id)?.amount.toLocaleString() || "0";
+  function findStatAmount(
+    stats: { amount: bigint; itemId: string }[],
+    id: string,
+    localeString = true,
+  ) {
+    const value = stats.find((i) => i.itemId === id)?.amount || "0";
+    return localeString ? value.toLocaleString() : value.toString();
   }
 
   const earnedStats = async () => {
@@ -728,6 +742,52 @@ async function run(
           ).toLocaleLowerCase()}** from selling items`,
         ),
       ],
+    });
+  };
+
+  const bakeStats = async () => {
+    const stats = await getStats(message.member);
+
+    const embed = new CustomEmbed(message.member).setHeader(
+      `${message.author.username}'s bake stats`,
+      message.author.avatarURL(),
+    );
+
+    const totalBaked = parseInt(findStatAmount(stats, "bake-total", false));
+    const cakesBaked = parseInt(findStatAmount(stats, "bake-cake", false));
+
+    console.log(
+      `${findStatAmount(stats, "bake-total")}, ${totalBaked}, ${totalBaked.toLocaleString()}`,
+    );
+
+    const breakdownItems = [
+      { key: "grandma", emoji: "👵🏻", name: "grandma" },
+      { key: "guild", emoji: ":busts_in_silhouette:", name: "your guild" },
+      { key: "heart", itemId: "crystal_heart" },
+      { key: "white", itemId: "white_gem" },
+      { key: "purple", itemId: "purple_gem" },
+      { key: "blue", itemId: "blue_gem" },
+    ];
+
+    const breakdown: string[] = [];
+
+    breakdownItems.forEach((item) => {
+      const bakedAmount = parseInt(findStatAmount(stats, `bake-${item.key}`, false));
+      if (bakedAmount > 0) {
+        breakdown.push(
+          `${item.emoji ?? getItems()[item.itemId].emoji} ${item.name ?? getItems()[item.itemId].name} has baked ${bakedAmount.toLocaleString()} ${pluralize("cookie", bakedAmount)}`,
+        );
+      }
+    });
+
+    embed.setDescription(
+      `your bakery has baked **${totalBaked.toLocaleString()}** cookies${cakesBaked > 0 ? ` and ${cakesBaked.toLocaleString()} ${pluralize("cake", cakesBaked)}` : ""}`,
+    );
+
+    if (breakdown.length > 0) embed.addField("breakdown", breakdown.join("\n"));
+
+    return send({
+      embeds: [embed],
     });
   };
 
@@ -882,6 +942,8 @@ async function run(
     return earnedStats();
   } else if (args[0].toLowerCase() === "spent") {
     return spentStats();
+  } else if (args[0].toLowerCase() === "bake") {
+    return bakeStats();
   } else if (args[0].toLowerCase() === "wordle") {
     return wordleStats();
   } else {

@@ -16,6 +16,7 @@ import { addTaskProgress } from "./tasks";
 import { getBakeryUpgradesData, getItems, getUpgradesData } from "./utils";
 import { pluralize } from "../string";
 import ms = require("ms");
+import { addStat } from "./stats";
 
 async function getLastBake(member: GuildMember | string) {
   let id: string;
@@ -159,6 +160,7 @@ export async function runBakery(member: GuildMember) {
 
       if (amount > 0) {
         earned.set(upgrade.upgradeId, amount);
+        addStat(member, "bake-grandma", amount);
       }
     } else if (getBakeryUpgradesData()[upgrade.upgradeId].upgrades === "bake") {
       if (upgrade.upgradeId === "super_cursor")
@@ -216,9 +218,10 @@ export async function runBakery(member: GuildMember) {
   let total = chosenAmount + passive;
 
   if (guildUpgrades.find((i) => i.upgradeId === "bakery")) {
-    if (percentChance(2 * guildUpgrades.find((i) => i.upgradeId === "bakery").amount)) {
+    if (percentChance(100)) {
       total = total * 2;
       earned.set("guild", Math.floor(total / 2));
+      addStat(member, "bake-guild", Math.floor(total / 2));
     }
   }
 
@@ -226,28 +229,37 @@ export async function runBakery(member: GuildMember) {
     if (percentChance(5)) {
       total = total * 2;
       earned.set("crystal_heart", Math.floor(total / 2));
+      addStat(member, "bake-heart", Math.floor(total / 2));
     }
   } else if ((await inventory.hasGem("white_gem")).any) {
     if (percentChance(2)) {
       total = total * 2;
       earned.set("white_gem", Math.floor(total / 2));
+      addStat(member, "bake-white", Math.floor(total / 2));
     }
   } else if ((await inventory.hasGem("purple_gem")).any) {
     if (percentChance(0.5)) {
       total = total * 2;
       earned.set("purple_gem", Math.floor(total / 2));
+      addStat(member, "bake-purple", Math.floor(total / 2));
     }
   } else if ((await inventory.hasGem("blue_gem")).any) {
     if (percentChance(0.1)) {
       total = total * 2;
       earned.set("blue_gem", Math.floor(total / 2));
+      addStat(member, "bake-blue", Math.floor(total / 2));
     }
   }
 
   while (percentChance(cakeChance > 25 ? 25 : cakeChance)) cakeAmount++;
 
   await addInventoryItem(member, "cookie", Math.round(total));
-  if (cakeAmount > 0) await addInventoryItem(member, "cake", cakeAmount);
+  addStat(member, "bake-total", Math.round(total));
+
+  if (cakeAmount > 0) {
+    await addInventoryItem(member, "cake", cakeAmount);
+    addStat(member, "bake-cake", cakeAmount);
+  }
 
   const embed = new CustomEmbed(member).setHeader(
     `${member.user.username}'s bakery`,
