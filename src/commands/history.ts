@@ -175,11 +175,6 @@ async function run(
     if (embed.data.fields?.length) embed.data.fields.length = 0;
 
     for (const item of page) {
-      let title = `case ${item.caseId}`;
-
-      if (item.evidence?.id)
-        title = `[case ${item.caseId}](https://cdn.nypsi.xyz/evidence/${item.guildId}/${item.evidence.id}) `;
-
       if (item.deleted) {
         embed.addField(
           item.caseId.toString(),
@@ -187,10 +182,11 @@ async function run(
         );
       } else {
         embed.addField(
-          title,
-          "`" +
-            item.type +
-            "` - " +
+          `case ${item.caseId}`,
+          (item.evidence?.id
+            ? `[\`${item.type}\`](https://cdn.nypsi.xyz/evidence/${item.guildId}/${item.evidence.id})`
+            : `\`${item.type}\``) +
+            " - " +
             item.command +
             "\non " +
             `<t:${Math.floor(item.time.getTime() / 1000)}:d>`,
