@@ -233,7 +233,6 @@ async function run(
         const res = await addRequestedItem(interaction).catch(() => {});
 
         if (res) {
-
           const item = res.fields.fields.get("item").value;
           const amount = res.fields.fields.get("amount").value;
 
@@ -263,7 +262,6 @@ async function run(
             } else {
               requestedItems.push({ item: selected, amount: parseInt(amount) });
             }
-
           }
         }
 
@@ -343,7 +341,6 @@ async function run(
               flags: MessageFlags.Ephemeral,
             });
           } else {
-            
             const cost = await formatBet(amount.toLowerCase(), message.member).catch(() => {});
 
             if (!cost)
