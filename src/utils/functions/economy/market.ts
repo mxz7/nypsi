@@ -1230,7 +1230,7 @@ export async function showMarketConfirmationModal(
     });
     return false;
   }
-  
+
   res.deferUpdate();
 
   return true;
