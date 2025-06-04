@@ -14,7 +14,7 @@ export default async function emojiCreate(emoji: GuildEmoji) {
 
     embed.setHeader("emoji created");
     embed.setDescription(`\`${emoji.name}\` - \`${emoji.id}\`\ncreated by \`${creator}\``);
-    embed.setImage(emoji.url);
+    embed.setImage(emoji.imageURL());
 
     addLog(emoji.guild, "emoji", embed);
   }
