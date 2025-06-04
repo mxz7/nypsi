@@ -1,5 +1,5 @@
 import { SupportRequest } from "@prisma/client";
-import { Attachment, Collection } from "discord.js";
+import { Attachment, Collection, Embed } from "discord.js";
 import { nanoid } from "nanoid";
 import { zodTextFormat } from "openai/helpers/zod";
 import { z } from "zod";
@@ -167,6 +167,7 @@ export async function sendToRequestChannel(
   embed: CustomEmbed,
   userId: string,
   client: NypsiClient,
+  forwardedEmbeds?: Embed[],
 ) {
   const request = await getSupportRequest(id);
 
@@ -210,7 +211,7 @@ export async function sendToRequestChannel(
   }
 
   const res = await client.cluster.broadcastEval(
-    async (c, { shard, embed, channelId, notify }) => {
+    async (c, { shard, embeds, channelId, notify }) => {
       const client = c as unknown as NypsiClient;
       if (client.cluster.id != shard) return false;
 
@@ -226,7 +227,7 @@ export async function sendToRequestChannel(
         content = notify.map((i) => `<@${i}>`).join(" ");
       }
 
-      const msg = await channel.send({ embeds: [embed], content }).catch(() => {});
+      const msg = await channel.send({ embeds: embeds, content }).catch(() => {});
 
       if (!msg) return false;
       return true;
@@ -234,7 +235,7 @@ export async function sendToRequestChannel(
     {
       context: {
         shard: shard,
-        embed: embed.toJSON(),
+        embeds: [embed.toJSON(), ...(forwardedEmbeds?.map((e) => e.toJSON()) || [])],
         channelId: request.channelId,
         notify: request.notify,
       },
