@@ -233,7 +233,6 @@ async function run(
         const res = await addRequestedItem(interaction).catch(() => {});
 
         if (res) {
-          await res.deferReply({ flags: MessageFlags.Ephemeral });
 
           const item = res.fields.fields.get("item").value;
           const amount = res.fields.fields.get("amount").value;
@@ -241,21 +240,22 @@ async function run(
           const selected = selectItem(item);
 
           if (!selected) {
-            await res.editReply({
+            await res.reply({
               embeds: [new ErrorEmbed("couldnt find that item")],
-              options: { flags: MessageFlags.Ephemeral },
+              flags: MessageFlags.Ephemeral,
             });
           } else if (selected.account_locked) {
-            await res.editReply({
+            await res.reply({
               embeds: [new ErrorEmbed("this item cannot be traded")],
-              options: { flags: MessageFlags.Ephemeral },
+              flags: MessageFlags.Ephemeral,
             });
           } else if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
-            await res.editReply({
+            await res.reply({
               embeds: [new ErrorEmbed("invalid amount")],
-              options: { flags: MessageFlags.Ephemeral },
+              flags: MessageFlags.Ephemeral,
             });
           } else {
+            await res.deferUpdate();
             const index = requestedItems.findIndex((entry) => entry.item === selected);
 
             if (index !== -1) {
@@ -264,7 +264,6 @@ async function run(
               requestedItems.push({ item: selected, amount: parseInt(amount) });
             }
 
-            await res.deleteReply();
           }
         }
 
@@ -276,8 +275,6 @@ async function run(
         const res = await addOfferedItem(interaction).catch(() => {});
 
         if (res) {
-          await res.deferReply({ flags: MessageFlags.Ephemeral });
-
           const item = res.fields.fields.get("item").value;
           let amount = res.fields.fields.get("amount").value;
 
@@ -290,26 +287,28 @@ async function run(
           }
 
           if (!selected) {
-            await res.editReply({
+            await res.reply({
               embeds: [new ErrorEmbed("couldnt find that item")],
-              options: { flags: MessageFlags.Ephemeral },
+              flags: MessageFlags.Ephemeral,
             });
           } else if (selected.account_locked) {
-            await res.editReply({
+            await res.reply({
               embeds: [new ErrorEmbed("this item cannot be traded")],
-              options: { flags: MessageFlags.Ephemeral },
+              flags: MessageFlags.Ephemeral,
             });
           } else if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
-            await res.editReply({
+            await res.reply({
               embeds: [new ErrorEmbed("invalid amount")],
-              options: { flags: MessageFlags.Ephemeral },
+              flags: MessageFlags.Ephemeral,
             });
           } else if (inventory.count(selected.id) < parseInt(amount)) {
-            await res.editReply({
+            await res.reply({
               embeds: [new ErrorEmbed(`you do not have enough ${selected.plural}`)],
-              options: { flags: MessageFlags.Ephemeral },
+              flags: MessageFlags.Ephemeral,
             });
           } else {
+            await res.deferUpdate();
+
             const index = offeredItems.findIndex((entry) => entry.item === selected);
 
             if (index !== -1) {
@@ -317,8 +316,6 @@ async function run(
             } else {
               offeredItems.push({ item: selected, amount: parseInt(amount) });
             }
-
-            await res.deleteReply();
           }
         }
 
@@ -330,34 +327,34 @@ async function run(
         const res = await addOfferedMoney(interaction).catch(() => {});
 
         if (res) {
-          await res.deferReply({ flags: MessageFlags.Ephemeral });
-
           const amount = res.fields.fields.get("amount").value;
 
           if (amount.toLowerCase() === "all") {
+            await res.deferUpdate();
             offeredMoney = await getBalance(message.author.id);
-            await res.deleteReply();
           } else if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
-            await res.editReply({
+            await res.reply({
               embeds: [new ErrorEmbed("invalid amount")],
-              options: { flags: MessageFlags.Ephemeral },
+              flags: MessageFlags.Ephemeral,
             });
           } else if (parseInt(amount) > balance) {
-            await res.editReply({
+            await res.reply({
               embeds: [new ErrorEmbed("you do not have enough money")],
-              options: { flags: MessageFlags.Ephemeral },
+              flags: MessageFlags.Ephemeral,
             });
           } else {
+            
             const cost = await formatBet(amount.toLowerCase(), message.member).catch(() => {});
 
             if (!cost)
-              await res.editReply({
+              await res.reply({
                 embeds: [new ErrorEmbed("invalid amount")],
-                options: { flags: MessageFlags.Ephemeral },
+                flags: MessageFlags.Ephemeral,
               });
-            else offeredMoney = cost;
-
-            await res.deleteReply();
+            else {
+              await res.deferUpdate();
+              offeredMoney = cost;
+            }
           }
         }
 
