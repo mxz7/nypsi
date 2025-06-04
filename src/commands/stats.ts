@@ -777,7 +777,7 @@ async function run(
     });
 
     embed.setDescription(
-      `your bakery has baked **${totalBaked.toLocaleString()}** ${pluralize("cookie", totalBaked)} 🍪 ${cakesBaked > 0 ? ` and ${cakesBaked.toLocaleString()} ${pluralize("cake", cakesBaked)} ${getItems()["cake"].emoji}` : ""}`,
+      `your bakery has baked **${totalBaked.toLocaleString()}** ${pluralize("cookie", totalBaked)} 🍪 ${cakesBaked > 0 ? ` and **${cakesBaked.toLocaleString()}** ${pluralize("cake", cakesBaked)} ${getItems()["cake"].emoji}` : ""}`,
     );
 
     if (breakdown.length > 0) embed.addField("breakdown", breakdown.join("\n"));
