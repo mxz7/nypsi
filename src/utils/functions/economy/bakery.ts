@@ -15,8 +15,8 @@ import { isPassive } from "./passive";
 import { addTaskProgress } from "./tasks";
 import { getBakeryUpgradesData, getItems, getUpgradesData } from "./utils";
 import { pluralize } from "../string";
-import ms = require("ms");
 import { addStat } from "./stats";
+import ms = require("ms");
 
 async function getLastBake(member: GuildMember | string) {
   let id: string;

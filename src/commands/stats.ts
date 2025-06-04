@@ -756,10 +756,6 @@ async function run(
     const totalBaked = parseInt(findStatAmount(stats, "bake-total", false));
     const cakesBaked = parseInt(findStatAmount(stats, "bake-cake", false));
 
-    console.log(
-      `${findStatAmount(stats, "bake-total")}, ${totalBaked}, ${totalBaked.toLocaleString()}`,
-    );
-
     const breakdownItems = [
       { key: "grandma", emoji: "👵🏻", name: "grandma" },
       { key: "guild", emoji: ":busts_in_silhouette:", name: "your guild" },
@@ -781,7 +777,7 @@ async function run(
     });
 
     embed.setDescription(
-      `your bakery has baked **${totalBaked.toLocaleString()}** cookies${cakesBaked > 0 ? ` and ${cakesBaked.toLocaleString()} ${pluralize("cake", cakesBaked)}` : ""}`,
+      `your bakery has baked **${totalBaked.toLocaleString()}** ${pluralize("cookie", totalBaked)} 🍪 ${cakesBaked > 0 ? ` and ${cakesBaked.toLocaleString()} ${pluralize("cake", cakesBaked)} ${getItems()["cake"].emoji}` : ""}`,
     );
 
     if (breakdown.length > 0) embed.addField("breakdown", breakdown.join("\n"));
