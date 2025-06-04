@@ -270,7 +270,7 @@ export default async function messageCreate(message: Message) {
           const embed = new CustomEmbed()
             .setHeader("nypsi", message.client.user.avatarURL())
             .setColor(Constants.PURPLE)
-            .setDescription(quickResponse)
+            .setDescription(aiResponse.answer)
             .setFooter({
               text: "this is an automatic message. please tell us if this doesn't match your query",
             });
