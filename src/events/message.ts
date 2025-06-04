@@ -3,6 +3,7 @@ import {
   ButtonBuilder,
   ButtonStyle,
   Collection,
+  Embed,
   EmbedBuilder,
   GuildMember,
   Interaction,
@@ -28,7 +29,7 @@ import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { userExists } from "../utils/functions/economy/utils";
 import { checkAutoMute, checkMessageContent } from "../utils/functions/guilds/filters";
 import { isSlashOnly } from "../utils/functions/guilds/slash";
-import { getPrefix, hasGuild } from "../utils/functions/guilds/utils";
+import { getGuildName, getPrefix, hasGuild } from "../utils/functions/guilds/utils";
 import { getKarma } from "../utils/functions/karma/karma";
 import { isPremium } from "../utils/functions/premium/premium";
 import sleep from "../utils/functions/sleep";
@@ -300,12 +301,13 @@ export default async function messageCreate(message: Message) {
         });
       }
 
-      await redis.set(
-        `${Constants.redis.cooldown.SUPPORT_MESSAGE}:${message.author.id}`,
-        1,
-        "EX",
-        3,
-      );
+      if (message.messageSnapshots.size == 0)
+        await redis.set(
+          `${Constants.redis.cooldown.SUPPORT_MESSAGE}:${message.author.id}`,
+          1,
+          "EX",
+          3,
+        );
 
       const embed = new CustomEmbed()
         .setHeader(message.author.username, message.author.avatarURL())
@@ -326,11 +328,53 @@ export default async function messageCreate(message: Message) {
         embed.addField("attachments", attachments.join("\n"));
       }
 
+      let forwardedEmbeds: Embed[];
+
+      if (message.messageSnapshots.size > 0) {
+        const snapshot = message.messageSnapshots.first();
+
+        const guildId = snapshot.guildId;
+        const channelId = snapshot.channelId;
+        const messageId = snapshot.id;
+
+        const res = guildId && (await hasGuild(guildId));
+
+        let name = res ? await getGuildName(guildId) : (guildId ?? "DM");
+
+        if (res) {
+          const channelName = snapshot.guild.channels.cache.get(channelId).name ?? undefined;
+          if (channelName) name += ` - #${channelName}`;
+        }
+
+        if (guildId && channelId && messageId) {
+          embed.setURL(`https://discord.com/channels/${guildId}/${channelId}/${messageId}`);
+        }
+
+        embed.setTitle(`forward (${name})`);
+        if (snapshot.content) embed.setDescription(`${snapshot.content}`);
+
+        if (snapshot.attachments.size > 0) {
+          const attachments = await handleAttachments(snapshot.attachments);
+
+          if (attachments === "too big")
+            return message.channel.send({
+              embeds: [new ErrorEmbed("cannot upload file larger than 100mb")],
+            });
+
+          embed.addField("forwarded attachments", attachments.join("\n"));
+        }
+
+        if (snapshot.embeds.length) {
+          forwardedEmbeds = snapshot.embeds;
+        }
+      }
+
       const res = await sendToRequestChannel(
         message.author.id,
         embed,
         message.author.id,
         message.client as NypsiClient,
+        forwardedEmbeds,
       );
 
       if (res) {
