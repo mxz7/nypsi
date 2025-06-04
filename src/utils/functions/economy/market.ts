@@ -1230,10 +1230,8 @@ export async function showMarketConfirmationModal(
     });
     return false;
   }
-  res.reply({
-    embeds: [new CustomEmbed(null, "✅ confirmation accepted")],
-    flags: MessageFlags.Ephemeral,
-  });
+
+  res.deferUpdate();
 
   return true;
 }
