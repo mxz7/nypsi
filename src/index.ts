@@ -15,6 +15,7 @@ import { listen } from "./utils/handlers/webhookhandler";
 import { getWebhooks, logger, setClusterId } from "./utils/logger";
 import { dmQueueWorker } from "./utils/queues/dms";
 import ms = require("ms");
+import { getInventory } from "./utils/functions/economy/inventory";
 
 setClusterId("main");
 getWebhooks();

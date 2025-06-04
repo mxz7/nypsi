@@ -197,7 +197,7 @@ export default async function messageCreate(message: Message) {
           { content: helpMessage, aiResponse },
         );
 
-        if (aiResponse.decision === "no") {
+        if (!aiResponse.decision) {
           return modalSubmit.editReply({
             embeds: [
               new CustomEmbed()

@@ -42,7 +42,7 @@ quickResponses.set(
 );
 
 const isRequestSuitableFormat = z.object({
-  choice: z.enum(["yes", "no"]),
+  valid: z.boolean(),
   reason: z.string(),
   answer: z.string().nullable(),
 });
@@ -344,7 +344,7 @@ export async function summariseRequest(id: string) {
 
 export async function isRequestSuitable(
   content: string,
-): Promise<{ decision: "yes" | "no"; reason: string; answer?: string }> {
+): Promise<{ decision: boolean; reason: string; answer?: string }> {
   const sysPrompt = [
     "# Role",
     "You are part of a support team for the Discord bot **nypsi**.",
@@ -358,13 +358,15 @@ export async function isRequestSuitable(
     "",
     "## Your Response",
     "",
-    "### Choice",
+    "### Valid",
+    "This is for the validity of the support request, 'true' will send it to staff, 'false' will block it from going to staff.",
     "",
-    "#### yes",
-    "The choice will be 'yes' for a suitable support request.",
+    "#### true",
+    "The decision will be 'true' for a suitable support request.",
+    "If the user is a question that appears to be relevant to the bot, but isn't in the documentation, you should still choose 'yes'.",
     "",
-    "#### no",
-    "The choice will be 'no' for an unsuitable support request.",
+    "#### false",
+    "The decision will be 'false' for an unsuitable support request.",
     "",
     "### Reason",
     "",
@@ -378,6 +380,9 @@ export async function isRequestSuitable(
     "This should only be used when the choice is 'yes' **AND** when you are able to provide a **DIRECT** answer to the user's question based on the documentation. Do not provide an anser if you can't answer the user's question directly with information from the documentation",
     "Your answer should be concise and easy to understand for a range of audiences. If suggesting commands, use the '$' dollar sign as a prefix for the command.",
     "Do not tell the user to 'dm nypsi' or to 'create a support request', they are already doing that.",
+    "Even if you can't answer the user's question, it could still be a suitable support request. The documentation does not include everything.",
+    "",
+    "If the user is suggesting a new feature, you should accept the support request, but tell them to use the suggestions channel.",
     "",
     "## Examples",
     "",
@@ -389,6 +394,8 @@ export async function isRequestSuitable(
     "* Asking how to do something",
     "* Asking for help with the nypsi discord server",
     "* Saying that they will send screenshots, videos etc",
+    "* Asking about a feature",
+    "* Suggesting a new feature",
     "",
     "### Unsuitable Requests",
     "* Begging/demanding for items or money",
@@ -410,14 +417,24 @@ export async function isRequestSuitable(
       text: { format: zodTextFormat(isRequestSuitableFormat, "supportrequest_suitable") },
     });
 
+    logger.debug(`support request ai tokens`, {
+      cost: {
+        input: {
+          used: response.usage?.input_tokens,
+          cached: response.usage?.input_tokens_details?.cached_tokens,
+        },
+        output: response.usage?.output_tokens,
+      },
+    });
+
     return {
-      decision: response.output_parsed.choice,
+      decision: response.output_parsed.valid,
       reason: response.output_parsed.reason,
       answer: response.output_parsed.answer,
     };
   } catch (e) {
     logger.error("supportrequest: error while checking if suitable", { e, content });
-    return { decision: "yes", reason: "ahhh" };
+    return { decision: true, reason: "ahhh" };
   }
 }
 
