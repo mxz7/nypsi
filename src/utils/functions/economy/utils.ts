@@ -316,8 +316,9 @@ export function formatNumberPretty(number: number): string {
 }
 
 export async function isEcoBanned(id: string): Promise<BanCache> {
-  if (await isUserBlacklisted(id))
-    return { banned: true, bannedAccount: id, expire: 0 } as BanCache;
+  const blacklist = await isUserBlacklisted(id);
+  if (blacklist.blacklisted)
+    return { banned: true, bannedAccount: blacklist.relation, expire: 0 } as BanCache;
 
   const cache = await redis.get(`${Constants.redis.cache.economy.BANNED}:${id}`);
 

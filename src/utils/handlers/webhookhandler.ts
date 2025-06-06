@@ -157,7 +157,7 @@ async function doVote(vote: topgg.WebhookPayload) {
     return;
   }
 
-  if (await isUserBlacklisted(user)) {
+  if ((await isUserBlacklisted(user)).blacklisted) {
     logger.info(`${user} blacklisted`);
     addNotificationToQueue({
       memberId: user,

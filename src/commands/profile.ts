@@ -134,7 +134,7 @@ async function run(
 
   if (!(await userExists(target))) await createUser(target);
 
-  if (await isUserBlacklisted(target.user.id))
+  if ((await isUserBlacklisted(target.user.id)).blacklisted)
     return send({
       embeds: [
         new ErrorEmbed(

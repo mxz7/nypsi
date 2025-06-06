@@ -52,7 +52,7 @@ module.exports = new ItemUse(
       }
     };
 
-    if (await isUserBlacklisted(message.guild.ownerId)) {
+    if ((await isUserBlacklisted(message.guild.ownerId)).blacklisted) {
       return send({
         embeds: [
           new ErrorEmbed(

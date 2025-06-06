@@ -17,7 +17,7 @@ import { runCommand } from "../utils/handlers/commandhandler";
 import { runInteraction } from "../utils/handlers/interactions";
 
 export default async function interactionCreate(interaction: Interaction) {
-  if (await isUserBlacklisted(interaction.user.id)) return;
+  if ((await isUserBlacklisted(interaction.user.id)).blacklisted) return;
 
   if (
     [InteractionType.ApplicationCommandAutocomplete, InteractionType.MessageComponent].includes(

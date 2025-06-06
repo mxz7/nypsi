@@ -16,7 +16,7 @@ async function run(
   if (args.length === 0)
     return message.channel.send({ content: "are you stupid or some shit lol lol ol ol ol ol" });
 
-  if (await isUserBlacklisted(args[0])) {
+  if ((await isUserBlacklisted(args[0])).blacklisted) {
     await setUserBlacklist(args[0], false);
   } else {
     await setUserBlacklist(args[0], true);

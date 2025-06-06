@@ -325,7 +325,7 @@ async function run(
 
     if (!(await hasProfile(user.id))) desc += "\n**has no user profile**";
 
-    if (await isUserBlacklisted(user.id)) {
+    if ((await isUserBlacklisted(user.id)).blacklisted) {
       rows[3].components[1].setDisabled(true);
       desc += "\n**currently blacklisted**";
     } else if ((await isEcoBanned(user.id)).banned) {
@@ -907,7 +907,7 @@ async function run(
           return waitForButton();
         }
 
-        if (await isUserBlacklisted(user.id)) {
+        if ((await isUserBlacklisted(user.id)).blacklisted) {
           logger.info(
             `admin: ${message.author.id} (${message.author.username}) removed blacklist for ${user.id} `,
           );

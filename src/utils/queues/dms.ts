@@ -12,7 +12,6 @@ import { manager } from "../..";
 import { NypsiClient } from "../../models/Client";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import { NotificationPayload } from "../../types/Notification";
-import { isUserBlacklisted } from "../functions/users/blacklist";
 import { logger } from "../logger";
 
 const connection = new Redis({ maxRetriesPerRequest: null });
@@ -70,16 +69,6 @@ interface RequestDMOptions {
 
 async function requestDM(options: RequestDMOptions): Promise<boolean> {
   logger.info(`DM requested: ${options.memberId}`);
-
-  try {
-    if (await isUserBlacklisted(options.memberId)) {
-      logger.info(`${options.memberId} is blacklisted`);
-      return false;
-    }
-  } catch {
-    logger.error(`failed blacklist check: ${options.memberId}`);
-    return false;
-  }
 
   if (options.client instanceof NypsiClient) {
     let clusterHas: (number | "not-found")[];

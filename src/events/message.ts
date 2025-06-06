@@ -104,10 +104,18 @@ export default async function messageCreate(message: Message) {
 
     if (message.system) return;
 
-    if (await isUserBlacklisted(message.author.id))
+    const blacklist = await isUserBlacklisted(message.author.id);
+
+    if (blacklist.blacklisted) {
+      let content = "you are blacklisted from nypsi. this punishment will not be removed.";
+
+      if (blacklist.relation !== message.author.id)
+        content += `\n\n in relation to \`${blacklist.relation}\``;
+
       return message.reply({
-        content: "you are blacklisted from nypsi. this punishment will not be removed.",
+        content,
       });
+    }
 
     if (await redis.exists(`${Constants.redis.cooldown.SUPPORT}:${message.author.id}`)) {
       return message.reply({

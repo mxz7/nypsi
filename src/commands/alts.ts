@@ -19,6 +19,7 @@ import prisma from "../init/database";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
+import { createUser, userExists } from "../utils/functions/economy/utils";
 import { isAltPunish } from "../utils/functions/guilds/altpunish";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
@@ -36,7 +37,6 @@ import { getMuteRole, isMuted, newMute } from "../utils/functions/moderation/mut
 import { getLastKnownAvatar, getLastKnownUsername } from "../utils/functions/users/tag";
 import { getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
-import { createUser, userExists } from "../utils/functions/economy/utils";
 
 const cmd = new Command("alts", "view a user's alts", "moderation")
   .setAliases(["alt", "account", "accounts"])
@@ -197,6 +197,7 @@ async function run(
         });
 
         exec(`redis-cli KEYS "*economy:banned*" | xargs redis-cli DEL`);
+        exec(`redis-cli KEYS "*blacklist*" | xargs redis-cli DEL`);
 
         if (await isAltPunish(message.guild)) {
           const accountIds = await getAllGroupAccountIds(message.guild, memberId);
@@ -312,8 +313,6 @@ async function run(
         });
 
       if (!msg) return;
-      console.log(await isAlt(message.guild, msg.content));
-      console.log(await getMainAccountId(message.guild, msg.content));
 
       if (
         !(await isAlt(message.guild, msg.content)) ||

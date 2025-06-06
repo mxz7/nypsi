@@ -681,7 +681,7 @@ export async function runCommand(
   }
 
   if (!(await hasProfile(message.member))) await createProfile(message.author);
-  if (await isUserBlacklisted(message.author.id)) return;
+  if ((await isUserBlacklisted(message.author.id)).blacklisted) return;
   if (await redis.exists(`${Constants.redis.nypsi.PROFILE_TRANSFER}:${message.author.id}`))
     return message.channel.send({
       embeds: [
