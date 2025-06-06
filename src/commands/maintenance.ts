@@ -15,6 +15,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
 
     const presence = await randomPresence();
 
+    (message.client as NypsiClient).cluster.send("maintenance_off");
     (message.client as NypsiClient).cluster.broadcastEval(
       (c, { presence }) => {
         c.user.setPresence({
@@ -27,6 +28,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
   } else {
     await redis.set("nypsi:maintenance", "t");
 
+    (message.client as NypsiClient).cluster.send("maintenance_on");
     (message.client as NypsiClient).cluster.broadcastEval((c) => {
       c.user.setPresence({
         status: "idle",

@@ -78,6 +78,10 @@ manager.on("clusterCreate", (cluster) => {
       return loadJobs(manager);
     } else if (typeof message === "string" && message === "reload_items") {
       return loadItems();
+    } else if (typeof message === "string" && message === "maintenance_on") {
+      dmQueueWorker.pause();
+    } else if (typeof message === "string" && message === "maintenance_off") {
+      dmQueueWorker.resume();
     }
   });
   logger.info(`launched cluster ${cluster.id}`);
