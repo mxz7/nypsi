@@ -35,7 +35,6 @@ import { runCountdowns } from "../utils/functions/guilds/countdowns";
 import { runSnipeClearIntervals } from "../utils/functions/guilds/utils";
 import { openKarmaShop } from "../utils/functions/karma/karmashop";
 import { getCustomPresence, randomPresence, setCustomPresence } from "../utils/functions/presence";
-import { getVersion } from "../utils/functions/version";
 import { runCommandUseTimers } from "../utils/handlers/commandhandler";
 import { getWebhooks, logger, setClusterId } from "../utils/logger";
 import ms = require("ms");
@@ -50,7 +49,7 @@ export class NypsiClient extends Client {
     this.cluster = new ClusterClient(this);
 
     setClusterId(this.cluster.id.toString());
-    process.title = `nypsi v${getVersion()}: cluster ${this.cluster.id}`;
+    process.title = `nypsi: cluster ${this.cluster.id}`;
 
     runEconomySetup();
 

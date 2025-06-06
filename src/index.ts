@@ -9,7 +9,6 @@ import Constants from "./utils/Constants";
 import { loadItems, runEconomySetup } from "./utils/functions/economy/utils";
 import { addFailedHeartbeat, sendHeartbeat } from "./utils/functions/heartbeat";
 import { updateStats } from "./utils/functions/topgg";
-import { getVersion } from "./utils/functions/version";
 import { startMentionInterval } from "./utils/handlers/mentions";
 import { listen } from "./utils/handlers/webhookhandler";
 import { getWebhooks, logger, setClusterId } from "./utils/logger";
@@ -18,7 +17,7 @@ import ms = require("ms");
 
 setClusterId("main");
 getWebhooks();
-process.title = `nypsi v${getVersion()}: main`;
+process.title = `nypsi: main`;
 
 let heartBeatIntervals: NodeJS.Timeout[] = [];
 

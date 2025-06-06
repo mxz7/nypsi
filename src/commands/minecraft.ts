@@ -11,7 +11,6 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import PageManager from "../utils/functions/page";
-import { getVersion } from "../utils/functions/version";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
 import dayjs = require("dayjs");
@@ -126,7 +125,7 @@ async function getNameHistory(uuid: string): Promise<{ username: string; changed
     `https://laby.net/api/user/${uuid}/get-names`,
     {
       headers: {
-        "User-Agent": `Mozilla/5.0 (compatible; nypsi/${getVersion()}; +https://github.com/mxz7)`,
+        "User-Agent": `Mozilla/5.0 (compatible; nypsi}; +https://github.com/mxz7)`,
       },
     },
   ).then((r) => r.json());
