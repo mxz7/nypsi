@@ -274,7 +274,7 @@ async function run(
                   (b) =>
                     `- **${b.itemAmount.toLocaleString()}x** ${items[b.itemId].emoji} ${
                       items[b.itemId].name
-                    } @ $${b.price.toLocaleString()} ea.`,
+                    } @ $${b.price.toLocaleString()}${pluralize("", b.itemAmount, " ea.")}`,
                 )
                 .join("\n")
         }`,
@@ -290,7 +290,7 @@ async function run(
                   (b) =>
                     `- **${b.itemAmount.toLocaleString()}x** ${items[b.itemId].emoji} ${
                       items[b.itemId].name
-                    } @ $${b.price.toLocaleString()} ea.`,
+                    } @ $${b.price.toLocaleString()}${pluralize("", b.itemAmount, " ea.")}`,
                 )
                 .join("\n")
         }`,
@@ -381,7 +381,7 @@ async function run(
 
       embed.setFields({
         name: `your ${type} orders`,
-        value: `${orders.length == 0 ? "none" : orders.map((b) => `- **${b.itemAmount.toLocaleString()}x** ${items[b.itemId].emoji} ${items[b.itemId].name} @ $${b.price.toLocaleString()} ea.`).join("\n")}`,
+        value: `${orders.length == 0 ? "none" : orders.map((b) => `- **${b.itemAmount.toLocaleString()}x** ${items[b.itemId].emoji} ${items[b.itemId].name} @ $${b.price.toLocaleString()}${pluralize("", b.itemAmount, " ea.")}`).join("\n")}`,
       });
 
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -833,7 +833,7 @@ async function run(
           .setValue(order.id.toString())
           .setEmoji(items[order.itemId].emoji as APIMessageComponentEmoji)
           .setLabel(
-            `${order.itemAmount.toLocaleString()}x ${items[order.itemId].name} @ $${order.price.toLocaleString()} ea.`,
+            `${order.itemAmount.toLocaleString()}x ${items[order.itemId].name} @ $${order.price.toLocaleString()}${pluralize("", order.itemAmount, " ea.")}`,
           ),
       );
     }
@@ -1548,7 +1548,7 @@ async function run(
                     (b) =>
                       `- **${b.itemAmount.toLocaleString()}x** ${item.emoji} ${
                         item.name
-                      } @ $${b.price.toLocaleString()} ea.`,
+                      } @ $${b.price.toLocaleString()}${pluralize("", b.itemAmount, " ea.")}`,
                   )
                   .join("\n")
           }${extraBuyOrderCount > 0 ? `\n*+ ${extraBuyOrderCount} more items*` : ""}`,
@@ -1565,7 +1565,7 @@ async function run(
                     (b) =>
                       `- **${b.itemAmount.toLocaleString()}x** ${item.emoji} ${
                         item.name
-                      } @ $${b.price.toLocaleString()} ea.`,
+                      } @ $${b.price.toLocaleString()}${pluralize("", b.itemAmount, " ea.")}`,
                   )
                   .join("\n")
           }${extraSellOrderCount > 0 ? `\n*+ ${extraSellOrderCount} more items*` : ""}`,
