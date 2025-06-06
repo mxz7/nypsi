@@ -36,10 +36,8 @@ import {
 } from "../utils/functions/economy/stats";
 import { getItems } from "../utils/functions/economy/utils";
 import PageManager from "../utils/functions/page";
-import { getCommandUses } from "../utils/functions/users/commands";
-
 import { formatTime, pluralize } from "../utils/functions/string";
-import { getVersion } from "../utils/functions/version";
+import { getCommandUses } from "../utils/functions/users/commands";
 import { aliasesSize, commandsSize } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
@@ -601,7 +599,7 @@ async function run(
       )
       .addField("cluster", `**uptime** ${uptime}`, true);
 
-    embed.setFooter({ text: `v${getVersion()} | shard: ${currentShard}` });
+    embed.setFooter({ text: `shard: ${currentShard}` });
 
     return send({ embeds: [embed] });
   };
