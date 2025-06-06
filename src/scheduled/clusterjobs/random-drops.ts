@@ -189,12 +189,6 @@ async function fastClickGame(
 
   const winner = await client.cluster.broadcastEval(
     async (c, { embed, row, channelId, cluster, buttonId, winEmbed, bannedEmbed }) => {
-      const path = await import("path");
-
-      const { isEcoBanned } = await import(
-        path.join(process.cwd(), "dist", "utils", "functions", "economy", "utils.js")
-      );
-
       const client = c as unknown as NypsiClient;
 
       if (client.cluster.id != cluster) return;
@@ -211,9 +205,13 @@ async function fastClickGame(
       const res = await msg
         .awaitMessageComponent({
           filter: async (i) => {
-            if ((await isEcoBanned(i.user.id)).banned) {
-              i.reply({ embeds: [bannedEmbed], flags: 64 });
-              return false;
+            try {
+              if ((await isEcoBanned(i.user.id)).banned) {
+                i.reply({ embeds: [bannedEmbed], flags: 64 });
+                return false;
+              }
+            } catch {
+              return i.customId === buttonId;
             }
             return i.customId === buttonId;
           },
@@ -319,8 +317,12 @@ async function typeFastGame(
       const res = await channel
         .awaitMessages({
           filter: async (m) => {
-            if ((await isEcoBanned(m.member.id)).banned) {
-              return false;
+            try {
+              if ((await isEcoBanned(m.member.id)).banned) {
+                return false;
+              }
+            } catch {
+              return m.content.toLowerCase() === chosenWord.toLowerCase();
             }
             return m.content.toLowerCase() === chosenWord.toLowerCase();
           },
@@ -525,15 +527,20 @@ async function clickSpecificGame(
       const res = await msg
         .awaitMessageComponent({
           filter: async (i) => {
-            if ((await isEcoBanned(i.user.id)).banned) {
-              i.reply({ embeds: [bannedEmbed], flags: 64 });
-              return false;
-            }
             if (losers.includes(i.user.id)) return;
             if (i.customId !== winningId) {
               i.reply({ embeds: [failEmbed], flags: 64 });
               losers.push(i.user.id);
               return false;
+            }
+
+            try {
+              if ((await isEcoBanned(i.user.id)).banned) {
+                i.reply({ embeds: [bannedEmbed], flags: 64 });
+                return false;
+              }
+            } catch {
+              return true;
             }
 
             return true;
