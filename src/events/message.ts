@@ -117,16 +117,6 @@ export default async function messageCreate(message: Message) {
       });
     }
 
-    if (await redis.exists(`${Constants.redis.cooldown.SUPPORT}:${message.author.id}`)) {
-      return message.reply({
-        embeds: [
-          new ErrorEmbed(
-            `you have created a support request recently, try again later.\nif you need support and don't want to wait, you can join the nypsi support server [here](${Constants.NYPSI_SERVER_INVITE_LINK})`,
-          ),
-        ],
-      });
-    }
-
     const request = await getSupportRequest(message.author.id);
 
     if (!request) {
@@ -150,6 +140,10 @@ export default async function messageCreate(message: Message) {
           .setCustomId("s")
           .setLabel("talk to a staff member")
           .setStyle(ButtonStyle.Danger),
+        new ButtonBuilder()
+          .setStyle(ButtonStyle.Link)
+          .setLabel("view your active punishments")
+          .setURL("https://nypsi.xyz/me/punishments"),
       );
 
       const msg = await message.reply({
@@ -184,6 +178,16 @@ export default async function messageCreate(message: Message) {
       }
 
       if (res.customId == "s") {
+        if (await redis.exists(`${Constants.redis.cooldown.SUPPORT}:${message.author.id}`)) {
+          return res.reply({
+            embeds: [
+              new ErrorEmbed(
+                `you have created a support request recently, try again later.\nif you need support and don't want to wait, you can join the nypsi support server [here](${Constants.NYPSI_SERVER_INVITE_LINK})`,
+              ),
+            ],
+          });
+        }
+
         await res.showModal(modal);
 
         const modalSubmit = await res.awaitModalSubmit({ filter, time: 300000 }).catch(() => {});
