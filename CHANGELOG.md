@@ -4,6 +4,7 @@
 
 - gems still give effects (and break) in market and trades (@growling_grizzly)
 - add `$stats bake` (@growling_grizzly)
+- added 'punishments' thing to website to see how long you're muted / banned in servers
 
 ## other
 
