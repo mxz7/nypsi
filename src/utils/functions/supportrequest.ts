@@ -148,6 +148,7 @@ export async function createSupportRequest(id: string, client: NypsiClient, user
     data: {
       channelId: channelId,
       userId: id,
+      latestActivity: new Date(),
     },
   });
 
@@ -179,6 +180,15 @@ export async function sendToRequestChannel(
         userId,
         content: embed.data.description,
         supportRequestId: id,
+      },
+    });
+
+    await prisma.supportRequest.update({
+      where: {
+        userId,
+      },
+      data: {
+        latestActivity: new Date(),
       },
     });
   }

@@ -867,9 +867,10 @@ model Mention {
 }
 
 model SupportRequest {
-  userId    String   @id
-  channelId String   @unique
-  notify    String[]
+  userId         String   @id
+  channelId      String   @unique
+  latestActivity DateTime
+  notify         String[]
 
   SupportRequestMessage SupportRequestMessage[]
 }
