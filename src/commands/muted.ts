@@ -6,6 +6,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
   PermissionFlagsBits,
+  User,
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
@@ -48,10 +49,12 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
   const pageItems: string[] = [];
 
   for (const m of muted) {
-    const user = await message.client.users.fetch(m.userId);
-    const username = await getLastKnownUsername(m.userId);
+    const username =
+      (await getLastKnownUsername(m.userId)) ??
+      (await message.client.users.fetch(m.userId).catch(() => undefined as User))?.username ??
+      "";
 
-    const msg = `${user ? `${user.username} ` : username ? `${username} ` : null}\`${m.userId}\` ${
+    const msg = `${username ? `${username} ` : ""} \`${m.userId}\` ${
       m.expire.getTime() >= 3130000000000
         ? "is permanently muted"
         : `will be unmuted <t:${Math.floor(m.expire.getTime() / 1000)}:R>`
