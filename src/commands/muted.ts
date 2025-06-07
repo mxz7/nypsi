@@ -1,12 +1,4 @@
-import {
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  CommandInteraction,
-  Message,
-  MessageActionRowComponentBuilder,
-  PermissionFlagsBits,
-} from "discord.js";
+import { CommandInteraction, Message, PermissionFlagsBits, User } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { getMutedUsers } from "../utils/functions/moderation/mute";
@@ -48,10 +40,12 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
   const pageItems: string[] = [];
 
   for (const m of muted) {
-    const user = await message.client.users.fetch(m.userId);
-    const username = await getLastKnownUsername(m.userId);
+    const username =
+      (await getLastKnownUsername(m.userId)) ??
+      (await message.client.users.fetch(m.userId).catch(() => undefined as User))?.username ??
+      "";
 
-    const msg = `${user ? `${user.username} ` : username ? `${username} ` : null}\`${m.userId}\` ${
+    const msg = `${username ? `${username} ` : ""} \`${m.userId}\` ${
       m.expire.getTime() >= 3130000000000
         ? "is permanently muted"
         : `will be unmuted <t:${Math.floor(m.expire.getTime() / 1000)}:R>`
@@ -66,27 +60,17 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
 
   embed.setDescription(pages.get(1).join("\n"));
 
-  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder()
-      .setCustomId("⬅")
-      .setLabel("back")
-      .setStyle(ButtonStyle.Primary)
-      .setDisabled(true),
-    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
-  );
-
   let msg: Message;
 
   if (pages.size == 1) {
     return await message.channel.send({ embeds: [embed] });
   } else {
-    msg = await message.channel.send({ embeds: [embed], components: [row] });
+    msg = await message.channel.send({ embeds: [embed], components: [PageManager.defaultRow()] });
   }
 
   const manager = new PageManager({
     message: msg,
     embed,
-    row,
     pages,
     userId: message.author.id,
   });

@@ -12,7 +12,7 @@ import { CustomEmbed } from "../../models/EmbedBuilders";
 
 interface PageManagerOptions<T> {
   message: Message;
-  row:
+  row?:
     | ActionRowBuilder<MessageActionRowComponentBuilder>
     | ActionRowBuilder<MessageActionRowComponentBuilder>[];
   arr?: T[];
@@ -82,7 +82,11 @@ export default class PageManager<T> {
     this.pages = opts.arr ? PageManager.createPages(opts.arr, opts.pageLength) : opts.pages;
     this.lastPage = this.pages.size;
     this.message = opts.message;
-    this.rows = Array.isArray(opts.row) ? opts.row : [opts.row];
+    this.rows = opts.row
+      ? Array.isArray(opts.row)
+        ? opts.row
+        : [opts.row]
+      : [PageManager.defaultRow()];
     this.updatePageFunc = opts.updateEmbed;
     this.userId = opts.userId;
     this.embed = opts.embed;
