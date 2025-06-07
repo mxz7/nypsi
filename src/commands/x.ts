@@ -58,6 +58,7 @@ import { addNotificationToQueue } from "../utils/functions/users/notifications";
 import { addTag, getTags, removeTag } from "../utils/functions/users/tags";
 import { hasProfile } from "../utils/functions/users/utils";
 import { logger } from "../utils/logger";
+import { pluralize } from "../utils/functions/string";
 
 const cmd = new Command("x", "admincmd", "none").setPermissions(["bot owner"]);
 
@@ -1934,6 +1935,87 @@ async function run(
     // idk how this should be done lol i might get back to it
 
     console.log(map);
+  } else if (args[0].toLowerCase() === "closetickets") {
+    if (message.author.id != Constants.TEKOH_ID) return;
+    const clusterHas = await (message.client as NypsiClient).cluster.broadcastEval(
+      async (c, { channelId }) => {
+        const client = c as unknown as NypsiClient;
+        const channel = client.channels.cache.get(channelId);
+
+        if (channel) {
+          return client.cluster.id;
+        } else {
+          return "not-found";
+        }
+      },
+      { context: { channelId: Constants.SUPPORT_CHANNEL_ID } },
+    );
+
+    let shard: number;
+
+    for (const i of clusterHas) {
+      if (i != "not-found") {
+        shard = i;
+        break;
+      }
+    }
+
+    if (isNaN(shard)) {
+      return;
+    }
+
+    const channelEmbed = new CustomEmbed().setDescription(
+      "this support request has been closed due to inactivity",
+    );
+    const sentEmbed = new CustomEmbed().setDescription(
+      "your support request has been closed due to inactivity",
+    );
+
+    const tickets = await prisma.supportRequest.findMany();
+
+    for (const support of tickets) {
+      addNotificationToQueue({
+        memberId: support.userId,
+        payload: { embed: sentEmbed },
+      });
+
+      await (message.client as NypsiClient).cluster.broadcastEval(
+        async (c, { shard, channelId, embed }) => {
+          const client = c as unknown as NypsiClient;
+          if (client.cluster.id != shard) return false;
+
+          const channel = client.channels.cache.get(channelId);
+
+          if (!channel) return false;
+
+          if (!channel.isTextBased()) return;
+          if (!channel.isThread()) return;
+
+          await channel.send({ embeds: [embed] });
+
+          await channel.setLocked(true).catch(() => {});
+          await channel.setArchived(true).catch(() => {});
+        },
+        { context: { shard: shard, channelId: support.channelId, embed: channelEmbed } },
+      );
+
+      await prisma.supportRequest.delete({
+        where: {
+          userId: support.userId,
+        },
+      });
+
+      await redis.del(`${Constants.redis.cache.SUPPORT}:${support.userId}`);
+    }
+
+    return message.channel.send({
+      embeds: [
+        new CustomEmbed(
+          message.member,
+          `closed ${tickets.length} ${pluralize("support request", tickets.length)}`,
+        ),
+      ],
+    });
   }
 }
 
