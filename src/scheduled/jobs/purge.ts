@@ -121,7 +121,7 @@ export default {
 
     const staleTickets = await prisma.supportRequest.findMany({
       where: {
-        latestActivity: { lt: dayjs().toDate() },
+        latestActivity: { lt: dayjs().subtract(3, "day").toDate() },
       },
     });
 
