@@ -1,13 +1,4 @@
-import {
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  CommandInteraction,
-  Message,
-  MessageActionRowComponentBuilder,
-  PermissionFlagsBits,
-  User,
-} from "discord.js";
+import { CommandInteraction, Message, PermissionFlagsBits, User } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { getBannedUsers } from "../utils/functions/moderation/ban";
@@ -51,7 +42,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
   for (const m of banned) {
     const username =
       (await getLastKnownUsername(m.userId)) ??
-      (await message.client.users.fetch(`${m.userId}`).catch(() => undefined as User))?.username ??
+      (await message.client.users.fetch(m.userId).catch(() => undefined as User))?.username ??
       "";
 
     const msg = `${username} \`${m.userId}\` ${
@@ -69,28 +60,18 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
 
   embed.setDescription(pages.get(1).join("\n"));
 
-  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder()
-      .setCustomId("⬅")
-      .setLabel("back")
-      .setStyle(ButtonStyle.Primary)
-      .setDisabled(true),
-    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
-  );
-
   let msg: Message;
 
   if (pages.size == 1) {
     return await message.channel.send({ embeds: [embed] });
   } else {
-    msg = await message.channel.send({ embeds: [embed], components: [row] });
+    msg = await message.channel.send({ embeds: [embed], components: [PageManager.defaultRow()] });
   }
 
   const manager = new PageManager({
     pages,
     message: msg,
     embed,
-    row,
     userId: message.author.id,
   });
 
