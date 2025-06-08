@@ -188,13 +188,13 @@ async function doMine(
 
   if ((await inventory.hasGem("purple_gem")).any) {
     if (percentChance(0.2)) {
-      gemBreak(message.member.user.id, 0.07, "purple_gem", message.client as NypsiClient);
+      gemBreak(message.member.user.id, 0.03, "purple_gem", message.client as NypsiClient);
       times++;
     }
   }
   if ((await inventory.hasGem("white_gem")).any) {
     if (percentChance(0.2)) {
-      gemBreak(message.member.user.id, 0.07, "white_gem", message.client as NypsiClient);
+      gemBreak(message.member.user.id, 0.03, "white_gem", message.client as NypsiClient);
       times++;
     }
   }

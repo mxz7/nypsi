@@ -368,7 +368,7 @@ export async function getGambleMulti(member: GuildMember | string, client: Nypsi
     if (chance < 2 && !heart) {
       multi -= Math.floor(Math.random() * 3) + 1;
     } else {
-      gemBreak(id, 0.01, "white_gem", client);
+      gemBreak(id, 0.009, "white_gem", client);
       const choices = [
         7, 3, 4, 5, 7, 2, 17, 7, 4, 5, 3, 3, 3, 4, 3, 3, 3, 2, 2, 2, 7, 7, 7, 7, 7, 7, 7,
       ];
@@ -380,7 +380,7 @@ export async function getGambleMulti(member: GuildMember | string, client: Nypsi
     if (chance < 2 && !heart) {
       multi -= 3;
     } else {
-      gemBreak(id, 0.07, "pink_gem", client);
+      gemBreak(id, 0.04, "pink_gem", client);
       const choices = [7, 5, 4, 3, 2, 1, 3, 1, 1, 1, 3, 3, 2, 2, 2, 3, 3, 4, 4];
       multi += Math.floor(Math.random() * choices[Math.floor(Math.random() * choices.length)]);
     }
@@ -501,7 +501,7 @@ export async function getSellMulti(member: GuildMember | string, client: NypsiCl
     if (chance < 2 && !heart) {
       multi -= Math.floor(Math.random() * 6) + 1;
     } else {
-      gemBreak(id, 0.01, "white_gem", client);
+      gemBreak(id, 0.009, "white_gem", client);
       const choices = [
         7, 3, 4, 5, 7, 2, 17, 7, 4, 5, 2, 2, 2, 2, 2, 3, 3, 3, 10, 17, 10, 7, 7, 7, 7,
       ];
@@ -513,7 +513,7 @@ export async function getSellMulti(member: GuildMember | string, client: NypsiCl
     if (chance < 2 && !heart) {
       multi -= 3;
     } else {
-      gemBreak(id, 0.07, "pink_gem", client);
+      gemBreak(id, 0.04, "pink_gem", client);
       const choices = [7, 5, 4, 3, 2, 1, 3, 1, 1, 1, 3, 3, 7, 7, 7, 7, 7, 4, 4, 4, 4, 4, 4, 4];
       multi += choices[Math.floor(Math.random() * choices.length)];
     }
