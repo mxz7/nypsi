@@ -1,7 +1,9 @@
 import dayjs = require("dayjs");
+import { ClusterManager } from "discord-hybrid-sharding";
 import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
+import { NypsiClient } from "../../../models/Client";
 import { CommandCategory } from "../../../models/Command";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { Item } from "../../../types/Economy";
@@ -14,19 +16,17 @@ import { pluralize } from "../string";
 import { getTax } from "../tax";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { addProgress } from "./achievements";
+import { addBalance, getSellMulti } from "./balance";
 import {
   deleteMarketOrder,
   getMarketAverage,
   getMarketOrders,
   setMarketOrderAmount,
 } from "./market";
-import { deleteTradeRequest, getTradeRequests } from "./trade_requests";
-import { addBalance, getSellMulti } from "./balance";
 import { getOffersAverage } from "./offers";
 import { addStat } from "./stats";
+import { deleteTradeRequest, getTradeRequests } from "./trade_requests";
 import { createUser, getItems, userExists } from "./utils";
-import { ClusterManager } from "discord-hybrid-sharding";
-import { NypsiClient } from "../../../models/Client";
 import ms = require("ms");
 
 const gemChanceCooldown = new Set<string>();
@@ -543,7 +543,7 @@ export function isGem(itemId: string) {
 export async function gemBreak(
   userId: string,
   chance: number,
-  gem: "blue_gem" | "purple_gem" | "pink_gem" | "white_gem",
+  gem: "blue_gem" | "purple_gem" | "pink_gem" | "green_gem" | "white_gem",
   client?: NypsiClient | ClusterManager,
 ) {
   if (!percentChance(chance)) return;

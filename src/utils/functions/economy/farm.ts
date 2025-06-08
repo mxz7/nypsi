@@ -2,9 +2,10 @@ import { GuildMember } from "discord.js";
 import { sort } from "fast-sort";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
+import { NypsiClient } from "../../../models/Client";
 import Constants from "../../Constants";
 import { addProgress } from "./achievements";
-import { addInventoryItem, getInventory, removeInventoryItem } from "./inventory";
+import { addInventoryItem, gemBreak, getInventory, removeInventoryItem } from "./inventory";
 import { getPlantsData, getPlantUpgrades, getUpgradesData } from "./utils";
 import dayjs = require("dayjs");
 import ms = require("ms");
@@ -201,6 +202,12 @@ export async function getClaimable(member: GuildMember | string, plantId: string
         hours *= 0.8;
       } else {
         hours *= 1.25;
+        gemBreak(
+          id,
+          0.01,
+          "pink_gem",
+          member instanceof GuildMember && (member.client as NypsiClient),
+        );
       }
     }
 
@@ -226,10 +233,31 @@ export async function getClaimable(member: GuildMember | string, plantId: string
 
     if ((await inventory.hasGem("green_gem")).any) {
       storageMulti += 0.2;
+
+      gemBreak(
+        id,
+        0.01,
+        "green_gem",
+        member instanceof GuildMember && (member.client as NypsiClient),
+      );
     }
 
     if ((await inventory.hasGem("pink_gem")).any && (await inventory.hasGem("purple_gem")).any) {
       storageMulti += 0.2;
+
+      gemBreak(
+        id,
+        0.005,
+        "pink_gem",
+        member instanceof GuildMember && (member.client as NypsiClient),
+      );
+
+      gemBreak(
+        id,
+        0.005,
+        "purple_gem",
+        member instanceof GuildMember && (member.client as NypsiClient),
+      );
     }
 
     const adjustedEarned = earned * outputMulti;
