@@ -651,8 +651,8 @@ export async function gemBreak(
   }
 
   const shardMax = new Map<string, number>([
-    ["green_gem", 3],
     ["blue_gem", 3],
+    ["green_gem", 5],
     ["purple_gem", 10],
     ["pink_gem", 15],
     ["white_gem", 30],
