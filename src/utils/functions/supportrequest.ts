@@ -185,7 +185,7 @@ export async function sendToRequestChannel(
 
     await prisma.supportRequest.update({
       where: {
-        userId,
+        userId: id,
       },
       data: {
         latestActivity: new Date(),
