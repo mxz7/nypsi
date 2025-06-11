@@ -3,11 +3,17 @@ import { readFile, readdir, unlink } from "fs/promises";
 import prisma from "../../init/database";
 import { Job } from "../../types/Jobs";
 import { deleteImage } from "../../utils/functions/image";
+import { NypsiClient } from "../../models/Client";
+import { CustomEmbed } from "../../models/EmbedBuilders";
+import { addNotificationToQueue } from "../../utils/functions/users/notifications";
+import { pluralize } from "../../utils/functions/string";
+import Constants from "../../utils/Constants";
+import redis from "../../init/redis";
 
 export default {
   name: "purge",
   cron: "0 1 * * *",
-  async run(log) {
+  async run(log, manager) {
     const old = dayjs().subtract(900, "days").toDate();
 
     const d = await prisma.username.deleteMany({
@@ -112,5 +118,83 @@ export default {
       await deleteImage(image.id);
     }
     log(`deleted ${searchResults.length} search results`);
+
+    const staleTickets = await prisma.supportRequest.findMany({
+      where: {
+        latestActivity: { lt: dayjs().subtract(3, "day").toDate() },
+      },
+    });
+
+    if (staleTickets.length > 0) {
+      const clusterHas = await manager.broadcastEval(
+        async (c, { channelId }) => {
+          const client = c as unknown as NypsiClient;
+          const channel = client.channels.cache.get(channelId);
+
+          if (channel) {
+            return client.cluster.id;
+          } else {
+            return "not-found";
+          }
+        },
+        { context: { channelId: Constants.SUPPORT_CHANNEL_ID } },
+      );
+
+      let shard: number;
+
+      for (const i of clusterHas) {
+        if (i != "not-found") {
+          shard = i;
+          break;
+        }
+      }
+
+      const channelEmbed = new CustomEmbed().setDescription(
+        "this support request has been closed due to inactivity",
+      );
+
+      const sentEmbed = new CustomEmbed().setDescription(
+        "your support request has been closed due to inactivity",
+      );
+
+      for (const support of staleTickets) {
+        addNotificationToQueue({
+          memberId: support.userId,
+          payload: { embed: sentEmbed },
+        });
+
+        await manager.broadcastEval(
+          async (c, { shard, channelId, embed }) => {
+            const client = c as unknown as NypsiClient;
+            if (client.cluster.id != shard) return false;
+
+            const channel = client.channels.cache.get(channelId);
+
+            if (!channel) return false;
+
+            if (!channel.isTextBased()) return;
+            if (!channel.isThread()) return;
+
+            await channel.send({ embeds: [embed] });
+
+            await channel.setLocked(true).catch(() => {});
+            await channel.setArchived(true).catch(() => {});
+          },
+          { context: { shard: shard, channelId: support.channelId, embed: channelEmbed } },
+        );
+
+        await prisma.supportRequest.delete({
+          where: {
+            userId: support.userId,
+          },
+        });
+
+        await redis.del(`${Constants.redis.cache.SUPPORT}:${support.userId}`);
+      }
+
+      log(
+        `closed ${staleTickets.length} stale ${pluralize("support request", staleTickets.length)}`,
+      );
+    }
   },
 } satisfies Job;
