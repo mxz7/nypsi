@@ -5,6 +5,8 @@
 - gems still give effects (and break) in market and trades (@growling_grizzly)
 - add `$stats bake` (@growling_grizzly)
 - added 'punishments' thing to website to see how long you're muted / banned in servers
+- gems can now be broken in farm
+- green gem can be broken
 
 ## other
 
@@ -15,3 +17,4 @@
 - prevent ecobanned users getting loot drops (@growling_grizzly)
 - nerfed farm item sell prices
 - big improvements to ci times (@growling_grizzly)
+- support requests close automatically with inactivity
