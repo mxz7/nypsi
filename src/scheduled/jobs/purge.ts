@@ -150,11 +150,11 @@ export default {
       }
 
       const channelEmbed = new CustomEmbed().setDescription(
-        "this support request has been closed due to 3 days of inactivity",
+        "this support request has been closed due to inactivity",
       );
 
       const sentEmbed = new CustomEmbed().setDescription(
-        "your support request has been closed due to 3 days of inactivity",
+        "your support request has been closed due to inactivity",
       );
 
       for (const support of staleTickets) {
