@@ -1,5 +1,6 @@
 import { DMSettings, Preferences } from "@prisma/client";
 import { GuildMember } from "discord.js";
+import { isNaN } from "lodash";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { InlineNotificationPayload, NotificationPayload } from "../../../types/Notification";
@@ -99,6 +100,12 @@ export async function getPreferences(member: GuildMember | string): Promise<Pref
   if (await redis.exists(`${Constants.redis.cache.user.PREFERENCES}:${id}`)) {
     return JSON.parse(
       await redis.get(`${Constants.redis.cache.user.PREFERENCES}:${id}`),
+      // json cant parse bigints on its own so we have to do it manually
+      (key, value) => {
+        return key !== "userId" && typeof value === "string" && !isNaN(value)
+          ? BigInt(value)
+          : value;
+      },
     ) as Preferences;
   }
 

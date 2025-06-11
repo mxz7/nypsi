@@ -721,6 +721,7 @@ export async function getMarketTransactionData(
       cost += Number(order.price * order.itemAmount);
       amount -= Number(order.itemAmount);
       orders.push(order);
+      if (amount <= 0) break;
     } else {
       cost += Number(order.price) * amount;
       amount = 0;
