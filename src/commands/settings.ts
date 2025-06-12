@@ -204,7 +204,7 @@ async function run(
             .setLabel("disable")
             .setStyle(ButtonStyle.Danger)
             // @ts-expect-error gay
-            .setDisabled(settings[settingId] === 0),
+            .setDisabled(settings[settingId] === 0 || settings[settingId] === 0n),
         ];
 
         userSelection.setComponents(boobies);
@@ -349,7 +349,7 @@ async function run(
 
           const value = formatNumber(modalResponse.fields.fields.first().value.toLowerCase());
 
-          if (typeof value !== "number") {
+          if (typeof value !== "number" || value < 0) {
             await modalResponse.reply({
               embeds: [new ErrorEmbed("invalid value. must a number. use 0 to disable")],
               flags: MessageFlags.Ephemeral,
@@ -435,7 +435,7 @@ async function run(
             .setLabel("disable")
             .setStyle(ButtonStyle.Danger)
             // @ts-expect-error gay
-            .setDisabled(settings[settingId] === 0),
+            .setDisabled(settings[settingId] === 0 || settings[settingId] === 0n),
         ];
 
         userSelection.setComponents(boobies);
@@ -580,7 +580,7 @@ async function run(
 
           const value = formatNumber(modalResponse.fields.fields.first().value.toLowerCase());
 
-          if (typeof value !== "number") {
+          if (typeof value !== "number" || value < 0) {
             await modalResponse.reply({
               embeds: [new ErrorEmbed("invalid value. must a number.")],
               flags: MessageFlags.Ephemeral,
