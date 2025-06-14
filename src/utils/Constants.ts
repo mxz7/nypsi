@@ -175,6 +175,7 @@ export default {
       MARKET_IN_TRANSACTION: "nypsi:market:intransaction",
       TRADE_FULFILLING: "nypsi:trade:fulfilling",
       MARKET_DM: "nypsi:market:dm",
+      DOCS_CONTENT: "nypsi:docs",
     },
   },
   ANNOUNCEMENTS_CHANNEL_ID: "747057465245564939",

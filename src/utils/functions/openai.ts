@@ -1,5 +1,8 @@
 import OpenAI from "openai";
+import redis from "../../init/redis";
+import Constants from "../Constants";
 import { logger } from "../logger";
+import ms = require("ms");
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_KEY });
 
@@ -21,13 +24,17 @@ export async function prompt(instructions: string, text: string) {
   }
 }
 
-let docs: string;
-
 export async function getDocsRaw() {
   try {
-    if (!docs) {
-      docs = await fetch("https://nypsi.xyz/llms.txt").then((res) => res.text());
+    const cache = await redis.get(Constants.redis.nypsi.DOCS_CONTENT);
+
+    if (cache) {
+      return cache;
     }
+
+    const docs = await fetch("https://nypsi.xyz/llms.txt").then((res) => res.text());
+
+    await redis.set(Constants.redis.nypsi.DOCS_CONTENT, docs, "EX", ms("1 day") / 1000);
 
     return docs;
   } catch (e) {
