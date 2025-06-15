@@ -143,7 +143,7 @@ export default async function messageCreate(message: Message) {
         new ButtonBuilder()
           .setStyle(ButtonStyle.Link)
           .setLabel("view your active punishments")
-          .setURL("https://nypsi.xyz/me/punishments"),
+          .setURL("https://nypsi.xyz/me/punishments?ref=bot-dm"),
       );
 
       const msg = await message.reply({
