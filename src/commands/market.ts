@@ -23,6 +23,7 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
+import prisma from "../init/database";
 import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
@@ -61,12 +62,11 @@ import {
 } from "../utils/functions/economy/utils";
 import { getEmojiImage } from "../utils/functions/image";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
-import { getAdminLevel } from "../utils/functions/users/admin";
-import { addCooldown, addExpiry, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
 import { pluralize } from "../utils/functions/string";
+import { getAdminLevel } from "../utils/functions/users/admin";
+import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
+import { addCooldown, addExpiry, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
-import prisma from "../init/database";
 
 const cmd = new Command(
   "market",
@@ -1482,6 +1482,10 @@ async function run(
       `${item.name} market`,
       getEmojiImage(item.emoji),
     );
+
+    const value = await calcItemValue(item.id);
+
+    embed.setFooter({ text: value ? `worth $${value.toLocaleString()}` : "unvalued" });
 
     const updateEmbed = async () => {
       const buyOrders = await getMarketItemOrders(item.id, "buy");
