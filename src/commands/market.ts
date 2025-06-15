@@ -1594,6 +1594,26 @@ async function run(
           .setStyle(ButtonStyle.Secondary),
       );
 
+      if (
+        !(
+          (await prisma.market.count({
+            where: { AND: [{ itemId: item.id }, { completed: true }] },
+          })) < 5 &&
+          (await prisma.offer.count({
+            where: { AND: [{ itemId: item.id }, { sold: true }] },
+          })) < 5 &&
+          (await prisma.graphMetrics.count({ where: { category: `item-count-${item.id}` } })) < 5
+        )
+      ) {
+        topRow.addComponents(
+          new ButtonBuilder()
+            .setStyle(ButtonStyle.Link)
+            .setLabel("history")
+            .setEmoji("📈")
+            .setURL(`https://nypsi.xyz/item/history/${item.id}?ref=bot-market-search`),
+        );
+      }
+
       const bottomRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
           .setCustomId("sellOne")
