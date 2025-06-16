@@ -263,36 +263,43 @@ async function run(
       return embed;
     };
 
-    const options = new StringSelectMenuBuilder()
-      .setCustomId("country")
-      .setPlaceholder("select a country");
-
     const shownCountries = ["GB", "US", "CA", "DE", "NL", "IN", "AU"];
 
-    for (const country of data.providers) {
-      if (!shownCountries.includes(country.countryCode)) continue;
-      options.addOptions(
-        new StringSelectMenuOptionBuilder()
-          .setLabel(regionNames.of(country.countryCode))
-          .setValue(country.countryCode)
-          .setEmoji(getFlagEmoji(country.countryCode)),
-      );
-    }
+    const selectRow = () => {
+      const options = new StringSelectMenuBuilder()
+        .setCustomId("country")
+        .setPlaceholder("select a country");
 
-    options.addOptions(new StringSelectMenuOptionBuilder().setLabel("other").setValue("other"));
+      for (const country of data.providers) {
+        if (
+          !shownCountries.includes(country.countryCode) &&
+          country.countryCode !== selectedCountry
+        )
+          continue;
+        options.addOptions(
+          new StringSelectMenuOptionBuilder()
+            .setLabel(regionNames.of(country.countryCode))
+            .setValue(country.countryCode)
+            .setEmoji(getFlagEmoji(country.countryCode))
+            .setDefault(country.countryCode == selectedCountry),
+        );
+      }
 
-    const topRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(options);
+      options.addOptions(new StringSelectMenuOptionBuilder().setLabel("other").setValue("other"));
+
+      return new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(options);
+    };
 
     const bottomRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder().setCustomId("back").setLabel("back").setStyle(ButtonStyle.Primary),
     );
 
     if (msg) {
-      msg = await msg.edit({ embeds: [makeEmbed()], components: [topRow, bottomRow] });
+      msg = await msg.edit({ embeds: [makeEmbed()], components: [selectRow(), bottomRow] });
     } else {
       msg = (await send({
         embeds: [makeEmbed()],
-        components: [topRow, bottomRow],
+        components: [selectRow(), bottomRow],
       })) as NypsiMessage;
     }
 
@@ -331,7 +338,7 @@ async function run(
             if (found) {
               await res.deferUpdate();
               selectedCountry = found.countryCode;
-              await msg.edit({ embeds: [makeEmbed()] });
+              await msg.edit({ embeds: [makeEmbed()], components: [selectRow(), bottomRow] });
             } else {
               let errorMessage: string;
 
@@ -349,7 +356,7 @@ async function run(
                 embeds: [new ErrorEmbed(errorMessage)],
                 flags: MessageFlags.Ephemeral,
               });
-              await msg.edit({ embeds: [makeEmbed()] });
+              await msg.edit({ embeds: [makeEmbed()], components: [selectRow(), bottomRow] });
             }
           }
           return pageManager();
@@ -358,7 +365,7 @@ async function run(
         await interaction.deferUpdate();
 
         selectedCountry = interaction.values[0];
-        await msg.edit({ embeds: [makeEmbed()] });
+        await msg.edit({ embeds: [makeEmbed()], components: [selectRow(), bottomRow] });
         return pageManager();
       } else if (res == "back") {
         return viewOverview(data, msg);
