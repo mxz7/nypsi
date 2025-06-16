@@ -7,6 +7,7 @@
 - added 'punishments' thing to website to see how long you're muted / banned in servers
 - gems can now be broken in farm
 - green gem can be broken
+- you get a cake for your birthday (@growling_grizzly)
 
 ## other
 
