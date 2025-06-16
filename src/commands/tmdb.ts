@@ -113,7 +113,7 @@ async function run(
       new ButtonBuilder()
         .setCustomId("watch")
         .setLabel("where to watch")
-        .setStyle(ButtonStyle.Success),
+        .setStyle(ButtonStyle.Primary),
     );
 
     if (data.type == "movie") {
@@ -245,7 +245,7 @@ async function run(
           ? provider
             ? `where to watch in ${getFlagEmoji(selectedCountry)} **${regionNames.of(selectedCountry)}**`
             : `could not find anywhere to watch this in **${regionNames.of(selectedCountry)}** ):`
-          : "select a country to see watch options\n\ndon't know the two letter code? find it [here](https://www.iban.com/country-codes)",
+          : "select a country to see watch options",
       );
 
       if (provider) {

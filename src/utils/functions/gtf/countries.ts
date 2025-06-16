@@ -35,19 +35,18 @@ export async function fetchCountryData(country: string): Promise<CountryData | "
 
     if (res) {
       await redis.set(
-        `${Constants.redis.cache.COUNTRY_DATA}:${res.name.official.toLowerCase()}`,
-        JSON.stringify(country),
+        `${Constants.redis.cache.COUNTRY_DATA}:${res.name.official.toLowerCase().replaceAll('"', "")}`,
+        JSON.stringify(res),
         "EX",
         ms("21 days") / 1000,
       );
 
-      if (!validNameCache && country.toLowerCase() !== res.name.official.toLowerCase())
-        await redis.set(
-          `${Constants.redis.cache.COUNTRY_VALID_NAMES}:${country.toLowerCase()}`,
-          res.name.official.toLowerCase(),
-          "EX",
-          ms("1 hour") / 1000,
-        );
+      await redis.set(
+        `${Constants.redis.cache.COUNTRY_VALID_NAMES}:${country.toLowerCase()}`,
+        res.name.official.toLowerCase().replaceAll('"', ""),
+        "EX",
+        ms("3 days") / 1000,
+      );
 
       return res;
     } else {
@@ -58,20 +57,19 @@ export async function fetchCountryData(country: string): Promise<CountryData | "
 
       if (res?.length) {
         await redis.set(
-          `${Constants.redis.cache.COUNTRY_DATA}:${res[0].name.official.toLowerCase()}`,
-          JSON.stringify(country),
+          `${Constants.redis.cache.COUNTRY_DATA}:${res[0].name.official.toLowerCase().replaceAll('"', "")}`,
+          JSON.stringify(res[0]),
           "EX",
           ms("21 days") / 1000,
         );
 
-        if (!validNameCache && country.toLowerCase() !== res[0].name.official.toLowerCase())
+        if (country.toLowerCase() !== res[0].name.official.toLowerCase().replaceAll('"', ""))
           await redis.set(
             `${Constants.redis.cache.COUNTRY_VALID_NAMES}:${country.toLowerCase()}`,
-            res[0].name.official.toLowerCase(),
+            res[0].name.official.toLowerCase().replaceAll('"', ""),
             "EX",
-            ms("1 hour") / 1000,
+            ms("3 days") / 1000,
           );
-
         return res[0];
       } else {
         return `failed`;
