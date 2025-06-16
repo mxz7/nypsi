@@ -23,7 +23,6 @@ import messageUpdate from "../events/messageUpdate";
 import roleDelete from "../events/roleDelete";
 import userUpdate from "../events/userUpdate";
 import redis from "../init/redis";
-import { runBirthdays } from "../scheduled/clusterjobs/birthdays";
 import { runLogs, runModerationChecks } from "../scheduled/clusterjobs/moderationchecks";
 import startRandomDrops from "../scheduled/clusterjobs/random-drops";
 import Constants from "../utils/Constants";
@@ -225,7 +224,6 @@ export class NypsiClient extends Client {
     runSnipeClearIntervals();
     doChatReactions(this);
     runCommandUseTimers(this);
-    runBirthdays(this);
 
     if (this.channels.cache.get(Constants.CRASH_CHANNEL) && this.user.id === "678711738845102087")
       initCrashGame(this);
