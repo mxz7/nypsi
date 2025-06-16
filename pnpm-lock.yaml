@@ -26,6 +26,9 @@ importers:
       '@twemoji/parser':
         specifier: ^16.0.0
         version: 16.0.0
+      '@yusifaliyevpro/countries':
+        specifier: ^2.2.1
+        version: 2.2.1
       '@zeyrbot/urbandictionary':
         specifier: ^1.0.3
         version: 1.0.3
@@ -1339,6 +1342,9 @@ packages:
   '@vladfrangu/async_event_emitter@2.4.6':
     resolution: {integrity: sha512-RaI5qZo6D2CVS6sTHFKg1v5Ohq/+Bo2LZ5gzUEwZ/WkHhwtGTCB/sVLw8ijOkAUxasZ+WshN/Rzj4ywsABJ5ZA==}
     engines: {node: '>=v14.0.0', npm: '>=7.0.0'}
+
+  '@yusifaliyevpro/countries@2.2.1':
+    resolution: {integrity: sha512-IjVO67BSNmKsofR1xj+9jnAYiGSpIkQRLAnr0WEAlXOJJgLm9qHFwBrxkbee07dBJgBvryfC+yiiGkzAA8KNNA==}
 
   '@zeyrbot/urbandictionary@1.0.3':
     resolution: {integrity: sha512-w4Nc88ikL4DakWTXwvKfCztDVmKNhcP3tLwmGWH7BwJcyDpvL5eJp+duumVyh6wrqhbRzlE7fLuDJPnl7jHkBw==}
@@ -4813,6 +4819,8 @@ snapshots:
   '@ungap/structured-clone@1.2.0': {}
 
   '@vladfrangu/async_event_emitter@2.4.6': {}
+
+  '@yusifaliyevpro/countries@2.2.1': {}
 
   '@zeyrbot/urbandictionary@1.0.3':
     dependencies:
