@@ -21,10 +21,21 @@ import {
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { getEpisodes, getMovie, getTv, movieSearch, tvSearch } from "../utils/functions/tmdb";
+import {
+  getEpisodes,
+  getMovie,
+  getUserRating,
+  getTv,
+  movieSearch,
+  setUserRating,
+  tvSearch,
+  getRating,
+} from "../utils/functions/tmdb";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { fetchCountryData } from "../utils/functions/gtf/countries";
 import { MovieDetails, TVDetails, TVSeasonEpisodeDetails } from "../types/tmdb";
+import { isNaN } from "lodash";
+import { pluralize } from "../utils/functions/string";
 
 const cmd = new Command("tmdb", "get movie or tv show information", "info").setAliases(["imdb"]);
 
@@ -107,8 +118,6 @@ async function run(
   const url = "https://image.tmdb.org/t/p/w1280";
 
   const viewOverview = async (data: MovieDetails | TVDetails, msg?: NypsiMessage) => {
-    const embed = new CustomEmbed(message.member);
-
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
         .setCustomId("watch")
@@ -116,33 +125,7 @@ async function run(
         .setStyle(ButtonStyle.Primary),
     );
 
-    if (data.type == "movie") {
-      embed
-        .setTitle(data.title)
-        .setURL(`https://themoviedb.org/movie/${data.id}`)
-        .setThumbnail(`${url}${data.poster_path}`)
-        .setDescription(
-          `${data.tagline ? `*${data.tagline}*\n\n` : ""}` +
-            `> ${data.overview}\n\n` +
-            `**${Math.round(data.vote_average * 10)}%** user score\n\n` +
-            `-# *${data.release_date}*\n` +
-            `-# *${data.genres.map((i) => i.name).join(", ")}*`,
-        );
-    } else if (data.type == "tv") {
-      embed
-        .setTitle(data.name)
-        .setURL(`https://themoviedb.org/tv/${data.id}`)
-        .setThumbnail(`${url}${data.poster_path}`)
-        .setDescription(
-          `${data.tagline ? `*${data.tagline}*\n\n` : ""}` +
-            `> ${data.overview}\n\n` +
-            `**${Math.round(data.vote_average * 10)}%** user score\n\n` +
-            `**${data.number_of_seasons.toLocaleString()}** seasons\n` +
-            `**${data.number_of_episodes.toLocaleString()}** episodes\n\n` +
-            `-# *${data.first_air_date} - ${data.status === "Ended" ? data.last_air_date : "ongoing"}*\n` +
-            `-# *${data.genres.map((i) => i.name).join(", ")}*`,
-        );
-
+    if (data.type == "tv") {
       row.addComponents(
         new ButtonBuilder()
           .setCustomId("season")
@@ -151,10 +134,63 @@ async function run(
       );
     }
 
+    row.addComponents(
+      new ButtonBuilder().setCustomId("rate").setLabel("rate").setStyle(ButtonStyle.Primary),
+    );
+
+    const createEmbed = async () => {
+      const embed = new CustomEmbed(message.member);
+
+      const selfRating = await getUserRating(message.member, data.type, data.id);
+
+      const nypsiRating = await getRating(data.type, data.id);
+
+      if (data.type == "movie") {
+        embed
+          .setTitle(data.title)
+          .setURL(`https://themoviedb.org/movie/${data.id}`)
+          .setThumbnail(`${url}${data.poster_path}`)
+          .setDescription(
+            `${data.tagline ? `*${data.tagline}*\n\n` : ""}` +
+              `> ${data.overview}\n\n` +
+              `${data.vote_count ? `**${Math.round(data.vote_average * 10)}%** user score (${data.vote_count.toLocaleString()} ${pluralize("rating", data.vote_count)})\n` : ""}` +
+              `${nypsiRating.count ? `**${Math.round(nypsiRating.average * 10)}%** nypsi score (${nypsiRating.count.toLocaleString()} ${pluralize("rating", nypsiRating.count)})` : "not rated by nypsi users"}\n` +
+              `${selfRating != -1 ? `your rating: **${selfRating / 2}/5**` : "you have not rated this movie"}\n\n` +
+              `-# *${data.release_date}*\n` +
+              `-# *${data.genres.map((i) => i.name).join(", ")}*`,
+          );
+      } else if (data.type == "tv") {
+        embed
+          .setTitle(data.name)
+          .setURL(`https://themoviedb.org/tv/${data.id}`)
+          .setThumbnail(`${url}${data.poster_path}`)
+          .setDescription(
+            `${data.tagline ? `*${data.tagline}*\n\n` : ""}` +
+              `> ${data.overview}\n\n` +
+              `${data.vote_count ? `**${Math.round(data.vote_average * 10)}%** user score (${data.vote_count.toLocaleString()} ${pluralize("rating", data.vote_count)})\n` : ""}` +
+              `${nypsiRating.count ? `**${Math.round(nypsiRating.average * 10)}%** nypsi score (${nypsiRating.count.toLocaleString()} ${pluralize("rating", nypsiRating.count)})` : "not rated by nypsi users"}\n` +
+              `${selfRating != -1 ? `your rating: **${selfRating / 2}/5**` : "you have not rated this movie"}\n\n` +
+              `**${data.number_of_seasons.toLocaleString()}** seasons\n` +
+              `**${data.number_of_episodes.toLocaleString()}** episodes\n\n` +
+              `-# *${data.first_air_date} - ${data.status === "Ended" ? data.last_air_date : "ongoing"}*\n` +
+              `-# *${data.genres.map((i) => i.name).join(", ")}*`,
+          );
+
+        row.addComponents(
+          new ButtonBuilder()
+            .setCustomId("season")
+            .setLabel("view season")
+            .setStyle(ButtonStyle.Primary),
+        );
+      }
+
+      return embed;
+    };
+
     if (msg) {
-      msg = await msg.edit({ embeds: [embed], components: [row] });
+      msg = await msg.edit({ embeds: [await createEmbed()], components: [row] });
     } else {
-      msg = (await send({ embeds: [embed], components: [row] })) as NypsiMessage;
+      msg = (await send({ embeds: [await createEmbed()], components: [row] })) as NypsiMessage;
     }
 
     const filter = (i: Interaction) => i.user.id == message.author.id;
@@ -165,7 +201,7 @@ async function run(
       const response = await msg
         .awaitMessageComponent({ filter, time: 60000 })
         .then(async (collected) => {
-          if (collected.customId !== "season")
+          if (collected.customId !== "season" && collected.customId !== "rate")
             await collected.deferUpdate().catch(() => {
               fail = true;
               return pageManager();
@@ -174,7 +210,7 @@ async function run(
         })
         .catch(async () => {
           fail = true;
-          await msg.edit({ embeds: [embed], components: [] });
+          await msg.edit({ embeds: [await createEmbed()], components: [] });
         });
 
       if (fail) return;
@@ -214,6 +250,48 @@ async function run(
         }
       } else if (res == "watch") {
         return viewWhereToWatch(data, msg);
+      } else if (res == "rate") {
+        const res = await numberSelectionModal(
+          interaction as ButtonInteraction,
+          "enter rating",
+          "enter a value 0 - 5",
+          `to remove your rating, enter "reset"`,
+        );
+
+        if (res) {
+          const value = res.fields.fields.get("number").value;
+
+          if (isNaN(value) && value !== "reset") {
+            await res.reply({
+              embeds: [new ErrorEmbed("invalid number")],
+              flags: MessageFlags.Ephemeral,
+            });
+            return pageManager();
+          }
+
+          if (value == "reset") {
+            await setUserRating(message.member, data.type, data.id, value);
+            await res.reply({
+              embeds: [new CustomEmbed(message.member, "✅ rating removed")],
+              flags: MessageFlags.Ephemeral,
+            });
+            await msg.edit({ embeds: [await createEmbed()] });
+            return pageManager();
+          }
+
+          const rating = (Math.min(Math.max(Number(value), 0), 5) * 20) / 10;
+
+          console.log();
+
+          await setUserRating(message.member, data.type, data.id, rating);
+
+          await res.reply({
+            embeds: [new CustomEmbed(message.member, "✅ your rating has been submitted")],
+            flags: MessageFlags.Ephemeral,
+          });
+          await msg.edit({ embeds: [await createEmbed()] });
+          return pageManager();
+        }
       }
     };
 
@@ -384,7 +462,7 @@ async function run(
       .setThumbnail(`${url}${season.poster_path}`)
       .setDescription(
         `${season.overview ? `> ${season.overview}` : ""}\n\n` +
-          `**${Math.round(season.vote_average * 10)}%** user score\n\n` +
+          `${season.vote_count ? `**${Math.round(season.vote_average * 10)}%** user score\n\n` : ""}` +
           `**${season.episode_count.toLocaleString()}** episodes\n\n` +
           `-# *aired ${season.air_date}*\n`,
       );
@@ -550,7 +628,7 @@ async function run(
       .setThumbnail(`${url}${episode.still_path}`)
       .setDescription(
         `${episode.overview ? `> ${episode.overview}` : ""}\n\n` +
-          `**${Math.round(episode.vote_average * 10)}%** user score\n\n` +
+          `${episode.vote_count ? `**${Math.round(episode.vote_average * 10)}%** user score\n\n` : ""}` +
           `-# duration: ${formatDuration(episode.runtime)}\n` +
           `-# *aired ${episode.air_date}*\n`,
       );
@@ -656,7 +734,7 @@ async function run(
     let movie: Awaited<ReturnType<typeof getMovie>>;
 
     if (!isNaN(parseInt(query))) {
-      movie = await getMovie(query);
+      movie = await getMovie(parseInt(query));
     } else {
       const search = await movieSearch(query);
 
@@ -686,7 +764,7 @@ async function run(
         });
       }
 
-      movie = await getMovie(search.results[0].id.toString());
+      movie = await getMovie(search.results[0].id);
     }
 
     if (movie === "unavailable")
@@ -714,7 +792,7 @@ async function run(
     let tv: Awaited<ReturnType<typeof getTv>>;
 
     if (!isNaN(parseInt(query))) {
-      tv = await getTv(query);
+      tv = await getTv(parseInt(query));
     } else {
       const search = await tvSearch(query);
 
@@ -744,7 +822,7 @@ async function run(
         });
       }
 
-      tv = await getTv(search.results[0].id.toString());
+      tv = await getTv(search.results[0].id);
     }
 
     if (tv === "unavailable")
@@ -807,7 +885,7 @@ async function run(
           .setPlaceholder(placeholder)
           .setStyle(TextInputStyle.Short)
           .setRequired(true)
-          .setMaxLength(3),
+          .setMaxLength(5),
       ),
     );
 

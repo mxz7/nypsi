@@ -20,6 +20,7 @@ export interface MovieDetails {
   tagline: string;
   title: string;
   vote_average: number;
+  vote_count: number;
   runtime: number;
   providers: CountryProvider[];
 }
@@ -36,6 +37,7 @@ export interface TVDetails {
   overview: string;
   poster_path: string;
   vote_average: number;
+  vote_count: number;
   status: string;
   tagline: string;
   seasons: {
@@ -46,6 +48,7 @@ export interface TVDetails {
     poster_path: string;
     season_number: number;
     vote_average: number;
+    vote_count: number;
   }[];
   providers: CountryProvider[];
 }
@@ -56,6 +59,7 @@ export interface TVSeasonEpisodeDetails {
   overview: string;
   runtime: number;
   vote_average: number;
+  vote_count: number;
   still_path: string;
   air_date: string;
 }

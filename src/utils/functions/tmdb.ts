@@ -8,7 +8,9 @@ import {
   TVSearch,
   TVSeasonEpisodeDetails,
 } from "../../types/tmdb";
+import { GuildMember } from "discord.js";
 import Constants from "../Constants";
+import prisma from "../../init/database";
 
 const BASE = "https://api.themoviedb.org/3";
 
@@ -80,7 +82,7 @@ export async function tvSearch(query: string): Promise<TVSearch | "unavailable" 
   return response.status;
 }
 
-export async function getMovie(id: string): Promise<MovieDetails | "unavailable" | number> {
+export async function getMovie(id: number): Promise<MovieDetails | "unavailable" | number> {
   const cache = await redis.get(`${Constants.redis.cache.tmdb.MOVIE}:${id}`);
 
   if (cache) {
@@ -122,7 +124,7 @@ export async function getMovie(id: string): Promise<MovieDetails | "unavailable"
   return response.ok ? providersRes.status : response.status;
 }
 
-export async function getTv(id: string): Promise<TVDetails | "unavailable" | number> {
+export async function getTv(id: number): Promise<TVDetails | "unavailable" | number> {
   const cache = await redis.get(`${Constants.redis.cache.tmdb.TV}:${id}`);
 
   if (cache) {
@@ -225,4 +227,67 @@ function transformProviders(providerData: any): CountryProvider[] {
       ...(flatrate ? { flatrate: transformList(flatrate) } : {}),
     };
   });
+}
+
+export async function setUserRating(
+  member: GuildMember | string,
+  type: "movie" | "tv",
+  id: number,
+  rating: number | "reset",
+) {
+  let userId: string;
+  if (member instanceof GuildMember) {
+    userId = member.user.id;
+  } else {
+    userId = member;
+  }
+
+  if (rating == "reset") {
+    return await prisma.tmdbRatings.deleteMany({ where: { userId, type, id } });
+  }
+
+  return await prisma.tmdbRatings.upsert({
+    where: { userId_type_id: { userId, type, id } },
+    update: { rating },
+    create: { userId, rating, id, type },
+  });
+}
+
+export async function getRating(type: "movie" | "tv", id: number) {
+  const res = await prisma.tmdbRatings.findMany({
+    where: {
+      id,
+      type,
+    },
+    select: {
+      rating: true,
+    },
+  });
+
+  return {
+    count: res.length,
+    average: res.length ? res.reduce((acc, res) => acc + res.rating, 0) / res.length : 0,
+  };
+}
+
+export async function getUserRating(
+  member: GuildMember | string,
+  type: "movie" | "tv",
+  id: number,
+) {
+  let userId: string;
+  if (member instanceof GuildMember) {
+    userId = member.user.id;
+  } else {
+    userId = member;
+  }
+
+  return (
+    (
+      await prisma.tmdbRatings.findUnique({
+        where: { userId_type_id: { userId, type, id } },
+        select: { rating: true },
+      })
+    )?.rating ?? -1
+  );
 }

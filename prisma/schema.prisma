@@ -993,3 +993,18 @@ model zKicks {
 
   @@id([userId, targetId])
 }
+
+enum RatingType {
+  tv
+  movie
+}
+
+model tmdbRatings {
+  userId    String
+
+  type      RatingType
+  id        Int
+  rating    Float
+  
+  @@id([userId, type, id])
+}
