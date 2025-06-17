@@ -267,7 +267,7 @@ export async function getRating(type: "movie" | "tv", id: number) {
 
   return {
     count: res.length,
-    average: res.length ? res.reduce((acc, res) => acc + res.rating, 0) / res.length : 0,
+    average: res.length ? res.reduce((acc, res) => acc + res.rating.toNumber(), 0) / res.length * 2 : 0,
   };
 }
 
@@ -299,11 +299,11 @@ export async function getUserRatings(
           where: { userId_type_id: { userId, type, id } },
           select: { rating: true },
         })
-      )?.rating ?? -1
+      )?.rating.toNumber() ?? -1
     );
 
-  return await prisma.tmdbRatings.findMany({
+  return (await prisma.tmdbRatings.findMany({
     where: { userId, type },
     select: { name: true, rating: true },
-  });
+  })).map((i) => ({ name: i.name, rating: i.rating.toNumber()}));
 }

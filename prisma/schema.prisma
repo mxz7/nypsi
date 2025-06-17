@@ -1005,7 +1005,7 @@ model tmdbRatings {
   type      RatingType
   id        Int
   name      String
-  rating    Float
+  rating    Decimal @db.Decimal(2, 1)
   
   @@id([userId, type, id])
 }

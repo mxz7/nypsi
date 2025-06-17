@@ -168,7 +168,7 @@ async function run(
               `> ${data.overview}\n\n` +
               `${data.vote_count ? `**${Math.round(data.vote_average * 10)}%** user score (${data.vote_count.toLocaleString()} ${pluralize("rating", data.vote_count)})\n` : ""}` +
               `${nypsiRating.count ? `**${Math.round(nypsiRating.average * 10)}%** nypsi score (${nypsiRating.count.toLocaleString()} ${pluralize("rating", nypsiRating.count)})` : "not rated by nypsi users"}\n` +
-              `${selfRating != -1 ? `your rating: **${selfRating / 2}/5**` : "you have not rated this movie"}\n\n` +
+              `${selfRating != -1 ? `your rating: **${selfRating}/5**` : "you have not rated this movie"}\n\n` +
               `-# *${data.release_date}*\n` +
               `-# *${data.genres.map((i) => i.name).join(", ")}*`,
           );
@@ -285,7 +285,7 @@ async function run(
             return pageManager();
           }
 
-          const rating = (Math.min(Math.max(Number(value), 0), 5) * 20) / 10;
+          const rating = (Math.min(Math.max(Number(value), 0), 5) * 10) / 10;
 
           console.log();
 
@@ -871,7 +871,7 @@ async function run(
 
       const average =
         Math.round(
-          (ratings.map((i) => i.rating).reduce((a, rating) => a + rating, 0) / ratings.length) * 5,
+          (ratings.map((i) => i.rating).reduce((a, rating) => a + rating, 0) / ratings.length) * 10,
         ) / 10;
 
       const pages = new Map<number, { name: string; rating: number }[]>();
@@ -897,7 +897,7 @@ async function run(
         if (embed.data.fields?.length) embed.data.fields.length = 0;
 
         for (const item of page) {
-          embed.addField(item.name, `${item.rating / 2}/5`);
+          embed.addField(item.name, `${item.rating}/5`);
         }
 
         return embed;
