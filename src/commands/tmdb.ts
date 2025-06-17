@@ -148,6 +148,7 @@ async function run(
     }
 
     row.addComponents(
+      new ButtonBuilder().setCustomId("credits").setLabel("credits").setStyle(ButtonStyle.Primary),
       new ButtonBuilder().setCustomId("rate").setLabel("rate").setStyle(ButtonStyle.Primary),
     );
 
@@ -256,6 +257,8 @@ async function run(
         }
       } else if (res == "watch") {
         return viewWhereToWatch(data, msg);
+      } else if (res == "credits") {
+        return viewCredits(data, msg);
       } else if (res == "rate") {
         const res = await numberSelectionModal(
           interaction as ButtonInteraction,
@@ -737,6 +740,156 @@ async function run(
     };
 
     return pageManager();
+  };
+
+  const viewCredits = async (data: TVDetails | MovieDetails, msg?: NypsiMessage) => {
+    const pages = new Map<number, { name: string; role: string }[]>();
+
+    for (const r of data.credits.cast) {
+      if (pages.size == 0) {
+        pages.set(1, [{ name: r.name, role: r.character }]);
+      } else if (pages.get(pages.size).length >= 5) {
+        pages.set(pages.size + 1, [{ name: r.name, role: r.character }]);
+      } else {
+        const arr = pages.get(pages.size);
+        arr.push({ name: r.name, role: r.character });
+      }
+    }
+
+    const embed = new CustomEmbed(message.member)
+      .setTitle(data.type == "tv" ? data.name : data.title)
+      .setURL(`https://themoviedb.org/${data.type}/${data.id}/credits`)
+      .setDescription("viewing credits for **cast**")
+      .setFooter({
+        text: `page 1/${pages.size}`,
+      });
+
+    const updatePage = (page: { name: string; role: string }[], embed: CustomEmbed) => {
+      if (embed.data.fields?.length) embed.data.fields.length = 0;
+
+      for (const item of page) {
+        embed.addField(item.name, `${item.role}`);
+      }
+
+      return embed;
+    };
+
+    updatePage(pages.get(1), embed);
+
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId("⬅")
+        .setLabel("previous")
+        .setStyle(ButtonStyle.Primary)
+        .setDisabled(true),
+      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+    );
+
+    const bottomRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder().setCustomId("back").setLabel("back").setStyle(ButtonStyle.Primary),
+      new ButtonBuilder()
+        .setCustomId("cast")
+        .setLabel("cast")
+        .setStyle(ButtonStyle.Success)
+        .setDisabled(true),
+      new ButtonBuilder().setCustomId("crew").setLabel("crew").setStyle(ButtonStyle.Success),
+    );
+
+    await msg.edit({ embeds: [embed], components: [row, bottomRow] });
+
+    const manager = new PageManager({
+      pages,
+      message: msg,
+      embed,
+      row: [row, bottomRow],
+      userId: message.author.id,
+      onPageUpdate(manager) {
+        manager.embed.setFooter({
+          text: `page ${manager.currentPage}/${manager.lastPage}`,
+        });
+        return manager.embed;
+      },
+      updateEmbed: updatePage,
+      handleResponses: new Map()
+        .set(
+          "back",
+          async (
+            _: PageManager<{ name: string; role: string }>,
+            interaction: ButtonInteraction,
+          ) => {
+            await interaction.deferUpdate();
+            return viewOverview(data, msg);
+          },
+        )
+        .set(
+          "cast",
+          async (
+            manager: PageManager<{ name: string; role: string }>,
+            interaction: ButtonInteraction,
+          ) => {
+            await interaction.deferUpdate();
+
+            manager.pages = PageManager.createPages(
+              data.credits.cast.map((i) => ({ name: i.name, role: i.character })),
+              5,
+            );
+
+            manager.updatePageFunc(manager.pages.get(1), manager.embed);
+            manager.currentPage = 1;
+            manager.lastPage = manager.pages.size;
+            manager.rows[0].components[0].setDisabled(true);
+            if (manager.lastPage == 1) manager.rows[0].components[1].setDisabled(true);
+            manager.rows[1].components[1].setDisabled(true);
+            manager.rows[1].components[2].setDisabled(false);
+            manager.embed.setDescription("viewing credits for **cast**");
+            manager.embed.setFooter({
+              text: `page 1/${manager.lastPage}`,
+            });
+
+            await manager.message.edit({
+              embeds: [manager.embed],
+              components: manager.rows,
+            });
+
+            return manager.listen();
+          },
+        )
+        .set(
+          "crew",
+          async (
+            manager: PageManager<{ name: string; role: string }>,
+            interaction: ButtonInteraction,
+          ) => {
+            await interaction.deferUpdate();
+
+            manager.pages = PageManager.createPages(
+              data.credits.crew.map((i) => ({ name: i.name, role: i.job })),
+              5,
+            );
+
+            manager.updatePageFunc(manager.pages.get(1), manager.embed);
+            manager.currentPage = 1;
+            manager.lastPage = manager.pages.size;
+            manager.rows[0].components[0].setDisabled(true);
+            if (manager.lastPage == 1) manager.rows[0].components[1].setDisabled(true);
+            manager.rows[1].components[1].setDisabled(false);
+            manager.rows[1].components[2].setDisabled(true);
+            manager.embed.setDescription("viewing credits for **crew**");
+            manager.embed.setFooter({
+              text: `page 1/${manager.lastPage}`,
+            });
+
+            await manager.message.edit({
+              embeds: [manager.embed],
+              components: manager.rows,
+            });
+
+            return manager.listen();
+          },
+        ),
+    });
+
+    return manager.listen();
   };
 
   if (args[0].toLowerCase() === "movie") {

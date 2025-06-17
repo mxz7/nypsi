@@ -91,22 +91,20 @@ export async function getMovie(id: number): Promise<MovieDetails | "unavailable"
 
   if (await redis.exists("nypsi:tmdb:ratelimit")) return "unavailable";
 
-  const response = await fetch(`${BASE}/movie/${id}`, {
-    headers: {
-      Authorization: `Bearer ${process.env.TMDB_KEY}`,
+  const response = await fetch(
+    `${BASE}/movie/${id}?append_to_response=credits%2Cwatch%2Fproviders`,
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.TMDB_KEY}`,
+      },
     },
-  });
+  );
 
-  const providersRes = await fetch(`${BASE}/movie/${id}/watch/providers`, {
-    headers: {
-      Authorization: `Bearer ${process.env.TMDB_KEY}`,
-    },
-  });
-
-  if (response.ok && response.status === 200 && providersRes.ok && providersRes.status == 200) {
+  if (response.ok && response.status === 200) {
     const data = await response.json();
     data.type = "movie";
-    data.providers = transformProviders(await providersRes.json());
+    data.providers = transformProviders(data["watch/providers"]);
+    data["watch/providers"] = undefined;
 
     await redis.set(
       `${Constants.redis.cache.tmdb.MOVIE}:${id}`,
@@ -118,10 +116,10 @@ export async function getMovie(id: number): Promise<MovieDetails | "unavailable"
     return data;
   }
 
-  if (response.status === 429 || providersRes.status == 429)
+  if (response.status === 429)
     await redis.set("nypsi:tmdb:ratelimit", "t", "EX", ms("10 minutes") / 1000);
 
-  return response.ok ? providersRes.status : response.status;
+  return response.status;
 }
 
 export async function getTv(id: number): Promise<TVDetails | "unavailable" | number> {
@@ -133,22 +131,17 @@ export async function getTv(id: number): Promise<TVDetails | "unavailable" | num
 
   if (await redis.exists("nypsi:tmdb:ratelimit")) return "unavailable";
 
-  const response = await fetch(`${BASE}/tv/${id}`, {
+  const response = await fetch(`${BASE}/tv/${id}?append_to_response=credits%2Cwatch%2Fproviders`, {
     headers: {
       Authorization: `Bearer ${process.env.TMDB_KEY}`,
     },
   });
 
-  const providersRes = await fetch(`${BASE}/tv/${id}/watch/providers`, {
-    headers: {
-      Authorization: `Bearer ${process.env.TMDB_KEY}`,
-    },
-  });
-
-  if (response.ok && response.status === 200 && providersRes.ok && providersRes.status == 200) {
+  if (response.ok && response.status === 200) {
     const data = await response.json();
     data.type = "tv";
-    data.providers = transformProviders(await providersRes.json());
+    data.providers = transformProviders(data["watch/providers"]);
+    data["watch/providers"] = undefined;
 
     await redis.set(
       `${Constants.redis.cache.tmdb.TV}:${id}`,
@@ -160,10 +153,10 @@ export async function getTv(id: number): Promise<TVDetails | "unavailable" | num
     return data;
   }
 
-  if (response.status === 429 || providersRes.status == 429)
+  if (response.status === 429)
     await redis.set("nypsi:tmdb:ratelimit", "t", "EX", ms("10 minutes") / 1000);
 
-  return response.ok ? providersRes.status : response.status;
+  return response.status;
 }
 
 export async function getEpisodes(
@@ -267,7 +260,9 @@ export async function getRating(type: "movie" | "tv", id: number) {
 
   return {
     count: res.length,
-    average: res.length ? res.reduce((acc, res) => acc + res.rating.toNumber(), 0) / res.length * 2 : 0,
+    average: res.length
+      ? (res.reduce((acc, res) => acc + res.rating.toNumber(), 0) / res.length) * 2
+      : 0,
   };
 }
 
@@ -302,8 +297,10 @@ export async function getUserRatings(
       )?.rating.toNumber() ?? -1
     );
 
-  return (await prisma.tmdbRatings.findMany({
-    where: { userId, type },
-    select: { name: true, rating: true },
-  })).map((i) => ({ name: i.name, rating: i.rating.toNumber()}));
+  return (
+    await prisma.tmdbRatings.findMany({
+      where: { userId, type },
+      select: { name: true, rating: true },
+    })
+  ).map((i) => ({ name: i.name, rating: i.rating.toNumber() }));
 }

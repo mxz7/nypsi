@@ -23,6 +23,7 @@ export interface MovieDetails {
   vote_count: number;
   runtime: number;
   providers: CountryProvider[];
+  credits: Credits;
 }
 
 export interface TVDetails {
@@ -51,6 +52,7 @@ export interface TVDetails {
     vote_count: number;
   }[];
   providers: CountryProvider[];
+  credits: Credits;
 }
 
 export interface TVSeasonEpisodeDetails {
@@ -62,6 +64,11 @@ export interface TVSeasonEpisodeDetails {
   vote_count: number;
   still_path: string;
   air_date: string;
+}
+
+interface Credits {
+  cast: { name: string; character: string }[];
+  crew: { name: string; job: string }[];
 }
 
 export interface Provider {
