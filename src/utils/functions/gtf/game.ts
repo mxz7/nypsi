@@ -19,12 +19,10 @@ import { CustomEmbed, ErrorEmbed, getColor } from "../../../models/EmbedBuilders
 // @ts-expect-error doesnt like getting from json file
 import { countries } from "../../../../data/lists.json";
 import prisma from "../../../init/database";
-import redis from "../../../init/redis";
 import Constants from "../../Constants";
 import { MStoTime } from "../date";
 import { addProgress } from "../economy/achievements";
 import { addTaskProgress } from "../economy/tasks";
-import ms = require("ms");
 import { fetchCountryData } from "./countries";
 
 export async function startGTFGame(
@@ -48,13 +46,6 @@ export async function startGTFGame(
           message.channel.send({ embeds: [new ErrorEmbed(`failed to fetch a valid country`)] }),
         );
   }
-
-  await redis.set(
-    `${Constants.redis.cache.COUNTRY_DATA}:${id.toLowerCase()}`,
-    JSON.stringify(country),
-    "EX",
-    ms("21 days") / 1000,
-  );
 
   const embed = new CustomEmbed(message.member, "guess the country of the flag below")
     .setHeader(`${message.author.username}'s guess the flag game`, message.author.avatarURL())

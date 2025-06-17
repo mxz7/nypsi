@@ -233,6 +233,7 @@ export async function setUserRating(
   member: GuildMember | string,
   type: "movie" | "tv",
   id: number,
+  name: string,
   rating: number | "reset",
 ) {
   let userId: string;
@@ -249,7 +250,7 @@ export async function setUserRating(
   return await prisma.tmdbRatings.upsert({
     where: { userId_type_id: { userId, type, id } },
     update: { rating },
-    create: { userId, rating, id, type },
+    create: { userId, rating, id, name, type },
   });
 }
 
@@ -270,10 +271,19 @@ export async function getRating(type: "movie" | "tv", id: number) {
   };
 }
 
-export async function getUserRating(
+export async function getUserRatings(
   member: GuildMember | string,
   type: "movie" | "tv",
   id: number,
+): Promise<number>;
+export async function getUserRatings(
+  member: GuildMember | string,
+  type: "movie" | "tv",
+): Promise<{ name: string; rating: number }[]>;
+export async function getUserRatings(
+  member: GuildMember | string,
+  type: "movie" | "tv",
+  id?: number,
 ) {
   let userId: string;
   if (member instanceof GuildMember) {
@@ -282,12 +292,18 @@ export async function getUserRating(
     userId = member;
   }
 
-  return (
-    (
-      await prisma.tmdbRatings.findUnique({
-        where: { userId_type_id: { userId, type, id } },
-        select: { rating: true },
-      })
-    )?.rating ?? -1
-  );
+  if (id)
+    return (
+      (
+        await prisma.tmdbRatings.findUnique({
+          where: { userId_type_id: { userId, type, id } },
+          select: { rating: true },
+        })
+      )?.rating ?? -1
+    );
+
+  return await prisma.tmdbRatings.findMany({
+    where: { userId, type },
+    select: { name: true, rating: true },
+  });
 }

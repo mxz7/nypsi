@@ -1004,6 +1004,7 @@ model tmdbRatings {
 
   type      RatingType
   id        Int
+  name      String
   rating    Float
   
   @@id([userId, type, id])

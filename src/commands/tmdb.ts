@@ -24,7 +24,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import {
   getEpisodes,
   getMovie,
-  getUserRating,
+  getUserRatings,
   getTv,
   movieSearch,
   setUserRating,
@@ -36,6 +36,7 @@ import { fetchCountryData } from "../utils/functions/gtf/countries";
 import { MovieDetails, TVDetails, TVSeasonEpisodeDetails } from "../types/tmdb";
 import { isNaN } from "lodash";
 import { pluralize } from "../utils/functions/string";
+import PageManager from "../utils/functions/page";
 
 const cmd = new Command("tmdb", "get movie or tv show information", "info").setAliases(["imdb"]);
 
@@ -65,6 +66,18 @@ cmd.slashData
           .setRequired(true)
           .setAutocomplete(true)
           .setMinLength(3),
+      ),
+  )
+  .addSubcommand((ratings) =>
+    ratings
+      .setName("ratings")
+      .setDescription("view your ratings")
+      .addStringOption((type) =>
+        type
+          .setName("type")
+          .setDescription("select tv or movie ratings")
+          .setRequired(true)
+          .setChoices({ name: "tv", value: "tv" }, { name: "movie", value: "movie" }),
       ),
   );
 
@@ -141,7 +154,7 @@ async function run(
     const createEmbed = async () => {
       const embed = new CustomEmbed(message.member);
 
-      const selfRating = await getUserRating(message.member, data.type, data.id);
+      const selfRating = await getUserRatings(message.member, data.type, data.id);
 
       const nypsiRating = await getRating(data.type, data.id);
 
@@ -175,13 +188,6 @@ async function run(
               `-# *${data.first_air_date} - ${data.status === "Ended" ? data.last_air_date : "ongoing"}*\n` +
               `-# *${data.genres.map((i) => i.name).join(", ")}*`,
           );
-
-        row.addComponents(
-          new ButtonBuilder()
-            .setCustomId("season")
-            .setLabel("view season")
-            .setStyle(ButtonStyle.Primary),
-        );
       }
 
       return embed;
@@ -270,7 +276,7 @@ async function run(
           }
 
           if (value == "reset") {
-            await setUserRating(message.member, data.type, data.id, value);
+            await setUserRating(message.member, data.type, data.id, undefined, value);
             await res.reply({
               embeds: [new CustomEmbed(message.member, "✅ rating removed")],
               flags: MessageFlags.Ephemeral,
@@ -283,7 +289,13 @@ async function run(
 
           console.log();
 
-          await setUserRating(message.member, data.type, data.id, rating);
+          await setUserRating(
+            message.member,
+            data.type,
+            data.id,
+            data.type == "tv" ? data.name : data.title,
+            rating,
+          );
 
           await res.reply({
             embeds: [new CustomEmbed(message.member, "✅ your rating has been submitted")],
@@ -843,6 +855,91 @@ async function run(
     }
 
     return viewOverview(tv);
+  } else if (args[0].toLowerCase() === "ratings") {
+    if (args[1].toLowerCase() == "tv" || args[1].toLowerCase() == "movie") {
+      const type = args[1].toLowerCase() as "tv" | "movie";
+
+      const ratings = await getUserRatings(message.member, type);
+
+      if (!ratings.length)
+        return send({
+          embeds: [
+            new ErrorEmbed(`you have not rated any ${type == "tv" ? "tv shows" : "movies"}`),
+          ],
+          flags: MessageFlags.Ephemeral,
+        });
+
+      const average =
+        Math.round(
+          (ratings.map((i) => i.rating).reduce((a, rating) => a + rating, 0) / ratings.length) * 5,
+        ) / 10;
+
+      const pages = new Map<number, { name: string; rating: number }[]>();
+
+      for (const r of ratings) {
+        if (pages.size == 0) {
+          pages.set(1, [r]);
+        } else if (pages.get(pages.size).length >= 5) {
+          pages.set(pages.size + 1, [r]);
+        } else {
+          const arr = pages.get(pages.size);
+          arr.push(r);
+        }
+      }
+
+      const embed = new CustomEmbed(message.member)
+        .setHeader(`your ${type} ratings`, message.author.avatarURL())
+        .setFooter({
+          text: `page 1/${pages.size} | average rating: ${average}/5`,
+        });
+
+      const updatePage = (page: { name: string; rating: number }[], embed: CustomEmbed) => {
+        if (embed.data.fields?.length) embed.data.fields.length = 0;
+
+        for (const item of page) {
+          embed.addField(item.name, `${item.rating / 2}/5`);
+        }
+
+        return embed;
+      };
+
+      updatePage(pages.get(1), embed);
+
+      const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder()
+          .setCustomId("⬅")
+          .setLabel("back")
+          .setStyle(ButtonStyle.Primary)
+          .setDisabled(true),
+        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+      );
+
+      let msg: Message;
+
+      if (pages.size == 1) {
+        return await send({ embeds: [embed] });
+      } else {
+        msg = await send({ embeds: [embed], components: [row] });
+      }
+
+      const manager = new PageManager({
+        pages,
+        message: msg,
+        embed,
+        row,
+        userId: message.author.id,
+        onPageUpdate(manager) {
+          manager.embed.setFooter({
+            text: `page ${manager.currentPage}/${manager.lastPage} | average rating: ${average}/5`,
+          });
+          return manager.embed;
+        },
+        updateEmbed: updatePage,
+      });
+
+      return manager.listen();
+    } else
+      return send({ embeds: [new ErrorEmbed(`invalid option`)], flags: MessageFlags.Ephemeral });
   }
 
   async function countrySelectionModal(interaction: StringSelectMenuInteraction) {
