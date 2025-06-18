@@ -61,7 +61,7 @@ export async function addExpiry(cmd: string, member: GuildMember, seconds: numbe
     length: expire,
   };
 
-  await redis.set(key, JSON.stringify(data), "EX", expire);
+  await redis.set(key, JSON.stringify(data), "PX", expire);
 }
 
 export async function getRemaining(cmd: string, member: GuildMember) {
