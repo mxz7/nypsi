@@ -761,7 +761,7 @@ async function run(
       .setURL(`https://themoviedb.org/${data.type}/${data.id}/credits`)
       .setDescription("viewing credits for **cast**")
       .setFooter({
-        text: `page 1/${pages.size}`,
+        text: pages.size > 1 ? `page 1/${pages.size}` : null,
       });
 
     const updatePage = (page: { name: string; role: string }[], embed: CustomEmbed) => {
@@ -782,7 +782,11 @@ async function run(
         .setLabel("previous")
         .setStyle(ButtonStyle.Primary)
         .setDisabled(true),
-      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+      new ButtonBuilder()
+        .setCustomId("➡")
+        .setLabel("next")
+        .setStyle(ButtonStyle.Primary)
+        .setDisabled(pages.size == 1),
     );
 
     const bottomRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -805,7 +809,7 @@ async function run(
       userId: message.author.id,
       onPageUpdate(manager) {
         manager.embed.setFooter({
-          text: `page ${manager.currentPage}/${manager.lastPage}`,
+          text: manager.lastPage > 1 ? `page ${manager.currentPage}/${manager.lastPage}` : null,
         });
         return manager.embed;
       },
@@ -839,11 +843,12 @@ async function run(
             manager.lastPage = manager.pages.size;
             manager.rows[0].components[0].setDisabled(true);
             if (manager.lastPage == 1) manager.rows[0].components[1].setDisabled(true);
+            else manager.rows[0].components[1].setDisabled(false);
             manager.rows[1].components[1].setDisabled(true);
             manager.rows[1].components[2].setDisabled(false);
             manager.embed.setDescription("viewing credits for **cast**");
             manager.embed.setFooter({
-              text: `page 1/${manager.lastPage}`,
+              text: manager.lastPage > 1 ? `page 1/${manager.lastPage}` : null,
             });
 
             await manager.message.edit({
@@ -872,6 +877,7 @@ async function run(
             manager.lastPage = manager.pages.size;
             manager.rows[0].components[0].setDisabled(true);
             if (manager.lastPage == 1) manager.rows[0].components[1].setDisabled(true);
+            else manager.rows[0].components[1].setDisabled(false);
             manager.rows[1].components[1].setDisabled(false);
             manager.rows[1].components[2].setDisabled(true);
             manager.embed.setDescription("viewing credits for **crew**");
