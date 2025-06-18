@@ -9,14 +9,15 @@
 - green gem can be broken
 - you get a cake for your birthday (@growling_grizzly)
 - you can now /marry someone (@growling_grizzly)
+- many new features in /tmdb (@growling_grizzly)
 
 ## other
 
-- improved suppor request validity ai
+- improved support request validity ai
 - add filtering and use pagemanager for history (@growling_grizzly)
 - plenty cleanup for markets (@growling_grizzly)
 - improve inventory handling (@growling_grizzly)
 - prevent ecobanned users getting loot drops (@growling_grizzly)
 - nerfed farm item sell prices
 - big improvements to ci times (@growling_grizzly)
-- support requests close automatically with inactivity
+- support requests close automatically with inactivity (@growling_grizzly)

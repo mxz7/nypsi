@@ -76,7 +76,6 @@ cmd.slashData
         type
           .setName("type")
           .setDescription("select tv or movie ratings")
-          .setRequired(true)
           .setChoices({ name: "tv", value: "tv" }, { name: "movie", value: "movie" }),
       ),
   );
@@ -121,8 +120,6 @@ async function run(
     if (res.respond) send({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
     return;
   }
-
-  await addCooldown(cmd.name, message.member, 5);
 
   if (message instanceof Message) return send({ embeds: [new ErrorEmbed("pls use /tmdb thx")] });
 
@@ -289,8 +286,6 @@ async function run(
           }
 
           const rating = (Math.min(Math.max(Number(value), 0), 5) * 10) / 10;
-
-          console.log();
 
           await setUserRating(
             message.member,
@@ -899,6 +894,8 @@ async function run(
   };
 
   if (args[0].toLowerCase() === "movie") {
+    await addCooldown(cmd.name, message.member, 5);
+
     args.shift();
     const query = args.join(" ");
 
@@ -957,6 +954,8 @@ async function run(
 
     return viewOverview(movie);
   } else if (args[0].toLowerCase() === "tv") {
+    await addCooldown(cmd.name, message.member, 5);
+
     args.shift();
     const query = args.join(" ");
 
@@ -1015,90 +1014,91 @@ async function run(
 
     return viewOverview(tv);
   } else if (args[0].toLowerCase() === "ratings") {
-    if (args[1].toLowerCase() == "tv" || args[1].toLowerCase() == "movie") {
-      const type = args[1].toLowerCase() as "tv" | "movie";
+    const type = args[1]?.toLowerCase() as "tv" | "movie";
 
-      const ratings = await getUserRatings(message.member, type);
+    const ratings = await getUserRatings(message.member, type);
 
-      if (!ratings.length)
-        return send({
-          embeds: [
-            new ErrorEmbed(`you have not rated any ${type == "tv" ? "tv shows" : "movies"}`),
-          ],
-          flags: MessageFlags.Ephemeral,
-        });
-
-      const average =
-        Math.round(
-          (ratings.map((i) => i.rating).reduce((a, rating) => a + rating, 0) / ratings.length) * 10,
-        ) / 10;
-
-      const pages = new Map<number, { name: string; rating: number }[]>();
-
-      for (const r of ratings) {
-        if (pages.size == 0) {
-          pages.set(1, [r]);
-        } else if (pages.get(pages.size).length >= 5) {
-          pages.set(pages.size + 1, [r]);
-        } else {
-          const arr = pages.get(pages.size);
-          arr.push(r);
-        }
-      }
-
-      const embed = new CustomEmbed(message.member)
-        .setHeader(`your ${type} ratings`, message.author.avatarURL())
-        .setFooter({
-          text: `page 1/${pages.size} | average rating: ${average}/5`,
-        });
-
-      const updatePage = (page: { name: string; rating: number }[], embed: CustomEmbed) => {
-        if (embed.data.fields?.length) embed.data.fields.length = 0;
-
-        for (const item of page) {
-          embed.addField(item.name, `${item.rating}/5`);
-        }
-
-        return embed;
-      };
-
-      updatePage(pages.get(1), embed);
-
-      const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder()
-          .setCustomId("⬅")
-          .setLabel("back")
-          .setStyle(ButtonStyle.Primary)
-          .setDisabled(true),
-        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
-      );
-
-      let msg: Message;
-
-      if (pages.size == 1) {
-        return await send({ embeds: [embed] });
-      } else {
-        msg = await send({ embeds: [embed], components: [row] });
-      }
-
-      const manager = new PageManager({
-        pages,
-        message: msg,
-        embed,
-        row,
-        userId: message.author.id,
-        onPageUpdate(manager) {
-          manager.embed.setFooter({
-            text: `page ${manager.currentPage}/${manager.lastPage} | average rating: ${average}/5`,
-          });
-          return manager.embed;
-        },
-        updateEmbed: updatePage,
+    if (!ratings.length)
+      return send({
+        embeds: [
+          new ErrorEmbed(
+            `you have not rated any ${type ? (type == "tv" ? "tv shows" : "movies") : "tv shows or movies"}`,
+          ),
+        ],
+        flags: MessageFlags.Ephemeral,
       });
 
-      return manager.listen();
-    } else
-      return send({ embeds: [new ErrorEmbed(`invalid option`)], flags: MessageFlags.Ephemeral });
+    await addCooldown(cmd.name, message.member, 5);
+
+    const average =
+      Math.round(
+        (ratings.map((i) => i.rating).reduce((a, rating) => a + rating, 0) / ratings.length) * 10,
+      ) / 10;
+
+    const pages = new Map<number, { name: string; rating: number }[]>();
+
+    for (const r of ratings) {
+      if (pages.size == 0) {
+        pages.set(1, [r]);
+      } else if (pages.get(pages.size).length >= 5) {
+        pages.set(pages.size + 1, [r]);
+      } else {
+        const arr = pages.get(pages.size);
+        arr.push(r);
+      }
+    }
+
+    const embed = new CustomEmbed(message.member)
+      .setHeader(`your ${type ? `${type} ` : ""}ratings`, message.author.avatarURL())
+      .setFooter({
+        text: `page 1/${pages.size} | average rating: ${average}/5`,
+      });
+
+    const updatePage = (page: { name: string; rating: number }[], embed: CustomEmbed) => {
+      if (embed.data.fields?.length) embed.data.fields.length = 0;
+
+      for (const item of page) {
+        embed.addField(item.name, `${item.rating}/5`);
+      }
+
+      return embed;
+    };
+
+    updatePage(pages.get(1), embed);
+
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId("⬅")
+        .setLabel("back")
+        .setStyle(ButtonStyle.Primary)
+        .setDisabled(true),
+      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+    );
+
+    let msg: Message;
+
+    if (pages.size == 1) {
+      return await send({ embeds: [embed] });
+    } else {
+      msg = await send({ embeds: [embed], components: [row] });
+    }
+
+    const manager = new PageManager({
+      pages,
+      message: msg,
+      embed,
+      row,
+      userId: message.author.id,
+      onPageUpdate(manager) {
+        manager.embed.setFooter({
+          text: `page ${manager.currentPage}/${manager.lastPage} | average rating: ${average}/5`,
+        });
+        return manager.embed;
+      },
+      updateEmbed: updatePage,
+    });
+
+    return manager.listen();
   }
 
   async function countrySelectionModal(interaction: StringSelectMenuInteraction) {

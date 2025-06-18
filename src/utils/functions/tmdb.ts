@@ -273,11 +273,11 @@ export async function getUserRatings(
 ): Promise<number>;
 export async function getUserRatings(
   member: GuildMember | string,
-  type: "movie" | "tv",
+  type?: "movie" | "tv",
 ): Promise<{ name: string; rating: number }[]>;
 export async function getUserRatings(
   member: GuildMember | string,
-  type: "movie" | "tv",
+  type?: "movie" | "tv",
   id?: number,
 ) {
   let userId: string;
@@ -299,7 +299,7 @@ export async function getUserRatings(
 
   return (
     await prisma.tmdbRatings.findMany({
-      where: { userId, type },
+      where: type ? { userId, type } : { userId },
       select: { name: true, rating: true },
     })
   ).map((i) => ({ name: i.name, rating: i.rating.toNumber() }));
