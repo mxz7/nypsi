@@ -59,6 +59,7 @@ export default {
         LASTFM: "cache:user:lastfm",
         TRACKING: "cache:user:tracking",
         ADMIN_LEVEL: "cache:user:adminlvl",
+        MARRIED: "cache:user:married",
         tags: "cache:user:tags",
         tagCount: "cache:tagcount",
         captcha_fail: "nypsi:user:captcha:fail",
