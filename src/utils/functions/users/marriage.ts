@@ -1,6 +1,8 @@
 import { GuildMember } from "discord.js";
 import { Marriage } from "@prisma/client";
 import prisma from "../../../init/database";
+import redis from "../../../init/redis";
+import Constants from "../../Constants";
 
 export async function isMarried(member: GuildMember | string): Promise<false | Marriage> {
   let userId: string;
@@ -8,6 +10,12 @@ export async function isMarried(member: GuildMember | string): Promise<false | M
     userId = member.user.id;
   } else {
     userId = member;
+  }
+
+  const cache = await redis.get(`${Constants.redis.cache.user.MARRIED}:${userId}`);
+
+  if (cache) {
+    return JSON.parse(cache);
   }
 
   const res = await prisma.marriage.findFirst({
@@ -21,12 +29,21 @@ export async function isMarried(member: GuildMember | string): Promise<false | M
     return false;
   }
 
+  await redis.set(
+    `${Constants.redis.cache.user.MARRIED}:${userId}`,
+    JSON.stringify(res),
+    "EX",
+    86400,
+  );
+
   return res || false;
 }
 
 export async function addMarriage(userId: string, targetId: string) {
-  await prisma.marriage.create({ data: { userId: userId, partnerId: targetId } });
-  await prisma.marriage.create({ data: { userId: targetId, partnerId: userId } });
+  await prisma.$transaction(async (prisma) => {
+    await prisma.marriage.create({ data: { userId: userId, partnerId: targetId } });
+    await prisma.marriage.create({ data: { userId: targetId, partnerId: userId } });
+  });
 }
 
 export async function removeMarriage(member: GuildMember | string) {
@@ -35,6 +52,17 @@ export async function removeMarriage(member: GuildMember | string) {
     userId = member.user.id;
   } else {
     userId = member;
+  }
+
+  const res = await prisma.marriage.findFirst({
+    where: {
+      userId,
+    },
+  });
+
+  if (res) {
+    await redis.del(`${Constants.redis.cache.user.MARRIED}:${res.userId}`);
+    await redis.del(`${Constants.redis.cache.user.MARRIED}:${res.partnerId}`);
   }
 
   await prisma.marriage.deleteMany({

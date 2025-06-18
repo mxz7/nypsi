@@ -6,6 +6,7 @@ import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { getGuildByUser } from "../economy/guilds";
 import { deleteOffer, getTargetedOffers } from "../economy/offers";
+import { isMarried, removeMarriage } from "./marriage";
 import { deleteImage } from "../image";
 import { deleteAllAvatars } from "./history";
 import ms = require("ms");
@@ -287,6 +288,10 @@ export async function dataDelete(userId: string) {
 
   for (const offer of offers) {
     await deleteOffer(offer);
+  }
+
+  if (await isMarried(userId)) {
+    await removeMarriage(userId);
   }
 
   await prisma.user

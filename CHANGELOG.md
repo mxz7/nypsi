@@ -8,6 +8,7 @@
 - gems can now be broken in farm
 - green gem can be broken
 - you get a cake for your birthday (@growling_grizzly)
+- you can now /marry someone (@growling_grizzly)
 
 ## other
 
