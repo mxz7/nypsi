@@ -208,7 +208,6 @@ async function run(
       fail = true;
       requested.delete(target.user.id);
       requesting.delete(message.member.id);
-      await addInventoryItem(message.member, "ring", 1);
     });
 
   if (fail) {

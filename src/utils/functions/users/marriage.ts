@@ -1,5 +1,5 @@
-import { GuildMember } from "discord.js";
 import { Marriage } from "@prisma/client";
+import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
@@ -44,6 +44,10 @@ export async function addMarriage(userId: string, targetId: string) {
     await prisma.marriage.create({ data: { userId: userId, partnerId: targetId } });
     await prisma.marriage.create({ data: { userId: targetId, partnerId: userId } });
   });
+  await redis.del(
+    `${Constants.redis.cache.user.MARRIED}:${userId}`,
+    `${Constants.redis.cache.user.MARRIED}:${targetId}`,
+  );
 }
 
 export async function removeMarriage(member: GuildMember | string) {
