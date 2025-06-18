@@ -12,6 +12,7 @@ import {
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
+  MessageFlags,
   PermissionFlagsBits,
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
@@ -223,12 +224,13 @@ async function run(
 
     if (!message.guild.channels.cache.get(channel)) {
       if (!message.mentions.channels.first()) {
-        return message.channel.send({
+        return send({
           embeds: [
             new ErrorEmbed(
               "you need to mention a channel, you can use the channel ID, or mention the channel by putting a # before the channel name",
             ),
           ],
+          flags: MessageFlags.Ephemeral,
         });
       } else {
         channel = message.mentions.channels.first();
@@ -238,17 +240,17 @@ async function run(
     }
 
     if (!channel) {
-      return message.channel.send({ embeds: [new ErrorEmbed("invalid channel")] });
+      return send({ embeds: [new ErrorEmbed("invalid channel")], flags: MessageFlags.Ephemeral });
     }
 
     if (!channel.isTextBased()) {
-      return message.channel.send({ embeds: [new ErrorEmbed("invalid channel")] });
+      return send({ embeds: [new ErrorEmbed("invalid channel")], flags: MessageFlags.Ephemeral });
     }
 
     if (channel.isDMBased()) return;
 
     if (channel.isThread()) {
-      return message.channel.send({ embeds: [new ErrorEmbed("invalid channel")] });
+      return send({ embeds: [new ErrorEmbed("invalid channel")], flags: MessageFlags.Ephemeral });
     }
 
     let fail = false;
@@ -260,13 +262,14 @@ async function run(
       })
       .catch((e) => {
         fail = true;
-        message.channel.send({
+        send({
           embeds: [
             new ErrorEmbed(
               "i was unable to make a webhook in that channel, please check my permissions\n" +
                 `\`\`\`${e.rawError.message}\`\`\``,
             ),
           ],
+          flags: MessageFlags.Ephemeral,
         });
       });
 
@@ -275,7 +278,7 @@ async function run(
 
     await setBirthdayChannel(message.guild.id, hook.url);
 
-    return message.channel.send({
+    return send({
       embeds: [
         new CustomEmbed(message.member, `birthday announcements set to ${channel.toString()}`),
       ],

@@ -927,7 +927,7 @@
     "name": "cake",
     "article": "a",
     "plural": "cakes",
-    "emoji": "<:cake:1354806924952207551>",
+    "emoji": "🍰",
     "longDesc": "yum yum 😋",
     "rarity": 69,
     "role": "booster",
@@ -1084,11 +1084,22 @@
     "name": "ring",
     "article": "a",
     "plural": "rings",
-    "emoji": "💍",
+    "emoji": "<:nypsi_ring:1384728690986061844>",
     "longDesc": "maybe get married?",
     "rarity": 4,
     "role": "collectable",
     "in_crates": true
+  },
+  "broken_ring": {
+    "id": "broken_ring",
+    "name": "broken ring",
+    "article": "a",
+    "plural": "broken rings",
+    "emoji": " <:nypsi_broken_ring:1384749748803600405>",
+    "longDesc": "ouch...",
+    "rarity": 4,
+    "role": "collectable",
+    "in_crates": false
   },
   "radio": {
     "id": "radio",

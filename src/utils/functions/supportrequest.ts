@@ -393,6 +393,7 @@ export async function isRequestSuitable(
     "Do not tell the user to 'dm nypsi' or to 'create a support request', they are already doing that.",
     "Do not tell the user to 'ask a question', they are already asking a question, you will not have further communication with this user.",
     "Even if you can't answer the user's question, it could still be a suitable support request. The documentation does not include everything.",
+    "When giving command examples, use '$' as the command prefix instead of '/'",
     "",
     "If the user is suggesting a new feature, you should accept the support request, but tell them to use the suggestions channel.",
     "",

@@ -44,6 +44,7 @@ model User {
   ModerationEvidence       ModerationEvidence[]
   ChatReactionLeaderboards ChatReactionLeaderboards[]
   z                        z?
+  Marriage                 Marriage?
   Purchases                Purchases[]
   WordleGame               WordleGame[]
   FlagGame                 FlagGame[]
@@ -558,6 +559,16 @@ model Aura {
 
   @@index([recipientId])
   @@index([senderId])
+}
+
+model Marriage {
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String @unique
+  partnerId String @unique
+
+  marriageStart DateTime @default(now())
+
+  @@id([userId, partnerId])
 }
 
 // guild specific tables
