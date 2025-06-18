@@ -1004,3 +1004,19 @@ model zKicks {
 
   @@id([userId, targetId])
 }
+
+enum RatingType {
+  tv
+  movie
+}
+
+model tmdbRatings {
+  userId    String
+
+  type      RatingType
+  id        Int
+  name      String
+  rating    Decimal @db.Decimal(2, 1)
+  
+  @@id([userId, type, id])
+}

@@ -30,12 +30,14 @@ export default {
     cache: {
       tmdb: {
         MOVIE_SEARCH: "cache:tmdb:movie:search",
+        TV_EPISODES: "cache:tmdb:tv:episodes",
         TV_SEARCH: "cache:tmdb:tv:search",
         MOVIE: "cache:tmdb:movie",
         TV: "cache:tmdb:tv",
       },
       IMAGE: "nypsi:image",
       COUNTRY_DATA: "nypsi_cache:countrydata",
+      COUNTRY_VALID_NAMES: "nypsi_cache:countrynames",
       minecraft: {
         UUID: "cache:minecraft:uuid",
         NAME_HISTORY: "cache:minecraft:namehistory",

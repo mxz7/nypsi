@@ -11,6 +11,7 @@ export interface TVSearch {
 }
 
 export interface MovieDetails {
+  type: "movie";
   genres: { name: string }[];
   overview: string;
   id: number;
@@ -19,10 +20,14 @@ export interface MovieDetails {
   tagline: string;
   title: string;
   vote_average: number;
+  vote_count: number;
   runtime: number;
+  providers: CountryProvider[];
+  credits: Credits;
 }
 
 export interface TVDetails {
+  type: "tv";
   id: number;
   first_air_date: string;
   genres: { name: string }[];
@@ -33,6 +38,48 @@ export interface TVDetails {
   overview: string;
   poster_path: string;
   vote_average: number;
+  vote_count: number;
   status: string;
   tagline: string;
+  seasons: {
+    air_date: string;
+    episode_count: number;
+    name: string;
+    overview: string;
+    poster_path: string;
+    season_number: number;
+    vote_average: number;
+    vote_count: number;
+  }[];
+  providers: CountryProvider[];
+  credits: Credits;
+}
+
+export interface TVSeasonEpisodeDetails {
+  episode_number: number;
+  name: string;
+  overview: string;
+  runtime: number;
+  vote_average: number;
+  vote_count: number;
+  still_path: string;
+  air_date: string;
+}
+
+interface Credits {
+  cast: { name: string; character: string }[];
+  crew: { name: string; job: string }[];
+}
+
+export interface Provider {
+  provider_id: number;
+  provider_name: string;
+  display_priority: number;
+}
+
+export interface CountryProvider {
+  countryCode: string;
+  rent?: Provider[];
+  buy?: Provider[];
+  flatrate?: Provider[];
 }
