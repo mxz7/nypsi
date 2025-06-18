@@ -57,6 +57,8 @@ import { addView, getViews } from "../utils/functions/users/views";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { pluralize } from "../utils/functions/string";
 import { NypsiClient } from "../models/Client";
+import { isMarried } from "../utils/functions/users/marriage";
+import { getLastKnownUsername } from "../utils/functions/users/tag";
 
 const cmd = new Command("profile", "view yours or someone's nypsi profile", "money").setAliases([
   "p",
@@ -198,15 +200,20 @@ async function run(
 
     if (target.user.id == message.author.id && padlock) padlockStatus = true;
 
-    let gemLine = "";
+    let desc = "";
 
     if ((await inventory.hasGem("crystal_heart")).any)
-      gemLine += `${getItems()["crystal_heart"].emoji}`;
-    if ((await inventory.hasGem("white_gem")).any) gemLine += `${getItems()["white_gem"].emoji}`;
-    if ((await inventory.hasGem("pink_gem")).any) gemLine += `${getItems()["pink_gem"].emoji}`;
-    if ((await inventory.hasGem("purple_gem")).any) gemLine += `${getItems()["purple_gem"].emoji}`;
-    if ((await inventory.hasGem("blue_gem")).any) gemLine += `${getItems()["blue_gem"].emoji}`;
-    if ((await inventory.hasGem("green_gem")).any) gemLine += `${getItems()["green_gem"].emoji}`;
+      desc += `${getItems()["crystal_heart"].emoji}`;
+    if ((await inventory.hasGem("white_gem")).any) desc += `${getItems()["white_gem"].emoji}`;
+    if ((await inventory.hasGem("pink_gem")).any) desc += `${getItems()["pink_gem"].emoji}`;
+    if ((await inventory.hasGem("purple_gem")).any) desc += `${getItems()["purple_gem"].emoji}`;
+    if ((await inventory.hasGem("blue_gem")).any) desc += `${getItems()["blue_gem"].emoji}`;
+    if ((await inventory.hasGem("green_gem")).any) desc += `${getItems()["green_gem"].emoji}`;
+
+    const marriage = await isMarried(target);
+
+    if (marriage)
+      desc += `${desc ? "\n" : ""}${getItems()["ring"].emoji} married to **${await getLastKnownUsername(marriage.partnerId)}**`;
 
     const balanceSection =
       `${padlockStatus ? "🔒" : "💰"} $**${formatNumberPretty(balance)}**\n` +
@@ -214,7 +221,7 @@ async function run(
         net.amount > 15_000_000 ? `\n🌍 $**${formatNumberPretty(net.amount)}**` : ""
       }`;
 
-    if (gemLine) embed.setDescription(gemLine);
+    if (desc) embed.setDescription(desc);
     embed.addField("balance", balanceSection, true);
     embed.addField(
       "level",
