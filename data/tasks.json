@@ -326,5 +326,13 @@
     "target": [15, 25, 35],
     "prizes": ["id:basic_crate:3", "xp:1000"],
     "type": "weekly"
+  },
+  "rate_daily": {
+    "id": "rate_daily",
+    "name": "couch potato",
+    "description": "rate a movie or tv show (/tmdb)",
+    "target": [1],
+    "prizes": ["id:basic_crate:1", "xp:500"],
+    "type": "daily"
   }
 }

@@ -1,4 +1,6 @@
 import ms = require("ms");
+import { GuildMember } from "discord.js";
+import prisma from "../../init/database";
 import redis from "../../init/redis";
 import {
   CountryProvider,
@@ -8,9 +10,8 @@ import {
   TVSearch,
   TVSeasonEpisodeDetails,
 } from "../../types/tmdb";
-import { GuildMember } from "discord.js";
 import Constants from "../Constants";
-import prisma from "../../init/database";
+import { addTaskProgress } from "./economy/tasks";
 
 const BASE = "https://api.themoviedb.org/3";
 
@@ -239,6 +240,8 @@ export async function setUserRating(
   if (rating == "reset") {
     return await prisma.tmdbRatings.deleteMany({ where: { userId, type, id } });
   }
+
+  addTaskProgress(userId, "rate_daily");
 
   return await prisma.tmdbRatings.upsert({
     where: { userId_type_id: { userId, type, id } },
