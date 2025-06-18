@@ -19,24 +19,24 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
+import { isNaN } from "lodash";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { MovieDetails, TVDetails, TVSeasonEpisodeDetails } from "../types/tmdb";
+import { fetchCountryData } from "../utils/functions/gtf/countries";
+import PageManager from "../utils/functions/page";
+import { pluralize } from "../utils/functions/string";
 import {
   getEpisodes,
   getMovie,
-  getUserRatings,
+  getRating,
   getTv,
+  getUserRatings,
   movieSearch,
   setUserRating,
   tvSearch,
-  getRating,
 } from "../utils/functions/tmdb";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { fetchCountryData } from "../utils/functions/gtf/countries";
-import { MovieDetails, TVDetails, TVSeasonEpisodeDetails } from "../types/tmdb";
-import { isNaN } from "lodash";
-import { pluralize } from "../utils/functions/string";
-import PageManager from "../utils/functions/page";
 
 const cmd = new Command("tmdb", "get movie or tv show information", "info").setAliases(["imdb"]);
 
@@ -180,7 +180,7 @@ async function run(
               `> ${data.overview}\n\n` +
               `${data.vote_count ? `**${Math.round(data.vote_average * 10)}%** user score (${data.vote_count.toLocaleString()} ${pluralize("rating", data.vote_count)})\n` : ""}` +
               `${nypsiRating.count ? `**${Math.round(nypsiRating.average * 10)}%** nypsi score (${nypsiRating.count.toLocaleString()} ${pluralize("rating", nypsiRating.count)})` : "not rated by nypsi users"}\n` +
-              `${selfRating != -1 ? `your rating: **${selfRating / 2}/5**` : "you have not rated this movie"}\n\n` +
+              `${selfRating != -1 ? `your rating: **${selfRating}/5**` : "you have not rated this movie"}\n\n` +
               `**${data.number_of_seasons.toLocaleString()}** seasons\n` +
               `**${data.number_of_episodes.toLocaleString()}** episodes\n\n` +
               `-# *${data.first_air_date} - ${data.status === "Ended" ? data.last_air_date : "ongoing"}*\n` +
