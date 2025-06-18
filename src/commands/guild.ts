@@ -1214,6 +1214,44 @@ async function run(
     const selected = Object.values(upgrades).find((i) => i.id === args[1].toLowerCase());
     if (!selected) return send({ embeds: [new ErrorEmbed("invalid upgrade")] });
 
+    let confirmMsg: Message;
+
+    if (
+      selected.id === "member" &&
+      (guild.upgrades.find((i) => i.upgradeId === "member")?.amount || 0) < 1
+    ) {
+      const embed = new CustomEmbed(
+        message.member,
+        "the **member slot upgrade** will increase the requirements of each guild level upgrade" +
+          "\n\nare you sure you want to buy this?",
+      ).setTitle("⚠️ warning");
+
+      const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("yes").setLabel("yes").setStyle(ButtonStyle.Success),
+        new ButtonBuilder().setCustomId("no").setLabel("no").setStyle(ButtonStyle.Danger),
+      );
+
+      confirmMsg = await send({ embeds: [embed], components: [row] });
+
+      const interaction = await confirmMsg
+        .awaitMessageComponent({
+          componentType: ComponentType.Button,
+          filter: (i) => i.user.id === message.author.id,
+          time: 30000,
+        })
+        .catch(() => {});
+
+      if (!interaction) return;
+
+      if (interaction.customId === "no")
+        return interaction.reply({
+          embeds: [new ErrorEmbed("purchase cancelled")],
+          flags: MessageFlags.Ephemeral,
+        });
+
+      await interaction.deferUpdate();
+    }
+
     const cost =
       selected.cost +
       Math.floor(
@@ -1221,8 +1259,16 @@ async function run(
           selected.increment_per_level,
       );
 
-    if (guild.tokens < cost)
-      return send({ embeds: [new ErrorEmbed("you cannot afford this upgrade")] });
+    if (guild.tokens < cost) {
+      if (confirmMsg) {
+        return confirmMsg.edit({
+          embeds: [new ErrorEmbed("you cannot afford this upgrade")],
+          components: [],
+        });
+      } else {
+        return send({ embeds: [new ErrorEmbed("you cannot afford this upgrade")] });
+      }
+    }
 
     await prisma.economyGuild.update({
       where: { guildName: guild.guildName },
@@ -1232,6 +1278,18 @@ async function run(
     });
 
     await addGuildUpgrade(guild.guildName, selected.id);
+
+    if (confirmMsg) {
+      return confirmMsg.edit({
+        embeds: [
+          new CustomEmbed(
+            message.member,
+            `✅ you have bought **${selected.name}** for ${cost} ${pluralize("token", cost)}`,
+          ),
+        ],
+        components: [],
+      });
+    }
 
     return send({
       embeds: [

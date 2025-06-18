@@ -317,7 +317,7 @@ export async function addToGuildXP(name: string, amount: number, member: GuildMe
 export async function getMaxMembersForGuild(name: string) {
   const guild = await getGuildByName(name);
 
-  let slots = 5;
+  let slots = 4;
 
   if (guild.upgrades.find((i) => i.upgradeId === "member"))
     slots += guild.upgrades.find((i) => i.upgradeId === "member").amount;
@@ -343,11 +343,20 @@ export async function getRequiredForGuildUpgrade(
   const money = 3000000 * Math.pow(guild.level, 2.1);
   const xp = 1750 * Math.pow(guild.level, 1.8);
 
+  let slots = guild.upgrades.find((i) => i.upgradeId === "member")?.amount || 0;
+
+  if (slots < guild.members.length - 4) {
+    slots = guild.members.length;
+  }
+
+  const bonusMoney = 1_000_000 * slots * (guild.level / 10);
+  const bonusXP = 2_000 * slots * (guild.level / 10);
+
   await redis.set(
     `${Constants.redis.cache.economy.GUILD_REQUIREMENTS}:${name}`,
     JSON.stringify({
-      money: Math.floor(money),
-      xp: Math.floor(xp),
+      money: Math.floor(money + bonusMoney),
+      xp: Math.floor(xp + bonusXP),
       members: guild.members.length,
     }),
     "EX",
@@ -355,8 +364,8 @@ export async function getRequiredForGuildUpgrade(
   );
 
   return {
-    money: Math.floor(money),
-    xp: Math.floor(xp),
+    money: Math.floor(money + bonusMoney),
+    xp: Math.floor(xp + bonusXP),
     members: guild.members.length,
   };
 }
