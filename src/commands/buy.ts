@@ -211,7 +211,7 @@ async function run(
   await addCooldown(cmd.name, message.member, 5);
 
   await removeBalance(message.member, selected.buy * amount);
-  addStat(message.author.id, "spent-shop", selected.buy * amount);
+  addStat(message.member, "spent-shop", selected.buy * amount);
   await addInventoryItem(message.member, selected.id, amount);
 
   const embed = new CustomEmbed(

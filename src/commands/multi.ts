@@ -1,10 +1,10 @@
 import { CommandInteraction } from "discord.js";
+import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders.js";
 import { getGambleMulti, getSellMulti } from "../utils/functions/economy/balance";
 import { createUser, userExists } from "../utils/functions/economy/utils.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { NypsiClient } from "../models/Client";
 
 const cmd = new Command("multi", "check your multipliers", "money").setAliases([
   "multis",

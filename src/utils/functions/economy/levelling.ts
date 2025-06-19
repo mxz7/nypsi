@@ -6,6 +6,8 @@ import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { addKarma } from "../karma/karma";
+import { getUserId, MemberResolvable } from "../member";
+import { pluralize } from "../string";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getLastKnownAvatar } from "../users/tag";
 import { addTag } from "../users/tags";
@@ -15,7 +17,6 @@ import { addInventoryItem } from "./inventory";
 import { addStat } from "./stats";
 import { addTaskProgress } from "./tasks";
 import { getXp, removeXp } from "./xp";
-import { pluralize } from "../string";
 import ms = require("ms");
 import dayjs = require("dayjs");
 
@@ -223,15 +224,10 @@ const cratesFormula = (rawLevel: number) => {
   return Math.floor(crates);
 };
 
-export async function getPrestige(member: GuildMember | string): Promise<number> {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function getPrestige(member: MemberResolvable): Promise<number> {
+  const userId = getUserId(member);
 
-  const cache = await redis.get(`${Constants.redis.cache.economy.PRESTIGE}:${id}`);
+  const cache = await redis.get(`${Constants.redis.cache.economy.PRESTIGE}:${userId}`);
 
   if (cache) {
     return parseInt(cache);
@@ -239,7 +235,7 @@ export async function getPrestige(member: GuildMember | string): Promise<number>
 
   const query = await prisma.economy.findUnique({
     where: {
-      userId: id,
+      userId,
     },
     select: {
       prestige: true,
@@ -247,7 +243,7 @@ export async function getPrestige(member: GuildMember | string): Promise<number>
   });
 
   await redis.set(
-    `${Constants.redis.cache.economy.PRESTIGE}:${id}`,
+    `${Constants.redis.cache.economy.PRESTIGE}:${userId}`,
     query.prestige,
     "EX",
     ms("6 hour") / 1000,
@@ -256,35 +252,25 @@ export async function getPrestige(member: GuildMember | string): Promise<number>
   return query.prestige;
 }
 
-export async function setPrestige(member: GuildMember | string, amount: number) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function setPrestige(member: MemberResolvable, amount: number) {
+  const userId = getUserId(member);
 
   await prisma.economy.update({
     where: {
-      userId: id,
+      userId,
     },
     data: {
       prestige: amount,
     },
   });
 
-  await redis.del(`${Constants.redis.cache.economy.PRESTIGE}:${id}`);
+  await redis.del(`${Constants.redis.cache.economy.PRESTIGE}:${userId}`);
 }
 
-export async function getLevel(member: GuildMember | string): Promise<number> {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function getLevel(member: MemberResolvable): Promise<number> {
+  const userId = getUserId(member);
 
-  const cache = await redis.get(`${Constants.redis.cache.economy.LEVEL}:${id}`);
+  const cache = await redis.get(`${Constants.redis.cache.economy.LEVEL}:${userId}`);
 
   if (cache) {
     return parseInt(cache);
@@ -292,7 +278,7 @@ export async function getLevel(member: GuildMember | string): Promise<number> {
 
   const query = await prisma.economy.findUnique({
     where: {
-      userId: id,
+      userId,
     },
     select: {
       level: true,
@@ -300,7 +286,7 @@ export async function getLevel(member: GuildMember | string): Promise<number> {
   });
 
   await redis.set(
-    `${Constants.redis.cache.economy.LEVEL}:${id}`,
+    `${Constants.redis.cache.economy.LEVEL}:${userId}`,
     query.level,
     "EX",
     ms("12 hours") / 1000,
@@ -309,7 +295,7 @@ export async function getLevel(member: GuildMember | string): Promise<number> {
   return query.level;
 }
 
-export async function getRawLevel(member: GuildMember | string) {
+export async function getRawLevel(member: MemberResolvable) {
   let [level, prestige] = await Promise.all([getLevel(member), getPrestige(member)]);
 
   while (prestige > 0) {
@@ -320,17 +306,12 @@ export async function getRawLevel(member: GuildMember | string) {
   return prestige * 100 + level;
 }
 
-export async function setLevel(member: GuildMember | string, amount: number) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function setLevel(member: MemberResolvable, amount: number) {
+  const userId = getUserId(member);
 
   const query = await prisma.economy.update({
     where: {
-      userId: id,
+      userId,
     },
     data: {
       level: amount,
@@ -340,7 +321,7 @@ export async function setLevel(member: GuildMember | string, amount: number) {
     },
   });
 
-  await redis.del(`${Constants.redis.cache.economy.LEVEL}:${id}`);
+  await redis.del(`${Constants.redis.cache.economy.LEVEL}:${userId}`);
 
   return query.level;
 }
@@ -359,26 +340,21 @@ export function getLevelRequirements(prestige: number, level: number) {
   return { xp: requiredXp, money: requiredMoney };
 }
 
-export async function getUpgrades(member: GuildMember | string): Promise<
+export async function getUpgrades(member: MemberResolvable): Promise<
   {
     upgradeId: string;
     amount: number;
   }[]
 > {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+  const userId = getUserId(member);
 
-  const cache = await redis.get(`${Constants.redis.cache.economy.UPGRADES}:${id}`);
+  const cache = await redis.get(`${Constants.redis.cache.economy.UPGRADES}:${userId}`);
 
   if (cache) return JSON.parse(cache);
 
   const query = await prisma.upgrades.findMany({
     where: {
-      userId: id,
+      userId,
     },
     select: {
       amount: true,
@@ -387,7 +363,7 @@ export async function getUpgrades(member: GuildMember | string): Promise<
   });
 
   await redis.set(
-    `${Constants.redis.cache.economy.UPGRADES}:${id}`,
+    `${Constants.redis.cache.economy.UPGRADES}:${userId}`,
     JSON.stringify(query),
     "EX",
     3600,
@@ -396,22 +372,17 @@ export async function getUpgrades(member: GuildMember | string): Promise<
   return query;
 }
 
-export async function setUpgrade(member: GuildMember | string, upgradeId: string, amount: number) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function setUpgrade(member: MemberResolvable, upgradeId: string, amount: number) {
+  const userId = getUserId(member);
 
   if (amount === 0)
-    await prisma.upgrades.delete({ where: { userId_upgradeId: { userId: id, upgradeId } } });
+    await prisma.upgrades.delete({ where: { userId_upgradeId: { userId, upgradeId } } });
   else
     await prisma.upgrades.upsert({
       where: {
         userId_upgradeId: {
           upgradeId,
-          userId: id,
+          userId,
         },
       },
       update: {
@@ -421,38 +392,33 @@ export async function setUpgrade(member: GuildMember | string, upgradeId: string
       create: {
         amount,
         upgradeId,
-        userId: id,
+        userId,
       },
     });
 
-  await redis.del(`${Constants.redis.cache.economy.UPGRADES}:${id}`);
+  await redis.del(`${Constants.redis.cache.economy.UPGRADES}:${userId}`);
 
   return await getUpgrades(member);
 }
 
-export async function doLevelUp(member: GuildMember | string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function doLevelUp(member: MemberResolvable) {
+  const userId = getUserId(member);
 
-  if (await redis.exists(`${Constants.redis.cache.economy.LEVELLING_UP}:${id}`)) return;
+  if (await redis.exists(`${Constants.redis.cache.economy.LEVELLING_UP}:${userId}`)) return;
   if (await redis.exists("nypsi:infinitemaxbet")) return;
 
-  const [beforePrestige, beforeLevel] = await Promise.all([getPrestige(id), getLevel(id)]);
+  const [beforePrestige, beforeLevel] = await Promise.all([getPrestige(userId), getLevel(userId)]);
   let requirements = getLevelRequirements(beforePrestige, beforeLevel);
-  const [beforeXp, beforeBank] = await Promise.all([getXp(id), getBankBalance(id)]);
+  const [beforeXp, beforeBank] = await Promise.all([getXp(userId), getBankBalance(userId)]);
 
   if (beforeXp < requirements.xp || beforeBank < requirements.money) {
-    await redis.del(`${Constants.redis.cache.economy.LEVELLING_UP}:${id}`);
+    await redis.del(`${Constants.redis.cache.economy.LEVELLING_UP}:${userId}`);
     return;
   }
 
-  if (await redis.exists(`${Constants.redis.cache.economy.LEVELLING_UP}:${id}`)) return;
+  if (await redis.exists(`${Constants.redis.cache.economy.LEVELLING_UP}:${userId}`)) return;
 
-  await redis.set(`${Constants.redis.cache.economy.LEVELLING_UP}:${id}`, "t", "EX", 600);
+  await redis.set(`${Constants.redis.cache.economy.LEVELLING_UP}:${userId}`, "t", "EX", 600);
 
   let totalUsedXp = 0;
   let totalUsedBank = 0;
@@ -467,10 +433,10 @@ export async function doLevelUp(member: GuildMember | string) {
   async function levelUp(consecutive = 0) {
     if (consecutive >= 10) {
       const [afterXp, afterBank, afterLevel, afterPrestige] = await Promise.all([
-        getXp(id),
-        getBankBalance(id),
-        getLevel(id),
-        getPrestige(id),
+        getXp(userId),
+        getBankBalance(userId),
+        getLevel(userId),
+        getPrestige(userId),
       ]);
 
       if (
@@ -575,32 +541,32 @@ export async function doLevelUp(member: GuildMember | string) {
   });
 
   if (!res) {
-    await redis.del(`${Constants.redis.cache.economy.LEVELLING_UP}:${id}`);
+    await redis.del(`${Constants.redis.cache.economy.LEVELLING_UP}:${userId}`);
     return;
   }
 
-  await removeXp(id, totalUsedXp, false);
-  await removeBankBalance(id, totalUsedBank, false);
-  await setLevel(id, beforeLevel + levels);
-  addStat(id, "spent-level", totalUsedBank);
-  addTaskProgress(id, "levelup_weekly", levels);
+  await removeXp(userId, totalUsedXp, false);
+  await removeBankBalance(userId, totalUsedBank, false);
+  await setLevel(userId, beforeLevel + levels);
+  addStat(userId, "spent-level", totalUsedBank);
+  addTaskProgress(userId, "levelup_weekly", levels);
 
   logger.info(
-    `${id} levelled up ${beforePrestige * 100 + beforeLevel} -> ${beforePrestige * 100 + beforeLevel + levels} (P${beforePrestige}L${beforeLevel} -> P${beforePrestige}L${beforeLevel + levels})`,
+    `${userId} levelled up ${beforePrestige * 100 + beforeLevel} -> ${beforePrestige * 100 + beforeLevel + levels} (P${beforePrestige}L${beforeLevel} -> P${beforePrestige}L${beforeLevel + levels})`,
   );
 
   if (items.size > 0) {
     for (const [itemId, amount] of items.entries()) {
-      await addInventoryItem(id, itemId, amount);
+      await addInventoryItem(userId, itemId, amount);
     }
   }
   if (tags.length > 0) {
     for (const tag of tags) {
-      await addTag(id, tag);
+      await addTag(userId, tag);
     }
   }
-  if (earnedKarma > 0) await addKarma(id, earnedKarma);
-  if (earnedMoney > 0) await addBalance(id, earnedMoney);
+  if (earnedKarma > 0) await addKarma(userId, earnedKarma);
+  if (earnedMoney > 0) await addBalance(userId, earnedMoney);
 
   let earnedBooster: "no" | "double" | "yes" = "no";
 
@@ -614,14 +580,14 @@ export async function doLevelUp(member: GuildMember | string) {
   }
 
   if (earnedBooster !== "no") {
-    const boosters = await getBoosters(id);
+    const boosters = await getBoosters(userId);
 
     if (!boosters.has("xp_booster")) {
       let time = 10;
       if (beforePrestige >= 5) time = 15;
       if (earnedBooster === "double") time *= 2;
 
-      await addBooster(id, "xp_booster", 1, dayjs().add(time, "minutes").toDate());
+      await addBooster(userId, "xp_booster", 1, dayjs().add(time, "minutes").toDate());
 
       const highest = inPlaceSort(Array.from(rewardsText.keys())).asc()[0];
       if (!rewardsText.has(highest)) {
@@ -632,11 +598,11 @@ export async function doLevelUp(member: GuildMember | string) {
     }
   }
 
-  await redis.del(`${Constants.redis.cache.economy.LEVELLING_UP}:${id}`);
+  await redis.del(`${Constants.redis.cache.economy.LEVELLING_UP}:${userId}`);
 
   const embed = new CustomEmbed(member).setHeader(
     "level up",
-    member instanceof GuildMember ? member.user.avatarURL() : await getLastKnownAvatar(id),
+    member instanceof GuildMember ? member.user.avatarURL() : await getLastKnownAvatar(userId),
   );
 
   let desc = `you are now **${beforePrestige > 0 ? `prestige ${beforePrestige} ` : ""}level ${beforeLevel + levels}**`;
@@ -661,14 +627,14 @@ export async function doLevelUp(member: GuildMember | string) {
 
   switch (dmSetting) {
     case "All":
-      addNotificationToQueue({ memberId: id, payload: { embed } });
+      addNotificationToQueue({ memberId: userId, payload: { embed } });
       break;
     case "OnlyReward":
-      if (rewardsText.size > 0) addNotificationToQueue({ memberId: id, payload: { embed } });
-      else await redis.set(`nypsi:levelup:${id}`, JSON.stringify(embed.toJSON()));
+      if (rewardsText.size > 0) addNotificationToQueue({ memberId: userId, payload: { embed } });
+      else await redis.set(`nypsi:levelup:${userId}`, JSON.stringify(embed.toJSON()));
       break;
     case "Disabled":
-      await redis.set(`nypsi:levelup:${id}`, JSON.stringify(embed.toJSON()));
+      await redis.set(`nypsi:levelup:${userId}`, JSON.stringify(embed.toJSON()));
       break;
   }
 }

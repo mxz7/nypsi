@@ -1,16 +1,11 @@
 import { Marriage } from "@prisma/client";
-import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
+import { getUserId, MemberResolvable } from "../member";
 
-export async function isMarried(member: GuildMember | string): Promise<false | Marriage> {
-  let userId: string;
-  if (member instanceof GuildMember) {
-    userId = member.user.id;
-  } else {
-    userId = member;
-  }
+export async function isMarried(member: MemberResolvable): Promise<false | Marriage> {
+  const userId = getUserId(member);
 
   const cache = await redis.get(`${Constants.redis.cache.user.MARRIED}:${userId}`);
 
@@ -50,13 +45,8 @@ export async function addMarriage(userId: string, targetId: string) {
   );
 }
 
-export async function removeMarriage(member: GuildMember | string) {
-  let userId: string;
-  if (member instanceof GuildMember) {
-    userId = member.user.id;
-  } else {
-    userId = member;
-  }
+export async function removeMarriage(member: MemberResolvable) {
+  const userId = getUserId(member);
 
   const res = await prisma.marriage.findFirst({
     where: {

@@ -2,6 +2,7 @@ import { Guild } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
+import { getUserId, MemberResolvable } from "../member";
 import ms = require("ms");
 
 export async function addAlt(guild: Guild, mainId: string, altId: string) {
@@ -42,7 +43,8 @@ export async function deleteAlt(guild: Guild, altId: string) {
   for (const alt of alts) await redis.del(`${Constants.redis.cache.guild.ALTS}:${guild.id}:${alt}`);
 }
 
-export async function getAlts(guild: Guild | string, mainId: string) {
+export async function getAlts(guild: Guild | string, member: MemberResolvable) {
+  const mainId = getUserId(member);
   let id: string;
 
   if (guild instanceof Guild) id = guild.id;
@@ -69,7 +71,9 @@ export async function getAlts(guild: Guild | string, mainId: string) {
   return query.map((i) => i.altId);
 }
 
-export async function getAllGroupAccountIds(guild: Guild | string, userId: string) {
+export async function getAllGroupAccountIds(guild: Guild | string, member: MemberResolvable) {
+  const userId = getUserId(member);
+
   let id: string;
 
   if (guild instanceof Guild) id = guild.id;

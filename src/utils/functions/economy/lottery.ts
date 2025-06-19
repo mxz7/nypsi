@@ -1,4 +1,5 @@
 import prisma from "../../../init/database";
+import { getUserId, MemberResolvable } from "../member";
 import { getItems } from "./utils";
 
 export async function getApproximatePrizePool() {
@@ -32,10 +33,10 @@ export async function getTicketCount() {
   return Number(query._sum.amount);
 }
 
-export async function getDailyLottoTickets(userId: string) {
+export async function getDailyLottoTickets(member: MemberResolvable) {
   const query = await prisma.economy.findUnique({
     where: {
-      userId,
+      userId: getUserId(member),
     },
     select: {
       dailyLottery: true,
@@ -45,10 +46,10 @@ export async function getDailyLottoTickets(userId: string) {
   return query.dailyLottery;
 }
 
-export async function setDailyLotteryTickets(userId: string, amount: number) {
+export async function setDailyLotteryTickets(member: MemberResolvable, amount: number) {
   await prisma.economy.update({
     where: {
-      userId,
+      userId: getUserId(member),
     },
     data: {
       dailyLottery: amount,

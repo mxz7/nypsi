@@ -222,13 +222,13 @@ async function run(
 
       await Promise.all([
         send({ embeds: [embed] }),
-        addProgress(message.author.id, "whore", 1),
+        addProgress(message.member, "whore", 1),
         addProgress(milf.userId, "whore", 1),
-        addTaskProgress(message.author.id, "horny"),
+        addTaskProgress(message.member, "horny"),
         addTaskProgress(milf.userId, "horny"),
       ]);
 
-      const authorTag = await getActiveTag(message.author.id);
+      const authorTag = await getActiveTag(message.member);
 
       const embed2 = new CustomEmbed(
         undefined,

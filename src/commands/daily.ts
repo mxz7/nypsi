@@ -90,7 +90,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
     await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t", "EX", 86400);
     logger.info(`${message.author.id} received blue_gem randomly (daily)`);
     await addInventoryItem(message.member, "blue_gem", 1);
-    addProgress(message.author.id, "gem_hunter", 1);
+    addProgress(message.member, "gem_hunter", 1);
 
     if ((await getDmSettings(message.member)).other) {
       addNotificationToQueue({

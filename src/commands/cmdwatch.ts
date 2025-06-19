@@ -1,16 +1,16 @@
 import { CommandInteraction, Message } from "discord.js";
 import redis from "../init/redis";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
-import Constants from "../utils/Constants";
-import { getAdminLevel } from "../utils/functions/users/admin";
-import { logger } from "../utils/logger";
-import { userExists } from "../utils/functions/economy/utils";
 import { ErrorEmbed } from "../models/EmbedBuilders";
+import Constants from "../utils/Constants";
+import { userExists } from "../utils/functions/economy/utils";
+import { getAdminLevel } from "../utils/functions/users/admin";
 import {
   commandAliasExists,
   commandExists,
   getCommandFromAlias,
 } from "../utils/handlers/commandhandler";
+import { logger } from "../utils/logger";
 
 const cmd = new Command("cmdwatch", "watch commands", "none");
 
@@ -18,7 +18,7 @@ async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
-  if ((await getAdminLevel(message.author.id)) < 2) return;
+  if ((await getAdminLevel(message.member)) < 2) return;
 
   if (args.length < 2) {
     return message.channel.send({ content: "dumbass - $cmdwatch <userid> <cmd>" });

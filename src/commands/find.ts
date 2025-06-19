@@ -18,10 +18,10 @@ import { getXp } from "../utils/functions/economy/xp";
 import { getPeaks } from "../utils/functions/guilds/utils";
 import { getKarma } from "../utils/functions/karma/karma";
 import { getTier, isPremium, levelString } from "../utils/functions/premium/premium";
+import { getAdminLevel } from "../utils/functions/users/admin";
 import { getLastCommand } from "../utils/functions/users/commands";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
 import dayjs = require("dayjs");
-import { getAdminLevel } from "../utils/functions/users/admin";
 
 const cmd = new Command("find", "find info", "none").setPermissions(["bot owner"]);
 
@@ -199,41 +199,41 @@ async function showUser(message: NypsiMessage, user: User) {
     .setTitle(user.username)
     .setDescription(
       `\`${user.id}\`${
-        (await isPremium(user.id)) ? ` (${levelString(await getTier(user.id))}) ` : ""
-      } ${(await isEcoBanned(user.id)).banned ? "[banned]" : ""}`,
+        (await isPremium(user)) ? ` (${levelString(await getTier(user))}) ` : ""
+      } ${(await isEcoBanned(user)).banned ? "[banned]" : ""}`,
     )
     .addField(
       "user",
       `**tag** ${user.username}
             **created** ${formatDate(user.createdAt)}${
-              (await getLastCommand(user.id))
+              (await getLastCommand(user))
                 ? `\n**last command** <t:${Math.floor(
-                    (await getLastCommand(user.id)).getTime() / 1000,
+                    (await getLastCommand(user)).getTime() / 1000,
                   )}:R>`
                 : ""
             }`,
       true,
     )
-    .setFooter({ text: `${await getKarma(user.id)} karma` });
+    .setFooter({ text: `${await getKarma(user)} karma` });
 
-  if (await userExists(user.id)) {
-    const voted = await hasVoted(user.id);
+  if (await userExists(user)) {
+    const voted = await hasVoted(user);
     embed.addField(
       "economy",
-      `💰 $**${(await getBalance(user.id)).toLocaleString()}**
-            💳 $**${(await getBankBalance(user.id)).toLocaleString()}** / $**${(
-              await getMaxBankBalance(user.id)
+      `💰 $**${(await getBalance(user)).toLocaleString()}**
+            💳 $**${(await getBankBalance(user)).toLocaleString()}** / $**${(
+              await getMaxBankBalance(user)
             ).toLocaleString()}**
-      🌍 $**${(await calcNetWorth("find", user.id, user.client as NypsiClient)).amount.toLocaleString()}**
-            **xp** ${(await getXp(user.id)).toLocaleString()}
+      🌍 $**${(await calcNetWorth("find", user, user.client as NypsiClient)).amount.toLocaleString()}**
+            **xp** ${(await getXp(user)).toLocaleString()}
             **voted** ${voted}
-            **prestige** ${await getPrestige(user.id)}
+            **prestige** ${await getPrestige(user)}
             **bonus** ${Math.floor((await getGambleMulti(message.member, message.client as NypsiClient)).multi * 100)}%`,
       true,
     );
   }
 
-  const usernameHistory = await fetchUsernameHistory(user.id);
+  const usernameHistory = await fetchUsernameHistory(user);
 
   if (usernameHistory.length > 0) {
     let msg = "";

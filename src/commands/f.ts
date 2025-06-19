@@ -8,8 +8,8 @@ import {
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { pluralize } from "../utils/functions/string";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("f", "pay your respects", "fun");
 

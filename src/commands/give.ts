@@ -20,10 +20,10 @@ import { getRawLevel } from "../utils/functions/economy/levelling";
 import { createUser, isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
+import { pluralize } from "../utils/functions/string";
 import { getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { transaction } from "../utils/logger";
-import { pluralize } from "../utils/functions/string";
 
 const cmd = new Command("give", "give other users items from your inventory", "money");
 

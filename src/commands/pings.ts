@@ -96,11 +96,11 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
   const showMentions = async (msg?: Message) => {
     let limit = 9;
 
-    if (await isPremium(message.author.id)) {
+    if (await isPremium(message.member)) {
       limit = 207;
     }
 
-    const preferences = await getPreferences(message.author.id);
+    const preferences = await getPreferences(message.member);
 
     const mentions = await fetchUserMentions(
       message.member,
@@ -214,7 +214,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
           async (manager: PageManager<string>, interaction: ButtonInteraction) => {
             await interaction.deferUpdate();
             preferences.mentionsGlobal = !preferences.mentionsGlobal;
-            await updatePreferences(message.author.id, preferences);
+            await updatePreferences(message.member, preferences);
 
             return showMentions(manager.message);
           },

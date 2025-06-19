@@ -50,8 +50,8 @@ async function run(
 
     let max = 1;
 
-    if (await isPremium(message.author.id)) {
-      max += await getTier(message.author.id);
+    if (await isPremium(message.member)) {
+      max += await getTier(message.member);
     }
 
     if (countdowns.length >= max) {

@@ -1,7 +1,9 @@
 import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
+import { NypsiClient } from "../../../models/Client";
 import Constants from "../../Constants";
+import { getUserId, MemberResolvable } from "../member";
 import { isBooster } from "../premium/boosters";
 import { getTier } from "../premium/premium";
 import { calcMaxBet, getRequiredBetForXp } from "./balance";
@@ -9,17 +11,11 @@ import { getBoosters } from "./boosters";
 import { gemBreak, getInventory } from "./inventory";
 import { doLevelUp, getRawLevel, getUpgrades } from "./levelling";
 import { getItems, getUpgradesData } from "./utils";
-import { NypsiClient } from "../../../models/Client";
 
-export async function getXp(member: GuildMember | string): Promise<number> {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function getXp(member: MemberResolvable): Promise<number> {
+  const userId = getUserId(member);
 
-  const cache = await redis.get(`${Constants.redis.cache.economy.XP}:${id}`);
+  const cache = await redis.get(`${Constants.redis.cache.economy.XP}:${userId}`);
 
   if (cache) {
     return parseInt(cache);
@@ -27,50 +23,40 @@ export async function getXp(member: GuildMember | string): Promise<number> {
 
   const query = await prisma.economy.findUnique({
     where: {
-      userId: id,
+      userId,
     },
     select: {
       xp: true,
     },
   });
 
-  await redis.set(`${Constants.redis.cache.economy.XP}:${id}`, query.xp.toString(), "EX", 3600);
+  await redis.set(`${Constants.redis.cache.economy.XP}:${userId}`, query.xp.toString(), "EX", 3600);
 
   return Number(query.xp);
 }
 
-export async function updateXp(member: GuildMember | string, amount: number, check = true) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function updateXp(member: MemberResolvable, amount: number, check = true) {
+  const userId = getUserId(member);
 
   await prisma.economy.update({
     where: {
-      userId: id,
+      userId,
     },
     data: {
       xp: amount,
     },
   });
-  await redis.del(`${Constants.redis.cache.economy.XP}:${id}`);
+  await redis.del(`${Constants.redis.cache.economy.XP}:${userId}`);
 
   if (check) doLevelUp(member);
 }
 
-export async function addXp(member: GuildMember | string, amount: number, check = true) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function addXp(member: MemberResolvable, amount: number, check = true) {
+  const userId = getUserId(member);
 
   const query = await prisma.economy.update({
     where: {
-      userId: id,
+      userId,
     },
     data: {
       xp: { increment: amount },
@@ -79,22 +65,17 @@ export async function addXp(member: GuildMember | string, amount: number, check 
       xp: true,
     },
   });
-  await redis.set(`${Constants.redis.cache.economy.XP}:${id}`, query.xp.toString(), "EX", 3600);
+  await redis.set(`${Constants.redis.cache.economy.XP}:${userId}`, query.xp.toString(), "EX", 3600);
 
   if (check) doLevelUp(member);
 }
 
-export async function removeXp(member: GuildMember | string, amount: number, check = true) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function removeXp(member: MemberResolvable, amount: number, check = true) {
+  const userId = getUserId(member);
 
   const query = await prisma.economy.update({
     where: {
-      userId: id,
+      userId,
     },
     data: {
       xp: { decrement: amount },
@@ -103,23 +84,17 @@ export async function removeXp(member: GuildMember | string, amount: number, che
       xp: true,
     },
   });
-  await redis.set(`${Constants.redis.cache.economy.XP}:${id}`, query.xp.toString(), "EX", 3600);
+  await redis.set(`${Constants.redis.cache.economy.XP}:${userId}`, query.xp.toString(), "EX", 3600);
 
   if (check) doLevelUp(member);
 }
 
 export async function calcEarnedGambleXp(
-  member: GuildMember | string,
+  member: MemberResolvable,
   client: NypsiClient,
   bet: number,
   multiplier: number,
 ): Promise<number> {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
   if (await redis.exists("nypsi:infinitemaxbet")) return 0;
 
   const requiredBet = await getRequiredBetForXp(member);
@@ -133,7 +108,7 @@ export async function calcEarnedGambleXp(
   const [inventory, tier, booster, boosters, upgrades, rawLevel, maxBet] = await Promise.all([
     getInventory(member),
     getTier(member),
-    isBooster(id),
+    isBooster(member),
     getBoosters(member),
     getUpgrades(member),
     getRawLevel(member),
@@ -152,7 +127,7 @@ export async function calcEarnedGambleXp(
     if (chance < 2) {
       min -= Math.floor(Math.random() * 7);
     } else {
-      gemBreak(id, 0.007, "white_gem", client);
+      gemBreak(member, 0.007, "white_gem", client);
       min += Math.floor(Math.random() * 17) + 1;
     }
   }

@@ -1,35 +1,30 @@
 import { UserAlias } from "@prisma/client";
-import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
-import ms = require("ms");
+import { getUserId, MemberResolvable } from "../member";
 import { isPremium } from "./premium";
+import ms = require("ms");
 
-export async function getUserAliases(member: GuildMember | string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function getUserAliases(member: MemberResolvable) {
+  const userId = getUserId(member);
 
-  if (await redis.exists(`${Constants.redis.cache.premium.ALIASES}:${id}`)) {
+  if (await redis.exists(`${Constants.redis.cache.premium.ALIASES}:${userId}`)) {
     return JSON.parse(
-      await redis.get(`${Constants.redis.cache.premium.ALIASES}:${id}`),
+      await redis.get(`${Constants.redis.cache.premium.ALIASES}:${userId}`),
     ) as UserAlias[];
   }
 
-  const query = (await isPremium(id))
+  const query = (await isPremium(userId))
     ? await prisma.userAlias.findMany({
         where: {
-          userId: id,
+          userId,
         },
       })
     : [];
 
   await redis.set(
-    `${Constants.redis.cache.premium.ALIASES}:${id}`,
+    `${Constants.redis.cache.premium.ALIASES}:${userId}`,
     JSON.stringify(query || []),
     "EX",
     ms("12 hour") / 1000,
@@ -38,41 +33,31 @@ export async function getUserAliases(member: GuildMember | string) {
   return query;
 }
 
-export async function addUserAlias(member: GuildMember | string, alias: string, command: string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function addUserAlias(member: MemberResolvable, alias: string, command: string) {
+  const userId = getUserId(member);
 
   await prisma.userAlias.create({
     data: {
       alias,
       command,
-      userId: id,
+      userId,
     },
   });
 
-  await redis.del(`${Constants.redis.cache.premium.ALIASES}:${id}`);
+  await redis.del(`${Constants.redis.cache.premium.ALIASES}:${userId}`);
 }
 
-export async function removeUserAlias(member: GuildMember | string, alias: string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function removeUserAlias(member: MemberResolvable, alias: string) {
+  const userId = getUserId(member);
 
   await prisma.userAlias.delete({
     where: {
       userId_alias: {
         alias,
-        userId: id,
+        userId,
       },
     },
   });
 
-  await redis.del(`${Constants.redis.cache.premium.ALIASES}:${id}`);
+  await redis.del(`${Constants.redis.cache.premium.ALIASES}:${userId}`);
 }

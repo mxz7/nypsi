@@ -1,5 +1,6 @@
 import redis from "../../init/redis";
 import Constants from "../Constants";
+import { getUserId, MemberResolvable } from "./member";
 
 type News = {
   text: string;
@@ -27,10 +28,10 @@ export async function setNews(string: string) {
   );
 }
 
-export async function hasSeenNews(id: string) {
+export async function hasSeenNews(member: MemberResolvable) {
   if (!(await redis.exists(Constants.redis.nypsi.NEWS_SEEN))) return null;
 
-  const index = await redis.lpos(Constants.redis.nypsi.NEWS_SEEN, id);
+  const index = await redis.lpos(Constants.redis.nypsi.NEWS_SEEN, getUserId(member));
 
   if (index == null) return null;
 

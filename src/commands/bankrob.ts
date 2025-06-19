@@ -166,8 +166,8 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
 
       await Promise.all([
         addBalance(message.member, stolen),
-        addProgress(message.author.id, "robber", 1),
-        addTaskProgress(message.author.id, "thief"),
+        addProgress(message.member, "robber", 1),
+        addTaskProgress(message.member, "thief"),
       ]);
 
       await removeFromNypsiBankBalance(stolen);

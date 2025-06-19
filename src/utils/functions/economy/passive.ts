@@ -1,18 +1,13 @@
-import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
+import { getUserId, MemberResolvable } from "../member";
 import ms = require("ms");
 
-export async function isPassive(member: GuildMember | string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function isPassive(member: MemberResolvable) {
+  const userId = getUserId(member);
 
-  const cache = await redis.get(`${Constants.redis.cache.economy.PASSIVE}:${id}`);
+  const cache = await redis.get(`${Constants.redis.cache.economy.PASSIVE}:${userId}`);
 
   if (cache) {
     return cache == "t";
@@ -20,7 +15,7 @@ export async function isPassive(member: GuildMember | string) {
 
   const query = await prisma.economy.findUnique({
     where: {
-      userId: id,
+      userId,
     },
     select: {
       passive: true,
@@ -28,7 +23,7 @@ export async function isPassive(member: GuildMember | string) {
   });
 
   await redis.set(
-    `${Constants.redis.cache.economy.PASSIVE}:${id}`,
+    `${Constants.redis.cache.economy.PASSIVE}:${userId}`,
     query.passive ? "t" : "f",
     "EX",
     ms("24 hours") / 1000,
@@ -37,22 +32,17 @@ export async function isPassive(member: GuildMember | string) {
   return query.passive;
 }
 
-export async function setPassive(member: GuildMember | string, value: boolean) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function setPassive(member: MemberResolvable, value: boolean) {
+  const userId = getUserId(member);
 
   await prisma.economy.update({
     where: {
-      userId: id,
+      userId,
     },
     data: {
       passive: value,
     },
   });
 
-  await redis.del(`${Constants.redis.cache.economy.PASSIVE}:${id}`);
+  await redis.del(`${Constants.redis.cache.economy.PASSIVE}:${userId}`);
 }

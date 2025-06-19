@@ -1,26 +1,21 @@
-import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
+import { getUserId, MemberResolvable } from "../member";
 
-export async function updateLastKnownUsername(member: GuildMember | string, tag: string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function updateLastKnownUsername(member: MemberResolvable, tag: string) {
+  const userId = getUserId(member);
 
   await prisma.user.update({
     where: {
-      id: id,
+      id: userId,
     },
     data: {
       lastKnownUsername: tag,
     },
   });
 
-  await redis.set(`${Constants.redis.cache.user.username}:${id}`, tag, "EX", 7200);
+  await redis.set(`${Constants.redis.cache.user.username}:${userId}`, tag, "EX", 7200);
 }
 
 export async function getLastKnownUsername(id: string) {

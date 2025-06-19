@@ -8,6 +8,7 @@ import { GuildUpgradeRequirements } from "../../../types/Economy";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { deleteImage } from "../image";
+import { getUserId, MemberResolvable } from "../member";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { addInventoryItem } from "./inventory";
 import { getUpgrades } from "./levelling";
@@ -74,18 +75,13 @@ export async function getGuildByName(name: string) {
   return guild;
 }
 
-export async function getGuildLevelByUser(member: GuildMember | string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function getGuildLevelByUser(member: MemberResolvable) {
+  const userId = getUserId(member);
 
   let guildName: string;
 
-  if (await redis.exists(`${Constants.redis.cache.economy.GUILD_USER}:${id}`)) {
-    guildName = await redis.get(`${Constants.redis.cache.economy.GUILD_USER}:${id}`);
+  if (await redis.exists(`${Constants.redis.cache.economy.GUILD_USER}:${userId}`)) {
+    guildName = await redis.get(`${Constants.redis.cache.economy.GUILD_USER}:${userId}`);
 
     if (guildName === "noguild") return 0;
   } else {
@@ -125,24 +121,19 @@ export async function getGuildLevelByUser(member: GuildMember | string) {
   }
 }
 
-export async function getGuildByUser(member: GuildMember | string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function getGuildByUser(member: MemberResolvable) {
+  const userId = getUserId(member);
 
   let guildName: string;
 
-  if (await redis.exists(`${Constants.redis.cache.economy.GUILD_USER}:${id}`)) {
-    guildName = await redis.get(`${Constants.redis.cache.economy.GUILD_USER}:${id}`);
+  if (await redis.exists(`${Constants.redis.cache.economy.GUILD_USER}:${userId}`)) {
+    guildName = await redis.get(`${Constants.redis.cache.economy.GUILD_USER}:${userId}`);
 
     if (guildName == "noguild") return undefined;
   } else {
     const query = await prisma.economyGuildMember.findUnique({
       where: {
-        userId: id,
+        userId,
       },
       include: {
         guild: {
@@ -180,7 +171,7 @@ export async function getGuildByUser(member: GuildMember | string) {
 
     if (!query || !query.guild) {
       await redis.set(
-        `${Constants.redis.cache.economy.GUILD_USER}:${id}`,
+        `${Constants.redis.cache.economy.GUILD_USER}:${userId}`,
         "noguild",
         "EX",
         ms("1 hour") / 1000,
@@ -188,7 +179,7 @@ export async function getGuildByUser(member: GuildMember | string) {
       return undefined;
     } else {
       await redis.set(
-        `${Constants.redis.cache.economy.GUILD_USER}:${id}`,
+        `${Constants.redis.cache.economy.GUILD_USER}:${userId}`,
         query.guild.guildName,
         "EX",
         ms("1 hour") / 1000,
@@ -206,18 +197,18 @@ export async function createGuild(name: string, owner: GuildMember) {
     data: {
       guildName: name,
       createdAt: new Date(),
-      ownerId: owner.user.id,
+      ownerId: owner.id,
     },
   });
   await prisma.economyGuildMember.create({
     data: {
-      userId: owner.user.id,
+      userId: owner.id,
       guildName: name,
       joinedAt: new Date(),
     },
   });
 
-  await redis.del(`${Constants.redis.cache.economy.GUILD_USER}:${owner.user.id}`);
+  await redis.del(`${Constants.redis.cache.economy.GUILD_USER}:${owner.id}`);
 }
 
 export async function deleteGuild(name: string) {
@@ -254,7 +245,7 @@ export async function deleteGuild(name: string) {
   });
 }
 
-export async function addToGuildBank(name: string, amount: number, member: GuildMember) {
+export async function addToGuildBank(name: string, amount: number, member: MemberResolvable) {
   await prisma.economyGuild.update({
     where: {
       guildName: name,
@@ -265,7 +256,7 @@ export async function addToGuildBank(name: string, amount: number, member: Guild
   });
   await prisma.economyGuildMember.update({
     where: {
-      userId: member.user.id,
+      userId: getUserId(member),
     },
     data: {
       contributedMoney: { increment: amount },
@@ -276,14 +267,7 @@ export async function addToGuildBank(name: string, amount: number, member: Guild
   return checkUpgrade(name);
 }
 
-export async function addToGuildXP(name: string, amount: number, member: GuildMember | string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
+export async function addToGuildXP(name: string, amount: number, member: MemberResolvable) {
   const upgrades = await getUpgrades(member);
 
   if (upgrades.find((i) => i.upgradeId === "guild_xp"))
@@ -303,7 +287,7 @@ export async function addToGuildXP(name: string, amount: number, member: GuildMe
   });
   await prisma.economyGuildMember.update({
     where: {
-      userId: id,
+      userId: getUserId(member),
     },
     data: {
       contributedXp: { increment: amount },
@@ -594,16 +578,11 @@ export async function setOwner(guild: string, newOwner: string) {
 }
 
 export async function getGuildUpgradesByUser(
-  member: GuildMember | string,
+  member: MemberResolvable,
 ): Promise<EconomyGuildUpgrades[]> {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+  const userId = getUserId(member);
 
-  if (!(await redis.exists(`${Constants.redis.cache.economy.GUILD_USER}:${id}`))) {
+  if (!(await redis.exists(`${Constants.redis.cache.economy.GUILD_USER}:${userId}`))) {
     const guild = await getGuildByUser(member);
 
     if (!guild) return [];
@@ -618,7 +597,7 @@ export async function getGuildUpgradesByUser(
     return guild.upgrades;
   }
 
-  const guildName = await redis.get(`${Constants.redis.cache.economy.GUILD_USER}:${id}`);
+  const guildName = await redis.get(`${Constants.redis.cache.economy.GUILD_USER}:${userId}`);
 
   if (guildName === "noguild") return [];
 
@@ -662,15 +641,8 @@ export async function addGuildUpgrade(guildName: string, upgradeId: string) {
   await redis.del(`${Constants.redis.cache.economy.GUILD_UPGRADES}:${guildName}`);
 }
 
-export async function getGuildName(member: GuildMember | string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
-  const cache = await redis.get(`${Constants.redis.cache.economy.GUILD_USER}:${id}`);
+export async function getGuildName(member: MemberResolvable) {
+  const cache = await redis.get(`${Constants.redis.cache.economy.GUILD_USER}:${getUserId(member)}`);
 
   if (cache) {
     if (cache === "noguild") return null;

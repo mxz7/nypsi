@@ -25,7 +25,7 @@ async function run(
     return;
   }
 
-  if (!(await isPremium(message.author.id))) {
+  if (!(await isPremium(message.member))) {
     return message.channel.send({
       embeds: [
         new ErrorEmbed("you must be have a premium membership for this command").setFooter({

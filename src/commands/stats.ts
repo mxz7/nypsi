@@ -786,7 +786,7 @@ async function run(
   };
 
   const lbStats = async () => {
-    const positions = await getLeaderboardPositions(message.author.id);
+    const positions = await getLeaderboardPositions(message.member);
 
     const embed = new CustomEmbed(message.member).setHeader(
       "leaderboard positions",

@@ -5,7 +5,6 @@ import {
   ButtonStyle,
   CommandInteraction,
   Guild,
-  GuildMember,
   Interaction,
   InteractionEditReplyOptions,
   InteractionReplyOptions,
@@ -22,7 +21,7 @@ import Constants from "../utils/Constants";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { isAltPunish } from "../utils/functions/guilds/altpunish";
 import { getPrefix } from "../utils/functions/guilds/utils";
-import { getMember } from "../utils/functions/member";
+import { getMember, MemberResolvable } from "../utils/functions/member";
 import {
   addAlt,
   deleteAlt,
@@ -392,10 +391,8 @@ async function getRow(
   return row;
 }
 
-async function getUserAlts(guild: Guild, member: GuildMember | string) {
-  return await getAlts(guild, member instanceof GuildMember ? member.user.id : member).catch(
-    () => [] as string[],
-  );
+async function getUserAlts(guild: Guild, member: MemberResolvable) {
+  return await getAlts(guild, member).catch(() => [] as string[]);
 }
 
 cmd.setRun(run);

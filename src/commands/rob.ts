@@ -8,6 +8,7 @@ import {
   MessageFlags,
 } from "discord.js";
 import redis from "../init/redis";
+import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
@@ -31,7 +32,6 @@ import { getMember } from "../utils/functions/member";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { NypsiClient } from "../models/Client";
 import ms = require("ms");
 
 const playerCooldown = new Set<string>();
@@ -150,7 +150,7 @@ async function run(
     return send({ embeds: [new ErrorEmbed("invalid user")] });
   }
 
-  if ((await isEcoBanned(target.user.id)).banned) {
+  if ((await isEcoBanned(target)).banned) {
     return send({ embeds: [new ErrorEmbed("they are banned xd xd xd xd xd xd lol")] });
   }
 
@@ -313,8 +313,8 @@ async function run(
         1_000_000,
         1,
       );
-      addProgress(message.author.id, "robber", 1);
-      addTaskProgress(message.author.id, "thief");
+      addProgress(message.member, "robber", 1);
+      addTaskProgress(message.member, "thief");
 
       if (earnedXp > 0) {
         await addXp(message.member, earnedXp);

@@ -1,4 +1,5 @@
 import prisma from "../../../init/database";
+import { getUserId, MemberResolvable } from "../member";
 import { isPremium } from "./premium";
 
 type PremiumCommand = {
@@ -25,50 +26,38 @@ export async function getCommand(name: string): Promise<PremiumCommand> {
   }
 }
 
-export async function getUserCommand(id: string) {
+export async function getUserCommand(member: MemberResolvable) {
   return await prisma.premiumCommand.findUnique({
     where: {
-      owner: id,
+      owner: getUserId(member),
     },
   });
 }
 
-export async function setCommand(id: string, trigger: string, content: string) {
-  const query = await prisma.premiumCommand.findUnique({
+export async function setCommand(member: MemberResolvable, trigger: string, content: string) {
+  const userId = getUserId(member);
+
+  await prisma.premiumCommand.upsert({
     where: {
-      owner: id,
+      owner: userId,
     },
-    select: {
-      owner: true,
+    update: {
+      trigger: trigger,
+      content: content,
+      uses: 0,
+    },
+    create: {
+      trigger: trigger,
+      content: content,
+      owner: userId,
     },
   });
-
-  if (query) {
-    await prisma.premiumCommand.update({
-      where: {
-        owner: id,
-      },
-      data: {
-        trigger: trigger,
-        content: content,
-        uses: 0,
-      },
-    });
-  } else {
-    await prisma.premiumCommand.create({
-      data: {
-        trigger: trigger,
-        content: content,
-        owner: id,
-      },
-    });
-  }
 }
 
-export async function addUse(id: string) {
+export async function addUse(member: MemberResolvable) {
   await prisma.premiumCommand.update({
     where: {
-      owner: id,
+      owner: getUserId(member),
     },
     data: {
       uses: { increment: 1 },

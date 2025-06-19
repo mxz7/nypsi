@@ -5,18 +5,14 @@ import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { Booster } from "../../../types/Economy";
 import { SteveData } from "../../../types/Workers";
 import Constants from "../../Constants";
+import { getUserId, MemberResolvable } from "../member";
+import { pluralize } from "../string";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getItems } from "./utils";
-import { pluralize } from "../string";
 import _ = require("lodash");
 
-async function checkBoosters(member: string | GuildMember, boosters: Map<string, Booster[]>) {
-  let userId: string;
-  if (member instanceof GuildMember) {
-    userId = member.user.id;
-  } else {
-    userId = member;
-  }
+async function checkBoosters(member: MemberResolvable, boosters: Map<string, Booster[]>) {
+  const userId = getUserId(member);
 
   const expired = new Map<string, number>();
 
@@ -126,15 +122,10 @@ async function checkBoosters(member: string | GuildMember, boosters: Map<string,
   return boosters;
 }
 
-export async function getBoosters(member: GuildMember | string): Promise<Map<string, Booster[]>> {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function getBoosters(member: MemberResolvable): Promise<Map<string, Booster[]>> {
+  const userId = getUserId(member);
 
-  const cache = await redis.get(`${Constants.redis.cache.economy.BOOSTERS}:${id}`);
+  const cache = await redis.get(`${Constants.redis.cache.economy.BOOSTERS}:${userId}`);
 
   if (cache) {
     if (_.isEmpty(JSON.parse(cache))) return new Map();
@@ -146,7 +137,7 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
 
   const query = await prisma.booster.findMany({
     where: {
-      userId: id,
+      userId,
     },
     select: {
       boosterId: true,
@@ -178,7 +169,7 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
   map = await checkBoosters(member, map);
 
   await redis.set(
-    `${Constants.redis.cache.economy.BOOSTERS}:${id}`,
+    `${Constants.redis.cache.economy.BOOSTERS}:${userId}`,
     JSON.stringify(Object.fromEntries(map)),
     "EX",
     300,
@@ -188,27 +179,21 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
 }
 
 export async function addBooster(
-  member: GuildMember | string,
+  member: MemberResolvable,
   boosterId: string,
   amount = 1,
   expire?: Date,
 ) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
+  const userId = getUserId(member);
   const items = getItems();
 
   await prisma.booster.createMany({
     data: new Array(amount).fill({
       boosterId: boosterId,
       expire: expire || new Date(Date.now() + items[boosterId].boosterEffect.time * 1000),
-      userId: id,
+      userId,
     }),
   });
 
-  await redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${id}`);
+  await redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${userId}`);
 }

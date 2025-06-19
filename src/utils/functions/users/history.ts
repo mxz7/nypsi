@@ -1,28 +1,25 @@
 import { DeleteObjectCommand, DeleteObjectsCommand } from "@aws-sdk/client-s3";
-import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import s3 from "../../../init/s3";
 import Constants from "../../Constants";
+import { getUserId, MemberResolvable } from "../member";
 import { hasProfile } from "./utils";
 
-export async function isTracking(member: GuildMember | string): Promise<boolean> {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
+export async function isTracking(member: MemberResolvable): Promise<boolean> {
+  const userId = getUserId(member);
+
+  if (await redis.exists(`${Constants.redis.cache.user.TRACKING}:${userId}`)) {
+    return (await redis.get(`${Constants.redis.cache.user.TRACKING}:${userId}`)) == "t"
+      ? true
+      : false;
   }
 
-  if (await redis.exists(`${Constants.redis.cache.user.TRACKING}:${id}`)) {
-    return (await redis.get(`${Constants.redis.cache.user.TRACKING}:${id}`)) == "t" ? true : false;
-  }
-
-  if (!(await hasProfile(id))) return false;
+  if (!(await hasProfile(userId))) return false;
 
   const query = await prisma.user.findUnique({
     where: {
-      id: id,
+      id: userId,
     },
     select: {
       tracking: true,
@@ -30,83 +27,59 @@ export async function isTracking(member: GuildMember | string): Promise<boolean>
   });
 
   if (query.tracking) {
-    await redis.set(`${Constants.redis.cache.user.TRACKING}:${id}`, "t", "EX", 86400);
+    await redis.set(`${Constants.redis.cache.user.TRACKING}:${userId}`, "t", "EX", 86400);
 
     return true;
   } else {
-    await redis.set(`${Constants.redis.cache.user.TRACKING}:${id}`, "f", "EX", 86400);
+    await redis.set(`${Constants.redis.cache.user.TRACKING}:${userId}`, "f", "EX", 86400);
 
     return false;
   }
 }
 
-export async function disableTracking(member: GuildMember | string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function disableTracking(member: MemberResolvable) {
+  const userId = getUserId(member);
 
   await prisma.user.update({
     where: {
-      id: id,
+      id: userId,
     },
     data: {
       tracking: false,
     },
   });
 
-  await redis.del(`${Constants.redis.cache.user.TRACKING}:${id}`);
+  await redis.del(`${Constants.redis.cache.user.TRACKING}:${userId}`);
 }
 
-export async function enableTracking(member: GuildMember | string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function enableTracking(member: MemberResolvable) {
+  const userId = getUserId(member);
 
   await prisma.user.update({
     where: {
-      id: id,
+      id: userId,
     },
     data: {
       tracking: true,
     },
   });
 
-  await redis.del(`${Constants.redis.cache.user.TRACKING}:${id}`);
+  await redis.del(`${Constants.redis.cache.user.TRACKING}:${userId}`);
 }
 
-export async function addNewUsername(member: GuildMember | string, username: string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
+export async function addNewUsername(member: MemberResolvable, username: string) {
   await prisma.username.create({
     data: {
-      userId: id,
+      userId: getUserId(member),
       value: username,
     },
   });
 }
 
-export async function fetchUsernameHistory(member: GuildMember | string, limit = 69) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
+export async function fetchUsernameHistory(member: MemberResolvable, limit = 69) {
   const query = await prisma.username.findMany({
     where: {
-      AND: [{ userId: id }, { type: "username" }],
+      AND: [{ userId: getUserId(member) }, { type: "username" }],
     },
     select: {
       value: true,
@@ -121,49 +94,28 @@ export async function fetchUsernameHistory(member: GuildMember | string, limit =
   return query;
 }
 
-export async function clearUsernameHistory(member: GuildMember | string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
+export async function clearUsernameHistory(member: MemberResolvable) {
   await prisma.username.deleteMany({
     where: {
-      AND: [{ userId: id }, { type: "username" }],
+      AND: [{ userId: getUserId(member) }, { type: "username" }],
     },
   });
 }
 
-export async function addNewAvatar(member: GuildMember | string, url: string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
+export async function addNewAvatar(member: MemberResolvable, url: string) {
   await prisma.username.create({
     data: {
-      userId: id,
+      userId: getUserId(member),
       type: "avatar",
       value: url,
     },
   });
 }
 
-export async function fetchAvatarHistory(member: GuildMember | string, limit = 69) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
+export async function fetchAvatarHistory(member: MemberResolvable, limit = 69) {
   const query = await prisma.username.findMany({
     where: {
-      AND: [{ userId: id }, { type: "avatar" }],
+      AND: [{ userId: getUserId(member) }, { type: "avatar" }],
     },
     select: {
       value: true,
@@ -203,7 +155,9 @@ export async function deleteAvatar(id: number) {
   return res;
 }
 
-export async function deleteAllAvatars(userId: string) {
+export async function deleteAllAvatars(member: MemberResolvable) {
+  const userId = getUserId(member);
+
   const avatars = await prisma.username.findMany({
     where: {
       AND: [{ type: "avatar" }, { userId }],
@@ -237,17 +191,10 @@ export async function deleteAllAvatars(userId: string) {
   });
 }
 
-export async function clearAvatarHistory(member: GuildMember | string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
+export async function clearAvatarHistory(member: MemberResolvable) {
   const avatars = await prisma.username.findMany({
     where: {
-      AND: [{ userId: id }, { type: "avatar" }],
+      AND: [{ userId: getUserId(member) }, { type: "avatar" }],
     },
     select: {
       id: true,

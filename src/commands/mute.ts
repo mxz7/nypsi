@@ -217,7 +217,7 @@ async function run(
     return;
   }
 
-  const ids = await getAllGroupAccountIds(message.guild, target.user.id);
+  const ids = await getAllGroupAccountIds(message.guild, target);
 
   if (ids.includes(message.member.user.id)) {
     await message.channel.send({ embeds: [new ErrorEmbed("you cannot mute one of your alts")] });

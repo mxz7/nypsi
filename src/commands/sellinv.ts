@@ -12,6 +12,7 @@ import {
   MessageFlags,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
+import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
@@ -23,7 +24,6 @@ import PageManager from "../utils/functions/page";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { addCooldown, addExpiry, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { NypsiClient } from "../models/Client";
 import pAll = require("p-all");
 
 const cmd = new Command("sellinv", "sell your entire inventory", "money");
@@ -154,7 +154,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
       await addBalance(message.member, total);
     });
 
-    addStat(message.author.id, "earned-sold", total);
+    addStat(message.member, "earned-sold", total);
 
     await pAll(functions, { concurrency: 5 });
 

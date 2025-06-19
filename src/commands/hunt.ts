@@ -11,6 +11,7 @@ import {
   MessageActionRowComponentBuilder,
   MessageFlags,
 } from "discord.js";
+import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
@@ -28,7 +29,6 @@ import { createUser, getItems, userExists } from "../utils/functions/economy/uti
 import { addXp, calcEarnedHFMXp } from "../utils/functions/economy/xp";
 import { percentChance } from "../utils/functions/random";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { NypsiClient } from "../models/Client";
 import { logger } from "../utils/logger";
 
 const cmd = new Command("hunt", "go to a field and hunt", "money");
@@ -158,13 +158,13 @@ async function doHunt(
 
   if ((await inventory.hasGem("purple_gem")).any) {
     if (percentChance(0.2)) {
-      gemBreak(message.member.user.id, 0.03, "purple_gem", message.client as NypsiClient);
+      gemBreak(message.member, 0.03, "purple_gem", message.client as NypsiClient);
       times++;
     }
   }
   if ((await inventory.hasGem("white_gem")).any) {
     if (percentChance(0.2)) {
-      gemBreak(message.member.user.id, 0.03, "white_gem", message.client as NypsiClient);
+      gemBreak(message.member, 0.03, "white_gem", message.client as NypsiClient);
       times++;
     }
   }
@@ -339,9 +339,9 @@ async function doHunt(
 
   send({ embeds: [embed], components: [row] });
 
-  addProgress(message.member.user.id, "hunter", total);
-  await addTaskProgress(message.member.user.id, "hunt_daily");
-  await addTaskProgress(message.member.user.id, "hunt_weekly");
+  addProgress(message.member, "hunter", total);
+  await addTaskProgress(message.member, "hunt_daily");
+  await addTaskProgress(message.member, "hunt_weekly");
 }
 
 cmd.setRun(run);

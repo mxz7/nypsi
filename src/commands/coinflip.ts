@@ -118,7 +118,7 @@ async function run(
 
     if (type === "money") {
       if (bet > (await getBalance(player2))) {
-        await addBalance(player1.user.id, bet);
+        await addBalance(player1.user, bet);
         return response.editReply({
           embeds: [new ErrorEmbed(`${player2.user.toString()} cannot afford this bet`)],
         });
@@ -205,7 +205,7 @@ async function run(
       let winnings = bet * 2;
       let tax = 0;
 
-      if (winnings > 1_000_000 && !(await isPremium(winner.user.id))) {
+      if (winnings > 1_000_000 && !(await isPremium(winner))) {
         tax = await getTax();
 
         const taxed = Math.floor(winnings * tax);
@@ -359,7 +359,7 @@ async function run(
       return send({ embeds: [new ErrorEmbed("invalid user")] });
     }
 
-    if (!(await getPreferences(target.user.id)).duelRequests) {
+    if (!(await getPreferences(target)).duelRequests) {
       return send({ embeds: [new ErrorEmbed(`${target.user.toString()} has requests disabled`)] });
     }
 
@@ -368,7 +368,7 @@ async function run(
         embeds: [new ErrorEmbed("this user is waiting for a response on a coinflip")],
       });
 
-    if ((await isEcoBanned(target.user.id)).banned) {
+    if ((await isEcoBanned(target)).banned) {
       return send({ embeds: [new ErrorEmbed("they are banned. lol.")] });
     }
 
@@ -418,7 +418,7 @@ async function run(
 
         if (!interaction) return;
 
-        if ((await getBalance(message.author.id)) < bet)
+        if ((await getBalance(message.member)) < bet)
           return interaction.reply({ embeds: [new ErrorEmbed("nice try buddy")] });
 
         if (interaction.customId !== "y") {
@@ -438,7 +438,7 @@ async function run(
         }** has challenged you to a coinflip\n\n**bet** $${bet.toLocaleString()}\n\ndo you accept?`,
       );
     } else {
-      const userInventory = await getInventory(message.author.id);
+      const userInventory = await getInventory(message.member);
       const targetInventory = await getInventory(target);
 
       if (userInventory.count(item.id) < itemAmount) {
@@ -521,11 +521,11 @@ async function run(
       if (i.customId == "n") return true;
 
       if (bet) {
-        const maxBet = await calcMaxBet(i.user.id);
+        const maxBet = await calcMaxBet(i.user);
 
         if (bet > maxBet * 10) {
           const confirmEmbed = new CustomEmbed(
-            i.user.id,
+            i.user,
             `are you sure you want to accept? the bet is $**${bet.toLocaleString()}**`,
           );
 
@@ -550,7 +550,7 @@ async function run(
 
           if (!confirmInteraction) return false;
 
-          if ((await getBalance(i.user.id)) < bet) {
+          if ((await getBalance(i.user)) < bet) {
             if (confirmInteraction.isRepliable())
               confirmInteraction.reply({
                 embeds: [new ErrorEmbed("you cannot afford this bet")],
@@ -682,7 +682,7 @@ async function run(
 
         if (!interaction) return;
 
-        if ((await getBalance(message.author.id)) < bet)
+        if ((await getBalance(message.member)) < bet)
           return interaction.reply({ embeds: [new ErrorEmbed("nice try buddy")] });
 
         if (interaction.customId !== "y") {
@@ -703,7 +703,7 @@ async function run(
         }** has created an open coinflip\n\n**bet** $${bet.toLocaleString()}`,
       );
     } else {
-      const userInventory = await getInventory(message.author.id);
+      const userInventory = await getInventory(message.member);
 
       if (userInventory.count(item.id) < itemAmount) {
         return send({
@@ -752,7 +752,7 @@ async function run(
         if (i.customId === "n") return true;
         return false;
       }
-      if ((await isEcoBanned(i.user.id)).banned) return false;
+      if ((await isEcoBanned(i.user)).banned) return false;
 
       if (playing.has(i.user.id)) {
         i.reply({
@@ -767,7 +767,7 @@ async function run(
         return false;
       }
 
-      if (!(await userExists(i.user.id))) {
+      if (!(await userExists(i.user))) {
         if (i.isRepliable())
           await i.reply({
             flags: MessageFlags.Ephemeral,
@@ -777,7 +777,7 @@ async function run(
       }
 
       if (bet) {
-        if ((await getBalance(i.user.id)) < bet) {
+        if ((await getBalance(i.user)) < bet) {
           if (i.isRepliable())
             i.reply({
               embeds: [new ErrorEmbed("you cannot afford this bet")],
@@ -786,11 +786,11 @@ async function run(
           return false;
         }
 
-        const maxBet = await calcMaxBet(i.user.id);
+        const maxBet = await calcMaxBet(i.user);
 
         if (bet > maxBet * 10) {
           const confirmEmbed = new CustomEmbed(
-            i.user.id,
+            i.user,
             `are you sure you want to accept? the bet is $**${bet.toLocaleString()}**`,
           );
 
@@ -815,7 +815,7 @@ async function run(
 
           if (!confirmInteraction) return false;
 
-          if ((await getBalance(i.user.id)) < bet) {
+          if ((await getBalance(i.user)) < bet) {
             if (confirmInteraction.isRepliable())
               confirmInteraction.reply({
                 embeds: [new ErrorEmbed("you cannot afford this bet")],
@@ -833,7 +833,7 @@ async function run(
           }
         }
       } else {
-        const inventory = await getInventory(i.user.id);
+        const inventory = await getInventory(i.user);
 
         if (inventory.count(item.id) < itemAmount) {
           if (i.isRepliable())

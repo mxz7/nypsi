@@ -13,6 +13,7 @@ import {
   MessageFlags,
 } from "discord.js";
 import { sort } from "fast-sort";
+import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
@@ -50,15 +51,14 @@ import { getXp } from "../utils/functions/economy/xp";
 import { getMember } from "../utils/functions/member.js";
 import { getTier } from "../utils/functions/premium/premium";
 import { percentChance } from "../utils/functions/random";
+import { pluralize } from "../utils/functions/string";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
+import { isMarried } from "../utils/functions/users/marriage";
+import { getLastKnownUsername } from "../utils/functions/users/tag";
 import { getActiveTag, getTags } from "../utils/functions/users/tags";
 import { hasProfile } from "../utils/functions/users/utils";
 import { addView, getViews } from "../utils/functions/users/views";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { pluralize } from "../utils/functions/string";
-import { NypsiClient } from "../models/Client";
-import { isMarried } from "../utils/functions/users/marriage";
-import { getLastKnownUsername } from "../utils/functions/users/tag";
 
 const cmd = new Command("profile", "view yours or someone's nypsi profile", "money").setAliases([
   "p",
@@ -136,7 +136,7 @@ async function run(
 
   if (!(await userExists(target))) await createUser(target);
 
-  if ((await isUserBlacklisted(target.user.id)).blacklisted)
+  if ((await isUserBlacklisted(target)).blacklisted)
     return send({
       embeds: [
         new ErrorEmbed(
@@ -145,10 +145,10 @@ async function run(
       ],
     });
 
-  if ((await isEcoBanned(target.user.id)).banned)
+  if ((await isEcoBanned(target)).banned)
     return send({ embeds: [new ErrorEmbed(`${target.toString()} is banned AHAHAHAHA`)] });
 
-  const [tag, tier] = await Promise.all([getActiveTag(target.user.id), getTier(target)]);
+  const [tag, tier] = await Promise.all([getActiveTag(target), getTier(target)]);
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>();
 
@@ -187,8 +187,8 @@ async function run(
       getLevel(target),
       getXp(target),
       getGuildByUser(target),
-      getTags(target.id),
-      getViews(target.id),
+      getTags(target),
+      getViews(target),
       getUpgrades(target),
     ]);
 
@@ -535,7 +535,7 @@ async function run(
 
       await addCooldown("p-tag", message.member, 5);
 
-      const tags = await getTags(target.user.id);
+      const tags = await getTags(target);
 
       await reaction.reply({
         embeds: [
@@ -552,7 +552,7 @@ async function run(
   };
   awaitButton();
 
-  addView(target.user.id, message.author.id, `profile in ${message.guild.id}`);
+  addView(target, message.member, `profile in ${message.guild.id}`);
 }
 
 cmd.setRun(run);

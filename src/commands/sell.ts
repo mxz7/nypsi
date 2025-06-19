@@ -12,6 +12,7 @@ import {
   MessageFlags,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
+import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
@@ -30,7 +31,6 @@ import PageManager from "../utils/functions/page";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { addCooldown, addExpiry, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { NypsiClient } from "../models/Client";
 import pAll = require("p-all");
 
 const cmd = new Command("sell", "sell items", "money");
@@ -204,7 +204,7 @@ async function run(
         await addBalance(message.member, total);
       });
 
-      addStat(message.author.id, "earned-sold", total);
+      addStat(message.member, "earned-sold", total);
 
       await pAll(functions, { concurrency: 5 });
 
@@ -433,7 +433,7 @@ async function run(
 
     await addBalance(message.member, sellWorth);
 
-    addStat(message.author.id, "earned-sold", sellWorth);
+    addStat(message.member, "earned-sold", sellWorth);
 
     const embed = new CustomEmbed(message.member);
 

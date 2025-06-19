@@ -3,10 +3,13 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
+import { getUserId, MemberResolvable } from "../member";
 import ms = require("ms");
 import dayjs = require("dayjs");
 
-export async function getViews(userId: string, limit?: Date) {
+export async function getViews(member: MemberResolvable, limit?: Date) {
+  const userId = getUserId(member);
+
   const cache = await redis.get(`${Constants.redis.cache.user.views}:${userId}`);
 
   if (cache)
@@ -38,7 +41,10 @@ export async function getViews(userId: string, limit?: Date) {
   return query;
 }
 
-export async function addView(userId: string, viewerId: string, source: string) {
+export async function addView(member: MemberResolvable, viewer: MemberResolvable, source: string) {
+  const userId = getUserId(member);
+  const viewerId = getUserId(viewer);
+
   if (userId === viewerId) return;
   const views = await getViews(userId, dayjs().subtract(5, "minute").toDate());
 

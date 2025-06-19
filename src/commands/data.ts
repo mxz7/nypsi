@@ -330,7 +330,7 @@ async function run(
 
       await m.edit({ embeds: [embed], components: [] });
 
-      await dataDelete(message.author.id);
+      await dataDelete(message.member);
 
       await addCooldown(cmd.name + "_delete", message.member, Math.floor(ms("1 week") / 1000));
 

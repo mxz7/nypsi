@@ -145,7 +145,7 @@ async function run(
   if (msg) msg.edit({ embeds: [embed] });
   else message.channel.send({ embeds: [embed] });
 
-  addView(member.user.id, message.author.id, `user in ${message.guild.id}`);
+  addView(member, message.member, `user in ${message.guild.id}`);
 }
 
 cmd.setRun(run);

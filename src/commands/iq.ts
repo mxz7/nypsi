@@ -86,8 +86,8 @@ async function run(
   } else {
     let chanceAmount = 25;
 
-    if (await isPremium(member.user.id)) {
-      if ((await getTier(member.user.id)) >= 3) {
+    if (await isPremium(member)) {
+      if ((await getTier(member)) >= 3) {
         chanceAmount = 10;
       }
     }
@@ -144,7 +144,7 @@ async function run(
 
   send({ embeds: [embed] });
 
-  addProgress(message.author.id, "unsure", 1);
+  addProgress(message.member, "unsure", 1);
 }
 
 cmd.setRun(run);

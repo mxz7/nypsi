@@ -3,8 +3,11 @@ import redis from "../../../init/redis";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { getTagsData } from "../economy/utils";
+import { getUserId, MemberResolvable } from "../member";
 
-export async function getTags(userId: string) {
+export async function getTags(member: MemberResolvable) {
+  const userId = getUserId(member);
+
   const cache = await redis.get(`${Constants.redis.cache.user.tags}:${userId}`);
 
   if (cache) {
@@ -30,7 +33,9 @@ export async function getTags(userId: string) {
   return query;
 }
 
-export async function removeTag(userId: string, tagId: string) {
+export async function removeTag(member: MemberResolvable, tagId: string) {
+  const userId = getUserId(member);
+
   await redis.del(`${Constants.redis.cache.user.tags}:${userId}`);
 
   await prisma.tags.delete({
@@ -45,7 +50,9 @@ export async function removeTag(userId: string, tagId: string) {
   return getTags(userId);
 }
 
-export async function addTag(userId: string, tagId: string) {
+export async function addTag(member: MemberResolvable, tagId: string) {
+  const userId = getUserId(member);
+
   const tags = getTagsData();
 
   if (!tags[tagId]) {
@@ -68,7 +75,9 @@ export async function addTag(userId: string, tagId: string) {
   return getTags(userId);
 }
 
-export async function setActiveTag(userId: string, tagId: string) {
+export async function setActiveTag(member: MemberResolvable, tagId: string) {
+  const userId = getUserId(member);
+
   await redis.del(`${Constants.redis.cache.user.tags}:${userId}`);
 
   await prisma.tags.updateMany({
@@ -94,8 +103,8 @@ export async function setActiveTag(userId: string, tagId: string) {
   return getTags(userId);
 }
 
-export async function getActiveTag(userId: string) {
-  const tags = await getTags(userId);
+export async function getActiveTag(member: MemberResolvable) {
+  const tags = await getTags(member);
 
   return tags.find((i) => i.selected);
 }

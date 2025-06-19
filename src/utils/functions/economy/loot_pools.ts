@@ -1,8 +1,9 @@
-import { GuildMember } from "discord.js";
 import { Item } from "../../../types/Economy";
 import { LootPool, LootPoolItemEntry, LootPoolResult } from "../../../types/LootPool";
 import { logger } from "../../logger";
 import { addKarma } from "../karma/karma";
+import { MemberResolvable } from "../member";
+import { pluralize } from "../string";
 import { addProgress } from "./achievements";
 import { addBalance } from "./balance";
 import { addToGuildXP, getGuildName } from "./guilds";
@@ -15,7 +16,6 @@ import {
 } from "./inventory";
 import { getItems, getLootPools } from "./utils";
 import { addXp } from "./xp";
-import { pluralize } from "../string";
 
 export function getDefaultLootPool(predicate?: (item: Item) => boolean): LootPool {
   const lootPool: LootPool = {
@@ -45,7 +45,7 @@ export function getDefaultLootPool(predicate?: (item: Item) => boolean): LootPoo
   return lootPool;
 }
 
-export async function giveLootPoolResult(member: string | GuildMember, result: LootPoolResult) {
+export async function giveLootPoolResult(member: MemberResolvable, result: LootPoolResult) {
   if (Object.hasOwn(result, "money")) {
     await addBalance(member, result.money);
   }
@@ -205,10 +205,7 @@ function getItemCount(data: LootPoolItemEntry, itemId: string): number {
   return Math.floor(Math.random() * (data.count.max - data.count.min + 1) + data.count.min);
 }
 
-export async function openCrate(
-  member: GuildMember | string,
-  item: Item,
-): Promise<LootPoolResult[]> {
+export async function openCrate(member: MemberResolvable, item: Item): Promise<LootPoolResult[]> {
   const inventory = await getInventory(member);
 
   if (!inventory.has(item.id) || !Object.hasOwn(item, "loot_pools")) {

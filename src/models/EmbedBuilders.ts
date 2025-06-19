@@ -1,5 +1,6 @@
-import { ColorResolvable, EmbedBuilder, GuildMember } from "discord.js";
+import { ColorResolvable, EmbedBuilder } from "discord.js";
 import Constants from "../utils/Constants";
+import { getUserId, MemberResolvable } from "../utils/functions/member";
 import { getEmbedColor } from "../utils/functions/premium/color";
 import { logger } from "../utils/logger";
 import ms = require("ms");
@@ -19,13 +20,13 @@ setInterval(() => {
 }, ms("1 hour"));
 
 export class CustomEmbed extends EmbedBuilder {
-  constructor(member?: GuildMember | string, text?: string, disableFooter = false) {
+  constructor(member?: MemberResolvable, text?: string, disableFooter = false) {
     super();
 
     super.setColor(Constants.PURPLE);
 
     if (member) {
-      super.setColor(getColor(typeof member === "string" ? member : member.id));
+      super.setColor(getColor(member));
     }
 
     if (text) {
@@ -212,14 +213,16 @@ export class ErrorEmbed extends EmbedBuilder {
   }
 }
 
-export function getColor(id: string): ColorResolvable {
-  (async () => {
-    const color = await getEmbedColor(id);
+export function getColor(member: MemberResolvable): ColorResolvable {
+  const userId = getUserId(member);
 
-    colorCache.set(id, color);
+  (async () => {
+    const color = await getEmbedColor(userId);
+
+    colorCache.set(userId, color);
   })();
-  if (colorCache.has(id)) {
-    if (colorCache.get(id) === "default") return Constants.PURPLE;
-    else return colorCache.get(id) as ColorResolvable;
+  if (colorCache.has(userId)) {
+    if (colorCache.get(userId) === "default") return Constants.PURPLE;
+    else return colorCache.get(userId) as ColorResolvable;
   } else return Constants.PURPLE;
 }

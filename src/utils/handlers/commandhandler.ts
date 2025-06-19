@@ -1036,7 +1036,7 @@ export async function runCommand(
       logger.info(`news shown to ${message.author.username}`);
     }
 
-    const notifs = await getInlineNotifications(message.author.id);
+    const notifs = await getInlineNotifications(message.member);
 
     if (notifs.length > 0) embeds.push(...notifs.map((i) => i.embed));
 
@@ -1114,7 +1114,7 @@ export async function runCommand(
   ]);
 
   setProgress(
-    message.author.id,
+    message.member,
     "discordian",
     parseInt(await redis.hget(Constants.redis.nypsi.TOP_COMMANDS_USER, message.author.id)) || 0,
   );

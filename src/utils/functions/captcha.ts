@@ -18,6 +18,7 @@ import Constants from "../Constants";
 import { getTimestamp } from "../logger";
 import { MStoTime } from "./date";
 import { isEcoBanned, setEcoBan } from "./economy/utils";
+import { getUserId, MemberResolvable } from "./member";
 import { getAllGroupAccountIds } from "./moderation/alts";
 import { addNotificationToQueue } from "./users/notifications";
 import ms = require("ms");
@@ -28,14 +29,16 @@ type CaptchaType2 = {
   id: string;
 };
 
-export async function isLockedOut(userId: string): Promise<false | CaptchaType2> {
-  const cache = await redis.get(`${Constants.redis.nypsi.LOCKED_OUT}:${userId}`);
+export async function isLockedOut(member: MemberResolvable): Promise<false | CaptchaType2> {
+  const cache = await redis.get(`${Constants.redis.nypsi.LOCKED_OUT}:${getUserId(member)}`);
   if (!cache) return false;
 
   return JSON.parse(cache);
 }
 
-export async function giveCaptcha(userId: string, type: 1 | 2 = 2, force = false) {
+export async function giveCaptcha(member: MemberResolvable, type: 1 | 2 = 2, force = false) {
+  const userId = getUserId(member);
+
   if (!force && (await isVerified(userId))) return false;
   await redis.del(`${Constants.redis.cache.user.CAPTCHA_HISTORY}:${userId}`);
 
@@ -57,8 +60,8 @@ export async function giveCaptcha(userId: string, type: 1 | 2 = 2, force = false
   return true;
 }
 
-async function isVerified(id: string) {
-  return await redis.exists(`${Constants.redis.nypsi.CAPTCHA_VERIFIED}:${id}`);
+async function isVerified(member: MemberResolvable) {
+  return await redis.exists(`${Constants.redis.nypsi.CAPTCHA_VERIFIED}:${getUserId(member)}`);
 }
 
 export async function passedCaptcha(member: GuildMember, check: Captcha, force = false) {
@@ -286,13 +289,15 @@ export async function verifyUser(
   return false;
 }
 
-export async function getCaptchaHistory(userId: string) {
+export async function getCaptchaHistory(member: MemberResolvable) {
+  const userId = getUserId(member);
+
   const cache = await redis.get(`${Constants.redis.cache.user.CAPTCHA_HISTORY}:${userId}`);
 
   if (cache) return JSON.parse(cache) as Captcha[];
 
   const history = await prisma.captcha.findMany({
-    where: { userId: userId },
+    where: { userId },
     orderBy: { createdAt: "desc" },
   });
 

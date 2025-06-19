@@ -804,7 +804,7 @@ async function run(
   };
 
   const doEmail = async () => {
-    const email = await getEmail(message.author.id);
+    const email = await getEmail(message.member);
 
     const embed = new CustomEmbed(message.member);
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -891,7 +891,7 @@ async function run(
 
       await modalSubmit.deferUpdate();
 
-      await setEmail(message.author.id, value.toLowerCase()).catch(() => {
+      await setEmail(message.member, value.toLowerCase()).catch(() => {
         fail = true;
       });
 
@@ -902,7 +902,7 @@ async function run(
         });
       }
 
-      checkPurchases(message.author.id);
+      checkPurchases(message.member);
 
       return res.message.edit({
         embeds: [new CustomEmbed(message.member, "✅ your email has been set")],

@@ -14,7 +14,7 @@ async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
-  if ((await getAdminLevel(message.author.id)) < 2) return;
+  if ((await getAdminLevel(message.member)) < 2) return;
 
   if (args.length < 2) {
     return message.channel.send({ embeds: [new ErrorEmbed("$requestdm <id> <content>")] });

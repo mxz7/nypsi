@@ -36,10 +36,10 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
     return message.channel.send({ embeds: [embed] });
   };
 
-  if (!(await isPremium(message.author.id)) && !(await isBooster(message.author.id))) {
+  if (!(await isPremium(message.member)) && !(await isBooster(message.member))) {
     return notValidForYou();
   } else {
-    if ((await getTier(message.author.id)) < 2 && !(await isBooster(message.author.id))) {
+    if ((await getTier(message.member)) < 2 && !(await isBooster(message.member))) {
       return notValidForYou();
     }
 

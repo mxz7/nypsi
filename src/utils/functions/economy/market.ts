@@ -5,7 +5,6 @@ import {
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
-  GuildMember,
   MessageActionRowComponentBuilder,
   MessageFlags,
   ModalBuilder,
@@ -23,9 +22,11 @@ import { NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
 import { logger, transaction } from "../../logger";
 import { findChannelCluster } from "../clusters";
+import { getUserId, MemberResolvable } from "../member";
 import { getAllGroupAccountIds } from "../moderation/alts";
 import { filterOutliers } from "../outliers";
 import { getTier } from "../premium/premium";
+import { pluralize } from "../string";
 import { addToNypsiBank, getTax } from "../tax";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getLastKnownAvatar, getLastKnownUsername } from "../users/tag";
@@ -34,7 +35,6 @@ import { addInventoryItem, getInventory, isGem, removeInventoryItem } from "./in
 import { addStat } from "./stats";
 import { createUser, getItems, userExists } from "./utils";
 import ms = require("ms");
-import { pluralize } from "../string";
 
 const inTransaction = new Set<string>();
 /**
@@ -42,17 +42,14 @@ const inTransaction = new Set<string>();
  */
 // const dmQueue = new Map<string, { earned: number; items: Map<string, Map<string, number>> }>();
 
-export async function getMarketOrders(member: GuildMember | string | undefined, type: OrderType) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
+export async function getMarketOrders(member: MemberResolvable | undefined, type: OrderType) {
   const query = await prisma.market.findMany({
     where: {
-      AND: [member ? { ownerId: id } : {}, { completed: false }, { orderType: type }],
+      AND: [
+        member ? { ownerId: getUserId(member) } : {},
+        { completed: false },
+        { orderType: type },
+      ],
     },
     orderBy: { createdAt: "asc" },
   });
@@ -62,14 +59,14 @@ export async function getMarketOrders(member: GuildMember | string | undefined, 
 
 export async function getMarketOrder(id: number) {
   return await prisma.market.findUnique({
-    where: { id: id },
+    where: { id },
   });
 }
 
 export async function setMarketOrderAmount(id: number, amount: number | bigint) {
   await prisma.market.update({
     where: {
-      id: id,
+      id,
     },
     data: {
       itemAmount: amount,
@@ -88,7 +85,7 @@ export async function getRecentMarketOrders(type: OrderType) {
 export async function getMarketItemOrders(
   itemId: string,
   type: OrderType,
-  filterOutUserId?: string,
+  excludeMember?: MemberResolvable,
 ) {
   const filters: Prisma.MarketWhereInput[] = [
     { itemId },
@@ -96,7 +93,7 @@ export async function getMarketItemOrders(
     { orderType: type },
   ];
 
-  if (filterOutUserId) filters.push({ ownerId: { not: filterOutUserId } });
+  if (excludeMember) filters.push({ ownerId: { not: getUserId(excludeMember) } });
 
   const query = await prisma.market.findMany({
     where: {
@@ -154,24 +151,16 @@ export async function getMarketAverage(item: string) {
 }
 
 export async function createMarketOrder(
-  member: GuildMember | string,
+  member: MemberResolvable,
   itemId: string,
   amount: number,
   price: number,
   orderType: OrderType,
   client: NypsiClient,
 ) {
-  let ownerId: string;
-
-  if (member instanceof GuildMember) {
-    ownerId = member.user.id;
-  } else {
-    ownerId = member;
-  }
-
   const order = await prisma.market.create({
     data: {
-      ownerId: ownerId,
+      ownerId: getUserId(member),
       itemId: itemId,
       itemAmount: amount,
       price: price,
@@ -453,22 +442,17 @@ export async function checkMarketOrder(
 }
 
 export async function updateMarketWatch(
-  member: GuildMember | string,
+  member: MemberResolvable,
   itemName: string,
   type: OrderType,
   priceThreshold?: number,
 ) {
-  let userId: string;
-  if (member instanceof GuildMember) {
-    userId = member.user.id;
-  } else {
-    userId = member;
-  }
+  const userId = getUserId(member);
 
   await prisma.marketWatch.upsert({
     where: {
       userId_itemId_orderType: {
-        userId: userId,
+        userId,
         itemId: itemName,
         orderType: type,
       },
@@ -478,7 +462,7 @@ export async function updateMarketWatch(
       priceThreshold: priceThreshold,
     },
     create: {
-      userId: userId,
+      userId,
       itemId: itemName,
       priceThreshold: priceThreshold,
       orderType: type,
@@ -488,36 +472,18 @@ export async function updateMarketWatch(
   return getMarketWatch(member, type);
 }
 
-export async function setMarketWatch(member: GuildMember | string, items: MarketWatch[]) {
-  let userId: string;
-  if (member instanceof GuildMember) {
-    userId = member.user.id;
-  } else {
-    userId = member;
-  }
-
-  await prisma.marketWatch.deleteMany({ where: { userId: userId } });
+export async function setMarketWatch(member: MemberResolvable, items: MarketWatch[]) {
+  await prisma.marketWatch.deleteMany({ where: { userId: getUserId(member) } });
 
   await prisma.marketWatch.createMany({ data: items });
   return items;
 }
 
-export async function deleteMarketWatch(
-  member: GuildMember | string,
-  type: OrderType,
-  itemId: string,
-) {
-  let userId: string;
-  if (member instanceof GuildMember) {
-    userId = member.user.id;
-  } else {
-    userId = member;
-  }
-
+export async function deleteMarketWatch(member: MemberResolvable, type: OrderType, itemId: string) {
   await prisma.marketWatch.delete({
     where: {
       userId_itemId_orderType: {
-        userId: userId,
+        userId: getUserId(member),
         itemId: itemId,
         orderType: type,
       },
@@ -527,19 +493,12 @@ export async function deleteMarketWatch(
   return getMarketWatch(member, type);
 }
 
-export async function getMarketWatch(member: GuildMember | string, type: OrderType) {
-  let userId: string;
-  if (member instanceof GuildMember) {
-    userId = member.user.id;
-  } else {
-    userId = member;
-  }
-
+export async function getMarketWatch(member: MemberResolvable, type: OrderType) {
   return (
     await prisma.economy
       .findUnique({
         where: {
-          userId: userId,
+          userId: getUserId(member),
         },
         select: {
           MarketWatch: true,
@@ -552,24 +511,17 @@ export async function getMarketWatch(member: GuildMember | string, type: OrderTy
 export async function checkMarketWatchers(
   itemId: string,
   amount: number,
-  member: GuildMember | string,
+  member: MemberResolvable,
   type: OrderType,
   cost: number,
   url: string,
 ) {
-  let creatorId: string;
-  if (member instanceof GuildMember) {
-    creatorId = member.user.id;
-  } else {
-    creatorId = member;
-  }
-
   const users = await prisma.marketWatch
     .findMany({
       where: {
         AND: [
           { itemId: itemId },
-          { userId: { not: creatorId } },
+          { userId: { not: getUserId(member) } },
           { orderType: type },
           {
             OR: [
@@ -700,14 +652,14 @@ export async function getMarketTransactionData(
   itemId: string,
   amount: number,
   type: OrderType,
-  filterOutUserId: string,
+  excludeMember: MemberResolvable,
 ) {
   const allOrders = await prisma.market.findMany({
     where: {
       AND: [
         { itemId, completed: false },
         { orderType: type },
-        { ownerId: { not: filterOutUserId } },
+        { ownerId: { not: getUserId(excludeMember) } },
       ],
     },
     orderBy: [{ price: type == "buy" ? "desc" : "asc" }, { createdAt: "asc" }],
@@ -735,13 +687,15 @@ export async function getMarketTransactionData(
 
 export async function completeOrder(
   orderId: number,
-  buyerId: string,
+  buyer: MemberResolvable,
   amount: bigint,
   client: NypsiClient,
   prisma: PrismaClient | Prisma.TransactionClient,
   checkLock?: { itemId: string },
   repeatCount = 0,
 ): Promise<boolean> {
+  const buyerId = getUserId(buyer);
+
   if (checkLock) {
     if (
       inTransaction.has(checkLock.itemId) ||
@@ -927,7 +881,7 @@ export async function completeOrder(
 }
 
 export async function marketSell(
-  userId: string,
+  member: MemberResolvable,
   itemId: string,
   amount: number,
   storedPrice: number,
@@ -935,6 +889,8 @@ export async function marketSell(
   orderId?: number,
   repeatCount = 1,
 ): Promise<{ status: string; remaining: number }> {
+  const userId = getUserId(member);
+
   if (
     inTransaction.has(itemId) ||
     (await redis.exists(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`))
@@ -1059,7 +1015,7 @@ export async function marketSell(
 }
 
 export async function marketBuy(
-  userId: string,
+  member: MemberResolvable,
   itemId: string,
   amount: number,
   storedPrice: number,
@@ -1067,6 +1023,8 @@ export async function marketBuy(
   orderId?: number,
   repeatCount = 1,
 ): Promise<{ status: string; remaining: number }> {
+  const userId = getUserId(member);
+
   if (
     inTransaction.has(itemId) ||
     (await redis.exists(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`))

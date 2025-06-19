@@ -1,5 +1,5 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { GuildMember, User } from "discord.js";
+import { User } from "discord.js";
 import { nanoid } from "nanoid";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
@@ -8,6 +8,7 @@ import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { getRawLevel } from "../economy/levelling";
 import { isEcoBanned } from "../economy/utils";
+import { getUserId, MemberResolvable } from "../member";
 import sleep from "../sleep";
 import { addNewAvatar, addNewUsername, fetchUsernameHistory, isTracking } from "./history";
 import { getLastKnownAvatar, getLastKnownUsername } from "./tag";
@@ -32,20 +33,17 @@ setInterval(async () => {
   if (count > 0) logger.debug(`${count} deleted from recent commands`);
 }, ms("1 hour"));
 
-export async function getLastCommand(member: GuildMember | string): Promise<Date> {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function getLastCommand(member: MemberResolvable): Promise<Date> {
+  const userId = getUserId(member);
 
-  if (await redis.exists(`${Constants.redis.cache.user.LAST_COMMAND}:${id}`))
-    return new Date(parseInt(await redis.get(`${Constants.redis.cache.user.LAST_COMMAND}:${id}`)));
+  if (await redis.exists(`${Constants.redis.cache.user.LAST_COMMAND}:${userId}`))
+    return new Date(
+      parseInt(await redis.get(`${Constants.redis.cache.user.LAST_COMMAND}:${userId}`)),
+    );
 
   const query = await prisma.user.findUnique({
     where: {
-      id: id,
+      id: userId,
     },
     select: {
       lastCommand: true,
@@ -57,7 +55,7 @@ export async function getLastCommand(member: GuildMember | string): Promise<Date
   }
 
   await redis.set(
-    `${Constants.redis.cache.user.LAST_COMMAND}:${id}`,
+    `${Constants.redis.cache.user.LAST_COMMAND}:${userId}`,
     query.lastCommand.getTime(),
     "EX",
     ms("30 minutes") / 1000,
@@ -66,17 +64,10 @@ export async function getLastCommand(member: GuildMember | string): Promise<Date
   return query.lastCommand;
 }
 
-export async function getCommandUses(member: GuildMember | string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
+export async function getCommandUses(member: MemberResolvable) {
   const query = await prisma.commandUse.findMany({
     where: {
-      userId: id,
+      userId: getUserId(member),
     },
     orderBy: {
       uses: "desc",

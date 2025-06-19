@@ -24,8 +24,8 @@ import {
 } from "../utils/functions/economy/achievements";
 import { getAchievements, getItems, getTagsData } from "../utils/functions/economy/utils";
 import PageManager from "../utils/functions/page";
-import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { pluralize } from "../utils/functions/string";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("achievements", "view your achievement progress", "money").setAliases([
   "ach",
@@ -96,7 +96,7 @@ async function run(
 
   const showCurrentProgress = async () => {
     const allAchievementData = getAchievements();
-    const achievements = await getUncompletedAchievements(message.author.id);
+    const achievements = await getUncompletedAchievements(message.member);
 
     if (!achievements || achievements.length == 0) {
       return showAllAchievements();
@@ -175,7 +175,7 @@ async function run(
   const showAllAchievements = async () => {
     const allAchievements = getAchievements();
     const achievementIds = Object.keys(allAchievements);
-    const usersAchievements = await getAllAchievements(message.author.id);
+    const usersAchievements = await getAllAchievements(message.member);
     const userAchievementIds = usersAchievements.map((i) => i.achievementId);
 
     inPlaceSort(achievementIds).asc();
@@ -286,7 +286,7 @@ async function run(
       return send({ embeds: [new ErrorEmbed("couldnt find that achievement")] });
     }
 
-    const achievement = await getUserAchievement(message.author.id, selected.id);
+    const achievement = await getUserAchievement(message.member, selected.id);
 
     const embed = new CustomEmbed(message.member).setTitle(`${selected.emoji} ${selected.name}`);
 

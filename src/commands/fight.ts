@@ -467,15 +467,15 @@ class Fight {
       this.updateLog(`${loser.user.username} died`);
     }
 
-    if (await userExists(winner.member.user.id)) {
-      addProgress(winner.member.user.id, "fighter", 1);
-      await addTaskProgress(winner.member.user.id, "mike_tyson");
-      addTaskProgress(winner.member.user.id, "mike_tyson_daily");
+    if (await userExists(winner.member)) {
+      addProgress(winner.member, "fighter", 1);
+      await addTaskProgress(winner.member, "mike_tyson");
+      addTaskProgress(winner.member, "mike_tyson_daily");
       await addInventoryItem(winner.member, "cookie", 1);
       embed.setFooter({ text: "well done. enjoy this cookie 🍪" });
     }
 
-    if (await userExists(this.home.user.id)) {
+    if (await userExists(this.home)) {
       await createGame({
         userId: this.home.user.id,
         bet: 0,

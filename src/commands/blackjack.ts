@@ -48,11 +48,11 @@ import { addXp, calcEarnedGambleXp } from "../utils/functions/economy/xp";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { percentChance, shuffle } from "../utils/functions/random";
 import sleep from "../utils/functions/sleep";
+import { getAdminLevel } from "../utils/functions/users/admin";
 import { recentCommands } from "../utils/functions/users/commands";
 import { addHourlyCommand } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { gamble, getTimestamp, logger } from "../utils/logger";
-import { getAdminLevel } from "../utils/functions/users/admin";
 
 const cmd = new Command("blackjack", "play blackjack", "money").setAliases(["bj", "blowjob"]);
 
@@ -416,7 +416,7 @@ class Game {
   ) {
     const embed = new CustomEmbed(
       this.member,
-      await renderGambleScreen(this.member.user.id, state, this.bet, null, winnings, multi),
+      await renderGambleScreen(state, this.bet, null, winnings, multi),
     ).setHeader("blackjack", this.member.avatarURL() || this.member.user.avatarURL());
 
     if (state === "win") embed.setColor(Constants.EMBED_SUCCESS_COLOR);
@@ -446,8 +446,8 @@ class Game {
 
       if (this.hand.cards.length === 2 && this.hand.total() === 21) {
         winnings = this.bet * 2.5;
-        addProgress(this.member.user.id, "blackjack_pro", 1);
-        addTaskProgress(this.member.user.id, "blackjack");
+        addProgress(this.member, "blackjack_pro", 1);
+        addTaskProgress(this.member, "blackjack");
       }
 
       winnings = winnings + Math.floor(winnings * multi.multi);
@@ -503,7 +503,7 @@ class Game {
       percentChance(0.05) &&
       parseInt(await redis.get(`anticheat:interactivegame:count:${this.member.user.id}`)) > 100
     ) {
-      const res = await giveCaptcha(this.member.user.id);
+      const res = await giveCaptcha(this.member);
 
       if (res) {
         logger.info(
@@ -551,7 +551,7 @@ class Game {
       logger.info(
         `::cmd ${this.message.guild.id} ${this.message.channelId} ${this.member.user.username}: replaying blackjack`,
       );
-      if (await isLockedOut(this.member.user.id)) return verifyUser(this.playerMessage);
+      if (await isLockedOut(this.member)) return verifyUser(this.playerMessage);
 
       addHourlyCommand(this.member);
 

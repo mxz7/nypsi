@@ -166,7 +166,15 @@ export async function getChristmasCountdown(guild: Guild) {
   return query;
 }
 
-export async function setChristmasCountdown(guild: Guild, xmas: any) {
+export async function setChristmasCountdown(
+  guild: Guild,
+  xmas: {
+    guildId: string;
+    channel: string;
+    enabled: boolean;
+    format: string;
+  },
+) {
   await prisma.guildChristmas.update({
     where: {
       guildId: guild.id,

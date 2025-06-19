@@ -10,6 +10,7 @@ import {
   MessageFlags,
 } from "discord.js";
 import redis from "../init/redis";
+import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
@@ -31,7 +32,6 @@ import { getPrefix } from "../utils/functions/guilds/utils";
 import { shuffle } from "../utils/functions/random";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { gamble } from "../utils/logger.js";
-import { NypsiClient } from "../models/Client";
 
 const staticEmojis = new Map<string, string>();
 const animatedEmojis = new Map<string, string>();
@@ -368,7 +368,7 @@ async function run(
     win = true;
     winnings = Math.round(multiplier * bet);
 
-    if (one.split("-")[0] == "cherry") addProgress(message.author.id, "slots_pro", 1);
+    if (one.split("-")[0] == "cherry") addProgress(message.member, "slots_pro", 1);
   } else if (one.split("-")[0] == two.split("-")[0]) {
     win = true;
     winnings = Math.round(bet * 1.2);

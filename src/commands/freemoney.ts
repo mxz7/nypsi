@@ -27,20 +27,20 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
 
   let amount = 1000;
 
-  if (await isPremium(message.author.id)) {
-    if ((await getTier(message.author.id)) == 1) {
+  if (await isPremium(message.member)) {
+    if ((await getTier(message.member)) == 1) {
       amount = 2500;
-    } else if ((await getTier(message.author.id)) == 2) {
+    } else if ((await getTier(message.member)) == 2) {
       amount = 5000;
-    } else if ((await getTier(message.author.id)) == 3) {
+    } else if ((await getTier(message.member)) == 3) {
       amount = 7500;
-    } else if ((await getTier(message.author.id)) == 4) {
+    } else if ((await getTier(message.member)) == 4) {
       amount = 10000;
     }
   }
 
   await addBalance(message.member, amount);
-  addStat(message.author.id, "earned-freemoney", amount);
+  addStat(message.member, "earned-freemoney", amount);
 
   const embed = new CustomEmbed(message.member, `+$**${amount.toLocaleString()}**`).setHeader(
     "free money",

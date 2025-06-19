@@ -2,22 +2,18 @@ import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
+import { getUserId, MemberResolvable } from "../member";
 import { createProfile } from "../users/utils";
 
-export async function getKarma(member: GuildMember | string): Promise<number> {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function getKarma(member: MemberResolvable): Promise<number> {
+  const userId = getUserId(member);
 
-  if (await redis.exists(`${Constants.redis.cache.user.KARMA}:${id}`))
-    return parseInt(await redis.get(`${Constants.redis.cache.user.KARMA}:${id}`));
+  if (await redis.exists(`${Constants.redis.cache.user.KARMA}:${userId}`))
+    return parseInt(await redis.get(`${Constants.redis.cache.user.KARMA}:${userId}`));
 
   const query = await prisma.user.findUnique({
     where: {
-      id: id,
+      id: userId,
     },
     select: {
       karma: true,
@@ -28,51 +24,41 @@ export async function getKarma(member: GuildMember | string): Promise<number> {
     if (member instanceof GuildMember) {
       await createProfile(member.user);
     } else {
-      await createProfile(id);
+      await createProfile(userId);
     }
     return 1;
   } else {
-    await redis.set(`${Constants.redis.cache.user.KARMA}:${id}`, query.karma, "EX", 86400);
+    await redis.set(`${Constants.redis.cache.user.KARMA}:${userId}`, query.karma, "EX", 86400);
     return query.karma;
   }
 }
 
-export async function addKarma(member: GuildMember | string, amount: number) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function addKarma(member: MemberResolvable, amount: number) {
+  const userId = getUserId(member);
 
   await prisma.user.update({
     where: {
-      id: id,
+      id: userId,
     },
     data: {
       karma: { increment: amount },
     },
   });
 
-  await redis.del(`${Constants.redis.cache.user.KARMA}:${id}`);
+  await redis.del(`${Constants.redis.cache.user.KARMA}:${userId}`);
 }
 
-export async function removeKarma(member: GuildMember | string, amount: number) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function removeKarma(member: MemberResolvable, amount: number) {
+  const userId = getUserId(member);
 
   await prisma.user.update({
     where: {
-      id: id,
+      id: userId,
     },
     data: {
       karma: { decrement: amount },
     },
   });
 
-  await redis.del(`${Constants.redis.cache.user.KARMA}:${id}`);
+  await redis.del(`${Constants.redis.cache.user.KARMA}:${userId}`);
 }

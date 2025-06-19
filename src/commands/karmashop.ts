@@ -367,7 +367,7 @@ async function run(
     await removeKarma(message.member, wanted.cost);
     await setKarmaShopItems(items);
     await redis.del(Constants.redis.nypsi.KARMA_SHOP_BUYING);
-    addProgress(message.author.id, "wizard", 1);
+    addProgress(message.member, "wizard", 1);
     const guild = await getGuildName(message.member);
 
     switch (wanted.type) {
@@ -391,7 +391,7 @@ async function run(
       await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t", "EX", 86400);
       logger.info(`${message.author.id} received purple_gem randomly (karmashop)`);
       await addInventoryItem(message.member, "purple_gem", 1);
-      addProgress(message.author.id, "gem_hunter", 1);
+      addProgress(message.member, "gem_hunter", 1);
       addNotificationToQueue({
         memberId: message.author.id,
         payload: {

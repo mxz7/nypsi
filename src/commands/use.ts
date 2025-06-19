@@ -38,10 +38,10 @@ import {
 import { addWorkerUpgrade, getWorkers } from "../utils/functions/economy/workers";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import PageManager from "../utils/functions/page";
+import { pluralize } from "../utils/functions/string";
 import { addTag, getTags } from "../utils/functions/users/tags";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
-import { pluralize } from "../utils/functions/string";
 
 const itemFunctions = new Map<string, ItemUse>();
 
@@ -424,14 +424,14 @@ async function run(
 
     return send({ embeds: [embed] });
   } else if (selected.role === "tag") {
-    const tags = await getTags(message.author.id);
+    const tags = await getTags(message.member);
 
     if (tags.find((i) => i.tagId === selected.tagId))
       return send({ embeds: [new ErrorEmbed("you already have this tag")] });
 
     await removeInventoryItem(message.member, selected.id, 1);
 
-    await addTag(message.author.id, selected.tagId);
+    await addTag(message.member, selected.tagId);
 
     return send({
       embeds: [

@@ -77,8 +77,8 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
 
   send({ embeds: [embed] });
 
-  addProgress(message.author.id, "cute", 1);
-  addTaskProgress(message.author.id, "cats_daily");
+  addProgress(message.member, "cute", 1);
+  addTaskProgress(message.member, "cats_daily");
 }
 
 cmd.setRun(run);

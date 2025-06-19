@@ -11,6 +11,7 @@ import {
   MessageActionRowComponentBuilder,
   MessageFlags,
 } from "discord.js";
+import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
@@ -30,7 +31,6 @@ import { createUser, getItems, userExists } from "../utils/functions/economy/uti
 import { addXp, calcEarnedHFMXp } from "../utils/functions/economy/xp";
 import { percentChance } from "../utils/functions/random";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { NypsiClient } from "../models/Client";
 
 const cmd = new Command("fish", "go to a pond and fish", "money");
 
@@ -187,13 +187,13 @@ async function doFish(
 
   if ((await inventory.hasGem("purple_gem")).any) {
     if (percentChance(0.2)) {
-      gemBreak(message.member.user.id, 0.03, "purple_gem", message.client as NypsiClient);
+      gemBreak(message.member, 0.03, "purple_gem", message.client as NypsiClient);
       times++;
     }
   }
   if ((await inventory.hasGem("white_gem")).any) {
     if (percentChance(0.2)) {
-      gemBreak(message.member.user.id, 0.03, "white_gem", message.client as NypsiClient);
+      gemBreak(message.member, 0.03, "white_gem", message.client as NypsiClient);
       times++;
     }
   }
@@ -340,7 +340,7 @@ async function doFish(
 
       await addInventoryItem(member, chosen, amount);
 
-      if (isGem(chosen)) await addProgress(member.id, "gem_hunter", amount);
+      if (isGem(chosen)) await addProgress(member, "gem_hunter", amount);
 
       foundItems.set(chosen, foundItems.has(chosen) ? foundItems.get(chosen) + amount : amount);
     }
@@ -383,9 +383,9 @@ async function doFish(
 
   send({ embeds: [embed], components: [row] });
 
-  addProgress(message.member.user.id, "fisher", total);
-  await addTaskProgress(message.member.user.id, "fish_daily");
-  await addTaskProgress(message.member.user.id, "fish_weekly");
+  addProgress(message.member, "fisher", total);
+  await addTaskProgress(message.member, "fish_daily");
+  await addTaskProgress(message.member, "fish_weekly");
 }
 
 cmd.setRun(run);

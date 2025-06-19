@@ -3,6 +3,7 @@ import { exec } from "node:child_process";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
+import { getUserId, MemberResolvable } from "../member";
 import { getAllGroupAccountIds } from "../moderation/alts";
 
 type Blacklisted = {
@@ -10,8 +11,9 @@ type Blacklisted = {
   relation?: string;
 };
 
-export async function isUserBlacklisted(id: string): Promise<Blacklisted> {
-  const cache = await redis.get(`${Constants.redis.cache.user.BLACKLIST}:${id}`);
+export async function isUserBlacklisted(member: MemberResolvable): Promise<Blacklisted> {
+  const userId = getUserId(member);
+  const cache = await redis.get(`${Constants.redis.cache.user.BLACKLIST}:${userId}`);
 
   if (cache) {
     const res = JSON.parse(cache) as Blacklisted;
@@ -19,7 +21,7 @@ export async function isUserBlacklisted(id: string): Promise<Blacklisted> {
     return res;
   }
 
-  const accounts = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, id);
+  const accounts = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, userId);
 
   for (const accountId of accounts) {
     const cache = await redis.get(`${Constants.redis.cache.user.BLACKLIST}:${accountId}`);
@@ -65,10 +67,10 @@ export async function isUserBlacklisted(id: string): Promise<Blacklisted> {
   return { blacklisted: false };
 }
 
-export async function setUserBlacklist(id: string, value: boolean) {
+export async function setUserBlacklist(member: MemberResolvable, value: boolean) {
   await prisma.user.update({
     where: {
-      id,
+      id: getUserId(member),
     },
     data: {
       blacklisted: value,

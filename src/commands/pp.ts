@@ -15,8 +15,8 @@ import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { getItems } from "../utils/functions/economy/utils";
 import { getMember } from "../utils/functions/member";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
-import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { pluralize } from "../utils/functions/string";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cache = new Map<string, number>();
 
@@ -96,8 +96,8 @@ async function run(
 
     let chance = 45;
 
-    if (await isPremium(member.user.id)) {
-      if ((await getTier(member.user.id)) >= 3) {
+    if (await isPremium(member)) {
+      if ((await getTier(member)) >= 3) {
         chance = 10;
       }
     }
@@ -136,13 +136,12 @@ async function run(
 
   send({ embeds: [embed] });
 
-  addProgress(message.author.id, "unsure", 1);
+  addProgress(message.member, "unsure", 1);
 
-  if (size < 5 && member.user.id === message.author.id)
-    addTaskProgress(message.author.id, "pp_small");
+  if (size < 5 && member.user.id === message.author.id) addTaskProgress(message.member, "pp_small");
   else if (size > 6 && member.user.id === message.author.id)
-    addTaskProgress(message.author.id, "pp_big");
-  else if (member.user.id === message.author.id) addTaskProgress(message.author.id, "pp");
+    addTaskProgress(message.member, "pp_big");
+  else if (member.user.id === message.author.id) addTaskProgress(message.member, "pp");
 }
 
 cmd.setRun(run);

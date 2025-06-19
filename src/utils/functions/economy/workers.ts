@@ -1,31 +1,24 @@
 import { EconomyWorker, EconomyWorkerUpgrades } from "@prisma/client";
-import { GuildMember } from "discord.js";
+import { ClusterManager } from "discord-hybrid-sharding";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
+import { NypsiClient } from "../../../models/Client";
+import { Worker, WorkerByproducts } from "../../../types/Workers";
 import { logger } from "../../logger";
+import { getUserId, MemberResolvable } from "../member";
 import { randomRound } from "../random";
+import { pluralize } from "../string";
 import { addProgress } from "./achievements";
 import { addBalance } from "./balance";
 import { getBoosters } from "./boosters";
 import { addInventoryItem, gemBreak, getInventory } from "./inventory";
 import { addStat } from "./stats";
 import { getBaseUpgrades, getBaseWorkers, getItems } from "./utils";
-import { Worker, WorkerByproducts } from "../../../types/Workers";
-import { pluralize } from "../string";
-import { NypsiClient } from "../../../models/Client";
-import { ClusterManager } from "discord-hybrid-sharding";
 
-export async function getWorkers(member: GuildMember | string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
+export async function getWorkers(member: MemberResolvable) {
   const query = await prisma.economyWorker.findMany({
     where: {
-      userId: id,
+      userId: getUserId(member),
     },
     include: {
       upgrades: true,
@@ -35,17 +28,10 @@ export async function getWorkers(member: GuildMember | string) {
   return query;
 }
 
-export async function getWorker(member: GuildMember | string, worker: Worker) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
+export async function getWorker(member: MemberResolvable, worker: Worker) {
   const query = await prisma.economyWorker.findFirst({
     where: {
-      userId: id,
+      userId: getUserId(member),
       workerId: worker.id,
     },
     include: {
@@ -56,14 +42,7 @@ export async function getWorker(member: GuildMember | string, worker: Worker) {
   return query;
 }
 
-export async function addWorker(member: GuildMember, id: string) {
-  let memberID: string;
-  if (member instanceof GuildMember) {
-    memberID = member.user.id;
-  } else {
-    memberID = member;
-  }
-
+export async function addWorker(member: MemberResolvable, id: string) {
   const baseWorkers = getBaseWorkers();
 
   if (!baseWorkers[id]) return logger.warn(`unknown worker: ${id}`);
@@ -71,24 +50,17 @@ export async function addWorker(member: GuildMember, id: string) {
   await prisma.economyWorker
     .create({
       data: {
-        userId: memberID,
+        userId: getUserId(member),
         workerId: id,
       },
     })
     .catch(() => {});
 }
 
-export async function emptyWorkersStored(member: GuildMember | string) {
-  let memberID: string;
-  if (member instanceof GuildMember) {
-    memberID = member.user.id;
-  } else {
-    memberID = member;
-  }
-
+export async function emptyWorkersStored(member: MemberResolvable) {
   await prisma.economyWorker.updateMany({
     where: {
-      userId: memberID,
+      userId: getUserId(member),
     },
     data: {
       stored: 0,
@@ -229,16 +201,18 @@ export async function calcWorkerValues(
 }
 
 export async function addWorkerUpgrade(
-  member: GuildMember,
+  member: MemberResolvable,
   workerId: string,
   upgradeId: string,
   amount = 1,
 ) {
+  const userId = getUserId(member);
+
   await prisma.economyWorkerUpgrades.upsert({
     where: {
       userId_workerId_upgradeId: {
         upgradeId: upgradeId,
-        userId: member.user.id,
+        userId,
         workerId: workerId,
       },
     },
@@ -247,7 +221,7 @@ export async function addWorkerUpgrade(
     },
     create: {
       upgradeId: upgradeId,
-      userId: member.user.id,
+      userId,
       workerId: workerId,
       amount,
     },
@@ -256,7 +230,7 @@ export async function addWorkerUpgrade(
 
 export async function evaluateWorker(
   client: NypsiClient | ClusterManager,
-  userId: string,
+  member: MemberResolvable,
   worker: Worker,
   options: {
     stored?: number;
@@ -275,7 +249,7 @@ export async function evaluateWorker(
   let stored = options.stored;
   if (stored === undefined) {
     // be lazy in getting the user worker, because it might not be needed
-    userWorker = await getWorker(userId, worker);
+    userWorker = await getWorker(member, worker);
     stored = userWorker.stored;
   }
 
@@ -285,7 +259,7 @@ export async function evaluateWorker(
   let byproductChances = options.calculated?.byproductChances;
   if (options.calculated === undefined) {
     // be lazy in getting the user worker, because it might not be needed
-    if (userWorker === undefined) userWorker = await getWorker(userId, worker);
+    if (userWorker === undefined) userWorker = await getWorker(member, worker);
     ({ perItem, byproductChances } = await calcWorkerValues(userWorker, client));
   }
 
@@ -310,11 +284,11 @@ export async function evaluateWorker(
 }
 
 export async function claimFromWorkers(
-  userId: string,
+  member: MemberResolvable,
   client: NypsiClient | ClusterManager,
 ): Promise<string> {
   const baseWorkers = getBaseWorkers();
-  const userWorkers = await getWorkers(userId);
+  const userWorkers = await getWorkers(member);
   const allItems = getItems();
 
   let totalAmountEarned = 0;
@@ -324,7 +298,7 @@ export async function claimFromWorkers(
   for (const worker of userWorkers) {
     const { amountEarned, byproductAmounts } = await evaluateWorker(
       client,
-      userId,
+      member,
       baseWorkers[worker.workerId],
       {
         stored: worker.stored,
@@ -355,11 +329,11 @@ export async function claimFromWorkers(
     return "you have no money to claim from your workers";
   }
 
-  await emptyWorkersStored(userId);
-  await addBalance(userId, totalAmountEarned);
-  await addProgress(userId, "capitalist", totalAmountEarned);
-  await addProgress(userId, "super_capitalist", totalAmountEarned);
-  await addStat(userId, "earned-workers", totalAmountEarned);
+  await emptyWorkersStored(member);
+  await addBalance(member, totalAmountEarned);
+  await addProgress(member, "capitalist", totalAmountEarned);
+  await addProgress(member, "super_capitalist", totalAmountEarned);
+  await addStat(member, "earned-workers", totalAmountEarned);
 
   const workers = moneyAmounts.keys().toArray();
   const byproducts = totalByproducts.keys().toArray();

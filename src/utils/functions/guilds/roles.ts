@@ -1,5 +1,6 @@
 import { Guild } from "discord.js";
 import prisma from "../../../init/database";
+import { getUserId, MemberResolvable } from "../member";
 import ms = require("ms");
 
 const autoRoleCache = new Map<string, string[]>();
@@ -66,13 +67,15 @@ export async function setPersistentRoles(guild: Guild, roles: string[]) {
   persistentRoleCache.delete(guild.id);
 }
 
-export async function getPersistentRolesForUser(guild: Guild, userId: string) {
+export async function getPersistentRolesForUser(guild: Guild, member: MemberResolvable) {
+  const userId = getUserId(member);
+
   const query: string[] = await prisma.rolePersist
     .findUnique({
       where: {
         guildId_userId: {
           guildId: guild.id,
-          userId: userId,
+          userId,
         },
       },
       select: {
@@ -87,7 +90,7 @@ export async function getPersistentRolesForUser(guild: Guild, userId: string) {
       where: {
         guildId_userId: {
           guildId: guild.id,
-          userId: userId,
+          userId,
         },
       },
     });

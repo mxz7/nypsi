@@ -1,6 +1,6 @@
 import { Mention } from "@prisma/client";
-import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
+import { getUserId, MemberResolvable } from "../member";
 
 export interface MentionQueueItem {
   members: string[];
@@ -13,23 +13,18 @@ export interface MentionQueueItem {
 }
 
 export async function fetchUserMentions(
-  member: GuildMember | string,
+  member: MemberResolvable,
   global: true | string,
   amount = 100,
 ) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+  const userId = getUserId(member);
 
   let mentions: Mention[];
 
   if (typeof global === "boolean" && global) {
     mentions = await prisma.mention.findMany({
       where: {
-        targetId: id,
+        targetId: userId,
       },
       orderBy: {
         date: "desc",
@@ -39,7 +34,7 @@ export async function fetchUserMentions(
   } else if (typeof global === "string") {
     mentions = await prisma.mention.findMany({
       where: {
-        AND: [{ guildId: global }, { targetId: id }],
+        AND: [{ guildId: global }, { targetId: userId }],
       },
       orderBy: {
         date: "desc",
@@ -51,10 +46,10 @@ export async function fetchUserMentions(
   return mentions;
 }
 
-export async function deleteUserMentions(userId: string, guildId?: string) {
+export async function deleteUserMentions(member: MemberResolvable, guildId?: string) {
   await prisma.mention.deleteMany({
     where: {
-      AND: [{ guildId: guildId }, { targetId: userId }],
+      AND: [{ guildId: guildId }, { targetId: getUserId(member) }],
     },
   });
 }

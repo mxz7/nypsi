@@ -350,7 +350,7 @@ async function prepareGame(
       .setDisabled(true),
   );
 
-  const desc = await renderGambleScreen(message.author.id, "playing", bet, `**0**x ($0)`);
+  const desc = await renderGambleScreen("playing", bet, `**0**x ($0)`);
 
   const embed = new CustomEmbed(message.member, desc)
     .setHeader("highlow", message.author.avatarURL())
@@ -444,7 +444,7 @@ async function playGame(
       percentChance(0.05) &&
       parseInt(await redis.get(`anticheat:interactivegame:count:${message.author.id}`)) > 100
     ) {
-      const res = await giveCaptcha(message.author.id);
+      const res = await giveCaptcha(message.member);
 
       if (res) {
         logger.info(
@@ -484,7 +484,7 @@ async function playGame(
       logger.info(
         `::cmd ${message.guild.id} ${message.channelId} ${message.author.username}: replaying highlow`,
       );
-      if (await isLockedOut(message.author.id)) return verifyUser(message);
+      if (await isLockedOut(message.member)) return verifyUser(message);
 
       addHourlyCommand(message.member);
 
@@ -539,7 +539,6 @@ async function playGame(
     newEmbed.setFooter({ text: `id: ${id}` });
     newEmbed.setColor(Constants.EMBED_FAIL_COLOR);
     const desc = await renderGambleScreen(
-      message.author.id,
       "lose",
       bet,
       `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
@@ -559,7 +558,6 @@ async function playGame(
     }
 
     const desc = await renderGambleScreen(
-      message.author.id,
       "win",
       bet,
       `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
@@ -587,7 +585,7 @@ async function playGame(
       }
     }
 
-    if (win >= 7) addProgress(message.author.id, "highlow_pro", 1);
+    if (win >= 7) addProgress(message.member, "highlow_pro", 1);
 
     const id = await createGame({
       userId: message.author.id,
@@ -629,7 +627,6 @@ async function playGame(
     newEmbed.setFooter({ text: `id: ${id}` });
     newEmbed.setColor(flavors.macchiato.colors.yellow.hex as ColorResolvable);
     const desc = await renderGambleScreen(
-      message.author.id,
       "draw",
       bet,
       `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
@@ -715,7 +712,6 @@ async function playGame(
       }
 
       const desc = await renderGambleScreen(
-        message.author.id,
         "playing",
         bet,
         `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
@@ -726,7 +722,6 @@ async function playGame(
       return playGame(message, m, args);
     } else if (newCard1 == oldCard) {
       const desc = await renderGambleScreen(
-        message.author.id,
         "playing",
         bet,
         `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
@@ -787,7 +782,6 @@ async function playGame(
       }
 
       const desc = await renderGambleScreen(
-        message.author.id,
         "playing",
         bet,
         `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
@@ -798,7 +792,6 @@ async function playGame(
       return playGame(message, m, args);
     } else if (newCard1 == oldCard) {
       const desc = await renderGambleScreen(
-        message.author.id,
         "playing",
         bet,
         `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,

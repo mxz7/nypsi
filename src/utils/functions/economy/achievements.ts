@@ -1,10 +1,10 @@
-import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
+import { getUserId, MemberResolvable } from "../member";
 import { percentChance } from "../random";
 import sleep from "../sleep";
 import {
@@ -27,11 +27,17 @@ import { addXp } from "./xp";
 /**
  * returns true if user has met requirements for achievement
  */
-export async function addAchievementProgress(userId: string, achievementId: string, amount = 1) {
+export async function addAchievementProgress(
+  member: MemberResolvable,
+  achievementId: string,
+  amount = 1,
+) {
+  const userId = getUserId(member);
+
   if ((await isEcoBanned(userId)).banned) return;
   const query = await prisma.achievements.upsert({
     create: {
-      userId: userId,
+      userId,
       achievementId: achievementId,
       progress: amount,
     },
@@ -40,7 +46,7 @@ export async function addAchievementProgress(userId: string, achievementId: stri
     },
     where: {
       userId_achievementId: {
-        userId: userId,
+        userId,
         achievementId: achievementId,
       },
     },
@@ -59,14 +65,16 @@ export async function addAchievementProgress(userId: string, achievementId: stri
 }
 
 export async function setAchievementProgress(
-  userId: string,
+  member: MemberResolvable,
   achievementId: string,
   progress: number,
 ) {
+  const userId = getUserId(member);
+
   if ((await isEcoBanned(userId)).banned) return;
   const query = await prisma.achievements.upsert({
     create: {
-      userId: userId,
+      userId,
       achievementId: achievementId,
       progress: progress,
     },
@@ -75,7 +83,7 @@ export async function setAchievementProgress(
     },
     where: {
       userId_achievementId: {
-        userId: userId,
+        userId,
         achievementId: achievementId,
       },
     },
@@ -93,33 +101,35 @@ export async function setAchievementProgress(
   return false;
 }
 
-export async function getAllAchievements(id: string, filter?: string) {
+export async function getAllAchievements(member: MemberResolvable, filter?: string) {
+  const userId = getUserId(member);
+
   if (filter) {
     return await prisma.achievements.findMany({
       where: {
-        AND: [{ userId: id }, { achievementId: { startsWith: filter } }],
+        AND: [{ userId }, { achievementId: { startsWith: filter } }],
       },
     });
   }
   return await prisma.achievements.findMany({
     where: {
-      userId: id,
+      userId,
     },
   });
 }
 
-export async function getCompletedAchievements(member: GuildMember) {
+export async function getCompletedAchievements(member: MemberResolvable) {
   return await prisma.achievements.findMany({
     where: {
-      AND: [{ userId: member.user.id }, { completed: true }],
+      AND: [{ userId: getUserId(member) }, { completed: true }],
     },
   });
 }
 
-export async function getUncompletedAchievements(id: string) {
+export async function getUncompletedAchievements(member: MemberResolvable) {
   return await prisma.achievements.findMany({
     where: {
-      AND: [{ userId: id }, { progress: { gt: 0 } }, { completed: false }],
+      AND: [{ userId: getUserId(member) }, { progress: { gt: 0 } }, { completed: false }],
     },
   });
 }
@@ -249,11 +259,11 @@ async function completeAchievement(userId: string, achievementId: string) {
   }
 }
 
-export async function getUserAchievement(userId: string, achievementId: string) {
+export async function getUserAchievement(member: MemberResolvable, achievementId: string) {
   return await prisma.achievements.findUnique({
     where: {
       userId_achievementId: {
-        userId: userId,
+        userId: getUserId(member),
         achievementId: achievementId,
       },
     },
@@ -263,17 +273,12 @@ export async function getUserAchievement(userId: string, achievementId: string) 
 const addProgressMutex = new Set<string>();
 
 export async function addProgress(
-  member: GuildMember | string,
+  member: MemberResolvable,
   achievementStartName: string,
   amount: number,
   repeat = 0,
 ) {
-  let userId: string;
-  if (member instanceof GuildMember) {
-    userId = member.user.id;
-  } else {
-    userId = member;
-  }
+  const userId = getUserId(member);
 
   if (addProgressMutex.has(userId)) {
     if (repeat > 10) addProgressMutex.delete(userId);
@@ -342,7 +347,13 @@ export async function addProgress(
   addProgressMutex.delete(userId);
 }
 
-export async function setProgress(userId: string, achievementStartName: string, amount: number) {
+export async function setProgress(
+  member: MemberResolvable,
+  achievementStartName: string,
+  amount: number,
+) {
+  const userId = getUserId(member);
+
   if (!(await userExists(userId))) return;
   if ((await isEcoBanned(userId)).banned) return;
   const achievements = await getAllAchievements(userId, achievementStartName);

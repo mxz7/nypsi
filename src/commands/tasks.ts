@@ -66,8 +66,8 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
 
   await addCooldown(cmd.name, message.member, 5);
 
-  const tasks = await getTasks(message.author.id);
-  const streaks = await getTaskStreaks(message.author.id);
+  const tasks = await getTasks(message.member);
+  const streaks = await getTaskStreaks(message.member);
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder()

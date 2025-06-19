@@ -49,12 +49,12 @@ import {
 import { getItems } from "../utils/functions/economy/utils.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import PageManager from "../utils/functions/page";
-import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import {
   commandAliasExists,
   commandExists,
   getCommandFromAlias,
 } from "../utils/handlers/commandhandler";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 
 const cmd = new Command("top", "view top etc. in the server", "money").setAliases([
   "baltop",
@@ -326,11 +326,11 @@ async function run(
   };
 
   if (args.length == 0) {
-    const data = await topBalance(message.guild, message.author.id);
+    const data = await topBalance(message.guild, message.member);
 
     return show(data.pages, data.pos, `top balance for ${message.guild.name}`);
   } else if (args[0].toLowerCase() == "balance") {
-    const data = await topBalance(message.guild, message.author.id);
+    const data = await topBalance(message.guild, message.member);
 
     return show(data.pages, data.pos, `top balance for ${message.guild.name}`);
   } else if (args[0].toLowerCase() == "prestige" || args[0].toLowerCase() === "level") {
@@ -341,9 +341,9 @@ async function run(
     let data: { pages: Map<number, string[]>; pos: number };
 
     if (global) {
-      data = await topPrestigeGlobal(message.author.id);
+      data = await topPrestigeGlobal(message.member);
     } else {
-      data = await topPrestige(message.guild, message.author.id);
+      data = await topPrestige(message.guild, message.member);
     }
 
     return show(
@@ -394,9 +394,9 @@ async function run(
     let data: { pages: Map<number, string[]>; pos: number };
 
     if (global) {
-      data = await topItemGlobal(item.id, message.author.id);
+      data = await topItemGlobal(item.id, message.member);
     } else {
-      data = await topItem(message.guild, item.id, message.author.id);
+      data = await topItem(message.guild, item.id, message.member);
     }
 
     return show(
@@ -406,7 +406,7 @@ async function run(
       global ? `https://nypsi.xyz/leaderboard/${item.id}?ref=bot-lb` : null,
     );
   } else if (args[0].toLowerCase() == "completion") {
-    const data = await topCompletion(message.guild, message.author.id);
+    const data = await topCompletion(message.guild, message.member);
 
     return show(data.pages, data.pos, `top completion in ${message.guild.name}`);
   } else if (args[0].toLowerCase() == "net" || args[0].toLowerCase() == "networth") {
@@ -417,9 +417,9 @@ async function run(
     let data: { pages: Map<number, string[]>; pos: number };
 
     if (global) {
-      data = await topNetWorthGlobal(message.author.id);
+      data = await topNetWorthGlobal(message.member);
     } else {
-      data = await topNetWorth(message.guild, message.author.id);
+      data = await topNetWorth(message.guild, message.member);
     }
 
     return show(
@@ -447,9 +447,9 @@ async function run(
     let data: { pages: Map<number, string[]>; pos: number };
 
     if (global) {
-      data = await topDailyStreakGlobal(message.author.id);
+      data = await topDailyStreakGlobal(message.member);
     } else {
-      data = await topDailyStreak(message.guild, message.author.id);
+      data = await topDailyStreak(message.guild, message.member);
     }
 
     return show(
@@ -466,9 +466,9 @@ async function run(
     let data: { pages: Map<number, string[]>; pos: number };
 
     if (global) {
-      data = await topLottoWinsGlobal(message.author.id);
+      data = await topLottoWinsGlobal(message.member);
     } else {
-      data = await topLottoWins(message.guild, message.author.id);
+      data = await topLottoWins(message.guild, message.member);
     }
 
     return show(
@@ -485,9 +485,9 @@ async function run(
     let data: { pages: Map<number, string[]>; pos: number };
 
     if (global) {
-      data = await topWordleTimeGlobal(message.author.id);
+      data = await topWordleTimeGlobal(message.member);
     } else {
-      data = await topWordleTime(message.guild, message.author.id);
+      data = await topWordleTime(message.guild, message.member);
     }
 
     return show(
@@ -504,9 +504,9 @@ async function run(
     let data: { pages: Map<number, string[]>; pos: number };
 
     if (global) {
-      data = await topWordleGlobal(message.author.id);
+      data = await topWordleGlobal(message.member);
     } else {
-      data = await topWordle(message.guild, message.author.id);
+      data = await topWordle(message.guild, message.member);
     }
 
     return show(
@@ -523,9 +523,9 @@ async function run(
     let data: { pages: Map<number, string[]>; pos: number };
 
     if (global) {
-      data = await topVoteStreakGlobal(message.author.id);
+      data = await topVoteStreakGlobal(message.member);
     } else {
-      data = await topVoteStreak(message.guild, message.author.id);
+      data = await topVoteStreak(message.guild, message.member);
     }
 
     return show(
@@ -541,9 +541,9 @@ async function run(
     let data: { pages: Map<number, string[]>; pos: number };
 
     if (global) {
-      data = await topVoteGlobal(message.author.id);
+      data = await topVoteGlobal(message.member);
     } else {
-      data = await topVote(message.guild, message.author.id);
+      data = await topVote(message.guild, message.member);
     }
 
     return show(
@@ -566,9 +566,9 @@ async function run(
     let data: { pages: Map<number, string[]>; pos: number };
 
     if (global) {
-      data = await topChatReactionGlobal(message.author.id, false);
+      data = await topChatReactionGlobal(message.member, false);
     } else {
-      data = await topChatReaction(message.guild, false, message.author.id);
+      data = await topChatReaction(message.guild, false, message.member);
     }
 
     return show(
@@ -586,9 +586,9 @@ async function run(
     let data: { pages: Map<number, string[]>; pos: number };
 
     if (global) {
-      data = await topChatReactionGlobal(message.author.id, true);
+      data = await topChatReactionGlobal(message.member, true);
     } else {
-      data = await topChatReaction(message.guild, true, message.author.id);
+      data = await topChatReaction(message.guild, true, message.member);
     }
 
     return show(
@@ -603,11 +603,11 @@ async function run(
 
     if (args.length === 1 || args[1]?.toLowerCase() === "global") {
       if (args[1]?.toLowerCase() === "global") {
-        data = await topCommandUsesGlobal(message.author.id);
+        data = await topCommandUsesGlobal(message.member);
         title = `top command uses [global]`;
         url = "https://nypsi.xyz/leaderboard/commands?ref=bot-lb";
       } else {
-        data = await topCommandUses(message.guild, message.author.id);
+        data = await topCommandUses(message.guild, message.member);
         title = `top command uses for ${message.guild.name}`;
       }
     } else {
@@ -623,9 +623,9 @@ async function run(
       if (args[2]?.toLowerCase() == "global") global = true;
 
       if (global) {
-        data = await topCommandGlobal(cmd, message.author.id);
+        data = await topCommandGlobal(cmd, message.member);
       } else {
-        data = await topCommand(message.guild, cmd, message.author.id);
+        data = await topCommand(message.guild, cmd, message.member);
       }
 
       title = `top ${(await getPrefix(message.guild))[0]}${cmd} uses ${
@@ -657,9 +657,9 @@ async function run(
     let data: { pages: Map<number, string[]>; pos: number };
 
     if (global) {
-      data = await topItemGlobal(selected.id, message.author.id);
+      data = await topItemGlobal(selected.id, message.member);
     } else {
-      data = await topItem(message.guild, selected.id, message.author.id);
+      data = await topItem(message.guild, selected.id, message.member);
     }
 
     return show(

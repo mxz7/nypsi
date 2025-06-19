@@ -1,10 +1,13 @@
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
+import { getUserId, MemberResolvable } from "../member";
 
 const base = 1000;
 
-export async function getAura(userId: string) {
+export async function getAura(member: MemberResolvable) {
+  const userId = getUserId(member);
+
   const cache = await redis.get(`${Constants.redis.cache.user.aura}:${userId}`);
 
   if (cache) return parseInt(cache);
@@ -25,7 +28,14 @@ export async function getAura(userId: string) {
   return total;
 }
 
-export async function createAuraTransaction(recipientId: string, senderId: string, amount: number) {
+export async function createAuraTransaction(
+  recipient: MemberResolvable,
+  sender: MemberResolvable,
+  amount: number,
+) {
+  const senderId = getUserId(recipient);
+  const recipientId = getUserId(sender);
+
   await prisma.aura.create({
     data: { senderId, recipientId, amount },
   });
@@ -35,7 +45,9 @@ export async function createAuraTransaction(recipientId: string, senderId: strin
   );
 }
 
-export async function getAuraTransactions(userId: string) {
+export async function getAuraTransactions(member: MemberResolvable) {
+  const userId = getUserId(member);
+
   const query = await prisma.aura.findMany({
     where: { OR: [{ recipientId: userId }, { senderId: userId }] },
     orderBy: { createdAt: "asc" },

@@ -1,33 +1,29 @@
 import { exec } from "child_process";
-import { GuildMember, User } from "discord.js";
+import { User } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { getGuildByUser } from "../economy/guilds";
 import { deleteOffer, getTargetedOffers } from "../economy/offers";
-import { isMarried, removeMarriage } from "./marriage";
 import { deleteImage } from "../image";
+import { getUserId, MemberResolvable } from "../member";
 import { deleteAllAvatars } from "./history";
+import { isMarried, removeMarriage } from "./marriage";
 import ms = require("ms");
 
-export async function hasProfile(member: GuildMember | string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function hasProfile(member: MemberResolvable) {
+  const userId = getUserId(member);
 
-  if (await redis.exists(`${Constants.redis.cache.user.EXISTS}:${id}`)) {
-    return (await redis.get(`${Constants.redis.cache.user.EXISTS}:${id}`)) === "true"
+  if (await redis.exists(`${Constants.redis.cache.user.EXISTS}:${userId}`)) {
+    return (await redis.get(`${Constants.redis.cache.user.EXISTS}:${userId}`)) === "true"
       ? true
       : false;
   }
 
   const query = await prisma.user.findUnique({
     where: {
-      id: id,
+      id: userId,
     },
     select: {
       id: true,
@@ -36,7 +32,7 @@ export async function hasProfile(member: GuildMember | string) {
 
   if (query) {
     await redis.set(
-      `${Constants.redis.cache.user.EXISTS}:${id}`,
+      `${Constants.redis.cache.user.EXISTS}:${userId}`,
       "true",
       "EX",
       Math.floor(ms("7 day") / 1000),
@@ -44,7 +40,7 @@ export async function hasProfile(member: GuildMember | string) {
     return true;
   } else {
     await redis.set(
-      `${Constants.redis.cache.user.EXISTS}:${id}`,
+      `${Constants.redis.cache.user.EXISTS}:${userId}`,
       "false",
       "EX",
       Math.floor(ms("7 day") / 1000),
@@ -53,28 +49,25 @@ export async function hasProfile(member: GuildMember | string) {
   }
 }
 
-export async function createProfile(member: User | string) {
-  let id: string;
+export async function createProfile(member: MemberResolvable) {
+  const userId = getUserId(member);
   let username = "";
-  if (member instanceof User) {
-    username = `${member.username}`;
-    id = member.id;
-  } else {
-    id = member;
+  if (typeof member !== "string") {
+    username = member instanceof User ? member.username : member.user.username;
   }
 
-  if (await redis.exists(`${Constants.redis.nypsi.PROFILE_TRANSFER}:${id}`)) return;
+  if (await redis.exists(`${Constants.redis.nypsi.PROFILE_TRANSFER}:${userId}`)) return;
 
   await prisma.user
     .create({
       data: {
-        id: id,
+        id: userId,
         lastKnownUsername: username,
         lastCommand: new Date(0),
       },
     })
     .catch(() => {});
-  await redis.del(`${Constants.redis.cache.user.EXISTS}:${id}`);
+  await redis.del(`${Constants.redis.cache.user.EXISTS}:${userId}`);
 }
 
 export async function doProfileTransfer(fromId: string, toId: string) {
@@ -274,7 +267,8 @@ export async function doProfileTransfer(fromId: string, toId: string) {
   logger.info(`transfer complete (${fromId} -> ${toId})`);
 }
 
-export async function dataDelete(userId: string) {
+export async function dataDelete(member: MemberResolvable) {
+  const userId = getUserId(member);
   logger.info(`deleting data for ${userId}...`);
   await deleteAllAvatars(userId);
 

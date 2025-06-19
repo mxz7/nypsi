@@ -32,8 +32,8 @@ import {
   getPlantUpgrades,
   userExists,
 } from "../utils/functions/economy/utils";
-import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { pluralize } from "../utils/functions/string";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import dayjs = require("dayjs");
 
 const cmd = new Command("farm", "view your farms and harvest", "money").setAliases(["fields"]);
@@ -455,7 +455,7 @@ async function run(
 
     await addCooldown(cmd.name + "_water", message.member, 3600);
 
-    const res = await waterFarm(message.author.id);
+    const res = await waterFarm(message.member);
 
     if (res.count === 0) {
       return send({
@@ -480,7 +480,7 @@ async function run(
   } else if (args[0].toLowerCase() === "fertilise") {
     if (farms.length === 0) return send({ embeds: [new ErrorEmbed("you have no plants")] });
 
-    const res = await fertiliseFarm(message.author.id);
+    const res = await fertiliseFarm(message.member);
 
     if (res.msg === "no fertiliser") {
       return send({

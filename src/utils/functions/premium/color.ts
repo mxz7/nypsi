@@ -1,36 +1,33 @@
-import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
+import { getUserId, MemberResolvable } from "../member";
 
-export async function setEmbedColor(member: GuildMember | string, color: string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function setEmbedColor(member: MemberResolvable, color: string) {
+  const userId = getUserId(member);
 
   await prisma.premium.update({
     where: {
-      userId: id,
+      userId,
     },
     data: {
       embedColor: color,
     },
   });
 
-  await redis.del(`${Constants.redis.cache.premium.COLOR}:${id}`);
+  await redis.del(`${Constants.redis.cache.premium.COLOR}:${userId}`);
 }
 
-export async function getEmbedColor(member: string): Promise<`#${string}` | "default"> {
-  const cache = await redis.get(`${Constants.redis.cache.premium.COLOR}:${member}`);
+export async function getEmbedColor(member: MemberResolvable): Promise<`#${string}` | "default"> {
+  const userId = getUserId(member);
+
+  const cache = await redis.get(`${Constants.redis.cache.premium.COLOR}:${userId}`);
 
   if (cache) return cache as `#${string}` | "default";
 
   const query = await prisma.premium.findFirst({
     where: {
-      AND: [{ userId: member }, { level: { gt: 0 } }],
+      AND: [{ userId }, { level: { gt: 0 } }],
     },
     select: {
       embedColor: true,
@@ -38,7 +35,7 @@ export async function getEmbedColor(member: string): Promise<`#${string}` | "def
   });
 
   await redis.set(
-    `${Constants.redis.cache.premium.COLOR}:${member}`,
+    `${Constants.redis.cache.premium.COLOR}:${userId}`,
     query?.embedColor || "default",
     "EX",
     3600,

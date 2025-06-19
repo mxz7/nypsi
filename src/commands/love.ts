@@ -209,7 +209,7 @@ async function run(
 
   send({ embeds: [embed] });
 
-  addProgress(message.author.id, "unsure", 1);
+  addProgress(message.member, "unsure", 1);
 }
 
 cmd.setRun(run);
