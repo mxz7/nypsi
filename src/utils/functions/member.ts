@@ -232,7 +232,7 @@ export async function getRole(guild: Guild, roleName: string): Promise<Role> {
 export type MemberResolvable = GuildMember | APIInteractionGuildMember | User | string;
 
 export function getUserId(user: MemberResolvable): string {
-    if (typeof user === "string") return user;
-    if (typeof (user as any).id === "string") return (user as any).id;
-    return (user as APIInteractionGuildMember).user.id;
+  if (typeof user === "string") return user;
+  if (typeof (user as any).id === "string") return (user as any).id;
+  return (user as APIInteractionGuildMember).user.id;
 }
