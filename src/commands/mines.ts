@@ -424,7 +424,7 @@ async function prepareGame(
     }
   }, ms("5 minutes"));
 
-  const desc = await renderGambleScreen(message.author.id, "playing", bet, "**0**x ($0)");
+  const desc = await renderGambleScreen("playing", bet, "**0**x ($0)");
   const embed = new CustomEmbed(message.member, desc).setHeader(
     "mines",
     message.author.avatarURL(),
@@ -558,7 +558,7 @@ async function playGame(
       percentChance(0.05) &&
       parseInt(await redis.get(`anticheat:interactivegame:count:${message.author.id}`)) > 100
     ) {
-      const res = await giveCaptcha(message.author.id);
+      const res = await giveCaptcha(message.member);
 
       if (res) {
         logger.info(
@@ -623,7 +623,7 @@ async function playGame(
       logger.info(
         `::cmd ${message.guild.id} ${message.channelId} ${message.author.username}: replaying mines`,
       );
-      if (await isLockedOut(message.author.id)) {
+      if (await isLockedOut(message.member)) {
         await verifyUser(message);
         return replay(embed, interaction, false);
       }
@@ -679,7 +679,6 @@ async function playGame(
     embed.setFooter({ text: `id: ${id}` });
     embed.setColor(Constants.EMBED_FAIL_COLOR);
     const desc = await renderGambleScreen(
-      message.author.id,
       "lose",
       bet,
       `**${win.toFixed(2)}**x ($${Math.round(bet * win).toLocaleString()})`,
@@ -698,7 +697,6 @@ async function playGame(
     }
 
     const desc = await renderGambleScreen(
-      message.author.id,
       "win",
       bet,
       `**${win.toFixed(2)}**x ($${Math.round(bet * win).toLocaleString()})`,
@@ -760,7 +758,6 @@ async function playGame(
     embed.setFooter({ text: `id: ${id}` });
     embed.setColor(flavors.macchiato.colors.yellow.hex as ColorResolvable);
     const desc = await renderGambleScreen(
-      message.author.id,
       "draw",
       bet,
       `**${win.toFixed(2)}**x ($${Math.round(bet * win).toLocaleString()})`,
@@ -906,7 +903,6 @@ async function playGame(
       });
 
       const desc = await renderGambleScreen(
-        message.author.id,
         "playing",
         bet,
         `**${win.toFixed(2)}**x ($${Math.round(bet * win).toLocaleString()})`,

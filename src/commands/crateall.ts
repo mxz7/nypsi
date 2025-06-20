@@ -4,8 +4,8 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
 import { getItems, userExists } from "../utils/functions/economy/utils";
-import { logger } from "../utils/logger";
 import { pluralize } from "../utils/functions/string";
+import { logger } from "../utils/logger";
 
 const cmd = new Command(
   "crateall",

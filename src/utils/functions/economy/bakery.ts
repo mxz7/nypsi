@@ -5,30 +5,26 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
+import { getUserId, MemberResolvable } from "../member";
 import { getTier, isPremium } from "../premium/premium";
 import { percentChance } from "../random";
+import { pluralize } from "../string";
 import { addProgress } from "./achievements";
 import { getGuildName, getGuildUpgradesByUser } from "./guilds";
 import { addInventoryItem, getInventory } from "./inventory";
 import { getUpgrades } from "./levelling";
 import { isPassive } from "./passive";
+import { addStat } from "./stats";
 import { addTaskProgress } from "./tasks";
 import { getBakeryUpgradesData, getItems, getUpgradesData } from "./utils";
-import { pluralize } from "../string";
-import { addStat } from "./stats";
 import ms = require("ms");
 
-async function getLastBake(member: GuildMember | string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+async function getLastBake(member: MemberResolvable) {
+  const userId = getUserId(member);
 
   const query = await prisma.economy.findUnique({
     where: {
-      userId: id,
+      userId,
     },
     select: {
       lastBake: true,
@@ -38,18 +34,13 @@ async function getLastBake(member: GuildMember | string) {
   return query.lastBake;
 }
 
-export async function addBakeryUpgrade(member: GuildMember | string, itemId: string, amount = 1) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function addBakeryUpgrade(member: MemberResolvable, itemId: string, amount = 1) {
+  const userId = getUserId(member);
 
   await prisma.bakeryUpgrade.upsert({
     where: {
       userId_upgradeId: {
-        userId: id,
+        userId,
         upgradeId: itemId,
       },
     },
@@ -57,32 +48,27 @@ export async function addBakeryUpgrade(member: GuildMember | string, itemId: str
       amount: { increment: amount },
     },
     create: {
-      userId: id,
+      userId,
       upgradeId: itemId,
       amount: amount,
     },
   });
 
-  await redis.del(`${Constants.redis.cache.economy.BAKERY_UPGRADES}:${id}`);
+  await redis.del(`${Constants.redis.cache.economy.BAKERY_UPGRADES}:${userId}`);
 }
 
-export async function getBakeryUpgrades(member: GuildMember | string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function getBakeryUpgrades(member: MemberResolvable) {
+  const userId = getUserId(member);
 
-  if (await redis.exists(`${Constants.redis.cache.economy.BAKERY_UPGRADES}:${id}`)) {
+  if (await redis.exists(`${Constants.redis.cache.economy.BAKERY_UPGRADES}:${userId}`)) {
     return JSON.parse(
-      await redis.get(`${Constants.redis.cache.economy.BAKERY_UPGRADES}:${id}`),
+      await redis.get(`${Constants.redis.cache.economy.BAKERY_UPGRADES}:${userId}`),
     ) as BakeryUpgrade[];
   }
 
   const query = await prisma.bakeryUpgrade.findMany({
     where: {
-      userId: id,
+      userId,
     },
     orderBy: {
       upgradeId: "asc",
@@ -90,7 +76,7 @@ export async function getBakeryUpgrades(member: GuildMember | string) {
   });
 
   await redis.set(
-    `${Constants.redis.cache.economy.BAKERY_UPGRADES}:${id}`,
+    `${Constants.redis.cache.economy.BAKERY_UPGRADES}:${userId}`,
     JSON.stringify(query),
     "EX",
     ms("3 hour") / 1000,
@@ -99,7 +85,7 @@ export async function getBakeryUpgrades(member: GuildMember | string) {
   return query;
 }
 
-async function getMaxAfkHours(member: GuildMember | string) {
+async function getMaxAfkHours(member: MemberResolvable) {
   let max = 1;
 
   if (await isPremium(member)) {

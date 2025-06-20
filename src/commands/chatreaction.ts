@@ -630,7 +630,7 @@ async function run(
           embeds: [new ErrorEmbed("that user is blacklisted from chat reactions in this server")],
         });
 
-      if (!(await userExists(target.user.id))) await createUser(target.user.id);
+      if (!(await userExists(target))) await createUser(target);
 
       let wager = formatNumber(args[2] || 0);
 
@@ -638,16 +638,16 @@ async function run(
       if (!wager) wager = 0;
       if (isNaN(wager)) wager = 0;
 
-      if (!(await getPreferences(target.user.id)).duelRequests) {
+      if (!(await getPreferences(target)).duelRequests) {
         return send({
           embeds: [new ErrorEmbed(`${target.user.toString()} has requests disabled`)],
         });
       }
 
-      if ((await isEcoBanned(message.author.id)).banned && wager > 0)
+      if ((await isEcoBanned(message.member)).banned && wager > 0)
         return send({ embeds: [new ErrorEmbed("you are banned. lol.")] });
 
-      if ((await isEcoBanned(target.user.id)).banned && wager > 0)
+      if ((await isEcoBanned(target)).banned && wager > 0)
         return send({ embeds: [new ErrorEmbed("they are banned. lol.")] });
 
       if ((await getBalance(message.member)) < wager)
@@ -747,7 +747,7 @@ async function run(
       if (!wager) wager = 0;
       if (isNaN(wager)) wager = 0;
 
-      if ((await isEcoBanned(message.author.id)).banned && wager > 0)
+      if ((await isEcoBanned(message.member)).banned && wager > 0)
         return send({ embeds: [new ErrorEmbed("you are banned. lol.")] });
 
       if ((await getBalance(message.member)) < wager)
@@ -790,14 +790,14 @@ async function run(
       const filter = async (i: Interaction): Promise<boolean> => {
         if (i.user.id != message.author.id && (i as ButtonInteraction).customId == "n")
           return false;
-        if ((await isEcoBanned(i.user.id)).banned && wager > 0) return false;
+        if ((await isEcoBanned(i.user)).banned && wager > 0) return false;
 
         if (i.user.id === message.author.id) {
           if ((i as ButtonInteraction).customId === "n") return true;
           return false;
         }
 
-        if (!(await userExists(i.user.id)) || (await getBalance(i.user.id)) < wager) {
+        if (!(await userExists(i.user)) || (await getBalance(i.user)) < wager) {
           if (i.isRepliable())
             await i.reply({
               flags: MessageFlags.Ephemeral,
@@ -806,13 +806,13 @@ async function run(
           return false;
         }
 
-        if ((await calcMaxBet(i.user.id)) * 10 < wager) {
+        if ((await calcMaxBet(i.user)) * 10 < wager) {
           if (i.isRepliable())
             i.reply({
               flags: MessageFlags.Ephemeral,
               embeds: [
                 new ErrorEmbed(
-                  `your max bet is $**${((await calcMaxBet(i.user.id)) * 10).toLocaleString()}**`,
+                  `your max bet is $**${((await calcMaxBet(i.user)) * 10).toLocaleString()}**`,
                 ),
               ],
             });
@@ -1112,7 +1112,7 @@ async function run(
         let added = false;
         let max = 1;
 
-        if (await isPremium(message.author.id)) {
+        if (await isPremium(message.member)) {
           max = 5;
         }
 
@@ -1278,7 +1278,7 @@ async function run(
 
       let maxSize = 100;
 
-      if (await isPremium(message.author.id)) {
+      if (await isPremium(message.member)) {
         maxSize = 200;
       }
 

@@ -17,8 +17,8 @@ import Constants from "../utils/Constants";
 import { getRawLevel } from "../utils/functions/economy/levelling";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getLastVote, getVoteStreak, hasVoted } from "../utils/functions/economy/vote";
-import { getDmSettings } from "../utils/functions/users/notifications";
 import { pluralize } from "../utils/functions/string";
+import { getDmSettings } from "../utils/functions/users/notifications";
 
 const cmd = new Command("vote", "vote every 12 hours to get rewards", "money");
 
@@ -57,7 +57,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
     }
   };
 
-  let level = await getRawLevel(message.author.id);
+  let level = await getRawLevel(message.member);
 
   if (level > 100) level = 100;
 
@@ -65,7 +65,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
 
   let xp = 15;
 
-  xp += Math.floor((await getRawLevel(message.author.id)) * 0.3);
+  xp += Math.floor((await getRawLevel(message.member)) * 0.3);
 
   if (xp > 100) xp = 100;
 
@@ -77,7 +77,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
       select: { monthVote: true, seasonVote: true },
     }),
     getDmSettings(message.member),
-    getVoteStreak(message.author.id),
+    getVoteStreak(message.member),
   ]);
 
   const embed = new CustomEmbed(message.member);

@@ -105,7 +105,7 @@ async function run(
     return send({ embeds: [new ErrorEmbed("invalid user")] });
   }
 
-  if ((await isEcoBanned(target.user.id)).banned) {
+  if ((await isEcoBanned(target)).banned) {
     return send({ embeds: [new ErrorEmbed("they are banned xd")] });
   }
 
@@ -152,7 +152,7 @@ async function run(
     await addCooldown(cmd.name, message.member, 10);
     await removeBalance(message.member, amount);
     await addToNypsiBank(amount);
-    addStat(message.author.id, "spent-bank", amount);
+    addStat(message.member, "spent-bank", amount);
 
     return send({
       embeds: [
@@ -167,7 +167,7 @@ async function run(
   await addCooldown(cmd.name, message.member, 10);
 
   await removeBalance(message.member, amount);
-  addStat(message.author.id, "spent-pay", amount);
+  addStat(message.member, "spent-pay", amount);
 
   let taxedAmount = 0;
 
@@ -175,10 +175,10 @@ async function run(
     taxedAmount = Math.floor(amount * tax);
     await addToNypsiBank(taxedAmount * 0.5);
     await addBalance(target, amount - taxedAmount);
-    addStat(target.user.id, "earned-pay", amount - taxedAmount);
+    addStat(target, "earned-pay", amount - taxedAmount);
   } else {
     await addBalance(target, amount);
-    addStat(target.user.id, "earned-pay", amount);
+    addStat(target, "earned-pay", amount);
   }
 
   if ((await getDmSettings(target)).payment) {

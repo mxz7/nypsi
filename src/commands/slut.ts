@@ -127,7 +127,7 @@ async function run(
     `${member.user.toString()}\n**${slutAmount}**% slut ${slutEmoji}\n${slutText}`,
   ).setTitle("slut calculator");
 
-  addProgress(message.author.id, "unsure", 1);
+  addProgress(message.member, "unsure", 1);
 
   return await send({ embeds: [embed] });
 }

@@ -14,12 +14,12 @@ import {
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
-import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { isMarried, removeMarriage } from "../utils/functions/users/marriage";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
-import { getLastKnownUsername } from "../utils/functions/users/tag";
+import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
+import { isMarried, removeMarriage } from "../utils/functions/users/marriage";
 import { addNotificationToQueue } from "../utils/functions/users/notifications";
+import { getLastKnownUsername } from "../utils/functions/users/tag";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("divorce", "divorce your partner", "fun");
 

@@ -3,28 +3,35 @@ import { sort } from "fast-sort";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
+import { getUserId, MemberResolvable } from "../member";
 
-export async function getBirthday(userId: string) {
-  const query = await prisma.user.findUnique({ where: { id: userId }, select: { birthday: true } });
+export async function getBirthday(member: MemberResolvable) {
+  const query = await prisma.user.findUnique({
+    where: { id: getUserId(member) },
+    select: { birthday: true },
+  });
 
   return query.birthday;
 }
 
-export async function setBirthday(userId: string, birthday: Date) {
-  await prisma.user.update({ where: { id: userId }, data: { birthday } });
+export async function setBirthday(member: MemberResolvable, birthday: Date) {
+  await prisma.user.update({ where: { id: getUserId(member) }, data: { birthday } });
 }
 
-export async function isBirthdayEnabled(userId: string) {
+export async function isBirthdayEnabled(member: MemberResolvable) {
   const query = await prisma.user.findUnique({
-    where: { id: userId },
+    where: { id: getUserId(member) },
     select: { birthdayAnnounce: true },
   });
 
   return query.birthdayAnnounce;
 }
 
-export async function setBirthdayEnabled(userId: string, enabled: boolean) {
-  await prisma.user.update({ where: { id: userId }, data: { birthdayAnnounce: enabled } });
+export async function setBirthdayEnabled(member: MemberResolvable, enabled: boolean) {
+  await prisma.user.update({
+    where: { id: getUserId(member) },
+    data: { birthdayAnnounce: enabled },
+  });
 }
 
 export async function getTodaysBirthdays(useCache = true) {

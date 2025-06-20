@@ -83,7 +83,7 @@ async function run(
     const embed = new CustomEmbed(message.member);
 
     const pool = await getApproximatePrizePool();
-    const autoBuy = await getDailyLottoTickets(message.author.id);
+    const autoBuy = await getDailyLottoTickets(message.member);
 
     embed.setHeader("lottery", message.author.avatarURL());
     embed.setDescription(
@@ -126,7 +126,7 @@ async function run(
       return send({ embeds: [new ErrorEmbed("invalid number")] });
     }
 
-    await setDailyLotteryTickets(message.author.id, amount);
+    await setDailyLotteryTickets(message.member, amount);
 
     return send({
       embeds: [

@@ -21,8 +21,8 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
 
   await addCooldown(cmd.name, message.member, 90);
 
-  if (await isTracking(message.author.id)) {
-    await disableTracking(message.author.id);
+  if (await isTracking(message.member)) {
+    await disableTracking(message.member);
     return message.channel.send({
       embeds: [
         new CustomEmbed(
@@ -34,7 +34,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
       ],
     });
   } else {
-    await enableTracking(message.author.id);
+    await enableTracking(message.member);
     return message.channel.send({
       embeds: [new CustomEmbed(message.member, "✅ username and avatar tracking has been enabled")],
     });

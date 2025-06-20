@@ -61,6 +61,7 @@ import {
   userExists,
 } from "../utils/functions/economy/utils";
 import { getEmojiImage } from "../utils/functions/image";
+import { MemberResolvable } from "../utils/functions/member";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { pluralize } from "../utils/functions/string";
 import { getAdminLevel } from "../utils/functions/users/admin";
@@ -219,7 +220,7 @@ async function run(
     }
   };
 
-  if (!(await userExists(message.author.id))) await createUser(message.author.id);
+  if (!(await userExists(message.member))) await createUser(message.member);
 
   if (message.client.user.id !== Constants.BOT_USER_ID && (await getAdminLevel(message.member)) < 1)
     return send({ embeds: [new ErrorEmbed("lol")] });
@@ -459,7 +460,7 @@ async function run(
 
           if (amount.toLowerCase() === "all") {
             amount = Math.max(
-              (await getInventory(message.author.id)).count(selected.id),
+              (await getInventory(message.member)).count(selected.id),
               1,
             ).toString();
           }
@@ -561,7 +562,7 @@ async function run(
             await removeBalance(message.member, parseInt(amount) * cost);
 
             const createRes = await createMarketOrder(
-              message.member.id,
+              message.member,
               selected.id,
               parseInt(amount),
               cost,
@@ -643,7 +644,7 @@ async function run(
             await removeInventoryItem(message.member, selected.id, parseInt(amount));
 
             const createRes = await createMarketOrder(
-              message.member.id,
+              message.member,
               selected.id,
               parseInt(amount),
               cost,
@@ -1090,7 +1091,7 @@ async function run(
     let amount = args[2] ?? "1";
 
     if (amount.toLowerCase() == "all") {
-      amount = (await getMarketItemOrders(item.id, "sell", message.member.id))
+      amount = (await getMarketItemOrders(item.id, "sell", message.member))
         .reduce((count, order) => Number(order.itemAmount) + count, 0)
         .toString();
 
@@ -1098,10 +1099,10 @@ async function run(
         item.id,
         parseInt(amount),
         "sell",
-        message.member.id,
+        message.member,
       );
 
-      let balance = await getBalance(message.member.id);
+      let balance = await getBalance(message.member);
 
       if (marketData.cost > balance) {
         let validCount = 0;
@@ -1125,15 +1126,14 @@ async function run(
     }
 
     if (
-      (await getMarketTransactionData(item.id, parseInt(amount), "sell", message.member.id)).cost ==
-      -1
+      (await getMarketTransactionData(item.id, parseInt(amount), "sell", message.member)).cost == -1
     ) {
       return send({
         embeds: [new ErrorEmbed(`not enough ${item.plural} on the market`)],
       });
     }
 
-    return await confirmTransaction("buy", item, parseInt(amount), message.member.id);
+    return await confirmTransaction("buy", item, parseInt(amount), message.member);
   } else if (args[0].toLowerCase().includes("sell") || args[0].toLowerCase().startsWith("s")) {
     if (args.length === 1)
       return send({ embeds: [new ErrorEmbed("/market sell <item> <amount>")] });
@@ -1148,7 +1148,7 @@ async function run(
 
     if (amount.toLowerCase() == "all") {
       const invAmount = inventory.count(item.id);
-      const marketAmount = (await getMarketItemOrders(item.id, "buy", message.member.id)).reduce(
+      const marketAmount = (await getMarketItemOrders(item.id, "buy", message.member)).reduce(
         (count, order) => Number(order.itemAmount) + count,
         0,
       );
@@ -1161,8 +1161,7 @@ async function run(
     }
 
     if (
-      (await getMarketTransactionData(item.id, parseInt(amount), "buy", message.member.id)).cost ==
-      -1
+      (await getMarketTransactionData(item.id, parseInt(amount), "buy", message.member)).cost == -1
     ) {
       return send({
         embeds: [new ErrorEmbed(`not enough ${item.plural} on the market`)],
@@ -1175,7 +1174,7 @@ async function run(
       });
     }
 
-    return await confirmTransaction("sell", item, parseInt(amount), message.member.id);
+    return await confirmTransaction("sell", item, parseInt(amount), message.member);
   } else if (args[0].toLowerCase().includes("create") || args[0].toLowerCase() == "c") {
     if (args.length < 4)
       return send({
@@ -1215,7 +1214,7 @@ async function run(
     }
 
     if (amount.toLowerCase() === "all") {
-      amount = Math.max((await getInventory(message.author.id)).count(selected.id), 1).toString();
+      amount = Math.max((await getInventory(message.member)).count(selected.id), 1).toString();
     }
 
     if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
@@ -1269,7 +1268,7 @@ async function run(
       await removeBalance(message.member, parseInt(amount) * cost);
 
       const createRes = await createMarketOrder(
-        message.member.id,
+        message.member,
         selected.id,
         parseInt(amount),
         cost,
@@ -1342,7 +1341,7 @@ async function run(
       await removeInventoryItem(message.member, selected.id, parseInt(amount));
 
       const createRes = await createMarketOrder(
-        message.member.id,
+        message.member,
         selected.id,
         parseInt(amount),
         cost,
@@ -1659,7 +1658,7 @@ async function run(
       if (res == "buyOne") {
         if (
           (await getBalance(message.member)) <
-          (await getMarketTransactionData(item.id, 1, "sell", message.member.id)).cost
+          (await getMarketTransactionData(item.id, 1, "sell", message.member)).cost
         ) {
           await interaction.reply({
             embeds: [new ErrorEmbed("insufficient funds")],
@@ -1669,7 +1668,7 @@ async function run(
           return pageManager();
         }
 
-        const price = (await getMarketTransactionData(item.id, 1, "sell", message.member.id)).cost;
+        const price = (await getMarketTransactionData(item.id, 1, "sell", message.member)).cost;
         if (price == -1) {
           await interaction.reply({
             embeds: [
@@ -1685,9 +1684,9 @@ async function run(
 
         await interaction.deferUpdate();
 
-        return confirmTransaction("buy", item, 1, message.member.id, msg);
+        return confirmTransaction("buy", item, 1, message.member, msg);
       } else if (res == "buyMulti") {
-        const res = await quantitySelectionModal(item, "buy", interaction as ButtonInteraction);
+        const res = await quantitySelectionModal("buy", interaction as ButtonInteraction);
 
         if (res) {
           const amount = res.fields.fields.get("amount").value;
@@ -1715,7 +1714,7 @@ async function run(
           }
 
           const price = (
-            await getMarketTransactionData(item.id, formattedAmount, "sell", message.member.id)
+            await getMarketTransactionData(item.id, formattedAmount, "sell", message.member)
           ).cost;
           if (price == -1) {
             await res.reply({
@@ -1732,8 +1731,7 @@ async function run(
 
           if (
             (await getBalance(message.member)) <
-            (await getMarketTransactionData(item.id, formattedAmount, "sell", message.member.id))
-              .cost
+            (await getMarketTransactionData(item.id, formattedAmount, "sell", message.member)).cost
           ) {
             await interaction.reply({
               embeds: [new ErrorEmbed("insufficient funds")],
@@ -1745,7 +1743,7 @@ async function run(
 
           await res.deferUpdate();
 
-          return confirmTransaction("buy", item, formattedAmount, message.member.id, msg);
+          return confirmTransaction("buy", item, formattedAmount, message.member, msg);
         }
 
         await updateEmbed();
@@ -1762,7 +1760,7 @@ async function run(
           return pageManager();
         }
 
-        const price = (await getMarketTransactionData(item.id, 1, "buy", message.member.id)).cost;
+        const price = (await getMarketTransactionData(item.id, 1, "buy", message.member)).cost;
         if (price == -1) {
           await interaction.reply({
             embeds: [new ErrorEmbed("not enough items")],
@@ -1774,9 +1772,9 @@ async function run(
 
         await interaction.deferUpdate();
 
-        return confirmTransaction("sell", item, 1, message.member.id, msg);
+        return confirmTransaction("sell", item, 1, message.member, msg);
       } else if (res == "sellMulti") {
-        const res = await quantitySelectionModal(item, "sell", interaction as ButtonInteraction);
+        const res = await quantitySelectionModal("sell", interaction as ButtonInteraction);
 
         if (res) {
           const amount = res.fields.fields.get("amount").value;
@@ -1804,7 +1802,7 @@ async function run(
           }
 
           const price = (
-            await getMarketTransactionData(item.id, formattedAmount, "buy", message.member.id)
+            await getMarketTransactionData(item.id, formattedAmount, "buy", message.member)
           ).cost;
           if (price == -1) {
             await res.reply({
@@ -1828,7 +1826,7 @@ async function run(
 
           await res.deferUpdate();
 
-          return confirmTransaction("sell", item, formattedAmount, message.member.id, msg);
+          return confirmTransaction("sell", item, formattedAmount, message.member, msg);
         }
 
         await updateEmbed();
@@ -1847,7 +1845,7 @@ async function run(
     type: OrderType,
     item: Item,
     amount: number,
-    userId: string,
+    member: MemberResolvable,
     msg?: NypsiMessage,
   ) {
     const embed = new CustomEmbed(message.member).setHeader(
@@ -1858,7 +1856,7 @@ async function run(
     const fromCommand = !msg;
 
     const price = (
-      await getMarketTransactionData(item.id, amount, type == "buy" ? "sell" : "buy", userId)
+      await getMarketTransactionData(item.id, amount, type == "buy" ? "sell" : "buy", member)
     ).cost;
 
     embed.setDescription(
@@ -1899,14 +1897,8 @@ async function run(
       if (res == "confirm") {
         const res =
           type == "buy"
-            ? await marketBuy(message.member.id, item.id, amount, price, msg.client as NypsiClient)
-            : await marketSell(
-                message.member.id,
-                item.id,
-                amount,
-                price,
-                msg.client as NypsiClient,
-              );
+            ? await marketBuy(message.member, item.id, amount, price, msg.client as NypsiClient)
+            : await marketSell(message.member, item.id, amount, price, msg.client as NypsiClient);
 
         if (!res) {
           if (fromCommand) {
@@ -1971,7 +1963,7 @@ async function run(
     return pageManager();
   }
 
-  async function quantitySelectionModal(item: Item, type: string, interaction: ButtonInteraction) {
+  async function quantitySelectionModal(type: string, interaction: ButtonInteraction) {
     const id = `market-quantity-${Math.floor(Math.random() * 69420)}`;
     const modal = new ModalBuilder().setCustomId(id).setTitle("select quantity");
 

@@ -294,7 +294,7 @@ async function run(
   }
 
   if (args[0].toLowerCase() == "create") {
-    const alts = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, message.author.id);
+    const alts = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, message.member);
 
     for (const accountId of alts) {
       if (await redis.exists(`${Constants.redis.cooldown.GUILD_CREATE}:${accountId}`)) {
@@ -353,7 +353,7 @@ async function run(
     await addCooldown(cmd.name, message.member, 3);
 
     await removeBalance(message.member, 500000);
-    addStat(message.author.id, "spent-guild", 500000);
+    addStat(message.member, "spent-guild", 500000);
 
     await createGuild(name, message.member);
 
@@ -414,11 +414,11 @@ async function run(
       return send({ embeds: [new ErrorEmbed("this user has already been invited to a guild")] });
     }
 
-    if ((await isEcoBanned(target.user.id)).banned) {
+    if ((await isEcoBanned(target)).banned) {
       return send({ embeds: [new ErrorEmbed("they're banned. lol. HA. HAHAHA.")] });
     }
 
-    if (!(await userExists(target.user.id))) {
+    if (!(await userExists(target))) {
       return send({ embeds: [new ErrorEmbed("invalid user")] });
     }
 
@@ -485,7 +485,7 @@ async function run(
         return send({ embeds: [new ErrorEmbed("guild invites/leaves are currently disabled")] });
       }
       invited.delete(target.user.id);
-      const targetGuild = await getGuildByUser(target.user.id);
+      const targetGuild = await getGuildByUser(target.user);
       const refreshedGuild = await getGuildByName(guild.guildName);
 
       if (targetGuild) {
@@ -833,7 +833,7 @@ async function run(
       }
 
       await removeBalance(message.member, amount);
-      addStat(message.author.id, "spent-guild", amount);
+      addStat(message.member, "spent-guild", amount);
 
       await addToGuildBank(guild.guildName, amount, message.member);
 

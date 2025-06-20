@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
-import { uploadSlashCommands, uploadSlashCommandsToGuild } from "../utils/handlers/commandhandler";
 import { getAdminLevel } from "../utils/functions/users/admin";
+import { uploadSlashCommands, uploadSlashCommandsToGuild } from "../utils/handlers/commandhandler";
 
 const cmd = new Command("reloadslash", "reload data for slash commands", "none").setPermissions([
   "bot owner",

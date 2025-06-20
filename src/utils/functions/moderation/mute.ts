@@ -1,10 +1,11 @@
-import { Guild, GuildMember, Role } from "discord.js";
+import { Guild, Role } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import { unmuteTimeouts } from "../../../scheduled/clusterjobs/moderationchecks";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
+import { getUserId, MemberResolvable } from "../member";
 import ms = require("ms");
 
 const muteRoleCache = new Map<string, string>();
@@ -37,33 +38,21 @@ export async function newMute(guild: Guild, userIDs: string[], date: Date) {
   }
 }
 
-export async function isMuted(guild: Guild, member: GuildMember | string) {
+export async function isMuted(guild: Guild, member: MemberResolvable) {
   const query = await prisma.moderationMute.findFirst({
     where: {
-      AND: [
-        { guildId: guild.id },
-        { userId: typeof member == "string" ? member : (member as GuildMember).user.id },
-      ],
+      AND: [{ guildId: guild.id }, { userId: getUserId(member) }],
     },
     select: {
       userId: true,
     },
   });
 
-  if (query) {
-    return true;
-  } else {
-    return false;
-  }
+  return Boolean(query);
 }
 
 export async function getMuteRole(guild: Guild | string) {
-  let guildId: string;
-  if (guild instanceof Guild) {
-    guildId = guild.id;
-  } else {
-    guildId = guild;
-  }
+  const guildId = guild instanceof Guild ? guild.id : guild;
 
   if (muteRoleCache.has(guildId)) return muteRoleCache.get(guildId);
 
@@ -86,13 +75,7 @@ export async function getMuteRole(guild: Guild | string) {
 }
 
 export async function setMuteRole(guild: Guild, role: Role | string) {
-  let id: string;
-
-  if (role instanceof Role) {
-    id = role.id;
-  } else {
-    id = role;
-  }
+  const id = role instanceof Role ? role.id : role;
 
   if (muteRoleCache.has(guild.id)) muteRoleCache.delete(guild.id);
 
@@ -163,69 +146,43 @@ export async function getMutedUsers(guild: Guild) {
   return query;
 }
 
-export async function deleteMute(guild: Guild | string, member: GuildMember | string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.id;
-  } else {
-    id = member;
-  }
-
-  let guildId: string;
-  if (guild instanceof Guild) {
-    guildId = guild.id;
-  } else {
-    guildId = guild;
-  }
+export async function deleteMute(guild: Guild | string, member: MemberResolvable) {
+  const guildId = guild instanceof Guild ? guild.id : guild;
 
   await prisma.moderationMute.deleteMany({
     where: {
-      AND: [{ userId: id }, { guildId: guildId }],
+      AND: [{ userId: getUserId(member) }, { guildId }],
     },
   });
 }
 
 export async function getAutoMuteLevels(guild: Guild) {
-  let guildId: string;
-  if (guild instanceof Guild) {
-    guildId = guild.id;
-  } else {
-    guildId = guild;
-  }
-
-  if (autoMuteLevelCache.has(guildId)) {
-    return autoMuteLevelCache.get(guildId);
+  if (autoMuteLevelCache.has(guild.id)) {
+    return autoMuteLevelCache.get(guild.id);
   }
 
   const query = await prisma.guild.findUnique({
     where: {
-      id: guildId,
+      id: guild.id,
     },
     select: {
       automute: true,
     },
   });
 
-  autoMuteLevelCache.set(guildId, query.automute);
+  autoMuteLevelCache.set(guild.id, query.automute);
 
   return query.automute;
 }
 
 export async function setAutoMuteLevels(guild: Guild, levels: number[]) {
-  let guildId: string;
-  if (guild instanceof Guild) {
-    guildId = guild.id;
-  } else {
-    guildId = guild;
-  }
-
-  if (autoMuteLevelCache.has(guildId)) {
-    autoMuteLevelCache.delete(guildId);
+  if (autoMuteLevelCache.has(guild.id)) {
+    autoMuteLevelCache.delete(guild.id);
   }
 
   await prisma.guild.update({
     where: {
-      id: guildId,
+      id: guild.id,
     },
     data: {
       automute: levels,
@@ -265,19 +222,21 @@ export async function setAutoMuteTimeout(guild: Guild, seconds: number) {
   autoMuteTimeoutCache.delete(guild.id);
 }
 
-export async function getMuteViolations(guild: Guild, member: GuildMember) {
+export async function getMuteViolations(guild: Guild, member: MemberResolvable) {
   const res = await redis.get(
-    `${Constants.redis.cache.guild.AUTOMUTE_VL}:${guild.id}:${member.user.id}`,
+    `${Constants.redis.cache.guild.AUTOMUTE_VL}:${guild.id}:${getUserId(member)}`,
   );
 
   if (res) return parseInt(res);
   else return 0;
 }
 
-export async function addMuteViolation(guild: Guild, member: GuildMember) {
-  await redis.incr(`${Constants.redis.cache.guild.AUTOMUTE_VL}:${guild.id}:${member.user.id}`);
+export async function addMuteViolation(guild: Guild, member: MemberResolvable) {
+  const userId = getUserId(member);
+
+  await redis.incr(`${Constants.redis.cache.guild.AUTOMUTE_VL}:${guild.id}:${userId}`);
   await redis.expire(
-    `${Constants.redis.cache.guild.AUTOMUTE_VL}:${guild.id}:${member.user.id}`,
+    `${Constants.redis.cache.guild.AUTOMUTE_VL}:${guild.id}:${userId}`,
     await getAutoMuteTimeout(guild),
   );
 }

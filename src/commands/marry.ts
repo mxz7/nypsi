@@ -14,14 +14,14 @@ import {
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
-import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { addMarriage, isMarried } from "../utils/functions/users/marriage";
 import {
   addInventoryItem,
   getInventory,
   removeInventoryItem,
 } from "../utils/functions/economy/inventory";
+import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
+import { addMarriage, isMarried } from "../utils/functions/users/marriage";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("marry", "marry your ekitten", "fun");
 
@@ -137,7 +137,7 @@ async function run(
     });
   }
 
-  if (!(await userExists(target.user.id))) {
+  if (!(await userExists(target))) {
     return send({ embeds: [new ErrorEmbed("invalid user")], flags: MessageFlags.Ephemeral });
   }
 

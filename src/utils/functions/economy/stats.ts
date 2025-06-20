@@ -1,22 +1,15 @@
-import { GuildMember } from "discord.js";
 import { inPlaceSort, sort } from "fast-sort";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { logger } from "../../logger";
+import { getUserId, MemberResolvable } from "../member";
 import { addProgress } from "./achievements";
 import { addTaskProgress, setTaskProgress } from "./tasks";
 
-export async function getGambleStats(member: GuildMember) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
+export async function getGambleStats(member: MemberResolvable) {
   const query = await prisma.game.groupBy({
     where: {
-      userId: id,
+      userId: getUserId(member),
     },
     by: ["game"],
     _count: {
@@ -35,9 +28,9 @@ export async function getGambleStats(member: GuildMember) {
   return sort(query).desc((i) => i._count._all);
 }
 
-export async function getGameWins(member: GuildMember, game: string) {
+export async function getGameWins(member: MemberResolvable, game: string) {
   return await prisma.game.count({
-    where: { AND: [{ userId: member.id }, { game }, { win: 1 }] },
+    where: { AND: [{ userId: getUserId(member) }, { game }, { win: 1 }] },
   });
 }
 
@@ -51,17 +44,10 @@ export async function getAllGameWins(name: string) {
   return query;
 }
 
-export async function getScratchCardStats(member: GuildMember) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
+export async function getScratchCardStats(member: MemberResolvable) {
   const query = await prisma.game.groupBy({
     where: {
-      AND: [{ userId: id }, { game: { contains: "scratch" } }],
+      AND: [{ userId: getUserId(member) }, { game: { contains: "scratch" } }],
     },
     by: ["game"],
     _count: {
@@ -77,21 +63,21 @@ export async function getScratchCardStats(member: GuildMember) {
   return query;
 }
 
-export async function getStat(userId: string, stat: string) {
+export async function getStat(member: MemberResolvable, stat: string) {
   return await prisma.stats.findUnique({
     where: {
       userId_itemId: {
-        userId,
+        userId: getUserId(member),
         itemId: stat,
       },
     },
   });
 }
 
-export async function getStats(member: GuildMember) {
+export async function getStats(member: MemberResolvable) {
   const query = await prisma.stats.findMany({
     where: {
-      userId: member.user.id,
+      userId: getUserId(member),
     },
     select: {
       amount: true,
@@ -174,62 +160,52 @@ export async function fetchGame(id: string) {
   });
 }
 
-export async function addStat(member: GuildMember | string, item: string, amount = 1) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function addStat(member: MemberResolvable, item: string, amount = 1) {
+  const userId = getUserId(member);
 
   await prisma.stats.upsert({
     where: {
       userId_itemId: {
         itemId: item,
-        userId: id,
+        userId,
       },
     },
     update: {
       amount: { increment: Math.floor(amount) },
     },
     create: {
-      userId: id,
+      userId,
       itemId: item,
       amount: Math.floor(amount),
     },
   });
 }
 
-export async function setStat(member: GuildMember | string, item: string, amount: number) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function setStat(member: MemberResolvable, item: string, amount: number) {
+  const userId = getUserId(member);
 
   await prisma.stats.upsert({
     where: {
       userId_itemId: {
         itemId: item,
-        userId: id,
+        userId,
       },
     },
     update: {
       amount: amount,
     },
     create: {
-      userId: id,
+      userId,
       itemId: item,
       amount: amount,
     },
   });
 }
 
-export async function getLeaderboardPositions(userId: string) {
+export async function getLeaderboardPositions(member: MemberResolvable) {
   return await prisma.leaderboards.findMany({
     where: {
-      userId,
+      userId: getUserId(member),
     },
     select: {
       leaderboard: true,

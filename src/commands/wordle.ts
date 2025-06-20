@@ -330,7 +330,7 @@ async function cancel(message: Message | (NypsiCommandInteraction & CommandInter
   games.delete(message.author.id);
 
   if (!message.member) return;
-  addWordleGame(message.author.id, false, game.guesses, performance.now() - game.start, game.word);
+  addWordleGame(message.member, false, game.guesses, performance.now() - game.start, game.word);
 }
 
 async function win(message: Message | (NypsiCommandInteraction & CommandInteraction), m: any) {
@@ -371,7 +371,7 @@ async function win(message: Message | (NypsiCommandInteraction & CommandInteract
       karmaCooldown.delete(message.author.id);
     }, ms("15m"));
 
-    await addKarma(message.author.id, 5);
+    await addKarma(message.member, 5);
   }
 }
 
@@ -398,7 +398,7 @@ async function lose(message: Message | (NypsiCommandInteraction & CommandInterac
   games.delete(message.author.id);
 
   if (!message.member) return;
-  addWordleGame(message.author.id, false, game.guesses, performance.now() - game.start, game.word);
+  addWordleGame(message.member, false, game.guesses, performance.now() - game.start, game.word);
 }
 
 function createBoard(): string[][] {

@@ -4,18 +4,17 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import Constants from "../../Constants";
+import { getUserId, MemberResolvable } from "../member";
 import { addProgress } from "./achievements";
 import { addInventoryItem, gemBreak, getInventory, removeInventoryItem } from "./inventory";
 import { getPlantsData, getPlantUpgrades, getUpgradesData } from "./utils";
 import dayjs = require("dayjs");
 import ms = require("ms");
 
-export async function getFarm(member: GuildMember | string) {
-  let id: string;
-  if (typeof member === "string") id = member;
-  else id = member.user.id;
+export async function getFarm(member: MemberResolvable) {
+  const userId = getUserId(member);
 
-  const cache = await redis.get(`${Constants.redis.cache.economy.farm}:${id}`);
+  const cache = await redis.get(`${Constants.redis.cache.economy.farm}:${userId}`);
 
   if (cache) {
     return (
@@ -39,7 +38,7 @@ export async function getFarm(member: GuildMember | string) {
 
   const query = await prisma.farm.findMany({
     where: {
-      userId: id,
+      userId,
     },
     orderBy: {
       id: "asc",
@@ -47,7 +46,7 @@ export async function getFarm(member: GuildMember | string) {
   });
 
   await redis.set(
-    `${Constants.redis.cache.economy.farm}:${id}`,
+    `${Constants.redis.cache.economy.farm}:${userId}`,
     JSON.stringify(query),
     "EX",
     Math.floor(ms("3 hour") / 1000),
@@ -56,15 +55,10 @@ export async function getFarm(member: GuildMember | string) {
   return query;
 }
 
-export async function getFarmUpgrades(member: GuildMember | string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function getFarmUpgrades(member: MemberResolvable) {
+  const userId = getUserId(member);
 
-  const cache = await redis.get(`${Constants.redis.cache.economy.farmUpgrades}:${id}`);
+  const cache = await redis.get(`${Constants.redis.cache.economy.farmUpgrades}:${userId}`);
 
   if (cache) {
     return JSON.parse(cache) as {
@@ -77,12 +71,12 @@ export async function getFarmUpgrades(member: GuildMember | string) {
 
   const query = await prisma.farmUpgrades.findMany({
     where: {
-      userId: id,
+      userId,
     },
   });
 
   await redis.set(
-    `${Constants.redis.cache.economy.farmUpgrades}:${id}`,
+    `${Constants.redis.cache.economy.farmUpgrades}:${userId}`,
     JSON.stringify(query),
     "EX",
     Math.floor(ms("3 hour") / 1000),
@@ -92,16 +86,18 @@ export async function getFarmUpgrades(member: GuildMember | string) {
 }
 
 export async function addFarmUpgrade(
-  member: GuildMember,
+  member: MemberResolvable,
   plantId: string,
   upgradeId: string,
   amount = 1,
 ) {
+  const userId = getUserId(member);
+
   await prisma.farmUpgrades.upsert({
     where: {
       userId_plantId_upgradeId: {
         upgradeId: upgradeId,
-        userId: member.user.id,
+        userId,
         plantId: plantId,
       },
     },
@@ -110,33 +106,27 @@ export async function addFarmUpgrade(
     },
     create: {
       upgradeId: upgradeId,
-      userId: member.user.id,
+      userId,
       plantId: plantId,
       amount,
     },
   });
 
-  await redis.del(`${Constants.redis.cache.economy.farmUpgrades}:${member.user.id}`);
+  await redis.del(`${Constants.redis.cache.economy.farmUpgrades}:${userId}`);
 }
 
-export async function addFarm(member: GuildMember | string, plantId: string, amount = 1) {
-  let id: string;
-  if (typeof member === "string") id = member;
-  else id = member.user.id;
+export async function addFarm(member: MemberResolvable, plantId: string, amount = 1) {
+  const userId = getUserId(member);
 
   await prisma.farm.createMany({
-    data: new Array(amount).fill({ userId: id, plantId }),
+    data: new Array(amount).fill({ userId, plantId }),
   });
-  await redis.del(`${Constants.redis.cache.economy.farm}:${id}`);
+  await redis.del(`${Constants.redis.cache.economy.farm}:${userId}`);
 }
 
-export async function getClaimable(member: GuildMember | string, plantId: string, claim: boolean) {
-  let id: string;
-  if (typeof member === "string") id = member;
-  else id = member.user.id;
-
+export async function getClaimable(member: MemberResolvable, plantId: string, claim: boolean) {
   const inventory = await getInventory(member);
-  const farm = await getFarm(id);
+  const farm = await getFarm(member);
   const plantData = getPlantsData()[plantId];
 
   const growthTime = dayjs().subtract(plantData.growthTime, "seconds").valueOf();
@@ -171,13 +161,13 @@ export async function getClaimable(member: GuildMember | string, plantId: string
       },
     });
 
-    await redis.del(`${Constants.redis.cache.economy.farm}:${id}`);
+    await redis.del(`${Constants.redis.cache.economy.farm}:${getUserId(member)}`);
   }
 
   let items = 0;
 
   const upgrades = getPlantUpgrades();
-  const userUpgrades = await getFarmUpgrades(id);
+  const userUpgrades = await getFarmUpgrades(member);
 
   for (const plant of plants) {
     const start = Date.now() - plant.harvestedAt.getTime();
@@ -203,7 +193,7 @@ export async function getClaimable(member: GuildMember | string, plantId: string
       } else {
         hours *= 1.25;
         gemBreak(
-          id,
+          member,
           0.01,
           "pink_gem",
           member instanceof GuildMember && (member.client as NypsiClient),
@@ -235,7 +225,7 @@ export async function getClaimable(member: GuildMember | string, plantId: string
       storageMulti += 0.2;
 
       gemBreak(
-        id,
+        member,
         0.01,
         "green_gem",
         member instanceof GuildMember && (member.client as NypsiClient),
@@ -246,14 +236,14 @@ export async function getClaimable(member: GuildMember | string, plantId: string
       storageMulti += 0.2;
 
       gemBreak(
-        id,
+        member,
         0.005,
         "pink_gem",
         member instanceof GuildMember && (member.client as NypsiClient),
       );
 
       gemBreak(
-        id,
+        member,
         0.005,
         "purple_gem",
         member instanceof GuildMember && (member.client as NypsiClient),
@@ -269,8 +259,8 @@ export async function getClaimable(member: GuildMember | string, plantId: string
   items = Math.floor(items);
 
   if (claim && items > 0) {
-    await addInventoryItem(id, plantData.item, items);
-    await addProgress(id, "green_fingers", items);
+    await addInventoryItem(member, plantData.item, items);
+    await addProgress(member, "green_fingers", items);
   }
 
   return items;
@@ -284,8 +274,8 @@ export async function deletePlant(id: number) {
   });
 }
 
-async function checkDead(userId: string, plantId?: string) {
-  const farm = await getFarm(userId);
+async function checkDead(member: MemberResolvable, plantId?: string) {
+  const farm = await getFarm(member);
   let count = 0;
 
   for (const plant of farm) {
@@ -301,15 +291,14 @@ async function checkDead(userId: string, plantId?: string) {
     }
   }
 
-  if (count > 0) await redis.del(`${Constants.redis.cache.economy.farm}:${userId}`);
+  if (count > 0) await redis.del(`${Constants.redis.cache.economy.farm}:${getUserId(member)}`);
 
   return count;
 }
 
-export async function waterFarm(userId: string) {
-  const dead = await checkDead(userId);
-
-  const farm = await getFarm(userId);
+export async function waterFarm(member: MemberResolvable) {
+  const dead = await checkDead(member);
+  const farm = await getFarm(member);
 
   const toWater: number[] = [];
 
@@ -330,19 +319,19 @@ export async function waterFarm(userId: string) {
       wateredAt: new Date(),
     },
   });
-  await redis.del(`${Constants.redis.cache.economy.farm}:${userId}`);
+  await redis.del(`${Constants.redis.cache.economy.farm}:${getUserId(member)}`);
 
   return { count: toWater.length, dead };
 }
 
-export async function fertiliseFarm(userId: string): Promise<{
+export async function fertiliseFarm(member: MemberResolvable): Promise<{
   dead?: number;
   msg?: "no fertiliser" | "no need";
   done?: number;
 }> {
-  const dead = await checkDead(userId);
+  const dead = await checkDead(member);
 
-  const [farm, inventory] = await Promise.all([getFarm(userId), getInventory(userId)]);
+  const [farm, inventory] = await Promise.all([getFarm(member), getInventory(member)]);
 
   if (!inventory.has("fertiliser")) return { dead, msg: "no fertiliser" };
 
@@ -375,8 +364,8 @@ export async function fertiliseFarm(userId: string): Promise<{
     },
   });
 
-  await removeInventoryItem(userId, "fertiliser", Math.ceil(possible.length / 3));
-  await redis.del(`${Constants.redis.cache.economy.farm}:${userId}`);
+  await removeInventoryItem(member, "fertiliser", Math.ceil(possible.length / 3));
+  await redis.del(`${Constants.redis.cache.economy.farm}:${getUserId(member)}`);
 
   return { done: possible.length, dead };
 }

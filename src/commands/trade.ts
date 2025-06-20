@@ -98,7 +98,7 @@ async function run(
     }
   };
 
-  if (!(await userExists(message.author.id))) await createUser(message.author.id);
+  if (!(await userExists(message.member))) await createUser(message.member);
 
   if (message.client.user.id !== Constants.BOT_USER_ID && (await getAdminLevel(message.member)) < 1)
     return send({ embeds: [new ErrorEmbed("lol")] });
@@ -276,7 +276,7 @@ async function run(
           const item = res.fields.fields.get("item").value;
           let amount = res.fields.fields.get("amount").value;
 
-          inventory = await getInventory(message.author.id);
+          inventory = await getInventory(message.member);
 
           const selected = selectItem(item);
 
@@ -329,7 +329,7 @@ async function run(
 
           if (amount.toLowerCase() === "all") {
             await res.deferUpdate();
-            offeredMoney = await getBalance(message.author.id);
+            offeredMoney = await getBalance(message.member);
           } else if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
             await res.reply({
               embeds: [new ErrorEmbed("invalid amount")],
@@ -652,7 +652,7 @@ async function run(
 
         if (
           dayjs(tradeRequests[page].createdAt).isAfter(
-            dayjs().subtract((await isPremium(message.author.id)) ? 1 : 12, "hour"),
+            dayjs().subtract((await isPremium(message.member)) ? 1 : 12, "hour"),
           )
         ) {
           row.addComponents(

@@ -6,6 +6,7 @@ import {
   MessageActionRowComponentBuilder,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
+import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { calcNetWorth } from "../utils/functions/economy/balance";
@@ -17,7 +18,6 @@ import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { hasProfile } from "../utils/functions/users/utils";
 import { addView } from "../utils/functions/users/views";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { NypsiClient } from "../models/Client";
 
 const cmd = new Command("networth", "view breakdown of your networth", "money").setAliases([
   "net",
@@ -54,7 +54,7 @@ async function run(
 
   if (!(await userExists(target))) await createUser(target);
 
-  if ((await isUserBlacklisted(target.user.id)).blacklisted)
+  if ((await isUserBlacklisted(target)).blacklisted)
     return message.channel.send({
       embeds: [
         new ErrorEmbed(
@@ -63,7 +63,7 @@ async function run(
       ],
     });
 
-  if ((await isEcoBanned(target.user.id)).banned)
+  if ((await isEcoBanned(target)).banned)
     return message.channel.send({
       embeds: [new ErrorEmbed(`${target.toString()} is banned AHAHAHAHA`)],
     });

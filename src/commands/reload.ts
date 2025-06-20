@@ -1,9 +1,9 @@
 import { CommandInteraction, Message } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { getAdminLevel } from "../utils/functions/users/admin";
 import { loadCommands, reloadCommand } from "../utils/handlers/commandhandler";
 import { reloadInteractions } from "../utils/handlers/interactions";
 import { logger } from "../utils/logger";
-import { getAdminLevel } from "../utils/functions/users/admin";
 
 const cmd = new Command("reload", "reload commands", "none").setPermissions(["bot owner"]);
 

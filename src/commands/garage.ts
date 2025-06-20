@@ -89,7 +89,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
     interaction?: ButtonInteraction | StringSelectMenuInteraction,
     needsUpdate = true,
   ): Promise<any> => {
-    const inventory = await getInventory(message.author.id);
+    const inventory = await getInventory(message.member);
     const embed = new CustomEmbed(message.member).setHeader(
       `${message.author.username}'s garage`,
       message.author.avatarURL(),
@@ -230,11 +230,11 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
         } else if (interaction.customId === "skin") {
           const chosen = interaction.values[0];
 
-          await setSkin(message.author.id, cars[index].id, chosen === "none" ? undefined : chosen);
+          await setSkin(message.member, cars[index].id, chosen === "none" ? undefined : chosen);
 
-          const changed = await checkSkins(message.author.id, await getGarage(message.author.id));
+          const changed = await checkSkins(message.member, await getGarage(message.member));
 
-          showCars(await getGarage(message.author.id), index, msg, interaction, true);
+          showCars(await getGarage(message.member), index, msg, interaction, true);
 
           if (changed) {
             await sleep(1000);
@@ -253,8 +253,8 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
         }
       } else if (interaction.componentType === ComponentType.Button) {
         if (interaction.customId === "buy") {
-          const balance = await getBalance(message.author.id);
-          const cost = calcCarCost((await getGarage(message.author.id)).length);
+          const balance = await getBalance(message.member);
+          const cost = calcCarCost((await getGarage(message.member)).length);
 
           if (balance < cost) {
             await interaction.reply({
@@ -264,10 +264,10 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
             return showCars(cars, index, msg, undefined, false);
           }
 
-          await addCar(message.author.id);
-          await removeBalance(message.author.id, cost);
-          addStat(message.author.id, "spent-garage", cost);
-          return showCars(await getGarage(message.author.id), index, msg, interaction);
+          await addCar(message.member);
+          await removeBalance(message.member, cost);
+          addStat(message.member, "spent-garage", cost);
+          return showCars(await getGarage(message.member), index, msg, interaction);
         } else if (interaction.customId === "rename") {
           const modal = new ModalBuilder()
             .setCustomId("rename_modal")
@@ -319,11 +319,11 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
             embeds: [new CustomEmbed(message.member, "car name updated")],
           });
 
-          await setCarName(message.author.id, cars[index].id, name);
-          return showCars(await getGarage(message.author.id), index, msg);
+          await setCarName(message.member, cars[index].id, name);
+          return showCars(await getGarage(message.member), index, msg);
         } else if (interaction.customId.startsWith("upg-")) {
           const upgrade = interaction.customId.substring(4);
-          const inventory = await getInventory(message.author.id);
+          const inventory = await getInventory(message.member);
 
           if (!inventory.has(upgrade)) {
             await interaction.reply({
@@ -333,11 +333,11 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
             return showCars(cars, index, msg, interaction, false);
           }
 
-          addProgress(message.author.id, "mechanic", 1);
-          await addCarUpgrade(message.author.id, cars[index].id, getItems()[upgrade].upgrades);
-          await removeInventoryItem(message.author.id, upgrade, 1);
+          addProgress(message.member, "mechanic", 1);
+          await addCarUpgrade(message.member, cars[index].id, getItems()[upgrade].upgrades);
+          await removeInventoryItem(message.member, upgrade, 1);
 
-          return showCars(await getGarage(message.author.id), index, msg, interaction);
+          return showCars(await getGarage(message.member), index, msg, interaction);
         }
       }
     };
@@ -345,7 +345,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
     return pageManager();
   };
 
-  showCars(await getGarage(message.author.id));
+  showCars(await getGarage(message.member));
 }
 
 cmd.setRun(run);

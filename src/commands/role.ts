@@ -25,8 +25,8 @@ import {
 import { getMember, getRole } from "../utils/functions/member";
 import PageManager from "../utils/functions/page";
 import sleep from "../utils/functions/sleep";
-import { logger } from "../utils/logger";
 import { pluralize } from "../utils/functions/string";
+import { logger } from "../utils/logger";
 
 const cmd = new Command("role", "role utilities", "utility");
 
@@ -239,7 +239,7 @@ async function run(
     let role: Role;
 
     if (!(message instanceof Message) && message.isChatInputCommand()) {
-      role = await message.guild.roles.cache.get(message.options.getRole("role").id);
+      role = message.guild.roles.cache.get(message.options.getRole("role").id);
     } else if (message.mentions?.roles?.first()) {
       role = message.mentions.roles.first();
     } else {

@@ -1,12 +1,12 @@
 import { CommandInteraction, Message } from "discord.js";
+import prisma from "../init/database";
+import redis from "../init/redis";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import Constants from "../utils/Constants";
 import { giveCaptcha, isLockedOut, passedCaptcha } from "../utils/functions/captcha";
+import { getMember } from "../utils/functions/member";
 import { getAdminLevel } from "../utils/functions/users/admin";
 import { logger } from "../utils/logger";
-import { getMember } from "../utils/functions/member";
-import redis from "../init/redis";
-import Constants from "../utils/Constants";
-import prisma from "../init/database";
 
 const cmd = new Command("captchatest", "test an account", "none");
 
@@ -14,7 +14,7 @@ async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
-  if ((await getAdminLevel(message.author.id)) < 1) return;
+  if ((await getAdminLevel(message.member)) < 1) return;
 
   if (args.length == 0) {
     return message.channel.send({ content: "dumbass" });
@@ -28,7 +28,7 @@ async function run(
       return;
     }
 
-    const res = await isLockedOut(target.id);
+    const res = await isLockedOut(target);
 
     if (!res) {
       if (message instanceof Message) message.react("➖");

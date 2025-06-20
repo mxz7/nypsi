@@ -190,70 +190,24 @@ async function run(
 
     for (const guildMember of members.values()) {
       if (guildMember.user.id === Constants.TEKOH_ID) continue; // no roles for me teehee
-      if (!(await userExists(guildMember.user.id))) continue;
+      if (!(await userExists(guildMember))) continue;
 
-      const level = await getRawLevel(guildMember.user.id);
-      const tags = await getTags(guildMember.user.id);
+      const level = await getRawLevel(guildMember);
+      const tags = await getTags(guildMember);
 
       if (level >= 99) {
-        if (
-          guildMember.joinedTimestamp < Date.now() - ms("1 year") &&
-          !tags.some((i) => i.tagId === "year1")
-        ) {
-          await addTag(guildMember.user.id, "year1");
-        } else if (
-          guildMember.joinedTimestamp > Date.now() - ms("1 year") &&
-          tags.some((i) => i.tagId === "year1")
-        ) {
-          await removeTag(guildMember.user.id, "year1");
-        }
-
-        if (
-          guildMember.joinedTimestamp < Date.now() - ms("2 year") &&
-          !tags.some((i) => i.tagId === "year2")
-        ) {
-          await addTag(guildMember.user.id, "year2");
-        } else if (
-          guildMember.joinedTimestamp > Date.now() - ms("2 year") &&
-          tags.some((i) => i.tagId === "year2")
-        ) {
-          await removeTag(guildMember.user.id, "year2");
-        }
-
-        if (
-          guildMember.joinedTimestamp < Date.now() - ms("3 year") &&
-          !tags.some((i) => i.tagId === "year3")
-        ) {
-          await addTag(guildMember.user.id, "year3");
-        } else if (
-          guildMember.joinedTimestamp > Date.now() - ms("3 year") &&
-          tags.some((i) => i.tagId === "year3")
-        ) {
-          await removeTag(guildMember.user.id, "year3");
-        }
-
-        if (
-          guildMember.joinedTimestamp < Date.now() - ms("4 year") &&
-          !tags.some((i) => i.tagId === "year4")
-        ) {
-          await addTag(guildMember.user.id, "year4");
-        } else if (
-          guildMember.joinedTimestamp > Date.now() - ms("4 year") &&
-          tags.some((i) => i.tagId === "year4")
-        ) {
-          await removeTag(guildMember.user.id, "year4");
-        }
-
-        if (
-          guildMember.joinedTimestamp < Date.now() - ms("5 year") &&
-          !tags.some((i) => i.tagId === "year5")
-        ) {
-          await addTag(guildMember.user.id, "year5");
-        } else if (
-          guildMember.joinedTimestamp > Date.now() - ms("5 year") &&
-          tags.some((i) => i.tagId === "year5")
-        ) {
-          await removeTag(guildMember.user.id, "year5");
+        for (let i = 1; i <= 5; i++) {
+          if (
+            guildMember.joinedTimestamp < Date.now() - ms(`${i} year`) &&
+            !tags.some((i) => i.tagId === `year${i}`)
+          ) {
+            await addTag(guildMember, `year${i}`);
+          } else if (
+            guildMember.joinedTimestamp > Date.now() - ms(`${i} year`) &&
+            tags.some((i) => i.tagId === `year${i}`)
+          ) {
+            await removeTag(guildMember, `year${i}`);
+          }
         }
       } else if (tags.some((i) => i.tagId.includes("year"))) {
         for (const tag of tags) {
@@ -264,10 +218,9 @@ async function run(
       const roleIds = Array.from(guildMember.roles.cache.keys());
 
       if (roleIds.includes(Constants.BOOST_ROLE_ID)) {
-        if (!(await isBooster(guildMember.user.id)))
-          await setBooster(guildMember.user.id, true).catch(() => {});
-      } else if (await isBooster(guildMember.user.id)) {
-        await setBooster(guildMember.user.id, false);
+        if (!(await isBooster(guildMember))) await setBooster(guildMember, true).catch(() => {});
+      } else if (await isBooster(guildMember)) {
+        await setBooster(guildMember, false);
       }
 
       if (!(await isPremium(guildMember))) {
@@ -344,19 +297,19 @@ async function run(
         }
       }
 
-      const totalSpend = await getTotalSpend(guildMember.id);
+      const totalSpend = await getTotalSpend(guildMember);
 
       if (guildMember.roles.cache.has(Constants.HIGHROLLER_ROLE)) {
         if (totalSpend < Constants.HIGHROLLER_REQUIREMENT) {
-          if ((await getTags(guildMember.id)).find((i) => i.tagId === "highroller"))
-            await removeTag(guildMember.id, "highroller");
+          if ((await getTags(guildMember)).find((i) => i.tagId === "highroller"))
+            await removeTag(guildMember, "highroller");
           await sleep(250);
           await guildMember.roles.remove(Constants.HIGHROLLER_ROLE);
         }
       } else {
         if (totalSpend >= Constants.HIGHROLLER_REQUIREMENT) {
-          if (!(await getTags(guildMember.id)).find((i) => i.tagId === "highroller"))
-            await addTag(guildMember.id, "highroller");
+          if (!(await getTags(guildMember)).find((i) => i.tagId === "highroller"))
+            await addTag(guildMember, "highroller");
           await sleep(250);
           await guildMember.roles.add(Constants.HIGHROLLER_ROLE);
           if (guildMember.roles.cache.has(Constants.SUPPORTER_ROLE)) {
@@ -378,7 +331,7 @@ async function run(
         await guildMember.roles.add(Constants.SUPPORTER_ROLE);
       }
 
-      const colour = await getEmbedColor(guildMember.user.id);
+      const colour = await getEmbedColor(guildMember);
 
       if (colour === "default") {
         const role = guildMember.roles.cache.find((i) => i.name === "custom");
@@ -493,7 +446,7 @@ async function run(
 
       let description =
         `**tier** ${levelString(profile.level)}` +
-        `\n**booster** ${await isBooster(message.author.id)}` +
+        `\n**booster** ${await isBooster(message.member)}` +
         `\n**started** <t:${Math.floor(profile.startDate.getTime() / 1000)}> (<t:${Math.floor(
           profile.startDate.getTime() / 1000,
         )}:R>)` +
@@ -503,7 +456,7 @@ async function run(
         `\n**aliases** ${aliases.length.toLocaleString()}`;
 
       if (profile.level > 2) {
-        const cmd = await getUserCommand(message.author.id);
+        const cmd = await getUserCommand(message.member);
         description += `\n**custom command** ${cmd ? cmd.trigger : "none"}`;
       }
 
@@ -515,7 +468,7 @@ async function run(
       embed.setFooter({ text: "thank you so much for supporting!" });
 
       return send({ embeds: [embed] });
-    } else if (await isBooster(message.author.id)) {
+    } else if (await isBooster(message.member)) {
       const embed = new CustomEmbed(
         message.member,
         "you are currently boosting the nypsi server!! thank you, your booster rewards are separate from premium, meaning that they can stack together.\n\nyou currently have no premium membership, this is what helps keep nypsi running. i (max) am massively grateful for any donations :heart:",
@@ -545,7 +498,7 @@ async function run(
   };
 
   const setColor = async () => {
-    if (!(await isPremium(message.author.id))) {
+    if (!(await isPremium(message.member))) {
       return send({
         embeds: [new ErrorEmbed("you must be **BRONZE** tier to set a custom color")],
       });
@@ -580,7 +533,7 @@ async function run(
       });
     }
 
-    await setEmbedColor(message.author.id, color.toLowerCase());
+    await setEmbedColor(message.member, color.toLowerCase());
 
     if (message.guildId === Constants.NYPSI_SERVER_ID) {
       let existingRole = message.member.roles.cache.find((i) => i.name === "custom");
@@ -633,7 +586,7 @@ async function run(
     }
 
     embed.setDescription(
-      `your color has been updated to **${await getEmbedColor(message.author.id)}**`,
+      `your color has been updated to **${await getEmbedColor(message.member)}**`,
     );
 
     return send({
@@ -642,7 +595,7 @@ async function run(
   };
 
   const doCustomCommand = async () => {
-    if ((await getTier(message.author.id)) < 3) {
+    if ((await getTier(message.member)) < 3) {
       return send({
         embeds: [new ErrorEmbed("you must be **GOLD** tier to create a custom command")],
       });
@@ -653,7 +606,7 @@ async function run(
     if (!message.isChatInputCommand()) return;
 
     if (args[1].toLowerCase() === "view") {
-      const cmd = await getUserCommand(message.author.id);
+      const cmd = await getUserCommand(message.member);
 
       const embed = new CustomEmbed(message.member);
 
@@ -698,7 +651,7 @@ async function run(
       if (cmd && cmd.owner !== message.author.id)
         return send({ embeds: [new ErrorEmbed("this custom command already exists")] });
 
-      await setCommand(message.author.id, commandTrigger, commandContent);
+      await setCommand(message.member, commandTrigger, commandContent);
 
       return send({
         embeds: [
@@ -713,7 +666,7 @@ async function run(
   };
 
   const doAliases = async () => {
-    if ((await getTier(message.author.id)) < 1) {
+    if ((await getTier(message.member)) < 1) {
       return send({
         embeds: [new ErrorEmbed("you must be **BRONZE** tier to create a custom alias")],
       });
@@ -724,7 +677,7 @@ async function run(
 
     if (!message.isChatInputCommand()) return;
 
-    const aliases = await getUserAliases(message.author.id);
+    const aliases = await getUserAliases(message.member);
 
     const prefix = (await getPrefix(message.guild))[0];
 
@@ -756,7 +709,7 @@ async function run(
     } else if (args[1].toLowerCase() === "add") {
       let max = 3;
 
-      const tier = await getTier(message.author.id);
+      const tier = await getTier(message.member);
 
       for (let i = 0; i < tier; i++) {
         max *= 1.75;
@@ -806,7 +759,7 @@ async function run(
           });
       }
 
-      await addUserAlias(message.author.id, trigger, command);
+      await addUserAlias(message.member, trigger, command);
 
       return send({
         embeds: [
@@ -826,7 +779,7 @@ async function run(
         return send({ embeds: [new ErrorEmbed(`couldnt find alias \`${prefix}${trigger}\``)] });
       }
 
-      await removeUserAlias(message.author.id, trigger);
+      await removeUserAlias(message.member, trigger);
 
       return send({
         embeds: [new CustomEmbed(message.member, `✅ removed \`${prefix}${trigger}\``)],
@@ -849,12 +802,12 @@ async function run(
 
     if (!user) return send({ embeds: [new ErrorEmbed("user doesnt exist")] });
 
-    if (await isPremium(user.id)) {
+    if (await isPremium(user)) {
       const embed = new CustomEmbed(message.member);
 
       embed.setHeader(`premium status of ${user.id}`);
 
-      const profile = await getPremiumProfile(user.id);
+      const profile = await getPremiumProfile(user);
 
       const timeStarted = formatDate(profile.startDate);
       const timeAgo = daysAgo(profile.startDate);
@@ -868,7 +821,7 @@ async function run(
       }`;
 
       if (profile.level > 2) {
-        const cmd = await getUserCommand(user.id);
+        const cmd = await getUserCommand(user);
         description += `\n**custom command** ${cmd ? cmd.content : "none"}`;
       }
 

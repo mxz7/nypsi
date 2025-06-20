@@ -55,7 +55,7 @@ cmd.setRun((message, args) => {
   };
 
   const listTags = async () => {
-    const tags = await getTags(message.author.id);
+    const tags = await getTags(message.member);
     const tagData = getTagsData();
 
     if (tags.length === 0) {
@@ -110,7 +110,7 @@ cmd.setRun((message, args) => {
   };
 
   const selectTag = async (search: string) => {
-    const tags = await getTags(message.author.id);
+    const tags = await getTags(message.member);
     const tagData = getTagsData();
 
     let selected: Tag;
@@ -132,14 +132,14 @@ cmd.setRun((message, args) => {
     }
 
     if (search === "none") {
-      await setActiveTag(message.author.id, "none");
+      await setActiveTag(message.member, "none");
 
       return send({
         embeds: [new CustomEmbed(message.member, `disabled any active tag`)],
       });
     }
 
-    await setActiveTag(message.author.id, selected.id);
+    await setActiveTag(message.member, selected.id);
 
     return send({
       embeds: [
@@ -153,7 +153,7 @@ cmd.setRun((message, args) => {
 
   const listAllTags = async () => {
     const tagData = getTagsData();
-    const userTags = await getTags(message.author.id);
+    const userTags = await getTags(message.member);
 
     const tagList: { title: string; value: string; owned: boolean }[] = [];
 

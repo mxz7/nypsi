@@ -9,6 +9,7 @@ import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { Item } from "../../../types/Economy";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
+import { getUserId, MemberResolvable } from "../member";
 import { getTier, isPremium } from "../premium/premium";
 import { percentChance } from "../random";
 import sleep from "../sleep";
@@ -34,31 +35,26 @@ setInterval(() => {
   gemChanceCooldown.clear();
 }, 60000);
 
-export async function getInventory(member: GuildMember | string): Promise<Inventory> {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function getInventory(member: MemberResolvable): Promise<Inventory> {
+  const userId = getUserId(member);
 
-  const cache = await redis.get(`${Constants.redis.cache.economy.INVENTORY}:${id}`);
+  const cache = await redis.get(`${Constants.redis.cache.economy.INVENTORY}:${userId}`);
 
   if (cache) {
     try {
       const parsed = JSON.parse(cache);
-      return Inventory.fromJSON(id, parsed);
+      return Inventory.fromJSON(userId, parsed);
     } catch (e) {
       console.error(e);
       logger.error("weird inventory cache error", { error: e });
-      return new Inventory(id);
+      return new Inventory(userId);
     }
   }
 
   const query = await prisma.inventory
     .findMany({
       where: {
-        userId: id,
+        userId,
       },
       select: {
         item: true,
@@ -73,20 +69,20 @@ export async function getInventory(member: GuildMember | string): Promise<Invent
     .catch(() => {});
 
   if (!query || query.length == 0) {
-    if (!(await userExists(id))) await createUser(id);
+    if (!(await userExists(userId))) await createUser(userId);
     await redis.set(
-      `${Constants.redis.cache.economy.INVENTORY}:${id}`,
+      `${Constants.redis.cache.economy.INVENTORY}:${userId}`,
       JSON.stringify({}),
       "EX",
       180,
     );
-    return new Inventory(id);
+    return new Inventory(userId);
   }
 
-  const inventory = new Inventory(id, query);
+  const inventory = new Inventory(userId, query);
 
   await redis.set(
-    `${Constants.redis.cache.economy.INVENTORY}:${id}`,
+    `${Constants.redis.cache.economy.INVENTORY}:${userId}`,
     JSON.stringify(inventory.toJSON()),
     "EX",
     180,
@@ -99,13 +95,8 @@ export class Inventory {
   private items: { [itemId: string]: number };
   private userId: string;
 
-  constructor(member: GuildMember | string, data?: { item: string; amount: number }[]) {
-    if (member instanceof GuildMember) {
-      this.userId = member.user.id;
-    } else {
-      this.userId = member;
-    }
-
+  constructor(member: MemberResolvable, data?: { item: string; amount: number }[]) {
+    this.userId = getUserId(member);
     this.items = {};
     if (data) {
       for (const i of data) {
@@ -174,7 +165,7 @@ export class Inventory {
     return this.items;
   }
 
-  static fromJSON(member: GuildMember | string, obj: { [itemId: string]: number }): Inventory {
+  static fromJSON(member: MemberResolvable, obj: { [itemId: string]: number }): Inventory {
     const data = Object.entries(obj).map(([item, amount]) => ({
       item,
       amount,
@@ -243,30 +234,21 @@ async function doAutosellThing(
   return;
 }
 
-export async function addInventoryItem(
-  member: GuildMember | string,
-  itemId: string,
-  amount: number,
-) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function addInventoryItem(member: MemberResolvable, itemId: string, amount: number) {
+  const userId = getUserId(member);
 
   if (amount <= 0) return;
 
-  if (!(await userExists(id))) await createUser(id);
+  if (!(await userExists(userId))) await createUser(userId);
 
   if (!getItems()[itemId]) {
     console.trace();
     return logger.error(`invalid item: ${itemId}`);
   }
 
-  if ((await getAutosellItems(id)).includes(itemId)) {
+  if ((await getAutosellItems(userId)).includes(itemId)) {
     return doAutosellThing(
-      id,
+      userId,
       itemId,
       amount,
       member instanceof GuildMember ? (member.client as NypsiClient) : undefined,
@@ -276,7 +258,7 @@ export async function addInventoryItem(
   await prisma.inventory.upsert({
     where: {
       userId_item: {
-        userId: id,
+        userId,
         item: itemId,
       },
     },
@@ -284,34 +266,29 @@ export async function addInventoryItem(
       amount: { increment: amount },
     },
     create: {
-      userId: id,
+      userId,
       item: itemId,
       amount: amount,
     },
   });
 
   await redis.del(
-    `${Constants.redis.cache.economy.INVENTORY}:${id}`,
+    `${Constants.redis.cache.economy.INVENTORY}:${userId}`,
     `${Constants.redis.cache.economy.ITEM_EXISTS}:${itemId}`,
-    ...(isGem(itemId) ? [`${Constants.redis.cache.economy.HAS_GEM}:${id}:${itemId}`] : []),
+    ...(isGem(itemId) ? [`${Constants.redis.cache.economy.HAS_GEM}:${userId}:${itemId}`] : []),
   );
 }
 
 export async function removeInventoryItem(
-  member: GuildMember | string,
+  member: MemberResolvable,
   itemId: string,
   amount: number,
 ) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+  const userId = getUserId(member);
 
   if (amount <= 0) return;
 
-  if (!(await userExists(id))) await createUser(id);
+  if (!(await userExists(userId))) await createUser(userId);
 
   if (!getItems()[itemId]) {
     console.trace();
@@ -321,7 +298,7 @@ export async function removeInventoryItem(
   const query = await prisma.inventory.upsert({
     where: {
       userId_item: {
-        userId: id,
+        userId,
         item: itemId,
       },
     },
@@ -329,7 +306,7 @@ export async function removeInventoryItem(
       amount: { decrement: amount },
     },
     create: {
-      userId: id,
+      userId,
       item: itemId,
       amount: amount,
     },
@@ -343,7 +320,7 @@ export async function removeInventoryItem(
       .delete({
         where: {
           userId_item: {
-            userId: id,
+            userId,
             item: itemId,
           },
         },
@@ -352,23 +329,14 @@ export async function removeInventoryItem(
   }
 
   await redis.del(
-    `${Constants.redis.cache.economy.INVENTORY}:${id}`,
+    `${Constants.redis.cache.economy.INVENTORY}:${userId}`,
     `${Constants.redis.cache.economy.ITEM_EXISTS}:${itemId}`,
-    ...(isGem(itemId) ? [`${Constants.redis.cache.economy.HAS_GEM}:${id}:${itemId}`] : []),
+    ...(isGem(itemId) ? [`${Constants.redis.cache.economy.HAS_GEM}:${userId}:${itemId}`] : []),
   );
 }
 
-export async function setInventoryItem(
-  member: GuildMember | string,
-  itemId: string,
-  amount: number,
-) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function setInventoryItem(member: MemberResolvable, itemId: string, amount: number) {
+  const userId = getUserId(member);
 
   if (!getItems()[itemId]) {
     console.trace();
@@ -380,7 +348,7 @@ export async function setInventoryItem(
       .delete({
         where: {
           userId_item: {
-            userId: id,
+            userId,
             item: itemId,
           },
         },
@@ -390,7 +358,7 @@ export async function setInventoryItem(
     await prisma.inventory.upsert({
       where: {
         userId_item: {
-          userId: id,
+          userId,
           item: itemId,
         },
       },
@@ -398,7 +366,7 @@ export async function setInventoryItem(
         amount: amount,
       },
       create: {
-        userId: id,
+        userId,
         item: itemId,
         amount: amount,
       },
@@ -406,9 +374,9 @@ export async function setInventoryItem(
   }
 
   await redis.del(
-    `${Constants.redis.cache.economy.INVENTORY}:${id}`,
+    `${Constants.redis.cache.economy.INVENTORY}:${userId}`,
     `${Constants.redis.cache.economy.ITEM_EXISTS}:${itemId}`,
-    ...(isGem(itemId) ? [`${Constants.redis.cache.economy.HAS_GEM}:${id}:${itemId}`] : []),
+    ...(isGem(itemId) ? [`${Constants.redis.cache.economy.HAS_GEM}:${userId}:${itemId}`] : []),
   );
 }
 
@@ -460,12 +428,14 @@ export function selectItem(search: string) {
   return undefined;
 }
 
-export async function commandGemCheck(member: GuildMember, commandCategory: CommandCategory) {
+export async function commandGemCheck(member: MemberResolvable, commandCategory: CommandCategory) {
+  const userId = getUserId(member);
+
   if (await redis.exists(Constants.redis.nypsi.GEM_GIVEN)) return;
   if (!(await userExists(member))) return;
   if (!(await getDmSettings(member)).other) return;
-  if (gemChanceCooldown.has(member.user.id)) return;
-  gemChanceCooldown.add(member.user.id);
+  if (gemChanceCooldown.has(userId)) return;
+  gemChanceCooldown.add(userId);
 
   if (percentChance(0.001)) {
     await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t", "EX", 86400);
@@ -473,14 +443,14 @@ export async function commandGemCheck(member: GuildMember, commandCategory: Comm
 
     const gem = gems[Math.floor(Math.random() * gems.length)];
 
-    logger.info(`${member.user.id} received ${gem} randomly`);
+    logger.info(`${userId} received ${gem} randomly`);
 
     await addInventoryItem(member, gem, 1);
-    addProgress(member.user.id, "gem_hunter", 1);
+    addProgress(member, "gem_hunter", 1);
 
     if ((await getDmSettings(member)).other) {
       addNotificationToQueue({
-        memberId: member.user.id,
+        memberId: userId,
         payload: {
           embed: new CustomEmbed(
             member,
@@ -494,13 +464,13 @@ export async function commandGemCheck(member: GuildMember, commandCategory: Comm
   if (commandCategory == "moderation") {
     if (percentChance(0.07)) {
       await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t", "EX", 86400);
-      logger.info(`${member.user.id} received pink_gem randomly`);
+      logger.info(`${userId} received pink_gem randomly`);
       await addInventoryItem(member, "pink_gem", 1);
-      addProgress(member.user.id, "gem_hunter", 1);
+      addProgress(userId, "gem_hunter", 1);
 
       if ((await getDmSettings(member)).other) {
         addNotificationToQueue({
-          memberId: member.user.id,
+          memberId: userId,
           payload: {
             embed: new CustomEmbed(
               member,
@@ -515,13 +485,13 @@ export async function commandGemCheck(member: GuildMember, commandCategory: Comm
   } else if (commandCategory == "animals") {
     if (percentChance(0.007)) {
       await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t", "EX", 86400);
-      logger.info(`${member.user.id} received purple_gem randomly`);
+      logger.info(`${userId} received purple_gem randomly`);
       await addInventoryItem(member, "purple_gem", 1);
-      addProgress(member.user.id, "gem_hunter", 1);
+      addProgress(member, "gem_hunter", 1);
 
       if ((await getDmSettings(member)).other) {
         addNotificationToQueue({
-          memberId: member.user.id,
+          memberId: userId,
           payload: {
             embed: new CustomEmbed(
               member,
@@ -541,12 +511,14 @@ export function isGem(itemId: string) {
 }
 
 export async function gemBreak(
-  userId: string,
+  member: MemberResolvable,
   chance: number,
   gem: "blue_gem" | "purple_gem" | "pink_gem" | "green_gem" | "white_gem",
   client?: NypsiClient | ClusterManager,
 ) {
   if (!percentChance(chance)) return;
+
+  const userId = getUserId(member);
 
   const inventory = await getInventory(userId);
   const gemLocation = await inventory.hasGem(gem);
@@ -682,11 +654,13 @@ export async function gemBreak(
   }
 }
 
-export async function setAutosellItems(member: GuildMember, items: string[]) {
+export async function setAutosellItems(member: MemberResolvable, items: string[]) {
+  const userId = getUserId(member);
+
   const query = await prisma.economy
     .update({
       where: {
-        userId: member.user.id,
+        userId,
       },
       data: {
         autosell: items,
@@ -697,29 +671,24 @@ export async function setAutosellItems(member: GuildMember, items: string[]) {
     })
     .then((q) => q.autosell);
 
-  await redis.del(`${Constants.redis.cache.economy.AUTO_SELL}:${member.user.id}`);
+  await redis.del(`${Constants.redis.cache.economy.AUTO_SELL}:${userId}`);
 
   return query;
 }
 
-export async function getAutosellItems(member: GuildMember | string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function getAutosellItems(member: MemberResolvable) {
+  const userId = getUserId(member);
 
-  if (await redis.exists(`${Constants.redis.cache.economy.AUTO_SELL}:${id}`)) {
+  if (await redis.exists(`${Constants.redis.cache.economy.AUTO_SELL}:${userId}`)) {
     return JSON.parse(
-      await redis.get(`${Constants.redis.cache.economy.AUTO_SELL}:${id}`),
+      await redis.get(`${Constants.redis.cache.economy.AUTO_SELL}:${userId}`),
     ) as string[];
   }
 
   const query = await prisma.economy
     .findUnique({
       where: {
-        userId: id,
+        userId,
       },
       select: {
         autosell: true,
@@ -728,7 +697,7 @@ export async function getAutosellItems(member: GuildMember | string) {
     .then((q) => q.autosell);
 
   await redis.set(
-    `${Constants.redis.cache.economy.AUTO_SELL}:${id}`,
+    `${Constants.redis.cache.economy.AUTO_SELL}:${userId}`,
     JSON.stringify(query),
     "EX",
     Math.floor(ms("1 hour") / 1000),
@@ -737,11 +706,13 @@ export async function getAutosellItems(member: GuildMember | string) {
   return query;
 }
 
-export async function setSellFilter(member: GuildMember, items: string[]) {
+export async function setSellFilter(member: MemberResolvable, items: string[]) {
+  const userId = getUserId(member);
+
   const query = await prisma.economy
     .update({
       where: {
-        userId: member.user.id,
+        userId,
       },
       data: {
         sellallFilter: items,
@@ -752,29 +723,24 @@ export async function setSellFilter(member: GuildMember, items: string[]) {
     })
     .then((q) => q.sellallFilter);
 
-  await redis.del(`${Constants.redis.cache.economy.SELL_FILTER}:${member.user.id}`);
+  await redis.del(`${Constants.redis.cache.economy.SELL_FILTER}:${userId}`);
 
   return query;
 }
 
-export async function getSellFilter(member: GuildMember | string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function getSellFilter(member: MemberResolvable) {
+  const userId = getUserId(member);
 
-  if (await redis.exists(`${Constants.redis.cache.economy.SELL_FILTER}:${id}`)) {
+  if (await redis.exists(`${Constants.redis.cache.economy.SELL_FILTER}:${userId}`)) {
     return JSON.parse(
-      await redis.get(`${Constants.redis.cache.economy.SELL_FILTER}:${id}`),
+      await redis.get(`${Constants.redis.cache.economy.SELL_FILTER}:${userId}`),
     ) as string[];
   }
 
   const query = await prisma.economy
     .findUnique({
       where: {
-        userId: id,
+        userId,
       },
       select: {
         sellallFilter: true,
@@ -783,7 +749,7 @@ export async function getSellFilter(member: GuildMember | string) {
     .then((q) => q.sellallFilter);
 
   await redis.set(
-    `${Constants.redis.cache.economy.SELL_FILTER}:${id}`,
+    `${Constants.redis.cache.economy.SELL_FILTER}:${userId}`,
     JSON.stringify(query),
     "EX",
     Math.floor(ms("1 hour") / 1000),

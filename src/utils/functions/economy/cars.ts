@@ -2,6 +2,7 @@ import { CarUpgradeType } from "@prisma/client";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
+import { getUserId, MemberResolvable } from "../member";
 import { getInventory } from "./inventory";
 import { getItems } from "./utils";
 
@@ -27,8 +28,8 @@ carEmojis.set(20, "<:nypsi_db11:1228708967769702401>");
 carEmojis.set(22, "<:nypsi_lambo:1207439589011357796>");
 carEmojis.set(25, "<:nypsi_812:1228709501771841558>");
 
-export async function checkSkins(userId: string, cars: Car[]) {
-  const inventory = await getInventory(userId);
+export async function checkSkins(member: MemberResolvable, cars: Car[]) {
+  const inventory = await getInventory(member);
 
   let changed = false;
   const counts = new Map<string, number>();
@@ -39,7 +40,7 @@ export async function checkSkins(userId: string, cars: Car[]) {
       else counts.set(car.skin, 1);
 
       if (inventory.count(car.skin) < counts.get(car.skin)) {
-        await setSkin(userId, car.id);
+        await setSkin(member, car.id);
         changed = true;
       }
     }
@@ -48,7 +49,9 @@ export async function checkSkins(userId: string, cars: Car[]) {
   return changed;
 }
 
-export async function getGarage(userId: string) {
+export async function getGarage(member: MemberResolvable) {
+  const userId = getUserId(member);
+
   const cache = await redis.get(`${Constants.redis.cache.economy.GARAGE}:${userId}`);
 
   if (cache) {
@@ -115,7 +118,9 @@ export function getCarEmoji(car: Car) {
   return emoji;
 }
 
-export async function addCar(userId: string) {
+export async function addCar(member: MemberResolvable) {
+  const userId = getUserId(member);
+
   await prisma.customCar.create({
     data: {
       name: "custom car",
@@ -126,7 +131,13 @@ export async function addCar(userId: string) {
   await redis.del(`${Constants.redis.cache.economy.GARAGE}:${userId}`);
 }
 
-export async function addCarUpgrade(userId: string, carId: number, upgradeType: CarUpgradeType) {
+export async function addCarUpgrade(
+  member: MemberResolvable,
+  carId: number,
+  upgradeType: CarUpgradeType,
+) {
+  const userId = getUserId(member);
+
   await prisma.carUpgrade.upsert({
     where: {
       carId_type: {
@@ -156,7 +167,9 @@ export function calcCarCost(amount: number) {
   return base;
 }
 
-export async function setCarName(userId: string, carId: number, name: string) {
+export async function setCarName(member: MemberResolvable, carId: number, name: string) {
+  const userId = getUserId(member);
+
   await prisma.customCar.update({
     where: {
       id: carId,
@@ -169,7 +182,7 @@ export async function setCarName(userId: string, carId: number, name: string) {
   await redis.del(`${Constants.redis.cache.economy.GARAGE}:${userId}`);
 }
 
-export async function setSkin(userId: string, carId: number, skin?: string) {
+export async function setSkin(member: MemberResolvable, carId: number, skin?: string) {
   await prisma.customCar.update({
     where: {
       id: carId,
@@ -179,5 +192,5 @@ export async function setSkin(userId: string, carId: number, skin?: string) {
     },
   });
 
-  await redis.del(`${Constants.redis.cache.economy.GARAGE}:${userId}`);
+  await redis.del(`${Constants.redis.cache.economy.GARAGE}:${getUserId(member)}`);
 }

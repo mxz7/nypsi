@@ -1,4 +1,5 @@
 import { TradeRequest } from "@prisma/client";
+import { ClusterManager } from "discord-hybrid-sharding";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -16,6 +17,7 @@ import { CustomEmbed, ErrorEmbed } from "../../../models/EmbedBuilders";
 import { Item } from "../../../types/Economy";
 import Constants from "../../Constants";
 import { logger, transactionMulti } from "../../logger";
+import { getUserId, MemberResolvable } from "../member";
 import { getAllGroupAccountIds } from "../moderation/alts";
 import { getTier, isPremium } from "../premium/premium";
 import { addToNypsiBank, getTax } from "../tax";
@@ -25,21 +27,13 @@ import { addInventoryItem, getInventory, isGem, removeInventoryItem } from "./in
 import { createUser, getItems, userExists } from "./utils";
 import ms = require("ms");
 import dayjs = require("dayjs");
-import { ClusterManager } from "discord-hybrid-sharding";
 
 const beingFulfilled = new Set<number>();
 
-export async function getTradeRequests(member: GuildMember | string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
+export async function getTradeRequests(member: MemberResolvable) {
   const query = await prisma.tradeRequest.findMany({
     where: {
-      AND: [{ ownerId: id }, { completed: false }],
+      AND: [{ ownerId: getUserId(member) }, { completed: false }],
     },
     orderBy: {
       createdAt: "asc",

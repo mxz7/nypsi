@@ -14,6 +14,7 @@ import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
+import { getUserId, MemberResolvable } from "../member";
 import { filterOutliers } from "../outliers";
 import { isPremium } from "../premium/premium";
 import { getTax } from "../tax";
@@ -94,25 +95,31 @@ export async function createOffer(
   return true;
 }
 
-export async function getOwnedOffers(userId: string) {
-  return await prisma.offer.findMany({ where: { AND: [{ ownerId: userId }, { sold: false }] } });
+export async function getOwnedOffers(member: MemberResolvable) {
+  return await prisma.offer.findMany({
+    where: { AND: [{ ownerId: getUserId(member) }, { sold: false }] },
+  });
 }
 
-export async function getTargetedOffers(userId: string) {
-  return await prisma.offer.findMany({ where: { AND: [{ targetId: userId }, { sold: false }] } });
+export async function getTargetedOffers(member: MemberResolvable) {
+  return await prisma.offer.findMany({
+    where: { AND: [{ targetId: getUserId(member) }, { sold: false }] },
+  });
 }
 
-export async function getBlockedList(userId: string) {
+export async function getBlockedList(member: MemberResolvable) {
+  const userId = getUserId(member);
+
   if (!(await userExists(userId))) await createUser(userId);
 
   return await prisma.economy
-    .findUnique({ where: { userId: userId }, select: { offersBlock: true } })
+    .findUnique({ where: { userId }, select: { offersBlock: true } })
     .then((r) => r.offersBlock);
 }
 
-export async function setBlockedList(userId: string, list: string[]) {
+export async function setBlockedList(member: MemberResolvable, list: string[]) {
   return await prisma.economy
-    .update({ where: { userId: userId }, data: { offersBlock: list } })
+    .update({ where: { userId: getUserId(member) }, data: { offersBlock: list } })
     .then((r) => r.offersBlock);
 }
 

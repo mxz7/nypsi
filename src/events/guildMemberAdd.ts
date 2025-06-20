@@ -74,7 +74,7 @@ export default async function guildMemberAdd(member: GuildMember) {
 
   const [persistentRoles, userRoles] = await Promise.all([
     getPersistentRoles(member.guild),
-    getPersistentRolesForUser(member.guild, member.id),
+    getPersistentRolesForUser(member.guild, member),
   ]);
 
   if (userRoles.length > 0 && persistentRoles.length > 0) {

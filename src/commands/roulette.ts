@@ -9,6 +9,7 @@ import {
   MessageFlags,
 } from "discord.js";
 import redis from "../init/redis";
+import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
@@ -29,7 +30,6 @@ import { getPrefix } from "../utils/functions/guilds/utils";
 import { shuffle } from "../utils/functions/random";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { gamble } from "../utils/logger.js";
-import { NypsiClient } from "../models/Client";
 
 const values = [
   "b",
@@ -301,7 +301,7 @@ async function run(
       await addBalance(message.member, winnings);
     }
 
-    if (roll == "🟢") addProgress(message.author.id, "roulette_pro", 1);
+    if (roll == "🟢") addProgress(message.member, "roulette_pro", 1);
   } else {
     await removeBalance(message.member, bet);
   }

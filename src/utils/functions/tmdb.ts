@@ -1,5 +1,4 @@
 import ms = require("ms");
-import { GuildMember } from "discord.js";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import {
@@ -12,6 +11,7 @@ import {
 } from "../../types/tmdb";
 import Constants from "../Constants";
 import { addTaskProgress } from "./economy/tasks";
+import { getUserId, MemberResolvable } from "./member";
 
 const BASE = "https://api.themoviedb.org/3";
 
@@ -224,18 +224,13 @@ function transformProviders(providerData: any): CountryProvider[] {
 }
 
 export async function setUserRating(
-  member: GuildMember | string,
+  member: MemberResolvable,
   type: "movie" | "tv",
   id: number,
   name: string,
   rating: number | "reset",
 ) {
-  let userId: string;
-  if (member instanceof GuildMember) {
-    userId = member.user.id;
-  } else {
-    userId = member;
-  }
+  const userId = getUserId(member);
 
   if (rating == "reset") {
     return await prisma.tmdbRatings.deleteMany({ where: { userId, type, id } });
@@ -270,25 +265,16 @@ export async function getRating(type: "movie" | "tv", id: number) {
 }
 
 export async function getUserRatings(
-  member: GuildMember | string,
+  member: MemberResolvable,
   type: "movie" | "tv",
   id: number,
 ): Promise<number>;
 export async function getUserRatings(
-  member: GuildMember | string,
+  member: MemberResolvable,
   type?: "movie" | "tv",
 ): Promise<{ name: string; rating: number }[]>;
-export async function getUserRatings(
-  member: GuildMember | string,
-  type?: "movie" | "tv",
-  id?: number,
-) {
-  let userId: string;
-  if (member instanceof GuildMember) {
-    userId = member.user.id;
-  } else {
-    userId = member;
-  }
+export async function getUserRatings(member: MemberResolvable, type?: "movie" | "tv", id?: number) {
+  const userId = getUserId(member);
 
   if (id)
     return (

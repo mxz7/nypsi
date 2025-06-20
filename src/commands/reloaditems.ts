@@ -4,8 +4,8 @@ import prisma from "../init/database";
 import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { getTasksData, loadItems } from "../utils/functions/economy/utils";
-import { logger } from "../utils/logger";
 import { getAdminLevel } from "../utils/functions/users/admin";
+import { logger } from "../utils/logger";
 
 const cmd = new Command("reloaditems", "reload items", "none").setPermissions(["bot owner"]);
 

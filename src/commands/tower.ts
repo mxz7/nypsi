@@ -326,7 +326,7 @@ async function prepareGame(
 
   components[components.length - 1].components[0].setDisabled(true);
 
-  const desc = await renderGambleScreen(message.author.id, "playing", bet, "**0**x ($0)");
+  const desc = await renderGambleScreen("playing", bet, "**0**x ($0)");
 
   const embed = new CustomEmbed(message.member, desc)
     .setHeader("dragon tower", message.author.avatarURL())
@@ -531,7 +531,7 @@ async function playGame(
         percentChance(0.05) &&
         parseInt(await redis.get(`anticheat:interactivegame:count:${message.author.id}`)) > 100
       ) {
-        const res = await giveCaptcha(message.author.id);
+        const res = await giveCaptcha(message.member);
 
         if (res) {
           logger.info(
@@ -577,7 +577,7 @@ async function playGame(
       logger.info(
         `::cmd ${message.guild.id} ${message.channelId} ${message.author.username}: replaying tower`,
       );
-      if (await isLockedOut(message.author.id)) {
+      if (await isLockedOut(message.member)) {
         await verifyUser(message);
         return replay(embed, interaction, false);
       }
@@ -641,7 +641,6 @@ async function playGame(
     game.embed.setFooter({ text: `id: ${id}` });
     game.embed.setColor(Constants.EMBED_FAIL_COLOR);
     const desc = await renderGambleScreen(
-      message.author.id,
       "lose",
       game.bet,
       `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
@@ -661,7 +660,6 @@ async function playGame(
     }
 
     const desc = await renderGambleScreen(
-      message.author.id,
       "win",
       game.bet,
       `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
@@ -740,7 +738,6 @@ async function playGame(
     gamble(message.author, "tower", game.bet, "draw", id, game.bet);
     game.embed.setColor(flavors.macchiato.colors.yellow.hex as ColorResolvable);
     const desc = await renderGambleScreen(
-      message.author.id,
       "draw",
       game.bet,
       `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
@@ -787,7 +784,7 @@ async function playGame(
             await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t", "EX", 86400);
             logger.info(`${message.author.id} received green_gem randomly (tower)`);
             addInventoryItem(message.member, "green_gem", 1);
-            addProgress(message.author.id, "gem_hunter", 1);
+            addProgress(message.member, "gem_hunter", 1);
             if (response.replied || response.deferred)
               response.followUp({
                 embeds: [
@@ -823,7 +820,6 @@ async function playGame(
         // });
 
         const desc = await renderGambleScreen(
-          message.author.id,
           "playing",
           game.bet,
           `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
@@ -831,7 +827,7 @@ async function playGame(
         game.embed.setDescription(desc);
 
         if (y >= 8) {
-          addProgress(message.author.id, "tower_pro", 1);
+          addProgress(message.member, "tower_pro", 1);
           win1(response);
           return;
         }

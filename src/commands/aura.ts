@@ -90,7 +90,7 @@ async function run(
   }
 
   const showProfile = async () => {
-    const aura = await getAura(target.user.id);
+    const aura = await getAura(target);
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
@@ -124,7 +124,7 @@ async function run(
 
     await interaction.deferReply();
 
-    const history = await getAuraTransactions(target.user.id);
+    const history = await getAuraTransactions(target);
 
     if (history.length === 0)
       return interaction.editReply({ embeds: [new ErrorEmbed("no history to show")] });
@@ -206,7 +206,7 @@ async function run(
 
     if (!(await userExists(target))) await createUser(target);
 
-    if ((await isUserBlacklisted(target.user.id)).blacklisted)
+    if ((await isUserBlacklisted(target)).blacklisted)
       return send({
         embeds: [
           new ErrorEmbed(
@@ -215,7 +215,7 @@ async function run(
         ],
       });
 
-    if ((await isEcoBanned(target.user.id)).banned)
+    if ((await isEcoBanned(target)).banned)
       return send({ embeds: [new ErrorEmbed(`${target.toString()} is banned AHAHAHAHA`)] });
 
     if (args.length === 1) {
@@ -223,12 +223,12 @@ async function run(
     }
 
     if (target.user.id === message.author.id) {
-      await createAuraTransaction(message.author.id, message.client.user.id, -50);
+      await createAuraTransaction(message.member, message.client.user, -50);
 
       return send({ embeds: [new ErrorEmbed("that's pretty sad. -50 aura")] });
     }
 
-    const groupIds = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, message.author.id);
+    const groupIds = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, message.member);
 
     if (groupIds.length > 0 && groupIds[0] !== message.author.id) {
       return send({ embeds: [new ErrorEmbed("you cannot do this")] });
@@ -239,26 +239,21 @@ async function run(
       args[1].toLowerCase().startsWith("+") ||
       args[1] === "+"
     ) {
-      const groupIds = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, message.author.id);
-
-      if (groupIds.length > 0 && groupIds[0] !== message.author.id)
-        return send({ embeds: [new ErrorEmbed("you cannot give aura")] });
-
       let amount: number;
 
       if (args.length > 2) amount = parseInt(args[2]);
       else amount = parseInt(args[1]);
 
       if (amount === 0 || isNaN(amount) || !amount) {
-        await createAuraTransaction(message.author.id, message.client.user.id, -50);
+        await createAuraTransaction(message.member, message.client.user, -50);
 
         return send({ embeds: [new ErrorEmbed("invalid amount. -50 aura")] });
       }
 
-      const aura = await getAura(message.author.id);
+      const aura = await getAura(message.member);
 
       if (aura < amount) {
-        await createAuraTransaction(message.author.id, message.client.user.id, -10);
+        await createAuraTransaction(message.member, message.client.user, -10);
 
         return send({ embeds: [new ErrorEmbed("you don't have this much aura. damn. -10 aura")] });
       }
@@ -269,7 +264,7 @@ async function run(
         amountGiven = Math.floor(Math.random() * (amount / 2)) + amount / 2;
       }
 
-      await createAuraTransaction(target.user.id, message.author.id, amountGiven);
+      await createAuraTransaction(target, message.member, amountGiven);
 
       return send({
         embeds: [
@@ -285,20 +280,20 @@ async function run(
       args[1].toLowerCase().startsWith("-")
     ) {
       if (await onCooldown(`${cmd.name}:${target.user.id}`, message.member)) {
-        await createAuraTransaction(message.author.id, message.client.user.id, -50);
+        await createAuraTransaction(message.member, message.client.user, -50);
 
         return send({
           embeds: [new ErrorEmbed("you've already taken aura from this user recently. -50 aura")],
         });
       }
 
-      const groupIds = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, target.user.id);
+      const groupIds = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, target);
 
       if (
         (groupIds.length > 0 && groupIds[0] !== target.user.id) ||
         message.client.user.id === target.user.id
       ) {
-        await createAuraTransaction(message.author.id, message.client.user.id, -10);
+        await createAuraTransaction(message.member, message.client.user, -10);
 
         return send({ embeds: [new ErrorEmbed("this user cannot be stolen from. -10 aura")] });
       }
@@ -309,22 +304,22 @@ async function run(
       else amount = parseInt(args[1]);
 
       if (amount === 0 || isNaN(amount) || !amount) {
-        await createAuraTransaction(message.author.id, message.client.user.id, -50);
+        await createAuraTransaction(message.member, message.client.user, -50);
 
         return send({ embeds: [new ErrorEmbed("invalid amount. -50 aura")] });
       }
 
-      const aura = await getAura(message.author.id);
+      const aura = await getAura(message.member);
 
       amount = Math.abs(amount);
 
       if (amount > aura * 2)
         return send({ embeds: [new ErrorEmbed("you don't have enough aura to take this 🙄")] });
 
-      const targetAura = await getAura(target.user.id);
+      const targetAura = await getAura(target);
 
       if (targetAura < aura / 2.5) {
-        createAuraTransaction(message.author.id, target.user.id, -50);
+        createAuraTransaction(message.member, target, -50);
         return send({ embeds: [new ErrorEmbed("pick on someone your own size. -50 aura")] });
       }
 
@@ -338,7 +333,7 @@ async function run(
 
       if (fail < 3 || target.user.id === message.client.user.id) {
         amountGiven = Math.floor(amountGiven * 1.5);
-        await createAuraTransaction(target.user.id, message.author.id, amountGiven);
+        await createAuraTransaction(target, message.member, amountGiven);
 
         return send({
           embeds: [
@@ -351,7 +346,7 @@ async function run(
       }
 
       await addCooldown(`${cmd.name}:${target.user.id}`, message.member, 600);
-      await createAuraTransaction(target.user.id, message.author.id, -Math.abs(amountGiven));
+      await createAuraTransaction(target, message.member, -Math.abs(amountGiven));
 
       return send({
         embeds: [

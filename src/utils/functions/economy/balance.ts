@@ -1,20 +1,23 @@
+import { ClusterManager } from "discord-hybrid-sharding";
 import { Collection, Guild, GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
+import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
+import { getUserId, MemberResolvable } from "../member";
 import { isBooster } from "../premium/boosters";
 import { getTier } from "../premium/premium";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
-import { getMarketAverage } from "./market";
 import { getBoosters } from "./boosters";
 import { calcCarCost } from "./cars";
 import { getClaimable, getFarm, getFarmUpgrades } from "./farm";
 import { getGuildUpgradesByUser } from "./guilds";
 import { calcItemValue, gemBreak, getInventory } from "./inventory";
 import { doLevelUp, getRawLevel, getUpgrades } from "./levelling";
+import { getMarketAverage } from "./market";
 import { getOffersAverage } from "./offers";
 import { isPassive } from "./passive";
 import {
@@ -27,20 +30,13 @@ import {
 } from "./utils";
 import { hasVoted } from "./vote";
 import { calcWorkerValues } from "./workers";
-import { NypsiClient } from "../../../models/Client";
-import { ClusterManager } from "discord-hybrid-sharding";
 import ms = require("ms");
 import _ = require("lodash");
 
-export async function getBalance(member: GuildMember | string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function getBalance(member: MemberResolvable) {
+  const userId = getUserId(member);
 
-  const cache = await redis.get(`${Constants.redis.cache.economy.BALANCE}:${id}`);
+  const cache = await redis.get(`${Constants.redis.cache.economy.BALANCE}:${userId}`);
 
   if (cache) {
     return parseInt(cache);
@@ -48,7 +44,7 @@ export async function getBalance(member: GuildMember | string) {
 
   const query = await prisma.economy.findUnique({
     where: {
-      userId: id,
+      userId,
     },
     select: {
       money: true,
@@ -56,7 +52,7 @@ export async function getBalance(member: GuildMember | string) {
   });
 
   await redis.set(
-    `${Constants.redis.cache.economy.BALANCE}:${id}`,
+    `${Constants.redis.cache.economy.BALANCE}:${userId}`,
     Number(query.money),
     "EX",
     3600,
@@ -65,17 +61,12 @@ export async function getBalance(member: GuildMember | string) {
   return Number(query.money);
 }
 
-export async function updateBalance(member: GuildMember | string, amount: number) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function updateBalance(member: MemberResolvable, amount: number) {
+  const userId = getUserId(member);
 
   const query = await prisma.economy.update({
     where: {
-      userId: id,
+      userId,
     },
     data: {
       money: Math.floor(amount),
@@ -86,24 +77,19 @@ export async function updateBalance(member: GuildMember | string, amount: number
   });
 
   await redis.set(
-    `${Constants.redis.cache.economy.BALANCE}:${id}`,
+    `${Constants.redis.cache.economy.BALANCE}:${userId}`,
     Number(query.money),
     "EX",
     3600,
   );
 }
 
-export async function addBalance(member: GuildMember | string, amount: number) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function addBalance(member: MemberResolvable, amount: number) {
+  const userId = getUserId(member);
 
   const query = await prisma.economy.update({
     where: {
-      userId: id,
+      userId,
     },
     data: {
       money: { increment: Math.floor(amount) },
@@ -114,7 +100,7 @@ export async function addBalance(member: GuildMember | string, amount: number) {
   });
 
   await redis.set(
-    `${Constants.redis.cache.economy.BALANCE}:${id}`,
+    `${Constants.redis.cache.economy.BALANCE}:${userId}`,
     Number(query.money),
     "EX",
     3600,
@@ -123,17 +109,12 @@ export async function addBalance(member: GuildMember | string, amount: number) {
   return query.money;
 }
 
-export async function removeBalance(member: GuildMember | string, amount: number) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function removeBalance(member: MemberResolvable, amount: number) {
+  const userId = getUserId(member);
 
   const query = await prisma.economy.update({
     where: {
-      userId: id,
+      userId,
     },
     data: {
       money: { decrement: Math.floor(amount) },
@@ -144,7 +125,7 @@ export async function removeBalance(member: GuildMember | string, amount: number
   });
 
   await redis.set(
-    `${Constants.redis.cache.economy.BALANCE}:${id}`,
+    `${Constants.redis.cache.economy.BALANCE}:${userId}`,
     Number(query.money),
     "EX",
     3600,
@@ -153,17 +134,10 @@ export async function removeBalance(member: GuildMember | string, amount: number
   return query.money;
 }
 
-export async function getBankBalance(member: GuildMember | string): Promise<number> {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
+export async function getBankBalance(member: MemberResolvable): Promise<number> {
   const query = await prisma.economy.findUnique({
     where: {
-      userId: id,
+      userId: getUserId(member),
     },
     select: {
       bank: true,
@@ -173,21 +147,10 @@ export async function getBankBalance(member: GuildMember | string): Promise<numb
   return Number(query.bank);
 }
 
-export async function updateBankBalance(
-  member: GuildMember | string,
-  amount: number,
-  check = true,
-) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
+export async function updateBankBalance(member: MemberResolvable, amount: number, check = true) {
   await prisma.economy.update({
     where: {
-      userId: id,
+      userId: getUserId(member),
     },
     data: {
       bank: amount,
@@ -197,17 +160,10 @@ export async function updateBankBalance(
   if (check) doLevelUp(member);
 }
 
-export async function addBankBalance(member: GuildMember | string, amount: number, check = true) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
+export async function addBankBalance(member: MemberResolvable, amount: number, check = true) {
   await prisma.economy.update({
     where: {
-      userId: id,
+      userId: getUserId(member),
     },
     data: {
       bank: { increment: amount },
@@ -217,21 +173,10 @@ export async function addBankBalance(member: GuildMember | string, amount: numbe
   if (check) doLevelUp(member);
 }
 
-export async function removeBankBalance(
-  member: GuildMember | string,
-  amount: number,
-  check = true,
-) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
+export async function removeBankBalance(member: MemberResolvable, amount: number, check = true) {
   await prisma.economy.update({
     where: {
-      userId: id,
+      userId: getUserId(member),
     },
     data: {
       bank: { decrement: amount },
@@ -241,10 +186,10 @@ export async function removeBankBalance(
   if (check) doLevelUp(member);
 }
 
-export async function increaseBaseBankStorage(member: GuildMember, amount: number) {
+export async function increaseBaseBankStorage(member: MemberResolvable, amount: number) {
   await prisma.economy.update({
     where: {
-      userId: member.user.id,
+      userId: getUserId(member),
     },
     data: {
       bankStorage: { increment: amount },
@@ -252,14 +197,7 @@ export async function increaseBaseBankStorage(member: GuildMember, amount: numbe
   });
 }
 
-export async function getGambleMulti(member: GuildMember | string, client: NypsiClient) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
+export async function getGambleMulti(member: MemberResolvable, client: NypsiClient) {
   let multi = 0;
   const breakdownMap = new Map<string, number>();
 
@@ -274,15 +212,15 @@ export async function getGambleMulti(member: GuildMember | string, client: Nypsi
     upgrades,
     rawLevel,
   ] = await Promise.all([
-    isBooster(id),
-    getBoosters(id),
+    isBooster(member),
+    getBoosters(member),
     getGuildUpgradesByUser(member),
-    isPassive(id),
-    getDmSettings(id),
-    getInventory(id),
-    getTier(id),
-    getUpgrades(id),
-    getRawLevel(id),
+    isPassive(member),
+    getDmSettings(member),
+    getInventory(member),
+    getTier(member),
+    getUpgrades(member),
+    getRawLevel(member),
   ]);
 
   let rawLevelModified = rawLevel;
@@ -337,7 +275,7 @@ export async function getGambleMulti(member: GuildMember | string, client: Nypsi
 
   if (
     dmSettings.voteReminder &&
-    !(await redis.sismember(Constants.redis.nypsi.VOTE_REMINDER_RECEIVED, id))
+    !(await redis.sismember(Constants.redis.nypsi.VOTE_REMINDER_RECEIVED, getUserId(member)))
   ) {
     multi += 2;
     breakdownMap.set("vote reminders", 2);
@@ -368,7 +306,7 @@ export async function getGambleMulti(member: GuildMember | string, client: Nypsi
     if (chance < 2 && !heart) {
       multi -= Math.floor(Math.random() * 3) + 1;
     } else {
-      gemBreak(id, 0.009, "white_gem", client);
+      gemBreak(member, 0.009, "white_gem", client);
       const choices = [
         7, 3, 4, 5, 7, 2, 17, 7, 4, 5, 3, 3, 3, 4, 3, 3, 3, 2, 2, 2, 7, 7, 7, 7, 7, 7, 7,
       ];
@@ -380,7 +318,7 @@ export async function getGambleMulti(member: GuildMember | string, client: Nypsi
     if (chance < 2 && !heart) {
       multi -= 3;
     } else {
-      gemBreak(id, 0.04, "pink_gem", client);
+      gemBreak(member, 0.04, "pink_gem", client);
       const choices = [7, 5, 4, 3, 2, 1, 3, 1, 1, 1, 3, 3, 2, 2, 2, 3, 3, 4, 4];
       multi += Math.floor(Math.random() * choices[Math.floor(Math.random() * choices.length)]);
     }
@@ -396,20 +334,13 @@ export async function getGambleMulti(member: GuildMember | string, client: Nypsi
   return { multi: parseFloat(multi.toFixed(2)), breakdown: breakdownMap };
 }
 
-export async function getSellMulti(member: GuildMember | string, client: NypsiClient) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
+export async function getSellMulti(member: MemberResolvable, client: NypsiClient) {
   const [level, tier, booster, boosters, guildUpgrades, passive, inventory, upgrades] =
     await Promise.all([
       getRawLevel(member),
       getTier(member),
-      isBooster(id),
-      getBoosters(id),
+      isBooster(member),
+      getBoosters(member),
       getGuildUpgradesByUser(member),
       isPassive(member),
       getInventory(member),
@@ -468,8 +399,8 @@ export async function getSellMulti(member: GuildMember | string, client: NypsiCl
   }
 
   if (
-    (await getDmSettings(id)).voteReminder &&
-    !(await redis.sismember(Constants.redis.nypsi.VOTE_REMINDER_RECEIVED, id))
+    (await getDmSettings(member)).voteReminder &&
+    !(await redis.sismember(Constants.redis.nypsi.VOTE_REMINDER_RECEIVED, getUserId(member)))
   ) {
     multi += 5;
     breakdown.set("vote reminders", 5);
@@ -501,7 +432,7 @@ export async function getSellMulti(member: GuildMember | string, client: NypsiCl
     if (chance < 2 && !heart) {
       multi -= Math.floor(Math.random() * 6) + 1;
     } else {
-      gemBreak(id, 0.009, "white_gem", client);
+      gemBreak(member, 0.009, "white_gem", client);
       const choices = [
         7, 3, 4, 5, 7, 2, 17, 7, 4, 5, 2, 2, 2, 2, 2, 3, 3, 3, 10, 17, 10, 7, 7, 7, 7,
       ];
@@ -513,7 +444,7 @@ export async function getSellMulti(member: GuildMember | string, client: NypsiCl
     if (chance < 2 && !heart) {
       multi -= 3;
     } else {
-      gemBreak(id, 0.04, "pink_gem", client);
+      gemBreak(member, 0.04, "pink_gem", client);
       const choices = [7, 5, 4, 3, 2, 1, 3, 1, 1, 1, 3, 3, 7, 7, 7, 7, 7, 4, 4, 4, 4, 4, 4, 4];
       multi += choices[Math.floor(Math.random() * choices.length)];
     }
@@ -529,18 +460,11 @@ export async function getSellMulti(member: GuildMember | string, client: NypsiCl
   return { multi: parseFloat(multi.toFixed(2)), breakdown };
 }
 
-export async function getMaxBankBalance(member: GuildMember | string): Promise<number> {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
+export async function getMaxBankBalance(member: MemberResolvable): Promise<number> {
   const base = await prisma.economy
     .findUnique({
       where: {
-        userId: id,
+        userId: getUserId(member),
       },
       select: {
         bankStorage: true,
@@ -548,7 +472,7 @@ export async function getMaxBankBalance(member: GuildMember | string): Promise<n
     })
     .then((q) => Number(q.bankStorage));
 
-  const level = await getRawLevel(id);
+  const level = await getRawLevel(member);
   const constant = 250;
   const starting = 20000;
   const bonus = level * constant;
@@ -626,8 +550,10 @@ export async function bottomAmount(guild: Guild, amount: number): Promise<string
   return usersFinal;
 }
 
-export async function hasPadlock(member: GuildMember): Promise<boolean> {
-  const cache = await redis.get(`${Constants.redis.cache.economy.PADLOCK}:${member.user.id}`);
+export async function hasPadlock(member: MemberResolvable): Promise<boolean> {
+  const userId = getUserId(member);
+
+  const cache = await redis.get(`${Constants.redis.cache.economy.PADLOCK}:${userId}`);
 
   if (cache) {
     return cache === "y";
@@ -635,7 +561,7 @@ export async function hasPadlock(member: GuildMember): Promise<boolean> {
 
   const query = await prisma.economy.findUnique({
     where: {
-      userId: member.user.id,
+      userId,
     },
     select: {
       padlock: true,
@@ -643,7 +569,7 @@ export async function hasPadlock(member: GuildMember): Promise<boolean> {
   });
 
   await redis.set(
-    `${Constants.redis.cache.economy.PADLOCK}:${member.user.id}`,
+    `${Constants.redis.cache.economy.PADLOCK}:${userId}`,
     query.padlock ? "y" : "n",
     "EX",
     Math.floor(ms("6 hours") / 1000),
@@ -652,34 +578,31 @@ export async function hasPadlock(member: GuildMember): Promise<boolean> {
   return query.padlock;
 }
 
-export async function setPadlock(member: GuildMember, setting: boolean) {
+export async function setPadlock(member: MemberResolvable, setting: boolean) {
+  const userId = getUserId(member);
+
   await prisma.economy.update({
     where: {
-      userId: member.user.id,
+      userId,
     },
     data: {
       padlock: setting,
     },
   });
 
-  await redis.del(`${Constants.redis.cache.economy.PADLOCK}:${member.user.id}`);
+  await redis.del(`${Constants.redis.cache.economy.PADLOCK}:${userId}`);
 }
 
-export async function getDefaultBet(member: GuildMember): Promise<number> {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function getDefaultBet(member: MemberResolvable): Promise<number> {
+  const userId = getUserId(member);
 
-  if (await redis.exists(`${Constants.redis.cache.economy.DEFAULT_BET}:${id}`)) {
-    return parseInt(await redis.get(`${Constants.redis.cache.economy.DEFAULT_BET}:${id}`));
+  if (await redis.exists(`${Constants.redis.cache.economy.DEFAULT_BET}:${userId}`)) {
+    return parseInt(await redis.get(`${Constants.redis.cache.economy.DEFAULT_BET}:${userId}`));
   }
 
   const query = await prisma.economy.findUnique({
     where: {
-      userId: id,
+      userId,
     },
     select: {
       defaultBet: true,
@@ -687,7 +610,7 @@ export async function getDefaultBet(member: GuildMember): Promise<number> {
   });
 
   await redis.set(
-    `${Constants.redis.cache.economy.DEFAULT_BET}:${id}`,
+    `${Constants.redis.cache.economy.DEFAULT_BET}:${userId}`,
     query.defaultBet,
     "EX",
     Math.floor(ms("6 hours") / 1000),
@@ -696,27 +619,22 @@ export async function getDefaultBet(member: GuildMember): Promise<number> {
   return query.defaultBet;
 }
 
-export async function setDefaultBet(member: GuildMember, setting: number) {
+export async function setDefaultBet(member: MemberResolvable, setting: number) {
+  const userId = getUserId(member);
+
   await prisma.economy.update({
     where: {
-      userId: member.user.id,
+      userId,
     },
     data: {
       defaultBet: setting,
     },
   });
 
-  await redis.del(`${Constants.redis.cache.economy.DEFAULT_BET}:${member.user.id}`);
+  await redis.del(`${Constants.redis.cache.economy.DEFAULT_BET}:${userId}`);
 }
 
-export async function calcMaxBet(member: GuildMember | string): Promise<number> {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
+export async function calcMaxBet(member: MemberResolvable): Promise<number> {
   if (await redis.exists("nypsi:infinitemaxbet")) return 1000000000000;
 
   let total = 1_000_000;
@@ -726,7 +644,7 @@ export async function calcMaxBet(member: GuildMember | string): Promise<number> 
     getRawLevel(member),
     getBoosters(member),
     getGuildUpgradesByUser(member),
-    isBooster(id),
+    isBooster(member),
   ]);
 
   const levelBonus = Math.floor(level / 25) * 50_000;
@@ -758,7 +676,7 @@ export async function calcMaxBet(member: GuildMember | string): Promise<number> 
   return total;
 }
 
-export async function getRequiredBetForXp(member: GuildMember | string): Promise<number> {
+export async function getRequiredBetForXp(member: MemberResolvable): Promise<number> {
   let requiredBet = 1000;
 
   const level = await getRawLevel(member);
@@ -772,24 +690,21 @@ export async function getRequiredBetForXp(member: GuildMember | string): Promise
 
 export async function calcNetWorth(
   source: string,
-  member: GuildMember | string,
+  member: MemberResolvable,
   client: NypsiClient | ClusterManager,
   breakdown = false,
 ) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+  const userId = getUserId(member);
 
-  if (!breakdown && (await redis.exists(`${Constants.redis.cache.economy.NETWORTH}:${id}`))) {
-    return { amount: parseInt(await redis.get(`${Constants.redis.cache.economy.NETWORTH}:${id}`)) };
+  if (!breakdown && (await redis.exists(`${Constants.redis.cache.economy.NETWORTH}:${userId}`))) {
+    return {
+      amount: parseInt(await redis.get(`${Constants.redis.cache.economy.NETWORTH}:${userId}`)),
+    };
   }
 
   const query = await prisma.economy.findUnique({
     where: {
-      userId: id,
+      userId,
     },
     select: {
       money: true,
@@ -859,7 +774,7 @@ export async function calcNetWorth(
 
   if (!query) {
     await redis.set(
-      `${Constants.redis.cache.economy.NETWORTH}:${id}`,
+      `${Constants.redis.cache.economy.NETWORTH}:${userId}`,
       worth,
       "EX",
       ms("1 hour") / 1000,
@@ -1041,7 +956,7 @@ export async function calcNetWorth(
 
   let farmBreakdown = 0;
 
-  const farms = await getFarm(id);
+  const farms = await getFarm(userId);
 
   const typesChecked: string[] = [];
 
@@ -1053,14 +968,14 @@ export async function calcNetWorth(
     const seedValue =
       farms.filter((i) => i.plantId === farm.plantId).length * ((await calcItemValue(seed)) || 0);
     const harvestValue =
-      (await getClaimable(id, farm.plantId, false)) *
+      (await getClaimable(userId, farm.plantId, false)) *
       ((await calcItemValue(getPlantsData()[farm.plantId].item)) || 0);
 
     let upgradesValue = 0;
 
     const upgrades = getPlantUpgrades();
 
-    for (const userUpgrade of (await getFarmUpgrades(id)).filter(
+    for (const userUpgrade of (await getFarmUpgrades(userId)).filter(
       (u) => u.plantId == farm.plantId,
     )) {
       const upgrade =
@@ -1085,7 +1000,7 @@ export async function calcNetWorth(
   breakdownItems.set("farm", farmBreakdown);
 
   await redis.set(
-    `${Constants.redis.cache.economy.NETWORTH}:${id}`,
+    `${Constants.redis.cache.economy.NETWORTH}:${userId}`,
     Math.floor(worth),
     "EX",
     ms("2 hour") / 1000,
@@ -1093,7 +1008,7 @@ export async function calcNetWorth(
 
   await prisma.economy.update({
     where: {
-      userId: id,
+      userId,
     },
     data: {
       netWorth: Math.floor(worth),
@@ -1104,23 +1019,26 @@ export async function calcNetWorth(
   });
 
   setImmediate(async () => {
-    if (query.netWorth && (await getDmSettings(id)).netWorth > 0) {
+    if (query.netWorth && (await getDmSettings(userId)).netWorth > 0) {
       const payload: NotificationPayload = {
-        memberId: id,
+        memberId: userId,
         payload: {
           content: "",
           embed: new CustomEmbed(
-            id,
+            userId,
             `$${Number(query.netWorth).toLocaleString()} ➔ $${Math.floor(worth).toLocaleString()}`,
           ),
         },
       };
 
-      if (Number(query.netWorth) < Math.floor(worth) - (await getDmSettings(id)).netWorth) {
+      if (Number(query.netWorth) < Math.floor(worth) - (await getDmSettings(userId)).netWorth) {
         payload.payload.content = `your net worth has increased by $${(
           Math.floor(worth) - Number(query.netWorth)
         ).toLocaleString()}`;
-      } else if (Number(query.netWorth) > Math.floor(worth) + (await getDmSettings(id)).netWorth) {
+      } else if (
+        Number(query.netWorth) >
+        Math.floor(worth) + (await getDmSettings(userId)).netWorth
+      ) {
         payload.payload.content = `your net worth has decreased by $${(
           Number(query.netWorth) - Math.floor(worth)
         ).toLocaleString()}`;
@@ -1129,7 +1047,7 @@ export async function calcNetWorth(
       }
 
       logger.debug(`added net worth notification`, {
-        userId: id,
+        userId,
         source,
       });
 

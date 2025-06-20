@@ -3,9 +3,9 @@ import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Comman
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { getBannedUsers } from "../utils/functions/moderation/ban";
 
+import PageManager from "../utils/functions/page";
 import { getLastKnownUsername } from "../utils/functions/users/tag";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import PageManager from "../utils/functions/page";
 
 const cmd = new Command(
   "banned",

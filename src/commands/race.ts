@@ -199,7 +199,7 @@ class Race {
 
   private async collectorFunction(interaction: ButtonInteraction): Promise<any> {
     if (interaction.customId === "join") {
-      if (!(await userExists(interaction.user.id)))
+      if (!(await userExists(interaction.user)))
         return interaction.reply({
           flags: MessageFlags.Ephemeral,
           embeds: [new ErrorEmbed("you cannot afford the entry fee for this race")],
@@ -209,14 +209,14 @@ class Race {
         return interaction.deferUpdate();
 
       const [garage, inventory, balance] = await Promise.all([
-        getGarage(interaction.user.id),
-        getInventory(interaction.user.id).then((i) =>
+        getGarage(interaction.user),
+        getInventory(interaction.user).then((i) =>
           i.entries.filter((i) => getItems()[i.item].role === "car"),
         ),
-        getBalance(interaction.user.id),
+        getBalance(interaction.user),
       ]);
 
-      const maxBet = (await calcMaxBet(interaction.user.id)) * 10;
+      const maxBet = (await calcMaxBet(interaction.user)) * 10;
 
       if (maxBet < this.bet)
         return interaction.reply({
@@ -286,7 +286,7 @@ class Race {
         .reply({
           flags: MessageFlags.Ephemeral,
           embeds: [
-            new CustomEmbed(interaction.user.id, "choose a car").setHeader(
+            new CustomEmbed(interaction.user, "choose a car").setHeader(
               this.embed.data.author.name,
               this.embed.data.author.icon_url,
             ),
@@ -305,7 +305,7 @@ class Race {
 
       if (!carInteraction) return;
 
-      if ((await getBalance(interaction.user.id)) < this.bet)
+      if ((await getBalance(interaction.user)) < this.bet)
         return carInteraction.reply({
           flags: MessageFlags.Ephemeral,
           embeds: [new ErrorEmbed("you cannot afford the entry fee for this race")],
@@ -322,7 +322,7 @@ class Race {
           embeds: [new ErrorEmbed("this car is faster than the speed limit for this race")],
         });
 
-      await removeBalance(interaction.user.id, this.bet);
+      await removeBalance(interaction.user, this.bet);
 
       this.members.push({
         car: cars.find((i) => i.car.id === chosen),
@@ -405,7 +405,7 @@ class Race {
     if (this.members.length < 2) {
       if (this.bet > 0) {
         for (const member of this.members) {
-          await addBalance(member.user.id, this.bet);
+          await addBalance(member.user, this.bet);
         }
       }
 
@@ -426,7 +426,7 @@ class Race {
 
         if (this.bet > 0) {
           for (const member of this.members) {
-            await addBalance(member.user.id, this.bet);
+            await addBalance(member.user, this.bet);
           }
         }
 
@@ -496,7 +496,7 @@ class Race {
             });
           }
 
-          addStat(member.user.id, member.car.car.id.toString(), 1);
+          addStat(member.user, member.car.car.id.toString(), 1);
 
           await createGame({
             userId: member.user.id,

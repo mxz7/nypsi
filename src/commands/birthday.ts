@@ -131,7 +131,7 @@ async function run(
     if (message.author.createdTimestamp > Date.now() - ms("30 days"))
       return send({ embeds: [new ErrorEmbed("your account is too new to use this feature ☹️")] });
 
-    const birthdayCheck = await getBirthday(message.author.id);
+    const birthdayCheck = await getBirthday(message.member);
 
     if (birthdayCheck)
       return send({
@@ -171,7 +171,7 @@ async function run(
     if (!interaction) return;
 
     if (interaction.customId === "confirm") {
-      await setBirthday(message.author.id, birthday);
+      await setBirthday(message.member, birthday);
 
       interaction.update({
         embeds: [
@@ -187,9 +187,9 @@ async function run(
       interaction.update({ components: [row] });
     }
   } else if (args[0]?.toLowerCase() === "toggle") {
-    const current = await isBirthdayEnabled(message.author.id);
+    const current = await isBirthdayEnabled(message.member);
 
-    await setBirthdayEnabled(message.author.id, !current);
+    await setBirthdayEnabled(message.member, !current);
 
     return send({
       embeds: [
@@ -328,7 +328,7 @@ async function run(
     manager.listen();
     return;
   } else {
-    const birthday = await getBirthday(message.author.id);
+    const birthday = await getBirthday(message.member);
 
     const embed = new CustomEmbed(
       message.member,

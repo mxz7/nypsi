@@ -3,6 +3,8 @@ import { Prisma } from "@prisma/client";
 import { Collection, Guild, GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
+import { NypsiClient } from "../../../models/Client";
+import { getUserId, MemberResolvable } from "../member";
 import PageManager from "../page";
 import sleep from "../sleep";
 import { formatTime, pluralize } from "../string";
@@ -12,10 +14,9 @@ import { getActiveTag } from "../users/tags";
 import { calcNetWorth } from "./balance";
 import { checkLeaderboardPositions } from "./stats";
 import { getAchievements, getItems, getTagsData } from "./utils";
-import { NypsiClient } from "../../../models/Client";
 import pAll = require("p-all");
 
-export async function topBalance(guild: Guild, userId?: string) {
+export async function topBalance(guild: Guild, member?: MemberResolvable) {
   let members: Collection<string, GuildMember>;
 
   if (guild.memberCount == guild.members.cache.size) {
@@ -81,8 +82,8 @@ export async function topBalance(guild: Guild, userId?: string) {
 
   let pos = 0;
 
-  if (userId) {
-    pos = userIds.indexOf(userId) + 1;
+  if (member) {
+    pos = userIds.indexOf(getUserId(member)) + 1;
   }
 
   return { pages, pos };
@@ -148,7 +149,7 @@ export async function topBalanceGlobal(amount: number, allowHidden = true): Prom
   return usersFinal.slice(0, amount);
 }
 
-export async function topNetWorthGlobal(userId: string, amount = 100) {
+export async function topNetWorthGlobal(member: MemberResolvable, amount = 100) {
   const query = await prisma.economy.findMany({
     where: {
       AND: [{ netWorth: { gt: 0 } }, { user: { blacklisted: false } }],
@@ -202,8 +203,8 @@ export async function topNetWorthGlobal(userId: string, amount = 100) {
 
   let pos = 0;
 
-  if (userId) {
-    pos = userIds.indexOf(userId) + 1;
+  if (member) {
+    pos = userIds.indexOf(getUserId(member)) + 1;
   }
 
   checkLeaderboardPositions(userIds, "networth");
@@ -213,11 +214,11 @@ export async function topNetWorthGlobal(userId: string, amount = 100) {
 
 const topNetLock = new Set<string>();
 
-export async function topNetWorth(guild: Guild, userId?: string, repeatCount = 1) {
+export async function topNetWorth(guild: Guild, member?: MemberResolvable, repeatCount = 1) {
   if (topNetLock.has(guild.id)) {
     if (repeatCount > 50) topNetLock.delete(guild.id);
     await sleep(100);
-    return topNetWorth(guild, userId, repeatCount + 1);
+    return topNetWorth(guild, member, repeatCount + 1);
   }
   topNetLock.add(guild.id);
 
@@ -317,8 +318,8 @@ export async function topNetWorth(guild: Guild, userId?: string, repeatCount = 1
 
   let pos = 0;
 
-  if (userId) {
-    pos = users.findIndex((i) => i.userId === userId) + 1;
+  if (member) {
+    pos = users.findIndex((i) => i.userId === getUserId(member)) + 1;
   }
 
   topNetLock.delete(guild.id);
@@ -326,7 +327,7 @@ export async function topNetWorth(guild: Guild, userId?: string, repeatCount = 1
   return { pages, pos };
 }
 
-export async function topPrestige(guild: Guild, userId?: string) {
+export async function topPrestige(guild: Guild, member?: MemberResolvable) {
   let members: Collection<string, GuildMember>;
 
   if (guild.memberCount == guild.members.cache.size) {
@@ -392,14 +393,14 @@ export async function topPrestige(guild: Guild, userId?: string) {
 
   let pos = 0;
 
-  if (userId) {
-    pos = userIds.indexOf(userId) + 1;
+  if (member) {
+    pos = userIds.indexOf(getUserId(member)) + 1;
   }
 
   return { pages, pos };
 }
 
-export async function topPrestigeGlobal(userId: string, amount = 100) {
+export async function topPrestigeGlobal(member: MemberResolvable, amount = 100) {
   const query = await prisma.economy.findMany({
     where: {
       AND: [
@@ -459,8 +460,8 @@ export async function topPrestigeGlobal(userId: string, amount = 100) {
 
   let pos = 0;
 
-  if (userId) {
-    pos = userIds.indexOf(userId) + 1;
+  if (member) {
+    pos = userIds.indexOf(getUserId(member)) + 1;
   }
 
   checkLeaderboardPositions(userIds, "prestige");
@@ -468,7 +469,7 @@ export async function topPrestigeGlobal(userId: string, amount = 100) {
   return { pages, pos };
 }
 
-export async function topItem(guild: Guild, item: string, userId: string) {
+export async function topItem(guild: Guild, item: string, member: MemberResolvable) {
   let members: Collection<string, GuildMember>;
 
   if (guild.memberCount == guild.members.cache.size) {
@@ -537,14 +538,14 @@ export async function topItem(guild: Guild, item: string, userId: string) {
 
   let pos = 0;
 
-  if (userId) {
-    pos = userIds.indexOf(userId) + 1;
+  if (member) {
+    pos = userIds.indexOf(getUserId(member)) + 1;
   }
 
   return { pages, pos };
 }
 
-export async function topItemGlobal(item: string, userId: string, amount = 100) {
+export async function topItemGlobal(item: string, member?: MemberResolvable, amount = 100) {
   const query = await prisma.inventory.findMany({
     where: {
       item,
@@ -604,8 +605,8 @@ export async function topItemGlobal(item: string, userId: string, amount = 100) 
 
   let pos = 0;
 
-  if (userId) {
-    pos = userIds.indexOf(userId) + 1;
+  if (member) {
+    pos = userIds.indexOf(getUserId(member)) + 1;
   }
 
   checkLeaderboardPositions(userIds, `item-${item}`);
@@ -613,7 +614,7 @@ export async function topItemGlobal(item: string, userId: string, amount = 100) 
   return { pages, pos };
 }
 
-export async function topCompletion(guild: Guild, userId: string) {
+export async function topCompletion(guild: Guild, member: MemberResolvable) {
   let members: Collection<string, GuildMember>;
 
   if (guild.memberCount == guild.members.cache.size) {
@@ -690,8 +691,8 @@ export async function topCompletion(guild: Guild, userId: string) {
 
   let pos = 0;
 
-  if (userId) {
-    pos = users.findIndex((i) => i.id === userId) + 1;
+  if (member) {
+    pos = users.findIndex((i) => i.id === getUserId(member)) + 1;
   }
 
   return { pages, pos };
@@ -735,7 +736,7 @@ export async function topGuilds(guildName?: string) {
   return { pages, pos };
 }
 
-export async function topDailyStreak(guild: Guild, userId?: string) {
+export async function topDailyStreak(guild: Guild, member?: MemberResolvable) {
   let members: Collection<string, GuildMember>;
 
   if (guild.memberCount == guild.members.cache.size) {
@@ -796,14 +797,14 @@ export async function topDailyStreak(guild: Guild, userId?: string) {
 
   let pos = 0;
 
-  if (userId) {
-    pos = userIds.indexOf(userId) + 1;
+  if (member) {
+    pos = userIds.indexOf(getUserId(getUserId(member))) + 1;
   }
 
   return { pages, pos };
 }
 
-export async function topDailyStreakGlobal(userId: string, amount = 100) {
+export async function topDailyStreakGlobal(member: MemberResolvable, amount = 100) {
   const query = await prisma.economy.findMany({
     where: {
       dailyStreak: { gt: 0 },
@@ -859,8 +860,8 @@ export async function topDailyStreakGlobal(userId: string, amount = 100) {
 
   let pos = 0;
 
-  if (userId) {
-    pos = userIds.indexOf(userId) + 1;
+  if (member) {
+    pos = userIds.indexOf(getUserId(member)) + 1;
   }
 
   checkLeaderboardPositions(userIds, "streak");
@@ -868,7 +869,7 @@ export async function topDailyStreakGlobal(userId: string, amount = 100) {
   return { pages, pos };
 }
 
-export async function topLottoWins(guild: Guild, userId?: string) {
+export async function topLottoWins(guild: Guild, member?: MemberResolvable) {
   let members: Collection<string, GuildMember>;
 
   if (guild.memberCount == guild.members.cache.size) {
@@ -933,14 +934,14 @@ export async function topLottoWins(guild: Guild, userId?: string) {
 
   let pos = 0;
 
-  if (userId) {
-    pos = userIds.indexOf(userId) + 1;
+  if (member) {
+    pos = userIds.indexOf(getUserId(member)) + 1;
   }
 
   return { pages, pos };
 }
 
-export async function topLottoWinsGlobal(userId: string) {
+export async function topLottoWinsGlobal(member: MemberResolvable) {
   const query = await prisma.achievements.findMany({
     where: {
       OR: [
@@ -996,14 +997,14 @@ export async function topLottoWinsGlobal(userId: string) {
 
   let pos = 0;
 
-  if (userId) {
-    pos = userIds.indexOf(userId) + 1;
+  if (member) {
+    pos = userIds.indexOf(getUserId(member)) + 1;
   }
 
   return { pages, pos };
 }
 
-export async function topWordle(guild: Guild, userId: string) {
+export async function topWordle(guild: Guild, member: MemberResolvable) {
   let members: Collection<string, GuildMember>;
 
   if (guild.memberCount == guild.members.cache.size) {
@@ -1062,14 +1063,14 @@ export async function topWordle(guild: Guild, userId: string) {
 
   let pos = 0;
 
-  if (userId) {
-    pos = query.findIndex((i) => i.userId === userId) + 1;
+  if (member) {
+    pos = query.findIndex((i) => i.userId === getUserId(member)) + 1;
   }
 
   return { pages, pos };
 }
 
-export async function topWordleGlobal(userId: string) {
+export async function topWordleGlobal(member: MemberResolvable) {
   const query = await prisma.wordleGame.groupBy({
     by: ["userId"],
     _count: {
@@ -1114,8 +1115,8 @@ export async function topWordleGlobal(userId: string) {
 
   let pos = 0;
 
-  if (userId) {
-    pos = query.findIndex((i) => i.userId === userId) + 1;
+  if (member) {
+    pos = query.findIndex((i) => i.userId === getUserId(member)) + 1;
   }
 
   checkLeaderboardPositions(
@@ -1126,7 +1127,7 @@ export async function topWordleGlobal(userId: string) {
   return { pages, pos };
 }
 
-export async function topWordleTime(guild: Guild, userId: string) {
+export async function topWordleTime(guild: Guild, member: MemberResolvable) {
   let members: Collection<string, GuildMember>;
 
   if (guild.memberCount == guild.members.cache.size) {
@@ -1182,14 +1183,14 @@ export async function topWordleTime(guild: Guild, userId: string) {
 
   let pos = 0;
 
-  if (userId) {
-    pos = query.findIndex((i) => i.userId === userId) + 1;
+  if (member) {
+    pos = query.findIndex((i) => i.userId === getUserId(member)) + 1;
   }
 
   return { pages, pos };
 }
 
-export async function topWordleTimeGlobal(userId: string) {
+export async function topWordleTimeGlobal(member: MemberResolvable) {
   const query: { userId: string; time: number; gameId: number }[] =
     await prisma.$queryRaw`WITH ranked_results AS (
     SELECT 
@@ -1233,8 +1234,8 @@ ORDER BY time ASC limit 100`;
 
   let pos = 0;
 
-  if (userId) {
-    pos = query.findIndex((i) => i.userId === userId) + 1;
+  if (member) {
+    pos = query.findIndex((i) => i.userId === getUserId(member)) + 1;
   }
 
   checkLeaderboardPositions(
@@ -1245,7 +1246,7 @@ ORDER BY time ASC limit 100`;
   return { pages, pos };
 }
 
-export async function topCommand(guild: Guild, command: string, userId: string) {
+export async function topCommand(guild: Guild, command: string, member: MemberResolvable) {
   let members: Collection<string, GuildMember>;
 
   if (guild.memberCount == guild.members.cache.size) {
@@ -1304,14 +1305,14 @@ export async function topCommand(guild: Guild, command: string, userId: string) 
 
   let pos = 0;
 
-  if (userId) {
-    pos = userIds.indexOf(userId) + 1;
+  if (member) {
+    pos = userIds.indexOf(getUserId(member)) + 1;
   }
 
   return { pages, pos };
 }
 
-export async function topCommandGlobal(command: string, userId: string) {
+export async function topCommandGlobal(command: string, member: MemberResolvable) {
   const query = await prisma.commandUse.findMany({
     where: {
       AND: [{ command }, { user: { blacklisted: false } }],
@@ -1361,8 +1362,8 @@ export async function topCommandGlobal(command: string, userId: string) {
 
   let pos = 0;
 
-  if (userId) {
-    pos = userIds.indexOf(userId) + 1;
+  if (member) {
+    pos = userIds.indexOf(getUserId(member)) + 1;
   }
 
   checkLeaderboardPositions(userIds, "commands");
@@ -1370,7 +1371,7 @@ export async function topCommandGlobal(command: string, userId: string) {
   return { pages, pos };
 }
 
-export async function topCommandUses(guild: Guild, userId: string) {
+export async function topCommandUses(guild: Guild, member: MemberResolvable) {
   let members: Collection<string, GuildMember>;
 
   if (guild.memberCount == guild.members.cache.size) {
@@ -1429,14 +1430,14 @@ export async function topCommandUses(guild: Guild, userId: string) {
 
   let pos = 0;
 
-  if (userId) {
-    pos = userIds.indexOf(userId) + 1;
+  if (member) {
+    pos = userIds.indexOf(getUserId(member)) + 1;
   }
 
   return { pages, pos };
 }
 
-export async function topCommandUsesGlobal(userId: string) {
+export async function topCommandUsesGlobal(member: MemberResolvable) {
   const query = await prisma.commandUse.groupBy({
     where: {
       user: { blacklisted: false },
@@ -1485,14 +1486,14 @@ export async function topCommandUsesGlobal(userId: string) {
 
   let pos = 0;
 
-  if (userId) {
-    pos = userIds.indexOf(userId) + 1;
+  if (member) {
+    pos = userIds.indexOf(getUserId(member)) + 1;
   }
 
   return { pages, pos };
 }
 
-export async function topVote(guild: Guild, userId?: string) {
+export async function topVote(guild: Guild, member?: MemberResolvable) {
   let members: Collection<string, GuildMember>;
 
   if (guild.memberCount == guild.members.cache.size) {
@@ -1557,14 +1558,14 @@ export async function topVote(guild: Guild, userId?: string) {
 
   let pos = 0;
 
-  if (userId) {
-    pos = userIds.indexOf(userId) + 1;
+  if (member) {
+    pos = userIds.indexOf(getUserId(member)) + 1;
   }
 
   return { pages, pos };
 }
 
-export async function topVoteGlobal(userId: string, amount = 100) {
+export async function topVoteGlobal(member: MemberResolvable, amount = 100) {
   const query = await prisma.economy.findMany({
     where: {
       AND: [{ user: { blacklisted: false } }, { monthVote: { gt: 0 } }],
@@ -1625,14 +1626,14 @@ export async function topVoteGlobal(userId: string, amount = 100) {
 
   let pos = 0;
 
-  if (userId) {
-    pos = query.map((i) => i.userId).indexOf(userId) + 1;
+  if (member) {
+    pos = query.map((i) => i.userId).indexOf(getUserId(member)) + 1;
   }
 
   return { pages, pos };
 }
 
-export async function topChatReaction(guild: Guild, daily: boolean, userId?: string) {
+export async function topChatReaction(guild: Guild, daily: boolean, member?: MemberResolvable) {
   let members: Collection<string, GuildMember>;
 
   if (guild.memberCount == guild.members.cache.size) {
@@ -1698,33 +1699,35 @@ export async function topChatReaction(guild: Guild, daily: boolean, userId?: str
 
   let pos = 0;
 
-  if (userId) {
-    pos = userIds.indexOf(userId) + 1;
+  if (member) {
+    pos = userIds.indexOf(getUserId(member)) + 1;
   }
 
   return { pages, pos };
 }
 
 export function topChatReactionGlobal(
-  userId: string,
+  member: MemberResolvable,
   daily: boolean,
   amount: number,
   posOnly: true,
 ): Promise<number>;
 
 export function topChatReactionGlobal(
-  userId: string,
+  member: MemberResolvable,
   daily: boolean,
   amount?: number,
   posOnly?: false,
 ): Promise<{ pages: Map<number, string[]>; pos: number }>;
 
 export async function topChatReactionGlobal(
-  userId: string,
+  member: MemberResolvable,
   daily: boolean,
   amount = 100,
   posOnly = false,
 ): Promise<number | { pages: Map<number, string[]>; pos: number }> {
+  const userId = getUserId(member);
+
   const query = await prisma.chatReactionLeaderboards.findMany({
     where: {
       AND: [
@@ -1798,7 +1801,7 @@ export async function topChatReactionGlobal(
   return { pages, pos };
 }
 
-export async function topVoteStreak(guild: Guild, userId?: string) {
+export async function topVoteStreak(guild: Guild, member?: MemberResolvable) {
   let members: Collection<string, GuildMember>;
 
   if (guild.memberCount == guild.members.cache.size) {
@@ -1859,14 +1862,14 @@ export async function topVoteStreak(guild: Guild, userId?: string) {
 
   let pos = 0;
 
-  if (userId) {
-    pos = userIds.indexOf(userId) + 1;
+  if (member) {
+    pos = userIds.indexOf(getUserId(member)) + 1;
   }
 
   return { pages, pos };
 }
 
-export async function topVoteStreakGlobal(userId: string, amount = 100) {
+export async function topVoteStreakGlobal(member: MemberResolvable, amount = 100) {
   const query = await prisma.economy.findMany({
     where: {
       voteStreak: { gt: 0 },
@@ -1922,8 +1925,8 @@ export async function topVoteStreakGlobal(userId: string, amount = 100) {
 
   let pos = 0;
 
-  if (userId) {
-    pos = userIds.indexOf(userId) + 1;
+  if (member) {
+    pos = userIds.indexOf(getUserId(member)) + 1;
   }
 
   checkLeaderboardPositions(userIds, "votestreak");

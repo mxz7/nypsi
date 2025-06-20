@@ -18,6 +18,7 @@ import {
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../init/database";
+import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Worker, WorkerByproducts } from "../types/Workers";
@@ -42,10 +43,9 @@ import {
   getWorker,
   getWorkers,
 } from "../utils/functions/economy/workers";
+import { pluralize } from "../utils/functions/string";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
-import { pluralize } from "../utils/functions/string";
-import { NypsiClient } from "../models/Client";
 import _ = require("lodash");
 
 const cmd = new Command(
@@ -331,7 +331,7 @@ async function run(
           return pageManager();
         } else {
           await removeBalance(message.member, baseWorkers[selected].cost);
-          addStat(message.author.id, "spent-workers", baseWorkers[selected].cost);
+          addStat(message.member, "spent-workers", baseWorkers[selected].cost);
           await addWorker(message.member, selected);
 
           userWorkers = await getWorkers(message.member);
@@ -512,7 +512,7 @@ async function run(
         }
 
         await removeBalance(message.member, cost);
-        addStat(message.author.id, "spent-workers", cost);
+        addStat(message.member, "spent-workers", cost);
         await addWorkerUpgrade(
           message.member,
           worker.id,
@@ -640,7 +640,7 @@ async function run(
           new CustomEmbed(
             message.member,
             `average yield for **${worker.id}** over ${value} ${pluralize("run", value)} ` +
-              `at ${(await getWorker(message.author.id, worker)).stored} ${worker.item_emoji} is **$${(totalEarned / value).toFixed(3)}**` +
+              `at ${(await getWorker(message.member, worker)).stored} ${worker.item_emoji} is **$${(totalEarned / value).toFixed(3)}**` +
               (totalByproducts.size > 0 ? " and:" : "") +
               byproductsDescription,
           ).setHeader("workers debug", message.author.avatarURL()),

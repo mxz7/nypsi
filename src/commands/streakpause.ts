@@ -10,7 +10,7 @@ async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
-  if ((await getAdminLevel(message.author.id)) < 5) return;
+  if ((await getAdminLevel(message.member)) < 5) return;
 
   if (args.length === 0) {
     await redis.set("nypsi:streakpause", 69, "EX", ms("1 day") / 1000);

@@ -71,8 +71,8 @@ async function run(
 
   if (history.length == 0) {
     if (
-      (await isTracking(message.author.id)) &&
-      !(await isEcoBanned(message.author.id)
+      (await isTracking(message.member)) &&
+      !(await isEcoBanned(message.member)
         .then((r) => r.banned)
         .catch(() => false))
     ) {
@@ -98,7 +98,7 @@ async function run(
           );
         });
 
-      await addNewAvatar(message.author.id, `https://cdn.nypsi.xyz/${key}`);
+      await addNewAvatar(message.member, `https://cdn.nypsi.xyz/${key}`);
       logger.debug(`uploaded new avatar for ${message.author.id}`);
 
       history = await fetchAvatarHistory(message.member);
@@ -166,7 +166,7 @@ async function run(
         const res = await deleteAvatar(history[manager.currentPage - 1].id);
 
         if (res) {
-          history = await fetchAvatarHistory(message.author.id);
+          history = await fetchAvatarHistory(message.member);
           manager.pages = PageManager.createPages(history, 1);
           manager.lastPage = manager.pages.size;
 

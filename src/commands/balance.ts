@@ -8,6 +8,7 @@ import {
   MessageFlags,
 } from "discord.js";
 import prisma from "../init/database";
+import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
@@ -22,11 +23,10 @@ import {
 import { getInventory } from "../utils/functions/economy/inventory";
 import { getLevel, getPrestige } from "../utils/functions/economy/levelling.js";
 import { createUser, deleteUser, getItems, userExists } from "../utils/functions/economy/utils.js";
-import { getMember } from "../utils/functions/member.js";
+import { getMember, getUserId } from "../utils/functions/member.js";
 import { getNypsiBankBalance, getTax, getTaxRefreshTime } from "../utils/functions/tax.js";
 import { addView } from "../utils/functions/users/views";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { NypsiClient } from "../models/Client";
 
 const cmd = new Command("balance", "check your balance", "money").setAliases([
   "bal",
@@ -60,7 +60,7 @@ async function run(
     } else if (args[1] == "clearinv") {
       await prisma.inventory.deleteMany({
         where: {
-          userId: typeof target == "string" ? target : target.user.id,
+          userId: getUserId(target),
         },
       });
 
@@ -192,7 +192,7 @@ async function run(
 
   send({ embeds: [embed] });
 
-  addView(target.user.id, message.author.id, `balance in ${message.guild.id}`);
+  addView(target, message.member, `balance in ${message.guild.id}`);
 }
 
 cmd.setRun(run);

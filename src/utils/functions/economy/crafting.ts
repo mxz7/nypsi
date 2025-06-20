@@ -1,21 +1,16 @@
 import dayjs = require("dayjs");
-import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
+import { getUserId, MemberResolvable } from "../member";
 import { addProgress } from "./achievements";
 import { addInventoryItem, isGem } from "./inventory";
 import { getItems } from "./utils";
 
-export async function getCraftingItems(member: GuildMember | string, deleteOld = true) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function getCraftingItems(member: MemberResolvable, deleteOld = true) {
+  const userId = getUserId(member);
 
   const query = await prisma.crafting.findMany({
     where: {
-      userId: id,
+      userId,
     },
     select: {
       amount: true,
@@ -43,15 +38,15 @@ export async function getCraftingItems(member: GuildMember | string, deleteOld =
           },
         });
 
-        await addInventoryItem(id, item.itemId, item.amount);
-        if (isGem(item.itemId)) await addProgress(id, "gem_hunter", item.amount);
+        await addInventoryItem(userId, item.itemId, item.amount);
+        if (isGem(item.itemId)) await addProgress(userId, "gem_hunter", item.amount);
       }
     }
   }
 
   if (completed.length > 0) {
     addProgress(
-      id,
+      userId,
       "crafter",
       completed.map((i) => i.amount).reduce((a, b) => a + b),
     );
@@ -60,19 +55,12 @@ export async function getCraftingItems(member: GuildMember | string, deleteOld =
   return { current, completed };
 }
 
-export async function newCraftItem(member: GuildMember | string, itemId: string, amount: number) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
+export async function newCraftItem(member: MemberResolvable, itemId: string, amount: number) {
   const time = getItems()[itemId].craft.time * amount;
 
   return await prisma.crafting.create({
     data: {
-      userId: id,
+      userId: getUserId(member),
       itemId: itemId,
       amount: amount,
       finished: dayjs().add(time, "seconds").toDate(),

@@ -140,7 +140,7 @@ async function run(
   const items = getItems();
 
   const manageOffers = async (msg?: Message) => {
-    const offers = await getOwnedOffers(message.author.id);
+    const offers = await getOwnedOffers(message.member);
 
     const embed = new CustomEmbed(message.member).setHeader(
       "your offers",
@@ -304,7 +304,7 @@ async function run(
   if (args.length == 0 || args[0].toLowerCase() == "manage") {
     return manageOffers();
   } else if (args[0].toLowerCase() == "block") {
-    let current = await getBlockedList(message.author.id);
+    let current = await getBlockedList(message.member);
     const max = 100;
 
     const items = getItems();
@@ -372,7 +372,7 @@ async function run(
 
       current.splice(current.indexOf(value), 1);
 
-      current = await setBlockedList(message.author.id, current);
+      current = await setBlockedList(message.member, current);
     } else {
       if (current.length >= max) {
         return send({ embeds: [new ErrorEmbed("you have reached the limit of your blocklist")] });
@@ -381,7 +381,7 @@ async function run(
       desc = `✅ added \`${value}\``;
 
       current.push(value);
-      current = await setBlockedList(message.author.id, current);
+      current = await setBlockedList(message.member, current);
     }
 
     const embed = new CustomEmbed(message.member, desc).setHeader(
@@ -413,7 +413,7 @@ async function run(
       max *= await getTier(message.member);
     }
 
-    const currentOffers = await getOwnedOffers(message.author.id);
+    const currentOffers = await getOwnedOffers(message.member);
 
     if (currentOffers.length + 1 > max)
       return send({
@@ -430,10 +430,10 @@ async function run(
       return send({ embeds: [new ErrorEmbed("lol xd cant offer yourself something")] });
     }
 
-    if ((await isEcoBanned(target.user.id)).banned)
+    if ((await isEcoBanned(target)).banned)
       return send({ embeds: [new ErrorEmbed("theyre banned lol xd be mean to them for me ty")] });
 
-    if ((await getPreferences(target)).offers <= (await getTargetedOffers(target.user.id)).length) {
+    if ((await getPreferences(target)).offers <= (await getTargetedOffers(target)).length) {
       if ((await getPreferences(target)).offers === 0)
         return send({
           embeds: [new ErrorEmbed(`**${target.user.username}** has disabled offers`)],
@@ -456,7 +456,7 @@ async function run(
     if (selected.account_locked)
       return send({ embeds: [new ErrorEmbed("this item cant be traded")] });
 
-    const blocked = await getBlockedList(target.user.id);
+    const blocked = await getBlockedList(target);
 
     if (blocked.includes(selected.id))
       return send({

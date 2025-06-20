@@ -6,6 +6,7 @@ import { Item } from "../../../types/Economy";
 import { Task } from "../../../types/Tasks";
 import Constants from "../../Constants";
 import { addKarma } from "../karma/karma";
+import { getUserId, MemberResolvable } from "../member";
 import sleep from "../sleep";
 import { addInlineNotification } from "../users/notifications";
 import { getLastKnownAvatar } from "../users/tag";
@@ -18,8 +19,9 @@ import { addXp } from "./xp";
 
 const taskGeneration = new Map<string, number>();
 
-async function generateDailyTasks(userId: string, count: number) {
+async function generateDailyTasks(member: MemberResolvable, count: number) {
   const tasks = Object.values(getTasksData()).filter((i) => i.type === "daily");
+  const userId = getUserId(member);
 
   const usersTasks: Task[] = [];
 
@@ -48,8 +50,9 @@ async function generateDailyTasks(userId: string, count: number) {
   await redis.del(`${Constants.redis.cache.economy.TASKS}:${userId}`);
 }
 
-async function generateWeeklyTasks(userId: string, count: number) {
+async function generateWeeklyTasks(member: MemberResolvable, count: number) {
   const tasks = Object.values(getTasksData()).filter((i) => i.type === "weekly");
+  const userId = getUserId(member);
 
   const usersTasks: Task[] = [];
 
@@ -78,7 +81,9 @@ async function generateWeeklyTasks(userId: string, count: number) {
   await redis.del(`${Constants.redis.cache.economy.TASKS}:${userId}`);
 }
 
-export async function getTasks(userId: string): Promise<PrismaTask[]> {
+export async function getTasks(member: MemberResolvable): Promise<PrismaTask[]> {
+  const userId = getUserId(member);
+
   if (taskGeneration.has(userId)) {
     await sleep(25 + Math.floor(Math.random() * 50));
     return getTasks(userId);
@@ -171,10 +176,10 @@ export async function getTasks(userId: string): Promise<PrismaTask[]> {
   return query;
 }
 
-export async function getTaskStreaks(userId: string) {
+export async function getTaskStreaks(member: MemberResolvable) {
   const query = await prisma.economy.findUnique({
     where: {
-      userId,
+      userId: getUserId(member),
     },
     select: {
       weeklyTaskStreak: true,
@@ -221,7 +226,9 @@ export function parseReward(reward: string) {
   return out;
 }
 
-export async function addTaskProgress(userId: string, taskId: string, amount = 1) {
+export async function addTaskProgress(member: MemberResolvable, taskId: string, amount = 1) {
+  const userId = getUserId(member);
+
   if (!(await userExists(userId))) return;
   if ((await isEcoBanned(userId)).banned) return;
 
@@ -297,7 +304,9 @@ export async function addTaskProgress(userId: string, taskId: string, amount = 1
   }
 }
 
-export async function setTaskProgress(userId: string, taskId: string, amount: number) {
+export async function setTaskProgress(member: MemberResolvable, taskId: string, amount: number) {
+  const userId = getUserId(member);
+
   if (!(await userExists(userId))) return;
 
   const tasks = await getTasks(userId);

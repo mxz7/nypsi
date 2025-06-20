@@ -1,8 +1,9 @@
-import { Guild, GuildMember } from "discord.js";
+import { Guild } from "discord.js";
 import prisma from "../../../init/database";
 import { NypsiClient } from "../../../models/Client";
 import { unbanTimeouts } from "../../../scheduled/clusterjobs/moderationchecks";
 import { logger } from "../../logger";
+import { getUserId, MemberResolvable } from "../member";
 import ms = require("ms");
 
 export async function newBan(guild: Guild, userIDs: string[] | string, date: Date) {
@@ -54,44 +55,25 @@ export async function getBannedUsers(guild: Guild) {
   return query;
 }
 
-export async function isBanned(guild: Guild, member: GuildMember | string) {
+export async function isBanned(guild: Guild, member: MemberResolvable) {
   const query = await prisma.moderationBan.findFirst({
     where: {
-      AND: [
-        { guildId: guild.id },
-        { userId: typeof member == "string" ? member : (member as GuildMember).user.id },
-      ],
+      AND: [{ guildId: guild.id }, { userId: getUserId(member) }],
     },
     select: {
       userId: true,
     },
   });
 
-  if (query) {
-    return true;
-  } else {
-    return false;
-  }
+  return Boolean(query);
 }
 
-export async function deleteBan(guild: Guild | string, member: GuildMember | string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.id;
-  } else {
-    id = member;
-  }
-
-  let guildId: string;
-  if (guild instanceof Guild) {
-    guildId = guild.id;
-  } else {
-    guildId = guild;
-  }
+export async function deleteBan(guild: Guild | string, member: MemberResolvable) {
+  const guildId = guild instanceof Guild ? guild.id : guild;
 
   await prisma.moderationBan.deleteMany({
     where: {
-      AND: [{ userId: id }, { guildId: guildId }],
+      AND: [{ userId: getUserId(member) }, { guildId }],
     },
   });
 }

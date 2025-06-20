@@ -138,9 +138,9 @@ async function run(
     }
   }
 
-  const cases = (
-    await getCases(message.guild, member instanceof GuildMember ? member.user.id : member)
-  ).filter((i) => (filter ? i.type == filter : true));
+  const cases = (await getCases(message.guild, member)).filter((i) =>
+    filter ? i.type == filter : true,
+  );
 
   if (cases.length == 0) {
     return send({ embeds: [new ErrorEmbed("no history to display")] });

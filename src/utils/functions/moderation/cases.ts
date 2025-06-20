@@ -1,6 +1,7 @@
 import { Guild, User } from "discord.js";
 import prisma from "../../../init/database";
 import { PunishmentType } from "../../../types/Moderation";
+import { getUserId, MemberResolvable } from "../member";
 import { addModLog, isModLogsEnabled } from "./logs";
 
 export async function getCaseCount(guild: Guild) {
@@ -71,10 +72,10 @@ export async function restoreCase(guild: Guild, caseId: number) {
   });
 }
 
-export async function getCases(guild: Guild, userID: string) {
+export async function getCases(guild: Guild, member: MemberResolvable) {
   const query = await prisma.moderationCase.findMany({
     where: {
-      AND: [{ guildId: guild.id }, { user: userID }],
+      AND: [{ guildId: guild.id }, { user: getUserId(member) }],
     },
     include: {
       evidence: {

@@ -1,18 +1,19 @@
 import prisma from "../../../init/database";
 import { addProgress } from "../economy/achievements";
 import { addTaskProgress } from "../economy/tasks";
+import { getUserId, MemberResolvable } from "../member";
 
 export async function addWordleGame(
-  userId: string,
+  member: MemberResolvable,
   win: boolean,
   guesses: string[],
   ms: number,
   word: string,
 ) {
   if (win) {
-    addProgress(userId, "wordle", 1);
-    addTaskProgress(userId, "wordles_daily");
-    addTaskProgress(userId, "wordles_weekly");
+    addProgress(member, "wordle", 1);
+    addTaskProgress(member, "wordles_daily");
+    addTaskProgress(member, "wordles_weekly");
   }
 
   const id = await prisma.wordleGame.create({
@@ -21,7 +22,7 @@ export async function addWordleGame(
       won: win,
       word,
       guesses,
-      userId,
+      userId: getUserId(member),
     },
     select: {
       id: true,

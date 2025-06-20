@@ -22,7 +22,9 @@ import { Worker, WorkerUpgrades } from "../../../types/Workers";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { deleteImage } from "../image";
+import { getUserId, MemberResolvable } from "../member";
 import { getAllGroupAccountIds } from "../moderation/alts";
+import { pluralize } from "../string";
 import { isUserBlacklisted } from "../users/blacklist";
 import { createProfile, hasProfile } from "../users/utils";
 import { setProgress } from "./achievements";
@@ -36,7 +38,6 @@ import { addXp } from "./xp";
 import ms = require("ms");
 import math = require("mathjs");
 import pAll = require("p-all");
-import { pluralize } from "../string";
 
 let items: { [key: string]: Item };
 let achievements: { [key: string]: AchievementData };
@@ -175,17 +176,12 @@ export function runEconomySetup() {
   loadItems();
 }
 
-export async function userExists(member: GuildMember | string): Promise<boolean> {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function userExists(member: MemberResolvable): Promise<boolean> {
+  const userId = getUserId(member);
 
-  if (!id) return;
+  if (!userId) return;
 
-  const cache = await redis.get(`${Constants.redis.cache.economy.EXISTS}:${id}`);
+  const cache = await redis.get(`${Constants.redis.cache.economy.EXISTS}:${userId}`);
 
   if (cache) {
     return cache === "true" ? true : false;
@@ -193,7 +189,7 @@ export async function userExists(member: GuildMember | string): Promise<boolean>
 
   const query = await prisma.economy.findUnique({
     where: {
-      userId: id,
+      userId,
     },
     select: {
       userId: true,
@@ -202,7 +198,7 @@ export async function userExists(member: GuildMember | string): Promise<boolean>
 
   if (query) {
     await redis.set(
-      `${Constants.redis.cache.economy.EXISTS}:${id}`,
+      `${Constants.redis.cache.economy.EXISTS}:${userId}`,
       "true",
       "EX",
       ms("7 day") / 1000,
@@ -210,7 +206,7 @@ export async function userExists(member: GuildMember | string): Promise<boolean>
     return true;
   } else {
     await redis.set(
-      `${Constants.redis.cache.economy.EXISTS}:${id}`,
+      `${Constants.redis.cache.economy.EXISTS}:${userId}`,
       "false",
       "EX",
       ms("7 day") / 1000,
@@ -219,40 +215,35 @@ export async function userExists(member: GuildMember | string): Promise<boolean>
   }
 }
 
-export async function createUser(member: GuildMember | string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function createUser(member: MemberResolvable) {
+  const userId = getUserId(member);
 
-  if (!id) return;
+  if (!userId) return;
 
-  if (await redis.exists(`${Constants.redis.nypsi.PROFILE_TRANSFER}:${id}`)) return;
+  if (await redis.exists(`${Constants.redis.nypsi.PROFILE_TRANSFER}:${userId}`)) return;
 
-  if (!(await hasProfile(id))) {
+  if (!(await hasProfile(userId))) {
     if (member instanceof GuildMember) {
       await createProfile(member.user);
     } else {
-      await createProfile(id);
+      await createProfile(userId);
     }
   }
 
   await prisma.economy.create({
     data: {
-      userId: id,
+      userId,
       lastVote: new Date(0),
       lastDaily: new Date(0),
     },
   });
-  await redis.del(`${Constants.redis.cache.economy.EXISTS}:${id}`);
-  await addInventoryItem(id, "beginner_booster", 1);
+  await redis.del(`${Constants.redis.cache.economy.EXISTS}:${userId}`);
+  await addInventoryItem(userId, "beginner_booster", 1);
 }
 
 export async function formatBet(
   bet: string | number,
-  member: GuildMember | string,
+  member: MemberResolvable,
   maxBet?: number,
 ): Promise<number | null> {
   if (!maxBet) maxBet = await calcMaxBet(member);
@@ -315,12 +306,14 @@ export function formatNumberPretty(number: number): string {
   return out.replace(".0", "");
 }
 
-export async function isEcoBanned(id: string): Promise<BanCache> {
-  const blacklist = await isUserBlacklisted(id);
+export async function isEcoBanned(member: MemberResolvable): Promise<BanCache> {
+  const userId = getUserId(member);
+
+  const blacklist = await isUserBlacklisted(userId);
   if (blacklist.blacklisted)
     return { banned: true, bannedAccount: blacklist.relation, expire: 0 } as BanCache;
 
-  const cache = await redis.get(`${Constants.redis.cache.economy.BANNED}:${id}`);
+  const cache = await redis.get(`${Constants.redis.cache.economy.BANNED}:${userId}`);
 
   if (cache) {
     const res = JSON.parse(cache) as BanCache;
@@ -330,7 +323,7 @@ export async function isEcoBanned(id: string): Promise<BanCache> {
     return res;
   }
 
-  const accounts = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, id);
+  const accounts = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, userId);
 
   for (const accountId of accounts) {
     const cache = await redis.get(`${Constants.redis.cache.economy.BANNED}:${accountId}`);
@@ -383,8 +376,8 @@ export async function isEcoBanned(id: string): Promise<BanCache> {
   return { banned: false };
 }
 
-export async function getEcoBanTime(id: string) {
-  const accounts = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, id);
+export async function getEcoBanTime(member: MemberResolvable) {
+  const accounts = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, getUserId(member));
 
   for (const accountId of accounts) {
     const query = await prisma.economy.findUnique({
@@ -398,11 +391,13 @@ export async function getEcoBanTime(id: string) {
   }
 }
 
-export async function setEcoBan(id: string, date?: Date) {
+export async function setEcoBan(member: MemberResolvable, date?: Date) {
+  const userId = getUserId(member);
+
   if (!date) {
     await prisma.economy.update({
       where: {
-        userId: id,
+        userId,
       },
       data: {
         banned: new Date(0),
@@ -411,7 +406,7 @@ export async function setEcoBan(id: string, date?: Date) {
   } else {
     await prisma.economy.update({
       where: {
-        userId: id,
+        userId,
       },
       data: {
         banned: date,
@@ -576,20 +571,15 @@ export function getLootPools() {
   return lootPools;
 }
 
-export async function deleteUser(member: GuildMember | string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+export async function deleteUser(member: MemberResolvable) {
+  const userId = getUserId(member);
 
-  exec(`redis-cli KEYS "*:${id}:*" | xargs redis-cli DEL`);
+  exec(`redis-cli KEYS "*:${userId}:*" | xargs redis-cli DEL`);
 
   const guild = await getGuildByUser(member);
 
   if (guild) {
-    if (guild.ownerId == id) {
+    if (guild.ownerId == userId) {
       await prisma.economyGuildMember.deleteMany({
         where: { guildName: guild.guildName },
       });
@@ -602,41 +592,34 @@ export async function deleteUser(member: GuildMember | string) {
     } else {
       await prisma.economyGuildMember.delete({
         where: {
-          userId: id,
+          userId,
         },
       });
     }
   }
 
   await prisma.booster.deleteMany({
-    where: { userId: id },
+    where: { userId },
   });
   await prisma.economy.delete({
     where: {
-      userId: id,
+      userId,
     },
   });
 }
 
-export async function isHandcuffed(id: string): Promise<boolean> {
-  return (await redis.exists(`economy:handcuffed:${id}`)) == 1 ? true : false;
+export async function isHandcuffed(member: MemberResolvable): Promise<boolean> {
+  return (await redis.exists(`economy:handcuffed:${getUserId(member)}`)) == 1 ? true : false;
 }
 
-export async function addHandcuffs(id: string) {
-  await redis.set(`economy:handcuffed:${id}`, Date.now(), "EX", 60);
+export async function addHandcuffs(member: MemberResolvable) {
+  await redis.set(`economy:handcuffed:${getUserId(member)}`, Date.now(), "EX", 60);
 }
 
-export async function getLastDaily(member: GuildMember | string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
+export async function getLastDaily(member: MemberResolvable) {
   const query = await prisma.economy.findUnique({
     where: {
-      userId: id,
+      userId: getUserId(member),
     },
     select: {
       lastDaily: true,
@@ -646,17 +629,10 @@ export async function getLastDaily(member: GuildMember | string) {
   return query.lastDaily;
 }
 
-export async function updateLastDaily(member: GuildMember | string, updateLast = true, amount = 1) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
+export async function updateLastDaily(member: MemberResolvable, updateLast = true, amount = 1) {
   await prisma.economy.update({
     where: {
-      userId: id,
+      userId: getUserId(member),
     },
     data: updateLast
       ? {
@@ -669,17 +645,10 @@ export async function updateLastDaily(member: GuildMember | string, updateLast =
   });
 }
 
-export async function getDailyStreak(member: GuildMember | string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
+export async function getDailyStreak(member: MemberResolvable) {
   const query = await prisma.economy.findUnique({
     where: {
-      userId: id,
+      userId: getUserId(member),
     },
     select: {
       dailyStreak: true,
@@ -779,15 +748,14 @@ export async function doDaily(member: GuildMember, updateLast = true, amount = 1
     }
   }
 
-  addStat(member.user.id, "earned-daily", totalMoney);
-  setProgress(member.id, "streaker", currentStreak + amount);
-  addTaskProgress(member.id, "daily_streaks", amount);
+  addStat(member, "earned-daily", totalMoney);
+  setProgress(member, "streaker", currentStreak + amount);
+  addTaskProgress(member, "daily_streaks", amount);
 
   return embed;
 }
 
 export async function renderGambleScreen(
-  userId: string,
   state: "playing" | "win" | "lose" | "draw",
   bet: number,
   insert?: string,

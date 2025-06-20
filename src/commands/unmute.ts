@@ -183,7 +183,7 @@ async function run(
 
   if (caseId) embed.setHeader(`unmute [${caseId}]`, message.guild.iconURL());
 
-  const ids = await getAllGroupAccountIds(message.guild, target.user.id);
+  const ids = await getAllGroupAccountIds(message.guild, target);
 
   let msg =
     punishAlts && ids.length > 3
@@ -277,7 +277,7 @@ async function doUnmute(
   }
   if (fail) return false;
 
-  await deleteMute(message.guild, target.user.id);
+  await deleteMute(message.guild, target);
   return await newCase(message.guild, "unmute", target.user.id, message.author, reason);
 }
 
