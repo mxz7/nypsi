@@ -33,8 +33,8 @@ export async function createAuraTransaction(
   sender: MemberResolvable,
   amount: number,
 ) {
-  const senderId = getUserId(recipient);
-  const recipientId = getUserId(sender);
+  const senderId = getUserId(sender);
+  const recipientId = getUserId(recipient);
 
   await prisma.aura.create({
     data: { senderId, recipientId, amount },
