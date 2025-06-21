@@ -1,5 +1,6 @@
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
+import { bearerAuth } from "hono/bearer-auth";
 import { HTTPException } from "hono/http-exception";
 import { checkStatus } from "..";
 import { logger } from "../utils/logger";
@@ -27,14 +28,14 @@ app.get("/", (c) => {
   return c.json({ meow: "meow" });
 });
 
-app.get("/status", async (c) => {
+app.get("/status", bearerAuth({ token: process.env.API_AUTH }), async (c) => {
   const status = await checkStatus();
 
   return c.json(status);
 });
 
 app.onError((err, c) => {
-  console.error(err);
+  logger.warn(`api: error ${c.req.method} ${c.req.path}`, err);
 
   if (err instanceof HTTPException) {
     return err.getResponse();
