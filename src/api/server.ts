@@ -1,6 +1,7 @@
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
+import { checkStatus } from "..";
 import { logger } from "../utils/logger";
 
 const app = new Hono();
@@ -18,12 +19,18 @@ app.use(async (c, next) => {
   logger.debug(`api: ${c.req.method} ${c.req.path}`, {
     body: body || undefined,
   });
-  next();
+  await next();
 });
 
 // routes
 app.get("/", (c) => {
   return c.json({ meow: "meow" });
+});
+
+app.get("/status", async (c) => {
+  const status = await checkStatus();
+
+  return c.json(status);
 });
 
 app.onError((err, c) => {
