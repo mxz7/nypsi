@@ -5,6 +5,7 @@ import { HTTPException } from "hono/http-exception";
 import { checkStatus } from "..";
 import redis from "../init/redis";
 import { setProgress } from "../utils/functions/economy/achievements";
+import { calcItemValue } from "../utils/functions/economy/inventory";
 import { logger } from "../utils/logger";
 import kofi from "./controllers/kofi";
 import vote from "./controllers/vote";
@@ -70,6 +71,12 @@ app.delete("/redis", bearerAuth({ token: process.env.API_AUTH }), async (c) => {
   await redis.del(...keys);
 
   return c.body(null, 200);
+});
+
+app.get("/item/value/:itemId", bearerAuth({ token: process.env.API_AUTH }), async (c) => {
+  const itemId = c.req.param("item");
+  const value = await calcItemValue(itemId);
+  return c.json({ value });
 });
 
 app.route("/vote", vote);
