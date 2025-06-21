@@ -4,8 +4,8 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "format": "prettier --write --cache --cache-location .prettiercache .",
-    "format:check": "prettier --check --cache --cache-location .prettiercache .",
+    "format": "prettier --write --cache --cache-location .prettiercache ./src/",
+    "format:check": "prettier --check --cache --cache-location .prettiercache ./src/",
     "clean": "rm -rf dist node_modules",
     "build": "tsc --incremental",
     "watch": "tsc --build --watch",
