@@ -46,6 +46,7 @@ kofi.post(
     const parsed = schema.safeParse(value);
 
     if (!parsed.success) {
+      logger.error(`api: received faulty kofi data`, { value, parsed });
       return c.body(null, 400);
     }
 
@@ -55,7 +56,7 @@ kofi.post(
     const data = c.req.valid("json");
 
     if (data.verification_token !== process.env.KOFI_VERIFICATION) {
-      logger.error(`received faulty kofi data`, data);
+      logger.error(`api: received faulty kofi data`, data);
       return c.body(null, 401);
     }
 
