@@ -3,6 +3,7 @@ import { ClusterManager } from "discord-hybrid-sharding";
 import "dotenv/config";
 import { loadavg } from "os";
 import { clearInterval } from "timers";
+import { startAPI } from "./api/server";
 import redis from "./init/redis";
 import { loadJobs, runJob } from "./scheduled/scheduler";
 import Constants from "./utils/Constants";
@@ -10,7 +11,6 @@ import { loadItems, runEconomySetup } from "./utils/functions/economy/utils";
 import { addFailedHeartbeat, sendHeartbeat } from "./utils/functions/heartbeat";
 import { updateStats } from "./utils/functions/topgg";
 import { startMentionInterval } from "./utils/handlers/mentions";
-import { listen } from "./utils/handlers/webhookhandler";
 import { getWebhooks, logger, setClusterId } from "./utils/logger";
 import { dmQueueWorker } from "./utils/queues/dms";
 import ms = require("ms");
@@ -106,7 +106,8 @@ manager.spawn().then(() => {
   runEconomySetup();
 });
 
-listen();
+loadItems();
+startAPI();
 
 // setTimeout(async () => {
 //   dmQueueWorker.resume();

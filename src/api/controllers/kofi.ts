@@ -1,36 +1,16 @@
 import { Prisma } from "@prisma/client";
-import * as topgg from "@top-gg/sdk";
-import {
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  MessageActionRowComponentBuilder,
-  WebhookClient,
-} from "discord.js";
-import * as express from "express";
-import { checkStatus } from "../..";
+import { WebhookClient } from "discord.js";
+import { Hono } from "hono";
+import { validator } from "hono/validator";
+import z from "zod";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { CustomEmbed } from "../../models/EmbedBuilders";
-import { KofiResponse } from "../../types/Kofi";
 import { NotificationPayload } from "../../types/Notification";
-import Constants from "../Constants";
-import { addProgress, setProgress } from "../functions/economy/achievements";
-import { addBalance } from "../functions/economy/balance";
-import { addBooster } from "../functions/economy/boosters";
-import { addToGuildXP, getGuildByUser } from "../functions/economy/guilds";
-import { addInventoryItem, calcItemValue } from "../functions/economy/inventory";
-import { getRawLevel } from "../functions/economy/levelling";
-import { addStat } from "../functions/economy/stats";
-import {
-  getItems,
-  isEcoBanned,
-  loadItems,
-  setEcoBan,
-  userExists,
-} from "../functions/economy/utils";
-import { addXp } from "../functions/economy/xp";
-import { addKarma } from "../functions/karma/karma";
+import Constants from "../../utils/Constants";
+import { addProgress } from "../../utils/functions/economy/achievements";
+import { addInventoryItem } from "../../utils/functions/economy/inventory";
+import { getItems, setEcoBan } from "../../utils/functions/economy/utils";
 import {
   addMember,
   getTier,
@@ -39,298 +19,55 @@ import {
   renewUser,
   setCredits,
   setTier,
-} from "../functions/premium/premium";
-import { percentChance } from "../functions/random";
-import { getTax, getTaxRefreshTime } from "../functions/tax";
-import { createAuraTransaction } from "../functions/users/aura";
-import { isUserBlacklisted } from "../functions/users/blacklist";
+} from "../../utils/functions/premium/premium";
+import { createAuraTransaction } from "../../utils/functions/users/aura";
 import {
   addNotificationToQueue,
   getDmSettings,
   getPreferences,
-} from "../functions/users/notifications";
-import { logger } from "../logger";
-import ms = require("ms");
-import { pluralize } from "../functions/string";
+} from "../../utils/functions/users/notifications";
+import { logger } from "../../utils/logger";
 
-loadItems(false);
+const kofi = new Hono();
 
-const app = express();
-const webhook = new topgg.Webhook(process.env.TOPGG_AUTH);
+const schema = z.object({
+  type: z.string(),
+  email: z.string(),
+  tier_name: z.string().optional(),
+  shop_items: z.array(z.object({ direct_link_code: z.string(), quantity: z.number() })).optional(),
+  verification_token: z.string(),
+  is_public: z.boolean(),
+  amount: z.string(),
+});
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+kofi.post(
+  "/",
+  validator("json", (value, c) => {
+    const parsed = schema.safeParse(value);
 
-export function listen() {
-  app.post(
-    "/topgg",
-    webhook.listener((vote) => {
-      logger.info(`received vote: ${vote.user}`);
-      doVote(vote);
-    }),
-  );
-
-  app.post("/kofi", async (req, response) => {
-    const data = JSON.parse(req.body.data) as KofiResponse;
-
-    logger.info("received kofi data", data);
-
-    if (data.verification_token != process.env.KOFI_VERIFICATION) {
-      logger.error("received faulty kofi data", data);
-      return;
+    if (!parsed.success) {
+      return c.body(null, 400);
     }
 
-    response.status(200).send();
+    return parsed.data;
+  }),
+  (c) => {
+    const data = c.req.valid("json");
 
-    return handleKofiData(data);
-  });
-
-  app.get("/status", async (req, res) => {
-    res.set("cache-control", "max-age=60");
-
-    const response = await checkStatus();
-
-    res.json(response);
-  });
-
-  app.get("/tax", async (req, res) => {
-    res.set("cache-control", "max-age=60");
-
-    const [tax, refreshTime] = await Promise.all([getTax(), getTaxRefreshTime()]);
-
-    res.json({
-      tax,
-      refreshTime,
-    });
-  });
-
-  app.post("/achievement/animal_lover/progress/:id", async (req, res) => {
-    const auth = req.headers.authorization;
-
-    if (auth !== process.env.API_AUTH) {
-      res.status(401).send();
-      return;
+    if (data.verification_token !== process.env.KOFI_VERIFICATION) {
+      logger.error(`received faulty kofi data`, data);
+      return c.body(null, 401);
     }
 
-    const { id } = req.params;
-    const { progress } = req.body;
-    await setProgress(id, "animal_lover", progress);
-    res.status(200).send();
-  });
+    handleKofiData(data);
 
-  app.delete("/redis", express.text(), async (req, res) => {
-    const auth = req.headers.authorization;
+    return c.body(null, 200);
+  },
+);
 
-    if (auth !== process.env.API_AUTH) {
-      res.status(401).send();
-      return;
-    }
+export default kofi;
 
-    logger.info(`deleting redis keys (${req.body.split("\n").join(", ")})`);
-
-    await redis.del(...req.body.split("\n"));
-
-    res.status(200).send();
-  });
-
-  app.get("/item/value/:item", async (req, res) => {
-    const { item } = req.params;
-
-    const value = await calcItemValue(item);
-    res.status(200).json({
-      value,
-    });
-  });
-
-  app.listen(process.env.EXPRESS_PORT || 5000);
-
-  logger.info(`listening on port ${process.env.EXPRESS_PORT || 5000}`);
-}
-
-async function doVote(vote: topgg.WebhookPayload) {
-  const { user } = vote;
-
-  await redis.srem(Constants.redis.nypsi.VOTE_REMINDER_RECEIVED, user);
-
-  if (!(await userExists(user))) {
-    logger.warn(`${user} doesnt exist`);
-    return;
-  }
-
-  if ((await isUserBlacklisted(user)).blacklisted) {
-    logger.info(`${user} blacklisted`);
-    addNotificationToQueue({
-      memberId: user,
-      payload: {
-        content:
-          "you voted but you're blacklisted. hahahahahahhhahah no it won't help you hahahahahahhahahahahahahah",
-      },
-    });
-    return;
-  }
-
-  const query = await prisma.economy.findUnique({
-    where: {
-      userId: user,
-    },
-    select: {
-      lastVote: true,
-      voteStreak: true,
-    },
-  });
-
-  const lastVote = query.lastVote.getTime();
-
-  if (Date.now() - lastVote < 25200000) {
-    return logger.error(`${user} already voted`);
-  }
-
-  const votes = await prisma.economy.update({
-    where: {
-      userId: user,
-    },
-    data: {
-      lastVote: new Date(),
-      monthVote: { increment: 1 },
-      seasonVote: { increment: 1 },
-      voteStreak: { increment: 1 },
-    },
-    select: {
-      monthVote: true,
-      seasonVote: true,
-      voteStreak: true,
-    },
-  });
-
-  if ((await isEcoBanned(user)).banned) {
-    logger.info(`${user} banned`);
-    addNotificationToQueue({
-      memberId: user,
-      payload: {
-        content: "you voted but you're banned. hahahahahahhhahah lol you get NOTHING.",
-      },
-    });
-    return;
-  }
-
-  await redis.set(
-    `${Constants.redis.cache.economy.VOTE}:${user}`,
-    "true",
-    "EX",
-    ms("1 hour") / 1000,
-  );
-
-  let level = await getRawLevel(user);
-  const guild = await getGuildByUser(user);
-
-  if (level > 100) level = 100;
-
-  const amount = Math.floor(15000 * (level / 13 + 1));
-
-  const determineCrateAmount = (value: number) => {
-    let amount = 0;
-
-    while (!amount && value >= 0) {
-      if (Constants.PROGRESSION.VOTE_CRATE.has(value)) {
-        amount = Constants.PROGRESSION.VOTE_CRATE.get(value);
-        break;
-      }
-      value--;
-    }
-
-    return amount;
-  };
-
-  const crateAmount = determineCrateAmount(votes.voteStreak);
-  const newCrateAmount = determineCrateAmount(query.voteStreak) < crateAmount;
-
-  try {
-    await Promise.all([
-      addBalance(user, amount),
-      addKarma(user, 10),
-      addXp(user, 100),
-      addBooster(user, "vote_booster"),
-      redis.del(`${Constants.redis.cache.economy.VOTE}:${user}`),
-      redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${user}`),
-      addStat(user, "earned-vote", amount),
-      addInventoryItem(user, "lottery_ticket", crateAmount),
-      createAuraTransaction(user, Constants.BOT_USER_ID, 50),
-      addInventoryItem(user, "vote_crate", crateAmount),
-    ]).catch((e) => {
-      logger.error("vote error", e);
-    });
-
-    if (guild) await addToGuildXP(guild.guildName, 100, user);
-  } catch (e) {
-    logger.error("vote error", e);
-  }
-
-  if (percentChance(0.05) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
-    await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t", "EX", 86400);
-    logger.info(`${user} received blue_gem randomly (vote)`);
-    await addInventoryItem(user, "blue_gem", 1);
-    addProgress(user, "gem_hunter", 1);
-
-    if ((await getDmSettings(user)).other) {
-      addNotificationToQueue({
-        memberId: user,
-        payload: {
-          embed: new CustomEmbed(user)
-            .setDescription(
-              `${
-                getItems()["blue_gem"].emoji
-              } you've found a gem! i wonder what powers it holds...`,
-            )
-            .setTitle("you've found a gem"),
-        },
-      });
-    }
-  }
-
-  logger.info(`::success vote processed for ${user}`);
-
-  const embed = new CustomEmbed()
-    .setColor(Constants.EMBED_SUCCESS_COLOR)
-    .setDescription(
-      "you have received the following: \n\n" +
-        `+ $**${amount.toLocaleString()}**\n` +
-        "+ **3**% multiplier\n" +
-        `+ **${crateAmount}** ${pluralize("vote crate", crateAmount)}` +
-        `\n+ **${crateAmount}** ${pluralize("lottery ticket", crateAmount)}\n\n` +
-        (newCrateAmount && votes.voteStreak > 5
-          ? `you will now receive **${crateAmount}** crates each vote thanks to your streak\n\n`
-          : "") +
-        `you have voted **${votes.monthVote}** ${pluralize("time", votes.monthVote)} this month`,
-    )
-    .setFooter({ text: `+100xp | streak: ${votes.voteStreak.toLocaleString()}` });
-
-  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder()
-      .setLabel("open crates")
-      .setCustomId("vote-crates")
-      .setStyle(ButtonStyle.Success),
-  );
-
-  if (!(await getDmSettings(user)).voteReminder) {
-    row.addComponents(
-      new ButtonBuilder()
-        .setLabel("enable vote reminders")
-        .setCustomId("enable-vote-reminders")
-        .setStyle(ButtonStyle.Secondary),
-    );
-  }
-
-  addNotificationToQueue({
-    memberId: user,
-    payload: {
-      content: "thank you for voting!",
-      embed: embed,
-      components: row,
-    },
-  });
-}
-
-async function handleKofiData(data: KofiResponse) {
+async function handleKofiData(data: z.infer<typeof schema>) {
   const user = await prisma.user.findFirst({
     where: {
       AND: [{ email: data.email }, { blacklisted: false }],

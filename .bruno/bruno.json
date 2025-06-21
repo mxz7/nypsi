@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "nypsi api",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}
