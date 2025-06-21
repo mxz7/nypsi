@@ -23,7 +23,6 @@
     "@discordjs/rest": "2.5.0",
     "@hono/node-server": "^1.14.4",
     "@prisma/client": "6.9.0",
-    "@top-gg/sdk": "3.1.6",
     "@twemoji/parser": "^16.0.0",
     "@yusifaliyevpro/countries": "^2.2.1",
     "@zeyrbot/urbandictionary": "^1.0.3",
