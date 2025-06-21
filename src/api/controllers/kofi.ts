@@ -33,8 +33,11 @@ const kofi = new Hono();
 const schema = z.object({
   type: z.string(),
   email: z.string(),
-  tier_name: z.string().optional(),
-  shop_items: z.array(z.object({ direct_link_code: z.string(), quantity: z.number() })).optional(),
+  tier_name: z.string().nullable().optional(),
+  shop_items: z
+    .array(z.object({ direct_link_code: z.string(), quantity: z.number() }))
+    .nullable()
+    .optional(),
   verification_token: z.string(),
   is_public: z.boolean(),
   amount: z.string(),
@@ -44,7 +47,7 @@ kofi.post(
   "/",
   validator("form", (value, c) => {
     console.log(value);
-    const parsed = schema.safeParse(value["data"]);
+    const parsed = schema.safeParse(JSON.parse(value["data"] as string));
     console.log(parsed);
 
     if (!parsed.success) {
@@ -58,7 +61,7 @@ kofi.post(
     const data = c.req.valid("form");
 
     if (data.verification_token !== process.env.KOFI_VERIFICATION) {
-      logger.error(`api: received faulty kofi data`, data);
+      logger.error(`api: received faulty kofi data (verification)`, data);
       return c.body(null, 401);
     }
 

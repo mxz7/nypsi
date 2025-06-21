@@ -1,7 +1,6 @@
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { bearerAuth } from "hono/bearer-auth";
-import { HTTPException } from "hono/http-exception";
 import { checkStatus, manager } from "..";
 import redis from "../init/redis";
 import { setProgress } from "../utils/functions/economy/achievements";
@@ -14,20 +13,20 @@ import vote from "./controllers/vote";
 const app = new Hono();
 
 // middlewares
-app.use(async (c, next) => {
-  let body: any;
+// app.use(async (c, next) => {
+//   let body: any;
 
-  try {
-    body = await c.req.json();
-  } catch {
-    // do nothing
-  }
+//   try {
+//     body = await c.req.json().catch(() => undefined);
+//   } catch {
+//     // do nothing
+//   }
 
-  logger.debug(`api: ${c.req.method} ${c.req.path}`, {
-    body: body || undefined,
-  });
-  await next();
-});
+//   logger.debug(`api: ${c.req.method} ${c.req.path}`, {
+//     body: body || undefined,
+//   });
+//   await next();
+// });
 
 // routes
 app.get("/", (c) => {
@@ -98,18 +97,18 @@ app.post("/reboot", bearerAuth({ token: process.env.API_AUTH }), async (c) => {
 app.route("/vote", vote);
 app.route("/kofi", kofi);
 
-app.onError((err, c) => {
-  logger.warn(`api: error ${c.req.method} ${c.req.path}`, err);
+// app.onError((err, c) => {
+//   logger.warn(`api: error ${c.req.method} ${c.req.path}`, err);
 
-  if (err instanceof HTTPException) {
-    return err.getResponse();
-  }
+//   if (err instanceof HTTPException) {
+//     return err.getResponse();
+//   }
 
-  c.status(500);
-  return c.json({
-    message: err.message || "Internal Server Error",
-  });
-});
+//   c.status(500);
+//   return c.json({
+//     message: err.message || "Internal Server Error",
+//   });
+// });
 
 export function startAPI() {
   serve({ fetch: app.fetch, port: parseInt(process.env.EXPRESS_PORT) || 5000 });
