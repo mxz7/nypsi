@@ -4,6 +4,7 @@ import { bearerAuth } from "hono/bearer-auth";
 import { HTTPException } from "hono/http-exception";
 import { checkStatus } from "..";
 import { logger } from "../utils/logger";
+import vote from "./controllers/vote";
 
 const app = new Hono();
 
@@ -33,6 +34,8 @@ app.get("/status", bearerAuth({ token: process.env.API_AUTH }), async (c) => {
 
   return c.json(status);
 });
+
+app.route("/vote", vote);
 
 app.onError((err, c) => {
   logger.warn(`api: error ${c.req.method} ${c.req.path}`, err);
