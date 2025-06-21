@@ -6,10 +6,12 @@ import logMiddleware from "./middleware/logger";
 
 const app = express();
 
+// middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(logMiddleware);
 
+// routes
 app.get("/", index);
 
 // after routes
