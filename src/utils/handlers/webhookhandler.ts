@@ -41,6 +41,7 @@ import {
   setTier,
 } from "../functions/premium/premium";
 import { percentChance } from "../functions/random";
+import { pluralize } from "../functions/string";
 import { getTax, getTaxRefreshTime } from "../functions/tax";
 import { createAuraTransaction } from "../functions/users/aura";
 import { isUserBlacklisted } from "../functions/users/blacklist";
@@ -51,7 +52,6 @@ import {
 } from "../functions/users/notifications";
 import { logger } from "../logger";
 import ms = require("ms");
-import { pluralize } from "../functions/string";
 
 loadItems(false);
 
