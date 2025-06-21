@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import { bearerAuth } from "hono/bearer-auth";
 import { HTTPException } from "hono/http-exception";
 import { checkStatus } from "..";
+import redis from "../init/redis";
 import { setProgress } from "../utils/functions/economy/achievements";
 import { logger } from "../utils/logger";
 import kofi from "./controllers/kofi";
@@ -60,6 +61,16 @@ app.post(
     return c.body(null, 200);
   },
 );
+
+app.delete("/redis", bearerAuth({ token: process.env.API_AUTH }), async (c) => {
+  const keys = await c.req.text().then((r) => r.split("\n"));
+
+  logger.info(`api: deleting redis keys (${keys.join(", ")})`);
+
+  await redis.del(...keys);
+
+  return c.body(null, 200);
+});
 
 app.route("/vote", vote);
 app.route("/kofi", kofi);
