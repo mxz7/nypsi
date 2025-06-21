@@ -42,7 +42,7 @@ const schema = z.object({
 
 kofi.post(
   "/",
-  validator("json", (value, c) => {
+  validator("form", (value, c) => {
     const parsed = schema.safeParse(value);
 
     if (!parsed.success) {
@@ -53,7 +53,7 @@ kofi.post(
     return parsed.data;
   }),
   (c) => {
-    const data = c.req.valid("json");
+    const data = c.req.valid("form");
 
     if (data.verification_token !== process.env.KOFI_VERIFICATION) {
       logger.error(`api: received faulty kofi data`, data);
