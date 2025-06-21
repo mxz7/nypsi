@@ -43,9 +43,8 @@ const schema = z.object({
 kofi.post(
   "/",
   validator("form", (value, c) => {
-    const parsed = schema.safeParse(value["data"]);
-
     console.log(value);
+    const parsed = schema.safeParse(value["data"]);
     console.log(parsed);
 
     if (!parsed.success) {
