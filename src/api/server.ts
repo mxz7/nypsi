@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import { bearerAuth } from "hono/bearer-auth";
 import { HTTPException } from "hono/http-exception";
 import { checkStatus } from "..";
+import { setProgress } from "../utils/functions/economy/achievements";
 import { logger } from "../utils/logger";
 import kofi from "./controllers/kofi";
 import vote from "./controllers/vote";
@@ -35,6 +36,30 @@ app.get("/status", bearerAuth({ token: process.env.API_AUTH }), async (c) => {
 
   return c.json(status);
 });
+
+app.post(
+  "/achievement/animal_lover/progress/:userid",
+  bearerAuth({ token: process.env.API_AUTH }),
+  async (c) => {
+    let body: { progress: number };
+
+    try {
+      body = await c.req.json();
+    } catch {
+      c.status(400);
+      return c.json({ error: "invalid body" });
+    }
+
+    if (!body.progress) {
+      c.status(400);
+      return c.json({ error: "invalid body" });
+    }
+
+    const userId = c.req.param("userid");
+    await setProgress(userId, "animal_lover", body.progress);
+    return c.body(null, 200);
+  },
+);
 
 app.route("/vote", vote);
 app.route("/kofi", kofi);
