@@ -1,24 +1,46 @@
-import * as express from "express";
+import { serve } from "@hono/node-server";
+import { Hono } from "hono";
+import { HTTPException } from "hono/http-exception";
 import { logger } from "../utils/logger";
-import { index } from "./controllers/indexController";
-import errorHandler from "./middleware/error";
-import logMiddleware from "./middleware/logger";
 
-const app = express();
+const app = new Hono();
 
 // middlewares
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(logMiddleware);
+app.use(async (c, next) => {
+  let body: any;
+
+  try {
+    body = await c.req.json();
+  } catch {
+    // do nothing
+  }
+
+  logger.debug(`api: ${c.req.method} ${c.req.path}`, {
+    body: body || undefined,
+  });
+  next();
+});
 
 // routes
-app.get("/", index);
+app.get("/", (c) => {
+  return c.json({ meow: "meow" });
+});
 
-// after routes
-app.use(errorHandler);
+app.onError((err, c) => {
+  console.error(err);
+
+  if (err instanceof HTTPException) {
+    return err.getResponse();
+  }
+
+  c.status(500);
+  return c.json({
+    message: err.message || "Internal Server Error",
+  });
+});
 
 export function startAPI() {
-  app.listen(process.env.EXPRESS_PORT || 5000);
+  serve({ fetch: app.fetch, port: parseInt(process.env.EXPRESS_PORT) || 5000 });
 
   logger.info(`api: running on port ${process.env.EXPRESS_PORT || 5000}`);
 }

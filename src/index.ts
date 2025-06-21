@@ -106,6 +106,7 @@ manager.spawn().then(() => {
   runEconomySetup();
 });
 
+loadItems();
 startAPI();
 
 // setTimeout(async () => {
