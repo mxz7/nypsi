@@ -2,10 +2,11 @@ import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { bearerAuth } from "hono/bearer-auth";
 import { HTTPException } from "hono/http-exception";
-import { checkStatus } from "..";
+import { checkStatus, manager } from "..";
 import redis from "../init/redis";
 import { setProgress } from "../utils/functions/economy/achievements";
 import { calcItemValue } from "../utils/functions/economy/inventory";
+import sleep from "../utils/functions/sleep";
 import { logger } from "../utils/logger";
 import kofi from "./controllers/kofi";
 import vote from "./controllers/vote";
@@ -77,6 +78,21 @@ app.get("/item/value/:itemId", bearerAuth({ token: process.env.API_AUTH }), asyn
   const itemId = c.req.param("item");
   const value = await calcItemValue(itemId);
   return c.json({ value });
+});
+
+app.post("/reboot", bearerAuth({ token: process.env.API_AUTH }), async (c) => {
+  logger.info(`api: forced reboot triggered`);
+
+  setTimeout(async () => {
+    logger.info(`api: killing clusters...`);
+    manager.clusters.forEach((c) => c.kill({ force: true, reason: "triggered by API" }));
+
+    logger.info(`api: killing process in 5 seconds...`);
+    await sleep(5000);
+    process.exit(0);
+  }, 3000);
+
+  return c.body(null, 200);
 });
 
 app.route("/vote", vote);
