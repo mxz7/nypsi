@@ -9,24 +9,11 @@ import sleep from "../utils/functions/sleep";
 import { logger } from "../utils/logger";
 import kofi from "./controllers/kofi";
 import vote from "./controllers/vote";
+import loggerMiddleware from "./middleware/logger";
 
 const app = new Hono();
 
-// middlewares
-// app.use(async (c, next) => {
-//   let body: any;
-
-//   try {
-//     body = await c.req.json().catch(() => undefined);
-//   } catch {
-//     // do nothing
-//   }
-
-//   logger.debug(`api: ${c.req.method} ${c.req.path}`, {
-//     body: body || undefined,
-//   });
-//   await next();
-// });
+app.use(loggerMiddleware);
 
 // routes
 app.get("/", (c) => {
