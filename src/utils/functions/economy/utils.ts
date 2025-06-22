@@ -1,5 +1,5 @@
 import { exec } from "child_process";
-import { GuildMember } from "discord.js";
+import { GuildMember, User } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import * as fs from "fs";
 import prisma from "../../../init/database";
@@ -658,7 +658,12 @@ export async function getDailyStreak(member: MemberResolvable) {
   return query.dailyStreak;
 }
 
-export async function doDaily(member: GuildMember, updateLast = true, amount = 1) {
+export async function doDaily(
+  member: GuildMember | User,
+  updateLast = true,
+  amount = 1,
+  rerun = false,
+) {
   const currentStreak = await getDailyStreak(member);
 
   let totalMoney = 0;
@@ -666,7 +671,7 @@ export async function doDaily(member: GuildMember, updateLast = true, amount = 1
 
   const totalRewards = new Map<string, number>();
 
-  for (let i = 1; i <= amount; i++) {
+  const addRewards = (i: number) => {
     const streak = currentStreak + i;
 
     let money = Math.floor(math.square(streak * 7) + 25_000);
@@ -705,6 +710,14 @@ export async function doDaily(member: GuildMember, updateLast = true, amount = 1
     if (streak % 500 == 0) {
       totalRewards.set("gem_crate", (totalRewards.get("gem_crate") ?? 0) + 1);
     }
+  };
+
+  if (!rerun)
+    for (let i = 1; i <= amount; i++) {
+      addRewards(i);
+    }
+  else {
+    addRewards(0);
   }
 
   const promises = [];
@@ -725,15 +738,17 @@ export async function doDaily(member: GuildMember, updateLast = true, amount = 1
 
   promises.push(async () => {
     await addBalance(member, totalMoney);
-    await updateLastDaily(member, updateLast, amount);
+    if (!rerun) await updateLastDaily(member, updateLast, amount);
     await addInventoryItem(member, "daily_scratch_card", amount);
   });
 
   await pAll(promises, { concurrency: 3 });
 
   const embed = new CustomEmbed(member);
-  embed.setHeader("daily", member.user.avatarURL());
-  embed.setDescription(`daily streak: \`${currentStreak}\` -> \`${currentStreak + amount}\``);
+  embed.setHeader("daily", member instanceof GuildMember ? member.user.avatarURL() : undefined);
+  embed.setDescription(
+    `daily streak: \`${currentStreak}\`${rerun ? "" : ` -> \`${currentStreak + amount}\``}`,
+  );
 
   embed.addField("rewards", rewards.join("\n"));
 
@@ -749,10 +764,21 @@ export async function doDaily(member: GuildMember, updateLast = true, amount = 1
   }
 
   addStat(member, "earned-daily", totalMoney);
-  setProgress(member, "streaker", currentStreak + amount);
+  setProgress(member, "streaker", rerun ? currentStreak : currentStreak + amount);
   addTaskProgress(member, "daily_streaks", amount);
 
   return embed;
+}
+
+export async function setDaily(member: MemberResolvable, amount: number) {
+  await prisma.economy.update({
+    where: {
+      userId: getUserId(member),
+    },
+    data: {
+      dailyStreak: amount,
+    },
+  });
 }
 
 export async function renderGambleScreen(

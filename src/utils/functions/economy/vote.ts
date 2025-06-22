@@ -63,3 +63,14 @@ export async function getVoteStreak(member: MemberResolvable) {
 
   return query?.voteStreak || 0;
 }
+
+export async function setVoteStreak(member: MemberResolvable, amount: number) {
+  await prisma.economy.update({
+    where: {
+      userId: getUserId(member),
+    },
+    data: {
+      voteStreak: amount,
+    },
+  });
+}

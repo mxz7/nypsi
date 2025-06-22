@@ -122,6 +122,17 @@ async function doVote(user: string) {
     return;
   }
 
+  await giveVoteRewards(user, votes);
+}
+
+export async function giveVoteRewards(
+  user: string,
+  votes: {
+    monthVote: number;
+    seasonVote: number;
+    voteStreak: number;
+  },
+) {
   await redis.set(
     `${Constants.redis.cache.economy.VOTE}:${user}`,
     "true",
@@ -151,7 +162,7 @@ async function doVote(user: string) {
   };
 
   const crateAmount = determineCrateAmount(votes.voteStreak);
-  const newCrateAmount = determineCrateAmount(query.voteStreak) < crateAmount;
+  const newCrateAmount = determineCrateAmount(votes.voteStreak - 1) < crateAmount;
 
   try {
     await Promise.all([
