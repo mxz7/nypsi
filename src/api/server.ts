@@ -61,7 +61,7 @@ app.delete("/redis", bearerAuth({ token: process.env.API_AUTH }), async (c) => {
 });
 
 app.get("/item/value/:itemId", bearerAuth({ token: process.env.API_AUTH }), async (c) => {
-  const itemId = c.req.param("item");
+  const itemId = c.req.param("itemId");
   const value = await calcItemValue(itemId);
   return c.json({ value });
 });
