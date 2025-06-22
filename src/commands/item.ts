@@ -4,26 +4,46 @@ import {
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
+  Interaction,
   InteractionEditReplyOptions,
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
   MessageFlags,
+  StringSelectMenuBuilder,
+  StringSelectMenuInteraction,
+  StringSelectMenuOptionBuilder,
 } from "discord.js";
 import prisma from "../init/database";
+import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { MStoTime } from "../utils/functions/date";
+import { getSellMulti } from "../utils/functions/economy/balance";
 import {
   calcItemValue,
   getInventory,
   getTotalAmountOfItem,
+  Inventory,
   selectItem,
 } from "../utils/functions/economy/inventory";
 import { countItemOnMarket } from "../utils/functions/economy/market";
 import { createUser, userExists } from "../utils/functions/economy/utils";
+import { getPrefix } from "../utils/functions/guilds/utils";
 import { getEmojiImage } from "../utils/functions/image";
 import { pluralize } from "../utils/functions/string";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+
+const rarities = [
+  "common",
+  "uncommon",
+  "rare",
+  "very rare",
+  "exotic",
+  "impossible",
+  "more impossible",
+  "even more impossible" // 7
+];
 
 const cmd = new Command("item", "view information about an item", "money").setAliases(["i"]);
 
@@ -91,90 +111,168 @@ async function run(
 
   await addCooldown(cmd.name, message.member, 4);
 
-  const embed = new CustomEmbed(message.member).setTitle(`${selected.emoji} ${selected.name}`);
+  const prefix = await getPrefix(message.guild);
 
-  const desc: string[] = [];
+  const metaTabs: StringSelectMenuOptionBuilder[] = []
+  let metaEmbeds: {[tab: string]: CustomEmbed} = {};
+  let tabButtons: {[tab: string]: ActionRowBuilder<MessageActionRowComponentBuilder>} = {};
 
-  desc.push(`[\`${selected.id}\`](https://nypsi.xyz/item/${selected.id}?ref=bot-item)`);
-  desc.push(`\n> ${selected.longDesc}\n`);
+// =====vvvvv===== MESSAGE DATA =====vvvvv=====
 
-  if (selected.booster_desc) {
-    desc.push(`*${selected.booster_desc}*`);
+  // general
+  let embed = new CustomEmbed(message.member);
+  metaTabs.push(new StringSelectMenuOptionBuilder()
+    .setLabel("general")
+    .setValue("general")
+    .setDefault(true)
+  );
+  let description: string[] = [
+    `**id** [\`${selected.id}\`](https://nypsi.xyz/item/${selected.id}?ref=bot-item)`,
+    `**description**`,
+    `> ${selected.longDesc}` + (selected.booster_desc === undefined ? "" : `\n> ${selected.booster_desc}`)
+  ];
+  if (selected.aliases) {
+    description.push(`**aliases** \`${selected.aliases.join("`, `")}\``);
   }
-
-  if (!selected.in_crates) {
-    desc.push("*cannot be found in crates*");
-  }
-
   if (selected.buy) {
-    if (desc[desc.length - 1].endsWith("\n")) {
-      desc.push(`**buy** $${selected.buy.toLocaleString()}`);
-    } else {
-      desc.push(`\n**buy** $${selected.buy.toLocaleString()}`);
-    }
+    description.push(`**buy** $${selected.buy.toLocaleString()}`);
   }
-
   if (selected.sell) {
-    if (selected.buy) {
-      desc.push(`**sell** $${selected.sell.toLocaleString()}`);
-    } else {
-      desc.push(`\n**sell** $${selected.sell.toLocaleString()}`);
+    description.push(`**sell** $${selected.sell.toLocaleString()}`);
+  }
+  if (typeof selected.rarity === "number" && selected.rarity >= 0 && selected.rarity < rarities.length) {
+    description.push(`**rarity** ${rarities[selected.rarity]} (${selected.rarity})`);
+  }
+  if (selected.role) {
+    description.push(`**role** ${selected.role}`);
+    if (selected.role === "booster") {
+      embed.addField(
+        "booster info",
+        `**boosts** ${selected.boosterEffect.boosts}\n` +
+        `**effect** ${selected.boosterEffect.effect}\n` +
+        `**time** ${MStoTime(selected.boosterEffect.time * 1000)}\n` +
+        `**stacks** ${selected.max ?? 1}\n` +
+        `you can activate your booster with ${prefix}**activate <booster>**`
+      );
+    } else if (selected.role == "car") {
+      embed.addField(
+        "car info",
+        `**speed** ${selected.speed}\n` +
+        `cars are used for street races (${prefix}**streetrace**)`,
+      );
+    } else if (
+      selected.role === "collectable" ||
+      selected.role === "flower" ||
+      selected.role === "cat"
+    ) {
+      embed.addField(
+        "collectable info",
+        "collectables don't do anything, theyre just *collectables*. if you dont want them, you can get rid of them by selling them",
+      );
+    } else if (
+      selected.role == "sellable" ||
+      selected.role == "prey" ||
+      selected.role == "fish"
+    ) {
+      embed.addField(
+        "sellable",
+        `this item is just meant to be sold. you can use the ${prefix}**sell all** command to do so quickly`,
+      );
     }
   }
+  metaEmbeds["general"] = embed
+    .setDescription(description.join("\n"));
 
-  const [total, inventory, inMarket, value] = await Promise.all([
+  // economy
+  embed = new CustomEmbed(message.member);
+  tabButtons["economy"] = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+    new ButtonBuilder()
+      .setStyle(ButtonStyle.Link)
+      .setLabel("leaderboard")
+      .setEmoji("🏆")
+      .setURL(`https://nypsi.xyz/leaderboard/${selected.id}?ref=bot-item`)
+  );
+  metaTabs.push(new StringSelectMenuOptionBuilder()
+    .setLabel("economy")
+    .setValue("economy")
+    .setDefault(false)
+  );
+  const [total, inMarket, value, sellMulti] = await Promise.all([
     getTotalAmountOfItem(selected.id),
-    getInventory(message.member),
     countItemOnMarket(selected.id, "sell"),
     calcItemValue(selected.id),
+    getSellMulti(message.author, message.client as NypsiClient),
   ]);
-
-  if (selected.account_locked) {
-    desc.push("\n**account locked**");
-  } else {
-    if (selected.sell || selected.buy) {
-      desc.push(
-        `**worth** ${value ? `$${Math.floor(value).toLocaleString()}` : "[unvalued](https://nypsi.xyz/docs/economy/items/worth?ref=bot-item#unvalued)"}`,
+  description = [
+    `[\`${selected.id}\`](https://nypsi.xyz/item/${selected.id}?ref=bot-item)`
+  ];
+  if(selected.unique) {
+    description.push("*unique*");
+  }
+  if (!selected.in_crates) {
+    description.push("*cannot be found in crates*");
+  }
+  if (selected.buy) {
+   description.push(`**buy** $${selected.buy.toLocaleString()}`);
+  }
+  if (selected.sell) {
+    if (
+      selected.role == "sellable" ||
+      selected.role == "prey" ||
+      selected.role == "fish"
+    ) {
+      description.push(
+        `**sell** $${selected.sell.toLocaleString()} ` +
+        `(+**${sellMulti.multi * 100}**% bonus = ` +
+        `$${Math.floor(selected.sell + selected.sell * sellMulti.multi).toLocaleString()})`
       );
     } else {
-      desc.push(
-        `\n**worth** ${value ? `$${Math.floor(value).toLocaleString()}` : "[unvalued](https://nypsi.xyz/docs/economy/items/worth?ref=bot-item#unvalued)"}`,
-      );
+      description.push(`**sell** $${selected.sell.toLocaleString()}`);
     }
-
+  }
+  if (selected.account_locked) {
+    description.push("\n**account locked**");
+  } else {
+    description.push(
+      `**worth** ${value ? `$${Math.floor(value).toLocaleString()}` : "[unvalued](https://nypsi.xyz/docs/economy/items/worth?ref=bot-item#unvalued)"}`,
+    );
     if (total && selected.id !== "lottery_ticket") {
-      desc.push(`\n**in world** ${total.toLocaleString()}`);
+      description.push(`**in world** ${total.toLocaleString()}`);
     }
-
     if (inMarket) {
-      desc.push(`\n**in market** ${inMarket.toLocaleString()}`);
+      description.push(`**in market** ${inMarket.toLocaleString()}`);
     }
-
     if (selected.role) {
       embed.addField(
         "role",
-        `\`${selected.role}${selected.role == "car" ? ` (${selected.speed})` : ""}\``,
+        `\`${selected.role}\``,
         true,
       );
     }
-
-    const rarityMap = new Map<number, string>();
-
-    rarityMap.set(0, "common");
-    rarityMap.set(1, "uncommon");
-    rarityMap.set(2, "rare");
-    rarityMap.set(3, "very rare");
-    rarityMap.set(4, "exotic");
-    rarityMap.set(5, "impossible");
-    rarityMap.set(6, "more impossible");
-    rarityMap.set(7, "even more impossible");
-
-    if (rarityMap.get(selected.rarity)) {
-      embed.addField("rarity", `\`${rarityMap.get(selected.rarity)}\``, true);
+    if (typeof selected.rarity === "number" && selected.rarity >= 0 && selected.rarity < rarities.length) {
+      embed.addField(
+        "rarity",
+        `${rarities[selected.rarity]}`
+      );
     }
+  }
+  metaEmbeds["economy"] = embed
+    .setDescription(description.join("\n"));
 
-    if (inventory.has(selected.id)) {
-      embed.setFooter({
+// =====^^^^^===== MESSAGE DATA =====^^^^^=====
+
+  // format the message
+  const inventory: Inventory = await getInventory(message.member);
+  const inventoryHas: boolean = inventory.has(selected.id);
+  const title = `${selected.emoji} ${selected.name}`;
+  const thumbnail = getEmojiImage(selected.emoji);
+  for(const embedName in metaEmbeds) {
+    metaEmbeds[embedName]
+      .setTitle(title)
+      .setThumbnail(thumbnail)
+      .disableFooter();
+    if (inventoryHas) {
+      metaEmbeds[embedName].setFooter({
         text: `you have ${inventory.count(selected.id).toLocaleString()} ${pluralize(
           selected,
           inventory.count(selected.id),
@@ -183,47 +281,73 @@ async function run(
     }
   }
 
-  embed.setDescription(desc.join("\n"));
+  // logic
+  const showItemMeta = async (msg?: Message, res?: StringSelectMenuInteraction): Promise<{ buttonRow: any; embed: any; }> => {
+    const showItemPage = async (tabName: string = "general") => {
+      for (const tab of metaTabs) {
+        tab.setDefault(tab.data.value === tabName);
+      }
 
-  const thumbnail = getEmojiImage(selected.emoji);
+      const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [];
+      rows.push(
+        new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+          new StringSelectMenuBuilder()
+            .setCustomId("tabs")
+            .setOptions(metaTabs)
+        )
+      );
+      if(tabButtons[tabName] !== undefined) {
+        rows.push(tabButtons[tabName])
+      }
 
-  embed.setThumbnail(thumbnail);
-  const components: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [
-    new ActionRowBuilder<MessageActionRowComponentBuilder>(),
-  ];
+      return { embed: metaEmbeds[tabName], widgetRows: rows };
+    }
+    
+    const filter = (i: Interaction) => i.user.id == message.author.id;
 
-  if (total > 0)
-    components[0].addComponents(
-      new ButtonBuilder()
-        .setStyle(ButtonStyle.Link)
-        .setLabel("leaderboard")
-        .setEmoji("🏆")
-        .setURL(`https://nypsi.xyz/leaderboard/${selected.id}?ref=bot-item`),
-    );
+    const pageManager: any = async () => {
+      const res = await msg
+        .awaitMessageComponent({ filter, time: 30_000 })
+        .then(async (i) => {
+          setTimeout(() => {
+            if (!i.deferred && !i.replied) i.deferUpdate().catch(() => {});
+          }, 2000);
 
-  if (
-    !(
-      (await prisma.market.count({
-        where: { AND: [{ itemId: selected.id }, { completed: true }] },
-      })) < 5 &&
-      (await prisma.offer.count({ where: { AND: [{ itemId: selected.id }, { sold: true }] } })) <
-        5 &&
-      (await prisma.graphMetrics.count({ where: { category: `item-count-${selected.id}` } })) < 5
-    )
-  ) {
-    components[0].addComponents(
-      new ButtonBuilder()
-        .setStyle(ButtonStyle.Link)
-        .setLabel("history")
-        .setEmoji("📈")
-        .setURL(`https://nypsi.xyz/item/history/${selected.id}?ref=bot-item`),
-    );
-  }
+          return i;
+        })
+        .catch(() => {});
 
-  return await send({
-    embeds: [embed],
-    components: components[0].components.length > 0 ? components : null,
-  });
+      if (!res) {
+        msg.edit({ components: [] });
+        return;
+      }
+
+      if (res.isStringSelectMenu()) {
+        const { embed, widgetRows } = await showItemPage(res.values[0]);
+        await res
+          .update({ embeds: [embed], components: widgetRows })
+          .catch(() => res.message.edit({ embeds: [embed], components: widgetRows }));
+        return pageManager();
+      }
+    };
+
+    const { embed, widgetRows } = await showItemPage();
+    const messageUpdateParams = { embeds: [embed], components: widgetRows };
+
+    if (res) {
+      await res
+        .update(messageUpdateParams)
+        .catch(() => msg.edit(messageUpdateParams));
+    } else if (msg) {
+      msg = await msg.edit(messageUpdateParams);
+    } else {
+      msg = await send(messageUpdateParams);
+    }
+
+    return pageManager();
+  };
+
+  return showItemMeta();
 }
 
 cmd.setRun(run);
