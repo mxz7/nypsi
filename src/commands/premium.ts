@@ -40,6 +40,7 @@ import {
   commandExists,
   getCommandFromAlias,
 } from "../utils/handlers/commandhandler";
+import { logger } from "../utils/logger";
 import dayjs = require("dayjs");
 import ms = require("ms");
 
@@ -199,19 +200,24 @@ async function run(
         for (let i = 1; i <= 5; i++) {
           if (
             guildMember.joinedTimestamp < Date.now() - ms(`${i} year`) &&
-            !tags.some((i) => i.tagId === `year${i}`)
+            !tags.some((tag) => tag.tagId === `year${i}`)
           ) {
+            logger.info(`premium: adding year${i} to ${guildMember.user.id}`);
             await addTag(guildMember, `year${i}`);
           } else if (
             guildMember.joinedTimestamp > Date.now() - ms(`${i} year`) &&
             tags.some((i) => i.tagId === `year${i}`)
           ) {
+            logger.info(`premium: removing year${i} from ${guildMember.user.id}`);
             await removeTag(guildMember, `year${i}`);
           }
         }
       } else if (tags.some((i) => i.tagId.includes("year"))) {
         for (const tag of tags) {
-          if (tag.tagId.includes("year")) await removeTag(tag.userId, tag.tagId);
+          if (tag.tagId.includes("year")) {
+            logger.info(`premium: removing ${tag.tagId} from ${guildMember.user.id}`);
+            await removeTag(tag.userId, tag.tagId);
+          }
         }
       }
 
@@ -220,33 +226,42 @@ async function run(
       if (roleIds.includes(Constants.BOOST_ROLE_ID)) {
         if (!(await isBooster(guildMember))) await setBooster(guildMember, true).catch(() => {});
       } else if (await isBooster(guildMember)) {
+        logger.info(`premium: removing ${guildMember.user.id} booster stat`);
         await setBooster(guildMember, false);
       }
 
       if (!(await isPremium(guildMember))) {
         if (roleIds.includes(Constants.PLATINUM_ROLE_ID)) {
+          logger.info(`premium: removing plat role ${guildMember.user.id}`);
           await sleep(250);
           await guildMember.roles.remove(Constants.PLATINUM_ROLE_ID);
         }
 
         if (roleIds.includes(Constants.GOLD_ROLE_ID)) {
+          logger.info(`premium: removing gold role ${guildMember.user.id}`);
           await sleep(250);
           await guildMember.roles.remove(Constants.GOLD_ROLE_ID);
         }
 
         if (roleIds.includes(Constants.SILVER_ROLE_ID)) {
+          logger.info(`premium: removing silver role ${guildMember.user.id}`);
           await sleep(250);
           await guildMember.roles.remove(Constants.SILVER_ROLE_ID);
         }
 
         if (roleIds.includes(Constants.BRONZE_ROLE_ID)) {
+          logger.info(`premium: removing bronze role ${guildMember.user.id}`);
           await sleep(250);
           await guildMember.roles.remove(Constants.BRONZE_ROLE_ID);
         }
 
         if (guildMember.roles.cache.find((i) => i.name === "custom")) {
+          logger.info(`premium: removing custom role ${guildMember.user.id}`);
+          const role = guildMember.roles.cache.find((i) => i.name === "custom");
+
           await sleep(250);
-          await guildMember.roles.remove(guildMember.roles.cache.find((i) => i.name === "custom"));
+          await guildMember.roles.remove(role);
+          if (role.members.size === 0) await role.delete();
         }
       }
 
@@ -267,8 +282,8 @@ async function run(
       }
 
       if (requiredRole != "none" && !roleIds.includes(requiredRole)) {
+        logger.info(`premium: adding ${requiredRole} to ${guildMember.user.id}`);
         await sleep(250);
-
         await guildMember.roles.add(requiredRole);
       }
 
@@ -291,6 +306,7 @@ async function run(
 
         if (requiredLevel !== 0) {
           if ((await getTier(guildMember)) != requiredLevel) {
+            logger.info(`premium: removing ${role.id} from ${guildMember.user.id}`);
             await sleep(250);
             await guildMember.roles.remove(role.id);
           }
@@ -301,18 +317,25 @@ async function run(
 
       if (guildMember.roles.cache.has(Constants.HIGHROLLER_ROLE)) {
         if (totalSpend < Constants.HIGHROLLER_REQUIREMENT) {
-          if ((await getTags(guildMember)).find((i) => i.tagId === "highroller"))
+          if ((await getTags(guildMember)).find((i) => i.tagId === "highroller")) {
+            logger.info(`premium: removing highroller tag from ${guildMember.user.id}`);
             await removeTag(guildMember, "highroller");
+          }
+          logger.info(`premium: removing highroller role from ${guildMember.user.id}`);
           await sleep(250);
           await guildMember.roles.remove(Constants.HIGHROLLER_ROLE);
         }
       } else {
         if (totalSpend >= Constants.HIGHROLLER_REQUIREMENT) {
-          if (!(await getTags(guildMember)).find((i) => i.tagId === "highroller"))
+          if (!(await getTags(guildMember)).find((i) => i.tagId === "highroller")) {
+            logger.info(`premium: adding highroller tag to ${guildMember.user.id}`);
             await addTag(guildMember, "highroller");
+          }
+          logger.info(`premium: adding highroller role to ${guildMember.user.id}`);
           await sleep(250);
           await guildMember.roles.add(Constants.HIGHROLLER_ROLE);
           if (guildMember.roles.cache.has(Constants.SUPPORTER_ROLE)) {
+            logger.info(`premium: removing supporter role from ${guildMember.user.id}`);
             await sleep(250);
             await guildMember.roles.remove(Constants.SUPPORTER_ROLE);
           }
@@ -320,6 +343,7 @@ async function run(
       }
 
       if (guildMember.roles.cache.has(Constants.SUPPORTER_ROLE) && totalSpend <= 0) {
+        logger.info(`premium: removing supporter role from ${guildMember.user.id}`);
         await sleep(250);
         await guildMember.roles.remove(Constants.SUPPORTER_ROLE);
       } else if (
@@ -327,6 +351,7 @@ async function run(
         !guildMember.roles.cache.has(Constants.HIGHROLLER_ROLE) &&
         !guildMember.roles.cache.has(Constants.SUPPORTER_ROLE)
       ) {
+        logger.info(`premium: adding supporter role to ${guildMember.user.id}`);
         await sleep(250);
         await guildMember.roles.add(Constants.SUPPORTER_ROLE);
       }
@@ -339,8 +364,10 @@ async function run(
         if (role) {
           await sleep(250);
           if (role.members.size === 1) {
+            logger.info(`premium: removing custom role from ${guildMember.user.id}`);
             await guildMember.guild.roles.delete(role.id);
           } else {
+            logger.info(`premium: removing custom role from ${guildMember.user.id}`);
             await guildMember.roles.remove(
               guildMember.roles.cache.find((i) => i.name === "custom"),
             );
@@ -354,10 +381,12 @@ async function run(
         );
 
         if (existingRole) {
+          logger.info(`premium: adding custom role to ${guildMember.user.id}`);
           await guildMember.roles.add(existingRole);
         } else {
           const separatorRole = guildMember.guild.roles.cache.get("1329425677614845972");
 
+          logger.info(`premium: adding custom role to ${guildMember.user.id}`);
           const role = await guildMember.guild.roles.create({
             name: "custom",
             color: colour,
@@ -375,6 +404,7 @@ async function run(
             await sleep(250);
             await guildMember.guild.roles.edit(role, { color: colour });
           } else {
+            logger.info(`premium: removing custom role from ${guildMember.user.id}`);
             await sleep(250);
             await guildMember.roles.remove(role);
 
@@ -383,12 +413,15 @@ async function run(
             );
 
             if (existingRole) {
+              logger.info(`premium: adding custom role to ${guildMember.user.id}`);
               await sleep(250);
               await guildMember.roles.add(existingRole);
             } else {
               const seperatorRole = guildMember.guild.roles.cache.get("1329425677614845972");
 
               await sleep(250);
+
+              logger.info(`premium: adding custom role to ${guildMember.user.id}`);
 
               const role = await guildMember.guild.roles.create({
                 name: "custom",
