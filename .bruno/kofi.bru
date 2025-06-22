@@ -1,0 +1,35 @@
+meta {
+  name: kofi
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{api}}/kofi
+  body: formUrlEncoded
+  auth: inherit
+}
+
+body:form-urlencoded {
+  data: '''
+    {
+      "verification_token": "boobies",
+      "message_id": "aaaa",
+      "timestamp": "2025-06-21T18:19:37Z",
+      "type": "Donation",
+      "is_public": true,
+      "from_name": "Jo Example",
+      "message": "Good luck with the integration!",
+      "amount": "3.00",
+      "url": "aaaa",
+      "email": "jo.example@example.com",
+      "currency": "USD",
+      "is_subscription_payment": false,
+      "is_first_subscription_payment": false,
+      "kofi_transaction_id": "00000000-1111-2222-3333-444444444444",
+      "shop_items": null,
+      "tier_name": null,
+      "shipping": null
+    }
+  '''
+}
