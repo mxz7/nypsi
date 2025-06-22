@@ -28,7 +28,7 @@ import {
   selectItem,
 } from "../utils/functions/economy/inventory";
 import { countItemOnMarket } from "../utils/functions/economy/market";
-import { createUser, userExists } from "../utils/functions/economy/utils";
+import { createUser, getBaseWorkers, getItems, getLootPools, getPlantsData, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getEmojiImage } from "../utils/functions/image";
 import { pluralize } from "../utils/functions/string";
@@ -44,6 +44,10 @@ const rarities = [
   "more impossible",
   "even more impossible" // 7
 ];
+const lootPools = getLootPools();
+const items = getItems();
+const workers = getBaseWorkers();
+const plants = getPlantsData();
 
 const cmd = new Command("item", "view information about an item", "money").setAliases(["i"]);
 
@@ -216,18 +220,16 @@ async function run(
    description.push(`**buy** $${selected.buy.toLocaleString()}`);
   }
   if (selected.sell) {
+    description.push(`**sell** $${selected.sell.toLocaleString()}`);
     if (
       selected.role == "sellable" ||
       selected.role == "prey" ||
       selected.role == "fish"
     ) {
-      description.push(
-        `**sell** $${selected.sell.toLocaleString()} ` +
-        `(+**${sellMulti.multi * 100}**% bonus = ` +
+      description[description.length - 1] = description[description.length - 1].concat(
+        ` (+**${sellMulti.multi * 100}**% bonus = `,
         `$${Math.floor(selected.sell + selected.sell * sellMulti.multi).toLocaleString()})`
       );
-    } else {
-      description.push(`**sell** $${selected.sell.toLocaleString()}`);
     }
   }
   if (selected.account_locked) {
@@ -258,6 +260,109 @@ async function run(
   }
   metaEmbeds["economy"] = embed
     .setDescription(description.join("\n"));
+
+  // sources
+  embed = new CustomEmbed(message.member);
+  metaTabs.push(new StringSelectMenuOptionBuilder()
+    .setLabel("sources")
+    .setValue("sources")
+    .setDefault(false)
+  );
+  description = [];
+  let workersDescription: string[] = [];
+  let farmDescription: string[] = [];
+  let poolsDescription: string[] = [];
+  if(selected.buy) {
+    description.push("💰 shop")
+  }
+  if(selected.craft) {
+    description.push("<:Craft:615426524862087191> crafting")
+  }
+  for(const worker of Object.values(workers).filter((w) => w.base.byproducts)) {
+    if(Object.keys(worker.base.byproducts).includes(selected.id)) {
+      workersDescription.push(`${worker.item_emoji} ${worker.name}`)
+    }
+  }
+  for(const plant of Object.values(plants)) {
+    if(plant.item === selected.id) {
+      farmDescription.push(`${selected.emoji} ${plant.name}`)
+    }
+  }
+  for(const item of Object.values(items).filter((i) => i.loot_pools)) {
+    for(const pool of Object.keys(item.loot_pools)) {
+      if(Object.keys(lootPools[pool].items ?? {}).includes(selected.id)) {
+        poolsDescription.push(`${item.emoji} ${item.name}`);
+        break;
+      }
+    }
+  }
+  if(workersDescription.length > 0) {
+    embed.addField(
+      "workers",
+      workersDescription.join("\n")
+    );
+  }
+  if(farmDescription.length > 0) {
+    embed.addField(
+      "farm",
+      farmDescription.join("\n")
+    );
+  }
+  if(poolsDescription.length > 0) {
+    embed.addField(
+      "crates and scratches",
+      poolsDescription.join("\n")
+    );
+  }
+  if(description.length > 0) {
+    embed.setDescription(description.join("\n"))
+  }
+  metaEmbeds["sources"] = embed;
+
+  // seed stats
+  if(selected.role === "seed") {
+    embed = new CustomEmbed(message.member);
+    metaTabs.push(new StringSelectMenuOptionBuilder()
+      .setLabel("seed stats")
+      .setValue("seed_stats")
+      .setDefault(false)
+    );
+    const plant = plants[selected.plantId];
+    const product = items[plant.item];
+    let sellString = `**sell** $${product.sell.toLocaleString()}`;
+    if (
+      product.role == "sellable" ||
+      product.role == "prey" ||
+      product.role == "fish"
+    ) {
+      sellString = sellString.concat(
+        ` (+**${sellMulti.multi * 100}**% bonus = `,
+        `$${Math.floor(product.sell + product.sell * sellMulti.multi).toLocaleString()})`
+      );
+    }
+    embed.setDescription(
+      `**growth time** ${MStoTime(plant.growthTime * 1000)}\n` +
+      `**hourly production** ${plant.hourly}\n` +
+      `**max product accumulation** ${plant.max}\n`
+    );
+    embed.addField(
+      "produces",
+      `${product.emoji} ${product.name}\n` +
+      sellString
+    );
+    embed.addField(
+      "water",
+      `**time until unhealthy** ${MStoTime(plant.water.every * 1000)}\n` +
+      `**time until dead** ${MStoTime(plant.water.dead * 1000)}`
+    );
+    embed.addField(
+      "fertilise",
+      `**time until unhealthy** ${MStoTime(plant.fertilise.every * 1000)}\n` +
+      `**time until dead** ${MStoTime(plant.fertilise.dead * 1000)}`
+    );
+    metaEmbeds["seed_stats"] = embed;
+  }
+
 
 // =====^^^^^===== MESSAGE DATA =====^^^^^=====
 

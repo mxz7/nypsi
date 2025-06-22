@@ -11,7 +11,7 @@
       "type_plural": "trees",
       "water": {
         "every": 86400,
-        "die": 604800
+        "dead": 604800
       },
       "fertilise": {
         "every": 604800,
@@ -29,7 +29,7 @@
       "type_plural": "trees",
       "water": {
         "every": 172800,
-        "die": 604800
+        "dead": 604800
       },
       "fertilise": {
         "every": 604800,
@@ -47,7 +47,7 @@
       "type_plural": "trees",
       "water": {
         "every": 172800,
-        "die": 604800
+        "dead": 604800
       },
       "fertilise": {
         "every": 604800,
@@ -65,7 +65,7 @@
       "type_plural": "bushes",
       "water": {
         "every": 259200,
-        "die": 1.21e6
+        "dead": 1.21e6
       },
       "fertilise": {
         "every": 1.21e6,
@@ -83,7 +83,7 @@
       "type_plural": "trees",
       "water": {
         "every": 129600,
-        "die": 604800
+        "dead": 604800
       },
       "fertilise": {
         "every": 604800,
@@ -101,7 +101,7 @@
       "type_plural": "trees",
       "water": {
         "every": 129600,
-        "die": 604800
+        "dead": 604800
       },
       "fertilise": {
         "every": 604800,
@@ -119,7 +119,7 @@
       "type_plural": "plants",
       "water": {
         "every": 129600,
-        "die": 604800
+        "dead": 604800
       },
       "fertilise": {
         "every": 604800,
