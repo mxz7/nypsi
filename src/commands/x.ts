@@ -1625,7 +1625,6 @@ async function run(
             userId: user.id,
           },
           data: {
-            lastVote: new Date(),
             monthVote: { increment: 1 },
             seasonVote: { increment: 1 },
           },
