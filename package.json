@@ -51,7 +51,6 @@
   },
   "devDependencies": {
     "@types/crypto-js": "4.2.2",
-    "@types/express": "5.0.2",
     "@types/figlet": "1.7.0",
     "@types/jest": "^29.5.14",
     "@types/lodash": "4.17.17",
