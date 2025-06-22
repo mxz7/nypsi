@@ -16,7 +16,6 @@ import {
 import * as fs from "fs/promises";
 import { promisify } from "util";
 import { gzip } from "zlib";
-import { giveVoteRewards } from "../api/controllers/vote";
 import prisma from "../init/database";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
@@ -46,7 +45,12 @@ import {
   setDaily,
   setEcoBan,
 } from "../utils/functions/economy/utils";
-import { getLastVote, getVoteStreak, setVoteStreak } from "../utils/functions/economy/vote";
+import {
+  getLastVote,
+  getVoteStreak,
+  giveVoteRewards,
+  setVoteStreak,
+} from "../utils/functions/economy/vote";
 import { updateXp } from "../utils/functions/economy/xp";
 import { addKarma, getKarma, removeKarma } from "../utils/functions/karma/karma";
 import { getMember } from "../utils/functions/member";
