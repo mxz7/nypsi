@@ -35,6 +35,7 @@ import {
   setInventoryItem,
 } from "../utils/functions/economy/inventory";
 import { setLevel, setPrestige } from "../utils/functions/economy/levelling";
+import { getTaskStreaks, setTaskStreak } from "../utils/functions/economy/tasks";
 import {
   doDaily,
   getDailyStreak,
@@ -1464,11 +1465,12 @@ async function run(
 
   const doStreaks = async (user: User, response: ButtonInteraction) => {
     const render = async () => {
-      const [daily, lastDaily, vote, lastVote] = await Promise.all([
+      const [daily, lastDaily, vote, lastVote, taskStreaks] = await Promise.all([
         getDailyStreak(user),
         getLastDaily(user),
         getVoteStreak(user),
         getLastVote(user),
+        getTaskStreaks(message.member),
       ]);
 
       const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [
@@ -1483,6 +1485,16 @@ async function run(
             .setLabel("set vote streak")
             .setStyle(ButtonStyle.Primary)
             .setEmoji("🗳"),
+          new ButtonBuilder()
+            .setCustomId("set-daily-tasks")
+            .setLabel("set daily task streak")
+            .setStyle(ButtonStyle.Primary)
+            .setEmoji("📋"),
+          new ButtonBuilder()
+            .setCustomId("set-weekly-tasks")
+            .setLabel("set weekly task streak")
+            .setStyle(ButtonStyle.Primary)
+            .setEmoji("📋"),
         ),
 
         new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -1503,7 +1515,8 @@ async function run(
 
       const embed = new CustomEmbed(message.member);
       embed.setDescription(
-        `daily streak: **${daily}** (last daily <t:${Math.floor(lastDaily.getTime() / 1000)}>)\nvote streak: **${vote}** (last vote <t:${Math.floor(lastVote.getTime() / 1000)}>)`,
+        `daily streak: **${daily.toLocaleString()}** (last daily <t:${Math.floor(lastDaily.getTime() / 1000)}>)\nvote streak: **${vote.toLocaleString()}** (last vote <t:${Math.floor(lastVote.getTime() / 1000)}>)` +
+          `\n\ndaily task streak: **${taskStreaks.dailyTaskStreak.toLocaleString()}**\nweekly task streak: **${taskStreaks.weeklyTaskStreak.toLocaleString()}**`,
       );
 
       return { rows, embed };
@@ -1590,6 +1603,74 @@ async function run(
         );
 
         await setVoteStreak(user, parseInt(msg.content));
+        msg.react("✅");
+        return waitForButton();
+      } else if (res.customId === "set-daily-tasks") {
+        if ((await getAdminLevel(message.member)) < 4) {
+          await res.editReply({
+            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+          });
+          return waitForButton();
+        }
+
+        await res.editReply({ embeds: [new CustomEmbed(message.member, "enter amount")] });
+
+        const msg = await message.channel
+          .awaitMessages({
+            filter: (msg: Message) => msg.author.id === message.author.id,
+            max: 1,
+            time: 30000,
+          })
+          .then((collected) => collected.first())
+          .catch(() => {
+            res.editReply({ embeds: [new CustomEmbed(message.member, "expired")] });
+          });
+
+        if (!msg) return;
+        if ((!parseInt(msg.content) && parseInt(msg.content) != 0) || parseInt(msg.content) < 0) {
+          await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid value")] });
+          return waitForButton();
+        }
+
+        logger.info(
+          `admin: ${message.author.id} (${message.author.username}) set ${user.id} daily task streak to ${msg.content}`,
+        );
+
+        await setTaskStreak(user, "daily", parseInt(msg.content));
+        msg.react("✅");
+        return waitForButton();
+      } else if (res.customId === "set-weekly-tasks") {
+        if ((await getAdminLevel(message.member)) < 4) {
+          await res.editReply({
+            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+          });
+          return waitForButton();
+        }
+
+        await res.editReply({ embeds: [new CustomEmbed(message.member, "enter amount")] });
+
+        const msg = await message.channel
+          .awaitMessages({
+            filter: (msg: Message) => msg.author.id === message.author.id,
+            max: 1,
+            time: 30000,
+          })
+          .then((collected) => collected.first())
+          .catch(() => {
+            res.editReply({ embeds: [new CustomEmbed(message.member, "expired")] });
+          });
+
+        if (!msg) return;
+        if ((!parseInt(msg.content) && parseInt(msg.content) != 0) || parseInt(msg.content) < 0) {
+          await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid value")] });
+          return waitForButton();
+        }
+
+        logger.info(
+          `admin: ${message.author.id} (${message.author.username}) set ${user.id} weekly task streak to ${msg.content}`,
+        );
+
+        await setTaskStreak(user, "weekly", parseInt(msg.content));
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "rerun-daily") {
