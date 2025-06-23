@@ -34,7 +34,23 @@ import {
   setInventoryItem,
 } from "../utils/functions/economy/inventory";
 import { setLevel, setPrestige } from "../utils/functions/economy/levelling";
-import { getEcoBanTime, getItems, isEcoBanned, setEcoBan } from "../utils/functions/economy/utils";
+import { getTaskStreaks, setTaskStreak } from "../utils/functions/economy/tasks";
+import {
+  doDaily,
+  getDailyStreak,
+  getEcoBanTime,
+  getItems,
+  getLastDaily,
+  isEcoBanned,
+  setDaily,
+  setEcoBan,
+} from "../utils/functions/economy/utils";
+import {
+  getLastVote,
+  getVoteStreak,
+  giveVoteRewards,
+  setVoteStreak,
+} from "../utils/functions/economy/vote";
 import { updateXp } from "../utils/functions/economy/xp";
 import { addKarma, getKarma, removeKarma } from "../utils/functions/karma/karma";
 import { getMember } from "../utils/functions/member";
@@ -261,6 +277,11 @@ async function run(
           .setCustomId("set-birthday")
           .setLabel("set birthday")
           .setEmoji("🎂")
+          .setStyle(ButtonStyle.Primary),
+        new ButtonBuilder()
+          .setCustomId("view-streak")
+          .setLabel("streaks")
+          .setEmoji("📅")
           .setStyle(ButtonStyle.Primary),
       ),
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -540,6 +561,18 @@ async function run(
         );
         await setBirthday(user, birthday);
         msg.react("✅");
+        return waitForButton();
+      } else if (res.customId === "view-streak") {
+        if ((await getAdminLevel(message.member)) < 1) {
+          await res.editReply({
+            embeds: [new ErrorEmbed("you require admin level **1** to do this")],
+          });
+          return waitForButton();
+        }
+        logger.info(
+          `admin: ${message.author.id} (${message.author.username}) viewed ${user.id} streak info`,
+        );
+        doStreaks(user, res as ButtonInteraction);
         return waitForButton();
       } else if (res.customId === "set-bal") {
         if ((await getAdminLevel(message.member)) < 4) {
@@ -1428,6 +1461,273 @@ async function run(
 
         await setCredits(user, parseInt(msg.content));
         msg.react("✅");
+        return waitForButton();
+      }
+    };
+    return waitForButton();
+  };
+
+  const doStreaks = async (user: User, response: ButtonInteraction) => {
+    const render = async () => {
+      const [daily, lastDaily, vote, lastVote, taskStreaks] = await Promise.all([
+        getDailyStreak(user),
+        getLastDaily(user),
+        getVoteStreak(user),
+        getLastVote(user),
+        getTaskStreaks(message.member),
+      ]);
+
+      const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [
+        new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+          new ButtonBuilder()
+            .setCustomId("set-daily")
+            .setLabel("set daily streak")
+            .setStyle(ButtonStyle.Primary)
+            .setEmoji("📅"),
+          new ButtonBuilder()
+            .setCustomId("set-vote")
+            .setLabel("set vote streak")
+            .setStyle(ButtonStyle.Primary)
+            .setEmoji("🗳"),
+          new ButtonBuilder()
+            .setCustomId("set-daily-tasks")
+            .setLabel("set daily task streak")
+            .setStyle(ButtonStyle.Primary)
+            .setEmoji("📋"),
+          new ButtonBuilder()
+            .setCustomId("set-weekly-tasks")
+            .setLabel("set weekly task streak")
+            .setStyle(ButtonStyle.Primary)
+            .setEmoji("📋"),
+        ),
+
+        new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+          new ButtonBuilder()
+            .setCustomId("rerun-daily")
+            .setLabel("rerun daily rewards")
+            .setStyle(ButtonStyle.Primary)
+            .setEmoji("📅")
+            .setDisabled(daily <= 0),
+          new ButtonBuilder()
+            .setCustomId("rerun-vote")
+            .setLabel("rerun vote rewards")
+            .setStyle(ButtonStyle.Primary)
+            .setEmoji("🗳")
+            .setDisabled(vote <= 0),
+        ),
+      ];
+
+      const embed = new CustomEmbed(message.member);
+      embed.setDescription(
+        `daily streak: **${daily.toLocaleString()}** (last daily <t:${Math.floor(lastDaily.getTime() / 1000)}>)\nvote streak: **${vote.toLocaleString()}** (last vote <t:${Math.floor(lastVote.getTime() / 1000)}>)` +
+          `\n\ndaily task streak: **${taskStreaks.dailyTaskStreak.toLocaleString()}**\nweekly task streak: **${taskStreaks.weeklyTaskStreak.toLocaleString()}**`,
+      );
+
+      return { rows, embed };
+    };
+
+    const waitForButton = async (): Promise<void> => {
+      const { rows, embed } = await render();
+
+      const msg = await response.editReply({ embeds: [embed], components: rows });
+
+      const filter = (i: Interaction) => i.user.id == message.author.id;
+
+      const res = await msg.awaitMessageComponent({ filter, time: 120000 }).catch(async () => {
+        await msg.edit({ components: [] });
+      });
+
+      if (!res) return;
+
+      await res.deferReply();
+
+      if (res.customId === "set-daily") {
+        if ((await getAdminLevel(message.member)) < 4) {
+          await res.editReply({
+            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+          });
+          return waitForButton();
+        }
+
+        await res.editReply({ embeds: [new CustomEmbed(message.member, "enter amount")] });
+
+        const msg = await message.channel
+          .awaitMessages({
+            filter: (msg: Message) => msg.author.id === message.author.id,
+            max: 1,
+            time: 30000,
+          })
+          .then((collected) => collected.first())
+          .catch(() => {
+            res.editReply({ embeds: [new CustomEmbed(message.member, "expired")] });
+          });
+
+        if (!msg) return;
+        if ((!parseInt(msg.content) && parseInt(msg.content) != 0) || parseInt(msg.content) < 0) {
+          await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid value")] });
+          return waitForButton();
+        }
+
+        logger.info(
+          `admin: ${message.author.id} (${message.author.username}) set ${user.id} daily streak to ${msg.content}`,
+        );
+
+        await setDaily(user, parseInt(msg.content));
+        msg.react("✅");
+        return waitForButton();
+      } else if (res.customId === "set-vote") {
+        if ((await getAdminLevel(message.member)) < 4) {
+          await res.editReply({
+            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+          });
+          return waitForButton();
+        }
+
+        await res.editReply({ embeds: [new CustomEmbed(message.member, "enter amount")] });
+
+        const msg = await message.channel
+          .awaitMessages({
+            filter: (msg: Message) => msg.author.id === message.author.id,
+            max: 1,
+            time: 30000,
+          })
+          .then((collected) => collected.first())
+          .catch(() => {
+            res.editReply({ embeds: [new CustomEmbed(message.member, "expired")] });
+          });
+
+        if (!msg) return;
+        if ((!parseInt(msg.content) && parseInt(msg.content) != 0) || parseInt(msg.content) < 0) {
+          await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid value")] });
+          return waitForButton();
+        }
+
+        logger.info(
+          `admin: ${message.author.id} (${message.author.username}) set ${user.id} vote streak to ${msg.content}`,
+        );
+
+        await setVoteStreak(user, parseInt(msg.content));
+        msg.react("✅");
+        return waitForButton();
+      } else if (res.customId === "set-daily-tasks") {
+        if ((await getAdminLevel(message.member)) < 4) {
+          await res.editReply({
+            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+          });
+          return waitForButton();
+        }
+
+        await res.editReply({ embeds: [new CustomEmbed(message.member, "enter amount")] });
+
+        const msg = await message.channel
+          .awaitMessages({
+            filter: (msg: Message) => msg.author.id === message.author.id,
+            max: 1,
+            time: 30000,
+          })
+          .then((collected) => collected.first())
+          .catch(() => {
+            res.editReply({ embeds: [new CustomEmbed(message.member, "expired")] });
+          });
+
+        if (!msg) return;
+        if ((!parseInt(msg.content) && parseInt(msg.content) != 0) || parseInt(msg.content) < 0) {
+          await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid value")] });
+          return waitForButton();
+        }
+
+        logger.info(
+          `admin: ${message.author.id} (${message.author.username}) set ${user.id} daily task streak to ${msg.content}`,
+        );
+
+        await setTaskStreak(user, "daily", parseInt(msg.content));
+        msg.react("✅");
+        return waitForButton();
+      } else if (res.customId === "set-weekly-tasks") {
+        if ((await getAdminLevel(message.member)) < 4) {
+          await res.editReply({
+            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+          });
+          return waitForButton();
+        }
+
+        await res.editReply({ embeds: [new CustomEmbed(message.member, "enter amount")] });
+
+        const msg = await message.channel
+          .awaitMessages({
+            filter: (msg: Message) => msg.author.id === message.author.id,
+            max: 1,
+            time: 30000,
+          })
+          .then((collected) => collected.first())
+          .catch(() => {
+            res.editReply({ embeds: [new CustomEmbed(message.member, "expired")] });
+          });
+
+        if (!msg) return;
+        if ((!parseInt(msg.content) && parseInt(msg.content) != 0) || parseInt(msg.content) < 0) {
+          await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid value")] });
+          return waitForButton();
+        }
+
+        logger.info(
+          `admin: ${message.author.id} (${message.author.username}) set ${user.id} weekly task streak to ${msg.content}`,
+        );
+
+        await setTaskStreak(user, "weekly", parseInt(msg.content));
+        msg.react("✅");
+        return waitForButton();
+      } else if (res.customId === "rerun-daily") {
+        if ((await getAdminLevel(message.member)) < 4) {
+          await res.editReply({
+            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+          });
+          return waitForButton();
+        }
+
+        addNotificationToQueue({
+          memberId: user.id,
+          payload: { embed: await doDaily(user, false, 1, true) },
+        });
+
+        await res.editReply({ embeds: [new CustomEmbed(message.member, "rewards sent")] });
+
+        logger.info(
+          `admin: ${message.author.id} (${message.author.username}) reran ${user.id} daily streak`,
+        );
+
+        return waitForButton();
+      } else if (res.customId === "rerun-vote") {
+        if ((await getAdminLevel(message.member)) < 4) {
+          await res.editReply({
+            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+          });
+          return waitForButton();
+        }
+
+        const votes = await prisma.economy.update({
+          where: {
+            userId: user.id,
+          },
+          data: {
+            monthVote: { increment: 1 },
+            seasonVote: { increment: 1 },
+          },
+          select: {
+            monthVote: true,
+            seasonVote: true,
+            voteStreak: true,
+          },
+        });
+
+        await giveVoteRewards(user.id, votes);
+
+        await res.editReply({ embeds: [new CustomEmbed(message.member, "rewards sent")] });
+
+        logger.info(
+          `admin: ${message.author.id} (${message.author.username}) reran ${user.id} vote streak`,
+        );
+
         return waitForButton();
       }
     };

@@ -190,6 +190,26 @@ export async function getTaskStreaks(member: MemberResolvable) {
   return query;
 }
 
+export async function setTaskStreak(
+  member: MemberResolvable,
+  type: "daily" | "weekly",
+  amount: number,
+) {
+  await prisma.economy.update({
+    where: {
+      userId: getUserId(member),
+    },
+    data:
+      type == "daily"
+        ? {
+            dailyTaskStreak: amount,
+          }
+        : {
+            weeklyTaskStreak: amount,
+          },
+  });
+}
+
 export function parseReward(reward: string) {
   const parts = reward.split(":");
 
