@@ -11,6 +11,7 @@
 - you can now /marry someone (@growling_grizzly)
 - many new features in /tmdb (@growling_grizzly)
 - guild member slots increase requirements for level up
+- replay button in bankrob for gold+ (@growling_grizzly)
 
 ## other
 

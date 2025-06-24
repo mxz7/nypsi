@@ -2,6 +2,7 @@ import {
   ActionRowBuilder,
   BaseMessageOptions,
   ButtonBuilder,
+  ButtonInteraction,
   ButtonStyle,
   CommandInteraction,
   Interaction,
@@ -10,27 +11,37 @@ import {
   Message,
   MessageActionRowComponentBuilder,
   MessageFlags,
+  WebhookClient,
 } from "discord.js";
+import redis from "../init/redis";
+import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
+import { a } from "../utils/functions/anticheat";
+import { giveCaptcha, isLockedOut, verifyUser } from "../utils/functions/captcha";
 import { addProgress } from "../utils/functions/economy/achievements.js";
 import { addBalance, getBalance, removeBalance } from "../utils/functions/economy/balance.js";
 import { getInventory, removeInventoryItem } from "../utils/functions/economy/inventory.js";
 import { createGame } from "../utils/functions/economy/stats.js";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { createUser, userExists } from "../utils/functions/economy/utils.js";
+import { getTier, isPremium } from "../utils/functions/premium/premium";
+import { percentChance } from "../utils/functions/random";
 import {
   addToNypsiBank,
   getNypsiBankBalance,
   removeFromNypsiBankBalance,
 } from "../utils/functions/tax.js";
+import { getAdminLevel } from "../utils/functions/users/admin";
+import { addHourlyCommand } from "../utils/handlers/commandhandler";
 import {
   addCooldown,
   getRemaining,
   getResponse,
   onCooldown,
 } from "../utils/handlers/cooldownhandler.js";
+import { getTimestamp, logger } from "../utils/logger";
 
 const cmd = new Command("bankrob", "attempt to rob a bank for a high reward", "money");
 
@@ -119,31 +130,38 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
     }`;
   };
 
-  const robBank = async (bank: string) => {
+  const robBank = async (bank: string, interaction: ButtonInteraction, replay = false) => {
     if (await onCooldown(cmd.name, message.member)) {
-      const res = await getResponse(cmd.name, message.member);
-
-      if (res.respond) {
-        if (message instanceof Message) {
-          message.channel.send({ embeds: [res.embed] });
-          return;
-        } else {
-          message.followUp({ embeds: [res.embed] });
+      if (replay) {
+        if (!(await getInventory(message.member)).has("mask")) {
+          interaction.reply({
+            embeds: [new ErrorEmbed("you need a mask to rob again")],
+            flags: MessageFlags.Ephemeral,
+          });
           return;
         }
+        await removeInventoryItem(message.member, "mask", 1);
+      } else {
+        const res = await getResponse(cmd.name, message.member);
+
+        if (res.respond) {
+          interaction.reply({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
+          return;
+        }
+        return;
       }
-      return;
     }
 
     if ((await getBalance(message.member)) < 5_000) {
-      if (message instanceof Message) {
-        message.channel.send({ embeds: [new ErrorEmbed("you must have at least $5k")] });
-        return;
-      } else {
-        message.followUp({ embeds: [new ErrorEmbed("you must have at least $5k")] });
-        return;
-      }
+      interaction.reply({
+        embeds: [new ErrorEmbed("you must have at least $5k")],
+        flags: MessageFlags.Ephemeral,
+      });
+
+      return;
     }
+
+    await interaction.deferUpdate();
 
     await addCooldown(cmd.name, message.member, 900);
 
@@ -228,6 +246,116 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
     return embed;
   };
 
+  const doRob = async (msg: Message, res: ButtonInteraction, replay = false) => {
+    const newEmbed = await robBank("nypsi", res, replay);
+
+    if (!newEmbed) return msg.edit({ components: [] });
+
+    const embed = new CustomEmbed(message.member).setHeader(
+      `${message.author.username}'s robbery`,
+      message.author.avatarURL(),
+    );
+
+    embed.setDescription("robbing nypsi bank...");
+
+    await msg.edit({ embeds: [embed], components: [] });
+
+    setTimeout(async () => {
+      if (
+        !(await isPremium(message.member)) ||
+        !((await getTier(message.member)) >= 3) ||
+        (await getBalance(message.member)) < 5_000 ||
+        (await getNypsiBankBalance()) < 100_000 ||
+        !(await getInventory(message.member)).has("mask")
+      ) {
+        return msg.edit({ embeds: [newEmbed], components: [] });
+      }
+
+      if (
+        percentChance(0.05) &&
+        parseInt(await redis.get(`anticheat:interactivegame:count:${message.author.id}`)) > 50
+      ) {
+        const res = await giveCaptcha(message.member);
+
+        if (res) {
+          logger.info(
+            `${message.member.user.username} (${message.author.id}) given captcha randomly in bankrob`,
+          );
+          const hook = new WebhookClient({
+            url: process.env.ANTICHEAT_HOOK,
+          });
+          await hook.send({
+            content: `[${getTimestamp()}] ${message.member.user.username} (${message.author.id}) given captcha randomly in bankrob`,
+          });
+          hook.destroy();
+        }
+      }
+
+      await redis.incr(`anticheat:interactivegame:count:${message.author.id}`);
+      await redis.expire(`anticheat:interactivegame:count:${message.author.id}`, 86400);
+
+      const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setLabel("rob again").setStyle(ButtonStyle.Success).setCustomId("rp"),
+      );
+
+      await msg.edit({ embeds: [newEmbed], components: [row] });
+
+      const result = await msg
+        .awaitMessageComponent({
+          filter: (i: Interaction) => i.user.id == message.author.id,
+          time: 30000,
+        })
+        .catch(() => {
+          msg.edit({ components: [] });
+          return;
+        });
+
+      if (result && result.customId == "rp") {
+        logger.info(
+          `::cmd ${message.guild.id} ${message.channelId} ${message.author.username}: replaying bankrob`,
+        );
+        if (await isLockedOut(message.member)) return verifyUser(message);
+
+        addHourlyCommand(message.member);
+
+        await a(message.author.id, message.author.username, message.content, "bankrob");
+
+        if (
+          (await redis.get(
+            `${Constants.redis.nypsi.RESTART}:${(message.client as NypsiClient).cluster.id}`,
+          )) == "t"
+        ) {
+          if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
+            message.react("💀");
+          } else {
+            return msg.edit({
+              embeds: [
+                new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes"),
+              ],
+            });
+          }
+        }
+
+        if (await redis.get("nypsi:maintenance")) {
+          if ((await getAdminLevel(message.member)) > 0 && message instanceof Message) {
+            message.react("💀");
+          } else {
+            return msg.edit({
+              embeds: [
+                new CustomEmbed(
+                  message.member,
+                  "fun & moderation commands are still available to you. maintenance mode only prevents certain commands to prevent loss of progress",
+                ).setTitle("⚠️ nypsi is under maintenance"),
+              ],
+            });
+          }
+        }
+
+        return doRob(msg, result as ButtonInteraction, true);
+      }
+    }, 2000);
+  };
+
   const embed = new CustomEmbed(message.member)
     .setHeader("bank robbery", message.author.avatarURL())
     .setDescription(await displayBankInfo());
@@ -251,36 +379,19 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
 
   const pageManager: any = async () => {
     const res = await msg
-      .awaitMessageComponent({ filter, time: 60_000 })
-      .then((i) => {
-        setTimeout(() => {
-          if (!i.replied) i.deferUpdate().catch(() => {});
-        }, 2000);
-
-        return i;
+      .awaitMessageComponent({
+        filter,
+        time: 30000,
       })
-      .catch(() => {});
+      .catch(() => {
+        msg.edit({ components: [] });
+        return;
+      });
 
-    if (!res) {
-      msg.edit({ components: [] });
-      return;
-    }
-
-    if (res.customId == "ro") {
-      const newEmbed = await robBank("nypsi");
-
-      if (!newEmbed)
-        return await res
-          .update({ components: [] })
-          .catch(() => res.message.edit({ components: [] }));
-
-      await res
-        .update({ embeds: [newEmbed], components: [] })
-        .then(() => res.message.edit({ embeds: [newEmbed], components: [] }));
-      return;
+    if (res && res.customId == "ro") {
+      return doRob(msg, res as ButtonInteraction);
     }
   };
-
   return pageManager();
 }
 
