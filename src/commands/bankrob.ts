@@ -131,27 +131,25 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
   };
 
   const robBank = async (bank: string, interaction: ButtonInteraction, replay = false) => {
-    if (!replay && (await onCooldown(cmd.name, message.member))) {
-      const res = await getResponse(cmd.name, message.member);
-
-      if (res.respond) {
-        interaction.reply({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
-        return;
-      }
-      return;
-    }
-
-    if (replay) {
-      if (!(await getInventory(message.member)).has("mask")) {
-        interaction.reply({
-          embeds: [new ErrorEmbed("you need a mask to rob again")],
-          flags: MessageFlags.Ephemeral,
-        });
-        return;
-      }
-
-      if (await onCooldown(cmd.name, message.member))
+    if (await onCooldown(cmd.name, message.member)) {
+      if (replay) {
+        if (!(await getInventory(message.member)).has("mask")) {
+          interaction.reply({
+            embeds: [new ErrorEmbed("you need a mask to rob again")],
+            flags: MessageFlags.Ephemeral,
+          });
+          return;
+        }
         await removeInventoryItem(message.member, "mask", 1);
+      } else {
+        const res = await getResponse(cmd.name, message.member);
+
+        if (res.respond) {
+          interaction.reply({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
+          return;
+        }
+        return;
+      }
     }
 
     if ((await getBalance(message.member)) < 5_000) {
