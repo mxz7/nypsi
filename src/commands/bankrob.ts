@@ -353,7 +353,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
 
         return doRob(msg, result as ButtonInteraction, true);
       }
-    }, 2000);
+    }, 3000);
   };
 
   const embed = new CustomEmbed(message.member)
