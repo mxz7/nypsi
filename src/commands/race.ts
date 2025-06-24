@@ -316,7 +316,7 @@ class Race {
 
       const chosen = carInteraction.values[0];
 
-      if (this.limit > -1 && cars.find((i) => i.car.id === chosen).speed > this.limit)
+      if (this.limit > -1 && cars.find((i) => i.car.id == chosen).speed > this.limit)
         return carInteraction.reply({
           flags: MessageFlags.Ephemeral,
           embeds: [new ErrorEmbed("this car is faster than the speed limit for this race")],
@@ -325,7 +325,7 @@ class Race {
       await removeBalance(interaction.user, this.bet);
 
       this.members.push({
-        car: cars.find((i) => i.car.id === chosen),
+        car: cars.find((i) => i.car.id == chosen),
         position: 0,
         user: interaction.user,
       });
@@ -337,7 +337,7 @@ class Race {
         embeds: [
           new CustomEmbed(
             interaction.user.id,
-            `chosen **${cars.find((i) => i.car.id === chosen).car.name}**`,
+            `chosen **${cars.find((i) => i.car.id == chosen).car.name}**`,
           ).setHeader(this.embed.data.author.name, this.embed.data.author.icon_url),
         ],
       });
