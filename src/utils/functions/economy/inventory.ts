@@ -401,7 +401,7 @@ export async function getTotalAmountOfItem(itemId: string) {
     },
   });
 
-  return Number(query._sum.amount) + Number(market._sum.itemAmount);
+  return Number(query._sum.amount) + market._sum.itemAmount;
 }
 
 export function selectItem(search: string) {
@@ -580,12 +580,12 @@ export async function gemBreak(
     const order = orders[orders.length - 1];
 
     if (order.itemAmount > 1) {
-      await setMarketOrderAmount(order.id, order.itemAmount - 1n);
+      await setMarketOrderAmount(order.id, order.itemAmount - 1);
     } else {
       const res = await deleteMarketOrder(order.id, client);
       if (typeof res == "string" || !res) return;
 
-      await addInventoryItem(order.ownerId, order.itemId, Number(order.itemAmount));
+      await addInventoryItem(order.ownerId, order.itemId, order.itemAmount);
 
       if ((await (await getInventory(userId)).hasGem(gem)).inInventory) {
         await removeInventoryItem(userId, gem, 1);

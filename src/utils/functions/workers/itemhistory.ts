@@ -72,9 +72,9 @@ if (!isMainThread) {
       const date = dayjs(item.createdAt).format("YYYY-MM-DD");
 
       if (marketBuyOrderAverages.has(date)) {
-        marketBuyOrderAverages.get(date).push(Number(item.price * item.itemAmount));
+        marketBuyOrderAverages.get(date).push(Number(item.price) * item.itemAmount);
       } else {
-        marketBuyOrderAverages.set(date, [Number(item.price * item.itemAmount)]);
+        marketBuyOrderAverages.set(date, [Number(item.price) * item.itemAmount]);
       }
     }
 
@@ -84,9 +84,9 @@ if (!isMainThread) {
       const date = dayjs(item.createdAt).format("YYYY-MM-DD");
 
       if (marketSellOrderAverages.has(date)) {
-        marketSellOrderAverages.get(date).push(Number(item.price * item.itemAmount));
+        marketSellOrderAverages.get(date).push(Number(item.price) * item.itemAmount);
       } else {
-        marketSellOrderAverages.set(date, [Number(item.price * item.itemAmount)]);
+        marketSellOrderAverages.set(date, [Number(item.price) * item.itemAmount]);
       }
     }
 

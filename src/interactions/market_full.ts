@@ -72,7 +72,7 @@ export default {
       if (order.orderType === "sell") {
         const balance = await getBalance(interaction.user.id);
 
-        if (balance < Number(order.price * order.itemAmount)) {
+        if (balance < Number(order.price) * order.itemAmount) {
           const embed = new ErrorEmbed("you can't afford this");
           await interaction
             .reply({
@@ -129,7 +129,7 @@ export default {
     let deferred = false;
 
     if (order.orderType == "sell") {
-      const value = Number(order.price * order.itemAmount);
+      const value = Number(order.price) * order.itemAmount;
 
       if ((await getPreferences(interaction.user.id)).marketConfirm < value) {
         const res = await showMarketConfirmationModal(interaction, "buy", value);
@@ -164,16 +164,16 @@ export default {
         ? await marketSell(
             interaction.user.id,
             order.itemId,
-            Number(order.itemAmount),
-            Number(order.price * order.itemAmount),
+            order.itemAmount,
+            Number(order.price) * order.itemAmount,
             interaction.client as NypsiClient,
             order.id,
           )
         : await marketBuy(
             interaction.user.id,
             order.itemId,
-            Number(order.itemAmount),
-            Number(order.price * order.itemAmount),
+            order.itemAmount,
+            Number(order.price) * order.itemAmount,
             interaction.client as NypsiClient,
             order.id,
           );
@@ -194,7 +194,7 @@ export default {
         return interaction.editReply({
           embeds: [
             new CustomEmbed(interaction.user.id).setDescription(
-              `✅ you've ${order.orderType === "sell" ? "bought" : "sold"} **${(Number(order.itemAmount) - res.remaining).toLocaleString()}x** ${getItems()[order.itemId].emoji} **[${getItems()[order.itemId].name}](https://nypsi.xyz/item/${order.itemId})** for $${(order.price * order.itemAmount).toLocaleString()}`,
+              `✅ you've ${order.orderType === "sell" ? "bought" : "sold"} **${(order.itemAmount - res.remaining).toLocaleString()}x** ${getItems()[order.itemId].emoji} **[${getItems()[order.itemId].name}](https://nypsi.xyz/item/${order.itemId})** for $${(Number(order.price) * order.itemAmount).toLocaleString()}`,
             ),
           ],
         });
@@ -202,7 +202,7 @@ export default {
         return interaction.followUp({
           embeds: [
             new CustomEmbed(interaction.user.id).setDescription(
-              `✅ you've ${order.orderType === "sell" ? "bought" : "sold"} **${(Number(order.itemAmount) - res.remaining).toLocaleString()}x** ${getItems()[order.itemId].emoji} **[${getItems()[order.itemId].name}](https://nypsi.xyz/item/${order.itemId})** for $${(order.price * order.itemAmount).toLocaleString()}`,
+              `✅ you've ${order.orderType === "sell" ? "bought" : "sold"} **${(order.itemAmount - res.remaining).toLocaleString()}x** ${getItems()[order.itemId].emoji} **[${getItems()[order.itemId].name}](https://nypsi.xyz/item/${order.itemId})** for $${(Number(order.price) * order.itemAmount).toLocaleString()}`,
             ),
           ],
           flags: MessageFlags.Ephemeral,

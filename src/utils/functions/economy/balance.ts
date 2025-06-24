@@ -792,10 +792,10 @@ export async function calcNetWorth(
   );
 
   for (const sellOrder of query.Market.filter((i) => i.orderType == "sell"))
-    worth += ((await calcItemValue(sellOrder.itemId)) || 0) * Number(sellOrder.itemAmount);
+    worth += ((await calcItemValue(sellOrder.itemId)) || 0) * sellOrder.itemAmount;
 
   for (const buyOrder of query.Market.filter((i) => i.orderType == "buy"))
-    worth += Number(buyOrder.price * buyOrder.itemAmount);
+    worth += Number(buyOrder.price) * buyOrder.itemAmount;
 
   if (breakdown) breakdownItems.set("balance", worth);
 

@@ -16,8 +16,8 @@ export default {
       orderBy: { createdAt: "asc" },
     });
 
-    const combinedQuantities: { itemId: string; itemAmount: bigint }[] = Object.values(
-      sellOrders.reduce<Record<string, { itemId: string; itemAmount: bigint }>>(
+    const combinedQuantities: { itemId: string; itemAmount: number }[] = Object.values(
+      sellOrders.reduce<Record<string, { itemId: string; itemAmount: number }>>(
         (acc, { itemId, itemAmount }) => {
           if (!acc[itemId]) {
             acc[itemId] = { itemId, itemAmount };

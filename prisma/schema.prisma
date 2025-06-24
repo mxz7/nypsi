@@ -502,7 +502,7 @@ model Market {
   id         Int       @id @default(autoincrement())
   ownerId    String
   itemId     String
-  itemAmount BigInt    @default(1)
+  itemAmount Int    @default(1)
   price      BigInt
   orderType  OrderType
   messageId  String?   @unique

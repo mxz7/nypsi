@@ -63,7 +63,7 @@ export async function getMarketOrder(id: number) {
   });
 }
 
-export async function setMarketOrderAmount(id: number, amount: number | bigint) {
+export async function setMarketOrderAmount(id: number, amount: number) {
   await prisma.market.update({
     where: {
       id,
@@ -183,7 +183,7 @@ export async function createMarketOrder(
     });
 
     if (completed) sold = true;
-    else if (Number(itemAmount) !== amount) amount = Number(itemAmount);
+    else if (itemAmount !== amount) amount = itemAmount;
   }
 
   const response: { sold: boolean; amount: number; url?: string } = {
@@ -193,7 +193,7 @@ export async function createMarketOrder(
 
   if (sold) return response;
 
-  order.itemAmount = BigInt(amount);
+  order.itemAmount = amount;
 
   const payload = await getMarketOrderEmbed(order);
 
@@ -271,7 +271,7 @@ export async function getMarketOrderEmbed(order: Market) {
 
   if (order.orderType === "buy") {
     embed.setColor("#b4befe");
-    description += `buying **${order.itemAmount.toLocaleString()}x** ${getItems()[order.itemId].emoji} **[${getItems()[order.itemId].name}](https://nypsi.xyz/item/${order.itemId}?ref=bot-market)** for $${(order.price * order.itemAmount).toLocaleString()}`;
+    description += `buying **${order.itemAmount.toLocaleString()}x** ${getItems()[order.itemId].emoji} **[${getItems()[order.itemId].name}](https://nypsi.xyz/item/${order.itemId}?ref=bot-market)** for $${(Number(order.price) * order.itemAmount).toLocaleString()}`;
     row.addComponents(
       new ButtonBuilder().setCustomId("market-full").setLabel("sell").setStyle(ButtonStyle.Success),
     );
@@ -291,7 +291,7 @@ export async function getMarketOrderEmbed(order: Market) {
       );
   } else if (order.orderType === "sell") {
     embed.setColor("#a6e3a1");
-    description += `selling **${order.itemAmount.toLocaleString()}x** ${getItems()[order.itemId].emoji} **[${getItems()[order.itemId].name}](https://nypsi.xyz/item/${order.itemId}?ref=bot-market)** for $${(order.price * order.itemAmount).toLocaleString()}`;
+    description += `selling **${order.itemAmount.toLocaleString()}x** ${getItems()[order.itemId].emoji} **[${getItems()[order.itemId].name}](https://nypsi.xyz/item/${order.itemId}?ref=bot-market)** for $${(Number(order.price) * order.itemAmount).toLocaleString()}`;
     row.addComponents(
       new ButtonBuilder().setCustomId("market-full").setLabel("buy").setStyle(ButtonStyle.Success),
     );
@@ -325,7 +325,7 @@ export async function checkMarketOrder(
   order: Market,
   client: NypsiClient,
   repeatCount = 0,
-): Promise<boolean | bigint> {
+): Promise<boolean | number> {
   if (
     inTransaction.has(order.itemId) ||
     (await redis.exists(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${order.itemId}`))
@@ -367,17 +367,17 @@ export async function checkMarketOrder(
   try {
     await prisma.$transaction(async (prisma) => {
       for (const validOrder of validOrders) {
-        let amount: bigint;
+        let amount: number;
 
         if (validOrder.itemAmount > remaining) {
           amount = remaining;
-          remaining = 0n;
+          remaining = 0;
         } else {
           amount = validOrder.itemAmount;
           remaining -= validOrder.itemAmount;
         }
 
-        if (amount === 0n) break;
+        if (amount === 0) break;
 
         const res = await completeOrder(
           validOrder.id,
@@ -388,13 +388,13 @@ export async function checkMarketOrder(
         );
 
         if (validOrder.price > order.price) {
-          excessMoney += (validOrder.price - order.price) * amount;
+          excessMoney += (validOrder.price - order.price) * BigInt(amount);
         }
 
         if (!res) break;
       }
 
-      if (remaining === 0n) {
+      if (remaining === 0) {
         await prisma.market.update({
           where: {
             id: order.id,
@@ -437,7 +437,7 @@ export async function checkMarketOrder(
   inTransaction.delete(order.itemId);
   await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${order.itemId}`);
 
-  if (remaining === 0n) return true;
+  if (remaining === 0) return true;
   else return remaining;
 }
 
@@ -670,8 +670,8 @@ export async function getMarketTransactionData(
 
   for (const order of allOrders) {
     if (amount >= order.itemAmount) {
-      cost += Number(order.price * order.itemAmount);
-      amount -= Number(order.itemAmount);
+      cost += Number(order.price) * order.itemAmount;
+      amount -= order.itemAmount;
       orders.push(order);
       if (amount <= 0) break;
     } else {
@@ -688,7 +688,7 @@ export async function getMarketTransactionData(
 export async function completeOrder(
   orderId: number,
   buyer: MemberResolvable,
-  amount: bigint,
+  amount: number,
   client: NypsiClient,
   prisma: PrismaClient | Prisma.TransactionClient,
   checkLock?: { itemId: string },
@@ -971,13 +971,13 @@ export async function marketSell(
   try {
     await prisma.$transaction(async (prisma) => {
       for (const order of orders) {
-        let amount: bigint;
+        let amount: number;
         if (order.itemAmount > remaining) {
-          amount = BigInt(remaining);
+          amount = remaining;
           remaining = 0;
         } else {
           amount = order.itemAmount;
-          remaining -= Number(order.itemAmount);
+          remaining -= order.itemAmount;
         }
 
         const res = await completeOrder(
@@ -1100,13 +1100,13 @@ export async function marketBuy(
   try {
     await prisma.$transaction(async (prisma) => {
       for (const order of orders) {
-        let amount: bigint;
+        let amount: number;
         if (order.itemAmount > remaining) {
-          amount = BigInt(remaining);
+          amount = remaining;
           remaining = 0;
         } else {
           amount = order.itemAmount;
-          remaining -= Number(order.itemAmount);
+          remaining -= order.itemAmount;
         }
 
         const res = await completeOrder(
