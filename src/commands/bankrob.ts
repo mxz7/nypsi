@@ -150,7 +150,8 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
         return;
       }
 
-      await removeInventoryItem(message.member, "mask", 1);
+      if (await onCooldown(cmd.name, message.member))
+        await removeInventoryItem(message.member, "mask", 1);
     }
 
     if ((await getBalance(message.member)) < 5_000) {
