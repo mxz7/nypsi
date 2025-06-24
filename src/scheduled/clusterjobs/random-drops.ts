@@ -201,9 +201,11 @@ async function fastClickGame(
 
       const msg = await channel.send({ embeds: [embed], components: [row] });
 
-      try {
-        const path = await import("path");
+      const path = await import("path");
 
+      const { logger } = await import(path.join(process.cwd(), "dist", "utils", "logger.js"));
+
+      try {
         const { isEcoBanned } = await import(
           path.join(process.cwd(), "dist", "utils", "functions", "economy", "utils.js")
         );
@@ -329,9 +331,11 @@ async function typeFastGame(
 
       const msg = await channel.send({ embeds: [embed] });
 
-      try {
-        const path = await import("path");
+      const path = await import("path");
 
+      const { logger } = await import(path.join(process.cwd(), "dist", "utils", "logger.js"));
+
+      try {
         const { isEcoBanned } = await import(
           path.join(process.cwd(), "dist", "utils", "functions", "economy", "utils.js")
         );
@@ -553,9 +557,11 @@ async function clickSpecificGame(
 
       const msg = await channel.send({ embeds: [embed], components: [row] });
 
-      try {
-        const path = await import("path");
+      const path = await import("path");
 
+      const { logger } = await import(path.join(process.cwd(), "dist", "utils", "logger.js"));
+
+      try {
         const { isEcoBanned } = await import(
           path.join(process.cwd(), "dist", "utils", "functions", "economy", "utils.js")
         );
