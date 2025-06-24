@@ -201,43 +201,67 @@ async function fastClickGame(
 
       const msg = await channel.send({ embeds: [embed], components: [row] });
 
-      const started = Date.now();
-      const res = await msg
-        .awaitMessageComponent({
-          filter: async (i) => {
-            try {
-              if ((await isEcoBanned(i.user.id)).banned) {
-                i.reply({ embeds: [bannedEmbed], flags: 64 });
-                return false;
+      const path = await import("path");
+
+      const { logger } = await import(path.join(process.cwd(), "dist", "utils", "logger.js"));
+
+      try {
+        const { isEcoBanned } = await import(
+          path.join(process.cwd(), "dist", "utils", "functions", "economy", "utils.js")
+        );
+
+        const started = Date.now();
+        const res = await msg
+          .awaitMessageComponent({
+            filter: async (i) => {
+              try {
+                if ((await isEcoBanned(i.user.id)).banned) {
+                  i.reply({ embeds: [bannedEmbed], flags: 64 });
+                  return false;
+                }
+              } catch (err) {
+                logger.error(
+                  `lootdrop: failed to check for ecoban on user ${i.user.id} in fastClick`,
+                  {
+                    err,
+                  },
+                );
+                return i.customId === buttonId;
               }
-            } catch {
               return i.customId === buttonId;
-            }
-            return i.customId === buttonId;
-          },
-          time: 30000,
-        })
-        .catch(() => {});
+            },
+            time: 30000,
+          })
+          .catch((err) => logger.error("lootdrop: awaitInteraction failed in fastClick", { err }));
 
-      row.components.forEach((b) => (b.disabled = true));
+        row.components.forEach((b) => (b.disabled = true));
 
-      if (!res) {
-        embed.description += "\n\nnobody clicked the button in time 😢";
+        if (!res) {
+          embed.description += "\n\nnobody clicked the button in time 😢";
+
+          await msg.edit({ embeds: [embed], components: [row] });
+          return;
+        }
+
+        embed.description += `\n\n**${res.user.username}** has won in \`${(
+          (Date.now() - started) /
+          1000
+        ).toFixed(2)}s\`!!`;
+
+        res
+          .update({ embeds: [embed], components: [row] })
+          .then(() => res.followUp({ embeds: [winEmbed], flags: 64 }));
+
+        return res.user.id;
+      } catch (err) {
+        logger.error("lootdrop: fastClick error", { err });
+
+        embed.description +=
+          "\n\nsomething went wrong with this lootdrop, please make a support ticket";
 
         await msg.edit({ embeds: [embed], components: [row] });
         return;
       }
-
-      embed.description += `\n\n**${res.user.username}** has won in \`${(
-        (Date.now() - started) /
-        1000
-      ).toFixed(2)}s\`!!`;
-
-      res
-        .update({ embeds: [embed], components: [row] })
-        .then(() => res.followUp({ embeds: [winEmbed], flags: 64 }));
-
-      return res.user.id;
     },
     {
       context: {
@@ -295,12 +319,6 @@ async function typeFastGame(
 
   const winner = await client.cluster.broadcastEval(
     async (c, { embed, channelId, cluster, chosenWord }) => {
-      const path = await import("path");
-
-      const { isEcoBanned } = await import(
-        path.join(process.cwd(), "dist", "utils", "functions", "economy", "utils.js")
-      );
-
       const client = c as unknown as NypsiClient;
 
       if (client.cluster.id != cluster) return;
@@ -313,41 +331,65 @@ async function typeFastGame(
 
       const msg = await channel.send({ embeds: [embed] });
 
-      const started = Date.now();
-      const res = await channel
-        .awaitMessages({
-          filter: async (m) => {
-            try {
-              if ((await isEcoBanned(m.member.id)).banned) {
-                return false;
-              }
-            } catch {
-              return m.content.toLowerCase() === chosenWord.toLowerCase();
-            }
-            return m.content.toLowerCase() === chosenWord.toLowerCase();
-          },
-          time: 30000,
-          max: 1,
-        })
-        .then((m) => m.first())
-        .catch(() => {});
+      const path = await import("path");
 
-      if (!res) {
-        embed.description += "\n\nnobody won 😢";
+      const { logger } = await import(path.join(process.cwd(), "dist", "utils", "logger.js"));
+
+      try {
+        const { isEcoBanned } = await import(
+          path.join(process.cwd(), "dist", "utils", "functions", "economy", "utils.js")
+        );
+
+        const started = Date.now();
+        const res = await channel
+          .awaitMessages({
+            filter: async (m) => {
+              try {
+                if ((await isEcoBanned(m.member.id)).banned) {
+                  return false;
+                }
+              } catch (err) {
+                logger.error(
+                  `lootdrop: failed to check for ecoban on user ${m.member.id} in typeFast`,
+                  {
+                    err,
+                  },
+                );
+                return m.content.toLowerCase() === chosenWord.toLowerCase();
+              }
+              return m.content.toLowerCase() === chosenWord.toLowerCase();
+            },
+            time: 30000,
+            max: 1,
+          })
+          .then((m) => m.first())
+          .catch((err) => logger.error("lootdrop: awaitMessages failed in typeFast", { err }));
+
+        if (!res) {
+          embed.description += "\n\nnobody won 😢";
+
+          await msg.edit({ embeds: [embed] });
+          return;
+        }
+
+        embed.description += `\n\n**${res.author.username}** has won in \`${(
+          (Date.now() - started) /
+          1000
+        ).toFixed(2)}s\`!!`;
+
+        res.react("🏆");
+        await msg.edit({ embeds: [embed] });
+
+        return res.author.id;
+      } catch (err) {
+        logger.error("lootdrop: typeFast error", { err });
+
+        embed.description +=
+          "\n\nsomething went wrong with this lootdrop, please make a support ticket";
 
         await msg.edit({ embeds: [embed] });
         return;
       }
-
-      embed.description += `\n\n**${res.author.username}** has won in \`${(
-        (Date.now() - started) /
-        1000
-      ).toFixed(2)}s\`!!`;
-
-      res.react("🏆");
-      await msg.edit({ embeds: [embed] });
-
-      return res.author.id;
     },
     { context: { embed, channelId, cluster: cluster.cluster, chosenWord } },
   );
@@ -503,12 +545,6 @@ async function clickSpecificGame(
 
   const winner = await client.cluster.broadcastEval(
     async (c, { embed, row, channelId, cluster, winningId, winEmbed, failEmbed, bannedEmbed }) => {
-      const path = await import("path");
-
-      const { isEcoBanned } = await import(
-        path.join(process.cwd(), "dist", "utils", "functions", "economy", "utils.js")
-      );
-
       const client = c as unknown as NypsiClient;
 
       if (client.cluster.id != cluster) return;
@@ -521,53 +557,79 @@ async function clickSpecificGame(
 
       const msg = await channel.send({ embeds: [embed], components: [row] });
 
-      const losers: string[] = [];
+      const path = await import("path");
 
-      const started = Date.now();
-      const res = await msg
-        .awaitMessageComponent({
-          filter: async (i) => {
-            if (losers.includes(i.user.id)) return;
-            if (i.customId !== winningId) {
-              i.reply({ embeds: [failEmbed], flags: 64 });
-              losers.push(i.user.id);
-              return false;
-            }
+      const { logger } = await import(path.join(process.cwd(), "dist", "utils", "logger.js"));
 
-            try {
-              if ((await isEcoBanned(i.user.id)).banned) {
-                i.reply({ embeds: [bannedEmbed], flags: 64 });
+      try {
+        const { isEcoBanned } = await import(
+          path.join(process.cwd(), "dist", "utils", "functions", "economy", "utils.js")
+        );
+
+        const losers: string[] = [];
+
+        const started = Date.now();
+        const res = await msg
+          .awaitMessageComponent({
+            filter: async (i) => {
+              if (losers.includes(i.user.id)) return;
+              if (i.customId !== winningId) {
+                i.reply({ embeds: [failEmbed], flags: 64 });
+                losers.push(i.user.id);
                 return false;
               }
-            } catch {
+
+              try {
+                if ((await isEcoBanned(i.user.id)).banned) {
+                  i.reply({ embeds: [bannedEmbed], flags: 64 });
+                  return false;
+                }
+              } catch (err) {
+                logger.error(
+                  `lootdrop: failed to check for ecoban on user ${i.user.id} in clickSpecific`,
+                  {
+                    err,
+                  },
+                );
+                return true;
+              }
+
               return true;
-            }
+            },
+            time: 30000,
+          })
+          .catch((err) =>
+            logger.error("lootdrop: awaitInteraction failed in clickSpecific", { err }),
+          );
 
-            return true;
-          },
-          time: 30000,
-        })
-        .catch(() => {});
+        row.components.forEach((b) => (b.disabled = true));
 
-      row.components.forEach((b) => (b.disabled = true));
+        if (!res) {
+          embed.description += "\n\nnobody clicked the button in time 😢";
 
-      if (!res) {
-        embed.description += "\n\nnobody clicked the button in time 😢";
+          await msg.edit({ embeds: [embed], components: [row] });
+          return;
+        }
+
+        embed.description += `\n\n**${res.user.username}** has won in \`${(
+          (Date.now() - started) /
+          1000
+        ).toFixed(2)}s\`!!`;
+
+        res
+          .update({ embeds: [embed], components: [row] })
+          .then(() => res.followUp({ embeds: [winEmbed], flags: 64 }));
+
+        return res.user.id;
+      } catch (err) {
+        logger.error("lootdrop: clickSpecific error", { err });
+
+        embed.description +=
+          "\n\nsomething went wrong with this lootdrop, please make a support ticket";
 
         await msg.edit({ embeds: [embed], components: [row] });
         return;
       }
-
-      embed.description += `\n\n**${res.user.username}** has won in \`${(
-        (Date.now() - started) /
-        1000
-      ).toFixed(2)}s\`!!`;
-
-      res
-        .update({ embeds: [embed], components: [row] })
-        .then(() => res.followUp({ embeds: [winEmbed], flags: 64 }));
-
-      return res.user.id;
     },
     {
       context: {
