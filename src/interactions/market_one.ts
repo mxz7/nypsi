@@ -54,7 +54,7 @@ export default {
         return false;
       }
 
-      if (order.completed || order.itemAmount <= 0n) {
+      if (order.completed || order.itemAmount <= 0) {
         const embed = new ErrorEmbed("too slow ):");
         await interaction
           .reply({
@@ -133,7 +133,7 @@ export default {
     let deferred = false;
 
     if (order.orderType == "sell") {
-      const value = Number(order.price * order.itemAmount);
+      const value = Number(order.price) * order.itemAmount;
 
       if ((await getPreferences(interaction.user.id)).marketConfirm < value) {
         const res = await showMarketConfirmationModal(interaction, "buy", value);

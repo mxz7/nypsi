@@ -486,6 +486,13 @@ async function run(
             });
             await updateEmbed();
             return pageManager();
+          } else if (parseInt(amount) > 100_000) {
+            await res.reply({
+              embeds: [new ErrorEmbed("the maximum amount of items per order is 100,000")],
+              options: { flags: MessageFlags.Ephemeral },
+            });
+            await updateEmbed();
+            return pageManager();
           } else if (!parseInt(price) || isNaN(parseInt(price)) || parseInt(price) < 1) {
             await res.reply({
               embeds: [new ErrorEmbed("invalid price")],
@@ -500,6 +507,13 @@ async function run(
           if (!cost) {
             await res.reply({
               embeds: [new ErrorEmbed("invalid price")],
+              options: { flags: MessageFlags.Ephemeral },
+            });
+            await updateEmbed();
+            return pageManager();
+          } else if (cost > 10_000_000_000) {
+            await res.reply({
+              embeds: [new ErrorEmbed("the maximum price per item is $10b")],
               options: { flags: MessageFlags.Ephemeral },
             });
             await updateEmbed();
@@ -684,9 +698,9 @@ async function run(
 
               if (result) {
                 if (type == "buy") {
-                  await addBalance(message.member, Number(order.itemAmount * order.price));
+                  await addBalance(message.member, order.itemAmount * Number(order.price));
                 } else {
-                  await addInventoryItem(message.member, order.itemId, Number(order.itemAmount));
+                  await addInventoryItem(message.member, order.itemId, order.itemAmount);
                 }
               }
             }
@@ -701,9 +715,9 @@ async function run(
 
           if (result) {
             if (type == "buy") {
-              await addBalance(message.member, Number(order.itemAmount * order.price));
+              await addBalance(message.member, order.itemAmount * Number(order.price));
             } else {
-              await addInventoryItem(message.member, order.itemId, Number(order.itemAmount));
+              await addInventoryItem(message.member, order.itemId, order.itemAmount);
             }
           }
         }
@@ -815,7 +829,7 @@ async function run(
   const deleteOrder = async (
     type: string,
     msg: NypsiMessage,
-    orders: { itemId: string; itemAmount: bigint; price: bigint; id: number }[],
+    orders: { itemId: string; itemAmount: number; price: bigint; id: number }[],
   ) => {
     const embed = new CustomEmbed(message.member).setHeader(
       `delete ${type} order`,
@@ -1092,7 +1106,7 @@ async function run(
 
     if (amount.toLowerCase() == "all") {
       amount = (await getMarketItemOrders(item.id, "sell", message.member))
-        .reduce((count, order) => Number(order.itemAmount) + count, 0)
+        .reduce((count, order) => order.itemAmount + count, 0)
         .toString();
 
       const marketData = await getMarketTransactionData(
@@ -1108,9 +1122,9 @@ async function run(
         let validCount = 0;
 
         for (const order of marketData.orders) {
-          if (balance >= order.itemAmount * order.price) {
-            balance -= Number(order.itemAmount);
-            validCount += Number(order.itemAmount);
+          if (balance >= order.itemAmount * Number(order.price)) {
+            balance -= order.itemAmount;
+            validCount += order.itemAmount;
           } else {
             validCount += Math.floor(balance / Number(order.price));
             break;
@@ -1149,7 +1163,7 @@ async function run(
     if (amount.toLowerCase() == "all") {
       const invAmount = inventory.count(item.id);
       const marketAmount = (await getMarketItemOrders(item.id, "buy", message.member)).reduce(
-        (count, order) => Number(order.itemAmount) + count,
+        (count, order) => order.itemAmount + count,
         0,
       );
 
@@ -1221,6 +1235,10 @@ async function run(
       return send({ embeds: [new ErrorEmbed("invalid amount")] });
     }
 
+    if (parseInt(amount) > 100_000) {
+      return send({ embeds: [new ErrorEmbed("the maximum amount of items per order is 100,000")] });
+    }
+
     if (!parseInt(price) || isNaN(parseInt(price)) || parseInt(price) < 1) {
       return send({ embeds: [new ErrorEmbed("invalid price")] });
     }
@@ -1228,6 +1246,8 @@ async function run(
     const cost = await formatBet(price.toLowerCase(), message.member).catch(() => {});
 
     if (!cost) return send({ embeds: [new ErrorEmbed("invalid price")] });
+    if (cost > 10_000_000_000)
+      return send({ embeds: [new ErrorEmbed("the maximum price per item is $10b")] });
 
     const itemWorth = await calcItemValue(selected.id);
 
@@ -1442,9 +1462,9 @@ async function run(
       if (!(await userExists(order.ownerId))) return;
 
       if (order.orderType == "buy") {
-        await addBalance(order.ownerId, Number(order.itemAmount * order.price));
+        await addBalance(order.ownerId, order.itemAmount * Number(order.price));
       } else {
-        await addInventoryItem(order.ownerId, order.itemId, Number(order.itemAmount));
+        await addInventoryItem(order.ownerId, order.itemId, order.itemAmount);
       }
 
       if ((await getDmSettings(order.ownerId)).market) {
@@ -1490,21 +1510,18 @@ async function run(
       const buyOrders = await getMarketItemOrders(item.id, "buy");
       const sellOrders = await getMarketItemOrders(item.id, "sell").then((r) => r.reverse());
 
-      const totalBuyOrderCount = buyOrders.reduce((sum, item) => sum + Number(item.itemAmount), 0);
-      const totalSellOrderCount = sellOrders.reduce(
-        (sum, item) => sum + Number(item.itemAmount),
-        0,
-      );
+      const totalBuyOrderCount = buyOrders.reduce((sum, item) => sum + item.itemAmount, 0);
+      const totalSellOrderCount = sellOrders.reduce((sum, item) => sum + item.itemAmount, 0);
 
       const formattedBuyOrders = buyOrders.reduce<{ itemAmount: number; price: number }[]>(
         (acc, order) => {
           const existingItem = acc.find((item) => item.price === Number(order.price));
 
           if (existingItem) {
-            existingItem.itemAmount += Number(order.itemAmount);
+            existingItem.itemAmount += order.itemAmount;
           } else {
             acc.push({
-              itemAmount: Number(order.itemAmount),
+              itemAmount: order.itemAmount,
               price: Number(order.price),
             });
           }
@@ -1519,10 +1536,10 @@ async function run(
           const existingItem = acc.find((item) => item.price === Number(order.price));
 
           if (existingItem) {
-            existingItem.itemAmount += Number(order.itemAmount);
+            existingItem.itemAmount += order.itemAmount;
           } else {
             acc.push({
-              itemAmount: Number(order.itemAmount),
+              itemAmount: order.itemAmount,
               price: Number(order.price),
             });
           }
@@ -1534,10 +1551,10 @@ async function run(
 
       const extraBuyOrderCount = formattedBuyOrders
         .slice(5)
-        .reduce((sum, item) => sum + Number(item.itemAmount), 0);
+        .reduce((sum, item) => sum + item.itemAmount, 0);
       const extraSellOrderCount = formattedSellOrders
         .slice(5)
-        .reduce((sum, item) => sum + Number(item.itemAmount), 0);
+        .reduce((sum, item) => sum + item.itemAmount, 0);
 
       embed.setFields(
         {

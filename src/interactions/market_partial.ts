@@ -13,10 +13,10 @@ import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
+import { getBalance } from "../utils/functions/economy/balance";
+import { getInventory } from "../utils/functions/economy/inventory";
 import { marketBuy, marketSell } from "../utils/functions/economy/market";
 import { getItems, isEcoBanned, userExists } from "../utils/functions/economy/utils";
-import { getInventory } from "../utils/functions/economy/inventory";
-import { getBalance } from "../utils/functions/economy/balance";
 
 const userFulfilling = new Map<string, number>();
 
@@ -49,7 +49,7 @@ export default {
       return;
     }
 
-    if (order.completed || order.itemAmount <= 0n) {
+    if (order.completed || order.itemAmount <= 0) {
       await interaction.reply({
         embeds: [new ErrorEmbed("too slow ):")],
         flags: MessageFlags.Ephemeral,
@@ -67,7 +67,7 @@ export default {
     const res = await showMultiModal(
       interaction,
       order.orderType == "buy" ? "sell" : "buy",
-      Number(order.itemAmount),
+      order.itemAmount,
     ).catch(() => {});
 
     if (userFulfilling.has(interaction.user.id)) return;
@@ -81,11 +81,11 @@ export default {
       if (order.orderType == "buy") {
         input = (await getInventory(interaction.user.id)).count(order.itemId).toString();
       } else {
-        input = Number(order.itemAmount).toString();
+        input = order.itemAmount.toString();
 
         const balance = await getBalance(interaction.user.id);
 
-        if (order.itemAmount * order.price > balance)
+        if (order.itemAmount * Number(order.price) > balance)
           input = Math.floor(balance / Number(order.price)).toString();
       }
     }
@@ -98,7 +98,7 @@ export default {
       });
     }
 
-    const amount = Math.min(parseInt(input), Number(order.itemAmount));
+    const amount = Math.min(parseInt(input), order.itemAmount);
 
     userFulfilling.delete(interaction.user.id);
 
@@ -114,7 +114,7 @@ export default {
       return;
     }
 
-    if (order.completed || order.itemAmount <= 0n) {
+    if (order.completed || order.itemAmount <= 0) {
       await res.editReply({
         embeds: [new ErrorEmbed("too slow ):")],
       });

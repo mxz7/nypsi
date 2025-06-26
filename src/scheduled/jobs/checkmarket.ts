@@ -6,8 +6,8 @@ import { addBalance } from "../../utils/functions/economy/balance";
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { deleteMarketOrder } from "../../utils/functions/economy/market";
 import { getItems, userExists } from "../../utils/functions/economy/utils";
-import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
 import { pluralize } from "../../utils/functions/string";
+import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
 
 export default {
   name: "checkmarket",
@@ -47,7 +47,7 @@ export default {
 
       if (!(await userExists(order.ownerId))) continue;
 
-      await addBalance(order.ownerId, Number(order.price * order.itemAmount));
+      await addBalance(order.ownerId, Number(order.price) * order.itemAmount);
 
       const embed = new CustomEmbed(order.ownerId);
 
