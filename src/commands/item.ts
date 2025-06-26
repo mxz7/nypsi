@@ -38,8 +38,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 import { getItemCount, getItemWeight, getTotalWeight } from "../utils/functions/economy/loot_pools";
 import { LootPool } from "../types/LootPool";
 import { inPlaceSort } from "fast-sort";
-import { max } from "mathjs";
-import PageManager from "../utils/functions/page";
+import { min } from "mathjs";
 import { Item } from "../types/Economy";
 
 const rarities = [
@@ -60,7 +59,7 @@ const plants = getPlantsData();
 type ItemMessageMember = GuildMember | (GuildMember & APIInteractionGuildMember);
 type ItemMessageData = {
   embed: CustomEmbed,
-  subEmbeds?: { [subTab: string]: CustomEmbed },
+  subEmbeds?: { [subTab: string]: CustomEmbed | CustomEmbed[] },
   subTabs?: StringSelectMenuOptionBuilder[],
   widgets?: ActionRowBuilder<MessageActionRowComponentBuilder>
 };
@@ -210,24 +209,28 @@ async function run(
         });
     }
     for(const subTab in tabs[tab].subEmbeds ?? {}) {
-      tabs[tab].subEmbeds[subTab]
-        .setTitle(title)
-        .setThumbnail(thumbnail)
-        .disableFooter();
-      if(inventoryHas) {
-        tabs[tab].subEmbeds[subTab].setFooter({
+      let subs = tabs[tab].subEmbeds[subTab];
+      subs = subs instanceof Array ? subs : [subs];
+      for(const sub of subs) {
+        sub
+          .setTitle(title)
+          .setThumbnail(thumbnail)
+          .disableFooter();
+        if(inventoryHas) {
+          sub.setFooter({
             text: `you have ${inventory.count(selected.id).toLocaleString()} ${pluralize(
               selected,
               inventory.count(selected.id),
             )}`,
           });
+        }
       }
     }
   }
 
   // logic
   const showItemMeta = async (msg?: Message, res?: StringSelectMenuInteraction): Promise<{ buttonRow: any; embed: any; }> => {
-    const showItemPage = async (tabName: string, subTab?: string) => {
+    const showItemPage = async (tabName: string, subTab?: string, page?: number) => {
       for (const tab of metaTabs) {
         tab.setDefault(tab.data.value === tabName);
       }
@@ -254,17 +257,28 @@ async function run(
           )
         );
       }
+
+      let target = subTab === undefined ? tabs[tabName].embed : tabs[tabName].subEmbeds[subTab];
+      if(target instanceof Array) {
+        rows.push(
+          new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+            new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary)
+              .setDisabled(page === undefined || page === 0),
+            new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+              .setDisabled(page === target.length - 1)
+          )
+        );
+        target = target[page ?? 0];
+      }
       if(tabs[tabName].widgets !== undefined) {
         rows.push(tabs[tabName].widgets)
       }
-
-      const target = subTab === undefined ? tabs[tabName].embed : tabs[tabName].subEmbeds[subTab];
       return { embed: target, widgetRows: rows };
     }
     
     const filter = (i: Interaction) => i.user.id == message.author.id;
 
-    const pageManager: any = async (tabName: string, subTab?: string) => {
+    const pageManager: any = async (tabName: string, subTab?: string, page?: number) => {
       const res = await msg
         .awaitMessageComponent({ filter, time: 30_000 })
         .then(async (i) => {
@@ -281,14 +295,27 @@ async function run(
         return;
       }
 
-      const targetTab = res.isStringSelectMenu() && res.customId === "tabs" ? res.values[0] : tabName;
-      const targetSub = res.isStringSelectMenu() && res.customId === "subtabs" ? res.values[0] : undefined;
+      let targetTab = tabName;
+      let targetSub = subTab;
+      let targetPage = page;
+      if(res.isButton() && ["⬅", "➡"].includes(res.customId)) {
+        targetPage = (page ?? 0) + +(res.customId === "➡") - +(res.customId === "⬅");
+      }
+      if(res.isStringSelectMenu() && res.customId === "subtabs") {
+        targetSub = res.values[0];
+        targetPage = undefined;
+      }
+      if(res.isStringSelectMenu() && res.customId === "tabs") {
+        targetTab = res.values[0];
+        targetSub = undefined;
+        targetPage = undefined;
+      }
 
-      const { embed, widgetRows } = await showItemPage(targetTab, targetSub);
+      const { embed, widgetRows } = await showItemPage(targetTab, targetSub, targetPage);
       await res
         .update({ embeds: [embed], components: widgetRows })
         .catch(() => res.message.edit({ embeds: [embed], components: widgetRows }));
-      return pageManager(targetTab, targetSub);
+      return pageManager(targetTab, targetSub, targetPage);
     };
 
     const { embed, widgetRows } = await showItemPage("general");
@@ -307,7 +334,8 @@ async function run(
     return pageManager("general");
   };
 
-  return showItemMeta();
+  showItemMeta();
+  return;
 }
 
 // HELPERS
@@ -511,7 +539,7 @@ function getLootPoolsMessage(
   const description: string[] = [];
   const pools: string[] = [];
   const poolOptions: StringSelectMenuOptionBuilder[] = [];
-  const subEmbeds: { [subTab: string]: CustomEmbed } = {};
+  const subEmbeds: { [subTab: string]: CustomEmbed[] } = {};
   for(const poolName in selected.loot_pools) {
     const count = selected.loot_pools[poolName];
     pools.push(poolName);
@@ -521,10 +549,23 @@ function getLootPoolsMessage(
       .setDefault(false)
     );
     description.push(`**${count}** draw${count === 1 ? "" : "s"} from pool \`${poolName}\``);
-    const breakdown = poolBreakdown(lootPools[pools[0]]);
-    //let pages: Map<number, string[]> = PageManager.createPages(breakdown, 20);
-    subEmbeds[poolName] = new CustomEmbed(member)
-      .setDescription(`**${count}** draw${count === 1 ? "" : "s"} from pool \`${poolName}\`\n\n`);
+    const breakdown = poolBreakdown(lootPools[poolName]);
+    subEmbeds[poolName] = [];
+    for(let i = 0; i < breakdown.length; i += 20) {
+      subEmbeds[poolName].push(
+        new CustomEmbed(member)
+          .setDescription(
+            `**${count}** draw${count === 1 ? "" : "s"} from pool \`${poolName}\`\n\n` +
+            breakdown.slice(i, min(i + 20, breakdown.length)).join("\n")
+          )
+      );
+    }
+    if(subEmbeds[poolName].length === 0) {
+      subEmbeds[poolName].push(
+        new CustomEmbed(member)
+          .setDescription(`**${count}** draw${count === 1 ? "" : "s"} from pool \`${poolName}\`\n\nNothing`)
+      );
+    }
   }
   return {
     embed: new CustomEmbed(member).setDescription(description.join("\n")),
