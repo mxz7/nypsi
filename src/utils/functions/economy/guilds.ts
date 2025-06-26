@@ -333,8 +333,8 @@ export async function getRequiredForGuildUpgrade(
     slots = guild.members.length;
   }
 
-  const bonusMoney = 1_000_000 * slots * (guild.level / 10);
-  const bonusXP = 2_000 * slots * (guild.level / 10);
+  const bonusMoney = 1_500_000 * slots * (guild.level / 10);
+  const bonusXP = 2_500 * slots * (guild.level / 10);
 
   await redis.set(
     `${Constants.redis.cache.economy.GUILD_REQUIREMENTS}:${name}`,
