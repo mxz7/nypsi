@@ -16,7 +16,6 @@ import {
   StringSelectMenuInteraction,
   StringSelectMenuOptionBuilder,
 } from "discord.js";
-import prisma from "../init/database";
 import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
@@ -27,6 +26,7 @@ import {
   getInventory,
   getTotalAmountOfItem,
   Inventory,
+  isGem,
   selectItem,
 } from "../utils/functions/economy/inventory";
 import { countItemOnMarket } from "../utils/functions/economy/market";
@@ -144,20 +144,12 @@ async function run(
 
 // =====vvvvv===== MESSAGE DATA =====vvvvv=====
 
-  // general
-  tabs["general"] = getGeneralMessage(selected, message.member, prefix);
+  // economy
+  tabs["general"] = getGeneralMessage(selected, message.member, prefix, total, inMarket, value, sellMulti.multi);
   metaTabs.push(new StringSelectMenuOptionBuilder()
     .setLabel("general")
     .setValue("general")
     .setDefault(true)
-  );
-
-  // economy
-  tabs["economy"] = getEconomyMessage(selected, message.member, total, inMarket, value, sellMulti.multi);
-  metaTabs.push(new StringSelectMenuOptionBuilder()
-    .setLabel("economy")
-    .setValue("economy")
-    .setDefault(false)
   );
 
   // sources
@@ -187,13 +179,23 @@ async function run(
     );
   }
 
+  // booster
+  if(selected.role === "booster") {
+    tabs["booster_stats"] = getBoosterMessage(selected, message.member);
+    metaTabs.push(new StringSelectMenuOptionBuilder()
+      .setLabel("booster stats")
+      .setValue("booster_stats")
+      .setDefault(false)
+    );
+  }
+
   // loot pools
   if(selected.loot_pools) {
     tabs["loot_pools"] = getLootPoolsMessage(selected, message.member);
     metaTabs.push(new StringSelectMenuOptionBuilder()
-      .setLabel("loot_pools")
-     .setValue("loot_pools")
-     .setDefault(false)
+      .setLabel("loot pools")
+      .setValue("loot_pools")
+      .setDefault(false)
     );
   }
 
@@ -355,69 +357,7 @@ async function run(
 function getGeneralMessage(
   selected: Item,
   member: ItemMessageMember,
-  prefix: string
-): ItemMessageData {
-  const embed = new CustomEmbed(member);
-  let description: string[] = [
-    `**id** [\`${selected.id}\`](https://nypsi.xyz/item/${selected.id}?ref=bot-item)`,
-    `**description**`,
-    `> ${selected.longDesc}` + (selected.booster_desc === undefined ? "" : `\n> ${selected.booster_desc}`)
-  ];
-  if (selected.aliases) {
-    description.push(`**aliases** \`${selected.aliases.join("`, `")}\``);
-  }
-  if (selected.buy) {
-    description.push(`**buy** $${selected.buy.toLocaleString()}`);
-  }
-  if (selected.sell) {
-    description.push(`**sell** $${selected.sell.toLocaleString()}`);
-  }
-  if (typeof selected.rarity === "number" && selected.rarity >= 0 && selected.rarity < rarities.length) {
-    description.push(`**rarity** ${rarities[selected.rarity]} (${selected.rarity})`);
-  }
-  if (selected.role) {
-    description.push(`**role** ${selected.role}`);
-    if (selected.role === "booster") {
-      embed.addField(
-        "booster info",
-        `**boosts** ${selected.boosterEffect.boosts}\n` +
-        `**effect** ${selected.boosterEffect.effect}\n` +
-        `**time** ${MStoTime(selected.boosterEffect.time * 1000)}\n` +
-        `**stacks** ${selected.max ?? 1}\n` +
-        `you can activate your booster with ${prefix}**activate <booster>**`
-      );
-    } else if (selected.role == "car") {
-      embed.addField(
-        "car info",
-        `**speed** ${selected.speed}\n` +
-        `cars are used for street races (${prefix}**streetrace**)`,
-      );
-    } else if (
-      selected.role === "collectable" ||
-      selected.role === "flower" ||
-      selected.role === "cat"
-    ) {
-      embed.addField(
-        "collectable info",
-        "collectables don't do anything, theyre just *collectables*. if you dont want them, you can get rid of them by selling them",
-      );
-    } else if (
-      selected.role == "sellable" ||
-      selected.role == "prey" ||
-      selected.role == "fish"
-    ) {
-      embed.addField(
-        "sellable",
-        `this item is just meant to be sold. you can use the ${prefix}**sell all** command to do so quickly`,
-      );
-    }
-  }
-  return { embed: embed.setDescription(description.join("\n")) };
-}
-
-function getEconomyMessage(
-  selected: Item,
-  member: ItemMessageMember,
+  prefix: string,
   total: number,
   inMarket: bigint | 0,
   value: number,
@@ -425,24 +365,24 @@ function getEconomyMessage(
 ): ItemMessageData {
   const embed = new CustomEmbed(member);
   const description: string[] = [
-    `[\`${selected.id}\`](https://nypsi.xyz/item/${selected.id}?ref=bot-item)`
+    `[\`${selected.id}\`](https://nypsi.xyz/item/${selected.id}?ref=bot-item)`,
+    `\n> ${selected.longDesc}\n`
   ];
+  if(selected.booster_desc !== undefined) {
+    description.push(`*${selected.booster_desc}*\n`);
+  }
   if(selected.unique) {
     description.push("*unique*");
   }
-  if (!selected.in_crates) {
-    description.push("*cannot be found in crates*");
+  if (selected.aliases) {
+    description.push(`**aliases** \`${selected.aliases.join("`, `")}\``);
   }
   if (selected.buy) {
    description.push(`**buy** $${selected.buy.toLocaleString()}`);
   }
   if (selected.sell) {
     description.push(`**sell** $${selected.sell.toLocaleString()}`);
-    if (
-      selected.role == "sellable" ||
-      selected.role == "prey" ||
-      selected.role == "fish"
-    ) {
+    if (["sellable", "prey", "fish"].includes(selected.role)) {
       description[description.length - 1] = description[description.length - 1].concat(
         ` (+**${sellMulti * 100}**% bonus = `,
         `$${Math.floor(selected.sell + selected.sell * sellMulti).toLocaleString()})`
@@ -462,16 +402,30 @@ function getEconomyMessage(
       description.push(`**in market** ${inMarket.toLocaleString()}`);
     }
     if (selected.role) {
+      const roleDescription: string[] = [`\`${selected.role}\``];
+      if(selected.role === "booster") {
+        roleDescription.push(`you can activate your booster with \`${prefix}use <booster> [amount]\``)
+      }
+      if(["collectable", "flower", "cat"].includes(selected.role)) {
+        roleDescription.push("collectables don't do anything, theyre just *collectables*. if you dont want them, you can get rid of them by selling them");
+      }
+      if(["sellable", "prey", "fish"].includes(selected.role)) {
+        roleDescription.push(`this item is just meant to be sold. you can use the \`${prefix}sell all\` command to do so quickly`);
+      }
+      if(selected.role === "car") {
+        roleDescription.push(`**speed** ${selected.speed}`);
+        roleDescription.push(`cars are used for street races (${prefix}**streetrace**)`);
+      }
       embed.addField(
         "role",
-        `\`${selected.role}\``,
+        roleDescription.join("\n"),
         true,
       );
     }
     if (typeof selected.rarity === "number" && selected.rarity >= 0 && selected.rarity < rarities.length) {
       embed.addField(
         "rarity",
-        `${rarities[selected.rarity]}`
+        `${rarities[selected.rarity]} (${selected.rarity})`
       );
     }
   }
@@ -482,7 +436,12 @@ function getEconomyMessage(
         .setStyle(ButtonStyle.Link)
         .setLabel("leaderboard")
         .setEmoji("🏆")
-        .setURL(`https://nypsi.xyz/leaderboard/${selected.id}?ref=bot-item`)
+        .setURL(`https://nypsi.xyz/leaderboard/${selected.id}?ref=bot-item`),
+      new ButtonBuilder()
+        .setStyle(ButtonStyle.Link)
+        .setLabel("history")
+        .setEmoji("📈")
+        .setURL(`https://nypsi.xyz/item/history/${selected.id}?ref=bot-item`)
     )
   };
 }
@@ -493,14 +452,20 @@ function getSourcesMessage(
 ): ItemMessageData {
   const embed = new CustomEmbed(member);
   const description: string[] = [];
-  let workersDescription: string[] = [];
-  let farmDescription: string[] = [];
-  let poolsDescription: string[] = [];
+  const workersDescription: string[] = [];
+  const farmDescription: string[] = [];
+  const poolsDescription: string[] = [];
   if(selected.buy) {
     description.push("💰 shop")
   }
   if(selected.craft) {
-    description.push("<:Craft:615426524862087191> crafting")
+    description.push("<:Craft:615426524862087191> crafting");
+  }
+  if(["vote_crate", "lottery_ticket"].includes(selected.id)) {
+    description.push("<:topgg:1355915569286610964> [voting](https://top.gg/bot/678711738845102087/vote)");
+  }
+  if(isGem(selected.id)) {
+    description.push(`${selected.emoji} [mysterious activities](https://nypsi.xyz/docs/economy/items/gems)`);
   }
   for(const worker of Object.values(workers).filter((w) => w.base.byproducts)) {
     if(Object.keys(worker.base.byproducts).includes(selected.id)) {
@@ -572,6 +537,21 @@ function getRecipesMessage(
   return { embed: embed };
 }
 
+function getBoosterMessage(
+  selected: Item,
+  member: ItemMessageMember,
+) {
+  return {
+    embed: new CustomEmbed(member).setDescription(
+      `**boosts** ${selected.boosterEffect.boosts}\n` +
+      `**effect** ${selected.boosterEffect.effect}\n` +
+      `**time** ${MStoTime(selected.boosterEffect.time * 1000)}\n` +
+      `**stacks** ${selected.max ?? 1}` +
+      (selected.booster_desc === undefined ? "" : `\n\n*${selected.booster_desc}*`)
+    )
+  }
+}
+
 function getLootPoolsMessage(
   selected: Item,
   member: ItemMessageMember
@@ -611,7 +591,6 @@ function getLootPoolsMessage(
     }
   }
   if(selected.role === "scratch-card") {
-    const count = selected.loot_pools[pools[0]]
     for(const embed of subEmbeds[pools[0]]) {
       embed.setDescription(
         `**${selected.clicks}** click${selected.clicks === 1 ? "" : "s"} with pool \`${pools[0]}\``
@@ -638,11 +617,7 @@ function getSeedStatsMessage(
   const plant = plants[selected.plantId];
   const product = items[plant.item];
   let sellString = `**sell** $${product.sell.toLocaleString()}`;
-  if (
-    product.role == "sellable" ||
-    product.role == "prey" ||
-    product.role == "fish"
-  ) {
+  if (["sellable", "prey", "fish"].includes(product.role)) {
     sellString = sellString.concat(
       ` (+**${sellMulti * 100}**% bonus = `,
       `$${Math.floor(product.sell + product.sell * sellMulti).toLocaleString()})`
@@ -692,7 +667,7 @@ function poolBreakdown(pool: LootPool): string[] {
   }
   for(const key in pool.items ?? {}) {
     const countObj = typeof pool.items[key] === "object" ? pool.items[key].count : {};
-    // @ts-expect-error
+    // @ts-expect-error ts doesnt realize min has to be present
     const countString = Object.hasOwn(countObj, "min") ? `${countObj.min}-${countObj.max}` : `${getItemCount(pool.items[key], key)}`;
     const weight = getItemWeight(pool.items[key]) * factor;
     description.set(`\`${countString}x\` ${items[key].emoji} ${items[key].name}: \`${weight.toFixed(4)}%\``, weight);
