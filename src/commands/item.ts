@@ -58,7 +58,7 @@ const plants = getPlantsData();
 
 type ItemMessageMember = GuildMember | (GuildMember & APIInteractionGuildMember);
 type ItemMessageData = {
-  embed: CustomEmbed,
+  embed: CustomEmbed | CustomEmbed[],
   subEmbeds?: { [subTab: string]: CustomEmbed | CustomEmbed[] },
   subTabs?: StringSelectMenuOptionBuilder[],
   widgets?: ActionRowBuilder<MessageActionRowComponentBuilder>
@@ -191,40 +191,33 @@ async function run(
 // =====^^^^^===== MESSAGE DATA =====^^^^^=====
 
   // format the message
-  const inventory: Inventory = await getInventory(message.member);
-  const inventoryHas: boolean = inventory.has(selected.id);
-  const title = `${selected.emoji} ${selected.name}`;
-  const thumbnail = getEmojiImage(selected.emoji);
-  for(const tab in tabs) {
-    tabs[tab].embed
-      .setTitle(title)
-      .setThumbnail(thumbnail)
-      .disableFooter();
-    if(inventoryHas) {
-      tabs[tab].embed.setFooter({
+  function formatEmbed(embeds: CustomEmbed | CustomEmbed[], inventoryHas: boolean) {
+    let targets = embeds;
+    targets = targets instanceof Array ? targets : [targets];
+    for(const target of targets) {
+      target
+        .setTitle(title)
+        .setThumbnail(thumbnail)
+        .disableFooter();
+      if(inventoryHas) {
+        target.setFooter({
           text: `you have ${inventory.count(selected.id).toLocaleString()} ${pluralize(
             selected,
             inventory.count(selected.id),
           )}`,
         });
-    }
-    for(const subTab in tabs[tab].subEmbeds ?? {}) {
-      let subs = tabs[tab].subEmbeds[subTab];
-      subs = subs instanceof Array ? subs : [subs];
-      for(const sub of subs) {
-        sub
-          .setTitle(title)
-          .setThumbnail(thumbnail)
-          .disableFooter();
-        if(inventoryHas) {
-          sub.setFooter({
-            text: `you have ${inventory.count(selected.id).toLocaleString()} ${pluralize(
-              selected,
-              inventory.count(selected.id),
-            )}`,
-          });
-        }
       }
+    }
+  }
+
+  const inventory: Inventory = await getInventory(message.member);
+  const inventoryHas: boolean = inventory.has(selected.id);
+  const title = `${selected.emoji} ${selected.name}`;
+  const thumbnail = getEmojiImage(selected.emoji);
+  for(const tab in tabs) {
+    formatEmbed(tabs[tab].embed, inventoryHas);
+    for(const subTab in tabs[tab].subEmbeds ?? {}) {
+      formatEmbed(tabs[tab].subEmbeds[subTab], inventoryHas);
     }
   }
 
@@ -263,9 +256,9 @@ async function run(
         rows.push(
           new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
             new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary)
-              .setDisabled(page === undefined || page === 0),
+              .setDisabled((page ?? 0) <= 0),
             new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
-              .setDisabled(page === target.length - 1)
+              .setDisabled((page ?? 0) >= target.length - 1)
           )
         );
         target = target[page ?? 0];
@@ -555,7 +548,9 @@ function getLootPoolsMessage(
       subEmbeds[poolName].push(
         new CustomEmbed(member)
           .setDescription(
-            `**${count}** draw${count === 1 ? "" : "s"} from pool \`${poolName}\`\n\n` +
+            `**${count}** draw${count === 1 ? "" : "s"} from pool \`${poolName}\``
+          ).addField(
+            "items",
             breakdown.slice(i, min(i + 20, breakdown.length)).join("\n")
           )
       );
@@ -563,9 +558,22 @@ function getLootPoolsMessage(
     if(subEmbeds[poolName].length === 0) {
       subEmbeds[poolName].push(
         new CustomEmbed(member)
-          .setDescription(`**${count}** draw${count === 1 ? "" : "s"} from pool \`${poolName}\`\n\nNothing`)
+          .setDescription(`**${count}** draw${count === 1 ? "" : "s"} from pool \`${poolName}\``)
+          .addField("items", "nothing")
       );
     }
+  }
+  if(selected.role === "scratch-card") {
+    const count = selected.loot_pools[pools[0]]
+    for(const embed of subEmbeds[pools[0]]) {
+      embed.setDescription(
+        `**${selected.clicks}** click${selected.clicks === 1 ? "" : "s"} with pool \`${pools[0]}\``
+      )
+    }
+    return { embed: subEmbeds[pools[0]] }
+  }
+  if(pools.length === 1) {
+    return { embed: subEmbeds[pools[0]] }
   }
   return {
     embed: new CustomEmbed(member).setDescription(description.join("\n")),
