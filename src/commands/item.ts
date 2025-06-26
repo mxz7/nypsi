@@ -168,6 +168,25 @@ async function run(
     .setDefault(false)
   );
 
+  // recipes
+  const ingredientIn: string[] = [];
+  for(const item of Object.values(items)) {
+    if (item.craft === undefined) {
+      continue;
+    }
+    if(item.craft.ingredients.map((i) => i.split(":")[0]).includes(selected.id)) {
+      ingredientIn.push(item.id)
+    }
+  }
+  if(selected.craft !== undefined || ingredientIn.length > 0) {
+    tabs["recipes"] = getRecipesMessage(selected, message.member, ingredientIn);
+    metaTabs.push(new StringSelectMenuOptionBuilder()
+      .setLabel("recipes")
+      .setValue("recipes")
+      .setDefault(false)
+    );
+  }
+
   // loot pools
   if(selected.loot_pools) {
     tabs["loot_pools"] = getLootPoolsMessage(selected, message.member);
@@ -521,6 +540,34 @@ function getSourcesMessage(
   }
   if(description.length > 0) {
     embed.setDescription(description.join("\n"))
+  }
+  return { embed: embed };
+}
+
+function getRecipesMessage(
+  selected: Item,
+  member: ItemMessageMember,
+  ingredientIn: string[]
+): ItemMessageData {
+  const embed = new CustomEmbed(member);
+  if(selected.craft !== undefined) {
+    embed.setDescription(`**${MStoTime(selected.craft.time * 1000)}** craft time`);
+    const ingredientsDescription: string[] = [];
+    for(const ingredient of selected.craft.ingredients) {
+      const split = ingredient.split(":");
+      ingredientsDescription.push(`\`${split[1]}x\` ${items[split[0]].emoji} ${items[split[0]].name}`);
+    }
+    embed.addField(
+      "recipe",
+      ingredientsDescription.join("\n")
+    )
+  }
+  const ingredientInItems = ingredientIn.map((i) => items[i]);
+  if(ingredientInItems.length > 0) {
+    embed.addField(
+      "ingredient in",
+      ingredientInItems.map((i) => `${i.emoji} ${i.name}`).join("\n")
+    )
   }
   return { embed: embed };
 }
