@@ -69,6 +69,7 @@ import { getLastKnownUsername } from "../functions/users/tag";
 import { createProfile, hasProfile } from "../functions/users/utils";
 import dayjs = require("dayjs");
 import ms = require("ms");
+import { runItemInfo } from "../functions/economy/item_info";
 
 const commands = new Map<string, Command>();
 const aliases = new Map<string, string>();
@@ -361,80 +362,7 @@ async function helpCmd(message: NypsiMessage, args: string[]) {
         }\n\nto disable custom commands in your server you can do:\n${prefix}disablecmd + customcommand`,
       );
     } else if (selectedItem) {
-      embed.setTitle(`${selectedItem.emoji} ${selectedItem.name}`);
-
-      const desc: string[] = [
-        `**id** \`${selectedItem.id}\``,
-        `**description** ${selectedItem.longDesc}`,
-      ];
-
-      if (selectedItem.aliases) {
-        desc.push(`**aliases** \`${selectedItem.aliases.join("`, `")}\``);
-      }
-
-      if (selectedItem.buy) {
-        desc.push(`**buy** $${selectedItem.buy.toLocaleString()}`);
-      }
-
-      if (selectedItem.sell) {
-        desc.push(`**sell** $${selectedItem.sell.toLocaleString()}`);
-      }
-
-      if (selectedItem.rarity) {
-        const rarityMap = new Map<number, string>();
-
-        rarityMap.set(0, "common");
-        rarityMap.set(1, "uncommon");
-        rarityMap.set(2, "rare");
-        rarityMap.set(3, "very rare");
-        rarityMap.set(4, "exotic");
-        rarityMap.set(5, "impossible");
-        rarityMap.set(6, "more impossible");
-        rarityMap.set(7, "even more impossible");
-
-        let rarity = rarityMap.get(selectedItem.rarity);
-
-        if (!rarity) {
-          rarity = "not obtainable through crates";
-        }
-
-        desc.push(`**rarity** ${rarity}`);
-      }
-
-      if (selectedItem.role) {
-        desc.push(`**role** ${selectedItem.role}`);
-        if (selectedItem.role == "booster") {
-          embed.addField(
-            "booster info",
-            `**boosts** ${selectedItem.boosterEffect.boosts}\n**effect** ${
-              selectedItem.boosterEffect.effect
-            }\n**time** ${MStoTime(
-              selectedItem.boosterEffect.time * 1000,
-            )}\nyou can activate your booster with ${prefix}**activate <booster>**`,
-          );
-        } else if (selectedItem.role == "car") {
-          embed.addField(
-            "car info",
-            `**speed** ${selectedItem.speed}\ncars are used for street races (${prefix}**streetrace**)`,
-          );
-        } else if (selectedItem.role == "collectable") {
-          embed.addField(
-            "collectable info",
-            "collectables don't do anything, theyre just *collectables*. if you dont want them, you can get rid of them by selling them",
-          );
-        } else if (
-          selectedItem.role == "sellable" ||
-          selectedItem.role == "prey" ||
-          selectedItem.role == "fish"
-        ) {
-          embed.addField(
-            "sellable",
-            `this item is just meant to be sold. you can use the ${prefix}**sellall** command to do so quickly`,
-          );
-        }
-      }
-
-      embed.setDescription(desc.join("\n"));
+      return await runItemInfo(message, args, selectedItem, "general");
     } else {
       return message.channel.send({ embeds: [new ErrorEmbed("unknown command or item")] });
     }
