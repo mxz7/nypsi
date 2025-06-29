@@ -40,6 +40,7 @@ import { LootPool } from "../types/LootPool";
 import { inPlaceSort } from "fast-sort";
 import { min } from "mathjs";
 import { Item } from "../types/Economy";
+import { KarmaShopItem } from "../types/Karmashop";
 
 const rarities = [
   "common",
@@ -53,6 +54,7 @@ const rarities = [
 ];
 const lootPools = getLootPools();
 const items = getItems();
+const karmashop = require("../../data/karmashop.json") as { [key: string]: KarmaShopItem };
 const workers = getBaseWorkers();
 const plants = getPlantsData();
 
@@ -190,7 +192,7 @@ async function run(
   }
 
   // loot pools
-  if(selected.loot_pools) {
+  if(selected.loot_pools || selected.id === "rain") {
     tabs["loot_pools"] = getLootPoolsMessage(selected, message.member);
     metaTabs.push(new StringSelectMenuOptionBuilder()
       .setLabel("loot pools")
@@ -359,7 +361,7 @@ function getGeneralMessage(
   member: ItemMessageMember,
   prefix: string,
   total: number,
-  inMarket: bigint | 0,
+  inMarket: number,
   value: number,
   sellMulti: number
 ): ItemMessageData {
@@ -458,14 +460,56 @@ function getSourcesMessage(
   if(selected.buy) {
     description.push("💰 shop")
   }
+  if(Object.values(karmashop).filter((i) => i.type === "item").map((i) => i.value).includes(selected.id)) {
+    description.push("🔮 karma shop");
+  }
   if(selected.craft) {
     description.push("<:Craft:615426524862087191> crafting");
   }
   if(["vote_crate", "lottery_ticket"].includes(selected.id)) {
     description.push("<:topgg:1355915569286610964> [voting](https://top.gg/bot/678711738845102087/vote)");
   }
-  if(isGem(selected.id)) {
+  if(["daily_scratch_card", "basic_crate", "nypsi_crate", "gem_crate"].includes(selected.id)) {
+    description.push("📅 streak")
+  }
+  if(["cookie", "cake"].includes(selected.id)) {
+    description.push("🧁 baking");
+  }
+  if(selected.id === "broken_ring") {
+    description.push(`${selected.emoji} divorce`);
+  }
+  const mineItems = ["cobblestone", "coal", "diamond", "amethyst", "emerald", "iron_ore", "gold_ore", "obsidian", "mineshaft_chest"];
+  if(mineItems.includes(selected.id) || selected.id === "stick") {
+    description.push("<:iron_pickaxe:1354809169198186607> mining ([odds](https://github.com/mxz7/nypsi-odds/))");
+  }
+  if(["netherrack", "ancient_debris", "quartz", "gold_nugget", "stick"].includes(selected.id)) {
+    description.push("<:iron_pickaxe:1354809169198186607> mining in the nether ([odds](https://github.com/mxz7/nypsi-odds/))");
+  }
+  if(["end_stone", "purpur", "obsidian", "dragon_egg", "chorus", "stick"].includes(selected.id)) {
+    description.push("<:iron_pickaxe:1354809169198186607> mining in the end ([odds](https://github.com/mxz7/nypsi-odds/))");
+  }
+  if(selected.role === "prey") {
+    if(["blaze", "wither_skeleton", "piglin", "ghast"].includes(selected.id)) {
+      description.push("🔫 hunting in the nether ([odds](https://github.com/mxz7/nypsi-odds/))");
+    } else {
+      description.push("🔫 hunting ([odds](https://github.com/mxz7/nypsi-odds/))");
+    }
+  }
+  if(!["booster", "car", "tool", "prey", "sellable", "ore"].includes(selected.role) &&
+    selected.rarity <= 4 &&
+    !mineItems.includes(selected.id) &&
+    !selected.id.includes("credit") &&
+    selected.id !== "crystal_heart"
+  ) {
+    description.push("🎣 fishing ([odds](https://github.com/mxz7/nypsi-odds/))");
+  }
+  if(isGem(selected.id) || selected.id === "gem_shard") {
     description.push(`${selected.emoji} [mysterious activities](https://nypsi.xyz/docs/economy/items/gems)`);
+  }
+  const randomDropPool = lootPools["random_drop"];
+  if(Object.keys(randomDropPool.items ?? {}).includes(selected.id)) {
+    const weight = getItemWeight(randomDropPool.items[selected.id]) * 100 / getTotalWeight(randomDropPool, []);
+    description.push(`💧 loot drop: \`${weight.toFixed(4)}%\``);
   }
   for(const worker of Object.values(workers).filter((w) => w.base.byproducts)) {
     if(Object.keys(worker.base.byproducts).includes(selected.id)) {
@@ -478,11 +522,17 @@ function getSourcesMessage(
     }
   }
   for(const item of Object.values(items).filter((i) => i.loot_pools)) {
+    let totalEntries = 0;
+    let itemWeight = 0;
     for(const pool of Object.keys(item.loot_pools)) {
       if(Object.keys(lootPools[pool].items ?? {}).includes(selected.id)) {
-        poolsDescription.push(`${item.emoji} ${item.name}`);
-        break;
+        itemWeight += getItemWeight(lootPools[pool].items[selected.id]) / getTotalWeight(lootPools[pool], []);
+        totalEntries++;
       }
+    }
+    if(itemWeight > 0 && totalEntries > 0) {
+      const weight = itemWeight * 100 / totalEntries;
+      poolsDescription.push(`${item.emoji} ${item.name}: \`${weight.toFixed(4)}%\``);
     }
   }
   if(workersDescription.length > 0) {
@@ -557,12 +607,12 @@ function getLootPoolsMessage(
   member: ItemMessageMember
 ): ItemMessageData {
   const description: string[] = [];
-  const pools: string[] = [];
   const poolOptions: StringSelectMenuOptionBuilder[] = [];
   const subEmbeds: { [subTab: string]: CustomEmbed[] } = {};
-  for(const poolName in selected.loot_pools) {
-    const count = selected.loot_pools[poolName];
-    pools.push(poolName);
+  const poolsMap: { [pool: string]: number | string } = selected.id === "rain" ? { random_drop: "?" } : selected.loot_pools;
+  const pools: string[] = Object.keys(poolsMap);
+  for(const poolName in poolsMap) {
+    const count = poolsMap[poolName];
     poolOptions.push(new StringSelectMenuOptionBuilder()
       .setLabel(poolName)
       .setValue(poolName)
@@ -571,14 +621,14 @@ function getLootPoolsMessage(
     description.push(`**${count}** draw${count === 1 ? "" : "s"} from pool \`${poolName}\``);
     const breakdown = poolBreakdown(lootPools[poolName]);
     subEmbeds[poolName] = [];
-    for(let i = 0; i < breakdown.length; i += 20) {
+    for(let i = 0; i < breakdown.length; i += 15) {
       subEmbeds[poolName].push(
         new CustomEmbed(member)
           .setDescription(
             `**${count}** draw${count === 1 ? "" : "s"} from pool \`${poolName}\``
           ).addField(
             "items",
-            breakdown.slice(i, min(i + 20, breakdown.length)).join("\n")
+            breakdown.slice(i, min(i + 15, breakdown.length)).join("\n")
           )
       );
     }
