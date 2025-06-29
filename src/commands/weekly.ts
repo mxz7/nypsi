@@ -28,7 +28,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
   const notValidForYou = () => {
     const embed = new CustomEmbed(
       message.member,
-      "you need [**premium**](https://ko-fi.com/tekoh/tiers) to get weekly rewards",
+      "you need [**premium**](https://ko-fi.com/nypsi/tiers) to get weekly rewards",
     ).setFooter({
       text: `${prefix}premium`,
     });

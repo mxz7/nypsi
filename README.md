@@ -38,7 +38,7 @@ join the support server: [`https://discord.gg/hJTDNST`](https://discord.gg/hJTDN
 
 ## premium
 
-gimme ur moneis ):< - haha joking but seriously check out the online shop!! it allows you to get cool benefits as well as support nypsi's development: [https://ko-fi.com/tekoh](https://ko-fi.com/tekoh)
+gimme ur moneis ):< - haha joking but seriously check out the online shop!! it allows you to get cool benefits as well as support nypsi's development: [https://ko-fi.com/nypsi](https://ko-fi.com/nypsi)
 
 ## features
 

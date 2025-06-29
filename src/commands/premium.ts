@@ -494,7 +494,7 @@ async function run(
       }
 
       if (profile.level < 4) {
-        description += "\n\nyou can upgrade your tier at [ko-fi](https://ko-fi.com/tekoh/tiers)";
+        description += "\n\nyou can upgrade your tier at [ko-fi](https://ko-fi.com/nypsi/tiers)";
       }
 
       embed.setDescription(description);
@@ -509,7 +509,7 @@ async function run(
 
       embed.addField(
         "payment methods",
-        "[ko-fi](https://ko-fi.com/tekoh/tiers)\n\n" +
+        "[ko-fi](https://ko-fi.com/nypsi/tiers)\n\n" +
           `if you'd like to pay another way (crypto, paypal, etc) join the [support server](${Constants.NYPSI_SERVER_INVITE_LINK})\nif you are just looking to buy crates, you can do so from the [nypsi shop](https://ko-fi.com/U7U4AEDXM/shop)`,
       );
 
@@ -522,7 +522,7 @@ async function run(
 
       embed.addField(
         "payment methods",
-        "[ko-fi](https://ko-fi.com/tekoh/tiers)\n\n" +
+        "[ko-fi](https://ko-fi.com/nypsi/tiers)\n\n" +
           `if you'd like to pay another way (crypto, paypal, etc) join the [support server](${Constants.NYPSI_SERVER_INVITE_LINK})\nif you are just looking to buy crates, you can do so from the [nypsi shop](https://ko-fi.com/U7U4AEDXM/shop)`,
       );
 

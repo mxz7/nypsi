@@ -37,7 +37,7 @@ quickResponses.set(
 
 quickResponses.set(
   "auto.buyunban",
-  "if you are **banned/muted from the nypsi discord server** then you can be unbanned/unmuted by making a custom donation of £20 to https://ko-fi.com/tekoh\n\n" +
+  "if you are **banned/muted from the nypsi discord server** then you can be unbanned/unmuted by making a custom donation of £20 to https://ko-fi.com/nypsi\n\n" +
     "if you are **banned from nypsi economy** you can buy an unban from https://ko-fi.com/s/1d78b621a5",
 );
 

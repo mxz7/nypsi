@@ -59,7 +59,7 @@ async function run(
 
       if (max == 1) {
         error +=
-          "\n\nget a premium membership to upgrade this limit (https://ko-fi.com/tekoh/tiers)";
+          "\n\nget a premium membership to upgrade this limit (https://ko-fi.com/nypsi/tiers)";
       } else if (max != 5) {
         error +=
           "\n\nyou can upgrade your subscription to get access to more countdowns per server";

@@ -1121,7 +1121,7 @@ async function run(
         } else {
           if (settings.randomChannels.length >= max) {
             const embed = new ErrorEmbed(
-              `you have reached the maximum amount of random channels (${max})\nyou can subscribe on [ko-fi](https://ko-fi.com/tekoh/tiers) to have more`,
+              `you have reached the maximum amount of random channels (${max})\nyou can subscribe on [ko-fi](https://ko-fi.com/nypsi/tiers) to have more`,
             );
 
             if (max > 1) {
