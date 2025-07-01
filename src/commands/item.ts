@@ -7,11 +7,11 @@ import {
   MessageFlags,
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
-import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { ErrorEmbed } from "../models/EmbedBuilders";
 import { selectItem } from "../utils/functions/economy/inventory";
+import { runItemInfo } from "../utils/functions/economy/item_info";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { runItemInfo } from "../utils/functions/economy/item_info";
 
 const cmd = new Command("item", "view information about an item", "money").setAliases(["i"]);
 
@@ -79,9 +79,9 @@ async function run(
 
   await addCooldown(cmd.name, message.member, 4);
 
-  if(!await runItemInfo(message, args, selected, "general", send)) {
+  if (!(await runItemInfo(message, args, selected, "general", send))) {
     // this should never happen
-    return send({ embeds: [new ErrorEmbed("unexpected error occured")] });
+    return send({ embeds: [new ErrorEmbed("unexpected error occurred")] });
   }
 }
 

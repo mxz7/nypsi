@@ -1,11 +1,10 @@
 import { CommandInteraction } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
-import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { MStoTime } from "../utils/functions/date";
+import { ErrorEmbed } from "../models/EmbedBuilders";
 import { selectItem } from "../utils/functions/economy/inventory";
+import { runItemInfo } from "../utils/functions/economy/item_info";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { runItemInfo } from "../utils/functions/economy/item_info";
 
 const cmd = new Command("recipe", "view the recipe for a craftable item", "money").setAliases([
   "howcraftthing",
@@ -34,10 +33,12 @@ async function run(
     return message.channel.send({ embeds: [new ErrorEmbed(`couldnt find \`${args.join(" ")}\``)] });
   }
 
-  if(await runItemInfo(message, args, selected, "recipes")) {
+  if (await runItemInfo(message, args, selected, "recipes")) {
     await addCooldown(cmd.name, message.member, 4);
   } else {
-    return message.channel.send({ embeds: [new ErrorEmbed(`that item is not craftable nor is it used to craft anything`)] });
+    return message.channel.send({
+      embeds: [new ErrorEmbed(`that item is not craftable nor is it used to craft anything`)],
+    });
   }
 }
 
