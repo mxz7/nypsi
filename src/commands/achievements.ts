@@ -4,6 +4,7 @@ import {
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
+  Interaction,
   InteractionEditReplyOptions,
   InteractionReplyOptions,
   Message,
@@ -268,16 +269,37 @@ async function run(
 
     const allAchievementData = getAchievements();
 
-    const searchTag = args.join(" ");
+    let searchTag = args.join(" ");
+
+    const numerals = ["i", "ii", "iii", "iv", "v"];
+
+    for (let i = 0; i < numerals.length; i++) {
+      if (searchTag[searchTag.length - 1] == `${i + 1}`)
+        searchTag = `${searchTag.substring(0, searchTag.length - 1)}${numerals[i]}`;
+    }
+
+    let numberProvided = false;
 
     for (const achievementId of Object.keys(allAchievementData)) {
       const achievement = allAchievementData[achievementId];
 
       if (searchTag.toLowerCase() == achievement.id) {
         selected = achievement;
+        numberProvided = true;
         break;
-      } else if (achievement.name.replaceAll("*", "").toLowerCase().includes(searchTag)) {
+      } else if (
+        searchTag.toLocaleLowerCase() ==
+        achievement.id.substring(0, achievement.id.lastIndexOf("_"))
+      ) {
         selected = achievement;
+        break;
+      } else if (
+        achievement.name.replaceAll("*", "").toLowerCase().includes(searchTag.toLowerCase())
+      ) {
+        selected = achievement;
+        numberProvided = /^(i{1,3}|iv|v)$/.test(
+          searchTag.split(" ")[searchTag.split(" ").length - 1].toLowerCase(),
+        );
         break;
       }
     }
@@ -286,73 +308,151 @@ async function run(
       return send({ embeds: [new ErrorEmbed("couldnt find that achievement")] });
     }
 
-    const achievement = await getUserAchievement(message.member, selected.id);
+    if (!numberProvided)
+      selected =
+        allAchievementData[
+          (await getUncompletedAchievements(message.member)).find((i) =>
+            i.achievementId.includes(selected.id.split("_")[0]),
+          )?.achievementId
+        ] || selected;
 
-    const embed = new CustomEmbed(message.member).setTitle(`${selected.emoji} ${selected.name}`);
+    const getAchievementEmbed = async (selected: AchievementData) => {
+      const achievement = await getUserAchievement(message.member, selected.id);
 
-    let desc = `\`${selected.id}\`\n\n*${selected.description}*\n\n`;
+      const embed = new CustomEmbed(message.member).setTitle(`${selected.emoji} ${selected.name}`);
 
-    if (achievement) {
-      if (achievement.completed) {
-        desc += `completed <t:${Math.floor(achievement.completedAt.getTime() / 1000)}:R>\n`;
-      } else {
-        desc += `${achievement.progress.toLocaleString()} / ${selected.target.toLocaleString()} (${(
-          (Number(achievement.progress) / selected.target) *
-          100
-        ).toFixed(1)}%)\n`;
+      let desc = `\`${selected.id}\`\n\n*${selected.description}*\n\n`;
+
+      if (achievement) {
+        if (achievement.completed) {
+          desc += `completed <t:${Math.floor(achievement.completedAt.getTime() / 1000)}:R>\n`;
+        } else {
+          desc += `${achievement.progress.toLocaleString()} / ${selected.target.toLocaleString()} (${(
+            (Number(achievement.progress) / selected.target) *
+            100
+          ).toFixed(1)}%)\n`;
+        }
       }
-    }
 
-    const completed = await prisma.achievements.count({
-      where: {
-        AND: [{ achievementId: selected.id }, { completed: true }],
-      },
-    });
+      const completed = await prisma.achievements.count({
+        where: {
+          AND: [{ achievementId: selected.id }, { completed: true }],
+        },
+      });
 
-    if (completed > 0) {
-      desc += `**${completed.toLocaleString()}** ${pluralize("person has", completed, "people have")} completed this achievement`;
-    }
+      if (completed > 0) {
+        desc += `**${completed.toLocaleString()}** ${pluralize("person has", completed, "people have")} completed this achievement`;
+      }
 
-    embed.setDescription(desc);
-    const prizes: string[] = [];
+      embed.setDescription(desc);
+      const prizes: string[] = [];
 
-    if (selected.id.endsWith("_v")) {
-      prizes.push("5,000xp");
-      prizes.push("69420_crate:5");
-    } else if (selected.id.endsWith("_iv")) {
-      prizes.push("1,500xp");
-      prizes.push("69420_crate:4");
-    } else if (selected.id.endsWith("_iii")) {
-      prizes.push("750xp");
-      prizes.push("69420_crate:3");
-    } else if (selected.id.endsWith("_ii")) {
-      prizes.push("250xp");
-    } else {
-      prizes.push("100xp");
-    }
+      if (selected.id.endsWith("_v")) {
+        prizes.push("5,000xp");
+        prizes.push("69420_crate:5");
+      } else if (selected.id.endsWith("_iv")) {
+        prizes.push("1,500xp");
+        prizes.push("69420_crate:4");
+      } else if (selected.id.endsWith("_iii")) {
+        prizes.push("750xp");
+        prizes.push("69420_crate:3");
+      } else if (selected.id.endsWith("_ii")) {
+        prizes.push("250xp");
+      } else {
+        prizes.push("100xp");
+      }
 
-    if (selected.prize) prizes.push(...selected.prize);
+      if (selected.prize) prizes.push(...selected.prize);
 
-    embed.addField(
-      "reward",
-      prizes
-        .map((prize) => {
-          if (prize.startsWith("tag:")) {
-            return `${getTagsData()[prize.split("tag:")[1]].emoji} ${
-              getTagsData()[prize.split("tag:")[1]].name
-            } tag`;
-          } else if (getItems()[prize.split(":")[0]]) {
-            const amount = parseInt(prize.split(":")[1]);
+      embed.addField(
+        "reward",
+        prizes
+          .map((prize) => {
+            if (prize.startsWith("tag:")) {
+              return `${getTagsData()[prize.split("tag:")[1]].emoji} ${
+                getTagsData()[prize.split("tag:")[1]].name
+              } tag`;
+            } else if (getItems()[prize.split(":")[0]]) {
+              const amount = parseInt(prize.split(":")[1]);
 
-            return `\`${amount}x\` ${getItems()[prize.split(":")[0]].emoji} ${
-              getItems()[prize.split(":")[0]].name
-            }`;
-          } else return prize;
-        })
-        .join("\n"),
+              return `\`${amount}x\` ${getItems()[prize.split(":")[0]].emoji} ${
+                getItems()[prize.split(":")[0]].name
+              }`;
+            } else return prize;
+          })
+          .join("\n"),
+      );
+
+      return embed;
+    };
+
+    const getRow = (id: string) => {
+      return new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder()
+          .setCustomId("⬅")
+          .setLabel("back")
+          .setStyle(ButtonStyle.Primary)
+          .setDisabled(tiers.indexOf(id) == 0),
+        new ButtonBuilder()
+          .setCustomId("➡")
+          .setLabel("next")
+          .setStyle(ButtonStyle.Primary)
+          .setDisabled(tiers.indexOf(id) == tiers.length - 1),
+      );
+    };
+
+    const tiers = Object.keys(allAchievementData).filter(
+      (i) =>
+        i.substring(0, i.lastIndexOf("_")) ==
+        selected.id.substring(0, selected.id.lastIndexOf("_")),
     );
 
-    return send({ embeds: [embed] });
+    const embed = await getAchievementEmbed(selected);
+
+    if (tiers.length == 1) return send({ embeds: [embed] });
+
+    let msg = await send({ embeds: [embed], components: [getRow(selected.id)] });
+
+    const filter = (i: Interaction) => i.user.id == message.author.id;
+
+    const pageManager: any = async () => {
+      let fail = false;
+
+      const response = await msg
+        .awaitMessageComponent({ filter, time: 60000 })
+        .then(async (collected) => {
+          await collected.deferUpdate().catch(() => {
+            fail = true;
+            return pageManager();
+          });
+          return { res: collected.customId };
+        })
+        .catch(async () => {
+          fail = true;
+          await msg.edit({ embeds: [embed], components: [] });
+        });
+
+      if (fail) return;
+      if (!response) return;
+
+      const { res } = response;
+
+      if (res == "➡") {
+        selected = allAchievementData[tiers[tiers.indexOf(selected.id) + 1]];
+        const embed = await getAchievementEmbed(selected);
+
+        msg = await msg.edit({ embeds: [embed], components: [getRow(selected.id)] });
+        return pageManager();
+      } else if (res == "⬅") {
+        selected = allAchievementData[tiers[tiers.indexOf(selected.id) - 1]];
+        const embed = await getAchievementEmbed(selected);
+
+        msg = await msg.edit({ embeds: [embed], components: [getRow(selected.id)] });
+        return pageManager();
+      }
+    };
+
+    return pageManager();
   };
 
   if (args.length == 0) {
