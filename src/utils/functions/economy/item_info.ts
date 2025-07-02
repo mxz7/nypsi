@@ -91,11 +91,11 @@ export async function runItemInfo(
   );
   metaTabs.push(new StringSelectMenuOptionBuilder().setLabel("general").setValue("general"));
 
-  // sources
-  tabs["sources"] = getSourcesMessage(selected, message.member);
-  metaTabs.push(new StringSelectMenuOptionBuilder().setLabel("sources").setValue("sources"));
+  // obtaining
+  tabs["obtaining"] = getObtainingMessage(selected, message.member);
+  metaTabs.push(new StringSelectMenuOptionBuilder().setLabel("obtaining").setValue("obtaining"));
 
-  // recipes
+  // crafting
   const ingredientIn: string[] = [];
   for (const item of Object.values(getItems())) {
     if (item.craft === undefined) {
@@ -109,8 +109,8 @@ export async function runItemInfo(
     (selected.craft !== undefined && selected.craft.ingredients.length > 0) ||
     ingredientIn.length > 0
   ) {
-    tabs["recipes"] = getRecipesMessage(selected, message.member, ingredientIn);
-    metaTabs.push(new StringSelectMenuOptionBuilder().setLabel("recipes").setValue("recipes"));
+    tabs["crafting"] = getCraftingMessage(selected, message.member, ingredientIn);
+    metaTabs.push(new StringSelectMenuOptionBuilder().setLabel("crafting").setValue("crafting"));
   }
 
   // booster
@@ -382,12 +382,12 @@ function getGeneralMessage(
   };
 }
 
-function getSourcesMessage(selected: Item, member: ItemMessageMember): ItemMessageData {
+function getObtainingMessage(selected: Item, member: ItemMessageMember): ItemMessageData {
   const embed = new CustomEmbed(member);
   const description: string[] = [];
   const workersDescription: string[] = [];
   const farmDescription: string[] = [];
-  const poolsDescription: string[] = [];
+  const poolsDescription: Map<string, number> = new Map<string, number>();
   const items = getItems();
   const lootPools = getLootPools();
   const workers = getBaseWorkers();
@@ -501,7 +501,7 @@ function getSourcesMessage(selected: Item, member: ItemMessageMember): ItemMessa
     }
     if (itemWeight > 0 && totalEntries > 0) {
       const weight = (itemWeight * 100) / totalEntries;
-      poolsDescription.push(`${item.emoji} ${item.name}: \`${weight.toFixed(4)}%\``);
+      poolsDescription.set(`${item.emoji} ${item.name}: \`${weight.toFixed(4)}%\``, weight);
     }
   }
   if (workersDescription.length > 0) {
@@ -510,18 +510,23 @@ function getSourcesMessage(selected: Item, member: ItemMessageMember): ItemMessa
   if (farmDescription.length > 0) {
     embed.addField("farm", farmDescription.join("\n"));
   }
-  if (poolsDescription.length > 0) {
-    embed.addField("crates and scratches", poolsDescription.join("\n"));
+  if (poolsDescription.entries().toArray().length > 0) {
+    embed.addField(
+      "crates and scratches",
+      inPlaceSort(poolsDescription.keys().toArray())
+        .desc((e) => poolsDescription.get(e))
+        .join("\n"),
+    );
   }
   if (description.length > 0) {
     embed.setDescription(description.join("\n"));
-  } else {
+  } else if ((embed.data?.fields?.length ?? 0) === 0) {
     embed.setDescription("no sources found");
   }
   return { embed: embed };
 }
 
-function getRecipesMessage(
+function getCraftingMessage(
   selected: Item,
   member: ItemMessageMember,
   ingredientIn: string[],

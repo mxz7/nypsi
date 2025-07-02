@@ -33,7 +33,7 @@ async function run(
     return message.channel.send({ embeds: [new ErrorEmbed(`couldnt find \`${args.join(" ")}\``)] });
   }
 
-  if (await runItemInfo(message, args, selected, "recipes")) {
+  if (await runItemInfo(message, args, selected, "crafting")) {
     await addCooldown(cmd.name, message.member, 4);
   } else {
     return message.channel.send({
