@@ -22,6 +22,7 @@ import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { Item } from "../../../types/Economy";
 import { KarmaShopItem } from "../../../types/Karmashop";
 import { LootPool } from "../../../types/LootPool";
+import Constants from "../../Constants";
 import { MStoTime } from "../date";
 import { getPrefix } from "../guilds/utils";
 import { getEmojiImage } from "../image";
@@ -382,6 +383,15 @@ function getGeneralMessage(
   };
 }
 
+function isOnStore(itemId: string) {
+  for (const [id, product] of Constants.KOFI_PRODUCTS) {
+    if (product.name == itemId) {
+      return { storeId: id };
+    }
+  }
+  return false;
+}
+
 function getObtainingMessage(selected: Item, member: ItemMessageMember): ItemMessageData {
   const embed = new CustomEmbed(member);
   const description: string[] = [];
@@ -392,8 +402,12 @@ function getObtainingMessage(selected: Item, member: ItemMessageMember): ItemMes
   const lootPools = getLootPools();
   const workers = getBaseWorkers();
   const plants = getPlantsData();
+  const onStore = isOnStore(selected.id);
   if (selected.buy) {
     description.push("💰 shop");
+  }
+  if (onStore) {
+    description.push(`💰 [nypsi store](https://ko-fi.com/s/${onStore.storeId})`);
   }
   if (
     Object.values(karmashop)
