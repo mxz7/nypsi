@@ -1,3 +1,10 @@
+# july 2025
+
+## changes you'll probably care about
+- added better searching and pages to $ach view (@growling_grizzly)
+
+---
+
 # june 2025
 
 ## changes you'll probably care about

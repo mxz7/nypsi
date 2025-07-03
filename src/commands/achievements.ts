@@ -269,13 +269,14 @@ async function run(
 
     const allAchievementData = getAchievements();
 
-    let searchTag = args.join(" ");
+    let searchTag = args.join(" ").toLowerCase();
 
     const numerals = ["i", "ii", "iii", "iv", "v"];
 
-    for (let i = 0; i < numerals.length; i++) {
-      if (searchTag[searchTag.length - 1] == `${i + 1}`)
-        searchTag = `${searchTag.substring(0, searchTag.length - 1)}${numerals[i]}`;
+    const digit = parseInt(searchTag.slice(-1));
+
+    if (digit >= 1 && digit <= 5) {
+      searchTag = searchTag.slice(0, -1) + numerals[digit - 1];
     }
 
     let numberProvided = false;
@@ -283,22 +284,17 @@ async function run(
     for (const achievementId of Object.keys(allAchievementData)) {
       const achievement = allAchievementData[achievementId];
 
-      if (searchTag.toLowerCase() == achievement.id) {
+      if (searchTag == achievement.id) {
         selected = achievement;
         numberProvided = true;
         break;
-      } else if (
-        searchTag.toLocaleLowerCase() ==
-        achievement.id.substring(0, achievement.id.lastIndexOf("_"))
-      ) {
+      } else if (searchTag == achievement.id.substring(0, achievement.id.lastIndexOf("_"))) {
         selected = achievement;
         break;
-      } else if (
-        achievement.name.replaceAll("*", "").toLowerCase().includes(searchTag.toLowerCase())
-      ) {
+      } else if (achievement.name.replaceAll("*", "").toLowerCase().includes(searchTag)) {
         selected = achievement;
         numberProvided = /^(i{1,3}|iv|v)$/.test(
-          searchTag.split(" ")[searchTag.split(" ").length - 1].toLowerCase(),
+          searchTag.split(" ")[searchTag.split(" ").length - 1],
         );
         break;
       }
