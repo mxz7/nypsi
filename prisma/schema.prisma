@@ -502,7 +502,7 @@ model Market {
   id         Int       @id @default(autoincrement())
   ownerId    String
   itemId     String
-  itemAmount Int    @default(1)
+  itemAmount Int       @default(1)
   price      BigInt
   orderType  OrderType
   messageId  String?   @unique
@@ -580,6 +580,7 @@ model Guild {
 
   peak             Int      @default(0)
   disabledCommands String[]
+  disabledChannels String[]
   snipeFilter      String[]
   prefixes         String[] @default(["$"])
   createdAt        DateTime @default(now())
@@ -1011,12 +1012,12 @@ enum RatingType {
 }
 
 model tmdbRatings {
-  userId    String
+  userId String
 
-  type      RatingType
-  id        Int
-  name      String
-  rating    Decimal @db.Decimal(2, 1)
-  
+  type   RatingType
+  id     Int
+  name   String
+  rating Decimal    @db.Decimal(2, 1)
+
   @@id([userId, type, id])
 }

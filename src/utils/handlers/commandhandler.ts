@@ -46,6 +46,7 @@ import {
   userExists,
 } from "../functions/economy/utils";
 import { addXp } from "../functions/economy/xp";
+import { getDisabledChannels } from "../functions/guilds/channels";
 import { getDisabledCommands } from "../functions/guilds/disabledcommands";
 import { getChatFilter } from "../functions/guilds/filters";
 import { getPrefix } from "../functions/guilds/utils";
@@ -60,6 +61,7 @@ import { isUserBlacklisted } from "../functions/users/blacklist";
 import { getLastCommand, updateUser } from "../functions/users/commands";
 import {
   addInlineNotification,
+  addNotificationToQueue,
   getInlineNotifications,
   getPreferences,
 } from "../functions/users/notifications";
@@ -956,6 +958,24 @@ export async function runCommand(
         embeds: [new ErrorEmbed(`that command has been disabled in ${message.guild.name}`)],
       });
     }
+  }
+
+  if (
+    (await getDisabledChannels(message.guild)).includes(message.channel.id) &&
+    !message.member.permissions.has(PermissionFlagsBits.ManageMessages)
+  ) {
+    if (!(await redis.exists(`cache:channeldisabledcooldown:${message.author.id}`))) {
+      addNotificationToQueue({
+        memberId: message.author.id,
+        payload: {
+          embed: new CustomEmbed(
+            `commands are disabled in ${message.channel.name} in ${message.guild.name}`,
+          ),
+        },
+      });
+      await redis.set(`cache:channeldisabledcooldown:${message.author.id}`, "true", "EX", 5);
+    }
+    return;
   }
 
   if (await redis.exists(`${Constants.redis.cache.economy.LEVELLING_UP}:${message.author.id}`)) {
