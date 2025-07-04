@@ -5,6 +5,8 @@
 - added better searching and pages to $ach view (@growling_grizzly)
 - you can disable channels in your server /settings server disabled-channels
 - after maintenance or reboots, boosters will be given their lost time back
+- revise `$help <item>` and `$recipe` to be aliases for `$item` (@fedpol1)
+- add more info to `$item`, accessible through pages (@fedpol1, @growling_grizzly)
 
 ## other
 
