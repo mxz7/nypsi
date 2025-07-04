@@ -31,7 +31,7 @@ quickResponses.set(
 quickResponses.set(
   "auto.transfer",
   "it sounds like you're asking about a **profile transfer** where data from one account will be applied to another\n\n" +
-    "you must provide evidence the old account username and user ID, as well as prove that it is your account\n\n" +
+    "you must provide evidence of the old account's username and user ID, as well as prove that it is your account\n\n" +
     "if you're unable to prove that it's your account, we cannot do anything.",
 );
 
