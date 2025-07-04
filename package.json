@@ -22,7 +22,7 @@
     "@catppuccin/palette": "1.7.1",
     "@discordjs/rest": "2.5.1",
     "@hono/node-server": "^1.15.0",
-    "@prisma/client": "6.10.1",
+    "@prisma/client": "6.11.1",
     "@twemoji/parser": "^16.0.0",
     "@yusifaliyevpro/countries": "^2.2.2",
     "@zeyrbot/urbandictionary": "^1.0.3",
@@ -65,7 +65,7 @@
     "eslint-plugin-deprecation": "3.0.0",
     "jest": "^30.0.4",
     "prettier": "3.6.2",
-    "prisma": "6.10.1",
+    "prisma": "6.11.1",
     "ts-node": "^10.9.2",
     "typescript": "5.8.3"
   },
