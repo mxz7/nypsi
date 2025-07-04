@@ -211,12 +211,6 @@ async function run(
 
   transaction(message.author, target.user, `${selected.id} x ${amount}`);
 
-  if (selected.id == "ring") {
-    return send({
-      embeds: [new CustomEmbed(message.member, "you may now kiss the bride :heart:")],
-    });
-  }
-
   return send({
     embeds: [
       new CustomEmbed(
