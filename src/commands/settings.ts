@@ -117,6 +117,17 @@ cmd.slashData
           .addBooleanOption((option) =>
             option.setName("value").setDescription("yes/no").setRequired(true),
           ),
+      )
+      .addSubcommand((disableChannels) =>
+        disableChannels
+          .setName("disabled-channels")
+          .setDescription("configure the disabled channels in the server")
+          .addChannelOption((option) =>
+            option
+              .setName("channel")
+              .setDescription("toggle the channel's disabled status")
+              .setRequired(false),
+          ),
       ),
   );
 
@@ -1064,9 +1075,10 @@ async function run(
   } else if (args[0].toLowerCase() == "server") {
     if (args[1]?.toLowerCase() == "slash-only") {
       return slashOnly();
-    }
-    if (args[1]?.toLowerCase() == "alt-punish") {
+    } else if (args[1]?.toLowerCase() == "alt-punish") {
       return altPunish();
+    } else if (args[1]?.toLowerCase() === "disabled-channels") {
+      return doDisabledChannels();
     } else {
       const subcommands = ["slash-only", "alt-punish", "disabled-channels"];
       return send({
