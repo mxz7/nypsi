@@ -66,6 +66,7 @@ import {
   setExpireDate,
   setTier,
 } from "../utils/functions/premium/premium";
+import { createSupportRequest } from "../utils/functions/supportrequest";
 import { getAdminLevel, setAdminLevel } from "../utils/functions/users/admin";
 import { setBirthday } from "../utils/functions/users/birthday";
 import { isUserBlacklisted, setUserBlacklist } from "../utils/functions/users/blacklist";
@@ -256,6 +257,11 @@ async function run(
           .setLabel("set admin level")
           .setStyle(ButtonStyle.Primary)
           .setEmoji("👨🏻‍💼"),
+        new ButtonBuilder()
+          .setCustomId("create-chat")
+          .setLabel("create chat")
+          .setStyle(ButtonStyle.Primary)
+          .setEmoji("💬"),
       ),
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
@@ -462,6 +468,39 @@ async function run(
         );
         await setAdminLevel(user, parseInt(msg.content));
         await res.editReply({ embeds: [new CustomEmbed(message.member, "✅")] });
+        return waitForButton();
+      } else if (res.customId === "create-chat") {
+        if ((await getAdminLevel(message.member)) < 2) {
+          await res.editReply({
+            embeds: [new ErrorEmbed("you require admin level **2** to do this")],
+          });
+          return waitForButton();
+        }
+
+        const supportRequestResponse = await createSupportRequest(
+          user.id,
+          message.client as NypsiClient,
+          user.username,
+        );
+
+        if (!supportRequestResponse) {
+          await res.editReply({
+            embeds: [new ErrorEmbed("failed to create support request")],
+          });
+          return waitForButton();
+        }
+
+        const userEmbed = new CustomEmbed(
+          user.id,
+          "a staff member has created a support ticket with you",
+        );
+
+        addNotificationToQueue({ memberId: user.id, payload: { embed: userEmbed } });
+
+        await res.editReply({
+          embeds: [new CustomEmbed(message.member, "✅ support request created with user")],
+        });
+
         return waitForButton();
       } else if (res.customId === "tags") {
         if ((await getAdminLevel(message.member)) < 4) {

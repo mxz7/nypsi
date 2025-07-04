@@ -3,6 +3,10 @@
 ## changes you'll probably care about
 - added better searching and pages to $ach view (@growling_grizzly)
 
+## other
+
+- staff members can now start a support request with users
+
 ---
 
 # june 2025
