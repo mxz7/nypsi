@@ -149,7 +149,11 @@ export async function runItemInfo(
   }
 
   // format the message
-  function formatEmbed(embeds: CustomEmbed | CustomEmbed[], inventory: Inventory, selected: Item) {
+  const formatEmbed = (
+    embeds: CustomEmbed | CustomEmbed[],
+    inventory: Inventory,
+    selected: Item,
+  ) => {
     let targets = embeds;
     targets = targets instanceof Array ? targets : [targets];
     for (const target of targets) {
@@ -166,7 +170,7 @@ export async function runItemInfo(
         });
       }
     }
-  }
+  };
 
   for (const tab in tabs) {
     formatEmbed(tabs[tab].embed, inventory, selected);
