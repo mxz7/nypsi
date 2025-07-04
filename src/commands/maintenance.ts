@@ -1,10 +1,12 @@
 import { CommandInteraction, Message } from "discord.js";
+import { exec } from "node:child_process";
 import prisma from "../init/database";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { randomPresence } from "../utils/functions/presence";
 import { getAdminLevel } from "../utils/functions/users/admin";
+import { logger } from "../utils/logger";
 import dayjs = require("dayjs");
 
 const cmd = new Command("maintenance", "maintenance", "none").setPermissions(["bot owner"]);
@@ -18,6 +20,10 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
 
     if (parseInt(before)) {
       const total = Date.now() - parseInt(before);
+
+      logger.info(`maintenance for ${total}ms, giving back booster time`);
+
+      exec('redis-cli KEYS "*economy:boosters*" | xargs redis-cli DEL');
 
       const boosters = await prisma.booster.findMany({
         select: {
@@ -36,6 +42,8 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
           },
         });
       }
+
+      exec('redis-cli KEYS "*economy:boosters*" | xargs redis-cli DEL');
     }
 
     const presence = await randomPresence();
