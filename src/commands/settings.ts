@@ -30,6 +30,7 @@ import {
 import { isPassive, setPassive } from "../utils/functions/economy/passive";
 import { createUser, formatNumber, userExists } from "../utils/functions/economy/utils";
 import { setAltPunish } from "../utils/functions/guilds/altpunish";
+import { getDisabledChannels, setDisabledChannels } from "../utils/functions/guilds/channels";
 import { setSlashOnly } from "../utils/functions/guilds/slash";
 import { cleanString } from "../utils/functions/string";
 import { checkPurchases, getEmail, setEmail } from "../utils/functions/users/email";
@@ -967,6 +968,69 @@ async function run(
       });
   };
 
+  const doDisabledChannels = async () => {
+    let disabledChannels = await getDisabledChannels(message.guild);
+
+    let updated = false;
+    for (const channelId of disabledChannels) {
+      if (!message.guild.channels.cache.has(channelId)) {
+        updated = true;
+        await setDisabledChannels(
+          message.guild,
+          disabledChannels.filter((c) => c !== channelId),
+        );
+      }
+    }
+
+    if (updated) {
+      disabledChannels = await getDisabledChannels(message.guild);
+    }
+
+    if (args.length === 2) {
+      return send({
+        embeds: [
+          new CustomEmbed(
+            message.member,
+            "disabled channels:\n" + disabledChannels.map((i) => `<#${i}>`).join("\n"),
+          ),
+        ],
+      });
+    }
+
+    const channel = message.mentions.channels.first();
+
+    if (!channel) {
+      return send({ embeds: [new ErrorEmbed("/settings server disabled-channels <channel>")] });
+    }
+
+    if (disabledChannels.includes(channel.id)) {
+      await setDisabledChannels(
+        message.guild,
+        disabledChannels.filter((c) => c !== channel.id),
+      );
+      disabledChannels = await getDisabledChannels(message.guild);
+      return send({
+        embeds: [
+          new CustomEmbed(
+            message.member,
+            "disabled channels:\n" + disabledChannels.map((i) => `<#${i}>`).join("\n"),
+          ),
+        ],
+      });
+    } else {
+      await setDisabledChannels(message.guild, [...disabledChannels, channel.id]);
+
+      return send({
+        embeds: [
+          new CustomEmbed(
+            message.member,
+            "disabled channels:\n" + disabledChannels.map((i) => `<#${i}>`).join("\n"),
+          ),
+        ],
+      });
+    }
+  };
+
   if (args.length == 0) {
     return send({ embeds: [new CustomEmbed(message.member, "/settings me\n/settings server")] });
   } else if (args[0].toLowerCase() == "me") {
@@ -1004,7 +1068,7 @@ async function run(
     if (args[1]?.toLowerCase() == "alt-punish") {
       return altPunish();
     } else {
-      const subcommands = ["slash-only", "alt-punish"];
+      const subcommands = ["slash-only", "alt-punish", "disabled-channels"];
       return send({
         embeds: [
           new CustomEmbed(
