@@ -1,9 +1,11 @@
+import { exec } from "child_process";
 import * as Cluster from "discord-hybrid-sharding";
 import { ClusterManager } from "discord-hybrid-sharding";
 import "dotenv/config";
 import { loadavg } from "os";
 import { clearInterval } from "timers";
 import { startAPI } from "./api/server";
+import prisma from "./init/database";
 import redis from "./init/redis";
 import { loadJobs, runJob } from "./scheduled/scheduler";
 import Constants from "./utils/Constants";
@@ -14,6 +16,7 @@ import { startMentionInterval } from "./utils/handlers/mentions";
 import { getWebhooks, logger, setClusterId } from "./utils/logger";
 import { dmQueueWorker } from "./utils/queues/dms";
 import ms = require("ms");
+import dayjs = require("dayjs");
 
 setClusterId("main");
 getWebhooks();
@@ -67,8 +70,36 @@ manager.on("clusterCreate", (cluster) => {
   cluster.on("message", (message) => {
     if (message == "restart") {
       dmQueueWorker.pause();
-      manager.recluster.start({ restartMode: "rolling", delay: 2500 }).then(() => {
+      const before = Date.now();
+      manager.recluster.start({ restartMode: "rolling", delay: 2500 }).then(async () => {
         dmQueueWorker.resume();
+        const after = Date.now();
+
+        logger.info(`reclustered in ${after - before}ms, giving back booster time`);
+
+        exec('redis-cli KEYS "*economy:boosters*" | xargs redis-cli DEL');
+
+        const boosters = await prisma.booster.findMany({
+          select: {
+            id: true,
+            expire: true,
+          },
+        });
+
+        for (const booster of boosters) {
+          await prisma.booster.update({
+            where: {
+              id: booster.id,
+            },
+            data: {
+              expire: dayjs(booster.expire)
+                .add(after - before, "millisecond")
+                .toDate(),
+            },
+          });
+        }
+
+        exec('redis-cli KEYS "*economy:boosters*" | xargs redis-cli DEL');
       });
       heartBeatIntervals.forEach((i) => clearInterval(i));
       heartBeatIntervals = [];
