@@ -1034,6 +1034,7 @@ async function run(
       return showChannels();
     } else {
       await setDisabledChannels(message.guild, [...disabledChannels, channel.id]);
+      disabledChannels = await getDisabledChannels(message.guild);
 
       return showChannels();
     }
