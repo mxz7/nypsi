@@ -401,7 +401,7 @@ export async function getTotalAmountOfItem(itemId: string) {
     },
   });
 
-  return Number(query._sum.amount) + market._sum.itemAmount;
+  return Number(query?._sum?.amount || 0) + market?._sum?.itemAmount || 0;
 }
 
 export function selectItem(search: string) {
