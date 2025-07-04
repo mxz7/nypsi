@@ -982,6 +982,23 @@ async function run(
   const doDisabledChannels = async () => {
     let disabledChannels = await getDisabledChannels(message.guild);
 
+    const showChannels = async () => {
+      if (disabledChannels.length === 0) {
+        return send({
+          embeds: [new CustomEmbed(message.member, "there are no disabled channels")],
+        });
+      }
+
+      return send({
+        embeds: [
+          new CustomEmbed(
+            message.member,
+            "disabled channels:\n" + disabledChannels.map((i) => `<#${i}>`).join("\n"),
+          ),
+        ],
+      });
+    };
+
     let updated = false;
     for (const channelId of disabledChannels) {
       if (!message.guild.channels.cache.has(channelId)) {
@@ -998,14 +1015,7 @@ async function run(
     }
 
     if (args.length === 2) {
-      return send({
-        embeds: [
-          new CustomEmbed(
-            message.member,
-            "disabled channels:\n" + disabledChannels.map((i) => `<#${i}>`).join("\n"),
-          ),
-        ],
-      });
+      return showChannels();
     }
 
     const channel = message.mentions.channels.first();
@@ -1020,25 +1030,12 @@ async function run(
         disabledChannels.filter((c) => c !== channel.id),
       );
       disabledChannels = await getDisabledChannels(message.guild);
-      return send({
-        embeds: [
-          new CustomEmbed(
-            message.member,
-            "disabled channels:\n" + disabledChannels.map((i) => `<#${i}>`).join("\n"),
-          ),
-        ],
-      });
+
+      return showChannels();
     } else {
       await setDisabledChannels(message.guild, [...disabledChannels, channel.id]);
 
-      return send({
-        embeds: [
-          new CustomEmbed(
-            message.member,
-            "disabled channels:\n" + disabledChannels.map((i) => `<#${i}>`).join("\n"),
-          ),
-        ],
-      });
+      return showChannels();
     }
   };
 
