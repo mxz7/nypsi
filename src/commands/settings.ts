@@ -13,6 +13,7 @@ import {
   MessageFlags,
   ModalBuilder,
   ModalSubmitInteraction,
+  PermissionFlagsBits,
   StringSelectMenuBuilder,
   StringSelectMenuOptionBuilder,
   TextInputBuilder,
@@ -980,6 +981,15 @@ async function run(
   };
 
   const doDisabledChannels = async () => {
+    if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
+      if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
+        return send({
+          embeds: [new ErrorEmbed("you need the `manage server` permission")],
+        });
+      }
+      return;
+    }
+
     let disabledChannels = await getDisabledChannels(message.guild);
 
     const showChannels = async () => {
