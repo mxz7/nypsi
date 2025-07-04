@@ -4,6 +4,7 @@
 
 - added better searching and pages to $ach view (@growling_grizzly)
 - you can disable channels in your server /settings server disabled-channels
+- after maintenance or reboots, boosters will be given their lost time back
 
 ## other
 
