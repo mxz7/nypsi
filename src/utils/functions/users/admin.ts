@@ -1,8 +1,12 @@
 import ms = require("ms");
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
-import Constants from "../../Constants";
+import Constants, { AdminPermission } from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
+
+export async function hasAdminPermission(member: MemberResolvable, permission: AdminPermission) {
+  return (await getAdminLevel(member)) >= Constants.ADMIN_PERMISSIONS.get(permission);
+}
 
 export async function getAdminLevel(member: MemberResolvable) {
   const userId = getUserId(member);

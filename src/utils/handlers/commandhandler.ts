@@ -56,7 +56,7 @@ import { getUserAliases } from "../functions/premium/aliases";
 import { addUse, getCommand } from "../functions/premium/command";
 import { percentChance } from "../functions/random";
 import { cleanString, pluralize } from "../functions/string";
-import { getAdminLevel } from "../functions/users/admin";
+import { hasAdminPermission } from "../functions/users/admin";
 import { createAuraTransaction } from "../functions/users/aura";
 import { isUserBlacklisted } from "../functions/users/blacklist";
 import { getLastCommand, updateUser } from "../functions/users/commands";
@@ -787,7 +787,10 @@ export async function runCommand(
     }
 
     if (await redis.get("nypsi:maintenance")) {
-      if ((await getAdminLevel(message.member)) > 0 && message instanceof Message) {
+      if (
+        (await hasAdminPermission(message.member, "bypass-maintenance")) &&
+        message instanceof Message
+      ) {
         message.react("💀");
       } else {
         if (message instanceof Message) {

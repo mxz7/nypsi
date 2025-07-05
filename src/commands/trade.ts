@@ -46,7 +46,7 @@ import {
 } from "../utils/functions/economy/trade_requests";
 import { createUser, formatBet, getItems, userExists } from "../utils/functions/economy/utils";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
-import { getAdminLevel } from "../utils/functions/users/admin";
+import { hasAdminPermission } from "../utils/functions/users/admin";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
@@ -100,7 +100,10 @@ async function run(
 
   if (!(await userExists(message.member))) await createUser(message.member);
 
-  if (message.client.user.id !== Constants.BOT_USER_ID && (await getAdminLevel(message.member)) < 1)
+  if (
+    message.client.user.id !== Constants.BOT_USER_ID &&
+    !(await hasAdminPermission(message.member, "bypass-dev-restrictions"))
+  )
     return send({ embeds: [new ErrorEmbed("lol")] });
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);

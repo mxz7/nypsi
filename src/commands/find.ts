@@ -18,7 +18,7 @@ import { getXp } from "../utils/functions/economy/xp";
 import { getPeaks } from "../utils/functions/guilds/utils";
 import { getKarma } from "../utils/functions/karma/karma";
 import { getTier, isPremium, levelString } from "../utils/functions/premium/premium";
-import { getAdminLevel } from "../utils/functions/users/admin";
+import { hasAdminPermission } from "../utils/functions/users/admin";
 import { getLastCommand } from "../utils/functions/users/commands";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
 import dayjs = require("dayjs");
@@ -29,7 +29,7 @@ async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
-  if ((await getAdminLevel(message.member)) < 3) return;
+  if (!(await hasAdminPermission(message.member, "find"))) return;
 
   if (!(message instanceof Message)) return;
 

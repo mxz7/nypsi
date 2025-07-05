@@ -1,6 +1,6 @@
 import { CommandInteraction, Message } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
-import { getAdminLevel } from "../utils/functions/users/admin";
+import { hasAdminPermission } from "../utils/functions/users/admin";
 import { isUserBlacklisted, setUserBlacklist } from "../utils/functions/users/blacklist";
 
 const cmd = new Command("bluser", "blacklist account from nypsi", "none").setPermissions([
@@ -11,7 +11,7 @@ async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
-  if ((await getAdminLevel(message.member)) < 3) return;
+  if (!(await hasAdminPermission(message.member, "blacklist"))) return;
 
   if (args.length === 0)
     return message.channel.send({ content: "are you stupid or some shit lol lol ol ol ol ol" });

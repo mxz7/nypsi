@@ -22,7 +22,7 @@ import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { startRandomDrop } from "../scheduled/clusterjobs/random-drops";
-import Constants from "../utils/Constants";
+import Constants, { AdminPermission } from "../utils/Constants";
 import { b, c } from "../utils/functions/anticheat";
 import { getCaptchaHistory, giveCaptcha } from "../utils/functions/captcha";
 import { MStoTime } from "../utils/functions/date";
@@ -67,7 +67,7 @@ import {
   setTier,
 } from "../utils/functions/premium/premium";
 import { createSupportRequest } from "../utils/functions/supportrequest";
-import { getAdminLevel, setAdminLevel } from "../utils/functions/users/admin";
+import { getAdminLevel, hasAdminPermission, setAdminLevel } from "../utils/functions/users/admin";
 import { setBirthday } from "../utils/functions/users/birthday";
 import { isUserBlacklisted, setUserBlacklist } from "../utils/functions/users/blacklist";
 import { getCommandUses } from "../utils/functions/users/commands";
@@ -83,7 +83,7 @@ async function run(
   args: string[],
 ) {
   if (!(message instanceof Message)) return;
-  if ((await getAdminLevel(message.member)) < 1) {
+  if (!(await hasAdminPermission(message.member, "view-user-info"))) {
     if (message.member.roles.cache.has("1023950187661635605")) {
       if (args[0].toLowerCase() !== "review") {
         if (await redis.exists("nypsi:xemoji:cooldown")) return;
@@ -104,6 +104,12 @@ async function run(
       );
     }
   }
+
+  const requiredLevelEmbed = (permission: AdminPermission) => {
+    return new ErrorEmbed(
+      `you require admin level **${Constants.ADMIN_PERMISSIONS.get(permission)}** to do this`,
+    );
+  };
 
   const getDbData = async (user: User) => {
     logger.info(`fetching data for ${user.id}...`);
@@ -377,9 +383,9 @@ async function run(
       await res.deferReply();
 
       if (res.customId === "db-data") {
-        if ((await getAdminLevel(message.member)) < 1) {
+        if (!(await hasAdminPermission(message.member, "view-user-info"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **1** to do this")],
+            embeds: [requiredLevelEmbed("view-user-info")],
           });
           return waitForButton();
         }
@@ -393,9 +399,9 @@ async function run(
         await res.editReply({ files });
         return waitForButton();
       } else if (res.customId === "cmds") {
-        if ((await getAdminLevel(message.member)) < 1) {
+        if (!(await hasAdminPermission(message.member, "view-user-info"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **1** to do this")],
+            embeds: [requiredLevelEmbed("view-user-info")],
           });
           return waitForButton();
         }
@@ -418,9 +424,9 @@ async function run(
         await res.editReply({ embeds: [embed] });
         return waitForButton();
       } else if (res.customId === "view-premium") {
-        if ((await getAdminLevel(message.member)) < 1) {
+        if (!(await hasAdminPermission(message.member, "view-user-info"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **1** to do this")],
+            embeds: [requiredLevelEmbed("view-user-info")],
           });
           return waitForButton();
         }
@@ -430,9 +436,9 @@ async function run(
         doPremium(user, res as ButtonInteraction);
         return waitForButton();
       } else if (res.customId === "set-admin") {
-        if ((await getAdminLevel(message.member)) < 69) {
+        if (!(await hasAdminPermission(message.member, "set-admin-level"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **69** to do this")],
+            embeds: [requiredLevelEmbed("set-admin-level")],
           });
           return waitForButton();
         }
@@ -470,9 +476,9 @@ async function run(
         await res.editReply({ embeds: [new CustomEmbed(message.member, "✅")] });
         return waitForButton();
       } else if (res.customId === "create-chat") {
-        if ((await getAdminLevel(message.member)) < 2) {
+        if (!(await hasAdminPermission(message.member, "create-chat"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **2** to do this")],
+            embeds: [requiredLevelEmbed("create-chat")],
           });
           return waitForButton();
         }
@@ -503,9 +509,9 @@ async function run(
 
         return waitForButton();
       } else if (res.customId === "tags") {
-        if ((await getAdminLevel(message.member)) < 4) {
+        if (!(await hasAdminPermission(message.member, "view-user-info"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+            embeds: [requiredLevelEmbed("view-user-info")],
           });
           return waitForButton();
         }
@@ -513,9 +519,9 @@ async function run(
         doTags(user, res as ButtonInteraction);
         return waitForButton();
       } else if (res.customId === "add-purchase") {
-        if ((await getAdminLevel(message.member)) < 4) {
+        if (!(await hasAdminPermission(message.member, "add-purchase"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+            embeds: [requiredLevelEmbed("add-purchase")],
           });
           return waitForButton();
         }
@@ -562,9 +568,9 @@ async function run(
 
         msgResponse.first().react("✅");
       } else if (res.customId === "set-birthday") {
-        if ((await getAdminLevel(message.member)) < 1) {
+        if (!(await hasAdminPermission(message.member, "set-birthday"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **1** to do this")],
+            embeds: [requiredLevelEmbed("set-birthday")],
           });
           return waitForButton();
         }
@@ -602,9 +608,9 @@ async function run(
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "view-streak") {
-        if ((await getAdminLevel(message.member)) < 1) {
+        if (!(await hasAdminPermission(message.member, "view-user-info"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **1** to do this")],
+            embeds: [requiredLevelEmbed("view-user-info")],
           });
           return waitForButton();
         }
@@ -614,9 +620,9 @@ async function run(
         doStreaks(user, res as ButtonInteraction);
         return waitForButton();
       } else if (res.customId === "set-bal") {
-        if ((await getAdminLevel(message.member)) < 4) {
+        if (!(await hasAdminPermission(message.member, "set-balance"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+            embeds: [requiredLevelEmbed("set-balance")],
           });
           return waitForButton();
         }
@@ -654,9 +660,9 @@ async function run(
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-bank") {
-        if ((await getAdminLevel(message.member)) < 4) {
+        if (!(await hasAdminPermission(message.member, "set-balance"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+            embeds: [requiredLevelEmbed("set-balance")],
           });
           return waitForButton();
         }
@@ -694,9 +700,9 @@ async function run(
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-prestige") {
-        if ((await getAdminLevel(message.member)) < 4) {
+        if (!(await hasAdminPermission(message.member, "set-prestige"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+            embeds: [requiredLevelEmbed("set-prestige")],
           });
           return waitForButton();
         }
@@ -729,9 +735,9 @@ async function run(
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-level") {
-        if ((await getAdminLevel(message.member)) < 4) {
+        if (!(await hasAdminPermission(message.member, "set-level"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+            embeds: [requiredLevelEmbed("set-level")],
           });
           return waitForButton();
         }
@@ -764,9 +770,9 @@ async function run(
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-xp") {
-        if ((await getAdminLevel(message.member)) < 4) {
+        if (!(await hasAdminPermission(message.member, "set-xp"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+            embeds: [requiredLevelEmbed("set-xp")],
           });
           return waitForButton();
         }
@@ -799,9 +805,9 @@ async function run(
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-inv") {
-        if ((await getAdminLevel(message.member)) < 4) {
+        if (!(await hasAdminPermission(message.member, "set-inv"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+            embeds: [requiredLevelEmbed("set-inv")],
           });
           return waitForButton();
         }
@@ -875,9 +881,9 @@ async function run(
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-karma") {
-        if ((await getAdminLevel(message.member)) < 4) {
+        if (!(await hasAdminPermission(message.member, "set-karma"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+            embeds: [requiredLevelEmbed("set-karma")],
           });
           return waitForButton();
         }
@@ -925,9 +931,9 @@ async function run(
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "ecoban") {
-        if ((await getAdminLevel(message.member)) < 2) {
+        if (!(await hasAdminPermission(message.member, "ecoban"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **2** to do this")],
+            embeds: [requiredLevelEmbed("ecoban")],
           });
           return waitForButton();
         }
@@ -972,9 +978,9 @@ async function run(
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "blacklist") {
-        if ((await getAdminLevel(message.member)) < 3) {
+        if (!(await hasAdminPermission(message.member, "blacklist"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **3** to do this")],
+            embeds: [requiredLevelEmbed("blacklist")],
           });
           return waitForButton();
         }
@@ -995,9 +1001,9 @@ async function run(
           return waitForButton();
         }
       } else if (res.customId === "ac") {
-        if ((await getAdminLevel(message.member)) < 1) {
+        if (!(await hasAdminPermission(message.member, "view-user-info"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **1** to do this")],
+            embeds: [requiredLevelEmbed("view-user-info")],
           });
           return waitForButton();
         }
@@ -1007,9 +1013,9 @@ async function run(
         doAnticheat(user, res as ButtonInteraction);
         return waitForButton();
       } else if (res.customId === "wipe") {
-        if ((await getAdminLevel(message.member)) < 69) {
+        if (!(await hasAdminPermission(message.member, "wipe"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **69** to do this")],
+            embeds: [requiredLevelEmbed("wipe")],
           });
           return waitForButton();
         }
@@ -1249,9 +1255,9 @@ async function run(
       await res.deferReply();
 
       if (res.customId === "add-premium") {
-        if ((await getAdminLevel(message.member)) < 5) {
+        if (!(await hasAdminPermission(message.member, "set-premium"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **5** to do this")],
+            embeds: [requiredLevelEmbed("set-premium")],
           });
           return waitForButton();
         }
@@ -1296,9 +1302,9 @@ async function run(
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-tier") {
-        if ((await getAdminLevel(message.member)) < 5) {
+        if (!(await hasAdminPermission(message.member, "set-premium"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **5** to do this")],
+            embeds: [requiredLevelEmbed("set-premium")],
           });
           return waitForButton();
         }
@@ -1343,9 +1349,9 @@ async function run(
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-expire") {
-        if ((await getAdminLevel(message.member)) < 5) {
+        if (!(await hasAdminPermission(message.member, "set-premium"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **5** to do this")],
+            embeds: [requiredLevelEmbed("set-premium")],
           });
           return waitForButton();
         }
@@ -1394,9 +1400,9 @@ async function run(
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "raw-data") {
-        if ((await getAdminLevel(message.member)) < 1) {
+        if (!(await hasAdminPermission(message.member, "view-user-info"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **1** to do this")],
+            embeds: [requiredLevelEmbed("view-user-info")],
           });
           return waitForButton();
         }
@@ -1411,9 +1417,9 @@ async function run(
         });
         return waitForButton();
       } else if (res.customId === "del-cmd") {
-        if ((await getAdminLevel(message.member)) < 3) {
+        if (!(await hasAdminPermission(message.member, "delete-prem-cmd"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **3** to do this")],
+            embeds: [requiredLevelEmbed("delete-prem-cmd")],
           });
           return waitForButton();
         }
@@ -1426,9 +1432,9 @@ async function run(
         });
         return waitForButton();
       } else if (res.customId === "del-aliases") {
-        if ((await getAdminLevel(message.member)) < 3) {
+        if (!(await hasAdminPermission(message.member, "delete-prem-aliases"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **3** to do this")],
+            embeds: [requiredLevelEmbed("delete-prem-aliases")],
           });
           return waitForButton();
         }
@@ -1442,9 +1448,9 @@ async function run(
         });
         return waitForButton();
       } else if (res.customId === "expire-now") {
-        if ((await getAdminLevel(message.member)) < 5) {
+        if (!(await hasAdminPermission(message.member, "set-premium"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **5** to do this")],
+            embeds: [requiredLevelEmbed("set-premium")],
           });
           return waitForButton();
         }
@@ -1455,9 +1461,9 @@ async function run(
         await res.editReply({ embeds: [new CustomEmbed(message.member, "done sir.")] });
         return waitForButton();
       } else if (res.customId === "set-credits") {
-        if ((await getAdminLevel(message.member)) < 5) {
+        if (!(await hasAdminPermission(message.member, "set-premium"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **5** to do this")],
+            embeds: [requiredLevelEmbed("set-premium")],
           });
           return waitForButton();
         }
@@ -1581,9 +1587,9 @@ async function run(
       await res.deferReply();
 
       if (res.customId === "set-daily") {
-        if ((await getAdminLevel(message.member)) < 4) {
+        if (!(await hasAdminPermission(message.member, "set-streak"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+            embeds: [requiredLevelEmbed("set-streak")],
           });
           return waitForButton();
         }
@@ -1615,9 +1621,9 @@ async function run(
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-vote") {
-        if ((await getAdminLevel(message.member)) < 4) {
+        if (!(await hasAdminPermission(message.member, "set-streak"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+            embeds: [requiredLevelEmbed("set-streak")],
           });
           return waitForButton();
         }
@@ -1649,9 +1655,9 @@ async function run(
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-daily-tasks") {
-        if ((await getAdminLevel(message.member)) < 4) {
+        if (!(await hasAdminPermission(message.member, "set-streak"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+            embeds: [requiredLevelEmbed("set-streak")],
           });
           return waitForButton();
         }
@@ -1683,9 +1689,9 @@ async function run(
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-weekly-tasks") {
-        if ((await getAdminLevel(message.member)) < 4) {
+        if (!(await hasAdminPermission(message.member, "set-streak"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+            embeds: [requiredLevelEmbed("set-streak")],
           });
           return waitForButton();
         }
@@ -1717,9 +1723,9 @@ async function run(
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "rerun-daily") {
-        if ((await getAdminLevel(message.member)) < 4) {
+        if (!(await hasAdminPermission(message.member, "run-streak"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+            embeds: [requiredLevelEmbed("run-streak")],
           });
           return waitForButton();
         }
@@ -1737,9 +1743,9 @@ async function run(
 
         return waitForButton();
       } else if (res.customId === "rerun-vote") {
-        if ((await getAdminLevel(message.member)) < 4) {
+        if (!(await hasAdminPermission(message.member, "run-streak"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+            embeds: [requiredLevelEmbed("run-streak")],
           });
           return waitForButton();
         }
@@ -1824,9 +1830,9 @@ async function run(
       await res.deferReply();
 
       if (res.customId === "ac-hist") {
-        if ((await getAdminLevel(message.member)) < 2) {
+        if (!(await hasAdminPermission(message.member, "anticheat-history"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **2** to do this")],
+            embeds: [requiredLevelEmbed("anticheat-history")],
           });
           return waitForButton();
         }
@@ -1862,9 +1868,9 @@ async function run(
         });
         return waitForButton();
       } else if (res.customId === "ac-clear") {
-        if ((await getAdminLevel(message.member)) < 3) {
+        if (!(await hasAdminPermission(message.member, "clear-anticheat"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **3** to do this")],
+            embeds: [requiredLevelEmbed("clear-anticheat")],
           });
           return waitForButton();
         }
@@ -1880,8 +1886,8 @@ async function run(
         await res.editReply({ content: "✅" });
         return waitForButton();
       } else if (res.customId === "give-captcha") {
-        if ((await getAdminLevel(res.user)) < 1) {
-          res.followUp({ embeds: [new ErrorEmbed("you require admin level 1 for this")] });
+        if (!(await hasAdminPermission(message.member, "captchatest"))) {
+          res.followUp({ embeds: [requiredLevelEmbed("captchatest")] });
           return;
         }
 
@@ -1894,8 +1900,8 @@ async function run(
         res.followUp({ content: "✅" });
         return waitForButton();
       } else if (res.customId === "captcha-hist") {
-        if ((await getAdminLevel(res.user)) < 3) {
-          res.followUp({ embeds: [new ErrorEmbed("you require admin level 3 for this")] });
+        if (!(await hasAdminPermission(message.member, "captcha-history"))) {
+          res.followUp({ embeds: [requiredLevelEmbed("captcha-history")] });
           return;
         }
 
@@ -1984,9 +1990,9 @@ async function run(
       await res.deferReply();
 
       if (res.customId === "add-tag") {
-        if ((await getAdminLevel(message.member)) < 4) {
+        if (!(await hasAdminPermission(message.member, "set-tags"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+            embeds: [requiredLevelEmbed("set-tags")],
           });
           return waitForButton();
         }
@@ -2023,9 +2029,9 @@ async function run(
         });
         return waitForButton();
       } else if (res.customId === "remove-tag") {
-        if ((await getAdminLevel(message.member)) < 4) {
+        if (!(await hasAdminPermission(message.member, "set-tags"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+            embeds: [requiredLevelEmbed("set-tags")],
           });
           return waitForButton();
         }
@@ -2128,7 +2134,7 @@ async function run(
   };
 
   const requestProfileTransfer = async (from: User, to: User) => {
-    if ((await getAdminLevel(message.member)) !== 69)
+    if (!hasAdminPermission(message.member, "profile-transfer"))
       return message.channel.send({
         embeds: [new ErrorEmbed("lol xd xdxddxd ahahhaha YOURE GAY dont even TRY")],
       });
@@ -2218,9 +2224,9 @@ async function run(
 
     return requestProfileTransfer(fromUser, toUser);
   } else if (args[0].toLowerCase() === "drop") {
-    if ((await getAdminLevel(message.member)) < 5) {
+    if (!(await hasAdminPermission(message.member, "spawn-lootdrop"))) {
       return message.channel.send({
-        embeds: [new ErrorEmbed("you require admin level **5** to do this")],
+        embeds: [requiredLevelEmbed("spawn-lootdrop")],
       });
     }
 
@@ -2243,9 +2249,9 @@ async function run(
     await redis.del(Constants.redis.nypsi.CRASH_STATUS);
     await initCrashGame(message.client as NypsiClient);
   } else if (args[0].toLowerCase() === "findalts") {
-    if ((await getAdminLevel(message.member)) < 3) {
+    if (!(await hasAdminPermission(message.member, "find-alts"))) {
       return message.channel.send({
-        embeds: [new ErrorEmbed("you require admin level **3** to do this")],
+        embeds: [requiredLevelEmbed("find-alts")],
       });
     }
 

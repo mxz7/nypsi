@@ -5,7 +5,7 @@ import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Comman
 import Constants from "../utils/Constants";
 import { giveCaptcha, isLockedOut, passedCaptcha } from "../utils/functions/captcha";
 import { getMember } from "../utils/functions/member";
-import { getAdminLevel } from "../utils/functions/users/admin";
+import { hasAdminPermission } from "../utils/functions/users/admin";
 import { logger } from "../utils/logger";
 
 const cmd = new Command("captchatest", "test an account", "none");
@@ -14,7 +14,7 @@ async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
-  if ((await getAdminLevel(message.member)) < 1) return;
+  if (!(await hasAdminPermission(message.member, "captchatest"))) return;
 
   if (args.length == 0) {
     return message.channel.send({ content: "dumbass" });

@@ -4,7 +4,7 @@ import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Comman
 import { ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { userExists } from "../utils/functions/economy/utils";
-import { getAdminLevel } from "../utils/functions/users/admin";
+import { hasAdminPermission } from "../utils/functions/users/admin";
 import {
   commandAliasExists,
   commandExists,
@@ -18,7 +18,7 @@ async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
-  if ((await getAdminLevel(message.member)) < 2) return;
+  if (!(await hasAdminPermission(message.member, "cmdwatch"))) return;
 
   if (args.length < 2) {
     return message.channel.send({ content: "dumbass - $cmdwatch <userid> <cmd>" });

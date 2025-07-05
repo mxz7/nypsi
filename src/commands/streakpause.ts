@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js";
 import redis from "../init/redis";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
-import { getAdminLevel } from "../utils/functions/users/admin";
+import { hasAdminPermission } from "../utils/functions/users/admin";
 import ms = require("ms");
 
 const cmd = new Command("streakpause", "pause streaks", "none");
@@ -10,7 +10,7 @@ async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
-  if ((await getAdminLevel(message.member)) < 5) return;
+  if (!(await hasAdminPermission(message.member, "streakpause"))) return;
 
   if (args.length === 0) {
     await redis.set("nypsi:streakpause", 69, "EX", ms("1 day") / 1000);
