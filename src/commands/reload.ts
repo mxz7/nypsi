@@ -1,6 +1,6 @@
 import { CommandInteraction, Message } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
-import { getAdminLevel } from "../utils/functions/users/admin";
+import { hasAdminPermission } from "../utils/functions/users/admin";
 import { loadCommands, reloadCommand } from "../utils/handlers/commandhandler";
 import { reloadInteractions } from "../utils/handlers/interactions";
 import { logger } from "../utils/logger";
@@ -11,7 +11,7 @@ async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
-  if ((await getAdminLevel(message.member)) < 3) return;
+  if (!(await hasAdminPermission(message.member, "reload"))) return;
 
   if (args.length == 0) {
     loadCommands();

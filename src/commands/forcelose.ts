@@ -2,7 +2,7 @@ import { CommandInteraction, Message } from "discord.js";
 import redis from "../init/redis";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import Constants from "../utils/Constants";
-import { getAdminLevel } from "../utils/functions/users/admin";
+import { hasAdminPermission } from "../utils/functions/users/admin";
 
 const cmd = new Command("forcelose", "make an account lose 100% of the time", "none");
 
@@ -10,7 +10,7 @@ async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
-  if ((await getAdminLevel(message.member)) < 3) return;
+  if (!(await hasAdminPermission(message.member, "forcelose"))) return;
 
   if (args.length == 0) {
     return message.channel.send({ content: "dumbass" });

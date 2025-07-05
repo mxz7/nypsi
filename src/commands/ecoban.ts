@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { isEcoBanned, setEcoBan } from "../utils/functions/economy/utils";
-import { getAdminLevel } from "../utils/functions/users/admin";
+import { hasAdminPermission } from "../utils/functions/users/admin";
 import { logger } from "../utils/logger";
 
 const cmd = new Command("ecoban", "ban an account from eco", "none");
@@ -10,7 +10,7 @@ async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
-  if ((await getAdminLevel(message.member)) < 2) return;
+  if (!(await hasAdminPermission(message.member, "ecoban"))) return;
 
   if (args.length == 0) {
     return message.channel.send({ content: "dumbass" });

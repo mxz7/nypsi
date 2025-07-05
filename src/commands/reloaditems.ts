@@ -4,13 +4,13 @@ import prisma from "../init/database";
 import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { getTasksData, loadItems } from "../utils/functions/economy/utils";
-import { getAdminLevel } from "../utils/functions/users/admin";
+import { hasAdminPermission } from "../utils/functions/users/admin";
 import { logger } from "../utils/logger";
 
 const cmd = new Command("reloaditems", "reload items", "none").setPermissions(["bot owner"]);
 
 async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) {
-  if ((await getAdminLevel(message.member)) < 3) return;
+  if (!(await hasAdminPermission(message.member, "reload"))) return;
 
   loadItems();
   (message.client as NypsiClient).cluster.send("reload_items");
