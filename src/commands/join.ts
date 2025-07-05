@@ -30,6 +30,8 @@ async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
+  let mode: "member" | "position" = "member";
+
   let member: GuildMember;
 
   if (args.length == 0) {
@@ -69,11 +71,12 @@ async function run(
   };
 
   if (!member) {
-    return send({ embeds: [new ErrorEmbed("invalid user")] });
+    if (parseInt(args[0])) {
+      mode = "position";
+    } else {
+      return send({ embeds: [new ErrorEmbed("invalid user")] });
+    }
   }
-
-  const joinedServer = formatDate(member.joinedAt).toLowerCase();
-  const timeAgo = daysAgo(new Date(member.joinedAt));
 
   let members: Collection<string, GuildMember>;
 
@@ -124,14 +127,26 @@ async function run(
     );
   }
 
-  let joinPos: number | string = membersSorted.findIndex((i) => i.id === member.id) + 1;
+  if (mode === "position") {
+    if (!membersSorted[parseInt(args[0]) - 1]) {
+      return send({ embeds: [new ErrorEmbed("invalid user")] });
+    }
 
-  if (joinPos == 0) joinPos = "invalid";
+    member = await message.guild.members.fetch(membersSorted[parseInt(args[0]) - 1].id);
+  }
+
+  const joinPos =
+    mode === "position"
+      ? parseInt(args[0])
+      : membersSorted.findIndex((i) => i.id === member.id) + 1;
+
+  const joinedServer = formatDate(member.joinedAt).toLowerCase();
+  const timeAgo = daysAgo(new Date(member.joinedAt));
 
   const embed = new CustomEmbed(
     message.member,
     `joined on **${joinedServer}**\n- **${timeAgo.toLocaleString()}** days ago\njoin position is **${
-      joinPos != "invalid" ? joinPos.toLocaleString() : "--"
+      joinPos !== 0 ? joinPos.toLocaleString() : "--"
     }**`,
   )
     .setTitle(member.user.username)
