@@ -70,40 +70,42 @@ export async function getZProfile(userId: string) {
 }
 
 export async function checkZPeoples(guild: Guild) {
-  const channel = guild.channels.cache.get(Constants.Z_CHANNEL);
+  for (const channelId of Constants.Z_CHANNELS) {
+    const channel = guild.channels.cache.get(channelId);
 
-  if (!channel || !channel.isTextBased() || !channel.isSendable() || channel.isThread()) {
-    logger.error("z channel not found");
-    return;
-  }
-
-  for (const overwrite of channel.permissionOverwrites.cache.values()) {
-    if (overwrite.type === OverwriteType.Role) continue;
-
-    const profile = await getZProfile(overwrite.id);
-    if (!profile || profile.removed) {
-      await sleep(250);
-      await overwrite.delete();
-      continue;
+    if (!channel || channel.isThread()) {
+      logger.error(`z: channel ${channelId} not found`);
+      return;
     }
-  }
 
-  const users = await prisma.z.findMany({
-    where: {
-      removed: false,
-    },
-    select: {
-      userId: true,
-    },
-  });
+    for (const overwrite of channel.permissionOverwrites.cache.values()) {
+      if (overwrite.type === OverwriteType.Role) continue;
 
-  for (const { userId } of users) {
-    if (!(await guild.members.fetch(userId).catch(() => {}))) continue;
-    if (!channel.permissionOverwrites.cache.has(userId)) {
-      await sleep(250);
-      await channel.permissionOverwrites.create(userId, {
-        ViewChannel: true,
-      });
+      const profile = await getZProfile(overwrite.id);
+      if (!profile || profile.removed) {
+        await sleep(250);
+        await overwrite.delete();
+        continue;
+      }
+    }
+
+    const users = await prisma.z.findMany({
+      where: {
+        removed: false,
+      },
+      select: {
+        userId: true,
+      },
+    });
+
+    for (const { userId } of users) {
+      if (!(await guild.members.fetch(userId).catch(() => {}))) continue;
+      if (!channel.permissionOverwrites.cache.has(userId)) {
+        await sleep(250);
+        await channel.permissionOverwrites.create(userId, {
+          ViewChannel: true,
+        });
+      }
     }
   }
 }
@@ -190,27 +192,39 @@ export async function removeZUser(userId: string, guild: Guild) {
     `${Constants.redis.cache.z.profile}:${query.invitedById}`,
   );
 
-  const channel = guild.channels.cache.get(Constants.Z_CHANNEL);
+  for (const channelId of Constants.Z_CHANNELS) {
+    const channel = guild.channels.cache.get(channelId);
 
-  if (!channel || !channel.isTextBased() || !channel.isSendable() || channel.isThread()) {
-    logger.error("z channel not found");
-    return;
+    if (!channel || channel.isThread()) {
+      logger.error(`z: channel ${channelId} not found`);
+      return;
+    }
+
+    await channel.permissionOverwrites.delete(userId);
+
+    if (Constants.Z_CHANNELS.indexOf(channelId) !== 0 || !channel.isSendable()) {
+      continue;
+    }
+
+    channel.send({
+      embeds: [
+        new CustomEmbed(
+          userId,
+          `${await getLastKnownUsername(userId)} has been removed from **z**`,
+        ),
+      ],
+    });
+
+    addNotificationToQueue({
+      memberId: userId,
+      payload: {
+        embed: new CustomEmbed(
+          userId,
+          "you have been removed from **z**, please remain civil or you will be removed from the server",
+        ),
+      },
+    });
   }
-
-  await channel.permissionOverwrites.delete(userId);
-
-  channel.send({
-    embeds: [
-      new CustomEmbed(userId, `${await getLastKnownUsername(userId)} has been removed from **z**`),
-    ],
-  });
-
-  addNotificationToQueue({
-    memberId: userId,
-    payload: {
-      embed: new CustomEmbed(userId, "you have been removed from **z**"),
-    },
-  });
 }
 
 export async function removeVoteKick(userId: string, targetId: string) {
@@ -271,24 +285,30 @@ export async function invite(userId: string, targetId: string, guild: Guild) {
     `${Constants.redis.cache.z.profile}:${targetId}`,
   );
 
-  const channel = guild.channels.cache.get(Constants.Z_CHANNEL);
+  for (const channelId of Constants.Z_CHANNELS) {
+    const channel = guild.channels.cache.get(channelId);
 
-  if (!channel || !channel.isTextBased() || !channel.isSendable() || channel.isThread()) {
-    logger.error("z channel not found");
-    return;
+    if (!channel || channel.isThread()) {
+      logger.error(`z: channel ${channelId} not found`);
+      return;
+    }
+
+    await channel.permissionOverwrites.create(discordTarget, {
+      ViewChannel: true,
+    });
+
+    if (Constants.Z_CHANNELS.indexOf(channelId) !== 0 || !channel.isSendable()) {
+      continue;
+    }
+
+    channel.send({
+      embeds: [
+        new CustomEmbed(
+          targetId,
+          `welcome to **z**\n\n` + "only rule of **z** is: do not talk about z",
+        ),
+      ],
+      content: `<@${targetId}>`,
+    });
   }
-
-  await channel.permissionOverwrites.create(discordTarget, {
-    ViewChannel: true,
-  });
-
-  channel.send({
-    embeds: [
-      new CustomEmbed(
-        targetId,
-        `welcome to **z**\n\n` + "only rule of **z** is: do not talk about z",
-      ),
-    ],
-    content: `<@${targetId}>`,
-  });
 }

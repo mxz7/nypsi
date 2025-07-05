@@ -34,7 +34,7 @@ async function run(
 ) {
   if (await onCooldown(cmd.name, message.member)) return;
 
-  if (message.channelId !== Constants.Z_CHANNEL) {
+  if (message.channelId !== Constants.Z_CHANNELS[0]) {
     await addCooldown(cmd.name, message.member, 10);
     return (message as Message).react("💤");
   }
