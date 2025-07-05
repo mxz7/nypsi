@@ -149,7 +149,7 @@ export async function rollLootPool(
   return {}; // this shouldnt be reached
 }
 
-function getTotalWeight(loot_pool: LootPool, excludedItems: string[]): number {
+export function getTotalWeight(loot_pool: LootPool, excludedItems: string[]): number {
   let totalWeight = 0;
 
   if (Object.hasOwn(loot_pool, "nothing")) {
@@ -181,7 +181,7 @@ function getTotalWeight(loot_pool: LootPool, excludedItems: string[]): number {
   return totalWeight;
 }
 
-function getItemWeight(data: LootPoolItemEntry): number {
+export function getItemWeight(data: LootPoolItemEntry): number {
   if (typeof data === "number") {
     return data;
   }
@@ -191,7 +191,7 @@ function getItemWeight(data: LootPoolItemEntry): number {
   return 100; // default weight
 }
 
-function getItemCount(data: LootPoolItemEntry, itemId: string): number {
+export function getItemCount(data: LootPoolItemEntry, itemId: string): number {
   const item = getItems()[itemId];
   if (typeof data !== "object" || !Object.hasOwn(data, "count")) {
     if (!Object.hasOwn(item, "default_count")) {

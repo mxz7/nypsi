@@ -1,8 +1,8 @@
 import { CommandInteraction } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
-import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { MStoTime } from "../utils/functions/date";
+import { ErrorEmbed } from "../models/EmbedBuilders";
 import { selectItem } from "../utils/functions/economy/inventory";
+import { runItemInfo } from "../utils/functions/economy/item_info";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -33,26 +33,13 @@ async function run(
     return message.channel.send({ embeds: [new ErrorEmbed(`couldnt find \`${args.join(" ")}\``)] });
   }
 
-  if (!selected.craft || selected.craft.ingredients.length == 0) {
-    return message.channel.send({ embeds: [new ErrorEmbed(`that item is not craftable`)] });
+  if (await runItemInfo(message, args, selected, "crafting")) {
+    await addCooldown(cmd.name, message.member, 4);
+  } else {
+    return message.channel.send({
+      embeds: [new ErrorEmbed(`that item is not craftable nor is it used to craft anything`)],
+    });
   }
-
-  await addCooldown(cmd.name, message.member, 4);
-
-  const embed = new CustomEmbed(message.member).setHeader("recipe", message.author.avatarURL());
-
-  const desc: string[] = [`${selected.emoji} ${selected.name}`];
-
-  selected.craft.ingredients.forEach((ingredient) => {
-    const item = selectItem(ingredient.split(":")[0]);
-    desc.push(`* ${ingredient.split(":")[1]} ${item.emoji} ${item.name}`);
-  });
-
-  embed.setDescription(
-    desc.join("\n") + `\n\n**${MStoTime(selected.craft.time * 1000)}** craft time`,
-  );
-
-  return message.channel.send({ embeds: [embed] });
 }
 
 cmd.setRun(run);
