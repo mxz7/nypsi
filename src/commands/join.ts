@@ -72,7 +72,7 @@ async function run(
     }
   };
 
-  if (!member) {
+  if (!member && mode === "member") {
     return send({ embeds: [new ErrorEmbed("invalid user")] });
   }
 
