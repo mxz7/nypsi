@@ -36,6 +36,8 @@ async function run(
 
   if (args.length == 0) {
     member = message.member;
+  } else if (parseInt(args[0])) {
+    mode = "position";
   } else {
     member = await getMember(message.guild, args.join(" "));
   }
@@ -71,11 +73,7 @@ async function run(
   };
 
   if (!member) {
-    if (parseInt(args[0])) {
-      mode = "position";
-    } else {
-      return send({ embeds: [new ErrorEmbed("invalid user")] });
-    }
+    return send({ embeds: [new ErrorEmbed("invalid user")] });
   }
 
   let members: Collection<string, GuildMember>;
