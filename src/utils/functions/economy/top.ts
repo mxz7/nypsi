@@ -941,7 +941,7 @@ export async function topLottoWins(guild: Guild, member?: MemberResolvable) {
   return { pages, pos };
 }
 
-export async function topLottoWinsGlobal(member: MemberResolvable) {
+export async function topLottoWinsGlobal(member?: MemberResolvable) {
   const query = await prisma.achievements.findMany({
     where: {
       OR: [
@@ -1190,7 +1190,7 @@ export async function topWordleTime(guild: Guild, member: MemberResolvable) {
   return { pages, pos };
 }
 
-export async function topWordleTimeGlobal(member: MemberResolvable) {
+export async function topWordleTimeGlobal(member?: MemberResolvable) {
   const query: { userId: string; time: number; gameId: number }[] =
     await prisma.$queryRaw`WITH ranked_results AS (
     SELECT 
@@ -1437,7 +1437,7 @@ export async function topCommandUses(guild: Guild, member: MemberResolvable) {
   return { pages, pos };
 }
 
-export async function topCommandUsesGlobal(member: MemberResolvable) {
+export async function topCommandUsesGlobal(member?: MemberResolvable) {
   const query = await prisma.commandUse.groupBy({
     where: {
       user: { blacklisted: false },
@@ -1869,7 +1869,7 @@ export async function topVoteStreak(guild: Guild, member?: MemberResolvable) {
   return { pages, pos };
 }
 
-export async function topVoteStreakGlobal(member: MemberResolvable, amount = 100) {
+export async function topVoteStreakGlobal(member?: MemberResolvable, amount = 100) {
   const query = await prisma.economy.findMany({
     where: {
       voteStreak: { gt: 0 },
