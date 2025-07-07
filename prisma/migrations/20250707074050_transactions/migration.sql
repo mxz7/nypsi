@@ -8,6 +8,7 @@ CREATE TABLE "Transaction" (
     "sourceId" TEXT NOT NULL,
     "targetId" TEXT NOT NULL,
     "type" "TransactionType" NOT NULL,
+    "itemId" TEXT,
     "amount" BIGINT NOT NULL,
 
     CONSTRAINT "Transaction_pkey" PRIMARY KEY ("id")

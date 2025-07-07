@@ -1037,6 +1037,7 @@ model Transaction {
   targetId String
 
   type   TransactionType
+  itemId String?
   amount BigInt
 
   source Economy @relation(fields: [sourceId], references: [userId], onDelete: Cascade, name: "source")
