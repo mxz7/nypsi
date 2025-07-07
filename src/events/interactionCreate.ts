@@ -27,7 +27,7 @@ export default async function interactionCreate(interaction: Interaction) {
     return runInteraction(interaction);
   }
 
-  if (interaction.type != InteractionType.ApplicationCommand) return;
+  if (!interaction.isChatInputCommand()) return;
 
   if (interaction.createdTimestamp < Date.now() - 2500) return;
 
