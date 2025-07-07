@@ -407,6 +407,7 @@ export async function transaction(
   type: TransactionType,
   amount: number,
   itemId?: string,
+  notes?: string,
 ) {
   const tx = await prisma.transaction.create({
     data: {
@@ -415,6 +416,7 @@ export async function transaction(
       type,
       amount,
       itemId,
+      notes,
     },
   });
 
