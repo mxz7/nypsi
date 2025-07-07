@@ -24,7 +24,6 @@ import { KarmaShopItem } from "../../../types/Karmashop";
 import { LootPool } from "../../../types/LootPool";
 import Constants from "../../Constants";
 import { MStoTime } from "../date";
-import { getPrefix } from "../guilds/utils";
 import { getEmojiImage } from "../image";
 import { pluralize } from "../string";
 import { getSellMulti } from "./balance";
@@ -65,8 +64,6 @@ export async function runItemInfo(
     return await message.channel.send(data as BaseMessageOptions);
   };
 
-  const prefix = (await getPrefix(message.guild))[0];
-
   const tabs: { [tab: string]: ItemMessageData } = {};
   const metaTabs: StringSelectMenuOptionBuilder[] = [];
 
@@ -84,7 +81,6 @@ export async function runItemInfo(
   tabs["general"] = getGeneralMessage(
     selected,
     message.member,
-    prefix,
     total,
     inMarket,
     value,
@@ -297,7 +293,6 @@ export async function runItemInfo(
 function getGeneralMessage(
   selected: Item,
   member: ItemMessageMember,
-  prefix: string,
   total: number,
   inMarket: number,
   value: number,
@@ -354,18 +349,18 @@ function getGeneralMessage(
 
       let roleDescription = "";
       if (selected.role === "booster") {
-        roleDescription = `you can activate your booster with \`${prefix}use <booster> [amount]\``;
+        roleDescription = `you can activate your booster with **/use <booster>**`;
       }
       if (["collectable", "flower", "cat"].includes(selected.role)) {
         roleDescription =
-          "collectables don't do anything, theyre just *collectables*. if you dont want them, you can get rid of them by selling them";
+          "collectables don't do anything, they're just *collectables*. if you dont want them, you can get rid of them by selling them";
       }
       if (["sellable", "prey", "fish"].includes(selected.role)) {
-        roleDescription = `this item is just meant to be sold. you can use the \`${prefix}sell all\` command to do so quickly`;
+        roleDescription = `this item is just meant to be sold. you can use the **/sell all** command to do so quickly`;
       }
       if (selected.role === "car") {
         description.push(`**speed** ${selected.speed}`);
-        roleDescription = `cars are used for street races (${prefix}**streetrace**)`;
+        roleDescription = `cars are used for races (**/race**)`;
       }
       if (roleDescription.length) description.push(`\n${roleDescription}`);
     }
