@@ -2312,7 +2312,7 @@ async function run(
       } else if (sourceId === "any" && targetId !== "any") {
         query.targetId = targetId;
       } else if (sourceId !== "any" && targetId === "any") {
-        query.targetId = targetId;
+        query.sourceId = sourceId;
       } else {
         return message.channel.send({ embeds: [new ErrorEmbed("invalid query")] });
       }
