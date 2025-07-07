@@ -324,7 +324,7 @@ function getGeneralMessage(
     description.push(`**sell** $${selected.sell.toLocaleString()}`);
     if (["sellable", "prey", "fish"].includes(selected.role)) {
       description[description.length - 1] = description[description.length - 1].concat(
-        ` (+**${sellMulti * 100}**% bonus = `,
+        ` (+**${Math.round(sellMulti * 100)}**% bonus = `,
         `$${Math.floor(selected.sell + selected.sell * sellMulti).toLocaleString()})`,
       );
     }
