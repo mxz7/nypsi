@@ -10,6 +10,7 @@ CREATE TABLE "Transaction" (
     "type" "TransactionType" NOT NULL,
     "itemId" TEXT,
     "amount" BIGINT NOT NULL,
+    "notes" TEXT,
 
     CONSTRAINT "Transaction_pkey" PRIMARY KEY ("id")
 );
