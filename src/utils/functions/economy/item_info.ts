@@ -640,7 +640,7 @@ function getSeedStatsMessage(
   let sellString = `**sell** $${product.sell.toLocaleString()}`;
   if (["sellable", "prey", "fish"].includes(product.role)) {
     sellString = sellString.concat(
-      ` (+**${sellMulti * 100}**% bonus = `,
+      ` (+**${Math.round(sellMulti * 100)}**% bonus = `,
       `$${Math.floor(product.sell + product.sell * sellMulti).toLocaleString()})`,
     );
   }
