@@ -1,9 +1,12 @@
 import { flavors } from "@catppuccin/palette";
+import { TransactionType } from "@prisma/client";
 import { Client, User, WebhookClient } from "discord.js";
 import { WriteStream, createWriteStream, existsSync } from "fs";
 import { rename, stat } from "fs/promises";
+import prisma from "../init/database";
 import DiscordTransport from "../models/DiscordLogs";
 import Constants from "./Constants";
+import { formatTransaction } from "./functions/transactions";
 import chalk = require("chalk");
 import dayjs = require("dayjs");
 
@@ -398,43 +401,29 @@ export function setClusterId(id: string) {
   logger.meta = { cluster: id };
 }
 
-export function transaction(
+export async function transaction(
   from: { username: string; id: string },
   to: { username: string; id: string },
-  value: string,
+  type: TransactionType,
+  amount: number,
+  itemId?: string,
 ) {
-  if (!nextLogMsg.get("pay")) {
-    nextLogMsg.set(
-      "pay",
-      `**${from.username}** (${from.id}) -> **${to.username}** (${to.id})\n- **${value}**\n`,
-    );
-  } else {
-    nextLogMsg.set(
-      "pay",
-      nextLogMsg.get("pay") +
-        `**${from.username}** (${from.id}) -> **${to.username}** (${to.id})\n- **${value}**\n`,
-    );
-  }
-}
+  const tx = await prisma.transaction.create({
+    data: {
+      sourceId: from.id,
+      targetId: to.id,
+      type,
+      amount,
+      itemId,
+    },
+  });
 
-export function transactionMulti(from: User, to: User, values: string[]) {
-  let formatted = "";
-
-  for (const value of values) {
-    formatted += `- **${value}**\n`;
-  }
+  const msg = await formatTransaction(tx, "discord");
 
   if (!nextLogMsg.get("pay")) {
-    nextLogMsg.set(
-      "pay",
-      `**${from.username}** (${from.id}) -> **${to.username}** (${to.id})\n${formatted}`,
-    );
+    nextLogMsg.set("pay", `${msg}\n`);
   } else {
-    nextLogMsg.set(
-      "pay",
-      nextLogMsg.get("pay") +
-        `**${from.username}** (${from.id}) -> **${to.username}** (${to.id})\n${formatted}`,
-    );
+    nextLogMsg.set("pay", nextLogMsg.get("pay") + `${msg}\n`);
   }
 }
 
