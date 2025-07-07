@@ -2317,6 +2317,10 @@ async function run(
         return message.channel.send({ embeds: [new ErrorEmbed("invalid query")] });
       }
 
+      logger.info(
+        `admin: ${message.author.id} (${message.author.username}) queried transactions ${sourceId} -> ${targetId}`,
+      );
+
       const test = await prisma.transaction.findMany({ where: query, take: 1 });
 
       if (test.length < 1) {
