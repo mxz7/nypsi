@@ -12,6 +12,7 @@
 
 - staff members can now start a support request with users
 - transaction logging in database - easier to query
+- players below prestige 1 don't get their level reset on new season
 
 ---
 
