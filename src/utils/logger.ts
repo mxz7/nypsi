@@ -405,7 +405,7 @@ export async function transaction(
   from: { username: string; id: string },
   to: { username: string; id: string },
   type: TransactionType,
-  amount: number,
+  amount: number | bigint,
   itemId?: string,
   notes?: string,
 ) {
