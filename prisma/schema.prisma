@@ -228,6 +228,8 @@ model Economy {
   CustomCar          CustomCar[]
   Farm               Farm[]
   FarmUpgrades       FarmUpgrades[]
+  transactionsSource Transaction[]       @relation(name: "source")
+  transactionsTarget Transaction[]       @relation(name: "target")
 }
 
 model Farm {
@@ -1020,4 +1022,23 @@ model tmdbRatings {
   rating Decimal    @db.Decimal(2, 1)
 
   @@id([userId, type, id])
+}
+
+enum TransactionType {
+  money
+  item
+}
+
+model Transaction {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  sourceId String
+  targetId String
+
+  type   TransactionType
+  amount BigInt
+
+  source Economy @relation(fields: [sourceId], references: [userId], onDelete: Cascade, name: "source")
+  target Economy @relation(fields: [targetId], references: [userId], onDelete: Cascade, name: "target")
 }
