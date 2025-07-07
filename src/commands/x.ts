@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client";
 import { exec } from "child_process";
 import {
   ActionRowBuilder,
+  AttachmentBuilder,
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
@@ -67,6 +68,7 @@ import {
   setTier,
 } from "../utils/functions/premium/premium";
 import { createSupportRequest } from "../utils/functions/supportrequest";
+import { exportTransactions } from "../utils/functions/transactions";
 import { getAdminLevel, setAdminLevel } from "../utils/functions/users/admin";
 import { setBirthday } from "../utils/functions/users/birthday";
 import { isUserBlacklisted, setUserBlacklist } from "../utils/functions/users/blacklist";
@@ -2185,6 +2187,7 @@ async function run(
       message.member,
       "$x userid (id) - view/edit disc info and db info" +
         "\n$x findid (tag/username) - will attempt to find user id from cached users and database" +
+        "\n$x tx - transactions" +
         "\n$x transfer <from id> <to id> - start a profile transfer" +
         "\n$x drop - start a random drop" +
         "\n$x memberfind - debug member targetting" +
@@ -2273,6 +2276,69 @@ async function run(
     // idk how this should be done lol i might get back to it
 
     console.log(map);
+  } else if (["transaction", "tx"].includes(args[0].toLowerCase())) {
+    if ((await getAdminLevel(message.member)) < 1) {
+      return message.channel.send({
+        embeds: [new ErrorEmbed("you require admin level **1** to do this")],
+      });
+    }
+
+    if (args[1]?.toLowerCase() === "query") {
+      if (args.length < 4) {
+        return message.channel.send({
+          embeds: [
+            new CustomEmbed(
+              message.member,
+              "$x tx query <source id | any> <target id | any>",
+            ).setHeader("transactions"),
+          ],
+        });
+      }
+
+      const sourceId = args[2];
+      const targetId = args[3];
+
+      const query: Prisma.TransactionFindManyArgs["where"] = {};
+
+      if (sourceId !== "any" && targetId !== "any") {
+        query.AND = [
+          {
+            sourceId,
+          },
+          {
+            targetId,
+          },
+        ];
+      } else if (sourceId === "any" && targetId !== "any") {
+        query.targetId = targetId;
+      } else if (sourceId !== "any" && targetId === "any") {
+        query.targetId = targetId;
+      } else {
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid query")] });
+      }
+
+      const test = await prisma.transaction.findMany({ where: query, take: 1 });
+
+      if (test.length < 1) {
+        return message.channel.send({ embeds: [new ErrorEmbed("no transactions found")] });
+      }
+
+      const file = await exportTransactions(query);
+
+      return message.channel.send({
+        files: [new AttachmentBuilder(file, { name: "transactions.txt" })],
+      });
+    } else {
+      return message.channel.send({
+        embeds: [
+          new CustomEmbed(
+            message.member,
+            "$x tx query <source id | any> <target id | any>\n" +
+              "$x tx analytics <source id | any> <target id | any>",
+          ).setHeader("transactions"),
+        ],
+      });
+    }
   }
 }
 
