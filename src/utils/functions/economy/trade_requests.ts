@@ -16,7 +16,7 @@ import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed, ErrorEmbed } from "../../../models/EmbedBuilders";
 import { Item } from "../../../types/Economy";
 import Constants from "../../Constants";
-import { logger, transactionMulti } from "../../logger";
+import { logger, transaction } from "../../logger";
 import { getUserId, MemberResolvable } from "../member";
 import { getAllGroupAccountIds } from "../moderation/alts";
 import { getTier, isPremium } from "../premium/premium";
@@ -496,37 +496,38 @@ export async function fulfillTradeRequest(
 
   logger.info(`trade request fulfilled owner: ${tradeRequest.ownerId} to: ${interaction.user.id}`);
 
-  const formattedRequested: string[] = [];
-  const formattedOffered: string[] = [];
-
   for (const item of tradeRequest.requestedItems) {
-    formattedRequested.push(item.replace(":", " x "));
+    transaction(
+      interaction.user,
+      await interaction.client.users.fetch(tradeRequest.ownerId),
+      "item",
+      parseInt(item.split(":")[0]),
+      item.split(":")[1],
+      "trade request",
+    );
   }
 
-  formattedRequested[formattedRequested.length - 1] =
-    `${formattedRequested[formattedRequested.length - 1]} (trade request)`;
-
   if (tradeRequest.offeredMoney > 0) {
-    formattedOffered.push(`$${(Number(tradeRequest.offeredMoney) - taxedAmount).toLocaleString()}`);
+    transaction(
+      await interaction.client.users.fetch(tradeRequest.ownerId),
+      interaction.user,
+      "money",
+      Number(tradeRequest.offeredMoney) - taxedAmount,
+      undefined,
+      "trade request",
+    );
   }
 
   for (const item of tradeRequest.offeredItems) {
-    formattedOffered.push(item.replace(":", " x "));
+    transaction(
+      await interaction.client.users.fetch(tradeRequest.ownerId),
+      interaction.user,
+      "item",
+      parseInt(item.split(":")[0]),
+      item.split(":")[1],
+      "trade request",
+    );
   }
-
-  formattedOffered[formattedOffered.length - 1] =
-    `${formattedOffered[formattedOffered.length - 1]} (trade request)`;
-
-  transactionMulti(
-    await interaction.client.users.fetch(tradeRequest.ownerId),
-    interaction.user,
-    formattedOffered,
-  );
-  transactionMulti(
-    interaction.user,
-    await interaction.client.users.fetch(tradeRequest.ownerId),
-    formattedRequested,
-  );
 
   if ((await getDmSettings(tradeRequest.ownerId)).market) {
     const embedDm = new CustomEmbed(tradeRequest.ownerId).setDescription(

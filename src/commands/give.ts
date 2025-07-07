@@ -209,7 +209,7 @@ async function run(
       .catch(() => {});
   }
 
-  transaction(message.author, target.user, `${selected.id} x ${amount}`);
+  transaction(message.author, target.user, "item", amount, selected.id);
 
   return send({
     embeds: [

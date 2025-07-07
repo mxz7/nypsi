@@ -146,12 +146,19 @@ export default {
     transaction(
       interaction.user,
       await interaction.client.users.fetch(offer.ownerId),
-      `${offer.itemAmount}x ${offer.itemId} (offer)`,
+      "item",
+      offer.itemAmount,
+      offer.itemId,
+      "offer",
     );
     transaction(
       await interaction.client.users.fetch(offer.ownerId),
       interaction.user,
-      `$${offer.money.toLocaleString()} (offer)`,
+      "money",
+      offer.money,
+
+      undefined,
+      "offer",
     );
   },
 } as InteractionHandler;
