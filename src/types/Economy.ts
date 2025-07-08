@@ -140,3 +140,9 @@ export type PlantUpgrade = {
     items: string[];
   };
 };
+
+export interface Event {
+  id: string;
+  name: string;
+  description: string; // with {target} to be replaced with actual target
+}
