@@ -89,11 +89,15 @@ export function loadItems(crypto = true) {
   lootPools.workers_crate = getDefaultLootPool((i) => i.role === "worker-upgrade");
   lootPools.boosters_crate = getDefaultLootPool((i) => i.role === "booster");
   lootPools.pandora_box = getDefaultLootPool(
-    (i) => !["sellable", "prey", "tool", "fish", "ore", "fuel"].includes(i.role),
+    (i) => !["sellable", "ore", "fuel"].includes(i.role) && !i.unique && i.id !== "hanafuda_tag",
   );
 
   for (const item in lootPools.pandora_box.items) {
-    lootPools.pandora_box.items[item] = 100;
+    if (getItems()[item].role === "tag") {
+      lootPools.pandora_box.items[item] = 1;
+    } else {
+      lootPools.pandora_box.items[item] = 100;
+    }
   }
 
   Object.values(userUpgrades).forEach((i) => {
