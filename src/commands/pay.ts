@@ -153,6 +153,7 @@ async function run(
     await removeBalance(message.member, amount);
     await addToNypsiBank(amount);
     addStat(message.member, "spent-bank", amount);
+    transaction(message.author, message.client.user, "money", amount);
 
     return send({
       embeds: [
@@ -284,7 +285,12 @@ async function run(
     }, 1500);
   });
 
-  transaction(message.author, target.user, `$${amount.toLocaleString()}`);
+  transaction(
+    message.author,
+    target.user,
+    "money",
+    tax ? amount - Math.round(amount * tax) : amount,
+  );
 }
 
 cmd.setRun(run);

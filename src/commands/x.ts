@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client";
 import { exec } from "child_process";
 import {
   ActionRowBuilder,
+  AttachmentBuilder,
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
@@ -67,11 +68,13 @@ import {
   setTier,
 } from "../utils/functions/premium/premium";
 import { createSupportRequest } from "../utils/functions/supportrequest";
+import { exportTransactions } from "../utils/functions/transactions";
 import { getAdminLevel, hasAdminPermission, setAdminLevel } from "../utils/functions/users/admin";
 import { setBirthday } from "../utils/functions/users/birthday";
 import { isUserBlacklisted, setUserBlacklist } from "../utils/functions/users/blacklist";
 import { getCommandUses } from "../utils/functions/users/commands";
 import { addNotificationToQueue } from "../utils/functions/users/notifications";
+import { getLastKnownUsername } from "../utils/functions/users/tag";
 import { addTag, getTags, removeTag } from "../utils/functions/users/tags";
 import { hasProfile } from "../utils/functions/users/utils";
 import { logger } from "../utils/logger";
@@ -2191,6 +2194,7 @@ async function run(
       message.member,
       "$x userid (id) - view/edit disc info and db info" +
         "\n$x findid (tag/username) - will attempt to find user id from cached users and database" +
+        "\n$x tx - transactions" +
         "\n$x transfer <from id> <to id> - start a profile transfer" +
         "\n$x drop - start a random drop" +
         "\n$x memberfind - debug member targetting" +
@@ -2279,6 +2283,139 @@ async function run(
     // idk how this should be done lol i might get back to it
 
     console.log(map);
+  } else if (["transaction", "tx"].includes(args[0].toLowerCase())) {
+    if ((await getAdminLevel(message.member)) < 1) {
+      return message.channel.send({
+        embeds: [new ErrorEmbed("you require admin level **1** to do this")],
+      });
+    }
+
+    if (args[1]?.toLowerCase() === "query") {
+      if (args.length < 4) {
+        return message.channel.send({
+          embeds: [
+            new CustomEmbed(
+              message.member,
+              "$x tx query <source id | any> <target id | any>",
+            ).setHeader("transactions"),
+          ],
+        });
+      }
+
+      const sourceId = args[2];
+      const targetId = args[3];
+
+      const query: Prisma.TransactionFindManyArgs["where"] = {};
+
+      if (sourceId !== "any" && targetId !== "any") {
+        query.AND = [
+          {
+            sourceId,
+          },
+          {
+            targetId,
+          },
+        ];
+      } else if (sourceId === "any" && targetId !== "any") {
+        query.targetId = targetId;
+      } else if (sourceId !== "any" && targetId === "any") {
+        query.sourceId = sourceId;
+      } else {
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid query")] });
+      }
+
+      logger.info(
+        `admin: ${message.author.id} (${message.author.username}) queried transactions ${sourceId} -> ${targetId}`,
+      );
+
+      const test = await prisma.transaction.findMany({ where: query, take: 1 });
+
+      if (test.length < 1) {
+        return message.channel.send({ embeds: [new ErrorEmbed("no transactions found")] });
+      }
+
+      const file = await exportTransactions(query);
+
+      return message.channel.send({
+        files: [new AttachmentBuilder(file, { name: "transactions.txt" })],
+      });
+    } else if (args[1]?.toLowerCase() === "analytics") {
+      if (args.length < 4) {
+        return message.channel.send({
+          embeds: [
+            new CustomEmbed(message.member, "$x tx analytics <source|target> <user id>").setHeader(
+              "transactions",
+            ),
+          ],
+        });
+      }
+
+      const type = args[2];
+      const userId = args[3];
+
+      if (type !== "source" && type !== "target") {
+        return message.channel.send({ embeds: [new ErrorEmbed("invalid type")] });
+      }
+
+      const count = await prisma.transaction.count({
+        where: {
+          [type === "source" ? "sourceId" : "targetId"]: userId,
+        },
+      });
+
+      logger.info(
+        `admin: ${message.author.id} (${message.author.username}) queried analytics ${type} ${userId}`,
+      );
+
+      if (count === 0) {
+        return message.channel.send({ embeds: [new ErrorEmbed("no transactions found")] });
+      }
+
+      const byOpposite = await prisma.transaction.groupBy({
+        where: {
+          [type === "source" ? "sourceId" : "targetId"]: userId,
+        },
+        by: [type === "source" ? "targetId" : "sourceId"],
+        _count: {
+          id: true,
+        },
+        orderBy: {
+          _count: {
+            id: "desc",
+          },
+        },
+        take: 5,
+      });
+
+      const oppositeFormatted: string[] = [];
+
+      for (const opposite of byOpposite) {
+        const username = await getLastKnownUsername(
+          opposite[type === "source" ? "targetId" : "sourceId"],
+        );
+        const percentage = ((opposite._count.id / count) * 100).toFixed(2);
+        oppositeFormatted.push(
+          `${username} (\`${opposite[type === "source" ? "targetId" : "sourceId"]}\`) \`${percentage}%\` (${opposite._count.id.toLocaleString()})`,
+        );
+      }
+
+      const embed = new CustomEmbed(
+        message.member,
+        `${count.toLocaleString()} total transactions\n\n${oppositeFormatted.join("\n")}`,
+      ).setHeader(`analytics for ${await getLastKnownUsername(userId)} (${userId})`);
+
+      return message.channel.send({ embeds: [embed] });
+    } else {
+      return message.channel.send({
+        embeds: [
+          new CustomEmbed(
+            message.member,
+            "$x tx query <source id | any> <target id | any>\n" +
+              "$x tx analytics <source|target> <user id>",
+          ).setHeader("transactions"),
+        ],
+      });
+    }
   }
 }
 

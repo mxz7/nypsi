@@ -85,8 +85,6 @@ async function createPayload(data: DMQueue, type: "buy" | "sell"): Promise<Notif
       description += `  - **${username}**: ${amount.toLocaleString()}\n`;
       total += amount;
     }
-
-    description += "\n";
   }
 
   const embed = new CustomEmbed(data.userId).setDescription(description);

@@ -80,6 +80,14 @@ export async function getCommandUses(member: MemberResolvable) {
 export async function updateUser(user: User, command: string) {
   if (!user) return;
   const date = new Date();
+
+  if (recentCommands.has(user.id)) {
+    if (recentCommands.get(user.id) + ms("5 minutes") > date.getTime()) {
+      // already updated very recently
+      return;
+    }
+  }
+
   recentCommands.set(user.id, date.getTime());
 
   await redis.set(

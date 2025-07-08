@@ -491,6 +491,9 @@ export async function reset() {
   let updated = 0;
 
   for (const user of query) {
+    let newLevel = user.level - (user.level % 100);
+    if (user.prestige < 1 && user.level < 101) newLevel = user.level;
+
     await prisma.economy.update({
       where: {
         userId: user.userId,
@@ -502,7 +505,7 @@ export async function reset() {
         defaultBet: 0,
         xp: 0,
         padlock: false,
-        level: user.level - (user.level % 100),
+        level: newLevel,
         seasonVote: 0,
         netWorth: 0,
       },

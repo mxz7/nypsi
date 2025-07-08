@@ -417,6 +417,7 @@ export async function isRequestSuitable(
     "* Nonsensical or random words",
     "* Not asking for anything",
     "* Asking for help but not specifying a subject",
+    "* Asking for help but not saying what they need help with",
     "",
     "",
   ];

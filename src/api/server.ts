@@ -10,6 +10,7 @@ import { logger } from "../utils/logger";
 import kofi from "./controllers/kofi";
 import vote from "./controllers/vote";
 import loggerMiddleware from "./middleware/logger";
+import ms = require("ms");
 
 const app = new Hono();
 
@@ -79,6 +80,11 @@ app.post("/reboot", bearerAuth({ token: process.env.API_AUTH }), async (c) => {
   }, 3000);
 
   return c.body(null, 200);
+});
+
+app.post("/pausestreak", bearerAuth({ token: process.env.API_AUTH }), async (c) => {
+  await redis.set("nypsi:streakpause", 69, "EX", ms("1 day") / 1000);
+  return c.body("streaks will be paused for the next 24 hours", 200);
 });
 
 app.route("/vote", vote);

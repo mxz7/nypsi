@@ -4,12 +4,16 @@ import { calcItemValue } from "../../utils/functions/economy/inventory";
 import {
   topBalanceGlobal,
   topChatReactionGlobal,
+  topCommandUsesGlobal,
   topDailyStreakGlobal,
   topItemGlobal,
+  topLottoWinsGlobal,
   topNetWorthGlobal,
   topPrestigeGlobal,
   topVoteGlobal,
+  topVoteStreakGlobal,
   topWordleGlobal,
+  topWordleTimeGlobal,
 } from "../../utils/functions/economy/top";
 import { getItems } from "../../utils/functions/economy/utils";
 import sleep from "../../utils/functions/sleep";
@@ -17,7 +21,7 @@ import { logger } from "../../utils/logger";
 
 export default {
   name: "seed leaderboards",
-  cron: "0 0 * * *",
+  cron: "0 4 * * *",
   run: async () => {
     const start = Date.now();
     const itemIds = Object.keys(getItems()).filter((i) => i !== "lottery_ticket");
@@ -37,6 +41,14 @@ export default {
     await topChatReactionGlobal("", false, 100);
     await sleep(1000);
     await topChatReactionGlobal("", true, 100);
+    await sleep(1000);
+    await topCommandUsesGlobal("");
+    await sleep(1000);
+    await topVoteStreakGlobal();
+    await sleep(1000);
+    await topWordleTimeGlobal();
+    await sleep(1000);
+    await topLottoWinsGlobal();
 
     for (const item of itemIds) {
       await sleep(1000);

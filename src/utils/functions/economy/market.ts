@@ -813,12 +813,18 @@ export async function completeOrder(
     transaction(
       { username: await getLastKnownUsername(order.ownerId), id: order.ownerId },
       { username: username, id: buyerId },
-      `${order.itemId} x ${amount} (market buy)`,
+      "item",
+      amount,
+      order.itemId,
+      "market",
     );
     transaction(
       { username: username, id: buyerId },
       { username: await getLastKnownUsername(order.ownerId), id: order.ownerId },
-      `$${(Number(amount) * Number(order.price) - taxedAmount).toLocaleString()} (market buy)`,
+      "money",
+      Number(amount) * Number(order.price) - taxedAmount,
+      undefined,
+      "market",
     );
 
     if ((await getDmSettings(order.ownerId)).market) {
