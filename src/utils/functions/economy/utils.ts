@@ -92,6 +92,12 @@ export function loadItems(crypto = true) {
     (i) => !["sellable", "prey", "tool", "fish", "ore", "fuel"].includes(i.role),
   );
 
+  for (const item in lootPools.pandora_box.items) {
+    lootPools.pandora_box.items[item] = 100;
+  }
+
+  console.log(lootPools.pandora_box);
+
   Object.values(userUpgrades).forEach((i) => {
     maxPrestige += i.max;
   });
