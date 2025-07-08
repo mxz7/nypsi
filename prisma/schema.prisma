@@ -48,6 +48,8 @@ model User {
   Purchases                Purchases[]
   WordleGame               WordleGame[]
   FlagGame                 FlagGame[]
+  Event                    Event[]
+  EventContribution        EventContribution[]
 }
 
 model ProfileView {
@@ -1044,4 +1046,33 @@ model Transaction {
 
   source Economy @relation(fields: [sourceId], references: [userId], onDelete: Cascade, name: "source")
   target Economy @relation(fields: [targetId], references: [userId], onDelete: Cascade, name: "target")
+}
+
+model Event {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  ownerId String
+
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+
+  title     String
+  type      String
+  target    String
+  expiresAt DateTime
+
+  owner User @relation(fields: [ownerId], references: [id])
+}
+
+model EventContribution {
+  userId  String
+  eventId Int
+
+  contribution BigInt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, eventId])
+  @@index([eventId])
 }
