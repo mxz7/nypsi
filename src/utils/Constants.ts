@@ -22,13 +22,21 @@ const adminPermissionLevels = {
     "bypass-maintenance",
     "bypass-dev-restrictions",
     "captchatest",
-    "view-user-info",
+    "view-transactions",
     "set-birthday",
+    "use-x",
   ] as const,
-  "2": ["ecoban", "cmdwatch", "requestdm", "create-chat", "anticheat-history"] as const,
+  "2": [
+    "view-user-info",
+    "find",
+    "ecoban",
+    "cmdwatch",
+    "requestdm",
+    "create-chat",
+    "anticheat-history",
+  ] as const,
   "3": [
     "blacklist",
-    "find",
     "forcelose",
     "logsearch",
     "toggle-maintenance",
@@ -52,7 +60,15 @@ const adminPermissionLevels = {
     "run-streak",
   ] as const,
   "5": ["set-premium", "streakpause", "spawn-lootdrop"] as const,
-  "69": ["set-admin-level", "wipe", "profile-transfer"] as const,
+  "69": [
+    "set-admin-level",
+    "wipe",
+    "profile-transfer",
+    "fix-crash",
+    "set-cmd-channels",
+    "reseteco",
+    "run-job",
+  ] as const,
 } as const;
 
 export type AdminPermission =

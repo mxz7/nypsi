@@ -151,7 +151,7 @@ export async function getMember(
 
   if (debug) {
     return [
-      { username: target.user.username, score: 10000 },
+      ...(target ? [{ username: target.user.username, score: 10000 }] : []),
       ...sort(scores)
         .desc((i) => i.score)
         .map((i) => ({ score: i.score, username: members.get(i.id).user.username })),
