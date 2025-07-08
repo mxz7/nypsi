@@ -1,0 +1,18 @@
+{
+  "blackjack": { "name": "blackjack", "description": "win {target} games of blackjack" },
+  "mines": { "name": "mines", "description": "win {target} games of mines" },
+  "highlow": { "name": "highlow", "description": "win {target} games of highlow" },
+  "dragontower": { "name": "dragon tower", "description": "win {target} games of dragon tower" },
+  "roulette": { "name": "roulette", "description": "win {target} games of roulette" },
+  "slots": { "name": "slots", "description": "win {target} games of slots" },
+  "rps": {
+    "name": "rock paper scissors",
+    "description": "win {target} games of rock paper scissors (rps)"
+  },
+  "coinflip": { "name": "coinflip", "description": "win {target} games of coinflip" },
+  "rob": { "name": "robbery", "description": "win {target} robberies" },
+  "gamble": { "name": "gambling addiction", "description": "win {target} gambles" },
+  "farming": { "name": "green thumbs", "description": "harvest {target} fruits/plants" },
+  "commands": { "name": "nypsi addicts", "description": "do {target} commands" },
+  "tasks": { "name": "task master", "description": "complete {target} tasks" }
+}
