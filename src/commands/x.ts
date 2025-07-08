@@ -2354,7 +2354,7 @@ async function run(
       });
   };
 
-  const doCaptchatest = async (args: string[]) => {
+  const doCaptcha = async (args: string[]) => {
     args.shift();
 
     let verify = false;
@@ -2637,7 +2637,7 @@ async function run(
     }
 
     return doFind(args);
-  } else if (args[0].toLowerCase() == "captchatest") {
+  } else if (args[0].toLowerCase() == "captcha") {
     if (!(await hasAdminPermission(message.member, "captchatest"))) {
       return message.channel.send({
         embeds: [requiredLevelEmbed("captchatest")],
@@ -2645,10 +2645,10 @@ async function run(
     }
 
     if (args.length == 1) {
-      return message.channel.send({ embeds: [new ErrorEmbed("$x captchatest (verify) <id>")] });
+      return message.channel.send({ embeds: [new ErrorEmbed("$x captcha (verify) <id>")] });
     }
 
-    return doCaptchatest(args);
+    return doCaptcha(args);
   } else if (args[0].toLowerCase() == "forcelose") {
     if (!(await hasAdminPermission(message.member, "forcelose"))) {
       return message.channel.send({
@@ -3039,7 +3039,7 @@ async function getUsableCommands(member: MemberResolvable) {
       permission: "find",
     },
     {
-      command: "$x captchatest (verify) <id>",
+      command: "$x captcha (verify) <id>",
       description: "give a user a captcha",
       permission: "captchatest",
     },
