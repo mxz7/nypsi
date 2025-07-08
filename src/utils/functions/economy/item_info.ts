@@ -700,7 +700,10 @@ function poolBreakdown(pool: LootPool): string[] {
       weight,
     );
   }
-  return inPlaceSort(description.keys().toArray()).asc([(e) => description.get(e), (e) => e]);
+  return inPlaceSort(description.keys().toArray()).by([
+    { desc: (e) => description.get(e) },
+    { asc: (e) => e },
+  ]);
 }
 
 // END HELPERS
