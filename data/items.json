@@ -3448,5 +3448,20 @@
     "role": "trophy",
     "in_crates": false,
     "account_locked": true
+  },
+  "pandora_box": {
+    "id": "pandora_box",
+    "name": "pandora's box",
+    "article": "a",
+    "plural": "pandora's boxes",
+    "emoji": "<:pandorabox:1392222630722932898>",
+    "role": "crate",
+    "longDesc": "open to receive a random item",
+    "rarity": 69,
+    "aliases": ["pandora", "pbox"],
+    "loot_pools": {
+      "pandora_box": 1
+    },
+    "in_crates": true
   }
 }

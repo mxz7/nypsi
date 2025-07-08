@@ -88,6 +88,9 @@ export function loadItems(crypto = true) {
   lootPools.basic_crate.xp = { 50: 100, 100: 100, 250: 100 };
   lootPools.workers_crate = getDefaultLootPool((i) => i.role === "worker-upgrade");
   lootPools.boosters_crate = getDefaultLootPool((i) => i.role === "booster");
+  lootPools.pandora_box = getDefaultLootPool(
+    (i) => !["sellable", "prey", "tool", "fish", "ore", "fuel"].includes(i.role),
+  );
 
   Object.values(userUpgrades).forEach((i) => {
     maxPrestige += i.max;
