@@ -190,6 +190,16 @@ export async function isModLogsEnabled(guild: Guild) {
 export async function setModLogs(guild: Guild, hook: string) {
   await redis.del(Constants.redis.cache.guild.MODLOGS_GUILDS);
 
+  const previous = await getModLogsHook(guild);
+
+  if (previous) {
+    try {
+      await previous.delete("modlogs moved/disabled");
+    } catch {
+      // silent fail
+    }
+  }
+
   await prisma.guild.update({
     where: {
       id: guild.id,
