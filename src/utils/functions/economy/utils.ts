@@ -96,8 +96,6 @@ export function loadItems(crypto = true) {
     lootPools.pandora_box.items[item] = 100;
   }
 
-  console.log(lootPools.pandora_box);
-
   Object.values(userUpgrades).forEach((i) => {
     maxPrestige += i.max;
   });
