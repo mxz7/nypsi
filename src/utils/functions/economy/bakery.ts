@@ -288,10 +288,11 @@ export async function runBakery(member: GuildMember) {
     embed.addField("stats", breakdownDesc.join("\n"));
   }
 
-  addProgress(member.user.id, "baker", Math.round(total));
-  addProgress(member.user.id, "super_baker", Math.round(total));
-  addTaskProgress(member.user.id, "bake_daily", Math.round(total));
-  addTaskProgress(member.user.id, "bake_weekly", Math.round(total));
+  addStat(member, "times-baked");
+  addProgress(member, "baker", Math.round(total));
+  addProgress(member, "super_baker", Math.round(total));
+  addTaskProgress(member, "bake_daily", Math.round(total));
+  addTaskProgress(member, "bake_weekly", Math.round(total));
 
   return embed;
 }

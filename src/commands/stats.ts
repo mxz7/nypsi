@@ -751,8 +751,19 @@ async function run(
       message.author.avatarURL(),
     );
 
+    const timesBaked = parseInt(findStatAmount(stats, "times-baked", false));
     const totalBaked = parseInt(findStatAmount(stats, "bake-total", false));
     const cakesBaked = parseInt(findStatAmount(stats, "bake-cake", false));
+
+    const averageBake = Math.floor(totalBaked / timesBaked);
+
+    if (timesBaked == 0) {
+      embed.setDescription("you have not baked any cookies (/bake)");
+
+      return send({
+        embeds: [embed],
+      });
+    }
 
     const breakdownItems = [
       { key: "grandma", emoji: "👵🏻", name: "grandma" },
@@ -775,7 +786,8 @@ async function run(
     });
 
     embed.setDescription(
-      `your bakery has baked **${totalBaked.toLocaleString()}** ${pluralize("cookie", totalBaked)} 🍪 ${cakesBaked > 0 ? ` and **${cakesBaked.toLocaleString()}** ${pluralize("cake", cakesBaked)} ${getItems()["cake"].emoji}` : ""}`,
+      `your bakery has baked **${totalBaked.toLocaleString()}** ${pluralize("cookie", totalBaked)} 🍪 ${cakesBaked > 0 ? ` and **${cakesBaked.toLocaleString()}** ${pluralize("cake", cakesBaked)} ${getItems()["cake"].emoji}` : ""}` +
+        `\n\nyou have baked **${timesBaked.toLocaleString()}** ${pluralize("time", timesBaked)}${timesBaked > 1 ? ` with an average of **${averageBake}** 🍪 ${pluralize("cookie", averageBake)} per bake` : ""}`,
     );
 
     if (breakdown.length > 0) embed.addField("breakdown", breakdown.join("\n"));
