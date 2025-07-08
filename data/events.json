@@ -1,18 +1,67 @@
 {
-  "blackjack": { "name": "blackjack", "description": "win {target} games of blackjack" },
-  "mines": { "name": "mines", "description": "win {target} games of mines" },
-  "highlow": { "name": "highlow", "description": "win {target} games of highlow" },
-  "dragontower": { "name": "dragon tower", "description": "win {target} games of dragon tower" },
-  "roulette": { "name": "roulette", "description": "win {target} games of roulette" },
-  "slots": { "name": "slots", "description": "win {target} games of slots" },
+  "blackjack": {
+    "id": "blackjack",
+    "name": "blackjack",
+    "description": "win {target} games of blackjack"
+  },
+  "mines": {
+    "id": "mines",
+    "name": "mines",
+    "description": "win {target} games of mines"
+  },
+  "highlow": {
+    "id": "highlow",
+    "name": "highlow",
+    "description": "win {target} games of highlow"
+  },
+  "dragontower": {
+    "id": "dragontower",
+    "name": "dragon tower",
+    "description": "win {target} games of dragon tower"
+  },
+  "roulette": {
+    "id": "roulette",
+    "name": "roulette",
+    "description": "win {target} games of roulette"
+  },
+  "slots": {
+    "id": "slots",
+    "name": "slots",
+    "description": "win {target} games of slots"
+  },
   "rps": {
+    "id": "rps",
     "name": "rock paper scissors",
     "description": "win {target} games of rock paper scissors (rps)"
   },
-  "coinflip": { "name": "coinflip", "description": "win {target} games of coinflip" },
-  "rob": { "name": "robbery", "description": "win {target} robberies" },
-  "gamble": { "name": "gambling addiction", "description": "win {target} gambles" },
-  "farming": { "name": "green thumbs", "description": "harvest {target} fruits/plants" },
-  "commands": { "name": "nypsi addicts", "description": "do {target} commands" },
-  "tasks": { "name": "task master", "description": "complete {target} tasks" }
+  "coinflip": {
+    "id": "coinflip",
+    "name": "coinflip",
+    "description": "win {target} games of coinflip"
+  },
+  "rob": {
+    "id": "rob",
+    "name": "robbery",
+    "description": "win {target} robberies"
+  },
+  "gamble": {
+    "id": "gamble",
+    "name": "gambling addiction",
+    "description": "win {target} gambles"
+  },
+  "farming": {
+    "id": "farming",
+    "name": "green thumbs",
+    "description": "harvest {target} fruits/plants"
+  },
+  "commands": {
+    "id": "commands",
+    "name": "nypsi addicts",
+    "description": "do {target} commands"
+  },
+  "tasks": {
+    "id": "tasks",
+    "name": "task master",
+    "description": "complete {target} tasks"
+  }
 }
