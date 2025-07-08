@@ -488,6 +488,9 @@ function getObtainingMessage(selected: Item, member: ItemMessageMember): ItemMes
   if (selected.id === "beginner_booster") {
     description.push("given one to begin your nypsi journey");
   }
+  if (selected.id === "pandora_box") {
+    description.push("[events](https://nypsi.xyz/events?ref=bot-item-pandora");
+  }
   const randomDropPool = lootPools["random_drop"];
   if (Object.keys(randomDropPool.items ?? {}).includes(selected.id)) {
     const weight =
