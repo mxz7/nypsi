@@ -27,7 +27,7 @@
     "@yusifaliyevpro/countries": "^2.2.2",
     "@zeyrbot/urbandictionary": "^1.0.3",
     "bufferutil": "4.0.9",
-    "bullmq": "^5.56.1",
+    "bullmq": "^5.56.2",
     "chalk": "4.1.2",
     "cron": "^4.3.1",
     "crypto-js": "4.2.0",
@@ -47,7 +47,7 @@
     "p-all": "3.0.0",
     "sharp": "^0.34.2",
     "string-similarity": "4.0.4",
-    "zod": "^3.25.74"
+    "zod": "^3.25.75"
   },
   "devDependencies": {
     "@types/crypto-js": "4.2.2",
