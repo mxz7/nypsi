@@ -206,20 +206,22 @@ export async function runItemInfo(
 
       let target = subTab === undefined ? tabs[tabName].embed : tabs[tabName].subEmbeds[subTab];
       if (target instanceof Array) {
-        rows.push(
-          new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-            new ButtonBuilder()
-              .setCustomId("⬅")
-              .setLabel("back")
-              .setStyle(ButtonStyle.Primary)
-              .setDisabled((page ?? 0) <= 0),
-            new ButtonBuilder()
-              .setCustomId("➡")
-              .setLabel("next")
-              .setStyle(ButtonStyle.Primary)
-              .setDisabled((page ?? 0) >= target.length - 1),
-          ),
-        );
+        if (target.length > 1) {
+          rows.push(
+            new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+              new ButtonBuilder()
+                .setCustomId("⬅")
+                .setLabel("back")
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled((page ?? 0) <= 0),
+              new ButtonBuilder()
+                .setCustomId("➡")
+                .setLabel("next")
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled((page ?? 0) >= target.length - 1),
+            ),
+          );
+        }
         target = target[page ?? 0];
       }
       if (tabs[tabName].widgets !== undefined) {
