@@ -9,6 +9,7 @@ import {
   AchievementData,
   BakeryUpgradeData,
   BanCache,
+  Event,
   GuildUpgrade,
   Item,
   Plant,
