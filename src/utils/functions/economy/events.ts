@@ -9,11 +9,13 @@ import {
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
+import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
+import { addNotificationToQueue } from "../users/notifications";
 import { addAchievementProgress } from "./achievements";
 import { addInventoryItem } from "./inventory";
-import { getEventsData } from "./utils";
+import { getEventsData, getItems } from "./utils";
 import ms = require("ms");
 
 export type EventData = Event & { contributions: EventContribution[] };
@@ -203,7 +205,7 @@ export function getEventProgress(event: EventData) {
 }
 
 async function giveRewards(event: EventData) {
-  if (!event) return [];
+  if (!event) return undefined;
 
   const top10p = event.contributions.slice(0, Math.floor(event.contributions.length / 10));
   const top25p = event.contributions.slice(0, Math.floor(event.contributions.length / 4));
@@ -216,29 +218,39 @@ async function giveRewards(event: EventData) {
     await addAchievementProgress(userId, "event_pro");
   }
 
-  const givenRewards: { [key: string]: { [key: string]: number } } = {};
+  // userid -> amount
+  const givenRewards = new Map<string, number>();
 
-  const giveRewardToGroup = async (group: EventContribution[], section: string, toGive: number) => {
+  const giveRewardToGroup = async (group: EventContribution[], toGive: number) => {
     while (toGive > 0) {
       toGive--;
       const chosen = group[Math.floor(Math.random() * group.length)];
 
-      if (!givenRewards[section]) {
-        givenRewards[section] = {};
+      if (!givenRewards.has(chosen.userId)) {
+        givenRewards.set(chosen.userId, 0);
       }
 
-      if (!givenRewards[section][chosen.userId]) {
-        givenRewards[section][chosen.userId] = 0;
-      }
-
-      givenRewards[section][chosen.userId]++;
+      givenRewards.set(chosen.userId, givenRewards.get(chosen.userId) + 1);
       await addInventoryItem(chosen.userId, "pandora_box", 1);
     }
   };
 
-  await giveRewardToGroup(top25p, "top 25%", REWARDS_TOP25P);
-  await giveRewardToGroup(top50p, "top 50%", REWARDS_TOP50P);
-  await giveRewardToGroup(bottom50p, "bottom 50%", REWARDS_BOTTOM50P);
+  await giveRewardToGroup(top25p, REWARDS_TOP25P);
+  await giveRewardToGroup(top50p, REWARDS_TOP50P);
+  await giveRewardToGroup(bottom50p, REWARDS_BOTTOM50P);
+
+  for (const [userId, amount] of givenRewards) {
+    await addNotificationToQueue({
+      memberId: userId,
+      payload: {
+        embed: new CustomEmbed(
+          userId,
+          `you have received **${amount}x** ${getItems()["pandora_box"].emoji} ${getItems()["pandora_box"].name} ` +
+            `for participating in the **${getEventsData()[event.type].name} event**!!`,
+        ),
+      },
+    });
+  }
 
   return givenRewards;
 }
