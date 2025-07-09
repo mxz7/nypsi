@@ -135,6 +135,16 @@ export async function setLogsChannelHook(guild: Guild, hook: string) {
     await redis.del(`${Constants.redis.nypsi.GUILD_LOG_QUEUE}:${guild.id}`);
   }
 
+  const previous = await getLogsChannelHook(guild);
+
+  if (previous) {
+    try {
+      await previous.delete("logs moved/disabled");
+    } catch {
+      // silent fail
+    }
+  }
+
   await prisma.guild.update({
     where: {
       id: guild.id,
