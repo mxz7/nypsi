@@ -28,6 +28,7 @@ import startRandomDrops from "../scheduled/clusterjobs/random-drops";
 import Constants from "../utils/Constants";
 import { doChatReactions } from "../utils/functions/chatreactions/utils";
 import { initCrashGame } from "../utils/functions/economy/crash";
+import { checkEventExpire } from "../utils/functions/economy/events";
 import { runEconomySetup } from "../utils/functions/economy/utils";
 import { runChristmas } from "../utils/functions/guilds/christmas";
 import { runCountdowns } from "../utils/functions/guilds/countdowns";
@@ -236,5 +237,6 @@ export class NypsiClient extends Client {
     openKarmaShop(this);
     startRandomDrops(this);
     runLogs();
+    checkEventExpire(this);
   }
 }

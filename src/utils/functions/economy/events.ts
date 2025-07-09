@@ -11,6 +11,7 @@ import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
+import { logger } from "../../logger";
 import { getUserId, MemberResolvable } from "../member";
 import { addNotificationToQueue } from "../users/notifications";
 import { addAchievementProgress } from "./achievements";
@@ -57,6 +58,8 @@ export async function createEvent(
         .toDate(),
     },
   });
+
+  await redis.del(Constants.redis.cache.economy.event);
 
   const targetChannel =
     client.user.id === Constants.BOT_USER_ID
@@ -121,6 +124,8 @@ export async function createEvent(
     .then((res) => {
       return res.filter((i) => Boolean(i));
     });
+
+  checkEventExpire(client);
 }
 
 export async function getCurrentEvent(useCache = true): Promise<EventData> {
@@ -253,4 +258,76 @@ async function giveRewards(event: EventData) {
   }
 
   return givenRewards;
+}
+
+export async function checkEventExpire(client: NypsiClient) {
+  const event = await getCurrentEvent(false);
+
+  if (!event) {
+    return;
+  }
+
+  const doExpire = async (event: EventData) => {
+    logger.info(`event: ${event.id} expired`);
+
+    const targetChannel =
+      client.user.id === Constants.BOT_USER_ID
+        ? Constants.ANNOUNCEMENTS_CHANNEL_ID
+        : "819640200699052052"; // dev channel
+
+    const clusters = await client.cluster.broadcastEval(
+      (client, { channelId }) => {
+        const guild = client.channels.cache.get(channelId);
+
+        if (guild) return (client as unknown as NypsiClient).cluster.id;
+        return "not-found";
+      },
+      { context: { channelId: targetChannel } },
+    );
+
+    let cluster: number;
+
+    for (const i of clusters) {
+      if (i != "not-found") {
+        cluster = i;
+        break;
+      }
+    }
+
+    await client.cluster
+      .broadcastEval(
+        async (client, { content, channelId, cluster }) => {
+          if ((client as unknown as NypsiClient).cluster.id != cluster) return;
+
+          const channel = client.channels.cache.get(channelId);
+
+          if (!channel) return;
+
+          if (channel.isTextBased() && channel.isSendable()) {
+            await channel.send({ content });
+          }
+        },
+        {
+          context: {
+            content:
+              `the **${getEventsData()[event.type].name}** event has come to an end without being completed **):**\n\n` +
+              `${getEventProgress(event).toLocaleString()}/${event.target.toLocaleString()}\n\n` +
+              `<@&${Constants.EVENTS_ROLE_ID}>`,
+            channelId: targetChannel,
+            cluster: cluster,
+          },
+        },
+      )
+      .then((res) => {
+        return res.filter((i) => Boolean(i));
+      });
+  };
+
+  setTimeout(async () => {
+    const event = await getCurrentEvent(false);
+
+    if (event) {
+      doExpire(event);
+    }
+  }, event.expiresAt.getTime() - Date.now());
 }
