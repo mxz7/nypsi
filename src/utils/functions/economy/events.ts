@@ -1,5 +1,5 @@
 import dayjs = require("dayjs");
-import { Event } from "@prisma/client";
+import { Event, EventContribution } from "@prisma/client";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -13,6 +13,8 @@ import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
 import { getEventsData } from "./utils";
 import ms = require("ms");
+
+export type EventData = Event & { EventContribution: EventContribution[] };
 
 export async function createEvent(
   client: NypsiClient,
@@ -115,7 +117,7 @@ export async function createEvent(
     });
 }
 
-export async function getCurrentEvent(useCache = true) {
+export async function getCurrentEvent(useCache = true): Promise<EventData> {
   if (useCache) {
     const cache = await redis.get(Constants.redis.cache.economy.event);
 
@@ -123,7 +125,7 @@ export async function getCurrentEvent(useCache = true) {
       if (cache === "none") {
         return undefined;
       } else {
-        return JSON.parse(cache) as Event;
+        return JSON.parse(cache);
       }
     }
   }
@@ -131,6 +133,11 @@ export async function getCurrentEvent(useCache = true) {
   const query = await prisma.event.findFirst({
     where: {
       AND: [{ completed: false, expiresAt: { gt: new Date() } }],
+    },
+    include: {
+      EventContribution: {
+        orderBy: { contribution: "desc" },
+      },
     },
   });
 
@@ -146,4 +153,47 @@ export async function getCurrentEvent(useCache = true) {
   }
 
   return query;
+}
+
+export async function trackEventProgress(user: MemberResolvable, type: string, amount: number) {
+  const event = await getCurrentEvent();
+
+  if (!event) {
+    return;
+  }
+
+  if (!getEventsData()[type]) {
+    throw new Error(`invalid event type: ${type}`);
+  }
+
+  const userId = getUserId(user);
+
+  await prisma.eventContribution.upsert({
+    where: {
+      userId_eventId: {
+        userId,
+        eventId: event.id,
+      },
+    },
+    update: {
+      contribution: {
+        increment: amount,
+      },
+    },
+    create: {
+      userId,
+      eventId: event.id,
+      contribution: amount,
+    },
+  });
+
+  return getEventProgress(event) + amount;
+}
+
+export function getEventProgress(event: EventData) {
+  if (!event) {
+    return 0;
+  }
+
+  return Number(event.EventContribution.reduce((acc, cur) => acc + cur.contribution, 0n));
 }
