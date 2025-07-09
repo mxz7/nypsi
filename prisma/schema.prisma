@@ -1059,7 +1059,7 @@ model Event {
 
   title     String
   type      String
-  target    String
+  target    BigInt
   expiresAt DateTime
 
   owner User @relation(fields: [ownerId], references: [id])
