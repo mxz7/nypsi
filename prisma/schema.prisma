@@ -1062,7 +1062,8 @@ model Event {
   target    BigInt
   expiresAt DateTime
 
-  owner User @relation(fields: [ownerId], references: [id])
+  owner             User                @relation(fields: [ownerId], references: [id])
+  EventContribution EventContribution[]
 }
 
 model EventContribution {
@@ -1071,7 +1072,8 @@ model EventContribution {
 
   contribution BigInt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   @@id([userId, eventId])
   @@index([eventId])
