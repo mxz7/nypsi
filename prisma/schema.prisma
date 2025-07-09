@@ -1057,7 +1057,6 @@ model Event {
   completed   Boolean   @default(false)
   completedAt DateTime?
 
-  title     String
   type      String
   target    BigInt
   expiresAt DateTime

@@ -26,7 +26,6 @@ export async function createEvent(
   client: NypsiClient,
   member: MemberResolvable,
   type: string,
-  title: string,
   target: number,
   days: number,
 ) {
@@ -46,7 +45,6 @@ export async function createEvent(
     data: {
       ownerId: userId,
       type,
-      title,
       target,
       expiresAt: dayjs()
         .add(days, "day")
@@ -98,7 +96,7 @@ export async function createEvent(
       {
         context: {
           content:
-            `the **${title}** event has started!!\n\n` +
+            `the **${getEventsData()[type].name}** event has started!!\n\n` +
             `${getEventsData()[type].description.replace("{target}", target.toLocaleString())}\n\n` +
             `<@&${Constants.EVENTS_ROLE_ID}>`,
           components: new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
