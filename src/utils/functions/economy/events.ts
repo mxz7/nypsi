@@ -14,7 +14,7 @@ import { getUserId, MemberResolvable } from "../member";
 import { getEventsData } from "./utils";
 import ms = require("ms");
 
-export type EventData = Event & { EventContribution: EventContribution[] };
+export type EventData = Event & { contributions: EventContribution[] };
 
 export async function createEvent(
   client: NypsiClient,
@@ -135,7 +135,7 @@ export async function getCurrentEvent(useCache = true): Promise<EventData> {
       AND: [{ completed: false, expiresAt: { gt: new Date() } }],
     },
     include: {
-      EventContribution: {
+      contributions: {
         orderBy: { contribution: "desc" },
       },
     },
