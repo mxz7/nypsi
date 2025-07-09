@@ -1,10 +1,17 @@
 import dayjs = require("dayjs");
 import { Event } from "@prisma/client";
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  MessageActionRowComponentBuilder,
+} from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
+import { getEventsData } from "./utils";
 import ms = require("ms");
 
 export async function createEvent(
@@ -12,19 +19,19 @@ export async function createEvent(
   member: MemberResolvable,
   type: string,
   title: string,
-  target: string,
+  target: number,
   days: number,
 ) {
   const userId = getUserId(member);
 
-  const check = await prisma.event.findFirst({
-    where: {
-      completed: false,
-    },
-  });
+  const check = await getCurrentEvent(true);
 
   if (check) {
     return "event already in process";
+  }
+
+  if (!getEventsData()[type]) {
+    return "invalid event type";
   }
 
   await prisma.event.create({
@@ -82,7 +89,22 @@ export async function createEvent(
       },
       {
         context: {
-          content: `the **${title}** event has started!!\n` + `<@&${Constants.EVENTS_ROLE_ID}>`,
+          content:
+            `the **${title}** event has started!!\n\n` +
+            `${getEventsData()[type].description.replace("{target}", target.toLocaleString())}\n\n` +
+            `<@&${Constants.EVENTS_ROLE_ID}>`,
+          components: new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+            new ButtonBuilder()
+              .setStyle(ButtonStyle.Link)
+              .setLabel("live progress")
+              .setEmoji("🏆")
+              .setURL("https://nypsi.xyz/events?ref=bot-event-announcement"),
+            new ButtonBuilder()
+              .setStyle(ButtonStyle.Link)
+              .setLabel("more information")
+              .setEmoji("📜")
+              .setURL("https://nypsi.xyz/docs/economy/events?ref=bot-event-announcement"),
+          ),
           channelId: targetChannel,
           cluster: cluster,
         },
