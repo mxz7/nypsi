@@ -96,6 +96,7 @@ export default {
         WORD_LIST: "cache:chatreaction:wordlist:words",
       },
       economy: {
+        event: "cache:economy:event",
         farm: "cache:economy:farm",
         farmUpgrades: "cache:economy:farmupgrades",
         TASKS: "cache:economy:tasks",

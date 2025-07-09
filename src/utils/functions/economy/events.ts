@@ -1,8 +1,11 @@
 import dayjs = require("dayjs");
+import { Event } from "@prisma/client";
 import prisma from "../../../init/database";
+import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
+import ms = require("ms");
 
 export async function createEvent(
   client: NypsiClient,
@@ -88,4 +91,37 @@ export async function createEvent(
     .then((res) => {
       return res.filter((i) => Boolean(i));
     });
+}
+
+export async function getCurrentEvent(useCache = true) {
+  if (useCache) {
+    const cache = await redis.get(Constants.redis.cache.economy.event);
+
+    if (cache) {
+      if (cache === "none") {
+        return undefined;
+      } else {
+        return JSON.parse(cache) as Event;
+      }
+    }
+  }
+
+  const query = await prisma.event.findFirst({
+    where: {
+      AND: [{ completed: false, expiresAt: { gt: new Date() } }],
+    },
+  });
+
+  if (query) {
+    await redis.set(
+      Constants.redis.cache.economy.event,
+      JSON.stringify(query),
+      "EX",
+      Math.min(query.expiresAt.getTime(), ms("12 hours")) / 1000,
+    );
+  } else {
+    await redis.set(Constants.redis.cache.economy.event, "none");
+  }
+
+  return query;
 }
