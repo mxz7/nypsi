@@ -19,7 +19,7 @@ import { addNotificationToQueue, getPreferences } from "../users/notifications";
 import { getLastKnownUsername } from "../users/tag";
 import { addAchievementProgress } from "./achievements";
 import { addInventoryItem } from "./inventory";
-import { getEventsData, getItems } from "./utils";
+import { getEventsData, getItems, isEcoBanned } from "./utils";
 import ms = require("ms");
 
 export type EventData = Event & { contributions: EventContribution[] };
@@ -177,6 +177,11 @@ export async function trackEventProgress(
   type: string,
   amount: number,
 ) {
+  const userId = getUserId(user);
+  if ((await isEcoBanned(userId)).banned) {
+    return;
+  }
+
   const event = await getCurrentEvent();
 
   if (!event) {
@@ -186,8 +191,6 @@ export async function trackEventProgress(
   if (!getEventsData()[type]) {
     throw new Error(`invalid event type: ${type}`);
   }
-
-  const userId = getUserId(user);
 
   await prisma.eventContribution.upsert({
     where: {
