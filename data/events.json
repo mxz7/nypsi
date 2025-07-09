@@ -73,5 +73,10 @@
     "id": "milfs",
     "name": "milf finder",
     "description": "find {target} milfs"
+  },
+  "messages": {
+    "id": "messages",
+    "name": "discord addicts",
+    "description": "send {target} messages in the official nypsi server (spammers will be muted!!)"
   }
 }
