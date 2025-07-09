@@ -63,5 +63,15 @@
     "id": "tasks",
     "name": "task master",
     "description": "complete {target} tasks"
+  },
+  "cookies": {
+    "id": "cookies",
+    "name": "cookie collector",
+    "description": "bake {target} cookies"
+  },
+  "milfs": {
+    "id": "milfs",
+    "name": "milf finder",
+    "description": "find {target} milfs"
   }
 }
