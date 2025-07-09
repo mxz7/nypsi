@@ -140,42 +140,53 @@ class FileTransport implements Transport {
   }
 
   private async checkFile() {
-    if (this.checkingFile || this.lastCheck > Date.now() - 30000) return;
-    this.checkingFile = true;
+    try {
+      if (this.checkingFile || this.lastCheck > Date.now() - 30000) return;
+      this.checkingFile = true;
 
-    const stats = await stat(this.stream.path);
+      const stats = await stat(this.stream.path);
 
-    if (stats.size >= this.rotateAfterBytes && this.rotateAfterBytes > 0) {
-      logger.debug("rotating file");
+      if (stats.size >= this.rotateAfterBytes && this.rotateAfterBytes > 0) {
+        logger.debug("rotating file");
 
-      if (existsSync(this.path.replace(`%DATE%`, dayjs().format("YYYY-MM-DD")))) {
-        let oldFileNameModifier = 1;
+        if (existsSync(this.path.replace(`%DATE%`, dayjs().format("YYYY-MM-DD")))) {
+          let oldFileNameModifier = 1;
 
-        while (existsSync(this.stream.path + "." + oldFileNameModifier)) oldFileNameModifier++;
-        await rename(this.stream.path, this.stream.path + "." + oldFileNameModifier);
+          while (existsSync(this.stream.path + "." + oldFileNameModifier)) oldFileNameModifier++;
+          await rename(this.stream.path, this.stream.path + "." + oldFileNameModifier);
 
-        this.stream?.end();
-        this.stream = null;
+          this.stream?.end();
+          this.stream = null;
 
-        this.stream = createWriteStream(this.path.replace(`%DATE%`, dayjs().format("YYYY-MM-DD")), {
-          flags: "a",
-        });
-      } else {
-        this.stream?.end();
-        this.stream = null;
+          this.stream = createWriteStream(
+            this.path.replace(`%DATE%`, dayjs().format("YYYY-MM-DD")),
+            {
+              flags: "a",
+            },
+          );
+        } else {
+          this.stream?.end();
+          this.stream = null;
 
-        this.stream = createWriteStream(this.path.replace(`%DATE%`, dayjs().format("YYYY-MM-DD")), {
-          flags: "a",
-        });
+          this.stream = createWriteStream(
+            this.path.replace(`%DATE%`, dayjs().format("YYYY-MM-DD")),
+            {
+              flags: "a",
+            },
+          );
+        }
+
+        if (this.queue) {
+          this.queue.forEach(this.write);
+          this.queue.length = 0;
+        }
       }
-
-      if (this.queue) {
-        this.queue.forEach(this.write);
-        this.queue.length = 0;
-      }
+    } catch (e) {
+      console.error(`logger: failed checking file`);
+      console.error(e);
+    } finally {
+      this.checkingFile = false;
     }
-
-    this.checkingFile = false;
   }
 
   public async write(data: WriteData) {
