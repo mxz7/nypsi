@@ -27,7 +27,7 @@
     "@yusifaliyevpro/countries": "^2.2.2",
     "@zeyrbot/urbandictionary": "^1.0.3",
     "bufferutil": "4.0.9",
-    "bullmq": "^5.56.1",
+    "bullmq": "^5.56.2",
     "chalk": "4.1.2",
     "cron": "^4.3.1",
     "crypto-js": "4.2.0",
@@ -43,11 +43,11 @@
     "ms": "2.1.3",
     "nanoid": "^3.3.11",
     "node-os-utils": "1.3.7",
-    "openai": "^5.8.2",
+    "openai": "^5.8.3",
     "p-all": "3.0.0",
     "sharp": "^0.34.2",
     "string-similarity": "4.0.4",
-    "zod": "^3.25.74"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/crypto-js": "4.2.2",
@@ -55,7 +55,7 @@
     "@types/jest": "^30.0.0",
     "@types/lodash": "4.17.20",
     "@types/ms": "2.1.0",
-    "@types/node": "24.0.10",
+    "@types/node": "24.0.12",
     "@types/node-os-utils": "1.3.4",
     "@types/string-similarity": "4.0.2",
     "@types/urban-dictionary": "3.0.2",
