@@ -5,14 +5,14 @@ import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { randomPresence } from "../utils/functions/presence";
-import { getAdminLevel } from "../utils/functions/users/admin";
+import { hasAdminPermission } from "../utils/functions/users/admin";
 import { logger } from "../utils/logger";
 import dayjs = require("dayjs");
 
 const cmd = new Command("maintenance", "maintenance", "none").setPermissions(["bot owner"]);
 
 async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) {
-  if ((await getAdminLevel(message.member)) < 3) return;
+  if (!(await hasAdminPermission(message.member, "toggle-maintenance"))) return;
 
   if (await redis.exists("nypsi:maintenance")) {
     const before = await redis.get("nypsi:maintenance");

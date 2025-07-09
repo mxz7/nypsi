@@ -17,6 +17,73 @@ products.set("1d78b621a5", { name: "unecoban", cost: 19.99 });
 products.set("0aec346b01", { name: "omega_crate", cost: 9.99 });
 products.set("23110fff7b", { name: "rain", cost: 4.99 });
 
+const adminPermissionLevels = {
+  "1": [
+    "bypass-maintenance",
+    "bypass-dev-restrictions",
+    "captchatest",
+    "view-transactions",
+    "set-birthday",
+    "use-x",
+  ] as const,
+  "2": [
+    "view-user-info",
+    "find",
+    "ecoban",
+    "cmdwatch",
+    "requestdm",
+    "create-chat",
+    "anticheat-history",
+  ] as const,
+  "3": [
+    "blacklist",
+    "forcelose",
+    "logsearch",
+    "toggle-maintenance",
+    "reload",
+    "delete-prem-cmd",
+    "delete-prem-aliases",
+    "clear-anticheat",
+    "captcha-history",
+    "find-alts",
+  ] as const,
+  "4": [
+    "set-inv",
+    "set-balance",
+    "set-xp",
+    "set-prestige",
+    "set-level",
+    "set-karma",
+    "set-tags",
+    "add-purchase",
+    "set-streak",
+    "run-streak",
+  ] as const,
+  "5": ["set-premium", "streakpause", "spawn-lootdrop"] as const,
+  "69": [
+    "set-admin-level",
+    "wipe",
+    "profile-transfer",
+    "fix-crash",
+    "set-cmd-channels",
+    "reseteco",
+    "run-job",
+  ] as const,
+} as const;
+
+export type AdminPermission =
+  (typeof adminPermissionLevels)[keyof typeof adminPermissionLevels][number];
+
+const adminPermissions = new Map<AdminPermission, number>();
+
+for (const [group, values] of Object.entries(adminPermissionLevels)) {
+  const adminLevel = parseInt(group);
+
+  for (const value of values) {
+    adminPermissions.set(value, adminLevel);
+  }
+}
+
 export default {
   redis: {
     cooldown: {
@@ -190,6 +257,7 @@ export default {
     "845613231229370429",
     "1105179633919471707",
   ] as string[],
+  ADMIN_PERMISSIONS: adminPermissions,
   BOOST_REWARDS_LINK:
     "https://discord.com/channels/747056029795221513/1031950370206924903/1092078265948188842",
   BOOST_ROLE_ID: "747066190530347089",

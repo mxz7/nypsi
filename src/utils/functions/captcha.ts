@@ -8,6 +8,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
   MessageFlags,
+  User,
   WebhookClient,
 } from "discord.js";
 import prisma from "../../init/database";
@@ -64,16 +65,18 @@ async function isVerified(member: MemberResolvable) {
   return await redis.exists(`${Constants.redis.nypsi.CAPTCHA_VERIFIED}:${getUserId(member)}`);
 }
 
-export async function passedCaptcha(member: GuildMember, check: Captcha, force = false) {
+export async function passedCaptcha(member: GuildMember | User, check: Captcha, force = false) {
   const hook = new WebhookClient({
     url: process.env.ANTICHEAT_HOOK,
   });
 
-  if (await redis.exists(`${Constants.redis.cache.user.captcha_pass}:${member.user.id}`)) {
-    await redis.incr(`${Constants.redis.cache.user.captcha_pass}:${member.user.id}`);
+  const username = member instanceof GuildMember ? member.user.username : member.username;
+
+  if (await redis.exists(`${Constants.redis.cache.user.captcha_pass}:${member.id}`)) {
+    await redis.incr(`${Constants.redis.cache.user.captcha_pass}:${member.id}`);
   } else {
     await redis.set(
-      `${Constants.redis.cache.user.captcha_pass}:${member.user.id}`,
+      `${Constants.redis.cache.user.captcha_pass}:${member.id}`,
       1,
       "EX",
       Math.floor(ms("1 day") / 1000),
@@ -82,20 +85,18 @@ export async function passedCaptcha(member: GuildMember, check: Captcha, force =
 
   if (force) {
     await hook.send(
-      `[${getTimestamp()}] **${member.user.username}** (${
-        member.user.id
+      `[${getTimestamp()}] **${username}** (${
+        member.id
       }) has forcefully passed a captcha [${await redis.get(
-        `${Constants.redis.cache.user.captcha_pass}:${member.user.id}`,
+        `${Constants.redis.cache.user.captcha_pass}:${member.id}`,
       )}]`,
     );
   } else {
     const timeTakenToSolve = check.solvedAt.getTime() - check.createdAt.getTime();
 
     await hook.send(
-      `[${getTimestamp()}] **${member.user.username}** (${
-        member.user.id
-      }) has passed a captcha [${await redis.get(
-        `${Constants.redis.cache.user.captcha_pass}:${member.user.id}`,
+      `[${getTimestamp()}] **${username}** (${member.id}) has passed a captcha [${await redis.get(
+        `${Constants.redis.cache.user.captcha_pass}:${member.id}`,
       )}]\n` +
         "```" +
         `received: ${check.received}\n` +
@@ -113,12 +114,7 @@ export async function passedCaptcha(member: GuildMember, check: Captcha, force =
   else if (check.received > 3) ttl = Math.floor(ms("5 minutes") / 1000);
   else if (check.received > 5) ttl = 1;
 
-  await redis.set(
-    `${Constants.redis.nypsi.CAPTCHA_VERIFIED}:${member.user.id}`,
-    member.user.id,
-    "EX",
-    ttl,
-  );
+  await redis.set(`${Constants.redis.nypsi.CAPTCHA_VERIFIED}:${member.id}`, member.id, "EX", ttl);
 
   if (!force && check.solvedIp) {
     let otherUsers = await prisma.captcha.findMany({
@@ -135,13 +131,13 @@ export async function passedCaptcha(member: GuildMember, check: Captcha, force =
     });
 
     if (otherUsers.length > 0) {
-      const altGroup = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, member.user.id);
+      const altGroup = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, member.id);
 
       otherUsers = otherUsers.filter((i) => !altGroup.includes(i.userId));
 
       if (otherUsers.length > 0)
         await hook.send(
-          `[${getTimestamp()}] **${member.user.username}** (${member.user.id}) has matching ip with: \`${otherUsers.map((i) => i.userId).join("` `")}\``,
+          `[${getTimestamp()}] **${username}** (${member.id}) has matching ip with: \`${otherUsers.map((i) => i.userId).join("` `")}\``,
         );
     }
   }

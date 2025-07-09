@@ -33,7 +33,7 @@ import {
   getNypsiBankBalance,
   removeFromNypsiBankBalance,
 } from "../utils/functions/tax.js";
-import { getAdminLevel } from "../utils/functions/users/admin";
+import { hasAdminPermission } from "../utils/functions/users/admin";
 import { addHourlyCommand } from "../utils/handlers/commandhandler";
 import {
   addCooldown,
@@ -337,7 +337,10 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
         }
 
         if (await redis.get("nypsi:maintenance")) {
-          if ((await getAdminLevel(message.member)) > 0 && message instanceof Message) {
+          if (
+            (await hasAdminPermission(message.member, "bypass-maintenance")) &&
+            message instanceof Message
+          ) {
             message.react("💀");
           } else {
             return msg.edit({

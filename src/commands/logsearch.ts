@@ -5,7 +5,7 @@ import { nanoid } from "nanoid";
 import { promisify } from "util";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { uploadImage } from "../utils/functions/image";
-import { getAdminLevel } from "../utils/functions/users/admin";
+import { hasAdminPermission } from "../utils/functions/users/admin";
 import { logger } from "../utils/logger";
 
 const cmd = new Command("logsearch", "search through logs", "none").setPermissions(["bot owner"]);
@@ -14,7 +14,7 @@ async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
-  if ((await getAdminLevel(message.member)) < 3) return;
+  if (!(await hasAdminPermission(message.member, "logsearch"))) return;
 
   if (args.length == 0) return;
 
