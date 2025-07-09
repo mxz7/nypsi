@@ -11,10 +11,16 @@ import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
+import { addAchievementProgress } from "./achievements";
+import { addInventoryItem } from "./inventory";
 import { getEventsData } from "./utils";
 import ms = require("ms");
 
 export type EventData = Event & { contributions: EventContribution[] };
+
+const REWARDS_TOP25P = 4;
+const REWARDS_TOP50P = 2;
+const REWARDS_BOTTOM50P = 1;
 
 export async function createEvent(
   client: NypsiClient,
@@ -195,5 +201,46 @@ export function getEventProgress(event: EventData) {
     return 0;
   }
 
-  return Number(event.EventContribution.reduce((acc, cur) => acc + cur.contribution, 0n));
+  return Number(event.contributions.reduce((acc, cur) => acc + cur.contribution, 0n));
+}
+
+async function giveRewards(event: EventData) {
+  if (!event) return [];
+
+  const top10p = event.contributions.slice(0, Math.floor(event.contributions.length / 10));
+  const top25p = event.contributions.slice(0, Math.floor(event.contributions.length / 4));
+  const top50p = event.contributions.slice(0, Math.floor(event.contributions.length / 2));
+  const bottom50p = event.contributions
+    .toReversed()
+    .slice(0, Math.floor(event.contributions.length / 2));
+
+  for (const { userId } of top10p) {
+    await addAchievementProgress(userId, "event_pro");
+  }
+
+  const givenRewards: { [key: string]: { [key: string]: number } } = {};
+
+  const giveRewardToGroup = async (group: EventContribution[], section: string, toGive: number) => {
+    while (toGive > 0) {
+      toGive--;
+      const chosen = group[Math.floor(Math.random() * group.length)];
+
+      if (!givenRewards[section]) {
+        givenRewards[section] = {};
+      }
+
+      if (!givenRewards[section][chosen.userId]) {
+        givenRewards[section][chosen.userId] = 0;
+      }
+
+      givenRewards[section][chosen.userId]++;
+      await addInventoryItem(chosen.userId, "pandora_box", 1);
+    }
+  };
+
+  await giveRewardToGroup(top25p, "top 25%", REWARDS_TOP25P);
+  await giveRewardToGroup(top50p, "top 50%", REWARDS_TOP50P);
+  await giveRewardToGroup(bottom50p, "bottom 50%", REWARDS_BOTTOM50P);
+
+  return givenRewards;
 }
