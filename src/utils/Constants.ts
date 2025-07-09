@@ -97,6 +97,7 @@ export default {
       },
       economy: {
         event: "cache:economy:event",
+        eventProgress: "cache:economy:event:progress",
         farm: "cache:economy:farm",
         farmUpgrades: "cache:economy:farmupgrades",
         TASKS: "cache:economy:tasks",

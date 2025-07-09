@@ -6,20 +6,25 @@ import {
   ButtonStyle,
   MessageActionRowComponentBuilder,
 } from "discord.js";
+import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
+import { MStoTime } from "../date";
 import { getUserId, MemberResolvable } from "../member";
-import { addNotificationToQueue } from "../users/notifications";
+import { addNotificationToQueue, getPreferences } from "../users/notifications";
+import { getLastKnownUsername } from "../users/tag";
 import { addAchievementProgress } from "./achievements";
 import { addInventoryItem } from "./inventory";
 import { getEventsData, getItems } from "./utils";
 import ms = require("ms");
 
 export type EventData = Event & { contributions: EventContribution[] };
+
+let completing = false;
 
 const REWARDS_TOP25P = 4;
 const REWARDS_TOP50P = 2;
@@ -166,7 +171,12 @@ export async function getCurrentEvent(useCache = true): Promise<EventData> {
   return query;
 }
 
-export async function trackEventProgress(user: MemberResolvable, type: string, amount: number) {
+export async function trackEventProgress(
+  client: NypsiClient,
+  user: MemberResolvable,
+  type: string,
+  amount: number,
+) {
   const event = await getCurrentEvent();
 
   if (!event) {
@@ -198,7 +208,27 @@ export async function trackEventProgress(user: MemberResolvable, type: string, a
     },
   });
 
-  return getEventProgress(event) + amount;
+  if (!(await redis.exists(Constants.redis.cache.economy.eventProgress))) {
+    await redis.set(
+      Constants.redis.cache.economy.eventProgress,
+      getEventProgress(await getCurrentEvent(false)),
+    );
+  }
+  const progress = await redis.incrby(Constants.redis.cache.economy.eventProgress, amount);
+
+  // keeps in sync
+  if (progress % 1000 === 0) {
+    await redis.set(
+      Constants.redis.cache.economy.eventProgress,
+      getEventProgress(await getCurrentEvent(false)),
+    );
+  }
+
+  if (progress >= event.target) {
+    completeEvent(client, userId);
+  }
+
+  return progress;
 }
 
 export function getEventProgress(event: EventData) {
@@ -330,4 +360,111 @@ export async function checkEventExpire(client: NypsiClient) {
       doExpire(event);
     }
   }, event.expiresAt.getTime() - Date.now());
+}
+
+async function completeEvent(client: NypsiClient, lastUser: string) {
+  if (completing) {
+    return;
+  }
+
+  completing = true;
+  let event = await getCurrentEvent(false);
+
+  if (event.completed) {
+    return;
+  }
+
+  event = await prisma.event.update({
+    where: { id: event.id },
+    data: {
+      completed: true,
+      completedAt: new Date(),
+    },
+    include: {
+      contributions: {
+        orderBy: { contribution: "desc" },
+      },
+    },
+  });
+
+  await redis.del(Constants.redis.cache.economy.event, Constants.redis.cache.economy.eventProgress);
+
+  completing = false;
+
+  const rewards = await giveRewards(event);
+  const privacy = await getPreferences(lastUser).then((r) => r.leaderboards);
+
+  let content =
+    `the **${getEventsData()[event.type].name}** event has been completed! ` +
+    `completed in ${MStoTime(event.completedAt.getTime() - event.createdAt.getTime())}\n\n`;
+
+  if (privacy) {
+    content += `the final contributing participant was **${await getLastKnownUsername(lastUser)}**\n\n`;
+  }
+
+  content += `**winning participants**\n`;
+
+  for (const [userId, amount] of inPlaceSort(Array.from(rewards.entries())).desc((i) => i[1])) {
+    content +=
+      `**${amount}x** ${getItems()["pandora_box"].emoji} ${getItems()["pandora_box"].name} ` +
+      `for **${await getLastKnownUsername(userId)}**\n`;
+  }
+
+  content += "\n";
+
+  const targetChannel =
+    client.user.id === Constants.BOT_USER_ID
+      ? Constants.ANNOUNCEMENTS_CHANNEL_ID
+      : "819640200699052052"; // dev channel
+
+  const clusters = await client.cluster.broadcastEval(
+    (client, { channelId }) => {
+      const guild = client.channels.cache.get(channelId);
+
+      if (guild) return (client as unknown as NypsiClient).cluster.id;
+      return "not-found";
+    },
+    { context: { channelId: targetChannel } },
+  );
+
+  let cluster: number;
+
+  for (const i of clusters) {
+    if (i != "not-found") {
+      cluster = i;
+      break;
+    }
+  }
+
+  await client.cluster
+    .broadcastEval(
+      async (client, { content, channelId, cluster }) => {
+        if ((client as unknown as NypsiClient).cluster.id != cluster) return;
+
+        const channel = client.channels.cache.get(channelId);
+
+        if (!channel) return;
+
+        if (channel.isTextBased() && channel.isSendable()) {
+          await channel.send({ content });
+        }
+      },
+      {
+        context: {
+          content,
+          components: new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+            new ButtonBuilder()
+              .setStyle(ButtonStyle.Link)
+              .setLabel("leaderboard")
+              .setEmoji("🏆")
+              .setURL(`https://nypsi.xyz/event/${event.id}?ref=bot-event-announcement`),
+          ),
+          channelId: targetChannel,
+          cluster: cluster,
+        },
+      },
+    )
+    .then((res) => {
+      return res.filter((i) => Boolean(i));
+    });
 }
