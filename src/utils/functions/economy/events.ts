@@ -173,7 +173,7 @@ export async function getCurrentEvent(useCache = true): Promise<EventData> {
   return query;
 }
 
-export async function trackEventProgress(
+export async function addEventProgress(
   client: NypsiClient,
   user: MemberResolvable,
   type: string,
