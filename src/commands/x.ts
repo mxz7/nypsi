@@ -47,6 +47,7 @@ import {
   updateBankBalance,
 } from "../utils/functions/economy/balance";
 import { initCrashGame } from "../utils/functions/economy/crash";
+import { createEvent, getCurrentEvent } from "../utils/functions/economy/events";
 import {
   addInventoryItem,
   removeInventoryItem,
@@ -59,6 +60,7 @@ import {
   doDaily,
   getDailyStreak,
   getEcoBanTime,
+  getEventsData,
   getItems,
   getLastDaily,
   isEcoBanned,
@@ -2613,6 +2615,81 @@ async function run(
     });
   };
 
+  const startEvent = async () => {
+    if (args.length < 4) {
+      return message.channel.send({ embeds: [new ErrorEmbed("$x event <type> <target> <days>")] });
+    }
+
+    const type = args[1];
+    const target = parseInt(args[2]);
+    const days = parseInt(args[3]);
+
+    if (!getEventsData()[type]) {
+      return message.channel.send({ embeds: [new ErrorEmbed("invalid event type")] });
+    }
+
+    if (isNaN(target) || target < 1) {
+      return message.channel.send({ embeds: [new ErrorEmbed("invalid target")] });
+    }
+
+    if (isNaN(days) || days < 1) {
+      return message.channel.send({ embeds: [new ErrorEmbed("invalid amount of days")] });
+    }
+
+    const confirmMessage = await message.channel.send({
+      embeds: [
+        new CustomEmbed(
+          message.member,
+          `confirm you want to start a ${type} event with target of ${target} for ${days} days`,
+        ),
+      ],
+      components: [
+        new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+          new ButtonBuilder()
+            .setStyle(ButtonStyle.Danger)
+            .setLabel("confirm")
+            .setCustomId("event-confirm"),
+        ),
+      ],
+    });
+
+    const response = await confirmMessage
+      .awaitMessageComponent({
+        filter: (i) => i.user.id == message.author.id,
+        time: 15000,
+        componentType: ComponentType.Button,
+      })
+      .catch(async () => {});
+
+    if (!response) {
+      return message.channel.send({ embeds: [new ErrorEmbed("confirmation cancelled")] });
+    }
+
+    const currentEvent = await getCurrentEvent(false);
+
+    if (currentEvent) {
+      return message.channel.send({
+        embeds: [new ErrorEmbed("there is already an event running")],
+      });
+    }
+
+    const eventRes = await createEvent(
+      message.client as NypsiClient,
+      message.member,
+      type,
+      target,
+      days,
+    );
+
+    if (typeof eventRes == "string") {
+      return message.channel.send({ embeds: [new ErrorEmbed(eventRes)] });
+    }
+
+    return message.channel.send({
+      embeds: [new CustomEmbed(message.member, "event has started!!")],
+    });
+  };
+
   if (args.length == 0) {
     return message.channel.send({
       embeds: [new CustomEmbed(message.member, await getUsableCommands(message.member))],
@@ -2985,6 +3062,14 @@ async function run(
         embeds: [new CustomEmbed(message.member, `${c} users reset`)],
       });
     }
+  } else if (args[0].toLowerCase() === "event") {
+    if (!(await hasAdminPermission(message.member, "create-event"))) {
+      return message.channel.send({
+        embeds: [requiredLevelEmbed("create-event")],
+      });
+    }
+
+    return startEvent();
   } else {
     return message.channel.send({
       embeds: [new CustomEmbed(message.member, await getUsableCommands(message.member))],
@@ -3102,6 +3187,11 @@ async function getUsableCommands(member: MemberResolvable) {
       command: "$x reseteco",
       description: "reset the nypsi economy",
       permission: "reseteco",
+    },
+    {
+      command: "$x event <type> <target> <days>",
+      description: "start an event",
+      permission: "create-event",
     },
   ];
 

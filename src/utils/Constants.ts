@@ -68,6 +68,7 @@ const adminPermissionLevels = {
     "set-cmd-channels",
     "reseteco",
     "run-job",
+    "create-event",
   ] as const,
 } as const;
 

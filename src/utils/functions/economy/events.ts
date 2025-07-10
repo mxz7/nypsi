@@ -131,6 +131,8 @@ export async function createEvent(
     });
 
   checkEventExpire(client);
+
+  return true;
 }
 
 export async function getCurrentEvent(useCache = true): Promise<EventData> {
