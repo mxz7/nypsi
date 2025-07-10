@@ -6,6 +6,7 @@ import { NypsiClient } from "../../../models/Client";
 import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
 import { addProgress } from "./achievements";
+import { addEventProgress } from "./events";
 import { addInventoryItem, gemBreak, getInventory, removeInventoryItem } from "./inventory";
 import { getPlantsData, getPlantUpgrades, getUpgradesData } from "./utils";
 import dayjs = require("dayjs");
@@ -124,7 +125,23 @@ export async function addFarm(member: MemberResolvable, plantId: string, amount 
   await redis.del(`${Constants.redis.cache.economy.farm}:${userId}`);
 }
 
-export async function getClaimable(member: MemberResolvable, plantId: string, claim: boolean) {
+export function getClaimable(
+  member: MemberResolvable,
+  plantId: string,
+  claim: true,
+  client: NypsiClient,
+): Promise<number>;
+export function getClaimable(
+  member: MemberResolvable,
+  plantId: string,
+  claim: false,
+): Promise<number>;
+export async function getClaimable(
+  member: MemberResolvable,
+  plantId: string,
+  claim: boolean,
+  client?: NypsiClient,
+) {
   const inventory = await getInventory(member);
   const farm = await getFarm(member);
   const plantData = getPlantsData()[plantId];
@@ -261,6 +278,7 @@ export async function getClaimable(member: MemberResolvable, plantId: string, cl
   if (claim && items > 0) {
     await addInventoryItem(member, plantData.item, items);
     await addProgress(member, "green_fingers", items);
+    addEventProgress(client, member, "farming", items);
   }
 
   return items;

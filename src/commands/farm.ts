@@ -13,6 +13,7 @@ import {
   StringSelectMenuOptionBuilder,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
+import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import {
@@ -424,7 +425,12 @@ async function run(
     for (const plant of plantTypes) {
       promises.push(
         (async () => {
-          const items = await getClaimable(message.member, plant, true);
+          const items = await getClaimable(
+            message.member,
+            plant,
+            true,
+            message.client as NypsiClient,
+          );
           if (items > 0) earned.set(plant, items);
         })(),
       );

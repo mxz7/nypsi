@@ -35,6 +35,7 @@ import {
   getGambleMulti,
   removeBalance,
 } from "../utils/functions/economy/balance.js";
+import { addEventProgress } from "../utils/functions/economy/events.js";
 import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds.js";
 import { addInventoryItem } from "../utils/functions/economy/inventory.js";
 import { createGame } from "../utils/functions/economy/stats.js";
@@ -865,6 +866,7 @@ async function playGame(
         win += 3;
 
         addProgress(message.author.id, "minesweeper_pro", 1);
+        addEventProgress(message.client as NypsiClient, message.member, "mines", 1);
 
         if (percentChance(0.5) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
           await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t", "EX", 86400);

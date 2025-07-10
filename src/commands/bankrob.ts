@@ -22,6 +22,7 @@ import { a } from "../utils/functions/anticheat";
 import { giveCaptcha, isLockedOut, verifyUser } from "../utils/functions/captcha";
 import { addProgress } from "../utils/functions/economy/achievements.js";
 import { addBalance, getBalance, removeBalance } from "../utils/functions/economy/balance.js";
+import { addEventProgress } from "../utils/functions/economy/events";
 import { getInventory, removeInventoryItem } from "../utils/functions/economy/inventory.js";
 import { createGame } from "../utils/functions/economy/stats.js";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
@@ -185,6 +186,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
       await Promise.all([
         addBalance(message.member, stolen),
         addProgress(message.member, "robber", 1),
+        addEventProgress(message.client as NypsiClient, message.member, "rob", 1),
         addTaskProgress(message.member, "thief"),
       ]);
 

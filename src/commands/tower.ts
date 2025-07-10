@@ -34,6 +34,7 @@ import {
   getGambleMulti,
   removeBalance,
 } from "../utils/functions/economy/balance";
+import { addEventProgress } from "../utils/functions/economy/events";
 import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
 import { createGame } from "../utils/functions/economy/stats";
@@ -655,6 +656,7 @@ async function playGame(
   };
 
   const win1 = async (interaction: ButtonInteraction) => {
+    addEventProgress(message.client as NypsiClient, message.member, "tower", 1);
     let winnings = Math.round(game.bet * game.win);
     const multi = (await getGambleMulti(message.member, message.client as NypsiClient)).multi;
 

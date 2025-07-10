@@ -184,12 +184,6 @@ export async function addEventProgress(
     return;
   }
 
-  const event = await getCurrentEvent();
-
-  if (!event) {
-    return;
-  }
-
   if (!getEventsData()[type]) {
     throw new Error(`invalid event type: ${type}`);
   }
@@ -197,6 +191,20 @@ export async function addEventProgress(
   const event = await getCurrentEvent();
 
   if (!event || event.type !== type) {
+    if (
+      [
+        "blackjack",
+        "mines",
+        "highlow",
+        "dragontower",
+        "roulette",
+        "slots",
+        "rps",
+        "coinflip",
+      ].includes(type)
+    ) {
+      addEventProgress(client, user, "gamble", amount);
+    }
     return;
   }
 

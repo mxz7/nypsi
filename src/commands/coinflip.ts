@@ -14,6 +14,7 @@ import {
   MessageFlags,
 } from "discord.js";
 import { randomInt } from "node:crypto";
+import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { Item } from "../types/Economy";
@@ -23,6 +24,7 @@ import {
   getBalance,
   removeBalance,
 } from "../utils/functions/economy/balance";
+import { addEventProgress } from "../utils/functions/economy/events";
 import {
   addInventoryItem,
   getInventory,
@@ -222,6 +224,8 @@ async function run(
         earned: winner.user.id == message.author.id ? winnings : null,
       });
 
+      addEventProgress(message.client as NypsiClient, winner, "coinflip", 1);
+
       await createGame({
         userId: player2.user.id,
         bet: bet,
@@ -261,6 +265,8 @@ async function run(
         earned: 0,
         xp: 0,
       });
+
+      addEventProgress(message.client as NypsiClient, winner, "coinflip", 1);
 
       await createGame({
         userId: player2.user.id,

@@ -3,6 +3,7 @@ import { GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
+import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
@@ -10,6 +11,7 @@ import { getTier, isPremium } from "../premium/premium";
 import { percentChance } from "../random";
 import { pluralize } from "../string";
 import { addProgress } from "./achievements";
+import { addEventProgress } from "./events";
 import { getGuildName, getGuildUpgradesByUser } from "./guilds";
 import { addInventoryItem, getInventory } from "./inventory";
 import { getUpgrades } from "./levelling";
@@ -292,6 +294,7 @@ export async function runBakery(member: GuildMember) {
   addProgress(member.user.id, "super_baker", Math.round(total));
   addTaskProgress(member.user.id, "bake_daily", Math.round(total));
   addTaskProgress(member.user.id, "bake_weekly", Math.round(total));
+  addEventProgress(member.client as NypsiClient, member, "cookies", Math.round(total));
 
   return embed;
 }

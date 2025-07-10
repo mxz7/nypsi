@@ -35,6 +35,7 @@ import {
   getGambleMulti,
   removeBalance,
 } from "../utils/functions/economy/balance.js";
+import { addEventProgress } from "../utils/functions/economy/events";
 import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds";
 import { createGame } from "../utils/functions/economy/stats";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
@@ -448,6 +449,7 @@ class Game {
         winnings = this.bet * 2.5;
         addProgress(this.member, "blackjack_pro", 1);
         addTaskProgress(this.member, "blackjack");
+        addEventProgress(this.member.client as NypsiClient, this.member, "blackjack", 1);
       }
 
       winnings = winnings + Math.floor(winnings * multi.multi);

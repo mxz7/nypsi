@@ -20,6 +20,7 @@ import {
   removeBalance,
   setPadlock,
 } from "../utils/functions/economy/balance";
+import { addEventProgress } from "../utils/functions/economy/events";
 import { addToGuildXP, getGuildByUser, getGuildName } from "../utils/functions/economy/guilds";
 import { getInventory, removeInventoryItem } from "../utils/functions/economy/inventory";
 import { isPassive } from "../utils/functions/economy/passive";
@@ -313,6 +314,7 @@ async function run(
         1_000_000,
         1,
       );
+      addEventProgress(message.client as NypsiClient, message.member, "rob", 1);
       addProgress(message.member, "robber", 1);
       addTaskProgress(message.member, "thief");
 

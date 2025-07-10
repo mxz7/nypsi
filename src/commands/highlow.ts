@@ -33,6 +33,7 @@ import {
   getGambleMulti,
   removeBalance,
 } from "../utils/functions/economy/balance.js";
+import { addEventProgress } from "../utils/functions/economy/events.js";
 import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds.js";
 import { createGame } from "../utils/functions/economy/stats.js";
 import {
@@ -589,6 +590,7 @@ async function playGame(
     }
 
     if (win >= 7) addProgress(message.member, "highlow_pro", 1);
+    addEventProgress(message.client as NypsiClient, message.member, "highlow", 1);
 
     const id = await createGame({
       userId: message.author.id,

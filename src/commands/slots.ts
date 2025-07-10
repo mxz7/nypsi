@@ -24,6 +24,7 @@ import {
   removeBalance,
 } from "../utils/functions/economy/balance.js";
 import { getBoosters } from "../utils/functions/economy/boosters.js";
+import { addEventProgress } from "../utils/functions/economy/events";
 import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds.js";
 import { createGame } from "../utils/functions/economy/stats";
 import { createUser, formatBet, userExists } from "../utils/functions/economy/utils.js";
@@ -378,6 +379,7 @@ async function run(
   let multi = 0;
 
   if (win) {
+    addEventProgress(message.client as NypsiClient, message.member, "slots", 1);
     multi = (await getGambleMulti(message.member, message.client as NypsiClient)).multi;
     winnings -= bet;
 

@@ -11,10 +11,10 @@ import redis from "../init/redis.js";
 import { NypsiClient } from "../models/Client.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-
 import Constants from "../utils/Constants.js";
 import { MStoTime } from "../utils/functions/date.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
+import { addEventProgress } from "../utils/functions/economy/events.js";
 import { addTaskProgress } from "../utils/functions/economy/tasks.js";
 import { getTagsData } from "../utils/functions/economy/utils.js";
 import { cleanString } from "../utils/functions/string.js";
@@ -226,6 +226,8 @@ async function run(
         addProgress(milf.userId, "whore", 1),
         addTaskProgress(message.member, "horny"),
         addTaskProgress(milf.userId, "horny"),
+        addEventProgress(message.client as NypsiClient, message.member, "milfs", 1),
+        addEventProgress(message.client as NypsiClient, milf.userId, "milfs", 1),
       ]);
 
       const authorTag = await getActiveTag(message.member);

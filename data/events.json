@@ -59,11 +59,6 @@
     "name": "nypsi addicts",
     "description": "do {target} commands"
   },
-  "tasks": {
-    "id": "tasks",
-    "name": "task master",
-    "description": "complete {target} tasks"
-  },
   "cookies": {
     "id": "cookies",
     "name": "cookie collector",
