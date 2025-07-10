@@ -194,6 +194,12 @@ export async function addEventProgress(
     throw new Error(`invalid event type: ${type}`);
   }
 
+  const event = await getCurrentEvent();
+
+  if (!event || event.type !== type) {
+    return;
+  }
+
   await prisma.eventContribution.upsert({
     where: {
       userId_eventId: {
