@@ -203,7 +203,7 @@ export async function addEventProgress(
         "coinflip",
       ].includes(type)
     ) {
-      addEventProgress(client, user, "gamble", amount);
+      return addEventProgress(client, user, "gamble", amount);
     }
     return;
   }
