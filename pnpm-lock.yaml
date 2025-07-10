@@ -36,8 +36,8 @@ importers:
         specifier: 4.0.9
         version: 4.0.9
       bullmq:
-        specifier: ^5.56.2
-        version: 5.56.2
+        specifier: ^5.56.3
+        version: 5.56.3
       chalk:
         specifier: 4.1.2
         version: 4.1.2
@@ -1573,8 +1573,8 @@ packages:
     resolution: {integrity: sha512-WDtdLmJvAuNNPzByAYpRo2rF1Mmradw6gvWsQKf63476DDXmomT9zUiGypLcG4ibIM67vhAj8jJRdbmEws2Aqw==}
     engines: {node: '>=6.14.2'}
 
-  bullmq@5.56.2:
-    resolution: {integrity: sha512-bq0PSxPCWeNlFBc5yjBs3eR+e6GxIEIeHY0xxq6WELzG65GPjL+A2ni1NS7NroKsur0C3UJdabw51IswiSTSYw==}
+  bullmq@5.56.3:
+    resolution: {integrity: sha512-03szheVTKfLsCm5EwzOjSSUTI0UIGJjTUgX91W4+a0pj6SSfiuuNzB29QJh+T3bcgUZUHuTp01Jyxa101sv0Lg==}
 
   callsites@3.1.0:
     resolution: {integrity: sha512-P8BjAsXvZS+VIDUI11hHCQEv74YT67YUi5JJFNWIqL235sBmjX4+qx9Muvls5ivyNENctx46xQLQ3aTuE7ssaQ==}
@@ -2304,6 +2304,10 @@ packages:
 
   luxon@3.6.1:
     resolution: {integrity: sha512-tJLxrKJhO2ukZ5z0gyjY1zPh3Rh88Ej9P7jNrZiHMUXHae1yvI2imgOZtL1TO8TW6biMMKfTtAOoEJANgtWBMQ==}
+    engines: {node: '>=12'}
+
+  luxon@3.7.1:
+    resolution: {integrity: sha512-RkRWjA926cTvz5rAb1BqyWkKbbjzCGchDUIKMCUvNi17j6f6j8uHGDV82Aqcqtzd+icoYpELmG3ksgGiFNNcNg==}
     engines: {node: '>=12'}
 
   magic-bytes.js@1.12.1:
@@ -4904,7 +4908,7 @@ snapshots:
     dependencies:
       node-gyp-build: 4.8.4
 
-  bullmq@5.56.2:
+  bullmq@5.56.3:
     dependencies:
       cron-parser: 4.9.0
       ioredis: 5.6.1
@@ -4975,7 +4979,7 @@ snapshots:
 
   cron-parser@4.9.0:
     dependencies:
-      luxon: 3.6.1
+      luxon: 3.7.1
 
   cron@4.3.1:
     dependencies:
@@ -5813,6 +5817,8 @@ snapshots:
       yallist: 3.1.1
 
   luxon@3.6.1: {}
+
+  luxon@3.7.1: {}
 
   magic-bytes.js@1.12.1: {}
 
