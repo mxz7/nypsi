@@ -11,7 +11,7 @@ import { getTier, isPremium } from "../premium/premium";
 import { percentChance } from "../random";
 import { pluralize } from "../string";
 import { addProgress } from "./achievements";
-import { addEventProgress } from "./events";
+import { addEventProgress, getCurrentEvent } from "./events";
 import { getGuildName, getGuildUpgradesByUser } from "./guilds";
 import { addInventoryItem, getInventory } from "./inventory";
 import { getUpgrades } from "./levelling";
@@ -290,11 +290,24 @@ export async function runBakery(member: GuildMember) {
     embed.addField("stats", breakdownDesc.join("\n"));
   }
 
+  const eventProgress = await addEventProgress(
+    member.client as NypsiClient,
+    member,
+    "cookies",
+    Math.round(total),
+  );
+
+  if (eventProgress) {
+    embed.addField(
+      "event progress",
+      `🔱 ${eventProgress.toLocaleString()}/${((await getCurrentEvent(false))?.target || 0).toLocaleString()}`,
+    );
+  }
+
   addProgress(member.user.id, "baker", Math.round(total));
   addProgress(member.user.id, "super_baker", Math.round(total));
   addTaskProgress(member.user.id, "bake_daily", Math.round(total));
   addTaskProgress(member.user.id, "bake_weekly", Math.round(total));
-  addEventProgress(member.client as NypsiClient, member, "cookies", Math.round(total));
 
   return embed;
 }

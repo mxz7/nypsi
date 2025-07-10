@@ -425,7 +425,7 @@ async function prepareGame(
     }
   }, ms("5 minutes"));
 
-  const desc = await renderGambleScreen("playing", bet, "**0**x ($0)");
+  const desc = await renderGambleScreen({ state: "playing", bet, insert: "**0**x ($0)" });
   const embed = new CustomEmbed(message.member, desc).setHeader(
     "mines",
     message.author.avatarURL(),
@@ -682,11 +682,11 @@ async function playGame(
     gamble(message.author, "mines", bet, "lose", id, 0);
     embed.setFooter({ text: `id: ${id}` });
     embed.setColor(Constants.EMBED_FAIL_COLOR);
-    const desc = await renderGambleScreen(
-      "lose",
+    const desc = await renderGambleScreen({
+      state: "lose",
       bet,
-      `**${win.toFixed(2)}**x ($${Math.round(bet * win).toLocaleString()})`,
-    );
+      insert: `**${win.toFixed(2)}**x ($${Math.round(bet * win).toLocaleString()})`,
+    });
     embed.setDescription(desc);
     games.delete(message.author.id);
     return replay(embed, interaction);
@@ -700,13 +700,21 @@ async function playGame(
       winnings = winnings + Math.round(winnings * games.get(message.author.id).voted);
     }
 
-    const desc = await renderGambleScreen(
-      "win",
-      bet,
-      `**${win.toFixed(2)}**x ($${Math.round(bet * win).toLocaleString()})`,
-      winnings,
-      games.get(message.author.id).voted,
+    const eventProgress = await addEventProgress(
+      message.client as NypsiClient,
+      message.member,
+      "mines",
+      1,
     );
+
+    const desc = await renderGambleScreen({
+      state: "win",
+      bet,
+      insert: `**${win.toFixed(2)}**x ($${Math.round(bet * win).toLocaleString()})`,
+      winnings,
+      multiplier: games.get(message.author.id).voted,
+      eventProgress,
+    });
     embed.setDescription(desc);
 
     const earnedXp = await calcEarnedGambleXp(
@@ -761,11 +769,11 @@ async function playGame(
     gamble(message.author, "mines", bet, "draw", id, bet);
     embed.setFooter({ text: `id: ${id}` });
     embed.setColor(flavors.macchiato.colors.yellow.hex as ColorResolvable);
-    const desc = await renderGambleScreen(
-      "draw",
+    const desc = await renderGambleScreen({
+      state: "draw",
       bet,
-      `**${win.toFixed(2)}**x ($${Math.round(bet * win).toLocaleString()})`,
-    );
+      insert: `**${win.toFixed(2)}**x ($${Math.round(bet * win).toLocaleString()})`,
+    });
     embed.setDescription(desc);
     await addBalance(message.member, bet);
     games.delete(message.author.id);
@@ -866,7 +874,6 @@ async function playGame(
         win += 3;
 
         addProgress(message.author.id, "minesweeper_pro", 1);
-        addEventProgress(message.client as NypsiClient, message.member, "mines", 1);
 
         if (percentChance(0.5) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
           await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t", "EX", 86400);
@@ -907,11 +914,11 @@ async function playGame(
         increment,
       });
 
-      const desc = await renderGambleScreen(
-        "playing",
+      const desc = await renderGambleScreen({
+        state: "playing",
         bet,
-        `**${win.toFixed(2)}**x ($${Math.round(bet * win).toLocaleString()})`,
-      );
+        insert: `**${win.toFixed(2)}**x ($${Math.round(bet * win).toLocaleString()})`,
+      });
       embed.setDescription(desc);
 
       if (win >= 15) {

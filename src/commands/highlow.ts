@@ -351,7 +351,7 @@ async function prepareGame(
       .setDisabled(true),
   );
 
-  const desc = await renderGambleScreen("playing", bet, `**0**x ($0)`);
+  const desc = await renderGambleScreen({ state: "playing", bet, insert: `**0**x ($0)` });
 
   const embed = new CustomEmbed(message.member, desc)
     .setHeader("highlow", message.author.avatarURL())
@@ -542,11 +542,11 @@ async function playGame(
     gamble(message.author, "highlow", bet, "lose", id, 0);
     newEmbed.setFooter({ text: `id: ${id}` });
     newEmbed.setColor(Constants.EMBED_FAIL_COLOR);
-    const desc = await renderGambleScreen(
-      "lose",
+    const desc = await renderGambleScreen({
+      state: "lose",
       bet,
-      `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
-    );
+      insert: `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
+    });
     newEmbed.setDescription(desc);
     newEmbed.addField("card", "| " + card + " |");
     games.delete(message.author.id);
@@ -561,13 +561,21 @@ async function playGame(
       winnings = winnings + Math.round(winnings * games.get(message.author.id).voted);
     }
 
-    const desc = await renderGambleScreen(
-      "win",
-      bet,
-      `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
-      winnings,
-      games.get(message.author.id).voted,
+    const eventProgress = await addEventProgress(
+      message.client as NypsiClient,
+      message.member,
+      "highlow",
+      1,
     );
+
+    const desc = await renderGambleScreen({
+      state: "win",
+      bet,
+      insert: `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
+      winnings,
+      multiplier: games.get(message.author.id).voted,
+      eventProgress,
+    });
 
     newEmbed.setDescription(desc);
 
@@ -590,7 +598,6 @@ async function playGame(
     }
 
     if (win >= 7) addProgress(message.member, "highlow_pro", 1);
-    addEventProgress(message.client as NypsiClient, message.member, "highlow", 1);
 
     const id = await createGame({
       userId: message.author.id,
@@ -631,11 +638,11 @@ async function playGame(
     gamble(message.author, "highlow", bet, "draw", id, bet);
     newEmbed.setFooter({ text: `id: ${id}` });
     newEmbed.setColor(flavors.macchiato.colors.yellow.hex as ColorResolvable);
-    const desc = await renderGambleScreen(
-      "draw",
+    const desc = await renderGambleScreen({
+      state: "draw",
       bet,
-      `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
-    );
+      insert: `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
+    });
     newEmbed.setDescription(desc);
     newEmbed.addField("card", "| " + card + " |");
     await addBalance(message.member, bet);
@@ -716,21 +723,21 @@ async function playGame(
         );
       }
 
-      const desc = await renderGambleScreen(
-        "playing",
+      const desc = await renderGambleScreen({
+        state: "playing",
         bet,
-        `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
-      );
+        insert: `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
+      });
       newEmbed.setDescription(desc);
       newEmbed.addField("card", "| " + card + " |");
       await edit({ embeds: [newEmbed], components: [row] }, reaction);
       return playGame(message, m, args);
     } else if (newCard1 == oldCard) {
-      const desc = await renderGambleScreen(
-        "playing",
+      const desc = await renderGambleScreen({
+        state: "playing",
         bet,
-        `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
-      );
+        insert: `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
+      });
       newEmbed.setDescription(desc);
       newEmbed.addField("card", "| " + card + " |");
 
@@ -786,21 +793,21 @@ async function playGame(
         );
       }
 
-      const desc = await renderGambleScreen(
-        "playing",
+      const desc = await renderGambleScreen({
+        state: "playing",
         bet,
-        `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
-      );
+        insert: `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
+      });
       newEmbed.setDescription(desc);
       newEmbed.addField("card", "| " + card + " |");
       await edit({ embeds: [newEmbed], components: [row] }, reaction);
       return playGame(message, m, args);
     } else if (newCard1 == oldCard) {
-      const desc = await renderGambleScreen(
-        "playing",
+      const desc = await renderGambleScreen({
+        state: "playing",
         bet,
-        `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
-      );
+        insert: `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
+      });
       newEmbed.setDescription(desc);
       newEmbed.addField("card", "| " + card + " |");
       await edit({ embeds: [newEmbed] }, reaction);

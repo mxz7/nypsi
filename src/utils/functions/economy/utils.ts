@@ -30,6 +30,7 @@ import { isUserBlacklisted } from "../users/blacklist";
 import { createProfile, hasProfile } from "../users/utils";
 import { setProgress } from "./achievements";
 import { addBalance, calcMaxBet, getBalance } from "./balance";
+import { getCurrentEvent } from "./events";
 import { addToGuildXP, getGuildByUser, getGuildName } from "./guilds";
 import { addInventoryItem } from "./inventory";
 import { getDefaultLootPool } from "./loot_pools";
@@ -803,21 +804,52 @@ export async function setDaily(member: MemberResolvable, amount: number) {
   });
 }
 
+type BaseRenderGambleScreenArgs = {
+  state: "playing" | "lose" | "draw";
+  bet: number;
+  insert?: string;
+};
+
+type WinRenderGambleScreenArgs = {
+  state: "win";
+  bet: number;
+  insert?: string;
+  winnings: number;
+  multiplier?: number;
+  eventProgress?: number;
+};
+
+// Overloads
+export function renderGambleScreen(args: BaseRenderGambleScreenArgs): Promise<string>;
+export function renderGambleScreen(args: WinRenderGambleScreenArgs): Promise<string>;
+
+// Implementation
 export async function renderGambleScreen(
-  state: "playing" | "win" | "lose" | "draw",
-  bet: number,
-  insert?: string,
-  winnings?: number,
-  multiplier?: number,
-) {
-  let output = `**bet** $${bet.toLocaleString()}${insert ? `\n${insert}` : ""}`;
-  if (state === "playing") return output;
-  if (state === "lose") output += "\n\n**you lose!!**";
-  if (state === "win")
-    output += `\n\n**winner!!!**\n**you win** $${winnings.toLocaleString()}${
-      multiplier ? `\n+**${Math.floor(multiplier * 100).toString()}%** bonus` : ""
+  args: BaseRenderGambleScreenArgs | WinRenderGambleScreenArgs,
+): Promise<string> {
+  let output = `**bet** $${args.bet.toLocaleString()}${args.insert ? `\n${args.insert}` : ""}`;
+
+  if (args.state === "playing") {
+    return output;
+  }
+
+  if (args.state === "lose") {
+    output += "\n\n**you lose!!**";
+  }
+
+  if (args.state === "draw") {
+    output += `\n\n**draw!!**\n**you win** $${args.bet.toLocaleString()}`;
+  }
+
+  if (args.state === "win") {
+    output += `\n\n**winner!!!**\n**you win** $${args.winnings.toLocaleString()}${
+      args.multiplier ? `\n+**${Math.floor(args.multiplier * 100).toString()}%** bonus` : ""
     }`;
-  if (state === "draw") output += `\n\n**draw!!**\n**you win** $${bet.toLocaleString()}`;
+
+    if (args.eventProgress) {
+      output += `\n\n🔱 ${args.eventProgress.toLocaleString()}/${((await getCurrentEvent())?.target || 0).toLocaleString()}`;
+    }
+  }
 
   return output;
 }
