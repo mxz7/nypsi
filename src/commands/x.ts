@@ -411,9 +411,9 @@ async function run(
       await res.deferReply();
 
       if (res.customId === "db-data") {
-        if (!(await hasAdminPermission(message.member, "view-user-info"))) {
+        if (!(await hasAdminPermission(message.member, "user-db-data"))) {
           await res.editReply({
-            embeds: [requiredLevelEmbed("view-user-info")],
+            embeds: [requiredLevelEmbed("user-db-data")],
           });
           return waitForButton();
         }
@@ -3030,7 +3030,7 @@ async function getUsableCommands(member: MemberResolvable) {
   const commands: { command: string; description: string; permission: AdminPermission }[] = [
     {
       command: "$x userid <id>",
-      description: "view/edit disc info and db info",
+      description: "view/edit discord and db info",
       permission: "view-user-info",
     },
     {
