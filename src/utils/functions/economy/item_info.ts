@@ -585,6 +585,7 @@ function getBoosterMessage(selected: Item, member: ItemMessageMember) {
 }
 
 function getLootPoolsMessage(selected: Item, member: ItemMessageMember): ItemMessageData {
+  const pageLength = 15;
   const description: string[] = [];
   const lootPools = getLootPools();
   const poolOptions: StringSelectMenuOptionBuilder[] = [];
@@ -600,18 +601,22 @@ function getLootPoolsMessage(selected: Item, member: ItemMessageMember): ItemMes
     description.push(`**${count}** draw${count === 1 ? "" : "s"} from pool \`${poolName}\``);
     const breakdown = poolBreakdown(lootPools[poolName]);
     subEmbeds[poolName] = [];
-    for (let i = 0; i < breakdown.length; i += 15) {
+    for (let i = 0; i < breakdown.length; i += pageLength) {
       subEmbeds[poolName].push(
-        new CustomEmbed(member)
-          .setDescription(`**${count}** draw${count === 1 ? "" : "s"} from pool \`${poolName}\``)
-          .addField("items", breakdown.slice(i, min(i + 15, breakdown.length)).join("\n")),
+        new CustomEmbed(member).setDescription(
+          `**${count}** draw${count === 1 ? "" : "s"} from pool \`${poolName}\`\n\n` +
+            "**entries**\n" +
+            breakdown.slice(i, min(i + pageLength, breakdown.length)).join("\n"),
+        ),
       );
     }
     if (subEmbeds[poolName].length === 0) {
       subEmbeds[poolName].push(
-        new CustomEmbed(member)
-          .setDescription(`**${count}** draw${count === 1 ? "" : "s"} from pool \`${poolName}\``)
-          .addField("items", "nothing"),
+        new CustomEmbed(member).setDescription(
+          `**${count}** draw${count === 1 ? "" : "s"} from pool \`${poolName}\`\n\n` +
+            "**entries**\n" +
+            "*nothing*",
+        ),
       );
     }
   }

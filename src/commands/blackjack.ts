@@ -48,7 +48,7 @@ import { addXp, calcEarnedGambleXp } from "../utils/functions/economy/xp";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { percentChance, shuffle } from "../utils/functions/random";
 import sleep from "../utils/functions/sleep";
-import { getAdminLevel } from "../utils/functions/users/admin";
+import { hasAdminPermission } from "../utils/functions/users/admin";
 import { recentCommands } from "../utils/functions/users/commands";
 import { addHourlyCommand } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
@@ -579,7 +579,10 @@ class Game {
       }
 
       if (await redis.get("nypsi:maintenance")) {
-        if ((await getAdminLevel(this.member)) > 0 && this.playerMessage instanceof Message) {
+        if (
+          (await hasAdminPermission(this.member, "bypass-maintenance")) &&
+          this.playerMessage instanceof Message
+        ) {
           this.playerMessage.react("💀");
         } else {
           return this.edit({
