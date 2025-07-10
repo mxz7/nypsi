@@ -501,8 +501,8 @@ export async function fulfillTradeRequest(
       interaction.user,
       await interaction.client.users.fetch(tradeRequest.ownerId),
       "item",
-      parseInt(item.split(":")[0]),
-      item.split(":")[1],
+      parseInt(item.split(":")[1]),
+      item.split(":")[0],
       "trade request",
     );
   }
