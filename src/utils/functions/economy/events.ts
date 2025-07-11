@@ -360,7 +360,7 @@ export async function checkEventExpire(client: NypsiClient) {
         {
           context: {
             content:
-              `the **${getEventsData()[event.type].name}** event has come to an end without being completed **):**\n\n` +
+              `🔱 the **${getEventsData()[event.type].name}** event has come to an end without being completed **):**\n\n` +
               `${getEventProgress(event).toLocaleString()}/${event.target.toLocaleString()}\n\n` +
               `<@&${Constants.EVENTS_ROLE_ID}>`,
             channelId: targetChannel,
@@ -415,7 +415,7 @@ async function completeEvent(client: NypsiClient, lastUser: string) {
   const privacy = await getPreferences(lastUser).then((r) => r.leaderboards);
 
   let content =
-    `the **${getEventsData()[event.type].name}** event has been completed! ` +
+    `🔱 the **${getEventsData()[event.type].name}** event has been completed! ` +
     `completed in ${MStoTime(event.completedAt.getTime() - event.createdAt.getTime())}\n\n`;
 
   if (privacy) {
@@ -430,7 +430,7 @@ async function completeEvent(client: NypsiClient, lastUser: string) {
       `for **${await getLastKnownUsername(userId)}**\n`;
   }
 
-  content += "\n";
+  content += `\n\n<@&${Constants.EVENTS_ROLE_ID}>`;
 
   const targetChannel =
     client.user.id === Constants.BOT_USER_ID
@@ -458,7 +458,7 @@ async function completeEvent(client: NypsiClient, lastUser: string) {
 
   await client.cluster
     .broadcastEval(
-      async (client, { content, channelId, cluster }) => {
+      async (client, { content, channelId, components, cluster }) => {
         if ((client as unknown as NypsiClient).cluster.id != cluster) return;
 
         const channel = client.channels.cache.get(channelId);
@@ -466,7 +466,7 @@ async function completeEvent(client: NypsiClient, lastUser: string) {
         if (!channel) return;
 
         if (channel.isTextBased() && channel.isSendable()) {
-          await channel.send({ content });
+          await channel.send({ content, components: [components] });
         }
       },
       {
