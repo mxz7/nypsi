@@ -2668,7 +2668,7 @@ async function run(
     const currentEvent = await getCurrentEvent(false);
 
     if (currentEvent) {
-      return message.channel.send({
+      return response.reply({
         embeds: [new ErrorEmbed("there is already an event running")],
       });
     }
@@ -2682,10 +2682,10 @@ async function run(
     );
 
     if (typeof eventRes == "string") {
-      return message.channel.send({ embeds: [new ErrorEmbed(eventRes)] });
+      return response.reply({ embeds: [new ErrorEmbed(eventRes)] });
     }
 
-    return message.channel.send({
+    return response.reply({
       embeds: [new CustomEmbed(message.member, "event has started!!")],
     });
   };
