@@ -257,9 +257,9 @@ async function run(
 
       embed.setDescription(
         `**winner** ${winner.user.username}\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}` +
-          eventProgress
-          ? `\n\n🔱 ${eventProgress.toLocaleString()}/${((await getCurrentEvent()).target || 0).toLocaleString()}`
-          : "",
+          (eventProgress
+            ? `\n\n🔱 ${eventProgress.toLocaleString()}/${((await getCurrentEvent()).target || 0).toLocaleString()}`
+            : ""),
       );
       embed.setColor(winner.displayHexColor);
       embed.setFooter({ text: `id: ${id}` });
@@ -304,9 +304,9 @@ async function run(
 
       embed.setDescription(
         `**winner** ${winner.user.username}\n\n${thingy}\n\n**bet** ${itemAmount.toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/item/${item.id}?ref=bot-cf)**` +
-          eventProgress
-          ? `\n\n🔱 ${eventProgress.toLocaleString()}/${((await getCurrentEvent()).target || 0).toLocaleString()}`
-          : "",
+          (eventProgress
+            ? `\n\n🔱 ${eventProgress.toLocaleString()}/${((await getCurrentEvent()).target || 0).toLocaleString()}`
+            : ""),
       );
       embed.setColor(winner.displayHexColor);
       embed.setFooter({ text: `id: ${id}` });
