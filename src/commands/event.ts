@@ -59,7 +59,8 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
           new ButtonBuilder()
             .setStyle(ButtonStyle.Link)
             .setLabel("past events")
-            .setURL("https://nypsi.xyz/event"),
+            .setURL("https://nypsi.xyz/event")
+            .setEmoji("🔱"),
         ),
       ],
     });

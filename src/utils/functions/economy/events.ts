@@ -118,7 +118,7 @@ export async function createEvent(
             new ButtonBuilder()
               .setStyle(ButtonStyle.Link)
               .setLabel("more information")
-              .setEmoji("📜")
+              .setEmoji("🔱")
               .setURL("https://nypsi.xyz/docs/economy/events?ref=bot-event-announcement"),
           ),
           channelId: targetChannel,
