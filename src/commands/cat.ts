@@ -12,6 +12,8 @@ import { addProgress } from "../utils/functions/economy/achievements";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { getRandomImage } from "../utils/functions/image";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { addEventProgress, getCurrentEvent } from "../utils/functions/economy/events";
+import { NypsiClient } from "../models/Client";
 
 const cmd = new Command("cat", "get a random picture of a cat", "animals").setAliases([
   "kitty",
@@ -65,7 +67,21 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
 
   if (!image) return send({ embeds: [new ErrorEmbed("failed to find a cat image")] });
 
-  const embed = new CustomEmbed(message.member).disableFooter().setImage(image.url);
+  const eventProgress = await addEventProgress(
+    message.client as NypsiClient,
+    message.member,
+    "animals",
+    1,
+  );
+
+  const embed = new CustomEmbed(
+    message.member,
+    eventProgress
+      ? `🔱 ${eventProgress.toLocaleString()}/${((await getCurrentEvent()).target || 0).toLocaleString()}`
+      : undefined,
+  )
+    .disableFooter()
+    .setImage(image.url);
 
   if (image.name) {
     embed.setTitle(image.name);
