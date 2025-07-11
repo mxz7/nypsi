@@ -73,5 +73,20 @@
     "id": "messages",
     "name": "discord addicts",
     "description": "send {target} messages in the official nypsi server (spammers will be muted!!)"
+  },
+  "votes": {
+    "id": "votes",
+    "name": "votes",
+    "description": "vote {target} times"
+  },
+  "animals": {
+    "id": "animals",
+    "name": "animals",
+    "description": "look at {target} pictures of animals"
+  },
+  "grind": {
+    "id": "grind",
+    "name": "grind",
+    "description": "fish/hunt/mine {target} times"
   }
 }
