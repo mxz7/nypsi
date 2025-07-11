@@ -108,7 +108,7 @@ export async function createEvent(
           content:
             `🔱 the **${getEventsData()[type].name}** event has started!!\n\n` +
             `> ${getEventsData()[type].description.replace("{target}", target.toLocaleString())}\n\n` +
-            `ends on <t:${Math.floor(event.expiresAt.getTime() / 1000)}> (<t:${Math.floor(event.expiresAt.getTime() / 1000)}:R)\n\n` +
+            `ends on <t:${Math.floor(event.expiresAt.getTime() / 1000)}> (<t:${Math.floor(event.expiresAt.getTime() / 1000)}:R>)\n\n` +
             `<@&${Constants.EVENTS_ROLE_ID}>`,
           components: new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
             new ButtonBuilder()
