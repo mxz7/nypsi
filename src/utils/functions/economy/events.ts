@@ -49,7 +49,7 @@ export async function createEvent(
     return "invalid event type";
   }
 
-  await prisma.event.create({
+  const event = await prisma.event.create({
     data: {
       ownerId: userId,
       type,
@@ -107,7 +107,8 @@ export async function createEvent(
         context: {
           content:
             `🔱 the **${getEventsData()[type].name}** event has started!!\n\n` +
-            `${getEventsData()[type].description.replace("{target}", target.toLocaleString())}\n\n` +
+            `> ${getEventsData()[type].description.replace("{target}", target.toLocaleString())}\n\n` +
+            `ends on <t:${Math.floor(event.expiresAt.getTime() / 1000)}> (<t:${Math.floor(event.expiresAt.getTime() / 1000)}:R)\n\n` +
             `<@&${Constants.EVENTS_ROLE_ID}>`,
           components: new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
             new ButtonBuilder()
