@@ -227,13 +227,14 @@ export async function addEventProgress(
     },
   });
 
+  let progress: number;
+
   if (!(await redis.exists(Constants.redis.cache.economy.eventProgress))) {
-    await redis.set(
-      Constants.redis.cache.economy.eventProgress,
-      getEventProgress(await getCurrentEvent(false)),
-    );
+    progress = getEventProgress(await getCurrentEvent(false));
+    await redis.set(Constants.redis.cache.economy.eventProgress, progress);
+  } else {
+    progress = await redis.incrby(Constants.redis.cache.economy.eventProgress, amount);
   }
-  const progress = await redis.incrby(Constants.redis.cache.economy.eventProgress, amount);
 
   // keeps in sync
   if (progress % 1000 === 0) {
