@@ -16,6 +16,7 @@ import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Comman
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getBoosters } from "../utils/functions/economy/boosters";
+import { addEventProgress, getCurrentEvent } from "../utils/functions/economy/events";
 import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds";
 import {
   addInventoryItem,
@@ -327,6 +328,13 @@ async function doHunt(
     }
   }
 
+  const eventProgress = await addEventProgress(
+    message.client as NypsiClient,
+    message.member,
+    "grind",
+    1,
+  );
+
   embed.setDescription(
     `you go to the ${chosenPlace} and prepare your **${items[gun].name}**\n\nyou killed${
       total > 0
@@ -334,7 +342,9 @@ async function doHunt(
             .map((i) => `- \`${i[1]}x\` ${items[i[0]].emoji} ${items[i[0]].name}`)
             .join("\n")}`
         : " **nothing**"
-    }`,
+    }` + eventProgress
+      ? `\n\n🔱 ${eventProgress.toLocaleString()}/${((await getCurrentEvent())?.target || 0).toLocaleString()}`
+      : "",
   );
 
   send({ embeds: [embed], components: [row] });
