@@ -17,6 +17,7 @@ import { MStoTime } from "../date";
 import { getUserId, MemberResolvable } from "../member";
 import { addNotificationToQueue, getPreferences } from "../users/notifications";
 import { getLastKnownUsername } from "../users/tag";
+import { hasProfile } from "../users/utils";
 import { addAchievementProgress } from "./achievements";
 import { addInventoryItem } from "./inventory";
 import { getEventsData, getItems, isEcoBanned } from "./utils";
@@ -181,7 +182,7 @@ export async function addEventProgress(
   amount: number,
 ) {
   const userId = getUserId(user);
-  if ((await isEcoBanned(userId)).banned) {
+  if (!(await hasProfile(userId)) || (await isEcoBanned(userId)).banned) {
     return;
   }
 
