@@ -244,7 +244,9 @@ async function run(
           authorTag ? `[${getTagsData()[authorTag.tagId].emoji}] ` : ""
         }**${message.author.username}**](https://nypsi.xyz/user/${
           message.author.id
-        }?ref=bot-milf) a *private* message 😉😏` + eventProgress ? `\n\n🔱 ${eventProgress.toLocaleString()}/${((await getCurrentEvent()).target || 0).toLocaleString()}`,
+        }?ref=bot-milf) a *private* message 😉😏` + eventProgress
+          ? `\n\n🔱 ${eventProgress.toLocaleString()}/${((await getCurrentEvent()).target || 0).toLocaleString()}`
+          : "",
       )
         .setHeader("milf finder")
         .setColor(Constants.EMBED_SUCCESS_COLOR);
