@@ -319,6 +319,14 @@ export async function checkEventExpire(client: NypsiClient) {
     return;
   }
 
+  if (event.expiresAt.getTime() > Date.now() + ms("12 hours")) {
+    setTimeout(() => {
+      checkEventExpire(client);
+    }, ms("10 hours"));
+
+    return;
+  }
+
   const doExpire = async (event: EventData) => {
     if (event.completed || event.expiresAt.getTime() < Date.now()) {
       return;
