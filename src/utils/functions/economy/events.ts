@@ -318,6 +318,9 @@ export async function checkEventExpire(client: NypsiClient) {
   }
 
   const doExpire = async (event: EventData) => {
+    if (event.completed || event.expiresAt.getTime() < Date.now()) {
+      return;
+    }
     logger.info(`event: ${event.id} expired`);
 
     const targetChannel =
