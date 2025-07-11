@@ -74,11 +74,6 @@
     "name": "discord addicts",
     "description": "send {target} messages in the official nypsi server (spammers will be muted!!)"
   },
-  "votes": {
-    "id": "votes",
-    "name": "votes",
-    "description": "vote {target} times"
-  },
   "animals": {
     "id": "animals",
     "name": "animals",
