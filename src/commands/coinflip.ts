@@ -14,6 +14,7 @@ import {
   MessageFlags,
 } from "discord.js";
 import { randomInt } from "node:crypto";
+import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { Item } from "../types/Economy";
@@ -23,6 +24,7 @@ import {
   getBalance,
   removeBalance,
 } from "../utils/functions/economy/balance";
+import { addEventProgress, getCurrentEvent } from "../utils/functions/economy/events";
 import {
   addInventoryItem,
   getInventory,
@@ -222,6 +224,13 @@ async function run(
         earned: winner.user.id == message.author.id ? winnings : null,
       });
 
+      const eventProgress = await addEventProgress(
+        message.client as NypsiClient,
+        winner,
+        "coinflip",
+        1,
+      );
+
       await createGame({
         userId: player2.user.id,
         bet: bet,
@@ -247,7 +256,10 @@ async function run(
       }
 
       embed.setDescription(
-        `**winner** ${winner.user.username}\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}`,
+        `**winner** ${winner.user.username}\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}` +
+          eventProgress
+          ? `\n\n🔱 ${eventProgress.toLocaleString()}/${((await getCurrentEvent()).target || 0).toLocaleString()}`
+          : "",
       );
       embed.setColor(winner.displayHexColor);
       embed.setFooter({ text: `id: ${id}` });
@@ -261,6 +273,13 @@ async function run(
         earned: 0,
         xp: 0,
       });
+
+      const eventProgress = await addEventProgress(
+        message.client as NypsiClient,
+        winner,
+        "coinflip",
+        1,
+      );
 
       await createGame({
         userId: player2.user.id,
@@ -284,7 +303,10 @@ async function run(
       }
 
       embed.setDescription(
-        `**winner** ${winner.user.username}\n\n${thingy}\n\n**bet** ${itemAmount.toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/item/${item.id}?ref=bot-cf)**`,
+        `**winner** ${winner.user.username}\n\n${thingy}\n\n**bet** ${itemAmount.toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/item/${item.id}?ref=bot-cf)**` +
+          eventProgress
+          ? `\n\n🔱 ${eventProgress.toLocaleString()}/${((await getCurrentEvent()).target || 0).toLocaleString()}`
+          : "",
       );
       embed.setColor(winner.displayHexColor);
       embed.setFooter({ text: `id: ${id}` });

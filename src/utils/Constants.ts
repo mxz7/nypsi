@@ -68,6 +68,7 @@ const adminPermissionLevels = {
     "set-cmd-channels",
     "reseteco",
     "run-job",
+    "create-event",
   ] as const,
 } as const;
 
@@ -163,6 +164,8 @@ export default {
         WORD_LIST: "cache:chatreaction:wordlist:words",
       },
       economy: {
+        event: "cache:economy:event",
+        eventProgress: "cache:economy:event:progress",
         farm: "cache:economy:farm",
         farmUpgrades: "cache:economy:farmupgrades",
         TASKS: "cache:economy:tasks",
@@ -270,6 +273,7 @@ export default {
   EMOJI_REGEX: /(<:[A-Za-z_-]+:[0-9]+>)/,
   GOLD_ROLE_ID: "819870846536646666",
   KARMA_SHOP_ROLE_ID: "1088800175532806187",
+  EVENTS_ROLE_ID: "1392067239649345627",
   KOFI_PRODUCTS: products,
   MAX_GUILD_LEVEL: 420,
   NYPSI_SERVER_ID: "747056029795221513",

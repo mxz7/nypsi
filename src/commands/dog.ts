@@ -6,9 +6,11 @@ import {
   Message,
   MessageFlags,
 } from "discord.js";
+import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { addProgress } from "../utils/functions/economy/achievements";
+import { addEventProgress, getCurrentEvent } from "../utils/functions/economy/events";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { getRandomImage } from "../utils/functions/image";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -61,7 +63,21 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
 
   if (!image) return send({ embeds: [new ErrorEmbed("failed to find a dog image")] });
 
-  const embed = new CustomEmbed(message.member).disableFooter().setImage(image.url);
+  const eventProgress = await addEventProgress(
+    message.client as NypsiClient,
+    message.member,
+    "animals",
+    1,
+  );
+
+  const embed = new CustomEmbed(
+    message.member,
+    eventProgress
+      ? `🔱 ${eventProgress.toLocaleString()}/${((await getCurrentEvent()).target || 0).toLocaleString()}`
+      : undefined,
+  )
+    .disableFooter()
+    .setImage(image.url);
 
   if (image.name) {
     embed.setTitle(image.name);

@@ -25,6 +25,7 @@ import { NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { a } from "../utils/functions/anticheat";
+import { addEventProgress } from "../utils/functions/economy/events";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { userExists } from "../utils/functions/economy/utils";
 import { checkAutoMute, checkMessageContent } from "../utils/functions/guilds/filters";
@@ -438,6 +439,7 @@ export default async function messageCreate(message: Message) {
     const addProgress = async () => {
       await addTaskProgress(message.author.id, "chat_daily");
       await addTaskProgress(message.author.id, "chat_weekly");
+      addEventProgress(message.client as NypsiClient, message.member, "messages", 1);
     };
 
     if (!lastContents) {

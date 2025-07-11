@@ -35,6 +35,7 @@ import {
   getGambleMulti,
   removeBalance,
 } from "../utils/functions/economy/balance.js";
+import { addEventProgress } from "../utils/functions/economy/events";
 import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds";
 import { createGame } from "../utils/functions/economy/stats";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
@@ -413,10 +414,20 @@ class Game {
     multi?: number,
     xp?: number,
     id?: string,
+    eventProgress?: number,
   ) {
     const embed = new CustomEmbed(
       this.member,
-      await renderGambleScreen(state, this.bet, null, winnings, multi),
+      // await renderGambleScreen(state, this.bet, null, winnings, multi),
+      await renderGambleScreen({
+        // @ts-expect-error fricking overloads ahhhh
+        state,
+        bet: this.bet,
+        insert: null,
+        winnings,
+        multiplier: multi,
+        eventProgress,
+      }),
     ).setHeader("blackjack", this.member.avatarURL() || this.member.user.avatarURL());
 
     if (state === "win") embed.setColor(Constants.EMBED_SUCCESS_COLOR);
@@ -440,9 +451,16 @@ class Game {
     let winnings = 0;
     let xp = 0;
     const multi = await getGambleMulti(this.member, this.member.client as NypsiClient);
+    let eventProgress: number;
 
     if (result === "win") {
       winnings = this.bet * 2;
+      eventProgress = await addEventProgress(
+        this.member.client as NypsiClient,
+        this.member,
+        "blackjack",
+        1,
+      );
 
       if (this.hand.cards.length === 2 && this.hand.total() === 21) {
         winnings = this.bet * 2.5;
@@ -458,7 +476,9 @@ class Game {
         this.bet,
         this.hand.cards.length === 2 && this.hand.total() === 21 ? 2.5 : 2,
       );
-    } else if (result === "draw") winnings = this.bet;
+    } else if (result === "draw") {
+      winnings = this.bet;
+    }
 
     if (winnings > 0) await addBalance(this.member, winnings);
     if (xp > 0) {
@@ -487,7 +507,7 @@ class Game {
     });
     gamble(this.member.user, "blackjack", this.bet, result, id, winnings);
 
-    const embed = await this.render(result, winnings, multi.multi, xp, id);
+    const embed = await this.render(result, winnings, multi.multi, xp, id, eventProgress);
 
     await redis.srem(Constants.redis.nypsi.USERS_PLAYING, this.member.user.id);
 
