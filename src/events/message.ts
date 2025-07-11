@@ -456,7 +456,7 @@ export default async function messageCreate(message: Message) {
         for (const content of lastContents.history) {
           const similarity = compareTwoStrings(content, message.content.toLowerCase());
 
-          if (similarity > 75) {
+          if (similarity > 50) {
             fail = true;
             break;
           }
