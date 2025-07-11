@@ -116,7 +116,7 @@ export async function createEvent(
               .setStyle(ButtonStyle.Link)
               .setLabel("live progress")
               .setEmoji("🏆")
-              .setURL("https://nypsi.xyz/events?ref=bot-event-announcement"),
+              .setURL("https://nypsi.xyz/event?ref=bot-event-announcement"),
             new ButtonBuilder()
               .setStyle(ButtonStyle.Link)
               .setLabel("more information")

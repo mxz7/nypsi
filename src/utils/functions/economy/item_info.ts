@@ -489,7 +489,7 @@ function getObtainingMessage(selected: Item, member: ItemMessageMember): ItemMes
     description.push("given one to begin your nypsi journey");
   }
   if (selected.id === "pandora_box") {
-    description.push("[events](https://nypsi.xyz/events?ref=bot-item-pandora");
+    description.push("[events](https://nypsi.xyz/docs/economy/events?ref=bot-item-pandora");
   }
   const randomDropPool = lootPools["random_drop"];
   if (Object.keys(randomDropPool.items ?? {}).includes(selected.id)) {
