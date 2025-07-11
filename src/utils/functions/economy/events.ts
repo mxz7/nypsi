@@ -106,7 +106,7 @@ export async function createEvent(
       {
         context: {
           content:
-            `the **${getEventsData()[type].name}** event has started!!\n\n` +
+            `🔱 the **${getEventsData()[type].name}** event has started!!\n\n` +
             `${getEventsData()[type].description.replace("{target}", target.toLocaleString())}\n\n` +
             `<@&${Constants.EVENTS_ROLE_ID}>`,
           components: new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
