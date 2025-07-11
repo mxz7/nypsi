@@ -397,6 +397,8 @@ export async function isRequestSuitable(
     "",
     "If the user is suggesting a new feature, you should accept the support request, but tell them to use the suggestions channel.",
     "",
+    "If you have no information or questions for the user, do not supply an answer.",
+    "",
     "## Examples",
     "",
     "### Suitable Requests",
