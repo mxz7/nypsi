@@ -20,7 +20,7 @@ import {
   removeBalance,
   setPadlock,
 } from "../utils/functions/economy/balance";
-import { addEventProgress } from "../utils/functions/economy/events";
+import { addEventProgress, getCurrentEvent } from "../utils/functions/economy/events";
 import { addToGuildXP, getGuildByUser, getGuildName } from "../utils/functions/economy/guilds";
 import { getInventory, removeInventoryItem } from "../utils/functions/economy/inventory";
 import { isPassive } from "../utils/functions/economy/passive";
@@ -305,18 +305,28 @@ async function run(
       await removeBalance(target, amountMoney);
       await addBalance(message.member, amountMoney);
 
-      embed2.setColor(Constants.EMBED_SUCCESS_COLOR);
-      embed2.addField("success!!", "you stole $**" + amountMoney.toLocaleString() + "**");
-
       const earnedXp = await calcEarnedGambleXp(
         message.member,
         message.client as NypsiClient,
         1_000_000,
         1,
       );
-      addEventProgress(message.client as NypsiClient, message.member, "rob", 1);
+      const eventProgress = await addEventProgress(
+        message.client as NypsiClient,
+        message.member,
+        "rob",
+        1,
+      );
       addProgress(message.member, "robber", 1);
       addTaskProgress(message.member, "thief");
+
+      embed2.setColor(Constants.EMBED_SUCCESS_COLOR);
+      embed2.addField(
+        "success!!",
+        "you stole $**" + amountMoney.toLocaleString() + "**" + eventProgress
+          ? `\n\n🔱${eventProgress.toLocaleString()}/${((await getCurrentEvent()).target || 0).toLocaleString()}`
+          : "",
+      );
 
       if (earnedXp > 0) {
         await addXp(message.member, earnedXp);

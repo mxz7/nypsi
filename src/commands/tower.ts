@@ -327,7 +327,7 @@ async function prepareGame(
 
   components[components.length - 1].components[0].setDisabled(true);
 
-  const desc = await renderGambleScreen("playing", bet, "**0**x ($0)");
+  const desc = await renderGambleScreen({ state: "playing", bet, insert: "**0**x ($0)" });
 
   const embed = new CustomEmbed(message.member, desc)
     .setHeader("dragon tower", message.author.avatarURL())
@@ -644,11 +644,11 @@ async function playGame(
     gamble(message.author, "tower", game.bet, "lose", id, 0);
     game.embed.setFooter({ text: `id: ${id}` });
     game.embed.setColor(Constants.EMBED_FAIL_COLOR);
-    const desc = await renderGambleScreen(
-      "lose",
-      game.bet,
-      `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
-    );
+    const desc = await renderGambleScreen({
+      state: "lose",
+      bet: game.bet,
+      insert: `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
+    });
     game.embed.setDescription(desc);
 
     replay(game.embed, interaction);
@@ -656,7 +656,12 @@ async function playGame(
   };
 
   const win1 = async (interaction: ButtonInteraction) => {
-    addEventProgress(message.client as NypsiClient, message.member, "tower", 1);
+    const eventProgress = await addEventProgress(
+      message.client as NypsiClient,
+      message.member,
+      "tower",
+      1,
+    );
     let winnings = Math.round(game.bet * game.win);
     const multi = (await getGambleMulti(message.member, message.client as NypsiClient)).multi;
 
@@ -664,13 +669,14 @@ async function playGame(
       winnings += Math.round(winnings * multi);
     }
 
-    const desc = await renderGambleScreen(
-      "win",
-      game.bet,
-      `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
+    const desc = await renderGambleScreen({
+      state: "win",
+      bet: game.bet,
+      insert: `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
       winnings,
-      multi,
-    );
+      multiplier: multi,
+      eventProgress: eventProgress,
+    });
     game.embed.setDescription(desc);
 
     game.embed.setColor(Constants.EMBED_SUCCESS_COLOR);
@@ -742,11 +748,11 @@ async function playGame(
     });
     gamble(message.author, "tower", game.bet, "draw", id, game.bet);
     game.embed.setColor(flavors.macchiato.colors.yellow.hex as ColorResolvable);
-    const desc = await renderGambleScreen(
-      "draw",
-      game.bet,
-      `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
-    );
+    const desc = await renderGambleScreen({
+      state: "draw",
+      bet: game.bet,
+      insert: `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
+    });
     game.embed.setDescription(desc);
     await addBalance(message.member, game.bet);
     games.delete(message.author.id);
@@ -824,11 +830,11 @@ async function playGame(
         //   increment,
         // });
 
-        const desc = await renderGambleScreen(
-          "playing",
-          game.bet,
-          `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
-        );
+        const desc = await renderGambleScreen({
+          state: "playing",
+          bet: game.bet,
+          insert: `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
+        });
         game.embed.setDescription(desc);
 
         if (y >= 8) {

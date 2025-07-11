@@ -130,7 +130,7 @@ export function getClaimable(
   plantId: string,
   claim: true,
   client: NypsiClient,
-): Promise<number>;
+): Promise<{ sold: number; eventProgress?: number }>;
 export function getClaimable(
   member: MemberResolvable,
   plantId: string,
@@ -141,7 +141,7 @@ export async function getClaimable(
   plantId: string,
   claim: boolean,
   client?: NypsiClient,
-) {
+): Promise<number | { sold: number; eventProgress?: number }> {
   const inventory = await getInventory(member);
   const farm = await getFarm(member);
   const plantData = getPlantsData()[plantId];
@@ -278,7 +278,9 @@ export async function getClaimable(
   if (claim && items > 0) {
     await addInventoryItem(member, plantData.item, items);
     await addProgress(member, "green_fingers", items);
-    addEventProgress(client, member, "farming", items);
+    const eventProgress = await addEventProgress(client, member, "farming", items);
+
+    return { sold: items, eventProgress };
   }
 
   return items;

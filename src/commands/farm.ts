@@ -16,6 +16,7 @@ import { inPlaceSort } from "fast-sort";
 import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { getCurrentEvent } from "../utils/functions/economy/events";
 import {
   addFarmUpgrade,
   deletePlant,
@@ -421,6 +422,7 @@ async function run(
     );
 
     const earned = new Map<string, number>();
+    let eventProgress = 0;
 
     for (const plant of plantTypes) {
       promises.push(
@@ -431,7 +433,14 @@ async function run(
             true,
             message.client as NypsiClient,
           );
-          if (items > 0) earned.set(plant, items);
+
+          if (items.sold > 0) {
+            earned.set(plant, items.sold);
+          }
+
+          if (items.eventProgress > eventProgress) {
+            eventProgress = items.eventProgress;
+          }
         })(),
       );
     }
@@ -444,6 +453,10 @@ async function run(
 
     for (const [plantId, value] of inPlaceSort(Array.from(earned.entries())).desc((i) => i[1])) {
       desc += `\n\`${value.toLocaleString()}x\` ${getItems()[getPlantsData()[plantId].item].emoji} ${getItems()[getPlantsData()[plantId].item].name}`;
+    }
+
+    if (eventProgress) {
+      desc += `\n\n🔱 ${eventProgress.toLocaleString()}/${((await getCurrentEvent()).target || 0).toLocaleString()}`;
     }
 
     const embed = new CustomEmbed(message.member, desc).setHeader(
