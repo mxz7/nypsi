@@ -74,8 +74,8 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
       `your contribution: ${event.contributions
         .find((contribution) => contribution.userId === message.author.id)
         ?.contribution.toLocaleString()} ` +
-      `(#${event.contributions.findIndex((contribution) => contribution.userId === message.author.id)})`,
-  );
+      `(#${event.contributions.findIndex((contribution) => contribution.userId === message.author.id) + 1})`,
+  ).setHeader("current event", message.author.avatarURL());
 
   return send({
     embeds: [embed],
