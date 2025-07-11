@@ -244,7 +244,7 @@ async function run(
       if (args.length > 2) amount = parseInt(args[2]);
       else amount = parseInt(args[1]);
 
-      if (amount === 0 || isNaN(amount) || !amount) {
+      if (amount <= 0 || isNaN(amount) || !amount) {
         await createAuraTransaction(message.member, message.client.user, -50);
 
         return send({ embeds: [new ErrorEmbed("invalid amount. -50 aura")] });
@@ -303,7 +303,7 @@ async function run(
       if (args.length > 2) amount = parseInt(args[2]);
       else amount = parseInt(args[1]);
 
-      if (amount === 0 || isNaN(amount) || !amount) {
+      if (amount <= 0 || isNaN(amount) || !amount) {
         await createAuraTransaction(message.member, message.client.user, -50);
 
         return send({ embeds: [new ErrorEmbed("invalid amount. -50 aura")] });
