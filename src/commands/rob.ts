@@ -323,9 +323,12 @@ async function run(
       embed2.setColor(Constants.EMBED_SUCCESS_COLOR);
       embed2.addField(
         "success!!",
-        "you stole $**" + amountMoney.toLocaleString() + "**" + eventProgress
-          ? `\n\n🔱${eventProgress.toLocaleString()}/${((await getCurrentEvent()).target || 0).toLocaleString()}`
-          : "",
+        "you stole $**" +
+          amountMoney.toLocaleString() +
+          "**" +
+          (eventProgress
+            ? `\n\n🔱${eventProgress.toLocaleString()}/${((await getCurrentEvent()).target || 0).toLocaleString()}`
+            : ""),
       );
 
       if (earnedXp > 0) {

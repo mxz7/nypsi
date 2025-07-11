@@ -204,9 +204,10 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
       });
 
       embed.setDescription(
-        `**success!**\n\n**you stole** $${stolen.toLocaleString()} from **${bank}**` + eventProgress
-          ? `\n\n🔱${eventProgress.toLocaleString()}/${((await getCurrentEvent())?.target || 0).toLocaleString()}`
-          : "",
+        `**success!**\n\n**you stole** $${stolen.toLocaleString()} from **${bank}**` +
+          (eventProgress
+            ? `\n\n🔱${eventProgress.toLocaleString()}/${((await getCurrentEvent())?.target || 0).toLocaleString()}`
+            : ""),
       );
       embed.setColor(Constants.EMBED_SUCCESS_COLOR);
       embed.setFooter({ text: `id: ${id}` });

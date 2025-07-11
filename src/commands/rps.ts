@@ -285,9 +285,9 @@ async function run(
             "+**" +
             Math.round(multi * 100).toString() +
             "**% bonus" +
-            eventProgress
-            ? `\n\n🔱 ${eventProgress.toLocaleString()}/${((await getCurrentEvent())?.target || 0).toLocaleString()}`
-            : "",
+            (eventProgress
+              ? `\n\n🔱 ${eventProgress.toLocaleString()}/${((await getCurrentEvent())?.target || 0).toLocaleString()}`
+              : ""),
         );
       } else {
         embed.addField("**winner!!**", "**you win** $" + winnings.toLocaleString());

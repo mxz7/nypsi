@@ -388,9 +388,10 @@ async function doMine(
             .map((i) => `- \`${i[1]}x\` ${items[i[0]].emoji} ${items[i[0]].name}`)
             .join("\n")}`
         : " **nothing**"
-    }` + eventProgress
-      ? `\n\n🔱 ${eventProgress.toLocaleString()}/${((await getCurrentEvent())?.target || 0).toLocaleString()}`
-      : "",
+    }` +
+      (eventProgress
+        ? `\n\n🔱 ${eventProgress.toLocaleString()}/${((await getCurrentEvent())?.target || 0).toLocaleString()}`
+        : ""),
   );
 
   send({ embeds: [embed], components: [row] });
