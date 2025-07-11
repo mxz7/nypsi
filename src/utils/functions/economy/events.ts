@@ -323,6 +323,10 @@ export async function checkEventExpire(client: NypsiClient) {
       return;
     }
     logger.info(`event: ${event.id} expired`);
+    await redis.del(
+      Constants.redis.cache.economy.event,
+      Constants.redis.cache.economy.eventProgress,
+    );
 
     const targetChannel =
       client.user.id === Constants.BOT_USER_ID
