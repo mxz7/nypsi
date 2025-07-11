@@ -92,7 +92,7 @@ export async function createEvent(
 
   await client.cluster
     .broadcastEval(
-      async (client, { content, channelId, cluster }) => {
+      async (client, { content, channelId, cluster, components }) => {
         if ((client as unknown as NypsiClient).cluster.id != cluster) return;
 
         const channel = client.channels.cache.get(channelId);
@@ -100,7 +100,7 @@ export async function createEvent(
         if (!channel) return;
 
         if (channel.isTextBased() && channel.isSendable()) {
-          await channel.send({ content });
+          await channel.send({ content, components: [components] });
         }
       },
       {
