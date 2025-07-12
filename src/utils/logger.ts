@@ -139,54 +139,58 @@ class FileTransport implements Transport {
     this.lastCheck = Date.now();
   }
 
-  private async checkFile() {
+  private async newFile() {
+    this.stream?.end();
+
     try {
-      if (this.checkingFile || this.lastCheck > Date.now() - 30000) return;
-      this.checkingFile = true;
+      if (existsSync(this.path.replace(`%DATE%`, dayjs().format("YYYY-MM-DD")))) {
+        let oldFileNameModifier = 1;
 
-      const stats = await stat(this.stream.path);
+        while (existsSync(this.stream.path + "." + oldFileNameModifier)) oldFileNameModifier++;
+        await rename(this.stream.path, this.stream.path + "." + oldFileNameModifier);
 
-      if (stats.size >= this.rotateAfterBytes && this.rotateAfterBytes > 0) {
-        logger.debug("rotating file");
-
-        if (existsSync(this.path.replace(`%DATE%`, dayjs().format("YYYY-MM-DD")))) {
-          let oldFileNameModifier = 1;
-
-          while (existsSync(this.stream.path + "." + oldFileNameModifier)) oldFileNameModifier++;
-          await rename(this.stream.path, this.stream.path + "." + oldFileNameModifier);
-
-          this.stream?.end();
-          this.stream = null;
-
-          this.stream = createWriteStream(
-            this.path.replace(`%DATE%`, dayjs().format("YYYY-MM-DD")),
-            {
-              flags: "a",
-            },
-          );
-        } else {
-          this.stream?.end();
-          this.stream = null;
-
-          this.stream = createWriteStream(
-            this.path.replace(`%DATE%`, dayjs().format("YYYY-MM-DD")),
-            {
-              flags: "a",
-            },
-          );
-        }
-
-        if (this.queue) {
-          this.queue.forEach(this.write);
-          this.queue.length = 0;
-        }
+        this.stream?.end();
       }
+    } catch (e) {
+      logger.debug(`logger: failed renaming old file`);
+      console.error(e);
+    }
+
+    this.stream = createWriteStream(this.path.replace(`%DATE%`, dayjs().format("YYYY-MM-DD")), {
+      flags: "a",
+    });
+
+    if (this.queue) {
+      this.queue.forEach(this.write);
+      this.queue.length = 0;
+    }
+  }
+
+  private async checkFile() {
+    if (this.checkingFile || this.lastCheck > Date.now() - 30000) return;
+    this.checkingFile = true;
+
+    let stats: Awaited<ReturnType<typeof stat>>;
+
+    try {
+      stats = await stat(this.stream.path);
     } catch (e) {
       console.error(`logger: failed checking file`);
       console.error(e);
-    } finally {
-      this.checkingFile = false;
     }
+
+    try {
+      if (!stats || (stats.size >= this.rotateAfterBytes && this.rotateAfterBytes > 0)) {
+        logger.debug("rotating file");
+
+        await this.newFile();
+      }
+    } catch (e) {
+      logger.debug(`logger: failed handling file`);
+      console.error(e);
+    }
+
+    this.checkingFile = false;
   }
 
   public async write(data: WriteData) {
