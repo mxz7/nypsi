@@ -110,6 +110,7 @@ export async function checkZPeoples(guild: Guild) {
         await sleep(250);
         await channel.permissionOverwrites.create(member, {
           ViewChannel: true,
+          Connect: true,
         });
       }
     }
