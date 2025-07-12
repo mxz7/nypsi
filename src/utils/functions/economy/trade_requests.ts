@@ -36,7 +36,7 @@ export async function getTradeRequests(member: MemberResolvable) {
       AND: [{ ownerId: getUserId(member) }, { completed: false }],
     },
     orderBy: {
-      createdAt: "asc",
+      id: "asc",
     },
   });
 

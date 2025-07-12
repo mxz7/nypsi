@@ -51,7 +51,7 @@ export async function getMarketOrders(member: MemberResolvable | undefined, type
         { orderType: type },
       ],
     },
-    orderBy: { createdAt: "asc" },
+    orderBy: { id: "asc" },
   });
 
   return query;
@@ -77,7 +77,7 @@ export async function setMarketOrderAmount(id: number, amount: number) {
 export async function getRecentMarketOrders(type: OrderType) {
   return await prisma.market.findMany({
     where: { AND: [{ completed: false }, { orderType: type }] },
-    orderBy: { createdAt: "desc" },
+    orderBy: { id: "desc" },
     take: 5,
   });
 }
@@ -99,7 +99,7 @@ export async function getMarketItemOrders(
     where: {
       AND: filters,
     },
-    orderBy: [{ price: "desc" }, { createdAt: "asc" }],
+    orderBy: [{ price: "desc" }, { id: "asc" }],
   });
 
   return query;
@@ -117,7 +117,7 @@ export async function getMarketAverage(item: string) {
       price: true,
     },
     orderBy: {
-      createdAt: "desc",
+      id: "desc",
     },
     take: 50,
   });
@@ -352,7 +352,7 @@ export async function checkMarketOrder(
         { ownerId: { not: order.ownerId } },
       ],
     },
-    orderBy: { createdAt: "desc" },
+    orderBy: { id: "desc" },
   });
 
   if (validOrders.length === 0) {
@@ -662,7 +662,7 @@ export async function getMarketTransactionData(
         { ownerId: { not: getUserId(excludeMember) } },
       ],
     },
-    orderBy: [{ price: type == "buy" ? "desc" : "asc" }, { createdAt: "asc" }],
+    orderBy: [{ price: type == "buy" ? "desc" : "asc" }, { id: "asc" }],
   });
   const orders: Market[] = [];
 

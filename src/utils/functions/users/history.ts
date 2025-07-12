@@ -86,7 +86,7 @@ export async function fetchUsernameHistory(member: MemberResolvable, limit = 69)
       createdAt: true,
     },
     orderBy: {
-      createdAt: "desc",
+      id: "desc",
     },
     take: limit,
   });
@@ -123,7 +123,7 @@ export async function fetchAvatarHistory(member: MemberResolvable, limit = 69) {
       id: true,
     },
     orderBy: {
-      createdAt: "desc",
+      id: "desc",
     },
     take: limit,
   });

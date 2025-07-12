@@ -27,7 +27,7 @@ export async function fetchUserMentions(
         targetId: userId,
       },
       orderBy: {
-        date: "desc",
+        id: "desc",
       },
       take: amount,
     });
@@ -37,7 +37,7 @@ export async function fetchUserMentions(
         AND: [{ guildId: global }, { targetId: userId }],
       },
       orderBy: {
-        date: "desc",
+        id: "desc",
       },
       take: amount,
     });

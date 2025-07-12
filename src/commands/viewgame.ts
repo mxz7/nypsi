@@ -103,7 +103,7 @@ async function run(
       },
       take: 6969,
       orderBy: {
-        date: "desc",
+        id: "desc",
       },
     };
 

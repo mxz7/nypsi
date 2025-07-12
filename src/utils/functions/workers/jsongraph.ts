@@ -101,7 +101,7 @@ if (!isMainThread) {
           value: true,
         },
         orderBy: {
-          date: "desc",
+          id: "desc",
         },
       }),
     );
