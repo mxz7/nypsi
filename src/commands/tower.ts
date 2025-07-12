@@ -659,7 +659,7 @@ async function playGame(
     const eventProgress = await addEventProgress(
       message.client as NypsiClient,
       message.member,
-      "tower",
+      "dragontower",
       1,
     );
     let winnings = Math.round(game.bet * game.win);
