@@ -43,7 +43,7 @@ export async function getInventory(member: MemberResolvable): Promise<Inventory>
   if (cache) {
     try {
       const parsed = JSON.parse(cache);
-      return Inventory.fromJSON(userId, parsed);
+      return new Inventory(userId, parsed);
     } catch (e) {
       console.error(e);
       logger.error("weird inventory cache error", { error: e });
@@ -95,13 +95,19 @@ export class Inventory {
   private items: { [itemId: string]: number };
   private userId: string;
 
-  constructor(member: MemberResolvable, data?: { item: string; amount: number }[]) {
+  constructor(
+    member: MemberResolvable,
+    data?: { [itemId: string]: number } | { item: string; amount: number }[],
+  ) {
     this.userId = getUserId(member);
     this.items = {};
-    if (data) {
+
+    if (Array.isArray(data)) {
       for (const i of data) {
         this.items[i.item] = i.amount;
       }
+    } else if (data) {
+      this.items = data;
     }
   }
 
@@ -163,14 +169,6 @@ export class Inventory {
 
   toJSON(): { [itemId: string]: number } {
     return this.items;
-  }
-
-  static fromJSON(member: MemberResolvable, obj: { [itemId: string]: number }): Inventory {
-    const data = Object.entries(obj).map(([item, amount]) => ({
-      item,
-      amount,
-    }));
-    return new Inventory(member, data);
   }
 }
 
