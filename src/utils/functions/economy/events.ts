@@ -264,14 +264,14 @@ export function getEventProgress(event: EventData) {
 async function giveRewards(event: EventData) {
   if (!event) return undefined;
 
-  const top10p = event.contributions.slice(0, Math.floor(event.contributions.length / 10));
+  const top5p = event.contributions.slice(0, Math.floor(event.contributions.length / 20));
   const top25p = event.contributions.slice(0, Math.floor(event.contributions.length / 4));
   const top50p = event.contributions.slice(0, Math.floor(event.contributions.length / 2));
   const bottom50p = event.contributions
     .toReversed()
     .slice(0, Math.floor(event.contributions.length / 2));
 
-  for (const { userId } of top10p) {
+  for (const { userId } of top5p) {
     await addAchievementProgress(userId, "event_pro");
   }
 
