@@ -213,7 +213,7 @@ async function doFish(
   const embed = new CustomEmbed(member).setHeader(
     user.username,
     user.avatarURL(),
-    `https://nypsi.xyz/user/${user.id}?ref=bot-fish`,
+    `https://nypsi.xyz/users/${user.id}?ref=bot-fish`,
   );
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(

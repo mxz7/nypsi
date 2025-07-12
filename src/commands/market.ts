@@ -1629,7 +1629,7 @@ async function run(
             .setStyle(ButtonStyle.Link)
             .setLabel("history")
             .setEmoji("📈")
-            .setURL(`https://nypsi.xyz/item/history/${item.id}?ref=bot-market-search`),
+            .setURL(`https://nypsi.xyz/items/history/${item.id}?ref=bot-market-search`),
         );
       }
 

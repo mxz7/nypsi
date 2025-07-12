@@ -159,7 +159,7 @@ async function run(
         tierMap.has(tier) ? ` ${tierMap.get(tier)}` : ""
       }`,
     )
-    .setURL(`https://nypsi.xyz/user/${target.id}?ref=bot-profile`);
+    .setURL(`https://nypsi.xyz/users/${target.id}?ref=bot-profile`);
 
   const updateEmbed = async () => {
     const [
@@ -233,7 +233,7 @@ async function run(
     if (guild)
       embed.addField(
         "guild",
-        `[${guild.guildName}](https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}?ref=bot-profile)\n` +
+        `[${guild.guildName}](https://nypsi.xyz/guilds/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}?ref=bot-profile)\n` +
           `level **${guild.level}**\n` +
           `${guild.members.length} ${pluralize("member", guild.members.length)}`,
         true,

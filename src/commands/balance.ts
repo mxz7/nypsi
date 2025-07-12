@@ -187,7 +187,7 @@ async function run(
   embed.setHeader(
     `${target.user.username} | season ${Constants.SEASON_NUMBER}`,
     target.user.avatarURL(),
-    `https://nypsi.xyz/user/${target.id}?ref=bot-bal`,
+    `https://nypsi.xyz/users/${target.id}?ref=bot-bal`,
   );
 
   send({ embeds: [embed] });

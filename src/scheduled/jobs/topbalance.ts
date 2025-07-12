@@ -17,12 +17,12 @@ export default {
     balance.setHeader(
       "top balance",
       "https://cdn.discordapp.com/avatars/678711738845102087/cb2dcd61010f2b89ceb1cd5ff15816cf.png?size=256",
-      "https://nypsi.xyz/leaderboard/balance?ref=bot-lb",
+      "https://nypsi.xyz/leaderboards/balance?ref=bot-lb",
     );
     guild.setHeader(
       "top guilds",
       "https://cdn.discordapp.com/avatars/678711738845102087/cb2dcd61010f2b89ceb1cd5ff15816cf.png?size=256",
-      "https://nypsi.xyz/leaderboard/guilds?ref=bot-lb",
+      "https://nypsi.xyz/leaderboards/guilds?ref=bot-lb",
     );
 
     balance.setColor(flavors.latte.colors.base.hex as ColorResolvable);

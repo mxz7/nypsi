@@ -190,7 +190,7 @@ async function run(
     } else {
       embed.setDescription(
         `*throwing..*\n\n${thingy}\n\n` +
-          `**bet** ${itemAmount.toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/item/${item.id}?ref=bot-cf)**`,
+          `**bet** ${itemAmount.toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-cf)**`,
       );
     }
 
@@ -295,15 +295,15 @@ async function run(
       await addInventoryItem(winner, item.id, itemAmount * 2);
 
       if (winner == message.member) {
-        thingy = `**${message.author.username}** +${(itemAmount * 2).toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/item/${item.id}?ref=bot-cf)**\n${player2.user.username}`;
+        thingy = `**${message.author.username}** +${(itemAmount * 2).toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-cf)**\n${player2.user.username}`;
       } else {
         thingy = `${message.author.username}\n**${
           player2.user.username
-        }** +${(itemAmount * 2).toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/item/${item.id}?ref=bot-cf)**`;
+        }** +${(itemAmount * 2).toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-cf)**`;
       }
 
       embed.setDescription(
-        `**winner** ${winner.user.username}\n\n${thingy}\n\n**bet** ${itemAmount.toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/item/${item.id}?ref=bot-cf)**` +
+        `**winner** ${winner.user.username}\n\n${thingy}\n\n**bet** ${itemAmount.toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-cf)**` +
           (eventProgress
             ? `\n\n🔱 ${eventProgress.toLocaleString()}/${((await getCurrentEvent()).target || 0).toLocaleString()}`
             : ""),
@@ -480,7 +480,7 @@ async function run(
       requestEmbed.setDescription(
         `**${
           message.author.username
-        }** has challenged you to a coinflip\n\n**bet** ${itemAmount}x ${item.emoji} **[${item.name}](https://nypsi.xyz/item/${item.id}?ref=bot-cf)**\n\ndo you accept?`,
+        }** has challenged you to a coinflip\n\n**bet** ${itemAmount}x ${item.emoji} **[${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-cf)**\n\ndo you accept?`,
       );
     }
 
@@ -738,7 +738,7 @@ async function run(
       requestEmbed.setDescription(
         `**${
           message.author.username
-        }** has created an open coinflip\n\n**bet** ${itemAmount}x ${item.emoji} **[${item.name}](https://nypsi.xyz/item/${item.id}?ref=bot-cf)**`,
+        }** has created an open coinflip\n\n**bet** ${itemAmount}x ${item.emoji} **[${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-cf)**`,
       );
     }
 

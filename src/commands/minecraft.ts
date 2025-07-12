@@ -122,7 +122,7 @@ async function getNameHistory(uuid: string): Promise<{ username: string; changed
   }
 
   const names: { username: string; changed_at: string }[] = await fetch(
-    `https://laby.net/api/user/${uuid}/get-names`,
+    `https://laby.net/api/users/${uuid}/get-names`,
     {
       headers: {
         "User-Agent": `Mozilla/5.0 (compatible; nypsi}; +https://github.com/mxz7)`,

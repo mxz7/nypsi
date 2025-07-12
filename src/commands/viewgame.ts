@@ -136,7 +136,7 @@ async function run(
     const pages = PageManager.createPages(
       query.map((game) => {
         let out =
-          `**id** [\`${game.id.toString(36)}\`](https://nypsi.xyz/game/${game.id.toString(
+          `**id** [\`${game.id.toString(36)}\`](https://nypsi.xyz/games/${game.id.toString(
             36,
           )}?ref=bot-game) \`(${game.id})\`\n` +
           `**user** \`${
@@ -240,13 +240,13 @@ async function run(
     const embed = new CustomEmbed(game.userId).setHeader(
       username ? `${username}'s ${game.game} game` : `id: ${game.id.toString(36)}`,
       username === "[hidden]" ? message.author.avatarURL() : await getLastKnownAvatar(game.userId),
-      `https://nypsi.xyz/game/${game.id.toString(36)}?ref=bot-game`,
+      `https://nypsi.xyz/games/${game.id.toString(36)}?ref=bot-game`,
     );
 
     let components: ActionRowBuilder<MessageActionRowComponentBuilder>[];
 
     const desc =
-      `**id** [\`${game.id.toString(36)}\`](https://nypsi.xyz/game/${game.id.toString(36)}?ref=bot-game) \`(${
+      `**id** [\`${game.id.toString(36)}\`](https://nypsi.xyz/games/${game.id.toString(36)}?ref=bot-game) \`(${
         game.id
       })\`\n` +
       `**user** \`${username || "[redacted]"}\`\n` +
@@ -268,7 +268,7 @@ async function run(
     } else if (game.game.includes("scratch_card") || game.game.includes("scratchie")) {
       components = JSON.parse(game.outcome);
     } else {
-      embed.addField("outcome", `https://nypsi.xyz/game/${game.id.toString(36)}`, true);
+      embed.addField("outcome", `https://nypsi.xyz/games/${game.id.toString(36)}`, true);
     }
 
     if (game.win == 1 && !(game.game.includes("scratchie") || game.game.includes("scratch_card"))) {

@@ -201,7 +201,7 @@ async function run(
         }**\n\n` +
           `go ahead and send [**${
             tag ? `[${getTagsData()[tag.tagId].emoji}] ` : ""
-          }${await getLastKnownUsername(milf.userId)}**](https://nypsi.xyz/user/${
+          }${await getLastKnownUsername(milf.userId)}**](https://nypsi.xyz/users/${
             milf.userId
           }?ref=bot-milf) a *private* message 😉😏`,
       ).setHeader("milf finder");
@@ -215,7 +215,7 @@ async function run(
           }**\n\n` +
             `[**${tag ? `[${getTagsData()[tag.tagId].emoji}] ` : ""}${await getLastKnownUsername(
               milf.userId,
-            )}**](https://nypsi.xyz/user/${milf.userId}?ref=bot-milf) - ${milf.description}\n\n` +
+            )}**](https://nypsi.xyz/users/${milf.userId}?ref=bot-milf) - ${milf.description}\n\n` +
             "go ahead and send them a *private* message 😉😏",
         );
       }
@@ -242,7 +242,7 @@ async function run(
             : message.guild.name
         }**\n\ngo ahead and send [${
           authorTag ? `[${getTagsData()[authorTag.tagId].emoji}] ` : ""
-        }**${message.author.username}**](https://nypsi.xyz/user/${
+        }**${message.author.username}**](https://nypsi.xyz/users/${
           message.author.id
         }?ref=bot-milf) a *private* message 😉😏` +
           (eventProgress
@@ -278,7 +278,7 @@ async function run(
           }**\n\n` +
             `[${authorTag ? `[${getTagsData()[authorTag.tagId].emoji}] ` : ""}**${
               message.author.username
-            }**](https://nypsi.xyz/user/${message.author.id}?ref=bot-milf) - ${description}\n\n` +
+            }**](https://nypsi.xyz/users/${message.author.id}?ref=bot-milf) - ${description}\n\n` +
             "go ahead and send them a *private* message 😉😏",
         );
       }

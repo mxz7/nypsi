@@ -234,7 +234,7 @@ async function doMine(
   const embed = new CustomEmbed(member).setHeader(
     user.username,
     user.avatarURL(),
-    `https://nypsi.xyz/user/${user.id}?ref=bot-mine`,
+    `https://nypsi.xyz/users/${user.id}?ref=bot-mine`,
   );
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(

@@ -302,7 +302,7 @@ function getGeneralMessage(
 ): ItemMessageData {
   const embed = new CustomEmbed(member);
   const description: string[] = [
-    `[\`${selected.id}\`](https://nypsi.xyz/item/${selected.id}?ref=bot-item)`,
+    `[\`${selected.id}\`](https://nypsi.xyz/items/${selected.id}?ref=bot-item)`,
   ];
   if (selected.unique) {
     description.push("*unique*");
@@ -374,12 +374,12 @@ function getGeneralMessage(
         .setStyle(ButtonStyle.Link)
         .setLabel("leaderboard")
         .setEmoji("🏆")
-        .setURL(`https://nypsi.xyz/leaderboard/${selected.id}?ref=bot-item`),
+        .setURL(`https://nypsi.xyz/leaderboards/${selected.id}?ref=bot-item`),
       new ButtonBuilder()
         .setStyle(ButtonStyle.Link)
         .setLabel("history")
         .setEmoji("📈")
-        .setURL(`https://nypsi.xyz/item/history/${selected.id}?ref=bot-item`),
+        .setURL(`https://nypsi.xyz/items/history/${selected.id}?ref=bot-item`),
     ),
   };
 }

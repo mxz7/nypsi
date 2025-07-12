@@ -59,7 +59,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
           new ButtonBuilder()
             .setStyle(ButtonStyle.Link)
             .setLabel("past events")
-            .setURL("https://nypsi.xyz/event?ref=bot-event-command")
+            .setURL("https://nypsi.xyz/events?ref=bot-event-command")
             .setEmoji("🔱"),
         ),
       ],
@@ -86,7 +86,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
           .setEmoji("🔱")
           .setLabel("live data")
           .setStyle(ButtonStyle.Link)
-          .setURL("https://nypsi.xyz/event?ref=bot-event-command"),
+          .setURL("https://nypsi.xyz/events?ref=bot-event-command"),
       ),
     ],
   });

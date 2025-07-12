@@ -617,12 +617,12 @@ async function run(
       embed.setFields(
         {
           name: "requesting",
-          value: `${tradeRequests[page].requestedItems.length > 0 ? tradeRequests[page].requestedItems.map((item) => `**${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} [${items[item.split(":")[0]].name}](https://nypsi.xyz/item/${item.split(":")[0]})`).join("\n") : "none"}`,
+          value: `${tradeRequests[page].requestedItems.length > 0 ? tradeRequests[page].requestedItems.map((item) => `**${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} [${items[item.split(":")[0]].name}](https://nypsi.xyz/items/${item.split(":")[0]})`).join("\n") : "none"}`,
           inline: true,
         },
         {
           name: "offering",
-          value: `${tradeRequests[page].offeredMoney > 0 ? `$${tradeRequests[page].offeredMoney.toLocaleString()}` : ""}\n${tradeRequests[page].offeredItems.map((item) => `**${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} [${items[item.split(":")[0]].name}](https://nypsi.xyz/item/${item.split(":")[0]})`).join("\n")}`,
+          value: `${tradeRequests[page].offeredMoney > 0 ? `$${tradeRequests[page].offeredMoney.toLocaleString()}` : ""}\n${tradeRequests[page].offeredItems.map((item) => `**${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} [${items[item.split(":")[0]].name}](https://nypsi.xyz/items/${item.split(":")[0]})`).join("\n")}`,
           inline: true,
         },
         {

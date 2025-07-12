@@ -250,7 +250,7 @@ async function run(
       embed.setHeader(
         guild.guildName,
         guild.avatarId ? undefined : await getLastKnownAvatar(guild.ownerId),
-        `https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}?ref=bot-guild`,
+        `https://nypsi.xyz/guilds/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}?ref=bot-guild`,
       );
       // embed.setDescription(guild.motd + `\n\n**bank** $${guild.balance.toLocaleString()}\n**xp** ${guild.xp.toLocaleString()}`)
       embed.setDescription(guild.motd);
@@ -273,7 +273,7 @@ async function run(
       const maxMembers = await getMaxMembersForGuild(guild.guildName);
 
       for (const m of guild.members) {
-        membersText += `[\`${m.economy.user.lastKnownUsername}\`](https://nypsi.xyz/user/${m.userId}?ref=bot-guild) `;
+        membersText += `[\`${m.economy.user.lastKnownUsername}\`](https://nypsi.xyz/users/${m.userId}?ref=bot-guild) `;
 
         if (m.userId == message.author.id) {
           embed.setFooter({ text: `you joined ${daysAgo(m.joinedAt).toLocaleString()} days ago` });
@@ -840,7 +840,7 @@ async function run(
       const embed = new CustomEmbed(message.member).setHeader(
         "guild deposit",
         guild.avatarId ? `https://cdn.nypsi.xyz/${guild.avatarId}` : undefined,
-        `https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}?ref=bot-guild`,
+        `https://nypsi.xyz/guilds/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}?ref=bot-guild`,
       );
 
       embed.setDescription(
@@ -869,7 +869,7 @@ async function run(
     const embed = new CustomEmbed(message.member).setHeader(
       `${guild.guildName} stats`,
       guild.avatarId ? `https://cdn.nypsi.xyz/${guild.avatarId}` : undefined,
-      `https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}?ref=bot-guild`,
+      `https://nypsi.xyz/guilds/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}?ref=bot-guild`,
     );
 
     let xp = "";
@@ -1020,7 +1020,7 @@ async function run(
     embed.setHeader(
       guild.guildName,
       guild.avatarId ? `https://cdn.nypsi.xyz/${guild.avatarId}` : undefined,
-      `https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}?ref=bot-guild`,
+      `https://nypsi.xyz/guilds/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}?ref=bot-guild`,
     );
     embed.setDescription(
       `requirements to upgrade to level **${guild.level + 1}**:\n\n` +
@@ -1352,7 +1352,7 @@ async function run(
       .setHeader(
         `${guild.guildName} upgrades`,
         guild.avatarId ? `https://cdn.nypsi.xyz/${guild.avatarId}` : undefined,
-        `https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}?ref=bot-guild`,
+        `https://nypsi.xyz/guilds/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}?ref=bot-guild`,
       )
       .setFields(...pages.get(1))
       .setFooter({ text: `you have ${guild.tokens} ${pluralize("token", guild.tokens)}` });

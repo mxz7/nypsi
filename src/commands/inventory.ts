@@ -108,7 +108,7 @@ async function run(
         new CustomEmbed(message.member, "your inventory is empty").setHeader(
           "your inventory",
           message.author.avatarURL(),
-          `https://nypsi.xyz/user/${message.author.id}?ref=bot-inv`,
+          `https://nypsi.xyz/users/${message.author.id}?ref=bot-inv`,
         ),
       ],
     });
@@ -138,7 +138,7 @@ async function run(
   embed.setHeader(
     "your inventory",
     message.author.avatarURL(),
-    `https://nypsi.xyz/user/${message.author.id}?ref=bot-inv`,
+    `https://nypsi.xyz/users/${message.author.id}?ref=bot-inv`,
   );
 
   const updatePage = (page: Item[], embed: CustomEmbed) => {

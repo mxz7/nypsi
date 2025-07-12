@@ -719,7 +719,7 @@ export async function topGuilds(guildName?: string) {
     else position += ".";
 
     out.push(
-      `${position} **[${guild.guildName}](https://nypsi.xyz/guild/${encodeURIComponent(
+      `${position} **[${guild.guildName}](https://nypsi.xyz/guilds/${encodeURIComponent(
         guild.guildName.replaceAll(" ", "-"),
       )}?ref=bot-lb)** level ${guild.level}`,
     );
@@ -1175,7 +1175,7 @@ export async function topWordleTime(guild: Guild, member: MemberResolvable) {
         user.userId,
         await getLastKnownUsername(user.userId),
         true,
-      )} [\`${formatTime(user.time)}\`](https://nypsi.xyz/wordle/${user.gameId?.toString(36)}?ref=bot-lb)`,
+      )} [\`${formatTime(user.time)}\`](https://nypsi.xyz/wordles/${user.gameId?.toString(36)}?ref=bot-lb)`,
     );
   }
 
@@ -1226,7 +1226,7 @@ ORDER BY time ASC limit 100`;
         user.userId,
         await getLastKnownUsername(user.userId),
         true,
-      )} [\`${formatTime(user.time)}\`](https://nypsi.xyz/wordle/${user.gameId?.toString(36)}?ref=bot-lb)`,
+      )} [\`${formatTime(user.time)}\`](https://nypsi.xyz/wordles/${user.gameId?.toString(36)}?ref=bot-lb)`,
     );
   }
 
@@ -1938,7 +1938,7 @@ export async function formatUsername(id: string, username: string, privacy: bool
   if (!privacy)
     return "[**[hidden]**](https://nypsi.xyz/docs/economy/user-settings/hidden?ref=bot-lb)";
 
-  let out = `[${username}](https://nypsi.xyz/user/${encodeURIComponent(id)}?ref=bot-lb)`;
+  let out = `[${username}](https://nypsi.xyz/users/${encodeURIComponent(id)}?ref=bot-lb)`;
 
   const tag = await getActiveTag(id);
 
