@@ -788,8 +788,10 @@ export async function completeOrder(
     await addInventoryItem(order.ownerId, order.itemId, Number(amount));
     await addBalance(buyerId, Number(amount) * Number(order.price) - taxedAmount);
 
-    addStat(order.ownerId, "market-fulfilled-buy", Number(amount));
     addStat(buyerId, "market-sold-items", Number(amount));
+    addStat(buyerId, "earned-market", Number(amount) * Number(order.price) - taxedAmount);
+    addStat(order.ownerId, "market-fulfilled-buy", Number(amount));
+    addStat(order.ownerId, "spent-market", Number(amount) * Number(order.price));
   } else {
     await addInventoryItem(buyerId, order.itemId, Number(amount));
     await addBalance(order.ownerId, Number(amount) * Number(order.price) - taxedAmount);
@@ -797,8 +799,10 @@ export async function completeOrder(
     if (isGem(order.itemId))
       await redis.del(`${Constants.redis.cache.economy.HAS_GEM}:${order.ownerId}:${order.itemId}`);
 
-    addStat(order.ownerId, "market-fulfilled-sell", Number(amount));
     addStat(buyerId, "market-bought-items", Number(amount));
+    addStat(buyerId, "spent-market", Number(amount) * Number(order.price));
+    addStat(order.ownerId, "market-fulfilled-sell", Number(amount));
+    addStat(order.ownerId, "earned-market", Number(amount) * Number(order.price) - taxedAmount);
   }
 
   if (checkLock) {
