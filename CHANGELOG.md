@@ -9,6 +9,7 @@
 - add more info to `$item`, accessible through pages (@fedpol1, @growling_grizzly)
 - add events (https://nypsi.xyz/docs/economy/events)
 - maxbet & mines balancing
+- daily guild contribution stats (@growling_grizzly)
 
 ## other
 
