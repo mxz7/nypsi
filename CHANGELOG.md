@@ -3,18 +3,18 @@
 ## changes you'll probably care about
 
 - added better searching and pages to $ach view (@growling_grizzly)
-- you can disable channels in your server /settings server disabled-channels
+- added disabled channels in your server /settings server disabled-channels
 - after maintenance or reboots, boosters will be given their lost time back
-- revise `$help <item>` and `$recipe` to be aliases for `$item` (@fedpol1)
-- add more info to `$item`, accessible through pages (@fedpol1, @growling_grizzly)
-- add events (https://nypsi.xyz/docs/economy/events)
+- revised `$help <item>` and `$recipe` to be aliases for `$item` (@fedpol1)
+- added more info to `$item`, accessible through pages (@fedpol1, @growling_grizzly)
+- added events (https://nypsi.xyz/docs/economy/events)
 - maxbet & mines balancing
 - daily guild contribution stats (@growling_grizzly)
 
 ## other
 
 - staff members can now start a support request with users
-- transaction logging in database - easier to query
+- added transaction logging in database - easier to query
 - players below prestige 1 don't get their level reset on new season
 
 ---
