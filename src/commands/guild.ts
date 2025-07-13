@@ -872,73 +872,54 @@ async function run(
       `https://nypsi.xyz/guilds/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}?ref=bot-guild`,
     );
 
-    let xp = "";
-    let money = "";
-    let xpLevel = "";
-    let moneyLevel = "";
+    const formatLeaderboard = (
+      sorted: typeof members,
+      valueKey: keyof (typeof members)[number],
+      label: string,
+      formatFn: (value: number) => string = (v) => v.toLocaleString(),
+    ): string => {
+      return sorted
+        .map((m, i) => {
+          const position = ["🥇", "🥈", "🥉"][i] || `${i + 1}.`;
+          const username = m.economy.user.lastKnownUsername;
+          const value = formatFn(m[valueKey] as number);
+          return `${position} **${username}** ${label === "money" ? `$${value}` : `${value}${label}`}`;
+        })
+        .join("\n");
+    };
 
-    const xpSort = sort(members).desc([(i) => i.contributedXp, (i) => i.contributedMoney]);
-    const moneySort = sort(members).desc([(i) => i.contributedMoney, (i) => i.contributedXp]);
-    const xpLevelSort = sort(members).desc([
-      (i) => i.contributedXpThisLevel,
-      (i) => i.contributedMoneyThisLevel,
-    ]);
-    const moneyLevelSort = sort(members).desc([
-      (i) => i.contributedMoneyThisLevel,
-      (i) => i.contributedXp,
-    ]);
+    const sortedStats = {
+      overall: {
+        xp: sort(members).desc([(i) => i.contributedXp, (i) => i.contributedMoney]),
+        money: sort(members).desc([(i) => i.contributedMoney, (i) => i.contributedXp]),
+      },
+      level: {
+        xp: sort(members).desc([
+          (i) => i.contributedXpThisLevel,
+          (i) => i.contributedMoneyThisLevel,
+        ]),
+        money: sort(members).desc([(i) => i.contributedMoneyThisLevel, (i) => i.contributedXp]),
+      },
+      today: {
+        xp: sort(members).desc([(i) => i.contributedXpToday, (i) => i.contributedMoneyToday]),
+        money: sort(members).desc([(i) => i.contributedMoneyToday, (i) => i.contributedXp]),
+      },
+    };
 
-    for (const m of xpSort) {
-      let position = (xpSort.indexOf(m) + 1).toString();
-
-      if (position == "1") position = "🥇";
-      else if (position == "2") position = "🥈";
-      else if (position == "3") position = "🥉";
-      else position += ".";
-
-      xp += `${position} **${
-        m.economy.user.lastKnownUsername
-      }** ${m.contributedXp.toLocaleString()}xp\n`;
-    }
-
-    for (const m of moneySort) {
-      let position = (moneySort.indexOf(m) + 1).toString();
-
-      if (position == "1") position = "🥇";
-      else if (position == "2") position = "🥈";
-      else if (position == "3") position = "🥉";
-      else position += ".";
-
-      money += `${position} **${
-        m.economy.user.lastKnownUsername
-      }** $${m.contributedMoney.toLocaleString()}\n`;
-    }
-
-    for (const m of xpLevelSort) {
-      let position = (xpLevelSort.indexOf(m) + 1).toString();
-
-      if (position == "1") position = "🥇";
-      else if (position == "2") position = "🥈";
-      else if (position == "3") position = "🥉";
-      else position += ".";
-
-      xpLevel += `${position} **${
-        m.economy.user.lastKnownUsername
-      }** ${m.contributedXpThisLevel.toLocaleString()}xp\n`;
-    }
-
-    for (const m of moneyLevelSort) {
-      let position = (moneyLevelSort.indexOf(m) + 1).toString();
-
-      if (position == "1") position = "🥇";
-      else if (position == "2") position = "🥈";
-      else if (position == "3") position = "🥉";
-      else position += ".";
-
-      moneyLevel += `${position} **${
-        m.economy.user.lastKnownUsername
-      }** $${m.contributedMoneyThisLevel.toLocaleString()}\n`;
-    }
+    const formattedStats = {
+      overall: {
+        xp: formatLeaderboard(sortedStats.overall.xp, "contributedXp", "xp"),
+        money: formatLeaderboard(sortedStats.overall.money, "contributedMoney", "money"),
+      },
+      level: {
+        xp: formatLeaderboard(sortedStats.level.xp, "contributedXpThisLevel", "xp"),
+        money: formatLeaderboard(sortedStats.level.money, "contributedMoneyThisLevel", "money"),
+      },
+      today: {
+        xp: formatLeaderboard(sortedStats.today.xp, "contributedXpToday", "xp"),
+        money: formatLeaderboard(sortedStats.today.money, "contributedMoneyToday", "money"),
+      },
+    };
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
@@ -950,11 +931,12 @@ async function run(
         .setLabel("this level")
         .setCustomId("level")
         .setStyle(ButtonStyle.Secondary),
+      new ButtonBuilder().setLabel("today").setCustomId("today").setStyle(ButtonStyle.Secondary),
     );
 
     embed.setFields(
-      { name: "xp", value: xp, inline: true },
-      { name: "money", value: money, inline: true },
+      { name: "xp", value: formattedStats.overall.xp, inline: true },
+      { name: "money", value: formattedStats.overall.money, inline: true },
     );
 
     const msg = await send({ embeds: [embed], components: [row] });
@@ -971,27 +953,19 @@ async function run(
 
       if (!interaction) return;
 
-      if (interaction.customId === "overall") {
-        embed.setFields(
-          { name: "xp", value: xp, inline: true },
-          { name: "money", value: money, inline: true },
-        );
-        row.components[0].setDisabled(true);
-        row.components[1].setDisabled(false);
+      const tab = interaction.customId as keyof typeof formattedStats;
 
-        interaction.update({ embeds: [embed], components: [row] });
-        listen();
-      } else {
-        embed.setFields(
-          { name: "xp", value: xpLevel, inline: true },
-          { name: "money", value: moneyLevel, inline: true },
-        );
-        row.components[0].setDisabled(false);
-        row.components[1].setDisabled(true);
+      embed.setFields(
+        { name: "xp", value: formattedStats[tab].xp, inline: true },
+        { name: "money", value: formattedStats[tab].money, inline: true },
+      );
 
-        interaction.update({ embeds: [embed], components: [row] });
-        listen();
-      }
+      row.components.forEach((btn) => {
+        btn.setDisabled((btn.data as any).custom_id === tab);
+      });
+
+      await interaction.update({ embeds: [embed], components: [row] });
+      listen();
     };
 
     return listen();
