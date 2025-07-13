@@ -1,14 +1,14 @@
 import dayjs = require("dayjs");
 import { readFile, readdir, unlink } from "fs/promises";
 import prisma from "../../init/database";
-import { Job } from "../../types/Jobs";
-import { deleteImage } from "../../utils/functions/image";
+import redis from "../../init/redis";
 import { NypsiClient } from "../../models/Client";
 import { CustomEmbed } from "../../models/EmbedBuilders";
-import { addNotificationToQueue } from "../../utils/functions/users/notifications";
-import { pluralize } from "../../utils/functions/string";
+import { Job } from "../../types/Jobs";
 import Constants from "../../utils/Constants";
-import redis from "../../init/redis";
+import { deleteImage } from "../../utils/functions/image";
+import { pluralize } from "../../utils/functions/string";
+import { addNotificationToQueue } from "../../utils/functions/users/notifications";
 
 export default {
   name: "purge",
@@ -196,5 +196,24 @@ export default {
         `closed ${staleTickets.length} stale ${pluralize("support request", staleTickets.length)}`,
       );
     }
+
+    await prisma.economyGuildMember.updateMany({
+      where: {
+        OR: [
+          {
+            contributedMoneyToday: { gt: 0 },
+          },
+          {
+            contributedXpToday: { gt: 0 },
+          },
+        ],
+      },
+      data: {
+        contributedMoneyToday: 0,
+        contributedXpToday: 0,
+      },
+    });
+
+    log(`cleared daily guild contributions`);
   },
 } satisfies Job;

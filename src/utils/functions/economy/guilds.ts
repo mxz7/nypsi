@@ -261,6 +261,7 @@ export async function addToGuildBank(name: string, amount: number, member: Membe
     data: {
       contributedMoney: { increment: amount },
       contributedMoneyThisLevel: { increment: amount },
+      contributedMoneyToday: { increment: amount },
     },
   });
 
@@ -292,6 +293,7 @@ export async function addToGuildXP(name: string, amount: number, member: MemberR
     data: {
       contributedXp: { increment: amount },
       contributedXpThisLevel: { increment: amount },
+      contributedXpToday: { increment: amount },
     },
   });
 
