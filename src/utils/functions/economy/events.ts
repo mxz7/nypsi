@@ -18,7 +18,7 @@ import { getUserId, MemberResolvable } from "../member";
 import { addNotificationToQueue, getPreferences } from "../users/notifications";
 import { getLastKnownUsername } from "../users/tag";
 import { hasProfile } from "../users/utils";
-import { addAchievementProgress } from "./achievements";
+import { addProgress } from "./achievements";
 import { addInventoryItem } from "./inventory";
 import { getEventsData, getItems, isEcoBanned } from "./utils";
 import ms = require("ms");
@@ -267,8 +267,10 @@ async function giveRewards(event: EventData) {
   const top10p = event.contributions.slice(0, Math.floor(event.contributions.length / 10));
   const top50p = event.contributions.slice(0, Math.floor(event.contributions.length / 2));
 
+  logger.debug(`event: rewards`, { top5p, top10p, top50p });
+
   for (const { userId } of top5p) {
-    await addAchievementProgress(userId, "event_pro");
+    await addProgress(userId, "event_pro", 1);
   }
 
   // userid -> amount
