@@ -27,8 +27,8 @@ export type EventData = Event & { contributions: EventContribution[] };
 
 let completing = false;
 
-const REWARDS_TOP10P = 4;
-const REWARDS_TOP50P = 3;
+const REWARDS_TOP5P = 4;
+const REWARDS_TOP10P = 3;
 
 export async function createEvent(
   client: NypsiClient,
@@ -263,13 +263,13 @@ export function getEventProgress(event: EventData) {
 async function giveRewards(event: EventData) {
   if (!event) return undefined;
 
+  const top1p = event.contributions.slice(0, Math.floor(event.contributions.length / 100));
   const top5p = event.contributions.slice(0, Math.floor(event.contributions.length / 20));
   const top10p = event.contributions.slice(0, Math.floor(event.contributions.length / 10));
-  const top50p = event.contributions.slice(0, Math.floor(event.contributions.length / 2));
 
-  logger.debug(`event: rewards`, { top5p, top10p, top50p });
+  logger.debug(`event: rewards`, { top1p, top5p, top10p });
 
-  for (const { userId } of top5p) {
+  for (const { userId } of top1p) {
     await addProgress(userId, "event_pro", 1);
   }
 
@@ -290,8 +290,8 @@ async function giveRewards(event: EventData) {
     }
   };
 
+  await giveRewardToGroup(top5p, REWARDS_TOP5P);
   await giveRewardToGroup(top10p, REWARDS_TOP10P);
-  await giveRewardToGroup(top50p, REWARDS_TOP50P);
 
   for (const [userId, amount] of givenRewards) {
     await addNotificationToQueue({
