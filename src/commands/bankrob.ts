@@ -22,7 +22,7 @@ import { a } from "../utils/functions/anticheat";
 import { giveCaptcha, isLockedOut, verifyUser } from "../utils/functions/captcha";
 import { addProgress } from "../utils/functions/economy/achievements.js";
 import { addBalance, getBalance, removeBalance } from "../utils/functions/economy/balance.js";
-import { addEventProgress, getCurrentEvent } from "../utils/functions/economy/events";
+import { addEventProgress, EventData, getCurrentEvent } from "../utils/functions/economy/events";
 import { getInventory, removeInventoryItem } from "../utils/functions/economy/inventory.js";
 import { createGame } from "../utils/functions/economy/stats.js";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
@@ -203,10 +203,20 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
         outcome: `${message.author.username} robbed ${bank}`,
       });
 
+      const eventData: { event?: EventData; target: number } = { target: 0 };
+
+      if (eventProgress) {
+        eventData.event = await getCurrentEvent();
+
+        if (eventData.event) {
+          eventData.target = Number(eventData.event.target);
+        }
+      }
+
       embed.setDescription(
         `**success!**\n\n**you stole** $${stolen.toLocaleString()} from **${bank}**` +
           (eventProgress
-            ? `\n\n🔱${eventProgress.toLocaleString()}/${((await getCurrentEvent())?.target || 0).toLocaleString()}`
+            ? `\n\n🔱${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`
             : ""),
       );
       embed.setColor(Constants.EMBED_SUCCESS_COLOR);

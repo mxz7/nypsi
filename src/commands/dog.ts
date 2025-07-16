@@ -10,7 +10,7 @@ import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { addProgress } from "../utils/functions/economy/achievements";
-import { addEventProgress, getCurrentEvent } from "../utils/functions/economy/events";
+import { addEventProgress, EventData, getCurrentEvent } from "../utils/functions/economy/events";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { getRandomImage } from "../utils/functions/image";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -70,10 +70,20 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
     1,
   );
 
+  const eventData: { event?: EventData; target: number } = { target: 0 };
+
+  if (eventProgress) {
+    eventData.event = await getCurrentEvent();
+
+    if (eventData.event) {
+      eventData.target = Number(eventData.event.target);
+    }
+  }
+
   const embed = new CustomEmbed(
     message.member,
     eventProgress
-      ? `🔱 ${eventProgress.toLocaleString()}/${((await getCurrentEvent()).target || 0).toLocaleString()}`
+      ? `🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`
       : undefined,
   )
     .disableFooter()

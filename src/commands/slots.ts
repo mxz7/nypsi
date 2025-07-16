@@ -24,7 +24,7 @@ import {
   removeBalance,
 } from "../utils/functions/economy/balance.js";
 import { getBoosters } from "../utils/functions/economy/boosters.js";
-import { addEventProgress, getCurrentEvent } from "../utils/functions/economy/events";
+import { addEventProgress, EventData, getCurrentEvent } from "../utils/functions/economy/events";
 import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds.js";
 import { createGame } from "../utils/functions/economy/stats";
 import { createUser, formatBet, userExists } from "../utils/functions/economy/utils.js";
@@ -438,6 +438,16 @@ async function run(
 
     if (win) {
       if (multi > 0) {
+        const eventData: { event?: EventData; target: number } = { target: 0 };
+
+        if (eventProgress) {
+          eventData.event = await getCurrentEvent();
+
+          if (eventData.event) {
+            eventData.target = Number(eventData.event.target);
+          }
+        }
+
         embed.addField(
           "**winner!!**",
           "**you win** $" +
@@ -447,7 +457,7 @@ async function run(
             Math.floor(multi * 100).toString() +
             "**% bonus" +
             (eventProgress
-              ? `\n\n🔱 ${eventProgress.toLocaleString()}/${((await getCurrentEvent())?.target || 0).toLocaleString()}`
+              ? `\n\n🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`
               : ""),
         );
       } else {

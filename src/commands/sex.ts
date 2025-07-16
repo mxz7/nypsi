@@ -14,7 +14,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants.js";
 import { MStoTime } from "../utils/functions/date.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
-import { addEventProgress, getCurrentEvent } from "../utils/functions/economy/events.js";
+import { addEventProgress, EventData, getCurrentEvent } from "../utils/functions/economy/events.js";
 import { addTaskProgress } from "../utils/functions/economy/tasks.js";
 import { getTagsData } from "../utils/functions/economy/utils.js";
 import { cleanString } from "../utils/functions/string.js";
@@ -234,6 +234,16 @@ async function run(
 
       const authorTag = await getActiveTag(message.member);
 
+      const eventData: { event?: EventData; target: number } = { target: 0 };
+
+      if (eventProgress) {
+        eventData.event = await getCurrentEvent();
+
+        if (eventData.event) {
+          eventData.target = Number(eventData.event.target);
+        }
+      }
+
       const embed2 = new CustomEmbed(
         undefined,
         `a match has been made from **${
@@ -246,7 +256,7 @@ async function run(
           message.author.id
         }?ref=bot-milf) a *private* message 😉😏` +
           (eventProgress
-            ? `\n\n🔱 ${eventProgress.toLocaleString()}/${((await getCurrentEvent()).target || 0).toLocaleString()}`
+            ? `\n\n🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`
             : ""),
       )
         .setHeader("milf finder")

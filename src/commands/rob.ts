@@ -20,7 +20,7 @@ import {
   removeBalance,
   setPadlock,
 } from "../utils/functions/economy/balance";
-import { addEventProgress, getCurrentEvent } from "../utils/functions/economy/events";
+import { addEventProgress, EventData, getCurrentEvent } from "../utils/functions/economy/events";
 import { addToGuildXP, getGuildByUser, getGuildName } from "../utils/functions/economy/guilds";
 import { getInventory, removeInventoryItem } from "../utils/functions/economy/inventory";
 import { isPassive } from "../utils/functions/economy/passive";
@@ -321,13 +321,24 @@ async function run(
       addTaskProgress(message.member, "thief");
 
       embed2.setColor(Constants.EMBED_SUCCESS_COLOR);
+
+      const eventData: { event?: EventData; target: number } = { target: 0 };
+
+      if (eventProgress) {
+        eventData.event = await getCurrentEvent();
+
+        if (eventData.event) {
+          eventData.target = Number(eventData.event.target);
+        }
+      }
+
       embed2.addField(
         "success!!",
         "you stole $**" +
           amountMoney.toLocaleString() +
           "**" +
           (eventProgress
-            ? `\n\n🔱${eventProgress.toLocaleString()}/${((await getCurrentEvent()).target || 0).toLocaleString()}`
+            ? `\n\n🔱${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`
             : ""),
       );
 

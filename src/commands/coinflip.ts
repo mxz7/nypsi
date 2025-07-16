@@ -24,7 +24,7 @@ import {
   getBalance,
   removeBalance,
 } from "../utils/functions/economy/balance";
-import { addEventProgress, getCurrentEvent } from "../utils/functions/economy/events";
+import { addEventProgress, EventData, getCurrentEvent } from "../utils/functions/economy/events";
 import {
   addInventoryItem,
   getInventory,
@@ -255,10 +255,20 @@ async function run(
         }** +$${winnings.toLocaleString()}${tax ? ` (${(tax * 100).toFixed(1)}% tax)` : ""}`;
       }
 
+      const eventData: { event?: EventData; target: number } = { target: 0 };
+
+      if (eventProgress) {
+        eventData.event = await getCurrentEvent();
+
+        if (eventData.event) {
+          eventData.target = Number(eventData.event.target);
+        }
+      }
+
       embed.setDescription(
         `**winner** ${winner.user.username}\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}` +
           (eventProgress
-            ? `\n\n🔱 ${eventProgress.toLocaleString()}/${((await getCurrentEvent()).target || 0).toLocaleString()}`
+            ? `\n\n🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`
             : ""),
       );
       embed.setColor(winner.displayHexColor);
@@ -302,10 +312,20 @@ async function run(
         }** +${(itemAmount * 2).toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-cf)**`;
       }
 
+      const eventData: { event?: EventData; target: number } = { target: 0 };
+
+      if (eventProgress) {
+        eventData.event = await getCurrentEvent();
+
+        if (eventData.event) {
+          eventData.target = Number(eventData.event.target);
+        }
+      }
+
       embed.setDescription(
         `**winner** ${winner.user.username}\n\n${thingy}\n\n**bet** ${itemAmount.toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-cf)**` +
           (eventProgress
-            ? `\n\n🔱 ${eventProgress.toLocaleString()}/${((await getCurrentEvent()).target || 0).toLocaleString()}`
+            ? `\n\n🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`
             : ""),
       );
       embed.setColor(winner.displayHexColor);

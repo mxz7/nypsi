@@ -847,7 +847,9 @@ export async function renderGambleScreen(
     }`;
 
     if (args.eventProgress) {
-      output += `\n\n🔱 ${args.eventProgress.toLocaleString()}/${((await getCurrentEvent())?.target || 0).toLocaleString()}`;
+      const event = await getCurrentEvent();
+      const target = event?.target || 0;
+      output += `\n\n🔱 ${args.eventProgress.toLocaleString()}/${target.toLocaleString()}`;
     }
   }
 

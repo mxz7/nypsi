@@ -16,7 +16,7 @@ import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Comman
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getBoosters } from "../utils/functions/economy/boosters";
-import { addEventProgress, getCurrentEvent } from "../utils/functions/economy/events";
+import { addEventProgress, EventData, getCurrentEvent } from "../utils/functions/economy/events";
 import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds";
 import {
   addInventoryItem,
@@ -381,6 +381,16 @@ async function doMine(
     1,
   );
 
+  const eventData: { event?: EventData; target: number } = { target: 0 };
+
+  if (eventProgress) {
+    eventData.event = await getCurrentEvent();
+
+    if (eventData.event) {
+      eventData.target = Number(eventData.event.target);
+    }
+  }
+
   embed.setDescription(
     `you go to the ${chosenArea} and swing your **${items[pickaxe].name}**\n\nyou found${
       total > 0
@@ -390,7 +400,7 @@ async function doMine(
         : " **nothing**"
     }` +
       (eventProgress
-        ? `\n\n🔱 ${eventProgress.toLocaleString()}/${((await getCurrentEvent())?.target || 0).toLocaleString()}`
+        ? `\n\n🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`
         : ""),
   );
 
