@@ -10,11 +10,12 @@ import {
   MessageActionRowComponentBuilder,
 } from "discord.js";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
-import { ItemUse } from "../../../../models/ItemUse";
-import { getInventory, removeInventoryItem, selectItem } from "../inventory";
-import { doDaily, getLastDaily } from "../utils";
 import { ErrorEmbed } from "../../../../models/EmbedBuilders";
+import { ItemUse } from "../../../../models/ItemUse";
 import { getTier, isPremium } from "../../premium/premium";
+import { getInventory, removeInventoryItem, selectItem } from "../inventory";
+import { addStat } from "../stats";
+import { doDaily, getLastDaily } from "../utils";
 import dayjs = require("dayjs");
 
 module.exports = new ItemUse(
@@ -79,6 +80,10 @@ module.exports = new ItemUse(
     await removeInventoryItem(message.member, "streak_token", amount);
 
     const embed = await doDaily(message.member, false, amount);
+
+    if (amount > 1) {
+      addStat(message.member, "streak_token", amount - 1);
+    }
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()

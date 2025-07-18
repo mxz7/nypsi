@@ -10,10 +10,11 @@ import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Comman
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import sleep from "../../sleep";
+import { pluralize } from "../../string";
 import { increaseBaseBankStorage } from "../balance";
 import { getInventory, removeInventoryItem } from "../inventory";
+import { addStat } from "../stats";
 import { formatNumber } from "../utils";
-import { pluralize } from "../../string";
 
 module.exports = new ItemUse(
   "stolen_credit_card",
@@ -67,6 +68,10 @@ module.exports = new ItemUse(
 
     if (inventory.count("stolen_credit_card") < amount)
       return send({ embeds: [new ErrorEmbed("you dont have this many stolen credit cards")] });
+
+    if (amount > 1) {
+      addStat(message.member, "stolen_credit_card", amount - 1);
+    }
 
     const addedAmount = randomInt(10_000 * amount, 250_000 * amount);
 
