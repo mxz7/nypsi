@@ -87,9 +87,7 @@ export async function addLog(guild: Guild, type: LogType, embed: CustomEmbed) {
 
 export async function isLogsEnabled(guild: Guild) {
   if (await redis.exists(`${Constants.redis.cache.guild.LOGS}:${guild.id}`)) {
-    return (await redis.get(`${Constants.redis.cache.guild.LOGS}:${guild.id}`)) === "t"
-      ? true
-      : false;
+    return (await redis.get(`${Constants.redis.cache.guild.LOGS}:${guild.id}`)) === "t";
   }
 
   if (checkingLogsEnabled) {
@@ -192,9 +190,7 @@ export async function isModLogsEnabled(guild: Guild) {
     },
   });
 
-  if (!query || !query.modlogs || query.modlogs == "") return false;
-
-  return true;
+  return !(!query || !query.modlogs || query.modlogs == "");
 }
 
 export async function setModLogs(guild: Guild, hook: string) {

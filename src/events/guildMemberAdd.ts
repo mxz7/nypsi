@@ -20,6 +20,7 @@ import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
 import { deleteMute, getMuteRole, isMuted, newMute } from "../utils/functions/moderation/mute";
 
 import sleep from "../utils/functions/sleep";
+import { pluralize } from "../utils/functions/string";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
 import { logger } from "../utils/logger";
 
@@ -39,7 +40,7 @@ export default async function guildMemberAdd(member: GuildMember) {
     embed.setDescription(
       `${member.toString()} \`${member.id}\`\n\n**username** ${
         member.user.username
-      }\n**created** ${daysAgo(member.user.createdAt)} days ago`,
+      }\n**created** ${daysAgo(member.user.createdAt)} ${pluralize("day", daysAgo(member.user.createdAt))} ago`,
     );
 
     const history = await fetchUsernameHistory(member);

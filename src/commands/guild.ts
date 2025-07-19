@@ -276,7 +276,9 @@ async function run(
         membersText += `[\`${m.economy.user.lastKnownUsername}\`](https://nypsi.xyz/users/${m.userId}?ref=bot-guild) `;
 
         if (m.userId == message.author.id) {
-          embed.setFooter({ text: `you joined ${daysAgo(m.joinedAt).toLocaleString()} days ago` });
+          embed.setFooter({
+            text: `you joined ${daysAgo(m.joinedAt).toLocaleString()} ${pluralize("day", daysAgo(m.joinedAt))} ago`,
+          });
         }
       }
 

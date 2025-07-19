@@ -342,6 +342,5 @@ export async function deleteGuildCounter(channelId: string) {
     })
     .catch(() => {});
 
-  if (res) return true;
-  return false;
+  return Boolean(res);
 }

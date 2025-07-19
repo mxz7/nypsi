@@ -114,7 +114,7 @@ export async function isAlt(guild: Guild, altId: string) {
     },
   });
 
-  return query ? true : false;
+  return Boolean(query);
 }
 
 export async function getMainAccountId(guild: Guild | string, altId: string) {
@@ -160,8 +160,7 @@ export async function isMainAccount(guild: Guild | string, userId: string) {
     const parsed = JSON.parse(cache) as { mainId: string; altId: string }[];
 
     if (parsed.length > 0) {
-      if (parsed[0]?.mainId === userId) return true;
-      else return false;
+      return parsed[0]?.mainId === userId;
     }
   }
 

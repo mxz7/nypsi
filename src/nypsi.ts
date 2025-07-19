@@ -14,10 +14,9 @@ const client = new NypsiClient({
         if (!msg.author) return true;
         if (msg.author?.bot) return true;
 
-        if (msg.createdTimestamp > Date.now() - 30000 || msg.editedTimestamp > Date.now() - 30000)
-          return false;
-
-        return true;
+        return !(
+          msg.createdTimestamp > Date.now() - 30000 || msg.editedTimestamp > Date.now() - 30000
+        );
       },
     },
     guildMembers: {
@@ -68,8 +67,7 @@ const client = new NypsiClient({
         if (user.id === user.client.user.id) return true;
         if (user.bot) return false;
 
-        if (recentCommands.has(user.id)) return true;
-        else return false;
+        return recentCommands.has(user.id);
       },
     },
     GuildMemberManager: {
@@ -78,8 +76,7 @@ const client = new NypsiClient({
         if (user.id === user.client.user.id) return true;
         if (user.user.bot) return false;
 
-        if (recentCommands.has(user.id)) return true;
-        else return false;
+        return recentCommands.has(user.id);
       },
     },
   }),

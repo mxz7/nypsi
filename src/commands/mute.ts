@@ -12,12 +12,13 @@ import {
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import { MStoTime } from "../utils/functions/date";
 import { isAltPunish } from "../utils/functions/guilds/altpunish";
 import { getExactMember } from "../utils/functions/member";
 import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import { newCase } from "../utils/functions/moderation/cases";
 import { deleteMute, getMuteRole, isMuted, newMute } from "../utils/functions/moderation/mute";
-import { pluralize } from "../utils/functions/string";
+import { getDuration, pluralize } from "../utils/functions/string";
 
 import ms = require("ms");
 import dayjs = require("dayjs");
@@ -177,7 +178,7 @@ async function run(
   } else if (guildMuteRole == "timeout") {
     mode = "timeout";
   } else {
-    muteRole = await message.guild.roles.cache.get(guildMuteRole);
+    muteRole = message.guild.roles.cache.get(guildMuteRole);
 
     if (!muteRole) {
       return send({ embeds: [new ErrorEmbed(`failed to find muterole: ${guildMuteRole}`)] });
@@ -291,7 +292,7 @@ async function run(
   let mutedLength = "";
 
   if (timedMute) {
-    mutedLength = getTime(time * 1000);
+    mutedLength = MStoTime(time * 1000);
   }
 
   const caseId = await doMute(
@@ -494,89 +495,3 @@ async function doMute(
 cmd.setRun(run);
 
 module.exports = cmd;
-
-export function getDuration(duration: string): number {
-  duration.toLowerCase();
-
-  if (duration.includes("d")) {
-    if (!parseInt(duration.split("d")[0])) return undefined;
-
-    const num = parseInt(duration.split("d")[0]);
-
-    return num * 86400;
-  } else if (duration.includes("h")) {
-    if (!parseInt(duration.split("h")[0])) return undefined;
-
-    const num = parseInt(duration.split("h")[0]);
-
-    return num * 3600;
-  } else if (duration.includes("m")) {
-    if (!parseInt(duration.split("m")[0])) return undefined;
-
-    const num = parseInt(duration.split("m")[0]);
-
-    return num * 60;
-  } else if (duration.includes("s")) {
-    if (!parseInt(duration.split("s")[0])) return undefined;
-
-    const num = parseInt(duration.split("s")[0]);
-
-    return num;
-  }
-}
-
-function getTime(ms: number) {
-  const days = Math.floor(ms / (24 * 60 * 60 * 1000));
-  const daysms = ms % (24 * 60 * 60 * 1000);
-  const hours = Math.floor(daysms / (60 * 60 * 1000));
-  const hoursms = ms % (60 * 60 * 1000);
-  const minutes = Math.floor(hoursms / (60 * 1000));
-  const minutesms = ms % (60 * 1000);
-  const sec = Math.floor(minutesms / 1000);
-
-  let output = "";
-
-  if (days > 0) {
-    let a = " days";
-
-    if (days == 1) {
-      a = " day";
-    }
-
-    output = days + a;
-  }
-
-  if (hours > 0) {
-    let a = " hours";
-
-    if (hours == 1) {
-      a = " hour";
-    }
-
-    if (output == "") {
-      output = hours + a;
-    } else {
-      output = `${output} ${hours}${a}`;
-    }
-  }
-
-  if (minutes > 0) {
-    let a = " mins";
-
-    if (minutes == 1) {
-      a = " min";
-    }
-
-    if (output == "") {
-      output = minutes + a;
-    } else {
-      output = `${output} ${minutes}${a}`;
-    }
-  }
-
-  if (sec > 0) {
-    output = output + sec + "s";
-  }
-
-  return output;
-}

@@ -439,15 +439,13 @@ export async function doLevelUp(member: MemberResolvable) {
         getPrestige(userId),
       ]);
 
-      if (
+      return (
         afterXp === beforeXp &&
         beforeBank === afterBank &&
         afterLevel === beforeLevel &&
         afterPrestige === beforePrestige &&
         levels > 0
-      )
-        return true;
-      return false;
+      );
     }
 
     requirements = getLevelRequirements(beforePrestige, beforeLevel + levels);

@@ -85,7 +85,6 @@ export async function checkZPeoples(guild: Guild) {
       if (!profile || profile.removed) {
         await sleep(250);
         await overwrite.delete();
-        continue;
       }
     }
 

@@ -45,11 +45,7 @@ export async function hasVoted(member: MemberResolvable) {
   if (await redis.exists(`${Constants.redis.cache.economy.VOTE}:${userId}`)) {
     const res = parseInt(await redis.get(`${Constants.redis.cache.economy.VOTE}:${userId}`));
 
-    if (Date.now() - res < ms("12 hours")) {
-      return true;
-    } else {
-      return false;
-    }
+    return Date.now() - res < ms("12 hours");
   }
 
   const lastVote = await getLastVote(userId);
