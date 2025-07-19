@@ -472,7 +472,6 @@ async function run(
     });
   } else {
     if (itemFunctions.has(selected.id)) {
-      await addStat(message.member, selected.id);
       return itemFunctions.get(selected.id).run(message, args);
     } else {
       return send({

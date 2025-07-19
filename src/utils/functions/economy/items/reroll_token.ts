@@ -1,12 +1,8 @@
 import {
   ActionRowBuilder,
-  BaseMessageOptions,
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
-  InteractionEditReplyOptions,
-  InteractionReplyOptions,
-  Message,
   MessageActionRowComponentBuilder,
   StringSelectMenuBuilder,
 } from "discord.js";
@@ -24,36 +20,6 @@ import { getUpgradesData } from "../utils";
 module.exports = new ItemUse(
   "reroll_token",
   async (message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) => {
-    const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-      if (!(message instanceof Message)) {
-        let usedNewMessage = false;
-        let res;
-
-        if (message.deferred) {
-          res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        } else {
-          res = await message.reply(data as InteractionReplyOptions).catch(() => {
-            return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-              usedNewMessage = true;
-              return await message.channel.send(data as BaseMessageOptions);
-            });
-          });
-        }
-
-        if (usedNewMessage && res instanceof Message) return res;
-
-        const replyMsg = await message.fetchReply();
-        if (replyMsg instanceof Message) {
-          return replyMsg;
-        }
-      } else {
-        return await message.channel.send(data as BaseMessageOptions);
-      }
-    };
-
     let [inventory, upgrades] = await Promise.all([
       getInventory(message.member),
       getUpgrades(message.member),
@@ -62,14 +28,14 @@ module.exports = new ItemUse(
     const upgradesData = getUpgradesData();
 
     if (upgrades.length === 0)
-      return send({
+      return ItemUse.send(message, {
         embeds: [
           new ErrorEmbed("you have no upgrades to reroll, you must prestige to receive an upgrade"),
         ],
       });
 
     if (!inventory.has("reroll_token"))
-      return send({ embeds: [new ErrorEmbed("you don't have a reroll token")] });
+      return ItemUse.send(message, { embeds: [new ErrorEmbed("you don't have a reroll token")] });
 
     const embed = new CustomEmbed(
       message.member,
@@ -95,7 +61,7 @@ module.exports = new ItemUse(
         .setDisabled(true),
     );
 
-    const msg = await send({ embeds: [embed], components: [selectMenu, button] });
+    const msg = await ItemUse.send(message, { embeds: [embed], components: [selectMenu, button] });
 
     const reactionManager: any = async () => {
       const interaction = await msg

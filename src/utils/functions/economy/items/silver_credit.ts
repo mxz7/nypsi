@@ -1,13 +1,9 @@
 import {
   ActionRowBuilder,
-  BaseMessageOptions,
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
   Interaction,
-  InteractionEditReplyOptions,
-  InteractionReplyOptions,
-  Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
@@ -23,6 +19,7 @@ import {
   setTier,
 } from "../../premium/premium";
 import { getInventory, removeInventoryItem } from "../inventory";
+import { addStat } from "../stats";
 import dayjs = require("dayjs");
 
 const SILVER_TIER = 2;
@@ -30,40 +27,12 @@ const SILVER_TIER = 2;
 module.exports = new ItemUse(
   "silver_credit",
   async (message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) => {
-    const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-      if (!(message instanceof Message)) {
-        let usedNewMessage = false;
-        let res;
-
-        if (message.deferred) {
-          res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        } else {
-          res = await message.reply(data as InteractionReplyOptions).catch(() => {
-            return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-              usedNewMessage = true;
-              return await message.channel.send(data as BaseMessageOptions);
-            });
-          });
-        }
-
-        if (usedNewMessage && res instanceof Message) return res;
-
-        const replyMsg = await message.fetchReply();
-        if (replyMsg instanceof Message) {
-          return replyMsg;
-        }
-      } else {
-        return await message.channel.send(data as BaseMessageOptions);
-      }
-    };
-
     const currentTier = await getTier(message.author.id);
 
     if (currentTier > SILVER_TIER)
-      return send({ embeds: [new ErrorEmbed("your current premium tier is higher than silver")] });
+      return ItemUse.send(message, {
+        embeds: [new ErrorEmbed("your current premium tier is higher than silver")],
+      });
 
     if (currentTier == SILVER_TIER) {
       const profile = await getPremiumProfile(message.author.id);
@@ -72,8 +41,9 @@ module.exports = new ItemUse(
       await setCredits(message.author.id, credits + 7);
 
       await removeInventoryItem(message.member, "silver_credit", 1);
+      await addStat(message.member, "silver_credit");
 
-      return send({
+      return ItemUse.send(message, {
         embeds: [
           new CustomEmbed(
             message.member,
@@ -90,8 +60,9 @@ module.exports = new ItemUse(
       await addMember(message.author.id, SILVER_TIER, new Date());
       await setCredits(message.author.id, 7);
       await removeInventoryItem(message.member, "silver_credit", 1);
+      await addStat(message.member, "silver_credit");
 
-      return send({
+      return ItemUse.send(message, {
         embeds: [
           new CustomEmbed(
             message.member,
@@ -100,7 +71,7 @@ module.exports = new ItemUse(
         ],
       });
     } else {
-      const msg = await send({
+      const msg = await ItemUse.send(message, {
         embeds: [
           new CustomEmbed(
             message.member,
@@ -131,6 +102,7 @@ module.exports = new ItemUse(
       }
 
       await removeInventoryItem(message.member, "silver_credit", 1);
+      await addStat(message.member, "silver_credit");
 
       await setTier(message.author.id, SILVER_TIER);
       await setExpireDate(message.author.id, new Date());

@@ -1,8 +1,6 @@
 import {
-  BaseMessageOptions,
   CommandInteraction,
   InteractionEditReplyOptions,
-  InteractionReplyOptions,
   Message,
   MessageEditOptions,
 } from "discord.js";
@@ -14,6 +12,7 @@ import Constants from "../../../Constants";
 import { getMember } from "../../member";
 import sleep from "../../sleep";
 import { removeInventoryItem } from "../inventory";
+import { addStat } from "../stats";
 
 module.exports = new ItemUse(
   "chastity_cage",
@@ -21,36 +20,6 @@ module.exports = new ItemUse(
     message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
     args: string[],
   ) => {
-    const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-      if (!(message instanceof Message)) {
-        let usedNewMessage = false;
-        let res;
-
-        if (message.deferred) {
-          res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        } else {
-          res = await message.reply(data as InteractionReplyOptions).catch(() => {
-            return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-              usedNewMessage = true;
-              return await message.channel.send(data as BaseMessageOptions);
-            });
-          });
-        }
-
-        if (usedNewMessage && res instanceof Message) return res;
-
-        const replyMsg = await message.fetchReply();
-        if (replyMsg instanceof Message) {
-          return replyMsg;
-        }
-      } else {
-        return await message.channel.send(data as BaseMessageOptions);
-      }
-    };
-
     const edit = async (data: MessageEditOptions, msg: Message) => {
       if (!(message instanceof Message)) {
         await message.editReply(data as InteractionEditReplyOptions);
@@ -61,7 +30,7 @@ module.exports = new ItemUse(
     };
 
     if (args.length == 1) {
-      return send({
+      return ItemUse.send(message, {
         embeds: [new ErrorEmbed("/use chastity <member>")],
       });
     }
@@ -69,11 +38,11 @@ module.exports = new ItemUse(
     const chastityTarget = await getMember(message.guild, args[1]);
 
     if (!chastityTarget) {
-      return send({ embeds: [new ErrorEmbed("invalid user")] });
+      return ItemUse.send(message, { embeds: [new ErrorEmbed("invalid user")] });
     }
 
     if (message.member == chastityTarget) {
-      return send({
+      return ItemUse.send(message, {
         embeds: [new ErrorEmbed("why would you do that to yourself.")],
       });
     }
@@ -82,7 +51,7 @@ module.exports = new ItemUse(
       (await redis.exists(`${Constants.redis.cooldown.SEX_CHASTITY}:${chastityTarget.user.id}`)) ==
       1
     ) {
-      return send({
+      return ItemUse.send(message, {
         embeds: [
           new ErrorEmbed(
             `**${chastityTarget.user.username}** is already equipped with a chastity cage`,
@@ -99,8 +68,9 @@ module.exports = new ItemUse(
     );
 
     await removeInventoryItem(message.member, "chastity_cage", 1);
+    await addStat(message.member, "chastity_cage");
 
-    const msg = await send({
+    const msg = await ItemUse.send(message, {
       embeds: [new CustomEmbed(message.member, "locking chastity cage...")],
     });
 

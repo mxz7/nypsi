@@ -1,20 +1,15 @@
-import {
-  BaseMessageOptions,
-  CommandInteraction,
-  InteractionEditReplyOptions,
-  InteractionReplyOptions,
-  Message,
-} from "discord.js";
+import { CommandInteraction } from "discord.js";
 import prisma from "../../../../init/database";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import { MStoTime } from "../../date";
 import sleep from "../../sleep";
+import { pluralize } from "../../string";
 import { getCraftingItems } from "../crafting";
 import { getInventory, removeInventoryItem } from "../inventory";
+import { addStat } from "../stats";
 import { formatNumber, getItems } from "../utils";
-import { pluralize } from "../../string";
 import dayjs = require("dayjs");
 
 module.exports = new ItemUse(
@@ -23,36 +18,6 @@ module.exports = new ItemUse(
     message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
     args: string[],
   ) => {
-    const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-      if (!(message instanceof Message)) {
-        let usedNewMessage = false;
-        let res;
-
-        if (message.deferred) {
-          res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        } else {
-          res = await message.reply(data as InteractionReplyOptions).catch(() => {
-            return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-              usedNewMessage = true;
-              return await message.channel.send(data as BaseMessageOptions);
-            });
-          });
-        }
-
-        if (usedNewMessage && res instanceof Message) return res;
-
-        const replyMsg = await message.fetchReply();
-        if (replyMsg instanceof Message) {
-          return replyMsg;
-        }
-      } else {
-        return await message.channel.send(data as BaseMessageOptions);
-      }
-    };
-
     const crafting = await prisma.crafting.findMany({
       where: {
         userId: message.author.id,
@@ -66,7 +31,9 @@ module.exports = new ItemUse(
     });
 
     if (crafting.length < 1)
-      return send({ embeds: [new ErrorEmbed("you are not currently crafting anything")] });
+      return ItemUse.send(message, {
+        embeds: [new ErrorEmbed("you are not currently crafting anything")],
+      });
 
     const inventory = await getInventory(message.member);
 
@@ -79,10 +46,10 @@ module.exports = new ItemUse(
     }
 
     if (!amount || isNaN(amount) || amount < 1)
-      return send({ embeds: [new ErrorEmbed("invalid amount")] });
+      return ItemUse.send(message, { embeds: [new ErrorEmbed("invalid amount")] });
 
     if (inventory.count("bob") < amount)
-      return send({ embeds: [new ErrorEmbed("you dont have this many bobs")] });
+      return ItemUse.send(message, { embeds: [new ErrorEmbed("you dont have this many bobs")] });
 
     const breakdown: string[] = [];
 
@@ -128,13 +95,16 @@ module.exports = new ItemUse(
     }
 
     if (maxUsedAmount == 0)
-      return send({ embeds: [new ErrorEmbed("you are not currently crafting anything")] });
+      return ItemUse.send(message, {
+        embeds: [new ErrorEmbed("you are not currently crafting anything")],
+      });
 
     await removeInventoryItem(message.member, "bob", maxUsedAmount);
+    await addStat(message.member, "bob", maxUsedAmount);
 
     getCraftingItems(message.member);
 
-    const msg = await send({
+    const msg = await ItemUse.send(message, {
       embeds: [
         new CustomEmbed(message.member, "<:nypsi_bob:1078776552067694672> sending bob to work..."),
       ],

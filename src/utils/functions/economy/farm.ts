@@ -8,6 +8,7 @@ import { getUserId, MemberResolvable } from "../member";
 import { addProgress } from "./achievements";
 import { addEventProgress } from "./events";
 import { addInventoryItem, gemBreak, getInventory, removeInventoryItem } from "./inventory";
+import { addStat } from "./stats";
 import { getPlantsData, getPlantUpgrades, getUpgradesData } from "./utils";
 import dayjs = require("dayjs");
 import ms = require("ms");
@@ -385,6 +386,7 @@ export async function fertiliseFarm(member: MemberResolvable): Promise<{
   });
 
   await removeInventoryItem(member, "fertiliser", Math.ceil(possible.length / 3));
+  await addStat(member, "fertiliser", Math.ceil(possible.length / 3));
   await redis.del(`${Constants.redis.cache.economy.farm}:${getUserId(member)}`);
 
   return { done: possible.length, dead };
