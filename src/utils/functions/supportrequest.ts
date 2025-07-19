@@ -239,8 +239,7 @@ export async function sendToRequestChannel(
 
       const msg = await channel.send({ embeds: embeds, content }).catch(() => {});
 
-      if (!msg) return false;
-      return true;
+      return Boolean(msg);
     },
     {
       context: {
@@ -252,9 +251,7 @@ export async function sendToRequestChannel(
     },
   );
 
-  if (!res.includes(true)) return false;
-
-  return true;
+  return res.includes(true);
 }
 
 export async function handleAttachments(attachments: Collection<string, Attachment>) {
@@ -342,15 +339,13 @@ export async function summariseRequest(id: string) {
     transcript += `${await getLastKnownUsername(message.userId)}: ${message.content}\n\n`;
   }
 
-  const res = await prompt(
+  return await prompt(
     "You are a summarising assistant. " +
       'The following transcript is in the format of "<username>: <message content>". ' +
       "Some of the responses may be in an unknown language, translate them to English. " +
       "Your response should only be the summary of the transcription, please keep it as concise as possible. ",
     transcript,
   );
-
-  return res;
 }
 
 export async function isRequestSuitable(

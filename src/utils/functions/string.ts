@@ -81,6 +81,39 @@ export function formatTime(ms: number) {
   return `${minutes > 0 ? `${minutes}m` : ""}${seconds}s`;
 }
 
+export function getDuration(duration: string): number | undefined {
+  const units: Record<string, number> = {
+    d: 86400,
+    h: 3600,
+    m: 60,
+    s: 1,
+  };
+
+  const regex = /^(\d+d)?(\d+h)?(\d+m)?(\d+s)?$/i;
+  const match = duration.toLowerCase().trim().match(regex);
+  if (!match) return undefined;
+
+  let totalSeconds = 0;
+  const seenUnits = new Set<string>();
+
+  for (let i = 1; i < match.length; i++) {
+    const part = match[i];
+    if (part) {
+      const unit = part.slice(-1);
+      const value = parseInt(part.slice(0, -1));
+
+      if (isNaN(value) || seenUnits.has(unit)) {
+        return undefined;
+      }
+
+      seenUnits.add(unit);
+      totalSeconds += value * units[unit];
+    }
+  }
+
+  return totalSeconds;
+}
+
 export function pluralize(text: string, amount: number | bigint, plural?: string): string;
 export function pluralize(item: Item, amount: number | bigint): string;
 export function pluralize(plantType: Plant, amount: number | bigint): string;

@@ -105,8 +105,6 @@ export function doChatReactions(client: NypsiClient) {
         const nextGame = new Date().getTime() + final * 1000;
 
         lastGame.set(channel.id, nextGame);
-
-        continue;
       }
     }
 

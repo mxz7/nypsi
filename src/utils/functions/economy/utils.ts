@@ -200,7 +200,7 @@ export async function userExists(member: MemberResolvable): Promise<boolean> {
   const cache = await redis.get(`${Constants.redis.cache.economy.EXISTS}:${userId}`);
 
   if (cache) {
-    return cache === "true" ? true : false;
+    return cache === "true";
   }
 
   const query = await prisma.economy.findUnique({
@@ -632,7 +632,7 @@ export async function deleteUser(member: MemberResolvable) {
 }
 
 export async function isHandcuffed(member: MemberResolvable): Promise<boolean> {
-  return (await redis.exists(`economy:handcuffed:${getUserId(member)}`)) == 1 ? true : false;
+  return (await redis.exists(`economy:handcuffed:${getUserId(member)}`)) == 1;
 }
 
 export async function addHandcuffs(member: MemberResolvable) {

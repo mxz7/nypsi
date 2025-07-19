@@ -3,6 +3,7 @@ import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Comman
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { newCase } from "../utils/functions/moderation/cases";
+import { getDuration } from "../utils/functions/string";
 
 const cmd = new Command("kicksince", "kick members that joined after a certain time", "admin")
   .setPermissions(["ADMINISTRATOR"])
@@ -240,33 +241,3 @@ async function run(
 cmd.setRun(run);
 
 module.exports = cmd;
-
-function getDuration(duration: string) {
-  duration.toLowerCase();
-
-  if (duration.includes("d")) {
-    if (!parseInt(duration.split("d")[0])) return undefined;
-
-    const num = parseInt(duration.split("d")[0]);
-
-    return num * 86400;
-  } else if (duration.includes("h")) {
-    if (!parseInt(duration.split("h")[0])) return undefined;
-
-    const num = parseInt(duration.split("h")[0]);
-
-    return num * 3600;
-  } else if (duration.includes("m")) {
-    if (!parseInt(duration.split("m")[0])) return undefined;
-
-    const num = parseInt(duration.split("m")[0]);
-
-    return num * 60;
-  } else if (duration.includes("s")) {
-    if (!parseInt(duration.split("s")[0])) return undefined;
-
-    const num = parseInt(duration.split("s")[0]);
-
-    return num;
-  }
-}

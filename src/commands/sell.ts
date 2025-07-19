@@ -522,7 +522,7 @@ async function calcValues(message: Message | (NypsiCommandInteraction & CommandI
     );
   }
 
-  const res = {
+  return {
     selected,
     total,
     desc,
@@ -531,8 +531,6 @@ async function calcValues(message: Message | (NypsiCommandInteraction & CommandI
     taxedAmount,
     multi,
   };
-
-  return res;
 }
 
 cmd.setRun(run);

@@ -273,81 +273,38 @@ async function run(
     }
   }
 
-  if (increasedLuck) {
-    /**
-     * the shit below results in an approximate 60% win rate overtime, resulting in an overall very high gain, without counting multiplier
-     */
+  if (
+    one.split("-")[0] != two.split("-")[0] &&
+    two.split("-")[0] != three.split("-")[0] &&
+    one.split("-")[0] != three.split("-")[0]
+  ) {
+    // increased luck has around 60% win rate, regular has 39%
+    const chance = Math.floor(Math.random() * (increasedLuck ? 6 : 41));
+    const chanceScore = 4;
+    const chanceScore2 = increasedLuck ? 3 : 8;
 
-    if (
-      one.split("-")[0] != two.split("-")[0] &&
-      two.split("-")[0] != three.split("-")[0] &&
-      one.split("-")[0] != three.split("-")[0]
-    ) {
-      const chance = Math.floor(Math.random() * 6);
-      const chanceScore = 4;
-      const chanceScore2 = 3;
-
-      if (chance < chanceScore) {
-        one = two.split("-")[0] + "-1";
-      } else if (chance < chanceScore2) {
-        three = two.split("-")[0] + "-3";
-      }
+    if (chance < chanceScore) {
+      one = two.split("-")[0] + "-1";
+    } else if (chance < chanceScore2) {
+      three = two.split("-")[0] + "-3";
     }
+  }
 
-    if (two.split("-")[0] == three.split("-")[0] && one.split("-")[0] != two.split("-")[0]) {
-      const chance = Math.floor(Math.random() * 12);
-      const chanceScore = 7;
+  if (two.split("-")[0] == three.split("-")[0] && one.split("-")[0] != two.split("-")[0]) {
+    const chance = Math.floor(Math.random() * 12);
+    const chanceScore = 7;
 
-      if (chance < chanceScore) {
-        one = two.split("-")[0] + "-1";
-      }
+    if (chance < chanceScore) {
+      one = two.split("-")[0] + "-1";
     }
+  }
 
-    if (one.split("-")[0] == two.split("-")[0] && one.split("-")[0] != three.split("-")[0]) {
-      const chance = Math.floor(Math.random() * 12);
-      const chanceScore = 6;
+  if (one.split("-")[0] == two.split("-")[0] && one.split("-")[0] != three.split("-")[0]) {
+    const chance = Math.floor(Math.random() * 12);
+    const chanceScore = 6;
 
-      if (chance < chanceScore) {
-        three = two.split("-")[0] + "-3";
-      }
-    }
-  } else {
-    /**
-     * the shit below results in an approximate 39% win rate overtime, resulting in an overall loss, without counting multiplier
-     */
-
-    if (
-      one.split("-")[0] != two.split("-")[0] &&
-      two.split("-")[0] != three.split("-")[0] &&
-      one.split("-")[0] != three.split("-")[0]
-    ) {
-      const chance = Math.floor(Math.random() * 41);
-      const chanceScore = 4;
-      const chanceScore2 = 8;
-
-      if (chance < chanceScore) {
-        one = two.split("-")[0] + "-1";
-      } else if (chance < chanceScore2) {
-        three = two.split("-")[0] + "-3";
-      }
-    }
-
-    if (two.split("-")[0] == three.split("-")[0] && one.split("-")[0] != two.split("-")[0]) {
-      const chance = Math.floor(Math.random() * 12);
-      const chanceScore = 7;
-
-      if (chance < chanceScore) {
-        one = two.split("-")[0] + "-1";
-      }
-    }
-
-    if (one.split("-")[0] == two.split("-")[0] && one.split("-")[0] != three.split("-")[0]) {
-      const chance = Math.floor(Math.random() * 12);
-      const chanceScore = 6;
-
-      if (chance < chanceScore) {
-        three = two.split("-")[0] + "-3";
-      }
+    if (chance < chanceScore) {
+      three = two.split("-")[0] + "-3";
     }
   }
 

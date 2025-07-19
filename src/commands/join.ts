@@ -14,6 +14,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { daysAgo, formatDate } from "../utils/functions/date";
 import { getMember } from "../utils/functions/member";
+import { pluralize } from "../utils/functions/string";
 import workerSort from "../utils/functions/workers/sort";
 import { logger } from "../utils/logger";
 
@@ -143,7 +144,7 @@ async function run(
 
   const embed = new CustomEmbed(
     message.member,
-    `joined on **${joinedServer}**\n- **${timeAgo.toLocaleString()}** days ago\njoin position is **${
+    `joined on **${joinedServer}**\n- **${timeAgo.toLocaleString()}** ${pluralize("day", timeAgo)} ago\njoin position is **${
       joinPos !== 0 ? joinPos.toLocaleString() : "--"
     }**`,
   )

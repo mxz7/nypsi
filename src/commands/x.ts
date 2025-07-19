@@ -93,6 +93,7 @@ import {
   setExpireDate,
   setTier,
 } from "../utils/functions/premium/premium";
+import { getDuration } from "../utils/functions/string";
 import { createSupportRequest } from "../utils/functions/supportrequest";
 import { exportTransactions } from "../utils/functions/transactions";
 import { getAdminLevel, hasAdminPermission, setAdminLevel } from "../utils/functions/users/admin";
@@ -3080,36 +3081,6 @@ async function run(
 cmd.setRun(run);
 
 module.exports = cmd;
-
-function getDuration(duration: string): number {
-  duration.toLowerCase();
-
-  if (duration.includes("d")) {
-    if (!parseInt(duration.split("d")[0])) return undefined;
-
-    const num = parseInt(duration.split("d")[0]);
-
-    return num * 86400;
-  } else if (duration.includes("h")) {
-    if (!parseInt(duration.split("h")[0])) return undefined;
-
-    const num = parseInt(duration.split("h")[0]);
-
-    return num * 3600;
-  } else if (duration.includes("m")) {
-    if (!parseInt(duration.split("m")[0])) return undefined;
-
-    const num = parseInt(duration.split("m")[0]);
-
-    return num * 60;
-  } else if (duration.includes("s")) {
-    if (!parseInt(duration.split("s")[0])) return undefined;
-
-    const num = parseInt(duration.split("s")[0]);
-
-    return num;
-  }
-}
 
 async function getUsableCommands(member: MemberResolvable) {
   const commands: { command: string; description: string; permission: AdminPermission }[] = [

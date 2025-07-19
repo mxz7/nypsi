@@ -9,6 +9,7 @@ import {
   setAutoMuteLevels,
   setAutoMuteTimeout,
 } from "../utils/functions/moderation/mute";
+import { getDuration } from "../utils/functions/string";
 
 const cmd = new Command("automute", "change auto mute lengths", "admin").setPermissions([
   "MANAGE_SERVER",
@@ -138,7 +139,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          `✅ set \`${level + 1}\` to \`${duration.toLocaleString()}\` seconds`,
+          `✅ set \`${level + 1}\` to \`${MStoTime(duration * 1000, true).trim() || "no mute"}\``,
         ),
       ],
     });
@@ -148,35 +149,3 @@ async function run(
 cmd.setRun(run);
 
 module.exports = cmd;
-
-function getDuration(duration: string): number {
-  duration.toLowerCase();
-
-  if (duration.includes("d")) {
-    if (!parseInt(duration.split("d")[0])) return undefined;
-
-    const num = parseInt(duration.split("d")[0]);
-
-    return num * 86400;
-  } else if (duration.includes("h")) {
-    if (!parseInt(duration.split("h")[0])) return undefined;
-
-    const num = parseInt(duration.split("h")[0]);
-
-    return num * 3600;
-  } else if (duration.includes("m")) {
-    if (!parseInt(duration.split("m")[0])) return undefined;
-
-    const num = parseInt(duration.split("m")[0]);
-
-    return num * 60;
-  } else if (duration.includes("s")) {
-    if (!parseInt(duration.split("s")[0])) return undefined;
-
-    const num = parseInt(duration.split("s")[0]);
-
-    return num;
-  }
-
-  return 0;
-}

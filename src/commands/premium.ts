@@ -32,7 +32,7 @@ import {
   setTier,
 } from "../utils/functions/premium/premium";
 import sleep from "../utils/functions/sleep";
-import { cleanString } from "../utils/functions/string";
+import { cleanString, pluralize } from "../utils/functions/string";
 import { getTotalSpend } from "../utils/functions/users/email";
 import { addTag, getTags, removeTag } from "../utils/functions/users/tags";
 import {
@@ -849,7 +849,7 @@ async function run(
 
       let description = `**tier** ${levelString(
         profile.level,
-      )}\n**started** ${timeStarted} (${timeAgo} days ago)\n**expires** ${expires} (${timeUntil} days left)\n**credit** ${
+      )}\n**started** ${timeStarted} (${timeAgo} ${pluralize("day", timeAgo)} ago)\n**expires** ${expires} (${timeUntil} ${pluralize("day", timeUntil)} left)\n**credit** ${
         profile.credit
       }`;
 

@@ -6,9 +6,7 @@ import ms = require("ms");
 
 export async function isAltPunish(guild: Guild) {
   if (await redis.exists(`${Constants.redis.cache.guild.ALT_PUNISH}:${guild.id}`)) {
-    return (await redis.get(`${Constants.redis.cache.guild.ALT_PUNISH}:${guild.id}`)) === "t"
-      ? true
-      : false;
+    return (await redis.get(`${Constants.redis.cache.guild.ALT_PUNISH}:${guild.id}`)) === "t";
   }
 
   const res = await prisma.guild

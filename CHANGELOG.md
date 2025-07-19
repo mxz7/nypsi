@@ -10,6 +10,7 @@
 - added events (https://nypsi.xyz/docs/economy/events)
 - maxbet & mines balancing
 - daily guild contribution stats (@growling_grizzly)
+- more complex times (such as 1h30m) can now be used in mute/ban/etc (@growling_grizzly)
 
 ## other
 

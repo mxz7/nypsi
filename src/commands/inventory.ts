@@ -79,15 +79,14 @@ async function run(
           if (alias.includes(filter)) return true;
         }
       }
-      if (
+
+      return (
         item.id.includes(filter) ||
         item.name.includes(filter) ||
         item.longDesc.includes(filter) ||
         item.shortDesc?.includes(filter) ||
         item.role.includes(filter)
-      )
-        return true;
-      return false;
+      );
     });
   };
 

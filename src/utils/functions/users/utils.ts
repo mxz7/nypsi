@@ -16,9 +16,7 @@ export async function hasProfile(member: MemberResolvable) {
   const userId = getUserId(member);
 
   if (await redis.exists(`${Constants.redis.cache.user.EXISTS}:${userId}`)) {
-    return (await redis.get(`${Constants.redis.cache.user.EXISTS}:${userId}`)) === "true"
-      ? true
-      : false;
+    return (await redis.get(`${Constants.redis.cache.user.EXISTS}:${userId}`)) === "true";
   }
 
   const query = await prisma.user.findUnique({

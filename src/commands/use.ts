@@ -323,14 +323,9 @@ async function run(
       }
 
       if (amount) {
-        if (
+        allowed =
           (!userUpgrade && amount <= upgrade.stack_limit) ||
-          (userUpgrade && userUpgrade.amount + amount <= upgrade.stack_limit)
-        ) {
-          allowed = true;
-        } else {
-          allowed = false;
-        }
+          (userUpgrade && userUpgrade.amount + amount <= upgrade.stack_limit);
       }
     }
 

@@ -99,10 +99,7 @@ export function runChristmas(client: NypsiClient) {
             fail = true;
           });
 
-          if (fail) {
-            return false;
-          }
-          return true;
+          return !fail;
         },
         {
           context: {
