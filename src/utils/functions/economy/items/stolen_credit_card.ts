@@ -1,10 +1,4 @@
-import {
-  BaseMessageOptions,
-  CommandInteraction,
-  InteractionEditReplyOptions,
-  InteractionReplyOptions,
-  Message,
-} from "discord.js";
+import { CommandInteraction } from "discord.js";
 import { randomInt } from "node:crypto";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
@@ -22,36 +16,6 @@ module.exports = new ItemUse(
     message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
     args: string[],
   ) => {
-    const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-      if (!(message instanceof Message)) {
-        let usedNewMessage = false;
-        let res;
-
-        if (message.deferred) {
-          res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        } else {
-          res = await message.reply(data as InteractionReplyOptions).catch(() => {
-            return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-              usedNewMessage = true;
-              return await message.channel.send(data as BaseMessageOptions);
-            });
-          });
-        }
-
-        if (usedNewMessage && res instanceof Message) return res;
-
-        const replyMsg = await message.fetchReply();
-        if (replyMsg instanceof Message) {
-          return replyMsg;
-        }
-      } else {
-        return await message.channel.send(data as BaseMessageOptions);
-      }
-    };
-
     const inventory = await getInventory(message.member);
 
     let amount = 1;
@@ -64,23 +28,22 @@ module.exports = new ItemUse(
     }
 
     if (!amount || isNaN(amount) || amount < 1)
-      return send({ embeds: [new ErrorEmbed("invalid amount")] });
+      return ItemUse.send(message, { embeds: [new ErrorEmbed("invalid amount")] });
 
     if (inventory.count("stolen_credit_card") < amount)
-      return send({ embeds: [new ErrorEmbed("you dont have this many stolen credit cards")] });
-
-    if (amount > 1) {
-      addStat(message.member, "stolen_credit_card", amount - 1);
-    }
+      return ItemUse.send(message, {
+        embeds: [new ErrorEmbed("you dont have this many stolen credit cards")],
+      });
 
     const addedAmount = randomInt(10_000 * amount, 250_000 * amount);
 
     await Promise.all([
       removeInventoryItem(message.member, "stolen_credit_card", amount),
+      addStat(message.member, "stolen_credit_card", amount),
       increaseBaseBankStorage(message.member, addedAmount),
     ]);
 
-    const msg = await send({
+    const msg = await ItemUse.send(message, {
       embeds: [
         new CustomEmbed(
           message.member,

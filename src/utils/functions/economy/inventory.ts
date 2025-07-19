@@ -513,6 +513,8 @@ export async function gemBreak(
   chance: number,
   gem: "blue_gem" | "purple_gem" | "pink_gem" | "green_gem" | "white_gem",
   client?: NypsiClient | ClusterManager,
+  shatterOnly = false,
+  sendMessage = true,
 ) {
   if (!percentChance(chance)) return;
 
@@ -521,7 +523,7 @@ export async function gemBreak(
   const inventory = await getInventory(userId);
   const gemLocation = await inventory.hasGem(gem);
 
-  if ((await inventory.hasGem("crystal_heart")).any || !gemLocation.any) return;
+  if (!shatterOnly && ((await inventory.hasGem("crystal_heart")).any || !gemLocation.any)) return;
 
   let uniqueGemCount = 0;
 
@@ -531,7 +533,12 @@ export async function gemBreak(
   if ((await inventory.hasGem("green_gem")).any) uniqueGemCount++;
   if ((await inventory.hasGem("white_gem")).any) uniqueGemCount++;
 
-  if (uniqueGemCount === 5 && percentChance(50) && (await getDmSettings(userId)).other) {
+  if (
+    !shatterOnly &&
+    uniqueGemCount === 5 &&
+    percentChance(50) &&
+    (await getDmSettings(userId)).other
+  ) {
     await Promise.all([
       removeInventoryItem(userId, "pink_gem", 1),
       removeInventoryItem(userId, "purple_gem", 1),
@@ -642,7 +649,7 @@ export async function gemBreak(
 
   if (footer) embed.setFooter({ text: footer });
 
-  if ((await getDmSettings(userId)).other) {
+  if (sendMessage && (await getDmSettings(userId)).other) {
     addNotificationToQueue({
       memberId: userId,
       payload: {
@@ -650,6 +657,11 @@ export async function gemBreak(
       },
     });
   }
+
+  return {
+    shards: amount,
+    footerMsg: footer,
+  };
 }
 
 export async function setAutosellItems(member: MemberResolvable, items: string[]) {

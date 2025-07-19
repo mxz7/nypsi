@@ -1,14 +1,10 @@
 import {
   ActionRowBuilder,
-  BaseMessageOptions,
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
   ComponentType,
   GuildTextBasedChannel,
-  InteractionEditReplyOptions,
-  InteractionReplyOptions,
-  Message,
   MessageActionRowComponentBuilder,
   MessageFlags,
 } from "discord.js";
@@ -19,40 +15,11 @@ import { ItemUse } from "../../../../models/ItemUse";
 import { startLootRain } from "../../../../scheduled/clusterjobs/random-drops";
 import Constants from "../../../Constants";
 import { getInventory, removeInventoryItem } from "../inventory";
+import { addStat } from "../stats";
 
 module.exports = new ItemUse(
   "rain",
   async (message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) => {
-    const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-      if (!(message instanceof Message)) {
-        let usedNewMessage = false;
-        let res;
-
-        if (message.deferred) {
-          res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        } else {
-          res = await message.reply(data as InteractionReplyOptions).catch(() => {
-            return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-              usedNewMessage = true;
-              return await message.channel.send(data as BaseMessageOptions);
-            });
-          });
-        }
-
-        if (usedNewMessage && res instanceof Message) return res;
-
-        const replyMsg = await message.fetchReply();
-        if (replyMsg instanceof Message) {
-          return replyMsg;
-        }
-      } else {
-        return await message.channel.send(data as BaseMessageOptions);
-      }
-    };
-
     let length = 1;
 
     if (Constants.LOOT_RAIN_ALLOWED_CHANNELS.includes(message.channelId)) length = 2;
@@ -64,7 +31,7 @@ module.exports = new ItemUse(
         .setStyle(ButtonStyle.Success),
     );
 
-    const msg = await send({
+    const msg = await ItemUse.send(message, {
       embeds: [
         new CustomEmbed(
           message.member,
@@ -116,6 +83,7 @@ module.exports = new ItemUse(
       }
 
       await removeInventoryItem(message.member, "rain", 1);
+      await addStat(message.member, "rain");
 
       row.components.forEach((c) => c.setDisabled(true));
 

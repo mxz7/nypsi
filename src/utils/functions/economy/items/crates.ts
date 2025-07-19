@@ -1,12 +1,8 @@
 import {
   ActionRowBuilder,
-  BaseMessageOptions,
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
-  InteractionEditReplyOptions,
-  InteractionReplyOptions,
-  Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
@@ -16,13 +12,13 @@ import { ItemUse } from "../../../../models/ItemUse";
 import PageManager from "../../page";
 import { getTier, isPremium } from "../../premium/premium";
 import sleep from "../../sleep";
+import { pluralize } from "../../string";
 import { addProgress } from "../achievements";
 import { calcItemValue, getInventory, selectItem } from "../inventory";
 import { openCrate } from "../loot_pools";
 import { addStat } from "../stats";
 import { addTaskProgress } from "../tasks";
 import { getItems } from "../utils";
-import { pluralize } from "../../string";
 
 module.exports = new ItemUse(
   "crates",
@@ -30,46 +26,16 @@ module.exports = new ItemUse(
     message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
     args: string[],
   ) => {
-    const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-      if (!(message instanceof Message)) {
-        let usedNewMessage = false;
-        let res;
-
-        if (message.deferred) {
-          res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        } else {
-          res = await message.reply(data as InteractionReplyOptions).catch(() => {
-            return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-              usedNewMessage = true;
-              return await message.channel.send(data as BaseMessageOptions);
-            });
-          });
-        }
-
-        if (usedNewMessage && res instanceof Message) return res;
-
-        const replyMsg = await message.fetchReply();
-        if (replyMsg instanceof Message) {
-          return replyMsg;
-        }
-      } else {
-        return await message.channel.send(data as BaseMessageOptions);
-      }
-    };
-
     const inventory = await getInventory(message.member);
 
     const selected = selectItem(args[0].toLowerCase());
 
     if (!selected || typeof selected == "string") {
-      return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] });
+      return ItemUse.send(message, { embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] });
     }
 
     if (!inventory.has(selected.id)) {
-      return send({
+      return ItemUse.send(message, {
         embeds: [new ErrorEmbed(`you dont have ${selected.article} ${selected.name}`)],
       });
     }
@@ -94,7 +60,9 @@ module.exports = new ItemUse(
     if (amount > max) amount = max;
 
     if (inventory.count(selected.id) < amount)
-      return send({ embeds: [new ErrorEmbed(`you don't have ${amount} ${selected.name}`)] });
+      return ItemUse.send(message, {
+        embeds: [new ErrorEmbed(`you don't have ${amount} ${selected.name}`)],
+      });
 
     const embed = new CustomEmbed(
       message.member,
@@ -104,7 +72,7 @@ module.exports = new ItemUse(
       message.author.avatarURL(),
     );
 
-    const msg = await send({ embeds: [embed] });
+    const msg = await ItemUse.send(message, { embeds: [embed] });
 
     const foundAll = {
       money: 0,
