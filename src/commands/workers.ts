@@ -255,7 +255,7 @@ async function run(
             }`,
           )
           .setValue(baseWorkers[worker].id)
-          .setDefault(baseWorkers[worker].id == defaultWorker ? true : false),
+          .setDefault(baseWorkers[worker].id == defaultWorker),
       );
     }
 

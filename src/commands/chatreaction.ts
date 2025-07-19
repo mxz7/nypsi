@@ -793,8 +793,7 @@ async function run(
         if ((await isEcoBanned(i.user)).banned && wager > 0) return false;
 
         if (i.user.id === message.author.id) {
-          if ((i as ButtonInteraction).customId === "n") return true;
-          return false;
+          return (i as ButtonInteraction).customId === "n";
         }
 
         if (!(await userExists(i.user)) || (await getBalance(i.user)) < wager) {

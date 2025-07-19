@@ -439,13 +439,7 @@ async function doMute(
   }
   if (fail) return false;
 
-  let storeReason = reason;
-
-  if (!timedMute) {
-    storeReason = "[perm] " + reason;
-  } else {
-    storeReason = `[${mutedLength}] ${reason}`;
-  }
+  const storeReason = `[${timedMute ? mutedLength : "perm"}] ${reason}`;
 
   const caseId = await newCase(message.guild, "mute", target.user.id, message.author, storeReason);
 

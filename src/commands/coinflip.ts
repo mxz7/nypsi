@@ -546,8 +546,7 @@ async function run(
     let proceeded = false;
     const filter = async (i: ButtonInteraction) => {
       if (message.author.id === i.user.id) {
-        if (i.customId === "n") return true;
-        return false;
+        return i.customId === "n";
       }
 
       if (playing.has(i.user.id)) {
@@ -603,11 +602,7 @@ async function run(
 
           confirmInteraction.update({ components: [] });
 
-          if (confirmInteraction.customId === "y") {
-            return true;
-          } else {
-            return false;
-          }
+          return confirmInteraction.customId === "y";
         }
       }
 
@@ -791,8 +786,7 @@ async function run(
     const filter = async (i: ButtonInteraction): Promise<boolean> => {
       if (i.customId === "n" && message.author.id !== i.user.id) return false;
       if (message.author.id === i.user.id) {
-        if (i.customId === "n") return true;
-        return false;
+        return i.customId === "n";
       }
       if ((await isEcoBanned(i.user)).banned) return false;
 
@@ -805,8 +799,7 @@ async function run(
       }
 
       if (i.user.id === message.author.id) {
-        if ((i as ButtonInteraction).customId === "n") return true;
-        return false;
+        return (i as ButtonInteraction).customId === "n";
       }
 
       if (!(await userExists(i.user))) {
@@ -868,11 +861,7 @@ async function run(
 
           confirmInteraction.update({ components: [] });
 
-          if (confirmInteraction.customId === "y") {
-            return true;
-          } else {
-            return false;
-          }
+          return confirmInteraction.customId === "y";
         }
       } else {
         const inventory = await getInventory(i.user);
