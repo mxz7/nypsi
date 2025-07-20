@@ -211,6 +211,10 @@ class FileTransport implements Transport {
       out[item] = data.meta[item];
     }
 
+    if (!out.data) {
+      delete out.data;
+    }
+
     this.stream.write(
       JSON.stringify(out, (key, value) => (typeof value === "bigint" ? value.toString() : value)) +
         "\n",
