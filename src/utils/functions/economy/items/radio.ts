@@ -1,8 +1,6 @@
 import {
-  BaseMessageOptions,
   CommandInteraction,
   InteractionEditReplyOptions,
-  InteractionReplyOptions,
   Message,
   MessageEditOptions,
 } from "discord.js";
@@ -15,6 +13,7 @@ import { getMember } from "../../member";
 import sleep from "../../sleep";
 import { removeInventoryItem } from "../inventory";
 import { isPassive } from "../passive";
+import { addStat } from "../stats";
 
 module.exports = new ItemUse(
   "radio",
@@ -22,22 +21,6 @@ module.exports = new ItemUse(
     message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
     args: string[],
   ) => {
-    const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-      if (!(message instanceof Message)) {
-        if (message.deferred) {
-          await message.editReply(data as InteractionEditReplyOptions);
-        } else {
-          await message.reply(data as InteractionReplyOptions);
-        }
-        const replyMsg = await message.fetchReply();
-        if (replyMsg instanceof Message) {
-          return replyMsg;
-        }
-      } else {
-        return await message.channel.send(data as BaseMessageOptions);
-      }
-    };
-
     const edit = async (data: MessageEditOptions, msg: Message) => {
       if (!(message instanceof Message)) {
         await message.editReply(data as InteractionEditReplyOptions);
@@ -48,7 +31,7 @@ module.exports = new ItemUse(
     };
 
     if (args.length == 1) {
-      return send({
+      return ItemUse.send(message, {
         embeds: [new ErrorEmbed("/use radio <member>")],
       });
     }
@@ -56,23 +39,25 @@ module.exports = new ItemUse(
     const radioTarget = await getMember(message.guild, args[1]);
 
     if (!radioTarget) {
-      return send({ embeds: [new ErrorEmbed("invalid user")] });
+      return ItemUse.send(message, { embeds: [new ErrorEmbed("invalid user")] });
     }
 
     if (message.member == radioTarget) {
-      return send({ embeds: [new ErrorEmbed("invalid user")] });
+      return ItemUse.send(message, { embeds: [new ErrorEmbed("invalid user")] });
     }
 
     if (await isPassive(radioTarget))
-      return send({
+      return ItemUse.send(message, {
         embeds: [new ErrorEmbed(`${radioTarget.toString()} is currently in passive mode`)],
       });
 
     if (await isPassive(message.member))
-      return send({ embeds: [new ErrorEmbed("you are currently in passive mode")] });
+      return ItemUse.send(message, {
+        embeds: [new ErrorEmbed("you are currently in passive mode")],
+      });
 
     if ((await redis.exists(`${Constants.redis.cooldown.ROB_RADIO}:${radioTarget.user.id}`)) == 1) {
-      return send({
+      return ItemUse.send(message, {
         embeds: [
           new ErrorEmbed(`the police are already looking for **${radioTarget.user.username}**`),
         ],
@@ -87,8 +72,9 @@ module.exports = new ItemUse(
     );
 
     await removeInventoryItem(message.member, "radio", 1);
+    await addStat(message.member, "radio");
 
-    const msg = await send({
+    const msg = await ItemUse.send(message, {
       embeds: [new CustomEmbed(message.member, "putting report out on police scanner...")],
     });
 

@@ -1,12 +1,8 @@
 import {
   ActionRowBuilder,
-  BaseMessageOptions,
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
-  InteractionEditReplyOptions,
-  InteractionReplyOptions,
-  Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
@@ -24,36 +20,6 @@ module.exports = new ItemUse(
     message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
     args: string[],
   ) => {
-    const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-      if (!(message instanceof Message)) {
-        let usedNewMessage = false;
-        let res;
-
-        if (message.deferred) {
-          res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        } else {
-          res = await message.reply(data as InteractionReplyOptions).catch(() => {
-            return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-              usedNewMessage = true;
-              return await message.channel.send(data as BaseMessageOptions);
-            });
-          });
-        }
-
-        if (usedNewMessage && res instanceof Message) return res;
-
-        const replyMsg = await message.fetchReply();
-        if (replyMsg instanceof Message) {
-          return replyMsg;
-        }
-      } else {
-        return await message.channel.send(data as BaseMessageOptions);
-      }
-    };
-
     const inventory = await getInventory(message.member);
 
     const selected = selectItem("streak_token");
@@ -75,15 +41,14 @@ module.exports = new ItemUse(
     if (amount > max) amount = max;
 
     if (amount > inventory.count(selected.id))
-      return send({ embeds: [new ErrorEmbed(`you don't have ${amount} ${selected.name}`)] });
+      return ItemUse.send(message, {
+        embeds: [new ErrorEmbed(`you don't have ${amount} ${selected.name}`)],
+      });
 
     await removeInventoryItem(message.member, "streak_token", amount);
+    await addStat(message.member, "streak_token", amount);
 
     const embed = await doDaily(message.member, false, amount);
-
-    if (amount > 1) {
-      addStat(message.member, "streak_token", amount - 1);
-    }
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
@@ -95,9 +60,9 @@ module.exports = new ItemUse(
     const lastDaily = await getLastDaily(message.member);
 
     if (dayjs(lastDaily.getTime()).isBefore(dayjs(), "day")) {
-      return send({ embeds: [embed], components: [row] });
+      return ItemUse.send(message, { embeds: [embed], components: [row] });
     }
 
-    return send({ embeds: [embed] });
+    return ItemUse.send(message, { embeds: [embed] });
   },
 );
