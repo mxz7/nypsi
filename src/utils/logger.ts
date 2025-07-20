@@ -140,6 +140,7 @@ class FileTransport implements Transport {
   }
 
   private async newFile() {
+    console.log("creating new file");
     this.stream?.end();
 
     try {
@@ -152,7 +153,7 @@ class FileTransport implements Transport {
         this.stream?.end();
       }
     } catch (e) {
-      logger.debug(`logger: failed renaming old file`);
+      console.error(`logger: failed renaming old file`);
       console.error(e);
     }
 
@@ -160,7 +161,10 @@ class FileTransport implements Transport {
       flags: "a",
     });
 
+    console.log("created new write stream");
+
     if (this.queue) {
+      console.log("completing queue");
       this.queue.forEach(this.write);
       this.queue.length = 0;
     }
@@ -175,18 +179,20 @@ class FileTransport implements Transport {
     try {
       stats = await stat(this.stream.path);
     } catch (e) {
+      this.checkingFile = false;
       console.error(`logger: failed checking file`);
       console.error(e);
     }
 
     try {
       if (!stats || (stats.size >= this.rotateAfterBytes && this.rotateAfterBytes > 0)) {
-        logger.debug("rotating file");
+        console.log("rotating file");
 
         await this.newFile();
       }
     } catch (e) {
-      logger.debug(`logger: failed handling file`);
+      this.checkingFile = false;
+      console.error("logger: failed handling file");
       console.error(e);
     }
 
@@ -381,7 +387,7 @@ logger.addTransport(
   new FileTransport({
     path: "./out/%DATE%.log",
     levels: ["debug", "info", "warn", "error"],
-    rotateAfterBytes: 10e6,
+    rotateAfterBytes: 1000,
   }),
 );
 logger.addTransport(
