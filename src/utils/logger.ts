@@ -387,7 +387,7 @@ logger.addTransport(
   new FileTransport({
     path: "./out/%DATE%.log",
     levels: ["debug", "info", "warn", "error"],
-    rotateAfterBytes: 1000,
+    rotateAfterBytes: 10e6,
   }),
 );
 logger.addTransport(
