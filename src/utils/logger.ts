@@ -217,7 +217,7 @@ class FileTransport implements Transport {
       out[item] = data.meta[item];
     }
 
-    if (!out.data) {
+    if (Object.keys(out.data).length < 1) {
       delete out.data;
     }
 
