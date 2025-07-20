@@ -375,15 +375,8 @@ const formatter = (data: WriteData) => {
 
 logger.addTransport(
   new FileTransport({
-    path: "./out/combined-%DATE%.log",
+    path: "./out/%DATE%.log",
     levels: ["debug", "info", "warn", "error"],
-    rotateAfterBytes: 10e6,
-  }),
-);
-logger.addTransport(
-  new FileTransport({
-    path: "./out/error-%DATE%.log",
-    levels: ["warn", "error"],
     rotateAfterBytes: 10e6,
   }),
 );
