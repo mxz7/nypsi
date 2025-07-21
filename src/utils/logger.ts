@@ -1,8 +1,7 @@
 import { flavors } from "@catppuccin/palette";
 import { TransactionType } from "@prisma/client";
 import { Client, User, WebhookClient } from "discord.js";
-import { WriteStream, createWriteStream, existsSync } from "fs";
-import { rename, stat } from "fs/promises";
+import { WriteStream, createWriteStream } from "fs";
 import prisma from "../init/database";
 import DiscordTransport from "../models/DiscordLogs";
 import Constants from "./Constants";
@@ -122,81 +121,20 @@ class FileTransport implements Transport {
   public path: string;
   public levels: Levels[];
   private stream: WriteStream;
-  private rotateAfterBytes: number;
   private queue: WriteData[];
-  private checkingFile: boolean;
-  private lastCheck: number;
 
-  constructor(opts: { path: string; levels: Levels[]; rotateAfterBytes?: number }) {
+  constructor(opts: { path: string; levels: Levels[] }) {
     this.path = opts.path;
     this.levels = opts.levels;
-    this.rotateAfterBytes = opts.rotateAfterBytes || 0;
     this.queue = [];
-    this.stream = createWriteStream(this.path.replace(`%DATE%`, dayjs().format("YYYY-MM-DD")), {
-      flags: "a",
-    });
-    this.checkingFile = false;
-    this.lastCheck = Date.now();
+
+    this.createStream();
   }
 
-  private async newFile() {
-    console.log("creating new file");
-    this.stream?.end();
-
-    try {
-      if (existsSync(this.path.replace(`%DATE%`, dayjs().format("YYYY-MM-DD")))) {
-        let oldFileNameModifier = 1;
-
-        while (existsSync(this.stream.path + "." + oldFileNameModifier)) oldFileNameModifier++;
-        await rename(this.stream.path, this.stream.path + "." + oldFileNameModifier);
-
-        this.stream?.end();
-      }
-    } catch (e) {
-      console.error(`logger: failed renaming old file`);
-      console.error(e);
-    }
-
-    this.stream = createWriteStream(this.path.replace(`%DATE%`, dayjs().format("YYYY-MM-DD")), {
+  private createStream() {
+    this.stream = createWriteStream(this.path, {
       flags: "a",
     });
-
-    console.log("created new write stream");
-
-    if (this.queue) {
-      console.log("completing queue");
-      this.queue.forEach(this.write);
-      this.queue.length = 0;
-    }
-  }
-
-  private async checkFile() {
-    if (this.checkingFile || this.lastCheck > Date.now() - 30000) return;
-    this.checkingFile = true;
-
-    let stats: Awaited<ReturnType<typeof stat>>;
-
-    try {
-      stats = await stat(this.stream.path);
-    } catch (e) {
-      this.checkingFile = false;
-      console.error(`logger: failed checking file`);
-      console.error(e);
-    }
-
-    try {
-      if (!stats || (stats.size >= this.rotateAfterBytes && this.rotateAfterBytes > 0)) {
-        console.log("rotating file");
-
-        await this.newFile();
-      }
-    } catch (e) {
-      this.checkingFile = false;
-      console.error("logger: failed handling file");
-      console.error(e);
-    }
-
-    this.checkingFile = false;
   }
 
   public async write(data: WriteData) {
@@ -221,12 +159,18 @@ class FileTransport implements Transport {
       delete out.data;
     }
 
-    this.stream.write(
-      JSON.stringify(out, (key, value) => (typeof value === "bigint" ? value.toString() : value)) +
-        "\n",
-    );
+    try {
+      this.stream.write(
+        JSON.stringify(out, (key, value) =>
+          typeof value === "bigint" ? value.toString() : value,
+        ) + "\n",
+      );
+    } catch (e) {
+      console.error("logger: failed writing to log - creating new stream");
+      console.error(e);
 
-    this.checkFile();
+      this.createStream();
+    }
   }
 }
 
@@ -385,9 +329,8 @@ const formatter = (data: WriteData) => {
 
 logger.addTransport(
   new FileTransport({
-    path: "./out/%DATE%.log",
+    path: process.env.LOG_FILE!,
     levels: ["debug", "info", "warn", "error"],
-    rotateAfterBytes: 10e6,
   }),
 );
 logger.addTransport(
