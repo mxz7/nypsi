@@ -1,7 +1,6 @@
 import { flavors } from "@catppuccin/palette";
 import {
   ActionRowBuilder,
-  BaseMessageOptions,
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
@@ -10,8 +9,6 @@ import {
   ComponentType,
   GuildMember,
   Interaction,
-  InteractionEditReplyOptions,
-  InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
   MessageCreateOptions,
@@ -596,42 +593,8 @@ class Game {
     const embed = await this.render("playing");
     const row = Game.getRow((await getBalance(this.member)) >= this.bet);
 
-    const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-      if (!(this.playerMessage instanceof Message)) {
-        let usedNewMessage = false;
-        let res;
-
-        if (this.playerMessage.deferred) {
-          res = await this.playerMessage
-            .editReply(data as InteractionEditReplyOptions)
-            .catch(async () => {
-              usedNewMessage = true;
-              return await this.playerMessage.channel.send(data as BaseMessageOptions);
-            });
-        } else {
-          res = await this.playerMessage.reply(data as InteractionReplyOptions).catch(() => {
-            return (this.playerMessage as CommandInteraction)
-              .editReply(data as InteractionEditReplyOptions)
-              .catch(async () => {
-                usedNewMessage = true;
-                return await this.playerMessage.channel.send(data as BaseMessageOptions);
-              });
-          });
-        }
-
-        if (usedNewMessage && res instanceof Message) return res;
-
-        const replyMsg = await this.playerMessage.fetchReply();
-        if (replyMsg instanceof Message) {
-          return replyMsg;
-        }
-      } else {
-        return await this.playerMessage.channel.send(data as BaseMessageOptions);
-      }
-    };
-
     if (!this.message)
-      this.message = (await send({ embeds: [embed], components: [row] })) as NypsiMessage;
+      this.message = (await this.send({ embeds: [embed], components: [row] })) as NypsiMessage;
     else await this.edit({ embeds: [embed], components: [row] });
 
     return this.listen();
