@@ -278,108 +278,128 @@ async function run(
           .setCustomId("db-data")
           .setLabel("view all db data")
           .setStyle(ButtonStyle.Primary)
-          .setEmoji("💻"),
+          .setEmoji("💻")
+          .setDisabled(!(await hasAdminPermission(message.member, "user-db-data"))),
         new ButtonBuilder()
           .setCustomId("cmds")
           .setLabel("command count")
           .setStyle(ButtonStyle.Primary)
-          .setEmoji("⌨️"),
+          .setEmoji("⌨️")
+          .setDisabled(!(await hasAdminPermission(message.member, "view-user-info"))),
         new ButtonBuilder()
           .setCustomId("view-premium")
           .setLabel("premium")
           .setStyle(ButtonStyle.Primary)
-          .setEmoji("💎"),
+          .setEmoji("💎")
+          .setDisabled(!(await hasAdminPermission(message.member, "view-user-info"))),
         new ButtonBuilder()
           .setCustomId("set-admin")
           .setLabel("set admin level")
           .setStyle(ButtonStyle.Primary)
-          .setEmoji("👨🏻‍💼"),
+          .setEmoji("👨🏻‍💼")
+          .setDisabled(!(await hasAdminPermission(message.member, "set-admin-level"))),
         new ButtonBuilder()
           .setCustomId("create-chat")
           .setLabel("create chat")
           .setStyle(ButtonStyle.Primary)
-          .setEmoji("💬"),
+          .setEmoji("💬")
+          .setDisabled(!(await hasAdminPermission(message.member, "create-chat"))),
       ),
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
           .setCustomId("ac")
           .setLabel("anticheat")
           .setStyle(ButtonStyle.Primary)
-          .setEmoji("🤥"),
+          .setEmoji("🤥")
+          .setDisabled(!(await hasAdminPermission(message.member, "view-user-info"))),
         new ButtonBuilder()
           .setCustomId("tags")
           .setLabel("tags")
           .setStyle(ButtonStyle.Primary)
-          .setEmoji("🏷️"),
+          .setEmoji("🏷️")
+          .setDisabled(!(await hasAdminPermission(message.member, "view-user-info"))),
         new ButtonBuilder()
           .setCustomId("add-purchase")
           .setLabel("add purchase")
           .setEmoji("💰")
-          .setStyle(ButtonStyle.Primary),
+          .setStyle(ButtonStyle.Primary)
+          .setDisabled(!(await hasAdminPermission(message.member, "add-purchase"))),
         new ButtonBuilder()
           .setCustomId("set-birthday")
           .setLabel("set birthday")
           .setEmoji("🎂")
-          .setStyle(ButtonStyle.Primary),
+          .setStyle(ButtonStyle.Primary)
+          .setDisabled(!(await hasAdminPermission(message.member, "set-birthday"))),
         new ButtonBuilder()
           .setCustomId("view-streak")
           .setLabel("streaks")
           .setEmoji("📅")
-          .setStyle(ButtonStyle.Primary),
+          .setStyle(ButtonStyle.Primary)
+          .setDisabled(!(await hasAdminPermission(message.member, "view-user-info"))),
       ),
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
           .setCustomId("set-bal")
           .setLabel("set balance")
           .setStyle(ButtonStyle.Danger)
-          .setEmoji("💰"),
+          .setEmoji("💰")
+          .setDisabled(!(await hasAdminPermission(message.member, "set-balance"))),
         new ButtonBuilder()
           .setCustomId("set-bank")
           .setLabel("set bank")
           .setStyle(ButtonStyle.Danger)
-          .setEmoji("💳"),
+          .setEmoji("💳")
+          .setDisabled(!(await hasAdminPermission(message.member, "set-balance"))),
         new ButtonBuilder()
           .setCustomId("set-prestige")
           .setLabel("set prestige")
           .setStyle(ButtonStyle.Danger)
-          .setEmoji("🌟"),
+          .setEmoji("🌟")
+          .setDisabled(!(await hasAdminPermission(message.member, "set-prestige"))),
         new ButtonBuilder()
           .setCustomId("set-level")
           .setLabel("set level")
           .setStyle(ButtonStyle.Danger)
-          .setEmoji("⭐"),
+          .setEmoji("⭐")
+          .setDisabled(!(await hasAdminPermission(message.member, "set-level"))),
         new ButtonBuilder()
           .setCustomId("set-xp")
           .setLabel("set xp")
           .setStyle(ButtonStyle.Danger)
-          .setEmoji("✨"),
+          .setEmoji("✨")
+          .setDisabled(!(await hasAdminPermission(message.member, "set-xp"))),
       ),
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
           .setCustomId("set-inv")
           .setLabel("modify inventory")
           .setStyle(ButtonStyle.Danger)
-          .setEmoji("🎒"),
+          .setEmoji("🎒")
+          .setDisabled(!(await hasAdminPermission(message.member, "set-inv"))),
         new ButtonBuilder()
           .setCustomId("set-karma")
           .setLabel("set karma")
           .setStyle(ButtonStyle.Danger)
-          .setEmoji("🔮"),
+          .setEmoji("🔮")
+          .setDisabled(!(await hasAdminPermission(message.member, "set-karma"))),
         new ButtonBuilder()
           .setCustomId("ecoban")
           .setLabel("economy ban")
           .setStyle(ButtonStyle.Danger)
-          .setEmoji("❌"),
+          .setEmoji("❌")
+          .setDisabled(!(await hasAdminPermission(message.member, "ecoban"))),
         new ButtonBuilder()
           .setCustomId("blacklist")
           .setLabel("blacklist")
           .setStyle(ButtonStyle.Danger)
-          .setEmoji("❌"),
+          .setEmoji("❌")
+          .setDisabled(!(await hasAdminPermission(message.member, "blacklist"))),
         new ButtonBuilder()
           .setCustomId("wipe")
           .setLabel("wipe")
           .setStyle(ButtonStyle.Danger)
-          .setEmoji("🧹"),
+          .setEmoji("🧹")
+          .setDisabled(!(await hasAdminPermission(message.member, "wipe"))),
       ),
     ];
 
@@ -1191,33 +1211,40 @@ async function run(
     const render = async () => {
       let desc = "";
 
+      const canSetPremium = await hasAdminPermission(message.member, "set-premium");
+
       const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [
         new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
           new ButtonBuilder()
             .setCustomId("add-premium")
             .setLabel("add premium")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("➕"),
+            .setEmoji("➕")
+            .setDisabled(!canSetPremium),
           new ButtonBuilder()
             .setCustomId("set-tier")
             .setLabel("set tier")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("😁"),
+            .setEmoji("😁")
+            .setDisabled(!canSetPremium),
           new ButtonBuilder()
             .setCustomId("set-expire")
             .setLabel("set expire date")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("😣"),
+            .setEmoji("😣")
+            .setDisabled(!canSetPremium),
           new ButtonBuilder()
             .setCustomId("set-credits")
             .setLabel("set credits")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("🪙"),
+            .setEmoji("🪙")
+            .setDisabled(!canSetPremium),
           new ButtonBuilder()
             .setCustomId("raw-data")
             .setLabel("view raw data")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("🥩"),
+            .setEmoji("🥩")
+            .setDisabled(!(await hasAdminPermission(message.member, "view-user-info"))),
         ),
 
         new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -1225,17 +1252,20 @@ async function run(
             .setCustomId("del-cmd")
             .setLabel("delete cmd")
             .setStyle(ButtonStyle.Danger)
-            .setEmoji("❌"),
+            .setEmoji("❌")
+            .setDisabled(!(await hasAdminPermission(message.member, "delete-prem-cmd"))),
           new ButtonBuilder()
             .setCustomId("del-aliases")
             .setLabel("delete aliases")
             .setStyle(ButtonStyle.Danger)
-            .setEmoji("❌"),
+            .setEmoji("❌")
+            .setDisabled(!(await hasAdminPermission(message.member, "delete-prem-aliases"))),
           new ButtonBuilder()
             .setCustomId("expire-now")
             .setLabel("expire now")
             .setStyle(ButtonStyle.Danger)
-            .setEmoji("❌"),
+            .setEmoji("❌")
+            .setDisabled(!canSetPremium),
         ),
       ];
 
@@ -1262,7 +1292,8 @@ async function run(
         }
       } else {
         rows.forEach((i) => i.components.forEach((j) => j.setDisabled(true)));
-        rows[0].components[0].setDisabled(false);
+
+        if (canSetPremium) rows[0].components[0].setDisabled(false);
 
         embed.setDescription("no premium");
       }
@@ -1553,28 +1584,34 @@ async function run(
         getTaskStreaks(message.member),
       ]);
 
+      const canSetStreaks = await hasAdminPermission(message.member, "set-streak");
+
       const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [
         new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
           new ButtonBuilder()
             .setCustomId("set-daily")
             .setLabel("set daily streak")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("📅"),
+            .setEmoji("📅")
+            .setDisabled(!canSetStreaks),
           new ButtonBuilder()
             .setCustomId("set-vote")
             .setLabel("set vote streak")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("🗳"),
+            .setEmoji("🗳")
+            .setDisabled(!canSetStreaks),
           new ButtonBuilder()
             .setCustomId("set-daily-tasks")
             .setLabel("set daily task streak")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("📋"),
+            .setEmoji("📋")
+            .setDisabled(!canSetStreaks),
           new ButtonBuilder()
             .setCustomId("set-weekly-tasks")
             .setLabel("set weekly task streak")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("📋"),
+            .setEmoji("📋")
+            .setDisabled(!canSetStreaks),
         ),
 
         new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -1583,13 +1620,13 @@ async function run(
             .setLabel("rerun daily rewards")
             .setStyle(ButtonStyle.Primary)
             .setEmoji("📅")
-            .setDisabled(daily <= 0),
+            .setDisabled(!canSetStreaks || daily <= 0),
           new ButtonBuilder()
             .setCustomId("rerun-vote")
             .setLabel("rerun vote rewards")
             .setStyle(ButtonStyle.Primary)
             .setEmoji("🗳")
-            .setDisabled(vote <= 0),
+            .setDisabled(!canSetStreaks || vote <= 0),
         ),
       ];
 
@@ -1818,12 +1855,14 @@ async function run(
             .setCustomId("ac-hist")
             .setLabel("show data")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("📋"),
+            .setEmoji("📋")
+            .setDisabled(!(await hasAdminPermission(message.member, "anticheat-history"))),
           new ButtonBuilder()
             .setCustomId("ac-clear")
             .setLabel("clear")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("🗑️"),
+            .setEmoji("🗑️")
+            .setDisabled(!(await hasAdminPermission(message.member, "clear-anticheat"))),
         ),
 
         new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -1831,12 +1870,14 @@ async function run(
             .setCustomId("captcha-hist")
             .setLabel("captcha history")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("🤖"),
+            .setEmoji("🤖")
+            .setDisabled(!(await hasAdminPermission(message.member, "captcha-history"))),
           new ButtonBuilder()
             .setCustomId("give-captcha")
             .setLabel("give captcha")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("🤖"),
+            .setEmoji("🤖")
+            .setDisabled(!(await hasAdminPermission(message.member, "captchatest"))),
         ),
       ];
 
@@ -1991,12 +2032,14 @@ async function run(
           .setCustomId("add-tag")
           .setLabel("add tag")
           .setStyle(ButtonStyle.Primary)
-          .setEmoji("👍🏻"),
+          .setEmoji("👍🏻")
+          .setDisabled(!(await hasAdminPermission(message.member, "set-tags"))),
         new ButtonBuilder()
           .setCustomId("remove-tag")
           .setLabel("remove tag")
           .setStyle(ButtonStyle.Primary)
-          .setEmoji("👎🏻"),
+          .setEmoji("👎🏻")
+          .setDisabled(!(await hasAdminPermission(message.member, "set-tags"))),
       ),
     ];
 
