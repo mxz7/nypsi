@@ -1,5 +1,5 @@
 import { CommandInteraction, PermissionFlagsBits } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders.js";
 import { bottomAmount } from "../utils/functions/economy/balance";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
@@ -11,12 +11,13 @@ const cmd = new Command("balbottom", "view bottom balances in the server", "mone
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) message.channel.send({ embeds: [res.embed] });
+    if (res.respond) send({ embeds: [res.embed] });
     return;
   }
 
@@ -46,7 +47,7 @@ async function run(
   });
 
   if (filtered.length == 0) {
-    return await message.channel.send({
+    return await send({
       embeds: [new CustomEmbed(message.member, "no members to show")],
     });
   }
@@ -55,7 +56,7 @@ async function run(
     .setHeader("bottom " + filtered.length)
     .setDescription(filtered.join("\n"));
 
-  message.channel.send({ embeds: [embed] });
+  send({ embeds: [embed] });
 }
 
 cmd.setRun(run);

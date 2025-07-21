@@ -1,5 +1,5 @@
 import { CommandInteraction, PermissionFlagsBits } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import {
   getDisabledCommands,
@@ -15,11 +15,12 @@ const cmd = new Command("disablecommand", "disable certain commands in your serv
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
     if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
-      return message.channel.send({
+      return send({
         embeds: [new ErrorEmbed("you need the `manage server` permission")],
       });
     }
@@ -39,12 +40,12 @@ async function run(
       embed.setDescription("`❌` no commands disabled");
     }
 
-    return message.channel.send({ embeds: [embed] });
+    return send({ embeds: [embed] });
   }
 
   if (args[0].toLowerCase() == "add" || args[0].toLowerCase() == "+") {
     if (args.length == 1) {
-      return message.channel.send({
+      return send({
         embeds: [new ErrorEmbed(`${prefix}disablecmd add/+ <command name>`)],
       });
     }
@@ -59,11 +60,11 @@ async function run(
         text: `you can use ${prefix}disablecmd to view currently disabled commands`,
       });
 
-      return message.channel.send({ embeds: [embed] });
+      return send({ embeds: [embed] });
     }
 
     if (!commandExists(word)) {
-      return message.channel.send({
+      return send({
         embeds: [
           new ErrorEmbed(
             `you must use the command's name, you can use ${prefix}help <command> to find this`,
@@ -73,7 +74,7 @@ async function run(
     }
 
     if (word == "disablecommand") {
-      return message.channel.send({ embeds: [new CustomEmbed(message.member, "nice try")] });
+      return send({ embeds: [new CustomEmbed(message.member, "nice try")] });
     }
 
     filter.push(word);
@@ -86,7 +87,7 @@ async function run(
         `❌ filter has exceeded the maximum size - please use *${prefix}disablecmd del/-* or *${prefix}disablecmd reset*`,
       ).setHeader("chat filter");
 
-      return message.channel.send({ embeds: [embed] });
+      return send({ embeds: [embed] });
     }
 
     await updateDisabledCommands(message.guild, filter);
@@ -95,10 +96,10 @@ async function run(
       message.member,
       "✅ disabled `" + prefix + word + "` command",
     ).setHeader("disabled commands");
-    return message.channel.send({ embeds: [embed] });
+    return send({ embeds: [embed] });
   } else if (args[0].toLowerCase() == "del" || args[0].toLowerCase() == "-") {
     if (args.length == 1) {
-      return message.channel.send({
+      return send({
         embeds: [new ErrorEmbed(`${prefix}disablecmd del/- <command>`)],
       });
     }
@@ -112,7 +113,7 @@ async function run(
         .setHeader("disabled commands")
         .setFooter({ text: `you can use ${prefix}disablecmd to view currently disabled commands` });
 
-      return message.channel.send({ embeds: [embed] });
+      return send({ embeds: [embed] });
     }
 
     await updateDisabledCommands(message.guild, filter);
@@ -124,7 +125,7 @@ async function run(
       .setHeader("disable commands")
       .setFooter({ text: `you can use ${prefix}disablecmd reset to reset disabled commands` });
 
-    return message.channel.send({ embeds: [embed] });
+    return send({ embeds: [embed] });
   } else if (args[0].toLowerCase() == "reset") {
     filter = [];
 
@@ -134,7 +135,7 @@ async function run(
       "disabled commands",
     );
 
-    return message.channel.send({ embeds: [embed] });
+    return send({ embeds: [embed] });
   } else {
     const embed = new CustomEmbed(message.member, "`" + filter.join("`\n`") + "`")
       .setHeader("disabled commands")
@@ -144,7 +145,7 @@ async function run(
       embed.setDescription("`❌` no commands disabled");
     }
 
-    return message.channel.send({ embeds: [embed] });
+    return send({ embeds: [embed] });
   }
 }
 

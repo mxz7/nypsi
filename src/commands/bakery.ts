@@ -1,5 +1,5 @@
 import { CommandInteraction } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getBakeryUpgrades } from "../utils/functions/economy/bakery";
 import { getBakeryUpgradesData } from "../utils/functions/economy/utils";
@@ -10,12 +10,13 @@ const cmd = new Command("bakery", "view your current bakery upgrades", "money");
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) message.channel.send({ embeds: [res.embed] });
+    if (res.respond) send({ embeds: [res.embed] });
     return;
   }
 
@@ -27,7 +28,7 @@ async function run(
     target = await getMember(message.guild, args.join(" "));
 
     if (!target)
-      return message.channel.send({
+      return send({
         embeds: [new ErrorEmbed(`couldn't find a member matching \`${args.join(" ")}\``)],
       });
   }
@@ -51,7 +52,7 @@ async function run(
     target.user.avatarURL(),
   );
 
-  return message.channel.send({ embeds: [embed] });
+  return send({ embeds: [embed] });
 }
 
 cmd.setRun(run);

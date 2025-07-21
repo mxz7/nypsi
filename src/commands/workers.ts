@@ -2,14 +2,11 @@ import dayjs = require("dayjs");
 import {
   ActionRowBuilder,
   APIApplicationCommandOptionChoice,
-  BaseMessageOptions,
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
   CommandInteraction,
   Interaction,
-  InteractionEditReplyOptions,
-  InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
   MessageFlags,
@@ -19,7 +16,7 @@ import {
 import { inPlaceSort } from "fast-sort";
 import prisma from "../init/database";
 import { NypsiClient } from "../models/Client";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Worker, WorkerByproducts } from "../types/Workers";
 import Constants from "../utils/Constants";
@@ -83,41 +80,12 @@ cmd.slashData
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   const baseWorkers = getBaseWorkers();
 
   if (!(await userExists(message.member))) await createUser(message.member);
-
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
 
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
@@ -567,7 +535,7 @@ async function run(
     const worker = baseWorkers[args[2]?.toLowerCase()];
     const value = parseInt(args[3]);
     if (args[1]?.toLowerCase() == "set") {
-      if (!(worker && value)) return message.channel.send({ embeds: [debugInfoEmbed] });
+      if (!(worker && value)) return send({ embeds: [debugInfoEmbed] });
       await prisma.economyWorker.update({
         where: {
           userId_workerId: {
@@ -582,7 +550,7 @@ async function run(
       logger.info(
         `workers debug: ${message.author.id} (${message.author.username}) set stored for ${worker.id} to ${value}`,
       );
-      return message.channel.send({
+      return send({
         embeds: [
           new CustomEmbed(
             message.member,
@@ -591,7 +559,7 @@ async function run(
         ],
       });
     } else if (args[1]?.toLowerCase() == "reset") {
-      if (!worker) return message.channel.send({ embeds: [debugInfoEmbed] });
+      if (!worker) return send({ embeds: [debugInfoEmbed] });
       await prisma.economyWorkerUpgrades.updateMany({
         where: {
           userId: message.author.id,
@@ -604,7 +572,7 @@ async function run(
       logger.info(
         `workers debug: ${message.author.id} (${message.author.username}) reset upgrades for ${worker.id}`,
       );
-      return message.channel.send({
+      return send({
         embeds: [
           new CustomEmbed(message.member, `reset upgrades for **${worker.id}**`).setHeader(
             "workers debug",
@@ -613,7 +581,7 @@ async function run(
         ],
       });
     } else if (args[1]?.toLowerCase() == "value") {
-      if (!(worker && value)) return message.channel.send({ embeds: [debugInfoEmbed] });
+      if (!(worker && value)) return send({ embeds: [debugInfoEmbed] });
       let totalEarned = 0;
       const totalByproducts = {} as WorkerByproducts;
       let byproductsDescription = "";
@@ -635,7 +603,7 @@ async function run(
         const amount = totalByproducts[byproduct];
         byproductsDescription += `\n  **${(amount / value).toFixed(3)}** ${item.emoji} ${amount === value ? item.name : item.plural}`;
       }
-      return message.channel.send({
+      return send({
         embeds: [
           new CustomEmbed(
             message.member,
@@ -647,7 +615,7 @@ async function run(
         ],
       });
     } else {
-      return message.channel.send({ embeds: [debugInfoEmbed] });
+      return send({ embeds: [debugInfoEmbed] });
     }
   } else {
     return showWorkers();

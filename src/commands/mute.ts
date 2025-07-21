@@ -1,16 +1,13 @@
 import {
-  BaseMessageOptions,
   CommandInteraction,
   GuildMember,
-  InteractionEditReplyOptions,
-  InteractionReplyOptions,
   Message,
   MessageFlags,
   PermissionFlagsBits,
   Role,
   ThreadChannel,
 } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { MStoTime } from "../utils/functions/date";
 import { isAltPunish } from "../utils/functions/guilds/altpunish";
@@ -37,6 +34,7 @@ cmd.slashData
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
@@ -44,36 +42,6 @@ async function run(
       return;
     }
   }
-
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
 
   if (
     !message.guild.members.me.permissions.has(PermissionFlagsBits.ManageRoles) ||
@@ -214,20 +182,26 @@ async function run(
   let fail = false;
 
   if (target.user.id == message.member.user.id) {
-    await message.channel.send({ embeds: [new ErrorEmbed("you cannot mute yourself")] });
+    await send({
+      embeds: [new ErrorEmbed("you cannot mute yourself")],
+      flags: MessageFlags.Ephemeral,
+    });
     return;
   }
 
   const ids = await getAllGroupAccountIds(message.guild, target);
 
   if (ids.includes(message.member.user.id)) {
-    await message.channel.send({ embeds: [new ErrorEmbed("you cannot mute one of your alts")] });
+    await send({
+      embeds: [new ErrorEmbed("you cannot mute one of your alts")],
+      flags: MessageFlags.Ephemeral,
+    });
     return;
   }
 
   if (mode == "role") {
     if (target.user.id == message.client.user.id) {
-      await message.channel.send({ content: "you'll never shut me up 😏" });
+      await send({ content: "you'll never shut me up 😏" });
       return;
     }
 
@@ -257,7 +231,7 @@ async function run(
     if (fail) return;
   } else if (mode == "timeout") {
     if (target.user.id == message.client.user.id) {
-      return await message.channel.send({ content: "youll never shut me up 😏" });
+      return await send({ content: "youll never shut me up 😏" });
     }
 
     const targetHighestRole = target.roles.highest;

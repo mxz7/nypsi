@@ -11,7 +11,7 @@ import {
 } from "discord.js";
 import { nanoid } from "nanoid";
 import s3 from "../init/s3";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { formatDate } from "../utils/functions/date";
@@ -37,18 +37,19 @@ const cmd = new Command("avatarhistory", "view a user's avatar history", "info")
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) message.channel.send({ embeds: [res.embed] });
+    if (res.respond) send({ embeds: [res.embed] });
     return;
   }
 
   if (args.length > 0 && args[0].toLowerCase() == "clear") {
     await clearAvatarHistory(message.member);
-    return message.channel.send({
+    return send({
       embeds: [new CustomEmbed(message.member, "✅ your avatar history has been cleared")],
     });
   }
@@ -59,7 +60,7 @@ async function run(
     (await getRawLevel(message.member).catch(() => 0)) < 500 ||
     message.client.user.id !== Constants.BOT_USER_ID
   )
-    return message.channel.send({
+    return send({
       embeds: [
         new ErrorEmbed(
           "you require at least level 500 (prestige 5) (/profile) for nypsi to track your avatars\n\nyou can disable avatar tracking with $toggletracking",
@@ -102,7 +103,7 @@ async function run(
       logger.debug(`uploaded new avatar for ${message.author.id}`);
 
       history = await fetchAvatarHistory(message.member);
-    } else return message.channel.send({ embeds: [new ErrorEmbed("no avatar history")] });
+    } else return send({ embeds: [new ErrorEmbed("no avatar history")] });
   }
 
   let index = 0;
@@ -141,9 +142,9 @@ async function run(
   let msg: Message;
 
   if (history.length == 1) {
-    return await message.channel.send({ embeds: [embed] });
+    return await send({ embeds: [embed] });
   } else {
-    msg = await message.channel.send({ embeds: [embed], components: [row] });
+    msg = await send({ embeds: [embed], components: [row] });
   }
 
   const manager = new PageManager({

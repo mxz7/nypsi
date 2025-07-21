@@ -1,5 +1,5 @@
 import { CommandInteraction } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { formatDate } from "../utils/functions/date";
@@ -9,20 +9,21 @@ const cmd = new Command("news", "set the news for the help command", "info");
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (args.length == 0 || message.author.id != Constants.TEKOH_ID) {
     const news = await getNews();
 
     if (news.text == "") {
-      return message.channel.send({ embeds: [new ErrorEmbed("no news has been set")] });
+      return send({ embeds: [new ErrorEmbed("no news has been set")] });
     }
 
     const lastSet = formatDate(news.date);
 
     const embed = new CustomEmbed(message.member, `${news.text}\n\nset on: ${lastSet}`);
 
-    return message.channel.send({ embeds: [embed] });
+    return send({ embeds: [embed] });
   } else {
     if (message.author.id != Constants.TEKOH_ID) return;
     await setNews(args.join(" "));
@@ -33,7 +34,7 @@ async function run(
 
     const embed = new CustomEmbed(message.member, `${news.text}\n\nset on: ${lastSet}`);
 
-    return message.channel.send({ embeds: [embed] });
+    return send({ embeds: [embed] });
   }
 }
 

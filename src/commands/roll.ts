@@ -1,11 +1,12 @@
 import { CommandInteraction } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 
 const cmd = new Command("roll", "roll a dice", "utility");
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   let range = 6;
@@ -13,14 +14,14 @@ async function run(
   if (args.length != 0) {
     if (parseInt(args[0])) {
       if (parseInt(args[0]) < 2 || parseInt(args[0]) > 1000000000) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid range")] });
+        return send({ embeds: [new ErrorEmbed("invalid range")] });
       } else {
         range = parseInt(args[0]);
       }
     }
   }
 
-  return message.channel.send({
+  return send({
     embeds: [
       new CustomEmbed(
         message.member,

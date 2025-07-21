@@ -1,5 +1,5 @@
 import { CommandInteraction, Message, PermissionFlagsBits, User } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { getBannedUsers } from "../utils/functions/moderation/ban";
 
@@ -13,7 +13,10 @@ const cmd = new Command(
   "moderation",
 ).setPermissions(["MANAGE_MESSAGES", "MODERATE_MEMBERS"]);
 
-async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) {
+async function run(
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
+) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
     if (!message.member.permissions.has(PermissionFlagsBits.ModerateMembers)) {
       return;
@@ -23,14 +26,14 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) message.channel.send({ embeds: [res.embed] });
+    if (res.respond) send({ embeds: [res.embed] });
     return;
   }
 
   const banned = await getBannedUsers(message.guild);
 
   if (!banned || banned.length == 0) {
-    return message.channel.send({
+    return send({
       embeds: [new CustomEmbed(message.member, "there is no one currently banned with nypsi")],
     });
   }
@@ -63,9 +66,9 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
   let msg: Message;
 
   if (pages.size == 1) {
-    return await message.channel.send({ embeds: [embed] });
+    return await send({ embeds: [embed] });
   } else {
-    msg = await message.channel.send({ embeds: [embed], components: [PageManager.defaultRow()] });
+    msg = await send({ embeds: [embed], components: [PageManager.defaultRow()] });
   }
 
   const manager = new PageManager({

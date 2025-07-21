@@ -1,5 +1,5 @@
 import { CommandInteraction } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
@@ -15,12 +15,13 @@ const cmd = new Command(
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (message.author.id != Constants.TEKOH_ID) return;
 
   if (args.length == 0) {
-    return message.channel.send({ embeds: [new ErrorEmbed("u know how this works")] });
+    return send({ embeds: [new ErrorEmbed("u know how this works")] });
   }
 
   const items = getItems();
@@ -46,11 +47,11 @@ async function run(
   selected = items[selected];
 
   if (!selected) {
-    return message.channel.send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] });
+    return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] });
   }
 
   if (!["crate", "scratch-card"].includes(selected.role)) {
-    return message.channel.send({ embeds: [new ErrorEmbed(`${selected.name} is not a crate`)] });
+    return send({ embeds: [new ErrorEmbed(`${selected.name} is not a crate`)] });
   }
 
   let members;
@@ -92,7 +93,7 @@ async function run(
 
   await Promise.all(promises);
 
-  return message.channel.send({
+  return send({
     embeds: [new CustomEmbed(message.member, `**${count}** ${pluralize(selected, count)} given`)],
   });
 }
