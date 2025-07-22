@@ -25,7 +25,7 @@ import { gzip } from "zlib";
 import prisma from "../init/database";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { startRandomDrop } from "../scheduled/clusterjobs/random-drops";
 import Constants, { AdminPermission } from "../utils/Constants";
@@ -117,6 +117,7 @@ const cmd = new Command("x", "admincmd", "none").setPermissions(["bot owner"]);
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (!(message instanceof Message)) return;
@@ -269,7 +270,7 @@ async function run(
     const user = await getUserFromId(id);
 
     if (!user) {
-      return message.channel.send({ embeds: [new ErrorEmbed("invalid id")] });
+      return send({ embeds: [new ErrorEmbed("invalid id")] });
     }
 
     const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [
@@ -278,108 +279,128 @@ async function run(
           .setCustomId("db-data")
           .setLabel("view all db data")
           .setStyle(ButtonStyle.Primary)
-          .setEmoji("💻"),
+          .setEmoji("💻")
+          .setDisabled(!(await hasAdminPermission(message.member, "user-db-data"))),
         new ButtonBuilder()
           .setCustomId("cmds")
           .setLabel("command count")
           .setStyle(ButtonStyle.Primary)
-          .setEmoji("⌨️"),
+          .setEmoji("⌨️")
+          .setDisabled(!(await hasAdminPermission(message.member, "view-user-info"))),
         new ButtonBuilder()
           .setCustomId("view-premium")
           .setLabel("premium")
           .setStyle(ButtonStyle.Primary)
-          .setEmoji("💎"),
+          .setEmoji("💎")
+          .setDisabled(!(await hasAdminPermission(message.member, "view-user-info"))),
         new ButtonBuilder()
           .setCustomId("set-admin")
           .setLabel("set admin level")
           .setStyle(ButtonStyle.Primary)
-          .setEmoji("👨🏻‍💼"),
+          .setEmoji("👨🏻‍💼")
+          .setDisabled(!(await hasAdminPermission(message.member, "set-admin-level"))),
         new ButtonBuilder()
           .setCustomId("create-chat")
           .setLabel("create chat")
           .setStyle(ButtonStyle.Primary)
-          .setEmoji("💬"),
+          .setEmoji("💬")
+          .setDisabled(!(await hasAdminPermission(message.member, "create-chat"))),
       ),
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
           .setCustomId("ac")
           .setLabel("anticheat")
           .setStyle(ButtonStyle.Primary)
-          .setEmoji("🤥"),
+          .setEmoji("🤥")
+          .setDisabled(!(await hasAdminPermission(message.member, "view-user-info"))),
         new ButtonBuilder()
           .setCustomId("tags")
           .setLabel("tags")
           .setStyle(ButtonStyle.Primary)
-          .setEmoji("🏷️"),
+          .setEmoji("🏷️")
+          .setDisabled(!(await hasAdminPermission(message.member, "view-user-info"))),
         new ButtonBuilder()
           .setCustomId("add-purchase")
           .setLabel("add purchase")
           .setEmoji("💰")
-          .setStyle(ButtonStyle.Primary),
+          .setStyle(ButtonStyle.Primary)
+          .setDisabled(!(await hasAdminPermission(message.member, "add-purchase"))),
         new ButtonBuilder()
           .setCustomId("set-birthday")
           .setLabel("set birthday")
           .setEmoji("🎂")
-          .setStyle(ButtonStyle.Primary),
+          .setStyle(ButtonStyle.Primary)
+          .setDisabled(!(await hasAdminPermission(message.member, "set-birthday"))),
         new ButtonBuilder()
           .setCustomId("view-streak")
           .setLabel("streaks")
           .setEmoji("📅")
-          .setStyle(ButtonStyle.Primary),
+          .setStyle(ButtonStyle.Primary)
+          .setDisabled(!(await hasAdminPermission(message.member, "view-user-info"))),
       ),
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
           .setCustomId("set-bal")
           .setLabel("set balance")
           .setStyle(ButtonStyle.Danger)
-          .setEmoji("💰"),
+          .setEmoji("💰")
+          .setDisabled(!(await hasAdminPermission(message.member, "set-balance"))),
         new ButtonBuilder()
           .setCustomId("set-bank")
           .setLabel("set bank")
           .setStyle(ButtonStyle.Danger)
-          .setEmoji("💳"),
+          .setEmoji("💳")
+          .setDisabled(!(await hasAdminPermission(message.member, "set-balance"))),
         new ButtonBuilder()
           .setCustomId("set-prestige")
           .setLabel("set prestige")
           .setStyle(ButtonStyle.Danger)
-          .setEmoji("🌟"),
+          .setEmoji("🌟")
+          .setDisabled(!(await hasAdminPermission(message.member, "set-prestige"))),
         new ButtonBuilder()
           .setCustomId("set-level")
           .setLabel("set level")
           .setStyle(ButtonStyle.Danger)
-          .setEmoji("⭐"),
+          .setEmoji("⭐")
+          .setDisabled(!(await hasAdminPermission(message.member, "set-level"))),
         new ButtonBuilder()
           .setCustomId("set-xp")
           .setLabel("set xp")
           .setStyle(ButtonStyle.Danger)
-          .setEmoji("✨"),
+          .setEmoji("✨")
+          .setDisabled(!(await hasAdminPermission(message.member, "set-xp"))),
       ),
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
           .setCustomId("set-inv")
           .setLabel("modify inventory")
           .setStyle(ButtonStyle.Danger)
-          .setEmoji("🎒"),
+          .setEmoji("🎒")
+          .setDisabled(!(await hasAdminPermission(message.member, "set-inv"))),
         new ButtonBuilder()
           .setCustomId("set-karma")
           .setLabel("set karma")
           .setStyle(ButtonStyle.Danger)
-          .setEmoji("🔮"),
+          .setEmoji("🔮")
+          .setDisabled(!(await hasAdminPermission(message.member, "set-karma"))),
         new ButtonBuilder()
           .setCustomId("ecoban")
           .setLabel("economy ban")
           .setStyle(ButtonStyle.Danger)
-          .setEmoji("❌"),
+          .setEmoji("❌")
+          .setDisabled(!(await hasAdminPermission(message.member, "ecoban"))),
         new ButtonBuilder()
           .setCustomId("blacklist")
           .setLabel("blacklist")
           .setStyle(ButtonStyle.Danger)
-          .setEmoji("❌"),
+          .setEmoji("❌")
+          .setDisabled(!(await hasAdminPermission(message.member, "blacklist"))),
         new ButtonBuilder()
           .setCustomId("wipe")
           .setLabel("wipe")
           .setStyle(ButtonStyle.Danger)
-          .setEmoji("🧹"),
+          .setEmoji("🧹")
+          .setDisabled(!(await hasAdminPermission(message.member, "wipe"))),
       ),
     ];
 
@@ -400,7 +421,7 @@ async function run(
       `${user.username}'s discord data`,
     );
 
-    const msg = await message.channel.send({ embeds: [embed], components: rows });
+    const msg = await send({ embeds: [embed], components: rows });
 
     const waitForButton = async (): Promise<void> => {
       const filter = (i: Interaction) => i.user.id == message.author.id;
@@ -1191,33 +1212,40 @@ async function run(
     const render = async () => {
       let desc = "";
 
+      const canSetPremium = await hasAdminPermission(message.member, "set-premium");
+
       const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [
         new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
           new ButtonBuilder()
             .setCustomId("add-premium")
             .setLabel("add premium")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("➕"),
+            .setEmoji("➕")
+            .setDisabled(!canSetPremium),
           new ButtonBuilder()
             .setCustomId("set-tier")
             .setLabel("set tier")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("😁"),
+            .setEmoji("😁")
+            .setDisabled(!canSetPremium),
           new ButtonBuilder()
             .setCustomId("set-expire")
             .setLabel("set expire date")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("😣"),
+            .setEmoji("😣")
+            .setDisabled(!canSetPremium),
           new ButtonBuilder()
             .setCustomId("set-credits")
             .setLabel("set credits")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("🪙"),
+            .setEmoji("🪙")
+            .setDisabled(!canSetPremium),
           new ButtonBuilder()
             .setCustomId("raw-data")
             .setLabel("view raw data")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("🥩"),
+            .setEmoji("🥩")
+            .setDisabled(!(await hasAdminPermission(message.member, "view-user-info"))),
         ),
 
         new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -1225,17 +1253,20 @@ async function run(
             .setCustomId("del-cmd")
             .setLabel("delete cmd")
             .setStyle(ButtonStyle.Danger)
-            .setEmoji("❌"),
+            .setEmoji("❌")
+            .setDisabled(!(await hasAdminPermission(message.member, "delete-prem-cmd"))),
           new ButtonBuilder()
             .setCustomId("del-aliases")
             .setLabel("delete aliases")
             .setStyle(ButtonStyle.Danger)
-            .setEmoji("❌"),
+            .setEmoji("❌")
+            .setDisabled(!(await hasAdminPermission(message.member, "delete-prem-aliases"))),
           new ButtonBuilder()
             .setCustomId("expire-now")
             .setLabel("expire now")
             .setStyle(ButtonStyle.Danger)
-            .setEmoji("❌"),
+            .setEmoji("❌")
+            .setDisabled(!canSetPremium),
         ),
       ];
 
@@ -1262,7 +1293,8 @@ async function run(
         }
       } else {
         rows.forEach((i) => i.components.forEach((j) => j.setDisabled(true)));
-        rows[0].components[0].setDisabled(false);
+
+        if (canSetPremium) rows[0].components[0].setDisabled(false);
 
         embed.setDescription("no premium");
       }
@@ -1553,28 +1585,34 @@ async function run(
         getTaskStreaks(message.member),
       ]);
 
+      const canSetStreaks = await hasAdminPermission(message.member, "set-streak");
+
       const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [
         new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
           new ButtonBuilder()
             .setCustomId("set-daily")
             .setLabel("set daily streak")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("📅"),
+            .setEmoji("📅")
+            .setDisabled(!canSetStreaks),
           new ButtonBuilder()
             .setCustomId("set-vote")
             .setLabel("set vote streak")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("🗳"),
+            .setEmoji("🗳")
+            .setDisabled(!canSetStreaks),
           new ButtonBuilder()
             .setCustomId("set-daily-tasks")
             .setLabel("set daily task streak")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("📋"),
+            .setEmoji("📋")
+            .setDisabled(!canSetStreaks),
           new ButtonBuilder()
             .setCustomId("set-weekly-tasks")
             .setLabel("set weekly task streak")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("📋"),
+            .setEmoji("📋")
+            .setDisabled(!canSetStreaks),
         ),
 
         new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -1583,13 +1621,13 @@ async function run(
             .setLabel("rerun daily rewards")
             .setStyle(ButtonStyle.Primary)
             .setEmoji("📅")
-            .setDisabled(daily <= 0),
+            .setDisabled(!canSetStreaks || daily <= 0),
           new ButtonBuilder()
             .setCustomId("rerun-vote")
             .setLabel("rerun vote rewards")
             .setStyle(ButtonStyle.Primary)
             .setEmoji("🗳")
-            .setDisabled(vote <= 0),
+            .setDisabled(!canSetStreaks || vote <= 0),
         ),
       ];
 
@@ -1818,12 +1856,14 @@ async function run(
             .setCustomId("ac-hist")
             .setLabel("show data")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("📋"),
+            .setEmoji("📋")
+            .setDisabled(!(await hasAdminPermission(message.member, "anticheat-history"))),
           new ButtonBuilder()
             .setCustomId("ac-clear")
             .setLabel("clear")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("🗑️"),
+            .setEmoji("🗑️")
+            .setDisabled(!(await hasAdminPermission(message.member, "clear-anticheat"))),
         ),
 
         new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -1831,12 +1871,14 @@ async function run(
             .setCustomId("captcha-hist")
             .setLabel("captcha history")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("🤖"),
+            .setEmoji("🤖")
+            .setDisabled(!(await hasAdminPermission(message.member, "captcha-history"))),
           new ButtonBuilder()
             .setCustomId("give-captcha")
             .setLabel("give captcha")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("🤖"),
+            .setEmoji("🤖")
+            .setDisabled(!(await hasAdminPermission(message.member, "captchatest"))),
         ),
       ];
 
@@ -1991,12 +2033,14 @@ async function run(
           .setCustomId("add-tag")
           .setLabel("add tag")
           .setStyle(ButtonStyle.Primary)
-          .setEmoji("👍🏻"),
+          .setEmoji("👍🏻")
+          .setDisabled(!(await hasAdminPermission(message.member, "set-tags"))),
         new ButtonBuilder()
           .setCustomId("remove-tag")
           .setLabel("remove tag")
           .setStyle(ButtonStyle.Primary)
-          .setEmoji("👎🏻"),
+          .setEmoji("👎🏻")
+          .setDisabled(!(await hasAdminPermission(message.member, "set-tags"))),
       ),
     ];
 
@@ -2135,7 +2179,7 @@ async function run(
         );
       }
 
-      return message.channel.send({ embeds: [embed] });
+      return send({ embeds: [embed] });
     };
 
     const findUser = async (message: NypsiMessage, user: User) => {
@@ -2192,14 +2236,13 @@ async function run(
         embed.addField("username history", msg, true);
       }
 
-      return message.channel.send({ embeds: [embed] });
+      return send({ embeds: [embed] });
     };
 
     const client = message.client as NypsiClient;
 
     if (args[0]?.toLowerCase() == "gid") {
-      if (args.length == 1)
-        return message.channel.send({ embeds: [new ErrorEmbed("$x find gid <guildid>")] });
+      if (args.length == 1) return send({ embeds: [new ErrorEmbed("$x find gid <guildid>")] });
 
       if (args[2]?.toLowerCase() === "leave") {
         return client.cluster.broadcastEval(
@@ -2236,8 +2279,7 @@ async function run(
 
       return findGuild(message, foundGuild);
     } else if (args[0]?.toLowerCase() == "gname") {
-      if (args.length == 1)
-        return message.channel.send({ embeds: [new ErrorEmbed("$x find gname <guild name>")] });
+      if (args.length == 1) return send({ embeds: [new ErrorEmbed("$x find gname <guild name>")] });
 
       args.shift();
 
@@ -2263,8 +2305,7 @@ async function run(
 
       return findGuild(message, foundGuild);
     } else if (args[0]?.toLowerCase() == "id") {
-      if (args.length == 1)
-        return message.channel.send({ embeds: [new ErrorEmbed("$x find id <userid>")] });
+      if (args.length == 1) return send({ embeds: [new ErrorEmbed("$x find id <userid>")] });
 
       let user: any = await client.cluster.broadcastEval(
         async (c, { userId }) => {
@@ -2286,8 +2327,7 @@ async function run(
 
       return findUser(message, user);
     } else if (args[0]?.toLowerCase() == "name") {
-      if (args.length == 1)
-        return message.channel.send({ embeds: [new ErrorEmbed("$x find name <username>")] });
+      if (args.length == 1) return send({ embeds: [new ErrorEmbed("$x find name <username>")] });
 
       args.shift();
 
@@ -2314,14 +2354,13 @@ async function run(
 
       return findUser(message, user);
     } else if (args[0]?.toLowerCase() == "nearby") {
-      if (args.length == 1)
-        return message.channel.send({ embeds: [new ErrorEmbed("$x find nearby <query>")] });
+      if (args.length == 1) return send({ embeds: [new ErrorEmbed("$x find nearby <query>")] });
 
       const search = args.slice(1);
 
       const results = await getMember(message.guild, search.join(" "), true);
 
-      return message.channel.send({
+      return send({
         embeds: [
           new CustomEmbed(
             message.member,
@@ -2338,9 +2377,9 @@ async function run(
         "top " + balTop.length,
       );
 
-      return message.channel.send({ embeds: [embed] });
+      return send({ embeds: [embed] });
     } else
-      return message.channel.send({
+      return send({
         embeds: [
           new CustomEmbed(
             message.member,
@@ -2370,7 +2409,7 @@ async function run(
     const target = await getUserFromId(args[0]);
 
     if (!target) {
-      return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });
+      return send({ embeds: [new ErrorEmbed("invalid user")] });
     }
 
     if (verify) {
@@ -2409,7 +2448,7 @@ async function run(
     const target = await getUserFromId(id);
 
     if (!target) {
-      return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });
+      return send({ embeds: [new ErrorEmbed("invalid user")] });
     }
 
     if (await redis.sismember(Constants.redis.nypsi.FORCE_LOSE, target.id)) {
@@ -2435,13 +2474,13 @@ async function run(
     const target = await getUserFromId(id);
 
     if (!target) {
-      return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });
+      return send({ embeds: [new ErrorEmbed("invalid user")] });
     }
 
     if (!commandExists(cmd)) {
       if (commandAliasExists(cmd)) {
         cmd = getCommandFromAlias(cmd);
-      } else return message.channel.send({ embeds: [new ErrorEmbed("invalid command")] });
+      } else return send({ embeds: [new ErrorEmbed("invalid command")] });
     }
 
     if (await redis.exists(`${Constants.redis.nypsi.COMMAND_WATCH}:${id}:${cmd}`)) {
@@ -2465,7 +2504,7 @@ async function run(
     const target = await getUserFromId(args[0]);
 
     if (!target) {
-      return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });
+      return send({ embeds: [new ErrorEmbed("invalid user")] });
     }
 
     if (!args[1]) {
@@ -2492,7 +2531,7 @@ async function run(
     const target = await getUserFromId(id);
 
     if (!target) {
-      return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });
+      return send({ embeds: [new ErrorEmbed("invalid user")] });
     }
 
     if ((await isUserBlacklisted(target)).blacklisted) {
@@ -2570,12 +2609,12 @@ async function run(
 
   const requestProfileTransfer = async (from: User, to: User) => {
     if (await hasProfile(to))
-      return message.channel.send({
+      return send({
         embeds: [new ErrorEmbed(`${to.username} has a nypsi profile, ask them to do /data delete`)],
       });
 
     if (!(await hasProfile(from)))
-      return message.channel.send({
+      return send({
         embeds: [new ErrorEmbed(`${from.username} doesn't have a nypsi profile you fucking idiot`)],
       });
 
@@ -2611,14 +2650,14 @@ async function run(
       },
     );
 
-    return message.channel.send({
+    return send({
       embeds: [new CustomEmbed(message.member, "profile transfer initiated")],
     });
   };
 
   const startEvent = async () => {
     if (args.length < 4) {
-      return message.channel.send({ embeds: [new ErrorEmbed("$x event <type> <target> <days>")] });
+      return send({ embeds: [new ErrorEmbed("$x event <type> <target> <days>")] });
     }
 
     const type = args[1];
@@ -2626,18 +2665,18 @@ async function run(
     const days = parseInt(args[3]);
 
     if (!getEventsData()[type]) {
-      return message.channel.send({ embeds: [new ErrorEmbed("invalid event type")] });
+      return send({ embeds: [new ErrorEmbed("invalid event type")] });
     }
 
     if (isNaN(target) || target < 1) {
-      return message.channel.send({ embeds: [new ErrorEmbed("invalid target")] });
+      return send({ embeds: [new ErrorEmbed("invalid target")] });
     }
 
     if (isNaN(days) || days < 1) {
-      return message.channel.send({ embeds: [new ErrorEmbed("invalid amount of days")] });
+      return send({ embeds: [new ErrorEmbed("invalid amount of days")] });
     }
 
-    const confirmMessage = await message.channel.send({
+    const confirmMessage = await send({
       embeds: [
         new CustomEmbed(
           message.member,
@@ -2663,7 +2702,7 @@ async function run(
       .catch(async () => {});
 
     if (!response) {
-      return message.channel.send({ embeds: [new ErrorEmbed("confirmation cancelled")] });
+      return send({ embeds: [new ErrorEmbed("confirmation cancelled")] });
     }
 
     const currentEvent = await getCurrentEvent(false);
@@ -2692,24 +2731,24 @@ async function run(
   };
 
   if (args.length == 0) {
-    return message.channel.send({
+    return send({
       embeds: [new CustomEmbed(message.member, await getUsableCommands(message.member))],
     });
   } else if (args[0].toLowerCase() == "userid") {
     if (!(await hasAdminPermission(message.member, "view-user-info"))) {
-      return message.channel.send({
+      return send({
         embeds: [requiredLevelEmbed("view-user-info")],
       });
     }
 
     if (args.length == 1) {
-      return message.channel.send({ embeds: [new ErrorEmbed("$x userid <id>")] });
+      return send({ embeds: [new ErrorEmbed("$x userid <id>")] });
     }
 
     return showUser(args[1]);
   } else if (args[0].toLowerCase() == "find") {
     if (!(await hasAdminPermission(message.member, "find"))) {
-      return message.channel.send({
+      return send({
         embeds: [requiredLevelEmbed("find")],
       });
     }
@@ -2717,67 +2756,67 @@ async function run(
     return doFind(args);
   } else if (args[0].toLowerCase() == "captcha") {
     if (!(await hasAdminPermission(message.member, "captchatest"))) {
-      return message.channel.send({
+      return send({
         embeds: [requiredLevelEmbed("captchatest")],
       });
     }
 
     if (args.length == 1) {
-      return message.channel.send({ embeds: [new ErrorEmbed("$x captcha (verify) <id>")] });
+      return send({ embeds: [new ErrorEmbed("$x captcha (verify) <id>")] });
     }
 
     return doCaptcha(args);
   } else if (args[0].toLowerCase() == "forcelose") {
     if (!(await hasAdminPermission(message.member, "forcelose"))) {
-      return message.channel.send({
+      return send({
         embeds: [requiredLevelEmbed("forcelose")],
       });
     }
 
     if (args.length == 1) {
-      return message.channel.send({ embeds: [new ErrorEmbed("$x forcelose <id>")] });
+      return send({ embeds: [new ErrorEmbed("$x forcelose <id>")] });
     }
 
     return doForcelose(args[1]);
   } else if (args[0].toLowerCase() == "cmdwatch") {
     if (!(await hasAdminPermission(message.member, "cmdwatch"))) {
-      return message.channel.send({
+      return send({
         embeds: [requiredLevelEmbed("cmdwatch")],
       });
     }
 
     if (args.length == 1) {
-      return message.channel.send({ embeds: [new ErrorEmbed("$x cmdwatch <id> <cmd>")] });
+      return send({ embeds: [new ErrorEmbed("$x cmdwatch <id> <cmd>")] });
     }
 
     return doCmdWatch(args[1], args[2]);
   } else if (args[0].toLowerCase() == "ecoban") {
     if (!(await hasAdminPermission(message.member, "ecoban"))) {
-      return message.channel.send({
+      return send({
         embeds: [requiredLevelEmbed("ecoban")],
       });
     }
 
     if (args.length == 1) {
-      return message.channel.send({ embeds: [new ErrorEmbed("$x ecoban <id>")] });
+      return send({ embeds: [new ErrorEmbed("$x ecoban <id>")] });
     }
 
     return doEcoban(args);
   } else if (args[0].toLowerCase() == "blacklist") {
     if (!(await hasAdminPermission(message.member, "blacklist"))) {
-      return message.channel.send({
+      return send({
         embeds: [requiredLevelEmbed("blacklist")],
       });
     }
 
     if (args.length == 1) {
-      return message.channel.send({ embeds: [new ErrorEmbed("$x blacklist <id>")] });
+      return send({ embeds: [new ErrorEmbed("$x blacklist <id>")] });
     }
 
     return doBlacklist(args[1]);
   } else if (args[0].toLowerCase() === "transfer") {
     if (!(await hasAdminPermission(message.member, "profile-transfer"))) {
-      return message.channel.send({
+      return send({
         embeds: [requiredLevelEmbed("profile-transfer")],
       });
     }
@@ -2788,13 +2827,13 @@ async function run(
     const fromUser = await message.client.users.fetch(fromId).catch(() => {});
     const toUser = await message.client.users.fetch(toId).catch(() => {});
 
-    if (!fromUser) return message.channel.send({ embeds: [new ErrorEmbed("invalid from user")] });
-    if (!toUser) return message.channel.send({ embeds: [new ErrorEmbed("invalid to user")] });
+    if (!fromUser) return send({ embeds: [new ErrorEmbed("invalid from user")] });
+    if (!toUser) return send({ embeds: [new ErrorEmbed("invalid to user")] });
 
     return requestProfileTransfer(fromUser, toUser);
   } else if (args[0].toLowerCase() === "drop") {
     if (!(await hasAdminPermission(message.member, "spawn-lootdrop"))) {
-      return message.channel.send({
+      return send({
         embeds: [requiredLevelEmbed("spawn-lootdrop")],
       });
     }
@@ -2802,7 +2841,7 @@ async function run(
     startRandomDrop(message.client as NypsiClient, message.channelId);
   } else if (args[0].toLowerCase() === "fixcrash") {
     if (!(await hasAdminPermission(message.member, "fix-crash"))) {
-      return message.channel.send({
+      return send({
         embeds: [requiredLevelEmbed("fix-crash")],
       });
     }
@@ -2810,26 +2849,26 @@ async function run(
     await initCrashGame(message.client as NypsiClient);
   } else if (args[0].toLowerCase() === "streakpause") {
     if (!(await hasAdminPermission(message.member, "streakpause"))) {
-      return message.channel.send({
+      return send({
         embeds: [requiredLevelEmbed("streakpause")],
       });
     }
 
     if (args.length === 1) {
       await redis.set("nypsi:streakpause", 69, "EX", ms("1 day") / 1000);
-      return message.channel.send({
+      return send({
         embeds: [new CustomEmbed(message.member, "✅ streaks won't be lost for the next 24 hours")],
       });
     } else if (args[1].toLowerCase() === "end") {
       await redis.del("nypsi:streakpause");
       return (message as Message).react("✅");
     } else
-      return message.channel.send({
+      return send({
         embeds: [new ErrorEmbed("$x streakpause (end)")],
       });
   } else if (args[0].toLowerCase() === "findalts") {
     if (!(await hasAdminPermission(message.member, "find-alts"))) {
-      return message.channel.send({
+      return send({
         embeds: [requiredLevelEmbed("find-alts")],
       });
     }
@@ -2860,17 +2899,17 @@ async function run(
     console.log(map);
   } else if (args[0].toLowerCase() === "cmd") {
     if (!(await hasAdminPermission(message.member, "set-cmd-channels"))) {
-      return message.channel.send({
+      return send({
         embeds: [requiredLevelEmbed("set-cmd-channels")],
       });
     }
 
     if (args[1]?.toLowerCase() != "add" && args[1]?.toLowerCase() != "rem") {
-      return message.channel.send({ embeds: [new ErrorEmbed("$x cmd <add/rem>")] });
+      return send({ embeds: [new ErrorEmbed("$x cmd <add/rem>")] });
     }
 
     if (message.guildId !== Constants.NYPSI_SERVER_ID) {
-      return message.channel.send({
+      return send({
         embeds: [new ErrorEmbed("this can only be done in the nypsi server")],
       });
     }
@@ -2878,7 +2917,7 @@ async function run(
     return args[1].toLowerCase() == "add" ? addCmd() : remCmd();
   } else if (args[0].toLowerCase() === "runjob") {
     if (!(await hasAdminPermission(message.member, "run-job"))) {
-      return message.channel.send({
+      return send({
         embeds: [requiredLevelEmbed("run-job")],
       });
     }
@@ -2900,14 +2939,14 @@ async function run(
     return message.react("✅");
   } else if (["transaction", "tx"].includes(args[0].toLowerCase())) {
     if (!(await hasAdminPermission(message.member, "view-transactions"))) {
-      return message.channel.send({
+      return send({
         embeds: [requiredLevelEmbed("view-transactions")],
       });
     }
 
     if (args[1]?.toLowerCase() === "query") {
       if (args.length < 4) {
-        return message.channel.send({
+        return send({
           embeds: [
             new CustomEmbed(
               message.member,
@@ -2936,7 +2975,7 @@ async function run(
       } else if (sourceId !== "any" && targetId === "any") {
         query.sourceId = sourceId;
       } else {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid query")] });
+        return send({ embeds: [new ErrorEmbed("invalid query")] });
       }
 
       logger.info(
@@ -2946,17 +2985,17 @@ async function run(
       const test = await prisma.transaction.findMany({ where: query, take: 1 });
 
       if (test.length < 1) {
-        return message.channel.send({ embeds: [new ErrorEmbed("no transactions found")] });
+        return send({ embeds: [new ErrorEmbed("no transactions found")] });
       }
 
       const file = await exportTransactions(query);
 
-      return message.channel.send({
+      return send({
         files: [new AttachmentBuilder(file, { name: "transactions.txt" })],
       });
     } else if (args[1]?.toLowerCase() === "analytics") {
       if (args.length < 4) {
-        return message.channel.send({
+        return send({
           embeds: [
             new CustomEmbed(message.member, "$x tx analytics <source|target> <user id>").setHeader(
               "transactions",
@@ -2969,7 +3008,7 @@ async function run(
       const userId = args[3];
 
       if (type !== "source" && type !== "target") {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid type")] });
+        return send({ embeds: [new ErrorEmbed("invalid type")] });
       }
 
       const count = await prisma.transaction.count({
@@ -2983,7 +3022,7 @@ async function run(
       );
 
       if (count === 0) {
-        return message.channel.send({ embeds: [new ErrorEmbed("no transactions found")] });
+        return send({ embeds: [new ErrorEmbed("no transactions found")] });
       }
 
       const byOpposite = await prisma.transaction.groupBy({
@@ -3019,9 +3058,9 @@ async function run(
         `${count.toLocaleString()} total transactions\n\n${oppositeFormatted.join("\n")}`,
       ).setHeader(`analytics for ${await getLastKnownUsername(userId)} (${userId})`);
 
-      return message.channel.send({ embeds: [embed] });
+      return send({ embeds: [embed] });
     } else {
-      return message.channel.send({
+      return send({
         embeds: [
           new CustomEmbed(
             message.member,
@@ -3033,14 +3072,14 @@ async function run(
     }
   } else if (args[0].toLowerCase() === "reseteco") {
     if (!(await hasAdminPermission(message.member, "reseteco"))) {
-      return message.channel.send({
+      return send({
         embeds: [requiredLevelEmbed("reseteco")],
       });
     }
 
     const embed = new CustomEmbed(message.member, "run that command again");
 
-    await message.channel.send({ embeds: [embed] });
+    await send({ embeds: [embed] });
 
     const code = Math.floor(Math.random() * 10000);
     console.log(code);
@@ -3055,24 +3094,24 @@ async function run(
     response = response.first().content;
 
     if (response != code) {
-      return message.channel.send({ embeds: [new ErrorEmbed("captcha failed")] });
+      return send({ embeds: [new ErrorEmbed("captcha failed")] });
     } else {
       const c = await reset();
 
-      return message.channel.send({
+      return send({
         embeds: [new CustomEmbed(message.member, `${c} users reset`)],
       });
     }
   } else if (args[0].toLowerCase() === "event") {
     if (!(await hasAdminPermission(message.member, "create-event"))) {
-      return message.channel.send({
+      return send({
         embeds: [requiredLevelEmbed("create-event")],
       });
     }
 
     return startEvent();
   } else {
-    return message.channel.send({
+    return send({
       embeds: [new CustomEmbed(message.member, await getUsableCommands(message.member))],
     });
   }

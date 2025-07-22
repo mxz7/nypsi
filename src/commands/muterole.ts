@@ -1,5 +1,5 @@
 import { CommandInteraction, GuildBasedChannel, PermissionFlagsBits, Role } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMuteRole, setMuteRole } from "../utils/functions/moderation/mute";
@@ -10,11 +10,12 @@ const cmd = new Command("muterole", "set the muterole for the server", "admin")
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
     if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
-      return message.channel.send({
+      return send({
         embeds: [new ErrorEmbed("you need the `manage server` permission")],
       });
     }
@@ -29,7 +30,7 @@ async function run(
     let role;
 
     if (current != "" && current != "timeout" && current) {
-      role = await message.guild.roles.cache.get(current);
+      role = message.guild.roles.cache.get(current);
 
       if (!role) {
         await setMuteRole(message.guild, "");
@@ -45,7 +46,7 @@ async function run(
       text += `current mute role: ${role ? role.toString() : "default"}`;
     }
 
-    return message.channel.send({
+    return send({
       embeds: [new CustomEmbed(message.member, text).setHeader("mute role")],
     });
   };
@@ -56,7 +57,7 @@ async function run(
 
   if (args[0].toLowerCase() == "set") {
     if (args.length == 1) {
-      return message.channel.send({
+      return send({
         embeds: [
           new ErrorEmbed(
             `${prefix}**muterole set <role>**\n\nyou can mention the role, use the role's ID or name`,
@@ -79,14 +80,14 @@ async function run(
     }
 
     if (!role) {
-      return message.channel.send({
+      return send({
         embeds: [new ErrorEmbed(`couldn't find the role \`${args.join(" ")}\``)],
       });
     }
 
     await setMuteRole(message.guild, role);
 
-    return message.channel.send({
+    return send({
       embeds: [
         new CustomEmbed(
           message.member,
@@ -97,7 +98,7 @@ async function run(
   } else if (args[0].toLowerCase() == "reset") {
     await setMuteRole(message.guild, "default");
 
-    return message.channel.send({
+    return send({
       embeds: [new CustomEmbed(message.member, "✅ muterole has been reset")],
     });
   } else if (args[0].toLowerCase() == "update") {
@@ -115,14 +116,14 @@ async function run(
           name: "muted",
         });
       } catch {
-        return message.channel.send({
+        return send({
           embeds: [new ErrorEmbed("error creating new mute role, please check my permissions")],
         });
       }
     }
 
     if (!muteRole) {
-      return message.channel.send({
+      return send({
         embeds: [new ErrorEmbed("error creating new mute role, please check my permissions")],
       });
     }
@@ -144,7 +145,7 @@ async function run(
     }
 
     if (failedChannels.length > 0) {
-      return message.channel.send({
+      return send({
         embeds: [
           new ErrorEmbed(
             `couldn't update the following channels: ${failedChannels.map((c) => c.toString()).join(", ")}`,
@@ -153,7 +154,7 @@ async function run(
       });
     }
 
-    return message.channel.send({
+    return send({
       embeds: [new CustomEmbed(message.member, `✅ permissions updated for all channels`)],
     });
   } else if (args[0].toLowerCase() == "timeout") {
@@ -164,7 +165,7 @@ async function run(
       `✅ now using **timeout** mode\n\nnote: any currently muted users will be automatically unmuted. check these users with (${prefix}**muted**)`,
     );
 
-    return message.channel.send({
+    return send({
       embeds: [embed],
     });
   }

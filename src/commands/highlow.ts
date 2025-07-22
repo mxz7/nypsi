@@ -1,7 +1,6 @@
 import { flavors } from "@catppuccin/palette";
 import {
   ActionRowBuilder,
-  BaseMessageOptions,
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
@@ -9,8 +8,6 @@ import {
   CommandInteraction,
   GuildMember,
   Interaction,
-  InteractionEditReplyOptions,
-  InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
   MessageEditOptions,
@@ -19,7 +16,7 @@ import {
 } from "discord.js";
 import redis from "../init/redis.js";
 import { NypsiClient } from "../models/Client.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command.js";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command.js";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
 import { a } from "../utils/functions/anticheat.js";
@@ -74,39 +71,10 @@ cmd.slashData.addStringOption((option) =>
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (!(await userExists(message.member))) await createUser(message.member);
-
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
 
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
@@ -115,7 +83,7 @@ async function run(
     return;
   }
 
-  return prepareGame(message, args);
+  return prepareGame(message, send, args);
 }
 
 cmd.setRun(run);
@@ -124,40 +92,11 @@ module.exports = cmd;
 
 async function prepareGame(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
   msg?: Message,
 ) {
   recentCommands.set(message.author.id, Date.now());
-
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
 
   const defaultBet = await getDefaultBet(message.member);
 
@@ -363,7 +302,7 @@ async function prepareGame(
     msg = await send({ embeds: [embed], components: [row] });
   }
 
-  playGame(message, msg, args).catch((e) => {
+  playGame(message, send, msg, args).catch((e) => {
     logger.error(
       `error occurred playing highlow - ${message.author.id} (${message.author.username})`,
     );
@@ -415,6 +354,7 @@ function getValue(member: GuildMember) {
 
 async function playGame(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   m: Message,
   args: string[],
 ): Promise<void> {
@@ -525,7 +465,7 @@ async function playGame(
         }
       }
 
-      return prepareGame(message, args, m);
+      return prepareGame(message, send, args, m);
     }
   };
 
@@ -731,7 +671,7 @@ async function playGame(
       newEmbed.setDescription(desc);
       newEmbed.addField("card", "| " + card + " |");
       await edit({ embeds: [newEmbed], components: [row] }, reaction);
-      return playGame(message, m, args);
+      return playGame(message, send, m, args);
     } else if (newCard1 == oldCard) {
       const desc = await renderGambleScreen({
         state: "playing",
@@ -742,7 +682,7 @@ async function playGame(
       newEmbed.addField("card", "| " + card + " |");
 
       await edit({ embeds: [newEmbed] }, reaction);
-      return playGame(message, m, args);
+      return playGame(message, send, m, args);
     } else {
       lose(reaction);
       return;
@@ -801,7 +741,7 @@ async function playGame(
       newEmbed.setDescription(desc);
       newEmbed.addField("card", "| " + card + " |");
       await edit({ embeds: [newEmbed], components: [row] }, reaction);
-      return playGame(message, m, args);
+      return playGame(message, send, m, args);
     } else if (newCard1 == oldCard) {
       const desc = await renderGambleScreen({
         state: "playing",
@@ -811,14 +751,14 @@ async function playGame(
       newEmbed.setDescription(desc);
       newEmbed.addField("card", "| " + card + " |");
       await edit({ embeds: [newEmbed] }, reaction);
-      return playGame(message, m, args);
+      return playGame(message, send, m, args);
     } else {
       lose(reaction);
       return;
     }
   } else if (reaction.customId == "💰") {
     if (win < 1) {
-      return playGame(message, m, args);
+      return playGame(message, send, m, args);
     } else if (win == 1) {
       draw(reaction);
       return;

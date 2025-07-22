@@ -235,6 +235,10 @@ async function doAutosellThing(
 export async function addInventoryItem(member: MemberResolvable, itemId: string, amount: number) {
   const userId = getUserId(member);
 
+  if (itemId.includes("gem")) {
+    logger.debug(`gems: ${userId} added ${amount}x ${itemId}`);
+  }
+
   if (amount <= 0) return;
 
   if (!(await userExists(userId))) await createUser(userId);
@@ -335,6 +339,10 @@ export async function removeInventoryItem(
 
 export async function setInventoryItem(member: MemberResolvable, itemId: string, amount: number) {
   const userId = getUserId(member);
+
+  if (itemId.includes("gem")) {
+    logger.debug(`gems: ${userId} set ${amount}x ${itemId}`);
+  }
 
   if (!getItems()[itemId]) {
     console.trace();
@@ -521,6 +529,12 @@ export async function gemBreak(
   const userId = getUserId(member);
 
   const inventory = await getInventory(userId);
+
+  if (!(await inventory.hasGem(gem))) {
+    logger.debug(`gems: ${userId} skipping gem break (${gem}), no gem`);
+    return;
+  }
+
   const gemLocation = await inventory.hasGem(gem);
 
   if (!shatterOnly && ((await inventory.hasGem("crystal_heart")).any || !gemLocation.any)) return;
@@ -536,7 +550,7 @@ export async function gemBreak(
   if (
     !shatterOnly &&
     uniqueGemCount === 5 &&
-    percentChance(50) &&
+    percentChance(25) &&
     (await getDmSettings(userId)).other
   ) {
     await Promise.all([
@@ -638,6 +652,8 @@ export async function gemBreak(
   const amount = Math.floor(Math.random() * shardMax.get(gem) - 1) + 1;
 
   await addInventoryItem(userId, "gem_shard", amount);
+
+  logger.debug(`gems: ${userId} shattered ${gem} into ${amount} shards`);
 
   const embed = new CustomEmbed(userId)
     .setTitle(`your ${getItems()[gem].name} has shattered`)

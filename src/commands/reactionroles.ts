@@ -1,14 +1,11 @@
 import { ReactionRole, ReactionRoleMode, ReactionRoleRoles } from "@prisma/client";
 import {
-  BaseMessageOptions,
   CommandInteraction,
   GuildTextBasedChannel,
-  InteractionEditReplyOptions,
-  InteractionReplyOptions,
   Message,
   PermissionFlagsBits,
 } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import {
@@ -176,38 +173,9 @@ cmd.slashData
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
-
   if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
     if (message.member.permissions.has(PermissionFlagsBits.ManageMessages))
       await send({
@@ -283,7 +251,7 @@ async function run(
           .delete()
           .catch(() => {
             fail = true;
-            message.channel.send({
+            send({
               content: `i am missing some permissions. if you need support join: ${Constants.NYPSI_SERVER_INVITE_LINK}`,
             });
           });
@@ -294,12 +262,12 @@ async function run(
       });
 
     if (fail || !title)
-      return message.channel.send({
+      return send({
         content: `${message.author.toString()} reaction role creation expired`,
       });
 
     if (title.length > 100)
-      return message.channel.send({ embeds: [new ErrorEmbed("length cannot be longer than 100")] });
+      return send({ embeds: [new ErrorEmbed("length cannot be longer than 100")] });
     if (title === "blank") title = "";
 
     await msg.edit({
@@ -318,7 +286,7 @@ async function run(
           .delete()
           .catch(() => {
             fail = true;
-            message.channel.send({
+            send({
               content: `i am missing some permissions. if you need support join: ${Constants.NYPSI_SERVER_INVITE_LINK}`,
             });
           });
@@ -329,12 +297,12 @@ async function run(
       });
 
     if (fail || !description)
-      return message.channel.send({
+      return send({
         content: `${message.author.toString()} reaction role creation expired`,
       });
 
     if (description.length > 1000)
-      return message.channel.send({ embeds: [new ErrorEmbed("length cannot be longer than 100")] });
+      return send({ embeds: [new ErrorEmbed("length cannot be longer than 100")] });
 
     await msg.edit({
       embeds: [
@@ -352,7 +320,7 @@ async function run(
           .delete()
           .catch(() => {
             fail = true;
-            message.channel.send({
+            send({
               content: `i am missing some permissions. if you need support join: ${Constants.NYPSI_SERVER_INVITE_LINK}`,
             });
           });
@@ -363,13 +331,12 @@ async function run(
       });
 
     if (fail || !channel)
-      return message.channel.send({
+      return send({
         content: `${message.author.toString()} reaction role creation expired`,
       });
 
-    if (!channel) return message.channel.send({ embeds: [new ErrorEmbed("invalid channel")] });
-    if (!channel.isTextBased())
-      return message.channel.send({ embeds: [new ErrorEmbed("must be a text channel")] });
+    if (!channel) return send({ embeds: [new ErrorEmbed("invalid channel")] });
+    if (!channel.isTextBased()) return send({ embeds: [new ErrorEmbed("must be a text channel")] });
     if (channel.isDMBased()) return;
 
     await createReactionRole({
@@ -383,7 +350,7 @@ async function run(
     });
 
     if (fail)
-      return message.channel.send({
+      return send({
         embeds: [
           new ErrorEmbed(
             "error occurred creating reaction role. does nypsi have permission to send messages in the channel?",
@@ -749,7 +716,7 @@ async function run(
                 reactionRole.messageId,
                 reactionRole.whitelist,
               );
-              run(message, args);
+              run(message, send, args);
               return;
             });
 

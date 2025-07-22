@@ -1,5 +1,5 @@
 import { CommandInteraction } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 
@@ -7,6 +7,7 @@ const cmd = new Command("flip", "flip a coin", "utility");
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   const headTails = [
@@ -47,20 +48,20 @@ async function run(
     embed.setDescription(`💸 you threw **${answer}**`);
   } else {
     if (!parseInt(args[0])) {
-      return message.channel.send({
+      return send({
         embeds: [new ErrorEmbed("invalid range: must be between 2 and 1,069")],
       });
     }
     const amount = parseInt(args[0]);
 
     if ((amount > 1069 || amount < 2) && message.author.id != Constants.TEKOH_ID) {
-      return message.channel.send({
+      return send({
         embeds: [new ErrorEmbed("invalid range: must be between 2 and 1,069")],
       });
     }
 
     if (amount > 100000000) {
-      return message.channel.send({
+      return send({
         embeds: [new ErrorEmbed("invalid range: must be between 2 and 1,069")],
       });
     }
@@ -89,7 +90,7 @@ async function run(
     }
   }
 
-  return message.channel.send({ embeds: [embed] });
+  return send({ embeds: [embed] });
 }
 
 cmd.setRun(run);

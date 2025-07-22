@@ -1,7 +1,6 @@
 import { flavors } from "@catppuccin/palette";
 import {
   ActionRowBuilder,
-  BaseMessageOptions,
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
@@ -10,8 +9,6 @@ import {
   ComponentType,
   GuildMember,
   Interaction,
-  InteractionEditReplyOptions,
-  InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
   MessageCreateOptions,
@@ -21,7 +18,7 @@ import {
 } from "discord.js";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { a } from "../utils/functions/anticheat";
@@ -64,39 +61,10 @@ cmd.slashData.addStringOption((option) =>
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (!(await userExists(message.member))) await createUser(message.member);
-
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
 
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
@@ -105,7 +73,7 @@ async function run(
     return;
   }
 
-  return prepareGame(message, args);
+  return prepareGame(message, send, args);
 }
 
 cmd.setRun(run);
@@ -114,41 +82,12 @@ module.exports = cmd;
 
 async function prepareGame(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
   msg?: NypsiMessage,
   interaction?: ButtonInteraction,
 ): Promise<any> {
   recentCommands.set(message.author.id, Date.now());
-
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
 
   if (await redis.sismember(Constants.redis.nypsi.USERS_PLAYING, message.author.id)) {
     if (msg) {
@@ -243,7 +182,7 @@ async function prepareGame(
   await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
   await removeBalance(message.member, bet);
 
-  const game = new Game(message, message.member, bet, msg, interaction);
+  const game = new Game(message, send, message.member, bet, msg, interaction);
 
   return game.play().catch((e) => {
     logger.error("bj error", e);
@@ -254,6 +193,7 @@ async function prepareGame(
 class Game {
   private playerMessage: NypsiMessage | (NypsiCommandInteraction & CommandInteraction);
   private message: NypsiMessage;
+  private send: SendMessage;
   private member: GuildMember;
   private deck: string[];
   private bet: number;
@@ -291,6 +231,7 @@ class Game {
 
   constructor(
     message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+    send: SendMessage,
     member: GuildMember,
     bet: number,
     msg?: NypsiMessage,
@@ -298,6 +239,7 @@ class Game {
   ) {
     this.playerMessage = message;
     this.member = member;
+    this.send = send;
     this.bet = bet;
     this.originalBet = bet;
     this.message = msg;
@@ -618,6 +560,7 @@ class Game {
 
       return prepareGame(
         this.playerMessage,
+        this.send,
         [this.originalBet.toString()],
         this.message,
         this.interaction,
@@ -650,42 +593,8 @@ class Game {
     const embed = await this.render("playing");
     const row = Game.getRow((await getBalance(this.member)) >= this.bet);
 
-    const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-      if (!(this.playerMessage instanceof Message)) {
-        let usedNewMessage = false;
-        let res;
-
-        if (this.playerMessage.deferred) {
-          res = await this.playerMessage
-            .editReply(data as InteractionEditReplyOptions)
-            .catch(async () => {
-              usedNewMessage = true;
-              return await this.playerMessage.channel.send(data as BaseMessageOptions);
-            });
-        } else {
-          res = await this.playerMessage.reply(data as InteractionReplyOptions).catch(() => {
-            return (this.playerMessage as CommandInteraction)
-              .editReply(data as InteractionEditReplyOptions)
-              .catch(async () => {
-                usedNewMessage = true;
-                return await this.playerMessage.channel.send(data as BaseMessageOptions);
-              });
-          });
-        }
-
-        if (usedNewMessage && res instanceof Message) return res;
-
-        const replyMsg = await this.playerMessage.fetchReply();
-        if (replyMsg instanceof Message) {
-          return replyMsg;
-        }
-      } else {
-        return await this.playerMessage.channel.send(data as BaseMessageOptions);
-      }
-    };
-
     if (!this.message)
-      this.message = (await send({ embeds: [embed], components: [row] })) as NypsiMessage;
+      this.message = (await this.send({ embeds: [embed], components: [row] })) as NypsiMessage;
     else await this.edit({ embeds: [embed], components: [row] });
 
     return this.listen();

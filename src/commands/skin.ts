@@ -1,6 +1,6 @@
 import { CommandInteraction } from "discord.js";
 import redis from "../init/redis";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { getPrefix } from "../utils/functions/guilds/utils";
@@ -10,18 +10,19 @@ const cmd = new Command("skin", "view the skin of a minecraft account", "minecra
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   const prefix = (await getPrefix(message.guild))[0];
 
   if (args.length == 0) {
-    return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}skin <account>`)] });
+    return send({ embeds: [new ErrorEmbed(`${prefix}skin <account>`)] });
   }
 
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) message.channel.send({ embeds: [res.embed] });
+    if (res.respond) send({ embeds: [res.embed] });
     return;
   }
 
@@ -30,7 +31,7 @@ async function run(
   const uuid = await getUUID(args[0]);
 
   if (!uuid || uuid.id === "null") {
-    return message.channel.send({ embeds: [new ErrorEmbed("invalid account")] });
+    return send({ embeds: [new ErrorEmbed("invalid account")] });
   }
 
   const embed = new CustomEmbed(
@@ -41,7 +42,7 @@ async function run(
     .setURL("https://namemc.com/profile/" + args[0])
     .setImage(`https://visage.surgeplay.com/full/${uuid.id}`);
 
-  return message.channel.send({ embeds: [embed] });
+  return send({ embeds: [embed] });
 }
 
 async function getUUID(username: string): Promise<{ name: string; id: string }> {

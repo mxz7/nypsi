@@ -1,8 +1,10 @@
 import {
+  BaseMessageOptions,
   Collection,
   CommandInteraction,
   GuildBasedChannel,
   GuildMember,
+  InteractionReplyOptions,
   Message,
   Role,
   SendableChannels,
@@ -22,6 +24,7 @@ export class Command {
   public data?: any;
   public run: (
     message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+    send?: (data: BaseMessageOptions | InteractionReplyOptions) => Promise<Message<boolean>>,
     args?: string[],
   ) => void;
 
@@ -62,6 +65,7 @@ export class Command {
   public setRun(
     run: (
       message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+      send?: (data: BaseMessageOptions | InteractionReplyOptions) => Promise<Message<boolean>>,
       args?: string[],
     ) => void,
   ) {
@@ -78,6 +82,10 @@ export class Command {
     return this;
   }
 }
+
+export type SendMessage = (
+  data: BaseMessageOptions | InteractionReplyOptions,
+) => Promise<Message<boolean>>;
 
 export type CommandCategory =
   | "none"

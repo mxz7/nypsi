@@ -1,5 +1,5 @@
 import { CommandInteraction, PermissionFlagsBits } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getCase, setReason } from "../utils/functions/moderation/cases";
@@ -12,6 +12,7 @@ const cmd = new Command(
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return;
@@ -24,7 +25,7 @@ async function run(
       .addField("usage", `${prefix}reason <case ID> <new reason>`)
       .addField("help", "use this command to change the current reason for a punishment case");
 
-    return await message.channel.send({ embeds: [embed] });
+    return await send({ embeds: [embed] });
   }
 
   const caseID = args[0];
@@ -36,7 +37,7 @@ async function run(
   const case0 = await getCase(message.guild, parseInt(caseID));
 
   if (!case0) {
-    return message.channel.send({
+    return send({
       embeds: [new ErrorEmbed("couldn't find a case with the id `" + caseID + "`")],
     });
   }
@@ -45,7 +46,7 @@ async function run(
 
   const embed = new CustomEmbed(message.member).setDescription("✅ case updated");
 
-  return message.channel.send({ embeds: [embed] });
+  return send({ embeds: [embed] });
 }
 
 cmd.setRun(run);

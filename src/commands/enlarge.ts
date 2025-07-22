@@ -1,5 +1,5 @@
 import { CommandInteraction } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getPrefix } from "../utils/functions/guilds/utils";
 
@@ -9,12 +9,13 @@ const cmd = new Command("enlarge", "enlarge a custom emoji to its full size", "u
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   const prefix = (await getPrefix(message.guild))[0];
 
   if (args.length == 0) {
-    return message.channel.send({
+    return send({
       embeds: [new ErrorEmbed(`${prefix}enlarge <emoji>`).setTitle("`❌` usage")],
     });
   }
@@ -24,7 +25,7 @@ async function run(
   emoji = emoji.split(":");
 
   if (!emoji[2]) {
-    return message.channel.send({
+    return send({
       embeds: [new ErrorEmbed("invalid emoji - please use a custom emoji")],
     });
   }
@@ -39,7 +40,7 @@ async function run(
     url = url + ".png";
   }
 
-  return message.channel.send({
+  return send({
     embeds: [new CustomEmbed(message.member).setImage(url).setFooter({ text: `id: ${emojiID}` })],
   });
 }

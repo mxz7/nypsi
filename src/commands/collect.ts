@@ -1,6 +1,6 @@
 import { CommandInteraction } from "discord.js";
 import { sort } from "fast-sort";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getInventory } from "../utils/functions/economy/inventory";
 import { getItems } from "../utils/functions/economy/utils";
@@ -11,12 +11,13 @@ const cmd = new Command("collect", "check your item collection progress", "money
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) message.channel.send({ embeds: [res.embed] });
+    if (res.respond) send({ embeds: [res.embed] });
     return;
   }
 
@@ -27,7 +28,7 @@ async function run(
   }
 
   if (items.length === 0)
-    return message.channel.send({ embeds: [new ErrorEmbed("no items with that role exist")] });
+    return send({ embeds: [new ErrorEmbed("no items with that role exist")] });
 
   await addCooldown(cmd.name, message.member, 5);
 
@@ -56,12 +57,12 @@ async function run(
     );
 
   if (pages.size === 1) {
-    return message.channel.send({ embeds: [embed] });
+    return send({ embeds: [embed] });
   }
 
   const row = PageManager.defaultRow();
 
-  const msg = await message.channel.send({ embeds: [embed], components: [row] });
+  const msg = await send({ embeds: [embed], components: [row] });
 
   const manager = new PageManager({
     embed,

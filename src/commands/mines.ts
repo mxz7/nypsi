@@ -3,7 +3,6 @@ import { randomInt } from "crypto";
 import {
   ActionRowBuilder,
   APIApplicationCommandOptionChoice,
-  BaseMessageOptions,
   ButtonBuilder,
   ButtonComponentData,
   ButtonInteraction,
@@ -11,8 +10,6 @@ import {
   ColorResolvable,
   CommandInteraction,
   Interaction,
-  InteractionEditReplyOptions,
-  InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
   MessageEditOptions,
@@ -21,7 +18,7 @@ import {
 } from "discord.js";
 import redis from "../init/redis.js";
 import { NypsiClient } from "../models/Client.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command.js";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command.js";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
 import { a } from "../utils/functions/anticheat.js";
@@ -110,39 +107,10 @@ cmd.slashData
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (!(await userExists(message.member))) await createUser(message.member);
-
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
 
   if (games.has(message.author.id)) {
     return send({ embeds: [new ErrorEmbed("you are already playing mines")] });
@@ -171,7 +139,7 @@ async function run(
     return send({ embeds: [embed] });
   }
 
-  return prepareGame(message, args);
+  return prepareGame(message, send, args);
 }
 
 cmd.setRun(run);
@@ -180,40 +148,11 @@ module.exports = cmd;
 
 async function prepareGame(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
   msg?: Message,
 ) {
   recentCommands.set(message.author.id, Date.now());
-
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
 
   if (games.has(message.author.id)) {
     if (msg) {
@@ -441,7 +380,7 @@ async function prepareGame(
     msg = await send({ embeds: [embed], components: rows });
   }
 
-  playGame(message, msg, args).catch((e: string) => {
+  playGame(message, send, msg, args).catch((e: string) => {
     logger.error(
       `error occurred playing mines - ${message.author.id} (${message.author.username})`,
     );
@@ -535,6 +474,7 @@ function toLocation(coordinate: string) {
 
 async function playGame(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   msg: Message,
   args: string[],
 ): Promise<void> {
@@ -667,7 +607,7 @@ async function playGame(
         }
       }
 
-      return prepareGame(message, args, msg);
+      return prepareGame(message, send, args, msg);
     }
   };
 
@@ -813,7 +753,7 @@ async function playGame(
     await message.channel.send({
       content: message.author.toString() + " invalid coordinate, example: `a3`",
     });
-    return playGame(message, msg, args);
+    return playGame(message, send, msg, args);
   }
 
   if (response.customId == "finish") {
@@ -852,7 +792,7 @@ async function playGame(
       await message.channel.send({
         content: message.author.toString() + " invalid coordinate, example: `a3`",
       });
-      return playGame(message, msg, args);
+      return playGame(message, send, msg, args);
     }
   }
 
@@ -864,7 +804,7 @@ async function playGame(
       lose(response);
       return;
     case "c":
-      return playGame(message, msg, args);
+      return playGame(message, send, msg, args);
     case "g":
     case "a":
       if (grid[location] == "a") {
@@ -934,6 +874,6 @@ async function playGame(
 
       edit({ embeds: [embed], components }, response);
 
-      return playGame(message, msg, args);
+      return playGame(message, send, msg, args);
   }
 }

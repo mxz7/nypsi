@@ -1,18 +1,17 @@
 import {
   ActionRowBuilder,
-  BaseMessageOptions,
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
   GuildMember,
   Interaction,
   InteractionEditReplyOptions,
-  InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
   MessageEditOptions,
+  MessageFlags,
 } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getMember } from "../utils/functions/member";
 
@@ -28,6 +27,7 @@ avatar.slashData.addUserOption((option) =>
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   let member: GuildMember;
@@ -39,7 +39,7 @@ async function run(
   }
 
   if (!member) {
-    return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });
+    return send({ embeds: [new ErrorEmbed("invalid user")], flags: MessageFlags.Ephemeral });
   }
 
   const avatar = member.user.displayAvatarURL({ size: 256, extension: "png" });
@@ -60,36 +60,6 @@ async function run(
   const embed = new CustomEmbed(member).setHeader(member.user.username).setImage(avatar);
 
   let msg: Message;
-
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
 
   if (serverAvatar) {
     msg = await send({ embeds: [embed], components: [row] });

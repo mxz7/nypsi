@@ -1,5 +1,5 @@
 import { CommandInteraction, GuildMember } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { getMember } from "../utils/functions/member";
@@ -9,17 +9,18 @@ const cmd = new Command("ddos", "ddos other users (fake)", "fun").setAliases(["h
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) message.channel.send({ embeds: [res.embed] });
+    if (res.respond) send({ embeds: [res.embed] });
     return;
   }
 
   if (args.length == 0) {
-    return message.channel.send({ embeds: [new ErrorEmbed("$ddos <user>")] });
+    return send({ embeds: [new ErrorEmbed("$ddos <user>")] });
   }
 
   let member: GuildMember;
@@ -31,7 +32,7 @@ async function run(
   }
 
   if (!member) {
-    return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });
+    return send({ embeds: [new ErrorEmbed("invalid user")] });
   }
 
   const ip = `${randNumber()}.${randNumber()}.${randNumber()}.${randNumber()}`;
@@ -50,7 +51,7 @@ async function run(
       "**status** *online*",
   ).setHeader("ddos tool");
 
-  return message.channel.send({ embeds: [embed] }).then((m) => {
+  return send({ embeds: [embed] }).then((m) => {
     embed.setDescription(
       member.user.toString() +
         "\n\n" +

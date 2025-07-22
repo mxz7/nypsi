@@ -1,5 +1,5 @@
 import { CommandInteraction } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -11,12 +11,13 @@ const cmd = new Command(
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) message.channel.send({ embeds: [res.embed] });
+    if (res.respond) send({ embeds: [res.embed] });
     return;
   }
 
@@ -32,7 +33,7 @@ async function run(
     );
 
     if (!role) {
-      return await message.channel.send({
+      return await send({
         embeds: [new ErrorEmbed("i wasn't able to find that role")],
       });
     }
@@ -40,7 +41,7 @@ async function run(
     members = Array.from(role.members.keys());
 
     if (members.length == 0) {
-      return message.channel.send({ embeds: [new ErrorEmbed("there is nobody in that role")] });
+      return send({ embeds: [new ErrorEmbed("there is nobody in that role")] });
     }
   }
 
@@ -52,7 +53,7 @@ async function run(
     .setHeader(`${message.author.username}'s raffle`, message.author.avatarURL())
     .setDescription(`${chosenMember.user.toString()} | \`${chosenMember.user.username}\``);
 
-  return message.channel.send({ embeds: [embed] });
+  return send({ embeds: [embed] });
 }
 
 cmd.setRun(run);

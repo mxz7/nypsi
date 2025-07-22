@@ -81,5 +81,7 @@ export function MStoTime(ms: number, long = false) {
     }
   }
 
+  if (!output) output = `0${long ? " seconds" : "s"}`;
+
   return output.trim();
 }

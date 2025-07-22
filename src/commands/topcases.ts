@@ -1,5 +1,5 @@
 import { CommandInteraction, PermissionFlagsBits, User } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 
 import prisma from "../init/database";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
@@ -17,6 +17,7 @@ const cmd = new Command(
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
@@ -28,7 +29,7 @@ async function run(
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) message.channel.send({ embeds: [res.embed] });
+    if (res.respond) send({ embeds: [res.embed] });
     return;
   }
 
@@ -67,8 +68,7 @@ async function run(
       getCaseCount(message.guild),
     ]);
 
-    if (moderators.length === 0)
-      return message.channel.send({ embeds: [new ErrorEmbed("no data")] });
+    if (moderators.length === 0) return send({ embeds: [new ErrorEmbed("no data")] });
 
     const moderatorsText: string[] = [];
     const usersText: string[] = [];
@@ -105,7 +105,7 @@ async function run(
     if (usersText.length > 0) embed.addField("received", usersText.join("\n"), true);
     if (typeText.length > 0) embed.addField("types", typeText.join("\n"), true);
 
-    return message.channel.send({ embeds: [embed] });
+    return send({ embeds: [embed] });
   }
 
   async function specificUser(user: User) {
@@ -133,7 +133,7 @@ async function run(
     ]);
 
     if (given.length === 0 && received.length === 0)
-      return message.channel.send({ embeds: [new ErrorEmbed("no data")] });
+      return send({ embeds: [new ErrorEmbed("no data")] });
 
     const givenText: string[] = [];
     const receivedText: string[] = [];
@@ -154,7 +154,7 @@ async function run(
     if (givenText.length > 0) embed.addField("given", givenText.join("\n"), true);
     if (receivedText.length > 0) embed.addField("received", receivedText.join("\n"), true);
 
-    return message.channel.send({ embeds: [embed] });
+    return send({ embeds: [embed] });
   }
 
   await addCooldown(cmd.name, message.member, 10);
@@ -164,7 +164,7 @@ async function run(
   } else {
     const target = await getMember(message.guild, args.join(" "));
 
-    if (!target) return message.channel.send({ embeds: [new ErrorEmbed("invalid member")] });
+    if (!target) return send({ embeds: [new ErrorEmbed("invalid member")] });
 
     return specificUser(target.user);
   }

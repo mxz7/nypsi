@@ -2,7 +2,6 @@ import { flavors } from "@catppuccin/palette";
 import { randomInt } from "crypto";
 import {
   ActionRowBuilder,
-  BaseMessageOptions,
   ButtonBuilder,
   ButtonComponentData,
   ButtonInteraction,
@@ -10,8 +9,6 @@ import {
   ColorResolvable,
   CommandInteraction,
   Interaction,
-  InteractionEditReplyOptions,
-  InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
   MessageEditOptions,
@@ -20,7 +17,7 @@ import {
 } from "discord.js";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { a } from "../utils/functions/anticheat";
@@ -130,39 +127,10 @@ cmd.slashData
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (!(await userExists(message.member))) await createUser(message.member);
-
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
 
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
@@ -174,7 +142,7 @@ async function run(
   if (games.has(message.author.id))
     return send({ embeds: [new ErrorEmbed("you are already playing dragon tower")] });
 
-  return prepareGame(message, args);
+  return prepareGame(message, send, args);
 }
 
 cmd.setRun(run);
@@ -183,40 +151,11 @@ module.exports = cmd;
 
 async function prepareGame(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
   msg?: Message,
 ) {
   recentCommands.set(message.author.id, Date.now());
-
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
 
   const defaultBet = await getDefaultBet(message.member);
 
@@ -363,7 +302,7 @@ async function prepareGame(
     msg = await send({ embeds: [embed], components });
   }
 
-  playGame(message, msg, args).catch((e) => {
+  playGame(message, send, msg, args).catch((e) => {
     logger.error(
       `error occurred playing tower - ${message.author.id} (${message.author.username})`,
     );
@@ -503,6 +442,7 @@ function createRows(board: string[][], end = false) {
 
 async function playGame(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   msg: Message,
   args: string[],
 ): Promise<void> {
@@ -621,7 +561,7 @@ async function playGame(
         }
       }
 
-      return prepareGame(message, args, msg);
+      return prepareGame(message, send, args, msg);
     }
   };
 
@@ -774,7 +714,7 @@ async function playGame(
             embeds: [new ErrorEmbed("invalid square")],
             flags: MessageFlags.Ephemeral,
           });
-        return playGame(message, msg, args);
+        return playGame(message, send, msg, args);
       }
     }
 
@@ -851,7 +791,7 @@ async function playGame(
 
         edit({ embeds: [game.embed], components }, response);
 
-        return playGame(message, msg, args);
+        return playGame(message, send, msg, args);
     }
   };
 

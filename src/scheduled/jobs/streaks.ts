@@ -112,7 +112,7 @@ async function doDailyStreaks(manager: ClusterManager) {
         await addStat(user.userId, "calendar");
 
         return;
-      } else if (inventory.hasGem("white_gem")) {
+      } else if (await inventory.hasGem("white_gem")) {
         const gemSaveChance = Math.floor(Math.random() * 10);
 
         if (gemSaveChance < 5) {
@@ -254,7 +254,7 @@ async function doVoteStreaks(manager: ClusterManager) {
         await addStat(user.userId, "calendar");
 
         return;
-      } else if (inventory.hasGem("white_gem")) {
+      } else if (await inventory.hasGem("white_gem")) {
         const gemSaveChance = Math.floor(Math.random() * 10);
 
         if (gemSaveChance < 5) {
