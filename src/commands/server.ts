@@ -1,5 +1,5 @@
 import { CommandInteraction } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders.js";
 import { formatDate } from "../utils/functions/date";
 import { getPeaks, updateGuild } from "../utils/functions/guilds/utils";
@@ -12,6 +12,7 @@ const cmd = new Command("server", "view information about the server", "info").s
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   const server = message.guild;
@@ -39,7 +40,7 @@ async function run(
       .setHeader(server.name)
       .setDescription("`" + server.id + "`");
 
-    return message.channel.send({ embeds: [embed] });
+    return send({ embeds: [embed] });
   }
 
   if (args.length == 1 && args[0] == "-m") {
@@ -55,7 +56,7 @@ async function run(
           `**member peak** ${(await getPeaks(message.guild)).toLocaleString()}`,
       );
 
-    return message.channel.send({ embeds: [embed] });
+    return send({ embeds: [embed] });
   }
 
   const embed = new CustomEmbed(message.member)
@@ -97,7 +98,7 @@ async function run(
     embed.setFooter({ text: "humans and bots may be inaccurate due to server size" });
   }
 
-  message.channel.send({ embeds: [embed] });
+  send({ embeds: [embed] });
 }
 
 cmd.setRun(run);

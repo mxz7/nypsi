@@ -1,5 +1,5 @@
 import { CommandInteraction } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { cleanString } from "../utils/functions/string";
@@ -25,18 +25,19 @@ const cmd = new Command("hypixel", "view hypixel stats for a minecraft account",
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   const prefix = (await getPrefix(message.guild))[0];
 
   if (args.length == 0) {
-    return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}h <username>`)] });
+    return send({ embeds: [new ErrorEmbed(`${prefix}h <username>`)] });
   }
 
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) message.channel.send({ embeds: [res.embed] });
+    if (res.respond) send({ embeds: [res.embed] });
     return;
   }
 
@@ -56,7 +57,7 @@ async function run(
     try {
       uuid = await fetch(uuidURL).then((uuidURL) => uuidURL.json());
     } catch {
-      return message.channel.send({ embeds: [new ErrorEmbed("invalid account")] });
+      return send({ embeds: [new ErrorEmbed("invalid account")] });
     }
 
     const hypixelURL = `https://api.hypixel.net/player?uuid=${uuid.id}&key=${process.env.HYPIXEL_TOKEN}`;
@@ -65,11 +66,11 @@ async function run(
       hypixelData = await fetch(hypixelURL).then((hypixelData) => hypixelData.json());
     } catch (e) {
       logger.error("hypixel error", e);
-      return await message.channel.send({ embeds: [new ErrorEmbed("error fetching data")] });
+      return await send({ embeds: [new ErrorEmbed("error fetching data")] });
     }
 
     if (!hypixelData.success) {
-      return await message.channel.send({ embeds: [new ErrorEmbed("error fetching data")] });
+      return await send({ embeds: [new ErrorEmbed("error fetching data")] });
     }
 
     cache.set(username.toLowerCase(), {
@@ -165,7 +166,7 @@ async function run(
     if (cache.has(username.toLowerCase())) {
       cache.delete(username.toLowerCase());
     }
-    return message.channel.send({ embeds: [new ErrorEmbed("error reading hypixel data")] });
+    return send({ embeds: [new ErrorEmbed("error reading hypixel data")] });
   }
 
   const embed = new CustomEmbed(message.member)
@@ -179,7 +180,7 @@ async function run(
     .setURL(url)
     .setThumbnail(skin);
 
-  return await message.channel.send({ embeds: [embed] });
+  return await send({ embeds: [embed] });
 }
 
 cmd.setRun(run);

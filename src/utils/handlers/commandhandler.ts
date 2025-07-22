@@ -2,12 +2,15 @@ import { REST } from "@discordjs/rest";
 import {
   ActionRowBuilder,
   APIEmbed,
+  BaseMessageOptions,
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
   Embed,
   GuildMember,
   Interaction,
+  InteractionEditReplyOptions,
+  InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
   MessageFlags,
@@ -923,7 +926,39 @@ export async function runCommand(
     }
   }
 
-  command.run(message, args);
+  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
+    if (!(message instanceof Message)) {
+      let usedNewMessage = false;
+      let res;
+
+      if (message.deferred) {
+        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
+          usedNewMessage = true;
+          return await message.channel.send(data as BaseMessageOptions);
+        });
+      } else {
+        res = await message.reply(data as InteractionReplyOptions).catch(async () => {
+          try {
+            return await message.editReply(data as InteractionEditReplyOptions);
+          } catch {
+            usedNewMessage = true;
+            return await message.channel.send(data as BaseMessageOptions);
+          }
+        });
+      }
+
+      if (usedNewMessage && res instanceof Message) return res;
+
+      const replyMsg = await message.fetchReply();
+      if (replyMsg instanceof Message) {
+        return replyMsg;
+      }
+    } else {
+      return await message.channel.send(data as BaseMessageOptions);
+    }
+  };
+
+  command.run(message, send, args);
   preProcessLength[1] = performance.now();
 
   if (preProcessLength[1] - preProcessLength[0] > 100) {

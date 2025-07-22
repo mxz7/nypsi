@@ -8,7 +8,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getMember } from "../utils/functions/member";
 import PageManager from "../utils/functions/page";
@@ -28,12 +28,13 @@ const cmd = new Command("usernamehistory", "view a user's username history", "in
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) message.channel.send({ embeds: [res.embed] });
+    if (res.respond) send({ embeds: [res.embed] });
     return;
   }
 
@@ -44,7 +45,7 @@ async function run(
   } else {
     if (args[0].toLowerCase() == "-clear") {
       await clearUsernameHistory(message.member);
-      return message.channel.send({
+      return send({
         embeds: [new CustomEmbed(message.member, "✅ your username history has been cleared")],
       });
     }
@@ -53,13 +54,13 @@ async function run(
   }
 
   if (!member) {
-    return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });
+    return send({ embeds: [new ErrorEmbed("invalid user")] });
   }
 
   await addCooldown(cmd.name, message.member, 5);
 
   if (!(await hasProfile(member))) {
-    return message.channel.send({
+    return send({
       embeds: [new CustomEmbed(message.member, "this user has no username history")],
     });
   }
@@ -70,7 +71,7 @@ async function run(
   ]);
 
   if (history.length == 0) {
-    return message.channel.send({
+    return send({
       embeds: [new CustomEmbed(message.member, "this user has no username history")],
     });
   }
@@ -112,9 +113,9 @@ async function run(
   let msg: Message;
 
   if (pages.size == 1) {
-    return await message.channel.send({ embeds: [embed] });
+    return await send({ embeds: [embed] });
   } else {
-    msg = await message.channel.send({ embeds: [embed], components: [row] });
+    msg = await send({ embeds: [embed], components: [row] });
   }
 
   if (pages.size == 1) return;

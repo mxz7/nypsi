@@ -1,5 +1,5 @@
 import { CommandInteraction } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { createUser, userExists } from "../utils/functions/economy/utils.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
@@ -9,11 +9,14 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 
 const cmd = new Command("weekly", "get your weekly bonus (premium only)", "money");
 
-async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) {
+async function run(
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
+) {
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) message.channel.send({ embeds: [res.embed] });
+    if (res.respond) send({ embeds: [res.embed] });
     return;
   }
 
@@ -33,7 +36,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
       text: `${prefix}premium`,
     });
 
-    return message.channel.send({ embeds: [embed] });
+    return send({ embeds: [embed] });
   };
 
   if (!(await isPremium(message.member)) && !(await isBooster(message.member))) {
@@ -53,7 +56,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
       `you will automatically receive your weekly rewards <t:${Math.floor(saturday.getTime() / 1000)}:R>`,
     );
 
-    return message.channel.send({ embeds: [embed] });
+    return send({ embeds: [embed] });
   }
 }
 

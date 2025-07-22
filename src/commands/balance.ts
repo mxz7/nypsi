@@ -1,15 +1,7 @@
-import {
-  BaseMessageOptions,
-  CommandInteraction,
-  GuildMember,
-  InteractionEditReplyOptions,
-  InteractionReplyOptions,
-  Message,
-  MessageFlags,
-} from "discord.js";
+import { CommandInteraction, GuildMember, Message, MessageFlags } from "discord.js";
 import prisma from "../init/database";
 import { NypsiClient } from "../models/Client";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
 import {
@@ -43,6 +35,7 @@ cmd.slashData.addUserOption((option) =>
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (message.author.id == Constants.TEKOH_ID && args.length == 2) {
@@ -82,39 +75,9 @@ async function run(
     target = await getMember(message.guild, args.join(" "));
 
     if (!target) {
-      return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });
+      return send({ embeds: [new ErrorEmbed("invalid user")] });
     }
   }
-
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
 
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);

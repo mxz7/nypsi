@@ -1,5 +1,5 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { hasAdminPermission } from "../utils/functions/users/admin";
 import { loadCommands, reloadCommand } from "../utils/handlers/commandhandler";
 import { reloadInteractions } from "../utils/handlers/interactions";
@@ -9,6 +9,7 @@ const cmd = new Command("reload", "reload commands", "none").setPermissions(["bo
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (!(await hasAdminPermission(message.member, "reload"))) return;

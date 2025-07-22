@@ -3,7 +3,7 @@ import { CommandInteraction, Message } from "discord.js";
 import { readFile } from "fs/promises";
 import { nanoid } from "nanoid";
 import { promisify } from "util";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { uploadImage } from "../utils/functions/image";
 import { hasAdminPermission } from "../utils/functions/users/admin";
 import { logger } from "../utils/logger";
@@ -12,6 +12,7 @@ const cmd = new Command("logsearch", "search through logs", "none").setPermissio
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (!(await hasAdminPermission(message.member, "logsearch"))) return;
@@ -26,7 +27,7 @@ async function run(
 
   logger.debug("grep");
 
-  const msg = message.channel.send({ content: "searching..." });
+  const msg = send({ content: "searching..." });
 
   const success = await execCmd(
     `grep -rh "${escapeForShellGrep(args.join(" "))}" out > ${path}`,

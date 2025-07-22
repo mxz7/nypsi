@@ -1,5 +1,5 @@
 import { CommandInteraction, MessageReaction, PermissionFlagsBits, User } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { newCase } from "../utils/functions/moderation/cases";
@@ -11,11 +11,12 @@ const cmd = new Command("kicksince", "kick members that joined after a certain t
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.Administrator)) {
     if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
-      return message.channel.send({
+      return send({
         embeds: [new ErrorEmbed("you need the `administrator` permission")],
       });
     }
@@ -23,7 +24,7 @@ async function run(
   }
 
   if (!message.guild.members.me.permissions.has(PermissionFlagsBits.KickMembers)) {
-    return message.channel.send({
+    return send({
       embeds: [new ErrorEmbed("i need the `kick members` permission for this command to work")],
     });
   }
@@ -46,25 +47,25 @@ async function run(
         "**1d** *1 day*\n**10h** *10 hours*\n**15m** *15 minutes*\n**30s** *30 seconds*",
       );
 
-    return message.channel.send({ embeds: [embed] });
+    return send({ embeds: [embed] });
   }
 
   const time = new Date().getTime() - getDuration(args[0].toLowerCase()) * 1000;
 
   if (!time) {
-    return message.channel.send({ embeds: [new ErrorEmbed("invalid time length")] });
+    return send({ embeds: [new ErrorEmbed("invalid time length")] });
   } else if (time < Date.now() - 604800000 && message.author.id != message.guild.ownerId) {
-    return message.channel.send({ embeds: [new ErrorEmbed("lol dont even try")] });
+    return send({ embeds: [new ErrorEmbed("lol dont even try")] });
   } else if (time < Date.now() - 604800000 * 2) {
-    return message.channel.send({ embeds: [new ErrorEmbed("lol dont even try")] });
+    return send({ embeds: [new ErrorEmbed("lol dont even try")] });
   }
 
   let members = await message.guild.members.fetch();
 
-  members = await members.filter((m) => m.joinedTimestamp >= time);
+  members = members.filter((m) => m.joinedTimestamp >= time);
 
   if (members.size >= 50) {
-    const confirm = await message.channel.send({
+    const confirm = await send({
       embeds: [
         new CustomEmbed(
           message.member,
@@ -109,7 +110,7 @@ async function run(
   let msg;
 
   if (status) {
-    msg = await message.channel.send({ embeds: [status] });
+    msg = await send({ embeds: [status] });
   }
 
   if (args.length > 1) {
@@ -162,7 +163,7 @@ async function run(
           fail = true;
         });
         if (fail) {
-          return message.channel.send({
+          return send({
             embeds: [new CustomEmbed(message.member, "✅ operation cancelled")],
           });
         }
@@ -172,7 +173,7 @@ async function run(
   }
 
   if (count == 0) {
-    return message.channel.send({ embeds: [new ErrorEmbed("i was unable to kick any users")] });
+    return send({ embeds: [new ErrorEmbed("i was unable to kick any users")] });
   }
 
   const embed = new CustomEmbed(message.member);
@@ -206,7 +207,7 @@ async function run(
     msg.delete();
   }
 
-  await message.channel.send({ embeds: [embed] });
+  await send({ embeds: [embed] });
 
   const members1 = Array.from(members.keys());
 

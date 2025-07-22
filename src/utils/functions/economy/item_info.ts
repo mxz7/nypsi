@@ -17,7 +17,7 @@ import {
 import { inPlaceSort } from "fast-sort";
 import { min } from "mathjs";
 import { NypsiClient } from "../../../models/Client";
-import { NypsiCommandInteraction, NypsiMessage } from "../../../models/Command";
+import { NypsiCommandInteraction, NypsiMessage, SendMessage } from "../../../models/Command";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { Item } from "../../../types/Economy";
 import { KarmaShopItem } from "../../../types/Karmashop";
@@ -58,7 +58,7 @@ export async function runItemInfo(
   args: string[],
   selected: Item,
   defaultTab: string,
-  send?: (data: BaseMessageOptions | InteractionReplyOptions) => Promise<Message<boolean>>,
+  send?: SendMessage,
 ): Promise<boolean> {
   send ??= async (data: BaseMessageOptions | InteractionReplyOptions) => {
     return await message.channel.send(data as BaseMessageOptions);

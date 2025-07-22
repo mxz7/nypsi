@@ -1,6 +1,6 @@
 import { CommandInteraction, Message } from "discord.js";
 import { NypsiClient } from "../models/Client";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import {
@@ -17,6 +17,7 @@ const cmd = new Command("reply", "reply to a support ticket", "none");
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   const support = await getSupportRequestByChannelId(message.channel.id);
@@ -26,7 +27,7 @@ async function run(
   if (!(message instanceof Message)) return;
 
   if (args.length == 0 && !message.attachments.first()) {
-    return message.channel.send({
+    return send({
       embeds: [
         new ErrorEmbed(
           Array.from(quickResponses.keys().map((i) => `**${i}**`)).join("\n") +
@@ -54,10 +55,10 @@ async function run(
       const summary = await summariseRequest(support.userId);
 
       if (!summary) {
-        return message.channel.send({ embeds: [new ErrorEmbed("failed to generate summary")] });
+        return send({ embeds: [new ErrorEmbed("failed to generate summary")] });
       }
 
-      return message.channel.send({
+      return send({
         embeds: [
           new CustomEmbed()
             .setDescription(summary)
@@ -72,7 +73,7 @@ async function run(
     const attachments = await handleAttachments(message.attachments);
 
     if (attachments === "too big")
-      return message.channel.send({
+      return send({
         embeds: [new ErrorEmbed("cannot upload file larger than 100mb")],
       });
 

@@ -1,7 +1,7 @@
 import { CommandInteraction } from "discord.js";
 // @ts-expect-error doesnt like getting from json file
 import { workMessages } from "../../data/lists.json";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addBalance, getBalance } from "../utils/functions/economy/balance";
 import { addStat } from "../utils/functions/economy/stats";
@@ -14,22 +14,25 @@ const cmd = new Command(
   "money",
 );
 
-async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) {
+async function run(
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
+) {
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) message.channel.send({ embeds: [res.embed] });
+    if (res.respond) send({ embeds: [res.embed] });
     return;
   }
 
   if (!(await userExists(message.member))) await createUser(message.member);
 
   if ((await getBalance(message.member)) <= 0) {
-    return message.channel.send({ embeds: [new ErrorEmbed("you need money to work")] });
+    return send({ embeds: [new ErrorEmbed("you need money to work")] });
   }
 
   if ((await getBalance(message.member)) > 1000000) {
-    return message.channel.send({
+    return send({
       embeds: [new ErrorEmbed("you're too rich for this command bro")],
     });
   }
@@ -62,7 +65,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
 
   const embed = new CustomEmbed(message.member, work).setHeader("work", message.author.avatarURL());
 
-  message.channel.send({ embeds: [embed] }).then(async (m) => {
+  send({ embeds: [embed] }).then(async (m) => {
     if ((await getBalance(message.member)) >= 2000000) {
       embed.setDescription(work + "\n\n+$**" + earned.toLocaleString() + "**");
     } else {

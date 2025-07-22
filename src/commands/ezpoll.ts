@@ -1,5 +1,5 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -8,12 +8,13 @@ const cmd = new Command("ezpoll", "simple poll builder", "utility");
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) message.channel.send({ embeds: [res.embed] });
+    if (res.respond) send({ embeds: [res.embed] });
     return;
   }
 
@@ -30,11 +31,11 @@ async function run(
       )
       .addField("example", `${prefix}ezpoll option1 option2`);
 
-    return message.channel.send({ embeds: [embed] });
+    return send({ embeds: [embed] });
   }
 
   if (args.length < 2) {
-    return message.channel.send({ embeds: [new ErrorEmbed("not enough options")] });
+    return send({ embeds: [new ErrorEmbed("not enough options")] });
   }
 
   await addCooldown(cmd.name, message.member, 30);
