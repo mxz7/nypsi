@@ -647,6 +647,8 @@ export async function gemBreak(
 
   await addInventoryItem(userId, "gem_shard", amount);
 
+  logger.debug(`gems: ${userId} shattered ${gem} into ${amount} shards`);
+
   const embed = new CustomEmbed(userId)
     .setTitle(`your ${getItems()[gem].name} has shattered`)
     .setDescription(
