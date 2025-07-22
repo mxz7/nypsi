@@ -529,6 +529,12 @@ export async function gemBreak(
   const userId = getUserId(member);
 
   const inventory = await getInventory(userId);
+
+  if (!(await inventory.hasGem(gem))) {
+    logger.debug(`gems: ${userId} skipping gem break (${gem}), no gem`);
+    return;
+  }
+
   const gemLocation = await inventory.hasGem(gem);
 
   if (!shatterOnly && ((await inventory.hasGem("crystal_heart")).any || !gemLocation.any)) return;
