@@ -38,22 +38,13 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient | Cl
   }
 
   if (isNaN(shard)) {
-    const res = await redis.get(
-      `${Constants.redis.nypsi.COUNTER_ERROR}:${data.guildId}:${data.channel}`,
-    );
-
-    const errorCount = res ? parseInt(res) + 1 : 1;
-
-    await redis.set(
-      `${Constants.redis.nypsi.COUNTER_ERROR}:${data.guildId}:${data.channel}`,
-      errorCount,
-      "EX",
-      ms("30 days") / 1000,
-    );
+    const errorCount = await redis.incr(`${Constants.redis.nypsi.COUNTER_ERROR}:${data.guildId}:${data.channel}`);
+    await redis.expire(`${Constants.redis.nypsi.COUNTER_ERROR}:${data.guildId}:${data.channel}`, ms("30 days") / 1000);
 
     logger.warn(
-      `counter channel not found (${errorCount}/50)${errorCount < 50 ? "" : ", deleting counter"}: ${JSON.stringify(data)}`,
+      `counters: channel not found (${errorCount}/50)${errorCount < 50 ? "" : ", deleting counter"}`, data
     );
+
     if (errorCount == 50)
       await prisma.guildCounter.delete({
         where: {
@@ -92,7 +83,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient | Cl
   for (const r of res) {
     if (r) {
       if (r === "failed") {
-        logger.warn("failed to update counter", data);
+        logger.warn("counters: failed to update counter", data);
       } else if (r === "updated") {
         logger.info(`::success updated counter for ${data.guildId} type: ${data.tracks}`);
       }
