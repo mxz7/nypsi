@@ -18,8 +18,8 @@ importers:
         specifier: 2.5.1
         version: 2.5.1
       '@hono/node-server':
-        specifier: ^1.16.0
-        version: 1.16.0(hono@4.8.4)
+        specifier: ^1.17.1
+        version: 1.17.1(hono@4.8.4)
       '@prisma/client':
         specifier: 6.11.1
         version: 6.11.1(prisma@6.11.1(typescript@5.8.3))(typescript@5.8.3)
@@ -568,8 +568,8 @@ packages:
     resolution: {integrity: sha512-d9zaMRSTIKDLhctzH12MtXvJKSSUhaHcjV+2Z+GK+EEY7XKpP5yR4x+N3TAcHTcu963nIr+TMcCb4DBCYX1z6Q==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
 
-  '@hono/node-server@1.16.0':
-    resolution: {integrity: sha512-9LwRb5XOrTFapOABiQjGC50wRVlzUvWZsDHINCnkBniP+Q+LQf4waN0nzk9t+2kqcTsnGnieSmqpHsr6kH2bdw==}
+  '@hono/node-server@1.17.1':
+    resolution: {integrity: sha512-SY79W/C+2b1MyAzmIcV32Q47vO1b5XwLRwj8S9N6Jr5n1QCkIfAIH6umOSgqWZ4/v67hg6qq8Ha5vZonVidGsg==}
     engines: {node: '>=18.14.1'}
     peerDependencies:
       hono: ^4
@@ -3662,7 +3662,7 @@ snapshots:
 
   '@eslint/js@8.57.1': {}
 
-  '@hono/node-server@1.16.0(hono@4.8.4)':
+  '@hono/node-server@1.17.1(hono@4.8.4)':
     dependencies:
       hono: 4.8.4
 
