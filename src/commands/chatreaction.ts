@@ -861,6 +861,10 @@ async function run(
 
         let user: string | GuildMember = args[2];
 
+        if (user.match(Constants.SNOWFLAKE_REGEX)) {
+          user = user.replaceAll(/\D/g, "");
+        }
+
         if (!(await message.guild.members.fetch(user))) {
           if (!message.mentions.members.first()) {
             return send({
@@ -904,6 +908,10 @@ async function run(
         }
 
         let user = args[2];
+
+        if (user.match(Constants.SNOWFLAKE_REGEX)) {
+          user = user.replaceAll(/\D/g, "");
+        }
 
         if (!(await message.guild.members.fetch(user))) {
           if (!message.mentions.members.first()) {
