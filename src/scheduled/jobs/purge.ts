@@ -1,5 +1,4 @@
 import dayjs = require("dayjs");
-import { readFile, readdir, unlink } from "fs/promises";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { NypsiClient } from "../../models/Client";
@@ -23,42 +22,6 @@ export default {
     });
 
     if (d.count > 0) log(`${d.count.toLocaleString()} usernames purged`);
-
-    const files = await readdir("./out");
-    let filesCount = 0;
-
-    for (const fileName of files) {
-      const file = await readFile(`./out/${fileName}`).then((r) =>
-        r
-          .toString()
-          .split("\n")
-          .map((i) => {
-            try {
-              return JSON.parse(i) as { time: number };
-            } catch {
-              return undefined;
-            }
-          }),
-      );
-
-      let attempts = 0;
-
-      while (attempts < 50) {
-        attempts++;
-        if (attempts >= 50) break;
-        const chosen = Math.floor(Math.random() * file.length);
-
-        if (file[chosen] && file[chosen].time) {
-          if (dayjs(file[chosen].time).isBefore(dayjs().subtract(120, "days"))) {
-            filesCount++;
-            await unlink(`./out/${fileName}`);
-            break;
-          }
-        }
-      }
-    }
-
-    log(`${filesCount} logs files deleted`);
 
     const limit = dayjs().subtract(1, "weeks").toDate();
 
