@@ -17,6 +17,7 @@
 - staff members can now start a support request with users
 - added transaction logging in database - easier to query
 - players below prestige 1 don't get their level reset on new season
+- counters now wont delete themselves after the first fail (@growling_grizzly)
 
 ---
 
