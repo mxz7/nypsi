@@ -235,6 +235,10 @@ async function doAutosellThing(
 export async function addInventoryItem(member: MemberResolvable, itemId: string, amount: number) {
   const userId = getUserId(member);
 
+  if (itemId.includes("gem")) {
+    logger.debug(`gems: ${userId} added ${amount}x ${itemId}`);
+  }
+
   if (amount <= 0) return;
 
   if (!(await userExists(userId))) await createUser(userId);
@@ -335,6 +339,10 @@ export async function removeInventoryItem(
 
 export async function setInventoryItem(member: MemberResolvable, itemId: string, amount: number) {
   const userId = getUserId(member);
+
+  if (itemId.includes("gem")) {
+    logger.debug(`gems: ${userId} set ${amount}x ${itemId}`);
+  }
 
   if (!getItems()[itemId]) {
     console.trace();
