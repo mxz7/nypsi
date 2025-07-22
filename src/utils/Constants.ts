@@ -250,6 +250,7 @@ export default {
       TRADE_FULFILLING: "nypsi:trade:fulfilling",
       MARKET_DM: "nypsi:market:dm",
       DOCS_CONTENT: "nypsi:docs",
+      COUNTER_ERROR: "nypsi:counter:error",
     },
   },
   ANNOUNCEMENTS_CHANNEL_ID: "747057465245564939",

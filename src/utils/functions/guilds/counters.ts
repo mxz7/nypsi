@@ -1,10 +1,13 @@
 import { GuildCounter, TrackingType } from "@prisma/client";
-import { ClusterManager } from "discord-hybrid-sharding";
-import { ChannelType, Guild, PermissionFlagsBits } from "discord.js";
+import { ClusterClient, ClusterManager } from "discord-hybrid-sharding";
+import { ChannelType, Client, Guild, PermissionFlagsBits } from "discord.js";
 import prisma from "../../../init/database";
+import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
+import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { getItems } from "../economy/utils";
+import ms = require("ms");
 
 export async function updateChannel(data: GuildCounter, client: NypsiClient | ClusterManager) {
   const clusterThing = client instanceof ClusterManager ? client : client.cluster;
@@ -35,211 +38,32 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient | Cl
   }
 
   if (isNaN(shard)) {
-    logger.warn(`counter channel not found: ${JSON.stringify(data)}`);
-    await prisma.guildCounter.delete({
-      where: {
-        channel: data.channel,
-      },
-    });
+    const res = await redis.get(
+      `${Constants.redis.nypsi.COUNTER_ERROR}:${data.guildId}:${data.channel}`,
+    );
+
+    const errorCount = res ? parseInt(res) + 1 : 1;
+
+    await redis.set(
+      `${Constants.redis.nypsi.COUNTER_ERROR}:${data.guildId}:${data.channel}`,
+      errorCount,
+      "EX",
+      ms("30 days") / 1000,
+    );
+
+    logger.warn(
+      `counter channel not found (${errorCount}/50)${errorCount < 50 ? "" : ", deleting counter"}: ${JSON.stringify(data)}`,
+    );
+    if (errorCount == 50)
+      await prisma.guildCounter.delete({
+        where: {
+          channel: data.channel,
+        },
+      });
     return;
   }
 
-  let value: string;
-
-  if (data.tracks === TrackingType.HUMANS) {
-    value = await clusterThing
-      .broadcastEval(
-        async (c, { channelId, shard }) => {
-          const client = c as unknown as NypsiClient;
-
-          if (client.cluster.id != shard) return;
-
-          const channel = await client.channels.cache.get(channelId);
-
-          if (channel.isDMBased()) return;
-
-          if (channel.guild.memberCount != channel.guild.members.cache.size) {
-            return await channel.guild.members.fetch().then((m) => m.size.toLocaleString());
-          }
-          return channel.guild.memberCount.toLocaleString();
-        },
-        { context: { channelId: data.channel, shard } },
-      )
-      .then((res) => {
-        for (const r of res) {
-          if (r) return r;
-        }
-      });
-  } else if (data.tracks === TrackingType.MEMBERS) {
-    value = await clusterThing
-      .broadcastEval(
-        async (c, { channelId, shard }) => {
-          const client = c as unknown as NypsiClient;
-
-          if (client.cluster.id != shard) return;
-
-          const channel = await client.channels.cache.get(channelId);
-
-          if (channel.isDMBased()) return;
-
-          return channel.guild.memberCount.toLocaleString();
-        },
-        { context: { channelId: data.channel, shard } },
-      )
-      .then((res) => {
-        for (const r of res) {
-          if (r) return r;
-        }
-      });
-  } else if (data.tracks === TrackingType.BOOSTS) {
-    value = await clusterThing
-      .broadcastEval(
-        async (c, { channelId, shard }) => {
-          const client = c as unknown as NypsiClient;
-
-          if (client.cluster.id != shard) return;
-
-          const channel = await client.channels.cache.get(channelId);
-
-          if (channel.isDMBased()) return;
-
-          return (channel.guild.premiumSubscriptionCount || 0).toLocaleString();
-        },
-        { context: { channelId: data.channel, shard } },
-      )
-      .then((res) => {
-        for (const r of res) {
-          if (r) return r;
-        }
-      });
-  } else if (data.tracks === TrackingType.RICHEST_MEMBER) {
-    const members = await clusterThing
-      .broadcastEval(
-        async (c, { channelId, shard }) => {
-          const client = c as unknown as NypsiClient;
-
-          if (client.cluster.id != shard) return;
-
-          const channel = await client.channels.cache.get(channelId);
-
-          if (channel.isDMBased()) return;
-
-          if (channel.guild.memberCount !== channel.guild.members.cache.size) {
-            return Array.from(
-              await channel.guild.members.fetch().then((members) => members.keys()),
-            );
-          }
-          return Array.from(channel.guild.members.cache.keys());
-        },
-        { context: { channelId: data.channel, shard } },
-      )
-      .then((res) => {
-        for (const r of res) {
-          if (r) return r;
-        }
-      });
-
-    const topMember = await prisma.economy.findFirst({
-      where: {
-        userId: { in: members },
-      },
-      select: {
-        user: {
-          select: {
-            lastKnownUsername: true,
-          },
-        },
-      },
-      orderBy: { money: "desc" },
-    });
-
-    value = topMember?.user?.lastKnownUsername || "null";
-  } else if (data.tracks === TrackingType.TOTAL_BALANCE) {
-    const members = await clusterThing
-      .broadcastEval(
-        async (c, { channelId, shard }) => {
-          const client = c as unknown as NypsiClient;
-
-          if (client.cluster.id != shard) return;
-
-          const channel = await client.channels.cache.get(channelId);
-
-          if (channel.isDMBased()) return;
-
-          if (channel.guild.memberCount !== channel.guild.members.cache.size) {
-            return Array.from(
-              await channel.guild.members.fetch().then((members) => members.keys()),
-            );
-          }
-          return Array.from(channel.guild.members.cache.keys());
-        },
-        { context: { channelId: data.channel, shard } },
-      )
-      .then((res) => {
-        for (const r of res) {
-          if (r) return r;
-        }
-      });
-
-    const total = await prisma.economy.aggregate({
-      where: {
-        userId: { in: members },
-      },
-      _sum: {
-        money: true,
-      },
-    });
-
-    value = (total?._sum?.money || 0).toLocaleString();
-  } else if (data.tracks === TrackingType.TOTAL_ITEM) {
-    if (!data.totalItem || !getItems()[data.totalItem]) {
-      logger.warn(`invalid item: ${JSON.stringify(data)}`);
-      return;
-    }
-    const members = await clusterThing
-      .broadcastEval(
-        async (c, { channelId, shard }) => {
-          const client = c as unknown as NypsiClient;
-
-          if (client.cluster.id != shard) return;
-
-          const channel = await client.channels.cache.get(channelId);
-
-          if (channel.isDMBased()) return;
-
-          if (channel.guild.memberCount !== channel.guild.members.cache.size) {
-            return Array.from(
-              await channel.guild.members.fetch().then((members) => members.keys()),
-            );
-          }
-          return Array.from(channel.guild.members.cache.keys());
-        },
-        { context: { channelId: data.channel, shard } },
-      )
-      .then((res) => {
-        for (const r of res) {
-          if (r) return r;
-        }
-      });
-
-    const query = await prisma.inventory.aggregate({
-      where: {
-        AND: [{ userId: { in: members } }, { item: data.totalItem }],
-      },
-      _sum: {
-        amount: true,
-      },
-    });
-
-    value = (query?._sum?.amount || 0).toLocaleString();
-  }
-
-  const format = data.format.replace("%value%", value);
-
-  if (format.length > 164) {
-    logger.warn(`channel name too long: ${JSON.stringify(data)}`);
-    return;
-  }
+  const format = await getCounterText(data, clusterThing, shard);
 
   const res = await clusterThing.broadcastEval(
     async (c, { shard, channelId, format }) => {
@@ -247,7 +71,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient | Cl
 
       if (client.cluster.id != shard) return;
 
-      const channel = await client.channels.cache.get(channelId);
+      const channel = client.channels.cache.get(channelId);
 
       if (channel.isDMBased()) return;
 
@@ -276,6 +100,182 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient | Cl
   }
 }
 
+async function getCounterText(
+  data: GuildCounter,
+  clusterOrGuild: ClusterManager | ClusterClient<Client<boolean>> | Guild,
+  shard?: number,
+) {
+  let value: string;
+
+  const members: string[] = await (clusterOrGuild instanceof Guild
+    ? (async () => {
+        if (clusterOrGuild.memberCount !== clusterOrGuild.members.cache.size) {
+          return Array.from(await clusterOrGuild.members.fetch().then((members) => members.keys()));
+        }
+        return Array.from(clusterOrGuild.members.cache.keys());
+      })()
+    : clusterOrGuild
+        .broadcastEval(
+          async (c, { channelId, shard }) => {
+            const client = c as unknown as NypsiClient;
+
+            if (client.cluster.id != shard) return;
+
+            const channel = client.channels.cache.get(channelId);
+            if (!channel || channel.isDMBased()) return;
+
+            if (channel.guild.memberCount !== channel.guild.members.cache.size) {
+              return Array.from(
+                await channel.guild.members.fetch().then((members) => members.keys()),
+              );
+            }
+
+            return Array.from(channel.guild.members.cache.keys());
+          },
+          { context: { channelId: data.channel, shard } },
+        )
+        .then((res) => {
+          for (const r of res) {
+            if (r) return r;
+          }
+          return [];
+        }));
+
+  if (data.tracks === TrackingType.HUMANS) {
+    if (clusterOrGuild instanceof Guild) {
+      if (clusterOrGuild.memberCount != clusterOrGuild.members.cache.size) {
+        value = await clusterOrGuild.members.fetch().then((m) => m.size.toLocaleString());
+      } else value = clusterOrGuild.memberCount.toLocaleString();
+    } else {
+      value = await clusterOrGuild
+        .broadcastEval(
+          async (c, { channelId, shard }) => {
+            const client = c as unknown as NypsiClient;
+
+            if (client.cluster.id != shard) return;
+
+            const channel = client.channels.cache.get(channelId);
+
+            if (channel.isDMBased()) return;
+
+            if (channel.guild.memberCount != channel.guild.members.cache.size) {
+              return await channel.guild.members.fetch().then((m) => m.size.toLocaleString());
+            }
+            return channel.guild.memberCount.toLocaleString();
+          },
+          { context: { channelId: data.channel, shard } },
+        )
+        .then((res) => {
+          for (const r of res) {
+            if (r) return r;
+          }
+        });
+    }
+  } else if (data.tracks === TrackingType.MEMBERS) {
+    if (clusterOrGuild instanceof Guild) {
+      value = clusterOrGuild.memberCount.toLocaleString();
+    } else {
+      value = await clusterOrGuild
+        .broadcastEval(
+          async (c, { channelId, shard }) => {
+            const client = c as unknown as NypsiClient;
+
+            if (client.cluster.id != shard) return;
+
+            const channel = client.channels.cache.get(channelId);
+
+            if (channel.isDMBased()) return;
+
+            return channel.guild.memberCount.toLocaleString();
+          },
+          { context: { channelId: data.channel, shard } },
+        )
+        .then((res) => {
+          for (const r of res) {
+            if (r) return r;
+          }
+        });
+    }
+  } else if (data.tracks === TrackingType.BOOSTS) {
+    if (clusterOrGuild instanceof Guild) {
+      value = (clusterOrGuild.premiumSubscriptionCount || 0).toLocaleString();
+    } else {
+      value = await clusterOrGuild
+        .broadcastEval(
+          async (c, { channelId, shard }) => {
+            const client = c as unknown as NypsiClient;
+
+            if (client.cluster.id != shard) return;
+
+            const channel = client.channels.cache.get(channelId);
+
+            if (channel.isDMBased()) return;
+
+            return (channel.guild.premiumSubscriptionCount || 0).toLocaleString();
+          },
+          { context: { channelId: data.channel, shard } },
+        )
+        .then((res) => {
+          for (const r of res) {
+            if (r) return r;
+          }
+        });
+    }
+  } else if (data.tracks === TrackingType.RICHEST_MEMBER) {
+    const topMember = await prisma.economy.findFirst({
+      where: {
+        userId: { in: members },
+      },
+      select: {
+        user: {
+          select: {
+            lastKnownUsername: true,
+          },
+        },
+      },
+      orderBy: { money: "desc" },
+    });
+
+    value = topMember?.user?.lastKnownUsername || "null";
+  } else if (data.tracks === TrackingType.TOTAL_BALANCE) {
+    const total = await prisma.economy.aggregate({
+      where: {
+        userId: { in: members },
+      },
+      _sum: {
+        money: true,
+      },
+    });
+
+    value = (total?._sum?.money || 0).toLocaleString();
+  } else if (data.tracks === TrackingType.TOTAL_ITEM) {
+    if (!data.totalItem || !getItems()[data.totalItem]) {
+      logger.warn(`invalid item: ${JSON.stringify(data)}`);
+      return;
+    }
+
+    const query = await prisma.inventory.aggregate({
+      where: {
+        AND: [{ userId: { in: members } }, { item: data.totalItem }],
+      },
+      _sum: {
+        amount: true,
+      },
+    });
+
+    value = (query?._sum?.amount || 0).toLocaleString();
+  }
+
+  const format = data.format.replace("%value%", value);
+
+  if (format.length > 164) {
+    logger.warn(`channel name too long: ${JSON.stringify(data)}`);
+    return;
+  }
+
+  return format;
+}
+
 export async function createGuildCounter(
   guild: Guild,
   mode: TrackingType,
@@ -288,7 +288,10 @@ export async function createGuildCounter(
 
   const channel = await guild.channels
     .create({
-      name: "creating...",
+      name: await getCounterText(
+        { channel: undefined, format, guildId: guild.id, tracks: mode, totalItem: item },
+        guild,
+      ),
       type: ChannelType.GuildVoice,
       permissionOverwrites: [
         {
@@ -319,8 +322,6 @@ export async function createGuildCounter(
     });
 
   if (fail || !res) return false;
-
-  await updateChannel(res, channel.client as NypsiClient);
 
   return true;
 }

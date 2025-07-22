@@ -6,6 +6,7 @@ import {
   InteractionReplyOptions,
   Message,
   PermissionFlagsBits,
+  VoiceChannel,
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
@@ -200,19 +201,29 @@ async function run(
         embeds: [new ErrorEmbed("failed to create counter")],
       });
 
-    return send({ embeds: [new CustomEmbed(message.member, "✅ successfully created counter.")] });
+    return send({ embeds: [new CustomEmbed(message.member, "✅ successfully created counter")] });
   } else if (args[0].toLowerCase() === "delete") {
-    const channel = message.options.getChannel("channel");
+    const channel = message.options.getChannel("channel") as VoiceChannel;
 
     const res = await deleteGuildCounter(channel.id);
 
     if (!res)
       return send({ embeds: [new ErrorEmbed("that channel does not have a counter tied to it")] });
+
+    let deleted = false;
+
+    try {
+      await channel.delete("counter removed");
+      deleted = true;
+    } catch {
+      //silent fail
+    }
+
     return send({
       embeds: [
         new CustomEmbed(
           message.member,
-          "✅ counter removed, you will have to manually delete the channel",
+          `✅ counter removed${deleted ? "" : ", you will have to manually delete the channel"}`,
         ),
       ],
     });
