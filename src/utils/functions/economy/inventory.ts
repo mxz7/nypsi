@@ -544,7 +544,7 @@ export async function gemBreak(
   if (
     !shatterOnly &&
     uniqueGemCount === 5 &&
-    percentChance(50) &&
+    percentChance(25) &&
     (await getDmSettings(userId)).other
   ) {
     await Promise.all([
