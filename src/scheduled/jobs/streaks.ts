@@ -101,9 +101,9 @@ async function doDailyStreaks(manager: ClusterManager) {
   const promises: (() => Promise<any>)[] = [];
 
   for (const user of users) {
-    const inventory = await getInventory(user.userId);
-
     promises.push(async () => {
+      const inventory = await getInventory(user.userId);
+
       if (inventory.has("calendar")) {
         if (user.user.DMSettings?.other)
           notifications.push({ memberId: user.userId, payload: { embed: calendarSavedEmbed } });
@@ -112,7 +112,7 @@ async function doDailyStreaks(manager: ClusterManager) {
         await addStat(user.userId, "calendar");
 
         return;
-      } else if (await inventory.hasGem("white_gem")) {
+      } else if ((await inventory.hasGem("white_gem")).any) {
         const gemSaveChance = Math.floor(Math.random() * 10);
 
         if (gemSaveChance < 5) {
@@ -232,9 +232,9 @@ async function doVoteStreaks(manager: ClusterManager) {
   const promises: (() => Promise<any>)[] = [];
 
   for (const user of users) {
-    const inventory = await getInventory(user.userId);
-
     promises.push(async () => {
+      const inventory = await getInventory(user.userId);
+
       if (inventory.has("calendar")) {
         if (user.user.DMSettings?.other) {
           if (user.user.DMSettings.voteReminder) {
@@ -254,7 +254,7 @@ async function doVoteStreaks(manager: ClusterManager) {
         await addStat(user.userId, "calendar");
 
         return;
-      } else if (await inventory.hasGem("white_gem")) {
+      } else if ((await inventory.hasGem("white_gem")).any) {
         const gemSaveChance = Math.floor(Math.random() * 10);
 
         if (gemSaveChance < 5) {
