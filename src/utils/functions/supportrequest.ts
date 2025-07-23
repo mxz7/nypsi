@@ -41,6 +41,12 @@ quickResponses.set(
     "if you are **banned from nypsi economy** you can buy an unban from https://ko-fi.com/s/1d78b621a5",
 );
 
+quickResponses.set(
+  "auto.wrongserver",
+  "this is support for the **nypsi discord bot**, not whichever server you have been punished in.\n\n" +
+    "that server may be using nypsi for moderation, but this support is completely unrelated.",
+);
+
 const isRequestSuitableFormat = z.object({
   valid: z.boolean(),
   reason: z.string(),
@@ -462,11 +468,15 @@ export async function getQuickSupportResponse(content: string) {
       "Should be used when the user is asking for a profile transfer, where data from one account is being transferred to another.\n\n" +
       "- auto.buyunban\n" +
       "Should be used when the user is asking to be unbanned, or are inquiring on how to be unbanned.\n\n" +
+      "- auto.wrongserver\n" +
+      "Should be used when the user is complaining about being punished (banned/muted) in a server other than nypsi.\n\n" +
       "- no\n" +
       "Used when none of the other options apply, and you are unable to assist the user. Use this when you are unsure.\n\n" +
       "## Examples\n\n" +
       "### Unbanned\n\n" +
-      "If the user is asking to be unbanned, or when they are unbanned, respond with 'auto.buyunban'",
+      "If the user is asking to be unbanned, or when they are unbanned, respond with 'auto.buyunban'\n\n" +
+      "### Wrong Server\n\n" +
+      "'I was muted/banned in jona''\n\n",
     content,
   );
 
