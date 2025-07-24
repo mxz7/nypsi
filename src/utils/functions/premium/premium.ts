@@ -10,6 +10,7 @@ import { formatDate } from "../date";
 import { getUserId, MemberResolvable } from "../member";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getLastKnownUsername } from "../users/tag";
+import { removeUserAlias } from "./aliases";
 import dayjs = require("dayjs");
 import ms = require("ms");
 
@@ -110,7 +111,23 @@ export async function addMember(member: MemberResolvable, level: number, expires
     },
   });
 
+  let max = 3;
+
+  for (let i = 0; i < level; i++) {
+    max *= 1.75;
+    if (i === 3) max *= 2;
+  }
+
+  max = Math.floor(max);
+
   const profile = await getPremiumProfile(userId);
+
+  if (profile.UserAlias.length > max) {
+    const toRemove = profile.UserAlias.slice(max);
+    for (const alias of toRemove) {
+      await removeUserAlias(userId, alias.alias);
+    }
+  }
 
   logger.info(`premium level ${level} given to ${userId}`);
 
