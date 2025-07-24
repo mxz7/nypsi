@@ -2330,30 +2330,66 @@ async function run(
     } else if (args[0]?.toLowerCase() == "name") {
       if (args.length == 1) return send({ embeds: [new ErrorEmbed("$x find name <username>")] });
 
-      args.shift();
+      const tag = args[1];
 
-      let user: any = await client.cluster.broadcastEval(
-        async (c, { userId }) => {
-          const g = c.users.cache.find((u) => {
-            return `${u.username}`.includes(userId);
-          });
+      const findFromCache = async () => {
+        let user: any = await (message.client as NypsiClient).cluster.broadcastEval(
+          async (c, { userId }) => {
+            const g = c.users.cache.find((u) => {
+              return `${u.username}`.includes(userId);
+            });
 
-          return g;
-        },
-        { context: { userId: args.join(" ") } },
-      );
+            return g;
+          },
+          { context: { userId: tag } },
+        );
 
-      for (const res of user) {
-        if (!res) continue;
-        if (res.username) {
-          user = res;
-          break;
+        for (const res of user) {
+          if (!res) continue;
+          if (res.username) {
+            user = res;
+            break;
+          }
         }
+
+        if (!user || user instanceof Array) return null;
+
+        return user.id as string;
+      };
+
+      const current = await findFromCache();
+
+      let desc = `current: ${current ? `\`${current}\`` : "not found"}`;
+
+      const knownTag = await prisma.user.findFirst({
+        where: {
+          lastKnownUsername: { contains: tag },
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      desc += `\nlkt: ${knownTag?.id ? `\`${knownTag?.id}\`` : "not found"}`;
+
+      const usernameHistories = await prisma.username.findMany({
+        where: {
+          AND: [{ type: "username" }, { value: { contains: tag } }],
+        },
+        select: {
+          value: true,
+          userId: true,
+        },
+      });
+
+      if (usernameHistories.length > 0) {
+        desc += `\nhistories: \n${usernameHistories
+          .map((i) => `\`${i.userId}\` - \`${i.value}\``)
+          .join("\n")
+          .substring(0, 1000)}`;
       }
 
-      if (!user || user instanceof Array) return message.react("❌");
-
-      return findUser(message, user);
+      return send({ embeds: [new CustomEmbed(message.member, desc)] });
     } else if (args[0]?.toLowerCase() == "nearby") {
       if (args.length == 1) return send({ embeds: [new ErrorEmbed("$x find nearby <query>")] });
 
@@ -2388,7 +2424,7 @@ async function run(
               "**$x find gid <id>** - find guild by id",
               "**$x find gname <name>** - find guild by name",
               "**$x find id <userid>** - find user by id",
-              "**$x find name <username>** - find user by username",
+              "**$x find name <username>** - find user id by username",
               "**$x find nearby <query>** - debug member targeting",
               "**$x find top** - find the top 15 balance",
             ].join("\n"),
