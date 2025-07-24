@@ -576,7 +576,7 @@ class Game {
       if (this.message) {
         await this.edit({ embeds: [embed], components: [row] });
       } else {
-        this.message = (await this.playerMessage.channel.send({
+        this.message = (await this.send({
           embeds: [embed],
           components: [row],
         })) as NypsiMessage;
