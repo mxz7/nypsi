@@ -48,6 +48,7 @@ import {
 } from "../utils/functions/economy/balance";
 import { initCrashGame } from "../utils/functions/economy/crash";
 import { createEvent, getCurrentEvent } from "../utils/functions/economy/events";
+import { getGuildByUser } from "../utils/functions/economy/guilds";
 import {
   addInventoryItem,
   removeInventoryItem,
@@ -2617,6 +2618,11 @@ async function run(
       return send({
         embeds: [new ErrorEmbed(`${from.username} doesn't have a nypsi profile you fucking idiot`)],
       });
+
+    const guild = await getGuildByUser(from.id);
+
+    if (guild.ownerId === from.id)
+      return send({ embeds: [new ErrorEmbed("user is owner of a guild")] });
 
     await redis.set(`${Constants.redis.nypsi.PROFILE_TRANSFER}:${to.id}`, from.id, "EX", 600);
     await redis.set(`${Constants.redis.nypsi.PROFILE_TRANSFER}:${from.id}`, to.id, "EX", 600);

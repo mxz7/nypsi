@@ -215,23 +215,6 @@ export async function doProfileTransfer(fromId: string, toId: string) {
           await prisma.crafting.createMany({ data: crafting });
         }
 
-        const games = (await prisma.game.findMany({ where: { userId: fromId } })).map((i) => {
-          i.userId = toId;
-          return i;
-        });
-        if (games.length > 0) {
-          await prisma.game.deleteMany({ where: { id: { in: games.map((i) => i.id) } } });
-          await prisma.game.createMany({ data: games });
-        }
-
-        const stats = (await prisma.stats.findMany({ where: { userId: fromId } })).map((i) => {
-          i.userId = toId;
-          return i;
-        });
-        if (stats.length > 0) {
-          await prisma.stats.createMany({ data: stats });
-        }
-
         const bakery = (await prisma.bakeryUpgrade.findMany({ where: { userId: fromId } })).map(
           (i) => {
             i.userId = toId;
@@ -251,11 +234,14 @@ export async function doProfileTransfer(fromId: string, toId: string) {
         if (upgrades.length > 0) {
           await prisma.upgrades.createMany({ data: upgrades });
         }
+
+        await prisma.market.updateMany({ where: { ownerId: fromId }, data: { ownerId: toId } });
       },
       { maxWait: 30000, timeout: 30000 },
     )
     .catch((e) => {
       logger.error(`transfer failed (${fromId} -> ${toId})`, e);
+      console.error(e);
       fail = true;
     });
   if (fail) return;
