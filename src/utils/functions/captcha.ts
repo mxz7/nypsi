@@ -117,9 +117,20 @@ export async function passedCaptcha(member: GuildMember | User, check: Captcha, 
   await redis.set(`${Constants.redis.nypsi.CAPTCHA_VERIFIED}:${member.id}`, member.id, "EX", ttl);
 
   if (!force && check.solvedIp) {
+    const solvedIps = await prisma.captcha
+      .findMany({
+        where: {
+          userId: check.userId,
+        },
+        select: {
+          solvedIp: true,
+        },
+      })
+      .then((q) => q.map((i) => i.solvedIp).filter((i) => Boolean(i)));
+
     let otherUsers = await prisma.captcha.findMany({
       where: {
-        solvedIp: check.solvedIp,
+        solvedIp: { in: solvedIps },
       },
       distinct: ["userId"],
       select: {
