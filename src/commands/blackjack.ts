@@ -11,6 +11,8 @@ import {
   Interaction,
   Message,
   MessageActionRowComponentBuilder,
+  MessageCreateOptions,
+  MessageEditOptions,
   MessageFlags,
   WebhookClient,
 } from "discord.js";
@@ -322,6 +324,24 @@ class Game {
     return this;
   }
 
+  private async edit(data: MessageEditOptions) {
+    if (!this.interaction || this.interaction.deferred || this.interaction.replied)
+      return this.message.edit(data).catch(async (e) => {
+        logger.error("bj edit error", e);
+        const msg = (await this.message.channel.send(data as MessageCreateOptions)) as NypsiMessage;
+        this.message = msg;
+        return msg;
+      });
+    return this.interaction.update(data).catch(() =>
+      this.message.edit(data).catch(async (e) => {
+        logger.error("bj edit error", e);
+        const msg = (await this.message.channel.send(data as MessageCreateOptions)) as NypsiMessage;
+        this.message = msg;
+        return msg;
+      }),
+    );
+  }
+
   private checkWin() {
     if (this.hand.total() > 21) return "lose";
     if (this.dealer.total() > 21) return "win";
@@ -438,7 +458,7 @@ class Game {
       !((await getTier(this.member)) >= 2) ||
       (await getBalance(this.member)) < this.bet
     ) {
-      return this.message.edit({ embeds: [embed], components: [] });
+      return this.edit({ embeds: [embed], components: [] });
     }
 
     if (
@@ -468,7 +488,7 @@ class Game {
       new ButtonBuilder().setLabel("play again").setStyle(ButtonStyle.Success).setCustomId("rp"),
     );
 
-    await this.message.edit({ embeds: [embed], components: [row] });
+    await this.edit({ embeds: [embed], components: [row] });
 
     const res = await this.message
       .awaitMessageComponent({
@@ -484,7 +504,7 @@ class Game {
         return collected;
       })
       .catch(() => {
-        this.message.edit({ components: [] });
+        this.edit({ components: [] });
         return;
       });
 
@@ -512,7 +532,7 @@ class Game {
         if (this.member.user.id == Constants.TEKOH_ID && this.playerMessage instanceof Message) {
           this.playerMessage.react("💀");
         } else {
-          return this.message.edit({
+          return this.edit({
             embeds: [
               new CustomEmbed(this.member, "nypsi is rebooting, try again in a few minutes"),
             ],
@@ -527,7 +547,7 @@ class Game {
         ) {
           this.playerMessage.react("💀");
         } else {
-          return this.message.edit({
+          return this.edit({
             embeds: [
               new CustomEmbed(
                 this.member,
@@ -554,9 +574,9 @@ class Game {
       const embed = await this.render("playing");
       const row = Game.getRow(false, true);
       if (this.message) {
-        await this.message.edit({ embeds: [embed], components: [row] });
+        await this.edit({ embeds: [embed], components: [row] });
       } else {
-        this.message = (await this.send({
+        this.message = (await this.playerMessage.channel.send({
           embeds: [embed],
           components: [row],
         })) as NypsiMessage;
@@ -575,7 +595,7 @@ class Game {
 
     if (!this.message)
       this.message = (await this.send({ embeds: [embed], components: [row] })) as NypsiMessage;
-    else await this.message.edit({ embeds: [embed], components: [row] });
+    else await this.edit({ embeds: [embed], components: [row] });
 
     return this.listen();
   }
@@ -617,7 +637,7 @@ class Game {
         this.dealer.dealer = false;
         const embed = await this.render("playing");
         const row = Game.getRow(false, true);
-        await this.message.edit({ embeds: [embed], components: [row] });
+        await this.edit({ embeds: [embed], components: [row] });
 
         this.dealer.autoPlay();
         const state = this.checkWin();
@@ -627,7 +647,7 @@ class Game {
       } else {
         const embed = await this.render("playing");
         const row = Game.getRow(false, false);
-        await this.message.edit({ embeds: [embed], components: [row] });
+        await this.edit({ embeds: [embed], components: [row] });
         return this.listen();
       }
     } else if (response.customId === "stand") {
@@ -635,7 +655,7 @@ class Game {
       const embed = await this.render("playing");
       const row = Game.getRow(false, true);
 
-      await this.message.edit({ embeds: [embed], components: [row] });
+      await this.edit({ embeds: [embed], components: [row] });
 
       this.dealer.autoPlay();
       const state = this.checkWin();
@@ -659,7 +679,7 @@ class Game {
         this.dealer.dealer = false;
         const embed = await this.render("playing");
         const row = Game.getRow(false, true);
-        await this.message.edit({ embeds: [embed], components: [row] });
+        await this.edit({ embeds: [embed], components: [row] });
 
         this.dealer.autoPlay();
         const state = this.checkWin();
