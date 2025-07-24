@@ -387,6 +387,8 @@ class Game {
   }
 
   private async end(result: "win" | "lose" | "draw") {
+    logger.debug(`blackjack: ${this.member.user.id} end: ${result}`);
+
     this.state = "end";
     this.dealer.dealer = false;
 
@@ -449,7 +451,11 @@ class Game {
     });
     gamble(this.member.user, "blackjack", this.bet, result, id, winnings);
 
+    logger.debug(`blackjack: ${this.member.user.id} end processed`);
+
     const embed = await this.render(result, winnings, multi.multi, xp, id, eventProgress);
+
+    logger.debug(`blackjack: ${this.member.user.id} end rendered`);
 
     await redis.srem(Constants.redis.nypsi.USERS_PLAYING, this.member.user.id);
 
@@ -458,6 +464,7 @@ class Game {
       !((await getTier(this.member)) >= 2) ||
       (await getBalance(this.member)) < this.bet
     ) {
+      logger.debug(`blackjack: ${this.member.user.id} final message edit`);
       return this.edit({ embeds: [embed], components: [] });
     }
 
@@ -487,6 +494,8 @@ class Game {
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder().setLabel("play again").setStyle(ButtonStyle.Success).setCustomId("rp"),
     );
+
+    logger.debug(`blackjack: ${this.member.user.id} editing final message with play again`);
 
     await this.edit({ embeds: [embed], components: [row] });
 
@@ -655,12 +664,23 @@ class Game {
       const embed = await this.render("playing");
       const row = Game.getRow(false, true);
 
+      logger.debug(`blackjack: ${this.member.user.id} stand editing`);
+
       await this.edit({ embeds: [embed], components: [row] });
 
+      logger.debug(`blackjack: ${this.member.user.id} stand edited`);
+
       this.dealer.autoPlay();
+
+      logger.debug(`blackjack: ${this.member.user.id} dealer auto played`);
+
       const state = this.checkWin();
 
+      logger.debug(`blackjack: ${this.member.user.id} checked win`);
+
       await sleep(1500);
+
+      logger.debug(`blackjack: ${this.member.user.id} sleep ended`);
 
       return this.end(state);
     } else if (response.customId === "dd") {
