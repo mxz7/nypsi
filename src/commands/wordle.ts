@@ -640,7 +640,6 @@ module.exports = cmd;
 
 async function generateWord() {
   if (!wordList || !guessList) {
-    console.log("propagating word lists");
     // remove \r for windows
     wordList = await fs
       .readFile("./data/wordle.txt")
