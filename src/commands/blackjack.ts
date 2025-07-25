@@ -327,19 +327,20 @@ class Game {
   private async edit(data: MessageEditOptions) {
     if (!this.interaction || this.interaction.deferred || this.interaction.replied)
       return this.message.edit(data).catch(async (e) => {
-        logger.error("bj edit error", e);
+        logger.error(`blackjack: ${this.member.user.id} edit error`, e);
         const msg = (await this.message.channel.send(data as MessageCreateOptions)) as NypsiMessage;
         this.message = msg;
         return msg;
       });
-    return this.interaction.update(data).catch(() =>
-      this.message.edit(data).catch(async (e) => {
-        logger.error("bj edit error", e);
+    return this.interaction.update(data).catch((e) => {
+      logger.warn(`blackjack: ${this.member.user.id} failed to update`, e);
+      return this.message.edit(data).catch(async (e) => {
+        logger.error(`blackjack: ${this.member.user.id} edit error after update`, e);
         const msg = (await this.message.channel.send(data as MessageCreateOptions)) as NypsiMessage;
         this.message = msg;
         return msg;
-      }),
-    );
+      });
+    });
   }
 
   private checkWin() {
