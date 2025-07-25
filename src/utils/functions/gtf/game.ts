@@ -141,9 +141,7 @@ export async function startGTFGame(
     if (
       secondPlayer
         ? guesses.find(
-            (i) =>
-              i.toLowerCase() ===
-              `${interaction.user.username.replaceAll("_", "\\_")}: ${guess.toLowerCase()}`,
+            (i) => i.toLowerCase() === `${interaction.user.username}: ${guess.toLowerCase()}`,
           )
         : guesses.find((i) => i.toLowerCase() === guess.toLowerCase())
     )
@@ -154,9 +152,7 @@ export async function startGTFGame(
         })
         .catch(() => {});
 
-    guesses.push(
-      secondPlayer ? `${interaction.user.username.replaceAll("_", "\\_")}: ${guess}` : guess,
-    );
+    guesses.push(secondPlayer ? `${interaction.user.username}: ${guess}` : guess);
 
     let correct = false;
 
@@ -198,7 +194,7 @@ export async function startGTFGame(
       saveGameStats(
         winner.id,
         id,
-        guesses.filter((i) => i.startsWith(winner.username.replaceAll("_", "\\_") + ":")),
+        guesses.filter((i) => i.startsWith(winner.username + ":")),
         true,
         res.createdTimestamp - msg.createdTimestamp,
       );
@@ -207,14 +203,14 @@ export async function startGTFGame(
           saveGameStats(
             secondPlayer.id,
             id,
-            guesses.filter((i) => i.startsWith(secondPlayer.username.replaceAll("_", "\\_") + ":")),
+            guesses.filter((i) => i.startsWith(secondPlayer.username + ":")),
             false,
           );
       } else {
         saveGameStats(
           message.author.id,
           id,
-          guesses.filter((i) => i.startsWith(message.author.username.replaceAll("_", "\\_") + ":")),
+          guesses.filter((i) => i.startsWith(message.author.username + ":")),
           false,
         );
       }

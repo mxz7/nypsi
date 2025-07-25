@@ -151,10 +151,12 @@ async function run(
 
     if (res.customId === "gtf-deny") {
       if (res.user.id === message.author.id) {
+        requestMessage.edit({ components: [] });
         return res.reply({
           embeds: [new CustomEmbed(message.member, "guess the flag request cancelled")],
         });
       } else if (target) {
+        requestMessage.edit({ components: [] });
         return res.reply({
           embeds: [new CustomEmbed(target, "guess the flag request denied")],
         });
