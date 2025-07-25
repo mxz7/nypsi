@@ -325,6 +325,8 @@ class Game {
   }
 
   private async edit(data: MessageEditOptions) {
+    logger.debug(`blackjack: ${this.member.user.id} requested edit`);
+
     if (
       !this.interaction ||
       this.interaction.deferred ||
