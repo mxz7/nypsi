@@ -187,7 +187,7 @@ async function run(
   if (failed.length != 0) {
     const failedTags = [];
     for (const fail1 of failed) {
-      failedTags.push(fail1.username);
+      failedTags.push(fail1.username.replaceAll("_", "\\_"));
     }
 
     embed.addField("error", "unable to kick: " + failedTags.join(", "));
@@ -195,10 +195,15 @@ async function run(
 
   if (count == 1) {
     if (reason.split(": ")[1] == "no reason given") {
-      embed.setDescription("✅ `" + members.first().user.username + "` has been kicked");
+      embed.setDescription(
+        "✅ `" + members.first().user.username.replaceAll("_", "\\_") + "` has been kicked",
+      );
     } else {
       embed.setDescription(
-        "✅ `" + members.first().user.username + "` has been kicked for: " + reason.split(": ")[1],
+        "✅ `" +
+          members.first().user.username.replaceAll("_", "\\_") +
+          "` has been kicked for: " +
+          reason.split(": ")[1],
       );
     }
   }

@@ -137,7 +137,7 @@ module.exports = new ItemUse(
     targetEmbed.setTitle("your padlock has been picked");
     targetEmbed.setDescription(
       "**" +
-        message.author.username +
+        message.author.username.replaceAll("_", "\\_") +
         "** has picked your padlock in **" +
         message.guild.name +
         "**\n" +
@@ -150,7 +150,10 @@ module.exports = new ItemUse(
 
     const msg = await ItemUse.send(message, {
       embeds: [
-        new CustomEmbed(message.member, `picking **${lockPickTarget.user.username}**'s padlock...`),
+        new CustomEmbed(
+          message.member,
+          `picking **${lockPickTarget.user.username.replaceAll("_", "\\_")}**'s padlock...`,
+        ),
       ],
     });
 
@@ -161,7 +164,7 @@ module.exports = new ItemUse(
         embeds: [
           new CustomEmbed(
             message.member,
-            `picking **${lockPickTarget.user.username}'**s padlock...\n\nyou have successfully picked their padlock`,
+            `picking **${lockPickTarget.user.username.replaceAll("_", "\\_")}'**s padlock...\n\nyou have successfully picked their padlock`,
           ),
         ],
       },

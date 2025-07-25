@@ -364,8 +364,8 @@ export function setClusterId(id: string) {
 }
 
 export async function transaction(
-  from: string | {id: string},
-  to: string | {id: string},
+  from: string | { id: string },
+  to: string | { id: string },
   type: TransactionType,
   amount: number | bigint,
   itemId?: string,
@@ -402,7 +402,7 @@ export function gamble(
   if (!nextLogMsg.get("gamble")) {
     nextLogMsg.set(
       "gamble",
-      `**${user.username}** (${user.id})\n` +
+      `**${user.username.replaceAll("_", "\\_")}** (${user.id})\n` +
         `- **game** ${game}\n` +
         `- **bet** $${amount.toLocaleString()}\n` +
         `- **result** ${result}${
@@ -415,7 +415,7 @@ export function gamble(
     nextLogMsg.set(
       "gamble",
       nextLogMsg.get("gamble") +
-        `**${user.username}** (${user.id})\n` +
+        `**${user.username.replaceAll("_", "\\_")}** (${user.id})\n` +
         `- **game** ${game}\n` +
         `- **bet** $${amount.toLocaleString()}\n` +
         `- **result** ${result}${

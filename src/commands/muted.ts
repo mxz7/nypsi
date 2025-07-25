@@ -42,7 +42,9 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
   for (const m of muted) {
     const username =
       (await getLastKnownUsername(m.userId)) ??
-      (await message.client.users.fetch(m.userId).catch(() => undefined as User))?.username.replaceAll('_', '\\_') ??
+      (
+        await message.client.users.fetch(m.userId).catch(() => undefined as User)
+      )?.username.replaceAll("_", "\\_") ??
       "";
 
     const msg = `${username ? `${username} ` : ""} \`${m.userId}\` ${

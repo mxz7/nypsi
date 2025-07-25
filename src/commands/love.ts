@@ -168,7 +168,7 @@ async function run(
 
   const embed = new CustomEmbed(
     message.member,
-    `${target1.user.username} **x** ${target2.user.username}\n\n${loveBar}\n**${lovePercent}**% **-** ${loveLevel} ${loveEmoji}`,
+    `${target1.user.username.replaceAll("_", "\\_")} **x** ${target2.user.username.replaceAll("_", "\\_")}\n\n${loveBar}\n**${lovePercent}**% **-** ${loveLevel} ${loveEmoji}`,
   );
 
   send({ embeds: [embed] });

@@ -111,7 +111,7 @@ async function run(
 
     if (target) {
       requestEmbed.setDescription(
-        `**${message.author.username}** has challenged you to a guess the flag game\n\ndo you accept?`,
+        `**${message.author.username.replaceAll("_", "\\_")}** has challenged you to a guess the flag game\n\ndo you accept?`,
       );
       requestRow.addComponents(
         new ButtonBuilder().setCustomId("gtf-deny").setLabel("deny").setStyle(ButtonStyle.Danger),
@@ -123,7 +123,7 @@ async function run(
       });
     } else {
       requestEmbed.setDescription(
-        `**${message.author.username}** has created an open guess the flag game`,
+        `**${message.author.username.replaceAll("_", "\\_")}** has created an open guess the flag game`,
       );
       requestRow.addComponents(
         new ButtonBuilder().setCustomId("gtf-deny").setLabel("cancel").setStyle(ButtonStyle.Danger),

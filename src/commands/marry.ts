@@ -188,7 +188,9 @@ async function run(
     if (await isMarried(target)) {
       embed.setDescription("❌ you are already married");
     } else if (await isMarried(message.member)) {
-      embed.setDescription(`❌ ${message.member.user.username} is already married`);
+      embed.setDescription(
+        `❌ ${message.member.user.username.replaceAll("_", "\\_")} is already married`,
+      );
     } else {
       await addMarriage(message.member.id, target.id);
       embed.setDescription("you may now kiss the bride!");

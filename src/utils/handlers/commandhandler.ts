@@ -652,7 +652,7 @@ export async function runCommand(
         return message.channel.send({
           embeds: [
             new ErrorEmbed(
-              `\`${cmd}\` is a custom alias owned by **${owner.replaceAll('_', '\\_')}**. to create your own custom aliases you need a premium membership\n` +
+              `\`${cmd}\` is a custom alias owned by **${owner.replaceAll("_", "\\_")}**. to create your own custom aliases you need a premium membership\n` +
                 "/premium",
             ),
           ],
@@ -1285,7 +1285,9 @@ export function runCommandUseTimers(client: NypsiClient) {
 
           giveCaptcha(id, 2, true);
           logger.info(`${tag} (${id}) has been given a captcha`);
-          await hook.send(`[${getTimestamp()}] **${tag}** (${id}) has been given a captcha`);
+          await hook.send(
+            `[${getTimestamp()}] **${tag.replaceAll("_", "\\_")}** (${id}) has been given a captcha`,
+          );
         }
       }
     }

@@ -812,14 +812,7 @@ export async function completeOrder(
 
   // send logs and dms
   (async () => {
-    transaction(
-      order.ownerId,
-      buyerId,
-      "item",
-      amount,
-      order.itemId,
-      "market",
-    );
+    transaction(order.ownerId, buyerId, "item", amount, order.itemId, "market");
     transaction(
       buyerId,
       order.ownerId,
@@ -1010,7 +1003,9 @@ export async function marketSell(
 
   await removeInventoryItem(userId, itemId, amount - remaining);
 
-  logger.info(`market: ${userId} (${await getLastKnownUsername(userId, false)}) sold ${amount} ${itemId}`);
+  logger.info(
+    `market: ${userId} (${await getLastKnownUsername(userId, false)}) sold ${amount} ${itemId}`,
+  );
 
   await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
   inTransaction.delete(itemId);

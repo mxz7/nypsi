@@ -79,7 +79,7 @@ export default {
 
       embed.setHeader("lottery winner", winnerAvatar);
       embed.setDescription(
-        `**${winnerUsername.replaceAll('_', '\\_')}** has won the lottery with ${winner.amount.toLocaleString()} tickets!!\n\n` +
+        `**${winnerUsername.replaceAll("_", "\\_")}** has won the lottery with ${winner.amount.toLocaleString()} tickets!!\n\n` +
           `they have won $**${total.toLocaleString()}**`,
       );
       embed.setFooter({ text: `a total of ${ticketCount.toLocaleString()} tickets were bought` });

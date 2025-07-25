@@ -547,7 +547,7 @@ export async function fulfillTradeRequest(
 
   const desc = embed.data.description.split("\n\n");
 
-  desc[0] = `**fulfilled** by ${interaction.user.username} <t:${Math.floor(Date.now() / 1000)}:R>`;
+  desc[0] = `**fulfilled** by ${interaction.user.username.replaceAll("_", "\\_")} <t:${Math.floor(Date.now() / 1000)}:R>`;
 
   embed.setDescription(desc.join("\n\n"));
 

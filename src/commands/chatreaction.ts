@@ -663,9 +663,10 @@ async function run(
 
       const requestEmbed = new CustomEmbed(
         message.member,
-        `**${
-          message.author.username
-        }** has challenged you to a chat reaction duel\n\n**wager** $${wager.toLocaleString()}\n\ndo you accept?`,
+        `**${message.author.username.replaceAll(
+          "_",
+          "\\_",
+        )}** has challenged you to a chat reaction duel\n\n**wager** $${wager.toLocaleString()}\n\ndo you accept?`,
       ).setFooter({ text: "expires in 60 seconds" });
 
       const m = await send({
@@ -746,9 +747,10 @@ async function run(
 
       const requestEmbed = new CustomEmbed(
         message.member,
-        `**${
-          message.author.username
-        }** has created an open chat reaction duel\n\n**wager** $${wager.toLocaleString()}`,
+        `**${message.author.username.replaceAll(
+          "_",
+          "\\_",
+        )}** has created an open chat reaction duel\n\n**wager** $${wager.toLocaleString()}`,
       ).setFooter({ text: "expires in 60 seconds" });
 
       const m = await send({

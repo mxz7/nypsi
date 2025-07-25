@@ -23,7 +23,11 @@ module.exports = new ItemUse(
 
     if (await redis.exists(`${Constants.redis.nypsi.RICKROLL}:${target.user.id}`))
       return ItemUse.send(message, {
-        embeds: [new ErrorEmbed(`${target.user.username} already has a rick roll queued`)],
+        embeds: [
+          new ErrorEmbed(
+            `${target.user.username.replaceAll("_", "\\_")} already has a rick roll queued`,
+          ),
+        ],
       });
 
     await removeInventoryItem(message.member, "rick_astley", 1);
@@ -35,7 +39,7 @@ module.exports = new ItemUse(
       embeds: [
         new CustomEmbed(
           message.member,
-          `<a:rick_astley:1100529748796506203> **${target.user.username}** will be rick rolled soon xd !!!!`,
+          `<a:rick_astley:1100529748796506203> **${target.user.username.replaceAll("_", "\\_")}** will be rick rolled soon xd !!!!`,
         ),
       ],
     });

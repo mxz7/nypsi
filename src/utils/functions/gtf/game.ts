@@ -62,7 +62,7 @@ export async function startGTFGame(
 
     embed.setDescription(
       "guess the country of the flag below\n\n" +
-        `${message.author.username} vs ${secondPlayer.username}`,
+        `${message.author.username.replaceAll("_", "\\_")} vs ${secondPlayer.username.replaceAll("_", "\\_")}`,
     );
     embed.setHeader("guess the flag");
   }
@@ -141,7 +141,9 @@ export async function startGTFGame(
     if (
       secondPlayer
         ? guesses.find(
-            (i) => i.toLowerCase() === `${interaction.user.username}: ${guess.toLowerCase()}`,
+            (i) =>
+              i.toLowerCase() ===
+              `${interaction.user.username.replaceAll("_", "\\_")}: ${guess.toLowerCase()}`,
           )
         : guesses.find((i) => i.toLowerCase() === guess.toLowerCase())
     )
@@ -152,7 +154,9 @@ export async function startGTFGame(
         })
         .catch(() => {});
 
-    guesses.push(secondPlayer ? `${interaction.user.username}: ${guess}` : guess);
+    guesses.push(
+      secondPlayer ? `${interaction.user.username.replaceAll("_", "\\_")}: ${guess}` : guess,
+    );
 
     let correct = false;
 
@@ -194,7 +198,7 @@ export async function startGTFGame(
       saveGameStats(
         winner.id,
         id,
-        guesses.filter((i) => i.startsWith(winner.username + ":")),
+        guesses.filter((i) => i.startsWith(winner.username.replaceAll("_", "\\_") + ":")),
         true,
         res.createdTimestamp - msg.createdTimestamp,
       );
@@ -203,14 +207,14 @@ export async function startGTFGame(
           saveGameStats(
             secondPlayer.id,
             id,
-            guesses.filter((i) => i.startsWith(secondPlayer.username + ":")),
+            guesses.filter((i) => i.startsWith(secondPlayer.username.replaceAll("_", "\\_") + ":")),
             false,
           );
       } else {
         saveGameStats(
           message.author.id,
           id,
-          guesses.filter((i) => i.startsWith(message.author.username + ":")),
+          guesses.filter((i) => i.startsWith(message.author.username.replaceAll("_", "\\_") + ":")),
           false,
         );
       }
@@ -249,7 +253,7 @@ export async function startGTFGame(
       if (secondPlayer) {
         embed
           .setDescription(
-            `**${winner.username}** won! the country was: **${country.name.common}**\n\n` +
+            `**${winner.username.replaceAll("_", "\\_")}** won! the country was: **${country.name.common}**\n\n` +
               `population: **${country.population.toLocaleString()}**\n` +
               `official name: **${country.name.official}**`,
           )

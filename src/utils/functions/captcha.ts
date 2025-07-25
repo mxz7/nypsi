@@ -70,7 +70,9 @@ export async function passedCaptcha(member: GuildMember | User, check: Captcha, 
     url: process.env.ANTICHEAT_HOOK,
   });
 
-  const username = member instanceof GuildMember ? member.user.username : member.username;
+  const username = (
+    member instanceof GuildMember ? member.user.username : member.username
+  ).replaceAll("_", "\\_");
 
   if (await redis.exists(`${Constants.redis.cache.user.captcha_pass}:${member.id}`)) {
     await redis.incr(`${Constants.redis.cache.user.captcha_pass}:${member.id}`);
@@ -185,7 +187,7 @@ export async function failedCaptcha(member: GuildMember, content: string) {
   ) {
     await setEcoBan(member.user.id, dayjs().add(1, "day").toDate());
     await hook.send(
-      `[${getTimestamp()}] **${member.user.username}** (${
+      `[${getTimestamp()}] **${member.user.username.replaceAll("_", "\\_")}** (${
         member.user.id
       }) has been banned for 24 hours for failing 50 captchas`,
     );
@@ -198,7 +200,7 @@ export async function failedCaptcha(member: GuildMember, content: string) {
   }
 
   await hook.send(
-    `[${getTimestamp()}] **${member.user.username}** (${
+    `[${getTimestamp()}] **${member.user.username.replaceAll("_", "\\_")}** (${
       member.user.id
     }) has failed/ignored a captcha (${content}) [${parseInt(
       await redis.get(`${Constants.redis.cache.user.captcha_fail}:${member.user.id}`),

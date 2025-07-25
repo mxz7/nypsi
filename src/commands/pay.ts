@@ -155,7 +155,7 @@ async function run(
   if ((await getDmSettings(target)).payment) {
     const embed = new CustomEmbed(
       target,
-      `**${message.author.username}** has sent you $**${Math.floor(
+      `**${message.author.username.replaceAll("_", "\\_")}** has sent you $**${Math.floor(
         amount - taxedAmount,
       ).toLocaleString()}**`,
     )

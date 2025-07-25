@@ -46,13 +46,17 @@ export async function addModLog(
   embed.setTimestamp();
 
   if (punished) {
-    embed.addField("user", `${punished.username} \`${punished.id}\``, true);
+    embed.addField("user", `${punished.username.replaceAll("_", "\\_")} \`${punished.id}\``, true);
   } else {
     embed.addField("user", userID, true);
   }
 
   if (moderator.id !== moderator.client.user.id) {
-    embed.addField("moderator", `${moderator.username} \`${moderator.id}\``, true);
+    embed.addField(
+      "moderator",
+      `${moderator.username.replaceAll("_", "\\_")} \`${moderator.id}\``,
+      true,
+    );
   } else {
     if (channelId) {
       embed.addField("moderator", `nypsi in <#${channelId}>`, true);

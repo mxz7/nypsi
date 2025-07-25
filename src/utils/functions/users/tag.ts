@@ -21,7 +21,7 @@ export async function updateLastKnownUsername(member: MemberResolvable, tag: str
 export async function getLastKnownUsername(id: string, escapeSpecialCharacters = true) {
   const cache = await redis.get(`${Constants.redis.cache.user.username}:${id}`);
 
-  if (cache) return escapeSpecialCharacters ? cache.replaceAll('_', '\\_') : cache;
+  if (cache) return escapeSpecialCharacters ? cache.replaceAll("_", "\\_") : cache;
 
   const query = await prisma.user.findUnique({
     where: {
@@ -39,7 +39,9 @@ export async function getLastKnownUsername(id: string, escapeSpecialCharacters =
     7200,
   );
 
-  return escapeSpecialCharacters ? query?.lastKnownUsername.replaceAll('_', '\\_') : query?.lastKnownUsername;
+  return escapeSpecialCharacters
+    ? query?.lastKnownUsername.replaceAll("_", "\\_")
+    : query?.lastKnownUsername;
 }
 
 export async function getIdFromUsername(username: string) {

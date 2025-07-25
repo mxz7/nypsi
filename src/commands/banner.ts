@@ -28,7 +28,7 @@ async function run(
     return send({
       embeds: [
         new ErrorEmbed(
-          `${member == message.member ? "you do" : `${user.username} does`} not have a banner`,
+          `${member == message.member ? "you do" : `${user.username.replaceAll("_", "\\_")} does`} not have a banner`,
         ),
       ],
     });
