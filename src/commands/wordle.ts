@@ -17,7 +17,7 @@ import { formatTime } from "../utils/functions/string";
 import { getPreferences } from "../utils/functions/users/notifications";
 import { getLastKnownAvatar, getLastKnownUsername } from "../utils/functions/users/tag";
 import { addWordleGame, getWordleGame } from "../utils/functions/users/wordle";
-import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
 
 const cmd = new Command("wordle", "play wordle on discord", "fun").setAliases(["w"]);
@@ -31,7 +31,11 @@ cmd.slashData
 
 interface Game {
   word: string;
-  notInWord: string[];
+  letters: {
+    notInWord: string[];
+    wrongPosition: string[];
+    correct: string[];
+  };
   message: Message;
   guesses: string[];
   board: string[][];
@@ -46,6 +50,7 @@ const games = new Map<string, Game>();
 const karmaCooldown = new Set<string>();
 
 let wordList: string[];
+let guessList: string[];
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
@@ -67,20 +72,30 @@ async function run(
 
     embed.setHeader("wordle help");
     embed.setDescription(
-      `you have 6 attempts to guess the word\n\ngreen letters indicate that the letter is in the correct spot\nyellow letters indicate that the letter is in the word, but in the wrong spot\ngrey letters arent in the word at all\n\n[wordlist](https://github.com/mxz7/nypsi/blob/main/data/wordle.txt)\n**${prefix}wordle play**`,
+      [
+        "you have 6 attempts to guess the word",
+        "",
+        "green letters indicate that the letter is in the correct spot",
+        "yellow letters indicate that the letter is in the word, but in the wrong spot",
+        "grey letters arent in the word at all",
+        "",
+        "[wordlist](https://github.com/mxz7/nypsi/blob/main/data/wordle.txt)",
+        "",
+        `**${prefix}wordle play** play a game of wordle`,
+        `**${prefix}wordle id <id>** view the result of a game`,
+      ].join("\n"),
     );
     embed.setFooter({ text: "type 'stop' to cancel the game when you're playing" });
 
     return await send({ embeds: [embed] });
   }
 
-  if (
-    args[0].toLowerCase() != "start" &&
-    args[0].toLowerCase() != "play" &&
-    args[0].toLowerCase() != "p"
-  ) {
-    const game = await getWordleGame(args[0].toLowerCase());
-    if (!game) return send({ embeds: [new ErrorEmbed(`${prefix}wordle play`)] });
+  if ((args.length >= 2 && args[0].toLowerCase() == "id") || args[0].toLowerCase() == "result") {
+    const game = await getWordleGame(args[1].toLowerCase());
+    if (!game)
+      return send({
+        embeds: [new ErrorEmbed(`could not find game with id \`${args[1].toLowerCase()}\``)],
+      });
 
     const username = (await getPreferences(game.userId))?.leaderboards
       ? await getLastKnownUsername(game.userId).catch(() => {})
@@ -97,7 +112,11 @@ async function run(
       embed: new CustomEmbed(),
       guesses: [],
       message: message as Message,
-      notInWord: [],
+      letters: {
+        notInWord: [],
+        wrongPosition: [],
+        correct: [],
+      },
       start: 0,
       word: game.word,
     });
@@ -107,52 +126,69 @@ async function run(
     }
 
     embed.setDescription(
-      renderBoard(games.get(game.id.toString(36)).board) +
+      renderBoard(games.get(game.id.toString(36)).board, games.get(game.id.toString(36)).letters) +
         "\n\n" +
         `${game.won ? "won" : "lost"} in ${formatTime(game.time)}${game.won ? "" : `\n\nthe word was ${game.word}`}`,
     );
     games.delete(game.id.toString(36));
 
     return send({ embeds: [embed] });
+  } else if (
+    args[0]?.toLowerCase() == "start" ||
+    args[0]?.toLowerCase() == "play" ||
+    args[0]?.toLowerCase() == "p"
+  ) {
+    if (await onCooldown(cmd.name, message.member)) {
+      const res = await getResponse(cmd.name, message.member);
+
+      if (res.respond) send({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
+      return;
+    }
+
+    //await addCooldown(cmd.name, message.member, 75);
+    await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+
+    const board = createBoard();
+    const word = await generateWord();
+
+    const embed = new CustomEmbed(message.member);
+
+    embed.setHeader(`${message.author.username}'s wordle`, message.author.avatarURL());
+    embed.setDescription(renderBoard(board));
+    embed.setFooter({ text: "type your guess in chat" });
+
+    let fail = false;
+    const msg = await send({ embeds: [embed] }).catch(() => {
+      fail = true;
+    });
+
+    if (fail) return;
+
+    games.set(message.author.id, {
+      message: msg as Message,
+      word: word,
+      letters: {
+        notInWord: [],
+        wrongPosition: [],
+        correct: [],
+      },
+      guesses: [],
+      board: board,
+      embed: embed,
+      start: performance.now(),
+    });
+
+    return play(message);
+  } else {
+    return send({
+      embeds: [
+        new CustomEmbed(
+          message.member,
+          `**${prefix}wordle play** play a game of wordle\n**${prefix}wordle id <id>** view the result of a game`,
+        ),
+      ],
+    });
   }
-
-  if (await onCooldown(cmd.name, message.member)) {
-    const res = await getResponse(cmd.name, message.member);
-
-    if (res.respond) send({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
-    return;
-  }
-
-  await addCooldown(cmd.name, message.member, 75);
-  await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
-
-  const board = createBoard();
-  const word = await getWord();
-
-  const embed = new CustomEmbed(message.member);
-
-  embed.setHeader(`${message.author.username}'s wordle`, message.author.avatarURL());
-  embed.setDescription(renderBoard(board));
-  embed.setFooter({ text: "type your guess in chat" });
-
-  let fail = false;
-  const msg = await send({ embeds: [embed] }).catch(() => {
-    fail = true;
-  });
-
-  if (fail) return;
-
-  games.set(message.author.id, {
-    message: msg as Message,
-    word: word,
-    notInWord: [],
-    guesses: [],
-    board: board,
-    embed: embed,
-    start: performance.now(),
-  });
-
-  return play(message);
 }
 
 async function play(
@@ -217,7 +253,7 @@ async function play(
       m.delete();
     }, 2000);
     return play(message);
-  } else if (!wordList.includes(response)) {
+  } else if (!guessList.includes(response)) {
     const msg = await message.channel.send({
       embeds: [new CustomEmbed(message.member, `\`${response}\` is not in the word list`)],
     });
@@ -238,23 +274,10 @@ async function play(
   } else {
     const res = guessWord(response, message.author.id);
 
-    embed.setDescription(renderBoard(games.get(message.author.id).board));
+    embed.setDescription(
+      renderBoard(games.get(message.author.id).board, games.get(message.author.id).letters),
+    );
     embed.setFooter({ text: "'stop' to end the game" });
-
-    if (games.get(message.author.id).notInWord.length > 0) {
-      if (embed.data?.fields) {
-        embed.data.fields[0] = {
-          name: "letters not in wordle",
-          value: `~~${games.get(message.author.id).notInWord.join("~~ ~~")}~~`,
-          inline: false,
-        };
-      } else {
-        embed.addField(
-          "letters not in wordle",
-          `~~${games.get(message.author.id).notInWord.join("~~ ~~")}~~`,
-        );
-      }
-    }
 
     let fail = false;
     await edit({ embeds: [embed] }).catch(() => {
@@ -290,17 +313,30 @@ async function cancel(message: Message | (NypsiCommandInteraction & CommandInter
 
   const embed = game.embed;
   embed.setDescription(
-    `${renderBoard(game.board)}\n\n` + `game cancelled. the word was **${game.word}**`,
+    `${renderBoard(game.board, game.letters)}\n\n` +
+      `game cancelled. the word was **${game.word}**`,
   );
   embed.setColor(Constants.EMBED_FAIL_COLOR);
   embed.setFooter(null);
 
-  edit({ embeds: [embed] });
   redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
   games.delete(message.author.id);
 
-  if (!message.member) return;
-  addWordleGame(message.member, false, game.guesses, performance.now() - game.start, game.word);
+  if (!message.member) {
+    return edit({ embeds: [embed] });
+  }
+
+  const id = await addWordleGame(
+    message.member,
+    false,
+    game.guesses,
+    performance.now() - game.start,
+    game.word,
+  );
+
+  embed.setFooter({ text: `id: ${id}` });
+
+  edit({ embeds: [embed] });
 }
 
 async function win(message: Message | (NypsiCommandInteraction & CommandInteraction), m: any) {
@@ -323,11 +359,12 @@ async function win(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const embed = games.get(message.author.id).embed;
   embed.setDescription(
-    `${renderBoard(games.get(message.author.id).board)}\n\n` + "you won!! congratulations",
+    `${renderBoard(games.get(message.author.id).board, games.get(message.author.id).letters)}\n\n` +
+      "you won!! congratulations",
   );
   embed.setColor(Constants.EMBED_SUCCESS_COLOR);
   embed.setFooter({
-    text: `completed in ${formatTime(performance.now() - games.get(message.author.id).start)} | ${id}`,
+    text: `completed in ${formatTime(performance.now() - games.get(message.author.id).start)} | id: ${id}`,
   });
 
   edit({ embeds: [embed] });
@@ -358,17 +395,29 @@ async function lose(message: Message | (NypsiCommandInteraction & CommandInterac
   const game = games.get(message.author.id);
   const embed = games.get(message.author.id).embed;
   embed.setDescription(
-    `${renderBoard(game.board)}\n\n` + `you lost ): the word was **${game.word}**`,
+    `${renderBoard(game.board, game.letters)}\n\n` + `you lost ): the word was **${game.word}**`,
   );
   embed.setColor(Constants.EMBED_FAIL_COLOR);
   embed.setFooter(null);
 
-  edit({ embeds: [embed] });
   redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
   games.delete(message.author.id);
 
-  if (!message.member) return;
-  addWordleGame(message.member, false, game.guesses, performance.now() - game.start, game.word);
+  if (!message.member) {
+    return edit({ embeds: [embed] });
+  }
+
+  const id = addWordleGame(
+    message.member,
+    false,
+    game.guesses,
+    performance.now() - game.start,
+    game.word,
+  );
+
+  embed.setFooter({ text: `id: ${id}` });
+
+  edit({ embeds: [embed] });
 }
 
 function createBoard(): string[][] {
@@ -384,14 +433,46 @@ function createBoard(): string[][] {
   return board;
 }
 
-function renderBoard(board: string[][]): string {
-  return board.join("\n").replaceAll(",", "");
+function renderBoard(
+  board: string[][],
+  letters?: {
+    notInWord: string[];
+    wrongPosition: string[];
+    correct: string[];
+  },
+): string {
+  let description = board.join("\n").replaceAll(",", "");
+
+  const top = ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"];
+  const middle = ["a", "s", "d", "f", "g", "h", "j", "k", "l"];
+  const bottom = ["z", "x", "c", "v", "b", "n", "m"];
+
+  const displayLetters = (row: string[]) => {
+    let line = "";
+    for (const letter of row) {
+      if (letters?.notInWord?.includes(letter)) line += emojis.get(`black-${letter}`);
+      else if (letters?.correct?.includes(letter)) line += emojis.get(`green-${letter}`);
+      else if (letters?.wrongPosition?.includes(letter)) line += emojis.get(`yellow-${letter}`);
+      else line += emojis.get(`grey-${letter}`);
+    }
+    return line;
+  };
+
+  const space = (amount: number) => {
+    return "\u00A0".repeat(amount); // non breaking space
+  };
+
+  description += `\n\n${displayLetters(top)}\n${space(3)}${displayLetters(middle)}\n${space(9)}${displayLetters(bottom)}`;
+
+  return description;
 }
 
 function guessWord(word: string, id: string): Response {
   const game = games.get(id);
   const board = game.board;
-  const notInWord = game.notInWord;
+  const notInWord = game.letters.notInWord;
+  const wrongPosition = game.letters.wrongPosition;
+  const correct = game.letters.correct;
 
   const counts = new Map<string, number>();
 
@@ -417,13 +498,14 @@ function guessWord(word: string, id: string): Response {
     let emoji: string;
 
     if (letter == actualLetter) {
-      // do nothing
+      if (!correct.includes(letter)) correct.push(letter);
     } else if (game.word.includes(letter)) {
       if ((counts.get(letter) || 0) >= letterCount) {
         emoji = emojis.get(`grey-${letter}`);
       } else {
         emoji = emojis.get(`yellow-${letter}`);
         counts.set(letter, (counts.get(letter) || 0) + 1);
+        if (!wrongPosition.includes(letter)) wrongPosition.push(letter);
       }
     } else {
       if (!notInWord.includes(letter)) notInWord.push(letter);
@@ -525,13 +607,50 @@ emojis.set("grey-x", "<:1f1fd:971480936342503444>");
 emojis.set("grey-y", "<:1f1fe:971480936279593011>");
 emojis.set("grey-z", "<:1f1ff:971480936380248144>");
 
+emojis.set("black-a", "<:1f1e6:1398187600673636413>");
+emojis.set("black-b", "<:1f1e7:1398187644709638209>");
+emojis.set("black-c", "<:1f1e8:1398187663793586268>");
+emojis.set("black-d", "<:1f1e9:1398187677085470780>");
+emojis.set("black-e", "<:1f1ea:1398187690054385704>");
+emojis.set("black-f", "<:1f1eb:1398187704771936381>");
+emojis.set("black-g", "<:1f1ec:1398187718185320469>");
+emojis.set("black-h", "<:1f1ed:1398187754118058045>");
+emojis.set("black-i", "<:1f1ee:1398187768361779291>");
+emojis.set("black-j", "<:1f1ef:1398187779120431219>");
+emojis.set("black-k", "<:1f1f0:1398187792017915914>");
+emojis.set("black-l", "<:1f1f1:1398187804504227840>");
+emojis.set("black-m", "<:1f1f2:1398187817129082883>");
+emojis.set("black-n", "<:1f1f3:1398187852654706912>");
+emojis.set("black-o", "<:1f1f4:1398187867850670122>");
+emojis.set("black-p", "<:1f1f5:1398187894295887986>");
+emojis.set("black-q", "<:1f1f6:1398187907423928442>");
+emojis.set("black-r", "<:1f1f7:1398187925719748750>");
+emojis.set("black-s", "<:1f1f8:1398187939523199036>");
+emojis.set("black-t", "<:1f1f9:1398187959445880984>");
+emojis.set("black-u", "<:1f1fa:1398187972695822357>");
+emojis.set("black-v", "<:1f1fb:1398187991138172998>");
+emojis.set("black-w", "<:1f1fc:1398188007575650397>");
+emojis.set("black-x", "<:1f1fd:1398188021567852655>");
+emojis.set("black-y", "<:1f1fe:1398188034196897903>");
+emojis.set("black-z", "<:1f1ff:1398188061795287070>");
+
 cmd.setRun(run);
 
 module.exports = cmd;
 
-async function getWord() {
-  if (!wordList)
-    wordList = await fs.readFile("./data/wordle.txt").then((res) => res.toString().split("\n"));
+async function generateWord() {
+  if (!wordList || !guessList) {
+    console.log("propagating word lists");
+    // remove \r for windows
+    wordList = await fs
+      .readFile("./data/wordle.txt")
+      .then((res) => res.toString().replaceAll("\r", "").split("\n"));
+    guessList = (
+      await fs
+        .readFile("./data/wordle_guesses.txt")
+        .then((res) => res.toString().replaceAll("\r", "").split("\n"))
+    ).concat(wordList);
+  }
 
   return wordList[Math.floor(Math.random() * wordList.length)];
 }
