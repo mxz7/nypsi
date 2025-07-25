@@ -497,7 +497,14 @@ class Game {
 
     logger.debug(`blackjack: ${this.member.user.id} editing final message with play again`);
 
-    await this.edit({ embeds: [embed], components: [row] });
+    try {
+      await this.edit({ embeds: [embed], components: [row] });
+    } catch (e) {
+      logger.error(`blackjack: ${this.member.user.id} error editing final message`, e);
+      console.error(e);
+    }
+
+    logger.debug(`blackjack: ${this.member.user.id} final message edited with play again`);
 
     const res = await this.message
       .awaitMessageComponent({
