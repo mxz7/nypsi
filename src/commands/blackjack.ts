@@ -521,6 +521,11 @@ class Game {
       this.interaction = res;
       logger.info(
         `::cmd ${this.message.guild.id} ${this.message.channelId} ${this.member.user.username}: replaying blackjack`,
+        {
+          userId: this.message.author.id,
+          guildId: this.message.guildId,
+          channelId: this.message.channelId,
+        },
       );
       if (await isLockedOut(this.member)) return verifyUser(this.playerMessage);
 

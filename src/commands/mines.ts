@@ -563,6 +563,7 @@ async function playGame(
       await res.deferUpdate();
       logger.info(
         `::cmd ${message.guild.id} ${message.channelId} ${message.author.username}: replaying mines`,
+        { userId: message.author.id, guildId: message.guildId, channelId: message.channelId },
       );
       if (await isLockedOut(message.member)) {
         await verifyUser(message);

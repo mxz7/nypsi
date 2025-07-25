@@ -221,6 +221,7 @@ async function prepare(
 
           logger.info(
             `::cmd ${message.guild.id} ${message.channelId} ${message.author.username}: replaying ${selected.id}`,
+            { userId: message.author.id, guildId: message.guildId, channelId: message.channelId },
           );
           return prepare(message, args, response);
         }

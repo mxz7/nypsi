@@ -300,6 +300,7 @@ async function run(
       if (result && result.customId == "rp") {
         logger.info(
           `::cmd ${message.guild.id} ${message.channelId} ${message.author.username}: replaying bankrob`,
+          { userId: message.author.id, guildId: message.guildId, channelId: message.channelId },
         );
         if (await isLockedOut(message.member)) return verifyUser(message);
 
