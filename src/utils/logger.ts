@@ -272,26 +272,6 @@ const formatter = (data: WriteData) => {
     return;
   }
 
-  if (typeof data.message === "string" && data.message.startsWith("::")) {
-    const category = data.message.split(" ").splice(0, 1)[0].substring(2);
-    data.message = data.message.split(" ").slice(1).join(" ");
-
-    switch (category.toLowerCase()) {
-      case "guild":
-        messageColor = chalk.magenta;
-        break;
-      case "auto":
-        messageColor = chalk.blue;
-        break;
-      case "cmd":
-        messageColor = chalk.cyan;
-        break;
-      case "success":
-        messageColor = chalk.green;
-        break;
-    }
-  }
-
   let jsonData = "";
 
   if (Boolean(data.data) && Object.keys(data.data).length > 0) {
@@ -318,6 +298,27 @@ const formatter = (data: WriteData) => {
         .trim()
         .replaceAll("\\n", "\n"),
     );
+  }
+
+  if (typeof data.message === "string" && data.message.startsWith("::")) {
+    const category = data.message.split(" ").splice(0, 1)[0].substring(2);
+    data.message = data.message.split(" ").slice(1).join(" ");
+
+    switch (category.toLowerCase()) {
+      case "guild":
+        messageColor = chalk.magenta;
+        break;
+      case "auto":
+        messageColor = chalk.blue;
+        break;
+      case "cmd":
+        messageColor = chalk.cyan;
+        jsonData = "";
+        break;
+      case "success":
+        messageColor = chalk.green;
+        break;
+    }
   }
 
   return `${chalk.blackBright.italic(dayjs(data.date).format("MM-DD HH:mm:ss.SSS"))} ${labelColor(
