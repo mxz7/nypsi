@@ -325,22 +325,35 @@ class Game {
   }
 
   private async edit(data: MessageEditOptions) {
-    if (!this.interaction || this.interaction.deferred || this.interaction.replied)
+    if (
+      !this.interaction ||
+      this.interaction.deferred ||
+      this.interaction.replied ||
+      this.interaction.createdTimestamp < Date.now() - 2500
+    ) {
       return this.message.edit(data).catch(async (e) => {
         logger.error(`blackjack: ${this.member.user.id} edit error`, e);
+
         const msg = (await this.message.channel.send(data as MessageCreateOptions)) as NypsiMessage;
         this.message = msg;
+
         return msg;
       });
-    return this.interaction.update(data).catch((e) => {
-      logger.warn(`blackjack: ${this.member.user.id} failed to update`, e);
-      return this.message.edit(data).catch(async (e) => {
-        logger.error(`blackjack: ${this.member.user.id} edit error after update`, e);
-        const msg = (await this.message.channel.send(data as MessageCreateOptions)) as NypsiMessage;
-        this.message = msg;
-        return msg;
+    } else {
+      return this.interaction.update(data).catch((e) => {
+        logger.warn(`blackjack: ${this.member.user.id} failed to update`, e);
+        return this.message.edit(data).catch(async (e) => {
+          logger.error(`blackjack: ${this.member.user.id} edit error after update`, e);
+
+          const msg = (await this.message.channel.send(
+            data as MessageCreateOptions,
+          )) as NypsiMessage;
+          this.message = msg;
+
+          return msg;
+        });
       });
-    });
+    }
   }
 
   private checkWin() {
@@ -631,6 +644,7 @@ class Game {
         time: 100000,
       })
       .then((collected) => {
+        this.interaction = collected;
         setTimeout(() => {
           collected.deferUpdate().catch(() => {});
         }, 1000);
@@ -647,8 +661,6 @@ class Game {
         content: `${this.member.toString()} blackjack game expired`,
       });
     }
-
-    this.interaction = response;
 
     if (response.customId === "hit") {
       this.hand.newCard();
