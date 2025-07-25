@@ -17,7 +17,7 @@ import { formatTime } from "../utils/functions/string";
 import { getPreferences } from "../utils/functions/users/notifications";
 import { getLastKnownAvatar, getLastKnownUsername } from "../utils/functions/users/tag";
 import { addWordleGame, getWordleGame } from "../utils/functions/users/wordle";
-import { getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
 
 const cmd = new Command("wordle", "play wordle on discord", "fun").setAliases(["w"]);
@@ -126,9 +126,7 @@ async function run(
     }
 
     embed.setDescription(
-      renderBoard(games.get(game.id.toString(36)).board, games.get(game.id.toString(36)).letters) +
-        "\n\n" +
-        `${game.won ? "won" : "lost"} in ${formatTime(game.time)}${game.won ? "" : `\n\nthe word was ${game.word}`}`,
+      `${renderBoard(games.get(game.id.toString(36)).board, games.get(game.id.toString(36)).letters)}\n\n${game.won ? "won" : "lost"} in ${formatTime(game.time)}${game.won ? "" : `\n\nthe word was ${game.word}`}`,
     );
     games.delete(game.id.toString(36));
 
@@ -145,7 +143,7 @@ async function run(
       return;
     }
 
-    //await addCooldown(cmd.name, message.member, 75);
+    await addCooldown(cmd.name, message.member, 75);
     await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
 
     const board = createBoard();
@@ -228,7 +226,7 @@ async function play(
       cancel(message, m);
       games.delete(message.author.id);
       redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
-      message.channel.send({ content: message.author.toString() + " wordle game expired" });
+      message.channel.send({ content: `${message.author.toString()} wordle game expired` });
     });
 
   if (fail) return;
@@ -313,8 +311,7 @@ async function cancel(message: Message | (NypsiCommandInteraction & CommandInter
 
   const embed = game.embed;
   embed.setDescription(
-    `${renderBoard(game.board, game.letters)}\n\n` +
-      `game cancelled. the word was **${game.word}**`,
+    `${renderBoard(game.board, game.letters)}\n\ngame cancelled. the word was **${game.word}**`,
   );
   embed.setColor(Constants.EMBED_FAIL_COLOR);
   embed.setFooter(null);
@@ -359,8 +356,7 @@ async function win(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const embed = games.get(message.author.id).embed;
   embed.setDescription(
-    `${renderBoard(games.get(message.author.id).board, games.get(message.author.id).letters)}\n\n` +
-      "you won!! congratulations",
+    `${renderBoard(games.get(message.author.id).board, games.get(message.author.id).letters)}\n\nyou won!! congratulations`,
   );
   embed.setColor(Constants.EMBED_SUCCESS_COLOR);
   embed.setFooter({
@@ -395,7 +391,7 @@ async function lose(message: Message | (NypsiCommandInteraction & CommandInterac
   const game = games.get(message.author.id);
   const embed = games.get(message.author.id).embed;
   embed.setDescription(
-    `${renderBoard(game.board, game.letters)}\n\n` + `you lost ): the word was **${game.word}**`,
+    `${renderBoard(game.board, game.letters)}\n\nyou lost ): the word was **${game.word}**`,
   );
   embed.setColor(Constants.EMBED_FAIL_COLOR);
   embed.setFooter(null);
