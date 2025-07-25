@@ -342,7 +342,7 @@ export async function summariseRequest(id: string) {
   let transcript = "";
 
   for (const message of messages) {
-    transcript += `${await getLastKnownUsername(message.userId)}: ${message.content}\n\n`;
+    transcript += `${await getLastKnownUsername(message.userId, false)}: ${message.content}\n\n`;
   }
 
   return await prompt(

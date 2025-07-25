@@ -652,7 +652,7 @@ export async function runCommand(
         return message.channel.send({
           embeds: [
             new ErrorEmbed(
-              `\`${cmd}\` is a custom alias owned by **${owner}**. to create your own custom aliases you need a premium membership\n` +
+              `\`${cmd}\` is a custom alias owned by **${owner.replaceAll('_', '\\_')}**. to create your own custom aliases you need a premium membership\n` +
                 "/premium",
             ),
           ],
@@ -689,7 +689,7 @@ export async function runCommand(
 
         message.content += ` [custom cmd - ${customCommand.owner}]`;
 
-        const ownerTag = await getLastKnownUsername(customCommand.owner);
+        const ownerTag = await getLastKnownUsername(customCommand.owner, false);
         await addUse(customCommand.owner);
         logCommand(message, ["", "", ""]);
 
@@ -829,7 +829,7 @@ export async function runCommand(
         `**you are banned from this command. dm me for help**\n\n` +
           `${
             banCheck.bannedAccount !== message.author.id
-              ? `in relation to \`${await getLastKnownUsername(banCheck.bannedAccount)}\`\n`
+              ? `in relation to \`${await getLastKnownUsername(banCheck.bannedAccount, false)}\`\n`
               : ""
           }` +
           `you'll be unbanned <t:${Math.floor(unbanTime.getTime() / 1000)}:R>`,

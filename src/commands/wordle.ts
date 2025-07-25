@@ -98,7 +98,7 @@ async function run(
       });
 
     const username = (await getPreferences(game.userId))?.leaderboards
-      ? await getLastKnownUsername(game.userId).catch(() => {})
+      ? await getLastKnownUsername(game.userId, false).catch(() => {})
       : "[hidden]";
 
     const embed = new CustomEmbed(game.userId).setHeader(
