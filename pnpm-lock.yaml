@@ -36,8 +36,8 @@ importers:
         specifier: 4.0.9
         version: 4.0.9
       bullmq:
-        specifier: ^5.56.5
-        version: 5.56.5
+        specifier: ^5.56.6
+        version: 5.56.6
       chalk:
         specifier: 4.1.2
         version: 4.1.2
@@ -57,8 +57,8 @@ importers:
         specifier: 14.21.0
         version: 14.21.0(bufferutil@4.0.9)
       dotenv:
-        specifier: 17.2.0
-        version: 17.2.0
+        specifier: 17.2.1
+        version: 17.2.1
       fast-sort:
         specifier: 3.4.1
         version: 3.4.1
@@ -1593,8 +1593,8 @@ packages:
     resolution: {integrity: sha512-WDtdLmJvAuNNPzByAYpRo2rF1Mmradw6gvWsQKf63476DDXmomT9zUiGypLcG4ibIM67vhAj8jJRdbmEws2Aqw==}
     engines: {node: '>=6.14.2'}
 
-  bullmq@5.56.5:
-    resolution: {integrity: sha512-nhcVxoE9Y0YUuNYtvaD+N0Bk2kqcU+rXzJwdQIr8i8qC/fxoghwUYb9a+CidTv24pi1eqstLnBoa8xkR/P7Mdw==}
+  bullmq@5.56.6:
+    resolution: {integrity: sha512-8ex5cf0LzL6zEjuriz3kBx2YiKilCUy1qv+Mw8Zn8XNKg4WIIlpeKZnzrwQSqAyOAf+CN2J+ebsoVeSzD6zH7w==}
 
   callsites@3.1.0:
     resolution: {integrity: sha512-P8BjAsXvZS+VIDUI11hHCQEv74YT67YUi5JJFNWIqL235sBmjX4+qx9Muvls5ivyNENctx46xQLQ3aTuE7ssaQ==}
@@ -1778,8 +1778,8 @@ packages:
     resolution: {integrity: sha512-yS+Q5i3hBf7GBkd4KG8a7eBNNWNGLTaEwwYWUijIYM7zrlYDM0BFXHjjPWlWZ1Rg7UaddZeIDmi9jF3HmqiQ2w==}
     engines: {node: '>=6.0.0'}
 
-  dotenv@17.2.0:
-    resolution: {integrity: sha512-Q4sgBT60gzd0BB0lSyYD3xM4YxrXA9y4uBDof1JNYGzOXrQdQ6yX+7XIAqoFOGQFOTK1D3Hts5OllpxMDZFONQ==}
+  dotenv@17.2.1:
+    resolution: {integrity: sha512-kQhDYKZecqnM0fCnzI5eIv5L4cAe/iRI+HqMbO/hbRdTAeXDG+M9FjipUxNfbARuEg4iHIbhnhs78BCHNbSxEQ==}
     engines: {node: '>=12'}
 
   eastasianwidth@0.2.0:
@@ -4974,7 +4974,7 @@ snapshots:
     dependencies:
       node-gyp-build: 4.8.4
 
-  bullmq@5.56.5:
+  bullmq@5.56.6:
     dependencies:
       cron-parser: 4.9.0
       ioredis: 5.6.1
@@ -5131,7 +5131,7 @@ snapshots:
     dependencies:
       esutils: 2.0.3
 
-  dotenv@17.2.0: {}
+  dotenv@17.2.1: {}
 
   eastasianwidth@0.2.0: {}
 
