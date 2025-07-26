@@ -691,9 +691,7 @@ async function playGame(
       playerDone: true,
     });
 
-    const dealerDrawing = total(message.member, "dealer") < 17;
-
-    if (dealerDrawing && !skipFirstEdit) {
+    if (!skipFirstEdit) {
       const embed = await render("playing");
       const row = getRow(false, true);
 
@@ -706,8 +704,7 @@ async function playGame(
 
     const check = checkWin();
 
-    if (dealerDrawing || skipFirstEdit) await sleep(1500);
-    else interaction?.deferUpdate().catch(() => {});
+    await sleep(1500);
 
     switch (check) {
       case "lose":
