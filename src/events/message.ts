@@ -516,7 +516,10 @@ export default async function messageCreate(message: Message) {
     }
   };
 
-  if (!message.author.bot) {
+  if (
+    (message.author.bot && Constants.WHITELISTED_BOTS.includes(message.author.id)) ||
+    !message.author.bot
+  ) {
     if (message.guildId === Constants.NYPSI_SERVER_ID) {
       setTimeout(() => {
         checkNeedSupport();
