@@ -177,7 +177,7 @@ async function run(
 
   let banLength = "";
 
-  if (temporary) banLength = MStoTime(duration * 1000);
+  if (temporary) banLength = MStoTime(duration * 1000, true);
 
   if (await isBanned(message.guild, mode === "id" ? userId : target))
     await deleteBan(message.guild, mode === "id" ? userId : target);
