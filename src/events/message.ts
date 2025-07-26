@@ -465,7 +465,7 @@ export default async function messageCreate(message: Message) {
 
       lastContents.history.push(message.content.toLowerCase());
       lastContents.last = Date.now();
-      if (lastContents.history.length >= 5) lastContents.history.shift();
+      if (lastContents.history.length >= 3) lastContents.history.shift();
 
       lastContent.set(message.author.id, lastContents);
 
