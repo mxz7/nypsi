@@ -364,8 +364,8 @@ export function setClusterId(id: string) {
 }
 
 export async function transaction(
-  from: { username: string; id: string },
-  to: { username: string; id: string },
+  from: string | { id: string },
+  to: string | { id: string },
   type: TransactionType,
   amount: number | bigint,
   itemId?: string,
@@ -373,8 +373,8 @@ export async function transaction(
 ) {
   const tx = await prisma.transaction.create({
     data: {
-      sourceId: from.id,
-      targetId: to.id,
+      sourceId: typeof from === "string" ? from : from.id,
+      targetId: typeof to === "string" ? to : to.id,
       type,
       amount,
       itemId,
@@ -402,7 +402,7 @@ export function gamble(
   if (!nextLogMsg.get("gamble")) {
     nextLogMsg.set(
       "gamble",
-      `**${user.username}** (${user.id})\n` +
+      `**${user.username.replaceAll("_", "\\_")}** (${user.id})\n` +
         `- **game** ${game}\n` +
         `- **bet** $${amount.toLocaleString()}\n` +
         `- **result** ${result}${
@@ -415,7 +415,7 @@ export function gamble(
     nextLogMsg.set(
       "gamble",
       nextLogMsg.get("gamble") +
-        `**${user.username}** (${user.id})\n` +
+        `**${user.username.replaceAll("_", "\\_")}** (${user.id})\n` +
         `- **game** ${game}\n` +
         `- **bet** $${amount.toLocaleString()}\n` +
         `- **result** ${result}${

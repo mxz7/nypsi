@@ -3098,7 +3098,7 @@ async function run(
       const embed = new CustomEmbed(
         message.member,
         `${count.toLocaleString()} total transactions\n\n${oppositeFormatted.join("\n")}`,
-      ).setHeader(`analytics for ${await getLastKnownUsername(userId)} (${userId})`);
+      ).setHeader(`analytics for ${await getLastKnownUsername(userId, false)} (${userId})`);
 
       return send({ embeds: [embed] });
     } else {

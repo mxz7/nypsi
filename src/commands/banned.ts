@@ -45,7 +45,9 @@ async function run(
   for (const m of banned) {
     const username =
       (await getLastKnownUsername(m.userId)) ??
-      (await message.client.users.fetch(m.userId).catch(() => undefined as User))?.username ??
+      (
+        await message.client.users.fetch(m.userId).catch(() => undefined as User)
+      )?.username.replaceAll("_", "\\_") ??
       "";
 
     const msg = `${username} \`${m.userId}\` ${

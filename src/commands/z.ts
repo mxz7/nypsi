@@ -58,7 +58,7 @@ async function run(
           `rating: ${profile.rating}\n` +
           `kick: ${profile.voteKicks.length}/${Math.ceil((await prisma.z.count({ where: { removed: false } })) / 5)}`,
       ).setHeader(
-        await getLastKnownUsername(profile.userId),
+        await getLastKnownUsername(profile.userId, false),
         await getLastKnownAvatar(profile.userId),
       );
 
@@ -94,7 +94,7 @@ async function run(
 
       if (interaction.customId === "invites") {
         const embed = new CustomEmbed(profile.userId).setHeader(
-          `${await getLastKnownUsername(profile.userId)}'s invites`,
+          `${await getLastKnownUsername(profile.userId, false)}'s invites`,
           await getLastKnownAvatar(profile.userId),
         );
         const desc: string[] = [];

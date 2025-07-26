@@ -143,6 +143,7 @@ async function randomDrop(client: NypsiClient) {
         logger.info(
           `random drop in ${channelId} winner: ${winner} (${await getLastKnownUsername(
             winner,
+            false,
           )}) prize: ${JSON.stringify(prize)}`,
         );
         giveLootPoolResult(winner, prize);
@@ -243,7 +244,7 @@ async function fastClickGame(
           return;
         }
 
-        embed.description += `\n\n**${res.user.username}** has won in \`${(
+        embed.description += `\n\n**${res.user.username.replaceAll("_", "\\_")}** has won in \`${(
           (Date.now() - started) /
           1000
         ).toFixed(2)}s\`!!`;
@@ -372,7 +373,7 @@ async function typeFastGame(
           return;
         }
 
-        embed.description += `\n\n**${res.author.username}** has won in \`${(
+        embed.description += `\n\n**${res.author.username.replaceAll("_", "\\_")}** has won in \`${(
           (Date.now() - started) /
           1000
         ).toFixed(2)}s\`!!`;
@@ -611,7 +612,7 @@ async function clickSpecificGame(
           return;
         }
 
-        embed.description += `\n\n**${res.user.username}** has won in \`${(
+        embed.description += `\n\n**${res.user.username.replaceAll("_", "\\_")}** has won in \`${(
           (Date.now() - started) /
           1000
         ).toFixed(2)}s\`!!`;
@@ -677,6 +678,7 @@ export async function startRandomDrop(client: NypsiClient, channelId: string, ra
     logger.info(
       `random drop in ${channelId} winner: ${winner} (${await getLastKnownUsername(
         winner,
+        false,
       )}) prize: ${JSON.stringify(prize)} ${rain ? "(rain)" : ""}`,
     );
 
@@ -702,7 +704,10 @@ export async function startLootRain(channel: GuildTextBasedChannel, user: User) 
 
   await channel.send({
     embeds: [
-      new CustomEmbed(null, `**${user.username}'s loot rain is starting!!!**`).setColor(0xffffff),
+      new CustomEmbed(
+        null,
+        `**${user.username.replaceAll("_", "\\_")}'s loot rain is starting!!!**`,
+      ).setColor(0xffffff),
     ],
   });
 
@@ -719,7 +724,10 @@ export async function startLootRain(channel: GuildTextBasedChannel, user: User) 
     if (!active) {
       channel.send({
         embeds: [
-          new CustomEmbed(null, `**${user.username}'s loot rain has ended.**`).setColor(0xffffff),
+          new CustomEmbed(
+            null,
+            `**${user.username.replaceAll("_", "\\_")}'s loot rain has ended.**`,
+          ).setColor(0xffffff),
         ],
       });
       return;

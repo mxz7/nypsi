@@ -203,7 +203,7 @@ async function run(
     embed2.addField(
       "**fail!!**",
       "**" +
-        target.user.username +
+        target.user.username.replaceAll("_", "\\_") +
         "** has been robbed recently and is protected by a private security team\n" +
         "you were caught and paid $" +
         amountMoney.toLocaleString(),
@@ -213,7 +213,7 @@ async function run(
     embed3.setColor(Constants.EMBED_SUCCESS_COLOR);
     embed3.setDescription(
       "**" +
-        message.author.username +
+        message.author.username.replaceAll("_", "\\_") +
         "** tried to rob you in **" +
         message.guild.name +
         "**\n" +
@@ -238,14 +238,16 @@ async function run(
     embed2.setColor(Constants.EMBED_FAIL_COLOR);
     embed2.addField(
       "fail!!",
-      "**" + target.user.username + "** had a padlock, which has now been broken",
+      "**" +
+        target.user.username.replaceAll("_", "\\_") +
+        "** had a padlock, which has now been broken",
     );
 
     embed3.setTitle("you were nearly robbed");
     embed3.setColor(Constants.EMBED_SUCCESS_COLOR);
     embed3.setDescription(
       "**" +
-        message.author.username +
+        message.author.username.replaceAll("_", "\\_") +
         "** tried to rob you in **" +
         message.guild.name +
         "**\n" +
@@ -326,7 +328,7 @@ async function run(
       embed3.setColor(Constants.EMBED_FAIL_COLOR);
       embed3.setDescription(
         "**" +
-          message.author.username +
+          message.author.username.replaceAll("_", "\\_") +
           "** has robbed you in **" +
           message.guild.name +
           "**\n" +
@@ -368,7 +370,7 @@ async function run(
         );
         embed3.setDescription(
           "**" +
-            message.author.username +
+            message.author.username.replaceAll("_", "\\_") +
             "** tried to rob you in **" +
             message.guild.name +
             "**\n" +
@@ -389,7 +391,7 @@ async function run(
         embed2.addField("fail!!", "you lost $**" + amountMoney.toLocaleString() + "**");
         embed3.setDescription(
           "**" +
-            message.author.username +
+            message.author.username.replaceAll("_", "\\_") +
             "** tried to rob you in **" +
             message.guild.name +
             "**\n" +

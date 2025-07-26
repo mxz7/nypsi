@@ -61,7 +61,7 @@ export default {
 
     if ((await getPreferences(users[0]))?.leaderboards) {
       embed.setFooter({
-        text: `${await getLastKnownUsername(users[0])} has no life (${parseInt(
+        text: `${await getLastKnownUsername(users[0], false)} has no life (${parseInt(
           topUsers[users[0]],
         ).toLocaleString()} commands)`,
       });

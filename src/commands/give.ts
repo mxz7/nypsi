@@ -156,7 +156,7 @@ async function run(
   if ((await getDmSettings(target)).payment) {
     const embed = new CustomEmbed(
       target,
-      `**${message.author.username}** has given you ${amount.toLocaleString()} ${selected.emoji} ${
+      `**${message.author.username.replaceAll("_", "\\_")}** has given you ${amount.toLocaleString()} ${selected.emoji} ${
         selected.name
       }`,
     )

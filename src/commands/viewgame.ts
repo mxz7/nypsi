@@ -201,7 +201,7 @@ async function run(
       return send({ embeds: [new ErrorEmbed(`couldn't find a game with id \`${args[0]}\``)] });
 
     const username = (await getPreferences(game.userId))?.leaderboards
-      ? await getLastKnownUsername(game.userId).catch(() => {})
+      ? await getLastKnownUsername(game.userId, false).catch(() => {})
       : "[hidden]";
 
     const embed = new CustomEmbed(game.userId).setHeader(

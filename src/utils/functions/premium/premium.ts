@@ -248,7 +248,7 @@ export async function expireUser(member: MemberResolvable, client?: NypsiClient 
   await redis.del(`${Constants.redis.cache.premium.LEVEL}:${userId}`);
   await redis.del(`${Constants.redis.cache.premium.ALIASES}:${userId}`);
 
-  clearExpiredUserAliases(await getLastKnownUsername(userId));
+  clearExpiredUserAliases(await getLastKnownUsername(userId, false));
 
   if (client) {
     const cluster = await findGuildCluster(client, Constants.NYPSI_SERVER_ID);

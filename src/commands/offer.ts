@@ -406,12 +406,16 @@ async function run(
     if ((await getPreferences(target)).offers <= (await getTargetedOffers(target)).length) {
       if ((await getPreferences(target)).offers === 0)
         return send({
-          embeds: [new ErrorEmbed(`**${target.user.username}** has disabled offers`)],
+          embeds: [
+            new ErrorEmbed(
+              `**${target.user.username.replaceAll("_", "\\_")}** has disabled offers`,
+            ),
+          ],
         });
       return send({
         embeds: [
           new ErrorEmbed(
-            `**${target.user.username}** has already received their max amount of offers (${
+            `**${target.user.username.replaceAll("_", "\\_")}** has already received their max amount of offers (${
               (await getPreferences(target)).offers
             })`,
           ),
@@ -432,14 +436,18 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            `**${target.user.username}** has blocked offers for ${selected.emoji} ${selected.name}`,
+            `**${target.user.username.replaceAll("_", "\\_")}** has blocked offers for ${selected.emoji} ${selected.name}`,
           ),
         ],
       });
 
     if (blocked.includes(message.author.id))
       return send({
-        embeds: [new ErrorEmbed(`**${target.user.username}** has blocked offers from you`)],
+        embeds: [
+          new ErrorEmbed(
+            `**${target.user.username.replaceAll("_", "\\_")}** has blocked offers from you`,
+          ),
+        ],
       });
 
     let amount = parseInt(args[2]);
@@ -455,7 +463,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            `**${target.user.username}** doesnt have ${amount}x ${selected.emoji} ${selected.name}`,
+            `**${target.user.username.replaceAll("_", "\\_")}** doesnt have ${amount}x ${selected.emoji} ${selected.name}`,
           ),
         ],
       });
@@ -489,7 +497,10 @@ async function run(
     } else {
       return send({
         embeds: [
-          new CustomEmbed(message.member, `✅ offer has been sent to **${target.user.username}**`),
+          new CustomEmbed(
+            message.member,
+            `✅ offer has been sent to **${target.user.username.replaceAll("_", "\\_")}**`,
+          ),
         ],
       });
     }

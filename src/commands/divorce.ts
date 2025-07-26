@@ -107,7 +107,7 @@ async function run(
       payload: {
         embed: new CustomEmbed(
           married.partnerId,
-          `${getItems()["broken_ring"].emoji} you have been divorced by ${message.member.user.username}!`,
+          `${getItems()["broken_ring"].emoji} you have been divorced by ${message.member.user.username.replaceAll("_", "\\_")}!`,
         ).setFooter({ text: `+1 broken ring` }),
       },
     });

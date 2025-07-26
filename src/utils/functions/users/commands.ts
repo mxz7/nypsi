@@ -90,7 +90,7 @@ export async function updateUser(user: User, command: string) {
   );
 
   const [username, avatar] = await Promise.all([
-    getLastKnownUsername(user.id),
+    getLastKnownUsername(user.id, false),
     getLastKnownAvatar(user.id),
   ]);
 

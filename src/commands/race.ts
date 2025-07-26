@@ -444,7 +444,7 @@ class Race {
         addTaskProgress(winner.id, "vin_diesel");
 
         description +=
-          `\n\n**${winner.username}** has won with their ${
+          `\n\n**${winner.username.replaceAll("_", "\\_")}** has won with their ${
             this.members.find((i) => i.user.id === winner.id).car.emoji
           } **${this.members.find((i) => i.user.id === winner.id).car.car.name}** by ${diff.toLocaleString()} meters` +
           `${this.bet ? `\n +$${winnings.toLocaleString()}` : ""}`;

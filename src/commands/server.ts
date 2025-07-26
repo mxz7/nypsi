@@ -66,7 +66,7 @@ async function run(
     .addField(
       "info",
       "**owner** " +
-        server.members.cache.get(server.ownerId).user.username +
+        server.members.cache.get(server.ownerId).user.username.replaceAll("_", "\\_") +
         "\n" +
         "**created** " +
         created,

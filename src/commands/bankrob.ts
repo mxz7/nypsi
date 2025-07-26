@@ -272,7 +272,7 @@ async function run(
             url: process.env.ANTICHEAT_HOOK,
           });
           await hook.send({
-            content: `[${getTimestamp()}] ${message.member.user.username} (${message.author.id}) given captcha randomly in bankrob`,
+            content: `[${getTimestamp()}] ${message.member.user.username.replaceAll("_", "\\_")} (${message.author.id}) given captcha randomly in bankrob`,
           });
           hook.destroy();
         }

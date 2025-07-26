@@ -125,7 +125,7 @@ async function prepare(
             url: process.env.ANTICHEAT_HOOK,
           });
           await hook.send({
-            content: `[${getTimestamp()}] ${message.author.username} (${message.author.id}) given captcha randomly in scratch card`,
+            content: `[${getTimestamp()}] ${message.author.username.replaceAll("_", "\\_")} (${message.author.id}) given captcha randomly in scratch card`,
           });
           hook.destroy();
         }

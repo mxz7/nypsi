@@ -256,7 +256,7 @@ export async function getMarketOrderEmbed(order: Market) {
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>();
 
   embed.setHeader(
-    await getLastKnownUsername(order.ownerId),
+    await getLastKnownUsername(order.ownerId, false),
     await getLastKnownAvatar(order.ownerId),
     `https://nypsi.xyz/users/${order.ownerId}?ref=bot-market`,
   );
@@ -812,19 +812,10 @@ export async function completeOrder(
 
   // send logs and dms
   (async () => {
-    const username = await getLastKnownUsername(buyerId);
-
+    transaction(order.ownerId, buyerId, "item", amount, order.itemId, "market");
     transaction(
-      { username: await getLastKnownUsername(order.ownerId), id: order.ownerId },
-      { username: username, id: buyerId },
-      "item",
-      amount,
-      order.itemId,
-      "market",
-    );
-    transaction(
-      { username: username, id: buyerId },
-      { username: await getLastKnownUsername(order.ownerId), id: order.ownerId },
+      buyerId,
+      order.ownerId,
       "money",
       Number(amount) * Number(order.price) - taxedAmount,
       undefined,
@@ -1012,7 +1003,9 @@ export async function marketSell(
 
   await removeInventoryItem(userId, itemId, amount - remaining);
 
-  logger.info(`market: ${userId} (${await getLastKnownUsername(userId)}) sold ${amount} ${itemId}`);
+  logger.info(
+    `market: ${userId} (${await getLastKnownUsername(userId, false)}) sold ${amount} ${itemId}`,
+  );
 
   await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
   inTransaction.delete(itemId);
@@ -1143,7 +1136,7 @@ export async function marketBuy(
   await removeBalance(userId, buyPrice);
 
   logger.info(
-    `market: ${userId} (${await getLastKnownUsername(userId)}) bought ${amount} ${itemId}`,
+    `market: ${userId} (${await getLastKnownUsername(userId, false)}) bought ${amount} ${itemId}`,
   );
 
   await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);

@@ -1053,7 +1053,7 @@ export async function topWordle(guild: Guild, member: MemberResolvable) {
     out.push(
       `${pos} ${await formatUsername(
         user.userId,
-        await getLastKnownUsername(user.userId),
+        await getLastKnownUsername(user.userId, false),
         true,
       )} ${user._count.userId.toLocaleString()} ${pluralize("win", user._count.userId)}`,
     );
@@ -1105,7 +1105,7 @@ export async function topWordleGlobal(member: MemberResolvable) {
     out.push(
       `${pos} ${await formatUsername(
         user.userId,
-        await getLastKnownUsername(user.userId),
+        await getLastKnownUsername(user.userId, false),
         true,
       )} ${user._count.userId.toLocaleString()} ${pluralize("win", user._count.userId)}`,
     );
@@ -1173,7 +1173,7 @@ export async function topWordleTime(guild: Guild, member: MemberResolvable) {
     out.push(
       `${pos} ${await formatUsername(
         user.userId,
-        await getLastKnownUsername(user.userId),
+        await getLastKnownUsername(user.userId, false),
         true,
       )} [\`${formatTime(user.time)}\`](https://nypsi.xyz/wordles/${user.gameId?.toString(36)}?ref=bot-lb)`,
     );
@@ -1224,7 +1224,7 @@ ORDER BY time ASC limit 100`;
     out.push(
       `${pos} ${await formatUsername(
         user.userId,
-        await getLastKnownUsername(user.userId),
+        await getLastKnownUsername(user.userId, false),
         true,
       )} [\`${formatTime(user.time)}\`](https://nypsi.xyz/wordles/${user.gameId?.toString(36)}?ref=bot-lb)`,
     );
@@ -1475,7 +1475,7 @@ export async function topCommandUsesGlobal(member?: MemberResolvable) {
 
     out[count] = `${pos} ${await formatUsername(
       user.userId,
-      await getLastKnownUsername(user.userId),
+      await getLastKnownUsername(user.userId, false),
       (await getPreferences(user.userId)).leaderboards,
     )} ${user._sum.uses.toLocaleString()} ${pluralize("command", user._sum.uses)}`;
 

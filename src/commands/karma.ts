@@ -38,7 +38,9 @@ async function run(
     embed.setDescription(`you have **${karma.toLocaleString()}** karma 🔮`);
   } else {
     embed.setHeader(`${target.user.username}'s karma`, target.user.avatarURL());
-    embed.setDescription(`${target.user.username} has **${karma.toLocaleString()}** karma 🔮`);
+    embed.setDescription(
+      `${target.user.username.replaceAll("_", "\\_")} has **${karma.toLocaleString()}** karma 🔮`,
+    );
   }
 
   embed.setFooter({ text: `whats karma? do ${(await getPrefix(message.guild))[0]}karmahelp` });
