@@ -266,7 +266,7 @@ async function run(
   let mutedLength = "";
 
   if (timedMute) {
-    mutedLength = MStoTime(time * 1000);
+    mutedLength = MStoTime(time * 1000, true);
   }
 
   const caseId = await doMute(

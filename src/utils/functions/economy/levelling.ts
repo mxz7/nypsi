@@ -340,6 +340,29 @@ export function getLevelRequirements(prestige: number, level: number) {
   return { xp: requiredXp, money: requiredMoney };
 }
 
+export function getNextPrestigeRequirements(prestige: number, level: number) {
+  while (level >= 100) {
+    prestige++;
+    level -= 100;
+  }
+
+  const rawLevel = prestige * 100 + level;
+
+  const nextPrestige = Math.ceil((rawLevel + 1) / 100) * 100;
+
+  const levelsRequired = nextPrestige - rawLevel;
+
+  let requiredXp = 0;
+  let requiredMoney = 0;
+
+  for (let i = 0; i < levelsRequired; i++) {
+    requiredXp += xpFormula(level + i, prestige);
+    requiredMoney += moneyFormula(rawLevel + i);
+  }
+
+  return { xp: requiredXp, money: requiredMoney };
+}
+
 export async function getUpgrades(member: MemberResolvable): Promise<
   {
     upgradeId: string;
