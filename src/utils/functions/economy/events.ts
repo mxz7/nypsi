@@ -267,14 +267,14 @@ async function giveRewards(event: EventData) {
 
   const top5 = event.contributions.slice(0, 5);
 
-  const top1p = event.contributions.slice(0, Math.ceil(event.contributions.length / 100));
-  const top5p = event.contributions.slice(0, Math.ceil(event.contributions.length / 20));
-  const top10p = event.contributions.slice(0, Math.ceil(event.contributions.length / 10));
-  const top50p = event.contributions.slice(0, Math.ceil(event.contributions.length / 2));
+  const achGroup = event.contributions.slice(0, Math.ceil(event.contributions.length * 0.025));
+  const top5p = event.contributions.slice(0, Math.ceil(event.contributions.length * 0.05));
+  const top10p = event.contributions.slice(0, Math.ceil(event.contributions.length * 0.1));
+  const top50p = event.contributions.slice(0, Math.ceil(event.contributions.length * 0.5));
 
-  logger.debug(`event: rewards`, { top1p, top5p, top10p });
+  logger.debug(`event: rewards`, { top1p: achGroup, top5p, top10p });
 
-  for (const { userId } of top1p) {
+  for (const { userId } of achGroup) {
     await addProgress(userId, "event_pro", 1);
   }
 
