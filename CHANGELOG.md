@@ -13,6 +13,7 @@
 - more complex times (such as 1h30m) can now be used in mute/ban/etc (@growling_grizzly)
 - added lotus 🪷 flower
 - added requirements to next prestige to $level (@growling_grizzly)
+- rewrote blackjack to hopefully fix it randomly breaking (@growling_grizzly)
 
 ## other
 

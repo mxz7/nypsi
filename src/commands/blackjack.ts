@@ -6,7 +6,6 @@ import {
   ButtonStyle,
   ColorResolvable,
   CommandInteraction,
-  GuildMember,
   Interaction,
   Message,
   MessageActionRowComponentBuilder,
@@ -79,17 +78,15 @@ cmd.setRun(run);
 
 module.exports = cmd;
 
-const games = new Map<
-  string,
-  {
-    id: number;
-    bet: number;
-    deck: string[];
-    dealerHand: string[];
-    playerHand: string[];
-    playerDone: boolean;
-  }
->();
+type Game = {
+  id: number;
+  bet: number;
+  deck: string[];
+  dealerHand: string[];
+  playerHand: string[];
+  playerDone: boolean;
+  state: "playing" | "end";
+};
 
 async function prepareGame(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
@@ -180,17 +177,6 @@ async function prepareGame(
     }
   }
 
-  if (games.has(message.author.id)) {
-    if (msg) {
-      return msg.edit({
-        embeds: [new ErrorEmbed("you are already playing blackjack")],
-        components: [],
-      });
-    } else {
-      return send({ embeds: [new ErrorEmbed("you are already playing blackjack")] });
-    }
-  }
-
   if (await redis.sismember(Constants.redis.nypsi.USERS_PLAYING, message.author.id)) {
     if (msg) {
       return msg.edit({ embeds: [new ErrorEmbed("you have an active game")], components: [] });
@@ -259,34 +245,31 @@ async function prepareGame(
     "K♦️",
   ];
 
-  setTimeout(() => {
-    if (games.has(message.author.id)) {
-      if (games.get(message.author.id).id == id) {
-        const game = games.get(message.author.id);
-        games.delete(message.author.id);
-        redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
-        logger.warn("blackjack still in playing state after 5 minutes - deleting key", game);
-      }
-    }
-  }, ms("5 minutes"));
-
-  games.set(message.author.id, {
+  const game: Game = {
     id,
     bet,
     deck: shuffle(newDeck),
     dealerHand: [],
     playerHand: [],
     playerDone: false,
-  });
+    state: "playing",
+  };
 
-  newCard(message.member, "player");
-  newCard(message.member, "dealer");
-  newCard(message.member, "player");
-  newCard(message.member, "dealer");
+  setTimeout(() => {
+    if (game.state == "playing" && game.id == id) {
+      logger.warn("blackjack still in playing state after 5 minutes - deleting key", game);
+      redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+    }
+  }, ms("5 minutes"));
+
+  newCard(game.deck, game.playerHand);
+  newCard(game.deck, game.dealerHand);
+  newCard(game.deck, game.playerHand);
+  newCard(game.deck, game.dealerHand);
 
   const row = getRow(
-    (await getBalance(message.member)) >= bet && total(message.member, "player") < 21,
-    total(message.member, "player") == 21,
+    (await getBalance(message.member)) >= bet && total(game.playerHand) < 21,
+    total(game.playerHand) == 21,
   );
 
   const desc = await renderGambleScreen({ state: "playing", bet });
@@ -298,13 +281,13 @@ async function prepareGame(
 
   embed.addField(
     "dealer",
-    total(message.member, "player") == 21
-      ? `| ${games.get(message.member.id).dealerHand.join(" | ")} | **${total(message.member, "dealer")}**`
-      : `| ${games.get(message.member.id).dealerHand[0]} |`,
+    total(game.playerHand) == 21
+      ? `| ${game.dealerHand.join(" | ")} | **${total(game.dealerHand)}**`
+      : `| ${game.dealerHand[0]} |`,
   );
   embed.addField(
     message.member.user.username,
-    `| ${games.get(message.member.id).playerHand.join(" | ")} | **${total(message.member, "player")}**`,
+    `| ${game.playerHand.join(" | ")} | **${total(game.playerHand)}**`,
   );
 
   if (msg) {
@@ -313,11 +296,11 @@ async function prepareGame(
     msg = await send({ embeds: [embed], components: [row] });
   }
 
-  playGame(message, send, msg, args).catch((e) => {
-    logger.error(
-      `error occurred playing blackjack - ${message.author.id} (${message.author.username})`,
-    );
-    logger.error("blackjack error", { err: e, game: games.get(message.author.id) });
+  playGame(game, message, send, msg, args).catch((e) => {
+    logger.error(`blackjack: ${message.author.id} error occurred during game`, {
+      err: e,
+      game: game,
+    });
     redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
     return send({
       embeds: [new ErrorEmbed("an error occurred while running - join support server")],
@@ -325,35 +308,17 @@ async function prepareGame(
   });
 }
 
-function newCard(member: GuildMember, forHand: "player" | "dealer") {
-  const deck = games.get(member.user.id).deck;
-
-  const hand =
-    forHand == "player"
-      ? games.get(member.user.id).playerHand
-      : games.get(member.user.id).dealerHand;
-
+function newCard(deck: string[], hand: string[]) {
   hand.push(deck.shift());
-
-  games.set(member.user.id, {
-    id: games.get(member.user.id).id,
-    bet: games.get(member.user.id).bet,
-    deck,
-    dealerHand: forHand == "dealer" ? hand : games.get(member.user.id).dealerHand,
-    playerHand: forHand == "player" ? hand : games.get(member.user.id).playerHand,
-    playerDone: games.get(member.user.id).playerDone,
-  });
 }
 
-function total(member: GuildMember, forHand: "player" | "dealer") {
+function total(hand: string[]) {
   let total = 0;
   let aces = 0;
 
   let aceAs11 = false;
 
-  for (let card of forHand == "player"
-    ? games.get(member.user.id).playerHand
-    : games.get(member.user.id).dealerHand) {
+  for (let card of hand) {
     card = card.split("♠️").join().split("♣️").join().split("♥️").join().split("♦️").join();
 
     if (card.includes("K") || card.includes("Q") || card.includes("J")) {
@@ -410,14 +375,13 @@ function getRow(doubleDown = true, disabled = false) {
 }
 
 async function playGame(
+  game: Game,
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   send: SendMessage,
   m: Message,
   args: string[],
 ) {
-  if (!games.has(message.author.id)) return;
-
-  const bet = games.get(message.author.id).bet;
+  const bet = game.bet;
 
   const edit = async (data: MessageEditOptions, interaction?: ButtonInteraction) => {
     if (!interaction || interaction.deferred || interaction.replied) return m.edit(data);
@@ -524,11 +488,11 @@ async function playGame(
   };
 
   const checkWin = () => {
-    if (total(message.member, "player") > 21) return "lose";
-    if (total(message.member, "dealer") > 21) return "win";
-    if (total(message.member, "player") > total(message.member, "dealer")) return "win";
-    if (total(message.member, "player") < total(message.member, "dealer")) return "lose";
-    if (total(message.member, "player") == total(message.member, "dealer")) return "draw";
+    if (total(game.playerHand) > 21) return "lose";
+    if (total(game.dealerHand) > 21) return "win";
+    if (total(game.playerHand) > total(game.dealerHand)) return "win";
+    if (total(game.playerHand) < total(game.dealerHand)) return "lose";
+    if (total(game.playerHand) == total(game.dealerHand)) return "draw";
   };
 
   const render = async (
@@ -544,7 +508,7 @@ async function playGame(
       await renderGambleScreen({
         // @ts-expect-error overloads
         state,
-        bet: games.get(message.member.id).bet,
+        bet: game.bet,
         winnings,
         multiplier: multi,
         eventProgress,
@@ -561,13 +525,13 @@ async function playGame(
 
     embed.addField(
       "dealer",
-      games.get(message.member.id).playerDone
-        ? `| ${games.get(message.member.id).dealerHand.join(" | ")} | **${total(message.member, "dealer")}**`
-        : `| ${games.get(message.member.id).dealerHand[0]} |`,
+      game.playerDone
+        ? `| ${game.dealerHand.join(" | ")} | **${total(game.dealerHand)}**`
+        : `| ${game.dealerHand[0]} |`,
     );
     embed.addField(
       message.member.user.username,
-      `| ${games.get(message.member.id).playerHand.join(" | ")} | **${total(message.member, "player")}**`,
+      `| ${game.playerHand.join(" | ")} | **${total(game.playerHand)}**`,
     );
 
     return embed;
@@ -576,12 +540,12 @@ async function playGame(
   const handOutcome = () => {
     return JSON.stringify({
       dealer: {
-        cards: games.get(message.member.id).dealerHand,
-        total: total(message.member, "dealer"),
+        cards: game.dealerHand,
+        total: total(game.dealerHand),
       },
       player: {
-        cards: games.get(message.member.id).playerHand,
-        total: total(message.member, "player"),
+        cards: game.playerHand,
+        total: total(game.playerHand),
       },
     });
   };
@@ -590,14 +554,14 @@ async function playGame(
     const id = await createGame({
       userId: message.author.id,
       game: "blackjack",
-      bet: bet,
+      bet: game.bet,
       result: "lose",
       outcome: handOutcome(),
     });
-    gamble(message.author, "blackjack", bet, "lose", id, 0);
+    gamble(message.author, "blackjack", game.bet, "lose", id, 0);
 
     const embed = await render("lose");
-    games.delete(message.author.id);
+    game.state = "end";
     return replay(embed, interaction);
   };
 
@@ -609,16 +573,13 @@ async function playGame(
       1,
     );
 
-    let winnings = bet * 2;
+    let winnings = game.bet * 2;
 
     const multi = (await getGambleMulti(message.member, message.member.client as NypsiClient))
       .multi;
 
-    if (
-      games.get(message.member.id).playerHand.length === 2 &&
-      total(message.member, "player") === 21
-    ) {
-      winnings = bet * 2.5;
+    if (game.playerHand.length === 2 && total(game.playerHand) === 21) {
+      winnings = game.bet * 2.5;
       addProgress(message.member, "blackjack_pro", 1);
       addTaskProgress(message.member, "blackjack");
     }
@@ -628,10 +589,8 @@ async function playGame(
     const earnedXp = await calcEarnedGambleXp(
       message.member,
       message.client as NypsiClient,
-      bet,
-      games.get(message.member.id).playerHand.length === 2 && total(message.member, "player") === 21
-        ? 2.5
-        : 2,
+      game.bet,
+      game.playerHand.length === 2 && total(game.playerHand) === 21 ? 2.5 : 2,
     );
 
     if (earnedXp > 0) {
@@ -646,55 +605,48 @@ async function playGame(
 
     const id = await createGame({
       userId: message.author.id,
-      bet: bet,
+      bet: game.bet,
       game: "blackjack",
       result: "win",
       outcome: handOutcome(),
       earned: winnings,
       xp: earnedXp,
     });
-    gamble(message.author, "blackjack", bet, "win", id, winnings);
+    gamble(message.author, "blackjack", game.bet, "win", id, winnings);
 
     await addBalance(message.member, winnings);
 
     const embed = await render("win", winnings, multi, earnedXp, id, eventProgress);
 
-    games.delete(message.author.id);
+    game.state = "end";
     return replay(embed, interaction);
   };
 
   const draw = async (interaction?: ButtonInteraction) => {
     const id = await createGame({
       userId: message.author.id,
-      bet,
+      bet: game.bet,
       game: "blackjack",
       result: "draw",
       outcome: handOutcome(),
-      earned: bet,
+      earned: game.bet,
     });
-    gamble(message.author, "blackjack", bet, "draw", id, bet);
-    await addBalance(message.member, bet);
-    const embed = await render("draw", bet);
+    gamble(message.author, "blackjack", game.bet, "draw", id, game.bet);
+    await addBalance(message.member, game.bet);
+    const embed = await render("draw", game.bet);
 
-    games.delete(message.author.id);
+    game.state = "end";
     return replay(embed, interaction);
   };
 
   const checkContinue = () => {
-    if (total(message.member, "player") < 21) return "continue";
-    else if (total(message.member, "player") > 21) return "lose";
+    if (total(game.playerHand) < 21) return "continue";
+    else if (total(game.playerHand) > 21) return "lose";
     else return "end";
   };
 
   const playerDone = async (interaction?: ButtonInteraction, skipFirstEdit = false) => {
-    games.set(message.member.id, {
-      id: games.get(message.member.id).id,
-      bet: games.get(message.member.id).bet,
-      deck: games.get(message.member.id).deck,
-      dealerHand: games.get(message.member.id).dealerHand,
-      playerHand: games.get(message.member.id).playerHand,
-      playerDone: true,
-    });
+    game.playerDone = true;
 
     if (!skipFirstEdit) {
       const embed = await render("playing");
@@ -703,8 +655,8 @@ async function playGame(
       await edit({ embeds: [embed], components: [row] }, interaction);
     }
 
-    while (total(message.member, "dealer") < 17) {
-      newCard(message.member, "dealer");
+    while (total(game.dealerHand) < 17) {
+      newCard(game.deck, game.dealerHand);
     }
 
     const check = checkWin();
@@ -721,7 +673,7 @@ async function playGame(
     }
   };
 
-  if (total(message.member, "player") == 21) {
+  if (total(game.playerHand) == 21) {
     return playerDone(undefined, true);
   }
 
@@ -741,7 +693,7 @@ async function playGame(
       .catch((e) => {
         logger.warn("bj error", e);
         fail = true;
-        games.delete(message.author.id);
+        game.state = "end";
         redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
         message.channel.send({ content: message.author.toString() + " blackjack game expired" });
       });
@@ -749,7 +701,7 @@ async function playGame(
     if (fail || !reaction) return;
 
     if (reaction.customId === "hit") {
-      newCard(message.member, "player");
+      newCard(game.deck, game.playerHand);
 
       const cont = checkContinue();
       if (cont === "lose") return lose(reaction);
@@ -765,20 +717,13 @@ async function playGame(
     } else if (reaction.customId === "dd") {
       const balance = await getBalance(message.member);
 
-      if (balance >= bet && games.get(message.member.id).playerHand.length === 2) {
+      if (balance >= bet && game.playerHand.length === 2) {
         await removeBalance(message.member, bet);
 
-        games.set(message.member.id, {
-          id: games.get(message.member.id).id,
-          bet: games.get(message.member.id).bet * 2,
-          deck: games.get(message.member.id).deck,
-          dealerHand: games.get(message.member.id).dealerHand,
-          playerHand: games.get(message.member.id).playerHand,
-          playerDone: games.get(message.member.id).playerDone,
-        });
+        game.bet *= 2;
       }
 
-      newCard(message.member, "player");
+      newCard(game.deck, game.playerHand);
 
       const cont = checkContinue();
       if (cont === "lose") return lose(reaction);
