@@ -134,7 +134,7 @@ async function prepareGame(
 
   if (!bet) {
     if (msg) {
-      return msg.edit({ embeds: [new ErrorEmbed("invalid bet")] });
+      return msg.edit({ embeds: [new ErrorEmbed("invalid bet")], components: [] });
     } else {
       return send({ embeds: [new ErrorEmbed("invalid bet")] });
     }
@@ -142,7 +142,7 @@ async function prepareGame(
 
   if (bet <= 0) {
     if (msg) {
-      return msg.edit({ embeds: [new ErrorEmbed("/blackjack <bet>")] });
+      return msg.edit({ embeds: [new ErrorEmbed("/blackjack <bet>")], components: [] });
     } else {
       return send({ embeds: [new ErrorEmbed("/blackjack <bet>")] });
     }
@@ -151,7 +151,7 @@ async function prepareGame(
   if (bet > (await getBalance(message.member))) {
     if (msg) {
       return msg.edit({
-        embeds: [new ErrorEmbed("you cannot afford this bet")],
+        embeds: [new ErrorEmbed("you cannot afford this bet")], components: []
       });
     } else {
       return send({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
@@ -165,7 +165,7 @@ async function prepareGame(
           new ErrorEmbed(
             `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`,
           ),
-        ],
+        ], components: []
       });
     } else {
       return send({
@@ -180,7 +180,7 @@ async function prepareGame(
 
   if (games.has(message.author.id)) {
     if (msg) {
-      return msg.edit({ embeds: [new ErrorEmbed("you are already playing blackjack")] });
+      return msg.edit({ embeds: [new ErrorEmbed("you are already playing blackjack")], components: [] });
     } else {
       return send({ embeds: [new ErrorEmbed("you are already playing blackjack")] });
     }
