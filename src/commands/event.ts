@@ -4,11 +4,13 @@ import {
   ButtonStyle,
   CommandInteraction,
   MessageActionRowComponentBuilder,
+  MessageFlags,
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { getCurrentEvent, getEventProgress } from "../utils/functions/economy/events";
-import { getEventsData } from "../utils/functions/economy/utils";
+import { createUser, getEventsData, userExists } from "../utils/functions/economy/utils";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("event", "view event information", "money");
 
@@ -18,6 +20,17 @@ async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   send: SendMessage,
 ) {
+  if (await onCooldown(cmd.name, message.member)) {
+    const res = await getResponse(cmd.name, message.member);
+
+    if (res.respond) send({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
+    return;
+  }
+
+  await addCooldown(cmd.name, message.member, 5);
+
+  if (!(await userExists(message.member))) await createUser(message.member);
+
   const event = await getCurrentEvent(false);
 
   if (!event) {
