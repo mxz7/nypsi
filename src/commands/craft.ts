@@ -448,6 +448,55 @@ async function run(
       });
     }
 
+    // BULK CRAFT CONFIRMATION FEATURE (500+ items)
+    const BULK_CRAFT_THRESHOLD = 500;
+    if (amount >= BULK_CRAFT_THRESHOLD) {
+      const confirmEmbed = new CustomEmbed(
+        message.member,
+        `Are you sure you want to craft \`${amount.toLocaleString()}x\` ${selected.emoji} ${pluralize(selected, amount)}? This cannot be undone.`
+      ).setFooter({ text: "Click the button below to confirm." });
+
+      const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder()
+          .setCustomId("confirm_craft")
+          .setLabel("Confirm Crafting")
+          .setStyle(ButtonStyle.Danger),
+        new ButtonBuilder()
+          .setCustomId("cancel_craft")
+          .setLabel("Cancel")
+          .setStyle(ButtonStyle.Secondary)
+      );
+
+      // Send confirmation prompt
+      const confirmMsg = await send({ embeds: [confirmEmbed], components: [row] });
+
+      try {
+        const filter = (i: Interaction) => i.user.id == message.author.id;
+        const interaction = await confirmMsg.awaitMessageComponent({ filter, time: 30000 });
+
+        await interaction.deferUpdate();
+
+        if (interaction.customId === "cancel_craft") {
+          await interaction.editReply({
+            embeds: [new ErrorEmbed("Crafting cancelled.")],
+            components: []
+          });
+          return;
+        }
+        // confirmed
+        await interaction.editReply({
+          embeds: [confirmEmbed.setFooter({ text: "Crafting confirmed, processing..." })],
+          components: []
+        });
+      } catch {
+        await confirmMsg.edit({
+          embeds: [new ErrorEmbed("Confirmation timed out, crafting cancelled.")],
+          components: []
+        });
+        return;
+      }
+    }
+
     const promises: Promise<any>[] = [];
 
     for (const ingredient of selected.craft.ingredients) {
