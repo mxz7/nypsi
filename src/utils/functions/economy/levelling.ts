@@ -169,8 +169,8 @@ const xpFormula = (level: number, prestige: number) => {
   if (prestige >= 70) prestigeModifier = 145;
   if (prestige >= 75) prestigeModifier = 175;
   if (prestige >= 80) prestigeModifier = 200;
-  if (prestige >= 90) prestigeModifier = 225;
-  if (prestige >= 100) prestigeModifier = 250;
+  if (prestige >= 85) prestigeModifier = 225;
+  if (prestige >= 90) prestigeModifier = 250;
 
   return Math.floor((level + 1) * 1.117 + prestigeModifier * prestige + 50 + 15 * prestige) - 1;
 };
