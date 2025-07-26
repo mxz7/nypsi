@@ -1495,7 +1495,7 @@
     "emoji": "🔱",
     "target": 5,
     "description": "get top 2.5% in an event 5 times",
-    "prize": ["lucky_scratch_card:3", "nypsi_crate:1"]
+    "prize": ["lucky_scratch_card:3", "nypsi_crate:1", "bronze_credit:1"]
   },
   "event_pro_iii": {
     "id": "event_pro_iii",
@@ -1503,7 +1503,12 @@
     "emoji": "🔱",
     "target": 10,
     "description": "get top 2.5% in an event 10 times",
-    "prize": ["lucky_scratch_card:4", "nypsi_crate:2"]
+    "prize": [
+      "lucky_scratch_card:4",
+      "nypsi_crate:2",
+      "legendary_scratch_card:1",
+      "silver_credit:1"
+    ]
   },
   "event_pro_iv": {
     "id": "event_pro_iv",
@@ -1511,7 +1516,7 @@
     "emoji": "🔱",
     "target": 25,
     "description": "get top 2.5% in an event 25 times",
-    "prize": ["legendary_scratch_card:3"]
+    "prize": ["legendary_scratch_card:3", "lucky_scratch_card:5", "nypsi_crate:3", "gold_credit:1"]
   },
   "event_pro_v": {
     "id": "event_pro_v",
@@ -1519,6 +1524,12 @@
     "emoji": "🔱",
     "target": 50,
     "description": "get top 2.5% in an event 50 times",
-    "prize": ["nypsi_crate:1", "legendary_scratch_card:3", "tag:trident"]
+    "prize": [
+      "nypsi_crate:4",
+      "legendary_scratch_card:4",
+      "omega_crate:1",
+      "platinum_credit:1",
+      "tag:trident"
+    ]
   }
 }
