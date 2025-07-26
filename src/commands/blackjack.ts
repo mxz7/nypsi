@@ -704,8 +704,10 @@ async function playGame(
       newCard(game.deck, game.playerHand);
 
       const cont = checkContinue();
-      if (cont === "lose") return lose(reaction);
-      else if (cont === "end") await playerDone(reaction);
+      if (cont === "lose") {
+        game.playerDone = true;
+        return lose(reaction);
+      } else if (cont === "end") await playerDone(reaction);
       else {
         const embed = await render("playing");
         const row = getRow(false, false);
@@ -726,8 +728,10 @@ async function playGame(
       newCard(game.deck, game.playerHand);
 
       const cont = checkContinue();
-      if (cont === "lose") return lose(reaction);
-      else return playerDone(reaction);
+      if (cont === "lose") {
+        game.playerDone = true;
+        return lose(reaction);
+      } else return playerDone(reaction);
     }
   };
 
