@@ -459,9 +459,18 @@ async function completeEvent(client: NypsiClient, lastUser: string) {
   content += `**winning participants**\n`;
 
   for (const [userId, amount] of inPlaceSort(Array.from(rewards.entries())).desc((i) => i[1])) {
+    let username: string;
+
+    if ((await getPreferences(userId)).leaderboards) {
+      username = `[${await getLastKnownUsername(userId)}](https://nypsi.xyz/users/${userId}?ref=event-winners)`;
+    } else {
+      username =
+        "[[hidden]](https://nypsi.xyz/docs/economy/user-settings/hidden?ref=event-winners)";
+    }
+
     content +=
       `**${amount}x** ${getItems()["pandora_box"].emoji} ${getItems()["pandora_box"].name} ` +
-      `for **${await getLastKnownUsername(userId)}**\n`;
+      `for **${username}**\n`;
   }
 
   content += `\n\n<@&${Constants.EVENTS_ROLE_ID}>`;
