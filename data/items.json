@@ -3267,6 +3267,18 @@
     "sell": 100000,
     "in_crates": true
   },
+  "lotus": {
+    "id": "lotus",
+    "name": "lotus",
+    "plural": "lotuses",
+    "article": "a",
+    "emoji": "🪷",
+    "longDesc": "so cute",
+    "rarity": 6,
+    "role": "flower",
+    "sell": 100000,
+    "in_crates": true
+  },
   "mango": {
     "id": "mango",
     "name": "mango",

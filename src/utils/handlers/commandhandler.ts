@@ -967,119 +967,126 @@ export async function runCommand(
     );
   }
 
-  setTimeout(async () => {
-    if (command.category === "money") {
-      if (
-        percentChance(0.77777) &&
-        (await getRawLevel(message.author.id)) < 250 &&
-        (await getPreferences(message.author.id)).tips
-      ) {
-        const tip = tips[Math.floor(Math.random() * tips.length)];
-
-        await addInlineNotification({
-          memberId: message.author.id,
-          embed: new CustomEmbed(message.member, tip),
-        });
-      }
-
-      if (!(await redis.exists(`nypsi:inactiveuserthing:${message.author.id}`))) {
-        await redis.set(`nypsi:inactiveuserthing:${message.author.id}`, "boobies", "EX", 2.628e6);
-        const lastCommand = await getLastCommand(message.author.id);
-        const rawLevel = await getRawLevel(message.author.id);
-
+  setTimeout(
+    async () => {
+      if (command.category === "money") {
         if (
-          dayjs(lastCommand).isBefore(dayjs().subtract(3, "months")) &&
-          dayjs(lastCommand).isAfter(dayjs().subtract(5, "year")) &&
-          rawLevel > 100
+          percentChance(0.77777) &&
+          (await getRawLevel(message.author.id)) < 250 &&
+          (await getPreferences(message.author.id)).tips
         ) {
-          await addBooster(message.author.id, "xp_booster", 2, dayjs().add(1, "day").toDate());
+          const tip = tips[Math.floor(Math.random() * tips.length)];
 
           await addInlineNotification({
             memberId: message.author.id,
-            embed: new CustomEmbed(
-              message.member,
-              "**welcome back!!**\n\nwelcome back to nypsi, since it's been a while, we've given you a 24 hour xp booster. enjoy!",
-            ),
+            embed: new CustomEmbed(message.member, tip),
+          });
+        }
+
+        if (!(await redis.exists(`nypsi:inactiveuserthing:${message.author.id}`))) {
+          await redis.set(`nypsi:inactiveuserthing:${message.author.id}`, "boobies", "EX", 2.628e6);
+          const lastCommand = await getLastCommand(message.author.id);
+          const rawLevel = await getRawLevel(message.author.id);
+
+          if (
+            dayjs(lastCommand).isBefore(dayjs().subtract(3, "months")) &&
+            dayjs(lastCommand).isAfter(dayjs().subtract(5, "year")) &&
+            rawLevel > 100
+          ) {
+            await addBooster(message.author.id, "xp_booster", 2, dayjs().add(1, "day").toDate());
+
+            await addInlineNotification({
+              memberId: message.author.id,
+              embed: new CustomEmbed(
+                message.member,
+                "**welcome back!!**\n\nwelcome back to nypsi, since it's been a while, we've given you a 24 hour xp booster. enjoy!",
+              ),
+            });
+          }
+        }
+      }
+
+      const news = await getNews();
+
+      const embeds: (Embed | CustomEmbed | APIEmbed)[] = [];
+
+      if (
+        news.text != "" &&
+        command.category == "money" &&
+        !(await hasSeenNews(message.author.id))
+      ) {
+        await redis.rpush(Constants.redis.nypsi.NEWS_SEEN, message.author.id);
+
+        const pos = await hasSeenNews(message.author.id);
+
+        const embed = new CustomEmbed(message.member, `${news.text}\n\n*${formatDate(news.date)}*`)
+          .setHeader("news", message.client.user.avatarURL())
+          .setFooter({ text: `you are #${pos} to see this` });
+
+        embeds.push(embed);
+
+        logger.info(`news shown to ${message.author.username}`);
+      }
+
+      const notifs = await getInlineNotifications(message.member);
+
+      if (notifs.length > 0) embeds.push(...notifs.map((i) => i.embed));
+
+      if (await redis.exists(`achievements:completed:${message.author.id}`)) {
+        if (!(await userExists(message.member))) await createUser(message.member);
+        const embed: APIEmbed = JSON.parse(
+          await redis.get(`achievements:completed:${message.author.id}`),
+        );
+        await redis.del(`achievements:completed:${message.author.id}`);
+
+        if (message instanceof Message) {
+          message.reply({ embeds: [embed] });
+        } else {
+          message.followUp({ embeds: [embed] }).catch(() => {
+            setTimeout(() => {
+              message.followUp({ embeds: [embed] }).catch(() => {});
+            }, 2500);
           });
         }
       }
-    }
 
-    const news = await getNews();
+      if (await redis.exists(`${Constants.redis.nypsi.RICKROLL}:${message.author.id}`)) {
+        if (!percentChance(10)) return;
 
-    const embeds: (Embed | CustomEmbed | APIEmbed)[] = [];
+        const userId = await redis.get(`${Constants.redis.nypsi.RICKROLL}:${message.author.id}`);
+        await redis.del(`${Constants.redis.nypsi.RICKROLL}:${message.author.id}`);
 
-    if (news.text != "" && command.category == "money" && !(await hasSeenNews(message.author.id))) {
-      await redis.rpush(Constants.redis.nypsi.NEWS_SEEN, message.author.id);
+        addTaskProgress(userId, "rickroll");
 
-      const pos = await hasSeenNews(message.author.id);
-
-      const embed = new CustomEmbed(message.member, `${news.text}\n\n*${formatDate(news.date)}*`)
-        .setHeader("news", message.client.user.avatarURL())
-        .setFooter({ text: `you are #${pos} to see this` });
-
-      embeds.push(embed);
-
-      logger.info(`news shown to ${message.author.username}`);
-    }
-
-    const notifs = await getInlineNotifications(message.member);
-
-    if (notifs.length > 0) embeds.push(...notifs.map((i) => i.embed));
-
-    if (await redis.exists(`achievements:completed:${message.author.id}`)) {
-      if (!(await userExists(message.member))) await createUser(message.member);
-      const embed: APIEmbed = JSON.parse(
-        await redis.get(`achievements:completed:${message.author.id}`),
-      );
-      await redis.del(`achievements:completed:${message.author.id}`);
-
-      if (message instanceof Message) {
-        message.reply({ embeds: [embed] });
-      } else {
-        message.followUp({ embeds: [embed] }).catch(() => {
-          setTimeout(() => {
-            message.followUp({ embeds: [embed] }).catch(() => {});
-          }, 2500);
+        await message.channel.send({
+          content: `${message.author.toString()} you have been **RICK ROLLED** by ${await getLastKnownUsername(
+            userId,
+          )}\n\nhttps://cdn.nypsi.xyz/rickroll.gif`,
         });
       }
-    }
 
-    if (await redis.exists(`${Constants.redis.nypsi.RICKROLL}:${message.author.id}`)) {
-      if (!percentChance(10)) return;
+      if (await redis.exists(`nypsi:levelup:${message.author.id}`)) {
+        const embed: APIEmbed = JSON.parse(await redis.get(`nypsi:levelup:${message.author.id}`));
 
-      const userId = await redis.get(`${Constants.redis.nypsi.RICKROLL}:${message.author.id}`);
-      await redis.del(`${Constants.redis.nypsi.RICKROLL}:${message.author.id}`);
+        embeds.push(embed);
 
-      addTaskProgress(userId, "rickroll");
-
-      await message.channel.send({
-        content: `${message.author.toString()} you have been **RICK ROLLED** by ${await getLastKnownUsername(
-          userId,
-        )}\n\nhttps://cdn.nypsi.xyz/rickroll.gif`,
-      });
-    }
-
-    if (await redis.exists(`nypsi:levelup:${message.author.id}`)) {
-      const embed: APIEmbed = JSON.parse(await redis.get(`nypsi:levelup:${message.author.id}`));
-
-      embeds.push(embed);
-
-      await redis.del(`nypsi:levelup:${message.author.id}`);
-    }
-
-    if (embeds.length > 0) {
-      if (message instanceof Message) {
-        message.reply({ embeds });
-      } else {
-        message.followUp({ embeds: embeds, flags: MessageFlags.Ephemeral }).catch(() => {
-          setTimeout(() => {
-            message.followUp({ embeds: embeds, flags: MessageFlags.Ephemeral }).catch(() => {});
-          }, 2500);
-        });
+        await redis.del(`nypsi:levelup:${message.author.id}`);
       }
-    }
-  }, 2000);
+
+      if (embeds.length > 0) {
+        if (message instanceof Message) {
+          message.reply({ embeds });
+        } else {
+          message.followUp({ embeds: embeds, flags: MessageFlags.Ephemeral }).catch(() => {
+            setTimeout(() => {
+              message.followUp({ embeds: embeds, flags: MessageFlags.Ephemeral }).catch(() => {});
+            }, 2500);
+          });
+        }
+      }
+    },
+    message instanceof Message ? 750 : 2500,
+  );
 
   await Promise.all([
     a(message.author.id, message.author.username, message.content, cmd),

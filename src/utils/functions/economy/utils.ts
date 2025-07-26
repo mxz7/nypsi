@@ -102,6 +102,8 @@ export function loadItems(crypto = true) {
     }
   }
 
+  delete lootPools.pandora_box.items["karma_tag"];
+
   Object.values(userUpgrades).forEach((i) => {
     maxPrestige += i.max;
   });

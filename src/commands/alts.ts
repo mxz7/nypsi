@@ -32,6 +32,7 @@ import { newBan } from "../utils/functions/moderation/ban";
 import { getMuteRole, isMuted, newMute } from "../utils/functions/moderation/mute";
 import { getLastKnownAvatar, getLastKnownUsername } from "../utils/functions/users/tag";
 import { getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { logger } from "../utils/logger";
 import ms = require("ms");
 
 const cmd = new Command("alts", "view a user's alts", "moderation")
@@ -150,6 +151,10 @@ async function run(
         });
         return waitForButton(altMsg);
       }
+
+      logger.info(
+        `alts: ${message.author.id} (${message.author.username}) added ${msg.content} as an alt of ${memberId}`,
+      );
 
       const addAltRes = await addAlt(message.guild, memberId, msg.content);
 
@@ -288,6 +293,10 @@ async function run(
         await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid alt")] });
         return waitForButton(altMsg);
       }
+
+      logger.info(
+        `alts: ${message.author.id} (${message.author.username}) removed ${msg.content} as an alt of ${memberId}`,
+      );
 
       await deleteAlt(message.guild, msg.content);
       await res.editReply({
