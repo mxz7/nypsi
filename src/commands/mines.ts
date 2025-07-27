@@ -56,7 +56,7 @@ type Game = {
   win: number;
   grid: string[];
   id: number;
-  voted: number;
+  multi: number;
   increment: number;
 };
 
@@ -323,7 +323,7 @@ async function prepareGame(
     win: 0,
     grid: grid,
     id: id,
-    voted: multi,
+    multi: multi,
     increment: incrementAmount,
   };
 
@@ -593,8 +593,8 @@ async function playGame(
     let winnings = Math.round(game.bet * game.win);
 
     embed.setColor(Constants.EMBED_SUCCESS_COLOR);
-    if (game.voted > 0) {
-      winnings = winnings + Math.round(winnings * game.voted);
+    if (game.multi > 0) {
+      winnings = winnings + Math.round(winnings * game.multi);
     }
 
     const eventProgress = await addEventProgress(
@@ -609,7 +609,7 @@ async function playGame(
       bet: game.bet,
       insert: `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
       winnings,
-      multiplier: game.voted,
+      multiplier: game.multi,
       eventProgress,
     });
     embed.setDescription(desc);
