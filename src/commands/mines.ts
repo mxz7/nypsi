@@ -10,6 +10,7 @@ import {
   ColorResolvable,
   CommandInteraction,
   Interaction,
+  InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
   MessageEditOptions,
@@ -50,19 +51,16 @@ import { recentCommands } from "../utils/functions/users/commands.js";
 import { addHourlyCommand } from "../utils/handlers/commandhandler.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { gamble, getTimestamp, logger } from "../utils/logger.js";
-import ms = require("ms");
 
-const games = new Map<
-  string,
-  {
-    bet: number;
-    win: number;
-    grid: string[];
-    id: number;
-    voted: number;
-    increment: number;
-  }
->();
+type Game = {
+  bet: number;
+  win: number;
+  grid: string[];
+  id: number;
+  multi: number;
+  increment: number;
+  moneyBag?: number;
+};
 
 const GEM_EMOJI = "<:nypsi_gem:1046854542047850556>";
 const abcde = new Map<string, number>();
@@ -112,10 +110,6 @@ async function run(
 ) {
   if (!(await userExists(message.member))) await createUser(message.member);
 
-  if (games.has(message.author.id)) {
-    return send({ embeds: [new ErrorEmbed("you are already playing mines")] });
-  }
-
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
@@ -153,14 +147,6 @@ async function prepareGame(
   msg?: Message,
 ) {
   recentCommands.set(message.author.id, Date.now());
-
-  if (games.has(message.author.id)) {
-    if (msg) {
-      return msg.edit({ embeds: [new ErrorEmbed("you are already playing mines")] });
-    } else {
-      return send({ embeds: [new ErrorEmbed("you are already playing mines")] });
-    }
-  }
 
   if (await redis.sismember(Constants.redis.nypsi.USERS_PLAYING, message.author.id)) {
     if (msg) {
@@ -258,16 +244,6 @@ async function prepareGame(
 
   await addCooldown(cmd.name, message.member, 10);
 
-  setTimeout(async () => {
-    if (games.has(message.author.id)) {
-      if (games.get(message.author.id).id == id) {
-        games.delete(message.author.id);
-        await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
-        await addBalance(message.member, bet);
-      }
-    }
-  }, 180000);
-
   await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
 
   await removeBalance(message.member, bet);
@@ -322,7 +298,7 @@ async function prepareGame(
     }
   }
 
-  if (percentChance(20)) {
+  if (percentChance(15)) {
     let passes = 0;
     let achieved = false;
 
@@ -342,27 +318,36 @@ async function prepareGame(
     }
   }
 
+  if (percentChance(33)) {
+    let passes = 0;
+    let achieved = false;
+
+    while (passes < 25 && !achieved) {
+      const index = randomInt(grid.length - 1);
+
+      if (grid[index] != "b") {
+        grid[index] = "m";
+        achieved = true;
+        break;
+      }
+      passes++;
+    }
+
+    if (!achieved) {
+      grid[grid.findIndex((i) => i == "a")] = "m";
+    }
+  }
+
   const multi = (await getGambleMulti(message.member, message.client as NypsiClient)).multi;
 
-  games.set(message.author.id, {
+  const game: Game = {
     bet: bet,
     win: 0,
     grid: grid,
     id: id,
-    voted: multi,
+    multi: multi,
     increment: incrementAmount,
-  });
-
-  setTimeout(() => {
-    if (games.has(message.author.id)) {
-      if (games.get(message.author.id).id == id) {
-        const game = games.get(message.author.id);
-        games.delete(message.author.id);
-        redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
-        logger.warn("mines still in playing state after 5 minutes - deleting key", game);
-      }
-    }
-  }, ms("5 minutes"));
+  };
 
   const desc = await renderGambleScreen({ state: "playing", bet, insert: "**0**x ($0)" });
   const embed = new CustomEmbed(message.member, desc).setHeader(
@@ -380,7 +365,7 @@ async function prepareGame(
     msg = await send({ embeds: [embed], components: rows });
   }
 
-  playGame(message, send, msg, args).catch((e: string) => {
+  playGame(game, message, send, msg, args).catch((e: string) => {
     logger.error(
       `error occurred playing mines - ${message.author.id} (${message.author.username})`,
     );
@@ -433,6 +418,18 @@ function getRows(grid: string[], end: boolean) {
         button.setEmoji(GEM_EMOJI);
         delete (button.data as ButtonComponentData).label;
         break;
+      case "m":
+        button.setStyle(ButtonStyle.Secondary);
+        if (end) {
+          button.setEmoji("💵").setDisabled(true);
+          delete (button.data as ButtonComponentData).label;
+        }
+        break;
+      case "mc":
+        button.setStyle(ButtonStyle.Success).setDisabled(true);
+        button.setEmoji("💵");
+        delete (button.data as ButtonComponentData).label;
+        break;
       case "x":
         button.setEmoji("💥").setStyle(ButtonStyle.Danger).setDisabled(true);
         delete (button.data as ButtonComponentData).label;
@@ -473,18 +470,12 @@ function toLocation(coordinate: string) {
 }
 
 async function playGame(
+  game: Game,
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   send: SendMessage,
   msg: Message,
   args: string[],
 ): Promise<void> {
-  if (!games.has(message.author.id)) return;
-
-  const bet = games.get(message.author.id).bet;
-  let win = games.get(message.author.id).win;
-  const grid = games.get(message.author.id).grid;
-  const increment = games.get(message.author.id).increment;
-
   const embed = new CustomEmbed(message.member).setHeader("mines", message.author.avatarURL());
 
   const edit = async (data: MessageEditOptions, interaction: ButtonInteraction) => {
@@ -518,15 +509,15 @@ async function playGame(
     await redis.incr(`anticheat:interactivegame:count:${message.author.id}`);
     await redis.expire(`anticheat:interactivegame:count:${message.author.id}`, 86400);
 
-    const components = getRows(grid, true);
+    const components = getRows(game.grid, true);
 
     if (update) {
       if (
         !(await isPremium(message.member)) ||
         !((await getTier(message.member)) >= 2) ||
-        (await getBalance(message.member)) < bet
+        (await getBalance(message.member)) < game.bet
       ) {
-        return edit({ embeds: [embed], components: getRows(grid, true) }, interaction);
+        return edit({ embeds: [embed], components: getRows(game.grid, true) }, interaction);
       }
 
       (
@@ -615,30 +606,30 @@ async function playGame(
   const lose = async (interaction: ButtonInteraction) => {
     const id = await createGame({
       userId: message.author.id,
-      bet: bet,
+      bet: game.bet,
       game: "mines",
       result: "lose",
-      outcome: `mines:${JSON.stringify(getRows(grid, true))}`,
+      outcome: `mines:${JSON.stringify(getRows(game.grid, true))}`,
+      earned: game.moneyBag,
     });
-    gamble(message.author, "mines", bet, "lose", id, 0);
+    gamble(message.author, "mines", game.bet, "lose", id, 0);
     embed.setFooter({ text: `id: ${id}` });
     embed.setColor(Constants.EMBED_FAIL_COLOR);
     const desc = await renderGambleScreen({
       state: "lose",
-      bet,
-      insert: `**${win.toFixed(2)}**x ($${Math.round(bet * win).toLocaleString()})`,
+      bet: game.bet,
+      insert: `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
     });
     embed.setDescription(desc);
-    games.delete(message.author.id);
     return replay(embed, interaction);
   };
 
   const win1 = async (interaction?: ButtonInteraction) => {
-    let winnings = Math.round(bet * win);
+    let winnings = Math.round(game.bet * game.win);
 
     embed.setColor(Constants.EMBED_SUCCESS_COLOR);
-    if (games.get(message.author.id).voted > 0) {
-      winnings = winnings + Math.round(winnings * games.get(message.author.id).voted);
+    if (game.multi > 0) {
+      winnings = winnings + Math.round(winnings * game.multi);
     }
 
     const eventProgress = await addEventProgress(
@@ -650,10 +641,10 @@ async function playGame(
 
     const desc = await renderGambleScreen({
       state: "win",
-      bet,
-      insert: `**${win.toFixed(2)}**x ($${Math.round(bet * win).toLocaleString()})`,
+      bet: game.bet,
+      insert: `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
       winnings,
-      multiplier: games.get(message.author.id).voted,
+      multiplier: game.multi,
       eventProgress,
     });
     embed.setDescription(desc);
@@ -661,8 +652,8 @@ async function playGame(
     const earnedXp = await calcEarnedGambleXp(
       message.member,
       message.client as NypsiClient,
-      bet,
-      win,
+      game.bet,
+      game.win,
     );
 
     if (earnedXp > 0) {
@@ -678,14 +669,14 @@ async function playGame(
 
     const id = await createGame({
       userId: message.author.id,
-      bet: bet,
+      bet: game.bet,
       game: "mines",
       result: "win",
-      outcome: `mines:${JSON.stringify(getRows(grid, true))}`,
-      earned: winnings,
+      outcome: `mines:${JSON.stringify(getRows(game.grid, true))}`,
+      earned: winnings + (game.moneyBag ? game.moneyBag : 0),
       xp: earnedXp,
     });
-    gamble(message.author, "mines", bet, "win", id, winnings);
+    gamble(message.author, "mines", game.bet, "win", id, winnings);
 
     if (earnedXp > 0) {
       embed.setFooter({ text: `+${earnedXp}xp | id: ${id}` });
@@ -694,34 +685,32 @@ async function playGame(
     }
 
     await addBalance(message.member, winnings);
-    games.delete(message.author.id);
     return replay(embed, interaction);
   };
 
   const draw = async (interaction: ButtonInteraction) => {
     const id = await createGame({
       userId: message.author.id,
-      bet: bet,
+      bet: game.bet,
       game: "mines",
       result: "draw",
-      outcome: `mines:${JSON.stringify(getRows(grid, true))}`,
-      earned: bet,
+      outcome: `mines:${JSON.stringify(getRows(game.grid, true))}`,
+      earned: game.bet + (game.moneyBag ? game.moneyBag : 0),
     });
-    gamble(message.author, "mines", bet, "draw", id, bet);
+    gamble(message.author, "mines", game.bet, "draw", id, game.bet);
     embed.setFooter({ text: `id: ${id}` });
     embed.setColor(flavors.macchiato.colors.yellow.hex as ColorResolvable);
     const desc = await renderGambleScreen({
       state: "draw",
-      bet,
-      insert: `**${win.toFixed(2)}**x ($${Math.round(bet * win).toLocaleString()})`,
+      bet: game.bet,
+      insert: `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
     });
     embed.setDescription(desc);
-    await addBalance(message.member, bet);
-    games.delete(message.author.id);
+    await addBalance(message.member, game.bet);
     return replay(embed, interaction);
   };
 
-  if (win >= 15) {
+  if (game.win >= 15) {
     win1();
     return;
   }
@@ -740,7 +729,6 @@ async function playGame(
     .catch((e) => {
       logger.warn("mines error", e);
       fail = true;
-      games.delete(message.author.id);
       redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
       message.channel.send({ content: message.author.toString() + " mines game expired" });
     });
@@ -750,18 +738,18 @@ async function playGame(
   if (!response) return;
 
   if (response.customId.length != 2 && response.customId != "finish") {
-    logger.error("WEIRD MINES COORDINATE THING", { response, game: games.get(message.author.id) });
+    logger.error("WEIRD MINES COORDINATE THING", { response, game });
     await message.channel.send({
       content: message.author.toString() + " invalid coordinate, example: `a3`",
     });
-    return playGame(message, send, msg, args);
+    return playGame(game, message, send, msg, args);
   }
 
   if (response.customId == "finish") {
-    if (win < 1) {
+    if (game.win < 1) {
       lose(response);
       return;
-    } else if (win == 1) {
+    } else if (game.win == 1) {
       draw(response);
       return;
     } else {
@@ -793,26 +781,42 @@ async function playGame(
       await message.channel.send({
         content: message.author.toString() + " invalid coordinate, example: `a3`",
       });
-      return playGame(message, send, msg, args);
+      return playGame(game, message, send, msg, args);
     }
   }
 
   const location = toLocation(response.customId);
 
-  switch (grid[location]) {
+  let followUp: InteractionReplyOptions;
+
+  switch (game.grid[location]) {
     case "b":
-      grid[location] = "x";
+      game.grid[location] = "x";
       lose(response);
       return;
     case "c":
-      return playGame(message, send, msg, args);
+      return playGame(game, message, send, msg, args);
     case "g":
+    case "m":
     case "a":
-      if (grid[location] == "a") {
-        grid[location] = "c";
-      } else {
-        grid[location] = "gc";
-        win += 3;
+      if (game.grid[location] == "a") {
+        game.grid[location] = "c";
+      } else if (game.grid[location] === "m") {
+        game.grid[location] = "mc";
+
+        const amount = (Math.random() * 100 + 33.3333333) / 100;
+
+        game.moneyBag = Math.floor(game.bet * amount);
+        await addBalance(message.member, game.moneyBag);
+
+        followUp = {
+          embeds: [
+            new CustomEmbed(message.member, `you found $**${game.moneyBag.toLocaleString()}**!!`),
+          ],
+        };
+      } else if (game.grid[location] === "g") {
+        game.grid[location] = "gc";
+        game.win += 3;
 
         addProgress(message.author.id, "minesweeper_pro", 1);
 
@@ -821,60 +825,46 @@ async function playGame(
           logger.info(`${message.author.id} received green_gem randomly (mines)`);
           addInventoryItem(message.member, "green_gem", 1);
           addProgress(message.author.id, "gem_hunter", 1);
-          if (response.replied || response.deferred)
-            response.followUp({
-              embeds: [
-                new CustomEmbed(
-                  message.member,
-                  `${GEM_EMOJI} you found a **gem**!!\nit has been added to your inventory, i wonder what powers it has`,
-                ),
-              ],
-              flags: MessageFlags.Ephemeral,
-            });
-          else
-            response.reply({
-              embeds: [
-                new CustomEmbed(
-                  message.member,
-                  `${GEM_EMOJI} you found a **gem**!!\nit has been added to your inventory, i wonder what powers it has`,
-                ),
-              ],
-              flags: MessageFlags.Ephemeral,
-            });
+          followUp = {
+            embeds: [
+              new CustomEmbed(
+                message.member,
+                `${GEM_EMOJI} you found a **gem**!!\nit has been added to your inventory, i wonder what powers it has`,
+              ),
+            ],
+            flags: MessageFlags.Ephemeral,
+          };
         }
       }
 
-      win += increment;
-
-      games.set(message.author.id, {
-        bet: bet,
-        win: win,
-        grid: grid,
-        id: games.get(message.author.id).id,
-        voted: games.get(message.author.id).voted,
-        increment,
-      });
+      game.win += game.increment;
 
       const desc = await renderGambleScreen({
         state: "playing",
-        bet,
-        insert: `**${win.toFixed(2)}**x ($${Math.round(bet * win).toLocaleString()})`,
+        bet: game.bet,
+        insert: `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
       });
       embed.setDescription(desc);
 
-      if (win >= 15) {
+      if (game.win >= 15) {
         win1(response);
         return;
       }
 
-      const components = getRows(grid, false);
+      const components = getRows(game.grid, false);
 
-      if (win < 1) {
+      if (game.win < 1) {
         components[4].components[4].setDisabled(true);
       }
 
-      edit({ embeds: [embed], components }, response);
+      edit({ embeds: [embed], components }, response).then(() => {
+        if (followUp) {
+          response.followUp(followUp).catch(() => {
+            logger.warn(`mines: ${message.author.id} failed to send follow up`, followUp);
+          });
+        }
+      });
 
-      return playGame(message, send, msg, args);
+      return playGame(game, message, send, msg, args);
   }
 }
