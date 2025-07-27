@@ -829,7 +829,7 @@ async function run(
         } else {
           response.reply({ embeds: [new CustomEmbed(target, "✅ duel request denied")] });
         }
-          m.edit({ components: [] }); 
+        m.edit({ components: [] }); 
       }
     }
     return;
