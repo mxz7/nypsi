@@ -709,7 +709,7 @@ async function run(
         } else {
           response.reply({ embeds: [new CustomEmbed(target, "✅ duel request denied")] });
         }
-          m.edit({ components: [] }); 
+        m.edit({ components: [] }); 
       }
     } else if (args.length <= 2 && (args.length === 1 ? true : Boolean(formatNumber(args[1])))) {
       let wager = formatNumber(args[1] || 0);
