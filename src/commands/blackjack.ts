@@ -7,10 +7,12 @@ import {
   ColorResolvable,
   CommandInteraction,
   Interaction,
+  InteractionResponse,
   Message,
   MessageActionRowComponentBuilder,
   MessageEditOptions,
   MessageFlags,
+  OmitPartialGroupDMChannel,
   WebhookClient,
 } from "discord.js";
 import redis from "../init/redis";
@@ -383,9 +385,25 @@ async function playGame(
 ) {
   const bet = game.bet;
 
-  const edit = async (data: MessageEditOptions, interaction?: ButtonInteraction) => {
-    if (!interaction || interaction.deferred || interaction.replied) return m.edit(data);
-    return interaction.update(data).catch(() => m.edit(data));
+  const edit = async (
+    data: MessageEditOptions,
+    reason: string,
+    interaction?: ButtonInteraction,
+  ) => {
+    let res: InteractionResponse<boolean> | OmitPartialGroupDMChannel<Message<boolean>>;
+
+    if (!interaction || interaction.deferred || interaction.replied) res = await m.edit(data);
+    else res = await interaction.update(data).catch(() => m.edit(data));
+
+    try {
+      logger.debug(
+        `blackjack: ${message.member.id} message edited for ${reason}, id from response: ${res instanceof InteractionResponse ? (res.interaction as ButtonInteraction).customId : res.id}`,
+      );
+    } catch {
+      logger.error("blackjack: failed to get response from edit");
+    }
+
+    return res;
   };
 
   const replay = async (embed: CustomEmbed, interaction: ButtonInteraction) => {
@@ -395,7 +413,7 @@ async function playGame(
       !((await getTier(message.member)) >= 2) ||
       (await getBalance(message.member)) < bet
     ) {
-      return edit({ embeds: [embed], components: [] }, interaction);
+      return edit({ embeds: [embed], components: [] }, "end", interaction);
     }
 
     if (
@@ -425,7 +443,7 @@ async function playGame(
       new ButtonBuilder().setLabel("play again").setStyle(ButtonStyle.Success).setCustomId("rp"),
     );
 
-    await edit({ embeds: [embed], components: [row] }, interaction);
+    await edit({ embeds: [embed], components: [row] }, "replay", interaction);
 
     const res = await m
       .awaitMessageComponent({
@@ -652,7 +670,7 @@ async function playGame(
       const embed = await render("playing");
       const row = getRow(false, true);
 
-      await edit({ embeds: [embed], components: [row] }, interaction);
+      await edit({ embeds: [embed], components: [row] }, "player done", interaction);
     }
 
     while (total(game.dealerHand) < 17) {
@@ -711,7 +729,7 @@ async function playGame(
       else {
         const embed = await render("playing");
         const row = getRow(false, false);
-        await edit({ embeds: [embed], components: [row] }, reaction);
+        await edit({ embeds: [embed], components: [row] }, "hit", reaction);
         return listen();
       }
     } else if (reaction.customId === "stand") {
