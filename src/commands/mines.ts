@@ -811,7 +811,10 @@ async function playGame(
 
         followUp = {
           embeds: [
-            new CustomEmbed(message.member, `you found $**${game.moneyBag.toLocaleString()}**!!`),
+            new CustomEmbed(
+              message.member,
+              `💵 you found $**${game.moneyBag.toLocaleString()}**!!`,
+            ),
           ],
         };
       } else if (game.grid[location] === "g") {
