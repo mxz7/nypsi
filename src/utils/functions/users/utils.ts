@@ -1,5 +1,6 @@
 import { exec } from "child_process";
 import { User } from "discord.js";
+import { promisify } from "util";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
@@ -280,10 +281,12 @@ export async function dataDelete(member: MemberResolvable) {
     })
     .catch(() => {});
 
-  exec(`redis-cli KEYS "*${userId}*" | xargs redis-cli DEL`);
+  const execCmd = promisify(exec);
+
+  await execCmd(`redis-cli KEYS "*${userId}*" | xargs redis-cli DEL`);
 
   if (guild) {
-    exec(`redis-cli KEYS "*${guild.guildName}*" | xargs redis-cli DEL`);
+    await execCmd(`redis-cli KEYS "*${guild.guildName}*" | xargs redis-cli DEL`);
   }
 
   logger.info(`data deleted for ${userId}`);
