@@ -10,6 +10,7 @@ import {
   ColorResolvable,
   CommandInteraction,
   Interaction,
+  InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
   MessageEditOptions,
@@ -58,6 +59,7 @@ type Game = {
   id: number;
   multi: number;
   increment: number;
+  moneyBag?: number;
 };
 
 const GEM_EMOJI = "<:nypsi_gem:1046854542047850556>";
@@ -296,7 +298,7 @@ async function prepareGame(
     }
   }
 
-  if (percentChance(20)) {
+  if (percentChance(15)) {
     let passes = 0;
     let achieved = false;
 
@@ -313,6 +315,26 @@ async function prepareGame(
 
     if (!achieved) {
       grid[grid.findIndex((i) => i == "a")] = "g";
+    }
+  }
+
+  if (percentChance(33)) {
+    let passes = 0;
+    let achieved = false;
+
+    while (passes < 25 && !achieved) {
+      const index = randomInt(grid.length - 1);
+
+      if (grid[index] != "b") {
+        grid[index] = "m";
+        achieved = true;
+        break;
+      }
+      passes++;
+    }
+
+    if (!achieved) {
+      grid[grid.findIndex((i) => i == "a")] = "m";
     }
   }
 
@@ -394,6 +416,18 @@ function getRows(grid: string[], end: boolean) {
       case "gc":
         button.setStyle(ButtonStyle.Success).setDisabled(true);
         button.setEmoji(GEM_EMOJI);
+        delete (button.data as ButtonComponentData).label;
+        break;
+      case "m":
+        button.setStyle(ButtonStyle.Secondary);
+        if (end) {
+          button.setEmoji("💵").setDisabled(true);
+          delete (button.data as ButtonComponentData).label;
+        }
+        break;
+      case "mc":
+        button.setStyle(ButtonStyle.Success).setDisabled(true);
+        button.setEmoji("💵");
         delete (button.data as ButtonComponentData).label;
         break;
       case "x":
@@ -576,6 +610,7 @@ async function playGame(
       game: "mines",
       result: "lose",
       outcome: `mines:${JSON.stringify(getRows(game.grid, true))}`,
+      earned: game.moneyBag,
     });
     gamble(message.author, "mines", game.bet, "lose", id, 0);
     embed.setFooter({ text: `id: ${id}` });
@@ -638,7 +673,7 @@ async function playGame(
       game: "mines",
       result: "win",
       outcome: `mines:${JSON.stringify(getRows(game.grid, true))}`,
-      earned: winnings,
+      earned: winnings + (game.moneyBag ? game.moneyBag : 0),
       xp: earnedXp,
     });
     gamble(message.author, "mines", game.bet, "win", id, winnings);
@@ -660,7 +695,7 @@ async function playGame(
       game: "mines",
       result: "draw",
       outcome: `mines:${JSON.stringify(getRows(game.grid, true))}`,
-      earned: game.bet,
+      earned: game.bet + (game.moneyBag ? game.moneyBag : 0),
     });
     gamble(message.author, "mines", game.bet, "draw", id, game.bet);
     embed.setFooter({ text: `id: ${id}` });
@@ -752,6 +787,8 @@ async function playGame(
 
   const location = toLocation(response.customId);
 
+  let followUp: InteractionReplyOptions;
+
   switch (game.grid[location]) {
     case "b":
       game.grid[location] = "x";
@@ -760,10 +797,24 @@ async function playGame(
     case "c":
       return playGame(game, message, send, msg, args);
     case "g":
+    case "m":
     case "a":
       if (game.grid[location] == "a") {
         game.grid[location] = "c";
-      } else {
+      } else if (game.grid[location] === "m") {
+        game.grid[location] = "mc";
+
+        const amount = (Math.random() * 99 + 33) / 100;
+
+        game.moneyBag = Math.floor(game.bet * amount);
+        await addBalance(message.member, game.moneyBag);
+
+        followUp = {
+          embeds: [
+            new CustomEmbed(message.member, `you found $**${game.moneyBag.toLocaleString()}**!!`),
+          ],
+        };
+      } else if (game.grid[location] === "g") {
         game.grid[location] = "gc";
         game.win += 3;
 
@@ -774,26 +825,15 @@ async function playGame(
           logger.info(`${message.author.id} received green_gem randomly (mines)`);
           addInventoryItem(message.member, "green_gem", 1);
           addProgress(message.author.id, "gem_hunter", 1);
-          if (response.replied || response.deferred)
-            response.followUp({
-              embeds: [
-                new CustomEmbed(
-                  message.member,
-                  `${GEM_EMOJI} you found a **gem**!!\nit has been added to your inventory, i wonder what powers it has`,
-                ),
-              ],
-              flags: MessageFlags.Ephemeral,
-            });
-          else
-            response.reply({
-              embeds: [
-                new CustomEmbed(
-                  message.member,
-                  `${GEM_EMOJI} you found a **gem**!!\nit has been added to your inventory, i wonder what powers it has`,
-                ),
-              ],
-              flags: MessageFlags.Ephemeral,
-            });
+          followUp = {
+            embeds: [
+              new CustomEmbed(
+                message.member,
+                `${GEM_EMOJI} you found a **gem**!!\nit has been added to your inventory, i wonder what powers it has`,
+              ),
+            ],
+            flags: MessageFlags.Ephemeral,
+          };
         }
       }
 
@@ -817,7 +857,13 @@ async function playGame(
         components[4].components[4].setDisabled(true);
       }
 
-      edit({ embeds: [embed], components }, response);
+      edit({ embeds: [embed], components }, response).then(() => {
+        if (followUp) {
+          response.followUp(followUp).catch(() => {
+            logger.warn(`mines: ${message.author.id} failed to send follow up`, followUp);
+          });
+        }
+      });
 
       return playGame(game, message, send, msg, args);
   }
