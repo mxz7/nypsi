@@ -165,7 +165,7 @@ async function run(
         }**\n\n` +
           `go ahead and send [**${
             tag ? `[${getTagsData()[tag.tagId].emoji}] ` : ""
-          }${(await getLastKnownUsername(milf.userId), false)}**](https://nypsi.xyz/users/${
+          }${(await getLastKnownUsername(milf.userId, false))}**](https://nypsi.xyz/users/${
             milf.userId
           }?ref=bot-milf) a *private* message 😉😏`,
       ).setHeader("milf finder");
