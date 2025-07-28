@@ -400,7 +400,7 @@ async function playGame(
         `blackjack: ${message.member.id} message edited for ${reason}, id from response: ${res instanceof InteractionResponse ? (res.interaction as ButtonInteraction).customId : res.id}`,
       );
     } catch {
-      logger.error("blackjack: failed to get response from edit");
+      logger.error(`blackjack: ${message.author.id} failed to get response from edit`);
     }
 
     return res;
@@ -454,6 +454,10 @@ async function playGame(
         m.edit({ components: [] });
         return;
       });
+
+    logger.debug(
+      `blackjack: ${message.author.id} received replay response: ${res ? res.customId : null}`,
+    );
 
     if (res && res.customId == "rp") {
       await res.deferUpdate();
@@ -704,12 +708,17 @@ async function playGame(
       .awaitMessageComponent({ filter, time: 90000 })
       .then(async (collected) => {
         setTimeout(() => {
-          collected.deferUpdate().catch(() => {});
-        }, 1500);
+          if (!collected.deferred && collected.isRepliable()) {
+            collected.deferUpdate().catch((e) => {
+              logger.error(`blackjack: ${message.author.id} failed to defer update`, e);
+              console.error(e);
+            });
+          }
+        }, 2000);
         return collected as ButtonInteraction;
       })
       .catch((e) => {
-        logger.warn("bj error", e);
+        logger.warn(`blackjack: ${message.author.id} interaction error`, e);
         fail = true;
         game.state = "end";
         redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
