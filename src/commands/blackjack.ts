@@ -720,7 +720,7 @@ async function playGame(
       .awaitMessageComponent({ filter, time: 90000 })
       .then(async (collected) => {
         setTimeout(() => {
-          if (!collected.deferred && collected.isRepliable()) {
+          if (!collected.deferred && collected.isRepliable() && !collected.replied) {
             collected.deferUpdate().catch((e) => {
               logger.error(`blackjack: ${message.author.id} failed to defer update`, e);
               console.error(e);
