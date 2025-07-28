@@ -259,7 +259,10 @@ async function prepareGame(
 
   setTimeout(() => {
     if (game.state == "playing" && game.id == id) {
-      logger.warn("blackjack still in playing state after 5 minutes - deleting key", game);
+      logger.warn(
+        `blackjack: ${message.author.id} still in playing state after 5 minutes - deleting key`,
+        game,
+      );
       redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
     }
   }, ms("5 minutes"));
