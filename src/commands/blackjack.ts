@@ -455,7 +455,7 @@ async function playGame(
       new ButtonBuilder().setLabel("play again").setStyle(ButtonStyle.Success).setCustomId("rp"),
     );
 
-    await edit({ embeds: [embed], components: [row] }, "replay", interaction);
+    await edit({ embeds: [embed], components: [row] }, "replay prep", interaction);
 
     const res = await m
       .awaitMessageComponent({
@@ -771,6 +771,11 @@ async function playGame(
         game.playerDone = true;
         return lose(reaction);
       } else return playerDone(reaction);
+    } else if (reaction.customId === "rp") {
+      const embed = await render("playing");
+      const row = getRow(false, false);
+      await edit({ embeds: [embed], components: [row] }, "rerender", reaction);
+      return listen();
     }
   };
 
