@@ -296,7 +296,16 @@ async function prepareGame(
   );
 
   if (msg) {
-    await msg.edit({ embeds: [embed], components: [row] });
+    const editedMsg = await msg.edit({ embeds: [embed], components: [row] });
+
+    try {
+      logger.debug(`blackjack: ${message.member.id} message edited for replay, `, {
+        id: editedMsg.id,
+        embeds: editedMsg.embeds,
+      });
+    } catch {
+      logger.error(`blackjack: ${message.author.id} failed to get response from edit`);
+    }
   } else {
     msg = await send({ embeds: [embed], components: [row] });
   }
