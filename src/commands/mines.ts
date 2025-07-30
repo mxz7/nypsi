@@ -11,10 +11,12 @@ import {
   CommandInteraction,
   Interaction,
   InteractionReplyOptions,
+  InteractionResponse,
   Message,
   MessageActionRowComponentBuilder,
   MessageEditOptions,
   MessageFlags,
+  OmitPartialGroupDMChannel,
   WebhookClient,
 } from "discord.js";
 import redis from "../init/redis.js";
@@ -478,9 +480,25 @@ async function playGame(
 ): Promise<void> {
   const embed = new CustomEmbed(message.member).setHeader("mines", message.author.avatarURL());
 
-  const edit = async (data: MessageEditOptions, interaction: ButtonInteraction) => {
-    if (!interaction || interaction.deferred || interaction.replied) return msg.edit(data);
-    return interaction.update(data).catch(() => msg.edit(data));
+  const edit = async (
+    data: MessageEditOptions,
+    reason: string,
+    interaction?: ButtonInteraction,
+  ) => {
+    let res: InteractionResponse<boolean> | OmitPartialGroupDMChannel<Message<boolean>>;
+
+    if (!interaction || interaction.deferred || interaction.replied) res = await msg.edit(data);
+    else res = await interaction.update(data).catch(() => msg.edit(data));
+
+    try {
+      logger.debug(
+        `mines: ${message.member.id} message edited for ${reason}, id from response: ${res instanceof InteractionResponse ? (res.interaction as ButtonInteraction).customId : res.id}`,
+      );
+    } catch {
+      logger.error(`mines: ${message.author.id} failed to get response from edit`);
+    }
+
+    return res;
   };
 
   const replay = async (embed: CustomEmbed, interaction: ButtonInteraction, update = true) => {
@@ -517,7 +535,7 @@ async function playGame(
         !((await getTier(message.member)) >= 2) ||
         (await getBalance(message.member)) < game.bet
       ) {
-        return edit({ embeds: [embed], components: getRows(game.grid, true) }, interaction);
+        return edit({ embeds: [embed], components: getRows(game.grid, true) }, "end", interaction);
       }
 
       (
@@ -529,7 +547,7 @@ async function playGame(
         .setLabel("play again")
         .setDisabled(false);
 
-      await edit({ embeds: [embed], components }, interaction);
+      await edit({ embeds: [embed], components }, "end with play again", interaction);
     }
 
     const res = await msg
@@ -722,12 +740,17 @@ async function playGame(
     .awaitMessageComponent({ filter, time: 90000 })
     .then(async (collected) => {
       setTimeout(() => {
-        collected.deferUpdate().catch(() => {});
-      }, 1500);
+        if (!collected.deferred && !collected.replied) {
+          collected.deferUpdate().catch((e) => {
+            logger.error(`mines: ${message.author.id} failed to defer update`, e);
+            console.error(e);
+          });
+        }
+      }, 2000);
       return collected as ButtonInteraction;
     })
     .catch((e) => {
-      logger.warn("mines error", e);
+      logger.warn(`mines: ${message.author.id} interaction error`, e);
       fail = true;
       redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
       message.channel.send({ content: message.author.toString() + " mines game expired" });
@@ -737,8 +760,10 @@ async function playGame(
 
   if (!response) return;
 
+  logger.debug(`mines: ${message.author.id} received interaction: ${response.customId}`);
+
   if (response.customId.length != 2 && response.customId != "finish") {
-    logger.error("WEIRD MINES COORDINATE THING", { response, game });
+    logger.error(`mines: ${message.author.id} weird coordinate thing`, { response, game });
     await message.channel.send({
       content: message.author.toString() + " invalid coordinate, example: `a3`",
     });
@@ -802,6 +827,7 @@ async function playGame(
       if (game.grid[location] == "a") {
         game.grid[location] = "c";
       } else if (game.grid[location] === "m") {
+        logger.debug(`mines: ${message.author.id} found money`);
         game.grid[location] = "mc";
 
         const amount = (Math.random() * 66.6666666 + 33.3333333) / 100;
@@ -818,6 +844,7 @@ async function playGame(
           ],
         };
       } else if (game.grid[location] === "g") {
+        logger.debug(`mines: ${message.author.id} found gem`);
         game.grid[location] = "gc";
         game.win += 3;
 
@@ -842,6 +869,7 @@ async function playGame(
 
       game.win += game.increment;
 
+      logger.debug(`mines: ${message.author.id} rendering`);
       const desc = await renderGambleScreen({
         state: "playing",
         bet: game.bet,
@@ -860,7 +888,9 @@ async function playGame(
         components[4].components[4].setDisabled(true);
       }
 
-      edit({ embeds: [embed], components }, response).then(() => {
+      logger.debug(`mines: ${message.author.id} editing`);
+
+      edit({ embeds: [embed], components }, "rerendering game", response).then(() => {
         if (followUp) {
           response.followUp(followUp).catch(() => {
             logger.warn(`mines: ${message.author.id} failed to send follow up`, followUp);
