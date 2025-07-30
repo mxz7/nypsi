@@ -804,7 +804,7 @@ async function playGame(
       } else if (game.grid[location] === "m") {
         game.grid[location] = "mc";
 
-        const amount = (Math.random() * 100 + 33.3333333) / 100;
+        const amount = (Math.random() * 66.6666666 + 33.3333333) / 100;
 
         game.moneyBag = Math.floor(game.bet * amount);
         await addBalance(message.member, game.moneyBag);

@@ -14,7 +14,7 @@
 - added lotus 🪷 flower
 - added requirements to next prestige to $level (@growling_grizzly)
 - rewrote blackjack to hopefully fix it randomly breaking (@growling_grizzly)
-- added money bag / cash (💵) to mines, gives 0.33x - 1.33x bet
+- added money bag / cash (💵) to mines, gives 0.33x - 1x bet
 
 ## other
 
