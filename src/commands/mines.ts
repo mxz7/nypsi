@@ -491,9 +491,10 @@ async function playGame(
     else res = await interaction.update(data).catch(() => msg.edit(data));
 
     try {
-      logger.debug(
-        `mines: ${message.member.id} message edited for ${reason}, id from response: ${res instanceof InteractionResponse ? (res.interaction as ButtonInteraction).customId : res.id}`,
-      );
+      const updatedMsg = await res.fetch();
+      logger.debug(`mines: ${message.member.id} message edited for ${reason}`, {
+        embed: updatedMsg.embeds[0],
+      });
     } catch {
       logger.error(`mines: ${message.author.id} failed to get response from edit`);
     }
