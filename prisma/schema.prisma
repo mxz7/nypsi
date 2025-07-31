@@ -230,8 +230,6 @@ model Economy {
   CustomCar          CustomCar[]
   Farm               Farm[]
   FarmUpgrades       FarmUpgrades[]
-  transactionsSource Transaction[]       @relation(name: "source")
-  transactionsTarget Transaction[]       @relation(name: "target")
 }
 
 model Farm {
@@ -1045,9 +1043,6 @@ model Transaction {
   amount BigInt
 
   notes String?
-
-  source Economy @relation(fields: [sourceId], references: [userId], onDelete: Cascade, name: "source")
-  target Economy @relation(fields: [targetId], references: [userId], onDelete: Cascade, name: "target")
 }
 
 model Event {
