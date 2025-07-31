@@ -19,7 +19,7 @@ importers:
         version: 2.5.1
       '@hono/node-server':
         specifier: ^1.17.1
-        version: 1.17.1(hono@4.8.5)
+        version: 1.17.1(hono@4.8.10)
       '@prisma/client':
         specifier: 6.12.0
         version: 6.12.0(prisma@6.12.0(typescript@5.8.3))(typescript@5.8.3)
@@ -36,8 +36,8 @@ importers:
         specifier: 4.0.9
         version: 4.0.9
       bullmq:
-        specifier: ^5.56.6
-        version: 5.56.6
+        specifier: ^5.56.8
+        version: 5.56.8
       chalk:
         specifier: 4.1.2
         version: 4.1.2
@@ -63,8 +63,8 @@ importers:
         specifier: 3.4.1
         version: 3.4.1
       hono:
-        specifier: ^4.8.5
-        version: 4.8.5
+        specifier: ^4.8.10
+        version: 4.8.10
       ioredis:
         specifier: 5.6.1
         version: 5.6.1
@@ -1593,8 +1593,8 @@ packages:
     resolution: {integrity: sha512-WDtdLmJvAuNNPzByAYpRo2rF1Mmradw6gvWsQKf63476DDXmomT9zUiGypLcG4ibIM67vhAj8jJRdbmEws2Aqw==}
     engines: {node: '>=6.14.2'}
 
-  bullmq@5.56.6:
-    resolution: {integrity: sha512-8ex5cf0LzL6zEjuriz3kBx2YiKilCUy1qv+Mw8Zn8XNKg4WIIlpeKZnzrwQSqAyOAf+CN2J+ebsoVeSzD6zH7w==}
+  bullmq@5.56.8:
+    resolution: {integrity: sha512-4vcgfLCyHKDWKDUxJGNz/plBVNWFsvOm1r63XIqA2BkfaUjmnq7G8zV+0liV5SEGy1lQb8zFMTVoG1uFUOkjNg==}
 
   callsites@3.1.0:
     resolution: {integrity: sha512-P8BjAsXvZS+VIDUI11hHCQEv74YT67YUi5JJFNWIqL235sBmjX4+qx9Muvls5ivyNENctx46xQLQ3aTuE7ssaQ==}
@@ -1996,8 +1996,8 @@ packages:
     resolution: {integrity: sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==}
     engines: {node: '>=8'}
 
-  hono@4.8.5:
-    resolution: {integrity: sha512-Up2cQbtNz1s111qpnnECdTGqSIUIhZJMLikdKkshebQSEBcoUKq6XJayLGqSZWidiH0zfHRCJqFu062Mz5UuRA==}
+  hono@4.8.10:
+    resolution: {integrity: sha512-DRMYbR3aFk6YET1FCSAFbgF2cWYTz5j0YAFYPECx9fmrbKBDAYnWU+YCgRTpOaatxMYN6e68U/2IG39zRP4W/A==}
     engines: {node: '>=16.9.0'}
 
   html-escaper@2.0.2:
@@ -3731,9 +3731,9 @@ snapshots:
 
   '@eslint/js@8.57.1': {}
 
-  '@hono/node-server@1.17.1(hono@4.8.5)':
+  '@hono/node-server@1.17.1(hono@4.8.10)':
     dependencies:
-      hono: 4.8.5
+      hono: 4.8.10
 
   '@humanwhocodes/config-array@0.13.0':
     dependencies:
@@ -4975,7 +4975,7 @@ snapshots:
     dependencies:
       node-gyp-build: 4.8.4
 
-  bullmq@5.56.6:
+  bullmq@5.56.8:
     dependencies:
       cron-parser: 4.9.0
       ioredis: 5.6.1
@@ -5389,7 +5389,7 @@ snapshots:
 
   has-flag@4.0.0: {}
 
-  hono@4.8.5: {}
+  hono@4.8.10: {}
 
   html-escaper@2.0.2: {}
 
