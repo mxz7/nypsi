@@ -34,7 +34,7 @@ export async function getWordListType(guild: Guild) {
 }
 
 export async function getWords(guild: Guild, type?: ChatReactionWordList) {
-  type = await getWordListType(guild);
+  if (!type) type = await getWordListType(guild);
 
   if (type === "custom") {
     const cache = await redis.get(`${Constants.redis.cache.chatReaction.WORD_LIST}:${guild.id}`);
