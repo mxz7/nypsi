@@ -154,6 +154,7 @@ async function run(
                     upgrades: true,
                   },
                 },
+                TradeRequest: true,
               },
             },
             Premium: {
@@ -184,6 +185,10 @@ async function run(
             Sessions: true,
             Viewed: true,
             Purchases: true,
+            Marriage: true,
+            Event: true,
+            EventContribution: true,
+            FlagGame: true,
           },
         }),
         moderation: {
