@@ -539,24 +539,7 @@ async function playGame(
         return edit({ embeds: [embed], components: getRows(game.grid, true) }, "end", interaction);
       }
 
-      (
-        components[components.length - 1].components[
-          components[components.length - 1].components.length - 1
-        ] as ButtonBuilder
-      )
-        .setCustomId("rp")
-        .setLabel("play again")
-        .setDisabled(false);
-
-      await edit({ embeds: [embed], components }, "end with play again", interaction);
-    }
-
-    const res = await msg
-      .awaitMessageComponent({
-        filter: (i: Interaction) => i.user.id == message.author.id,
-        time: 30000,
-      })
-      .catch(() => {
+      const renderAndListen = async () => {
         (
           components[components.length - 1].components[
             components[components.length - 1].components.length - 1
@@ -564,61 +547,87 @@ async function playGame(
         )
           .setCustomId("rp")
           .setLabel("play again")
-          .setDisabled(true);
-        msg.edit({ components });
-        return;
-      });
+          .setDisabled(false);
 
-    if (res && res.customId == "rp") {
-      await res.deferUpdate();
-      logger.info(
-        `::cmd ${message.guild.id} ${message.channelId} ${message.author.username}: replaying mines`,
-        { userId: message.author.id, guildId: message.guildId, channelId: message.channelId },
-      );
-      if (await isLockedOut(message.member)) {
-        await verifyUser(message);
-        return replay(embed, interaction, false);
-      }
+        await edit({ embeds: [embed], components }, "end with play again", interaction);
 
-      addHourlyCommand(message.member);
-
-      a(message.author.id, message.author.username, message.content, "mines");
-
-      if (
-        (await redis.get(
-          `${Constants.redis.nypsi.RESTART}:${(message.client as NypsiClient).cluster.id}`,
-        )) == "t"
-      ) {
-        if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
-          message.react("💀");
-        } else {
-          return msg.edit({
-            embeds: [
-              new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes"),
-            ],
+        const res = await msg
+          .awaitMessageComponent({
+            filter: (i: Interaction) => i.user.id == message.author.id,
+            time: 30000,
+          })
+          .catch(() => {
+            (
+              components[components.length - 1].components[
+                components[components.length - 1].components.length - 1
+              ] as ButtonBuilder
+            )
+              .setCustomId("rp")
+              .setLabel("play again")
+              .setDisabled(true);
+            msg.edit({ components });
+            return;
           });
-        }
-      }
 
-      if (await redis.get("nypsi:maintenance")) {
-        if (
-          (await hasAdminPermission(message.member, "bypass-maintenance")) &&
-          message instanceof Message
-        ) {
-          message.react("💀");
+        if (!res) return;
+
+        if (res.customId == "rp") {
+          await res.deferUpdate();
+          logger.info(
+            `::cmd ${message.guild.id} ${message.channelId} ${message.author.username}: replaying mines`,
+            { userId: message.author.id, guildId: message.guildId, channelId: message.channelId },
+          );
+          if (await isLockedOut(message.member)) {
+            await verifyUser(message);
+            return replay(embed, interaction, false);
+          }
+
+          addHourlyCommand(message.member);
+
+          a(message.author.id, message.author.username, message.content, "mines");
+
+          if (
+            (await redis.get(
+              `${Constants.redis.nypsi.RESTART}:${(message.client as NypsiClient).cluster.id}`,
+            )) == "t"
+          ) {
+            if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
+              message.react("💀");
+            } else {
+              return msg.edit({
+                embeds: [
+                  new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes"),
+                ],
+              });
+            }
+          }
+
+          if (await redis.get("nypsi:maintenance")) {
+            if (
+              (await hasAdminPermission(message.member, "bypass-maintenance")) &&
+              message instanceof Message
+            ) {
+              message.react("💀");
+            } else {
+              return msg.edit({
+                embeds: [
+                  new CustomEmbed(
+                    message.member,
+                    "fun & moderation commands are still available to you. maintenance mode only prevents certain commands to prevent loss of progress",
+                  ).setTitle("⚠️ nypsi is under maintenance"),
+                ],
+              });
+            }
+          }
+
+          return prepareGame(message, send, args, msg);
         } else {
-          return msg.edit({
-            embeds: [
-              new CustomEmbed(
-                message.member,
-                "fun & moderation commands are still available to you. maintenance mode only prevents certain commands to prevent loss of progress",
-              ).setTitle("⚠️ nypsi is under maintenance"),
-            ],
-          });
+          logger.debug(`mines: ${message.author.id} rerendering end (replay) message`);
+          return renderAndListen();
         }
-      }
+      };
 
-      return prepareGame(message, send, args, msg);
+      renderAndListen();
     }
   };
 
