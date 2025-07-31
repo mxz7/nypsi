@@ -89,17 +89,20 @@ export async function addLog(guild: Guild, type: LogType, embed: CustomEmbed) {
   );
 }
 
-export async function isLogsEnabled(guild: Guild) {
+export async function isLogsEnabled(guild: Guild, times = 1) {
   if (await redis.exists(`${Constants.redis.cache.guild.LOGS}:${guild.id}`)) {
     return (await redis.get(`${Constants.redis.cache.guild.LOGS}:${guild.id}`)) === "t";
   }
 
   if (checkingLogsEnabled) {
-    return (await new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(isLogsEnabled(guild));
-      }, 200);
-    })) as boolean;
+    if (times < 1000) {
+      times++;
+      return (await new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(isLogsEnabled(guild, times));
+        }, 200);
+      })) as boolean;
+    }
   }
 
   checkingLogsEnabled = true;
