@@ -815,6 +815,8 @@ async function playGame(
 
   let followUp: InteractionReplyOptions;
 
+  logger.debug(`mines: ${message.author.id} at location: ${game.grid[location]}`);
+
   switch (game.grid[location]) {
     case "b":
       game.grid[location] = "x";
@@ -828,7 +830,6 @@ async function playGame(
       if (game.grid[location] == "a") {
         game.grid[location] = "c";
       } else if (game.grid[location] === "m") {
-        logger.debug(`mines: ${message.author.id} found money`);
         game.grid[location] = "mc";
 
         const amount = (Math.random() * 66.6666666 + 33.3333333) / 100;
@@ -845,7 +846,6 @@ async function playGame(
           ],
         };
       } else if (game.grid[location] === "g") {
-        logger.debug(`mines: ${message.author.id} found gem`);
         game.grid[location] = "gc";
         game.win += 3;
 
