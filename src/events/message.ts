@@ -46,6 +46,7 @@ import { createAuraTransaction } from "../utils/functions/users/aura";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { getLastCommand } from "../utils/functions/users/commands";
 import { MentionQueueItem } from "../utils/functions/users/mentions";
+import { getLastKnownUsername } from "../utils/functions/users/tag";
 import { hasProfile } from "../utils/functions/users/utils";
 import { runCommand } from "../utils/handlers/commandhandler";
 import { logger } from "../utils/logger";
@@ -111,7 +112,7 @@ export default async function messageCreate(message: Message) {
       let content = "you are blacklisted from nypsi. this punishment will not be removed.";
 
       if (blacklist.relation !== message.author.id)
-        content += `\n\n in relation to \`${blacklist.relation}\``;
+        content += `\n\n in relation to \`${blacklist.relation}\` (${await getLastKnownUsername(blacklist.relation)})`;
 
       return message.reply({
         content,
