@@ -362,6 +362,7 @@ async function prepareGame(
   rows[4].components[4].setDisabled(true);
 
   if (msg) {
+    logger.debug(`mines: ${message.author.id} updating message for replay`);
     await msg.edit({ embeds: [embed], components: rows });
   } else {
     msg = await send({ embeds: [embed], components: rows });
@@ -577,9 +578,10 @@ async function playGame(
             `::cmd ${message.guild.id} ${message.channelId} ${message.author.username}: replaying mines`,
             { userId: message.author.id, guildId: message.guildId, channelId: message.channelId },
           );
+
           if (await isLockedOut(message.member)) {
             await verifyUser(message);
-            return replay(embed, interaction, false);
+            return;
           }
 
           addHourlyCommand(message.member);
