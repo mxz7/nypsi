@@ -326,7 +326,7 @@ async function getEmbed(
 
   const embed = new CustomEmbed(message.member);
 
-  const username = await getLastKnownUsername(member);
+  const username = await getLastKnownUsername(member, false);
 
   embed.setHeader(
     "alts of " + username ? username + ` (${member})` : member,
