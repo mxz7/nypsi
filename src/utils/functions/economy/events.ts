@@ -101,7 +101,8 @@ export async function createEvent(
         if (!channel) return;
 
         if (channel.isTextBased() && channel.isSendable()) {
-          await channel.send({ content, components: [components] });
+          const msg = await channel.send({ content, components: [components] });
+          msg.crosspost().catch(() => {});
         }
       },
       {
@@ -403,7 +404,8 @@ export async function checkEventExpire(client: NypsiClient) {
           if (!channel) return;
 
           if (channel.isTextBased() && channel.isSendable()) {
-            await channel.send({ content });
+            const msg = await channel.send({ content });
+            msg.crosspost().catch(() => {});
           }
         },
         {
@@ -524,7 +526,8 @@ async function completeEvent(client: NypsiClient, lastUser: string) {
         if (!channel) return;
 
         if (channel.isTextBased() && channel.isSendable()) {
-          await channel.send({ content, components: [components] });
+          const msg = await channel.send({ content, components: [components] });
+          msg.crosspost().catch(() => {});
         }
       },
       {
