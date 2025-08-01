@@ -163,6 +163,24 @@ async function run(
         .catch(() => msg.edit({ components: [row] }));
     }
 
+    if (selected.id === "lottery_ticket") {
+      const limit = dayjs()
+        .set("hour", 23)
+        .set("minute", 59)
+        .set("second", 0)
+        .set("millisecond", 0);
+
+      if (dayjs().isAfter(limit) || (await redis.exists("nypsi:lottery"))) {
+        return interaction
+          .reply({
+            embeds: [new ErrorEmbed("you cannot currently buy a lottery ticket")],
+          })
+          .catch(() =>
+            msg.edit({ embeds: [new ErrorEmbed("you cannot currently buy a lottery ticket")] }),
+          );
+      }
+    }
+
     balance = await getBalance(message.member);
 
     if (balance < selected.buy * amount) {
