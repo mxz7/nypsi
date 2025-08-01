@@ -275,17 +275,26 @@ async function giveRewards(event: EventData) {
   logger.debug(`event: rewards`, { top1p: achGroup, top5p, top10p });
 
   for (const { userId } of achGroup) {
+    if ((await isEcoBanned(userId)).banned) continue;
     await addProgress(userId, "event_pro", 1);
   }
 
   // userid -> amount
   const givenRewards = new Map<string, number>();
 
-  givenRewards.set(top5[0].userId, 1);
-  await addInventoryItem(top5[0].userId, "pandora_box", 1);
+  if (!(await isEcoBanned(top5[0].userId)).banned) {
+    givenRewards.set(top5[0].userId, 1);
+    await addInventoryItem(top5[0].userId, "pandora_box", 1);
+  }
 
   for (let i = 0; i < 2; i++) {
     const chosen = top5[Math.floor(Math.random() * top5.length)];
+
+    if ((await isEcoBanned(chosen.userId)).banned) {
+      logger.debug(`event: rewards: banned`, { userId: chosen.userId });
+      i--;
+      continue;
+    }
 
     if (!givenRewards.has(chosen.userId)) {
       givenRewards.set(chosen.userId, 0);
@@ -299,6 +308,12 @@ async function giveRewards(event: EventData) {
     while (toGive > 0) {
       toGive--;
       const chosen = group[Math.floor(Math.random() * group.length)];
+
+      if ((await isEcoBanned(chosen.userId)).banned) {
+        logger.debug(`event: rewards: banned`, { userId: chosen.userId });
+        toGive++;
+        continue;
+      }
 
       if (!givenRewards.has(chosen.userId)) {
         givenRewards.set(chosen.userId, 0);
