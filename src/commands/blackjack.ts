@@ -310,16 +310,7 @@ async function prepareGame(
     msg = await send({ embeds: [embed], components: [row] });
   }
 
-  playGame(game, message, send, msg, args).catch((e) => {
-    logger.error(`blackjack: ${message.author.id} error occurred during game`, {
-      err: e,
-      game: game,
-    });
-    redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
-    return send({
-      embeds: [new ErrorEmbed("an error occurred while running - join support server")],
-    });
-  });
+  playGame(game, message, send, msg, args);
 }
 
 function newCard(deck: string[], hand: string[]) {
@@ -472,7 +463,9 @@ async function playGame(
     );
 
     if (res && res.customId == "rp") {
-      await res.deferUpdate();
+      await res.deferUpdate().catch(() => {
+        logger.warn(`blackjack: ${message.author.id} failed to defer update for replay`);
+      });
       logger.info(
         `::cmd ${message.guild.id} ${message.channelId} ${message.author.username}: replaying blackjack`,
         { userId: message.author.id, guildId: message.guildId, channelId: message.channelId },
