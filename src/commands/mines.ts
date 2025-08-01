@@ -793,6 +793,20 @@ async function playGame(
       win1(response);
       return;
     }
+  } else if (response.customId === "rp") {
+    logger.debug(`mines: ${message.author.id} rerendering stuck message`);
+
+    const desc = await renderGambleScreen({
+      state: "playing",
+      bet: game.bet,
+      insert: `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
+    });
+    embed.setDescription(desc);
+
+    const components = getRows(game.grid, false);
+
+    edit({ embeds: [embed], components }, "rerendering stuck message", response);
+    return playGame(game, message, send, msg, args);
   } else {
     const letter = response.customId.split("")[0];
     const number = response.customId.split("")[1];
