@@ -1,3 +1,7 @@
+# august 2025
+
+---
+
 # july 2025
 
 ## changes you'll probably care about
