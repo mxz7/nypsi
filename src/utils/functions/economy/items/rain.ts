@@ -22,7 +22,9 @@ module.exports = new ItemUse(
   async (message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) => {
     let length = 1;
 
-    if (Constants.LOOT_RAIN_ALLOWED_CHANNELS.includes(message.channelId)) length = 2;
+    if (message.channel.isDMBased()) return;
+
+    if (message.channel.parentId === "1246516186171314337") length = 2;
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
@@ -37,7 +39,7 @@ module.exports = new ItemUse(
           message.member,
           `💦 confirm to start a loot rain for **${length} minutes**` +
             (message.guildId !== Constants.NYPSI_SERVER_ID
-              ? "\n\nyou can **double** the length of your loot rain by using it in the **[official nypsi server](https://nypsi.xyz/discord)**"
+              ? "\n\nyou can **double** the length of your loot rain by using it in a **public commands channel** in the **[official nypsi server](https://nypsi.xyz/discord)**"
               : ""),
         ).setHeader(`${message.author.username}'s loot rain`, message.author.avatarURL()),
       ],

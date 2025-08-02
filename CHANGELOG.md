@@ -1,5 +1,9 @@
 # august 2025
 
+## changes you'll probably care about
+
+- loot rains only double time in public command channels
+
 ---
 
 # july 2025
