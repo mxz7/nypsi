@@ -48,16 +48,22 @@ async function run(
     });
   }
 
+  const contribution = event.contributions.find(
+    (contribution) => contribution.userId === message.author.id,
+  );
+
   const embed = new CustomEmbed(
     message.member,
     `**${getEventsData()[event.type].name}**\n` +
       `> ${getEventsData()[event.type].description.replaceAll("{target}", event.target.toLocaleString())}\n\n` +
       `ends on <t:${Math.floor(event.expiresAt.getTime() / 1000)}> (<t:${Math.floor(event.expiresAt.getTime() / 1000)}:R>)\n\n` +
       `${getEventProgress(event).toLocaleString()}/${event.target.toLocaleString()}\n` +
-      `your contribution: ${event.contributions
-        .find((contribution) => contribution.userId === message.author.id)
-        ?.contribution.toLocaleString()} ` +
-      `(#${(event.contributions.findIndex((contribution) => contribution.userId === message.author.id) + 1).toLocaleString()})`,
+      (contribution
+        ? `your contribution: ${event.contributions
+            .find((contribution) => contribution.userId === message.author.id)
+            ?.contribution.toLocaleString()} ` +
+          `(#${(event.contributions.findIndex((contribution) => contribution.userId === message.author.id) + 1).toLocaleString()})`
+        : ""),
   ).setHeader("current event", message.author.avatarURL());
 
   return send({
