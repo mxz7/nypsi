@@ -479,10 +479,10 @@ async function completeEvent(client: NypsiClient, lastUser: string) {
     let username: string;
 
     if ((await getPreferences(userId)).leaderboards) {
-      username = `<[${await getLastKnownUsername(userId, false)}](https://nypsi.xyz/users/${userId}?ref=event-winners)>`;
+      username = `[${await getLastKnownUsername(userId, false)}](<https://nypsi.xyz/users/${userId}?ref=event-winners>)`;
     } else {
       username =
-        "<[[hidden]](https://nypsi.xyz/docs/economy/user-settings/hidden?ref=event-winners)>";
+        "[[hidden]](<https://nypsi.xyz/docs/economy/user-settings/hidden?ref=event-winners>)";
     }
 
     content +=
