@@ -359,11 +359,15 @@ async function run(
             .map((i) => `- \`${i[1]}x\` ${items[i[0]].emoji} ${items[i[0]].name}`)
             .join("\n")}`
         : " **nothing**"
-    }` +
-      (eventProgress
-        ? `\n\n🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`
-        : ""),
+    }`,
   );
+
+  if (eventProgress) {
+    embed.addField(
+      "event progress",
+      `🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`,
+    );
+  }
 
   send({ embeds: [embed], components: [row] });
 
