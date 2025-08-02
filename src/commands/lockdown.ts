@@ -16,22 +16,14 @@ const cmd = new Command(
   "moderation",
 )
   .setAliases(["lock", "shutup"])
-  .setPermissions(["MANAGE_MESSAGES", "MANAGE_CHANNELS"]);
+  .setPermissions(["MANAGE_MESSAGES"]);
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   send: SendMessage,
   args: string[],
 ) {
-  if (
-    !message.member.permissions.has(PermissionFlagsBits.ManageChannels) ||
-    !message.member.permissions.has(PermissionFlagsBits.ManageMessages)
-  ) {
-    if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
-      return send({
-        embeds: [new ErrorEmbed("you need the `manage channels` and `manage messages` permission")],
-      });
-    }
+  if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
     return;
   }
 
