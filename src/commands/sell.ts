@@ -3,6 +3,7 @@ import {
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
+  ComponentType,
   Interaction,
   Message,
   MessageActionRowComponentBuilder,
@@ -15,6 +16,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { addBalance, getSellMulti } from "../utils/functions/economy/balance";
 import {
+  calcItemValue,
   getInventory,
   getSellFilter,
   removeInventoryItem,
@@ -374,7 +376,62 @@ async function run(
       return send({ embeds: [new ErrorEmbed("you can never get rid of gold stars 😈")] });
     }
 
-    await addCooldown(cmd.name, message.member, 5);
+    let msg: Message;
+
+    const marketWorth = await calcItemValue(selected.id);
+
+    await addCooldown(cmd.name, message.member, 900);
+
+    if (selected.role !== "sellable" && marketWorth > selected.sell) {
+      const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("✅").setLabel("confirm").setStyle(ButtonStyle.Success),
+        new ButtonBuilder().setCustomId("❌").setLabel("cancel").setStyle(ButtonStyle.Danger),
+      );
+
+      msg = await send({
+        embeds: [
+          new CustomEmbed(
+            message.member,
+            `are you sure you want to sell **${amount} ${selected.emoji} ${selected.name}?\n` +
+              "you may get more money from selling this item on the [**/market**](https://nypsi.xyz/docs/economy/market?ref=bot-sell)" +
+              `, its [*worth*](https://nypsi.xyz/docs/economy/items/worth?ref=bot-sell) is $**${marketWorth.toLocaleString()}**`,
+          ),
+        ],
+        components: [row],
+      });
+
+      const interaction = await msg
+        .awaitMessageComponent({
+          filter: (i) => i.user.id === message.author.id,
+          time: 30000,
+          componentType: ComponentType.Button,
+        })
+        .catch(() => {});
+
+      row.components.forEach((c) => c.setDisabled(false));
+
+      if (!interaction) {
+        addExpiry(cmd.name, message.member, 1);
+        return msg.edit({ components: [row] });
+      } else if (interaction.customId === "❌") {
+        addExpiry(cmd.name, message.member, 1);
+        await interaction.update({ components: [row] });
+        await interaction.followUp({
+          embeds: [new CustomEmbed(message.member, "sell cancelled")],
+          flags: MessageFlags.Ephemeral,
+        });
+        return;
+      } else if (interaction.customId === "✅") {
+        await interaction.deferUpdate();
+      }
+
+      if (!inventory.has(selected.id) || inventory.count(selected.id) < amount) {
+        addExpiry(cmd.name, message.member, 69);
+        return msg.edit({ embeds: [new ErrorEmbed("sneaky sneaky... bitch")] });
+      }
+    }
+
+    await addExpiry(cmd.name, message.member, 5);
 
     await removeInventoryItem(message.member, selected.id, amount);
 
