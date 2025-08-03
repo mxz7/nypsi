@@ -289,6 +289,10 @@ class Race {
           embeds: [new ErrorEmbed("this car is faster than the speed limit for this race")],
         });
 
+      if (this.started) {
+        return carInteraction.reply({ embeds: [new ErrorEmbed("the race has already started")] });
+      }
+
       await removeBalance(interaction.user, this.bet);
 
       this.members.push({
