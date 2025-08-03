@@ -3,6 +3,11 @@
 ## changes you'll probably care about
 
 - loot rains only double time in public command channels
+- buffed tower
+
+## other
+
+- reaction roles support standard discord emojis
 
 ---
 

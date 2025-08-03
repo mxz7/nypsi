@@ -272,7 +272,7 @@ export default {
   MEMBER_MENTION_REGEX: /<@!?[0-9]+>/,
   EMBED_FAIL_COLOR: "#e31e3b" as ColorResolvable,
   EMBED_SUCCESS_COLOR: "#68f78c" as ColorResolvable,
-  EMOJI_REGEX: /(<:[A-Za-z_-]+:[0-9]+>)/,
+  EMOJI_REGEX: /^(<:?[A-Za-z0-9_~-]+:[0-9]+>|:[A-Za-z0-9_~-]+:)$/,
   GOLD_ROLE_ID: "819870846536646666",
   KARMA_SHOP_ROLE_ID: "1088800175532806187",
   EVENTS_ROLE_ID: "1392067239649345627",
