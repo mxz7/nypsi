@@ -39,7 +39,7 @@ export async function getLastKnownUsername(id: string, escapeSpecialCharacters =
     7200,
   );
 
-  return escapeSpecialCharacters && query?.lastKnownUsername.split("_").length > 2
+  return escapeSpecialCharacters
     ? query?.lastKnownUsername.replaceAll("_", "\\_")
     : query?.lastKnownUsername;
 }
