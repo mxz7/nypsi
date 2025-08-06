@@ -403,7 +403,7 @@ async function lose(message: Message | (NypsiCommandInteraction & CommandInterac
     return edit({ embeds: [embed] });
   }
 
-  const id = addWordleGame(
+  const id = await addWordleGame(
     message.member,
     false,
     game.guesses,
