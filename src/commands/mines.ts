@@ -805,7 +805,7 @@ async function playGame(
 
     const components = getRows(game.grid, false);
 
-    edit({ embeds: [embed], components }, "rerendering stuck message", response);
+    await edit({ embeds: [embed], components }, "rerendering stuck message", response);
     return playGame(game, message, send, msg, args);
   } else {
     const letter = response.customId.split("")[0];
@@ -916,7 +916,31 @@ async function playGame(
 
       logger.debug(`mines: ${message.author.id} editing`);
 
-      edit({ embeds: [embed], components }, "rerendering game", response).then(() => {
+      await edit({ embeds: [embed], components }, "rerendering game", response).then(() => {
+        if (followUp) {
+          response.followUp(followUp).catch(() => {
+            logger.warn(`mines: ${message.author.id} failed to send follow up`, followUp);
+          });
+        }
+      });
+
+      return playGame(game, message, send, msg, args);
+    default:
+      logger.debug(`mines: ${message.author.id} rerendering due to invalid location`);
+
+      embed.setDescription(
+        await renderGambleScreen({
+          state: "playing",
+          bet: game.bet,
+          insert: `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
+        }),
+      );
+
+      await edit(
+        { embeds: [embed], components: getRows(game.grid, false) },
+        "rerendering game (invalid location)",
+        response,
+      ).then(() => {
         if (followUp) {
           response.followUp(followUp).catch(() => {
             logger.warn(`mines: ${message.author.id} failed to send follow up`, followUp);
