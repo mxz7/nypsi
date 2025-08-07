@@ -192,6 +192,65 @@ export async function getGuildByUser(member: MemberResolvable) {
   return await getGuildByName(guildName);
 }
 
+export async function getGuildAdmins(guildName: string): Promise<string[]> {
+  if (await redis.exists(`${Constants.redis.cache.economy.GUILD_ADMINS}:${guildName}`)) {
+    return JSON.parse(
+      await redis.get(`${Constants.redis.cache.economy.GUILD_ADMINS}:${guildName}`),
+    );
+  }
+
+  const guild = await getGuildByName(guildName);
+
+  if (!guild) return undefined;
+
+  const admins = (
+    await prisma.economyGuildMember.findMany({
+      where: {
+        guildName,
+        role: { in: ["owner", "admin"] },
+      },
+      select: {
+        userId: true,
+      },
+    })
+  ).map((i) => i.userId);
+
+  await redis.set(
+    `${Constants.redis.cache.economy.GUILD_ADMINS}:${guildName}`,
+    JSON.stringify(admins),
+    "EX",
+    ms("1 hour") / 1000,
+  );
+
+  return admins;
+}
+
+export async function promoteGuildMember(name: string, member: GuildMember) {
+  await prisma.economyGuildMember.update({
+    where: {
+      userId: member.id,
+    },
+    data: {
+      role: "admin",
+    },
+  });
+
+  await redis.del(`${Constants.redis.cache.economy.GUILD_ADMINS}:${name}`);
+}
+
+export async function demoteGuildMember(name: string, member: GuildMember) {
+  await prisma.economyGuildMember.update({
+    where: {
+      userId: member.id,
+    },
+    data: {
+      role: "member",
+    },
+  });
+
+  await redis.del(`${Constants.redis.cache.economy.GUILD_ADMINS}:${name}`);
+}
+
 export async function createGuild(name: string, owner: GuildMember) {
   await prisma.economyGuild.create({
     data: {
@@ -205,6 +264,7 @@ export async function createGuild(name: string, owner: GuildMember) {
       userId: owner.id,
       guildName: name,
       joinedAt: new Date(),
+      role: "owner",
     },
   });
 
@@ -221,6 +281,8 @@ export async function deleteGuild(name: string) {
   for (const member of guild.members) {
     await redis.del(`${Constants.redis.cache.economy.GUILD_USER}:${member.userId}`);
   }
+
+  await redis.del(`${Constants.redis.cache.economy.GUILD_ADMINS}:${name}`);
 
   await prisma.economyGuildMember.deleteMany({
     where: {
@@ -376,44 +438,16 @@ export async function addMember(name: string, member: GuildMember) {
   return true;
 }
 
-export type RemoveMemberMode = "id" | "tag";
-
-export async function removeMember(member: string, mode: RemoveMemberMode) {
-  if (mode == "id") {
-    await prisma.economyGuildMember.delete({
-      where: {
-        userId: member,
-      },
-    });
-    await redis.del(`${Constants.redis.cache.economy.GUILD_USER}:${member}`);
-    return true;
-  } else {
-    const user = await prisma.user.findFirst({
-      where: {
-        lastKnownUsername: member,
-      },
-      select: {
-        id: true,
-      },
-    });
-
-    if (!user || !user.id) {
-      return false;
-    }
-
-    const x = await prisma.economyGuildMember.delete({
-      where: {
-        userId: user.id,
-      },
-    });
-
-    if (x) {
-      await redis.del(`${Constants.redis.cache.economy.GUILD_USER}:${x.userId}`);
-
-      return true;
-    }
-    return false;
-  }
+export async function removeMember(member: string) {
+  const res = await prisma.economyGuildMember.delete({
+    where: {
+      userId: member,
+    },
+  });
+  await redis.del(
+    `${Constants.redis.cache.economy.GUILD_USER}:${member}`,
+    `${Constants.redis.cache.economy.GUILD_ADMINS}:${res.guildName}`,
+  );
 }
 
 interface EconomyGuild {

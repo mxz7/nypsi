@@ -4,6 +4,7 @@
 
 - loot rains only double time in public command channels
 - buffed tower
+- added guild admins to buy shop items and invite/kick members (@growling_grizzly)
 
 ## other
 

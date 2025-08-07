@@ -183,6 +183,7 @@ export default {
         GUILD_LEVEL: "cache:economy:guild:level",
         GUILD_REQUIREMENTS: "cache:economy:guild:requirements",
         GUILD_USER: "cache:economy:guild:user",
+        GUILD_ADMINS: "cache:economy:guild:admins",
         GUILD_UPGRADES: "cache:economy:guild:upgrades",
         INVENTORY: "cache:economy:inventory",
         NETWORTH: "cache:economy:networth",
