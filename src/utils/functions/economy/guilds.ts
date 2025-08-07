@@ -192,39 +192,6 @@ export async function getGuildByUser(member: MemberResolvable) {
   return await getGuildByName(guildName);
 }
 
-export async function getGuildAdmins(guildName: string): Promise<string[]> {
-  if (await redis.exists(`${Constants.redis.cache.economy.GUILD_ADMINS}:${guildName}`)) {
-    return JSON.parse(
-      await redis.get(`${Constants.redis.cache.economy.GUILD_ADMINS}:${guildName}`),
-    );
-  }
-
-  const guild = await getGuildByName(guildName);
-
-  if (!guild) return undefined;
-
-  const admins = (
-    await prisma.economyGuildMember.findMany({
-      where: {
-        guildName,
-        role: { in: ["owner", "admin"] },
-      },
-      select: {
-        userId: true,
-      },
-    })
-  ).map((i) => i.userId);
-
-  await redis.set(
-    `${Constants.redis.cache.economy.GUILD_ADMINS}:${guildName}`,
-    JSON.stringify(admins),
-    "EX",
-    ms("1 hour") / 1000,
-  );
-
-  return admins;
-}
-
 export async function promoteGuildMember(name: string, member: GuildMember) {
   await prisma.economyGuildMember.update({
     where: {

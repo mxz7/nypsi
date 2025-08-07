@@ -29,7 +29,6 @@ import {
   createGuild,
   deleteGuild,
   demoteGuildMember,
-  getGuildAdmins,
   getGuildByName,
   getGuildByUser,
   getMaxMembersForGuild,
@@ -259,8 +258,11 @@ async function run(
     return send({ embeds: [embed] });
   };
 
-  let guild = await getGuildByUser(message.member);
   const prefix = (await getPrefix(message.guild))[0];
+  const guild = await getGuildByUser(message.member);
+  const guildAdmins = guild.members
+    .filter((m) => m.role === "admin" || m.role === "owner")
+    .map((i) => i.userId);
 
   if (args.length == 0) {
     return showGuild(guild);
@@ -353,7 +355,7 @@ async function run(
       });
     }
 
-    if (!(await getGuildAdmins(guild.guildName)).includes(message.author.id)) {
+    if (!guildAdmins.includes(message.author.id)) {
       return send({ embeds: [new ErrorEmbed("you are not a guild admin")] });
     }
 
@@ -567,7 +569,7 @@ async function run(
       return send({ embeds: [new ErrorEmbed("you're not in a guild")] });
     }
 
-    if (!(await getGuildAdmins(guild.guildName)).includes(message.author.id)) {
+    if (!guildAdmins.includes(message.author.id)) {
       return send({ embeds: [new ErrorEmbed("you are not a guild admin")] });
     }
 
@@ -582,15 +584,14 @@ async function run(
     let target: { role: EconomyGuildRole; id: string };
 
     if (message.mentions?.members?.first()) {
-      let found: EconomyGuildRole = undefined;
       for (const m of guild.members) {
         if (m.userId == message.mentions.members.first().user.id) {
-          found = m.role;
+          target = { role: m.role, id: m.userId };
           break;
         }
       }
 
-      if (!found) {
+      if (!target) {
         return send({
           embeds: [
             new ErrorEmbed(
@@ -601,19 +602,15 @@ async function run(
           ],
         });
       }
-
-      target = { role: found, id: message.mentions.members.first().user.id };
     } else {
-      let found = false;
       for (const m of guild.members) {
         if (m.userId == args[1] || m.economy.user.lastKnownUsername == args[1]) {
-          found = true;
           target = { role: m.role, id: m.userId };
           break;
         }
       }
 
-      if (!found) {
+      if (!target) {
         return send({
           embeds: [new ErrorEmbed(`\`${args[1]}\` is not in **${guild.guildName}**`)],
         });
@@ -711,7 +708,7 @@ async function run(
 
     args.shift();
 
-    guild = await getGuildByName(args.join(" "));
+    const guild = await getGuildByName(args.join(" "));
 
     if (!guild) return;
 
@@ -1158,7 +1155,7 @@ async function run(
   if (args[0].toLowerCase() == "buy") {
     if (!guild) return send({ embeds: [new ErrorEmbed("you are not in a guild")] });
 
-    if (!(await getGuildAdmins(guild.guildName)).includes(message.author.id)) {
+    if (!guildAdmins.includes(message.author.id)) {
       return send({ embeds: [new ErrorEmbed("you are not a guild admin")] });
     }
 
