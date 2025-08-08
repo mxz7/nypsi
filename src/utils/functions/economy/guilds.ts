@@ -201,8 +201,6 @@ export async function promoteGuildMember(name: string, member: GuildMember) {
       role: "admin",
     },
   });
-
-  await redis.del(`${Constants.redis.cache.economy.GUILD_ADMINS}:${name}`);
 }
 
 export async function demoteGuildMember(name: string, member: GuildMember) {
@@ -214,8 +212,6 @@ export async function demoteGuildMember(name: string, member: GuildMember) {
       role: "member",
     },
   });
-
-  await redis.del(`${Constants.redis.cache.economy.GUILD_ADMINS}:${name}`);
 }
 
 export async function createGuild(name: string, owner: GuildMember) {
@@ -248,8 +244,6 @@ export async function deleteGuild(name: string) {
   for (const member of guild.members) {
     await redis.del(`${Constants.redis.cache.economy.GUILD_USER}:${member.userId}`);
   }
-
-  await redis.del(`${Constants.redis.cache.economy.GUILD_ADMINS}:${name}`);
 
   await prisma.economyGuildMember.deleteMany({
     where: {
@@ -406,15 +400,12 @@ export async function addMember(name: string, member: GuildMember) {
 }
 
 export async function removeMember(member: string) {
-  const res = await prisma.economyGuildMember.delete({
+  await prisma.economyGuildMember.delete({
     where: {
       userId: member,
     },
   });
-  await redis.del(
-    `${Constants.redis.cache.economy.GUILD_USER}:${member}`,
-    `${Constants.redis.cache.economy.GUILD_ADMINS}:${res.guildName}`,
-  );
+  await redis.del(`${Constants.redis.cache.economy.GUILD_USER}:${member}`);
 }
 
 interface EconomyGuild {
@@ -566,18 +557,50 @@ export async function setGuildMOTD(name: string, motd: string) {
   });
 }
 
-export async function setOwner(guild: string, newOwner: string) {
+export async function setOwner(name: string, newOwner: string) {
+  const guild = await getGuildByName(name);
+
+  if (!guild) return "invalid guild";
+
+  if (guild.ownerId == newOwner) return "user is already guild owner";
+
+  const res = await prisma.economyGuildMember.updateMany({
+    where: {
+      guildName: {
+        mode: "insensitive",
+        equals: name,
+      },
+      userId: newOwner,
+    },
+    data: {
+      role: "owner",
+    },
+  });
+
+  if (res.count == 0) return "invalid guild member";
+
+  await prisma.economyGuildMember.update({
+    where: {
+      userId: guild.ownerId,
+    },
+    data: {
+      role: "admin",
+    },
+  });
+
   await prisma.economyGuild.updateMany({
     where: {
       guildName: {
         mode: "insensitive",
-        equals: guild,
+        equals: name,
       },
     },
     data: {
       ownerId: newOwner,
     },
   });
+
+  return true;
 }
 
 export async function getGuildUpgradesByUser(

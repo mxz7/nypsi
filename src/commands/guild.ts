@@ -239,10 +239,24 @@ async function run(
         );
       }
 
+      const rolePriority: Record<string, number> = {
+        owner: 0,
+        admin: 1,
+        member: 2,
+      };
+
+      // sort by join date and role
+      const sortedMembers = [...guild.members].sort((a, b) => {
+        const roleDiff = rolePriority[a.role] - rolePriority[b.role];
+        if (roleDiff !== 0) return roleDiff;
+
+        return a.joinedAt.getTime() - b.joinedAt.getTime();
+      });
+
       let membersText = "";
       const maxMembers = await getMaxMembersForGuild(guild.guildName);
 
-      for (const m of guild.members) {
+      for (const m of sortedMembers) {
         membersText += `[\`${m.role == "owner" ? "**" : m.role == "admin" ? "*" : ""}${m.economy.user.lastKnownUsername}\`](https://nypsi.xyz/users/${m.userId}?ref=bot-guild) `;
 
         if (m.userId == message.author.id) {
@@ -561,7 +575,13 @@ async function run(
       return send({ embeds: [new ErrorEmbed(`${prefix}guild setowner <guild> <newid>`)] });
     }
 
-    return await setOwner(args[1], args[2]);
+    const res = await setOwner(args[1], args[2]);
+
+    if (typeof res === "string") {
+      return send({ embeds: [new ErrorEmbed(res)] });
+    } else {
+      if (message instanceof Message) return message.react("✅");
+    }
   }
 
   if (args[0].toLowerCase() == "kick") {
