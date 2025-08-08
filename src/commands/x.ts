@@ -3152,27 +3152,6 @@ async function run(
     }
 
     return startEvent();
-  } else if (args[0].toLowerCase() === "fixguildroles") {
-    if ((await getAdminLevel(message.member)) >= 3) {
-      const res = await prisma.economyGuildMember.updateMany({
-        where: {
-          userId: {
-            in: (
-              await prisma.economyGuild.findMany({
-                select: { ownerId: true },
-              })
-            ).map((g) => g.ownerId),
-          },
-        },
-        data: {
-          role: "owner",
-        },
-      });
-
-      return send({
-        embeds: [new CustomEmbed(message.member, `✅ updated ${res.count} guild roles`)],
-      });
-    }
   } else {
     return send({
       embeds: [new CustomEmbed(message.member, await getUsableCommands(message.member))],
