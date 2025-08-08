@@ -37,6 +37,7 @@ import {
 } from "../utils/functions/economy/inventory";
 import { getRawLevel } from "../utils/functions/economy/levelling";
 import {
+  countItemOnMarket,
   createMarketOrder,
   deleteMarketOrder,
   deleteMarketWatch,
@@ -1675,7 +1676,11 @@ async function run(
 
         return confirmTransaction("buy", item, 1, message.member, msg);
       } else if (res == "buyMulti") {
-        const res = await quantitySelectionModal("buy", interaction as ButtonInteraction);
+        const res = await quantitySelectionModal(
+          interaction as ButtonInteraction,
+          "buy",
+          await countItemOnMarket(item.id, "sell"),
+        );
 
         if (res) {
           const amount = res.fields.fields.get("amount").value;
@@ -1763,7 +1768,12 @@ async function run(
 
         return confirmTransaction("sell", item, 1, message.member, msg);
       } else if (res == "sellMulti") {
-        const res = await quantitySelectionModal("sell", interaction as ButtonInteraction);
+        const res = await quantitySelectionModal(
+          interaction as ButtonInteraction,
+          "sell",
+          await countItemOnMarket(item.id, "buy"),
+          (await getInventory(message.member)).count(item.id),
+        );
 
         if (res) {
           const amount = res.fields.fields.get("amount").value;
@@ -1805,9 +1815,9 @@ async function run(
           const inventory = await getInventory(message.member);
 
           if (inventory.count(item.id) < formattedAmount) {
-            await interaction.editReply({
+            await res.reply({
               embeds: [new ErrorEmbed(`you do not have this many ${item.plural}`)],
-              options: { flags: MessageFlags.Ephemeral },
+              flags: MessageFlags.Ephemeral,
             });
             await updateEmbed();
             return pageManager();
@@ -1952,7 +1962,12 @@ async function run(
     return pageManager();
   }
 
-  async function quantitySelectionModal(type: string, interaction: ButtonInteraction) {
+  async function quantitySelectionModal(
+    interaction: ButtonInteraction,
+    type: string,
+    inOrders: number,
+    inInventory?: number,
+  ) {
     const id = `market-quantity-${Math.floor(Math.random() * 69420)}`;
     const modal = new ModalBuilder().setCustomId(id).setTitle("select quantity");
 
@@ -1961,6 +1976,11 @@ async function run(
         new TextInputBuilder()
           .setCustomId("amount")
           .setLabel(`how many would you like to ${type}?`)
+          .setPlaceholder(
+            type == "sell"
+              ? `${inOrders.toLocaleString()} in buy orders, ${inInventory.toLocaleString()} in inventory`
+              : `${inOrders.toLocaleString()} in sell orders`,
+          )
           .setStyle(TextInputStyle.Short)
           .setRequired(true)
           .setMaxLength(10),
