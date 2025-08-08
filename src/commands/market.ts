@@ -1977,9 +1977,9 @@ async function run(
           .setCustomId("amount")
           .setLabel(`how many would you like to ${type}?`)
           .setPlaceholder(
-            type == "sell" ? 
-            `${inOrders.toLocaleString()} in buy orders, ${inInventory.toLocaleString()} in inventory`
-            : `${inOrders.toLocaleString()} in sell orders`
+            type == "sell"
+              ? `${inOrders.toLocaleString()} in buy orders, ${inInventory.toLocaleString()} in inventory`
+              : `${inOrders.toLocaleString()} in sell orders`,
           )
           .setStyle(TextInputStyle.Short)
           .setRequired(true)
