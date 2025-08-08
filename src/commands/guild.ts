@@ -1,4 +1,4 @@
-import { EconomyGuild, EconomyGuildMember } from "@prisma/client";
+import { EconomyGuild, EconomyGuildMember, EconomyGuildRole } from "@prisma/client";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -13,7 +13,7 @@ import {
   MessageEditOptions,
   MessageFlags,
 } from "discord.js";
-import { sort } from "fast-sort";
+import { inPlaceSort, sort } from "fast-sort";
 import { nanoid } from "nanoid";
 import prisma from "../init/database";
 import redis from "../init/redis";
@@ -23,16 +23,17 @@ import Constants from "../utils/Constants";
 import { daysAgo, formatDate } from "../utils/functions/date";
 import { getBalance, removeBalance } from "../utils/functions/economy/balance";
 import {
-  RemoveMemberMode,
   addGuildUpgrade,
   addMember,
   addToGuildBank,
   createGuild,
   deleteGuild,
+  demoteGuildMember,
   getGuildByName,
   getGuildByUser,
   getMaxMembersForGuild,
   getRequiredForGuildUpgrade,
+  promoteGuildMember,
   removeMember,
   setGuildMOTD,
   setOwner,
@@ -51,7 +52,7 @@ import { deleteImage, uploadImage } from "../utils/functions/image";
 import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import PageManager from "../utils/functions/page";
 import { cleanString, pluralize } from "../utils/functions/string";
-import { getLastKnownAvatar } from "../utils/functions/users/tag";
+import { getLastKnownAvatar, getLastKnownUsername } from "../utils/functions/users/tag";
 import { addCooldown, addExpiry, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
 import sharp = require("sharp");
@@ -238,11 +239,22 @@ async function run(
         );
       }
 
+      const rolePriority: Record<string, number> = {
+        owner: 0,
+        admin: 1,
+        member: 2,
+      };
+
+      inPlaceSort(guild.members).asc([
+        (member) => rolePriority[member.role],
+        (member) => member.joinedAt.getTime(),
+      ]);
+
       let membersText = "";
       const maxMembers = await getMaxMembersForGuild(guild.guildName);
 
       for (const m of guild.members) {
-        membersText += `[\`${m.economy.user.lastKnownUsername}\`](https://nypsi.xyz/users/${m.userId}?ref=bot-guild) `;
+        membersText += `[\`${m.role == "owner" ? "**" : m.role == "admin" ? "*" : ""}${m.economy.user.lastKnownUsername}\`](https://nypsi.xyz/users/${m.userId}?ref=bot-guild) `;
 
         if (m.userId == message.author.id) {
           embed.setFooter({
@@ -257,8 +269,11 @@ async function run(
     return send({ embeds: [embed] });
   };
 
-  let guild = await getGuildByUser(message.member);
   const prefix = (await getPrefix(message.guild))[0];
+  const guild = await getGuildByUser(message.member);
+  const guildAdmins = guild.members
+    .filter((m) => m.role === "admin" || m.role === "owner")
+    .map((i) => i.userId);
 
   if (args.length == 0) {
     return showGuild(guild);
@@ -347,14 +362,12 @@ async function run(
   ) {
     if (!guild) {
       return send({
-        embeds: [new ErrorEmbed("you must be the owner of a guild to invite members")],
+        embeds: [new ErrorEmbed("you are not in a guild")],
       });
     }
 
-    if (guild.ownerId != message.author.id) {
-      return send({
-        embeds: [new ErrorEmbed("you must be the owner of a guild to invite members")],
-      });
+    if (!guildAdmins.includes(message.author.id)) {
+      return send({ embeds: [new ErrorEmbed("you are not a guild admin")] });
     }
 
     if (await redis.exists("nypsi:infinitemaxbet")) {
@@ -534,19 +547,12 @@ async function run(
       });
     }
 
-    const res = await removeMember(message.author.id, "id");
+    await removeMember(message.author.id);
 
-    if (res) {
-      return msg.edit({
-        embeds: [new CustomEmbed(message.member, `✅ you have left **${guild.guildName}**`)],
-        components: [],
-      });
-    } else {
-      return msg.edit({
-        embeds: [new CustomEmbed(message.member, "failed while leaving guild")],
-        components: [],
-      });
-    }
+    return msg.edit({
+      embeds: [new CustomEmbed(message.member, `✅ you have left **${guild.guildName}**`)],
+      components: [],
+    });
   }
 
   if (args[0].toLowerCase() == "forcekick") {
@@ -556,7 +562,7 @@ async function run(
       return send({ embeds: [new ErrorEmbed(`${prefix}guild kick <tag>`)] });
     }
 
-    return await removeMember(args[1], "id");
+    return await removeMember(args[1]);
   }
 
   if (args[0].toLowerCase() == "setowner") {
@@ -566,7 +572,13 @@ async function run(
       return send({ embeds: [new ErrorEmbed(`${prefix}guild setowner <guild> <newid>`)] });
     }
 
-    return await setOwner(args[1], args[2]);
+    const res = await setOwner(args[1], args[2]);
+
+    if (typeof res === "string") {
+      return send({ embeds: [new ErrorEmbed(res)] });
+    } else {
+      if (message instanceof Message) return message.react("✅");
+    }
   }
 
   if (args[0].toLowerCase() == "kick") {
@@ -574,8 +586,8 @@ async function run(
       return send({ embeds: [new ErrorEmbed("you're not in a guild")] });
     }
 
-    if (guild.ownerId != message.author.id) {
-      return send({ embeds: [new ErrorEmbed("you are not the guild owner")] });
+    if (!guildAdmins.includes(message.author.id)) {
+      return send({ embeds: [new ErrorEmbed("you are not a guild admin")] });
     }
 
     if (args.length == 1) {
@@ -586,19 +598,17 @@ async function run(
       return send({ embeds: [new ErrorEmbed("guild invites/leaves are currently disabled")] });
     }
 
-    let target: string;
-    let mode: RemoveMemberMode = "id";
+    let target: { role: EconomyGuildRole; id: string };
 
     if (message.mentions?.members?.first()) {
-      let found = false;
       for (const m of guild.members) {
         if (m.userId == message.mentions.members.first().user.id) {
-          found = true;
+          target = { role: m.role, id: m.userId };
           break;
         }
       }
 
-      if (!found) {
+      if (!target) {
         return send({
           embeds: [
             new ErrorEmbed(
@@ -609,49 +619,41 @@ async function run(
           ],
         });
       }
-
-      target = message.mentions.members.first().user.id;
     } else {
-      let found = false;
       for (const m of guild.members) {
-        if (m.userId == args[1]) {
-          found = true;
-          mode = "id";
-          break;
-        } else if (m.economy.user.lastKnownUsername == args[1]) {
-          found = true;
-          mode = "tag";
+        if (m.userId == args[1] || m.economy.user.lastKnownUsername == args[1]) {
+          target = { role: m.role, id: m.userId };
           break;
         }
       }
 
-      if (!found) {
+      if (!target) {
         return send({
           embeds: [new ErrorEmbed(`\`${args[1]}\` is not in **${guild.guildName}**`)],
         });
       }
+    }
 
-      target = args[1];
+    if (target.id == message.author.id) {
+      return send({ embeds: [new ErrorEmbed("you cannot kick yourself")] });
+    }
+
+    if (message.author.id != guild.ownerId && (target.role == "admin" || target.role == "owner")) {
+      return send({ embeds: [new ErrorEmbed("you cannot kick other admins")] });
     }
 
     await addCooldown(cmd.name, message.member, 10);
 
-    const res = await removeMember(target, mode);
+    await removeMember(target.id);
 
-    if (res) {
-      return send({
-        embeds: [
-          new CustomEmbed(
-            message.member,
-            `✅ \`${target}\` has been kicked from **${guild.guildName}**`,
-          ),
-        ],
-      });
-    } else {
-      return send({
-        embeds: [new CustomEmbed(message.member, `failed to kick ${target}`)],
-      });
-    }
+    return send({
+      embeds: [
+        new CustomEmbed(
+          message.member,
+          `✅ \`${getLastKnownUsername(target.id, false)}\` has been kicked from **${guild.guildName}**`,
+        ),
+      ],
+    });
   }
 
   if (args[0].toLowerCase() == "delete") {
@@ -723,7 +725,7 @@ async function run(
 
     args.shift();
 
-    guild = await getGuildByName(args.join(" "));
+    const guild = await getGuildByName(args.join(" "));
 
     if (!guild) return;
 
@@ -1126,22 +1128,42 @@ async function run(
     const embed = new CustomEmbed(message.member);
 
     embed.setHeader("guild help");
-    embed.setDescription(
-      `${prefix}**guild create <name>** *create a guild*\n` +
-        `${prefix}**guild invite <@member>** *invite a user to your guild*\n` +
-        `${prefix}**guild leave** *leave your current guild*\n` +
-        `${prefix}**guild kick <tag>** *kick user from your guild*\n` +
-        `${prefix}**guild delete** *delete your guild*\n` +
-        `${prefix}**guild deposit <amount>** *deposit money into your guild*\n` +
-        `${prefix}**guild stats** *show contribution stats of your guild*\n` +
-        `${prefix}**guild shop** *view guild upgrades that are available to buy*\n` +
-        `${prefix}**guild buy** *buy guild upgrades with tokens*\n` +
-        `${prefix}**guild upgrade** *show requirements for next upgrade*\n` +
-        `${prefix}**guild motd <motd>** *set guild motd*\n` +
-        `${prefix}**guild avatar** *set the guild avatar*\n` +
-        `${prefix}**top guild** *view top guilds on nypsi*\n` +
+    embed.addField(
+      "general commands",
+      [
+        `${prefix}**guild create <name>** *create a guild*`,
         `${prefix}**guild (name)** *show guild info*`,
+        `${prefix}**top guild** *view top guilds on nypsi*`,
+        `${prefix}**guild stats** *show contribution stats of your guild*`,
+        `${prefix}**guild upgrade** *show requirements for next upgrade*`,
+        `${prefix}**guild deposit <amount>** *deposit money into your guild*`,
+        `${prefix}**guild shop** *view guild upgrades that are available to buy*`,
+        `${prefix}**guild leave** *leave your current guild*`,
+        "\u200B", //spacer
+      ].join("\n"),
     );
+
+    embed.addField(
+      "admin commands",
+      [
+        `${prefix}**guild invite <@member>** *invite a user to your guild*`,
+        `${prefix}**guild kick <tag>** *kick user from your guild*`,
+        `${prefix}**guild buy** *buy guild upgrades with tokens*`,
+        "\u200B", //spacer
+      ].join("\n"),
+    );
+
+    embed.addField(
+      "owner commands",
+      [
+        `${prefix}**guild promote** *promote a member to admin in your guild*`,
+        `${prefix}**guild demote** *demote a member in your guild*`,
+        `${prefix}**guild motd <motd>** *set guild motd*`,
+        `${prefix}**guild avatar** *set the guild avatar*`,
+        `${prefix}**guild delete** *delete your guild*`,
+      ].join("\n"),
+    );
+
     embed.setFooter({ text: "you must be at least prestige 1 to create a guild" });
 
     return send({ embeds: [embed] });
@@ -1149,8 +1171,10 @@ async function run(
 
   if (args[0].toLowerCase() == "buy") {
     if (!guild) return send({ embeds: [new ErrorEmbed("you are not in a guild")] });
-    if (guild.ownerId !== message.author.id)
-      return send({ embeds: [new ErrorEmbed("you must be the guild owner")] });
+
+    if (!guildAdmins.includes(message.author.id)) {
+      return send({ embeds: [new ErrorEmbed("you are not a guild admin")] });
+    }
 
     if (args.length === 1) return send({ embeds: [new ErrorEmbed("/guild buy <item>")] });
 
@@ -1319,6 +1343,90 @@ async function run(
     });
 
     return manager.listen();
+  }
+
+  if (args[0].toLowerCase() == "promote") {
+    if (!guild) {
+      return send({ embeds: [new ErrorEmbed("you're not in a guild")] });
+    }
+
+    if (guild.ownerId != message.author.id) {
+      return send({ embeds: [new ErrorEmbed("you are not the guild owner")] });
+    }
+
+    if (args.length == 1) {
+      return send({ embeds: [new ErrorEmbed(`${prefix}guild promote <@member>`)] });
+    }
+
+    if (!message.mentions?.members?.first()) {
+      return send({ embeds: [new ErrorEmbed("you must tag the member you want to promote")] });
+    }
+
+    const target = message.mentions.members.first();
+
+    if (target.id == message.author.id) {
+      return send({
+        embeds: [new ErrorEmbed("you're already the guild owner. how much more do you want?")],
+      });
+    }
+
+    const member = guild.members.find((i) => i.userId == target.id);
+
+    if (!member) {
+      return send({ embeds: [new ErrorEmbed("invalid guild member")] });
+    }
+
+    if (member.role == "admin") {
+      return send({ embeds: [new ErrorEmbed(`${target} is already a guild admin`)] });
+    }
+
+    await promoteGuildMember(guild.guildName, target);
+
+    return send({
+      embeds: [
+        new CustomEmbed(message.member, `✅ ${target} has been promoted to guild admin`).setFooter({
+          text: `check ${prefix}guild help for permissions granted by this`,
+        }),
+      ],
+    });
+  }
+
+  if (args[0].toLowerCase() == "demote") {
+    if (!guild) {
+      return send({ embeds: [new ErrorEmbed("you're not in a guild")] });
+    }
+
+    if (guild.ownerId != message.author.id) {
+      return send({ embeds: [new ErrorEmbed("you are not the guild owner")] });
+    }
+
+    if (args.length == 1) {
+      return send({ embeds: [new ErrorEmbed(`${prefix}guild demote <@member>`)] });
+    }
+
+    if (!message.mentions?.members?.first()) {
+      return send({ embeds: [new ErrorEmbed("you must tag the member you want to demote")] });
+    }
+
+    const target = message.mentions.members.first();
+
+    if (target.id == message.author.id) {
+      return send({ embeds: [new ErrorEmbed("why would you want to demote yourself")] });
+    }
+
+    const member = guild.members.find((i) => i.userId == target.id);
+
+    if (!member) {
+      return send({ embeds: [new ErrorEmbed("invalid guild member")] });
+    }
+
+    if (member.role == "member") {
+      return send({ embeds: [new ErrorEmbed(`${target} is not a guild admin`)] });
+    }
+
+    await demoteGuildMember(guild.guildName, target);
+
+    return send({ embeds: [new CustomEmbed(message.member, `✅ ${target} has been demoted`)] });
   }
 
   if (args[0].toLowerCase() == "view") {

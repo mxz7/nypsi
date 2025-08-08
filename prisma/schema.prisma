@@ -840,10 +840,18 @@ model EconomyGuild {
   upgrades EconomyGuildUpgrades[]
 }
 
+enum EconomyGuildRole {
+  member
+  admin
+  owner
+}
+
 model EconomyGuildMember {
-  userId                    String   @unique
-  guildName                 String
-  joinedAt                  DateTime
+  userId    String   @unique
+  guildName String
+  joinedAt  DateTime
+  role      EconomyGuildRole @default(member)
+
   contributedMoney          BigInt   @default(0)
   contributedXp             Int      @default(0)
   contributedMoneyThisLevel BigInt   @default(0)
