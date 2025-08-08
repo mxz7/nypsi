@@ -37,6 +37,7 @@ import {
 } from "../utils/functions/economy/inventory";
 import { getRawLevel } from "../utils/functions/economy/levelling";
 import {
+  countItemOnMarket,
   createMarketOrder,
   deleteMarketOrder,
   deleteMarketWatch,
@@ -1675,7 +1676,11 @@ async function run(
 
         return confirmTransaction("buy", item, 1, message.member, msg);
       } else if (res == "buyMulti") {
-        const res = await quantitySelectionModal("buy", interaction as ButtonInteraction);
+        const res = await quantitySelectionModal(
+          "buy",
+          await countItemOnMarket(item.id, "sell"),
+          interaction as ButtonInteraction,
+        );
 
         if (res) {
           const amount = res.fields.fields.get("amount").value;
@@ -1763,7 +1768,11 @@ async function run(
 
         return confirmTransaction("sell", item, 1, message.member, msg);
       } else if (res == "sellMulti") {
-        const res = await quantitySelectionModal("sell", interaction as ButtonInteraction);
+        const res = await quantitySelectionModal(
+          "sell",
+          await countItemOnMarket(item.id, "buy"),
+          interaction as ButtonInteraction,
+        );
 
         if (res) {
           const amount = res.fields.fields.get("amount").value;
@@ -1952,7 +1961,11 @@ async function run(
     return pageManager();
   }
 
-  async function quantitySelectionModal(type: string, interaction: ButtonInteraction) {
+  async function quantitySelectionModal(
+    type: string,
+    quantity: number,
+    interaction: ButtonInteraction,
+  ) {
     const id = `market-quantity-${Math.floor(Math.random() * 69420)}`;
     const modal = new ModalBuilder().setCustomId(id).setTitle("select quantity");
 
@@ -1961,6 +1974,9 @@ async function run(
         new TextInputBuilder()
           .setCustomId("amount")
           .setLabel(`how many would you like to ${type}?`)
+          .setPlaceholder(
+            `${quantity.toLocaleString()} in ${type == "sell" ? "buy" : "sell"} orders`,
+          )
           .setStyle(TextInputStyle.Short)
           .setRequired(true)
           .setMaxLength(10),
