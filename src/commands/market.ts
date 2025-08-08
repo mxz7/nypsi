@@ -1677,9 +1677,9 @@ async function run(
         return confirmTransaction("buy", item, 1, message.member, msg);
       } else if (res == "buyMulti") {
         const res = await quantitySelectionModal(
+          interaction as ButtonInteraction,
           "buy",
           await countItemOnMarket(item.id, "sell"),
-          interaction as ButtonInteraction,
         );
 
         if (res) {
@@ -1769,9 +1769,9 @@ async function run(
         return confirmTransaction("sell", item, 1, message.member, msg);
       } else if (res == "sellMulti") {
         const res = await quantitySelectionModal(
+          interaction as ButtonInteraction,
           "sell",
           await countItemOnMarket(item.id, "buy"),
-          interaction as ButtonInteraction,
           (await getInventory(message.member)).count(item.id),
         );
 
@@ -1963,9 +1963,9 @@ async function run(
   }
 
   async function quantitySelectionModal(
+    interaction: ButtonInteraction,
     type: string,
     inOrders: number,
-    interaction: ButtonInteraction,
     inInventory?: number,
   ) {
     const id = `market-quantity-${Math.floor(Math.random() * 69420)}`;
