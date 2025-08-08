@@ -1772,6 +1772,7 @@ async function run(
           "sell",
           await countItemOnMarket(item.id, "buy"),
           interaction as ButtonInteraction,
+          (await getInventory(message.member)).count(item.id),
         );
 
         if (res) {
@@ -1814,9 +1815,9 @@ async function run(
           const inventory = await getInventory(message.member);
 
           if (inventory.count(item.id) < formattedAmount) {
-            await interaction.editReply({
+            await res.reply({
               embeds: [new ErrorEmbed(`you do not have this many ${item.plural}`)],
-              options: { flags: MessageFlags.Ephemeral },
+              flags: MessageFlags.Ephemeral,
             });
             await updateEmbed();
             return pageManager();
@@ -1963,8 +1964,9 @@ async function run(
 
   async function quantitySelectionModal(
     type: string,
-    quantity: number,
+    inOrders: number,
     interaction: ButtonInteraction,
+    inInventory?: number,
   ) {
     const id = `market-quantity-${Math.floor(Math.random() * 69420)}`;
     const modal = new ModalBuilder().setCustomId(id).setTitle("select quantity");
@@ -1975,7 +1977,9 @@ async function run(
           .setCustomId("amount")
           .setLabel(`how many would you like to ${type}?`)
           .setPlaceholder(
-            `${quantity.toLocaleString()} in ${type == "sell" ? "buy" : "sell"} orders`,
+            type == "sell" ? 
+            `${inOrders.toLocaleString()} in buy orders, ${inInventory.toLocaleString()} in inventory`
+            : `${inOrders.toLocaleString()} in sell orders`
           )
           .setStyle(TextInputStyle.Short)
           .setRequired(true)
