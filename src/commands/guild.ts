@@ -245,7 +245,10 @@ async function run(
         member: 2,
       };
 
-      inPlaceSort(guild.members).asc((member) => rolePriority[member.role]);
+      inPlaceSort(guild.members).asc([
+        (member) => rolePriority[member.role],
+        (member) => member.joinedAt.getTime(),
+      ]);
 
       let membersText = "";
       const maxMembers = await getMaxMembersForGuild(guild.guildName);
