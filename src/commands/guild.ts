@@ -13,7 +13,7 @@ import {
   MessageEditOptions,
   MessageFlags,
 } from "discord.js";
-import { sort } from "fast-sort";
+import { inPlaceSort, sort } from "fast-sort";
 import { nanoid } from "nanoid";
 import prisma from "../init/database";
 import redis from "../init/redis";
@@ -245,18 +245,12 @@ async function run(
         member: 2,
       };
 
-      // sort by join date and role
-      const sortedMembers = [...guild.members].sort((a, b) => {
-        const roleDiff = rolePriority[a.role] - rolePriority[b.role];
-        if (roleDiff !== 0) return roleDiff;
-
-        return a.joinedAt.getTime() - b.joinedAt.getTime();
-      });
+      inPlaceSort(guild.members).asc((member) => rolePriority[member.role]);
 
       let membersText = "";
       const maxMembers = await getMaxMembersForGuild(guild.guildName);
 
-      for (const m of sortedMembers) {
+      for (const m of guild.members) {
         membersText += `[\`${m.role == "owner" ? "**" : m.role == "admin" ? "*" : ""}${m.economy.user.lastKnownUsername}\`](https://nypsi.xyz/users/${m.userId}?ref=bot-guild) `;
 
         if (m.userId == message.author.id) {
