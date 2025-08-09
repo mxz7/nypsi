@@ -5,7 +5,6 @@ import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { Booster } from "../../../types/Economy";
 import { SteveData } from "../../../types/Workers";
 import Constants from "../../Constants";
-import { logger } from "../../logger";
 import { getUserId, MemberResolvable } from "../member";
 import { pluralize } from "../string";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
@@ -24,10 +23,6 @@ async function checkBoosters(member: MemberResolvable, boosters: Map<string, Boo
   }
 
   lastBoosterCheck.set(userId, Date.now());
-
-  const stack = new Error().stack.split("\n").slice(2).join("\n");
-
-  logger.debug(`boosters: ${userId} checking expired`, { stack });
 
   if (
     (await redis.exists("nypsi:maintenance")) ||
@@ -71,8 +66,6 @@ async function checkBoosters(member: MemberResolvable, boosters: Map<string, Boo
   }
 
   if (expired.size != 0) {
-    logger.debug(`boosters: ${userId} expired`, Object.fromEntries(expired));
-
     await redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${userId}`);
 
     if ((await getDmSettings(userId)).booster) {
