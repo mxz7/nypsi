@@ -7,154 +7,144 @@ import { SteveData } from "../../../types/Workers";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { getUserId, MemberResolvable } from "../member";
-import { Mutex } from "../mutex";
 import { pluralize } from "../string";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getItems } from "./utils";
 import _ = require("lodash");
 
-const checkBoosterMutex = new Mutex();
 const lastBoosterCheck = new Map<string, number>();
 
 async function checkBoosters(member: MemberResolvable, boosters: Map<string, Booster[]>) {
-  const release = await checkBoosterMutex.acquire();
-  try {
-    const userId = getUserId(member);
+  const userId = getUserId(member);
 
-    if (lastBoosterCheck.has(userId)) {
-      if (Date.now() - lastBoosterCheck.get(userId) < 500) {
-        return boosters;
-      }
-    }
-
-    lastBoosterCheck.set(userId, Date.now());
-
-    const stack = new Error().stack.split("\n").slice(2).join("\n");
-
-    logger.debug(`boosters: ${userId} checking expired`, { stack });
-
-    if (
-      (await redis.exists("nypsi:maintenance")) ||
-      (await redis.exists(`${Constants.redis.nypsi.RESTART}:1`))
-    ) {
+  if (lastBoosterCheck.has(userId)) {
+    if (Date.now() - lastBoosterCheck.get(userId) < 500) {
       return boosters;
     }
-
-    const expired = new Map<string, number>();
-    const now = Date.now();
-
-    for (const key of boosters.keys()) {
-      const boosters2 = boosters.get(key);
-      const newBoosters: Booster[] = [];
-
-      for (const booster of boosters2) {
-        if (booster.expire <= now) {
-          await prisma.booster
-            .delete({
-              where: {
-                id: booster.id,
-              },
-            })
-            .catch(() => {});
-
-          if (expired.has(booster.boosterId)) {
-            expired.set(booster.boosterId, expired.get(booster.boosterId) + 1);
-          } else {
-            expired.set(booster.boosterId, 1);
-          }
-        } else {
-          newBoosters.push(booster);
-        }
-      }
-
-      if (newBoosters.length > 0) {
-        boosters.set(key, newBoosters);
-      } else {
-        boosters.delete(key);
-      }
-    }
-
-    if (expired.size != 0) {
-      logger.debug(`boosters: ${userId} expired`, Object.fromEntries(expired));
-
-      await redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${userId}`);
-
-      if ((await getDmSettings(userId)).booster) {
-        const embed = new CustomEmbed(userId).setFooter({ text: "/settings me notifications" });
-
-        let desc = "";
-        let text = "";
-        let total = 0;
-        const items = getItems();
-
-        for (const expiredBoosterId of Array.from(expired.keys())) {
-          total += expired.get(expiredBoosterId);
-
-          if (expiredBoosterId == "steve") {
-            let earned: SteveData = JSON.parse(
-              await redis.get(`${Constants.redis.nypsi.STEVE_EARNED}:${userId}`),
-            );
-
-            if (!earned) earned = { money: 0, byproducts: {} };
-
-            desc += `\`${expired.get(expiredBoosterId)}x\` ${items[expiredBoosterId].emoji} ${
-              items[expiredBoosterId].name
-            } (earned $${earned.money.toLocaleString()})\n`;
-
-            const descOther: string[] = [];
-
-            for (const byproduct in earned.byproducts) {
-              if (earned.byproducts[byproduct] > 0) {
-                descOther.push(
-                  `steve found **${earned.byproducts[byproduct]}x** ${getItems()[byproduct].emoji} ${
-                    getItems()[byproduct].name
-                  }`,
-                );
-              }
-            }
-
-            if (descOther.length > 0) desc += `\n${descOther.join("\n")}\n\n`;
-          } else {
-            desc += `\`${expired.get(expiredBoosterId)}x\` ${items[expiredBoosterId].emoji} ${
-              items[expiredBoosterId].name
-            }\n`;
-          }
-        }
-
-        embed.setHeader(`expired ${pluralize("booster", total)}:`);
-        embed.setDescription(desc);
-
-        if (total == 1) {
-          text = `your ${items[Array.from(expired.keys())[0]].name} ${
-            items[Array.from(expired.keys())[0]].name.endsWith("booster") ? "" : "booster "
-          }has expired`;
-        } else {
-          text = `${total} of your boosters have expired`;
-        }
-
-        if (member instanceof GuildMember) {
-          member.send({ embeds: [embed], content: text });
-        } else {
-          addNotificationToQueue({
-            memberId: userId,
-            payload: {
-              content: text,
-              embed: embed,
-            },
-          });
-        }
-      }
-
-      if (expired.has("steve")) await redis.del(`${Constants.redis.nypsi.STEVE_EARNED}:${userId}`);
-    }
-
-    return boosters;
-  } catch (e) {
-    logger.error(`boosters: failed checking boosters`, { error: e });
-    throw e;
-  } finally {
-    release();
   }
+
+  lastBoosterCheck.set(userId, Date.now());
+
+  const stack = new Error().stack.split("\n").slice(2).join("\n");
+
+  logger.debug(`boosters: ${userId} checking expired`, { stack });
+
+  if (
+    (await redis.exists("nypsi:maintenance")) ||
+    (await redis.exists(`${Constants.redis.nypsi.RESTART}:1`))
+  ) {
+    return boosters;
+  }
+
+  const expired = new Map<string, number>();
+  const now = Date.now();
+
+  for (const key of boosters.keys()) {
+    const boosters2 = boosters.get(key);
+    const newBoosters: Booster[] = [];
+
+    for (const booster of boosters2) {
+      if (booster.expire <= now) {
+        await prisma.booster
+          .delete({
+            where: {
+              id: booster.id,
+            },
+          })
+          .catch(() => {});
+
+        if (expired.has(booster.boosterId)) {
+          expired.set(booster.boosterId, expired.get(booster.boosterId) + 1);
+        } else {
+          expired.set(booster.boosterId, 1);
+        }
+      } else {
+        newBoosters.push(booster);
+      }
+    }
+
+    if (newBoosters.length > 0) {
+      boosters.set(key, newBoosters);
+    } else {
+      boosters.delete(key);
+    }
+  }
+
+  if (expired.size != 0) {
+    logger.debug(`boosters: ${userId} expired`, Object.fromEntries(expired));
+
+    await redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${userId}`);
+
+    if ((await getDmSettings(userId)).booster) {
+      const embed = new CustomEmbed(userId).setFooter({ text: "/settings me notifications" });
+
+      let desc = "";
+      let text = "";
+      let total = 0;
+      const items = getItems();
+
+      for (const expiredBoosterId of Array.from(expired.keys())) {
+        total += expired.get(expiredBoosterId);
+
+        if (expiredBoosterId == "steve") {
+          let earned: SteveData = JSON.parse(
+            await redis.get(`${Constants.redis.nypsi.STEVE_EARNED}:${userId}`),
+          );
+
+          if (!earned) earned = { money: 0, byproducts: {} };
+
+          desc += `\`${expired.get(expiredBoosterId)}x\` ${items[expiredBoosterId].emoji} ${
+            items[expiredBoosterId].name
+          } (earned $${earned.money.toLocaleString()})\n`;
+
+          const descOther: string[] = [];
+
+          for (const byproduct in earned.byproducts) {
+            if (earned.byproducts[byproduct] > 0) {
+              descOther.push(
+                `steve found **${earned.byproducts[byproduct]}x** ${getItems()[byproduct].emoji} ${
+                  getItems()[byproduct].name
+                }`,
+              );
+            }
+          }
+
+          if (descOther.length > 0) desc += `\n${descOther.join("\n")}\n\n`;
+        } else {
+          desc += `\`${expired.get(expiredBoosterId)}x\` ${items[expiredBoosterId].emoji} ${
+            items[expiredBoosterId].name
+          }\n`;
+        }
+      }
+
+      embed.setHeader(`expired ${pluralize("booster", total)}:`);
+      embed.setDescription(desc);
+
+      if (total == 1) {
+        text = `your ${items[Array.from(expired.keys())[0]].name} ${
+          items[Array.from(expired.keys())[0]].name.endsWith("booster") ? "" : "booster "
+        }has expired`;
+      } else {
+        text = `${total} of your boosters have expired`;
+      }
+
+      if (member instanceof GuildMember) {
+        member.send({ embeds: [embed], content: text });
+      } else {
+        addNotificationToQueue({
+          memberId: userId,
+          payload: {
+            content: text,
+            embed: embed,
+          },
+        });
+      }
+    }
+
+    if (expired.has("steve")) await redis.del(`${Constants.redis.nypsi.STEVE_EARNED}:${userId}`);
+  }
+
+  return boosters;
 }
 
 export async function getBoosters(member: MemberResolvable): Promise<Map<string, Booster[]>> {
