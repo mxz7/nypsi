@@ -271,9 +271,9 @@ async function run(
 
   const prefix = (await getPrefix(message.guild))[0];
   const guild = await getGuildByUser(message.member);
-  const guildAdmins = guild.members
-    .filter((m) => m.role === "admin" || m.role === "owner")
-    .map((i) => i.userId);
+  const guildAdmins = guild
+    ? guild.members.filter((m) => m.role === "admin" || m.role === "owner").map((i) => i.userId)
+    : [];
 
   if (args.length == 0) {
     return showGuild(guild);
