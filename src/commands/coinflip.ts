@@ -138,7 +138,7 @@ async function run(
       "tails",
     ];
     const choice = lols[randomInt(lols.length)];
-    let thingy = `${player1.user.username.replace("_", "\\_")}\n${player2.user.username.replace("_", "\\_")}`;
+    let thingy = `${player1.user.username.replaceAll("_", "\\_")}\n${player2.user.username.replaceAll("_", "\\_")}`;
 
     let winner: GuildMember;
     let loser: GuildMember;
@@ -214,11 +214,11 @@ async function run(
       await addBalance(winner, winnings);
 
       if (winner == message.member) {
-        thingy = `**${message.author.username.replace("_", "\\_")}** +$${winnings.toLocaleString()}${
+        thingy = `**${message.author.username.replaceAll("_", "\\_")}** +$${winnings.toLocaleString()}${
           tax ? ` (${(tax * 100).toFixed(1)}% tax)` : ""
-        }\n${player2.user.username.replace("_", "\\_")}`;
+        }\n${player2.user.username.replaceAll("_", "\\_")}`;
       } else {
-        thingy = `${message.author.username.replace("_", "\\_")}\n**${player2.user.username.replace(
+        thingy = `${message.author.username.replaceAll("_", "\\_")}\n**${player2.user.username.replaceAll(
           "_",
           "\\_",
         )}** +$${winnings.toLocaleString()}${tax ? ` (${(tax * 100).toFixed(1)}% tax)` : ""}`;
@@ -235,7 +235,7 @@ async function run(
       }
 
       embed.setDescription(
-        `**winner** ${winner.user.username.replace("_", "\\_")}\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}` +
+        `**winner** ${winner.user.username.replaceAll("_", "\\_")}\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}` +
           (eventProgress
             ? `\n\n🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`
             : ""),
@@ -274,9 +274,9 @@ async function run(
       await addInventoryItem(winner, item.id, itemAmount * 2);
 
       if (winner == message.member) {
-        thingy = `**${message.author.username.replace("_", "\\_")}** +${(itemAmount * 2).toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-cf)**\n${player2.user.username.replace("_", "\\_")}`;
+        thingy = `**${message.author.username.replaceAll("_", "\\_")}** +${(itemAmount * 2).toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-cf)**\n${player2.user.username.replaceAll("_", "\\_")}`;
       } else {
-        thingy = `${message.author.username.replace("_", "\\_")}\n**${player2.user.username.replace(
+        thingy = `${message.author.username.replaceAll("_", "\\_")}\n**${player2.user.username.replaceAll(
           "_",
           "\\_",
         )}** +${(itemAmount * 2).toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-cf)**`;
@@ -293,7 +293,7 @@ async function run(
       }
 
       embed.setDescription(
-        `**winner** ${winner.user.username.replace("_", "\\_")}\n\n${thingy}\n\n**bet** ${itemAmount.toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-cf)**` +
+        `**winner** ${winner.user.username.replaceAll("_", "\\_")}\n\n${thingy}\n\n**bet** ${itemAmount.toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-cf)**` +
           (eventProgress
             ? `\n\n🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`
             : ""),
@@ -401,7 +401,7 @@ async function run(
         return send({
           embeds: [
             new ErrorEmbed(
-              `**${target.user.username.replace("_", "\\_")}** cannot afford this bet`,
+              `**${target.user.username.replaceAll("_", "\\_")}** cannot afford this bet`,
             ),
           ],
         });
@@ -449,7 +449,7 @@ async function run(
 
       await removeBalance(message.member, bet);
       requestEmbed.setDescription(
-        `**${message.author.username.replace(
+        `**${message.author.username.replaceAll(
           "_",
           "\\_",
         )}** has challenged you to a coinflip\n\n**bet** $${bet.toLocaleString()}\n\ndo you accept?`,
@@ -468,7 +468,7 @@ async function run(
         return send({
           embeds: [
             new ErrorEmbed(
-              `**${target.user.username.replace("_", "\\_")}** doesn't have enough ${item.name}`,
+              `**${target.user.username.replaceAll("_", "\\_")}** doesn't have enough ${item.name}`,
             ),
           ],
         });
@@ -477,7 +477,7 @@ async function run(
       await removeInventoryItem(message.member, item.id, itemAmount);
 
       requestEmbed.setDescription(
-        `**${message.author.username.replace(
+        `**${message.author.username.replaceAll(
           "_",
           "\\_",
         )}** has challenged you to a coinflip\n\n**bet** ${itemAmount}x ${item.emoji} **[${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-cf)**\n\ndo you accept?`,
@@ -715,7 +715,7 @@ async function run(
       await removeBalance(message.member, bet);
 
       requestEmbed.setDescription(
-        `**${message.author.username.replace(
+        `**${message.author.username.replaceAll(
           "_",
           "\\_",
         )}** has created an open coinflip\n\n**bet** $${bet.toLocaleString()}`,
@@ -732,7 +732,7 @@ async function run(
       await removeInventoryItem(message.member, item.id, itemAmount);
 
       requestEmbed.setDescription(
-        `**${message.author.username.replace(
+        `**${message.author.username.replaceAll(
           "_",
           "\\_",
         )}** has created an open coinflip\n\n**bet** ${itemAmount}x ${item.emoji} **[${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-cf)**`,
