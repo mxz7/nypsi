@@ -1,17 +1,14 @@
 import {
   ActionRowBuilder,
-  BaseMessageOptions,
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
   ComponentType,
-  InteractionEditReplyOptions,
-  InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
   MessageFlags,
 } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { createUser, isEcoBanned, userExists } from "../utils/functions/economy/utils.js";
@@ -39,38 +36,9 @@ cmd.slashData.addUserOption((option) =>
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
-
   let target = message.member;
 
   if (await onCooldown(cmd.name, message.member)) {
@@ -244,7 +212,7 @@ async function run(
       if (args.length > 2) amount = parseInt(args[2]);
       else amount = parseInt(args[1]);
 
-      if (amount === 0 || isNaN(amount) || !amount) {
+      if (amount <= 0 || isNaN(amount) || !amount) {
         await createAuraTransaction(message.member, message.client.user, -50);
 
         return send({ embeds: [new ErrorEmbed("invalid amount. -50 aura")] });
@@ -303,7 +271,7 @@ async function run(
       if (args.length > 2) amount = parseInt(args[2]);
       else amount = parseInt(args[1]);
 
-      if (amount === 0 || isNaN(amount) || !amount) {
+      if (Math.abs(amount) <= 0 || isNaN(amount) || !amount) {
         await createAuraTransaction(message.member, message.client.user, -50);
 
         return send({ embeds: [new ErrorEmbed("invalid amount. -50 aura")] });

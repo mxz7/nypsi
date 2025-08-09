@@ -7,6 +7,7 @@ import {
   MessageActionRowComponentBuilder,
 } from "discord.js";
 import redis from "../../../init/redis";
+import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { Item } from "../../../types/Economy";
 import { LootPoolResult } from "../../../types/LootPool";
@@ -14,6 +15,7 @@ import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { percentChance, shuffle } from "../random";
 import { addProgress } from "./achievements";
+import { addEventProgress, EventData, getCurrentEvent } from "./events";
 import { isGem, itemExists } from "./inventory";
 import { describeLootPoolResult, giveLootPoolResult, rollLootPool } from "./loot_pools";
 import { addStat } from "./stats";
@@ -205,7 +207,26 @@ export default class ScratchCard {
 
       const prize = this.area[y][x].result;
       await giveLootPoolResult(this.member.user.id, prize);
-      embed.setDescription(`you found ${describeLootPoolResult(prize)}!`);
+
+      const eventProgress = await addEventProgress(
+        this.member.client as NypsiClient,
+        this.member,
+        "gamble",
+        1,
+      );
+      const eventData: { event?: EventData; target: number } = { target: 0 };
+
+      if (eventProgress) {
+        eventData.event = await getCurrentEvent();
+
+        if (eventData.event) {
+          eventData.target = Number(eventData.event.target);
+        }
+      }
+
+      embed.setDescription(
+        `you found ${describeLootPoolResult(prize)}!${eventProgress ? `\n\n🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}` : ""}`,
+      );
 
       if (Object.hasOwn(prize, "money")) {
         addStat(this.member, "earned-scratch", prize.money);

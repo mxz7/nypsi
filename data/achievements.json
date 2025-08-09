@@ -360,8 +360,7 @@
     "name": "streaker **I**",
     "emoji": "📅",
     "target": 7,
-    "description": "get a daily streak for 7 days",
-    "prize": ["streak_token:1"]
+    "description": "get a daily streak for 7 days"
   },
   "streaker_ii": {
     "id": "streaker_ii",
@@ -369,7 +368,7 @@
     "emoji": "📅",
     "target": 14,
     "description": "get a daily streak for 14 days",
-    "prize": ["lucky_scratch_card:1", "streak_token:2"]
+    "prize": ["lucky_scratch_card:1"]
   },
   "streaker_iii": {
     "id": "streaker_iii",
@@ -377,7 +376,7 @@
     "emoji": "📅",
     "target": 30,
     "description": "get a daily streak for 30 days",
-    "prize": ["lucky_scratch_card:2", "streak_token:3"]
+    "prize": ["lucky_scratch_card:2"]
   },
   "streaker_iv": {
     "id": "streaker_iv",
@@ -385,7 +384,7 @@
     "emoji": "📅",
     "target": 69,
     "description": "get a daily streak for 69 days",
-    "prize": ["lucky_scratch_card:3", "streak_token:4"]
+    "prize": ["lucky_scratch_card:3"]
   },
   "streaker_v": {
     "id": "streaker_v",
@@ -393,7 +392,7 @@
     "emoji": "📅",
     "target": 100,
     "description": "get a daily streak for 100 days",
-    "prize": ["legendary_scratch_card:1", "streak_token:5"]
+    "prize": ["legendary_scratch_card:1", "streak_token:3"]
   },
   "unboxer_i": {
     "id": "unboxer_i",
@@ -1480,5 +1479,56 @@
     "target": 2500,
     "description": "win 2,500 guess the flag games",
     "prize": ["legendary_scratch_card:2", "nypsi_crate:1"]
+  },
+  "event_pro_i": {
+    "id": "event_pro_i",
+    "name": "event professional **I**",
+    "emoji": "🔱",
+    "target": 1,
+    "description": "get top 2.5% in an event 1 time",
+    "prize": ["lucky_scratch_card:2"]
+  },
+  "event_pro_ii": {
+    "id": "event_pro_ii",
+    "name": "event professional **II**",
+    "emoji": "🔱",
+    "target": 5,
+    "description": "get top 2.5% in an event 5 times",
+    "prize": ["lucky_scratch_card:3", "nypsi_crate:1", "bronze_credit:1"]
+  },
+  "event_pro_iii": {
+    "id": "event_pro_iii",
+    "name": "event professional **III**",
+    "emoji": "🔱",
+    "target": 10,
+    "description": "get top 2.5% in an event 10 times",
+    "prize": [
+      "lucky_scratch_card:4",
+      "nypsi_crate:2",
+      "legendary_scratch_card:1",
+      "silver_credit:1"
+    ]
+  },
+  "event_pro_iv": {
+    "id": "event_pro_iv",
+    "name": "event professional **IV**",
+    "emoji": "🔱",
+    "target": 25,
+    "description": "get top 2.5% in an event 25 times",
+    "prize": ["legendary_scratch_card:3", "lucky_scratch_card:5", "nypsi_crate:3", "gold_credit:1"]
+  },
+  "event_pro_v": {
+    "id": "event_pro_v",
+    "name": "event professional **V**",
+    "emoji": "🔱",
+    "target": 50,
+    "description": "get top 2.5% in an event 50 times",
+    "prize": [
+      "nypsi_crate:4",
+      "legendary_scratch_card:4",
+      "omega_crate:1",
+      "platinum_credit:1",
+      "tag:trident"
+    ]
   }
 }

@@ -1,13 +1,11 @@
 import { DMSettings, Preferences } from "@prisma/client";
 import {
   ActionRowBuilder,
-  BaseMessageOptions,
   ButtonBuilder,
   ButtonStyle,
+  Channel,
   CommandInteraction,
   Interaction,
-  InteractionEditReplyOptions,
-  InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
   MessageFlags,
@@ -20,7 +18,7 @@ import {
   TextInputStyle,
 } from "discord.js";
 import redis from "../init/redis";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import {
   calcMaxBet,
@@ -33,6 +31,13 @@ import { createUser, formatNumber, userExists } from "../utils/functions/economy
 import { setAltPunish } from "../utils/functions/guilds/altpunish";
 import { getDisabledChannels, setDisabledChannels } from "../utils/functions/guilds/channels";
 import { setSlashOnly } from "../utils/functions/guilds/slash";
+import { getPrefix, setPrefix } from "../utils/functions/guilds/utils";
+import {
+  getLogsChannelHook,
+  getModLogsHook,
+  setLogsChannelHook,
+  setModLogs,
+} from "../utils/functions/moderation/logs";
 import { cleanString } from "../utils/functions/string";
 import { checkPurchases, getEmail, setEmail } from "../utils/functions/users/email";
 import { getLastfmUsername, setLastfmUsername } from "../utils/functions/users/lastfm";
@@ -129,43 +134,48 @@ cmd.slashData
               .setDescription("toggle the channel's disabled status")
               .setRequired(false),
           ),
+      )
+      .addSubcommand((modlogs) =>
+        modlogs
+          .setName("modlogs")
+          .setDescription("set the modlogs channel in the server")
+          .addChannelOption((option) =>
+            option
+              .setName("channel")
+              .setDescription("select the channel for modlogs")
+              .setRequired(false),
+          ),
+      )
+      .addSubcommand((logs) =>
+        logs
+          .setName("logs")
+          .setDescription("set the logs channel in the server")
+          .addChannelOption((option) =>
+            option
+              .setName("channel")
+              .setDescription("select the channel for logs")
+              .setRequired(false),
+          ),
+      )
+      .addSubcommand((prefix) =>
+        prefix
+          .setName("prefix")
+          .setDescription("manage nypsi prefixes")
+          .addStringOption((option) =>
+            option
+              .setName("prefix")
+              .setDescription("toggle a prefix on/off")
+              .setRequired(false)
+              .setMaxLength(3),
+          ),
       ),
   );
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
-
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
@@ -1050,6 +1060,376 @@ async function run(
     }
   };
 
+  const doModlogs = async () => {
+    if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
+      if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
+        return send({
+          embeds: [new ErrorEmbed("you need the `manage server` permission")],
+        });
+      }
+      return;
+    }
+
+    if (
+      !message.guild.members.me.permissions.has(PermissionFlagsBits.ManageWebhooks) ||
+      !message.guild.members.me.permissions.has(PermissionFlagsBits.ManageChannels)
+    ) {
+      return send({
+        embeds: [
+          new ErrorEmbed(
+            "i need the `manage webhooks` and `manage channels` permissions for this command",
+          ),
+        ],
+      });
+    }
+
+    if (args.length == 2) {
+      const current = await getModLogsHook(message.guild);
+
+      const embed = new CustomEmbed(message.member);
+
+      embed.setHeader("mod logs");
+
+      const notEnabled = `mod logs have not been enabled\n\nuse **/settings server modlogs <channel>** to enable them`;
+
+      if (!current) {
+        embed.setDescription(notEnabled);
+
+        return send({ embeds: [embed] });
+      } else {
+        try {
+          const hookMsg = await current.send({ content: "fetching channel..." });
+
+          const channel = message.guild.channels.cache.get(hookMsg.channel_id);
+
+          embed.setDescription(
+            `current channel: ${channel ? channel.toString() : `${hookMsg.channel_id}`}\n\n**/settings server modlogs <channel>** to change the channel`,
+          );
+
+          try {
+            await current.deleteMessage(hookMsg.id);
+          } catch {
+            // silent fail
+          }
+
+          const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+            new ButtonBuilder().setCustomId("d").setLabel("disable").setStyle(ButtonStyle.Danger),
+          );
+
+          const msg = await send({ embeds: [embed], components: [row] });
+
+          const filter = (i: Interaction) => i.user.id == message.author.id;
+
+          const pageManager: any = async () => {
+            let fail = false;
+
+            const response = await msg
+              .awaitMessageComponent({ filter, time: 60000 })
+              .then(async (collected) => {
+                await collected.deferUpdate().catch(() => {
+                  fail = true;
+                  return pageManager();
+                });
+                return { res: collected.customId };
+              })
+              .catch(async () => {
+                fail = true;
+                await msg.edit({ embeds: [embed], components: [] });
+              });
+
+            if (fail) return;
+            if (!response) return;
+
+            const { res } = response;
+
+            if (res == "d") {
+              await setModLogs(message.guild, null);
+
+              embed.setDescription(notEnabled);
+              return msg.edit({ embeds: [embed], components: [] });
+            }
+          };
+
+          return pageManager();
+        } catch {
+          await setModLogs(message.guild, null);
+          embed.setDescription(notEnabled);
+          return send({ embeds: [embed] });
+        }
+      }
+    } else {
+      let channel: string | Channel = args[0];
+
+      if (!message.guild.channels.cache.get(args[0])) {
+        if (!message.mentions.channels.first()) {
+          return send({
+            embeds: [
+              new ErrorEmbed(
+                "you need to mention a channel, you can use the channel ID, or mention the channel by putting a # before the channel name",
+              ),
+            ],
+          });
+        } else {
+          channel = message.mentions.channels.first();
+        }
+      } else {
+        channel = message.guild.channels.cache.find((ch) => ch.id == channel);
+      }
+
+      if (!channel || !channel.isTextBased() || channel.isThread()) {
+        return send({ embeds: [new ErrorEmbed("invalid channel")] });
+      }
+
+      if (channel.isDMBased()) return;
+
+      let fail = false;
+
+      const hook = await channel
+        .createWebhook({
+          name: "nypsi",
+          avatar: channel.client.user.avatarURL(),
+        })
+        .catch((e) => {
+          fail = true;
+          send({
+            embeds: [
+              new ErrorEmbed(
+                "i was unable to make a webhook in that channel, please check my permissions\n" +
+                  `\`\`\`${e.rawError.message}\`\`\``,
+              ),
+            ],
+          });
+        });
+
+      if (fail) return;
+      if (!hook) return;
+
+      await setModLogs(message.guild, hook.url);
+
+      return send({
+        embeds: [new CustomEmbed(message.member, `✅ modlogs set to ${channel.toString()}`)],
+      });
+    }
+  };
+
+  const doLogs = async () => {
+    if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
+      if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
+        return send({
+          embeds: [new ErrorEmbed("you need the `manage server` permission")],
+        });
+      }
+      return;
+    }
+
+    if (
+      !message.guild.members.me.permissions.has(PermissionFlagsBits.ManageWebhooks) ||
+      !message.guild.members.me.permissions.has(PermissionFlagsBits.ManageChannels)
+    ) {
+      return send({
+        embeds: [
+          new ErrorEmbed(
+            "i need the `manage webhooks` and `manage channels` permissions for this command",
+          ),
+        ],
+      });
+    }
+
+    if (args.length == 2) {
+      const current = await getLogsChannelHook(message.guild);
+
+      const embed = new CustomEmbed(message.member);
+
+      embed.setHeader("logs");
+
+      const notEnabled = `logs have not been enabled\n\nuse **/settings server logs <channel>** to enable them`;
+
+      if (!current) {
+        embed.setDescription(notEnabled);
+
+        return send({ embeds: [embed] });
+      } else {
+        try {
+          const hookMsg = await current.send({ content: "fetching channel..." });
+
+          const channel = message.guild.channels.cache.get(hookMsg.channel_id);
+
+          embed.setDescription(
+            `current channel: ${channel ? channel.toString() : `${hookMsg.channel_id}`}\n\n**/settings server logs <channel>** to change the channel`,
+          );
+
+          try {
+            await current.deleteMessage(hookMsg.id);
+          } catch {
+            // silent fail
+          }
+
+          const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+            new ButtonBuilder().setCustomId("d").setLabel("disable").setStyle(ButtonStyle.Danger),
+          );
+
+          const msg = await send({ embeds: [embed], components: [row] });
+
+          const filter = (i: Interaction) => i.user.id == message.author.id;
+
+          const pageManager: any = async () => {
+            let fail = false;
+
+            const response = await msg
+              .awaitMessageComponent({ filter, time: 60000 })
+              .then(async (collected) => {
+                await collected.deferUpdate().catch(() => {
+                  fail = true;
+                  return pageManager();
+                });
+                return { res: collected.customId };
+              })
+              .catch(async () => {
+                fail = true;
+                await msg.edit({ embeds: [embed], components: [] });
+              });
+
+            if (fail) return;
+            if (!response) return;
+
+            const { res } = response;
+
+            if (res == "d") {
+              await setLogsChannelHook(message.guild, null);
+
+              embed.setDescription(notEnabled);
+              return msg.edit({ embeds: [embed], components: [] });
+            }
+          };
+
+          return pageManager();
+        } catch {
+          await setLogsChannelHook(message.guild, null);
+          embed.setDescription(notEnabled);
+          return send({ embeds: [embed] });
+        }
+      }
+    } else {
+      let channel: string | Channel = args[0];
+
+      if (!message.guild.channels.cache.get(args[0])) {
+        if (!message.mentions.channels.first()) {
+          return send({
+            embeds: [
+              new ErrorEmbed(
+                "you need to mention a channel, you can use the channel ID, or mention the channel by putting a # before the channel name",
+              ),
+            ],
+          });
+        } else {
+          channel = message.mentions.channels.first();
+        }
+      } else {
+        channel = message.guild.channels.cache.find((ch) => ch.id == channel);
+      }
+
+      if (!channel || !channel.isTextBased() || channel.isThread()) {
+        return send({ embeds: [new ErrorEmbed("invalid channel")] });
+      }
+
+      if (channel.isDMBased()) return;
+
+      let fail = false;
+
+      const hook = await channel
+        .createWebhook({
+          name: "nypsi",
+          avatar: channel.client.user.avatarURL(),
+        })
+        .catch((e) => {
+          fail = true;
+          send({
+            embeds: [
+              new ErrorEmbed(
+                "i was unable to make a webhook in that channel, please check my permissions\n" +
+                  `\`\`\`${e.rawError.message}\`\`\``,
+              ),
+            ],
+          });
+        });
+
+      if (fail) return;
+      if (!hook) return;
+
+      await setLogsChannelHook(message.guild, hook.url);
+
+      return send({
+        embeds: [new CustomEmbed(message.member, `✅ logs channel set to ${channel.toString()}`)],
+      });
+    }
+  };
+
+  const doPrefix = async () => {
+    const prefixes = await getPrefix(message.guild);
+
+    if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
+      if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
+        return send({
+          embeds: [new ErrorEmbed("you need the `manage server` permission")],
+        });
+      }
+      return;
+    }
+
+    if (args.length == 2) {
+      const embed = new CustomEmbed(
+        message.member,
+        "current prefixes: \n" +
+          prefixes.map((i) => "`" + i + "`").join("\n") +
+          `\n\n**/settings server prefix <prefix>** *toggle a prefix on/off*`,
+      ).setHeader("prefix", message.guild.iconURL());
+
+      return send({ embeds: [embed] });
+    } else {
+      if (prefixes.includes(args[2])) {
+        if (prefixes.length === 1)
+          return send({
+            embeds: [
+              new ErrorEmbed("are you really trying to remove your ONLY prefix???").setFooter({
+                text: "psst... /settings server slash-only",
+              }),
+            ],
+          });
+
+        const index = prefixes.findIndex((i) => i === args[2]);
+
+        if (index < 0) return send({ embeds: [new ErrorEmbed("couldn't find that prefix")] });
+
+        prefixes.splice(index, 1);
+
+        await setPrefix(message.guild, prefixes);
+
+        return send({ embeds: [new CustomEmbed(message.member, `✅ removed \`${args[2]}\``)] });
+      } else {
+        if (prefixes.length >= 5)
+          return send({ embeds: [new ErrorEmbed("you can have a max of 5 prefixes")] });
+
+        if (args[2].length > 3)
+          return send({
+            embeds: [new ErrorEmbed("prefix cannot be longer than 3 characters")],
+          });
+
+        if (args[2].includes("`") || args[2].includes("*") || args[2].includes("_"))
+          return send({
+            embeds: [new ErrorEmbed("prefix includes illegal character")],
+          });
+
+        prefixes.push(args[2]);
+
+        await setPrefix(message.guild, prefixes);
+
+        return send({
+          embeds: [new CustomEmbed(message.member, `✅ added \`${args[2]}\` as a prefix`)],
+        });
+      }
+    }
+  };
+
   if (args.length == 0) {
     return send({ embeds: [new CustomEmbed(message.member, "/settings me\n/settings server")] });
   } else if (args[0].toLowerCase() == "me") {
@@ -1087,8 +1467,14 @@ async function run(
       return altPunish();
     } else if (args[1]?.toLowerCase() === "disabled-channels") {
       return doDisabledChannels();
+    } else if (args[1]?.toLowerCase() === "modlogs") {
+      return doModlogs();
+    } else if (args[1]?.toLowerCase() === "logs") {
+      return doLogs();
+    } else if (args[1]?.toLowerCase() === "prefix") {
+      return doPrefix();
     } else {
-      const subcommands = ["slash-only", "alt-punish", "disabled-channels"];
+      const subcommands = ["slash-only", "alt-punish", "disabled-channels", "modlogs"];
       return send({
         embeds: [
           new CustomEmbed(

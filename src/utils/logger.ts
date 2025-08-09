@@ -1,8 +1,7 @@
 import { flavors } from "@catppuccin/palette";
 import { TransactionType } from "@prisma/client";
 import { Client, User, WebhookClient } from "discord.js";
-import { WriteStream, createWriteStream, existsSync } from "fs";
-import { rename, stat } from "fs/promises";
+import { WriteStream, createWriteStream } from "fs";
 import prisma from "../init/database";
 import DiscordTransport from "../models/DiscordLogs";
 import Constants from "./Constants";
@@ -122,60 +121,20 @@ class FileTransport implements Transport {
   public path: string;
   public levels: Levels[];
   private stream: WriteStream;
-  private rotateAfterBytes: number;
   private queue: WriteData[];
-  private checkingFile: boolean;
-  private lastCheck: number;
 
-  constructor(opts: { path: string; levels: Levels[]; rotateAfterBytes?: number }) {
+  constructor(opts: { path: string; levels: Levels[] }) {
     this.path = opts.path;
     this.levels = opts.levels;
-    this.rotateAfterBytes = opts.rotateAfterBytes || 0;
     this.queue = [];
-    this.stream = createWriteStream(this.path.replace(`%DATE%`, dayjs().format("YYYY-MM-DD")), {
-      flags: "a",
-    });
-    this.checkingFile = false;
-    this.lastCheck = Date.now();
+
+    this.createStream();
   }
 
-  private async checkFile() {
-    if (this.checkingFile || this.lastCheck > Date.now() - 30000) return;
-    this.checkingFile = true;
-
-    const stats = await stat(this.stream.path);
-
-    if (stats.size >= this.rotateAfterBytes && this.rotateAfterBytes > 0) {
-      logger.debug("rotating file");
-
-      if (existsSync(this.path.replace(`%DATE%`, dayjs().format("YYYY-MM-DD")))) {
-        let oldFileNameModifier = 1;
-
-        while (existsSync(this.stream.path + "." + oldFileNameModifier)) oldFileNameModifier++;
-        await rename(this.stream.path, this.stream.path + "." + oldFileNameModifier);
-
-        this.stream?.end();
-        this.stream = null;
-
-        this.stream = createWriteStream(this.path.replace(`%DATE%`, dayjs().format("YYYY-MM-DD")), {
-          flags: "a",
-        });
-      } else {
-        this.stream?.end();
-        this.stream = null;
-
-        this.stream = createWriteStream(this.path.replace(`%DATE%`, dayjs().format("YYYY-MM-DD")), {
-          flags: "a",
-        });
-      }
-
-      if (this.queue) {
-        this.queue.forEach(this.write);
-        this.queue.length = 0;
-      }
-    }
-
-    this.checkingFile = false;
+  private createStream() {
+    this.stream = createWriteStream(this.path, {
+      flags: "a",
+    });
   }
 
   public async write(data: WriteData) {
@@ -186,7 +145,7 @@ class FileTransport implements Transport {
 
     const out = {
       level: data.label,
-      msg: data.message,
+      msg: data.message.replace(/^::\w+/, ""),
       time: data.date,
       data: data.data,
     };
@@ -196,12 +155,22 @@ class FileTransport implements Transport {
       out[item] = data.meta[item];
     }
 
-    this.stream.write(
-      JSON.stringify(out, (key, value) => (typeof value === "bigint" ? value.toString() : value)) +
-        "\n",
-    );
+    if (Object.keys(out.data).length < 1) {
+      delete out.data;
+    }
 
-    this.checkFile();
+    try {
+      this.stream.write(
+        JSON.stringify(out, (key, value) =>
+          typeof value === "bigint" ? value.toString() : value,
+        ) + "\n",
+      );
+    } catch (e) {
+      console.error("logger: failed writing to log - creating new stream");
+      console.error(e);
+
+      this.createStream();
+    }
   }
 }
 
@@ -303,26 +272,6 @@ const formatter = (data: WriteData) => {
     return;
   }
 
-  if (typeof data.message === "string" && data.message.startsWith("::")) {
-    const category = data.message.split(" ").splice(0, 1)[0].substring(2);
-    data.message = data.message.split(" ").slice(1).join(" ");
-
-    switch (category.toLowerCase()) {
-      case "guild":
-        messageColor = chalk.magenta;
-        break;
-      case "auto":
-        messageColor = chalk.blue;
-        break;
-      case "cmd":
-        messageColor = chalk.cyan;
-        break;
-      case "success":
-        messageColor = chalk.green;
-        break;
-    }
-  }
-
   let jsonData = "";
 
   if (Boolean(data.data) && Object.keys(data.data).length > 0) {
@@ -351,6 +300,27 @@ const formatter = (data: WriteData) => {
     );
   }
 
+  if (typeof data.message === "string" && data.message.startsWith("::")) {
+    const category = data.message.split(" ").splice(0, 1)[0].substring(2);
+    data.message = data.message.split(" ").slice(1).join(" ");
+
+    switch (category.toLowerCase()) {
+      case "guild":
+        messageColor = chalk.magenta;
+        break;
+      case "auto":
+        messageColor = chalk.blue;
+        break;
+      case "cmd":
+        messageColor = chalk.cyan;
+        jsonData = "";
+        break;
+      case "success":
+        messageColor = chalk.green;
+        break;
+    }
+  }
+
   return `${chalk.blackBright.italic(dayjs(data.date).format("MM-DD HH:mm:ss.SSS"))} ${labelColor(
     data.label.toUpperCase(),
   )}${
@@ -360,16 +330,8 @@ const formatter = (data: WriteData) => {
 
 logger.addTransport(
   new FileTransport({
-    path: "./out/combined-%DATE%.log",
+    path: process.env.LOG_FILE!,
     levels: ["debug", "info", "warn", "error"],
-    rotateAfterBytes: 10e6,
-  }),
-);
-logger.addTransport(
-  new FileTransport({
-    path: "./out/error-%DATE%.log",
-    levels: ["warn", "error"],
-    rotateAfterBytes: 10e6,
   }),
 );
 logger.addTransport(
@@ -402,8 +364,8 @@ export function setClusterId(id: string) {
 }
 
 export async function transaction(
-  from: { username: string; id: string },
-  to: { username: string; id: string },
+  from: string | { id: string },
+  to: string | { id: string },
   type: TransactionType,
   amount: number | bigint,
   itemId?: string,
@@ -411,8 +373,8 @@ export async function transaction(
 ) {
   const tx = await prisma.transaction.create({
     data: {
-      sourceId: from.id,
-      targetId: to.id,
+      sourceId: typeof from === "string" ? from : from.id,
+      targetId: typeof to === "string" ? to : to.id,
       type,
       amount,
       itemId,
@@ -440,7 +402,7 @@ export function gamble(
   if (!nextLogMsg.get("gamble")) {
     nextLogMsg.set(
       "gamble",
-      `**${user.username}** (${user.id})\n` +
+      `**${user.username.replaceAll("_", "\\_")}** (${user.id})\n` +
         `- **game** ${game}\n` +
         `- **bet** $${amount.toLocaleString()}\n` +
         `- **result** ${result}${
@@ -453,7 +415,7 @@ export function gamble(
     nextLogMsg.set(
       "gamble",
       nextLogMsg.get("gamble") +
-        `**${user.username}** (${user.id})\n` +
+        `**${user.username.replaceAll("_", "\\_")}** (${user.id})\n` +
         `- **game** ${game}\n` +
         `- **bet** $${amount.toLocaleString()}\n` +
         `- **result** ${result}${

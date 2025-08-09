@@ -2,7 +2,6 @@ import { flavors } from "@catppuccin/palette";
 import { randomInt } from "crypto";
 import {
   ActionRowBuilder,
-  BaseMessageOptions,
   ButtonBuilder,
   ButtonComponentData,
   ButtonInteraction,
@@ -10,8 +9,6 @@ import {
   ColorResolvable,
   CommandInteraction,
   Interaction,
-  InteractionEditReplyOptions,
-  InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
   MessageEditOptions,
@@ -20,7 +17,7 @@ import {
 } from "discord.js";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { a } from "../utils/functions/anticheat";
@@ -34,6 +31,7 @@ import {
   getGambleMulti,
   removeBalance,
 } from "../utils/functions/economy/balance";
+import { addEventProgress } from "../utils/functions/economy/events";
 import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
 import { createGame } from "../utils/functions/economy/stats";
@@ -46,7 +44,7 @@ import {
 import { addXp, calcEarnedGambleXp } from "../utils/functions/economy/xp";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { percentChance } from "../utils/functions/random";
-import { getAdminLevel } from "../utils/functions/users/admin";
+import { hasAdminPermission } from "../utils/functions/users/admin";
 import { recentCommands } from "../utils/functions/users/commands";
 import { addHourlyCommand } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -86,10 +84,10 @@ interface Game {
  */
 
 const payoutsData = new Map<string, number[]>([
-  ["easy", [0.3, 0.7, 1.25, 1.9, 2.7, 3.6, 4.6, 4.7, 6]],
-  ["medium", [0.95, 1.7, 2.5, 3.4, 4.5, 5.9, 6, 7.9, 10]],
-  ["hard", [1, 2, 3.1, 4.3, 5.6, 6.9, 8.6, 10, 15]],
-  ["expert", [2, 3.8, 6.1, 8.4, 10.6, 14, 17, 25, 50]],
+  ["easy", [0.5, 0.9, 1.5, 2.0, 2.7, 3.5, 4.3, 5.2, 6.2]],
+  ["medium", [1, 1.9, 2.8, 3.9, 5, 6.5, 8.2, 10, 12]],
+  ["hard", [1.35, 2.5, 4, 6, 8.5, 11, 14, 17.5, 21]],
+  ["expert", [2.5, 4.2, 6.1, 9, 11, 15, 17.7, 25, 50]],
 ]);
 
 // is the difference
@@ -129,39 +127,10 @@ cmd.slashData
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (!(await userExists(message.member))) await createUser(message.member);
-
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
 
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
@@ -173,7 +142,7 @@ async function run(
   if (games.has(message.author.id))
     return send({ embeds: [new ErrorEmbed("you are already playing dragon tower")] });
 
-  return prepareGame(message, args);
+  return prepareGame(message, send, args);
 }
 
 cmd.setRun(run);
@@ -182,40 +151,11 @@ module.exports = cmd;
 
 async function prepareGame(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
   msg?: Message,
 ) {
   recentCommands.set(message.author.id, Date.now());
-
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
 
   const defaultBet = await getDefaultBet(message.member);
 
@@ -326,7 +266,7 @@ async function prepareGame(
 
   components[components.length - 1].components[0].setDisabled(true);
 
-  const desc = await renderGambleScreen("playing", bet, "**0**x ($0)");
+  const desc = await renderGambleScreen({ state: "playing", bet, insert: "**0**x ($0)" });
 
   const embed = new CustomEmbed(message.member, desc)
     .setHeader("dragon tower", message.author.avatarURL())
@@ -362,7 +302,7 @@ async function prepareGame(
     msg = await send({ embeds: [embed], components });
   }
 
-  playGame(message, msg, args).catch((e) => {
+  playGame(message, send, msg, args).catch((e) => {
     logger.error(
       `error occurred playing tower - ${message.author.id} (${message.author.username})`,
     );
@@ -502,6 +442,7 @@ function createRows(board: string[][], end = false) {
 
 async function playGame(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   msg: Message,
   args: string[],
 ): Promise<void> {
@@ -541,7 +482,7 @@ async function playGame(
             url: process.env.ANTICHEAT_HOOK,
           });
           await hook.send({
-            content: `[${getTimestamp()}] ${message.member.user.username} (${message.author.id}) given captcha randomly in tower`,
+            content: `[${getTimestamp()}] ${message.member.user.username.replaceAll("_", "\\_")} (${message.author.id}) given captcha randomly in tower`,
           });
           hook.destroy();
         }
@@ -576,6 +517,7 @@ async function playGame(
       await res.deferUpdate();
       logger.info(
         `::cmd ${message.guild.id} ${message.channelId} ${message.author.username}: replaying tower`,
+        { userId: message.author.id, guildId: message.guildId, channelId: message.channelId },
       );
       if (await isLockedOut(message.member)) {
         await verifyUser(message);
@@ -603,7 +545,10 @@ async function playGame(
       }
 
       if (await redis.get("nypsi:maintenance")) {
-        if ((await getAdminLevel(message.member)) > 0 && message instanceof Message) {
+        if (
+          (await hasAdminPermission(message.member, "bypass-maintenance")) &&
+          message instanceof Message
+        ) {
           message.react("💀");
         } else {
           return msg.edit({
@@ -617,7 +562,7 @@ async function playGame(
         }
       }
 
-      return prepareGame(message, args, msg);
+      return prepareGame(message, send, args, msg);
     }
   };
 
@@ -640,11 +585,11 @@ async function playGame(
     gamble(message.author, "tower", game.bet, "lose", id, 0);
     game.embed.setFooter({ text: `id: ${id}` });
     game.embed.setColor(Constants.EMBED_FAIL_COLOR);
-    const desc = await renderGambleScreen(
-      "lose",
-      game.bet,
-      `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
-    );
+    const desc = await renderGambleScreen({
+      state: "lose",
+      bet: game.bet,
+      insert: `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
+    });
     game.embed.setDescription(desc);
 
     replay(game.embed, interaction);
@@ -652,6 +597,12 @@ async function playGame(
   };
 
   const win1 = async (interaction: ButtonInteraction) => {
+    const eventProgress = await addEventProgress(
+      message.client as NypsiClient,
+      message.member,
+      "dragontower",
+      1,
+    );
     let winnings = Math.round(game.bet * game.win);
     const multi = (await getGambleMulti(message.member, message.client as NypsiClient)).multi;
 
@@ -659,13 +610,14 @@ async function playGame(
       winnings += Math.round(winnings * multi);
     }
 
-    const desc = await renderGambleScreen(
-      "win",
-      game.bet,
-      `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
+    const desc = await renderGambleScreen({
+      state: "win",
+      bet: game.bet,
+      insert: `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
       winnings,
-      multi,
-    );
+      multiplier: multi,
+      eventProgress: eventProgress,
+    });
     game.embed.setDescription(desc);
 
     game.embed.setColor(Constants.EMBED_SUCCESS_COLOR);
@@ -737,11 +689,11 @@ async function playGame(
     });
     gamble(message.author, "tower", game.bet, "draw", id, game.bet);
     game.embed.setColor(flavors.macchiato.colors.yellow.hex as ColorResolvable);
-    const desc = await renderGambleScreen(
-      "draw",
-      game.bet,
-      `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
-    );
+    const desc = await renderGambleScreen({
+      state: "draw",
+      bet: game.bet,
+      insert: `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
+    });
     game.embed.setDescription(desc);
     await addBalance(message.member, game.bet);
     games.delete(message.author.id);
@@ -763,7 +715,7 @@ async function playGame(
             embeds: [new ErrorEmbed("invalid square")],
             flags: MessageFlags.Ephemeral,
           });
-        return playGame(message, msg, args);
+        return playGame(message, send, msg, args);
       }
     }
 
@@ -819,11 +771,11 @@ async function playGame(
         //   increment,
         // });
 
-        const desc = await renderGambleScreen(
-          "playing",
-          game.bet,
-          `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
-        );
+        const desc = await renderGambleScreen({
+          state: "playing",
+          bet: game.bet,
+          insert: `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
+        });
         game.embed.setDescription(desc);
 
         if (y >= 8) {
@@ -840,7 +792,7 @@ async function playGame(
 
         edit({ embeds: [game.embed], components }, response);
 
-        return playGame(message, msg, args);
+        return playGame(message, send, msg, args);
     }
   };
 

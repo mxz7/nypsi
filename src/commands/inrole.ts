@@ -11,7 +11,7 @@ import {
   Role,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import PageManager from "../utils/functions/page";
@@ -22,19 +22,20 @@ const cmd = new Command("inrole", "get the members in a role", "utility");
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) message.channel.send({ embeds: [res.embed] });
+    if (res.respond) send({ embeds: [res.embed] });
     return;
   }
 
   const prefix = (await getPrefix(message.guild))[0];
 
   if (args.length == 0) {
-    return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}inrole <role>`)] });
+    return send({ embeds: [new ErrorEmbed(`${prefix}inrole <role>`)] });
   }
 
   const roles = message.guild.roles.cache;
@@ -50,7 +51,7 @@ async function run(
   }
 
   if (!role) {
-    return message.channel.send({
+    return send({
       embeds: [new ErrorEmbed(`couldn't find the role \`${args.join(" ")}\``)],
     });
   }
@@ -81,7 +82,7 @@ async function run(
   const pages = PageManager.createPages(memberList, 10);
 
   if (!pages.get(1)) {
-    return message.channel.send({
+    return send({
       embeds: [new CustomEmbed(message.member, "that role has no members")],
     });
   }
@@ -102,9 +103,9 @@ async function run(
   );
 
   if (pages.size >= 2) {
-    msg = await message.channel.send({ embeds: [embed], components: [row] });
+    msg = await send({ embeds: [embed], components: [row] });
   } else {
-    return await message.channel.send({ embeds: [embed] });
+    return await send({ embeds: [embed] });
   }
 
   if (pages.size <= 1) return;

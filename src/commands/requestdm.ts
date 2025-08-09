@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { ErrorEmbed } from "../models/EmbedBuilders";
-import { getAdminLevel } from "../utils/functions/users/admin";
+import { hasAdminPermission } from "../utils/functions/users/admin";
 import { addNotificationToQueue } from "../utils/functions/users/notifications";
 
 const cmd = new Command(
@@ -12,12 +12,13 @@ const cmd = new Command(
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
-  if ((await getAdminLevel(message.member)) < 2) return;
+  if (!(await hasAdminPermission(message.member, "requestdm"))) return;
 
   if (args.length < 2) {
-    return message.channel.send({ embeds: [new ErrorEmbed("$requestdm <id> <content>")] });
+    return send({ embeds: [new ErrorEmbed("$requestdm <id> <content>")] });
   }
 
   const user = args[0];

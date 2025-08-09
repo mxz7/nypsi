@@ -91,7 +91,7 @@ if (!isMainThread) {
           category: "balance",
         },
         orderBy: {
-          date: "asc",
+          id: "asc",
         },
       }),
     );
@@ -103,7 +103,7 @@ if (!isMainThread) {
           category: "networth",
         },
         orderBy: {
-          date: "asc",
+          id: "asc",
         },
       }),
     );

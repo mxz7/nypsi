@@ -1,5 +1,5 @@
 import { CommandInteraction } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getMember } from "../utils/functions/member";
 import { getLastfmUsername } from "../utils/functions/users/lastfm";
@@ -13,12 +13,13 @@ const cmd = new Command(
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) message.channel.send({ embeds: [res.embed] });
+    if (res.respond) send({ embeds: [res.embed] });
     return;
   }
 
@@ -31,20 +32,20 @@ async function run(
   }
 
   if (!member) {
-    return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });
+    return send({ embeds: [new ErrorEmbed("invalid user")] });
   }
 
   const username = await getLastfmUsername(member);
 
   if (!username) {
     if (message.author.id == member.user.id) {
-      return message.channel.send({
+      return send({
         embeds: [
           new ErrorEmbed("you have not set your last.fm username (**/settings me lastfm**)"),
         ],
       });
     } else {
-      return message.channel.send({
+      return send({
         embeds: [new ErrorEmbed("this user has not set their last.fm username")],
       });
     }
@@ -57,7 +58,7 @@ async function run(
   ).then((res) => res.json());
 
   if (!res.recenttracks) {
-    return message.channel.send({ embeds: [new CustomEmbed(message.member, "no recent songs")] });
+    return send({ embeds: [new CustomEmbed(message.member, "no recent songs")] });
   }
 
   let recenttracks = res.recenttracks.track;
@@ -65,7 +66,7 @@ async function run(
   recenttracks = recenttracks.slice(0, 5);
 
   if (recenttracks.length == 0) {
-    return message.channel.send({ embeds: [new CustomEmbed(message.member, "no recent songs")] });
+    return send({ embeds: [new CustomEmbed(message.member, "no recent songs")] });
   }
 
   let msg = "";
@@ -83,7 +84,7 @@ async function run(
 
   embed.setAuthor({ name: username, iconURL: member.user.displayAvatarURL({ size: 128 }) });
 
-  return message.channel.send({ embeds: [embed] });
+  return send({ embeds: [embed] });
 }
 
 cmd.setRun(run);

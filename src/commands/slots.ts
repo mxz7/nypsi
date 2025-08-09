@@ -1,9 +1,7 @@
 import { randomInt } from "crypto";
 import {
-  BaseMessageOptions,
   CommandInteraction,
   InteractionEditReplyOptions,
-  InteractionReplyOptions,
   InteractionResponse,
   Message,
   MessageEditOptions,
@@ -11,7 +9,7 @@ import {
 } from "discord.js";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
@@ -24,6 +22,7 @@ import {
   removeBalance,
 } from "../utils/functions/economy/balance.js";
 import { getBoosters } from "../utils/functions/economy/boosters.js";
+import { addEventProgress, EventData, getCurrentEvent } from "../utils/functions/economy/events";
 import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds.js";
 import { createGame } from "../utils/functions/economy/stats";
 import { createUser, formatBet, userExists } from "../utils/functions/economy/utils.js";
@@ -139,38 +138,9 @@ cmd.slashData.addStringOption((option) =>
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
-
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
@@ -272,81 +242,38 @@ async function run(
     }
   }
 
-  if (increasedLuck) {
-    /**
-     * the shit below results in an approximate 60% win rate overtime, resulting in an overall very high gain, without counting multiplier
-     */
+  if (
+    one.split("-")[0] != two.split("-")[0] &&
+    two.split("-")[0] != three.split("-")[0] &&
+    one.split("-")[0] != three.split("-")[0]
+  ) {
+    // increased luck has around 60% win rate, regular has 39%
+    const chance = Math.floor(Math.random() * (increasedLuck ? 6 : 41));
+    const chanceScore = 4;
+    const chanceScore2 = increasedLuck ? 3 : 8;
 
-    if (
-      one.split("-")[0] != two.split("-")[0] &&
-      two.split("-")[0] != three.split("-")[0] &&
-      one.split("-")[0] != three.split("-")[0]
-    ) {
-      const chance = Math.floor(Math.random() * 6);
-      const chanceScore = 4;
-      const chanceScore2 = 3;
-
-      if (chance < chanceScore) {
-        one = two.split("-")[0] + "-1";
-      } else if (chance < chanceScore2) {
-        three = two.split("-")[0] + "-3";
-      }
+    if (chance < chanceScore) {
+      one = two.split("-")[0] + "-1";
+    } else if (chance < chanceScore2) {
+      three = two.split("-")[0] + "-3";
     }
+  }
 
-    if (two.split("-")[0] == three.split("-")[0] && one.split("-")[0] != two.split("-")[0]) {
-      const chance = Math.floor(Math.random() * 12);
-      const chanceScore = 7;
+  if (two.split("-")[0] == three.split("-")[0] && one.split("-")[0] != two.split("-")[0]) {
+    const chance = Math.floor(Math.random() * 12);
+    const chanceScore = 7;
 
-      if (chance < chanceScore) {
-        one = two.split("-")[0] + "-1";
-      }
+    if (chance < chanceScore) {
+      one = two.split("-")[0] + "-1";
     }
+  }
 
-    if (one.split("-")[0] == two.split("-")[0] && one.split("-")[0] != three.split("-")[0]) {
-      const chance = Math.floor(Math.random() * 12);
-      const chanceScore = 6;
+  if (one.split("-")[0] == two.split("-")[0] && one.split("-")[0] != three.split("-")[0]) {
+    const chance = Math.floor(Math.random() * 12);
+    const chanceScore = 6;
 
-      if (chance < chanceScore) {
-        three = two.split("-")[0] + "-3";
-      }
-    }
-  } else {
-    /**
-     * the shit below results in an approximate 39% win rate overtime, resulting in an overall loss, without counting multiplier
-     */
-
-    if (
-      one.split("-")[0] != two.split("-")[0] &&
-      two.split("-")[0] != three.split("-")[0] &&
-      one.split("-")[0] != three.split("-")[0]
-    ) {
-      const chance = Math.floor(Math.random() * 41);
-      const chanceScore = 4;
-      const chanceScore2 = 8;
-
-      if (chance < chanceScore) {
-        one = two.split("-")[0] + "-1";
-      } else if (chance < chanceScore2) {
-        three = two.split("-")[0] + "-3";
-      }
-    }
-
-    if (two.split("-")[0] == three.split("-")[0] && one.split("-")[0] != two.split("-")[0]) {
-      const chance = Math.floor(Math.random() * 12);
-      const chanceScore = 7;
-
-      if (chance < chanceScore) {
-        one = two.split("-")[0] + "-1";
-      }
-    }
-
-    if (one.split("-")[0] == two.split("-")[0] && one.split("-")[0] != three.split("-")[0]) {
-      const chance = Math.floor(Math.random() * 12);
-      const chanceScore = 6;
-
-      if (chance < chanceScore) {
-        three = two.split("-")[0] + "-3";
-      }
+    if (chance < chanceScore) {
+      three = two.split("-")[0] + "-3";
     }
   }
 
@@ -376,8 +303,15 @@ async function run(
   }
 
   let multi = 0;
+  let eventProgress: number;
 
   if (win) {
+    eventProgress = await addEventProgress(
+      message.client as NypsiClient,
+      message.member,
+      "slots",
+      1,
+    );
     multi = (await getGambleMulti(message.member, message.client as NypsiClient)).multi;
     winnings -= bet;
 
@@ -430,6 +364,16 @@ async function run(
 
     if (win) {
       if (multi > 0) {
+        const eventData: { event?: EventData; target: number } = { target: 0 };
+
+        if (eventProgress) {
+          eventData.event = await getCurrentEvent();
+
+          if (eventData.event) {
+            eventData.target = Number(eventData.event.target);
+          }
+        }
+
         embed.addField(
           "**winner!!**",
           "**you win** $" +
@@ -437,7 +381,10 @@ async function run(
             "\n" +
             "+**" +
             Math.floor(multi * 100).toString() +
-            "**% bonus",
+            "**% bonus" +
+            (eventProgress
+              ? `\n\n🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`
+              : ""),
         );
       } else {
         embed.addField("**winner!!**", "**you win** $" + winnings.toLocaleString());

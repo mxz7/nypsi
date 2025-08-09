@@ -3,14 +3,12 @@ import { OrderType } from "@prisma/client";
 import {
   ActionRowBuilder,
   APIMessageComponentEmoji,
-  BaseMessageOptions,
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
   CommandInteraction,
   Interaction,
   InteractionEditReplyOptions,
-  InteractionReplyOptions,
   InteractionResponse,
   Message,
   MessageActionRowComponentBuilder,
@@ -25,7 +23,7 @@ import {
 } from "discord.js";
 import prisma from "../init/database";
 import { NypsiClient } from "../models/Client";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Item } from "../types/Economy";
 import Constants from "../utils/Constants";
@@ -39,6 +37,7 @@ import {
 } from "../utils/functions/economy/inventory";
 import { getRawLevel } from "../utils/functions/economy/levelling";
 import {
+  countItemOnMarket,
   createMarketOrder,
   deleteMarketOrder,
   deleteMarketWatch,
@@ -64,7 +63,7 @@ import { getEmojiImage } from "../utils/functions/image";
 import { MemberResolvable } from "../utils/functions/member";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { pluralize } from "../utils/functions/string";
-import { getAdminLevel } from "../utils/functions/users/admin";
+import { hasAdminPermission } from "../utils/functions/users/admin";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, addExpiry, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
@@ -179,38 +178,9 @@ cmd.slashData
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
-
   const edit = async (data: MessageEditOptions, msg: Message | InteractionResponse) => {
     if (!(message instanceof Message)) {
       return await message.editReply(data as InteractionEditReplyOptions);
@@ -222,7 +192,10 @@ async function run(
 
   if (!(await userExists(message.member))) await createUser(message.member);
 
-  if (message.client.user.id !== Constants.BOT_USER_ID && (await getAdminLevel(message.member)) < 1)
+  if (
+    message.client.user.id !== Constants.BOT_USER_ID &&
+    !(await hasAdminPermission(message.member, "bypass-dev-restrictions"))
+  )
     return send({ embeds: [new ErrorEmbed("lol")] });
 
   if (await onCooldown(cmd.name, message.member)) {
@@ -1434,7 +1407,7 @@ async function run(
     if (!allow) return viewMarket();
 
     if (args.length == 1) {
-      return message.channel.send({ embeds: [new ErrorEmbed("use the message id dumbass")] });
+      return send({ embeds: [new ErrorEmbed("use the message id dumbass")] });
     }
 
     const order = await prisma.market.findUnique({
@@ -1443,7 +1416,7 @@ async function run(
       },
     });
 
-    if (!order) return message.channel.send({ embeds: [new ErrorEmbed("invalid order bro")] });
+    if (!order) return send({ embeds: [new ErrorEmbed("invalid order bro")] });
 
     logger.info(
       `admin: ${message.author.id} (${message.author.username}) deleted market order`,
@@ -1626,7 +1599,7 @@ async function run(
             .setStyle(ButtonStyle.Link)
             .setLabel("history")
             .setEmoji("📈")
-            .setURL(`https://nypsi.xyz/item/history/${item.id}?ref=bot-market-search`),
+            .setURL(`https://nypsi.xyz/items/history/${item.id}?ref=bot-market-search`),
         );
       }
 
@@ -1703,7 +1676,11 @@ async function run(
 
         return confirmTransaction("buy", item, 1, message.member, msg);
       } else if (res == "buyMulti") {
-        const res = await quantitySelectionModal("buy", interaction as ButtonInteraction);
+        const res = await quantitySelectionModal(
+          interaction as ButtonInteraction,
+          "buy",
+          await countItemOnMarket(item.id, "sell"),
+        );
 
         if (res) {
           const amount = res.fields.fields.get("amount").value;
@@ -1791,7 +1768,12 @@ async function run(
 
         return confirmTransaction("sell", item, 1, message.member, msg);
       } else if (res == "sellMulti") {
-        const res = await quantitySelectionModal("sell", interaction as ButtonInteraction);
+        const res = await quantitySelectionModal(
+          interaction as ButtonInteraction,
+          "sell",
+          await countItemOnMarket(item.id, "buy"),
+          (await getInventory(message.member)).count(item.id),
+        );
 
         if (res) {
           const amount = res.fields.fields.get("amount").value;
@@ -1833,9 +1815,9 @@ async function run(
           const inventory = await getInventory(message.member);
 
           if (inventory.count(item.id) < formattedAmount) {
-            await interaction.editReply({
+            await res.reply({
               embeds: [new ErrorEmbed(`you do not have this many ${item.plural}`)],
-              options: { flags: MessageFlags.Ephemeral },
+              flags: MessageFlags.Ephemeral,
             });
             await updateEmbed();
             return pageManager();
@@ -1980,7 +1962,12 @@ async function run(
     return pageManager();
   }
 
-  async function quantitySelectionModal(type: string, interaction: ButtonInteraction) {
+  async function quantitySelectionModal(
+    interaction: ButtonInteraction,
+    type: string,
+    inOrders: number,
+    inInventory?: number,
+  ) {
     const id = `market-quantity-${Math.floor(Math.random() * 69420)}`;
     const modal = new ModalBuilder().setCustomId(id).setTitle("select quantity");
 
@@ -1989,6 +1976,11 @@ async function run(
         new TextInputBuilder()
           .setCustomId("amount")
           .setLabel(`how many would you like to ${type}?`)
+          .setPlaceholder(
+            type == "sell"
+              ? `${inOrders.toLocaleString()} in buy orders, ${inInventory.toLocaleString()} in inventory`
+              : `${inOrders.toLocaleString()} in sell orders`,
+          )
           .setStyle(TextInputStyle.Short)
           .setRequired(true)
           .setMaxLength(10),

@@ -1,14 +1,10 @@
 import {
   ActionRowBuilder,
-  BaseMessageOptions,
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
   ComponentType,
   GuildTextBasedChannel,
-  InteractionEditReplyOptions,
-  InteractionReplyOptions,
-  Message,
   MessageActionRowComponentBuilder,
   MessageFlags,
 } from "discord.js";
@@ -19,43 +15,16 @@ import { ItemUse } from "../../../../models/ItemUse";
 import { startLootRain } from "../../../../scheduled/clusterjobs/random-drops";
 import Constants from "../../../Constants";
 import { getInventory, removeInventoryItem } from "../inventory";
+import { addStat } from "../stats";
 
 module.exports = new ItemUse(
   "rain",
   async (message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) => {
-    const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-      if (!(message instanceof Message)) {
-        let usedNewMessage = false;
-        let res;
-
-        if (message.deferred) {
-          res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        } else {
-          res = await message.reply(data as InteractionReplyOptions).catch(() => {
-            return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-              usedNewMessage = true;
-              return await message.channel.send(data as BaseMessageOptions);
-            });
-          });
-        }
-
-        if (usedNewMessage && res instanceof Message) return res;
-
-        const replyMsg = await message.fetchReply();
-        if (replyMsg instanceof Message) {
-          return replyMsg;
-        }
-      } else {
-        return await message.channel.send(data as BaseMessageOptions);
-      }
-    };
-
     let length = 1;
 
-    if (Constants.LOOT_RAIN_ALLOWED_CHANNELS.includes(message.channelId)) length = 2;
+    if (message.channel.isDMBased()) return;
+
+    if (message.channel.parentId === "1246516186171314337") length = 2;
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
@@ -64,13 +33,13 @@ module.exports = new ItemUse(
         .setStyle(ButtonStyle.Success),
     );
 
-    const msg = await send({
+    const msg = await ItemUse.send(message, {
       embeds: [
         new CustomEmbed(
           message.member,
           `💦 confirm to start a loot rain for **${length} minutes**` +
             (message.guildId !== Constants.NYPSI_SERVER_ID
-              ? "\n\nyou can **double** the length of your loot rain by using it in the **[official nypsi server](https://nypsi.xyz/discord)**"
+              ? "\n\nyou can **double** the length of your loot rain by using it in a **public commands channel** in the **[official nypsi server](https://nypsi.xyz/discord)**"
               : ""),
         ).setHeader(`${message.author.username}'s loot rain`, message.author.avatarURL()),
       ],
@@ -116,6 +85,7 @@ module.exports = new ItemUse(
       }
 
       await removeInventoryItem(message.member, "rain", 1);
+      await addStat(message.member, "rain");
 
       row.components.forEach((c) => c.setDisabled(true));
 

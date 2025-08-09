@@ -1,5 +1,5 @@
 import { Channel, CommandInteraction, PermissionFlagsBits } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 
 const cmd = new Command("nsfw", "toggle nsfw on a channel", "admin").setPermissions([
@@ -8,11 +8,12 @@ const cmd = new Command("nsfw", "toggle nsfw on a channel", "admin").setPermissi
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageChannels)) {
     if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
-      return message.channel.send({
+      return send({
         embeds: [new ErrorEmbed("you need the `manage channels` permission")],
       });
     }
@@ -20,7 +21,7 @@ async function run(
   }
 
   if (!message.guild.members.me.permissions.has(PermissionFlagsBits.ManageChannels)) {
-    return message.channel.send({
+    return send({
       embeds: [new ErrorEmbed("i need the `manage channel` permission for this command to work")],
     });
   }
@@ -35,22 +36,22 @@ async function run(
     channel = message.guild.channels.cache.find((ch) => ch.name.includes(args[0]));
 
     if (!channel) {
-      return message.channel.send({ embeds: [new ErrorEmbed("couldn't find that channel")] });
+      return send({ embeds: [new ErrorEmbed("couldn't find that channel")] });
     }
   }
 
   if (!channel) {
-    return message.channel.send({ embeds: [new ErrorEmbed("couldn't find that channel")] });
+    return send({ embeds: [new ErrorEmbed("couldn't find that channel")] });
   }
 
   if (!channel.isTextBased()) {
-    return message.channel.send({ embeds: [new ErrorEmbed("this is not a text channel")] });
+    return send({ embeds: [new ErrorEmbed("this is not a text channel")] });
   }
 
   if (channel.isDMBased()) return;
 
   if (channel.isThread()) {
-    return message.channel.send({ embeds: [new ErrorEmbed("invalid channel")] });
+    return send({ embeds: [new ErrorEmbed("invalid channel")] });
   }
 
   if (!channel.nsfw) {
@@ -60,10 +61,10 @@ async function run(
     });
 
     if (fail) {
-      return message.channel.send({ embeds: [new ErrorEmbed("unable to edit that channel")] });
+      return send({ embeds: [new ErrorEmbed("unable to edit that channel")] });
     }
 
-    return message.channel.send({
+    return send({
       embeds: [new CustomEmbed(message.member, `✅ ${channel.toString()} is now nsfw`)],
     });
   } else {
@@ -73,10 +74,10 @@ async function run(
     });
 
     if (fail) {
-      return message.channel.send({ embeds: [new ErrorEmbed("unable to edit that channel")] });
+      return send({ embeds: [new ErrorEmbed("unable to edit that channel")] });
     }
 
-    return message.channel.send({
+    return send({
       embeds: [new CustomEmbed(message.member, `✅ ${channel.toString()} is no longer nsfw`)],
     });
   }

@@ -1,7 +1,6 @@
 import { flavors } from "@catppuccin/palette";
 import {
   ActionRowBuilder,
-  BaseMessageOptions,
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
@@ -9,8 +8,6 @@ import {
   CommandInteraction,
   GuildMember,
   Interaction,
-  InteractionEditReplyOptions,
-  InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
   MessageEditOptions,
@@ -19,7 +16,7 @@ import {
 } from "discord.js";
 import redis from "../init/redis.js";
 import { NypsiClient } from "../models/Client.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command.js";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command.js";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
 import { a } from "../utils/functions/anticheat.js";
@@ -33,6 +30,7 @@ import {
   getGambleMulti,
   removeBalance,
 } from "../utils/functions/economy/balance.js";
+import { addEventProgress } from "../utils/functions/economy/events.js";
 import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds.js";
 import { createGame } from "../utils/functions/economy/stats.js";
 import {
@@ -44,7 +42,7 @@ import {
 import { addXp, calcEarnedGambleXp } from "../utils/functions/economy/xp.js";
 import { getTier, isPremium } from "../utils/functions/premium/premium.js";
 import { percentChance, shuffle } from "../utils/functions/random.js";
-import { getAdminLevel } from "../utils/functions/users/admin.js";
+import { hasAdminPermission } from "../utils/functions/users/admin.js";
 import { recentCommands } from "../utils/functions/users/commands.js";
 import { addHourlyCommand } from "../utils/handlers/commandhandler.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
@@ -73,39 +71,10 @@ cmd.slashData.addStringOption((option) =>
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (!(await userExists(message.member))) await createUser(message.member);
-
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
 
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
@@ -114,7 +83,7 @@ async function run(
     return;
   }
 
-  return prepareGame(message, args);
+  return prepareGame(message, send, args);
 }
 
 cmd.setRun(run);
@@ -123,40 +92,11 @@ module.exports = cmd;
 
 async function prepareGame(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
   msg?: Message,
 ) {
   recentCommands.set(message.author.id, Date.now());
-
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
 
   const defaultBet = await getDefaultBet(message.member);
 
@@ -350,7 +290,7 @@ async function prepareGame(
       .setDisabled(true),
   );
 
-  const desc = await renderGambleScreen("playing", bet, `**0**x ($0)`);
+  const desc = await renderGambleScreen({ state: "playing", bet, insert: `**0**x ($0)` });
 
   const embed = new CustomEmbed(message.member, desc)
     .setHeader("highlow", message.author.avatarURL())
@@ -362,7 +302,7 @@ async function prepareGame(
     msg = await send({ embeds: [embed], components: [row] });
   }
 
-  playGame(message, msg, args).catch((e) => {
+  playGame(message, send, msg, args).catch((e) => {
     logger.error(
       `error occurred playing highlow - ${message.author.id} (${message.author.username})`,
     );
@@ -414,6 +354,7 @@ function getValue(member: GuildMember) {
 
 async function playGame(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   m: Message,
   args: string[],
 ): Promise<void> {
@@ -454,7 +395,7 @@ async function playGame(
           url: process.env.ANTICHEAT_HOOK,
         });
         await hook.send({
-          content: `[${getTimestamp()}] ${message.member.user.username} (${message.author.id}) given captcha randomly in high low`,
+          content: `[${getTimestamp()}] ${message.member.user.username.replaceAll("_", "\\_")} (${message.author.id}) given captcha randomly in high low`,
         });
         hook.destroy();
       }
@@ -483,6 +424,7 @@ async function playGame(
       await res.deferUpdate();
       logger.info(
         `::cmd ${message.guild.id} ${message.channelId} ${message.author.username}: replaying highlow`,
+        { userId: message.author.id, guildId: message.guildId, channelId: message.channelId },
       );
       if (await isLockedOut(message.member)) return verifyUser(message);
 
@@ -507,7 +449,10 @@ async function playGame(
       }
 
       if (await redis.get("nypsi:maintenance")) {
-        if ((await getAdminLevel(message.member)) > 0 && message instanceof Message) {
+        if (
+          (await hasAdminPermission(message.member, "bypass-maintenance")) &&
+          message instanceof Message
+        ) {
           message.react("💀");
         } else {
           return m.edit({
@@ -521,7 +466,7 @@ async function playGame(
         }
       }
 
-      return prepareGame(message, args, m);
+      return prepareGame(message, send, args, m);
     }
   };
 
@@ -538,11 +483,11 @@ async function playGame(
     gamble(message.author, "highlow", bet, "lose", id, 0);
     newEmbed.setFooter({ text: `id: ${id}` });
     newEmbed.setColor(Constants.EMBED_FAIL_COLOR);
-    const desc = await renderGambleScreen(
-      "lose",
+    const desc = await renderGambleScreen({
+      state: "lose",
       bet,
-      `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
-    );
+      insert: `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
+    });
     newEmbed.setDescription(desc);
     newEmbed.addField("card", "| " + card + " |");
     games.delete(message.author.id);
@@ -557,13 +502,21 @@ async function playGame(
       winnings = winnings + Math.round(winnings * games.get(message.author.id).voted);
     }
 
-    const desc = await renderGambleScreen(
-      "win",
-      bet,
-      `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
-      winnings,
-      games.get(message.author.id).voted,
+    const eventProgress = await addEventProgress(
+      message.client as NypsiClient,
+      message.member,
+      "highlow",
+      1,
     );
+
+    const desc = await renderGambleScreen({
+      state: "win",
+      bet,
+      insert: `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
+      winnings,
+      multiplier: games.get(message.author.id).voted,
+      eventProgress,
+    });
 
     newEmbed.setDescription(desc);
 
@@ -626,11 +579,11 @@ async function playGame(
     gamble(message.author, "highlow", bet, "draw", id, bet);
     newEmbed.setFooter({ text: `id: ${id}` });
     newEmbed.setColor(flavors.macchiato.colors.yellow.hex as ColorResolvable);
-    const desc = await renderGambleScreen(
-      "draw",
+    const desc = await renderGambleScreen({
+      state: "draw",
       bet,
-      `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
-    );
+      insert: `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
+    });
     newEmbed.setDescription(desc);
     newEmbed.addField("card", "| " + card + " |");
     await addBalance(message.member, bet);
@@ -711,26 +664,26 @@ async function playGame(
         );
       }
 
-      const desc = await renderGambleScreen(
-        "playing",
+      const desc = await renderGambleScreen({
+        state: "playing",
         bet,
-        `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
-      );
+        insert: `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
+      });
       newEmbed.setDescription(desc);
       newEmbed.addField("card", "| " + card + " |");
       await edit({ embeds: [newEmbed], components: [row] }, reaction);
-      return playGame(message, m, args);
+      return playGame(message, send, m, args);
     } else if (newCard1 == oldCard) {
-      const desc = await renderGambleScreen(
-        "playing",
+      const desc = await renderGambleScreen({
+        state: "playing",
         bet,
-        `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
-      );
+        insert: `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
+      });
       newEmbed.setDescription(desc);
       newEmbed.addField("card", "| " + card + " |");
 
       await edit({ embeds: [newEmbed] }, reaction);
-      return playGame(message, m, args);
+      return playGame(message, send, m, args);
     } else {
       lose(reaction);
       return;
@@ -781,32 +734,32 @@ async function playGame(
         );
       }
 
-      const desc = await renderGambleScreen(
-        "playing",
+      const desc = await renderGambleScreen({
+        state: "playing",
         bet,
-        `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
-      );
+        insert: `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
+      });
       newEmbed.setDescription(desc);
       newEmbed.addField("card", "| " + card + " |");
       await edit({ embeds: [newEmbed], components: [row] }, reaction);
-      return playGame(message, m, args);
+      return playGame(message, send, m, args);
     } else if (newCard1 == oldCard) {
-      const desc = await renderGambleScreen(
-        "playing",
+      const desc = await renderGambleScreen({
+        state: "playing",
         bet,
-        `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
-      );
+        insert: `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
+      });
       newEmbed.setDescription(desc);
       newEmbed.addField("card", "| " + card + " |");
       await edit({ embeds: [newEmbed] }, reaction);
-      return playGame(message, m, args);
+      return playGame(message, send, m, args);
     } else {
       lose(reaction);
       return;
     }
   } else if (reaction.customId == "💰") {
     if (win < 1) {
-      return playGame(message, m, args);
+      return playGame(message, send, m, args);
     } else if (win == 1) {
       draw(reaction);
       return;

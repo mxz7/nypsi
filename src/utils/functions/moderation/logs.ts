@@ -46,13 +46,17 @@ export async function addModLog(
   embed.setTimestamp();
 
   if (punished) {
-    embed.addField("user", `${punished.username} \`${punished.id}\``, true);
+    embed.addField("user", `${punished.username.replaceAll("_", "\\_")} \`${punished.id}\``, true);
   } else {
     embed.addField("user", userID, true);
   }
 
   if (moderator.id !== moderator.client.user.id) {
-    embed.addField("moderator", `${moderator.username} \`${moderator.id}\``, true);
+    embed.addField(
+      "moderator",
+      `${moderator.username.replaceAll("_", "\\_")} \`${moderator.id}\``,
+      true,
+    );
   } else {
     if (channelId) {
       embed.addField("moderator", `nypsi in <#${channelId}>`, true);
@@ -85,19 +89,20 @@ export async function addLog(guild: Guild, type: LogType, embed: CustomEmbed) {
   );
 }
 
-export async function isLogsEnabled(guild: Guild) {
+export async function isLogsEnabled(guild: Guild, times = 1) {
   if (await redis.exists(`${Constants.redis.cache.guild.LOGS}:${guild.id}`)) {
-    return (await redis.get(`${Constants.redis.cache.guild.LOGS}:${guild.id}`)) === "t"
-      ? true
-      : false;
+    return (await redis.get(`${Constants.redis.cache.guild.LOGS}:${guild.id}`)) === "t";
   }
 
   if (checkingLogsEnabled) {
-    return (await new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(isLogsEnabled(guild));
-      }, 200);
-    })) as boolean;
+    if (times < 1000) {
+      times++;
+      return (await new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(isLogsEnabled(guild, times));
+        }, 200);
+      })) as boolean;
+    }
   }
 
   checkingLogsEnabled = true;
@@ -133,6 +138,16 @@ export async function setLogsChannelHook(guild: Guild, hook: string) {
 
   if (!hook) {
     await redis.del(`${Constants.redis.nypsi.GUILD_LOG_QUEUE}:${guild.id}`);
+  }
+
+  const previous = await getLogsChannelHook(guild);
+
+  if (previous) {
+    try {
+      await previous.delete("logs moved/disabled");
+    } catch {
+      // silent fail
+    }
   }
 
   await prisma.guild.update({
@@ -182,13 +197,21 @@ export async function isModLogsEnabled(guild: Guild) {
     },
   });
 
-  if (!query || !query.modlogs || query.modlogs == "") return false;
-
-  return true;
+  return !(!query || !query.modlogs || query.modlogs == "");
 }
 
 export async function setModLogs(guild: Guild, hook: string) {
   await redis.del(Constants.redis.cache.guild.MODLOGS_GUILDS);
+
+  const previous = await getModLogsHook(guild);
+
+  if (previous) {
+    try {
+      await previous.delete("modlogs moved/disabled");
+    } catch {
+      // silent fail
+    }
+  }
 
   await prisma.guild.update({
     where: {

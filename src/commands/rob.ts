@@ -1,15 +1,13 @@
 import {
-  BaseMessageOptions,
   CommandInteraction,
   InteractionEditReplyOptions,
-  InteractionReplyOptions,
   Message,
   MessageEditOptions,
   MessageFlags,
 } from "discord.js";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { addProgress } from "../utils/functions/economy/achievements";
@@ -20,6 +18,7 @@ import {
   removeBalance,
   setPadlock,
 } from "../utils/functions/economy/balance";
+import { addEventProgress, EventData, getCurrentEvent } from "../utils/functions/economy/events";
 import { addToGuildXP, getGuildByUser, getGuildName } from "../utils/functions/economy/guilds";
 import { getInventory, removeInventoryItem } from "../utils/functions/economy/inventory";
 import { isPassive } from "../utils/functions/economy/passive";
@@ -45,38 +44,9 @@ cmd.slashData.addUserOption((option) =>
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
-
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
@@ -233,7 +203,7 @@ async function run(
     embed2.addField(
       "**fail!!**",
       "**" +
-        target.user.username +
+        target.user.username.replaceAll("_", "\\_") +
         "** has been robbed recently and is protected by a private security team\n" +
         "you were caught and paid $" +
         amountMoney.toLocaleString(),
@@ -243,7 +213,7 @@ async function run(
     embed3.setColor(Constants.EMBED_SUCCESS_COLOR);
     embed3.setDescription(
       "**" +
-        message.author.username +
+        message.author.username.replaceAll("_", "\\_") +
         "** tried to rob you in **" +
         message.guild.name +
         "**\n" +
@@ -268,14 +238,16 @@ async function run(
     embed2.setColor(Constants.EMBED_FAIL_COLOR);
     embed2.addField(
       "fail!!",
-      "**" + target.user.username + "** had a padlock, which has now been broken",
+      "**" +
+        target.user.username.replaceAll("_", "\\_") +
+        "** had a padlock, which has now been broken",
     );
 
     embed3.setTitle("you were nearly robbed");
     embed3.setColor(Constants.EMBED_SUCCESS_COLOR);
     embed3.setDescription(
       "**" +
-        message.author.username +
+        message.author.username.replaceAll("_", "\\_") +
         "** tried to rob you in **" +
         message.guild.name +
         "**\n" +
@@ -304,17 +276,42 @@ async function run(
       await removeBalance(target, amountMoney);
       await addBalance(message.member, amountMoney);
 
-      embed2.setColor(Constants.EMBED_SUCCESS_COLOR);
-      embed2.addField("success!!", "you stole $**" + amountMoney.toLocaleString() + "**");
-
       const earnedXp = await calcEarnedGambleXp(
         message.member,
         message.client as NypsiClient,
         1_000_000,
         1,
       );
+      const eventProgress = await addEventProgress(
+        message.client as NypsiClient,
+        message.member,
+        "rob",
+        1,
+      );
       addProgress(message.member, "robber", 1);
       addTaskProgress(message.member, "thief");
+
+      embed2.setColor(Constants.EMBED_SUCCESS_COLOR);
+
+      const eventData: { event?: EventData; target: number } = { target: 0 };
+
+      if (eventProgress) {
+        eventData.event = await getCurrentEvent();
+
+        if (eventData.event) {
+          eventData.target = Number(eventData.event.target);
+        }
+      }
+
+      embed2.addField(
+        "success!!",
+        "you stole $**" +
+          amountMoney.toLocaleString() +
+          "**" +
+          (eventProgress
+            ? `\n\n🔱${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`
+            : ""),
+      );
 
       if (earnedXp > 0) {
         await addXp(message.member, earnedXp);
@@ -331,7 +328,7 @@ async function run(
       embed3.setColor(Constants.EMBED_FAIL_COLOR);
       embed3.setDescription(
         "**" +
-          message.author.username +
+          message.author.username.replaceAll("_", "\\_") +
           "** has robbed you in **" +
           message.guild.name +
           "**\n" +
@@ -373,7 +370,7 @@ async function run(
         );
         embed3.setDescription(
           "**" +
-            message.author.username +
+            message.author.username.replaceAll("_", "\\_") +
             "** tried to rob you in **" +
             message.guild.name +
             "**\n" +
@@ -394,7 +391,7 @@ async function run(
         embed2.addField("fail!!", "you lost $**" + amountMoney.toLocaleString() + "**");
         embed3.setDescription(
           "**" +
-            message.author.username +
+            message.author.username.replaceAll("_", "\\_") +
             "** tried to rob you in **" +
             message.guild.name +
             "**\n" +

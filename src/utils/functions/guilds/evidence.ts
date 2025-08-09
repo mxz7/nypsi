@@ -24,8 +24,7 @@ export async function getMaxEvidenceBytes(guild: Guild) {
     },
   });
 
-  const base = Constants.EVIDENCE_BASE;
-  let total = base;
+  let total = Constants.EVIDENCE_BASE;
 
   if (query.length > 0) total += Number(query.map((a) => a.bytes).reduce((a, b) => a + b));
 

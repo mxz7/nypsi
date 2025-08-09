@@ -2,9 +2,12 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
+import { userExists } from "./utils";
 import ms = require("ms");
 
 export async function isPassive(member: MemberResolvable) {
+  if (!(await userExists(member))) return false;
+
   const userId = getUserId(member);
 
   const cache = await redis.get(`${Constants.redis.cache.economy.PASSIVE}:${userId}`);

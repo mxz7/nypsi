@@ -6,7 +6,7 @@ import {
   MessageActionRowComponentBuilder,
 } from "discord.js";
 import redis from "../init/redis";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { getPrefix } from "../utils/functions/guilds/utils";
@@ -19,18 +19,19 @@ const cmd = new Command("minecraft", "view minecraft name history", "minecraft")
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   const prefix = (await getPrefix(message.guild))[0];
 
   if (args.length == 0) {
-    return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}mc <account>`)] });
+    return send({ embeds: [new ErrorEmbed(`${prefix}mc <account>`)] });
   }
 
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) message.channel.send({ embeds: [res.embed] });
+    if (res.respond) send({ embeds: [res.embed] });
     return;
   }
 
@@ -41,13 +42,13 @@ async function run(
   const uuid = await getUUID(args[0]);
 
   if (!uuid || uuid.id === "null") {
-    return message.channel.send({ embeds: [new ErrorEmbed("invalid account")] });
+    return send({ embeds: [new ErrorEmbed("invalid account")] });
   }
 
   const names = await getNameHistory(uuid.id);
 
   if (!names || names.length === 0) {
-    return message.channel.send({
+    return send({
       embeds: [new ErrorEmbed("invalid data")],
     });
   }
@@ -67,7 +68,7 @@ async function run(
     .setThumbnail(`https://mc-heads.net/avatar/${uuid.id}`)
     .setDescription(pages.get(1).join("\n"));
 
-  if (pages.size === 1) return message.channel.send({ embeds: [embed] });
+  if (pages.size === 1) return send({ embeds: [embed] });
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder()
@@ -78,7 +79,7 @@ async function run(
     new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
   );
 
-  const msg = await message.channel.send({ embeds: [embed], components: [row] });
+  const msg = await send({ embeds: [embed], components: [row] });
 
   const manager = new PageManager({
     embed,
@@ -122,7 +123,7 @@ async function getNameHistory(uuid: string): Promise<{ username: string; changed
   }
 
   const names: { username: string; changed_at: string }[] = await fetch(
-    `https://laby.net/api/user/${uuid}/get-names`,
+    `https://laby.net/api/users/${uuid}/get-names`,
     {
       headers: {
         "User-Agent": `Mozilla/5.0 (compatible; nypsi}; +https://github.com/mxz7)`,

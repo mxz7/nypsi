@@ -10,9 +10,7 @@ export async function isTracking(member: MemberResolvable): Promise<boolean> {
   const userId = getUserId(member);
 
   if (await redis.exists(`${Constants.redis.cache.user.TRACKING}:${userId}`)) {
-    return (await redis.get(`${Constants.redis.cache.user.TRACKING}:${userId}`)) == "t"
-      ? true
-      : false;
+    return (await redis.get(`${Constants.redis.cache.user.TRACKING}:${userId}`)) == "t";
   }
 
   if (!(await hasProfile(userId))) return false;
@@ -86,7 +84,7 @@ export async function fetchUsernameHistory(member: MemberResolvable, limit = 69)
       createdAt: true,
     },
     orderBy: {
-      createdAt: "desc",
+      id: "desc",
     },
     take: limit,
   });
@@ -123,7 +121,7 @@ export async function fetchAvatarHistory(member: MemberResolvable, limit = 69) {
       id: true,
     },
     orderBy: {
-      createdAt: "desc",
+      id: "desc",
     },
     take: limit,
   });

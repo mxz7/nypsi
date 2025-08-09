@@ -17,7 +17,7 @@ import {
 import { inPlaceSort } from "fast-sort";
 import { min } from "mathjs";
 import { NypsiClient } from "../../../models/Client";
-import { NypsiCommandInteraction, NypsiMessage } from "../../../models/Command";
+import { NypsiCommandInteraction, NypsiMessage, SendMessage } from "../../../models/Command";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { Item } from "../../../types/Economy";
 import { KarmaShopItem } from "../../../types/Karmashop";
@@ -58,7 +58,7 @@ export async function runItemInfo(
   args: string[],
   selected: Item,
   defaultTab: string,
-  send?: (data: BaseMessageOptions | InteractionReplyOptions) => Promise<Message<boolean>>,
+  send?: SendMessage,
 ): Promise<boolean> {
   send ??= async (data: BaseMessageOptions | InteractionReplyOptions) => {
     return await message.channel.send(data as BaseMessageOptions);
@@ -302,7 +302,7 @@ function getGeneralMessage(
 ): ItemMessageData {
   const embed = new CustomEmbed(member);
   const description: string[] = [
-    `[\`${selected.id}\`](https://nypsi.xyz/item/${selected.id}?ref=bot-item)`,
+    `[\`${selected.id}\`](https://nypsi.xyz/items/${selected.id}?ref=bot-item)`,
   ];
   if (selected.unique) {
     description.push("*unique*");
@@ -374,12 +374,12 @@ function getGeneralMessage(
         .setStyle(ButtonStyle.Link)
         .setLabel("leaderboard")
         .setEmoji("🏆")
-        .setURL(`https://nypsi.xyz/leaderboard/${selected.id}?ref=bot-item`),
+        .setURL(`https://nypsi.xyz/leaderboards/${selected.id}?ref=bot-item`),
       new ButtonBuilder()
         .setStyle(ButtonStyle.Link)
         .setLabel("history")
         .setEmoji("📈")
-        .setURL(`https://nypsi.xyz/item/history/${selected.id}?ref=bot-item`),
+        .setURL(`https://nypsi.xyz/items/history/${selected.id}?ref=bot-item`),
     ),
   };
 }
@@ -488,6 +488,9 @@ function getObtainingMessage(selected: Item, member: ItemMessageMember): ItemMes
   if (selected.id === "beginner_booster") {
     description.push("given one to begin your nypsi journey");
   }
+  if (selected.id === "pandora_box") {
+    description.push("[events](https://nypsi.xyz/docs/economy/events?ref=bot-item-pandora)");
+  }
   const randomDropPool = lootPools["random_drop"];
   if (Object.keys(randomDropPool.items ?? {}).includes(selected.id)) {
     const weight =
@@ -582,6 +585,7 @@ function getBoosterMessage(selected: Item, member: ItemMessageMember) {
 }
 
 function getLootPoolsMessage(selected: Item, member: ItemMessageMember): ItemMessageData {
+  const pageLength = 15;
   const description: string[] = [];
   const lootPools = getLootPools();
   const poolOptions: StringSelectMenuOptionBuilder[] = [];
@@ -597,18 +601,22 @@ function getLootPoolsMessage(selected: Item, member: ItemMessageMember): ItemMes
     description.push(`**${count}** draw${count === 1 ? "" : "s"} from pool \`${poolName}\``);
     const breakdown = poolBreakdown(lootPools[poolName]);
     subEmbeds[poolName] = [];
-    for (let i = 0; i < breakdown.length; i += 15) {
+    for (let i = 0; i < breakdown.length; i += pageLength) {
       subEmbeds[poolName].push(
-        new CustomEmbed(member)
-          .setDescription(`**${count}** draw${count === 1 ? "" : "s"} from pool \`${poolName}\``)
-          .addField("items", breakdown.slice(i, min(i + 15, breakdown.length)).join("\n")),
+        new CustomEmbed(member).setDescription(
+          `**${count}** draw${count === 1 ? "" : "s"} from pool \`${poolName}\`\n\n` +
+            "**entries**\n" +
+            breakdown.slice(i, min(i + pageLength, breakdown.length)).join("\n"),
+        ),
       );
     }
     if (subEmbeds[poolName].length === 0) {
       subEmbeds[poolName].push(
-        new CustomEmbed(member)
-          .setDescription(`**${count}** draw${count === 1 ? "" : "s"} from pool \`${poolName}\``)
-          .addField("items", "nothing"),
+        new CustomEmbed(member).setDescription(
+          `**${count}** draw${count === 1 ? "" : "s"} from pool \`${poolName}\`\n\n` +
+            "**entries**\n" +
+            "*nothing*",
+        ),
       );
     }
   }
@@ -697,7 +705,10 @@ function poolBreakdown(pool: LootPool): string[] {
       weight,
     );
   }
-  return inPlaceSort(description.keys().toArray()).desc((e) => description.get(e));
+  return inPlaceSort(description.keys().toArray()).by([
+    { desc: (e) => description.get(e) },
+    { asc: (e) => e },
+  ]);
 }
 
 // END HELPERS

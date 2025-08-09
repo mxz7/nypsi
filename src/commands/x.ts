@@ -7,106 +7,158 @@ import {
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
+  CategoryChannel,
+  ChannelType,
   CommandInteraction,
   ComponentType,
+  Guild,
   Interaction,
   Message,
   MessageActionRowComponentBuilder,
+  TextChannel,
   User,
 } from "discord.js";
+import { sort } from "fast-sort";
 import * as fs from "fs/promises";
 import { promisify } from "util";
 import { gzip } from "zlib";
 import prisma from "../init/database";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { startRandomDrop } from "../scheduled/clusterjobs/random-drops";
-import Constants from "../utils/Constants";
+import Constants, { AdminPermission } from "../utils/Constants";
 import { b, c } from "../utils/functions/anticheat";
-import { getCaptchaHistory, giveCaptcha } from "../utils/functions/captcha";
-import { MStoTime } from "../utils/functions/date";
-import { updateBalance, updateBankBalance } from "../utils/functions/economy/balance";
+import {
+  getCaptchaHistory,
+  giveCaptcha,
+  isLockedOut,
+  passedCaptcha,
+} from "../utils/functions/captcha";
+import { formatDate, MStoTime } from "../utils/functions/date";
+import {
+  calcNetWorth,
+  getBalance,
+  getBankBalance,
+  getGambleMulti,
+  getMaxBankBalance,
+  updateBalance,
+  updateBankBalance,
+} from "../utils/functions/economy/balance";
 import { initCrashGame } from "../utils/functions/economy/crash";
+import { createEvent, getCurrentEvent } from "../utils/functions/economy/events";
+import { getGuildByUser } from "../utils/functions/economy/guilds";
 import {
   addInventoryItem,
   removeInventoryItem,
   setInventoryItem,
 } from "../utils/functions/economy/inventory";
-import { setLevel, setPrestige } from "../utils/functions/economy/levelling";
+import { getPrestige, setLevel, setPrestige } from "../utils/functions/economy/levelling";
 import { getTaskStreaks, setTaskStreak } from "../utils/functions/economy/tasks";
+import { topBalanceGlobal } from "../utils/functions/economy/top";
 import {
   doDaily,
   getDailyStreak,
   getEcoBanTime,
+  getEventsData,
   getItems,
   getLastDaily,
   isEcoBanned,
+  reset,
   setDaily,
   setEcoBan,
+  userExists,
 } from "../utils/functions/economy/utils";
 import {
   getLastVote,
   getVoteStreak,
   giveVoteRewards,
+  hasVoted,
   setVoteStreak,
 } from "../utils/functions/economy/vote";
-import { updateXp } from "../utils/functions/economy/xp";
+import { getXp, updateXp } from "../utils/functions/economy/xp";
+import { getPeaks } from "../utils/functions/guilds/utils";
 import { addKarma, getKarma, removeKarma } from "../utils/functions/karma/karma";
-import { getMember } from "../utils/functions/member";
+import { getMember, MemberResolvable } from "../utils/functions/member";
 import PageManager from "../utils/functions/page";
 import { getUserAliases } from "../utils/functions/premium/aliases";
 import {
   addMember,
   expireUser,
   getPremiumProfile,
+  getTier,
   isPremium,
   levelString,
   setCredits,
   setExpireDate,
   setTier,
 } from "../utils/functions/premium/premium";
+import { getDuration } from "../utils/functions/string";
 import { createSupportRequest } from "../utils/functions/supportrequest";
 import { exportTransactions } from "../utils/functions/transactions";
-import { getAdminLevel, setAdminLevel } from "../utils/functions/users/admin";
+import { getAdminLevel, hasAdminPermission, setAdminLevel } from "../utils/functions/users/admin";
 import { setBirthday } from "../utils/functions/users/birthday";
 import { isUserBlacklisted, setUserBlacklist } from "../utils/functions/users/blacklist";
-import { getCommandUses } from "../utils/functions/users/commands";
+import { getCommandUses, getLastCommand } from "../utils/functions/users/commands";
+import { fetchUsernameHistory } from "../utils/functions/users/history";
 import { addNotificationToQueue } from "../utils/functions/users/notifications";
 import { getLastKnownUsername } from "../utils/functions/users/tag";
 import { addTag, getTags, removeTag } from "../utils/functions/users/tags";
 import { hasProfile } from "../utils/functions/users/utils";
+import {
+  commandAliasExists,
+  commandExists,
+  getCommandFromAlias,
+} from "../utils/handlers/commandhandler";
 import { logger } from "../utils/logger";
+import ms = require("ms");
 
 const cmd = new Command("x", "admincmd", "none").setPermissions(["bot owner"]);
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (!(message instanceof Message)) return;
-  if ((await getAdminLevel(message.member)) < 1) {
-    if (message.member.roles.cache.has("1023950187661635605")) {
-      if (args[0].toLowerCase() !== "review") {
-        if (await redis.exists("nypsi:xemoji:cooldown")) return;
-        await redis.set("nypsi:xemoji:cooldown", "boobies", "EX", 5);
-        return message.react(
-          ["🫦", "💦", "🍑", "🍆", "😩"][
-            Math.floor(Math.random() * ["🫦", "💦", "🍑", "🍆", "😩"].length)
-          ],
-        );
-      }
-    } else {
-      if (await redis.exists("nypsi:xemoji:cooldown")) return;
-      await redis.set("nypsi:xemoji:cooldown", "boobies", "EX", 5);
-      return message.react(
-        ["🫦", "💦", "🍑", "🍆", "😩"][
-          Math.floor(Math.random() * ["🫦", "💦", "🍑", "🍆", "😩"].length)
-        ],
-      );
-    }
+  if (!(await hasAdminPermission(message.member, "use-x"))) {
+    if (await redis.exists("nypsi:xemoji:cooldown")) return;
+    await redis.set("nypsi:xemoji:cooldown", "boobies", "EX", 5);
+    return message.react(
+      ["🫦", "💦", "🍑", "🍆", "😩"][
+        Math.floor(Math.random() * ["🫦", "💦", "🍑", "🍆", "😩"].length)
+      ],
+    );
   }
+
+  const requiredLevelEmbed = (permission: AdminPermission) => {
+    return new ErrorEmbed(
+      `you require admin level **${Constants.ADMIN_PERMISSIONS.get(permission)}** to do this`,
+    );
+  };
+
+  const getUserFromId = async (id: string) => {
+    const res = await (message.client as NypsiClient).cluster.broadcastEval(
+      async (c, { userId }) => {
+        const g = await c.users.fetch(userId).catch(() => undefined as User);
+
+        return g;
+      },
+      { context: { userId: id } },
+    );
+
+    let user: User;
+
+    for (const i of res) {
+      if ((i as any)?.username) {
+        user = i as User;
+        break;
+      }
+    }
+
+    return user;
+  };
 
   const getDbData = async (user: User) => {
     logger.info(`fetching data for ${user.id}...`);
@@ -216,26 +268,10 @@ async function run(
   };
 
   const showUser = async (id: string) => {
-    const res = await (message.client as NypsiClient).cluster.broadcastEval(
-      async (c, { userId }) => {
-        const g = await c.users.fetch(userId).catch(() => undefined as User);
-
-        return g;
-      },
-      { context: { userId: id } },
-    );
-
-    let user: User;
-
-    for (const i of res) {
-      if ((i as any)?.username) {
-        user = i as User;
-        break;
-      }
-    }
+    const user = await getUserFromId(id);
 
     if (!user) {
-      return message.channel.send({ embeds: [new ErrorEmbed("invalid id")] });
+      return send({ embeds: [new ErrorEmbed("invalid id")] });
     }
 
     const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [
@@ -244,108 +280,128 @@ async function run(
           .setCustomId("db-data")
           .setLabel("view all db data")
           .setStyle(ButtonStyle.Primary)
-          .setEmoji("💻"),
+          .setEmoji("💻")
+          .setDisabled(!(await hasAdminPermission(message.member, "user-db-data"))),
         new ButtonBuilder()
           .setCustomId("cmds")
           .setLabel("command count")
           .setStyle(ButtonStyle.Primary)
-          .setEmoji("⌨️"),
+          .setEmoji("⌨️")
+          .setDisabled(!(await hasAdminPermission(message.member, "view-user-info"))),
         new ButtonBuilder()
           .setCustomId("view-premium")
           .setLabel("premium")
           .setStyle(ButtonStyle.Primary)
-          .setEmoji("💎"),
+          .setEmoji("💎")
+          .setDisabled(!(await hasAdminPermission(message.member, "view-user-info"))),
         new ButtonBuilder()
           .setCustomId("set-admin")
           .setLabel("set admin level")
           .setStyle(ButtonStyle.Primary)
-          .setEmoji("👨🏻‍💼"),
+          .setEmoji("👨🏻‍💼")
+          .setDisabled(!(await hasAdminPermission(message.member, "set-admin-level"))),
         new ButtonBuilder()
           .setCustomId("create-chat")
           .setLabel("create chat")
           .setStyle(ButtonStyle.Primary)
-          .setEmoji("💬"),
+          .setEmoji("💬")
+          .setDisabled(!(await hasAdminPermission(message.member, "create-chat"))),
       ),
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
           .setCustomId("ac")
           .setLabel("anticheat")
           .setStyle(ButtonStyle.Primary)
-          .setEmoji("🤥"),
+          .setEmoji("🤥")
+          .setDisabled(!(await hasAdminPermission(message.member, "view-user-info"))),
         new ButtonBuilder()
           .setCustomId("tags")
           .setLabel("tags")
           .setStyle(ButtonStyle.Primary)
-          .setEmoji("🏷️"),
+          .setEmoji("🏷️")
+          .setDisabled(!(await hasAdminPermission(message.member, "view-user-info"))),
         new ButtonBuilder()
           .setCustomId("add-purchase")
           .setLabel("add purchase")
           .setEmoji("💰")
-          .setStyle(ButtonStyle.Primary),
+          .setStyle(ButtonStyle.Primary)
+          .setDisabled(!(await hasAdminPermission(message.member, "add-purchase"))),
         new ButtonBuilder()
           .setCustomId("set-birthday")
           .setLabel("set birthday")
           .setEmoji("🎂")
-          .setStyle(ButtonStyle.Primary),
+          .setStyle(ButtonStyle.Primary)
+          .setDisabled(!(await hasAdminPermission(message.member, "set-birthday"))),
         new ButtonBuilder()
           .setCustomId("view-streak")
           .setLabel("streaks")
           .setEmoji("📅")
-          .setStyle(ButtonStyle.Primary),
+          .setStyle(ButtonStyle.Primary)
+          .setDisabled(!(await hasAdminPermission(message.member, "view-user-info"))),
       ),
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
           .setCustomId("set-bal")
           .setLabel("set balance")
           .setStyle(ButtonStyle.Danger)
-          .setEmoji("💰"),
+          .setEmoji("💰")
+          .setDisabled(!(await hasAdminPermission(message.member, "set-balance"))),
         new ButtonBuilder()
           .setCustomId("set-bank")
           .setLabel("set bank")
           .setStyle(ButtonStyle.Danger)
-          .setEmoji("💳"),
+          .setEmoji("💳")
+          .setDisabled(!(await hasAdminPermission(message.member, "set-balance"))),
         new ButtonBuilder()
           .setCustomId("set-prestige")
           .setLabel("set prestige")
           .setStyle(ButtonStyle.Danger)
-          .setEmoji("🌟"),
+          .setEmoji("🌟")
+          .setDisabled(!(await hasAdminPermission(message.member, "set-prestige"))),
         new ButtonBuilder()
           .setCustomId("set-level")
           .setLabel("set level")
           .setStyle(ButtonStyle.Danger)
-          .setEmoji("⭐"),
+          .setEmoji("⭐")
+          .setDisabled(!(await hasAdminPermission(message.member, "set-level"))),
         new ButtonBuilder()
           .setCustomId("set-xp")
           .setLabel("set xp")
           .setStyle(ButtonStyle.Danger)
-          .setEmoji("✨"),
+          .setEmoji("✨")
+          .setDisabled(!(await hasAdminPermission(message.member, "set-xp"))),
       ),
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
           .setCustomId("set-inv")
           .setLabel("modify inventory")
           .setStyle(ButtonStyle.Danger)
-          .setEmoji("🎒"),
+          .setEmoji("🎒")
+          .setDisabled(!(await hasAdminPermission(message.member, "set-inv"))),
         new ButtonBuilder()
           .setCustomId("set-karma")
           .setLabel("set karma")
           .setStyle(ButtonStyle.Danger)
-          .setEmoji("🔮"),
+          .setEmoji("🔮")
+          .setDisabled(!(await hasAdminPermission(message.member, "set-karma"))),
         new ButtonBuilder()
           .setCustomId("ecoban")
           .setLabel("economy ban")
           .setStyle(ButtonStyle.Danger)
-          .setEmoji("❌"),
+          .setEmoji("❌")
+          .setDisabled(!(await hasAdminPermission(message.member, "ecoban"))),
         new ButtonBuilder()
           .setCustomId("blacklist")
           .setLabel("blacklist")
           .setStyle(ButtonStyle.Danger)
-          .setEmoji("❌"),
+          .setEmoji("❌")
+          .setDisabled(!(await hasAdminPermission(message.member, "blacklist"))),
         new ButtonBuilder()
           .setCustomId("wipe")
           .setLabel("wipe")
           .setStyle(ButtonStyle.Danger)
-          .setEmoji("🧹"),
+          .setEmoji("🧹")
+          .setDisabled(!(await hasAdminPermission(message.member, "wipe"))),
       ),
     ];
 
@@ -366,7 +422,7 @@ async function run(
       `${user.username}'s discord data`,
     );
 
-    const msg = await message.channel.send({ embeds: [embed], components: rows });
+    const msg = await send({ embeds: [embed], components: rows });
 
     const waitForButton = async (): Promise<void> => {
       const filter = (i: Interaction) => i.user.id == message.author.id;
@@ -380,9 +436,9 @@ async function run(
       await res.deferReply();
 
       if (res.customId === "db-data") {
-        if ((await getAdminLevel(message.member)) < 1) {
+        if (!(await hasAdminPermission(message.member, "user-db-data"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **1** to do this")],
+            embeds: [requiredLevelEmbed("user-db-data")],
           });
           return waitForButton();
         }
@@ -396,9 +452,9 @@ async function run(
         await res.editReply({ files });
         return waitForButton();
       } else if (res.customId === "cmds") {
-        if ((await getAdminLevel(message.member)) < 1) {
+        if (!(await hasAdminPermission(message.member, "view-user-info"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **1** to do this")],
+            embeds: [requiredLevelEmbed("view-user-info")],
           });
           return waitForButton();
         }
@@ -421,9 +477,9 @@ async function run(
         await res.editReply({ embeds: [embed] });
         return waitForButton();
       } else if (res.customId === "view-premium") {
-        if ((await getAdminLevel(message.member)) < 1) {
+        if (!(await hasAdminPermission(message.member, "view-user-info"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **1** to do this")],
+            embeds: [requiredLevelEmbed("view-user-info")],
           });
           return waitForButton();
         }
@@ -433,9 +489,9 @@ async function run(
         doPremium(user, res as ButtonInteraction);
         return waitForButton();
       } else if (res.customId === "set-admin") {
-        if ((await getAdminLevel(message.member)) < 69) {
+        if (!(await hasAdminPermission(message.member, "set-admin-level"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **69** to do this")],
+            embeds: [requiredLevelEmbed("set-admin-level")],
           });
           return waitForButton();
         }
@@ -473,9 +529,9 @@ async function run(
         await res.editReply({ embeds: [new CustomEmbed(message.member, "✅")] });
         return waitForButton();
       } else if (res.customId === "create-chat") {
-        if ((await getAdminLevel(message.member)) < 2) {
+        if (!(await hasAdminPermission(message.member, "create-chat"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **2** to do this")],
+            embeds: [requiredLevelEmbed("create-chat")],
           });
           return waitForButton();
         }
@@ -506,9 +562,9 @@ async function run(
 
         return waitForButton();
       } else if (res.customId === "tags") {
-        if ((await getAdminLevel(message.member)) < 4) {
+        if (!(await hasAdminPermission(message.member, "view-user-info"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+            embeds: [requiredLevelEmbed("view-user-info")],
           });
           return waitForButton();
         }
@@ -516,9 +572,9 @@ async function run(
         doTags(user, res as ButtonInteraction);
         return waitForButton();
       } else if (res.customId === "add-purchase") {
-        if ((await getAdminLevel(message.member)) < 4) {
+        if (!(await hasAdminPermission(message.member, "add-purchase"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+            embeds: [requiredLevelEmbed("add-purchase")],
           });
           return waitForButton();
         }
@@ -565,9 +621,9 @@ async function run(
 
         msgResponse.first().react("✅");
       } else if (res.customId === "set-birthday") {
-        if ((await getAdminLevel(message.member)) < 1) {
+        if (!(await hasAdminPermission(message.member, "set-birthday"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **1** to do this")],
+            embeds: [requiredLevelEmbed("set-birthday")],
           });
           return waitForButton();
         }
@@ -605,9 +661,9 @@ async function run(
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "view-streak") {
-        if ((await getAdminLevel(message.member)) < 1) {
+        if (!(await hasAdminPermission(message.member, "view-user-info"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **1** to do this")],
+            embeds: [requiredLevelEmbed("view-user-info")],
           });
           return waitForButton();
         }
@@ -617,9 +673,9 @@ async function run(
         doStreaks(user, res as ButtonInteraction);
         return waitForButton();
       } else if (res.customId === "set-bal") {
-        if ((await getAdminLevel(message.member)) < 4) {
+        if (!(await hasAdminPermission(message.member, "set-balance"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+            embeds: [requiredLevelEmbed("set-balance")],
           });
           return waitForButton();
         }
@@ -657,9 +713,9 @@ async function run(
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-bank") {
-        if ((await getAdminLevel(message.member)) < 4) {
+        if (!(await hasAdminPermission(message.member, "set-balance"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+            embeds: [requiredLevelEmbed("set-balance")],
           });
           return waitForButton();
         }
@@ -697,9 +753,9 @@ async function run(
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-prestige") {
-        if ((await getAdminLevel(message.member)) < 4) {
+        if (!(await hasAdminPermission(message.member, "set-prestige"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+            embeds: [requiredLevelEmbed("set-prestige")],
           });
           return waitForButton();
         }
@@ -732,9 +788,9 @@ async function run(
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-level") {
-        if ((await getAdminLevel(message.member)) < 4) {
+        if (!(await hasAdminPermission(message.member, "set-level"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+            embeds: [requiredLevelEmbed("set-level")],
           });
           return waitForButton();
         }
@@ -767,9 +823,9 @@ async function run(
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-xp") {
-        if ((await getAdminLevel(message.member)) < 4) {
+        if (!(await hasAdminPermission(message.member, "set-xp"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+            embeds: [requiredLevelEmbed("set-xp")],
           });
           return waitForButton();
         }
@@ -802,9 +858,9 @@ async function run(
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-inv") {
-        if ((await getAdminLevel(message.member)) < 4) {
+        if (!(await hasAdminPermission(message.member, "set-inv"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+            embeds: [requiredLevelEmbed("set-inv")],
           });
           return waitForButton();
         }
@@ -878,9 +934,9 @@ async function run(
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-karma") {
-        if ((await getAdminLevel(message.member)) < 4) {
+        if (!(await hasAdminPermission(message.member, "set-karma"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+            embeds: [requiredLevelEmbed("set-karma")],
           });
           return waitForButton();
         }
@@ -928,9 +984,9 @@ async function run(
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "ecoban") {
-        if ((await getAdminLevel(message.member)) < 2) {
+        if (!(await hasAdminPermission(message.member, "ecoban"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **2** to do this")],
+            embeds: [requiredLevelEmbed("ecoban")],
           });
           return waitForButton();
         }
@@ -975,9 +1031,9 @@ async function run(
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "blacklist") {
-        if ((await getAdminLevel(message.member)) < 3) {
+        if (!(await hasAdminPermission(message.member, "blacklist"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **3** to do this")],
+            embeds: [requiredLevelEmbed("blacklist")],
           });
           return waitForButton();
         }
@@ -998,9 +1054,9 @@ async function run(
           return waitForButton();
         }
       } else if (res.customId === "ac") {
-        if ((await getAdminLevel(message.member)) < 1) {
+        if (!(await hasAdminPermission(message.member, "view-user-info"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **1** to do this")],
+            embeds: [requiredLevelEmbed("view-user-info")],
           });
           return waitForButton();
         }
@@ -1010,9 +1066,9 @@ async function run(
         doAnticheat(user, res as ButtonInteraction);
         return waitForButton();
       } else if (res.customId === "wipe") {
-        if ((await getAdminLevel(message.member)) < 69) {
+        if (!(await hasAdminPermission(message.member, "wipe"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **69** to do this")],
+            embeds: [requiredLevelEmbed("wipe")],
           });
           return waitForButton();
         }
@@ -1157,33 +1213,40 @@ async function run(
     const render = async () => {
       let desc = "";
 
+      const canSetPremium = await hasAdminPermission(message.member, "set-premium");
+
       const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [
         new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
           new ButtonBuilder()
             .setCustomId("add-premium")
             .setLabel("add premium")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("➕"),
+            .setEmoji("➕")
+            .setDisabled(!canSetPremium),
           new ButtonBuilder()
             .setCustomId("set-tier")
             .setLabel("set tier")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("😁"),
+            .setEmoji("😁")
+            .setDisabled(!canSetPremium),
           new ButtonBuilder()
             .setCustomId("set-expire")
             .setLabel("set expire date")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("😣"),
+            .setEmoji("😣")
+            .setDisabled(!canSetPremium),
           new ButtonBuilder()
             .setCustomId("set-credits")
             .setLabel("set credits")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("🪙"),
+            .setEmoji("🪙")
+            .setDisabled(!canSetPremium),
           new ButtonBuilder()
             .setCustomId("raw-data")
             .setLabel("view raw data")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("🥩"),
+            .setEmoji("🥩")
+            .setDisabled(!(await hasAdminPermission(message.member, "view-user-info"))),
         ),
 
         new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -1191,17 +1254,20 @@ async function run(
             .setCustomId("del-cmd")
             .setLabel("delete cmd")
             .setStyle(ButtonStyle.Danger)
-            .setEmoji("❌"),
+            .setEmoji("❌")
+            .setDisabled(!(await hasAdminPermission(message.member, "delete-prem-cmd"))),
           new ButtonBuilder()
             .setCustomId("del-aliases")
             .setLabel("delete aliases")
             .setStyle(ButtonStyle.Danger)
-            .setEmoji("❌"),
+            .setEmoji("❌")
+            .setDisabled(!(await hasAdminPermission(message.member, "delete-prem-aliases"))),
           new ButtonBuilder()
             .setCustomId("expire-now")
             .setLabel("expire now")
             .setStyle(ButtonStyle.Danger)
-            .setEmoji("❌"),
+            .setEmoji("❌")
+            .setDisabled(!canSetPremium),
         ),
       ];
 
@@ -1228,7 +1294,8 @@ async function run(
         }
       } else {
         rows.forEach((i) => i.components.forEach((j) => j.setDisabled(true)));
-        rows[0].components[0].setDisabled(false);
+
+        if (canSetPremium) rows[0].components[0].setDisabled(false);
 
         embed.setDescription("no premium");
       }
@@ -1252,9 +1319,9 @@ async function run(
       await res.deferReply();
 
       if (res.customId === "add-premium") {
-        if ((await getAdminLevel(message.member)) < 5) {
+        if (!(await hasAdminPermission(message.member, "set-premium"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **5** to do this")],
+            embeds: [requiredLevelEmbed("set-premium")],
           });
           return waitForButton();
         }
@@ -1299,9 +1366,9 @@ async function run(
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-tier") {
-        if ((await getAdminLevel(message.member)) < 5) {
+        if (!(await hasAdminPermission(message.member, "set-premium"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **5** to do this")],
+            embeds: [requiredLevelEmbed("set-premium")],
           });
           return waitForButton();
         }
@@ -1346,9 +1413,9 @@ async function run(
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-expire") {
-        if ((await getAdminLevel(message.member)) < 5) {
+        if (!(await hasAdminPermission(message.member, "set-premium"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **5** to do this")],
+            embeds: [requiredLevelEmbed("set-premium")],
           });
           return waitForButton();
         }
@@ -1397,9 +1464,9 @@ async function run(
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "raw-data") {
-        if ((await getAdminLevel(message.member)) < 1) {
+        if (!(await hasAdminPermission(message.member, "view-user-info"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **1** to do this")],
+            embeds: [requiredLevelEmbed("view-user-info")],
           });
           return waitForButton();
         }
@@ -1414,9 +1481,9 @@ async function run(
         });
         return waitForButton();
       } else if (res.customId === "del-cmd") {
-        if ((await getAdminLevel(message.member)) < 3) {
+        if (!(await hasAdminPermission(message.member, "delete-prem-cmd"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **3** to do this")],
+            embeds: [requiredLevelEmbed("delete-prem-cmd")],
           });
           return waitForButton();
         }
@@ -1429,9 +1496,9 @@ async function run(
         });
         return waitForButton();
       } else if (res.customId === "del-aliases") {
-        if ((await getAdminLevel(message.member)) < 3) {
+        if (!(await hasAdminPermission(message.member, "delete-prem-aliases"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **3** to do this")],
+            embeds: [requiredLevelEmbed("delete-prem-aliases")],
           });
           return waitForButton();
         }
@@ -1445,9 +1512,9 @@ async function run(
         });
         return waitForButton();
       } else if (res.customId === "expire-now") {
-        if ((await getAdminLevel(message.member)) < 5) {
+        if (!(await hasAdminPermission(message.member, "set-premium"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **5** to do this")],
+            embeds: [requiredLevelEmbed("set-premium")],
           });
           return waitForButton();
         }
@@ -1458,9 +1525,9 @@ async function run(
         await res.editReply({ embeds: [new CustomEmbed(message.member, "done sir.")] });
         return waitForButton();
       } else if (res.customId === "set-credits") {
-        if ((await getAdminLevel(message.member)) < 5) {
+        if (!(await hasAdminPermission(message.member, "set-premium"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **5** to do this")],
+            embeds: [requiredLevelEmbed("set-premium")],
           });
           return waitForButton();
         }
@@ -1519,28 +1586,34 @@ async function run(
         getTaskStreaks(message.member),
       ]);
 
+      const canSetStreaks = await hasAdminPermission(message.member, "set-streak");
+
       const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [
         new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
           new ButtonBuilder()
             .setCustomId("set-daily")
             .setLabel("set daily streak")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("📅"),
+            .setEmoji("📅")
+            .setDisabled(!canSetStreaks),
           new ButtonBuilder()
             .setCustomId("set-vote")
             .setLabel("set vote streak")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("🗳"),
+            .setEmoji("🗳")
+            .setDisabled(!canSetStreaks),
           new ButtonBuilder()
             .setCustomId("set-daily-tasks")
             .setLabel("set daily task streak")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("📋"),
+            .setEmoji("📋")
+            .setDisabled(!canSetStreaks),
           new ButtonBuilder()
             .setCustomId("set-weekly-tasks")
             .setLabel("set weekly task streak")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("📋"),
+            .setEmoji("📋")
+            .setDisabled(!canSetStreaks),
         ),
 
         new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -1549,13 +1622,13 @@ async function run(
             .setLabel("rerun daily rewards")
             .setStyle(ButtonStyle.Primary)
             .setEmoji("📅")
-            .setDisabled(daily <= 0),
+            .setDisabled(!canSetStreaks || daily <= 0),
           new ButtonBuilder()
             .setCustomId("rerun-vote")
             .setLabel("rerun vote rewards")
             .setStyle(ButtonStyle.Primary)
             .setEmoji("🗳")
-            .setDisabled(vote <= 0),
+            .setDisabled(!canSetStreaks || vote <= 0),
         ),
       ];
 
@@ -1584,9 +1657,9 @@ async function run(
       await res.deferReply();
 
       if (res.customId === "set-daily") {
-        if ((await getAdminLevel(message.member)) < 4) {
+        if (!(await hasAdminPermission(message.member, "set-streak"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+            embeds: [requiredLevelEmbed("set-streak")],
           });
           return waitForButton();
         }
@@ -1618,9 +1691,9 @@ async function run(
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-vote") {
-        if ((await getAdminLevel(message.member)) < 4) {
+        if (!(await hasAdminPermission(message.member, "set-streak"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+            embeds: [requiredLevelEmbed("set-streak")],
           });
           return waitForButton();
         }
@@ -1652,9 +1725,9 @@ async function run(
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-daily-tasks") {
-        if ((await getAdminLevel(message.member)) < 4) {
+        if (!(await hasAdminPermission(message.member, "set-streak"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+            embeds: [requiredLevelEmbed("set-streak")],
           });
           return waitForButton();
         }
@@ -1686,9 +1759,9 @@ async function run(
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-weekly-tasks") {
-        if ((await getAdminLevel(message.member)) < 4) {
+        if (!(await hasAdminPermission(message.member, "set-streak"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+            embeds: [requiredLevelEmbed("set-streak")],
           });
           return waitForButton();
         }
@@ -1720,9 +1793,9 @@ async function run(
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "rerun-daily") {
-        if ((await getAdminLevel(message.member)) < 4) {
+        if (!(await hasAdminPermission(message.member, "run-streak"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+            embeds: [requiredLevelEmbed("run-streak")],
           });
           return waitForButton();
         }
@@ -1740,9 +1813,9 @@ async function run(
 
         return waitForButton();
       } else if (res.customId === "rerun-vote") {
-        if ((await getAdminLevel(message.member)) < 4) {
+        if (!(await hasAdminPermission(message.member, "run-streak"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+            embeds: [requiredLevelEmbed("run-streak")],
           });
           return waitForButton();
         }
@@ -1784,12 +1857,14 @@ async function run(
             .setCustomId("ac-hist")
             .setLabel("show data")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("📋"),
+            .setEmoji("📋")
+            .setDisabled(!(await hasAdminPermission(message.member, "anticheat-history"))),
           new ButtonBuilder()
             .setCustomId("ac-clear")
             .setLabel("clear")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("🗑️"),
+            .setEmoji("🗑️")
+            .setDisabled(!(await hasAdminPermission(message.member, "clear-anticheat"))),
         ),
 
         new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -1797,12 +1872,14 @@ async function run(
             .setCustomId("captcha-hist")
             .setLabel("captcha history")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("🤖"),
+            .setEmoji("🤖")
+            .setDisabled(!(await hasAdminPermission(message.member, "captcha-history"))),
           new ButtonBuilder()
             .setCustomId("give-captcha")
             .setLabel("give captcha")
             .setStyle(ButtonStyle.Primary)
-            .setEmoji("🤖"),
+            .setEmoji("🤖")
+            .setDisabled(!(await hasAdminPermission(message.member, "captchatest"))),
         ),
       ];
 
@@ -1827,9 +1904,9 @@ async function run(
       await res.deferReply();
 
       if (res.customId === "ac-hist") {
-        if ((await getAdminLevel(message.member)) < 2) {
+        if (!(await hasAdminPermission(message.member, "anticheat-history"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **2** to do this")],
+            embeds: [requiredLevelEmbed("anticheat-history")],
           });
           return waitForButton();
         }
@@ -1865,9 +1942,9 @@ async function run(
         });
         return waitForButton();
       } else if (res.customId === "ac-clear") {
-        if ((await getAdminLevel(message.member)) < 3) {
+        if (!(await hasAdminPermission(message.member, "clear-anticheat"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **3** to do this")],
+            embeds: [requiredLevelEmbed("clear-anticheat")],
           });
           return waitForButton();
         }
@@ -1883,8 +1960,8 @@ async function run(
         await res.editReply({ content: "✅" });
         return waitForButton();
       } else if (res.customId === "give-captcha") {
-        if ((await getAdminLevel(res.user)) < 1) {
-          res.followUp({ embeds: [new ErrorEmbed("you require admin level 1 for this")] });
+        if (!(await hasAdminPermission(message.member, "captchatest"))) {
+          res.followUp({ embeds: [requiredLevelEmbed("captchatest")] });
           return;
         }
 
@@ -1897,8 +1974,8 @@ async function run(
         res.followUp({ content: "✅" });
         return waitForButton();
       } else if (res.customId === "captcha-hist") {
-        if ((await getAdminLevel(res.user)) < 3) {
-          res.followUp({ embeds: [new ErrorEmbed("you require admin level 3 for this")] });
+        if (!(await hasAdminPermission(message.member, "captcha-history"))) {
+          res.followUp({ embeds: [requiredLevelEmbed("captcha-history")] });
           return;
         }
 
@@ -1911,16 +1988,17 @@ async function run(
         const embed = new CustomEmbed(message.member);
 
         const pages = PageManager.createPages(
-          history.map(
-            (captcha) =>
-              "```" +
-              `received: ${captcha.received}\n` +
-              `received at: ${dayjs(captcha.createdAt).format("HH:mm:ss")}\n` +
-              `visits (${captcha.visits.length}): ${captcha.visits.map((i) => dayjs(i).format("HH:mm:ss")).join(" ")}\n` +
-              `solved at: ${dayjs(captcha.solvedAt).format("HH:mm:ss")}\n` +
-              `time taken: ${MStoTime(captcha.solvedAt.getTime() - captcha.createdAt.getTime())}\n` +
-              `solved ip: ${captcha.solvedIp}\n` +
+          history.map((captcha) =>
+            [
               "```",
+              `received: ${captcha.received}`,
+              `received at: ${dayjs(captcha.createdAt).format("HH:mm:ss")}`,
+              `visits (${captcha.visits.length}): ${captcha.visits.map((i) => dayjs(i).format("HH:mm:ss")).join(" ")}`,
+              `solved at: ${dayjs(captcha.solvedAt).format("HH:mm:ss")}`,
+              `time taken: ${MStoTime(captcha.solvedAt.getTime() - captcha.createdAt.getTime())}`,
+              `solved ip: ${captcha.solvedIp}`,
+              "```",
+            ].join("\n"),
           ),
           1,
         );
@@ -1956,12 +2034,14 @@ async function run(
           .setCustomId("add-tag")
           .setLabel("add tag")
           .setStyle(ButtonStyle.Primary)
-          .setEmoji("👍🏻"),
+          .setEmoji("👍🏻")
+          .setDisabled(!(await hasAdminPermission(message.member, "set-tags"))),
         new ButtonBuilder()
           .setCustomId("remove-tag")
           .setLabel("remove tag")
           .setStyle(ButtonStyle.Primary)
-          .setEmoji("👎🏻"),
+          .setEmoji("👎🏻")
+          .setDisabled(!(await hasAdminPermission(message.member, "set-tags"))),
       ),
     ];
 
@@ -1987,9 +2067,9 @@ async function run(
       await res.deferReply();
 
       if (res.customId === "add-tag") {
-        if ((await getAdminLevel(message.member)) < 4) {
+        if (!(await hasAdminPermission(message.member, "set-tags"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+            embeds: [requiredLevelEmbed("set-tags")],
           });
           return waitForButton();
         }
@@ -2026,9 +2106,9 @@ async function run(
         });
         return waitForButton();
       } else if (res.customId === "remove-tag") {
-        if ((await getAdminLevel(message.member)) < 4) {
+        if (!(await hasAdminPermission(message.member, "set-tags"))) {
           await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+            embeds: [requiredLevelEmbed("set-tags")],
           });
           return waitForButton();
         }
@@ -2069,82 +2149,516 @@ async function run(
     return waitForButton();
   };
 
-  const findId = async (tag: string) => {
-    const findFromCache = async () => {
-      let user: any = await (message.client as NypsiClient).cluster.broadcastEval(
-        async (c, { userId }) => {
-          const g = await c.users.cache.find((u) => {
-            return `${u.username}`.includes(userId);
-          });
+  const doFind = async (args: string[]) => {
+    args.shift();
+
+    const findGuild = async (message: NypsiMessage, guild: any) => {
+      const owner = guild.ownerId;
+
+      const invites = guild.invites.cache;
+
+      const embed = new CustomEmbed(message.member)
+        .setDescription(`\`${guild.id}\``)
+        .setTitle(guild.name)
+        .addField(
+          "info",
+          `**owner** ${owner}
+            **created** ${dayjs(guild.createdTimestamp).format()}`,
+          true,
+        )
+        .addField(
+          "member info",
+          `**members** ${guild.members.length}
+    **peak** ${await getPeaks(guild)}`,
+          true,
+        ); // if guild.members.length works add members field back
+
+      if (invites && invites.length > 0) {
+        embed.addField(
+          `invite (${invites.length})`,
+          invites[Math.floor(Math.random() & invites.length)],
+        );
+      }
+
+      return send({ embeds: [embed] });
+    };
+
+    const findUser = async (message: NypsiMessage, user: User) => {
+      const embed = new CustomEmbed(message.member)
+        .setTitle(user.username)
+        .setDescription(
+          `\`${user.id}\`${
+            (await isPremium(user)) ? ` (${levelString(await getTier(user))}) ` : ""
+          } ${(await isEcoBanned(user)).banned ? "[banned]" : ""}`,
+        )
+        .addField(
+          "user",
+          `**tag** ${user.username}
+            **created** ${formatDate(user.createdAt)}${
+              (await getLastCommand(user))
+                ? `\n**last command** <t:${Math.floor(
+                    (await getLastCommand(user)).getTime() / 1000,
+                  )}:R>`
+                : ""
+            }`,
+          true,
+        )
+        .setFooter({ text: `${await getKarma(user)} karma` });
+
+      if (await userExists(user)) {
+        const voted = await hasVoted(user);
+        embed.addField(
+          "economy",
+          `💰 $**${(await getBalance(user)).toLocaleString()}**
+            💳 $**${(await getBankBalance(user)).toLocaleString()}** / $**${(
+              await getMaxBankBalance(user)
+            ).toLocaleString()}**
+      🌍 $**${(await calcNetWorth("find", user, user.client as NypsiClient)).amount.toLocaleString()}**
+            **xp** ${(await getXp(user)).toLocaleString()}
+            **voted** ${voted}
+            **prestige** ${await getPrestige(user)}
+            **bonus** ${Math.floor((await getGambleMulti(message.member, message.client as NypsiClient)).multi * 100)}%`,
+          true,
+        );
+      }
+
+      const usernameHistory = await fetchUsernameHistory(user);
+
+      if (usernameHistory.length > 0) {
+        let msg = "";
+
+        let count = 0;
+        for (const un of usernameHistory) {
+          if (count >= 10) break;
+          msg += `\`${un.value}\` | \`${formatDate(un.createdAt)}\`\n`;
+          count++;
+        }
+
+        embed.addField("username history", msg, true);
+      }
+
+      return send({ embeds: [embed] });
+    };
+
+    const client = message.client as NypsiClient;
+
+    if (args[0]?.toLowerCase() == "gid") {
+      if (args.length == 1) return send({ embeds: [new ErrorEmbed("$x find gid <guildid>")] });
+
+      if (args[2]?.toLowerCase() === "leave") {
+        return client.cluster.broadcastEval(
+          (c, { guildId }) => {
+            const g = c.guilds.cache.get(guildId);
+
+            if (g) return g.leave();
+          },
+          { context: { guildId: args[1] } },
+        );
+      }
+
+      const guild: any = await client.cluster.broadcastEval(
+        async (c, { guildId }) => {
+          const g = c.guilds.cache.get(guildId);
+
+          if (!g) return null;
 
           return g;
         },
-        { context: { userId: tag } },
+        { context: { guildId: args[1] } },
+      );
+
+      let foundGuild: Guild;
+
+      for (const res of guild) {
+        if (res?.id) {
+          foundGuild = res;
+          break;
+        }
+      }
+
+      if (!foundGuild) return message.react("❌");
+
+      return findGuild(message, foundGuild);
+    } else if (args[0]?.toLowerCase() == "gname") {
+      if (args.length == 1) return send({ embeds: [new ErrorEmbed("$x find gname <guild name>")] });
+
+      args.shift();
+
+      const guild: any = await client.cluster.broadcastEval(
+        (c, { guildId }) => {
+          const g = c.guilds.cache.find((g) => g.name.includes(guildId));
+
+          return g;
+        },
+        { context: { guildId: args.join(" ") } },
+      );
+
+      let foundGuild: Guild;
+
+      for (const res of guild) {
+        if (res?.id) {
+          foundGuild = res;
+          break;
+        }
+      }
+
+      if (!foundGuild) return message.react("❌");
+
+      return findGuild(message, foundGuild);
+    } else if (args[0]?.toLowerCase() == "id") {
+      if (args.length == 1) return send({ embeds: [new ErrorEmbed("$x find id <userid>")] });
+
+      let user: any = await client.cluster.broadcastEval(
+        async (c, { userId }) => {
+          const g = await c.users.fetch(userId);
+
+          return g;
+        },
+        { context: { userId: args[1] } },
       );
 
       for (const res of user) {
-        if (!res) continue;
         if (res.username) {
           user = res;
           break;
         }
       }
 
-      if (!user || user instanceof Array) return null;
+      if (!user) return message.react("❌");
 
-      return user.id as string;
-    };
+      return findUser(message, user);
+    } else if (args[0]?.toLowerCase() == "name") {
+      if (args.length == 1) return send({ embeds: [new ErrorEmbed("$x find name <username>")] });
 
-    const current = await findFromCache();
+      const tag = args[1];
 
-    let desc = `current: ${current || "not found"}`;
+      const findFromCache = async () => {
+        let user: any = await (message.client as NypsiClient).cluster.broadcastEval(
+          async (c, { userId }) => {
+            const g = c.users.cache.find((u) => {
+              return `${u.username}`.includes(userId);
+            });
 
-    const knownTag = await prisma.user.findFirst({
-      where: {
-        lastKnownUsername: { contains: tag },
-      },
-      select: {
-        id: true,
-      },
-    });
+            return g;
+          },
+          { context: { userId: tag } },
+        );
 
-    desc += `\nlkt: ${knownTag?.id || "not found"}`;
+        for (const res of user) {
+          if (!res) continue;
+          if (res.username) {
+            user = res;
+            break;
+          }
+        }
 
-    const usernameHistories = await prisma.username.findMany({
-      where: {
-        AND: [{ type: "username" }, { value: { contains: tag } }],
-      },
-      select: {
-        value: true,
-        userId: true,
-      },
-    });
+        if (!user || user instanceof Array) return null;
 
-    if (usernameHistories.length > 0) {
-      desc += `\nhistories: \n${usernameHistories
-        .map((i) => `\`${i.userId}\` - \`${i.value}\``)
-        .join("\n")
-        .substring(0, 1000)}`;
+        return user.id as string;
+      };
+
+      const current = await findFromCache();
+
+      let desc = `current: ${current ? `\`${current}\`` : "not found"}`;
+
+      const knownTag = await prisma.user.findFirst({
+        where: {
+          lastKnownUsername: { contains: tag },
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      desc += `\nlkt: ${knownTag?.id ? `\`${knownTag?.id}\`` : "not found"}`;
+
+      const usernameHistories = await prisma.username.findMany({
+        where: {
+          AND: [{ type: "username" }, { value: { contains: tag } }],
+        },
+        select: {
+          value: true,
+          userId: true,
+        },
+      });
+
+      if (usernameHistories.length > 0) {
+        desc += `\nhistories: \n${usernameHistories
+          .map((i) => `\`${i.userId}\` - \`${i.value}\``)
+          .join("\n")
+          .substring(0, 1000)}`;
+      }
+
+      return send({ embeds: [new CustomEmbed(message.member, desc)] });
+    } else if (args[0]?.toLowerCase() == "nearby") {
+      if (args.length == 1) return send({ embeds: [new ErrorEmbed("$x find nearby <query>")] });
+
+      const search = args.slice(1);
+
+      const results = await getMember(message.guild, search.join(" "), true);
+
+      return send({
+        embeds: [
+          new CustomEmbed(
+            message.member,
+            results.length
+              ? `\`${results.map((i) => `${i.username} - ${i.score}`).join("`\n`")}\``
+              : "no results found",
+          ),
+        ],
+      });
+    } else if (args[0]?.toLowerCase() == "top") {
+      const balTop = await topBalanceGlobal(15, false);
+
+      const embed = new CustomEmbed(message.member, balTop.join("\n")).setTitle(
+        "top " + balTop.length,
+      );
+
+      return send({ embeds: [embed] });
+    } else
+      return send({
+        embeds: [
+          new CustomEmbed(
+            message.member,
+            [
+              "**$x find gid <id>** - find guild by id",
+              "**$x find gname <name>** - find guild by name",
+              "**$x find id <userid>** - find user by id",
+              "**$x find name <username>** - find user id by username",
+              "**$x find nearby <query>** - debug member targeting",
+              "**$x find top** - find the top 15 balance",
+            ].join("\n"),
+          ),
+        ],
+      });
+  };
+
+  const doCaptcha = async (args: string[]) => {
+    args.shift();
+
+    let verify = false;
+
+    if (args.length == 2 && args[0].toLowerCase() == "verify") {
+      args.shift();
+      verify = true;
     }
 
-    return message.channel.send({ embeds: [new CustomEmbed(message.member, desc)] });
+    const target = await getUserFromId(args[0]);
+
+    if (!target) {
+      return send({ embeds: [new ErrorEmbed("invalid user")] });
+    }
+
+    if (verify) {
+      const res = await isLockedOut(target);
+
+      if (!res) {
+        return message.react("➖");
+      }
+
+      const captcha = await prisma.captcha.update({
+        where: { id: res.id },
+        data: {
+          solved: true,
+          solvedAt: new Date(),
+        },
+      });
+
+      await redis.del(`${Constants.redis.nypsi.LOCKED_OUT}:${target.id}`);
+      await passedCaptcha(target, captcha, true);
+      await redis.del(`${Constants.redis.cache.user.CAPTCHA_HISTORY}:${target.id}`);
+
+      logger.info(
+        `admin: ${message.author.id} (${message.author.username}) force verified ${target.id} captcha`,
+      );
+      return message.react("✅");
+    }
+
+    giveCaptcha(target, 2, true);
+    logger.info(
+      `admin: ${message.author.id} (${message.author.username}) gave ${target.id} captcha`,
+    );
+    return message.react("✅");
+  };
+
+  const doForcelose = async (id: string) => {
+    const target = await getUserFromId(id);
+
+    if (!target) {
+      return send({ embeds: [new ErrorEmbed("invalid user")] });
+    }
+
+    if (await redis.sismember(Constants.redis.nypsi.FORCE_LOSE, target.id)) {
+      await redis.srem(Constants.redis.nypsi.FORCE_LOSE, target.id);
+
+      logger.info(
+        `admin: ${message.author.id} (${message.author.username}) set ${target.id} forcelose to false`,
+      );
+
+      return message.react("➖");
+    } else {
+      await redis.sadd(Constants.redis.nypsi.FORCE_LOSE, target.id);
+
+      logger.info(
+        `admin: ${message.author.id} (${message.author.username}) set ${target.id} forcelose to true`,
+      );
+
+      return message.react("➕");
+    }
+  };
+
+  const doCmdWatch = async (id: string, cmd: string) => {
+    const target = await getUserFromId(id);
+
+    if (!target) {
+      return send({ embeds: [new ErrorEmbed("invalid user")] });
+    }
+
+    if (!commandExists(cmd)) {
+      if (commandAliasExists(cmd)) {
+        cmd = getCommandFromAlias(cmd);
+      } else return send({ embeds: [new ErrorEmbed("invalid command")] });
+    }
+
+    if (await redis.exists(`${Constants.redis.nypsi.COMMAND_WATCH}:${id}:${cmd}`)) {
+      await redis.del(`${Constants.redis.nypsi.COMMAND_WATCH}:${id}:${cmd}`);
+      await message.react("➖");
+    } else {
+      await redis.set(`${Constants.redis.nypsi.COMMAND_WATCH}:${id}:${cmd}`, "t");
+      await message.react("➕");
+    }
+
+    logger.info(
+      `admin: ${message.author.id} (${message.author.username}) toggled command watch - ${args.join(
+        " ",
+      )}`,
+    );
+  };
+
+  const doEcoban = async (args: string[]) => {
+    args.shift();
+
+    const target = await getUserFromId(args[0]);
+
+    if (!target) {
+      return send({ embeds: [new ErrorEmbed("invalid user")] });
+    }
+
+    if (!args[1]) {
+      if ((await isEcoBanned(target)).banned) {
+        await setEcoBan(target); // unbans user
+        logger.info(
+          `admin: ${message.author.id} (${message.author.username}) set ${target.id} ecoban to unban`,
+        );
+      }
+    } else {
+      const time = new Date(Date.now() + getDuration(args[1].toLowerCase()) * 1000);
+
+      await setEcoBan(target, time);
+
+      logger.info(
+        `admin: ${message.author.id} (${message.author.username}) set ${target.id} ecoban to ${time}`,
+      );
+    }
+
+    return message.react("✅");
+  };
+
+  const doBlacklist = async (id: string) => {
+    const target = await getUserFromId(id);
+
+    if (!target) {
+      return send({ embeds: [new ErrorEmbed("invalid user")] });
+    }
+
+    if ((await isUserBlacklisted(target)).blacklisted) {
+      await setUserBlacklist(target, false);
+      logger.info(
+        `admin: ${message.author.id} (${message.author.username}) removed blacklist from ${target.id}`,
+      );
+    } else {
+      await setUserBlacklist(target, true);
+      logger.info(
+        `admin: ${message.author.id} (${message.author.username}) blacklisted ${target.id}`,
+      );
+    }
+
+    return message.react("✅");
+  };
+
+  const addCmd = async () => {
+    const category = (await message.guild.channels.fetch("1246516186171314337")) as CategoryChannel;
+    const archive = (await message.guild.channels.fetch("1060585526945665197")) as CategoryChannel;
+
+    const { children } = category;
+
+    const name = `cmds-${children.cache.size + 1}`;
+
+    let channel: TextChannel;
+
+    const archivedChannel = archive.children.cache.find((i) => i.name === name) as TextChannel;
+
+    if (archivedChannel) {
+      await archivedChannel.setParent("1246516186171314337");
+
+      channel = archivedChannel;
+    } else {
+      channel = await children.create({ name, type: ChannelType.GuildText });
+    }
+
+    console.log(children.cache.size);
+
+    console.log(channel.position);
+
+    await channel.setPosition(children.cache.size - 1);
+
+    console.log(channel.position);
+
+    logger.info(`admin: ${message.author.id} (${message.author.username}) added cmd channel`);
+
+    return message.react("✅");
+  };
+
+  const remCmd = async () => {
+    const category = (await message.guild.channels.fetch("1246516186171314337")) as CategoryChannel;
+
+    const { children } = category;
+
+    logger.debug(
+      "children",
+      children.cache.map((v) => ({ name: v.name, position: v.position })),
+    );
+
+    const filtered = Array.from(
+      children.cache.filter((channel) => channel.name.startsWith("cmds-")).values(),
+    );
+
+    const ordered = sort(filtered).desc((i) => parseInt(i.name.split("-")[1]));
+
+    const toDelete = ordered[0];
+
+    await toDelete.setParent("1060585526945665197"); // archive
+
+    logger.info(`admin: ${message.author.id} (${message.author.username}) removed cmd channel`);
+
+    return message.react("✅");
   };
 
   const requestProfileTransfer = async (from: User, to: User) => {
-    if ((await getAdminLevel(message.member)) !== 69)
-      return message.channel.send({
-        embeds: [new ErrorEmbed("lol xd xdxddxd ahahhaha YOURE GAY dont even TRY")],
-      });
-
     if (await hasProfile(to))
-      return message.channel.send({
+      return send({
         embeds: [new ErrorEmbed(`${to.username} has a nypsi profile, ask them to do /data delete`)],
       });
 
     if (!(await hasProfile(from)))
-      return message.channel.send({
+      return send({
         embeds: [new ErrorEmbed(`${from.username} doesn't have a nypsi profile you fucking idiot`)],
       });
+
+    const guild = await getGuildByUser(from.id);
+
+    if (guild.ownerId === from.id)
+      return send({ embeds: [new ErrorEmbed("user is owner of a guild")] });
 
     await redis.set(`${Constants.redis.nypsi.PROFILE_TRANSFER}:${to.id}`, from.id, "EX", 600);
     await redis.set(`${Constants.redis.nypsi.PROFILE_TRANSFER}:${from.id}`, to.id, "EX", 600);
@@ -2178,38 +2692,176 @@ async function run(
       },
     );
 
-    return message.channel.send({
+    return send({
       embeds: [new CustomEmbed(message.member, "profile transfer initiated")],
     });
   };
 
-  if (args.length == 0) {
-    const embed = new CustomEmbed(
+  const startEvent = async () => {
+    if (args.length < 4) {
+      return send({ embeds: [new ErrorEmbed("$x event <type> <target> <days>")] });
+    }
+
+    const type = args[1];
+    const target = parseInt(args[2]);
+    const days = parseInt(args[3]);
+
+    if (!getEventsData()[type]) {
+      return send({ embeds: [new ErrorEmbed("invalid event type")] });
+    }
+
+    if (isNaN(target) || target < 1) {
+      return send({ embeds: [new ErrorEmbed("invalid target")] });
+    }
+
+    if (isNaN(days) || days < 1) {
+      return send({ embeds: [new ErrorEmbed("invalid amount of days")] });
+    }
+
+    const confirmMessage = await send({
+      embeds: [
+        new CustomEmbed(
+          message.member,
+          `confirm you want to start a ${type} event with target of ${target} for ${days} days`,
+        ),
+      ],
+      components: [
+        new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+          new ButtonBuilder()
+            .setStyle(ButtonStyle.Danger)
+            .setLabel("confirm")
+            .setCustomId("event-confirm"),
+        ),
+      ],
+    });
+
+    const response = await confirmMessage
+      .awaitMessageComponent({
+        filter: (i) => i.user.id == message.author.id,
+        time: 15000,
+        componentType: ComponentType.Button,
+      })
+      .catch(async () => {});
+
+    if (!response) {
+      return send({ embeds: [new ErrorEmbed("confirmation cancelled")] });
+    }
+
+    const currentEvent = await getCurrentEvent(false);
+
+    if (currentEvent) {
+      return response.reply({
+        embeds: [new ErrorEmbed("there is already an event running")],
+      });
+    }
+
+    const eventRes = await createEvent(
+      message.client as NypsiClient,
       message.member,
-      "$x userid (id) - view/edit disc info and db info" +
-        "\n$x findid (tag/username) - will attempt to find user id from cached users and database" +
-        "\n$x tx - transactions" +
-        "\n$x transfer <from id> <to id> - start a profile transfer" +
-        "\n$x drop - start a random drop" +
-        "\n$x memberfind - debug member targetting" +
-        "\n$x fixcrash - reinitialise crash",
+      type,
+      target,
+      days,
     );
 
-    return message.channel.send({ embeds: [embed] });
+    if (typeof eventRes == "string") {
+      return response.reply({ embeds: [new ErrorEmbed(eventRes)] });
+    }
+
+    return response.reply({
+      embeds: [new CustomEmbed(message.member, "event has started!!")],
+    });
+  };
+
+  if (args.length == 0) {
+    return send({
+      embeds: [new CustomEmbed(message.member, await getUsableCommands(message.member))],
+    });
   } else if (args[0].toLowerCase() == "userid") {
+    if (!(await hasAdminPermission(message.member, "view-user-info"))) {
+      return send({
+        embeds: [requiredLevelEmbed("view-user-info")],
+      });
+    }
+
     if (args.length == 1) {
-      return message.channel.send({ embeds: [new ErrorEmbed("$x userid (id)")] });
+      return send({ embeds: [new ErrorEmbed("$x userid <id>")] });
     }
 
     return showUser(args[1]);
-  } else if (args[0].toLowerCase() == "findid") {
-    if (args.length == 1) {
-      return message.channel.send({ embeds: [new ErrorEmbed("$x findid (tag)")] });
+  } else if (args[0].toLowerCase() == "find") {
+    if (!(await hasAdminPermission(message.member, "find"))) {
+      return send({
+        embeds: [requiredLevelEmbed("find")],
+      });
     }
 
-    return findId(args.slice(1, args.length).join(" "));
+    return doFind(args);
+  } else if (args[0].toLowerCase() == "captcha") {
+    if (!(await hasAdminPermission(message.member, "captchatest"))) {
+      return send({
+        embeds: [requiredLevelEmbed("captchatest")],
+      });
+    }
+
+    if (args.length == 1) {
+      return send({ embeds: [new ErrorEmbed("$x captcha (verify) <id>")] });
+    }
+
+    return doCaptcha(args);
+  } else if (args[0].toLowerCase() == "forcelose") {
+    if (!(await hasAdminPermission(message.member, "forcelose"))) {
+      return send({
+        embeds: [requiredLevelEmbed("forcelose")],
+      });
+    }
+
+    if (args.length == 1) {
+      return send({ embeds: [new ErrorEmbed("$x forcelose <id>")] });
+    }
+
+    return doForcelose(args[1]);
+  } else if (args[0].toLowerCase() == "cmdwatch") {
+    if (!(await hasAdminPermission(message.member, "cmdwatch"))) {
+      return send({
+        embeds: [requiredLevelEmbed("cmdwatch")],
+      });
+    }
+
+    if (args.length == 1) {
+      return send({ embeds: [new ErrorEmbed("$x cmdwatch <id> <cmd>")] });
+    }
+
+    return doCmdWatch(args[1], args[2]);
+  } else if (args[0].toLowerCase() == "ecoban") {
+    if (!(await hasAdminPermission(message.member, "ecoban"))) {
+      return send({
+        embeds: [requiredLevelEmbed("ecoban")],
+      });
+    }
+
+    if (args.length == 1) {
+      return send({ embeds: [new ErrorEmbed("$x ecoban <id>")] });
+    }
+
+    return doEcoban(args);
+  } else if (args[0].toLowerCase() == "blacklist") {
+    if (!(await hasAdminPermission(message.member, "blacklist"))) {
+      return send({
+        embeds: [requiredLevelEmbed("blacklist")],
+      });
+    }
+
+    if (args.length == 1) {
+      return send({ embeds: [new ErrorEmbed("$x blacklist <id>")] });
+    }
+
+    return doBlacklist(args[1]);
   } else if (args[0].toLowerCase() === "transfer") {
-    if (message.author.id !== Constants.TEKOH_ID) return;
+    if (!(await hasAdminPermission(message.member, "profile-transfer"))) {
+      return send({
+        embeds: [requiredLevelEmbed("profile-transfer")],
+      });
+    }
 
     const fromId = args[1];
     const toId = args[2];
@@ -2217,39 +2869,49 @@ async function run(
     const fromUser = await message.client.users.fetch(fromId).catch(() => {});
     const toUser = await message.client.users.fetch(toId).catch(() => {});
 
-    if (!fromUser) return message.channel.send({ embeds: [new ErrorEmbed("invalid from user")] });
-    if (!toUser) return message.channel.send({ embeds: [new ErrorEmbed("invalid to user")] });
+    if (!fromUser) return send({ embeds: [new ErrorEmbed("invalid from user")] });
+    if (!toUser) return send({ embeds: [new ErrorEmbed("invalid to user")] });
 
     return requestProfileTransfer(fromUser, toUser);
   } else if (args[0].toLowerCase() === "drop") {
-    if ((await getAdminLevel(message.member)) < 5) {
-      return message.channel.send({
-        embeds: [new ErrorEmbed("you require admin level **5** to do this")],
+    if (!(await hasAdminPermission(message.member, "spawn-lootdrop"))) {
+      return send({
+        embeds: [requiredLevelEmbed("spawn-lootdrop")],
       });
     }
 
     startRandomDrop(message.client as NypsiClient, message.channelId);
-  } else if (args[0].toLowerCase() === "memberfind") {
-    const search = args.slice(1);
-
-    const results = await getMember(message.guild, search.join(" "), true);
-
-    return message.channel.send({
-      embeds: [
-        new CustomEmbed(
-          message.member,
-          `\`${results.map((i) => `${i.username} - ${i.score}`).join("`\n`")}\``,
-        ),
-      ],
-    });
   } else if (args[0].toLowerCase() === "fixcrash") {
-    if (message.author.id !== Constants.TEKOH_ID) return;
+    if (!(await hasAdminPermission(message.member, "fix-crash"))) {
+      return send({
+        embeds: [requiredLevelEmbed("fix-crash")],
+      });
+    }
     await redis.del(Constants.redis.nypsi.CRASH_STATUS);
     await initCrashGame(message.client as NypsiClient);
+  } else if (args[0].toLowerCase() === "streakpause") {
+    if (!(await hasAdminPermission(message.member, "streakpause"))) {
+      return send({
+        embeds: [requiredLevelEmbed("streakpause")],
+      });
+    }
+
+    if (args.length === 1) {
+      await redis.set("nypsi:streakpause", 69, "EX", ms("1 day") / 1000);
+      return send({
+        embeds: [new CustomEmbed(message.member, "✅ streaks won't be lost for the next 24 hours")],
+      });
+    } else if (args[1].toLowerCase() === "end") {
+      await redis.del("nypsi:streakpause");
+      return (message as Message).react("✅");
+    } else
+      return send({
+        embeds: [new ErrorEmbed("$x streakpause (end)")],
+      });
   } else if (args[0].toLowerCase() === "findalts") {
-    if ((await getAdminLevel(message.member)) < 3) {
-      return message.channel.send({
-        embeds: [new ErrorEmbed("you require admin level **3** to do this")],
+    if (!(await hasAdminPermission(message.member, "find-alts"))) {
+      return send({
+        embeds: [requiredLevelEmbed("find-alts")],
       });
     }
 
@@ -2277,16 +2939,56 @@ async function run(
     // idk how this should be done lol i might get back to it
 
     console.log(map);
+  } else if (args[0].toLowerCase() === "cmd") {
+    if (!(await hasAdminPermission(message.member, "set-cmd-channels"))) {
+      return send({
+        embeds: [requiredLevelEmbed("set-cmd-channels")],
+      });
+    }
+
+    if (args[1]?.toLowerCase() != "add" && args[1]?.toLowerCase() != "rem") {
+      return send({ embeds: [new ErrorEmbed("$x cmd <add/rem>")] });
+    }
+
+    if (message.guildId !== Constants.NYPSI_SERVER_ID) {
+      return send({
+        embeds: [new ErrorEmbed("this can only be done in the nypsi server")],
+      });
+    }
+
+    return args[1].toLowerCase() == "add" ? addCmd() : remCmd();
+  } else if (args[0].toLowerCase() === "runjob") {
+    if (!(await hasAdminPermission(message.member, "run-job"))) {
+      return send({
+        embeds: [requiredLevelEmbed("run-job")],
+      });
+    }
+
+    if (args.length == 1) {
+      (message.client as NypsiClient).cluster.send("reload_jobs");
+
+      logger.info(`admin: ${message.author.id} (${message.author.username}) reloaded jobs`);
+    } else {
+      (message.client as NypsiClient).cluster.send(
+        `trigger_job_${args.slice(1).join(" ").toLowerCase()}`,
+      );
+
+      logger.info(
+        `admin: ${message.author.id} (${message.author.username}) ran job ${args.slice(1).join(" ").toLowerCase()}`,
+      );
+    }
+
+    return message.react("✅");
   } else if (["transaction", "tx"].includes(args[0].toLowerCase())) {
-    if ((await getAdminLevel(message.member)) < 1) {
-      return message.channel.send({
-        embeds: [new ErrorEmbed("you require admin level **1** to do this")],
+    if (!(await hasAdminPermission(message.member, "view-transactions"))) {
+      return send({
+        embeds: [requiredLevelEmbed("view-transactions")],
       });
     }
 
     if (args[1]?.toLowerCase() === "query") {
       if (args.length < 4) {
-        return message.channel.send({
+        return send({
           embeds: [
             new CustomEmbed(
               message.member,
@@ -2315,7 +3017,7 @@ async function run(
       } else if (sourceId !== "any" && targetId === "any") {
         query.sourceId = sourceId;
       } else {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid query")] });
+        return send({ embeds: [new ErrorEmbed("invalid query")] });
       }
 
       logger.info(
@@ -2325,17 +3027,17 @@ async function run(
       const test = await prisma.transaction.findMany({ where: query, take: 1 });
 
       if (test.length < 1) {
-        return message.channel.send({ embeds: [new ErrorEmbed("no transactions found")] });
+        return send({ embeds: [new ErrorEmbed("no transactions found")] });
       }
 
       const file = await exportTransactions(query);
 
-      return message.channel.send({
+      return send({
         files: [new AttachmentBuilder(file, { name: "transactions.txt" })],
       });
     } else if (args[1]?.toLowerCase() === "analytics") {
       if (args.length < 4) {
-        return message.channel.send({
+        return send({
           embeds: [
             new CustomEmbed(message.member, "$x tx analytics <source|target> <user id>").setHeader(
               "transactions",
@@ -2348,7 +3050,7 @@ async function run(
       const userId = args[3];
 
       if (type !== "source" && type !== "target") {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid type")] });
+        return send({ embeds: [new ErrorEmbed("invalid type")] });
       }
 
       const count = await prisma.transaction.count({
@@ -2362,7 +3064,7 @@ async function run(
       );
 
       if (count === 0) {
-        return message.channel.send({ embeds: [new ErrorEmbed("no transactions found")] });
+        return send({ embeds: [new ErrorEmbed("no transactions found")] });
       }
 
       const byOpposite = await prisma.transaction.groupBy({
@@ -2396,11 +3098,11 @@ async function run(
       const embed = new CustomEmbed(
         message.member,
         `${count.toLocaleString()} total transactions\n\n${oppositeFormatted.join("\n")}`,
-      ).setHeader(`analytics for ${await getLastKnownUsername(userId)} (${userId})`);
+      ).setHeader(`analytics for ${await getLastKnownUsername(userId, false)} (${userId})`);
 
-      return message.channel.send({ embeds: [embed] });
+      return send({ embeds: [embed] });
     } else {
-      return message.channel.send({
+      return send({
         embeds: [
           new CustomEmbed(
             message.member,
@@ -2410,6 +3112,50 @@ async function run(
         ],
       });
     }
+  } else if (args[0].toLowerCase() === "reseteco") {
+    if (!(await hasAdminPermission(message.member, "reseteco"))) {
+      return send({
+        embeds: [requiredLevelEmbed("reseteco")],
+      });
+    }
+
+    const embed = new CustomEmbed(message.member, "run that command again");
+
+    await send({ embeds: [embed] });
+
+    const code = Math.floor(Math.random() * 10000);
+    console.log(code);
+
+    const filter = (msg: Message) => message.author.id == msg.author.id;
+
+    let response: any = await message.channel.awaitMessages({
+      filter,
+      max: 1,
+    });
+
+    response = response.first().content;
+
+    if (response != code) {
+      return send({ embeds: [new ErrorEmbed("captcha failed")] });
+    } else {
+      const c = await reset();
+
+      return send({
+        embeds: [new CustomEmbed(message.member, `${c} users reset`)],
+      });
+    }
+  } else if (args[0].toLowerCase() === "event") {
+    if (!(await hasAdminPermission(message.member, "create-event"))) {
+      return send({
+        embeds: [requiredLevelEmbed("create-event")],
+      });
+    }
+
+    return startEvent();
+  } else {
+    return send({
+      embeds: [new CustomEmbed(message.member, await getUsableCommands(message.member))],
+    });
   }
 }
 
@@ -2417,32 +3163,98 @@ cmd.setRun(run);
 
 module.exports = cmd;
 
-function getDuration(duration: string): number {
-  duration.toLowerCase();
+async function getUsableCommands(member: MemberResolvable) {
+  const commands: { command: string; description: string; permission: AdminPermission }[] = [
+    {
+      command: "$x userid <id>",
+      description: "view/edit discord and db info",
+      permission: "view-user-info",
+    },
+    {
+      command: "$x find",
+      description: "find data about users or guilds",
+      permission: "find",
+    },
+    {
+      command: "$x captcha (verify) <id>",
+      description: "give a user a captcha",
+      permission: "captchatest",
+    },
+    {
+      command: "$x forcelose <id>",
+      description: "toggle whether a user will always lose games",
+      permission: "forcelose",
+    },
+    {
+      command: "$x cmdwatch <id> <cmd>",
+      description: "watch a players usage of a command",
+      permission: "cmdwatch",
+    },
+    {
+      command: "$x tx",
+      description: "view a user's transactions",
+      permission: "view-transactions",
+    },
+    {
+      command: "$x ecoban <id> [time]",
+      description: "ban a user from economy (no time removes ban)",
+      permission: "ecoban",
+    },
+    {
+      command: "$x blacklist <id>",
+      description: "blacklist a user from interacting with nypsi",
+      permission: "blacklist",
+    },
+    {
+      command: "$x transfer <from id> <to id>",
+      description: "start a profile transfer",
+      permission: "profile-transfer",
+    },
+    {
+      command: "$x drop",
+      description: "start a random drop",
+      permission: "spawn-lootdrop",
+    },
+    {
+      command: "$x fixcrash",
+      description: "reinitialise crash",
+      permission: "fix-crash",
+    },
+    {
+      command: "$x streakpause (end)",
+      description: "pause streak losses for 24 hours",
+      permission: "streakpause",
+    },
+    {
+      command: "$x cmd <add/rem>",
+      description: "add or remove a cmds channel",
+      permission: "set-cmd-channels",
+    },
+    {
+      command: "$x runjob [name]",
+      description: "run a job (no name to reload jobs)",
+      permission: "reseteco",
+    },
+    {
+      command: "$x reseteco",
+      description: "reset the nypsi economy",
+      permission: "reseteco",
+    },
+    {
+      command: "$x event <type> <target> <days>",
+      description: "start an event",
+      permission: "create-event",
+    },
+  ];
 
-  if (duration.includes("d")) {
-    if (!parseInt(duration.split("d")[0])) return undefined;
+  const permittedCommands = await Promise.all(
+    commands.map(async (cmd) => {
+      return (await hasAdminPermission(member, cmd.permission)) ? cmd : undefined;
+    }),
+  );
 
-    const num = parseInt(duration.split("d")[0]);
-
-    return num * 86400;
-  } else if (duration.includes("h")) {
-    if (!parseInt(duration.split("h")[0])) return undefined;
-
-    const num = parseInt(duration.split("h")[0]);
-
-    return num * 3600;
-  } else if (duration.includes("m")) {
-    if (!parseInt(duration.split("m")[0])) return undefined;
-
-    const num = parseInt(duration.split("m")[0]);
-
-    return num * 60;
-  } else if (duration.includes("s")) {
-    if (!parseInt(duration.split("s")[0])) return undefined;
-
-    const num = parseInt(duration.split("s")[0]);
-
-    return num;
-  }
+  return permittedCommands
+    .filter((cmd) => cmd !== undefined)
+    .map((cmd) => `**${cmd.command}** - ${cmd.description}`)
+    .join("\n");
 }

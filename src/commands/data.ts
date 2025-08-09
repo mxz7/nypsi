@@ -1,12 +1,10 @@
 import {
   ActionRowBuilder,
-  BaseMessageOptions,
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
   Interaction,
   InteractionEditReplyOptions,
-  InteractionReplyOptions,
   InteractionResponse,
   Message,
   MessageActionRowComponentBuilder,
@@ -16,7 +14,7 @@ import {
 import { promisify } from "util";
 import { gzip } from "zlib";
 import prisma from "../init/database";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { dataDelete } from "../utils/functions/users/utils";
 import { addCooldown, onCooldown } from "../utils/handlers/cooldownhandler.js";
@@ -46,38 +44,9 @@ BigInt.prototype.toJSON = function () {
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
-
   const edit = async (data: MessageEditOptions, msg: Message | InteractionResponse) => {
     if (!(message instanceof Message)) {
       return await message.editReply(data as InteractionEditReplyOptions);
@@ -185,6 +154,7 @@ async function run(
                     upgrades: true,
                   },
                 },
+                TradeRequest: true,
               },
             },
             Premium: {
@@ -215,6 +185,10 @@ async function run(
             Sessions: true,
             Viewed: true,
             Purchases: true,
+            Marriage: true,
+            Event: true,
+            EventContribution: true,
+            FlagGame: true,
           },
         }),
         moderation: {

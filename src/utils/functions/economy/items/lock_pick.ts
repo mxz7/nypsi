@@ -1,8 +1,6 @@
 import {
-  BaseMessageOptions,
   CommandInteraction,
   InteractionEditReplyOptions,
-  InteractionReplyOptions,
   Message,
   MessageEditOptions,
 } from "discord.js";
@@ -19,6 +17,7 @@ import { getDmSettings } from "../../users/notifications";
 import { hasPadlock, setPadlock } from "../balance";
 import { removeInventoryItem } from "../inventory";
 import { isPassive } from "../passive";
+import { addStat } from "../stats";
 import ms = require("ms");
 
 module.exports = new ItemUse(
@@ -27,22 +26,6 @@ module.exports = new ItemUse(
     message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
     args: string[],
   ) => {
-    const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-      if (!(message instanceof Message)) {
-        if (message.deferred) {
-          await message.editReply(data as InteractionEditReplyOptions);
-        } else {
-          await message.reply(data as InteractionReplyOptions);
-        }
-        const replyMsg = await message.fetchReply();
-        if (replyMsg instanceof Message) {
-          return replyMsg;
-        }
-      } else {
-        return await message.channel.send(data as BaseMessageOptions);
-      }
-    };
-
     const edit = async (data: MessageEditOptions, msg: Message) => {
       if (!(message instanceof Message)) {
         await message.editReply(data as InteractionEditReplyOptions);
@@ -53,7 +36,7 @@ module.exports = new ItemUse(
     };
 
     if ((await isUserBlacklisted(message.guild.ownerId)).blacklisted) {
-      return send({
+      return ItemUse.send(message, {
         embeds: [
           new ErrorEmbed(
             `the owner of this server (${(await message.guild.members.fetch(message.guild.ownerId)).toString()}) is blacklisted\n` +
@@ -64,7 +47,7 @@ module.exports = new ItemUse(
     }
 
     if (args.length == 1) {
-      return send({
+      return ItemUse.send(message, {
         embeds: [new ErrorEmbed("/use lockpick <member>")],
       });
     }
@@ -72,7 +55,7 @@ module.exports = new ItemUse(
     const lockPickTarget = await getMember(message.guild, args[1]);
 
     if (!lockPickTarget) {
-      return send({ embeds: [new ErrorEmbed("invalid user")] });
+      return ItemUse.send(message, { embeds: [new ErrorEmbed("invalid user")] });
     }
 
     if (message.member == lockPickTarget) {
@@ -81,7 +64,7 @@ module.exports = new ItemUse(
       ) {
         await redis.del(`${Constants.redis.cooldown.SEX_CHASTITY}:${message.author.id}`);
 
-        const msg = await send({
+        const msg = await ItemUse.send(message, {
           embeds: [new CustomEmbed(message.member, "picking chastity cage...")],
         });
 
@@ -99,11 +82,11 @@ module.exports = new ItemUse(
           msg,
         );
       }
-      return send({ embeds: [new ErrorEmbed("invalid user")] });
+      return ItemUse.send(message, { embeds: [new ErrorEmbed("invalid user")] });
     }
 
     if ((await getDisabledCommands(message.guild)).includes("rob")) {
-      return send({
+      return ItemUse.send(message, {
         embeds: [new ErrorEmbed(`lockpicks have been disabled in ${message.guild.name}`)],
       });
     }
@@ -114,21 +97,23 @@ module.exports = new ItemUse(
         `${Constants.redis.cache.guild.RECENTLY_ATTACKED}:${message.guildId}:${lockPickTarget.id}`,
       ))
     ) {
-      return send({
+      return ItemUse.send(message, {
         embeds: [new ErrorEmbed(`${lockPickTarget.toString()} cannot be robbed yet`)],
       });
     }
 
     if (await isPassive(lockPickTarget))
-      return send({
+      return ItemUse.send(message, {
         embeds: [new ErrorEmbed(`${lockPickTarget.toString()} is currently in passive mode`)],
       });
 
     if (await isPassive(message.member))
-      return send({ embeds: [new ErrorEmbed("you are currently in passive mode")] });
+      return ItemUse.send(message, {
+        embeds: [new ErrorEmbed("you are currently in passive mode")],
+      });
 
     if (!(await hasPadlock(lockPickTarget))) {
-      return send({
+      return ItemUse.send(message, {
         embeds: [new ErrorEmbed("this member doesn't have a padlock")],
       });
     }
@@ -142,6 +127,7 @@ module.exports = new ItemUse(
 
     await Promise.all([
       removeInventoryItem(message.member, "lock_pick", 1),
+      addStat(message.member, "lock_pick"),
       setPadlock(lockPickTarget, false),
     ]);
 
@@ -151,7 +137,7 @@ module.exports = new ItemUse(
     targetEmbed.setTitle("your padlock has been picked");
     targetEmbed.setDescription(
       "**" +
-        message.author.username +
+        message.author.username.replaceAll("_", "\\_") +
         "** has picked your padlock in **" +
         message.guild.name +
         "**\n" +
@@ -162,9 +148,12 @@ module.exports = new ItemUse(
       await lockPickTarget.send({ embeds: [targetEmbed] });
     }
 
-    const msg = await send({
+    const msg = await ItemUse.send(message, {
       embeds: [
-        new CustomEmbed(message.member, `picking **${lockPickTarget.user.username}**'s padlock...`),
+        new CustomEmbed(
+          message.member,
+          `picking **${lockPickTarget.user.username.replaceAll("_", "\\_")}**'s padlock...`,
+        ),
       ],
     });
 
@@ -175,7 +164,7 @@ module.exports = new ItemUse(
         embeds: [
           new CustomEmbed(
             message.member,
-            `picking **${lockPickTarget.user.username}'**s padlock...\n\nyou have successfully picked their padlock`,
+            `picking **${lockPickTarget.user.username.replaceAll("_", "\\_")}'**s padlock...\n\nyou have successfully picked their padlock`,
           ),
         ],
       },

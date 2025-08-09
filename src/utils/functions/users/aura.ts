@@ -50,7 +50,7 @@ export async function getAuraTransactions(member: MemberResolvable) {
 
   const query = await prisma.aura.findMany({
     where: { OR: [{ recipientId: userId }, { senderId: userId }] },
-    orderBy: { createdAt: "asc" },
+    orderBy: { id: "asc" },
   });
 
   return query;

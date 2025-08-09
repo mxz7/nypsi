@@ -1,3 +1,4 @@
+import { Game } from "@prisma/client";
 import { inPlaceSort, sort } from "fast-sort";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
@@ -153,11 +154,13 @@ export async function createGame(
 }
 
 export async function fetchGame(id: string) {
-  return await prisma.game.findUnique({
-    where: {
-      id: parseInt(id, 36),
-    },
-  });
+  return await prisma.game
+    .findUnique({
+      where: {
+        id: parseInt(id, 36),
+      },
+    })
+    .catch(() => undefined as Game);
 }
 
 export async function addStat(member: MemberResolvable, item: string, amount = 1) {

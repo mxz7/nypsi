@@ -141,7 +141,7 @@ export async function sendReactionRole(
 
     const button = new ButtonBuilder().setCustomId(role.roleId).setStyle(ButtonStyle.Secondary);
 
-    if (role.label.match(Constants.EMOJI_REGEX)) {
+    if (role.label.split(" ")[0].match(Constants.EMOJI_REGEX)) {
       button.setEmoji(role.label.split(" ")[0]);
     } else {
       button.setLabel(role.label);

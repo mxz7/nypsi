@@ -11,17 +11,35 @@ import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getItems } from "./utils";
 import _ = require("lodash");
 
+const lastBoosterCheck = new Map<string, number>();
+
 async function checkBoosters(member: MemberResolvable, boosters: Map<string, Booster[]>) {
   const userId = getUserId(member);
 
+  if (lastBoosterCheck.has(userId)) {
+    if (Date.now() - lastBoosterCheck.get(userId) < 500) {
+      return boosters;
+    }
+  }
+
+  lastBoosterCheck.set(userId, Date.now());
+
+  if (
+    (await redis.exists("nypsi:maintenance")) ||
+    (await redis.exists(`${Constants.redis.nypsi.RESTART}:1`))
+  ) {
+    return boosters;
+  }
+
   const expired = new Map<string, number>();
+  const now = Date.now();
 
   for (const key of boosters.keys()) {
     const boosters2 = boosters.get(key);
     const newBoosters: Booster[] = [];
 
     for (const booster of boosters2) {
-      if (booster.expire <= Date.now()) {
+      if (booster.expire <= now) {
         await prisma.booster
           .delete({
             where: {
@@ -104,7 +122,7 @@ async function checkBoosters(member: MemberResolvable, boosters: Map<string, Boo
       }
 
       if (member instanceof GuildMember) {
-        await member.send({ embeds: [embed], content: text });
+        member.send({ embeds: [embed], content: text });
       } else {
         addNotificationToQueue({
           memberId: userId,

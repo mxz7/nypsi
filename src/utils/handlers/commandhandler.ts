@@ -2,12 +2,15 @@ import { REST } from "@discordjs/rest";
 import {
   ActionRowBuilder,
   APIEmbed,
+  BaseMessageOptions,
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
   Embed,
   GuildMember,
   Interaction,
+  InteractionEditReplyOptions,
+  InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
   MessageFlags,
@@ -34,6 +37,7 @@ import Constants from "../Constants";
 import { a } from "../functions/anticheat";
 import { addProgress, setProgress } from "../functions/economy/achievements";
 import { addBooster } from "../functions/economy/boosters";
+import { addEventProgress } from "../functions/economy/events";
 import { commandGemCheck, gemBreak, getInventory } from "../functions/economy/inventory";
 import { runItemInfo } from "../functions/economy/item_info";
 import { getRawLevel } from "../functions/economy/levelling";
@@ -56,7 +60,7 @@ import { getUserAliases } from "../functions/premium/aliases";
 import { addUse, getCommand } from "../functions/premium/command";
 import { percentChance } from "../functions/random";
 import { cleanString, pluralize } from "../functions/string";
-import { getAdminLevel } from "../functions/users/admin";
+import { hasAdminPermission } from "../functions/users/admin";
 import { createAuraTransaction } from "../functions/users/aura";
 import { isUserBlacklisted } from "../functions/users/blacklist";
 import { getLastCommand, updateUser } from "../functions/users/commands";
@@ -648,7 +652,7 @@ export async function runCommand(
         return message.channel.send({
           embeds: [
             new ErrorEmbed(
-              `\`${cmd}\` is a custom alias owned by **${owner}**. to create your own custom aliases you need a premium membership\n` +
+              `\`${cmd}\` is a custom alias owned by **${owner.replaceAll("_", "\\_")}**. to create your own custom aliases you need a premium membership\n` +
                 "/premium",
             ),
           ],
@@ -685,7 +689,7 @@ export async function runCommand(
 
         message.content += ` [custom cmd - ${customCommand.owner}]`;
 
-        const ownerTag = await getLastKnownUsername(customCommand.owner);
+        const ownerTag = await getLastKnownUsername(customCommand.owner, false);
         await addUse(customCommand.owner);
         logCommand(message, ["", "", ""]);
 
@@ -787,7 +791,10 @@ export async function runCommand(
     }
 
     if (await redis.get("nypsi:maintenance")) {
-      if ((await getAdminLevel(message.member)) > 0 && message instanceof Message) {
+      if (
+        (await hasAdminPermission(message.member, "bypass-maintenance")) &&
+        message instanceof Message
+      ) {
         message.react("💀");
       } else {
         if (message instanceof Message) {
@@ -822,7 +829,7 @@ export async function runCommand(
         `**you are banned from this command. dm me for help**\n\n` +
           `${
             banCheck.bannedAccount !== message.author.id
-              ? `in relation to \`${await getLastKnownUsername(banCheck.bannedAccount)}\`\n`
+              ? `in relation to \`${await getLastKnownUsername(banCheck.bannedAccount, false)}\`\n`
               : ""
           }` +
           `you'll be unbanned <t:${Math.floor(unbanTime.getTime() / 1000)}:R>`,
@@ -919,7 +926,39 @@ export async function runCommand(
     }
   }
 
-  command.run(message, args);
+  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
+    if (!(message instanceof Message)) {
+      let usedNewMessage = false;
+      let res;
+
+      if (message.deferred) {
+        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
+          usedNewMessage = true;
+          return await message.channel.send(data as BaseMessageOptions);
+        });
+      } else {
+        res = await message.reply(data as InteractionReplyOptions).catch(async () => {
+          try {
+            return await message.editReply(data as InteractionEditReplyOptions);
+          } catch {
+            usedNewMessage = true;
+            return await message.channel.send(data as BaseMessageOptions);
+          }
+        });
+      }
+
+      if (usedNewMessage && res instanceof Message) return res;
+
+      const replyMsg = await message.fetchReply();
+      if (replyMsg instanceof Message) {
+        return replyMsg;
+      }
+    } else {
+      return await message.channel.send(data as BaseMessageOptions);
+    }
+  };
+
+  command.run(message, send, args);
   preProcessLength[1] = performance.now();
 
   if (preProcessLength[1] - preProcessLength[0] > 100) {
@@ -928,119 +967,126 @@ export async function runCommand(
     );
   }
 
-  setTimeout(async () => {
-    if (command.category === "money") {
-      if (
-        percentChance(0.77777) &&
-        (await getRawLevel(message.author.id)) < 250 &&
-        (await getPreferences(message.author.id)).tips
-      ) {
-        const tip = tips[Math.floor(Math.random() * tips.length)];
-
-        await addInlineNotification({
-          memberId: message.author.id,
-          embed: new CustomEmbed(message.member, tip),
-        });
-      }
-
-      if (!(await redis.exists(`nypsi:inactiveuserthing:${message.author.id}`))) {
-        await redis.set(`nypsi:inactiveuserthing:${message.author.id}`, "boobies", "EX", 2.628e6);
-        const lastCommand = await getLastCommand(message.author.id);
-        const rawLevel = await getRawLevel(message.author.id);
-
+  setTimeout(
+    async () => {
+      if (command.category === "money") {
         if (
-          dayjs(lastCommand).isBefore(dayjs().subtract(3, "months")) &&
-          dayjs(lastCommand).isAfter(dayjs().subtract(5, "year")) &&
-          rawLevel > 100
+          percentChance(0.77777) &&
+          (await getRawLevel(message.author.id)) < 250 &&
+          (await getPreferences(message.author.id)).tips
         ) {
-          await addBooster(message.author.id, "xp_booster", 2, dayjs().add(1, "day").toDate());
+          const tip = tips[Math.floor(Math.random() * tips.length)];
 
           await addInlineNotification({
             memberId: message.author.id,
-            embed: new CustomEmbed(
-              message.member,
-              "**welcome back!!**\n\nwelcome back to nypsi, since it's been a while, we've given you a 24 hour xp booster. enjoy!",
-            ),
+            embed: new CustomEmbed(message.member, tip),
+          });
+        }
+
+        if (!(await redis.exists(`nypsi:inactiveuserthing:${message.author.id}`))) {
+          await redis.set(`nypsi:inactiveuserthing:${message.author.id}`, "boobies", "EX", 2.628e6);
+          const lastCommand = await getLastCommand(message.author.id);
+          const rawLevel = await getRawLevel(message.author.id);
+
+          if (
+            dayjs(lastCommand).isBefore(dayjs().subtract(3, "months")) &&
+            dayjs(lastCommand).isAfter(dayjs().subtract(5, "year")) &&
+            rawLevel > 100
+          ) {
+            await addBooster(message.author.id, "xp_booster", 2, dayjs().add(1, "day").toDate());
+
+            await addInlineNotification({
+              memberId: message.author.id,
+              embed: new CustomEmbed(
+                message.member,
+                "**welcome back!!**\n\nwelcome back to nypsi, since it's been a while, we've given you a 24 hour xp booster. enjoy!",
+              ),
+            });
+          }
+        }
+      }
+
+      const news = await getNews();
+
+      const embeds: (Embed | CustomEmbed | APIEmbed)[] = [];
+
+      if (
+        news.text != "" &&
+        command.category == "money" &&
+        !(await hasSeenNews(message.author.id))
+      ) {
+        await redis.rpush(Constants.redis.nypsi.NEWS_SEEN, message.author.id);
+
+        const pos = await hasSeenNews(message.author.id);
+
+        const embed = new CustomEmbed(message.member, `${news.text}\n\n*${formatDate(news.date)}*`)
+          .setHeader("news", message.client.user.avatarURL())
+          .setFooter({ text: `you are #${pos} to see this` });
+
+        embeds.push(embed);
+
+        logger.info(`news shown to ${message.author.username}`);
+      }
+
+      const notifs = await getInlineNotifications(message.member);
+
+      if (notifs.length > 0) embeds.push(...notifs.map((i) => i.embed));
+
+      if (await redis.exists(`achievements:completed:${message.author.id}`)) {
+        if (!(await userExists(message.member))) await createUser(message.member);
+        const embed: APIEmbed = JSON.parse(
+          await redis.get(`achievements:completed:${message.author.id}`),
+        );
+        await redis.del(`achievements:completed:${message.author.id}`);
+
+        if (message instanceof Message) {
+          message.reply({ embeds: [embed] });
+        } else {
+          message.followUp({ embeds: [embed] }).catch(() => {
+            setTimeout(() => {
+              message.followUp({ embeds: [embed] }).catch(() => {});
+            }, 2500);
           });
         }
       }
-    }
 
-    const news = await getNews();
+      if (await redis.exists(`${Constants.redis.nypsi.RICKROLL}:${message.author.id}`)) {
+        if (!percentChance(10)) return;
 
-    const embeds: (Embed | CustomEmbed | APIEmbed)[] = [];
+        const userId = await redis.get(`${Constants.redis.nypsi.RICKROLL}:${message.author.id}`);
+        await redis.del(`${Constants.redis.nypsi.RICKROLL}:${message.author.id}`);
 
-    if (news.text != "" && command.category == "money" && !(await hasSeenNews(message.author.id))) {
-      await redis.rpush(Constants.redis.nypsi.NEWS_SEEN, message.author.id);
+        addTaskProgress(userId, "rickroll");
 
-      const pos = await hasSeenNews(message.author.id);
-
-      const embed = new CustomEmbed(message.member, `${news.text}\n\n*${formatDate(news.date)}*`)
-        .setHeader("news", message.client.user.avatarURL())
-        .setFooter({ text: `you are #${pos} to see this` });
-
-      embeds.push(embed);
-
-      logger.info(`news shown to ${message.author.username}`);
-    }
-
-    const notifs = await getInlineNotifications(message.member);
-
-    if (notifs.length > 0) embeds.push(...notifs.map((i) => i.embed));
-
-    if (await redis.exists(`achievements:completed:${message.author.id}`)) {
-      if (!(await userExists(message.member))) await createUser(message.member);
-      const embed: APIEmbed = JSON.parse(
-        await redis.get(`achievements:completed:${message.author.id}`),
-      );
-      await redis.del(`achievements:completed:${message.author.id}`);
-
-      if (message instanceof Message) {
-        message.reply({ embeds: [embed] });
-      } else {
-        message.followUp({ embeds: [embed] }).catch(() => {
-          setTimeout(() => {
-            message.followUp({ embeds: [embed] }).catch(() => {});
-          }, 2500);
+        await message.channel.send({
+          content: `${message.author.toString()} you have been **RICK ROLLED** by ${await getLastKnownUsername(
+            userId,
+          )}\n\nhttps://cdn.nypsi.xyz/rickroll.gif`,
         });
       }
-    }
 
-    if (await redis.exists(`${Constants.redis.nypsi.RICKROLL}:${message.author.id}`)) {
-      if (!percentChance(10)) return;
+      if (await redis.exists(`nypsi:levelup:${message.author.id}`)) {
+        const embed: APIEmbed = JSON.parse(await redis.get(`nypsi:levelup:${message.author.id}`));
 
-      const userId = await redis.get(`${Constants.redis.nypsi.RICKROLL}:${message.author.id}`);
-      await redis.del(`${Constants.redis.nypsi.RICKROLL}:${message.author.id}`);
+        embeds.push(embed);
 
-      addTaskProgress(userId, "rickroll");
-
-      await message.channel.send({
-        content: `${message.author.toString()} you have been **RICK ROLLED** by ${await getLastKnownUsername(
-          userId,
-        )}\n\nhttps://cdn.nypsi.xyz/rickroll.gif`,
-      });
-    }
-
-    if (await redis.exists(`nypsi:levelup:${message.author.id}`)) {
-      const embed: APIEmbed = JSON.parse(await redis.get(`nypsi:levelup:${message.author.id}`));
-
-      embeds.push(embed);
-
-      await redis.del(`nypsi:levelup:${message.author.id}`);
-    }
-
-    if (embeds.length > 0) {
-      if (message instanceof Message) {
-        message.reply({ embeds });
-      } else {
-        message.followUp({ embeds: embeds, flags: MessageFlags.Ephemeral }).catch(() => {
-          setTimeout(() => {
-            message.followUp({ embeds: embeds, flags: MessageFlags.Ephemeral }).catch(() => {});
-          }, 2500);
-        });
+        await redis.del(`nypsi:levelup:${message.author.id}`);
       }
-    }
-  }, 2000);
+
+      if (embeds.length > 0) {
+        if (message instanceof Message) {
+          message.reply({ embeds });
+        } else {
+          message.followUp({ embeds: embeds, flags: MessageFlags.Ephemeral }).catch(() => {
+            setTimeout(() => {
+              message.followUp({ embeds: embeds, flags: MessageFlags.Ephemeral }).catch(() => {});
+            }, 2500);
+          });
+        }
+      }
+    },
+    message instanceof Message ? 750 : 2500,
+  );
 
   await Promise.all([
     a(message.author.id, message.author.username, message.content, cmd),
@@ -1048,6 +1094,7 @@ export async function runCommand(
     updateUser(message.author || message.author || null, command.name),
     redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS, command.name, 1),
     addProgress(message.author.id, "nypsi", 1),
+    addEventProgress(message.client as NypsiClient, message.member, "commands", 1),
     addTaskProgress(message.author.id, "commands_weekly"),
     addTaskProgress(message.author.id, "commands_daily"),
     commandGemCheck(message.member, command.category),
@@ -1168,7 +1215,11 @@ export function logCommand(
     msg = `${message.guild.id} ${message.channelId} ${message.author.username}: ${content}`;
   }
 
-  logger.info(`::cmd ${msg}`);
+  logger.info(`::cmd ${msg}`, {
+    userId: message.author.id,
+    guildId: message.guildId,
+    channelId: message.channelId,
+  });
 }
 
 export function addHourlyCommand(member: GuildMember) {
@@ -1241,7 +1292,9 @@ export function runCommandUseTimers(client: NypsiClient) {
 
           giveCaptcha(id, 2, true);
           logger.info(`${tag} (${id}) has been given a captcha`);
-          await hook.send(`[${getTimestamp()}] **${tag}** (${id}) has been given a captcha`);
+          await hook.send(
+            `[${getTimestamp()}] **${tag.replaceAll("_", "\\_")}** (${id}) has been given a captcha`,
+          );
         }
       }
     }

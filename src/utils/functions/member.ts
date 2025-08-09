@@ -151,7 +151,7 @@ export async function getMember(
 
   if (debug) {
     return [
-      { username: target.user.username, score: 10000 },
+      ...(target ? [{ username: target.user.username, score: 10000 }] : []),
       ...sort(scores)
         .desc((i) => i.score)
         .map((i) => ({ score: i.score, username: members.get(i.id).user.username })),
@@ -180,14 +180,12 @@ export async function getExactMember(guild: Guild, memberName: string): Promise<
     members = await guild.members.fetch();
   }
 
-  const target = members.find(
+  return members.find(
     (member) =>
       member.user.username.toLowerCase() == memberName.toLowerCase() ||
       member.user.id == memberName ||
       member.user.displayName.toLowerCase() == memberName.toLowerCase(),
   );
-
-  return target;
 }
 
 export async function getRole(guild: Guild, roleName: string): Promise<Role> {

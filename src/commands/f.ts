@@ -6,7 +6,7 @@ import {
   MessageActionRowComponentBuilder,
   MessageFlags,
 } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { pluralize } from "../utils/functions/string";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -15,17 +15,18 @@ const cmd = new Command("f", "pay your respects", "fun");
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) message.channel.send({ embeds: [res.embed] });
+    if (res.respond) send({ embeds: [res.embed] });
     return;
   }
 
   if (args.length == 0) {
-    return message.channel.send({
+    return send({
       embeds: [new ErrorEmbed("you need to pay respects to something")],
     });
   }
@@ -52,7 +53,7 @@ async function run(
     new ButtonBuilder().setStyle(ButtonStyle.Primary).setLabel("F").setCustomId(customId),
   );
 
-  await message.channel.send({ embeds: [embed], components: [row] });
+  await send({ embeds: [embed], components: [row] });
 
   const reactions: string[] = [];
 

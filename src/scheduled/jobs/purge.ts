@@ -1,14 +1,13 @@
 import dayjs = require("dayjs");
-import { readFile, readdir, unlink } from "fs/promises";
 import prisma from "../../init/database";
-import { Job } from "../../types/Jobs";
-import { deleteImage } from "../../utils/functions/image";
+import redis from "../../init/redis";
 import { NypsiClient } from "../../models/Client";
 import { CustomEmbed } from "../../models/EmbedBuilders";
-import { addNotificationToQueue } from "../../utils/functions/users/notifications";
-import { pluralize } from "../../utils/functions/string";
+import { Job } from "../../types/Jobs";
 import Constants from "../../utils/Constants";
-import redis from "../../init/redis";
+import { deleteImage } from "../../utils/functions/image";
+import { pluralize } from "../../utils/functions/string";
+import { addNotificationToQueue } from "../../utils/functions/users/notifications";
 
 export default {
   name: "purge",
@@ -23,42 +22,6 @@ export default {
     });
 
     if (d.count > 0) log(`${d.count.toLocaleString()} usernames purged`);
-
-    const files = await readdir("./out");
-    let filesCount = 0;
-
-    for (const fileName of files) {
-      const file = await readFile(`./out/${fileName}`).then((r) =>
-        r
-          .toString()
-          .split("\n")
-          .map((i) => {
-            try {
-              return JSON.parse(i) as { time: number };
-            } catch {
-              return undefined;
-            }
-          }),
-      );
-
-      let attempts = 0;
-
-      while (attempts < 50) {
-        attempts++;
-        if (attempts >= 50) break;
-        const chosen = Math.floor(Math.random() * file.length);
-
-        if (file[chosen] && file[chosen].time) {
-          if (dayjs(file[chosen].time).isBefore(dayjs().subtract(120, "days"))) {
-            filesCount++;
-            await unlink(`./out/${fileName}`);
-            break;
-          }
-        }
-      }
-    }
-
-    log(`${filesCount} logs files deleted`);
 
     const limit = dayjs().subtract(1, "weeks").toDate();
 
@@ -196,5 +159,24 @@ export default {
         `closed ${staleTickets.length} stale ${pluralize("support request", staleTickets.length)}`,
       );
     }
+
+    await prisma.economyGuildMember.updateMany({
+      where: {
+        OR: [
+          {
+            contributedMoneyToday: { gt: 0 },
+          },
+          {
+            contributedXpToday: { gt: 0 },
+          },
+        ],
+      },
+      data: {
+        contributedMoneyToday: 0,
+        contributedXpToday: 0,
+      },
+    });
+
+    log(`cleared daily guild contributions`);
   },
 } satisfies Job;

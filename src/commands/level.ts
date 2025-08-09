@@ -1,14 +1,13 @@
-import {
-  BaseMessageOptions,
-  InteractionEditReplyOptions,
-  InteractionReplyOptions,
-  Message,
-  MessageFlags,
-} from "discord.js";
+import { MessageFlags } from "discord.js";
 import { Command } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { getBankBalance } from "../utils/functions/economy/balance";
-import { getLevel, getLevelRequirements, getPrestige } from "../utils/functions/economy/levelling";
+import {
+  getLevel,
+  getLevelRequirements,
+  getNextPrestigeRequirements,
+  getPrestige,
+} from "../utils/functions/economy/levelling";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getXp } from "../utils/functions/economy/xp";
 import { getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -19,37 +18,7 @@ const cmd = new Command("level", "view your progress to the next level", "money"
   "levelup",
 ]);
 
-cmd.setRun(async (message) => {
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
-
+cmd.setRun(async (message, send) => {
   if (!(await userExists(message.member))) await createUser(message.member);
 
   if (await onCooldown(cmd.name, message.member)) {
@@ -66,17 +35,29 @@ cmd.setRun(async (message) => {
     getPrestige(message.member),
   ]);
 
-  const required = getLevelRequirements(prestige, level);
+  const nextLevelRequirements = getLevelRequirements(prestige, level);
+  const nextPrestigeRequirements = getNextPrestigeRequirements(prestige, level);
 
   return send({
     embeds: [
-      new CustomEmbed(
-        message.member,
-        `for level **${level + 1}**\n\n` +
-          `**xp** ${xp.toLocaleString()}/${required.xp.toLocaleString()}\n` +
-          `**bank** $${bank.toLocaleString()}/$${required.money.toLocaleString()}`,
-      )
+      new CustomEmbed(message.member)
         .setHeader("level requirements", message.author.avatarURL())
+        .addFields(
+          {
+            name: `level ${level + 1}`,
+            value:
+              `**xp** ${xp.toLocaleString()}/${nextLevelRequirements.xp.toLocaleString()}\n` +
+              `**bank** $${bank.toLocaleString()}/$${nextLevelRequirements.money.toLocaleString()}`,
+            inline: true,
+          },
+          {
+            name: `next prestige (level ${Math.ceil((level + 1) / 100) * 100})`,
+            value:
+              `**xp** ${xp.toLocaleString()}/${nextPrestigeRequirements.xp.toLocaleString()}\n` +
+              `**bank** $${bank.toLocaleString()}/$${nextPrestigeRequirements.money.toLocaleString()}`,
+            inline: true,
+          },
+        )
         .setFooter({ text: `currently prestige ${prestige} level ${level}` }),
     ],
   });

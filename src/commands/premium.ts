@@ -1,13 +1,6 @@
-import {
-  BaseMessageOptions,
-  ColorResolvable,
-  CommandInteraction,
-  InteractionEditReplyOptions,
-  InteractionReplyOptions,
-  Message,
-} from "discord.js";
+import { ColorResolvable, CommandInteraction } from "discord.js";
 import { NypsiClient } from "../models/Client";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { daysAgo, daysUntil, formatDate } from "../utils/functions/date";
@@ -32,7 +25,7 @@ import {
   setTier,
 } from "../utils/functions/premium/premium";
 import sleep from "../utils/functions/sleep";
-import { cleanString } from "../utils/functions/string";
+import { cleanString, pluralize } from "../utils/functions/string";
 import { getTotalSpend } from "../utils/functions/users/email";
 import { addTag, getTags, removeTag } from "../utils/functions/users/tags";
 import {
@@ -148,38 +141,9 @@ cmd.slashData
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
-
   const checkRoles = async () => {
     if (doingRoles) return;
     if (message.guildId !== Constants.NYPSI_SERVER_ID) return;
@@ -849,7 +813,7 @@ async function run(
 
       let description = `**tier** ${levelString(
         profile.level,
-      )}\n**started** ${timeStarted} (${timeAgo} days ago)\n**expires** ${expires} (${timeUntil} days left)\n**credit** ${
+      )}\n**started** ${timeStarted} (${timeAgo} ${pluralize("day", timeAgo)} ago)\n**expires** ${expires} (${timeUntil} ${pluralize("day", timeUntil)} left)\n**credit** ${
         profile.credit
       }`;
 

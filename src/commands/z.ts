@@ -8,7 +8,7 @@ import {
   MessageActionRowComponentBuilder,
 } from "discord.js";
 import prisma from "../init/database";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { getExactMember, getMember } from "../utils/functions/member";
@@ -30,6 +30,7 @@ const cmd = new Command("z", "z", "none");
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) return;
@@ -57,7 +58,7 @@ async function run(
           `rating: ${profile.rating}\n` +
           `kick: ${profile.voteKicks.length}/${Math.ceil((await prisma.z.count({ where: { removed: false } })) / 5)}`,
       ).setHeader(
-        await getLastKnownUsername(profile.userId),
+        await getLastKnownUsername(profile.userId, false),
         await getLastKnownAvatar(profile.userId),
       );
 
@@ -74,7 +75,7 @@ async function run(
       }
 
       if (msg) msg.edit({ embeds: [embed], components: [row] });
-      else msg = await message.channel.send({ embeds: [embed], components: [row] });
+      else msg = await send({ embeds: [embed], components: [row] });
       return msg;
     };
 
@@ -93,7 +94,7 @@ async function run(
 
       if (interaction.customId === "invites") {
         const embed = new CustomEmbed(profile.userId).setHeader(
-          `${await getLastKnownUsername(profile.userId)}'s invites`,
+          `${await getLastKnownUsername(profile.userId, false)}'s invites`,
           await getLastKnownAvatar(profile.userId),
         );
         const desc: string[] = [];
@@ -179,15 +180,15 @@ async function run(
     memberId = message.author.id;
   } else if (args[0].toLowerCase() === "invite") {
     if (!profile.hasInvite)
-      return message.channel.send({
+      return send({
         embeds: [new ErrorEmbed("you don't have an available invite loser.")],
       });
 
-    if (!args[1]) return message.channel.send({ content: "dumbass - $z invite <username>" });
+    if (!args[1]) return send({ content: "dumbass - $z invite <username>" });
     const member = await getExactMember(message.guild, args[1]);
 
     if (!member) {
-      return message.channel.send({ embeds: [new ErrorEmbed("exact username or id")] });
+      return send({ embeds: [new ErrorEmbed("exact username or id")] });
     }
 
     return invite(message.author.id, member.id, message.guild);
@@ -214,13 +215,13 @@ async function run(
       message.guild.iconURL(),
     );
 
-    if (pages.size === 0) return message.channel.send({ embeds: [new ErrorEmbed("no members")] });
+    if (pages.size === 0) return send({ embeds: [new ErrorEmbed("no members")] });
 
-    if (pages.size === 1) return message.channel.send({ embeds: [embed] });
+    if (pages.size === 1) return send({ embeds: [embed] });
 
     const row = PageManager.defaultRow();
 
-    const msg = await message.channel.send({ embeds: [embed], components: [row] });
+    const msg = await send({ embeds: [embed], components: [row] });
 
     const manager = new PageManager({
       message: msg,
@@ -239,7 +240,7 @@ async function run(
     }
 
     if (!memberId.match(Constants.SNOWFLAKE_REGEX)) {
-      return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });
+      return send({ embeds: [new ErrorEmbed("invalid user")] });
     }
   }
 

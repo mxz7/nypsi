@@ -6,7 +6,9 @@ import { NypsiClient } from "../../../models/Client";
 import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
 import { addProgress } from "./achievements";
+import { addEventProgress } from "./events";
 import { addInventoryItem, gemBreak, getInventory, removeInventoryItem } from "./inventory";
+import { addStat } from "./stats";
 import { getPlantsData, getPlantUpgrades, getUpgradesData } from "./utils";
 import dayjs = require("dayjs");
 import ms = require("ms");
@@ -124,7 +126,23 @@ export async function addFarm(member: MemberResolvable, plantId: string, amount 
   await redis.del(`${Constants.redis.cache.economy.farm}:${userId}`);
 }
 
-export async function getClaimable(member: MemberResolvable, plantId: string, claim: boolean) {
+export function getClaimable(
+  member: MemberResolvable,
+  plantId: string,
+  claim: true,
+  client: NypsiClient,
+): Promise<{ sold: number; eventProgress?: number }>;
+export function getClaimable(
+  member: MemberResolvable,
+  plantId: string,
+  claim: false,
+): Promise<number>;
+export async function getClaimable(
+  member: MemberResolvable,
+  plantId: string,
+  claim: boolean,
+  client?: NypsiClient,
+): Promise<number | { sold: number; eventProgress?: number }> {
   const inventory = await getInventory(member);
   const farm = await getFarm(member);
   const plantData = getPlantsData()[plantId];
@@ -261,6 +279,9 @@ export async function getClaimable(member: MemberResolvable, plantId: string, cl
   if (claim && items > 0) {
     await addInventoryItem(member, plantData.item, items);
     await addProgress(member, "green_fingers", items);
+    const eventProgress = await addEventProgress(client, member, "farming", items);
+
+    return { sold: items, eventProgress };
   }
 
   return items;
@@ -365,6 +386,7 @@ export async function fertiliseFarm(member: MemberResolvable): Promise<{
   });
 
   await removeInventoryItem(member, "fertiliser", Math.ceil(possible.length / 3));
+  await addStat(member, "fertiliser", Math.ceil(possible.length / 3));
   await redis.del(`${Constants.redis.cache.economy.farm}:${getUserId(member)}`);
 
   return { done: possible.length, dead };

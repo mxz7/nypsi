@@ -13,7 +13,7 @@ export default {
       where: {
         AND: [{ completed: false }, { orderType: "buy" }],
       },
-      orderBy: { createdAt: "asc" },
+      orderBy: { id: "asc" },
     });
 
     const combinedQuantities: { itemId: string; itemAmount: number }[] = Object.values(

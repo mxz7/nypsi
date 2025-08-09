@@ -11,7 +11,7 @@ import {
   MessageActionRowComponentBuilder,
   MessageFlags,
 } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { imageExists, uploadImage } from "../utils/functions/image";
@@ -23,6 +23,7 @@ const cmd = new Command("color", "get a random hex color code", "info").setAlias
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   let color: string;
@@ -53,7 +54,7 @@ async function run(
   try {
     embed.setColor(color as ColorResolvable);
   } catch {
-    return message.channel.send({ embeds: [new ErrorEmbed("invalid color")] });
+    return send({ embeds: [new ErrorEmbed("invalid color")] });
   }
 
   if (member) {
@@ -78,9 +79,9 @@ async function run(
     new ButtonBuilder().setStyle(ButtonStyle.Secondary).setCustomId("circle").setLabel("circle"),
   );
 
-  const msg = await message.channel
-    .send({ embeds: [embed], components: [row] })
-    .catch(async () => message.channel.send({ embeds: [new ErrorEmbed("invalid color")] }));
+  const msg = await send({ embeds: [embed], components: [row] }).catch(async () =>
+    send({ embeds: [new ErrorEmbed("invalid color")] }),
+  );
 
   let generating = false;
 

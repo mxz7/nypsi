@@ -96,10 +96,7 @@ export function runCountdowns(client: NypsiClient) {
             fail = true;
           });
 
-          if (fail) {
-            return false;
-          }
-          return true;
+          return !fail;
         },
         {
           context: {

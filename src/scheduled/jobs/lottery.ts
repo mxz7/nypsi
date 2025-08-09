@@ -61,7 +61,7 @@ export default {
         return;
       }
 
-      const winnerUsername = await getLastKnownUsername(winner.winner);
+      const winnerUsername = await getLastKnownUsername(winner.winner, false);
       const winnerAvatar = await getLastKnownAvatar(winner.winner);
       prisma.inventory
         .deleteMany({ where: { item: "lottery_ticket" } })
@@ -79,7 +79,7 @@ export default {
 
       embed.setHeader("lottery winner", winnerAvatar);
       embed.setDescription(
-        `**${winnerUsername}** has won the lottery with ${winner.amount.toLocaleString()} tickets!!\n\n` +
+        `**${winnerUsername.replaceAll("_", "\\_")}** has won the lottery with ${winner.amount.toLocaleString()} tickets!!\n\n` +
           `they have won $**${total.toLocaleString()}**`,
       );
       embed.setFooter({ text: `a total of ${ticketCount.toLocaleString()} tickets were bought` });

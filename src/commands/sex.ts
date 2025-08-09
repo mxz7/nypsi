@@ -1,20 +1,13 @@
 import dayjs = require("dayjs");
-import {
-  BaseMessageOptions,
-  CommandInteraction,
-  InteractionEditReplyOptions,
-  InteractionReplyOptions,
-  Message,
-  MessageFlags,
-} from "discord.js";
+import { CommandInteraction, MessageFlags } from "discord.js";
 import redis from "../init/redis.js";
 import { NypsiClient } from "../models/Client.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-
 import Constants from "../utils/Constants.js";
 import { MStoTime } from "../utils/functions/date.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
+import { addEventProgress, EventData, getCurrentEvent } from "../utils/functions/economy/events.js";
 import { addTaskProgress } from "../utils/functions/economy/tasks.js";
 import { getTagsData } from "../utils/functions/economy/utils.js";
 import { cleanString } from "../utils/functions/string.js";
@@ -70,38 +63,9 @@ const descFilter = [
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
-
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
@@ -201,7 +165,7 @@ async function run(
         }**\n\n` +
           `go ahead and send [**${
             tag ? `[${getTagsData()[tag.tagId].emoji}] ` : ""
-          }${await getLastKnownUsername(milf.userId)}**](https://nypsi.xyz/user/${
+          }${await getLastKnownUsername(milf.userId, false)}**](https://nypsi.xyz/users/${
             milf.userId
           }?ref=bot-milf) a *private* message 😉😏`,
       ).setHeader("milf finder");
@@ -215,20 +179,35 @@ async function run(
           }**\n\n` +
             `[**${tag ? `[${getTagsData()[tag.tagId].emoji}] ` : ""}${await getLastKnownUsername(
               milf.userId,
-            )}**](https://nypsi.xyz/user/${milf.userId}?ref=bot-milf) - ${milf.description}\n\n` +
+              false,
+            )}**](https://nypsi.xyz/users/${milf.userId}?ref=bot-milf) - ${milf.description}\n\n` +
             "go ahead and send them a *private* message 😉😏",
         );
       }
 
-      await Promise.all([
+      const promises = await Promise.all([
         send({ embeds: [embed] }),
         addProgress(message.member, "whore", 1),
         addProgress(milf.userId, "whore", 1),
         addTaskProgress(message.member, "horny"),
         addTaskProgress(milf.userId, "horny"),
+        addEventProgress(message.client as NypsiClient, message.member, "milfs", 1),
+        addEventProgress(message.client as NypsiClient, milf.userId, "milfs", 1),
       ]);
 
+      const eventProgress = promises.slice(-2, -1).toSorted()[1] as number;
+
       const authorTag = await getActiveTag(message.member);
+
+      const eventData: { event?: EventData; target: number } = { target: 0 };
+
+      if (eventProgress) {
+        eventData.event = await getCurrentEvent();
+
+        if (eventData.event) {
+          eventData.target = Number(eventData.event.target);
+        }
+      }
 
       const embed2 = new CustomEmbed(
         undefined,
@@ -238,9 +217,12 @@ async function run(
             : message.guild.name
         }**\n\ngo ahead and send [${
           authorTag ? `[${getTagsData()[authorTag.tagId].emoji}] ` : ""
-        }**${message.author.username}**](https://nypsi.xyz/user/${
+        }**${message.author.username}**](https://nypsi.xyz/users/${
           message.author.id
-        }?ref=bot-milf) a *private* message 😉😏`,
+        }?ref=bot-milf) a *private* message 😉😏` +
+          (eventProgress
+            ? `\n\n🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`
+            : ""),
       )
         .setHeader("milf finder")
         .setColor(Constants.EMBED_SUCCESS_COLOR);
@@ -271,7 +253,7 @@ async function run(
           }**\n\n` +
             `[${authorTag ? `[${getTagsData()[authorTag.tagId].emoji}] ` : ""}**${
               message.author.username
-            }**](https://nypsi.xyz/user/${message.author.id}?ref=bot-milf) - ${description}\n\n` +
+            }**](https://nypsi.xyz/users/${message.author.id}?ref=bot-milf) - ${description}\n\n` +
             "go ahead and send them a *private* message 😉😏",
         );
       }

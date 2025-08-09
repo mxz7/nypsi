@@ -36,7 +36,7 @@ export async function getTradeRequests(member: MemberResolvable) {
       AND: [{ ownerId: getUserId(member) }, { completed: false }],
     },
     orderBy: {
-      createdAt: "asc",
+      id: "asc",
     },
   });
 
@@ -141,12 +141,12 @@ export async function createTradeRequest(
   embed.setFields(
     {
       name: "requesting",
-      value: `${requestedItems.length > 0 ? requestedItems.map((item) => `**${item.amount.toLocaleString()}x** ${item.item.emoji} [${item.item.name}](https://nypsi.xyz/item/${item.item.id}?ref=bot-trade)`).join("\n") : "none"}`,
+      value: `${requestedItems.length > 0 ? requestedItems.map((item) => `**${item.amount.toLocaleString()}x** ${item.item.emoji} [${item.item.name}](https://nypsi.xyz/items/${item.item.id}?ref=bot-trade)`).join("\n") : "none"}`,
       inline: false,
     },
     {
       name: "offering",
-      value: `${offeredMoney > 0 ? `$${offeredMoney.toLocaleString()}` : ""}\n${offeredItems.map((item) => `**${item.amount.toLocaleString()}x** ${item.item.emoji} [${item.item.name}](https://nypsi.xyz/item/${item.item.id}?ref=bot-trade)`).join("\n")}`,
+      value: `${offeredMoney > 0 ? `$${offeredMoney.toLocaleString()}` : ""}\n${offeredItems.map((item) => `**${item.amount.toLocaleString()}x** ${item.item.emoji} [${item.item.name}](https://nypsi.xyz/items/${item.item.id}?ref=bot-trade)`).join("\n")}`,
       inline: false,
     },
   );
@@ -269,12 +269,12 @@ export async function bumpTradeRequest(id: number, client: NypsiClient) {
   embed.setFields(
     {
       name: "requesting",
-      value: `${query.requestedItems.length > 0 ? query.requestedItems.map((item) => `**${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} [${items[item.split(":")[0]].name}](https://nypsi.xyz/item/${item.split(":")[0]}?ref=bot-trade)`).join("\n") : "none"}`,
+      value: `${query.requestedItems.length > 0 ? query.requestedItems.map((item) => `**${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} [${items[item.split(":")[0]].name}](https://nypsi.xyz/items/${item.split(":")[0]}?ref=bot-trade)`).join("\n") : "none"}`,
       inline: false,
     },
     {
       name: "offering",
-      value: `${query.offeredMoney > 0 ? `$${query.offeredMoney.toLocaleString()}` : ""}\n${query.offeredItems.map((item) => `**${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} [${items[item.split(":")[0]].name}](https://nypsi.xyz/item/${item.split(":")[0]}?ref=bot-trade)`).join("\n")}`,
+      value: `${query.offeredMoney > 0 ? `$${query.offeredMoney.toLocaleString()}` : ""}\n${query.offeredItems.map((item) => `**${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} [${items[item.split(":")[0]].name}](https://nypsi.xyz/items/${item.split(":")[0]}?ref=bot-trade)`).join("\n")}`,
       inline: false,
     },
   );
@@ -501,8 +501,8 @@ export async function fulfillTradeRequest(
       interaction.user,
       await interaction.client.users.fetch(tradeRequest.ownerId),
       "item",
-      parseInt(item.split(":")[0]),
-      item.split(":")[1],
+      parseInt(item.split(":")[1]),
+      item.split(":")[0],
       "trade request",
     );
   }
@@ -547,7 +547,7 @@ export async function fulfillTradeRequest(
 
   const desc = embed.data.description.split("\n\n");
 
-  desc[0] = `**fulfilled** by ${interaction.user.username} <t:${Math.floor(Date.now() / 1000)}:R>`;
+  desc[0] = `**fulfilled** by ${interaction.user.username.replaceAll("_", "\\_")} <t:${Math.floor(Date.now() / 1000)}:R>`;
 
   embed.setDescription(desc.join("\n\n"));
 

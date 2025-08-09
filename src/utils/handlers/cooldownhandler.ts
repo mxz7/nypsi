@@ -13,7 +13,7 @@ export async function onCooldown(cmd: string, member: MemberResolvable): Promise
 
   const res = await redis.exists(key);
 
-  return res == 1 ? true : false;
+  return res == 1;
 }
 
 export async function addCooldown(cmd: string, member: MemberResolvable, seconds?: number) {

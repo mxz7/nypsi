@@ -28,7 +28,7 @@ export async function getViews(member: MemberResolvable, limit?: Date) {
       source: true,
       viewerId: true,
     },
-    orderBy: { createdAt: "desc" },
+    orderBy: { id: "desc" },
   });
 
   await redis.set(

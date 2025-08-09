@@ -148,7 +148,7 @@ export default {
       return res.editReply({
         embeds: [
           new CustomEmbed(interaction.user.id).setDescription(
-            `✅ you've ${order.orderType === "sell" ? "bought" : "sold"} **${(amount - marketRes.remaining).toLocaleString()}x** ${getItems()[order.itemId].emoji} **[${getItems()[order.itemId].name}](https://nypsi.xyz/item/${order.itemId})** for $${((amount - marketRes.remaining) * Number(order.price)).toLocaleString()}`,
+            `✅ you've ${order.orderType === "sell" ? "bought" : "sold"} **${(amount - marketRes.remaining).toLocaleString()}x** ${getItems()[order.itemId].emoji} **[${getItems()[order.itemId].name}](https://nypsi.xyz/items/${order.itemId})** for $${((amount - marketRes.remaining) * Number(order.price)).toLocaleString()}`,
           ),
         ],
       });

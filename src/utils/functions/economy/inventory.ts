@@ -43,7 +43,7 @@ export async function getInventory(member: MemberResolvable): Promise<Inventory>
   if (cache) {
     try {
       const parsed = JSON.parse(cache);
-      return Inventory.fromJSON(userId, parsed);
+      return new Inventory(userId, parsed);
     } catch (e) {
       console.error(e);
       logger.error("weird inventory cache error", { error: e });
@@ -95,13 +95,19 @@ export class Inventory {
   private items: { [itemId: string]: number };
   private userId: string;
 
-  constructor(member: MemberResolvable, data?: { item: string; amount: number }[]) {
+  constructor(
+    member: MemberResolvable,
+    data?: { [itemId: string]: number } | { item: string; amount: number }[],
+  ) {
     this.userId = getUserId(member);
     this.items = {};
-    if (data) {
+
+    if (Array.isArray(data)) {
       for (const i of data) {
         this.items[i.item] = i.amount;
       }
+    } else if (data) {
+      this.items = data;
     }
   }
 
@@ -163,14 +169,6 @@ export class Inventory {
 
   toJSON(): { [itemId: string]: number } {
     return this.items;
-  }
-
-  static fromJSON(member: MemberResolvable, obj: { [itemId: string]: number }): Inventory {
-    const data = Object.entries(obj).map(([item, amount]) => ({
-      item,
-      amount,
-    }));
-    return new Inventory(member, data);
   }
 }
 
@@ -236,6 +234,10 @@ async function doAutosellThing(
 
 export async function addInventoryItem(member: MemberResolvable, itemId: string, amount: number) {
   const userId = getUserId(member);
+
+  if (itemId.includes("gem")) {
+    logger.debug(`gems: ${userId} added ${amount}x ${itemId}`);
+  }
 
   if (amount <= 0) return;
 
@@ -337,6 +339,10 @@ export async function removeInventoryItem(
 
 export async function setInventoryItem(member: MemberResolvable, itemId: string, amount: number) {
   const userId = getUserId(member);
+
+  if (itemId.includes("gem")) {
+    logger.debug(`gems: ${userId} set ${amount}x ${itemId}`);
+  }
 
   if (!getItems()[itemId]) {
     console.trace();
@@ -515,15 +521,23 @@ export async function gemBreak(
   chance: number,
   gem: "blue_gem" | "purple_gem" | "pink_gem" | "green_gem" | "white_gem",
   client?: NypsiClient | ClusterManager,
+  shatterOnly = false,
+  sendMessage = true,
 ) {
   if (!percentChance(chance)) return;
 
   const userId = getUserId(member);
 
   const inventory = await getInventory(userId);
+
+  if (!(await inventory.hasGem(gem))) {
+    logger.debug(`gems: ${userId} skipping gem break (${gem}), no gem`);
+    return;
+  }
+
   const gemLocation = await inventory.hasGem(gem);
 
-  if ((await inventory.hasGem("crystal_heart")).any || !gemLocation.any) return;
+  if (!shatterOnly && ((await inventory.hasGem("crystal_heart")).any || !gemLocation.any)) return;
 
   let uniqueGemCount = 0;
 
@@ -533,7 +547,12 @@ export async function gemBreak(
   if ((await inventory.hasGem("green_gem")).any) uniqueGemCount++;
   if ((await inventory.hasGem("white_gem")).any) uniqueGemCount++;
 
-  if (uniqueGemCount === 5 && percentChance(50) && (await getDmSettings(userId)).other) {
+  if (
+    !shatterOnly &&
+    uniqueGemCount === 5 &&
+    percentChance(25) &&
+    (await getDmSettings(userId)).other
+  ) {
     await Promise.all([
       removeInventoryItem(userId, "pink_gem", 1),
       removeInventoryItem(userId, "purple_gem", 1),
@@ -634,6 +653,8 @@ export async function gemBreak(
 
   await addInventoryItem(userId, "gem_shard", amount);
 
+  logger.debug(`gems: ${userId} shattered ${gem} into ${amount} shards`);
+
   const embed = new CustomEmbed(userId)
     .setTitle(`your ${getItems()[gem].name} has shattered`)
     .setDescription(
@@ -644,7 +665,7 @@ export async function gemBreak(
 
   if (footer) embed.setFooter({ text: footer });
 
-  if ((await getDmSettings(userId)).other) {
+  if (sendMessage && (await getDmSettings(userId)).other) {
     addNotificationToQueue({
       memberId: userId,
       payload: {
@@ -652,6 +673,11 @@ export async function gemBreak(
       },
     });
   }
+
+  return {
+    shards: amount,
+    footerMsg: footer,
+  };
 }
 
 export async function setAutosellItems(member: MemberResolvable, items: string[]) {

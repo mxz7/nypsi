@@ -36,8 +36,7 @@ export async function getLastKarmaShopOpen() {
 export async function isKarmaShopOpen() {
   const v = await redis.get(Constants.redis.nypsi.KARMA_SHOP_OPEN);
 
-  if (typeof v === "string" && v === "t") return true;
-  return false;
+  return typeof v === "string" && v === "t";
 }
 
 export async function closeKarmaShop() {

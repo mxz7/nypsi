@@ -1,19 +1,15 @@
 import { Game, Prisma } from "@prisma/client";
 import {
   ActionRowBuilder,
-  BaseMessageOptions,
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
-  InteractionEditReplyOptions,
-  InteractionReplyOptions,
-  Message,
   MessageActionRowComponentBuilder,
   MessageFlags,
 } from "discord.js";
 import { readFile, writeFile } from "node:fs/promises";
 import prisma from "../init/database";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { fetchGame } from "../utils/functions/economy/stats";
 import PageManager from "../utils/functions/page";
@@ -30,38 +26,9 @@ const cmd = new Command(
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
-
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
@@ -103,7 +70,7 @@ async function run(
       },
       take: 6969,
       orderBy: {
-        date: "desc",
+        id: "desc",
       },
     };
 
@@ -136,7 +103,7 @@ async function run(
     const pages = PageManager.createPages(
       query.map((game) => {
         let out =
-          `**id** [\`${game.id.toString(36)}\`](https://nypsi.xyz/game/${game.id.toString(
+          `**id** [\`${game.id.toString(36)}\`](https://nypsi.xyz/games/${game.id.toString(
             36,
           )}?ref=bot-game) \`(${game.id})\`\n` +
           `**user** \`${
@@ -210,7 +177,7 @@ async function run(
       ),
     );
 
-    const msg = await message.channel.send({
+    const msg = await send({
       embeds: [embed],
       components: [row],
       files: [{ attachment: await readFile(`/tmp/${message.author.id}.txt`), name: "data.txt" }],
@@ -234,19 +201,19 @@ async function run(
       return send({ embeds: [new ErrorEmbed(`couldn't find a game with id \`${args[0]}\``)] });
 
     const username = (await getPreferences(game.userId))?.leaderboards
-      ? await getLastKnownUsername(game.userId).catch(() => {})
+      ? await getLastKnownUsername(game.userId, false).catch(() => {})
       : "[hidden]";
 
     const embed = new CustomEmbed(game.userId).setHeader(
       username ? `${username}'s ${game.game} game` : `id: ${game.id.toString(36)}`,
       username === "[hidden]" ? message.author.avatarURL() : await getLastKnownAvatar(game.userId),
-      `https://nypsi.xyz/game/${game.id.toString(36)}?ref=bot-game`,
+      `https://nypsi.xyz/games/${game.id.toString(36)}?ref=bot-game`,
     );
 
     let components: ActionRowBuilder<MessageActionRowComponentBuilder>[];
 
     const desc =
-      `**id** [\`${game.id.toString(36)}\`](https://nypsi.xyz/game/${game.id.toString(36)}?ref=bot-game) \`(${
+      `**id** [\`${game.id.toString(36)}\`](https://nypsi.xyz/games/${game.id.toString(36)}?ref=bot-game) \`(${
         game.id
       })\`\n` +
       `**user** \`${username || "[redacted]"}\`\n` +
@@ -268,7 +235,7 @@ async function run(
     } else if (game.game.includes("scratch_card") || game.game.includes("scratchie")) {
       components = JSON.parse(game.outcome);
     } else {
-      embed.addField("outcome", `https://nypsi.xyz/game/${game.id.toString(36)}`, true);
+      embed.addField("outcome", `https://nypsi.xyz/games/${game.id.toString(36)}`, true);
     }
 
     if (game.win == 1 && !(game.game.includes("scratchie") || game.game.includes("scratch_card"))) {

@@ -1,5 +1,5 @@
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { getPrefix } from "../utils/functions/guilds/utils";
@@ -10,6 +10,7 @@ const cmd = new Command("embed", "create an embed message", "utility").setPermis
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
@@ -34,7 +35,7 @@ async function run(
           `${prefix}embed hello | this is a description | #13c696`,
       );
 
-    return message.channel.send({ embeds: [embed] });
+    return send({ embeds: [embed] });
   }
 
   let mode = "";
@@ -69,7 +70,7 @@ async function run(
       message.delete();
     })
     .catch((e) => {
-      message.channel.send({ embeds: [new ErrorEmbed(e)] });
+      send({ embeds: [new ErrorEmbed(e)] });
     });
 }
 

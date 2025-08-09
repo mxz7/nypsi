@@ -1,4 +1,5 @@
 import dayjs = require("dayjs");
+import { ClusterManager } from "discord-hybrid-sharding";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -11,30 +12,35 @@ import { CustomEmbed } from "../../models/EmbedBuilders";
 import { Job } from "../../types/Jobs";
 import { NotificationPayload } from "../../types/Notification";
 import Constants from "../../utils/Constants";
-import { removeInventoryItem } from "../../utils/functions/economy/inventory";
-import { percentChance } from "../../utils/functions/random";
+import {
+  gemBreak,
+  getInventory,
+  removeInventoryItem,
+} from "../../utils/functions/economy/inventory";
+import { addStat } from "../../utils/functions/economy/stats";
+import { pluralize } from "../../utils/functions/string";
 import { addNotificationToQueue } from "../../utils/functions/users/notifications";
 import pAll = require("p-all");
 
 export default {
   name: "streaks",
   cron: "0 0 * * *",
-  async run(log) {
+  async run(log, manager) {
     if (await redis.exists("nypsi:streakpause")) {
       log("streaks paused");
       return;
     }
 
-    const dailyStreak = await doDailyStreaks();
+    const dailyStreak = await doDailyStreaks(manager);
 
     log(`${dailyStreak} daily streak notifications sent`);
 
-    const voteStreak = await doVoteStreaks();
+    const voteStreak = await doVoteStreaks(manager);
     log(`${voteStreak} vote streak notifications sent`);
   },
 } satisfies Job;
 
-async function doDailyStreaks() {
+async function doDailyStreaks(manager: ClusterManager) {
   const limit = dayjs().subtract(1, "day").subtract(1, "hours").toDate();
 
   const users = await prisma.economy.findMany({
@@ -75,12 +81,14 @@ async function doDailyStreaks() {
       "<:nypsi_gem_white:1046933670436552725> white gems have a chance to protect your streaks. make sure to do /daily to continue your streak",
     );
 
-  const whiteGemBrokeEmbed = new CustomEmbed()
-    .setColor(Constants.EMBED_FAIL_COLOR)
-    .setTitle("your white gem has shattered")
-    .setDescription(
-      "<:nypsi_gem_white:1046933670436552725> the power exerted by your white gem to save your streak has unfortunately caused it to shatter...",
-    );
+  const whiteGemBrokeEmbed = (amount: number) => {
+    return new CustomEmbed()
+      .setColor(Constants.EMBED_FAIL_COLOR)
+      .setTitle("your white gem has shattered")
+      .setDescription(
+        `<:nypsi_gem_white:1046933670436552725> the power exerted by your white gem to save your streak has unfortunately caused it to shatter into ${amount} ${pluralize("piece", amount)}`,
+      );
+  };
 
   const resetEmbed = new CustomEmbed()
     .setColor(Constants.EMBED_FAIL_COLOR)
@@ -94,24 +102,31 @@ async function doDailyStreaks() {
 
   for (const user of users) {
     promises.push(async () => {
-      if (user.Inventory.find((i) => i.item == "calendar")?.amount > 0) {
+      const inventory = await getInventory(user.userId);
+
+      if (inventory.has("calendar")) {
         if (user.user.DMSettings?.other)
           notifications.push({ memberId: user.userId, payload: { embed: calendarSavedEmbed } });
 
         await removeInventoryItem(user.userId, "calendar", 1);
+        await addStat(user.userId, "calendar");
 
         return;
-      } else if (user.Inventory.find((i) => i.item == "white_gem")?.amount > 0n) {
+      } else if ((await inventory.hasGem("white_gem")).any) {
         const gemSaveChance = Math.floor(Math.random() * 10);
 
         if (gemSaveChance < 5) {
           notifications.push({ memberId: user.userId, payload: { embed: gemSavedEmbed } });
 
-          if (percentChance(7)) {
-            await removeInventoryItem(user.userId, "calendar", 1);
+          const res = await gemBreak(user.userId, 7, "white_gem", manager, true, false);
 
-            notifications.push({ memberId: user.userId, payload: { embed: whiteGemBrokeEmbed } });
+          if (res) {
+            notifications.push({
+              memberId: user.userId,
+              payload: { embed: whiteGemBrokeEmbed(res.shards).setFooter({ text: res.footerMsg }) },
+            });
           }
+
           return;
         }
       }
@@ -136,7 +151,7 @@ async function doDailyStreaks() {
   return notifications.length;
 }
 
-async function doVoteStreaks() {
+async function doVoteStreaks(manager: ClusterManager) {
   const limit = dayjs().subtract(1, "day").subtract(1, "hours").toDate();
 
   const users = await prisma.economy.findMany({
@@ -178,12 +193,14 @@ async function doVoteStreaks() {
       "<:nypsi_gem_white:1046933670436552725> white gems have a chance to protect your streak. make sure to vote to continue your streak",
     );
 
-  const whiteGemBrokeEmbed = new CustomEmbed()
-    .setColor(Constants.EMBED_FAIL_COLOR)
-    .setTitle("your white gem has shattered")
-    .setDescription(
-      "<:nypsi_gem_white:1046933670436552725> the power exerted by your white gem to save your streak has unfortunately caused it to shatter...",
-    );
+  const whiteGemBrokeEmbed = (amount: number) => {
+    return new CustomEmbed()
+      .setColor(Constants.EMBED_FAIL_COLOR)
+      .setTitle("your white gem has shattered")
+      .setDescription(
+        `<:nypsi_gem_white:1046933670436552725> the power exerted by your white gem to save your streak has unfortunately caused it to shatter into ${amount} ${pluralize("piece", amount)}`,
+      );
+  };
 
   const resetEmbed = new CustomEmbed()
     .setColor(Constants.EMBED_FAIL_COLOR)
@@ -216,7 +233,9 @@ async function doVoteStreaks() {
 
   for (const user of users) {
     promises.push(async () => {
-      if (user.Inventory.find((i) => i.item == "calendar")?.amount > 0) {
+      const inventory = await getInventory(user.userId);
+
+      if (inventory.has("calendar")) {
         if (user.user.DMSettings?.other) {
           if (user.user.DMSettings.voteReminder) {
             notifications.push({
@@ -232,9 +251,10 @@ async function doVoteStreaks() {
         }
 
         await removeInventoryItem(user.userId, "calendar", 1);
+        await addStat(user.userId, "calendar");
 
         return;
-      } else if (user.Inventory.find((i) => i.item == "white_gem")?.amount > 0n) {
+      } else if ((await inventory.hasGem("white_gem")).any) {
         const gemSaveChance = Math.floor(Math.random() * 10);
 
         if (gemSaveChance < 5) {
@@ -252,23 +272,30 @@ async function doVoteStreaks() {
             }
           }
 
-          if (percentChance(7)) {
-            await removeInventoryItem(user.userId, "calendar", 1);
+          const res = await gemBreak(user.userId, 7, "white_gem", manager, true, false);
 
+          if (res) {
             if (user.user.DMSettings?.other) {
               if (user.user.DMSettings.voteReminder) {
                 notifications.push({
                   memberId: user.userId,
-                  payload: { embed: whiteGemBrokeEmbed, components: voteRow },
+                  payload: {
+                    embed: whiteGemBrokeEmbed(res.shards).setFooter({ text: res.footerMsg }),
+                    components: voteRow,
+                  },
                 });
               } else {
                 notifications.push({
                   memberId: user.userId,
-                  payload: { embed: whiteGemBrokeEmbed, components: remindersRow },
+                  payload: {
+                    embed: whiteGemBrokeEmbed(res.shards).setFooter({ text: res.footerMsg }),
+                    components: remindersRow,
+                  },
                 });
               }
             }
           }
+
           return;
         }
       }

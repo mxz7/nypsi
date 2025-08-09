@@ -1,18 +1,44 @@
+# august 2025
+
+## changes you'll probably care about
+
+- loot rains only double time in public command channels
+- buffed tower
+- added guild admins to buy shop items and invite/kick members (@growling_grizzly)
+- can get married for free from 100% love
+- auto divorce when you get 100% love with someone else
+
+## other
+
+- reaction roles support standard discord emojis
+
+---
+
 # july 2025
 
 ## changes you'll probably care about
 
 - added better searching and pages to $ach view (@growling_grizzly)
-- you can disable channels in your server /settings server disabled-channels
+- added disabled channels in your server /settings server disabled-channels
 - after maintenance or reboots, boosters will be given their lost time back
-- revise `$help <item>` and `$recipe` to be aliases for `$item` (@fedpol1)
-- add more info to `$item`, accessible through pages (@fedpol1, @growling_grizzly)
+- revised `$help <item>` and `$recipe` to be aliases for `$item` (@fedpol1)
+- added more info to `$item`, accessible through pages (@fedpol1, @growling_grizzly)
+- added events (https://nypsi.xyz/docs/economy/events)
+- maxbet & mines balancing
+- daily guild contribution stats (@growling_grizzly)
+- more complex times (such as 1h30m) can now be used in mute/ban/etc (@growling_grizzly)
+- added lotus 🪷 flower
+- added requirements to next prestige to $level (@growling_grizzly)
+- rewrote blackjack to hopefully fix it randomly breaking (@growling_grizzly)
+- added money bag / cash (💵) to mines, gives 0.33x - 1x bet
 
 ## other
 
 - staff members can now start a support request with users
-- transaction logging in database - easier to query
+- added transaction logging in database - easier to query
 - players below prestige 1 don't get their level reset on new season
+- counters now wont delete themselves after the first fail (@growling_grizzly)
+- fixed underscores in names messing up some formatting (@growling_grizzly)
 
 ---
 

@@ -1,5 +1,5 @@
 import { CommandInteraction } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { ErrorEmbed } from "../models/EmbedBuilders";
 import { selectItem } from "../utils/functions/economy/inventory";
 import { runItemInfo } from "../utils/functions/economy/item_info";
@@ -12,6 +12,7 @@ const cmd = new Command("recipe", "view the recipe for a craftable item", "money
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (!(await userExists(message.member))) await createUser(message.member);
@@ -19,24 +20,24 @@ async function run(
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) message.channel.send({ embeds: [res.embed] });
+    if (res.respond) send({ embeds: [res.embed] });
     return;
   }
 
   if (args.length == 0) {
-    return message.channel.send({ embeds: [new ErrorEmbed("/recipe <item>")] });
+    return send({ embeds: [new ErrorEmbed("/recipe <item>")] });
   }
 
   const selected = selectItem(args.join(" ").toLowerCase());
 
   if (!selected) {
-    return message.channel.send({ embeds: [new ErrorEmbed(`couldnt find \`${args.join(" ")}\``)] });
+    return send({ embeds: [new ErrorEmbed(`couldnt find \`${args.join(" ")}\``)] });
   }
 
-  if (await runItemInfo(message, args, selected, "crafting")) {
+  if (await runItemInfo(message, args, selected, "crafting", send)) {
     await addCooldown(cmd.name, message.member, 4);
   } else {
-    return message.channel.send({
+    return send({
       embeds: [new ErrorEmbed(`that item is not craftable nor is it used to craft anything`)],
     });
   }

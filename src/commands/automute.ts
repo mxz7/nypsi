@@ -1,5 +1,5 @@
 import { CommandInteraction, PermissionFlagsBits } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { MStoTime } from "../utils/functions/date";
 import { getPrefix } from "../utils/functions/guilds/utils";
@@ -9,6 +9,7 @@ import {
   setAutoMuteLevels,
   setAutoMuteTimeout,
 } from "../utils/functions/moderation/mute";
+import { getDuration } from "../utils/functions/string";
 
 const cmd = new Command("automute", "change auto mute lengths", "admin").setPermissions([
   "MANAGE_SERVER",
@@ -16,11 +17,12 @@ const cmd = new Command("automute", "change auto mute lengths", "admin").setPerm
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
     if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
-      return message.channel.send({
+      return send({
         embeds: [new ErrorEmbed("you need the `manage server` permission")],
       });
     }
@@ -46,20 +48,20 @@ async function run(
       embed.setDescription("automute is disabled");
     }
 
-    return message.channel.send({ embeds: [embed] });
+    return send({ embeds: [embed] });
   }
 
   if (args[0].toLowerCase() == "disable") {
     await setAutoMuteLevels(message.guild, []);
 
-    return message.channel.send({
+    return send({
       embeds: [new CustomEmbed(message.member, "✅ auto mute has been disabled")],
     });
   }
 
   if (args[0].toLowerCase() === "timeout") {
     if (!args[1].toLowerCase()) {
-      return message.channel.send({
+      return send({
         embeds: [
           new CustomEmbed(
             message.member,
@@ -73,18 +75,18 @@ async function run(
     const duration = getDuration(args[1].toLowerCase());
 
     if (duration < 3600 || isNaN(duration) || typeof duration !== "number")
-      return message.channel.send({
+      return send({
         embeds: [new ErrorEmbed("invalid duration. format: 15m = 15 minutes")],
       });
 
     if (duration > 2629746)
-      return message.channel.send({
+      return send({
         embeds: [new ErrorEmbed("invalid duration. format: 15m = 15 minutes")],
       });
 
     await setAutoMuteTimeout(message.guild, duration);
 
-    return message.channel.send({
+    return send({
       embeds: [
         new CustomEmbed(
           message.member,
@@ -94,7 +96,7 @@ async function run(
     });
   } else {
     if (args.length == 1 || !parseInt(args[0])) {
-      return message.channel.send({
+      return send({
         embeds: [
           new ErrorEmbed(
             `${prefix}automute <vl> <length | delete>\n${prefix}automute disable\n${prefix}automute <vl> 0 to set a vl to not mute`,
@@ -106,11 +108,11 @@ async function run(
     const level = parseInt(args[0]) - 1;
 
     if (level < 0) {
-      return message.channel.send({ embeds: [new ErrorEmbed("invalid level")] });
+      return send({ embeds: [new ErrorEmbed("invalid level")] });
     } else if (level > 9) {
-      return message.channel.send({ embeds: [new ErrorEmbed("cannot have more than 10 levels")] });
+      return send({ embeds: [new ErrorEmbed("cannot have more than 10 levels")] });
     } else if (level > levels.length) {
-      return message.channel.send({ embeds: [new ErrorEmbed("cannot skip a vl")] });
+      return send({ embeds: [new ErrorEmbed("cannot skip a vl")] });
     }
 
     if (args[1].toLowerCase() == "delete") {
@@ -118,7 +120,7 @@ async function run(
 
       await setAutoMuteLevels(message.guild, levels);
 
-      return message.channel.send({
+      return send({
         embeds: [new CustomEmbed(message.member, `✅ level \`${level + 1}\` has been removed`)],
       });
     }
@@ -126,7 +128,7 @@ async function run(
     const duration = getDuration(args[1].toLowerCase());
 
     if (duration < 0 || isNaN(duration) || typeof duration !== "number")
-      return message.channel.send({
+      return send({
         embeds: [new ErrorEmbed("invalid duration. format: 15m = 15 minutes")],
       });
 
@@ -134,11 +136,11 @@ async function run(
 
     await setAutoMuteLevels(message.guild, levels);
 
-    return message.channel.send({
+    return send({
       embeds: [
         new CustomEmbed(
           message.member,
-          `✅ set \`${level + 1}\` to \`${duration.toLocaleString()}\` seconds`,
+          `✅ set \`${level + 1}\` to \`${MStoTime(duration * 1000, true).trim() || "no mute"}\``,
         ),
       ],
     });
@@ -148,35 +150,3 @@ async function run(
 cmd.setRun(run);
 
 module.exports = cmd;
-
-function getDuration(duration: string): number {
-  duration.toLowerCase();
-
-  if (duration.includes("d")) {
-    if (!parseInt(duration.split("d")[0])) return undefined;
-
-    const num = parseInt(duration.split("d")[0]);
-
-    return num * 86400;
-  } else if (duration.includes("h")) {
-    if (!parseInt(duration.split("h")[0])) return undefined;
-
-    const num = parseInt(duration.split("h")[0]);
-
-    return num * 3600;
-  } else if (duration.includes("m")) {
-    if (!parseInt(duration.split("m")[0])) return undefined;
-
-    const num = parseInt(duration.split("m")[0]);
-
-    return num * 60;
-  } else if (duration.includes("s")) {
-    if (!parseInt(duration.split("s")[0])) return undefined;
-
-    const num = parseInt(duration.split("s")[0]);
-
-    return num;
-  }
-
-  return 0;
-}

@@ -1,3 +1,4 @@
+import { WordleGame } from "@prisma/client";
 import prisma from "../../../init/database";
 import { addProgress } from "../economy/achievements";
 import { addTaskProgress } from "../economy/tasks";
@@ -33,9 +34,9 @@ export async function addWordleGame(
 }
 
 export async function getWordleGame(id: string) {
-  const query = await prisma.wordleGame.findUnique({
-    where: { id: parseInt(id, 36) },
-  });
-
-  return query;
+  return prisma.wordleGame
+    .findUnique({
+      where: { id: parseInt(id, 36) },
+    })
+    .catch(() => undefined as WordleGame);
 }

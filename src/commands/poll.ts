@@ -1,5 +1,5 @@
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -8,12 +8,13 @@ const cmd = new Command("poll", "create a poll with a lot of customisation", "ut
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) message.channel.send({ embeds: [res.embed] });
+    if (res.respond) send({ embeds: [res.embed] });
     return;
   }
 
@@ -32,7 +33,7 @@ async function run(
       )
       .addField("examples", `${prefix}poll question?\n` + `${prefix}poll 2 this or that`);
 
-    return message.channel.send({ embeds: [embed] });
+    return send({ embeds: [embed] });
   }
 
   await addCooldown(cmd.name, message.member, 45);
@@ -61,7 +62,7 @@ async function run(
   }
 
   if (args.length == 0) {
-    return message.channel.send({ embeds: [new ErrorEmbed("missing text")] });
+    return send({ embeds: [new ErrorEmbed("missing text")] });
   }
 
   const embed = new CustomEmbed(message.member);
@@ -74,7 +75,7 @@ async function run(
 
   if (!(message instanceof Message)) return;
 
-  message.channel.send({ embeds: [embed] }).then(async (m) => {
+  send({ embeds: [embed] }).then(async (m) => {
     await message.delete().catch(() => {});
 
     if (choices == 0) {

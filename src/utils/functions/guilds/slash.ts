@@ -6,9 +6,7 @@ import ms = require("ms");
 
 export async function isSlashOnly(guild: Guild) {
   if (await redis.exists(`${Constants.redis.cache.guild.SLASH_ONLY}:${guild.id}`)) {
-    return (await redis.get(`${Constants.redis.cache.guild.SLASH_ONLY}:${guild.id}`)) === "t"
-      ? true
-      : false;
+    return (await redis.get(`${Constants.redis.cache.guild.SLASH_ONLY}:${guild.id}`)) === "t";
   }
 
   const res = await prisma.guild

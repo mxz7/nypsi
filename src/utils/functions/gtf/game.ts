@@ -62,7 +62,7 @@ export async function startGTFGame(
 
     embed.setDescription(
       "guess the country of the flag below\n\n" +
-        `${message.author.username} vs ${secondPlayer.username}`,
+        `${message.author.username.replaceAll("_", "\\_")} vs ${secondPlayer.username.replaceAll("_", "\\_")}`,
     );
     embed.setHeader("guess the flag");
   }
@@ -249,7 +249,7 @@ export async function startGTFGame(
       if (secondPlayer) {
         embed
           .setDescription(
-            `**${winner.username}** won! the country was: **${country.name.common}**\n\n` +
+            `**${winner.username.replaceAll("_", "\\_")}** won! the country was: **${country.name.common}**\n\n` +
               `population: **${country.population.toLocaleString()}**\n` +
               `official name: **${country.name.official}**`,
           )

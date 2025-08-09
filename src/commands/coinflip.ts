@@ -1,20 +1,18 @@
 import {
   ActionRowBuilder,
-  BaseMessageOptions,
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
   CommandInteraction,
   ComponentType,
   GuildMember,
-  InteractionEditReplyOptions,
-  InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
   MessageFlags,
 } from "discord.js";
 import { randomInt } from "node:crypto";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { NypsiClient } from "../models/Client";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { Item } from "../types/Economy";
 import {
@@ -23,6 +21,7 @@ import {
   getBalance,
   removeBalance,
 } from "../utils/functions/economy/balance";
+import { addEventProgress, EventData, getCurrentEvent } from "../utils/functions/economy/events";
 import {
   addInventoryItem,
   getInventory,
@@ -53,41 +52,12 @@ cmd.slashData
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (!(await userExists(message.member))) {
     await createUser(message.member);
   }
-
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
 
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
@@ -168,7 +138,7 @@ async function run(
       "tails",
     ];
     const choice = lols[randomInt(lols.length)];
-    let thingy = `${player1.user.username}\n${player2.user.username}`;
+    let thingy = `${player1.user.username.replace("_", "\\_")}\n${player2.user.username.replace("_", "\\_")}`;
 
     let winner: GuildMember;
     let loser: GuildMember;
@@ -188,7 +158,7 @@ async function run(
     } else {
       embed.setDescription(
         `*throwing..*\n\n${thingy}\n\n` +
-          `**bet** ${itemAmount.toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/item/${item.id}?ref=bot-cf)**`,
+          `**bet** ${itemAmount.toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-cf)**`,
       );
     }
 
@@ -222,6 +192,13 @@ async function run(
         earned: winner.user.id == message.author.id ? winnings : null,
       });
 
+      const eventProgress = await addEventProgress(
+        message.client as NypsiClient,
+        winner,
+        "coinflip",
+        1,
+      );
+
       await createGame({
         userId: player2.user.id,
         bet: bet,
@@ -237,17 +214,31 @@ async function run(
       await addBalance(winner, winnings);
 
       if (winner == message.member) {
-        thingy = `**${message.author.username}** +$${winnings.toLocaleString()}${
+        thingy = `**${message.author.username.replace("_", "\\_")}** +$${winnings.toLocaleString()}${
           tax ? ` (${(tax * 100).toFixed(1)}% tax)` : ""
-        }\n${player2.user.username}`;
+        }\n${player2.user.username.replace("_", "\\_")}`;
       } else {
-        thingy = `${message.author.username}\n**${
-          player2.user.username
-        }** +$${winnings.toLocaleString()}${tax ? ` (${(tax * 100).toFixed(1)}% tax)` : ""}`;
+        thingy = `${message.author.username.replace("_", "\\_")}\n**${player2.user.username.replace(
+          "_",
+          "\\_",
+        )}** +$${winnings.toLocaleString()}${tax ? ` (${(tax * 100).toFixed(1)}% tax)` : ""}`;
+      }
+
+      const eventData: { event?: EventData; target: number } = { target: 0 };
+
+      if (eventProgress) {
+        eventData.event = await getCurrentEvent();
+
+        if (eventData.event) {
+          eventData.target = Number(eventData.event.target);
+        }
       }
 
       embed.setDescription(
-        `**winner** ${winner.user.username}\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}`,
+        `**winner** ${winner.user.username.replace("_", "\\_")}\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}` +
+          (eventProgress
+            ? `\n\n🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`
+            : ""),
       );
       embed.setColor(winner.displayHexColor);
       embed.setFooter({ text: `id: ${id}` });
@@ -261,6 +252,13 @@ async function run(
         earned: 0,
         xp: 0,
       });
+
+      const eventProgress = await addEventProgress(
+        message.client as NypsiClient,
+        winner,
+        "coinflip",
+        1,
+      );
 
       await createGame({
         userId: player2.user.id,
@@ -276,15 +274,29 @@ async function run(
       await addInventoryItem(winner, item.id, itemAmount * 2);
 
       if (winner == message.member) {
-        thingy = `**${message.author.username}** +${(itemAmount * 2).toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/item/${item.id}?ref=bot-cf)**\n${player2.user.username}`;
+        thingy = `**${message.author.username.replace("_", "\\_")}** +${(itemAmount * 2).toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-cf)**\n${player2.user.username.replace("_", "\\_")}`;
       } else {
-        thingy = `${message.author.username}\n**${
-          player2.user.username
-        }** +${(itemAmount * 2).toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/item/${item.id}?ref=bot-cf)**`;
+        thingy = `${message.author.username.replace("_", "\\_")}\n**${player2.user.username.replace(
+          "_",
+          "\\_",
+        )}** +${(itemAmount * 2).toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-cf)**`;
+      }
+
+      const eventData: { event?: EventData; target: number } = { target: 0 };
+
+      if (eventProgress) {
+        eventData.event = await getCurrentEvent();
+
+        if (eventData.event) {
+          eventData.target = Number(eventData.event.target);
+        }
       }
 
       embed.setDescription(
-        `**winner** ${winner.user.username}\n\n${thingy}\n\n**bet** ${itemAmount.toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/item/${item.id}?ref=bot-cf)**`,
+        `**winner** ${winner.user.username.replace("_", "\\_")}\n\n${thingy}\n\n**bet** ${itemAmount.toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-cf)**` +
+          (eventProgress
+            ? `\n\n🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`
+            : ""),
       );
       embed.setColor(winner.displayHexColor);
       embed.setFooter({ text: `id: ${id}` });
@@ -387,7 +399,11 @@ async function run(
 
       if (bet > (await getBalance(target))) {
         return send({
-          embeds: [new ErrorEmbed(`**${target.user.username}** cannot afford this bet`)],
+          embeds: [
+            new ErrorEmbed(
+              `**${target.user.username.replace("_", "\\_")}** cannot afford this bet`,
+            ),
+          ],
         });
       }
 
@@ -433,9 +449,10 @@ async function run(
 
       await removeBalance(message.member, bet);
       requestEmbed.setDescription(
-        `**${
-          message.author.username
-        }** has challenged you to a coinflip\n\n**bet** $${bet.toLocaleString()}\n\ndo you accept?`,
+        `**${message.author.username.replace(
+          "_",
+          "\\_",
+        )}** has challenged you to a coinflip\n\n**bet** $${bet.toLocaleString()}\n\ndo you accept?`,
       );
     } else {
       const userInventory = await getInventory(message.member);
@@ -449,16 +466,21 @@ async function run(
 
       if (targetInventory.count(item.id) < itemAmount) {
         return send({
-          embeds: [new ErrorEmbed(`**${target.user.username}** doesn't have enough ${item.name}`)],
+          embeds: [
+            new ErrorEmbed(
+              `**${target.user.username.replace("_", "\\_")}** doesn't have enough ${item.name}`,
+            ),
+          ],
         });
       }
 
       await removeInventoryItem(message.member, item.id, itemAmount);
 
       requestEmbed.setDescription(
-        `**${
-          message.author.username
-        }** has challenged you to a coinflip\n\n**bet** ${itemAmount}x ${item.emoji} **[${item.name}](https://nypsi.xyz/item/${item.id}?ref=bot-cf)**\n\ndo you accept?`,
+        `**${message.author.username.replace(
+          "_",
+          "\\_",
+        )}** has challenged you to a coinflip\n\n**bet** ${itemAmount}x ${item.emoji} **[${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-cf)**\n\ndo you accept?`,
       );
     }
 
@@ -504,8 +526,7 @@ async function run(
     let proceeded = false;
     const filter = async (i: ButtonInteraction) => {
       if (message.author.id === i.user.id) {
-        if (i.customId === "n") return true;
-        return false;
+        return i.customId === "n";
       }
 
       if (playing.has(i.user.id)) {
@@ -561,11 +582,7 @@ async function run(
 
           confirmInteraction.update({ components: [] });
 
-          if (confirmInteraction.customId === "y") {
-            return true;
-          } else {
-            return false;
-          }
+          return confirmInteraction.customId === "y";
         }
       }
 
@@ -698,9 +715,10 @@ async function run(
       await removeBalance(message.member, bet);
 
       requestEmbed.setDescription(
-        `**${
-          message.author.username
-        }** has created an open coinflip\n\n**bet** $${bet.toLocaleString()}`,
+        `**${message.author.username.replace(
+          "_",
+          "\\_",
+        )}** has created an open coinflip\n\n**bet** $${bet.toLocaleString()}`,
       );
     } else {
       const userInventory = await getInventory(message.member);
@@ -714,9 +732,10 @@ async function run(
       await removeInventoryItem(message.member, item.id, itemAmount);
 
       requestEmbed.setDescription(
-        `**${
-          message.author.username
-        }** has created an open coinflip\n\n**bet** ${itemAmount}x ${item.emoji} **[${item.name}](https://nypsi.xyz/item/${item.id}?ref=bot-cf)**`,
+        `**${message.author.username.replace(
+          "_",
+          "\\_",
+        )}** has created an open coinflip\n\n**bet** ${itemAmount}x ${item.emoji} **[${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-cf)**`,
       );
     }
 
@@ -749,8 +768,7 @@ async function run(
     const filter = async (i: ButtonInteraction): Promise<boolean> => {
       if (i.customId === "n" && message.author.id !== i.user.id) return false;
       if (message.author.id === i.user.id) {
-        if (i.customId === "n") return true;
-        return false;
+        return i.customId === "n";
       }
       if ((await isEcoBanned(i.user)).banned) return false;
 
@@ -763,8 +781,7 @@ async function run(
       }
 
       if (i.user.id === message.author.id) {
-        if ((i as ButtonInteraction).customId === "n") return true;
-        return false;
+        return (i as ButtonInteraction).customId === "n";
       }
 
       if (!(await userExists(i.user))) {
@@ -826,11 +843,7 @@ async function run(
 
           confirmInteraction.update({ components: [] });
 
-          if (confirmInteraction.customId === "y") {
-            return true;
-          } else {
-            return false;
-          }
+          return confirmInteraction.customId === "y";
         }
       } else {
         const inventory = await getInventory(i.user);

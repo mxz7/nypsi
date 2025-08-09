@@ -1,20 +1,18 @@
 import {
   ActionRowBuilder,
-  BaseMessageOptions,
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
-  InteractionEditReplyOptions,
-  InteractionReplyOptions,
-  Message,
   MessageActionRowComponentBuilder,
   MessageFlags,
   StringSelectMenuBuilder,
   StringSelectMenuOptionBuilder,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { NypsiClient } from "../models/Client";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { EventData, getCurrentEvent } from "../utils/functions/economy/events";
 import {
   addFarmUpgrade,
   deletePlant,
@@ -51,39 +49,10 @@ cmd.slashData
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (!(await userExists(message.member))) await createUser(message.member);
-
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
 
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
@@ -420,12 +389,25 @@ async function run(
     );
 
     const earned = new Map<string, number>();
+    let eventProgress = 0;
 
     for (const plant of plantTypes) {
       promises.push(
         (async () => {
-          const items = await getClaimable(message.member, plant, true);
-          if (items > 0) earned.set(plant, items);
+          const items = await getClaimable(
+            message.member,
+            plant,
+            true,
+            message.client as NypsiClient,
+          );
+
+          if (items.sold > 0) {
+            earned.set(plant, items.sold);
+          }
+
+          if (items.eventProgress > eventProgress) {
+            eventProgress = items.eventProgress;
+          }
         })(),
       );
     }
@@ -438,6 +420,18 @@ async function run(
 
     for (const [plantId, value] of inPlaceSort(Array.from(earned.entries())).desc((i) => i[1])) {
       desc += `\n\`${value.toLocaleString()}x\` ${getItems()[getPlantsData()[plantId].item].emoji} ${getItems()[getPlantsData()[plantId].item].name}`;
+    }
+
+    if (eventProgress) {
+      const eventData: { event?: EventData; target: number } = { target: 0 };
+
+      eventData.event = await getCurrentEvent();
+
+      if (eventData.event) {
+        eventData.target = Number(eventData.event.target);
+      }
+
+      desc += `\n\n🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`;
     }
 
     const embed = new CustomEmbed(message.member, desc).setHeader(

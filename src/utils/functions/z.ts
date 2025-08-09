@@ -85,7 +85,6 @@ export async function checkZPeoples(guild: Guild) {
       if (!profile || profile.removed) {
         await sleep(250);
         await overwrite.delete();
-        continue;
       }
     }
 
@@ -99,11 +98,18 @@ export async function checkZPeoples(guild: Guild) {
     });
 
     for (const { userId } of users) {
-      if (!(await guild.members.fetch(userId).catch(() => {}))) continue;
-      if (!channel.permissionOverwrites.cache.has(userId)) {
+      const member = await guild.members.fetch(userId).catch(() => {});
+
+      if (!member) {
+        continue;
+      }
+
+      if (!channel.permissionOverwrites.cache.has(member.user.id)) {
+        logger.debug(`z: adding ${member?.user?.id} to ${channelId}`);
         await sleep(250);
-        await channel.permissionOverwrites.create(userId, {
+        await channel.permissionOverwrites.create(member, {
           ViewChannel: true,
+          Connect: true,
         });
       }
     }

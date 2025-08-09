@@ -9,6 +9,7 @@ import {
   AchievementData,
   BakeryUpgradeData,
   BanCache,
+  Event,
   GuildUpgrade,
   Item,
   Plant,
@@ -29,6 +30,7 @@ import { isUserBlacklisted } from "../users/blacklist";
 import { createProfile, hasProfile } from "../users/utils";
 import { setProgress } from "./achievements";
 import { addBalance, calcMaxBet, getBalance } from "./balance";
+import { getCurrentEvent } from "./events";
 import { addToGuildXP, getGuildByUser, getGuildName } from "./guilds";
 import { addInventoryItem } from "./inventory";
 import { getDefaultLootPool } from "./loot_pools";
@@ -51,6 +53,7 @@ let tasks: { [key: string]: Task };
 let plants: { [key: string]: Plant };
 let plantUpgrades: { [key: string]: PlantUpgrade };
 let lootPools: { [key: string]: LootPool };
+let events: { [key: string]: Event };
 
 export let maxPrestige = 0;
 
@@ -66,6 +69,7 @@ export function loadItems(crypto = true) {
   const tasksFile: any = fs.readFileSync("./data/tasks.json");
   const plantsFile: any = fs.readFileSync("./data/plants.json");
   const lootPoolsFile: any = fs.readFileSync("./data/loot_pools.json");
+  const eventsFile: any = fs.readFileSync("./data/events.json");
 
   items = JSON.parse(itemsFile);
   achievements = JSON.parse(achievementsFile);
@@ -79,12 +83,26 @@ export function loadItems(crypto = true) {
   plants = JSON.parse(plantsFile).plants;
   plantUpgrades = JSON.parse(plantsFile).upgrades;
   lootPools = JSON.parse(lootPoolsFile);
+  events = JSON.parse(eventsFile);
 
   lootPools.basic_crate = getDefaultLootPool((i) => i.in_crates);
   lootPools.basic_crate.money = { 50000: 100, 100000: 100, 500000: 100 };
   lootPools.basic_crate.xp = { 50: 100, 100: 100, 250: 100 };
   lootPools.workers_crate = getDefaultLootPool((i) => i.role === "worker-upgrade");
   lootPools.boosters_crate = getDefaultLootPool((i) => i.role === "booster");
+  lootPools.pandora_box = getDefaultLootPool(
+    (i) => !["sellable", "ore", "fuel"].includes(i.role) && !i.unique && i.id !== "hanafuda_tag",
+  );
+
+  for (const item in lootPools.pandora_box.items) {
+    if (getItems()[item].role === "tag") {
+      lootPools.pandora_box.items[item] = 1;
+    } else {
+      lootPools.pandora_box.items[item] = 100;
+    }
+  }
+
+  delete lootPools.pandora_box.items["karma_tag"];
 
   Object.values(userUpgrades).forEach((i) => {
     maxPrestige += i.max;
@@ -184,7 +202,7 @@ export async function userExists(member: MemberResolvable): Promise<boolean> {
   const cache = await redis.get(`${Constants.redis.cache.economy.EXISTS}:${userId}`);
 
   if (cache) {
-    return cache === "true" ? true : false;
+    return cache === "true";
   }
 
   const query = await prisma.economy.findUnique({
@@ -574,6 +592,10 @@ export function getLootPools() {
   return lootPools;
 }
 
+export function getEventsData() {
+  return events;
+}
+
 export async function deleteUser(member: MemberResolvable) {
   const userId = getUserId(member);
 
@@ -612,7 +634,7 @@ export async function deleteUser(member: MemberResolvable) {
 }
 
 export async function isHandcuffed(member: MemberResolvable): Promise<boolean> {
-  return (await redis.exists(`economy:handcuffed:${getUserId(member)}`)) == 1 ? true : false;
+  return (await redis.exists(`economy:handcuffed:${getUserId(member)}`)) == 1;
 }
 
 export async function addHandcuffs(member: MemberResolvable) {
@@ -784,21 +806,57 @@ export async function setDaily(member: MemberResolvable, amount: number) {
   });
 }
 
+type BaseRenderGambleScreenArgs = {
+  state: "playing" | "lose" | "draw";
+  bet: number;
+  insert?: string;
+};
+
+type WinRenderGambleScreenArgs = {
+  state: "win";
+  bet: number;
+  insert?: string;
+  winnings: number;
+  multiplier?: number;
+  eventProgress?: number;
+};
+
+// Overloads
+export function renderGambleScreen(args: BaseRenderGambleScreenArgs): Promise<string>;
+export function renderGambleScreen(args: WinRenderGambleScreenArgs): Promise<string>;
+
+// Implementation
 export async function renderGambleScreen(
-  state: "playing" | "win" | "lose" | "draw",
-  bet: number,
-  insert?: string,
-  winnings?: number,
-  multiplier?: number,
-) {
-  let output = `**bet** $${bet.toLocaleString()}${insert ? `\n${insert}` : ""}`;
-  if (state === "playing") return output;
-  if (state === "lose") output += "\n\n**you lose!!**";
-  if (state === "win")
-    output += `\n\n**winner!!!**\n**you win** $${winnings.toLocaleString()}${
-      multiplier ? `\n+**${Math.floor(multiplier * 100).toString()}%** bonus` : ""
+  args: BaseRenderGambleScreenArgs | WinRenderGambleScreenArgs,
+): Promise<string> {
+  let output = `**bet** $${args.bet.toLocaleString()}${args.insert ? `\n${args.insert}` : ""}`;
+
+  if (args.state === "playing") {
+    return output;
+  }
+
+  if (args.state === "lose") {
+    output += "\n\n**you lose!!**";
+  }
+
+  if (args.state === "draw") {
+    output += `\n\n**draw!!**\n**you win** $${args.bet.toLocaleString()}`;
+  }
+
+  if (args.state === "win") {
+    output += `\n\n**winner!!!**\n**you win** $${args.winnings.toLocaleString()}${
+      args.multiplier ? `\n+**${Math.floor(args.multiplier * 100).toString()}%** bonus` : ""
     }`;
-  if (state === "draw") output += `\n\n**draw!!**\n**you win** $${bet.toLocaleString()}`;
+
+    if (args.eventProgress) {
+      const event = await getCurrentEvent();
+      let target = 0;
+      if (event.target) {
+        target = Number(event.target);
+      }
+      output += `\n\n🔱 ${args.eventProgress.toLocaleString()}/${target.toLocaleString()}`;
+    }
+  }
 
   return output;
 }

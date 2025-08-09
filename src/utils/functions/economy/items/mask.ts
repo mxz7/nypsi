@@ -1,54 +1,19 @@
-import {
-  BaseMessageOptions,
-  CommandInteraction,
-  InteractionEditReplyOptions,
-  InteractionReplyOptions,
-  Message,
-} from "discord.js";
+import { CommandInteraction } from "discord.js";
 import redis from "../../../../init/redis";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import { removeInventoryItem } from "../inventory";
+import { addStat } from "../stats";
 
 module.exports = new ItemUse(
   "mask",
   async (message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) => {
-    const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-      if (!(message instanceof Message)) {
-        let usedNewMessage = false;
-        let res;
-
-        if (message.deferred) {
-          res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        } else {
-          res = await message.reply(data as InteractionReplyOptions).catch(() => {
-            return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-              usedNewMessage = true;
-              return await message.channel.send(data as BaseMessageOptions);
-            });
-          });
-        }
-
-        if (usedNewMessage && res instanceof Message) return res;
-
-        const replyMsg = await message.fetchReply();
-        if (replyMsg instanceof Message) {
-          return replyMsg;
-        }
-      } else {
-        return await message.channel.send(data as BaseMessageOptions);
-      }
-    };
-
     const robCooldown = (await redis.exists(`cd:rob:${message.author.id}`)) == 1;
     const bankRobCooldown = (await redis.exists(`cd:bankrob:${message.author.id}`)) == 1;
     const storeRobCooldown = (await redis.exists(`cd:storerob:${message.author.id}`)) == 1;
     if (!robCooldown && !bankRobCooldown && !storeRobCooldown) {
-      return send({
+      return ItemUse.send(message, {
         embeds: [new ErrorEmbed("you are currently not on a rob cooldown")],
       });
     }
@@ -67,7 +32,8 @@ module.exports = new ItemUse(
     }
 
     await removeInventoryItem(message.member, "mask", 1);
+    await addStat(message.member, "mask");
 
-    return send({ embeds: [embed] });
+    return ItemUse.send(message, { embeds: [embed] });
   },
 );

@@ -1,13 +1,10 @@
 import {
   ActionRowBuilder,
-  BaseMessageOptions,
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
   CommandInteraction,
   Interaction,
-  InteractionEditReplyOptions,
-  InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
   MessageFlags,
@@ -15,13 +12,14 @@ import {
 } from "discord.js";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
 import { a } from "../utils/functions/anticheat";
 import { giveCaptcha, isLockedOut, verifyUser } from "../utils/functions/captcha";
 import { addProgress } from "../utils/functions/economy/achievements.js";
 import { addBalance, getBalance, removeBalance } from "../utils/functions/economy/balance.js";
+import { addEventProgress, EventData, getCurrentEvent } from "../utils/functions/economy/events";
 import { getInventory, removeInventoryItem } from "../utils/functions/economy/inventory.js";
 import { createGame } from "../utils/functions/economy/stats.js";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
@@ -33,7 +31,7 @@ import {
   getNypsiBankBalance,
   removeFromNypsiBankBalance,
 } from "../utils/functions/tax.js";
-import { getAdminLevel } from "../utils/functions/users/admin";
+import { hasAdminPermission } from "../utils/functions/users/admin";
 import { addHourlyCommand } from "../utils/handlers/commandhandler";
 import {
   addCooldown,
@@ -47,38 +45,11 @@ const cmd = new Command("bankrob", "attempt to rob a bank for a high reward", "m
 
 cmd.slashEnabled = true;
 
-async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) {
+async function run(
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
+) {
   if (!(await userExists(message.member))) await createUser(message.member);
-
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
 
   if ((await getBalance(message.member)) < 5_000) {
     return send({
@@ -182,11 +153,14 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
 
       const stolen = Math.floor(Math.random() * (steal - minStolen)) + minStolen;
 
-      await Promise.all([
+      const promises = await Promise.all([
         addBalance(message.member, stolen),
         addProgress(message.member, "robber", 1),
+        addEventProgress(message.client as NypsiClient, message.member, "rob", 1),
         addTaskProgress(message.member, "thief"),
       ]);
+
+      const eventProgress = promises[2];
 
       await removeFromNypsiBankBalance(stolen);
 
@@ -199,8 +173,21 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
         outcome: `${message.author.username} robbed ${bank}`,
       });
 
+      const eventData: { event?: EventData; target: number } = { target: 0 };
+
+      if (eventProgress) {
+        eventData.event = await getCurrentEvent();
+
+        if (eventData.event) {
+          eventData.target = Number(eventData.event.target);
+        }
+      }
+
       embed.setDescription(
-        `**success!**\n\n**you stole** $${stolen.toLocaleString()} from **${bank}**`,
+        `**success!**\n\n**you stole** $${stolen.toLocaleString()} from **${bank}**` +
+          (eventProgress
+            ? `\n\n🔱${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`
+            : ""),
       );
       embed.setColor(Constants.EMBED_SUCCESS_COLOR);
       embed.setFooter({ text: `id: ${id}` });
@@ -285,7 +272,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
             url: process.env.ANTICHEAT_HOOK,
           });
           await hook.send({
-            content: `[${getTimestamp()}] ${message.member.user.username} (${message.author.id}) given captcha randomly in bankrob`,
+            content: `[${getTimestamp()}] ${message.member.user.username.replaceAll("_", "\\_")} (${message.author.id}) given captcha randomly in bankrob`,
           });
           hook.destroy();
         }
@@ -313,6 +300,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
       if (result && result.customId == "rp") {
         logger.info(
           `::cmd ${message.guild.id} ${message.channelId} ${message.author.username}: replaying bankrob`,
+          { userId: message.author.id, guildId: message.guildId, channelId: message.channelId },
         );
         if (await isLockedOut(message.member)) return verifyUser(message);
 
@@ -337,7 +325,10 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
         }
 
         if (await redis.get("nypsi:maintenance")) {
-          if ((await getAdminLevel(message.member)) > 0 && message instanceof Message) {
+          if (
+            (await hasAdminPermission(message.member, "bypass-maintenance")) &&
+            message instanceof Message
+          ) {
             message.react("💀");
           } else {
             return msg.edit({

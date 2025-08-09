@@ -41,6 +41,12 @@ quickResponses.set(
     "if you are **banned from nypsi economy** you can buy an unban from https://ko-fi.com/s/1d78b621a5",
 );
 
+quickResponses.set(
+  "auto.wrongserver",
+  "this is support for the **nypsi discord bot**, not whichever server you have been punished in.\n\n" +
+    "that server may be using nypsi for moderation, but this support is completely unrelated.",
+);
+
 const isRequestSuitableFormat = z.object({
   valid: z.boolean(),
   reason: z.string(),
@@ -155,7 +161,7 @@ export async function createSupportRequest(id: string, client: NypsiClient, user
   const embed = new CustomEmbed()
     .setColor(Constants.PURPLE)
     .setDescription(
-      `support request for [${username} (${id})](https://nypsi.xyz/user/${id}?ref=bot-support)`,
+      `support request for [${username} (${id})](https://nypsi.xyz/users/${id}?ref=bot-support)`,
     );
 
   await sendToRequestChannel(id, embed, id, client);
@@ -239,8 +245,7 @@ export async function sendToRequestChannel(
 
       const msg = await channel.send({ embeds: embeds, content }).catch(() => {});
 
-      if (!msg) return false;
-      return true;
+      return Boolean(msg);
     },
     {
       context: {
@@ -252,9 +257,7 @@ export async function sendToRequestChannel(
     },
   );
 
-  if (!res.includes(true)) return false;
-
-  return true;
+  return res.includes(true);
 }
 
 export async function handleAttachments(attachments: Collection<string, Attachment>) {
@@ -339,18 +342,16 @@ export async function summariseRequest(id: string) {
   let transcript = "";
 
   for (const message of messages) {
-    transcript += `${await getLastKnownUsername(message.userId)}: ${message.content}\n\n`;
+    transcript += `${await getLastKnownUsername(message.userId, false)}: ${message.content}\n\n`;
   }
 
-  const res = await prompt(
+  return await prompt(
     "You are a summarising assistant. " +
       'The following transcript is in the format of "<username>: <message content>". ' +
       "Some of the responses may be in an unknown language, translate them to English. " +
       "Your response should only be the summary of the transcription, please keep it as concise as possible. ",
     transcript,
   );
-
-  return res;
 }
 
 export async function isRequestSuitable(
@@ -397,6 +398,8 @@ export async function isRequestSuitable(
     "",
     "If the user is suggesting a new feature, you should accept the support request, but tell them to use the suggestions channel.",
     "",
+    "If you have no information or questions for the user, do not supply an answer.",
+    "",
     "## Examples",
     "",
     "### Suitable Requests",
@@ -426,7 +429,7 @@ export async function isRequestSuitable(
 
   try {
     const response = await openai.responses.parse({
-      model: "gpt-4.1-mini",
+      model: "gpt-5-mini",
       instructions: sysPrompt.join("\n"),
       input: [{ role: "user", content }],
       text: { format: zodTextFormat(isRequestSuitableFormat, "supportrequest_suitable") },
@@ -465,11 +468,15 @@ export async function getQuickSupportResponse(content: string) {
       "Should be used when the user is asking for a profile transfer, where data from one account is being transferred to another.\n\n" +
       "- auto.buyunban\n" +
       "Should be used when the user is asking to be unbanned, or are inquiring on how to be unbanned.\n\n" +
+      "- auto.wrongserver\n" +
+      "Should be used when the user is complaining about being punished (banned/muted) in a server other than nypsi.\n\n" +
       "- no\n" +
       "Used when none of the other options apply, and you are unable to assist the user. Use this when you are unsure.\n\n" +
       "## Examples\n\n" +
       "### Unbanned\n\n" +
-      "If the user is asking to be unbanned, or when they are unbanned, respond with 'auto.buyunban'",
+      "If the user is asking to be unbanned, or when they are unbanned, respond with 'auto.buyunban'\n\n" +
+      "### Wrong Server\n\n" +
+      "'I was muted/banned in jona''\n\n",
     content,
   );
 

@@ -53,7 +53,7 @@ const waitingButtons = new ActionRowBuilder<MessageActionRowComponentBuilder>().
   new ButtonBuilder()
     .setURL("https://nypsi.xyz/docs/economy/crash?ref=bot-crash")
     .setStyle(ButtonStyle.Link)
-    .setLabel("docs"),
+    .setLabel("help"),
 );
 const startedButtons = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
   new ButtonBuilder().setCustomId("crash-out").setLabel("cash out").setStyle(ButtonStyle.Success),

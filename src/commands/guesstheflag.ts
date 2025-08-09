@@ -1,19 +1,16 @@
 import {
   ActionRowBuilder,
-  BaseMessageOptions,
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
   ComponentType,
   GuildMember,
-  InteractionEditReplyOptions,
-  InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
   MessageFlags,
 } from "discord.js";
 import prisma from "../init/database";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { MStoTime } from "../utils/functions/date";
 import { startGTFGame } from "../utils/functions/gtf/game";
@@ -42,38 +39,9 @@ cmd.slashData
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
-
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
@@ -143,7 +111,7 @@ async function run(
 
     if (target) {
       requestEmbed.setDescription(
-        `**${message.author.username}** has challenged you to a guess the flag game\n\ndo you accept?`,
+        `**${message.author.username.replaceAll("_", "\\_")}** has challenged you to a guess the flag game\n\ndo you accept?`,
       );
       requestRow.addComponents(
         new ButtonBuilder().setCustomId("gtf-deny").setLabel("deny").setStyle(ButtonStyle.Danger),
@@ -155,7 +123,7 @@ async function run(
       });
     } else {
       requestEmbed.setDescription(
-        `**${message.author.username}** has created an open guess the flag game`,
+        `**${message.author.username.replaceAll("_", "\\_")}** has created an open guess the flag game`,
       );
       requestRow.addComponents(
         new ButtonBuilder().setCustomId("gtf-deny").setLabel("cancel").setStyle(ButtonStyle.Danger),
@@ -183,10 +151,12 @@ async function run(
 
     if (res.customId === "gtf-deny") {
       if (res.user.id === message.author.id) {
+        requestMessage.edit({ components: [] });
         return res.reply({
           embeds: [new CustomEmbed(message.member, "guess the flag request cancelled")],
         });
       } else if (target) {
+        requestMessage.edit({ components: [] });
         return res.reply({
           embeds: [new CustomEmbed(target, "guess the flag request denied")],
         });

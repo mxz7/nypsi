@@ -1,19 +1,16 @@
 import {
   ActionRowBuilder,
-  BaseMessageOptions,
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
   CommandInteraction,
   ComponentType,
-  InteractionEditReplyOptions,
-  InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
   MessageFlags,
 } from "discord.js";
 import redis from "../init/redis";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getBalance, removeBalance } from "../utils/functions/economy/balance";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
@@ -38,39 +35,10 @@ cmd.slashData
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (!(await userExists(message.member))) await createUser(message.member);
-
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
 
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
@@ -193,6 +161,24 @@ async function run(
           components: [row],
         })
         .catch(() => msg.edit({ components: [row] }));
+    }
+
+    if (selected.id === "lottery_ticket") {
+      const limit = dayjs()
+        .set("hour", 23)
+        .set("minute", 59)
+        .set("second", 0)
+        .set("millisecond", 0);
+
+      if (dayjs().isAfter(limit) || (await redis.exists("nypsi:lottery"))) {
+        return interaction
+          .reply({
+            embeds: [new ErrorEmbed("you cannot currently buy a lottery ticket")],
+          })
+          .catch(() =>
+            msg.edit({ embeds: [new ErrorEmbed("you cannot currently buy a lottery ticket")] }),
+          );
+      }
     }
 
     balance = await getBalance(message.member);

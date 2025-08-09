@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js";
 import { sort } from "fast-sort";
 import redis from "../init/redis";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { formatDate } from "../utils/functions/date";
@@ -18,6 +18,7 @@ const cmd = new Command("user", "view info about a user in the server", "info").
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   let member;
@@ -29,14 +30,14 @@ async function run(
   }
 
   if (!member) {
-    return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });
+    return send({ embeds: [new ErrorEmbed("invalid user")] });
   }
 
   if (args.includes("-id")) {
     const embed = new CustomEmbed(message.member, "`" + member.user.id + "`").setHeader(
       member.user.username,
     );
-    return message.channel.send({ embeds: [embed] });
+    return send({ embeds: [embed] });
   }
 
   let members;
@@ -60,7 +61,7 @@ async function run(
   } else {
     if (members.size > 2000) {
       if (members.size > 5000)
-        msg = await message.channel.send({
+        msg = await send({
           embeds: [
             new CustomEmbed(
               message.member,
@@ -143,7 +144,7 @@ async function run(
   }
 
   if (msg) msg.edit({ embeds: [embed] });
-  else message.channel.send({ embeds: [embed] });
+  else send({ embeds: [embed] });
 
   addView(member, message.member, `user in ${message.guild.id}`);
 }

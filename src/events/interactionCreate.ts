@@ -15,8 +15,13 @@ import Constants from "../utils/Constants";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { runCommand } from "../utils/handlers/commandhandler";
 import { runInteraction } from "../utils/handlers/interactions";
+import { logger } from "../utils/logger";
 
 export default async function interactionCreate(interaction: Interaction) {
+  if (interaction.isButton()) {
+    logger.debug(`btn interaction: ${interaction.user.id} ${interaction.customId}`);
+  }
+
   if ((await isUserBlacklisted(interaction.user.id)).blacklisted) return;
 
   if (

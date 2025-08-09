@@ -1,5 +1,5 @@
 import { CommandInteraction, PermissionFlagsBits } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getSnipeFilter, updateSnipeFilter } from "../utils/functions/guilds/filters";
 import { getPrefix } from "../utils/functions/guilds/utils";
@@ -11,11 +11,12 @@ const cmd = new Command("snipefilter", "change the snipe filter for your server"
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
     if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
-      return message.channel.send({
+      return send({
         embeds: [new ErrorEmbed("you need the `manage server` permission")],
       });
     }
@@ -35,12 +36,12 @@ async function run(
       embed.setDescription("`❌` empty snipe filter");
     }
 
-    return message.channel.send({ embeds: [embed] });
+    return send({ embeds: [embed] });
   }
 
   if (args[0].toLowerCase() == "add" || args[0].toLowerCase() == "+") {
     if (args.length == 1) {
-      return message.channel.send({
+      return send({
         embeds: [
           new ErrorEmbed(
             `${prefix}sf add/+ <word> | cAsInG doesn't matter, it'll be filtered either way`,
@@ -52,7 +53,7 @@ async function run(
     const word = cleanString(args[1].toString().toLowerCase().normalize("NFD"));
 
     if (word == "" || word == " ") {
-      return message.channel.send({
+      return send({
         embeds: [new ErrorEmbed("word must contain letters or numbers")],
       });
     }
@@ -65,7 +66,7 @@ async function run(
         .setHeader("snipe filter")
         .setFooter({ text: `you can use ${prefix}sf to view the filter` });
 
-      return message.channel.send({ embeds: [embed] });
+      return send({ embeds: [embed] });
     }
 
     filter.push(word);
@@ -78,7 +79,7 @@ async function run(
         `❌ filter has exceeded the maximum size - please use *${prefix}sf del/-* or *${prefix}sf reset*`,
       ).setHeader("snipe filter");
 
-      return message.channel.send({ embeds: [embed] });
+      return send({ embeds: [embed] });
     }
 
     await updateSnipeFilter(message.guild, filter);
@@ -87,12 +88,12 @@ async function run(
       message.member,
       "✅ added `" + word + "` to the filter",
     ).setHeader("snipe filter");
-    return message.channel.send({ embeds: [embed] });
+    return send({ embeds: [embed] });
   }
 
   if (args[0].toLowerCase() == "del" || args[0].toLowerCase() == "-") {
     if (args.length == 1) {
-      return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}sf del/- <word>`)] });
+      return send({ embeds: [new ErrorEmbed(`${prefix}sf del/- <word>`)] });
     }
 
     const word = cleanString(args[1].toString().toLowerCase().normalize("NFD"));
@@ -104,7 +105,7 @@ async function run(
         .setHeader("snipe filter")
         .setFooter({ text: `you can use ${prefix}sf to view the filter` });
 
-      return message.channel.send({ embeds: [embed] });
+      return send({ embeds: [embed] });
     }
 
     await updateSnipeFilter(message.guild, filter);
@@ -113,7 +114,7 @@ async function run(
       .setHeader("snipe filter")
       .setFooter({ text: `you can use ${prefix}sf reset to reset the filter` });
 
-    return message.channel.send({ embeds: [embed] });
+    return send({ embeds: [embed] });
   }
 
   if (args[0].toLowerCase() == "reset") {
@@ -125,7 +126,7 @@ async function run(
       "snipe filter",
     );
 
-    return message.channel.send({ embeds: [embed] });
+    return send({ embeds: [embed] });
   }
 }
 

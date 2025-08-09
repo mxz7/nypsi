@@ -7,7 +7,7 @@ import {
   PermissionFlagsBits,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import {
   addChatFilterWord,
@@ -24,11 +24,12 @@ const cmd = new Command("chatfilter", "change the chat filter for your server", 
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
     if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
-      return message.channel.send({
+      return send({
         embeds: [new ErrorEmbed("you need the `manage server` permission")],
       });
     }
@@ -56,7 +57,7 @@ async function run(
       embed.setDescription(pages.get(1).join("\n"));
     }
 
-    if (pages.size <= 1) return message.channel.send({ embeds: [embed] });
+    if (pages.size <= 1) return send({ embeds: [embed] });
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
@@ -67,7 +68,7 @@ async function run(
       new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
     );
 
-    const msg = await message.channel.send({ embeds: [embed], components: [row] });
+    const msg = await send({ embeds: [embed], components: [row] });
 
     const manager = new PageManager({
       embed,
@@ -80,7 +81,7 @@ async function run(
     return manager.listen();
   } else if (args[0].toLowerCase() == "add" || args[0].toLowerCase() == "+") {
     if (args.length == 1) {
-      return message.channel.send({
+      return send({
         embeds: [
           new ErrorEmbed(
             `${prefix}filter add/+ <word> | cAsInG doesn't matter, it'll be filtered either way`,
@@ -92,7 +93,7 @@ async function run(
     const word = args.slice(1, args.length).join(" ").toLowerCase().normalize("NFD");
 
     if (word == "" || word == " ") {
-      return message.channel.send({ embeds: [new ErrorEmbed("invalid")] });
+      return send({ embeds: [new ErrorEmbed("invalid")] });
     }
 
     if (filter.findIndex((i) => i.content === word) > -1) {
@@ -103,7 +104,7 @@ async function run(
         .setHeader("chat filter")
         .setFooter({ text: `you can use ${prefix}filter to view the filter` });
 
-      return message.channel.send({ embeds: [embed] });
+      return send({ embeds: [embed] });
     }
 
     if (filter.length + 1 > 250) {
@@ -112,7 +113,7 @@ async function run(
         `❌ filter has exceeded the maximum size - please use *${prefix}filter del/-* or *${prefix}filter reset*`,
       ).setHeader("chat filter");
 
-      return message.channel.send({ embeds: [embed] });
+      return send({ embeds: [embed] });
     }
 
     await addChatFilterWord(message.guildId, word);
@@ -121,10 +122,10 @@ async function run(
       message.member,
       "✅ added `" + word + "` to the filter",
     ).setHeader("chat filter");
-    return message.channel.send({ embeds: [embed] });
+    return send({ embeds: [embed] });
   } else if (args[0].toLowerCase() == "del" || args[0].toLowerCase() == "-") {
     if (args.length == 1) {
-      return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}filter del/- <word>`)] });
+      return send({ embeds: [new ErrorEmbed(`${prefix}filter del/- <word>`)] });
     }
 
     const word = args.slice(1, args.length).join(" ").toLowerCase().normalize("NFD");
@@ -136,14 +137,14 @@ async function run(
         .setHeader("chat filter")
         .setFooter({ text: `you can use ${prefix}filter to view the filter` });
 
-      return message.channel.send({ embeds: [embed] });
+      return send({ embeds: [embed] });
     }
 
     const embed = new CustomEmbed(message.member, "✅ removed `" + word + "` from the filter")
       .setHeader("chat filter")
       .setFooter({ text: `you can use ${prefix}filter reset to reset the filter` });
 
-    return message.channel.send({ embeds: [embed] });
+    return send({ embeds: [embed] });
   } else if (args[0].toLowerCase() == "reset") {
     filter = [];
 
@@ -155,10 +156,10 @@ async function run(
       "chat filter",
     );
 
-    return message.channel.send({ embeds: [embed] });
+    return send({ embeds: [embed] });
   } else if (args[0].toLowerCase() == "test") {
     if (args.length == 1) {
-      return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}filter test <text>`)] });
+      return send({ embeds: [new ErrorEmbed(`${prefix}filter test <text>`)] });
     }
     const content = args.slice(1, args.length).join(" ").toLowerCase().normalize("NFD");
     const check = await checkMessageContent(message.guild, content, false);
@@ -170,7 +171,7 @@ async function run(
       embed = new ErrorEmbed(`\`${content}\` was not found in the filter`);
     }
 
-    return message.channel.send({ embeds: [embed] });
+    return send({ embeds: [embed] });
   } else {
     const embed = new CustomEmbed(message.member).setHeader("chat filter help");
 
@@ -178,7 +179,7 @@ async function run(
       `${prefix}**filter add/+ <word>** *add a word to the chat filter*\n${prefix}**filter del/- <word>** *remove a word from the chat filter*\n${prefix}**filter reset** *reset the chat filter*\n${prefix}**filter test** *test the chat filter*\n\nyou can use the [web dashboard](https://nypsi.xyz/me/guilds/${message.guildId}?ref=bot-filter) for percentage matching`,
     );
 
-    return message.channel.send({ embeds: [embed] });
+    return send({ embeds: [embed] });
   }
 }
 

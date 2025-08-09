@@ -11,7 +11,7 @@ export default openai;
 export async function prompt(instructions: string, text: string) {
   try {
     const response = await openai.responses.create({
-      model: "gpt-4.1-nano",
+      model: "gpt-5-nano",
       instructions,
       input: text,
     });

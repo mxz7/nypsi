@@ -25,6 +25,7 @@ import { NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { a } from "../utils/functions/anticheat";
+import { addEventProgress } from "../utils/functions/economy/events";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { userExists } from "../utils/functions/economy/utils";
 import { checkAutoMute, checkMessageContent } from "../utils/functions/guilds/filters";
@@ -45,6 +46,7 @@ import { createAuraTransaction } from "../utils/functions/users/aura";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { getLastCommand } from "../utils/functions/users/commands";
 import { MentionQueueItem } from "../utils/functions/users/mentions";
+import { getLastKnownUsername } from "../utils/functions/users/tag";
 import { hasProfile } from "../utils/functions/users/utils";
 import { runCommand } from "../utils/handlers/commandhandler";
 import { logger } from "../utils/logger";
@@ -110,7 +112,7 @@ export default async function messageCreate(message: Message) {
       let content = "you are blacklisted from nypsi. this punishment will not be removed.";
 
       if (blacklist.relation !== message.author.id)
-        content += `\n\n in relation to \`${blacklist.relation}\``;
+        content += `\n\n in relation to \`${blacklist.relation}\` (${await getLastKnownUsername(blacklist.relation)})`;
 
       return message.reply({
         content,
@@ -438,6 +440,7 @@ export default async function messageCreate(message: Message) {
     const addProgress = async () => {
       await addTaskProgress(message.author.id, "chat_daily");
       await addTaskProgress(message.author.id, "chat_weekly");
+      addEventProgress(message.client as NypsiClient, message.member, "messages", 1);
     };
 
     if (!lastContents) {
@@ -448,13 +451,13 @@ export default async function messageCreate(message: Message) {
     } else {
       let fail = false;
 
-      if (lastContents.last > Date.now() - 15000) {
+      if (lastContents.last > Date.now() - 2500) {
         fail = true;
       } else {
         for (const content of lastContents.history) {
           const similarity = compareTwoStrings(content, message.content.toLowerCase());
 
-          if (similarity > 75) {
+          if (similarity > 80) {
             fail = true;
             break;
           }
@@ -463,7 +466,7 @@ export default async function messageCreate(message: Message) {
 
       lastContents.history.push(message.content.toLowerCase());
       lastContents.last = Date.now();
-      if (lastContents.history.length >= 5) lastContents.history.shift();
+      if (lastContents.history.length >= 3) lastContents.history.shift();
 
       lastContent.set(message.author.id, lastContents);
 
@@ -514,7 +517,10 @@ export default async function messageCreate(message: Message) {
     }
   };
 
-  if (!message.author.bot) {
+  if (
+    (message.author.bot && Constants.WHITELISTED_BOTS.includes(message.author.id)) ||
+    !message.author.bot
+  ) {
     if (message.guildId === Constants.NYPSI_SERVER_ID) {
       setTimeout(() => {
         checkNeedSupport();

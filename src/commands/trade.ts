@@ -2,7 +2,6 @@ import dayjs = require("dayjs");
 import {
   ActionRowBuilder,
   APIMessageComponentEmoji,
-  BaseMessageOptions,
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
@@ -10,7 +9,6 @@ import {
   ComponentType,
   Interaction,
   InteractionEditReplyOptions,
-  InteractionReplyOptions,
   InteractionResponse,
   Message,
   MessageActionRowComponentBuilder,
@@ -25,7 +23,7 @@ import {
 } from "discord.js";
 import prisma from "../init/database";
 import { NypsiClient } from "../models/Client";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Item } from "../types/Economy";
 import Constants from "../utils/Constants";
@@ -46,7 +44,7 @@ import {
 } from "../utils/functions/economy/trade_requests";
 import { createUser, formatBet, getItems, userExists } from "../utils/functions/economy/utils";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
-import { getAdminLevel } from "../utils/functions/users/admin";
+import { hasAdminPermission } from "../utils/functions/users/admin";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
@@ -57,38 +55,9 @@ cmd.slashEnabled = false;
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
-
   const edit = async (data: MessageEditOptions, msg: Message | InteractionResponse) => {
     if (!(message instanceof Message)) {
       return await message.editReply(data as InteractionEditReplyOptions);
@@ -100,7 +69,10 @@ async function run(
 
   if (!(await userExists(message.member))) await createUser(message.member);
 
-  if (message.client.user.id !== Constants.BOT_USER_ID && (await getAdminLevel(message.member)) < 1)
+  if (
+    message.client.user.id !== Constants.BOT_USER_ID &&
+    !(await hasAdminPermission(message.member, "bypass-dev-restrictions"))
+  )
     return send({ embeds: [new ErrorEmbed("lol")] });
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
@@ -614,12 +586,12 @@ async function run(
       embed.setFields(
         {
           name: "requesting",
-          value: `${tradeRequests[page].requestedItems.length > 0 ? tradeRequests[page].requestedItems.map((item) => `**${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} [${items[item.split(":")[0]].name}](https://nypsi.xyz/item/${item.split(":")[0]})`).join("\n") : "none"}`,
+          value: `${tradeRequests[page].requestedItems.length > 0 ? tradeRequests[page].requestedItems.map((item) => `**${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} [${items[item.split(":")[0]].name}](https://nypsi.xyz/items/${item.split(":")[0]})`).join("\n") : "none"}`,
           inline: true,
         },
         {
           name: "offering",
-          value: `${tradeRequests[page].offeredMoney > 0 ? `$${tradeRequests[page].offeredMoney.toLocaleString()}` : ""}\n${tradeRequests[page].offeredItems.map((item) => `**${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} [${items[item.split(":")[0]].name}](https://nypsi.xyz/item/${item.split(":")[0]})`).join("\n")}`,
+          value: `${tradeRequests[page].offeredMoney > 0 ? `$${tradeRequests[page].offeredMoney.toLocaleString()}` : ""}\n${tradeRequests[page].offeredItems.map((item) => `**${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} [${items[item.split(":")[0]].name}](https://nypsi.xyz/items/${item.split(":")[0]})`).join("\n")}`,
           inline: true,
         },
         {
@@ -838,13 +810,12 @@ async function run(
     if (!allow) return;
 
     if (args.length == 1) {
-      return message.channel.send({ embeds: [new ErrorEmbed("use the message id dumbass")] });
+      return send({ embeds: [new ErrorEmbed("use the message id dumbass")] });
     }
 
     const tradeRequest = await getTradeRequestByMessage(args[1]);
 
-    if (!tradeRequest)
-      return message.channel.send({ embeds: [new ErrorEmbed("invalid trade request bro")] });
+    if (!tradeRequest) return send({ embeds: [new ErrorEmbed("invalid trade request bro")] });
 
     logger.info(
       `admin: ${message.author.id} (${message.author.username}) deleted trade request`,

@@ -1,5 +1,5 @@
 import { CommandInteraction } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -30,17 +30,18 @@ const cmd = new Command("8ball", "ask the 8ball a question", "fun");
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) message.channel.send({ embeds: [res.embed] });
+    if (res.respond) send({ embeds: [res.embed] });
     return;
   }
 
   if (args.length == 0) {
-    return message.channel.send({ embeds: [new ErrorEmbed("you must ask the 8ball something")] });
+    return send({ embeds: [new ErrorEmbed("you must ask the 8ball something")] });
   }
 
   await addCooldown(cmd.name, message.member, 5);
@@ -54,7 +55,7 @@ async function run(
     `**${question}** - ${message.author.toString()}\n\n🎱 ${response}`,
   );
 
-  message.channel.send({ embeds: [embed] });
+  send({ embeds: [embed] });
 }
 
 cmd.setRun(run);

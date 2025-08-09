@@ -233,6 +233,12 @@
     "description": "found in the super capitalist achievement",
     "emoji": "👷🏻‍♂️"
   },
+  "trident": {
+    "id": "trident",
+    "name": "trident",
+    "description": "found in the events pro v achievement",
+    "emoji": "🔱"
+  },
   "year1": {
     "id": "year1",
     "name": "year 1",

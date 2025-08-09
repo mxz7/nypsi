@@ -654,7 +654,7 @@ export async function calcMaxBet(member: MemberResolvable): Promise<number> {
   if (total > 2_500_000) {
     total = 2_500_000;
 
-    if (level > 1250) total += Math.floor((level - 1250) / 75) * 15000;
+    if (level > 1250) total += Math.floor((level - 1250) / 80) * 15000;
   }
 
   if (voted) {
@@ -663,7 +663,7 @@ export async function calcMaxBet(member: MemberResolvable): Promise<number> {
 
   if (booster) total += 250_000;
   if (guildUpgrades.find((i) => i.upgradeId === "maxbet"))
-    total += guildUpgrades.find((i) => i.upgradeId === "maxbet").amount * 100_000;
+    total += guildUpgrades.find((i) => i.upgradeId === "maxbet").amount * 75_000;
 
   for (const boosterId of boosters.keys()) {
     if (getItems()[boosterId].boosterEffect.boosts.includes("maxbet")) {

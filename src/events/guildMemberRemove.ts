@@ -8,6 +8,7 @@ import { getPersistentRoles } from "../utils/functions/guilds/roles";
 import { clearMemberCache } from "../utils/functions/member";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
 import { isBooster, setBooster } from "../utils/functions/premium/boosters";
+import { pluralize } from "../utils/functions/string";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
 import { getTags, removeTag } from "../utils/functions/users/tags";
 
@@ -23,7 +24,7 @@ export default async function guildMemberRemove(member: GuildMember) {
     embed.setDescription(
       `${member.toString()} \`${member.id}\`\n\n**username** ${
         member.user.username
-      }\n**joined** ${daysAgo(member.joinedAt)} days ago`,
+      }\n**joined** ${pluralize("day", daysAgo(member.joinedAt))} ago`,
     );
 
     const history = await fetchUsernameHistory(member);

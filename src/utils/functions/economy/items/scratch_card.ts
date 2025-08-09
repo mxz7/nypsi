@@ -22,12 +22,12 @@ import { getTimestamp, logger } from "../../../logger";
 import { a } from "../../anticheat";
 import { giveCaptcha, isLockedOut, verifyUser } from "../../captcha";
 import { percentChance } from "../../random";
-import { getAdminLevel } from "../../users/admin";
+import { pluralize } from "../../string";
+import { hasAdminPermission } from "../../users/admin";
 import { recentCommands } from "../../users/commands";
 import { getInventory, removeInventoryItem, selectItem } from "../inventory";
 import ScratchCard from "../scratchies";
 import { addStat, createGame } from "../stats";
-import { pluralize } from "../../string";
 
 async function prepare(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
@@ -125,7 +125,7 @@ async function prepare(
             url: process.env.ANTICHEAT_HOOK,
           });
           await hook.send({
-            content: `[${getTimestamp()}] ${message.author.username} (${message.author.id}) given captcha randomly in scratch card`,
+            content: `[${getTimestamp()}] ${message.author.username.replaceAll("_", "\\_")} (${message.author.id}) given captcha randomly in scratch card`,
           });
           hook.destroy();
         }
@@ -201,7 +201,10 @@ async function prepare(
           await a(message.author.id, message.author.username, message.content);
 
           if (await redis.get("nypsi:maintenance")) {
-            if ((await getAdminLevel(message.member)) > 0 && message instanceof Message) {
+            if (
+              (await hasAdminPermission(message.member, "bypass-maintenance")) &&
+              message instanceof Message
+            ) {
               message.react("💀");
             } else {
               msg.edit({
@@ -218,6 +221,7 @@ async function prepare(
 
           logger.info(
             `::cmd ${message.guild.id} ${message.channelId} ${message.author.username}: replaying ${selected.id}`,
+            { userId: message.author.id, guildId: message.guildId, channelId: message.channelId },
           );
           return prepare(message, args, response);
         }

@@ -1,18 +1,15 @@
 import {
   ActionRowBuilder,
   APIApplicationCommandOptionChoice,
-  BaseMessageOptions,
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
-  InteractionEditReplyOptions,
-  InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
   MessageFlags,
 } from "discord.js";
 import redis from "../init/redis";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { Item } from "../types/Economy.js";
 import { getGuildByUser } from "../utils/functions/economy/guilds";
@@ -221,38 +218,9 @@ cmd.slashData
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
-
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
@@ -350,7 +318,7 @@ async function run(
       data.pages,
       data.pos,
       `top prestige ${global ? "[global]" : `for ${message.guild.name}`}`,
-      global ? "https://nypsi.xyz/leaderboard/level?ref=bot-lb" : null,
+      global ? "https://nypsi.xyz/leaderboards/level?ref=bot-lb" : null,
     );
   } else if (args[0].toLowerCase() == "item") {
     const items = getItems();
@@ -403,7 +371,7 @@ async function run(
       data.pages,
       data.pos,
       `top ${item.name} ${global ? "[global]" : `for ${message.guild.name}`}`,
-      global ? `https://nypsi.xyz/leaderboard/${item.id}?ref=bot-lb` : null,
+      global ? `https://nypsi.xyz/leaderboards/${item.id}?ref=bot-lb` : null,
     );
   } else if (args[0].toLowerCase() == "completion") {
     const data = await topCompletion(message.guild, message.member);
@@ -426,7 +394,7 @@ async function run(
       data.pages,
       data.pos,
       `top net worth ${global ? "[global]" : `for ${message.guild.name}`}`,
-      global ? "https://nypsi.xyz/leaderboard/net-worth?ref=bot-lb" : null,
+      global ? "https://nypsi.xyz/leaderboards/net-worth?ref=bot-lb" : null,
     );
   } else if (args[0].toLowerCase() === "guild" || args[0].toLowerCase() === "guilds") {
     const userGuild = await getGuildByUser(message.member);
@@ -437,7 +405,7 @@ async function run(
       data.pages,
       data.pos,
       "top guilds",
-      "https://nypsi.xyz/leaderboard/guilds?ref=bot-lb",
+      "https://nypsi.xyz/leaderboards/guilds?ref=bot-lb",
     );
   } else if (args[0].toLowerCase() === "streak" || args[0].toLowerCase() === "dailystreak") {
     let global = false;
@@ -456,7 +424,7 @@ async function run(
       data.pages,
       data.pos,
       `top daily streak ${global ? "[global]" : `for ${message.guild.name}`}`,
-      global ? "https://nypsi.xyz/leaderboard/streak?ref=bot-lb" : null,
+      global ? "https://nypsi.xyz/leaderboards/streak?ref=bot-lb" : null,
     );
   } else if (args[0].toLowerCase() === "lottery") {
     let global = false;
@@ -475,7 +443,7 @@ async function run(
       data.pages,
       data.pos,
       `top lottery wins ${global ? "[global]" : `for ${message.guild.name}`}`,
-      global ? "https://nypsi.xyz/leaderboard/lottery?ref=bot-lb" : null,
+      global ? "https://nypsi.xyz/leaderboards/lottery?ref=bot-lb" : null,
     );
   } else if (args[0].toLowerCase() === "wordle-time" || args[0].toLowerCase() === "wordletime") {
     let global = false;
@@ -494,7 +462,7 @@ async function run(
       data.pages,
       data.pos,
       `fastest wordle wins ${global ? "[global]" : `for ${message.guild.name}`}`,
-      global ? "https://nypsi.xyz/leaderboard/wordle?ref=bot-lb" : null,
+      global ? "https://nypsi.xyz/leaderboards/wordle?ref=bot-lb" : null,
     );
   } else if (args[0].toLowerCase() === "wordle") {
     let global = false;
@@ -513,7 +481,7 @@ async function run(
       data.pages,
       data.pos,
       `top wordle wins ${global ? "[global]" : `for ${message.guild.name}`}`,
-      global ? "https://nypsi.xyz/leaderboard/wordle?ref=bot-lb" : null,
+      global ? "https://nypsi.xyz/leaderboards/wordle?ref=bot-lb" : null,
     );
   } else if (args[0].toLowerCase() === "votestreak") {
     let global = false;
@@ -550,7 +518,7 @@ async function run(
       data.pages,
       data.pos,
       `top monthly votes ${global ? "[global]" : `for ${message.guild.name}`}`,
-      global ? "https://nypsi.xyz/leaderboard/vote?ref=bot-lb" : null,
+      global ? "https://nypsi.xyz/leaderboards/vote?ref=bot-lb" : null,
     );
   } else if (["cr", "crglobal", "cr-global", "chatreaction"].includes(args[0].toLowerCase())) {
     let global = false;
@@ -559,7 +527,7 @@ async function run(
       args.splice(1, 1);
       args[0] = "crdaily";
       await redis.del(`cd:top:${message.author.id}`);
-      return run(message, args);
+      return run(message, send, args);
     }
     if (args[1]?.toLowerCase() == "global") global = true;
 
@@ -605,7 +573,7 @@ async function run(
       if (args[1]?.toLowerCase() === "global") {
         data = await topCommandUsesGlobal(message.member);
         title = `top command uses [global]`;
-        url = "https://nypsi.xyz/leaderboard/commands?ref=bot-lb";
+        url = "https://nypsi.xyz/leaderboards/commands?ref=bot-lb";
       } else {
         data = await topCommandUses(message.guild, message.member);
         title = `top command uses for ${message.guild.name}`;
@@ -666,7 +634,7 @@ async function run(
       data.pages,
       data.pos,
       `top ${selected.name} ${global ? "[global]" : `for ${message.guild.name}`}`,
-      global ? `https://nypsi.xyz/leaderboard/${selected.id}?ref=bot-lb` : null,
+      global ? `https://nypsi.xyz/leaderboards/${selected.id}?ref=bot-lb` : null,
     );
   }
 }

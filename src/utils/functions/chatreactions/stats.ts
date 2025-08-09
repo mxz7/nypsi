@@ -35,11 +35,7 @@ export async function hasReactionStatsProfile(guild: Guild, member: GuildMember)
     },
   });
 
-  if (query) {
-    return true;
-  } else {
-    return false;
-  }
+  return Boolean(query);
 }
 
 export async function createReactionStatsProfile(guild: Guild, member: GuildMember) {

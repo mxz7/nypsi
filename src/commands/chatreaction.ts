@@ -1,7 +1,6 @@
 import { ChatReactionWordList } from "@prisma/client";
 import {
   ActionRowBuilder,
-  BaseMessageOptions,
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
@@ -10,7 +9,6 @@ import {
   GuildMember,
   Interaction,
   InteractionEditReplyOptions,
-  InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
   MessageEditOptions,
@@ -20,7 +18,7 @@ import {
 } from "discord.js";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { getBlacklisted, setBlacklisted } from "../utils/functions/chatreactions/blacklisted";
@@ -215,38 +213,9 @@ const duelRequests = new Set<string>();
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
-
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
@@ -694,9 +663,10 @@ async function run(
 
       const requestEmbed = new CustomEmbed(
         message.member,
-        `**${
-          message.author.username
-        }** has challenged you to a chat reaction duel\n\n**wager** $${wager.toLocaleString()}\n\ndo you accept?`,
+        `**${message.author.username.replaceAll(
+          "_",
+          "\\_",
+        )}** has challenged you to a chat reaction duel\n\n**wager** $${wager.toLocaleString()}\n\ndo you accept?`,
       ).setFooter({ text: "expires in 60 seconds" });
 
       const m = await send({
@@ -739,6 +709,7 @@ async function run(
         } else {
           response.reply({ embeds: [new CustomEmbed(target, "✅ duel request denied")] });
         }
+        m.edit({ components: [] });
       }
     } else if (args.length <= 2 && (args.length === 1 ? true : Boolean(formatNumber(args[1])))) {
       let wager = formatNumber(args[1] || 0);
@@ -777,9 +748,10 @@ async function run(
 
       const requestEmbed = new CustomEmbed(
         message.member,
-        `**${
-          message.author.username
-        }** has created an open chat reaction duel\n\n**wager** $${wager.toLocaleString()}`,
+        `**${message.author.username.replaceAll(
+          "_",
+          "\\_",
+        )}** has created an open chat reaction duel\n\n**wager** $${wager.toLocaleString()}`,
       ).setFooter({ text: "expires in 60 seconds" });
 
       const m = await send({
@@ -793,8 +765,7 @@ async function run(
         if ((await isEcoBanned(i.user)).banned && wager > 0) return false;
 
         if (i.user.id === message.author.id) {
-          if ((i as ButtonInteraction).customId === "n") return true;
-          return false;
+          return (i as ButtonInteraction).customId === "n";
         }
 
         if (!(await userExists(i.user)) || (await getBalance(i.user)) < wager) {
@@ -858,6 +829,7 @@ async function run(
         } else {
           response.reply({ embeds: [new CustomEmbed(target, "✅ duel request denied")] });
         }
+        m.edit({ components: [] });
       }
     }
     return;
@@ -892,6 +864,10 @@ async function run(
         }
 
         let user: string | GuildMember = args[2];
+
+        if (user.match(Constants.SNOWFLAKE_REGEX)) {
+          user = user.replaceAll(/\D/g, "");
+        }
 
         if (!(await message.guild.members.fetch(user))) {
           if (!message.mentions.members.first()) {
@@ -936,6 +912,10 @@ async function run(
         }
 
         let user = args[2];
+
+        if (user.match(Constants.SNOWFLAKE_REGEX)) {
+          user = user.replaceAll(/\D/g, "");
+        }
 
         if (!(await message.guild.members.fetch(user))) {
           if (!message.mentions.members.first()) {

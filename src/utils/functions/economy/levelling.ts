@@ -145,6 +145,10 @@ levellingRewards.set(7000, {
   text: ["- 🤍 prestige 70 tag"],
   rewards: ["tag:p70"],
 });
+levellingRewards.set(8000, {
+  text: ["- 💚 prestige 80 tag"],
+  rewards: ["tag:p70"],
+});
 
 const xpFormula = (level: number, prestige: number) => {
   let prestigeModifier = 30;
@@ -169,12 +173,12 @@ const xpFormula = (level: number, prestige: number) => {
   if (prestige >= 70) prestigeModifier = 145;
   if (prestige >= 75) prestigeModifier = 175;
   if (prestige >= 80) prestigeModifier = 200;
-  if (prestige >= 90) prestigeModifier = 225;
-  if (prestige >= 100) prestigeModifier = 250;
+  if (prestige >= 85) prestigeModifier = 225;
+  if (prestige >= 90) prestigeModifier = 250;
 
   return Math.floor((level + 1) * 1.117 + prestigeModifier * prestige + 50 + 15 * prestige) - 1;
 };
-const moneyFormula = (level: number) => Math.floor(Math.pow(level + 1, 2.07) + 10_000) - 1;
+const moneyFormula = (level: number) => Math.floor(Math.pow(level + 1, 2.077) + 10_000) - 1;
 const cratesFormula = (rawLevel: number) => {
   const prestige = Math.floor(rawLevel / 100);
   const level = rawLevel - prestige * 100;
@@ -340,6 +344,29 @@ export function getLevelRequirements(prestige: number, level: number) {
   return { xp: requiredXp, money: requiredMoney };
 }
 
+export function getNextPrestigeRequirements(prestige: number, level: number) {
+  while (level >= 100) {
+    prestige++;
+    level -= 100;
+  }
+
+  const rawLevel = prestige * 100 + level;
+
+  const nextPrestige = Math.ceil((rawLevel + 1) / 100) * 100;
+
+  const levelsRequired = nextPrestige - rawLevel;
+
+  let requiredXp = 0;
+  let requiredMoney = 0;
+
+  for (let i = 0; i < levelsRequired; i++) {
+    requiredXp += xpFormula(level + i, prestige);
+    requiredMoney += moneyFormula(rawLevel + i);
+  }
+
+  return { xp: requiredXp, money: requiredMoney };
+}
+
 export async function getUpgrades(member: MemberResolvable): Promise<
   {
     upgradeId: string;
@@ -439,15 +466,13 @@ export async function doLevelUp(member: MemberResolvable) {
         getPrestige(userId),
       ]);
 
-      if (
+      return (
         afterXp === beforeXp &&
         beforeBank === afterBank &&
         afterLevel === beforeLevel &&
         afterPrestige === beforePrestige &&
         levels > 0
-      )
-        return true;
-      return false;
+      );
     }
 
     requirements = getLevelRequirements(beforePrestige, beforeLevel + levels);

@@ -51,7 +51,7 @@ export async function getMarketOrders(member: MemberResolvable | undefined, type
         { orderType: type },
       ],
     },
-    orderBy: { createdAt: "asc" },
+    orderBy: { id: "asc" },
   });
 
   return query;
@@ -77,7 +77,7 @@ export async function setMarketOrderAmount(id: number, amount: number) {
 export async function getRecentMarketOrders(type: OrderType) {
   return await prisma.market.findMany({
     where: { AND: [{ completed: false }, { orderType: type }] },
-    orderBy: { createdAt: "desc" },
+    orderBy: { id: "desc" },
     take: 5,
   });
 }
@@ -99,7 +99,7 @@ export async function getMarketItemOrders(
     where: {
       AND: filters,
     },
-    orderBy: [{ price: "desc" }, { createdAt: "asc" }],
+    orderBy: [{ price: "desc" }, { id: "asc" }],
   });
 
   return query;
@@ -117,7 +117,7 @@ export async function getMarketAverage(item: string) {
       price: true,
     },
     orderBy: {
-      createdAt: "desc",
+      id: "desc",
     },
     take: 50,
   });
@@ -256,9 +256,9 @@ export async function getMarketOrderEmbed(order: Market) {
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>();
 
   embed.setHeader(
-    await getLastKnownUsername(order.ownerId),
+    await getLastKnownUsername(order.ownerId, false),
     await getLastKnownAvatar(order.ownerId),
-    `https://nypsi.xyz/user/${order.ownerId}?ref=bot-market`,
+    `https://nypsi.xyz/users/${order.ownerId}?ref=bot-market`,
   );
 
   let description: string;
@@ -271,7 +271,7 @@ export async function getMarketOrderEmbed(order: Market) {
 
   if (order.orderType === "buy") {
     embed.setColor("#b4befe");
-    description += `buying **${order.itemAmount.toLocaleString()}x** ${getItems()[order.itemId].emoji} **[${getItems()[order.itemId].name}](https://nypsi.xyz/item/${order.itemId}?ref=bot-market)** for $${(Number(order.price) * order.itemAmount).toLocaleString()}`;
+    description += `buying **${order.itemAmount.toLocaleString()}x** ${getItems()[order.itemId].emoji} **[${getItems()[order.itemId].name}](https://nypsi.xyz/items/${order.itemId}?ref=bot-market)** for $${(Number(order.price) * order.itemAmount).toLocaleString()}`;
     row.addComponents(
       new ButtonBuilder().setCustomId("market-full").setLabel("sell").setStyle(ButtonStyle.Success),
     );
@@ -291,7 +291,7 @@ export async function getMarketOrderEmbed(order: Market) {
       );
   } else if (order.orderType === "sell") {
     embed.setColor("#a6e3a1");
-    description += `selling **${order.itemAmount.toLocaleString()}x** ${getItems()[order.itemId].emoji} **[${getItems()[order.itemId].name}](https://nypsi.xyz/item/${order.itemId}?ref=bot-market)** for $${(Number(order.price) * order.itemAmount).toLocaleString()}`;
+    description += `selling **${order.itemAmount.toLocaleString()}x** ${getItems()[order.itemId].emoji} **[${getItems()[order.itemId].name}](https://nypsi.xyz/items/${order.itemId}?ref=bot-market)** for $${(Number(order.price) * order.itemAmount).toLocaleString()}`;
     row.addComponents(
       new ButtonBuilder().setCustomId("market-full").setLabel("buy").setStyle(ButtonStyle.Success),
     );
@@ -352,7 +352,7 @@ export async function checkMarketOrder(
         { ownerId: { not: order.ownerId } },
       ],
     },
-    orderBy: { createdAt: "desc" },
+    orderBy: { id: "desc" },
   });
 
   if (validOrders.length === 0) {
@@ -543,7 +543,7 @@ export async function checkMarketWatchers(
   const payload: NotificationPayload = {
     payload: {
       embed: new CustomEmbed().setDescription(
-        `a ${type} order has made been for ${amount} ${getItems()[itemId].emoji} **[${pluralize(getItems()[itemId], amount)}](https://nypsi.xyz/item/${itemId}?ref=bot-market)**`,
+        `a ${type} order has made been for ${amount} ${getItems()[itemId].emoji} **[${pluralize(getItems()[itemId], amount)}](https://nypsi.xyz/items/${itemId}?ref=bot-market)**`,
       ),
       components: new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("jump").setURL(url),
@@ -662,7 +662,7 @@ export async function getMarketTransactionData(
         { ownerId: { not: getUserId(excludeMember) } },
       ],
     },
-    orderBy: [{ price: type == "buy" ? "desc" : "asc" }, { createdAt: "asc" }],
+    orderBy: [{ price: type == "buy" ? "desc" : "asc" }, { id: "asc" }],
   });
   const orders: Market[] = [];
 
@@ -788,8 +788,10 @@ export async function completeOrder(
     await addInventoryItem(order.ownerId, order.itemId, Number(amount));
     await addBalance(buyerId, Number(amount) * Number(order.price) - taxedAmount);
 
-    addStat(order.ownerId, "market-fulfilled-buy", Number(amount));
     addStat(buyerId, "market-sold-items", Number(amount));
+    addStat(buyerId, "earned-market", Number(amount) * Number(order.price) - taxedAmount);
+    addStat(order.ownerId, "market-fulfilled-buy", Number(amount));
+    addStat(order.ownerId, "spent-market", Number(amount) * Number(order.price));
   } else {
     await addInventoryItem(buyerId, order.itemId, Number(amount));
     await addBalance(order.ownerId, Number(amount) * Number(order.price) - taxedAmount);
@@ -797,8 +799,10 @@ export async function completeOrder(
     if (isGem(order.itemId))
       await redis.del(`${Constants.redis.cache.economy.HAS_GEM}:${order.ownerId}:${order.itemId}`);
 
-    addStat(order.ownerId, "market-fulfilled-sell", Number(amount));
     addStat(buyerId, "market-bought-items", Number(amount));
+    addStat(buyerId, "spent-market", Number(amount) * Number(order.price));
+    addStat(order.ownerId, "market-fulfilled-sell", Number(amount));
+    addStat(order.ownerId, "earned-market", Number(amount) * Number(order.price) - taxedAmount);
   }
 
   if (checkLock) {
@@ -808,19 +812,10 @@ export async function completeOrder(
 
   // send logs and dms
   (async () => {
-    const username = await getLastKnownUsername(buyerId);
-
+    transaction(order.ownerId, buyerId, "item", amount, order.itemId, "market");
     transaction(
-      { username: await getLastKnownUsername(order.ownerId), id: order.ownerId },
-      { username: username, id: buyerId },
-      "item",
-      amount,
-      order.itemId,
-      "market",
-    );
-    transaction(
-      { username: username, id: buyerId },
-      { username: await getLastKnownUsername(order.ownerId), id: order.ownerId },
+      buyerId,
+      order.ownerId,
       "money",
       Number(amount) * Number(order.price) - taxedAmount,
       undefined,
@@ -1008,7 +1003,9 @@ export async function marketSell(
 
   await removeInventoryItem(userId, itemId, amount - remaining);
 
-  logger.info(`market: ${userId} (${await getLastKnownUsername(userId)}) sold ${amount} ${itemId}`);
+  logger.info(
+    `market: ${userId} (${await getLastKnownUsername(userId, false)}) sold ${amount} ${itemId}`,
+  );
 
   await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
   inTransaction.delete(itemId);
@@ -1139,7 +1136,7 @@ export async function marketBuy(
   await removeBalance(userId, buyPrice);
 
   logger.info(
-    `market: ${userId} (${await getLastKnownUsername(userId)}) bought ${amount} ${itemId}`,
+    `market: ${userId} (${await getLastKnownUsername(userId, false)}) bought ${amount} ${itemId}`,
   );
 
   await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);

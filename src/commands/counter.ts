@@ -1,13 +1,6 @@
 import { TrackingType } from "@prisma/client";
-import {
-  BaseMessageOptions,
-  CommandInteraction,
-  InteractionEditReplyOptions,
-  InteractionReplyOptions,
-  Message,
-  PermissionFlagsBits,
-} from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { CommandInteraction, Message, PermissionFlagsBits, VoiceChannel } from "discord.js";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getItems } from "../utils/functions/economy/utils";
 import {
@@ -64,38 +57,9 @@ cmd.slashData
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
-
   if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
     if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
       return send({ embeds: [new ErrorEmbed("you need the `manage server` permission")] });
@@ -200,19 +164,29 @@ async function run(
         embeds: [new ErrorEmbed("failed to create counter")],
       });
 
-    return send({ embeds: [new CustomEmbed(message.member, "✅ successfully created counter.")] });
+    return send({ embeds: [new CustomEmbed(message.member, "✅ successfully created counter")] });
   } else if (args[0].toLowerCase() === "delete") {
-    const channel = message.options.getChannel("channel");
+    const channel = message.options.getChannel("channel") as VoiceChannel;
 
     const res = await deleteGuildCounter(channel.id);
 
     if (!res)
       return send({ embeds: [new ErrorEmbed("that channel does not have a counter tied to it")] });
+
+    let deleted = false;
+
+    try {
+      await channel.delete("counter removed");
+      deleted = true;
+    } catch {
+      //silent fail
+    }
+
     return send({
       embeds: [
         new CustomEmbed(
           message.member,
-          "✅ counter removed, you will have to manually delete the channel",
+          `✅ counter removed${deleted ? "" : ", you will have to manually delete the channel"}`,
         ),
       ],
     });

@@ -8,7 +8,7 @@ import {
   MessageActionRowComponentBuilder,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { getItems } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -21,12 +21,13 @@ const cmd = new Command(
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) message.channel.send({ embeds: [res.embed] });
+    if (res.respond) send({ embeds: [res.embed] });
     return;
   }
 
@@ -99,9 +100,9 @@ async function run(
   let msg: Message;
 
   if (pages.length == 1) {
-    return await message.channel.send({ embeds: [embed] });
+    return await send({ embeds: [embed] });
   } else {
-    msg = await message.channel.send({ embeds: [embed], components: [row] });
+    msg = await send({ embeds: [embed], components: [row] });
   }
 
   if (pages.length > 1) {

@@ -7,7 +7,7 @@ import {
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { NypsiClient } from "../models/Client";
-import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { calcNetWorth } from "../utils/functions/economy/balance";
 import { getInventory } from "../utils/functions/economy/inventory";
@@ -26,12 +26,13 @@ const cmd = new Command("networth", "view breakdown of your networth", "money").
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
   args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 
-    if (res.respond) message.channel.send({ embeds: [res.embed] });
+    if (res.respond) send({ embeds: [res.embed] });
     return;
   }
 
@@ -43,19 +44,19 @@ async function run(
     target = await getMember(message.guild, args.join(" "));
 
     if (!target) {
-      return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });
+      return send({ embeds: [new ErrorEmbed("invalid user")] });
     }
   }
 
   if (!(await hasProfile(target)))
-    return message.channel.send({
+    return send({
       embeds: [new ErrorEmbed(`${target.toString()} has never used nypsi. what a LOSER lol.`)],
     });
 
   if (!(await userExists(target))) await createUser(target);
 
   if ((await isUserBlacklisted(target)).blacklisted)
-    return message.channel.send({
+    return send({
       embeds: [
         new ErrorEmbed(
           `${target.user.toString()} is blacklisted 😬. they did something REALLY bad. laugh at them for me. lol. AHHAHAAHHA`,
@@ -64,7 +65,7 @@ async function run(
     });
 
   if ((await isEcoBanned(target)).banned)
-    return message.channel.send({
+    return send({
       embeds: [new ErrorEmbed(`${target.toString()} is banned AHAHAHAHA`)],
     });
 
@@ -149,8 +150,8 @@ async function run(
       .setDisabled(true),
     new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
   );
-  if (pages.size <= 1) return message.channel.send({ embeds: [embed] });
-  const msg = await message.channel.send({ embeds: [embed], components: [row] });
+  if (pages.size <= 1) return send({ embeds: [embed] });
+  const msg = await send({ embeds: [embed], components: [row] });
 
   addView(target.user.id, message.author.id, `profile in ${message.guild.id}`);
 

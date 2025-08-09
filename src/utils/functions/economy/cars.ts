@@ -75,7 +75,7 @@ export async function getGarage(member: MemberResolvable) {
       skin: true,
     },
     orderBy: {
-      createdAt: "asc",
+      id: "asc",
     },
   });
 
