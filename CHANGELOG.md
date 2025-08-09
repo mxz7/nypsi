@@ -5,6 +5,8 @@
 - loot rains only double time in public command channels
 - buffed tower
 - added guild admins to buy shop items and invite/kick members (@growling_grizzly)
+- can get married for free from 100% love
+- auto divorce when you get 100% love with someone else
 
 ## other
 

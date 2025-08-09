@@ -1,9 +1,23 @@
-import { CommandInteraction, MessageFlags } from "discord.js";
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  CommandInteraction,
+  ComponentType,
+  MessageActionRowComponentBuilder,
+  MessageFlags,
+} from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { addProgress } from "../utils/functions/economy/achievements";
+import { addInventoryItem } from "../utils/functions/economy/inventory";
+import { getItems } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
+import { percentChance } from "../utils/functions/random";
+import { addMarriage, isMarried, removeMarriage } from "../utils/functions/users/marriage";
+import { addNotificationToQueue } from "../utils/functions/users/notifications";
+import { getLastKnownUsername } from "../utils/functions/users/tag";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cache = new Map<string, number>();
@@ -108,6 +122,10 @@ async function run(
     lovePercent = 0;
   }
 
+  if (lovePercent === 100 && percentChance(50)) {
+    lovePercent = 99;
+  }
+
   if (lovePercent == 100) {
     loveLevel = "perfect!!";
     loveEmoji = "💞👀🍆🍑";
@@ -166,14 +184,130 @@ async function run(
     loveBar = "💔💔💔💔💔💔💔💔💔💔";
   }
 
-  const embed = new CustomEmbed(
-    message.member,
-    `${target1.user.username.replaceAll("_", "\\_")} **x** ${target2.user.username.replaceAll("_", "\\_")}\n\n${loveBar}\n**${lovePercent}**% **-** ${loveLevel} ${loveEmoji}`,
-  );
+  let desc =
+    `${target1.user.username.replaceAll("_", "\\_")} **x** ${target2.user.username.replaceAll("_", "\\_")}\n\n` +
+    `${loveBar}\n**${lovePercent}**% **-** ${loveLevel} ${loveEmoji}`;
 
-  send({ embeds: [embed] });
+  let marriage = await isMarried(message.member);
+  let marryOpportunity = false;
+
+  const target =
+    target1.id === message.author.id
+      ? target2
+      : target2.id === message.author.id
+        ? target1
+        : undefined;
+
+  if (
+    marriage &&
+    lovePercent === 100 &&
+    target &&
+    !(await isMarried(target)) &&
+    (target1.id === message.author.id || target2.id === message.author.id)
+  ) {
+    await removeMarriage(message.member);
+    await addInventoryItem(marriage.partnerId, "broken_ring", 1);
+
+    addNotificationToQueue({
+      memberId: marriage.partnerId,
+      payload: {
+        embed: new CustomEmbed(
+          marriage.partnerId,
+          `${getItems()["broken_ring"].emoji} **${message.member.user.username.replaceAll("_", "\\_")}** has cheated on you!`,
+        ).setFooter({ text: `+1 broken ring` }),
+      },
+    });
+
+    desc += `\n\n${getItems()["broken_ring"].emoji} you cheated on **${await getLastKnownUsername(marriage.partnerId, true)}**!`;
+
+    marriage = false;
+  }
+
+  if (
+    !marriage &&
+    lovePercent === 100 &&
+    !(await isMarried(target1)) &&
+    !(await isMarried(target2)) &&
+    target &&
+    target.user.id !== message.author.id &&
+    (target1.id === message.author.id || target2.id === message.author.id)
+  ) {
+    marryOpportunity = true;
+  }
 
   addProgress(message.member, "unsure", 1);
+
+  const embed = new CustomEmbed(message.member, desc);
+
+  if (!marryOpportunity) {
+    send({ embeds: [embed] });
+    return;
+  }
+
+  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+    new ButtonBuilder()
+      .setCustomId("love-marry")
+      .setLabel("get married! (0/2)")
+      .setStyle(ButtonStyle.Success),
+  );
+
+  const msg = await send({ embeds: [embed], components: [row] });
+
+  const collector = msg.createMessageComponentCollector({
+    componentType: ComponentType.Button,
+    time: 30000,
+    filter: (i) => {
+      if (i.user.id === target1.user.id || i.user.id === target2.user.id) return true;
+      i.reply({
+        embeds: [new ErrorEmbed("this isn't for you IDIOT")],
+        flags: MessageFlags.Ephemeral,
+      });
+    },
+  });
+
+  const clicked: string[] = [];
+  let ended = false;
+
+  collector.on("end", async () => {
+    if (ended) return;
+
+    row.components[0].setDisabled(true);
+
+    await msg.edit({ components: [row] });
+  });
+
+  collector.on("collect", async (i) => {
+    if (ended) return;
+    if (clicked.includes(i.user.id)) return;
+
+    clicked.push(i.user.id);
+
+    if (clicked.length === 1) {
+      (row.components[0] as ButtonBuilder).setLabel("get married! (1/2)");
+      return i.update({ components: [row] });
+    }
+
+    ended = true;
+    collector.stop();
+
+    (row.components[0] as ButtonBuilder).setLabel("get married! (2/2)").setDisabled(true);
+    await i.update({ components: [row] });
+
+    const target1Marriage = await isMarried(target1);
+    const target2Marriage = await isMarried(target2);
+
+    if (target1Marriage || target2Marriage) {
+      return i.followUp({
+        embeds: [new ErrorEmbed("some trickery has gone on and you can't be married... cunts")],
+      });
+    }
+
+    await addMarriage(target1.user.id, target2.user.id);
+
+    return i.followUp({
+      embeds: [new CustomEmbed(message.member, "you may now kiss the bride!")],
+    });
+  });
 }
 
 cmd.setRun(run);
