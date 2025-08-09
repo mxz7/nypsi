@@ -650,7 +650,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          `✅ \`${getLastKnownUsername(target.id, false)}\` has been kicked from **${guild.guildName}**`,
+          `✅ \`${await getLastKnownUsername(target.id, false)}\` has been kicked from **${guild.guildName}**`,
         ),
       ],
     });
