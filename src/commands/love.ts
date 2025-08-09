@@ -188,9 +188,7 @@ async function run(
     `${target1.user.username.replaceAll("_", "\\_")} **x** ${target2.user.username.replaceAll("_", "\\_")}\n\n` +
     `${loveBar}\n**${lovePercent}**% **-** ${loveLevel} ${loveEmoji}`;
 
-  let marriage = await isMarried(message.member);
-  let marryOpportunity = false;
-
+  // undefined if author isn't one of the love birds
   const target =
     target1.id === message.author.id
       ? target2
@@ -198,11 +196,20 @@ async function run(
         ? target1
         : undefined;
 
+  let marriage: Awaited<ReturnType<typeof isMarried>>;
+  let targetMarriage: Awaited<ReturnType<typeof isMarried>>;
+  let marryOpportunity = false;
+
+  if (target && lovePercent === 100) {
+    marriage = await isMarried(message.member);
+    targetMarriage = await isMarried(target);
+  }
+
   if (
     marriage &&
     lovePercent === 100 &&
     target &&
-    !(await isMarried(target)) &&
+    (!targetMarriage || targetMarriage.partnerId !== marriage.partnerId) &&
     (target1.id === message.author.id || target2.id === message.author.id)
   ) {
     await removeMarriage(message.member);
@@ -226,8 +233,8 @@ async function run(
   if (
     !marriage &&
     lovePercent === 100 &&
-    !(await isMarried(target1)) &&
-    !(await isMarried(target2)) &&
+    !marriage &&
+    !targetMarriage &&
     target &&
     target.user.id !== message.author.id &&
     (target1.id === message.author.id || target2.id === message.author.id)
