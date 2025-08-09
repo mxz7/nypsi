@@ -21,7 +21,7 @@ import { createUser, getItems, userExists } from "../utils/functions/economy/uti
 import { addMarriage, isMarried } from "../utils/functions/users/marriage";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("marry", "marry your ekitten", "fun");
+const cmd = new Command("marry", "marry your ekitten", "fun").setAliases(["propose"]);
 
 cmd.slashEnabled = true;
 
