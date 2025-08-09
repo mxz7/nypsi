@@ -32,13 +32,14 @@ async function checkBoosters(member: MemberResolvable, boosters: Map<string, Boo
     }
 
     const expired = new Map<string, number>();
+    const now = Date.now();
 
     for (const key of boosters.keys()) {
       const boosters2 = boosters.get(key);
       const newBoosters: Booster[] = [];
 
       for (const booster of boosters2) {
-        if (booster.expire <= Date.now()) {
+        if (booster.expire <= now) {
           await prisma.booster
             .delete({
               where: {
