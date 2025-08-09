@@ -82,6 +82,6 @@
   "grind": {
     "id": "grind",
     "name": "grind",
-    "description": "fish/hunt/mine {target} times"
+    "description": "get {target} items from fish/hunt/mine"
   }
 }

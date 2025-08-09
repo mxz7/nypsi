@@ -295,7 +295,7 @@ async function run(
     message.client as NypsiClient,
     message.member,
     "grind",
-    1,
+    total,
   );
 
   const eventData: { event?: EventData; target: number } = { target: 0 };
