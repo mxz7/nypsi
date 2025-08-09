@@ -15,7 +15,9 @@ import _ = require("lodash");
 async function checkBoosters(member: MemberResolvable, boosters: Map<string, Booster[]>) {
   const userId = getUserId(member);
 
-  logger.debug(`boosters: ${userId} checking expired`);
+  const stack = new Error().stack.split("\n").slice(2).join("\n");
+
+  logger.debug(`boosters: ${userId} checking expired`, { stack });
 
   if (
     (await redis.exists("nypsi:maintenance")) ||
