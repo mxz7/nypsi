@@ -399,9 +399,9 @@ async function playGame(
     else res = await interaction.update(data).catch(() => m.edit(data));
 
     try {
-      logger.debug(
-        `blackjack: ${message.member.id} message edited for ${reason}, id from response: ${res instanceof InteractionResponse ? (res.interaction as ButtonInteraction).customId : res.id}`,
-      );
+      logger.debug(`blackjack: ${message.member.id} message edited for ${reason}`, {
+        components: await res.fetch().then((m) => m.components),
+      });
     } catch {
       logger.error(`blackjack: ${message.author.id} failed to get response from edit`);
     }
