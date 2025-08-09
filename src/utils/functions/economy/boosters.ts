@@ -14,11 +14,20 @@ import { getItems } from "./utils";
 import _ = require("lodash");
 
 const checkBoosterMutex = new Mutex();
+const lastBoosterCheck = new Map<string, number>();
 
 async function checkBoosters(member: MemberResolvable, boosters: Map<string, Booster[]>) {
   const release = await checkBoosterMutex.acquire();
   try {
     const userId = getUserId(member);
+
+    if (lastBoosterCheck.has(userId)) {
+      if (Date.now() - lastBoosterCheck.get(userId) < 500) {
+        return boosters;
+      }
+    }
+
+    lastBoosterCheck.set(userId, Date.now());
 
     const stack = new Error().stack.split("\n").slice(2).join("\n");
 
