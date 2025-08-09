@@ -124,7 +124,7 @@ async function checkBoosters(member: MemberResolvable, boosters: Map<string, Boo
         }
 
         if (member instanceof GuildMember) {
-          await member.send({ embeds: [embed], content: text });
+          member.send({ embeds: [embed], content: text });
         } else {
           addNotificationToQueue({
             memberId: userId,
