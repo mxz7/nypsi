@@ -400,6 +400,18 @@ export async function isRequestSuitable(
     "",
     "If you have no information or questions for the user, do not supply an answer.",
     "",
+    "#### Quick Replies",
+    "You should use these when it best matches. Prefer using these over your own response only when the user's query is a good match",
+    "",
+    "##### auto.scam",
+    "Used when the user is claiming that they have been scammed. Keywords like 'scammed' me",
+    "",
+    "##### auto.transfer",
+    "Used when the user is asking for a profile transfer. Specifically only when they say things like 'transfer account data'",
+    "",
+    "##### auto.buyunban",
+    "Used when the user is asking to be unbanned, or asking how to be unbanned",
+    "",
     "## Examples",
     "",
     "### Suitable Requests",
@@ -445,6 +457,10 @@ export async function isRequestSuitable(
       },
     });
 
+    if (quickResponses.has(response.output_parsed.answer)) {
+      response.output_parsed.answer = quickResponses.get(response.output_parsed.answer)!;
+    }
+
     return {
       decision: response.output_parsed.valid,
       reason: response.output_parsed.reason,
@@ -456,31 +472,31 @@ export async function isRequestSuitable(
   }
 }
 
-export async function getQuickSupportResponse(content: string) {
-  const res = await prompt(
-    "# Role\n\n" +
-      "You are a support agent for the 'nypsi' Discord bot. You are an assistance to the staff members of nypsi, helping save their time by instantly responding to a user's query with instructions on how to give the correct information.\n\n" +
-      "## Your response\n\n" +
-      "Your response should **ONLY** be one of the following:\n" +
-      "- auto.scam\n" +
-      "Should be used when the user is claiming that they have been scammed by another user.\n\n" +
-      "- auto.transfer\n" +
-      "Should be used when the user is asking for a profile transfer, where data from one account is being transferred to another.\n\n" +
-      "- auto.buyunban\n" +
-      "Should be used when the user is asking to be unbanned, or are inquiring on how to be unbanned.\n\n" +
-      "- auto.wrongserver\n" +
-      "Should be used when the user is complaining about being punished (banned/muted) in a server other than nypsi.\n\n" +
-      "- no\n" +
-      "Used when none of the other options apply, and you are unable to assist the user. Use this when you are unsure.\n\n" +
-      "## Examples\n\n" +
-      "### Unbanned\n\n" +
-      "If the user is asking to be unbanned, or when they are unbanned, respond with 'auto.buyunban'\n\n" +
-      "### Wrong Server\n\n" +
-      "'I was muted/banned in jona''\n\n",
-    content,
-  );
+// export async function getQuickSupportResponse(content: string) {
+//   const res = await prompt(
+//     "# Role\n\n" +
+//       "You are a support agent for the 'nypsi' Discord bot. You are an assistance to the staff members of nypsi, helping save their time by instantly responding to a user's query with instructions on how to give the correct information.\n\n" +
+//       "## Your response\n\n" +
+//       "Your response should **ONLY** be one of the following:\n" +
+//       "- auto.scam\n" +
+//       "Should be used when the user is claiming that they have been scammed by another user.\n\n" +
+//       "- auto.transfer\n" +
+//       "Should be used when the user is asking for a profile transfer, where data from one account is being transferred to another.\n\n" +
+//       "- auto.buyunban\n" +
+//       "Should be used when the user is asking to be unbanned, or are inquiring on how to be unbanned.\n\n" +
+//       "- auto.wrongserver\n" +
+//       "Should be used when the user is complaining about being punished (banned/muted) in a server other than nypsi.\n\n" +
+//       "- no\n" +
+//       "Used when none of the other options apply, and you are unable to assist the user. Use this when you are unsure.\n\n" +
+//       "## Examples\n\n" +
+//       "### Unbanned\n\n" +
+//       "If the user is asking to be unbanned, or when they are unbanned, respond with 'auto.buyunban'\n\n" +
+//       "### Wrong Server\n\n" +
+//       "'I was muted/banned in jona''\n\n",
+//     content,
+//   );
 
-  if (quickResponses.has(res)) {
-    return quickResponses.get(res);
-  }
-}
+//   if (quickResponses.has(res)) {
+//     return quickResponses.get(res);
+//   }
+// }

@@ -36,7 +36,6 @@ import { isPremium } from "../utils/functions/premium/premium";
 import sleep from "../utils/functions/sleep";
 import {
   createSupportRequest,
-  getQuickSupportResponse,
   getSupportRequest,
   handleAttachments,
   isRequestSuitable,
@@ -226,8 +225,6 @@ export default async function messageCreate(message: Message) {
           });
         }
 
-        const quickResponse = await getQuickSupportResponse(helpMessage);
-
         const r = await createSupportRequest(
           message.author.id,
           message.client as NypsiClient,
@@ -261,26 +258,7 @@ export default async function messageCreate(message: Message) {
           ],
         });
 
-        if (quickResponse) {
-          const embed = new CustomEmbed()
-            .setHeader("nypsi", message.client.user.avatarURL())
-            .setColor(Constants.PURPLE)
-            .setDescription(quickResponse)
-            .setFooter({
-              text: "this is an automatic message. please tell us if this doesn't match your query",
-            });
-
-          sendToRequestChannel(
-            message.author.id,
-            embed,
-            message.author.id,
-            message.client as NypsiClient,
-          );
-          modalSubmit.followUp({
-            embeds: [embed],
-            content: "you have received a message from your support ticket",
-          });
-        } else if (aiResponse.answer) {
+        if (aiResponse.answer) {
           const embed = new CustomEmbed()
             .setHeader("nypsi", message.client.user.avatarURL())
             .setColor(Constants.PURPLE)
