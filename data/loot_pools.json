@@ -139,7 +139,8 @@
       "strawberry_seed": 50,
       "mango_seed": 25,
       "coconut_seed": 25,
-      "rain": 7
+      "rain": 7,
+      "pot_of_gold": 3
     }
   },
   "corner_shop_scratchie": {
@@ -342,7 +343,8 @@
       "stick": 20,
       "unbreaking": 10,
       "apple_seed": 30,
-      "rain": 5
+      "rain": 5,
+      "pot_of_gold": 0.1
     }
   },
   "legendary_scratch_card": {
@@ -386,7 +388,8 @@
       "veilside_rx7_skin": 5,
       "stick": 40,
       "rain": 10,
-      "apple_seed": 50
+      "apple_seed": 50,
+      "pot_of_gold": 1.5
     }
   },
   "random_drop": {
@@ -445,7 +448,17 @@
       "oye": 3,
       "ethel": 5,
       "rain": 0.75,
-      "charger_skin": 7
+      "charger_skin": 7,
+      "pot_of_gold": 1
+    }
+  },
+  "pot_of_gold": {
+    "money": {
+      "50000000": 100,
+      "100000000": 80,
+      "250000000": 50,
+      "500000000": 15,
+      "1000000000": 5
     }
   }
 }

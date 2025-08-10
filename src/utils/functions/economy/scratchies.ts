@@ -65,6 +65,44 @@ export default class ScratchCard {
 
     const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [];
 
+    const styleButton = (button: ButtonBuilder, result: LootPoolResult) => {
+      if (Object.hasOwn(result, "item")) {
+        button.setEmoji(items[result.item].emoji);
+      } else if (Object.hasOwn(result, "xp")) {
+        button.setEmoji("✨");
+      } else if (Object.hasOwn(result, "money")) {
+        if (this.item.id === "pot_of_gold") {
+          switch (result.money) {
+            case 50000000:
+              button.setEmoji("🪙");
+              break;
+            case 100000000:
+              button.setEmoji("💵");
+              break;
+            case 250000000:
+              button.setEmoji("💸");
+              break;
+            case 500000000:
+              button.setEmoji("💰");
+              break;
+            case 1000000000:
+              button.setEmoji("🤑");
+              break;
+            default:
+              button.setEmoji("💰");
+              break;
+          }
+        } else {
+          button.setEmoji("💰");
+        }
+      } else if (Object.hasOwn(result, "karma")) {
+        button.setEmoji("🔮");
+      } else {
+        button.setLabel("\u200B");
+        button.setStyle(ButtonStyle.Danger);
+      }
+    };
+
     const index = [0, 0];
     for (const row of this.area) {
       const buttonRow = new ActionRowBuilder<MessageActionRowComponentBuilder>();
@@ -74,6 +112,7 @@ export default class ScratchCard {
         if (col.clicks === 2) {
           button.setDisabled(true);
           button.setStyle(ButtonStyle.Success);
+          styleButton(button, col.result);
           if (Object.hasOwn(col.result, "item")) {
             button.setEmoji(items[col.result.item].emoji);
           } else if (Object.hasOwn(col.result, "xp")) {
@@ -89,35 +128,18 @@ export default class ScratchCard {
         } else if (col.clicks === 1) {
           button.setDisabled(true);
           button.setStyle(ButtonStyle.Secondary);
+
           if (end) button.setStyle(ButtonStyle.Danger);
-          if (Object.hasOwn(col.result, "item")) {
-            button.setEmoji(items[col.result.item].emoji);
-          } else if (Object.hasOwn(col.result, "xp")) {
-            button.setEmoji("✨");
-          } else if (Object.hasOwn(col.result, "money")) {
-            button.setEmoji("💰");
-          } else if (Object.hasOwn(col.result, "karma")) {
-            button.setEmoji("🔮");
-          } else {
-            button.setLabel("\u200B");
-            button.setStyle(ButtonStyle.Danger);
-          }
+
+          styleButton(button, col.result);
         } else if (end) {
           button.setStyle(ButtonStyle.Secondary);
           button.setDisabled(true);
+
           if (col.clicks === 2) button.setStyle(ButtonStyle.Success);
           if (col.clicks === 1) button.setStyle(ButtonStyle.Danger);
-          if (Object.hasOwn(col.result, "item")) {
-            button.setEmoji(items[col.result.item].emoji);
-          } else if (Object.hasOwn(col.result, "xp")) {
-            button.setEmoji("✨");
-          } else if (Object.hasOwn(col.result, "money")) {
-            button.setEmoji("💰");
-          } else if (Object.hasOwn(col.result, "karma")) {
-            button.setEmoji("🔮");
-          } else {
-            button.setLabel("\u200B");
-          }
+
+          styleButton(button, col.result);
         } else {
           button.setStyle(ButtonStyle.Secondary);
           button.setLabel("\u200B");

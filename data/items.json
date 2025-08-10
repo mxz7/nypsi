@@ -3475,5 +3475,22 @@
       "pandora_box": 1
     },
     "in_crates": true
+  },
+  "pot_of_gold": {
+    "id": "pot_of_gold",
+    "name": "pot of gold",
+    "plural": "pots of gold",
+    "article": "a",
+    "emoji": "<:pot_of_gold:1404088756415234048>",
+    "role": "scratch-card",
+    "longDesc": "match 3 in a row to win!",
+    "aliases": ["mpot"],
+    "rarity": 6,
+    "in_crates": false,
+    "sell": 1000000,
+    "clicks": 6,
+    "loot_pools": {
+      "pot_of_gold": 1
+    }
   }
 }
