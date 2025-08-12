@@ -3485,7 +3485,7 @@
     "role": "scratch-card",
     "longDesc": "match 3 in a row to win!",
     "aliases": ["mpot"],
-    "rarity": 6,
+    "rarity": 5,
     "in_crates": false,
     "sell": 1000000,
     "clicks": 6,

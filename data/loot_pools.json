@@ -140,7 +140,7 @@
       "mango_seed": 25,
       "coconut_seed": 25,
       "rain": 7,
-      "pot_of_gold": 3
+      "pot_of_gold": 15
     }
   },
   "corner_shop_scratchie": {
@@ -344,7 +344,7 @@
       "unbreaking": 10,
       "apple_seed": 30,
       "rain": 5,
-      "pot_of_gold": 0.1
+      "pot_of_gold": 2
     }
   },
   "legendary_scratch_card": {
@@ -389,7 +389,7 @@
       "stick": 40,
       "rain": 10,
       "apple_seed": 50,
-      "pot_of_gold": 1.5
+      "pot_of_gold": 2.5
     }
   },
   "random_drop": {
@@ -449,7 +449,7 @@
       "ethel": 5,
       "rain": 0.75,
       "charger_skin": 7,
-      "pot_of_gold": 1
+      "pot_of_gold": 1.5
     }
   },
   "pot_of_gold": {
