@@ -54,7 +54,7 @@ async function run(
     }
     const amount = parseInt(args[0]);
 
-    if ((amount > 1069 || amount < 2) && message.author.id != Constants.TEKOH_ID) {
+    if ((amount > 1069 || amount < 2) && message.author.id != Constants.OWNER_ID) {
       return send({
         embeds: [new ErrorEmbed("invalid range: must be between 2 and 1,069")],
       });

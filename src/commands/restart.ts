@@ -14,7 +14,7 @@ const cmd = new Command("restart", "restart", "none").setPermissions(["bot owner
 let confirm = false;
 
 async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) {
-  if (message.author.id != Constants.TEKOH_ID) return;
+  if (message.author.id != Constants.OWNER_ID) return;
 
   if (confirm == false) {
     confirm = true;

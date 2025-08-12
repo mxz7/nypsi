@@ -66,7 +66,7 @@ async function run(
   args: string[],
 ) {
   if (!(await userExists(message.member))) await createUser(message.member);
-  if (message.author.id == Constants.TEKOH_ID) {
+  if (message.author.id == Constants.OWNER_ID) {
     if (args[0] && args[0].toLowerCase() == "open") {
       return openKarmaShop(message.client as NypsiClient, true);
     } else if (args[0] && args[0].toLowerCase() == "close") {

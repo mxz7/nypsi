@@ -12,7 +12,7 @@ async function run(
   send: SendMessage,
   args: string[],
 ) {
-  if (args.length == 0 || message.author.id != Constants.TEKOH_ID) {
+  if (args.length == 0 || message.author.id != Constants.OWNER_ID) {
     const news = await getNews();
 
     if (news.text == "") {
@@ -25,7 +25,7 @@ async function run(
 
     return send({ embeds: [embed] });
   } else {
-    if (message.author.id != Constants.TEKOH_ID) return;
+    if (message.author.id != Constants.OWNER_ID) return;
     await setNews(args.join(" "));
 
     const news = await getNews();

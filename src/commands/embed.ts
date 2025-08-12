@@ -61,7 +61,7 @@ async function run(
 
   if (!(message instanceof Message)) return;
 
-  if (message.author.id != Constants.TEKOH_ID)
+  if (message.author.id != Constants.OWNER_ID)
     embed.setFooter({ text: `sent by: ${message.author.username}` });
 
   message.channel

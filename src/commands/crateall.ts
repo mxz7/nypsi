@@ -18,7 +18,7 @@ async function run(
   send: SendMessage,
   args: string[],
 ) {
-  if (message.author.id != Constants.TEKOH_ID) return;
+  if (message.author.id != Constants.OWNER_ID) return;
 
   if (args.length == 0) {
     return send({ embeds: [new ErrorEmbed("u know how this works")] });

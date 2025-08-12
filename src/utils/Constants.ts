@@ -208,7 +208,7 @@ export default {
       MENTION_QUEUE: "nypsi:mention:queue",
       MENTION_DELAY: "nypsi:mention:delay",
       MENTION_MAX: "nypsi:mention:max",
-      MENTION_DM_TEKOH_THRESHOLD: "nypsi:mention:warn",
+      MENTION_DM_OWNER_THRESHOLD: "nypsi:mention:warn",
       CAPTCHA_VERIFIED: "nypsi:captcha_verified",
       DM_QUEUE: "nypsi:dmqueue",
       INLINE_QUEUE: "nypsi:inlinequeue",
@@ -284,7 +284,7 @@ export default {
   SILVER_ROLE_ID: "819870727834566696",
   SUPPORT_CHANNEL_ID: "1015299117934723173",
   SUPPORT_ROLE_ID: "1091314758986256424",
-  TEKOH_ID: "672793821850894347",
+  OWNER_ID: "672793821850894347",
   PROGRESSION: {
     VOTE_CRATE: new Map([
       [1, 1],

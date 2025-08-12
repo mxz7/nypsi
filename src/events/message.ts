@@ -395,12 +395,12 @@ export default async function messageCreate(message: Message) {
 
     const lastContents = lastContent.get(message.author.id);
 
-    if (message.author.id === Constants.TEKOH_ID) redis.set("nypsi:tekoh:lastchat", Date.now());
+    if (message.author.id === Constants.OWNER_ID) redis.set("nypsi:owner:lastchat", Date.now());
 
     if (
       (message.channel as TextChannel).parentId === "1246516186171314337" &&
-      message.content.includes(`<@${Constants.TEKOH_ID}>`) &&
-      parseInt(await redis.get("nypsi:tekoh:lastchat")) < Date.now() - ms("15 minutes")
+      message.content.includes(`<@${Constants.OWNER_ID}>`) &&
+      parseInt(await redis.get("nypsi:owner:lastchat")) < Date.now() - ms("15 minutes")
     ) {
       message.reply({
         content: message.author.toString(),

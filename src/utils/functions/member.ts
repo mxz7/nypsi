@@ -79,8 +79,8 @@ export async function getMember(
   let target: GuildMember;
   const scores: { id: string; score: number }[] = [];
 
-  if (memberName === "max" && members.get(Constants.TEKOH_ID) && !debug)
-    return members.get(Constants.TEKOH_ID);
+  if (memberName === "max" && members.get(Constants.OWNER_ID) && !debug)
+    return members.get(Constants.OWNER_ID);
 
   if (members.size > 2000) {
     const id = await chooseMember(members, memberName);

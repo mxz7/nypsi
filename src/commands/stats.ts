@@ -822,7 +822,7 @@ async function run(
 
   if (args.length == 0) {
     return gambleStats();
-  } else if (args[0].toLowerCase() == "global" && message.author.id == Constants.TEKOH_ID) {
+  } else if (args[0].toLowerCase() == "global" && message.author.id == Constants.OWNER_ID) {
     const byTypeGamble = await prisma.game.groupBy({
       by: ["game"],
       _sum: {
@@ -886,7 +886,7 @@ async function run(
     return commandStats();
   } else if (args[0].toLowerCase().includes("bot") || args[0].toLowerCase().includes("nypsi")) {
     return botStats();
-  } else if (args[0].toLowerCase() == "db" && message.author.id == Constants.TEKOH_ID) {
+  } else if (args[0].toLowerCase() == "db" && message.author.id == Constants.OWNER_ID) {
     return dbStats();
   } else if (args[0].toLowerCase().includes("item")) {
     return itemStats();

@@ -313,7 +313,7 @@ async function run(
             `${Constants.redis.nypsi.RESTART}:${(message.client as NypsiClient).cluster.id}`,
           )) == "t"
         ) {
-          if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
+          if (message.author.id == Constants.OWNER_ID && message instanceof Message) {
             message.react("💀");
           } else {
             return msg.edit({

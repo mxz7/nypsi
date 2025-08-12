@@ -556,7 +556,7 @@ async function run(
   }
 
   if (args[0].toLowerCase() == "forcekick") {
-    if (message.author.id != Constants.TEKOH_ID) return;
+    if (message.author.id != Constants.OWNER_ID) return;
 
     if (args.length == 1) {
       return send({ embeds: [new ErrorEmbed(`${prefix}guild kick <tag>`)] });
@@ -566,7 +566,7 @@ async function run(
   }
 
   if (args[0].toLowerCase() == "setowner") {
-    if (message.author.id != Constants.TEKOH_ID) return;
+    if (message.author.id != Constants.OWNER_ID) return;
 
     if (args.length != 3) {
       return send({ embeds: [new ErrorEmbed(`${prefix}guild setowner <guild> <newid>`)] });
@@ -721,7 +721,7 @@ async function run(
   }
 
   if (args[0].toLowerCase() == "forcedelete") {
-    if (message.author.id != Constants.TEKOH_ID) return;
+    if (message.author.id != Constants.OWNER_ID) return;
 
     args.shift();
 
