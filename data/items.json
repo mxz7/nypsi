@@ -3484,7 +3484,7 @@
     "emoji": "<:pot_of_gold:1404088756415234048>",
     "role": "scratch-card",
     "longDesc": "match 3 in a row to win!",
-    "aliases": ["mpot"],
+    "aliases": ["mpot", "pog"],
     "rarity": 5,
     "in_crates": false,
     "sell": 1000000,
