@@ -65,7 +65,7 @@ export default class ScratchCard {
 
     const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [];
 
-    const labelButton = (button: ButtonBuilder, result: LootPoolResult) => {
+    const labelButton = (button: ButtonBuilder, result: LootPoolResult, end = false) => {
       if (Object.hasOwn(result, "item")) {
         button.setEmoji(items[result.item].emoji);
       } else if (Object.hasOwn(result, "xp")) {
@@ -99,6 +99,7 @@ export default class ScratchCard {
         button.setEmoji("🔮");
       } else {
         button.setLabel("\u200B");
+        if (!end) button.setStyle(ButtonStyle.Danger);
       }
     };
 
@@ -126,7 +127,7 @@ export default class ScratchCard {
           if (col.clicks === 2) button.setStyle(ButtonStyle.Success);
           if (col.clicks === 1) button.setStyle(ButtonStyle.Danger);
 
-          labelButton(button, col.result);
+          labelButton(button, col.result, true);
         } else {
           button.setStyle(ButtonStyle.Secondary);
           button.setLabel("\u200B");
