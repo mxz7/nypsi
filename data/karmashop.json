@@ -129,5 +129,16 @@
     "type": "item",
     "value": "rain",
     "limit": 1
+  },
+  "pot_of_gold": {
+    "name": "pot of gold",
+    "emoji": "<:pot_of_gold:1404088756415234048>",
+    "id": "pot_of_gold",
+    "cost": 1500,
+    "items_left": 1,
+    "type": "item",
+    "value": "pot_of_gold",
+    "aliases": ["mpot", "pog"],
+    "limit": 1
   }
 }
