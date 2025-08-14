@@ -19,7 +19,7 @@ importers:
         version: 2.5.1
       '@hono/node-server':
         specifier: ^1.18.2
-        version: 1.18.2(hono@4.8.10)
+        version: 1.18.2(hono@4.9.1)
       '@prisma/client':
         specifier: 6.13.0
         version: 6.13.0(prisma@6.13.0(typescript@5.8.3))(typescript@5.8.3)
@@ -63,8 +63,8 @@ importers:
         specifier: 3.4.1
         version: 3.4.1
       hono:
-        specifier: ^4.8.10
-        version: 4.8.10
+        specifier: ^4.9.1
+        version: 4.9.1
       ioredis:
         specifier: 5.7.0
         version: 5.7.0
@@ -2017,8 +2017,8 @@ packages:
     resolution: {integrity: sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==}
     engines: {node: '>=8'}
 
-  hono@4.8.10:
-    resolution: {integrity: sha512-DRMYbR3aFk6YET1FCSAFbgF2cWYTz5j0YAFYPECx9fmrbKBDAYnWU+YCgRTpOaatxMYN6e68U/2IG39zRP4W/A==}
+  hono@4.9.1:
+    resolution: {integrity: sha512-qfvdJ42t6CQE0N/iSCa8KsW8SQqYD67YB+TYbwPHlnALvX+s7ynh8otR1NEk5jXtUg73gpV/B82OSufDmwtX3w==}
     engines: {node: '>=16.9.0'}
 
   hosted-git-info@7.0.2:
@@ -3832,9 +3832,9 @@ snapshots:
 
   '@eslint/js@8.57.1': {}
 
-  '@hono/node-server@1.18.2(hono@4.8.10)':
+  '@hono/node-server@1.18.2(hono@4.9.1)':
     dependencies:
-      hono: 4.8.10
+      hono: 4.9.1
 
   '@humanwhocodes/config-array@0.13.0':
     dependencies:
@@ -5511,7 +5511,7 @@ snapshots:
 
   has-flag@4.0.0: {}
 
-  hono@4.8.10: {}
+  hono@4.9.1: {}
 
   hosted-git-info@7.0.2:
     dependencies:
