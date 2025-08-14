@@ -116,7 +116,7 @@ export default class ScratchCard {
           button.setDisabled(true);
           button.setStyle(ButtonStyle.Secondary);
 
-          if (end) button.setStyle(ButtonStyle.Danger);
+          if (end || !Object.keys(col.result).length) button.setStyle(ButtonStyle.Danger);
 
           labelButton(button, col.result);
         } else if (end) {
