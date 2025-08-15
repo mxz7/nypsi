@@ -1,6 +1,10 @@
 import { getInfo } from "discord-hybrid-sharding";
 import { ActivityType, GatewayIntentBits, Options, Partials } from "discord.js";
 import { NypsiClient } from "./models/Client";
+import ms = require("ms");
+
+// when first seen in cache
+const cacheTimestamp = new Map<string, number>();
 
 const client = new NypsiClient({
   allowedMentions: {
@@ -22,21 +26,43 @@ const client = new NypsiClient({
     guildMembers: {
       interval: 900,
       filter: () => (member) => {
+        if (!member || !member.user) return true;
+
+        const now = Date.now();
+
+        if (!cacheTimestamp.has(member.id)) {
+          cacheTimestamp.set(member.id, now);
+        }
+
+        if (now - cacheTimestamp.get(member.id) < ms("45 minutes")) return false;
+
         if (member.id === member.client.user.id) return false;
-        if (!member.user) return true;
         if (member.user.bot) return true;
 
         if (recentCommands.has(member.id)) return false;
+
+        return true;
       },
     },
     users: {
       interval: 900,
       filter: () => (user) => {
         if (!user) return true;
+
+        const now = Date.now();
+
+        if (!cacheTimestamp.has(user.id)) {
+          cacheTimestamp.set(user.id, now);
+        }
+
+        if (now - cacheTimestamp.get(user.id) < ms("45 minutes")) return false;
+
         if (user.id === user.client.user.id) return false;
         if (user.bot) return true;
 
         if (recentCommands.has(user.id)) return false;
+
+        return true;
       },
     },
   },
@@ -66,6 +92,8 @@ const client = new NypsiClient({
       keepOverLimit: (user) => {
         if (user.id === user.client.user.id) return true;
         if (user.bot) return false;
+        if (!cacheTimestamp.has(user.id)) return false;
+        if (cacheTimestamp.get(user.id) < ms("45 minutes")) return false;
 
         return recentCommands.has(user.id);
       },
