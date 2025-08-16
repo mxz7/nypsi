@@ -475,6 +475,10 @@ async function run(
 
     if (tax) embed.setFooter({ text: `${((await getTax()) * 100).toFixed(1)}% tax` });
 
+    if (msg) {
+      return msg.edit({ embeds: [embed], components: [] });
+    }
+
     return send({ embeds: [embed] });
   }
 }
