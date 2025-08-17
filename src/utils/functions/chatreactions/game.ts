@@ -1,10 +1,12 @@
 import { Guild, GuildMember, Message, TextChannel, User } from "discord.js";
 import { inPlaceSort } from "fast-sort";
+import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed, getColor } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { gamble } from "../../logger";
 import { addProgress } from "../economy/achievements";
 import { addBalance } from "../economy/balance";
+import { addEventProgress, EventData, getCurrentEvent, getEventProgress } from "../economy/events";
 import { createGame } from "../economy/stats";
 import { addTaskProgress } from "../economy/tasks";
 import { topChatReactionGlobal } from "../economy/top";
@@ -255,11 +257,23 @@ export async function startChatReactionDuel(
     let tax = 0;
     let editing = false;
 
+    const eventData: { event?: EventData; target: number } = { target: 0 };
+    let eventProgress: Awaited<ReturnType<typeof getEventProgress>>;
+
     const interval = setInterval(() => {
       if (editing) return;
       if (collector.ended) clearInterval(interval);
       if (winners.length === 0) return;
       else if (winners.length === 2) clearInterval(interval);
+
+      if (eventProgress) {
+        embed.setDescription(
+          `${wager > 0 ? ` **wager** $${wager.toLocaleString()}\n\n` : ""}type: \`${word.display}\`\n\n` +
+            (eventProgress
+              ? `\n\n🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`
+              : ""),
+        );
+      }
 
       embed.setFields({
         name: "winner",
@@ -325,6 +339,20 @@ export async function startChatReactionDuel(
           addProgress(message.author.id, "fast_typer", 1);
           addTaskProgress(message.author.id, "chat_reaction_daily");
           addTaskProgress(message.author.id, "chat_reaction_weekly");
+          eventProgress = await addEventProgress(
+            message.client as NypsiClient,
+            message.author,
+            "chatreaction",
+            1,
+          );
+
+          if (eventProgress) {
+            eventData.event = await getCurrentEvent();
+
+            if (eventData.event) {
+              eventData.target = Number(eventData.event.target);
+            }
+          }
 
           winnings = wager * 2;
           tax = 0;

@@ -203,6 +203,7 @@ export async function addEventProgress(
         "slots",
         "rps",
         "coinflip",
+        "chatreaction",
         "rob",
       ].includes(type)
     ) {
