@@ -30,7 +30,7 @@ async function run(
   const msg = send({ content: "searching..." });
 
   const success = await execCmd(
-    `grep -rh "${escapeForShellGrep(args.join(" "))}" out > ${path}`,
+    `grep -rh "${escapeForShellGrep(args.join(" "))}" /var/log/nypsi > ${path}`,
   ).catch((err) => {
     console.error(err);
     logger.error("failed to complete logsearch", { err });
