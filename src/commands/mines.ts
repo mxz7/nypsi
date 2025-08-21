@@ -491,14 +491,14 @@ async function playGame(
     if (!interaction || interaction.deferred || interaction.replied) res = await msg.edit(data);
     else res = await interaction.update(data).catch(() => msg.edit(data));
 
-    try {
-      const updatedMsg = await res.fetch();
-      logger.debug(`mines: ${message.member.id} message edited for ${reason}`, {
-        embed: updatedMsg.embeds[0],
-      });
-    } catch {
-      logger.error(`mines: ${message.author.id} failed to get response from edit`);
-    }
+    // try {
+    //   const updatedMsg = await res.fetch();
+    //   logger.debug(`mines: ${message.member.id} message edited for ${reason}`, {
+    //     embed: updatedMsg.embeds[0],
+    //   });
+    // } catch {
+    //   logger.error(`mines: ${message.author.id} failed to get response from edit`);
+    // }
 
     return res;
   };
@@ -624,7 +624,7 @@ async function playGame(
 
           return prepareGame(message, send, args, msg);
         } else {
-          logger.debug(`mines: ${message.author.id} rerendering end (replay) message`);
+          // logger.debug(`mines: ${message.author.id} rerendering end (replay) message`);
           return renderAndListen();
         }
       };
@@ -772,7 +772,7 @@ async function playGame(
 
   if (!response) return;
 
-  logger.debug(`mines: ${message.author.id} received interaction: ${response.customId}`);
+  // logger.debug(`mines: ${message.author.id} received interaction: ${response.customId}`);
 
   if (response.customId.length != 2 && response.customId != "finish") {
     logger.error(`mines: ${message.author.id} weird coordinate thing`, { response, game });
@@ -840,8 +840,6 @@ async function playGame(
 
   let followUp: InteractionReplyOptions;
 
-  logger.debug(`mines: ${message.author.id} at location: ${game.grid[location]}`);
-
   switch (game.grid[location]) {
     case "b":
       game.grid[location] = "x";
@@ -895,7 +893,6 @@ async function playGame(
 
       game.win += game.increment;
 
-      logger.debug(`mines: ${message.author.id} rendering`);
       const desc = await renderGambleScreen({
         state: "playing",
         bet: game.bet,
@@ -913,8 +910,6 @@ async function playGame(
       if (game.win < 1) {
         components[4].components[4].setDisabled(true);
       }
-
-      logger.debug(`mines: ${message.author.id} editing`);
 
       await edit({ embeds: [embed], components }, "rerendering game", response).then(() => {
         if (followUp) {
