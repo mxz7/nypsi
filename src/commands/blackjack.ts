@@ -296,16 +296,17 @@ async function prepareGame(
   );
 
   if (msg) {
-    const editedMsg = await msg.edit({ embeds: [embed], components: [row] });
+    // const editedMsg = await msg.edit({ embeds: [embed], components: [row] });
+    await msg.edit({ embeds: [embed], components: [row] });
 
-    try {
-      logger.debug(`blackjack: ${message.member.id} message edited for replay, `, {
-        id: editedMsg.id,
-        embeds: editedMsg.embeds,
-      });
-    } catch {
-      logger.error(`blackjack: ${message.author.id} failed to get response from edit`);
-    }
+    // try {
+    //   logger.debug(`blackjack: ${message.member.id} message edited for replay, `, {
+    //     id: editedMsg.id,
+    //     embeds: editedMsg.embeds,
+    //   });
+    // } catch {
+    //   logger.error(`blackjack: ${message.author.id} failed to get response from edit`);
+    // }
   } else {
     msg = await send({ embeds: [embed], components: [row] });
   }
@@ -398,13 +399,13 @@ async function playGame(
     if (!interaction || interaction.deferred || interaction.replied) res = await m.edit(data);
     else res = await interaction.update(data).catch(() => m.edit(data));
 
-    try {
-      logger.debug(`blackjack: ${message.member.id} message edited for ${reason}`, {
-        components: await res.fetch().then((m) => m.components),
-      });
-    } catch {
-      logger.error(`blackjack: ${message.author.id} failed to get response from edit`);
-    }
+    // try {
+    //   logger.debug(`blackjack: ${message.member.id} message edited for ${reason}`, {
+    //     components: await res.fetch().then((m) => m.components),
+    //   });
+    // } catch {
+    //   logger.error(`blackjack: ${message.author.id} failed to get response from edit`);
+    // }
 
     return res;
   };
@@ -458,9 +459,9 @@ async function playGame(
         return;
       });
 
-    logger.debug(
-      `blackjack: ${message.author.id} received replay response: ${res ? res.customId : null}`,
-    );
+    // logger.debug(
+    //   `blackjack: ${message.author.id} received replay response: ${res ? res.customId : null}`,
+    // );
 
     if (res && res.customId == "rp") {
       await res.deferUpdate().catch(() => {
