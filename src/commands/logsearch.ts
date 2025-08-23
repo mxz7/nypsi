@@ -44,7 +44,7 @@ async function run(
   const res = await fetch("https://nypsi-logprocess.fly.dev/process", {
     method: "POST",
     headers: { authorization: process.env.LOGSEARCH_TOKEN },
-    body: await readFile(path),
+    body: Buffer.from(await readFile(path)),
   });
 
   if (!res.ok) {
