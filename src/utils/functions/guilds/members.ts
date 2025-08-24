@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { Guild } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
@@ -5,23 +6,26 @@ import Constants from "../../Constants";
 import { Mutex } from "../mutex";
 import ms = require("ms");
 
-async function getDatabaseMembers(guildId: string) {
-  const cache = await redis.get(`${Constants.redis.cache.guild.MEMBERS}:${guildId}`);
+async function getDatabaseMembers(guildId: string, onlyWithProfile = false) {
+  const redisKey = onlyWithProfile
+    ? `${Constants.redis.cache.guild.MEMBERS_WITH_PROFILE}:${guildId}`
+    : `${Constants.redis.cache.guild.MEMBERS}:${guildId}`;
+
+  const cache = await redis.get(redisKey);
 
   if (cache) {
     return JSON.parse(cache) as string[];
   }
 
+  const where: Prisma.GuildMemberWhereInput = onlyWithProfile
+    ? ({ guildId, user: { NOT: null } } as const)
+    : ({ guildId } as const);
+
   const members = await prisma.guildMember
-    .findMany({ where: { guildId }, select: { userId: true } })
+    .findMany({ where, select: { userId: true } })
     .then((members) => members.map(({ userId }) => userId));
 
-  await redis.set(
-    `${Constants.redis.cache.guild.MEMBERS}:${guildId}`,
-    JSON.stringify(members),
-    "EX",
-    ms("30 minute") / 1000,
-  );
+  await redis.set(redisKey, JSON.stringify(members), "EX", ms("30 minute") / 1000);
 }
 
 async function checkMembers(guildId: string, discordMembers: string[]) {
@@ -37,12 +41,18 @@ async function checkMembers(guildId: string, discordMembers: string[]) {
     await prisma.guildMember.createMany({
       data: missing.map((userId) => ({ guildId, userId })),
     });
-    redis.del(`${Constants.redis.cache.guild.MEMBERS}:${guildId}`);
+    redis.del(
+      `${Constants.redis.cache.guild.MEMBERS}:${guildId}`,
+      `${Constants.redis.cache.guild.MEMBERS_WITH_PROFILE}:${guildId}`,
+    );
   }
 
   if (extra.length > 0) {
     await prisma.guildMember.deleteMany({ where: { guildId, userId: { in: extra } } });
-    redis.del(`${Constants.redis.cache.guild.MEMBERS}:${guildId}`);
+    redis.del(
+      `${Constants.redis.cache.guild.MEMBERS}:${guildId}`,
+      `${Constants.redis.cache.guild.MEMBERS_WITH_PROFILE}:${guildId}`,
+    );
   }
 }
 
