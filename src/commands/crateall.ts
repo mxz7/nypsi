@@ -4,7 +4,9 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
 import { getItems, userExists } from "../utils/functions/economy/utils";
+import { getAllMembers } from "../utils/functions/guilds/members";
 import { pluralize } from "../utils/functions/string";
+import { getLastKnownUsername } from "../utils/functions/users/tag";
 import { logger } from "../utils/logger";
 
 const cmd = new Command(
@@ -54,15 +56,12 @@ async function run(
     return send({ embeds: [new ErrorEmbed(`${selected.name} is not a crate`)] });
   }
 
-  let members;
+  let members: string[];
 
   if (message.guild.memberCount == message.guild.members.cache.size) {
-    members = message.guild.members.cache;
+    members = message.guild.members.cache.map((i) => i.id);
   } else {
-    members = await message.guild.members.fetch().catch((e) => {
-      logger.error("failed to fetch members for crateall", e);
-      return message.guild.members.cache;
-    });
+    members = await getAllMembers(message.guild);
   }
 
   let amount = 1;
@@ -74,18 +73,14 @@ async function run(
   let count = 0;
   const promises = [];
 
-  for (const m of members.keys()) {
+  for (const m of members) {
     promises.push(
       (async () => {
-        const member = members.get(m);
-
         if (!(await userExists(m))) return;
 
-        await addInventoryItem(member, selected.id, amount);
+        await addInventoryItem(m, selected.id, amount);
 
-        logger.info(
-          `${amount} ${selected.id} given to ${member.user.id} (${member.user.username})`,
-        );
+        logger.info(`${amount} ${selected.id} given to ${m} (${await getLastKnownUsername(m)})`);
         count += amount;
       })(),
     );
