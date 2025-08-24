@@ -852,12 +852,12 @@ model EconomyGuildMember {
   joinedAt  DateTime
   role      EconomyGuildRole @default(member)
 
-  contributedMoney          BigInt   @default(0)
-  contributedXp             Int      @default(0)
-  contributedMoneyThisLevel BigInt   @default(0)
-  contributedXpThisLevel    Int      @default(0)
-  contributedMoneyToday     BigInt   @default(0)
-  contributedXpToday        Int      @default(0)
+  contributedMoney          BigInt @default(0)
+  contributedXp             Int    @default(0)
+  contributedMoneyThisLevel BigInt @default(0)
+  contributedXpThisLevel    Int    @default(0)
+  contributedMoneyToday     BigInt @default(0)
+  contributedXpToday        Int    @default(0)
 
   economy Economy      @relation(fields: [userId], references: [userId], onDelete: Cascade)
   guild   EconomyGuild @relation(fields: [guildName], references: [guildName], onDelete: Cascade)
