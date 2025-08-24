@@ -26,6 +26,8 @@ async function getDatabaseMembers(guildId: string, onlyWithProfile = false) {
     .then((members) => members.map(({ userId }) => userId));
 
   await redis.set(redisKey, JSON.stringify(members), "EX", ms("30 minute") / 1000);
+
+  return members;
 }
 
 async function checkMembers(guildId: string, discordMembers: string[]) {
