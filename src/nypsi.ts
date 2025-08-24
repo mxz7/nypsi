@@ -27,42 +27,48 @@ const client = new NypsiClient({
       interval: 900,
       filter: () => (member) => {
         if (!member || !member.user) return true;
-
-        const now = Date.now();
+        if (member.user.id === member.client.user.id) return false;
 
         if (!cacheTimestamp.has(member.id)) {
-          cacheTimestamp.set(member.id, now);
+          cacheTimestamp.set(member.id, Date.now());
+          return false;
+        } else if (cacheTimestamp.get(member.id) < Date.now() - ms("45 minutes")) {
+          // if they've been in cache longer than 45 minutes
+          const inRecentCommands = recentCommands.has(member.id);
+
+          if (inRecentCommands) {
+            return true;
+          } else {
+            cacheTimestamp.delete(member.id);
+            return false;
+          }
         }
 
-        if (now - cacheTimestamp.get(member.id) < ms("45 minutes")) return false;
-
-        if (member.id === member.client.user.id) return false;
-        if (member.user.bot) return true;
-
-        if (recentCommands.has(member.id)) return false;
-
-        return true;
+        return false;
       },
     },
     users: {
       interval: 900,
       filter: () => (user) => {
         if (!user) return true;
-
-        const now = Date.now();
+        if (user.id === user.client.user.id) return false;
 
         if (!cacheTimestamp.has(user.id)) {
-          cacheTimestamp.set(user.id, now);
+          cacheTimestamp.set(user.id, Date.now());
+          return false;
+        } else if (cacheTimestamp.get(user.id) < Date.now() - ms("45 minutes")) {
+          // if they've been in cache longer than 45 minutes
+          const inRecentCommands = recentCommands.has(user.id);
+
+          if (inRecentCommands) {
+            return true;
+          } else {
+            cacheTimestamp.delete(user.id);
+            return false;
+          }
         }
 
-        if (now - cacheTimestamp.get(user.id) < ms("45 minutes")) return false;
-
-        if (user.id === user.client.user.id) return false;
-        if (user.bot) return true;
-
-        if (recentCommands.has(user.id)) return false;
-
-        return true;
+        return false;
       },
     },
   },
@@ -91,20 +97,46 @@ const client = new NypsiClient({
       maxSize: 2_500,
       keepOverLimit: (user) => {
         if (user.id === user.client.user.id) return true;
-        if (user.bot) return false;
-        if (!cacheTimestamp.has(user.id)) return false;
-        if (cacheTimestamp.get(user.id) < ms("45 minutes")) return false;
 
-        return recentCommands.has(user.id);
+        if (!cacheTimestamp.has(user.id)) {
+          cacheTimestamp.set(user.id, Date.now());
+          return true;
+        } else if (cacheTimestamp.get(user.id) < Date.now() - ms("45 minutes")) {
+          // if they've been in cache longer than 45 minutes
+          const inRecentCommands = recentCommands.has(user.id);
+
+          if (inRecentCommands) {
+            return true;
+          } else {
+            cacheTimestamp.delete(user.id);
+            return false;
+          }
+        }
+
+        return true;
       },
     },
     GuildMemberManager: {
       maxSize: 2_500,
       keepOverLimit: (user) => {
         if (user.id === user.client.user.id) return true;
-        if (user.user.bot) return false;
 
-        return recentCommands.has(user.id);
+        if (!cacheTimestamp.has(user.id)) {
+          cacheTimestamp.set(user.id, Date.now());
+          return true;
+        } else if (cacheTimestamp.get(user.id) < Date.now() - ms("45 minutes")) {
+          // if they've been in cache longer than 45 minutes
+          const inRecentCommands = recentCommands.has(user.id);
+
+          if (inRecentCommands) {
+            return true;
+          } else {
+            cacheTimestamp.delete(user.id);
+            return false;
+          }
+        }
+
+        return true;
       },
     },
   }),
