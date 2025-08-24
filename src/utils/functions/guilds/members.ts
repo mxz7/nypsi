@@ -18,7 +18,7 @@ async function getDatabaseMembers(guildId: string, onlyWithProfile = false) {
   }
 
   const where: Prisma.GuildMemberWhereInput = onlyWithProfile
-    ? ({ guildId, user: { NOT: null } } as const)
+    ? ({ guildId, user: { isNot: null } } as const)
     : ({ guildId } as const);
 
   const members = await prisma.guildMember
@@ -60,7 +60,7 @@ async function checkMembers(guildId: string, discordMembers: string[]) {
 
 const mutex = new Mutex();
 
-export async function getAllMembers(guild: Guild) {
+export async function getAllMembers(guild: Guild, onlyWithProfile = false) {
   await mutex.acquire(`member_fetch_${guild.id}`);
   try {
     const lastFetched = await redis
@@ -68,7 +68,7 @@ export async function getAllMembers(guild: Guild) {
       .then((v) => (v ? parseInt(v) : 0));
 
     if (lastFetched > Date.now() - ms("10 minute")) {
-      return getDatabaseMembers(guild.id);
+      return await getDatabaseMembers(guild.id, onlyWithProfile);
     }
 
     let discordMembers: string[];
@@ -87,6 +87,11 @@ export async function getAllMembers(guild: Guild) {
       "EX",
       ms("10 minute") / 1000,
     );
+
+    if (onlyWithProfile) {
+      await checkMembers(guild.id, discordMembers);
+      return await getDatabaseMembers(guild.id, true);
+    }
 
     checkMembers(guild.id, discordMembers);
 
