@@ -159,7 +159,6 @@ export default {
         AUTOMUTE_VL: "cache:guild:automute",
         CHATFILTER: "cache:guild:chatfilter",
         MEMBERS: "cache:guild:members",
-        MEMBERS_WITH_PROFILE: "cache:guild:members:with_profile",
         MEMBERS_LAST_FETCHED: "cache:guild:members:last_fetched",
       },
       chatReaction: {
