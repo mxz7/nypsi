@@ -50,6 +50,7 @@ model User {
   FlagGame                 FlagGame[]
   Event                    Event[]
   EventContribution        EventContribution[]
+  guilds                   GuildMember[]
 }
 
 model ProfileView {
@@ -614,6 +615,17 @@ model Guild {
   ModerationEvidence  ModerationEvidence[]
   GuildEvidenceCredit GuildEvidenceCredit[]
   ChatFilter          ChatFilter[]
+  members             GuildMember[]
+}
+
+model GuildMember {
+  guildId String
+  userId  String
+
+  user  User? @relation(fields: [userId], references: [id])
+  guild Guild @relation(fields: [guildId], references: [id])
+
+  @@id([guildId, userId])
 }
 
 model ChatFilter {
@@ -847,7 +859,7 @@ enum EconomyGuildRole {
 }
 
 model EconomyGuildMember {
-  userId    String   @unique
+  userId    String           @unique
   guildName String
   joinedAt  DateTime
   role      EconomyGuildRole @default(member)
