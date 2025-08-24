@@ -78,7 +78,7 @@ export async function getAllMembers(guild: Guild) {
       ms("10 minute") / 1000,
     );
 
-    checkMembers(guild.id, discordMembers);
+    await checkMembers(guild.id, discordMembers);
 
     return discordMembers;
   } finally {
