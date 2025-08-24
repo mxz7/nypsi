@@ -30,7 +30,11 @@ export async function addFailedHeartbeat(cluster: Cluster) {
     if (failedHeartbeats.get(cluster.id) >= 5) {
       logger.info(`respawning cluster ${cluster.id} due to missing heartbeats`);
       await dmQueueWorker.pause();
-      await cluster.respawn().then((c) => c.emit("ready"));
+      await cluster.respawn().then((c) => {
+        logger.debug(`${cluster.id} respawn promise resolved, sending ready event`);
+        c.emit("ready");
+        logger.debug(`${cluster.id} ready event sent`);
+      });
       dmQueueWorker.resume();
       failedHeartbeats.delete(cluster.id);
     } else {
