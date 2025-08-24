@@ -158,6 +158,8 @@ export default {
         EVIDENCE_MAX: "cache:guilds:evidence:max",
         AUTOMUTE_VL: "cache:guild:automute",
         CHATFILTER: "cache:guild:chatfilter",
+        MEMBERS: "cache:guild:members",
+        MEMBERS_LAST_FETCHED: "cache:guild:members:last_fetched",
       },
       chatReaction: {
         EXISTS: "cache:chatreaction:exists",
