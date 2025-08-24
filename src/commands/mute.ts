@@ -30,6 +30,9 @@ cmd.slashData
   .addUserOption((option) =>
     option.setName("user").setDescription("user to mute").setRequired(true),
   )
+  .addStringOption((option) =>
+    option.setName("duration").setDescription("duration of the mute, e.g: 3d, 3h, 3m"),
+  )
   .addStringOption((option) => option.setName("reason").setDescription("reason for the mute"));
 
 async function run(
