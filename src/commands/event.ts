@@ -12,7 +12,7 @@ import { getCurrentEvent, getEventProgress } from "../utils/functions/economy/ev
 import { createUser, getEventsData, userExists } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("event", "view event information", "money");
+const cmd = new Command("event", "view event information", "money").setAliases(["events"]);
 
 cmd.slashEnabled = true;
 
