@@ -22,6 +22,8 @@ async function getDatabaseMembers(guildId: string) {
     "EX",
     ms("30 minute") / 1000,
   );
+
+  return members;
 }
 
 async function checkMembers(guildId: string, discordMembers: string[]) {
