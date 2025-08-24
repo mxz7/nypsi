@@ -619,6 +619,8 @@ model Guild {
 }
 
 model GuildMember {
+  createdAt DateTime @default(now())
+
   guildId String
   userId  String
 
