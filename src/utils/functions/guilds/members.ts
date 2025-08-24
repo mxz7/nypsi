@@ -1,4 +1,4 @@
-import { Guild } from "discord.js";
+import { Collection, Guild, GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
@@ -50,26 +50,34 @@ async function checkMembers(guildId: string, discordMembers: string[]) {
 
 const mutex = new Mutex();
 
-export async function getAllMembers(guild: Guild) {
+export async function getAllMembers(
+  guild: Guild,
+  forceFetch: true,
+): Promise<Collection<string, GuildMember>>;
+export async function getAllMembers(guild: Guild, forceFetch?: false): Promise<string[]>;
+export async function getAllMembers(
+  guild: Guild,
+  forceFetch = false,
+): Promise<string[] | Collection<string, GuildMember>> {
   await mutex.acquire(`member_fetch_${guild.id}`);
   try {
     const lastFetched = await redis
       .get(`${Constants.redis.cache.guild.MEMBERS_LAST_FETCHED}:${guild.id}`)
       .then((v) => (v ? parseInt(v) : 0));
 
-    if (lastFetched > Date.now() - ms("10 minute")) {
+    if (lastFetched > Date.now() - ms("10 minute") && !forceFetch) {
       return getDatabaseMembers(guild.id);
     }
 
-    let discordMembers: string[];
+    let discordMembers: Collection<string, GuildMember>;
 
     if (guild.memberCount === guild.members.cache.size) {
-      discordMembers = guild.members.cache.map((member) => member.id);
+      discordMembers = guild.members.cache;
     } else {
-      discordMembers = await guild.members
-        .fetch()
-        .then((members) => members.map((member) => member.id));
+      discordMembers = await guild.members.fetch();
     }
+
+    const discordMemberIds = discordMembers.map((i) => i.id);
 
     await redis.set(
       `${Constants.redis.cache.guild.MEMBERS_LAST_FETCHED}:${guild.id}`,
@@ -78,9 +86,9 @@ export async function getAllMembers(guild: Guild) {
       ms("10 minute") / 1000,
     );
 
-    await checkMembers(guild.id, discordMembers);
+    await checkMembers(guild.id, discordMemberIds);
 
-    return discordMembers;
+    return forceFetch ? discordMembers : discordMemberIds;
   } finally {
     mutex.release(`member_fetch_${guild.id}`);
   }
