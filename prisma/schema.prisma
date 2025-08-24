@@ -50,7 +50,6 @@ model User {
   FlagGame                 FlagGame[]
   Event                    Event[]
   EventContribution        EventContribution[]
-  guilds                   GuildMember[]
 }
 
 model ProfileView {
@@ -624,7 +623,6 @@ model GuildMember {
   guildId String
   userId  String
 
-  user  User? @relation(fields: [userId], references: [id], onDelete: Cascade)
   guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
 
   @@id([guildId, userId])
