@@ -1,6 +1,11 @@
 import { getInfo } from "discord-hybrid-sharding";
 import { ActivityType, GatewayIntentBits, Options, Partials } from "discord.js";
 import { NypsiClient } from "./models/Client";
+import ms = require("ms");
+
+// when first seen in cache
+const cacheTimestamp = new Map<string, number>();
+const minTimeInCache = ms("2 minutes");
 
 const client = new NypsiClient({
   allowedMentions: {
@@ -22,11 +27,26 @@ const client = new NypsiClient({
     guildMembers: {
       interval: 900,
       filter: () => (member) => {
-        if (member.id === member.client.user.id) return false;
-        if (!member.user) return true;
-        if (member.user.bot) return true;
+        if (!member || !member.user) return true;
+        if (member.user.id === member.client.user.id) return false;
 
-        if (recentCommands.has(member.id)) return false;
+        const key = `${member.guild.id}-${member.id}`;
+
+        if (!cacheTimestamp.has(key)) {
+          cacheTimestamp.set(key, Date.now());
+          return false;
+        } else if (cacheTimestamp.get(key) < Date.now() - minTimeInCache) {
+          // if they've been in cache longer than min time
+          if (recentCommands.has(member.id)) {
+            return false;
+          } else {
+            cacheTimestamp.delete(key);
+            return true;
+          }
+        } else {
+          // been in cache less than min time
+          return false;
+        }
       },
     },
     users: {
@@ -34,9 +54,22 @@ const client = new NypsiClient({
       filter: () => (user) => {
         if (!user) return true;
         if (user.id === user.client.user.id) return false;
-        if (user.bot) return true;
 
-        if (recentCommands.has(user.id)) return false;
+        if (!cacheTimestamp.has(user.id)) {
+          cacheTimestamp.set(user.id, Date.now());
+          return false;
+        } else if (cacheTimestamp.get(user.id) < Date.now() - minTimeInCache) {
+          // if they've been in cache longer than min time
+          if (recentCommands.has(user.id)) {
+            return false;
+          } else {
+            cacheTimestamp.delete(user.id);
+            return true;
+          }
+        } else {
+          // been in cache less than min time
+          return false;
+        }
       },
     },
   },
@@ -65,18 +98,46 @@ const client = new NypsiClient({
       maxSize: 2_500,
       keepOverLimit: (user) => {
         if (user.id === user.client.user.id) return true;
-        if (user.bot) return false;
 
-        return recentCommands.has(user.id);
+        if (!cacheTimestamp.has(user.id)) {
+          cacheTimestamp.set(user.id, Date.now());
+          return true;
+        } else if (cacheTimestamp.get(user.id) < Date.now() - minTimeInCache) {
+          // if they've been in cache longer than min time
+          if (recentCommands.has(user.id)) {
+            return true;
+          } else {
+            cacheTimestamp.delete(user.id);
+            return false;
+          }
+        } else {
+          // been in cache less than min time
+          return false;
+        }
       },
     },
     GuildMemberManager: {
       maxSize: 2_500,
       keepOverLimit: (user) => {
         if (user.id === user.client.user.id) return true;
-        if (user.user.bot) return false;
 
-        return recentCommands.has(user.id);
+        const key = `${user.guild.id}-${user.id}`;
+
+        if (!cacheTimestamp.has(key)) {
+          cacheTimestamp.set(key, Date.now());
+          return true;
+        } else if (cacheTimestamp.get(key) < Date.now() - minTimeInCache) {
+          // if they've been in cache longer than min time
+          if (recentCommands.has(user.id)) {
+            return true;
+          } else {
+            cacheTimestamp.delete(key);
+            return false;
+          }
+        } else {
+          // been in cache less than min time
+          return false;
+        }
       },
     },
   }),
