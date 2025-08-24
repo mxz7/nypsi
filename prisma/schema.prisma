@@ -624,8 +624,8 @@ model GuildMember {
   guildId String
   userId  String
 
-  user  User? @relation(fields: [userId], references: [id])
-  guild Guild @relation(fields: [guildId], references: [id])
+  user  User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
 
   @@id([guildId, userId])
 }
