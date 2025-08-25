@@ -90,20 +90,23 @@ export async function updateUser(user: User, command: string) {
   );
 
   const [username, avatar] = await Promise.all([
-    getLastKnownUsername(user.id, false),
+    getLastKnownUsername(user.id, false, true),
     getLastKnownAvatar(user.id),
   ]);
 
   let updateUsername = false;
   let updateAvatar = false;
 
-  if (username !== user.username) {
+  if (
+    username.lastKnownUsername !== user.username ||
+    username.usernameUpdatedAt.getTime() < date.getTime() - ms("1 week")
+  ) {
     updateUsername = true;
-    if (await isTracking(user.id)) {
+    if ((await isTracking(user.id)) && username.lastKnownUsername !== user.username) {
       const history = await fetchUsernameHistory(user.id, 1);
 
-      if (history[0]?.value !== username) {
-        addNewUsername(user.id, username);
+      if (history[0]?.value !== username.lastKnownUsername) {
+        addNewUsername(user.id, username.lastKnownUsername);
       }
     }
   }
