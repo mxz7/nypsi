@@ -12,6 +12,7 @@ export async function updateLastKnownUsername(member: MemberResolvable, tag: str
     },
     data: {
       lastKnownUsername: tag,
+      usernameUpdatedAt: new Date(),
     },
   });
 

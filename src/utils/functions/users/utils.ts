@@ -62,6 +62,7 @@ export async function createProfile(member: MemberResolvable) {
       data: {
         id: userId,
         lastKnownUsername: username,
+        usernameUpdatedAt: new Date(),
         lastCommand: new Date(0),
       },
     })

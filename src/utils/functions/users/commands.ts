@@ -156,6 +156,7 @@ export async function updateUser(user: User, command: string) {
     data: {
       lastCommand: date,
       lastKnownUsername: updateUsername ? user.username : undefined,
+      usernameUpdatedAt: updateUsername ? date : undefined,
       avatar: updateAvatar ? newAvatar : undefined,
       CommandUse: {
         upsert: {
