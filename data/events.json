@@ -83,5 +83,10 @@
     "id": "grind",
     "name": "grind",
     "description": "get {target} items from fish/hunt/mine"
+  },
+  "chatreaction": {
+    "id": "chatreaction",
+    "name": "fast typers",
+    "description": "play {target} chat reaction games"
   }
 }
