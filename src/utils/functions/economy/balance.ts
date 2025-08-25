@@ -1,5 +1,5 @@
 import { ClusterManager } from "discord-hybrid-sharding";
-import { Collection, Guild, GuildMember } from "discord.js";
+import { Guild } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
@@ -7,6 +7,7 @@ import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
+import { getAllMembers } from "../guilds/members";
 import { getUserId, MemberResolvable } from "../member";
 import { isBooster } from "../premium/boosters";
 import { getTier } from "../premium/premium";
@@ -482,15 +483,7 @@ export async function getMaxBankBalance(member: MemberResolvable): Promise<numbe
 }
 
 export async function bottomAmount(guild: Guild, amount: number): Promise<string[]> {
-  let members: Collection<string, GuildMember>;
-
-  if (guild.memberCount == guild.members.cache.size) {
-    members = guild.members.cache;
-  } else {
-    members = await guild.members.fetch();
-  }
-
-  if (!members) members = guild.members.cache;
+  let members = await getAllMembers(guild, true);
 
   members = members.filter((m) => {
     return !m.user.bot;

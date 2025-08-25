@@ -1,39 +1,25 @@
 import dayjs = require("dayjs");
 import { Prisma } from "@prisma/client";
-import { Collection, Guild, GuildMember } from "discord.js";
-import { inPlaceSort } from "fast-sort";
+import { Guild } from "discord.js";
 import prisma from "../../../init/database";
-import { NypsiClient } from "../../../models/Client";
+import { getAllMembers } from "../guilds/members";
 import { getUserId, MemberResolvable } from "../member";
+import { Mutex } from "../mutex";
 import PageManager from "../page";
-import sleep from "../sleep";
 import { formatTime, pluralize } from "../string";
 import { getPreferences } from "../users/notifications";
 import { getLastKnownUsername } from "../users/tag";
 import { getActiveTag } from "../users/tags";
-import { calcNetWorth } from "./balance";
 import { checkLeaderboardPositions } from "./stats";
 import { getAchievements, getItems, getTagsData } from "./utils";
 import pAll = require("p-all");
 
 export async function topBalance(guild: Guild, member?: MemberResolvable) {
-  let members: Collection<string, GuildMember>;
-
-  if (guild.memberCount == guild.members.cache.size) {
-    members = guild.members.cache;
-  } else {
-    members = await guild.members.fetch();
-  }
-
-  if (!members) members = guild.members.cache;
+  const members = await getAllMembers(guild);
 
   const query = await prisma.economy.findMany({
     where: {
-      AND: [
-        { money: { gt: 0 } },
-        { userId: { in: Array.from(members.keys()) } },
-        { user: { blacklisted: false } },
-      ],
+      AND: [{ userId: { in: members } }, { money: { gt: 0 } }, { user: { blacklisted: false } }],
     },
     select: {
       userId: true,
@@ -41,42 +27,47 @@ export async function topBalance(guild: Guild, member?: MemberResolvable) {
       banned: true,
     },
     orderBy: [{ money: "desc" }, { user: { lastKnownUsername: "asc" } }],
-    take: 100,
   });
 
-  const out = [];
-
+  const out: string[] = [];
   let count = 0;
-
   const userIds = query.map((i) => i.userId);
+  const promises: (() => Promise<void>)[] = [];
+  const date = dayjs();
 
   for (const user of query) {
-    if (user.banned && dayjs().isBefore(user.banned)) {
+    if (user.banned && date.isBefore(user.banned)) {
       userIds.splice(userIds.indexOf(user.userId), 1);
       continue;
     }
-    if (Number(user.money) != 0) {
-      let pos = (count + 1).toString();
 
-      if (pos == "1") {
-        pos = "🥇";
-      } else if (pos == "2") {
-        pos = "🥈";
-      } else if (pos == "3") {
-        pos = "🥉";
-      } else {
-        pos += ".";
-      }
+    const currentCount = count;
+    let pos = (count + 1).toString();
 
-      out[count] = `${pos} ${await formatUsername(
+    if (pos == "1") {
+      pos = "🥇";
+    } else if (pos == "2") {
+      pos = "🥈";
+    } else if (pos == "3") {
+      pos = "🥉";
+    } else {
+      pos += ".";
+    }
+
+    count++;
+
+    promises.push(async () => {
+      const discordUser = await guild.client.users.fetch(user.userId);
+
+      out[currentCount] = `${pos} ${await formatUsername(
         user.userId,
-        members.get(user.userId).user.username,
+        discordUser.username,
         true,
       )} $${Number(user.money).toLocaleString()}`;
-
-      count++;
-    }
+    });
   }
+
+  await pAll(promises, { concurrency: 10 });
 
   const pages = PageManager.createPages(out);
 
@@ -212,60 +203,21 @@ export async function topNetWorthGlobal(member: MemberResolvable, amount = 100) 
   return { pages, pos };
 }
 
-const topNetLock = new Set<string>();
+const topNetMutex = new Mutex();
 
-export async function topNetWorth(guild: Guild, member?: MemberResolvable, repeatCount = 1) {
-  if (topNetLock.has(guild.id)) {
-    if (repeatCount > 50) topNetLock.delete(guild.id);
-    await sleep(100);
-    return topNetWorth(guild, member, repeatCount + 1);
-  }
-  topNetLock.add(guild.id);
+export async function topNetWorth(guild: Guild, member?: MemberResolvable) {
+  topNetMutex.acquire(guild.id);
 
-  let members: Collection<string, GuildMember>;
+  try {
+    const members = await getAllMembers(guild);
 
-  if (guild.memberCount == guild.members.cache.size) {
-    members = guild.members.cache;
-  } else {
-    members = await guild.members.fetch();
-  }
-
-  if (!members) members = guild.members.cache;
-
-  const users: { userId: string; netWorth: number | bigint }[] = [];
-
-  if (members.size < 1000) {
     const query = await prisma.economy.findMany({
       where: {
-        AND: [{ userId: { in: Array.from(members.keys()) } }, { user: { blacklisted: false } }],
-      },
-      select: {
-        userId: true,
-        banned: true,
-      },
-    });
-
-    const promises = [];
-
-    for (const user of query) {
-      if (user.banned && dayjs().isBefore(user.banned)) {
-        continue;
-      }
-
-      promises.push(async () => {
-        const net = await calcNetWorth("leaderboard", user.userId, guild.client as NypsiClient);
-
-        users.push({ userId: user.userId, netWorth: net.amount });
-      });
-    }
-
-    await pAll(promises, { concurrency: 25 });
-
-    inPlaceSort(users).desc((i) => i.netWorth);
-  } else {
-    const query = await prisma.economy.findMany({
-      where: {
-        AND: [{ userId: { in: Array.from(members.keys()) } }, { user: { blacklisted: false } }],
+        AND: [
+          { userId: { in: members } },
+          { user: { blacklisted: false } },
+          { netWorth: { gt: 0 } },
+        ],
       },
       select: {
         userId: true,
@@ -275,23 +227,19 @@ export async function topNetWorth(guild: Guild, member?: MemberResolvable, repea
       orderBy: [{ netWorth: "desc" }, { user: { lastKnownUsername: "asc" } }],
     });
 
+    const out: string[] = [];
+    let count = 0;
+    const userIds = query.map((i) => i.userId);
+    const promises: (() => Promise<void>)[] = [];
+    const date = dayjs();
+
     for (const user of query) {
-      if (user.banned && dayjs().isBefore(user.banned)) {
+      if (user.banned && date.isBefore(user.banned)) {
+        userIds.splice(userIds.indexOf(user.userId), 1);
         continue;
       }
 
-      users.push({ userId: user.userId, netWorth: user.netWorth });
-    }
-  }
-
-  const out = [];
-
-  let count = 0;
-
-  for (const user of users) {
-    if (out.length >= 100) break;
-
-    if (user.netWorth > 0) {
+      const currentCount = count;
       let pos = (count + 1).toString();
 
       if (pos == "1") {
@@ -304,45 +252,43 @@ export async function topNetWorth(guild: Guild, member?: MemberResolvable, repea
         pos += ".";
       }
 
-      out[count] = `${pos} ${await formatUsername(
-        user.userId,
-        members.get(user.userId).user.username,
-        true,
-      )} $${Number(user.netWorth).toLocaleString()}`;
-
       count++;
+
+      promises.push(async () => {
+        const discordUser = await guild.client.users.fetch(user.userId);
+
+        out[currentCount] = `${pos} ${await formatUsername(
+          user.userId,
+          discordUser.username,
+          true,
+        )} $${Number(user.netWorth).toLocaleString()}`;
+      });
     }
+
+    await pAll(promises, { concurrency: 10 });
+
+    const pages = PageManager.createPages(out);
+
+    let pos = 0;
+
+    if (member) {
+      pos = userIds.indexOf(getUserId(member)) + 1;
+    }
+
+    return { pages, pos };
+  } finally {
+    topNetMutex.release(guild.id);
   }
-
-  const pages = PageManager.createPages(out);
-
-  let pos = 0;
-
-  if (member) {
-    pos = users.findIndex((i) => i.userId === getUserId(member)) + 1;
-  }
-
-  topNetLock.delete(guild.id);
-
-  return { pages, pos };
 }
 
 export async function topPrestige(guild: Guild, member?: MemberResolvable) {
-  let members: Collection<string, GuildMember>;
-
-  if (guild.memberCount == guild.members.cache.size) {
-    members = guild.members.cache;
-  } else {
-    members = await guild.members.fetch();
-  }
-
-  if (!members) members = guild.members.cache;
+  const members = await getAllMembers(guild);
 
   const query = await prisma.economy.findMany({
     where: {
       AND: [
+        { userId: { in: members } },
         { OR: [{ prestige: { gt: 0 } }, { level: { gt: 0 } }] },
-        { userId: { in: Array.from(members.keys()) } },
         { user: { blacklisted: false } },
       ],
     },
@@ -353,21 +299,21 @@ export async function topPrestige(guild: Guild, member?: MemberResolvable) {
       banned: true,
     },
     orderBy: [{ prestige: "desc" }, { level: "desc" }, { user: { lastKnownUsername: "asc" } }],
-    take: 100,
   });
 
-  const out = [];
-
+  const out: string[] = [];
   let count = 0;
-
   const userIds = query.map((i) => i.userId);
+  const promises: (() => Promise<void>)[] = [];
+  const date = dayjs();
 
   for (const user of query) {
-    if (user.banned && dayjs().isBefore(user.banned)) {
+    if (user.banned && date.isBefore(user.banned)) {
       userIds.splice(userIds.indexOf(user.userId), 1);
       continue;
     }
 
+    const currentCount = count;
     let pos = (count + 1).toString();
 
     if (pos == "1") {
@@ -380,14 +326,20 @@ export async function topPrestige(guild: Guild, member?: MemberResolvable) {
       pos += ".";
     }
 
-    out[count] = `${pos} ${await formatUsername(
-      user.userId,
-      members.get(user.userId).user.username,
-      true,
-    )} P${user.prestige} | L${user.level}`;
-
     count++;
+
+    promises.push(async () => {
+      const discordUser = await guild.client.users.fetch(user.userId);
+
+      out[currentCount] = `${pos} ${await formatUsername(
+        user.userId,
+        discordUser.username,
+        true,
+      )} P${user.prestige} | L${user.level}`;
+    });
   }
+
+  await pAll(promises, { concurrency: 10 });
 
   const pages = PageManager.createPages(out);
 
@@ -470,20 +422,12 @@ export async function topPrestigeGlobal(member: MemberResolvable, amount = 100) 
 }
 
 export async function topItem(guild: Guild, item: string, member: MemberResolvable) {
-  let members: Collection<string, GuildMember>;
-
-  if (guild.memberCount == guild.members.cache.size) {
-    members = guild.members.cache;
-  } else {
-    members = await guild.members.fetch();
-  }
-
-  if (!members) members = guild.members.cache;
+  const members = await getAllMembers(guild);
 
   const query = await prisma.inventory.findMany({
     where: {
       AND: [
-        { userId: { in: Array.from(members.keys()) } },
+        { userId: { in: members } },
         { item: item },
         { economy: { user: { blacklisted: false } } },
       ],
@@ -498,21 +442,21 @@ export async function topItem(guild: Guild, item: string, member: MemberResolvab
       },
     },
     orderBy: [{ amount: "desc" }, { economy: { user: { lastKnownUsername: "asc" } } }],
-    take: 100,
   });
 
-  const out = [];
-
+  const out: string[] = [];
   let count = 0;
-
   const userIds = query.map((i) => i.userId);
+  const promises: (() => Promise<void>)[] = [];
+  const date = dayjs();
 
   for (const user of query) {
-    if (user.economy.banned && dayjs().isBefore(user.economy.banned)) {
+    if (user.economy.banned && date.isBefore(user.economy.banned)) {
       userIds.splice(userIds.indexOf(user.userId), 1);
       continue;
     }
 
+    const currentCount = count;
     let pos = (count + 1).toString();
 
     if (pos == "1") {
@@ -525,14 +469,20 @@ export async function topItem(guild: Guild, item: string, member: MemberResolvab
       pos += ".";
     }
 
-    out[count] = `${pos} ${await formatUsername(
-      user.userId,
-      members.get(user.userId).user.username,
-      true,
-    )} ${user.amount.toLocaleString()} ${pluralize(getItems()[item], user.amount)}`;
-
     count++;
+
+    promises.push(async () => {
+      const discordUser = await guild.client.users.fetch(user.userId);
+
+      out[currentCount] = `${pos} ${await formatUsername(
+        user.userId,
+        discordUser.username,
+        true,
+      )} ${user.amount.toLocaleString()} ${pluralize(getItems()[item], user.amount)}`;
+    });
   }
+
+  await pAll(promises, { concurrency: 10 });
 
   const pages = PageManager.createPages(out);
 
@@ -615,25 +565,11 @@ export async function topItemGlobal(item: string, member?: MemberResolvable, amo
 }
 
 export async function topCompletion(guild: Guild, member: MemberResolvable) {
-  let members: Collection<string, GuildMember>;
-
-  if (guild.memberCount == guild.members.cache.size) {
-    members = guild.members.cache;
-  } else {
-    members = await guild.members.fetch();
-  }
-
-  if (!members) members = guild.members.cache;
-
-  const users: { id: string; completion: number }[] = [];
+  const members = await getAllMembers(guild);
 
   const query = await prisma.achievements.groupBy({
     where: {
-      AND: [
-        { completed: true },
-        { userId: { in: Array.from(members.keys()) } },
-        { user: { blacklisted: false } },
-      ],
+      AND: [{ userId: { in: members } }, { completed: true }, { user: { blacklisted: false } }],
     },
     by: ["userId"],
     _count: {
@@ -652,47 +588,47 @@ export async function topCompletion(guild: Guild, member: MemberResolvable) {
 
   const allAchievements = Object.keys(getAchievements()).length;
 
+  const out: string[] = [];
+  let count = 0;
+  const userIds = query.map((i) => i.userId);
+  const promises: (() => Promise<void>)[] = [];
+
   for (const user of query) {
-    users.push({
-      id: user.userId,
-      completion: (user._count.completed / allAchievements) * 100,
+    const currentCount = count;
+    const completion = (user._count.completed / allAchievements) * 100;
+    let pos = (count + 1).toString();
+
+    if (pos == "1") {
+      pos = "🥇";
+    } else if (pos == "2") {
+      pos = "🥈";
+    } else if (pos == "3") {
+      pos = "🥉";
+    } else {
+      pos += ".";
+    }
+
+    count++;
+
+    promises.push(async () => {
+      const discordUser = await guild.client.users.fetch(user.userId);
+
+      out[currentCount] = `${pos} ${await formatUsername(
+        user.userId,
+        discordUser.username,
+        true,
+      )} ${completion.toFixed(1)}%`;
     });
   }
 
-  const out = [];
-
-  let count = 0;
-
-  for (const user of users) {
-    if (user.completion !== 0) {
-      let pos = (count + 1).toString();
-
-      if (pos == "1") {
-        pos = "🥇";
-      } else if (pos == "2") {
-        pos = "🥈";
-      } else if (pos == "3") {
-        pos = "🥉";
-      } else {
-        pos += ".";
-      }
-
-      out[count] = `${pos} ${await formatUsername(
-        user.id,
-        members.get(user.id).user.username,
-        true,
-      )} ${user.completion.toFixed(1)}%`;
-
-      count++;
-    }
-  }
+  await pAll(promises, { concurrency: 10 });
 
   const pages = PageManager.createPages(out);
 
   let pos = 0;
 
   if (member) {
-    pos = users.findIndex((i) => i.id === getUserId(member)) + 1;
+    pos = userIds.indexOf(getUserId(member)) + 1;
   }
 
   return { pages, pos };
@@ -737,19 +673,11 @@ export async function topGuilds(guildName?: string) {
 }
 
 export async function topDailyStreak(guild: Guild, member?: MemberResolvable) {
-  let members: Collection<string, GuildMember>;
-
-  if (guild.memberCount == guild.members.cache.size) {
-    members = guild.members.cache;
-  } else {
-    members = await guild.members.fetch();
-  }
-
-  if (!members) members = guild.members.cache;
+  const members = await getAllMembers(guild);
 
   const query = await prisma.economy.findMany({
     where: {
-      AND: [{ dailyStreak: { gt: 0 } }, { userId: { in: Array.from(members.keys()) } }],
+      AND: [{ dailyStreak: { gt: 0 } }, { userId: { in: members } }],
     },
     select: {
       userId: true,
@@ -757,21 +685,21 @@ export async function topDailyStreak(guild: Guild, member?: MemberResolvable) {
       banned: true,
     },
     orderBy: [{ dailyStreak: "desc" }, { user: { lastKnownUsername: "asc" } }],
-    take: 100,
   });
 
-  const out = [];
-
+  const out: string[] = [];
   let count = 0;
-
   const userIds = query.map((i) => i.userId);
+  const promises: (() => Promise<void>)[] = [];
+  const date = dayjs();
 
   for (const user of query) {
-    if (user.banned && dayjs().isBefore(user.banned)) {
+    if (user.banned && date.isBefore(user.banned)) {
       userIds.splice(userIds.indexOf(user.userId), 1);
       continue;
     }
 
+    const currentCount = count;
     let pos = (count + 1).toString();
 
     if (pos == "1") {
@@ -784,21 +712,27 @@ export async function topDailyStreak(guild: Guild, member?: MemberResolvable) {
       pos += ".";
     }
 
-    out[count] = `${pos} ${await formatUsername(
-      user.userId,
-      members.get(user.userId).user.username,
-      true,
-    )} ${user.dailyStreak.toLocaleString()}`;
-
     count++;
+
+    promises.push(async () => {
+      const discordUser = await guild.client.users.fetch(user.userId);
+
+      out[currentCount] = `${pos} ${await formatUsername(
+        user.userId,
+        discordUser.username,
+        true,
+      )} ${user.dailyStreak.toLocaleString()}`;
+    });
   }
+
+  await pAll(promises, { concurrency: 10 });
 
   const pages = PageManager.createPages(out);
 
   let pos = 0;
 
   if (member) {
-    pos = userIds.indexOf(getUserId(getUserId(member))) + 1;
+    pos = userIds.indexOf(getUserId(member)) + 1;
   }
 
   return { pages, pos };
@@ -870,15 +804,7 @@ export async function topDailyStreakGlobal(member: MemberResolvable, amount = 10
 }
 
 export async function topLottoWins(guild: Guild, member?: MemberResolvable) {
-  let members: Collection<string, GuildMember>;
-
-  if (guild.memberCount == guild.members.cache.size) {
-    members = guild.members.cache;
-  } else {
-    members = await guild.members.fetch();
-  }
-
-  if (!members) members = guild.members.cache;
+  const members = await getAllMembers(guild);
 
   const query = await prisma.achievements.findMany({
     where: {
@@ -889,7 +815,7 @@ export async function topLottoWins(guild: Guild, member?: MemberResolvable) {
             { AND: [{ completed: true }, { achievementId: { equals: "lucky_v" } }] },
           ],
         },
-        { userId: { in: Array.from(members.keys()) } },
+        { userId: { in: members } },
       ],
     },
     select: {
@@ -899,16 +825,15 @@ export async function topLottoWins(guild: Guild, member?: MemberResolvable) {
     orderBy: {
       progress: "desc",
     },
-    take: 100,
   });
 
-  const out = [];
-
+  const out: string[] = [];
   let count = 0;
-
   const userIds = query.map((i) => i.userId);
+  const promises: (() => Promise<void>)[] = [];
 
   for (const user of query) {
+    const currentCount = count;
     let pos = (count + 1).toString();
 
     if (pos == "1") {
@@ -921,14 +846,20 @@ export async function topLottoWins(guild: Guild, member?: MemberResolvable) {
       pos += ".";
     }
 
-    out[count] = `${pos} ${await formatUsername(
-      user.userId,
-      members.get(user.userId).user.username,
-      true,
-    )} ${user.progress}`;
-
     count++;
+
+    promises.push(async () => {
+      const discordUser = await guild.client.users.fetch(user.userId);
+
+      out[currentCount] = `${pos} ${await formatUsername(
+        user.userId,
+        discordUser.username,
+        true,
+      )} ${user.progress}`;
+    });
   }
+
+  await pAll(promises, { concurrency: 10 });
 
   const pages = PageManager.createPages(out);
 
@@ -1005,15 +936,7 @@ export async function topLottoWinsGlobal(member?: MemberResolvable) {
 }
 
 export async function topWordle(guild: Guild, member: MemberResolvable) {
-  let members: Collection<string, GuildMember>;
-
-  if (guild.memberCount == guild.members.cache.size) {
-    members = guild.members.cache;
-  } else {
-    members = await guild.members.fetch();
-  }
-
-  if (!members) members = guild.members.cache;
+  const members = await getAllMembers(guild);
 
   const query = await prisma.wordleGame.groupBy({
     by: ["userId"],
@@ -1025,20 +948,19 @@ export async function topWordle(guild: Guild, member: MemberResolvable) {
         userId: "desc",
       },
     },
-    take: 100,
     where: {
-      AND: [
-        { userId: { in: Array.from(members.keys()) } },
-        { won: true },
-        { user: { blacklisted: false } },
-      ],
+      AND: [{ userId: { in: members } }, { won: true }, { user: { blacklisted: false } }],
     },
   });
 
   const out: string[] = [];
+  let count = 0;
+  const userIds = query.map((i) => i.userId);
+  const promises: (() => Promise<void>)[] = [];
 
   for (const user of query) {
-    let pos = (out.length + 1).toString();
+    const currentCount = count;
+    let pos = (count + 1).toString();
 
     if (pos == "1") {
       pos = "🥇";
@@ -1050,21 +972,27 @@ export async function topWordle(guild: Guild, member: MemberResolvable) {
       pos += ".";
     }
 
-    out.push(
-      `${pos} ${await formatUsername(
+    count++;
+
+    promises.push(async () => {
+      const discordUser = await guild.client.users.fetch(user.userId);
+
+      out[currentCount] = `${pos} ${await formatUsername(
         user.userId,
-        await getLastKnownUsername(user.userId, false),
+        discordUser.username,
         true,
-      )} ${user._count.userId.toLocaleString()} ${pluralize("win", user._count.userId)}`,
-    );
+      )} ${user._count.userId.toLocaleString()} ${pluralize("win", user._count.userId)}`;
+    });
   }
+
+  await pAll(promises, { concurrency: 10 });
 
   const pages = PageManager.createPages(out);
 
   let pos = 0;
 
   if (member) {
-    pos = query.findIndex((i) => i.userId === getUserId(member)) + 1;
+    pos = userIds.indexOf(getUserId(member)) + 1;
   }
 
   return { pages, pos };
@@ -1128,17 +1056,7 @@ export async function topWordleGlobal(member: MemberResolvable) {
 }
 
 export async function topWordleTime(guild: Guild, member: MemberResolvable) {
-  let members: Collection<string, GuildMember>;
-
-  if (guild.memberCount == guild.members.cache.size) {
-    members = guild.members.cache;
-  } else {
-    members = await guild.members.fetch();
-  }
-
-  if (!members) members = guild.members.cache;
-
-  const userIds = Array.from(members.keys());
+  const members = await getAllMembers(guild);
 
   const query: { userId: string; time: number; gameId: number }[] =
     await prisma.$queryRaw`WITH ranked_results AS (
@@ -1148,17 +1066,21 @@ export async function topWordleTime(guild: Guild, member: MemberResolvable) {
           "WordleGame"."id" as "gameId", 
           ROW_NUMBER() OVER (PARTITION BY "userId" ORDER BY time ASC) AS rank
       FROM "WordleGame"
-      where won = true and "userId" IN (${Prisma.join(userIds)}) and time > 0
+      where won = true and "userId" IN (${Prisma.join(members)}) and time > 0
   )
   SELECT "userId", time, "gameId"
   FROM ranked_results
   WHERE rank = 1
-  ORDER BY time ASC limit 100`;
+  ORDER BY time ASC limit 1000`;
 
   const out: string[] = [];
+  let count = 0;
+  const userIds = query.map((i) => i.userId);
+  const promises: (() => Promise<void>)[] = [];
 
   for (const user of query) {
-    let pos = (out.length + 1).toString();
+    const currentCount = count;
+    let pos = (count + 1).toString();
 
     if (pos == "1") {
       pos = "🥇";
@@ -1170,21 +1092,27 @@ export async function topWordleTime(guild: Guild, member: MemberResolvable) {
       pos += ".";
     }
 
-    out.push(
-      `${pos} ${await formatUsername(
+    count++;
+
+    promises.push(async () => {
+      const discordUser = await guild.client.users.fetch(user.userId);
+
+      out[currentCount] = `${pos} ${await formatUsername(
         user.userId,
-        await getLastKnownUsername(user.userId, false),
+        discordUser.username,
         true,
-      )} [\`${formatTime(user.time)}\`](https://nypsi.xyz/wordles/${user.gameId?.toString(36)}?ref=bot-lb)`,
-    );
+      )} [\`${formatTime(user.time)}\`](https://nypsi.xyz/wordles/${user.gameId?.toString(36)}?ref=bot-lb)`;
+    });
   }
+
+  await pAll(promises, { concurrency: 10 });
 
   const pages = PageManager.createPages(out);
 
   let pos = 0;
 
   if (member) {
-    pos = query.findIndex((i) => i.userId === getUserId(member)) + 1;
+    pos = userIds.indexOf(getUserId(member)) + 1;
   }
 
   return { pages, pos };
@@ -1247,23 +1175,11 @@ ORDER BY time ASC limit 100`;
 }
 
 export async function topCommand(guild: Guild, command: string, member: MemberResolvable) {
-  let members: Collection<string, GuildMember>;
-
-  if (guild.memberCount == guild.members.cache.size) {
-    members = guild.members.cache;
-  } else {
-    members = await guild.members.fetch();
-  }
-
-  if (!members) members = guild.members.cache;
+  const members = await getAllMembers(guild);
 
   const query = await prisma.commandUse.findMany({
     where: {
-      AND: [
-        { userId: { in: Array.from(members.keys()) } },
-        { command: command },
-        { user: { blacklisted: false } },
-      ],
+      AND: [{ userId: { in: members } }, { command: command }, { user: { blacklisted: false } }],
     },
     select: {
       userId: true,
@@ -1273,13 +1189,13 @@ export async function topCommand(guild: Guild, command: string, member: MemberRe
     take: 100,
   });
 
-  const out = [];
-
+  const out: string[] = [];
   let count = 0;
-
   const userIds = query.map((i) => i.userId);
+  const promises: (() => Promise<void>)[] = [];
 
   for (const user of query) {
+    const currentCount = count;
     let pos = (count + 1).toString();
 
     if (pos == "1") {
@@ -1292,14 +1208,20 @@ export async function topCommand(guild: Guild, command: string, member: MemberRe
       pos += ".";
     }
 
-    out[count] = `${pos} ${await formatUsername(
-      user.userId,
-      members.get(user.userId).user.username,
-      true,
-    )} ${user.uses.toLocaleString()} ${pluralize("use", user.uses)}`;
-
     count++;
+
+    promises.push(async () => {
+      const discordUser = await guild.client.users.fetch(user.userId);
+
+      out[currentCount] = `${pos} ${await formatUsername(
+        user.userId,
+        discordUser.username,
+        true,
+      )} ${user.uses.toLocaleString()} ${pluralize("use", user.uses)}`;
+    });
   }
+
+  await pAll(promises, { concurrency: 10 });
 
   const pages = PageManager.createPages(out);
 
@@ -1372,19 +1294,11 @@ export async function topCommandGlobal(command: string, member: MemberResolvable
 }
 
 export async function topCommandUses(guild: Guild, member: MemberResolvable) {
-  let members: Collection<string, GuildMember>;
-
-  if (guild.memberCount == guild.members.cache.size) {
-    members = guild.members.cache;
-  } else {
-    members = await guild.members.fetch();
-  }
-
-  if (!members) members = guild.members.cache;
+  const members = await getAllMembers(guild);
 
   const query = await prisma.commandUse.groupBy({
     where: {
-      AND: [{ userId: { in: Array.from(members.keys()) } }, { user: { blacklisted: false } }],
+      AND: [{ userId: { in: members } }, { user: { blacklisted: false } }],
     },
     by: ["userId"],
     _sum: {
@@ -1395,16 +1309,15 @@ export async function topCommandUses(guild: Guild, member: MemberResolvable) {
         uses: "desc",
       },
     },
-    take: 100,
   });
 
-  const out = [];
-
+  const out: string[] = [];
   let count = 0;
-
   const userIds = query.map((i) => i.userId);
+  const promises: (() => Promise<void>)[] = [];
 
   for (const user of query) {
+    const currentCount = count;
     let pos = (count + 1).toString();
 
     if (pos == "1") {
@@ -1417,14 +1330,20 @@ export async function topCommandUses(guild: Guild, member: MemberResolvable) {
       pos += ".";
     }
 
-    out[count] = `${pos} ${await formatUsername(
-      user.userId,
-      members.get(user.userId).user.username,
-      true,
-    )} ${user._sum.uses.toLocaleString()} ${pluralize("command", user._sum.uses)}`;
-
     count++;
+
+    promises.push(async () => {
+      const discordUser = await guild.client.users.fetch(user.userId);
+
+      out[currentCount] = `${pos} ${await formatUsername(
+        user.userId,
+        discordUser.username,
+        true,
+      )} ${user._sum.uses.toLocaleString()} ${pluralize("command", user._sum.uses)}`;
+    });
   }
+
+  await pAll(promises, { concurrency: 10 });
 
   const pages = PageManager.createPages(out);
 
@@ -1494,21 +1413,13 @@ export async function topCommandUsesGlobal(member?: MemberResolvable) {
 }
 
 export async function topVote(guild: Guild, member?: MemberResolvable) {
-  let members: Collection<string, GuildMember>;
-
-  if (guild.memberCount == guild.members.cache.size) {
-    members = guild.members.cache;
-  } else {
-    members = await guild.members.fetch();
-  }
-
-  if (!members) members = guild.members.cache;
+  const members = await getAllMembers(guild);
 
   const query = await prisma.economy.findMany({
     where: {
       AND: [
         { OR: [{ monthVote: { gt: 0 } }, { seasonVote: { gt: 0 } }] },
-        { userId: { in: Array.from(members.keys()) } },
+        { userId: { in: members } },
         { user: { blacklisted: false } },
       ],
     },
@@ -1518,21 +1429,21 @@ export async function topVote(guild: Guild, member?: MemberResolvable) {
       banned: true,
     },
     orderBy: [{ monthVote: "desc" }, { lastVote: "asc" }, { user: { lastKnownUsername: "asc" } }],
-    take: 100,
   });
 
-  const out = [];
-
+  const out: string[] = [];
   let count = 0;
-
   const userIds = query.map((i) => i.userId);
+  const promises: (() => Promise<void>)[] = [];
+  const date = dayjs();
 
   for (const user of query) {
-    if (user.banned && dayjs().isBefore(user.banned)) {
+    if (user.banned && date.isBefore(user.banned)) {
       userIds.splice(userIds.indexOf(user.userId), 1);
       continue;
     }
 
+    const currentCount = count;
     let pos = (count + 1).toString();
 
     if (pos == "1") {
@@ -1545,14 +1456,20 @@ export async function topVote(guild: Guild, member?: MemberResolvable) {
       pos += ".";
     }
 
-    out[count] = `${pos} ${await formatUsername(
-      user.userId,
-      members.get(user.userId).user.username,
-      true,
-    )} ${user.monthVote.toLocaleString()}`;
-
     count++;
+
+    promises.push(async () => {
+      const discordUser = await guild.client.users.fetch(user.userId);
+
+      out[currentCount] = `${pos} ${await formatUsername(
+        user.userId,
+        discordUser.username,
+        true,
+      )} ${user.monthVote.toLocaleString()}`;
+    });
   }
+
+  await pAll(promises, { concurrency: 10 });
 
   const pages = PageManager.createPages(out);
 
@@ -1634,21 +1551,13 @@ export async function topVoteGlobal(member: MemberResolvable, amount = 100) {
 }
 
 export async function topChatReaction(guild: Guild, daily: boolean, member?: MemberResolvable) {
-  let members: Collection<string, GuildMember>;
-
-  if (guild.memberCount == guild.members.cache.size) {
-    members = guild.members.cache;
-  } else {
-    members = await guild.members.fetch();
-  }
-
-  if (!members) members = guild.members.cache;
+  const members = await getAllMembers(guild);
 
   const query = await prisma.chatReactionLeaderboards.findMany({
     where: {
       AND: [
         { daily: daily },
-        { userId: { in: Array.from(members.keys()) } },
+        { userId: { in: members } },
         { user: { blacklisted: false } },
         {
           OR: [
@@ -1664,16 +1573,15 @@ export async function topChatReaction(guild: Guild, daily: boolean, member?: Mem
       createdAt: true,
     },
     orderBy: [{ time: "asc" }, { user: { lastKnownUsername: "asc" } }],
-    take: 100,
   });
 
-  const out = [];
-
+  const out: string[] = [];
   let count = 0;
-
   const userIds = query.map((i) => i.userId);
+  const promises: (() => Promise<void>)[] = [];
 
   for (const user of query) {
+    const currentCount = count;
     let pos = (count + 1).toString();
 
     if (pos == "1") {
@@ -1686,14 +1594,20 @@ export async function topChatReaction(guild: Guild, daily: boolean, member?: Mem
       pos += ".";
     }
 
-    out[count] = `${pos} ${await formatUsername(
-      user.userId,
-      members.get(user.userId).user.username,
-      true,
-    )} \`${user.time.toFixed(3)}s\` <t:${Math.floor(user.createdAt.getTime() / 1000)}:${dayjs(user.createdAt).isAfter(dayjs().subtract(1, "day")) ? "R" : "D"}>`;
-
     count++;
+
+    promises.push(async () => {
+      const discordUser = await guild.client.users.fetch(user.userId);
+
+      out[currentCount] = `${pos} ${await formatUsername(
+        user.userId,
+        discordUser.username,
+        true,
+      )} \`${user.time.toFixed(3)}s\` <t:${Math.floor(user.createdAt.getTime() / 1000)}:${dayjs(user.createdAt).isAfter(dayjs().subtract(1, "day")) ? "R" : "D"}>`;
+    });
   }
+
+  await pAll(promises, { concurrency: 10 });
 
   const pages = PageManager.createPages(out);
 
@@ -1802,19 +1716,11 @@ export async function topChatReactionGlobal(
 }
 
 export async function topVoteStreak(guild: Guild, member?: MemberResolvable) {
-  let members: Collection<string, GuildMember>;
-
-  if (guild.memberCount == guild.members.cache.size) {
-    members = guild.members.cache;
-  } else {
-    members = await guild.members.fetch();
-  }
-
-  if (!members) members = guild.members.cache;
+  const members = await getAllMembers(guild);
 
   const query = await prisma.economy.findMany({
     where: {
-      AND: [{ voteStreak: { gt: 0 } }, { userId: { in: Array.from(members.keys()) } }],
+      AND: [{ voteStreak: { gt: 0 } }, { userId: { in: members } }],
     },
     select: {
       userId: true,
@@ -1822,21 +1728,21 @@ export async function topVoteStreak(guild: Guild, member?: MemberResolvable) {
       banned: true,
     },
     orderBy: [{ voteStreak: "desc" }, { lastVote: "asc" }],
-    take: 100,
   });
 
-  const out = [];
-
+  const out: string[] = [];
   let count = 0;
-
   const userIds = query.map((i) => i.userId);
+  const promises: (() => Promise<void>)[] = [];
+  const date = dayjs();
 
   for (const user of query) {
-    if (user.banned && dayjs().isBefore(user.banned)) {
+    if (user.banned && date.isBefore(user.banned)) {
       userIds.splice(userIds.indexOf(user.userId), 1);
       continue;
     }
 
+    const currentCount = count;
     let pos = (count + 1).toString();
 
     if (pos == "1") {
@@ -1849,14 +1755,20 @@ export async function topVoteStreak(guild: Guild, member?: MemberResolvable) {
       pos += ".";
     }
 
-    out[count] = `${pos} ${await formatUsername(
-      user.userId,
-      members.get(user.userId).user.username,
-      true,
-    )} ${user.voteStreak.toLocaleString()}`;
-
     count++;
+
+    promises.push(async () => {
+      const discordUser = await guild.client.users.fetch(user.userId);
+
+      out[currentCount] = `${pos} ${await formatUsername(
+        user.userId,
+        discordUser.username,
+        true,
+      )} ${user.voteStreak.toLocaleString()}`;
+    });
   }
+
+  await pAll(promises, { concurrency: 10 });
 
   const pages = PageManager.createPages(out);
 
