@@ -497,10 +497,6 @@ export async function fulfillTradeRequest(
   logger.info(`trade request fulfilled owner: ${tradeRequest.ownerId} to: ${interaction.user.id}`);
 
   for (const item of tradeRequest.requestedItems) {
-    logger.debug(
-      `trade request: amount: ${parseInt(item.split(":")[1])} item: ${item.split(":")[0]}`,
-      { item, tradeRequest },
-    );
     transaction(
       interaction.user,
       await interaction.client.users.fetch(tradeRequest.ownerId),
@@ -523,17 +519,12 @@ export async function fulfillTradeRequest(
   }
 
   for (const item of tradeRequest.offeredItems) {
-    logger.debug(
-      `trade request: amount: ${parseInt(item.split(":")[1])} item: ${item.split(":")[0]}`,
-      { item, tradeRequest },
-    );
-
     transaction(
       await interaction.client.users.fetch(tradeRequest.ownerId),
       interaction.user,
       "item",
-      parseInt(item.split(":")[0]),
-      item.split(":")[1],
+      parseInt(item.split(":")[1]),
+      item.split(":")[0],
       "trade request",
     );
   }
