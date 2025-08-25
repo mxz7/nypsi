@@ -716,7 +716,6 @@ export async function topGuilds(guildName?: string) {
       level: true,
     },
     orderBy: [{ level: "desc" }, { xp: "desc" }, { balance: "desc" }, { guildName: "asc" }],
-    take: 100,
   });
 
   const out: string[] = [];
@@ -1322,7 +1321,6 @@ export async function topCommand(guild: Guild, command: string, member: MemberRe
       },
     },
     orderBy: [{ uses: "desc" }, { user: { lastKnownUsername: "asc" } }],
-    take: 100,
   });
 
   const out: string[] = [];
