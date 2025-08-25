@@ -512,11 +512,6 @@ export async function fulfillTradeRequest(
   }
 
   if (tradeRequest.offeredMoney > 0) {
-    logger.debug(
-      `trade request: amount: ${parseInt(item.split(":")[1])} item: ${item.split(":")[0]}`,
-      { item, tradeRequest },
-    );
-
     transaction(
       await interaction.client.users.fetch(tradeRequest.ownerId),
       interaction.user,
