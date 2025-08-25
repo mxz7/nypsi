@@ -17,7 +17,12 @@ export async function updateLastKnownUsername(member: MemberResolvable, tag: str
     },
   });
 
-  await redis.set(`${Constants.redis.cache.user.username}:${userId}`, tag, "EX", 7200);
+  await redis.set(
+    `${Constants.redis.cache.user.username}:${userId}`,
+    JSON.stringify({ lastKnownUsername: tag, usernameUpdatedAt: new Date() }),
+    "EX",
+    7200,
+  );
 }
 
 export async function getLastKnownUsername(
