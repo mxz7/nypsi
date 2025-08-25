@@ -6,7 +6,7 @@ import { getAllMembers } from "../guilds/members";
 import { getUserId, MemberResolvable } from "../member";
 import { Mutex } from "../mutex";
 import PageManager from "../page";
-import { formatTime, pluralize } from "../string";
+import { escapeFormattingCharacters, formatTime, pluralize } from "../string";
 import { getPreferences } from "../users/notifications";
 import { getLastKnownUsername, updateLastKnownUsername } from "../users/tag";
 import { getActiveTag } from "../users/tags";
@@ -76,6 +76,8 @@ export async function topBalance(guild: Guild, member?: MemberResolvable) {
           await updateLastKnownUsername(user.userId, username);
         }
       }
+
+      username = escapeFormattingCharacters(username);
 
       out[currentCount] = `${pos} ${await formatUsername(
         user.userId,
@@ -290,6 +292,8 @@ export async function topNetWorth(guild: Guild, member?: MemberResolvable) {
           }
         }
 
+        username = escapeFormattingCharacters(username);
+
         out[currentCount] = `${pos} ${await formatUsername(
           user.userId,
           username,
@@ -378,6 +382,8 @@ export async function topPrestige(guild: Guild, member?: MemberResolvable) {
           await updateLastKnownUsername(user.userId, username);
         }
       }
+
+      username = escapeFormattingCharacters(username);
 
       out[currentCount] = `${pos} ${await formatUsername(
         user.userId,
@@ -537,6 +543,8 @@ export async function topItem(guild: Guild, item: string, member: MemberResolvab
         }
       }
 
+      username = escapeFormattingCharacters(username);
+
       out[currentCount] = `${pos} ${await formatUsername(
         user.userId,
         username,
@@ -655,6 +663,7 @@ export async function topCompletion(guild: Guild, member: MemberResolvable) {
   let count = 0;
   const userIds = query.map((i) => i.userId);
   const promises: (() => Promise<void>)[] = [];
+  const date = dayjs();
 
   for (const user of query) {
     const currentCount = count;
@@ -674,11 +683,22 @@ export async function topCompletion(guild: Guild, member: MemberResolvable) {
     count++;
 
     promises.push(async () => {
-      const discordUser = await guild.client.users.fetch(user.userId);
+      const usernameData = await getLastKnownUsername(user.userId, true, true);
+
+      let username = usernameData.lastKnownUsername;
+
+      if (usernameData.usernameUpdatedAt.getTime() < date.valueOf() - WEEK_MS) {
+        const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
+
+        if (discordUser) {
+          username = discordUser.username;
+          await updateLastKnownUsername(user.userId, username);
+        }
+      }
 
       out[currentCount] = `${pos} ${await formatUsername(
         user.userId,
-        discordUser.username,
+        username,
         true,
       )} ${completion.toFixed(1)}%`;
     });
@@ -746,6 +766,12 @@ export async function topDailyStreak(guild: Guild, member?: MemberResolvable) {
       userId: true,
       dailyStreak: true,
       banned: true,
+      user: {
+        select: {
+          lastKnownUsername: true,
+          usernameUpdatedAt: true,
+        },
+      },
     },
     orderBy: [{ dailyStreak: "desc" }, { user: { lastKnownUsername: "asc" } }],
   });
@@ -778,11 +804,20 @@ export async function topDailyStreak(guild: Guild, member?: MemberResolvable) {
     count++;
 
     promises.push(async () => {
-      const discordUser = await guild.client.users.fetch(user.userId);
+      let username = user.user.lastKnownUsername;
+
+      if (user.user.usernameUpdatedAt.getTime() < date.valueOf() - WEEK_MS) {
+        const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
+
+        if (discordUser) {
+          username = discordUser.username;
+          await updateLastKnownUsername(user.userId, username);
+        }
+      }
 
       out[currentCount] = `${pos} ${await formatUsername(
         user.userId,
-        discordUser.username,
+        username,
         true,
       )} ${user.dailyStreak.toLocaleString()}`;
     });
@@ -884,6 +919,12 @@ export async function topLottoWins(guild: Guild, member?: MemberResolvable) {
     select: {
       userId: true,
       progress: true,
+      user: {
+        select: {
+          lastKnownUsername: true,
+          usernameUpdatedAt: true,
+        },
+      },
     },
     orderBy: {
       progress: "desc",
@@ -894,6 +935,7 @@ export async function topLottoWins(guild: Guild, member?: MemberResolvable) {
   let count = 0;
   const userIds = query.map((i) => i.userId);
   const promises: (() => Promise<void>)[] = [];
+  const date = dayjs();
 
   for (const user of query) {
     const currentCount = count;
@@ -912,11 +954,20 @@ export async function topLottoWins(guild: Guild, member?: MemberResolvable) {
     count++;
 
     promises.push(async () => {
-      const discordUser = await guild.client.users.fetch(user.userId);
+      let username = user.user.lastKnownUsername;
+
+      if (user.user.usernameUpdatedAt.getTime() < date.valueOf() - WEEK_MS) {
+        const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
+
+        if (discordUser) {
+          username = discordUser.username;
+          await updateLastKnownUsername(user.userId, username);
+        }
+      }
 
       out[currentCount] = `${pos} ${await formatUsername(
         user.userId,
-        discordUser.username,
+        username,
         true,
       )} ${user.progress}`;
     });
@@ -1020,6 +1071,7 @@ export async function topWordle(guild: Guild, member: MemberResolvable) {
   let count = 0;
   const userIds = query.map((i) => i.userId);
   const promises: (() => Promise<void>)[] = [];
+  const date = dayjs();
 
   for (const user of query) {
     const currentCount = count;
@@ -1038,11 +1090,22 @@ export async function topWordle(guild: Guild, member: MemberResolvable) {
     count++;
 
     promises.push(async () => {
-      const discordUser = await guild.client.users.fetch(user.userId);
+      const usernameData = await getLastKnownUsername(user.userId, true, true);
+
+      let username = usernameData.lastKnownUsername;
+
+      if (usernameData.usernameUpdatedAt.getTime() < date.valueOf() - WEEK_MS) {
+        const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
+
+        if (discordUser) {
+          username = discordUser.username;
+          await updateLastKnownUsername(user.userId, username);
+        }
+      }
 
       out[currentCount] = `${pos} ${await formatUsername(
         user.userId,
-        discordUser.username,
+        username,
         true,
       )} ${user._count.userId.toLocaleString()} ${pluralize("win", user._count.userId)}`;
     });
@@ -1140,6 +1203,7 @@ export async function topWordleTime(guild: Guild, member: MemberResolvable) {
   let count = 0;
   const userIds = query.map((i) => i.userId);
   const promises: (() => Promise<void>)[] = [];
+  const date = dayjs();
 
   for (const user of query) {
     const currentCount = count;
@@ -1158,11 +1222,22 @@ export async function topWordleTime(guild: Guild, member: MemberResolvable) {
     count++;
 
     promises.push(async () => {
-      const discordUser = await guild.client.users.fetch(user.userId);
+      const usernameData = await getLastKnownUsername(user.userId, true, true);
+
+      let username = usernameData.lastKnownUsername;
+
+      if (usernameData.usernameUpdatedAt.getTime() < date.valueOf() - WEEK_MS) {
+        const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
+
+        if (discordUser) {
+          username = discordUser.username;
+          await updateLastKnownUsername(user.userId, username);
+        }
+      }
 
       out[currentCount] = `${pos} ${await formatUsername(
         user.userId,
-        discordUser.username,
+        username,
         true,
       )} [\`${formatTime(user.time)}\`](https://nypsi.xyz/wordles/${user.gameId?.toString(36)}?ref=bot-lb)`;
     });
@@ -1247,6 +1322,12 @@ export async function topCommand(guild: Guild, command: string, member: MemberRe
     select: {
       userId: true,
       uses: true,
+      user: {
+        select: {
+          lastKnownUsername: true,
+          usernameUpdatedAt: true,
+        },
+      },
     },
     orderBy: [{ uses: "desc" }, { user: { lastKnownUsername: "asc" } }],
     take: 100,
@@ -1256,6 +1337,7 @@ export async function topCommand(guild: Guild, command: string, member: MemberRe
   let count = 0;
   const userIds = query.map((i) => i.userId);
   const promises: (() => Promise<void>)[] = [];
+  const date = dayjs();
 
   for (const user of query) {
     const currentCount = count;
@@ -1274,11 +1356,20 @@ export async function topCommand(guild: Guild, command: string, member: MemberRe
     count++;
 
     promises.push(async () => {
-      const discordUser = await guild.client.users.fetch(user.userId);
+      let username = user.user.lastKnownUsername;
+
+      if (user.user.usernameUpdatedAt.getTime() < date.valueOf() - WEEK_MS) {
+        const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
+
+        if (discordUser) {
+          username = discordUser.username;
+          await updateLastKnownUsername(user.userId, username);
+        }
+      }
 
       out[currentCount] = `${pos} ${await formatUsername(
         user.userId,
-        discordUser.username,
+        username,
         true,
       )} ${user.uses.toLocaleString()} ${pluralize("use", user.uses)}`;
     });
@@ -1378,6 +1469,7 @@ export async function topCommandUses(guild: Guild, member: MemberResolvable) {
   let count = 0;
   const userIds = query.map((i) => i.userId);
   const promises: (() => Promise<void>)[] = [];
+  const date = dayjs();
 
   for (const user of query) {
     const currentCount = count;
@@ -1396,11 +1488,22 @@ export async function topCommandUses(guild: Guild, member: MemberResolvable) {
     count++;
 
     promises.push(async () => {
-      const discordUser = await guild.client.users.fetch(user.userId);
+      const usernameData = await getLastKnownUsername(user.userId, true, true);
+
+      let username = usernameData.lastKnownUsername;
+
+      if (usernameData.usernameUpdatedAt.getTime() < date.valueOf() - WEEK_MS) {
+        const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
+
+        if (discordUser) {
+          username = discordUser.username;
+          await updateLastKnownUsername(user.userId, username);
+        }
+      }
 
       out[currentCount] = `${pos} ${await formatUsername(
         user.userId,
-        discordUser.username,
+        username,
         true,
       )} ${user._sum.uses.toLocaleString()} ${pluralize("command", user._sum.uses)}`;
     });
@@ -1490,6 +1593,12 @@ export async function topVote(guild: Guild, member?: MemberResolvable) {
       userId: true,
       monthVote: true,
       banned: true,
+      user: {
+        select: {
+          lastKnownUsername: true,
+          usernameUpdatedAt: true,
+        },
+      },
     },
     orderBy: [{ monthVote: "desc" }, { lastVote: "asc" }, { user: { lastKnownUsername: "asc" } }],
   });
@@ -1522,11 +1631,20 @@ export async function topVote(guild: Guild, member?: MemberResolvable) {
     count++;
 
     promises.push(async () => {
-      const discordUser = await guild.client.users.fetch(user.userId);
+      let username = user.user.lastKnownUsername;
+
+      if (user.user.usernameUpdatedAt.getTime() < date.valueOf() - WEEK_MS) {
+        const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
+
+        if (discordUser) {
+          username = discordUser.username;
+          await updateLastKnownUsername(user.userId, username);
+        }
+      }
 
       out[currentCount] = `${pos} ${await formatUsername(
         user.userId,
-        discordUser.username,
+        username,
         true,
       )} ${user.monthVote.toLocaleString()}`;
     });
@@ -1634,6 +1752,12 @@ export async function topChatReaction(guild: Guild, daily: boolean, member?: Mem
       userId: true,
       time: true,
       createdAt: true,
+      user: {
+        select: {
+          lastKnownUsername: true,
+          usernameUpdatedAt: true,
+        },
+      },
     },
     orderBy: [{ time: "asc" }, { user: { lastKnownUsername: "asc" } }],
   });
@@ -1642,6 +1766,7 @@ export async function topChatReaction(guild: Guild, daily: boolean, member?: Mem
   let count = 0;
   const userIds = query.map((i) => i.userId);
   const promises: (() => Promise<void>)[] = [];
+  const date = dayjs();
 
   for (const user of query) {
     const currentCount = count;
@@ -1660,11 +1785,20 @@ export async function topChatReaction(guild: Guild, daily: boolean, member?: Mem
     count++;
 
     promises.push(async () => {
-      const discordUser = await guild.client.users.fetch(user.userId);
+      let username = user.user.lastKnownUsername;
+
+      if (user.user.usernameUpdatedAt.getTime() < date.valueOf() - WEEK_MS) {
+        const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
+
+        if (discordUser) {
+          username = discordUser.username;
+          await updateLastKnownUsername(user.userId, username);
+        }
+      }
 
       out[currentCount] = `${pos} ${await formatUsername(
         user.userId,
-        discordUser.username,
+        username,
         true,
       )} \`${user.time.toFixed(3)}s\` <t:${Math.floor(user.createdAt.getTime() / 1000)}:${dayjs(user.createdAt).isAfter(dayjs().subtract(1, "day")) ? "R" : "D"}>`;
     });
@@ -1789,6 +1923,12 @@ export async function topVoteStreak(guild: Guild, member?: MemberResolvable) {
       userId: true,
       voteStreak: true,
       banned: true,
+      user: {
+        select: {
+          lastKnownUsername: true,
+          usernameUpdatedAt: true,
+        },
+      },
     },
     orderBy: [{ voteStreak: "desc" }, { lastVote: "asc" }],
   });
@@ -1821,11 +1961,20 @@ export async function topVoteStreak(guild: Guild, member?: MemberResolvable) {
     count++;
 
     promises.push(async () => {
-      const discordUser = await guild.client.users.fetch(user.userId);
+      let username = user.user.lastKnownUsername;
+
+      if (user.user.usernameUpdatedAt.getTime() < date.valueOf() - WEEK_MS) {
+        const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
+
+        if (discordUser) {
+          username = discordUser.username;
+          await updateLastKnownUsername(user.userId, username);
+        }
+      }
 
       out[currentCount] = `${pos} ${await formatUsername(
         user.userId,
-        discordUser.username,
+        username,
         true,
       )} ${user.voteStreak.toLocaleString()}`;
     });
