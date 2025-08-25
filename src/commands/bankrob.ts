@@ -26,6 +26,7 @@ import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { createUser, userExists } from "../utils/functions/economy/utils.js";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { percentChance } from "../utils/functions/random";
+import { escapeFormattingCharacters } from "../utils/functions/string";
 import {
   addToNypsiBank,
   getNypsiBankBalance,
@@ -40,7 +41,6 @@ import {
   onCooldown,
 } from "../utils/handlers/cooldownhandler.js";
 import { getTimestamp, logger } from "../utils/logger";
-import { escapeSpecialCharacters } from "../utils/functions/string";
 
 const cmd = new Command("bankrob", "attempt to rob a bank for a high reward", "money");
 
@@ -273,7 +273,7 @@ async function run(
             url: process.env.ANTICHEAT_HOOK,
           });
           await hook.send({
-            content: `[${getTimestamp()}] ${escapeSpecialCharacters(message.member.user.username)} (${message.author.id}) given captcha randomly in bankrob`,
+            content: `[${getTimestamp()}] ${escapeFormattingCharacters(message.member.user.username)} (${message.author.id}) given captcha randomly in bankrob`,
           });
           hook.destroy();
         }

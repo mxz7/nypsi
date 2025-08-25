@@ -32,7 +32,7 @@ import { createGame } from "../utils/functions/economy/stats";
 import { createUser, formatBet, isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { getMember } from "../utils/functions/member.js";
 import { isPremium } from "../utils/functions/premium/premium";
-import { escapeSpecialCharacters } from "../utils/functions/string";
+import { escapeFormattingCharacters } from "../utils/functions/string";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { getPreferences } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
@@ -139,7 +139,7 @@ async function run(
       "tails",
     ];
     const choice = lols[randomInt(lols.length)];
-    let thingy = `${escapeSpecialCharacters(target.user.username)}\n${escapeSpecialCharacters(target.user.username)}`;
+    let thingy = `${escapeFormattingCharacters(target.user.username)}\n${escapeFormattingCharacters(target.user.username)}`;
 
     let winner: GuildMember;
     let loser: GuildMember;
@@ -215,11 +215,11 @@ async function run(
       await addBalance(winner, winnings);
 
       if (winner == message.member) {
-        thingy = `**${escapeSpecialCharacters(message.author.username)}** +$${winnings.toLocaleString()}${
+        thingy = `**${escapeFormattingCharacters(message.author.username)}** +$${winnings.toLocaleString()}${
           tax ? ` (${(tax * 100).toFixed(1)}% tax)` : ""
-        }\n${escapeSpecialCharacters(target.user.username)}`;
+        }\n${escapeFormattingCharacters(target.user.username)}`;
       } else {
-        thingy = `${escapeSpecialCharacters(message.author.username)}\n**${player2.user.username.replaceAll(
+        thingy = `${escapeFormattingCharacters(message.author.username)}\n**${player2.user.username.replaceAll(
           "_",
           "\\_",
         )}** +$${winnings.toLocaleString()}${tax ? ` (${(tax * 100).toFixed(1)}% tax)` : ""}`;
@@ -236,7 +236,7 @@ async function run(
       }
 
       embed.setDescription(
-        `**winner** ${escapeSpecialCharacters(winner.user.username)}\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}` +
+        `**winner** ${escapeFormattingCharacters(winner.user.username)}\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}` +
           (eventProgress
             ? `\n\n🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`
             : ""),
@@ -275,9 +275,9 @@ async function run(
       await addInventoryItem(winner, item.id, itemAmount * 2);
 
       if (winner == message.member) {
-        thingy = `**${escapeSpecialCharacters(message.author.username)}** +${(itemAmount * 2).toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-cf)**\n${escapeSpecialCharacters(target.user.username)}`;
+        thingy = `**${escapeFormattingCharacters(message.author.username)}** +${(itemAmount * 2).toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-cf)**\n${escapeFormattingCharacters(target.user.username)}`;
       } else {
-        thingy = `${escapeSpecialCharacters(message.author.username)}\n**${player2.user.username.replaceAll(
+        thingy = `${escapeFormattingCharacters(message.author.username)}\n**${player2.user.username.replaceAll(
           "_",
           "\\_",
         )}** +${(itemAmount * 2).toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-cf)**`;
@@ -294,7 +294,7 @@ async function run(
       }
 
       embed.setDescription(
-        `**winner** ${escapeSpecialCharacters(winner.user.username)}\n\n${thingy}\n\n**bet** ${itemAmount.toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-cf)**` +
+        `**winner** ${escapeFormattingCharacters(winner.user.username)}\n\n${thingy}\n\n**bet** ${itemAmount.toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-cf)**` +
           (eventProgress
             ? `\n\n🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`
             : ""),
@@ -402,7 +402,7 @@ async function run(
         return send({
           embeds: [
             new ErrorEmbed(
-              `**${escapeSpecialCharacters(target.user.username)}** cannot afford this bet`,
+              `**${escapeFormattingCharacters(target.user.username)}** cannot afford this bet`,
             ),
           ],
         });
@@ -469,7 +469,7 @@ async function run(
         return send({
           embeds: [
             new ErrorEmbed(
-              `**${escapeSpecialCharacters(target.user.username)}** doesn't have enough ${item.name}`,
+              `**${escapeFormattingCharacters(target.user.username)}** doesn't have enough ${item.name}`,
             ),
           ],
         });

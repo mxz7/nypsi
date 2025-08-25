@@ -22,7 +22,7 @@ import { getTimestamp, logger } from "../../../logger";
 import { a } from "../../anticheat";
 import { giveCaptcha, isLockedOut, verifyUser } from "../../captcha";
 import { percentChance } from "../../random";
-import { escapeSpecialCharacters, pluralize } from "../../string";
+import { escapeFormattingCharacters, pluralize } from "../../string";
 import { hasAdminPermission } from "../../users/admin";
 import { recentCommands } from "../../users/commands";
 import { getInventory, removeInventoryItem, selectItem } from "../inventory";
@@ -125,7 +125,7 @@ async function prepare(
             url: process.env.ANTICHEAT_HOOK,
           });
           await hook.send({
-            content: `[${getTimestamp()}] ${escapeSpecialCharacters(message.author.username)} (${message.author.id}) given captcha randomly in scratch card`,
+            content: `[${getTimestamp()}] ${escapeFormattingCharacters(message.author.username)} (${message.author.id}) given captcha randomly in scratch card`,
           });
           hook.destroy();
         }

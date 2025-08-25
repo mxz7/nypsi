@@ -18,7 +18,7 @@ import {
   removeInventoryItem,
 } from "../utils/functions/economy/inventory";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
-import { escapeSpecialCharacters } from "../utils/functions/string";
+import { escapeFormattingCharacters } from "../utils/functions/string";
 import { addMarriage, isMarried } from "../utils/functions/users/marriage";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -190,7 +190,7 @@ async function run(
       embed.setDescription("❌ you are already married");
     } else if (await isMarried(message.member)) {
       embed.setDescription(
-        `❌ ${escapeSpecialCharacters(message.member.user.username)} is already married`,
+        `❌ ${escapeFormattingCharacters(message.member.user.username)} is already married`,
       );
     } else {
       await addMarriage(message.member.id, target.id);

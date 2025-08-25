@@ -29,12 +29,12 @@ import { formatNumber, getItems, isEcoBanned } from "../utils/functions/economy/
 import { getMember } from "../utils/functions/member";
 import PageManager from "../utils/functions/page";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
+import { escapeFormattingCharacters } from "../utils/functions/string";
 import { getPreferences } from "../utils/functions/users/notifications";
 import { getLastKnownUsername } from "../utils/functions/users/tag";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
 import dayjs = require("dayjs");
-import { escapeSpecialCharacters } from "../utils/functions/string";
 
 const cmd = new Command("offer", "create and manage offers", "money").setAliases([
   "offers",
@@ -409,14 +409,14 @@ async function run(
         return send({
           embeds: [
             new ErrorEmbed(
-              `**${escapeSpecialCharacters(target.user.username)}** has disabled offers`,
+              `**${escapeFormattingCharacters(target.user.username)}** has disabled offers`,
             ),
           ],
         });
       return send({
         embeds: [
           new ErrorEmbed(
-            `**${escapeSpecialCharacters(target.user.username)}** has already received their max amount of offers (${
+            `**${escapeFormattingCharacters(target.user.username)}** has already received their max amount of offers (${
               (await getPreferences(target)).offers
             })`,
           ),
@@ -437,7 +437,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            `**${escapeSpecialCharacters(target.user.username)}** has blocked offers for ${selected.emoji} ${selected.name}`,
+            `**${escapeFormattingCharacters(target.user.username)}** has blocked offers for ${selected.emoji} ${selected.name}`,
           ),
         ],
       });
@@ -446,7 +446,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            `**${escapeSpecialCharacters(target.user.username)}** has blocked offers from you`,
+            `**${escapeFormattingCharacters(target.user.username)}** has blocked offers from you`,
           ),
         ],
       });
@@ -464,7 +464,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            `**${escapeSpecialCharacters(target.user.username)}** doesnt have ${amount}x ${selected.emoji} ${selected.name}`,
+            `**${escapeFormattingCharacters(target.user.username)}** doesnt have ${amount}x ${selected.emoji} ${selected.name}`,
           ),
         ],
       });
@@ -500,7 +500,7 @@ async function run(
         embeds: [
           new CustomEmbed(
             message.member,
-            `✅ offer has been sent to **${escapeSpecialCharacters(target.user.username)}**`,
+            `✅ offer has been sent to **${escapeFormattingCharacters(target.user.username)}**`,
           ),
         ],
       });

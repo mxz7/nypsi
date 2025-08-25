@@ -18,8 +18,8 @@ import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
+import { escapeFormattingCharacters } from "../utils/functions/string";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { escapeSpecialCharacters } from "../utils/functions/string";
 
 const cmd = new Command("fight", "challenge another member to a fight", "fun");
 
@@ -118,7 +118,7 @@ async function run(
   );
 
   embed.setDescription(
-    `${escapeSpecialCharacters(message.author.username)} has challenged you to a fight. do you accept?`,
+    `${escapeFormattingCharacters(message.author.username)} has challenged you to a fight. do you accept?`,
   );
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(

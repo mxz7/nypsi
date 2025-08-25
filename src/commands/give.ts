@@ -13,7 +13,7 @@ import { getRawLevel } from "../utils/functions/economy/levelling";
 import { createUser, isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
-import { escapeSpecialCharacters, pluralize } from "../utils/functions/string";
+import { escapeFormattingCharacters, pluralize } from "../utils/functions/string";
 import { getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { transaction } from "../utils/logger";
@@ -156,7 +156,7 @@ async function run(
   if ((await getDmSettings(target)).payment) {
     const embed = new CustomEmbed(
       target,
-      `**${escapeSpecialCharacters(message.author.username)}** has given you ${amount.toLocaleString()} ${selected.emoji} ${
+      `**${escapeFormattingCharacters(message.author.username)}** has given you ${amount.toLocaleString()} ${selected.emoji} ${
         selected.name
       }`,
     )

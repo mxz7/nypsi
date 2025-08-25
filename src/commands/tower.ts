@@ -44,6 +44,7 @@ import {
 import { addXp, calcEarnedGambleXp } from "../utils/functions/economy/xp";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { percentChance } from "../utils/functions/random";
+import { escapeFormattingCharacters } from "../utils/functions/string";
 import { hasAdminPermission } from "../utils/functions/users/admin";
 import { recentCommands } from "../utils/functions/users/commands";
 import { addHourlyCommand } from "../utils/handlers/commandhandler";
@@ -51,7 +52,6 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 import { gamble, getTimestamp, logger } from "../utils/logger";
 import _ = require("lodash");
 import ms = require("ms");
-import { escapeSpecialCharacters } from "../utils/functions/string";
 
 const cmd = new Command("tower", "play dragon tower", "money").setAliases([
   "dragon",
@@ -483,7 +483,7 @@ async function playGame(
             url: process.env.ANTICHEAT_HOOK,
           });
           await hook.send({
-            content: `[${getTimestamp()}] ${escapeSpecialCharacters(message.member.user.username)} (${message.author.id}) given captcha randomly in tower`,
+            content: `[${getTimestamp()}] ${escapeFormattingCharacters(message.member.user.username)} (${message.author.id}) given captcha randomly in tower`,
           });
           hook.destroy();
         }

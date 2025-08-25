@@ -14,11 +14,11 @@ import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
+import { escapeFormattingCharacters } from "../utils/functions/string";
 import { isMarried, removeMarriage } from "../utils/functions/users/marriage";
 import { addNotificationToQueue } from "../utils/functions/users/notifications";
 import { getLastKnownUsername } from "../utils/functions/users/tag";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { escapeSpecialCharacters } from "../utils/functions/string";
 
 const cmd = new Command("divorce", "divorce your partner", "fun");
 
@@ -108,7 +108,7 @@ async function run(
       payload: {
         embed: new CustomEmbed(
           married.partnerId,
-          `${getItems()["broken_ring"].emoji} you have been divorced by ${escapeSpecialCharacters(message.member.user.username)}!`,
+          `${getItems()["broken_ring"].emoji} you have been divorced by ${escapeFormattingCharacters(message.member.user.username)}!`,
         ).setFooter({ text: `+1 broken ring` }),
       },
     });

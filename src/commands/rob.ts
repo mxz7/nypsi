@@ -28,11 +28,11 @@ import { createUser, isEcoBanned, userExists } from "../utils/functions/economy/
 import { addXp, calcEarnedGambleXp } from "../utils/functions/economy/xp";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
+import { escapeFormattingCharacters } from "../utils/functions/string";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
-import { escapeSpecialCharacters } from "../utils/functions/string";
 
 const playerCooldown = new Set<string>();
 
@@ -204,7 +204,7 @@ async function run(
     embed2.addField(
       "**fail!!**",
       "**" +
-        escapeSpecialCharacters(target.user.username) +
+        escapeFormattingCharacters(target.user.username) +
         "** has been robbed recently and is protected by a private security team\n" +
         "you were caught and paid $" +
         amountMoney.toLocaleString(),
@@ -214,7 +214,7 @@ async function run(
     embed3.setColor(Constants.EMBED_SUCCESS_COLOR);
     embed3.setDescription(
       "**" +
-        escapeSpecialCharacters(message.author.username) +
+        escapeFormattingCharacters(message.author.username) +
         "** tried to rob you in **" +
         message.guild.name +
         "**\n" +
@@ -240,7 +240,7 @@ async function run(
     embed2.addField(
       "fail!!",
       "**" +
-        escapeSpecialCharacters(target.user.username) +
+        escapeFormattingCharacters(target.user.username) +
         "** had a padlock, which has now been broken",
     );
 
@@ -248,7 +248,7 @@ async function run(
     embed3.setColor(Constants.EMBED_SUCCESS_COLOR);
     embed3.setDescription(
       "**" +
-        escapeSpecialCharacters(message.author.username) +
+        escapeFormattingCharacters(message.author.username) +
         "** tried to rob you in **" +
         message.guild.name +
         "**\n" +
@@ -329,7 +329,7 @@ async function run(
       embed3.setColor(Constants.EMBED_FAIL_COLOR);
       embed3.setDescription(
         "**" +
-          escapeSpecialCharacters(message.author.username) +
+          escapeFormattingCharacters(message.author.username) +
           "** has robbed you in **" +
           message.guild.name +
           "**\n" +
@@ -371,7 +371,7 @@ async function run(
         );
         embed3.setDescription(
           "**" +
-            escapeSpecialCharacters(message.author.username) +
+            escapeFormattingCharacters(message.author.username) +
             "** tried to rob you in **" +
             message.guild.name +
             "**\n" +
@@ -392,7 +392,7 @@ async function run(
         embed2.addField("fail!!", "you lost $**" + amountMoney.toLocaleString() + "**");
         embed3.setDescription(
           "**" +
-            escapeSpecialCharacters(message.author.username) +
+            escapeFormattingCharacters(message.author.username) +
             "** tried to rob you in **" +
             message.guild.name +
             "**\n" +

@@ -4,7 +4,7 @@ import { CustomEmbed } from "../models/EmbedBuilders";
 import { getBannedUsers } from "../utils/functions/moderation/ban";
 
 import PageManager from "../utils/functions/page";
-import { escapeSpecialCharacters } from "../utils/functions/string";
+import { escapeFormattingCharacters } from "../utils/functions/string";
 import { getLastKnownUsername } from "../utils/functions/users/tag";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -44,7 +44,7 @@ async function run(
   const pageItems: string[] = [];
 
   for (const m of banned) {
-    const username = escapeSpecialCharacters(
+    const username = escapeFormattingCharacters(
       (await getLastKnownUsername(m.userId)) ??
         (await message.client.users.fetch(m.userId).catch(() => undefined as User))?.username ??
         "",

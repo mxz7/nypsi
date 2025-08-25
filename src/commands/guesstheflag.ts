@@ -15,8 +15,8 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { MStoTime } from "../utils/functions/date";
 import { startGTFGame } from "../utils/functions/gtf/game";
 import { getMember } from "../utils/functions/member";
+import { escapeFormattingCharacters } from "../utils/functions/string";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { escapeSpecialCharacters } from "../utils/functions/string";
 
 const cmd = new Command("guesstheflag", "play a guess the flag game", "fun").setAliases([
   "gtf",
@@ -112,7 +112,7 @@ async function run(
 
     if (target) {
       requestEmbed.setDescription(
-        `**${escapeSpecialCharacters(message.author.username)}** has challenged you to a guess the flag game\n\ndo you accept?`,
+        `**${escapeFormattingCharacters(message.author.username)}** has challenged you to a guess the flag game\n\ndo you accept?`,
       );
       requestRow.addComponents(
         new ButtonBuilder().setCustomId("gtf-deny").setLabel("deny").setStyle(ButtonStyle.Danger),
@@ -124,7 +124,7 @@ async function run(
       });
     } else {
       requestEmbed.setDescription(
-        `**${escapeSpecialCharacters(message.author.username)}** has created an open guess the flag game`,
+        `**${escapeFormattingCharacters(message.author.username)}** has created an open guess the flag game`,
       );
       requestRow.addComponents(
         new ButtonBuilder().setCustomId("gtf-deny").setLabel("cancel").setStyle(ButtonStyle.Danger),

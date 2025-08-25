@@ -12,6 +12,7 @@ import Constants from "../../../Constants";
 import { getDisabledCommands } from "../../guilds/disabledcommands";
 import { getMember } from "../../member";
 import sleep from "../../sleep";
+import { escapeFormattingCharacters } from "../../string";
 import { isUserBlacklisted } from "../../users/blacklist";
 import { getDmSettings } from "../../users/notifications";
 import { hasPadlock, setPadlock } from "../balance";
@@ -19,7 +20,6 @@ import { removeInventoryItem } from "../inventory";
 import { isPassive } from "../passive";
 import { addStat } from "../stats";
 import ms = require("ms");
-import { escapeSpecialCharacters } from "../../string";
 
 module.exports = new ItemUse(
   "lock_pick",
@@ -138,7 +138,7 @@ module.exports = new ItemUse(
     targetEmbed.setTitle("your padlock has been picked");
     targetEmbed.setDescription(
       "**" +
-        escapeSpecialCharacters(message.author.username) +
+        escapeFormattingCharacters(message.author.username) +
         "** has picked your padlock in **" +
         message.guild.name +
         "**\n" +
