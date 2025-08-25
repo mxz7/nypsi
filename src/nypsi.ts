@@ -5,7 +5,7 @@ import ms = require("ms");
 
 // when first seen in cache
 const cacheTimestamp = new Map<string, number>();
-const minTimeInCache = ms("2 minutes");
+const minTimeInCache = { guildMember: ms("2 minutes"), user: ms("10 minutes") };
 
 const client = new NypsiClient({
   allowedMentions: {
@@ -35,7 +35,7 @@ const client = new NypsiClient({
         if (!cacheTimestamp.has(key)) {
           cacheTimestamp.set(key, Date.now());
           return false;
-        } else if (cacheTimestamp.get(key) < Date.now() - minTimeInCache) {
+        } else if (cacheTimestamp.get(key) < Date.now() - minTimeInCache.guildMember) {
           // if they've been in cache longer than min time
           if (recentCommands.has(member.id)) {
             return false;
@@ -58,7 +58,7 @@ const client = new NypsiClient({
         if (!cacheTimestamp.has(user.id)) {
           cacheTimestamp.set(user.id, Date.now());
           return false;
-        } else if (cacheTimestamp.get(user.id) < Date.now() - minTimeInCache) {
+        } else if (cacheTimestamp.get(user.id) < Date.now() - minTimeInCache.user) {
           // if they've been in cache longer than min time
           if (recentCommands.has(user.id)) {
             return false;
@@ -102,7 +102,7 @@ const client = new NypsiClient({
         if (!cacheTimestamp.has(user.id)) {
           cacheTimestamp.set(user.id, Date.now());
           return true;
-        } else if (cacheTimestamp.get(user.id) < Date.now() - minTimeInCache) {
+        } else if (cacheTimestamp.get(user.id) < Date.now() - minTimeInCache.user) {
           // if they've been in cache longer than min time
           if (recentCommands.has(user.id)) {
             return true;
@@ -126,7 +126,7 @@ const client = new NypsiClient({
         if (!cacheTimestamp.has(key)) {
           cacheTimestamp.set(key, Date.now());
           return true;
-        } else if (cacheTimestamp.get(key) < Date.now() - minTimeInCache) {
+        } else if (cacheTimestamp.get(key) < Date.now() - minTimeInCache.guildMember) {
           // if they've been in cache longer than min time
           if (recentCommands.has(user.id)) {
             return true;
