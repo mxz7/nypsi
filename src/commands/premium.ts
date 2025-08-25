@@ -6,6 +6,7 @@ import Constants from "../utils/Constants";
 import { daysAgo, daysUntil, formatDate } from "../utils/functions/date";
 import { getRawLevel } from "../utils/functions/economy/levelling";
 import { userExists } from "../utils/functions/economy/utils";
+import { getAllMembers } from "../utils/functions/guilds/members";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import PageManager from "../utils/functions/page";
 import { addUserAlias, getUserAliases, removeUserAlias } from "../utils/functions/premium/aliases";
@@ -149,9 +150,7 @@ async function run(
     if (message.guildId !== Constants.NYPSI_SERVER_ID) return;
     doingRoles = true;
 
-    let members = await message.guild.members.fetch();
-
-    if (members.size !== message.guild.memberCount) members = await message.guild.members.fetch();
+    const members = await getAllMembers(message.guild, true);
 
     for (const guildMember of members.values()) {
       if (guildMember.user.id === Constants.OWNER_ID) continue; // no roles for me teehee

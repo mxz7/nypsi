@@ -1,6 +1,7 @@
 import { CommandInteraction, MessageReaction, PermissionFlagsBits, User } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import { getAllMembers } from "../utils/functions/guilds/members";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { newCase } from "../utils/functions/moderation/cases";
 import { getDuration } from "../utils/functions/string";
@@ -60,7 +61,7 @@ async function run(
     return send({ embeds: [new ErrorEmbed("lol dont even try")] });
   }
 
-  let members = await message.guild.members.fetch();
+  let members = await getAllMembers(message.guild, true);
 
   members = members.filter((m) => m.joinedTimestamp >= time);
 

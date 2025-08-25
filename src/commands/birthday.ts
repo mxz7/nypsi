@@ -14,6 +14,7 @@ import {
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { setBirthdayChannel } from "../utils/functions/guilds/birthday";
+import { getAllMembers } from "../utils/functions/guilds/members";
 import PageManager from "../utils/functions/page";
 import {
   getBirthday,
@@ -251,11 +252,9 @@ async function run(
       ],
     });
   } else if (args[0]?.toLowerCase() === "upcoming") {
-    const members = await message.guild.members.fetch().catch(() => {
-      return new Collection<string, GuildMember>();
-    });
+    const members = await getAllMembers(message.guild);
 
-    const birthdays = await getUpcomingBirthdays(members.map((m) => m.id));
+    const birthdays = await getUpcomingBirthdays(members);
 
     if (birthdays.length === 0) {
       return send({ embeds: [new ErrorEmbed("no upcoming birthdays")] });

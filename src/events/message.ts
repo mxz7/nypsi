@@ -29,6 +29,7 @@ import { addEventProgress } from "../utils/functions/economy/events";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { userExists } from "../utils/functions/economy/utils";
 import { checkAutoMute, checkMessageContent } from "../utils/functions/guilds/filters";
+import { getAllMembers } from "../utils/functions/guilds/members";
 import { isSlashOnly } from "../utils/functions/guilds/slash";
 import { getGuildName, getPrefix, hasGuild } from "../utils/functions/guilds/utils";
 import { getKarma } from "../utils/functions/karma/karma";
@@ -561,9 +562,7 @@ export default async function messageCreate(message: Message) {
 
     if (message.mentions.everyone) {
       if (message.guild.members.cache.size != message.guild.memberCount) {
-        await message.guild.members.fetch().catch((e) => {
-          logger.error("failed to fetch guild members for @everyone mention", e);
-        });
+        await getAllMembers(message.guild, true);
       }
 
       let members: Collection<string, GuildMember | ThreadMember> | ThreadMemberManager =
@@ -576,9 +575,7 @@ export default async function messageCreate(message: Message) {
       mentionMembers = Array.from(members.mapValues((m) => m.user.id).values());
     } else if (message.mentions.roles.first()) {
       if (message.guild.members.cache.size != message.guild.memberCount) {
-        await message.guild.members.fetch().catch((e) => {
-          logger.error("failed to fetch members for role mention", e);
-        });
+        await getAllMembers(message.guild, true);
       }
 
       message.mentions.roles.forEach((r) => {

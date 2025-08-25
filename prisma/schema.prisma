@@ -614,6 +614,18 @@ model Guild {
   ModerationEvidence  ModerationEvidence[]
   GuildEvidenceCredit GuildEvidenceCredit[]
   ChatFilter          ChatFilter[]
+  members             GuildMember[]
+}
+
+model GuildMember {
+  createdAt DateTime @default(now())
+
+  guildId String
+  userId  String
+
+  guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@id([guildId, userId])
 }
 
 model ChatFilter {
@@ -847,7 +859,7 @@ enum EconomyGuildRole {
 }
 
 model EconomyGuildMember {
-  userId    String   @unique
+  userId    String           @unique
   guildName String
   joinedAt  DateTime
   role      EconomyGuildRole @default(member)

@@ -5,11 +5,11 @@ import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { formatDate } from "../utils/functions/date";
+import { getAllMembers } from "../utils/functions/guilds/members";
 import { getMember } from "../utils/functions/member";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
 import { addView } from "../utils/functions/users/views";
 import workerSort from "../utils/functions/workers/sort";
-import { logger } from "../utils/logger";
 
 const cmd = new Command("user", "view info about a user in the server", "info").setAliases([
   "whois",
@@ -40,16 +40,7 @@ async function run(
     return send({ embeds: [embed] });
   }
 
-  let members;
-
-  if (message.guild.memberCount == message.guild.members.cache.size) {
-    members = message.guild.members.cache;
-  } else {
-    members = await message.guild.members.fetch().catch((e) => {
-      logger.error("failed to fetch members for join position", e);
-      return message.guild.members.cache;
-    });
-  }
+  const members = await getAllMembers(message.guild, true);
 
   let membersSorted: { id: string; joinedTimestamp: number }[] = [];
   let msg: Message;
