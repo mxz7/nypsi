@@ -509,7 +509,7 @@ async function run(
           new CustomEmbed(
             target,
             `${tags
-              .map((i) => `- ${getTagsData()[i.tagId].emoji} ${getTagsData()[i.tagId].name}`)
+              .map((i) => `- ${getTagsData()[i.tagId].emoji} \`${getTagsData()[i.tagId].name}\``)
               .join("\n")}`,
           ).setHeader(`${target.user.username}'s tags`, target.user.avatarURL()),
         ],
