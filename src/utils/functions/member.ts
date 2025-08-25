@@ -3,6 +3,7 @@ import { inPlaceSort, sort } from "fast-sort";
 import { compareTwoStrings } from "string-similarity";
 import Constants from "../Constants";
 import { logger } from "../logger";
+import { getAllMembers } from "./guilds/members";
 import chooseMember from "./workers/choosemember";
 import ms = require("ms");
 
@@ -51,6 +52,18 @@ export async function getMember(
 ): Promise<GuildMember | { username: string; score: number }[]> {
   if (!guild) return null;
 
+  memberName = memberName.toLowerCase();
+
+  const cacheHit = memberCache.get(guild.id)?.get(memberName);
+
+  if (cacheHit && !debug) {
+    if (cacheHit.expire < Date.now()) {
+      memberCache.get(guild.id).delete(memberName);
+    } else {
+      return (await guild.members.fetch(cacheHit.userId).catch(() => {})) || null;
+    }
+  }
+
   if (memberName.match(Constants.MEMBER_MENTION_REGEX)) {
     return (await guild.members.fetch(memberName.replaceAll(/\D/g, "")).catch(() => {})) || null;
   }
@@ -64,16 +77,7 @@ export async function getMember(
   if (guild.memberCount === guild.members.cache.size) {
     members = guild.members.cache;
   } else {
-    members = await guild.members.fetch();
-  }
-
-  memberName = memberName.toLowerCase();
-
-  const cacheHit = memberCache.get(guild.id)?.get(memberName);
-
-  if (cacheHit && !debug) {
-    if (cacheHit.expire < Date.now()) memberCache.get(guild.id).delete(memberName);
-    return members.get(cacheHit.userId);
+    members = await getAllMembers(guild, true);
   }
 
   let target: GuildMember;
@@ -177,7 +181,7 @@ export async function getExactMember(guild: Guild, memberName: string): Promise<
   if (guild.memberCount == guild.members.cache.size && guild.memberCount <= 25) {
     members = guild.members.cache;
   } else {
-    members = await guild.members.fetch();
+    members = await getAllMembers(guild, true);
   }
 
   return members.find(
