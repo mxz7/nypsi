@@ -16,6 +16,7 @@ import { addStat } from "../utils/functions/economy/stats";
 import { getItems, isEcoBanned } from "../utils/functions/economy/utils";
 import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import { getTier } from "../utils/functions/premium/premium";
+import { escapeSpecialCharacters } from "../utils/functions/string";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
 import { transaction } from "../utils/logger";
@@ -120,7 +121,7 @@ export default {
       addNotificationToQueue({
         memberId: offer.ownerId,
         payload: {
-          content: `your offer to ${interaction.user.username.replaceAll("_", "\\_")} for ${offer.itemAmount}x ${
+          content: `your offer to ${escapeSpecialCharacters(interaction.user.username)} for ${offer.itemAmount}x ${
             getItems()[offer.itemId].name
           } has been accepted`,
           embed: new CustomEmbed(

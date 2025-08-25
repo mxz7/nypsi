@@ -7,6 +7,7 @@ import Constants from "../../../Constants";
 import { getMember } from "../../member";
 import { removeInventoryItem } from "../inventory";
 import { addStat } from "../stats";
+import { escapeSpecialCharacters } from "../../string";
 
 module.exports = new ItemUse(
   "rick_astley",
@@ -25,7 +26,7 @@ module.exports = new ItemUse(
       return ItemUse.send(message, {
         embeds: [
           new ErrorEmbed(
-            `${target.user.username.replaceAll("_", "\\_")} already has a rick roll queued`,
+            `${escapeSpecialCharacters(target.user.username)} already has a rick roll queued`,
           ),
         ],
       });
@@ -39,7 +40,7 @@ module.exports = new ItemUse(
       embeds: [
         new CustomEmbed(
           message.member,
-          `<a:rick_astley:1100529748796506203> **${target.user.username.replaceAll("_", "\\_")}** will be rick rolled soon xd !!!!`,
+          `<a:rick_astley:1100529748796506203> **${escapeSpecialCharacters(target.user.username)}** will be rick rolled soon xd !!!!`,
         ),
       ],
     });

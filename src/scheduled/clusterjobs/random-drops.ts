@@ -34,7 +34,7 @@ import {
 import { getPrefix } from "../../utils/functions/guilds/utils";
 import { percentChance, shuffle } from "../../utils/functions/random";
 import sleep from "../../utils/functions/sleep";
-import { getZeroWidth } from "../../utils/functions/string";
+import { escapeSpecialCharacters, getZeroWidth } from "../../utils/functions/string";
 import { getLastKnownUsername } from "../../utils/functions/users/tag";
 import { createProfile, hasProfile } from "../../utils/functions/users/utils";
 import { logger } from "../../utils/logger";
@@ -706,7 +706,7 @@ export async function startLootRain(channel: GuildTextBasedChannel, user: User) 
     embeds: [
       new CustomEmbed(
         null,
-        `**${user.username.replaceAll("_", "\\_")}'s loot rain is starting!!!**`,
+        `**${escapeSpecialCharacters(user.username)}'s loot rain is starting!!!**`,
       ).setColor(0xffffff),
     ],
   });
@@ -726,7 +726,7 @@ export async function startLootRain(channel: GuildTextBasedChannel, user: User) 
         embeds: [
           new CustomEmbed(
             null,
-            `**${user.username.replaceAll("_", "\\_")}'s loot rain has ended.**`,
+            `**${escapeSpecialCharacters(user.username)}'s loot rain has ended.**`,
           ).setColor(0xffffff),
         ],
       });

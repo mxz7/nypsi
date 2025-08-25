@@ -7,6 +7,7 @@ import Constants from "../utils/Constants";
 import { addBalance } from "../utils/functions/economy/balance";
 import { getItems, isEcoBanned } from "../utils/functions/economy/utils";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
+import { escapeSpecialCharacters } from "../utils/functions/string";
 
 export default {
   name: "deny-offer",
@@ -73,7 +74,7 @@ export default {
       addNotificationToQueue({
         memberId: offer.ownerId,
         payload: {
-          content: `your offer to ${interaction.user.username.replaceAll("_", "\\_")} for ${offer.itemAmount}x ${
+          content: `your offer to ${escapeSpecialCharacters(interaction.user.username)} for ${offer.itemAmount}x ${
             getItems()[offer.itemId].name
           } has been denied`,
           embed: new CustomEmbed(

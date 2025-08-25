@@ -32,6 +32,7 @@ import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
+import { escapeSpecialCharacters } from "../utils/functions/string";
 
 const playerCooldown = new Set<string>();
 
@@ -203,7 +204,7 @@ async function run(
     embed2.addField(
       "**fail!!**",
       "**" +
-        target.user.username.replaceAll("_", "\\_") +
+        escapeSpecialCharacters(target.user.username) +
         "** has been robbed recently and is protected by a private security team\n" +
         "you were caught and paid $" +
         amountMoney.toLocaleString(),
@@ -213,7 +214,7 @@ async function run(
     embed3.setColor(Constants.EMBED_SUCCESS_COLOR);
     embed3.setDescription(
       "**" +
-        message.author.username.replaceAll("_", "\\_") +
+        escapeSpecialCharacters(message.author.username) +
         "** tried to rob you in **" +
         message.guild.name +
         "**\n" +
@@ -239,7 +240,7 @@ async function run(
     embed2.addField(
       "fail!!",
       "**" +
-        target.user.username.replaceAll("_", "\\_") +
+        escapeSpecialCharacters(target.user.username) +
         "** had a padlock, which has now been broken",
     );
 
@@ -247,7 +248,7 @@ async function run(
     embed3.setColor(Constants.EMBED_SUCCESS_COLOR);
     embed3.setDescription(
       "**" +
-        message.author.username.replaceAll("_", "\\_") +
+        escapeSpecialCharacters(message.author.username) +
         "** tried to rob you in **" +
         message.guild.name +
         "**\n" +
@@ -328,7 +329,7 @@ async function run(
       embed3.setColor(Constants.EMBED_FAIL_COLOR);
       embed3.setDescription(
         "**" +
-          message.author.username.replaceAll("_", "\\_") +
+          escapeSpecialCharacters(message.author.username) +
           "** has robbed you in **" +
           message.guild.name +
           "**\n" +
@@ -370,7 +371,7 @@ async function run(
         );
         embed3.setDescription(
           "**" +
-            message.author.username.replaceAll("_", "\\_") +
+            escapeSpecialCharacters(message.author.username) +
             "** tried to rob you in **" +
             message.guild.name +
             "**\n" +
@@ -391,7 +392,7 @@ async function run(
         embed2.addField("fail!!", "you lost $**" + amountMoney.toLocaleString() + "**");
         embed3.setDescription(
           "**" +
-            message.author.username.replaceAll("_", "\\_") +
+            escapeSpecialCharacters(message.author.username) +
             "** tried to rob you in **" +
             message.guild.name +
             "**\n" +

@@ -8,6 +8,7 @@ import Constants from "./Constants";
 import { formatTransaction } from "./functions/transactions";
 import chalk = require("chalk");
 import dayjs = require("dayjs");
+import { escapeSpecialCharacters } from "./functions/string";
 
 export type WriteData = {
   level: number;
@@ -402,7 +403,7 @@ export function gamble(
   if (!nextLogMsg.get("gamble")) {
     nextLogMsg.set(
       "gamble",
-      `**${user.username.replaceAll("_", "\\_")}** (${user.id})\n` +
+      `**${escapeSpecialCharacters(user.username)}** (${user.id})\n` +
         `- **game** ${game}\n` +
         `- **bet** $${amount.toLocaleString()}\n` +
         `- **result** ${result}${
@@ -415,7 +416,7 @@ export function gamble(
     nextLogMsg.set(
       "gamble",
       nextLogMsg.get("gamble") +
-        `**${user.username.replaceAll("_", "\\_")}** (${user.id})\n` +
+        `**${escapeSpecialCharacters(user.username)}** (${user.id})\n` +
         `- **game** ${game}\n` +
         `- **bet** $${amount.toLocaleString()}\n` +
         `- **result** ${result}${

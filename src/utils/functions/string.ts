@@ -132,3 +132,7 @@ export function pluralize(
 
   return amount == 1 ? data.name : (data.plural ?? data.name);
 }
+
+export function escapeSpecialCharacters(str: string) {
+  return str.replaceAll("_", "\\_");
+}

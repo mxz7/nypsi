@@ -34,6 +34,7 @@ import { getLastKnownUsername } from "../utils/functions/users/tag";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
 import dayjs = require("dayjs");
+import { escapeSpecialCharacters } from "../utils/functions/string";
 
 const cmd = new Command("offer", "create and manage offers", "money").setAliases([
   "offers",
@@ -408,14 +409,14 @@ async function run(
         return send({
           embeds: [
             new ErrorEmbed(
-              `**${target.user.username.replaceAll("_", "\\_")}** has disabled offers`,
+              `**${escapeSpecialCharacters(target.user.username)}** has disabled offers`,
             ),
           ],
         });
       return send({
         embeds: [
           new ErrorEmbed(
-            `**${target.user.username.replaceAll("_", "\\_")}** has already received their max amount of offers (${
+            `**${escapeSpecialCharacters(target.user.username)}** has already received their max amount of offers (${
               (await getPreferences(target)).offers
             })`,
           ),
@@ -436,7 +437,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            `**${target.user.username.replaceAll("_", "\\_")}** has blocked offers for ${selected.emoji} ${selected.name}`,
+            `**${escapeSpecialCharacters(target.user.username)}** has blocked offers for ${selected.emoji} ${selected.name}`,
           ),
         ],
       });
@@ -445,7 +446,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            `**${target.user.username.replaceAll("_", "\\_")}** has blocked offers from you`,
+            `**${escapeSpecialCharacters(target.user.username)}** has blocked offers from you`,
           ),
         ],
       });
@@ -463,7 +464,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            `**${target.user.username.replaceAll("_", "\\_")}** doesnt have ${amount}x ${selected.emoji} ${selected.name}`,
+            `**${escapeSpecialCharacters(target.user.username)}** doesnt have ${amount}x ${selected.emoji} ${selected.name}`,
           ),
         ],
       });
@@ -499,7 +500,7 @@ async function run(
         embeds: [
           new CustomEmbed(
             message.member,
-            `✅ offer has been sent to **${target.user.username.replaceAll("_", "\\_")}**`,
+            `✅ offer has been sent to **${escapeSpecialCharacters(target.user.username)}**`,
           ),
         ],
       });

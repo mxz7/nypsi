@@ -24,6 +24,7 @@ import { MStoTime } from "../date";
 import { addProgress } from "../economy/achievements";
 import { addTaskProgress } from "../economy/tasks";
 import { fetchCountryData } from "./countries";
+import { escapeSpecialCharacters } from "../string";
 
 export async function startGTFGame(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
@@ -62,7 +63,7 @@ export async function startGTFGame(
 
     embed.setDescription(
       "guess the country of the flag below\n\n" +
-        `${message.author.username.replaceAll("_", "\\_")} vs ${secondPlayer.username.replaceAll("_", "\\_")}`,
+        `${escapeSpecialCharacters(message.author.username)} vs ${secondPlayer.username.replaceAll("_", "\\_")}`,
     );
     embed.setHeader("guess the flag");
   }

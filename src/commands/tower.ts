@@ -51,6 +51,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 import { gamble, getTimestamp, logger } from "../utils/logger";
 import _ = require("lodash");
 import ms = require("ms");
+import { escapeSpecialCharacters } from "../utils/functions/string";
 
 const cmd = new Command("tower", "play dragon tower", "money").setAliases([
   "dragon",
@@ -482,7 +483,7 @@ async function playGame(
             url: process.env.ANTICHEAT_HOOK,
           });
           await hook.send({
-            content: `[${getTimestamp()}] ${message.member.user.username.replaceAll("_", "\\_")} (${message.author.id}) given captcha randomly in tower`,
+            content: `[${getTimestamp()}] ${escapeSpecialCharacters(message.member.user.username)} (${message.author.id}) given captcha randomly in tower`,
           });
           hook.destroy();
         }

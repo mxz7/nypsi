@@ -53,6 +53,7 @@ import { recentCommands } from "../utils/functions/users/commands.js";
 import { addHourlyCommand } from "../utils/handlers/commandhandler.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { gamble, getTimestamp, logger } from "../utils/logger.js";
+import { escapeSpecialCharacters } from "../utils/functions/string.js";
 
 type Game = {
   bet: number;
@@ -520,7 +521,7 @@ async function playGame(
           url: process.env.ANTICHEAT_HOOK,
         });
         await hook.send({
-          content: `[${getTimestamp()}] ${message.member.user.username.replaceAll("_", "\\_")} (${message.author.id}) given captcha randomly in mines`,
+          content: `[${getTimestamp()}] ${escapeSpecialCharacters(message.member.user.username)} (${message.author.id}) given captcha randomly in mines`,
         });
         hook.destroy();
       }

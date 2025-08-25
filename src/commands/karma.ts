@@ -4,6 +4,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getKarma } from "../utils/functions/karma/karma";
 import { getMember } from "../utils/functions/member";
+import { escapeSpecialCharacters } from "../utils/functions/string";
 
 const cmd = new Command("karma", "check how much karma you have", "money").setDocs(
   "https://nypsi.xyz/docs/economy/karma?ref=bot-help",
@@ -39,7 +40,7 @@ async function run(
   } else {
     embed.setHeader(`${target.user.username}'s karma`, target.user.avatarURL());
     embed.setDescription(
-      `${target.user.username.replaceAll("_", "\\_")} has **${karma.toLocaleString()}** karma 🔮`,
+      `${escapeSpecialCharacters(target.user.username)} has **${karma.toLocaleString()}** karma 🔮`,
     );
   }
 

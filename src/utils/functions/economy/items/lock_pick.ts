@@ -19,6 +19,7 @@ import { removeInventoryItem } from "../inventory";
 import { isPassive } from "../passive";
 import { addStat } from "../stats";
 import ms = require("ms");
+import { escapeSpecialCharacters } from "../../string";
 
 module.exports = new ItemUse(
   "lock_pick",
@@ -137,7 +138,7 @@ module.exports = new ItemUse(
     targetEmbed.setTitle("your padlock has been picked");
     targetEmbed.setDescription(
       "**" +
-        message.author.username.replaceAll("_", "\\_") +
+        escapeSpecialCharacters(message.author.username) +
         "** has picked your padlock in **" +
         message.guild.name +
         "**\n" +

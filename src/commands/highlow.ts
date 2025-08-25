@@ -48,6 +48,7 @@ import { addHourlyCommand } from "../utils/handlers/commandhandler.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { gamble, getTimestamp, logger } from "../utils/logger.js";
 import ms = require("ms");
+import { escapeSpecialCharacters } from "../utils/functions/string.js";
 
 const games = new Map<
   string,
@@ -395,7 +396,7 @@ async function playGame(
           url: process.env.ANTICHEAT_HOOK,
         });
         await hook.send({
-          content: `[${getTimestamp()}] ${message.member.user.username.replaceAll("_", "\\_")} (${message.author.id}) given captcha randomly in high low`,
+          content: `[${getTimestamp()}] ${escapeSpecialCharacters(message.member.user.username)} (${message.author.id}) given captcha randomly in high low`,
         });
         hook.destroy();
       }

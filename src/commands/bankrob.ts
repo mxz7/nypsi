@@ -40,6 +40,7 @@ import {
   onCooldown,
 } from "../utils/handlers/cooldownhandler.js";
 import { getTimestamp, logger } from "../utils/logger";
+import { escapeSpecialCharacters } from "../utils/functions/string";
 
 const cmd = new Command("bankrob", "attempt to rob a bank for a high reward", "money");
 
@@ -272,7 +273,7 @@ async function run(
             url: process.env.ANTICHEAT_HOOK,
           });
           await hook.send({
-            content: `[${getTimestamp()}] ${message.member.user.username.replaceAll("_", "\\_")} (${message.author.id}) given captcha randomly in bankrob`,
+            content: `[${getTimestamp()}] ${escapeSpecialCharacters(message.member.user.username)} (${message.author.id}) given captcha randomly in bankrob`,
           });
           hook.destroy();
         }

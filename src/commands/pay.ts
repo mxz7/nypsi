@@ -24,6 +24,7 @@ import { getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { transaction } from "../utils/logger";
 import dayjs = require("dayjs");
+import { escapeSpecialCharacters } from "../utils/functions/string";
 
 const cmd = new Command("pay", "give other users money", "money");
 
@@ -155,7 +156,7 @@ async function run(
   if ((await getDmSettings(target)).payment) {
     const embed = new CustomEmbed(
       target,
-      `**${message.author.username.replaceAll("_", "\\_")}** has sent you $**${Math.floor(
+      `**${escapeSpecialCharacters(message.author.username)}** has sent you $**${Math.floor(
         amount - taxedAmount,
       ).toLocaleString()}**`,
     )
