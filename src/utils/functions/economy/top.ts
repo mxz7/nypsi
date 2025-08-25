@@ -6,7 +6,7 @@ import { getAllMembers } from "../guilds/members";
 import { getUserId, MemberResolvable } from "../member";
 import { Mutex } from "../mutex";
 import PageManager from "../page";
-import { escapeFormattingCharacters, formatTime, pluralize } from "../string";
+import { formatTime, pluralize } from "../string";
 import { getPreferences } from "../users/notifications";
 import { getActiveTag } from "../users/tags";
 import { getLastKnownUsername, updateLastKnownUsername } from "../users/username";
@@ -76,8 +76,6 @@ export async function topBalance(guild: Guild, member?: MemberResolvable) {
           await updateLastKnownUsername(user.userId, username);
         }
       }
-
-      username = escapeFormattingCharacters(username);
 
       out[currentCount] = `${pos} ${await formatUsername(
         user.userId,
@@ -292,8 +290,6 @@ export async function topNetWorth(guild: Guild, member?: MemberResolvable) {
           }
         }
 
-        username = escapeFormattingCharacters(username);
-
         out[currentCount] = `${pos} ${await formatUsername(
           user.userId,
           username,
@@ -382,8 +378,6 @@ export async function topPrestige(guild: Guild, member?: MemberResolvable) {
           await updateLastKnownUsername(user.userId, username);
         }
       }
-
-      username = escapeFormattingCharacters(username);
 
       out[currentCount] = `${pos} ${await formatUsername(
         user.userId,
@@ -543,8 +537,6 @@ export async function topItem(guild: Guild, item: string, member: MemberResolvab
         }
       }
 
-      username = escapeFormattingCharacters(username);
-
       out[currentCount] = `${pos} ${await formatUsername(
         user.userId,
         username,
@@ -683,7 +675,7 @@ export async function topCompletion(guild: Guild, member: MemberResolvable) {
     count++;
 
     promises.push(async () => {
-      const usernameData = await getLastKnownUsername(user.userId, true, true);
+      const usernameData = await getLastKnownUsername(user.userId, false, true);
 
       let username = usernameData.lastKnownUsername;
 
@@ -1090,7 +1082,7 @@ export async function topWordle(guild: Guild, member: MemberResolvable) {
     count++;
 
     promises.push(async () => {
-      const usernameData = await getLastKnownUsername(user.userId, true, true);
+      const usernameData = await getLastKnownUsername(user.userId, false, true);
 
       let username = usernameData.lastKnownUsername;
 
@@ -1222,7 +1214,7 @@ export async function topWordleTime(guild: Guild, member: MemberResolvable) {
     count++;
 
     promises.push(async () => {
-      const usernameData = await getLastKnownUsername(user.userId, true, true);
+      const usernameData = await getLastKnownUsername(user.userId, false, true);
 
       let username = usernameData.lastKnownUsername;
 
@@ -1488,7 +1480,7 @@ export async function topCommandUses(guild: Guild, member: MemberResolvable) {
     count++;
 
     promises.push(async () => {
-      const usernameData = await getLastKnownUsername(user.userId, true, true);
+      const usernameData = await getLastKnownUsername(user.userId, false, true);
 
       let username = usernameData.lastKnownUsername;
 
@@ -2062,11 +2054,11 @@ export async function formatUsername(id: string, username: string, privacy: bool
   if (!privacy)
     return "[**[hidden]**](https://nypsi.xyz/docs/economy/user-settings/hidden?ref=bot-lb)";
 
-  let out = `[${username}](https://nypsi.xyz/users/${encodeURIComponent(id)}?ref=bot-lb)`;
+  let out = `[**${username}**](https://nypsi.xyz/users/${encodeURIComponent(id)}?ref=bot-lb)`;
 
   const tag = await getActiveTag(id);
 
   if (tag) out = `[${getTagsData()[tag.tagId].emoji}] ${out}`;
 
-  return `**${out}**`;
+  return out;
 }
