@@ -139,7 +139,7 @@ async function run(
       "tails",
     ];
     const choice = lols[randomInt(lols.length)];
-    let thingy = `${escapeFormattingCharacters(target.user.username)}\n${escapeFormattingCharacters(target.user.username)}`;
+    let thingy = `${escapeFormattingCharacters(player1.user.username)}\n${escapeFormattingCharacters(player2.user.username)}`;
 
     let winner: GuildMember;
     let loser: GuildMember;
@@ -217,7 +217,7 @@ async function run(
       if (winner == message.member) {
         thingy = `**${escapeFormattingCharacters(message.author.username)}** +$${winnings.toLocaleString()}${
           tax ? ` (${(tax * 100).toFixed(1)}% tax)` : ""
-        }\n${escapeFormattingCharacters(target.user.username)}`;
+        }\n${escapeFormattingCharacters(player2.user.username)}`;
       } else {
         thingy = `${escapeFormattingCharacters(message.author.username)}\n**${player2.user.username.replaceAll(
           "_",
@@ -275,12 +275,9 @@ async function run(
       await addInventoryItem(winner, item.id, itemAmount * 2);
 
       if (winner == message.member) {
-        thingy = `**${escapeFormattingCharacters(message.author.username)}** +${(itemAmount * 2).toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-cf)**\n${escapeFormattingCharacters(target.user.username)}`;
+        thingy = `**${escapeFormattingCharacters(message.author.username)}** +${(itemAmount * 2).toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-cf)**\n${escapeFormattingCharacters(player2.user.username)}`;
       } else {
-        thingy = `${escapeFormattingCharacters(message.author.username)}\n**${player2.user.username.replaceAll(
-          "_",
-          "\\_",
-        )}** +${(itemAmount * 2).toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-cf)**`;
+        thingy = `${escapeFormattingCharacters(message.author.username)}\n**${escapeFormattingCharacters(player2.user.username)}** +${(itemAmount * 2).toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-cf)**`;
       }
 
       const eventData: { event?: EventData; target: number } = { target: 0 };
