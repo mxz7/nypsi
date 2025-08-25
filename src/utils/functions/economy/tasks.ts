@@ -9,7 +9,7 @@ import { addKarma } from "../karma/karma";
 import { getUserId, MemberResolvable } from "../member";
 import sleep from "../sleep";
 import { addInlineNotification } from "../users/notifications";
-import { getLastKnownAvatar } from "../users/tag";
+import { getLastKnownAvatar } from "../users/username";
 import { addProgress } from "./achievements";
 import { addBalance } from "./balance";
 import { addToGuildXP, getGuildName } from "./guilds";

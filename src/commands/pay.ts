@@ -19,6 +19,7 @@ import {
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
+import { escapeFormattingCharacters } from "../utils/functions/string";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -155,7 +156,7 @@ async function run(
   if ((await getDmSettings(target)).payment) {
     const embed = new CustomEmbed(
       target,
-      `**${message.author.username.replaceAll("_", "\\_")}** has sent you $**${Math.floor(
+      `**${escapeFormattingCharacters(message.author.username)}** has sent you $**${Math.floor(
         amount - taxedAmount,
       ).toLocaleString()}**`,
     )

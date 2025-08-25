@@ -2,6 +2,7 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
+import { escapeFormattingCharacters } from "../string";
 
 export async function updateLastKnownUsername(member: MemberResolvable, tag: string) {
   const userId = getUserId(member);
@@ -12,16 +13,48 @@ export async function updateLastKnownUsername(member: MemberResolvable, tag: str
     },
     data: {
       lastKnownUsername: tag,
+      usernameUpdatedAt: new Date(),
     },
   });
 
   await redis.set(`${Constants.redis.cache.user.username}:${userId}`, tag, "EX", 7200);
 }
 
-export async function getLastKnownUsername(id: string, escapeSpecialCharacters = true) {
+export async function getLastKnownUsername(
+  id: string,
+  escape?: boolean,
+  showUpdatedAt?: false,
+): Promise<string>;
+export async function getLastKnownUsername(
+  id: string,
+  escape?: boolean,
+  showUpdatedAt?: true,
+): Promise<{ lastKnownUsername: string; usernameUpdatedAt: Date }>;
+export async function getLastKnownUsername(
+  id: string,
+  escape = true,
+  showUpdatedAt?: boolean,
+): Promise<string | { lastKnownUsername: string; usernameUpdatedAt: Date }> {
   const cache = await redis.get(`${Constants.redis.cache.user.username}:${id}`);
 
-  if (cache) return escapeSpecialCharacters ? cache.replaceAll("_", "\\_") : cache;
+  if (cache) {
+    const data: {
+      lastKnownUsername: string;
+      usernameUpdatedAt: Date;
+    } = JSON.parse(cache);
+
+    data.usernameUpdatedAt = new Date(data.usernameUpdatedAt);
+
+    if (escape) {
+      data.lastKnownUsername = escapeFormattingCharacters(data.lastKnownUsername);
+    }
+
+    if (showUpdatedAt) {
+      return data;
+    }
+
+    return data.lastKnownUsername;
+  }
 
   const query = await prisma.user.findUnique({
     where: {
@@ -29,19 +62,28 @@ export async function getLastKnownUsername(id: string, escapeSpecialCharacters =
     },
     select: {
       lastKnownUsername: true,
+      usernameUpdatedAt: true,
     },
   });
 
   await redis.set(
     `${Constants.redis.cache.user.username}:${id}`,
-    query?.lastKnownUsername || "",
+    JSON.stringify(query ? query : { lastKnownUsername: "unknown", usernameUpdatedAt: new Date() }),
     "EX",
     7200,
   );
 
-  return escapeSpecialCharacters
-    ? query?.lastKnownUsername.replaceAll("_", "\\_")
-    : query?.lastKnownUsername;
+  if (!query) return "unknown";
+
+  if (escape) {
+    query.lastKnownUsername = escapeFormattingCharacters(query.lastKnownUsername);
+  }
+
+  if (showUpdatedAt) {
+    return query;
+  }
+
+  return query.lastKnownUsername;
 }
 
 export async function getIdFromUsername(username: string) {

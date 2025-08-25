@@ -25,7 +25,7 @@ import {
   getUsedEvidenceBytes,
 } from "../utils/functions/guilds/evidence";
 import { formatBytes } from "../utils/functions/string";
-import { getLastKnownUsername } from "../utils/functions/users/tag";
+import { getLastKnownUsername } from "../utils/functions/users/username";
 
 const cmd = new Command("case", "get information about a given case", "moderation")
   .setPermissions(["MANAGE_MESSAGES", "MANAGE_SERVER", "MODERATE_MEMBERS"])

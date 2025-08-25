@@ -52,7 +52,7 @@ import { deleteImage, uploadImage } from "../utils/functions/image";
 import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import PageManager from "../utils/functions/page";
 import { cleanString, pluralize } from "../utils/functions/string";
-import { getLastKnownAvatar, getLastKnownUsername } from "../utils/functions/users/tag";
+import { getLastKnownAvatar, getLastKnownUsername } from "../utils/functions/users/username";
 import { addCooldown, addExpiry, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
 import sharp = require("sharp");

@@ -17,7 +17,7 @@ import { percentChance } from "../../utils/functions/random";
 import sleep from "../../utils/functions/sleep";
 import { getTax } from "../../utils/functions/tax";
 import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
-import { getLastKnownAvatar, getLastKnownUsername } from "../../utils/functions/users/tag";
+import { getLastKnownAvatar, getLastKnownUsername } from "../../utils/functions/users/username";
 import { logger } from "../../utils/logger";
 
 export default {

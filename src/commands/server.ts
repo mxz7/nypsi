@@ -4,6 +4,7 @@ import { CustomEmbed } from "../models/EmbedBuilders.js";
 import { formatDate } from "../utils/functions/date";
 import { getAllMembers } from "../utils/functions/guilds/members";
 import { getPeaks, updateGuild } from "../utils/functions/guilds/utils";
+import { escapeFormattingCharacters } from "../utils/functions/string";
 
 const cmd = new Command("server", "view information about the server", "info").setAliases([
   "serverinfo",
@@ -57,7 +58,7 @@ async function run(
     .addField(
       "info",
       "**owner** " +
-        server.members.cache.get(server.ownerId).user.username.replaceAll("_", "\\_") +
+        escapeFormattingCharacters(server.members.cache.get(server.ownerId).user.username) +
         "\n" +
         "**created** " +
         created,

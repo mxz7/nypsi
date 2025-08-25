@@ -29,7 +29,7 @@ import { getTier } from "../premium/premium";
 import { pluralize } from "../string";
 import { addToNypsiBank, getTax } from "../tax";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
-import { getLastKnownAvatar, getLastKnownUsername } from "../users/tag";
+import { getLastKnownAvatar, getLastKnownUsername } from "../users/username";
 import { addBalance, getBalance, removeBalance } from "./balance";
 import { addInventoryItem, getInventory, isGem, removeInventoryItem } from "./inventory";
 import { addStat } from "./stats";

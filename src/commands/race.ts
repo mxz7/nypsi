@@ -32,6 +32,7 @@ import { addStat, createGame } from "../utils/functions/economy/stats";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { createUser, formatBet, getItems, userExists } from "../utils/functions/economy/utils";
 import sleep from "../utils/functions/sleep";
+import { escapeFormattingCharacters } from "../utils/functions/string";
 import ms = require("ms");
 
 const cmd = new Command("race", "create or join a race", "money").setAliases(["sr"]);
@@ -448,7 +449,7 @@ class Race {
         addTaskProgress(winner.id, "vin_diesel");
 
         description +=
-          `\n\n**${winner.username.replaceAll("_", "\\_")}** has won with their ${
+          `\n\n**${escapeFormattingCharacters(winner.username)}** has won with their ${
             this.members.find((i) => i.user.id === winner.id).car.emoji
           } **${this.members.find((i) => i.user.id === winner.id).car.car.name}** by ${diff.toLocaleString()} meters` +
           `${this.bet ? `\n +$${winnings.toLocaleString()}` : ""}`;

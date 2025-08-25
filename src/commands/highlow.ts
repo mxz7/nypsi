@@ -42,6 +42,7 @@ import {
 import { addXp, calcEarnedGambleXp } from "../utils/functions/economy/xp.js";
 import { getTier, isPremium } from "../utils/functions/premium/premium.js";
 import { percentChance, shuffle } from "../utils/functions/random.js";
+import { escapeFormattingCharacters } from "../utils/functions/string.js";
 import { hasAdminPermission } from "../utils/functions/users/admin.js";
 import { recentCommands } from "../utils/functions/users/commands.js";
 import { addHourlyCommand } from "../utils/handlers/commandhandler.js";
@@ -395,7 +396,7 @@ async function playGame(
           url: process.env.ANTICHEAT_HOOK,
         });
         await hook.send({
-          content: `[${getTimestamp()}] ${message.member.user.username.replaceAll("_", "\\_")} (${message.author.id}) given captcha randomly in high low`,
+          content: `[${getTimestamp()}] ${escapeFormattingCharacters(message.member.user.username)} (${message.author.id}) given captcha randomly in high low`,
         });
         hook.destroy();
       }

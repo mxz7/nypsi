@@ -6,7 +6,7 @@ import { NotificationPayload } from "../../types/Notification";
 import Constants from "../../utils/Constants";
 import { getItems } from "../../utils/functions/economy/utils";
 import { addNotificationToQueue, getPreferences } from "../../utils/functions/users/notifications";
-import { getLastKnownUsername } from "../../utils/functions/users/tag";
+import { getLastKnownUsername } from "../../utils/functions/users/username";
 
 export default {
   name: "market dm",

@@ -19,7 +19,7 @@ import {
   setAutoJoinRoles,
   setPersistentRoles,
 } from "../utils/functions/guilds/roles";
-import { getMember, getRole } from "../utils/functions/member";
+import { getRole } from "../utils/functions/member";
 import PageManager from "../utils/functions/page";
 import sleep from "../utils/functions/sleep";
 import { pluralize } from "../utils/functions/string";
@@ -147,19 +147,7 @@ async function run(
   }
 
   const getMembers = async () => {
-    if (args[1].toLowerCase() == "all") {
-      return Array.from((await getAllMembers(message.guild, true)).values());
-    } else {
-      if (message.mentions?.members?.first()) {
-        return [message.mentions.members.first()];
-      } else {
-        const member = await getMember(message.guild, args[2]);
-
-        if (!member) {
-          return [];
-        }
-      }
-    }
+    return Array.from((await getAllMembers(message.guild, true)).values());
   };
 
   if (args.length == 0) {

@@ -6,7 +6,7 @@ import { InteractionHandler } from "../types/InteractionHandler";
 import Constants from "../utils/Constants";
 import { getBlockedList, setBlockedList } from "../utils/functions/economy/offers";
 import { isEcoBanned } from "../utils/functions/economy/utils";
-import { getLastKnownUsername } from "../utils/functions/users/tag";
+import { getLastKnownUsername } from "../utils/functions/users/username";
 
 export default {
   name: "block-user",
