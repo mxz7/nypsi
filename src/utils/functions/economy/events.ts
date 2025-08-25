@@ -15,7 +15,7 @@ import { logger } from "../../logger";
 import { MStoTime } from "../date";
 import { getUserId, MemberResolvable } from "../member";
 import { addNotificationToQueue, getPreferences } from "../users/notifications";
-import { getLastKnownUsername } from "../users/tag";
+import { getLastKnownUsername } from "../users/username";
 import { hasProfile } from "../users/utils";
 import { addProgress } from "./achievements";
 import { addInventoryItem } from "./inventory";

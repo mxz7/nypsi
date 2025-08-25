@@ -103,8 +103,8 @@ import { isUserBlacklisted, setUserBlacklist } from "../utils/functions/users/bl
 import { getCommandUses, getLastCommand } from "../utils/functions/users/commands";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
 import { addNotificationToQueue } from "../utils/functions/users/notifications";
-import { getLastKnownUsername } from "../utils/functions/users/tag";
 import { addTag, getTags, removeTag } from "../utils/functions/users/tags";
+import { getLastKnownUsername } from "../utils/functions/users/username";
 import { hasProfile } from "../utils/functions/users/utils";
 import {
   commandAliasExists,

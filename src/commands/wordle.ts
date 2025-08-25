@@ -15,7 +15,7 @@ import { getPrefix } from "../utils/functions/guilds/utils";
 import { addKarma } from "../utils/functions/karma/karma";
 import { formatTime } from "../utils/functions/string";
 import { getPreferences } from "../utils/functions/users/notifications";
-import { getLastKnownAvatar, getLastKnownUsername } from "../utils/functions/users/tag";
+import { getLastKnownAvatar, getLastKnownUsername } from "../utils/functions/users/username";
 import { addWordleGame, getWordleGame } from "../utils/functions/users/wordle";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");

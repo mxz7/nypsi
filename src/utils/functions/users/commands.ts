@@ -11,7 +11,7 @@ import { isEcoBanned } from "../economy/utils";
 import { getUserId, MemberResolvable } from "../member";
 import sleep from "../sleep";
 import { addNewAvatar, addNewUsername, fetchUsernameHistory, isTracking } from "./history";
-import { getLastKnownAvatar, getLastKnownUsername } from "./tag";
+import { getLastKnownAvatar, getLastKnownUsername } from "./username";
 import ms = require("ms");
 
 export const recentCommands = new Map<string, number>();

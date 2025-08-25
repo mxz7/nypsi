@@ -17,7 +17,7 @@ import { createUser, getItems, userExists } from "../utils/functions/economy/uti
 import { escapeFormattingCharacters } from "../utils/functions/string";
 import { isMarried, removeMarriage } from "../utils/functions/users/marriage";
 import { addNotificationToQueue } from "../utils/functions/users/notifications";
-import { getLastKnownUsername } from "../utils/functions/users/tag";
+import { getLastKnownUsername } from "../utils/functions/users/username";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("divorce", "divorce your partner", "fun");

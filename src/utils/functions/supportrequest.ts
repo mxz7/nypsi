@@ -11,7 +11,7 @@ import Constants from "../Constants";
 import { logger } from "../logger";
 import { uploadImage } from "./image";
 import openai, { getDocsRaw, prompt } from "./openai";
-import { getLastKnownUsername } from "./users/tag";
+import { getLastKnownUsername } from "./users/username";
 import pAll = require("p-all");
 
 export const quickResponses = new Map<string, string>();

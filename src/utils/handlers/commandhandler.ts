@@ -70,7 +70,7 @@ import {
   getInlineNotifications,
   getPreferences,
 } from "../functions/users/notifications";
-import { getLastKnownUsername } from "../functions/users/tag";
+import { getLastKnownUsername } from "../functions/users/username";
 import { createProfile, hasProfile } from "../functions/users/utils";
 import dayjs = require("dayjs");
 import ms = require("ms");

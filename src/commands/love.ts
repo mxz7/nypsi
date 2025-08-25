@@ -18,7 +18,7 @@ import { percentChance } from "../utils/functions/random";
 import { escapeFormattingCharacters } from "../utils/functions/string";
 import { addMarriage, isMarried, removeMarriage } from "../utils/functions/users/marriage";
 import { addNotificationToQueue } from "../utils/functions/users/notifications";
-import { getLastKnownUsername } from "../utils/functions/users/tag";
+import { getLastKnownUsername } from "../utils/functions/users/username";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cache = new Map<string, number>();

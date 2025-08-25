@@ -5,7 +5,7 @@ import { getMutedUsers } from "../utils/functions/moderation/mute";
 
 import PageManager from "../utils/functions/page";
 import { escapeFormattingCharacters } from "../utils/functions/string";
-import { getLastKnownUsername } from "../utils/functions/users/tag";
+import { getLastKnownUsername } from "../utils/functions/users/username";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command(

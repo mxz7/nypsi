@@ -9,7 +9,7 @@ import { findGuildCluster } from "../clusters";
 import { formatDate } from "../date";
 import { getUserId, MemberResolvable } from "../member";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
-import { getLastKnownUsername } from "../users/tag";
+import { getLastKnownUsername } from "../users/username";
 import { removeUserAlias } from "./aliases";
 import dayjs = require("dayjs");
 import ms = require("ms");

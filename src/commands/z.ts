@@ -13,7 +13,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { getExactMember, getMember } from "../utils/functions/member";
 import PageManager from "../utils/functions/page";
-import { getLastKnownAvatar, getLastKnownUsername } from "../utils/functions/users/tag";
+import { getLastKnownAvatar, getLastKnownUsername } from "../utils/functions/users/username";
 import {
   castVoteKick,
   checkZPeoples,

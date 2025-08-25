@@ -35,7 +35,7 @@ import { getPrefix } from "../../utils/functions/guilds/utils";
 import { percentChance, shuffle } from "../../utils/functions/random";
 import sleep from "../../utils/functions/sleep";
 import { escapeFormattingCharacters, getZeroWidth } from "../../utils/functions/string";
-import { getLastKnownUsername } from "../../utils/functions/users/tag";
+import { getLastKnownUsername } from "../../utils/functions/users/username";
 import { createProfile, hasProfile } from "../../utils/functions/users/utils";
 import { logger } from "../../utils/logger";
 import dayjs = require("dayjs");

@@ -5,7 +5,7 @@ import redis from "../../init/redis";
 import { Job } from "../../types/Jobs";
 import Constants from "../../utils/Constants";
 import { getPreferences } from "../../utils/functions/users/notifications";
-import { getLastKnownUsername } from "../../utils/functions/users/tag";
+import { getLastKnownUsername } from "../../utils/functions/users/username";
 
 export default {
   name: "top commands",

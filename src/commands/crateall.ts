@@ -6,7 +6,7 @@ import { addInventoryItem } from "../utils/functions/economy/inventory";
 import { getItems, userExists } from "../utils/functions/economy/utils";
 import { getAllMembers } from "../utils/functions/guilds/members";
 import { pluralize } from "../utils/functions/string";
-import { getLastKnownUsername } from "../utils/functions/users/tag";
+import { getLastKnownUsername } from "../utils/functions/users/username";
 import { logger } from "../utils/logger";
 
 const cmd = new Command(
