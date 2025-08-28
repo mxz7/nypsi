@@ -36,8 +36,8 @@ importers:
         specifier: 4.0.9
         version: 4.0.9
       bullmq:
-        specifier: ^5.58.1
-        version: 5.58.1
+        specifier: ^5.58.2
+        version: 5.58.2
       chalk:
         specifier: 4.1.2
         version: 4.1.2
@@ -48,8 +48,8 @@ importers:
         specifier: 4.2.0
         version: 4.2.0
       dayjs:
-        specifier: 1.11.13
-        version: 1.11.13
+        specifier: 1.11.14
+        version: 1.11.14
       discord-hybrid-sharding:
         specifier: 2.2.6
         version: 2.2.6
@@ -1570,8 +1570,8 @@ packages:
     resolution: {integrity: sha512-WDtdLmJvAuNNPzByAYpRo2rF1Mmradw6gvWsQKf63476DDXmomT9zUiGypLcG4ibIM67vhAj8jJRdbmEws2Aqw==}
     engines: {node: '>=6.14.2'}
 
-  bullmq@5.58.1:
-    resolution: {integrity: sha512-ySnO1Yn+J7oVkXn4cvPQQK7RFEP3hlqwnIJRxumODyLk+1o4/3H5qwB7s7e9h5W6tZdktvysNZsE/e5/VdKvuA==}
+  bullmq@5.58.2:
+    resolution: {integrity: sha512-HSGtNFM8Ttzml4OHO5cy6ju0ObnDmSedXJwpSUCFSDXR6l9MQe5CQCs/FzAb6Ac9EXYIvvF20UMV+C1OVDW39w==}
 
   c12@3.1.0:
     resolution: {integrity: sha512-uWoS8OU1MEIsOv8p/5a82c3H31LsWVR5qiyXVfBNOzfffjUWtPnhAb4BYI2uG2HfGmZmFjCtui5XNWaps+iFuw==}
@@ -1692,8 +1692,8 @@ packages:
   crypto-js@4.2.0:
     resolution: {integrity: sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q==}
 
-  dayjs@1.11.13:
-    resolution: {integrity: sha512-oaMBel6gjolK862uaPQOVTA7q3TZhuSvuMQAAglQDOWYO9A91IrAOUJEyKVlqJlHE0vq5p5UXxzdPfMH/x6xNg==}
+  dayjs@1.11.14:
+    resolution: {integrity: sha512-E8fIdSxUlyqSA8XYGnNa3IkIzxtEmFjI+JU/6ic0P1zmSqyL6HyG5jHnpPjRguDNiaHLpfvHKWFiohNsJLqcJQ==}
 
   debug@4.3.5:
     resolution: {integrity: sha512-pt0bNEmneDIvdL1Xsd9oDQ/wrQRkXDT4AUWlNZNPKvW5x/jyO9VFXkJUP07vQ2upmw5PlaITaPKc31jK13V+jg==}
@@ -5008,7 +5008,7 @@ snapshots:
     dependencies:
       node-gyp-build: 4.8.4
 
-  bullmq@5.58.1:
+  bullmq@5.58.2:
     dependencies:
       cron-parser: 4.9.0
       ioredis: 5.7.0
@@ -5129,7 +5129,7 @@ snapshots:
 
   crypto-js@4.2.0: {}
 
-  dayjs@1.11.13: {}
+  dayjs@1.11.14: {}
 
   debug@4.3.5:
     dependencies:
