@@ -1,10 +1,4 @@
-import {
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  CommandInteraction,
-  MessageActionRowComponentBuilder,
-} from "discord.js";
+import { CommandInteraction } from "discord.js";
 import redis from "../init/redis";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
@@ -12,7 +6,6 @@ import Constants from "../utils/Constants";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import PageManager from "../utils/functions/page";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { logger } from "../utils/logger";
 import dayjs = require("dayjs");
 
 const cmd = new Command("minecraft", "view minecraft name history", "minecraft").setAliases(["mc"]);
@@ -37,7 +30,7 @@ async function run(
 
   await addCooldown(cmd.name, message.member, 4);
 
-  const username = args[0];
+  let username = args[0];
 
   const uuid = await getUUID(args[0]);
 
@@ -45,20 +38,28 @@ async function run(
     return send({ embeds: [new ErrorEmbed("invalid account")] });
   }
 
-  const names = await getNameHistory(uuid.id);
+  const data = await getNameHistory(uuid.id);
 
-  if (!names || names.length === 0) {
+  if (!data) {
+    return send({ embeds: [new ErrorEmbed("invalid data")] });
+  }
+
+  if (typeof data === "string") {
+    return send({ embeds: [new ErrorEmbed(data.toLowerCase())] });
+  }
+
+  if (data.name_history.length === 0) {
     return send({
       embeds: [new ErrorEmbed("invalid data")],
     });
   }
 
+  username = data.name;
+
   const pages = PageManager.createPages(
-    names
+    data.name_history
       .reverse()
-      .map(
-        (i) => `\`${i.username}\`${i.changed_at ? ` | <t:${dayjs(i.changed_at).unix()}:d>` : ""}`,
-      ),
+      .map((i) => `\`${i.name}\`${i.changed_at ? ` | <t:${dayjs(i.changed_at).unix()}:d>` : ""}`),
     7,
   );
 
@@ -70,14 +71,7 @@ async function run(
 
   if (pages.size === 1) return send({ embeds: [embed] });
 
-  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder()
-      .setCustomId("⬅")
-      .setLabel("back")
-      .setStyle(ButtonStyle.Primary)
-      .setDisabled(true),
-    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
-  );
+  const row = PageManager.defaultRow();
 
   const msg = await send({ embeds: [embed], components: [row] });
 
@@ -117,13 +111,13 @@ async function getUUID(username: string): Promise<{ name: string; id: string }> 
   return uuid;
 }
 
-async function getNameHistory(uuid: string): Promise<{ username: string; changed_at: string }[]> {
+async function getNameHistory(uuid: string): Promise<ApiResponse | string> {
   if (await redis.exists(`${Constants.redis.cache.minecraft.NAME_HISTORY}:${uuid}`)) {
     return JSON.parse(await redis.get(`${Constants.redis.cache.minecraft.NAME_HISTORY}:${uuid}`));
   }
 
-  const names: { username: string; changed_at: string }[] = await fetch(
-    `https://laby.net/api/users/${uuid}/get-names`,
+  const data: ApiResponse & { error?: string } = await fetch(
+    `https://laby.net/api/v3/user/${uuid}/profile`,
     {
       headers: {
         "User-Agent": `Mozilla/5.0 (compatible; nypsi}; +https://github.com/mxz7)`,
@@ -133,16 +127,22 @@ async function getNameHistory(uuid: string): Promise<{ username: string; changed
 
   // @ts-expect-error possible
   if (names.error) {
-    logger.error(`minecraft name history fetch error`, names);
-    return [];
+    return data.error;
   }
 
   await redis.set(
     `${Constants.redis.cache.minecraft.NAME_HISTORY}:${uuid}`,
-    JSON.stringify(names),
+    JSON.stringify(data),
     "EX",
-    300,
+    86400,
   );
 
-  return names;
+  return data;
 }
+
+type ApiResponse = {
+  uuid: string;
+  name: string;
+  last_updated: string;
+  name_history: { name: string; changed_at: string | null; accurate: boolean }[];
+};
