@@ -242,7 +242,10 @@
       "lucky_cheese": 5,
       "reroll_token": 0.05,
       "banana_seed": 1,
-      "fertiliser": 50,
+      "fertiliser": {
+        "weight": 40,
+        "count": 3
+      },
       "toe": 10,
       "unbreaking": 2,
       "mango_seed": 4

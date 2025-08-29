@@ -13,6 +13,8 @@ import { getPlantsData, getPlantUpgrades, getUpgradesData } from "./utils";
 import dayjs = require("dayjs");
 import ms = require("ms");
 
+const PLANTS_PER_FERTILISER = 5;
+
 export async function getFarm(member: MemberResolvable) {
   const userId = getUserId(member);
 
@@ -373,8 +375,8 @@ export async function fertiliseFarm(member: MemberResolvable): Promise<{
 
   if (possible.length === 0) return { dead, msg: "no need" };
 
-  if (possible.length > inventory.count("fertiliser") * 3)
-    possible = possible.slice(0, inventory.count("fertiliser") * 3);
+  if (possible.length > inventory.count("fertiliser") * PLANTS_PER_FERTILISER)
+    possible = possible.slice(0, inventory.count("fertiliser") * PLANTS_PER_FERTILISER);
 
   await prisma.farm.updateMany({
     where: {
@@ -385,8 +387,12 @@ export async function fertiliseFarm(member: MemberResolvable): Promise<{
     },
   });
 
-  await removeInventoryItem(member, "fertiliser", Math.ceil(possible.length / 3));
-  await addStat(member, "fertiliser", Math.ceil(possible.length / 3));
+  await removeInventoryItem(
+    member,
+    "fertiliser",
+    Math.ceil(possible.length / PLANTS_PER_FERTILISER),
+  );
+  await addStat(member, "fertiliser", Math.ceil(possible.length / PLANTS_PER_FERTILISER));
   await redis.del(`${Constants.redis.cache.economy.farm}:${getUserId(member)}`);
 
   return { done: possible.length, dead };

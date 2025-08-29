@@ -8,6 +8,7 @@
 - can get married for free from 100% love
 - auto divorce when you get 100% love with someone else
 - added pot of gold item
+- fertiliser now works on 5 plants each, and more common from daily scratches
 
 ## other
 
