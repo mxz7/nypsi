@@ -236,8 +236,8 @@ async function run(
 
       const i = setInterval(async () => {
         if (fail) {
-          massOperations.delete(message.guild.id);
           clearInterval(i);
+          massOperations.delete(message.guild.id);
 
           return msg.edit({
             embeds: [
@@ -249,8 +249,8 @@ async function run(
         }
 
         if (cancelled) {
-          massOperations.delete(message.guild.id);
           clearInterval(i);
+          massOperations.delete(message.guild.id);
 
           return message.channel.send({
             embeds: [new ErrorEmbed("operation cancelled")],
@@ -258,8 +258,8 @@ async function run(
         }
 
         if (done) {
-          massOperations.delete(message.guild.id);
           clearInterval(i);
+          massOperations.delete(message.guild.id);
 
           return msg.edit({
             embeds: [
@@ -393,8 +393,8 @@ async function run(
 
       const i = setInterval(async () => {
         if (fail) {
-          massOperations.delete(message.guild.id);
           clearInterval(i);
+          massOperations.delete(message.guild.id);
 
           return msg.edit({
             embeds: [
@@ -406,8 +406,8 @@ async function run(
         }
 
         if (cancelled) {
-          massOperations.delete(message.guild.id);
           clearInterval(i);
+          massOperations.delete(message.guild.id);
 
           return message.channel.send({
             embeds: [new ErrorEmbed("operation cancelled")],
@@ -415,8 +415,8 @@ async function run(
         }
 
         if (done) {
-          massOperations.delete(message.guild.id);
           clearInterval(i);
+          massOperations.delete(message.guild.id);
 
           return msg.edit({
             embeds: [
