@@ -51,6 +51,7 @@ model User {
   FlagGame                 FlagGame[]
   Event                    Event[]
   EventContribution        EventContribution[]
+  tmdbRatings              tmdbRatings[]
 }
 
 model ProfileView {
@@ -1043,6 +1044,8 @@ model tmdbRatings {
   id     Int
   name   String
   rating Decimal    @db.Decimal(2, 1)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, type, id])
 }
