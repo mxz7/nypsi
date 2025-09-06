@@ -1,3 +1,11 @@
+# september 2025
+
+## changes you'll probably care about
+
+- increase xp from tasks - improves new player experience
+
+---
+
 # august 2025
 
 ## changes you'll probably care about
