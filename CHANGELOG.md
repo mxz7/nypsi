@@ -5,6 +5,10 @@
 - increase xp from tasks - improves new player experience
 - increase returning player booster to 1 week
 
+## other
+
+- add levelling tip for new / low level players
+
 ---
 
 # august 2025

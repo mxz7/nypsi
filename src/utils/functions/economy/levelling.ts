@@ -330,13 +330,22 @@ export async function setLevel(member: MemberResolvable, amount: number) {
   return query.level;
 }
 
-export function getLevelRequirements(prestige: number, level: number) {
-  while (level >= 100) {
-    prestige++;
-    level -= 100;
-  }
+export function getLevelRequirements(rawLevel: number): { xp: number; money: number };
+export function getLevelRequirements(
+  prestige: number,
+  level: number,
+): { xp: number; money: number };
+export function getLevelRequirements(prestige: number, level?: number) {
+  let rawLevel = prestige;
 
-  const rawLevel = prestige * 100 + level;
+  if (level) {
+    while (level >= 100) {
+      prestige++;
+      level -= 100;
+    }
+
+    rawLevel = prestige * 100 + level;
+  }
 
   const requiredXp = xpFormula(level, prestige);
   const requiredMoney = moneyFormula(rawLevel);

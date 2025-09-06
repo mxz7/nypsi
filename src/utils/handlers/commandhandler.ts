@@ -36,11 +36,12 @@ import { Item } from "../../types/Economy";
 import Constants from "../Constants";
 import { a } from "../functions/anticheat";
 import { addProgress, setProgress } from "../functions/economy/achievements";
+import { getBankBalance } from "../functions/economy/balance";
 import { addBooster } from "../functions/economy/boosters";
 import { addEventProgress } from "../functions/economy/events";
 import { commandGemCheck, gemBreak, getInventory } from "../functions/economy/inventory";
 import { runItemInfo } from "../functions/economy/item_info";
-import { getRawLevel } from "../functions/economy/levelling";
+import { getLevelRequirements, getRawLevel } from "../functions/economy/levelling";
 import { addTaskProgress } from "../functions/economy/tasks";
 import {
   createUser,
@@ -50,7 +51,7 @@ import {
   isHandcuffed,
   userExists,
 } from "../functions/economy/utils";
-import { addXp } from "../functions/economy/xp";
+import { addXp, getXp } from "../functions/economy/xp";
 import { getDisabledChannels } from "../functions/guilds/channels";
 import { getDisabledCommands } from "../functions/guilds/disabledcommands";
 import { getChatFilter } from "../functions/guilds/filters";
@@ -971,23 +972,35 @@ export async function runCommand(
   setTimeout(
     async () => {
       if (command.category === "money") {
-        if (
-          percentChance(0.77777) &&
-          (await getRawLevel(message.author.id)) < 250 &&
-          (await getPreferences(message.author.id)).tips
-        ) {
+        const rawLevel = await getRawLevel(message.author.id);
+        const levelRequirements = getLevelRequirements(rawLevel);
+        const preferences = await getPreferences(message.author.id);
+
+        if (percentChance(0.77777) && rawLevel < 250 && preferences.tips) {
           const tip = tips[Math.floor(Math.random() * tips.length)];
 
           await addInlineNotification({
             memberId: message.author.id,
             embed: new CustomEmbed(message.member, tip),
           });
+        } else if (
+          percentChance(1) &&
+          rawLevel < 75 &&
+          levelRequirements.xp < (await getXp(message.author.id))
+        ) {
+          const bankBalance = await getBankBalance(message.author.id);
+          await addInlineNotification({
+            memberId: message.author.id,
+            embed: new CustomEmbed(
+              message.member,
+              `you have enough xp for a **level up**!!! you only need to deposit $${(levelRequirements.money - bankBalance).toLocaleString()} more into your bank to level up!\n\n[more information about levelling](https://nypsi.xyz/docs/economy/level?ref=bot-level-tip)`,
+            ),
+          });
         }
 
         if (!(await redis.exists(`nypsi:inactiveuserthing:${message.author.id}`))) {
           await redis.set(`nypsi:inactiveuserthing:${message.author.id}`, "boobies", "EX", 2.628e6);
           const lastCommand = await getLastCommand(message.author.id);
-          const rawLevel = await getRawLevel(message.author.id);
           const alts = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, message.author.id);
 
           if (
