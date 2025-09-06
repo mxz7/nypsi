@@ -999,8 +999,8 @@ export async function runCommand(
               memberId: message.author.id,
               embed: new CustomEmbed(
                 message.member,
-                "**welcome back!!**\n\nwelcome back to nypsi, since it's been a while, we've given you a 24 hour xp booster. enjoy!",
-              ),
+                "welcome back to nypsi, since it's been a while, we've given you a 24 hour xp booster. enjoy!",
+              ).setHeader("welcome back!!", message.author.avatarURL()),
             });
           }
         }
