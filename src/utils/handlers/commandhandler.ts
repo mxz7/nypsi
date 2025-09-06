@@ -56,6 +56,7 @@ import { getDisabledCommands } from "../functions/guilds/disabledcommands";
 import { getChatFilter } from "../functions/guilds/filters";
 import { getPrefix } from "../functions/guilds/utils";
 import { addKarma, getKarma } from "../functions/karma/karma";
+import { getAllGroupAccountIds } from "../functions/moderation/alts";
 import { getUserAliases } from "../functions/premium/aliases";
 import { addUse, getCommand } from "../functions/premium/command";
 import { percentChance } from "../functions/random";
@@ -987,19 +988,22 @@ export async function runCommand(
           await redis.set(`nypsi:inactiveuserthing:${message.author.id}`, "boobies", "EX", 2.628e6);
           const lastCommand = await getLastCommand(message.author.id);
           const rawLevel = await getRawLevel(message.author.id);
+          const alts = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, message.author.id);
 
           if (
             dayjs(lastCommand).isBefore(dayjs().subtract(3, "months")) &&
             dayjs(lastCommand).isAfter(dayjs().subtract(5, "year")) &&
-            rawLevel > 100
+            rawLevel > 100 &&
+            // first is always the 'main' account
+            alts[0] === message.author.id
           ) {
-            await addBooster(message.author.id, "xp_booster", 2, dayjs().add(1, "day").toDate());
+            await addBooster(message.author.id, "xp_booster", 2, dayjs().add(7, "day").toDate());
 
             await addInlineNotification({
               memberId: message.author.id,
               embed: new CustomEmbed(
                 message.member,
-                "welcome back to nypsi, since it's been a while, we've given you a 24 hour xp booster. enjoy!",
+                "welcome back to nypsi, since it's been a while, we've given you a 1 week xp booster. enjoy!",
               ).setHeader("welcome back!!", message.author.avatarURL()),
             });
           }

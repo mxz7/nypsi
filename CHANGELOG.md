@@ -3,6 +3,7 @@
 ## changes you'll probably care about
 
 - increase xp from tasks - improves new player experience
+- increase returning player booster to 1 week
 
 ---
 
