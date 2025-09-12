@@ -64,7 +64,7 @@ export async function createEvent(
     },
   });
 
-  await redis.del(Constants.redis.cache.economy.event);
+  await redis.del(Constants.redis.cache.economy.event, Constants.redis.cache.economy.eventProgress);
 
   const targetChannel =
     client.user.id === Constants.BOT_USER_ID
