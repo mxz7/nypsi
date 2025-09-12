@@ -109,7 +109,7 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel, 
       embed.setDescription(
         `type: \`${word.display}\`` +
           (eventProgress
-            ? `🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`
+            ? `\n\n🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`
             : ""),
       );
     }
