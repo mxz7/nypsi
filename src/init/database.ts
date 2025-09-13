@@ -1,10 +1,13 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { parentPort } from "worker_threads";
+import { PrismaClient } from "../generated/prisma/client";
 import Constants from "../utils/Constants";
 import { logger } from "../utils/logger";
 import redis from "./redis";
 
-const prisma = new PrismaClient().$extends({
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+
+const prisma = new PrismaClient({ adapter }).$extends({
   query: {
     $allModels: {
       async $allOperations({ query, args, model, operation }) {
