@@ -1,4 +1,4 @@
-import { OrderType } from "@prisma/client";
+import { OrderType } from "#generated/prisma";
 import {
   ActionRowBuilder,
   ButtonInteraction,

@@ -1,5 +1,5 @@
+import { TransactionType } from "#generated/prisma";
 import { flavors } from "@catppuccin/palette";
-import { TransactionType } from "@prisma/client";
 import { Client, User, WebhookClient } from "discord.js";
 import { WriteStream, createWriteStream } from "fs";
 import prisma from "../init/database";

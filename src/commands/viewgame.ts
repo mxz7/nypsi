@@ -1,4 +1,4 @@
-import { Game, Prisma } from "@prisma/client";
+import { Game, Prisma } from "#generated/prisma";
 import {
   ActionRowBuilder,
   ButtonBuilder,

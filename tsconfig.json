@@ -6,7 +6,10 @@
     "module": "commonjs",
     "strictFunctionTypes": true,
     "skipLibCheck": true,
-    "noImplicitAny": true
+    "noImplicitAny": true,
+    "paths": {
+      "#generated/prisma": ["./src/generated/prisma/client"]
+    }
   },
   "exclude": ["node_modules", "dist", "prisma"]
 }

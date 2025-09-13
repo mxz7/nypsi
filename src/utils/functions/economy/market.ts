@@ -1,4 +1,4 @@
-import { Market, MarketWatch, OrderType, Prisma, PrismaClient } from "@prisma/client";
+import { Market, MarketWatch, OrderType, Prisma, PrismaClient } from "#generated/prisma";
 import { ClusterManager } from "discord-hybrid-sharding";
 import {
   ActionRowBuilder,

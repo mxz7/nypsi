@@ -1,4 +1,4 @@
-import { EconomyGuild, EconomyGuildMember, EconomyGuildRole } from "@prisma/client";
+import { EconomyGuild, EconomyGuildMember, EconomyGuildRole } from "#generated/prisma";
 import {
   ActionRowBuilder,
   ButtonBuilder,

@@ -1,17 +1,25 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "#generated/prisma";
+import { PrismaPg } from "@prisma/adapter-pg";
+import "dotenv/config";
 import * as fs from "fs";
-import { Item } from "../src/types/Economy";
 import Redis from "ioredis";
+import { Item } from "../types/Economy";
 
-const redis = new Redis({
-  showFriendlyErrorStack: true,
-});
+const redis = new Redis({ showFriendlyErrorStack: true });
 
-const prisma = new PrismaClient();
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+const prisma = new PrismaClient({ adapter });
 
 const admins = ["672793821850894347", "499720078770831360", "223953495982735363"];
 
 async function main() {
+  // prevents accidentally running on (maybe) prod
+  const check = await prisma.user.findFirst();
+
+  if (check) {
+    throw new Error("Database is not empty");
+  }
+
   const items: { [key: string]: Item } = JSON.parse(fs.readFileSync("./data/items.json") as any);
 
   const tradeableItems = Object.values(items).filter((item) => !item.account_locked);

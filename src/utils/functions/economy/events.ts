@@ -1,5 +1,5 @@
 import dayjs = require("dayjs");
-import { Event, EventContribution } from "@prisma/client";
+import { Event, EventContribution } from "#generated/prisma";
 import {
   ActionRowBuilder,
   ButtonBuilder,

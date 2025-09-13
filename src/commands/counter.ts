@@ -1,4 +1,4 @@
-import { TrackingType } from "@prisma/client";
+import { TrackingType } from "#generated/prisma";
 import { CommandInteraction, Message, PermissionFlagsBits, VoiceChannel } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";

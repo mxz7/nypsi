@@ -1,4 +1,4 @@
-import { ChatReactionWordList } from "@prisma/client";
+import { ChatReactionWordList } from "#generated/prisma";
 import {
   ActionRowBuilder,
   ButtonBuilder,
