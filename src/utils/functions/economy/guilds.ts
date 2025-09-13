@@ -1,4 +1,4 @@
-import { EconomyGuildUpgrades } from "@prisma/client";
+import { EconomyGuildUpgrades } from "@generated/prisma";
 import { GuildMember } from "discord.js";
 import { sort } from "fast-sort";
 import prisma from "../../../init/database";

@@ -1,4 +1,4 @@
-import { Mention } from "@prisma/client";
+import { Mention } from "@generated/prisma";
 import prisma from "../../../init/database";
 import { getUserId, MemberResolvable } from "../member";
 

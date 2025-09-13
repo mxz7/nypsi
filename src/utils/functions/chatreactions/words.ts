@@ -1,4 +1,4 @@
-import { ChatReactionWordList } from "@prisma/client";
+import { ChatReactionWordList } from "@generated/prisma";
 import { Guild } from "discord.js";
 import { readFile } from "fs/promises";
 import prisma from "../../../init/database";

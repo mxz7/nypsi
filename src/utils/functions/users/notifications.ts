@@ -1,4 +1,4 @@
-import { DMSettings, Preferences } from "@prisma/client";
+import { DMSettings, Preferences } from "@generated/prisma";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { InlineNotificationPayload, NotificationPayload } from "../../../types/Notification";

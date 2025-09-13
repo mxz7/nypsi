@@ -1,4 +1,4 @@
-import { Mention } from "@prisma/client";
+import { Mention } from "@generated/prisma";
 import { Worker, isMainThread, parentPort, workerData } from "worker_threads";
 import prisma from "../../../init/database";
 import { MentionQueueItem } from "../users/mentions";

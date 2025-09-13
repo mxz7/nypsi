@@ -1,4 +1,4 @@
-import { UserAlias } from "@prisma/client";
+import { UserAlias } from "@generated/prisma";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";

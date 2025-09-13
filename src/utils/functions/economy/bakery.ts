@@ -1,4 +1,4 @@
-import { BakeryUpgrade } from "@prisma/client";
+import { BakeryUpgrade } from "@generated/prisma";
 import { GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";

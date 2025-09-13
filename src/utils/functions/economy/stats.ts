@@ -1,4 +1,4 @@
-import { Game } from "@prisma/client";
+import { Game } from "@generated/prisma";
 import { inPlaceSort, sort } from "fast-sort";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
