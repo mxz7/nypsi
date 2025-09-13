@@ -13,7 +13,7 @@
     "validate": "npm run format:check && npm run lint"
   },
   "prisma": {
-    "seed": "ts-node --transpile-only prisma/seed.ts"
+    "seed": "NODE_ENV=development ts-node --transpile-only src/scripts/seed.ts"
   },
   "author": "mxz7",
   "license": "ISC",
