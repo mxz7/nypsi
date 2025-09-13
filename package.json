@@ -15,6 +15,9 @@
   "prisma": {
     "seed": "NODE_ENV=development ts-node --transpile-only src/scripts/seed.ts"
   },
+  "imports": {
+    "#generated/prisma": "./dist/generated/prisma/client.js"
+  },
   "author": "mxz7",
   "license": "ISC",
   "dependencies": {

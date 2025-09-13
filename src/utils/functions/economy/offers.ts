@@ -1,4 +1,4 @@
-import { Offer } from "@generated/prisma";
+import { Offer } from "#generated/prisma";
 import {
   ActionRowBuilder,
   ButtonBuilder,

@@ -1,4 +1,4 @@
-import { Captcha } from "@generated/prisma";
+import { Captcha } from "#generated/prisma";
 import {
   ActionRowBuilder,
   ButtonBuilder,

@@ -1,5 +1,5 @@
 import dayjs = require("dayjs");
-import { Prisma } from "@generated/prisma";
+import { Prisma } from "#generated/prisma";
 import { exec } from "child_process";
 import {
   ActionRowBuilder,

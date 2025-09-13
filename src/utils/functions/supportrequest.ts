@@ -1,4 +1,4 @@
-import { SupportRequest } from "@generated/prisma";
+import { SupportRequest } from "#generated/prisma";
 import { Attachment, Collection, Embed } from "discord.js";
 import { nanoid } from "nanoid";
 import { zodTextFormat } from "openai/helpers/zod";

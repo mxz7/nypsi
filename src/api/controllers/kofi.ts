@@ -1,4 +1,4 @@
-import { Prisma } from "@generated/prisma";
+import { Prisma } from "#generated/prisma";
 import { WebhookClient } from "discord.js";
 import { Hono } from "hono";
 import { validator } from "hono/validator";

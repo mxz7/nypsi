@@ -1,4 +1,4 @@
-import { TradeRequest } from "@generated/prisma";
+import { TradeRequest } from "#generated/prisma";
 import { ClusterManager } from "discord-hybrid-sharding";
 import {
   ActionRowBuilder,

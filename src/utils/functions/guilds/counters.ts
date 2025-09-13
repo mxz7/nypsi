@@ -1,4 +1,4 @@
-import { GuildCounter, TrackingType } from "@generated/prisma";
+import { GuildCounter, TrackingType } from "#generated/prisma";
 import { ClusterClient, ClusterManager } from "discord-hybrid-sharding";
 import { ChannelType, Client, Guild, PermissionFlagsBits } from "discord.js";
 import prisma from "../../../init/database";

@@ -1,5 +1,5 @@
 import dayjs = require("dayjs");
-import { OrderType } from "@generated/prisma";
+import { OrderType } from "#generated/prisma";
 import {
   ActionRowBuilder,
   APIMessageComponentEmoji,

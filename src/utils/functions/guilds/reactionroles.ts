@@ -1,4 +1,4 @@
-import { ReactionRole, ReactionRoleMode, ReactionRoleRoles } from "@generated/prisma";
+import { ReactionRole, ReactionRoleMode, ReactionRoleRoles } from "#generated/prisma";
 import {
   ActionRowBuilder,
   ButtonBuilder,

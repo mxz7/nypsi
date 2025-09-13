@@ -1,4 +1,4 @@
-import { Prisma, Transaction } from "@generated/prisma";
+import { Prisma, Transaction } from "#generated/prisma";
 import { createWriteStream } from "node:fs";
 import prisma from "../../init/database";
 import { logger } from "../logger";

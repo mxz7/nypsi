@@ -8,7 +8,7 @@
     "skipLibCheck": true,
     "noImplicitAny": true,
     "paths": {
-      "@generated/prisma": ["./src/generated/prisma/client"]
+      "#generated/prisma": ["./src/generated/prisma/client"]
     }
   },
   "exclude": ["node_modules", "dist", "prisma"]

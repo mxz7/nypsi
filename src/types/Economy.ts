@@ -1,4 +1,4 @@
-import { CarUpgradeType } from "@generated/prisma";
+import { CarUpgradeType } from "#generated/prisma";
 
 export interface Item {
   id: string;

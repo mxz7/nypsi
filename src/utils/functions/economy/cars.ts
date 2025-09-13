@@ -1,4 +1,4 @@
-import { CarUpgradeType } from "@generated/prisma";
+import { CarUpgradeType } from "#generated/prisma";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";

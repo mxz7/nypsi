@@ -1,4 +1,4 @@
-import { Market } from "@generated/prisma";
+import { Market } from "#generated/prisma";
 import { MessageFlags } from "discord.js";
 import prisma from "../init/database";
 import redis from "../init/redis";

@@ -1,4 +1,4 @@
-import { DMSettings, Preferences } from "@generated/prisma";
+import { DMSettings, Preferences } from "#generated/prisma";
 import {
   ActionRowBuilder,
   ButtonBuilder,

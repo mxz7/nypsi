@@ -1,4 +1,4 @@
-import { ProfileViewSource } from "@generated/prisma";
+import { ProfileViewSource } from "#generated/prisma";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";

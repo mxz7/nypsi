@@ -1,4 +1,4 @@
-import { Task as PrismaTask } from "@generated/prisma";
+import { Task as PrismaTask } from "#generated/prisma";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
