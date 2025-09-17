@@ -150,6 +150,10 @@ async function run(
     if (message.guildId !== Constants.NYPSI_SERVER_ID) return;
     doingRoles = true;
 
+    setTimeout(() => {
+      doingRoles = false;
+    }, ms("1 hour"));
+
     const members = await getAllMembers(message.guild, true);
 
     for (const guildMember of members.values()) {
