@@ -359,14 +359,34 @@ export async function getRequiredForGuildUpgrade(
     slots = guild.members.length;
   }
 
-  const bonusMoney = 50_000_000 * slots * (guild.level / 10);
-  const bonusXP = 10_000 * slots * (guild.level / 10);
+  const slotBonus = {
+    money: 50_000_000 * slots * (guild.level / 10),
+    xp: 10_000 * slots * (guild.level / 10),
+  };
+
+  const levelBonus = {
+    money: 1_000_000_000 * (guild.level / 100),
+    xp: 1_000_000 * (guild.level / 100),
+  };
+
+  /**
+   * TODO: remove for season 11
+   * this stops already higher levelled guilds from having an unfair advantage with the change
+   */
+  if (guild.level < 420) {
+    levelBonus.money = 0;
+    levelBonus.xp = 0;
+  }
+
+  const total = {
+    money: Math.floor(money + slotBonus.money + levelBonus.money),
+    xp: Math.floor(xp + slotBonus.xp + levelBonus.xp),
+  };
 
   await redis.set(
     `${Constants.redis.cache.economy.GUILD_REQUIREMENTS}:${name}`,
     JSON.stringify({
-      money: Math.floor(money + bonusMoney),
-      xp: Math.floor(xp + bonusXP),
+      ...total,
       members: guild.members.length,
     }),
     "EX",
@@ -374,8 +394,7 @@ export async function getRequiredForGuildUpgrade(
   );
 
   return {
-    money: Math.floor(money + bonusMoney),
-    xp: Math.floor(xp + bonusXP),
+    ...total,
     members: guild.members.length,
   };
 }
