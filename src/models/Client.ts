@@ -218,6 +218,11 @@ export class NypsiClient extends Client {
         });
       }, 10000);
     });
+
+    this.on("clientReady", () => {
+      logger.info(`client ready`);
+      this.cluster.triggerReady();
+    });
   }
 
   private runIntervals() {
