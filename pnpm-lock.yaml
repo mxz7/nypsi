@@ -75,8 +75,8 @@ importers:
         specifier: 4.17.21
         version: 4.17.21
       mathjs:
-        specifier: 14.6.0
-        version: 14.6.0
+        specifier: 14.7.0
+        version: 14.7.0
       ms:
         specifier: 2.1.3
         version: 2.1.3
@@ -476,8 +476,8 @@ packages:
     peerDependencies:
       '@babel/core': ^7.0.0-0
 
-  '@babel/runtime@7.28.2':
-    resolution: {integrity: sha512-KHp2IflsnGywDjBWDkR9iEqiWSpc8GIi0lgTT3mOElT0PP1tG26P4tmFI2YvAdzgq9RGyoHZQEIEdZy6Ec5xCA==}
+  '@babel/runtime@7.28.4':
+    resolution: {integrity: sha512-Q/N6JNWvIvPnLDvjlE1OUBLPQHH6l3CltCEsHIujp45zQUSSh8K+gHnaEX45yAT1nyngnINhvWtzN+Nb9D8RAQ==}
     engines: {node: '>=6.9.0'}
 
   '@babel/template@7.27.2':
@@ -1977,9 +1977,8 @@ packages:
     resolution: {integrity: sha512-gIXjKqtFuWEgzFRJA9WCQeSJLZDjgJUOMCMzxtvFq/37KojM1BFGufqsCy0r4qSQmYLsZYMeyRqzIWOMup03sw==}
     engines: {node: '>=14'}
 
-  fraction.js@5.2.2:
-    resolution: {integrity: sha512-uXBDv5knpYmv/2gLzWQ5mBHGBRk9wcKTeWu6GLTUEQfjCxO09uM/mHDrojlL+Q1mVGIIFo149Gba7od1XPgSzQ==}
-    engines: {node: '>= 12'}
+  fraction.js@5.3.4:
+    resolution: {integrity: sha512-1X1NTtiJphryn/uLQz3whtY6jK3fTqoE3ohKs0tT+Ujr1W59oopxmoEh7Lu5p6vBaPbgoM0bzveAW4Qi5RyWDQ==}
 
   fs.realpath@1.0.0:
     resolution: {integrity: sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==}
@@ -2402,8 +2401,8 @@ packages:
   makeerror@1.0.12:
     resolution: {integrity: sha512-JmqCvUhmt43madlpFzG4BQzG2Z3m6tvQDNKdClZnO3VbIudJYmxsT0FNJMeiB2+JTSlTQTSbU8QdesVmwJcmLg==}
 
-  mathjs@14.6.0:
-    resolution: {integrity: sha512-5vI2BLB5GKQmiSK9BH6hVkZ+GgqpdnOgEfmHl7mqVmdQObLynr63KueyYYLCQMzj66q69mV2XZZGQqqxeftQbA==}
+  mathjs@14.7.0:
+    resolution: {integrity: sha512-RaMhb+9MSESjDZNox/FzzuFpIUI+oxGLyOy1t3BMoW53pGWnTzZtlucJ5cvbit0dIMYlCq00gNbW1giZX4/1Rg==}
     engines: {node: '>= 18'}
     hasBin: true
 
@@ -3737,7 +3736,7 @@ snapshots:
       '@babel/core': 7.28.4
       '@babel/helper-plugin-utils': 7.27.1
 
-  '@babel/runtime@7.28.2': {}
+  '@babel/runtime@7.28.4': {}
 
   '@babel/template@7.27.2':
     dependencies:
@@ -5514,7 +5513,7 @@ snapshots:
       cross-spawn: 7.0.6
       signal-exit: 4.1.0
 
-  fraction.js@5.2.2: {}
+  fraction.js@5.3.4: {}
 
   fs.realpath@1.0.0: {}
 
@@ -6120,13 +6119,13 @@ snapshots:
     dependencies:
       tmpl: 1.0.5
 
-  mathjs@14.6.0:
+  mathjs@14.7.0:
     dependencies:
-      '@babel/runtime': 7.28.2
+      '@babel/runtime': 7.28.4
       complex.js: 2.4.2
       decimal.js: 10.6.0
       escape-latex: 1.2.0
-      fraction.js: 5.2.2
+      fraction.js: 5.3.4
       javascript-natural-sort: 0.7.1
       seedrandom: 3.0.5
       tiny-emitter: 2.1.0
