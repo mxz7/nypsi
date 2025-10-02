@@ -3492,5 +3492,16 @@
     "loot_pools": {
       "pot_of_gold": 1
     }
+  },
+  "pumpkin": {
+    "id": "pumpkin",
+    "name": "pumpkin",
+    "article": "a",
+    "plural": "pumpkins",
+    "emoji": "🎃",
+    "longDesc": "spooky scary skeletons send shivers down your spine",
+    "rarity": 0,
+    "role": "item",
+    "in_crates": true
   }
 }
