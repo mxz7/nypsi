@@ -1095,8 +1095,8 @@ export async function runCommand(
         await redis.del(`nypsi:levelup:${message.author.id}`);
       }
 
-      if (!(await redis.exists(Constants.redis.nypsi.LAST_PUMPKIN)) && percentChance(0.5)) {
-        let amount = Math.floor(Math.random() * 3) + 1;
+      if (!(await redis.exists(Constants.redis.nypsi.LAST_PUMPKIN)) && percentChance(7.7)) {
+        let amount = Math.floor(Math.random() * 4) + 1;
 
         const inventory = await getInventory(message.member);
 
