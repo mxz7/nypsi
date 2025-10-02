@@ -2718,11 +2718,19 @@ async function run(
       return send({ embeds: [new ErrorEmbed("invalid amount of days")] });
     }
 
+    const ends = dayjs()
+      .add(days, "day")
+      .set("hours", 0)
+      .set("minute", 0)
+      .set("second", 0)
+      .set("millisecond", 0)
+      .toDate();
+
     const confirmMessage = await send({
       embeds: [
         new CustomEmbed(
           message.member,
-          `confirm you want to start a ${type} event with target of ${target} for ${days} days`,
+          `confirm you want to start a ${type} event with target of ${target} that ends on ${ends.toISOString()}`,
         ),
       ],
       components: [
