@@ -194,7 +194,8 @@
       "69420_crate": 40,
       "banana_seed": 1,
       "fertiliser": 3,
-      "toe": 50
+      "toe": 50,
+      "pumpkin": 10
     }
   },
   "daily_scratch_card": {
@@ -248,7 +249,8 @@
       },
       "toe": 10,
       "unbreaking": 2,
-      "mango_seed": 4
+      "mango_seed": 4,
+      "pumpkin": 80
     }
   },
   "lucky_scratch_card": {
