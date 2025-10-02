@@ -38,7 +38,7 @@ import { a } from "../functions/anticheat";
 import { addProgress, setProgress } from "../functions/economy/achievements";
 import { getBankBalance } from "../functions/economy/balance";
 import { addBooster } from "../functions/economy/boosters";
-import { addEventProgress } from "../functions/economy/events";
+import { addEventProgress, EventData, getCurrentEvent } from "../functions/economy/events";
 import {
   addInventoryItem,
   commandGemCheck,
@@ -1105,7 +1105,8 @@ export async function runCommand(
           amount **= 2;
         }
 
-        await Promise.all([
+        const [eventProgress] = await Promise.all([
+          addEventProgress(message.client as NypsiClient, message.member, "halloween", 1),
           redis.set(Constants.redis.nypsi.LAST_PUMPKIN, message.author.id, "EX", 300),
           addInventoryItem(message.member, "pumpkin", amount),
         ]);
@@ -1114,6 +1115,21 @@ export async function runCommand(
           message.member,
           `🎃 you found ${amount} **${pluralize("pumpkin", amount)}**!!`,
         );
+
+        if (eventProgress) {
+          const eventData: { event?: EventData; target: number } = { target: 0 };
+
+          eventData.event = await getCurrentEvent();
+
+          if (eventData.event) {
+            eventData.target = Number(eventData.event.target);
+          }
+
+          embed.addField(
+            "event progress",
+            `🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`,
+          );
+        }
 
         embeds.push(embed);
       }

@@ -217,12 +217,16 @@ export default class ScratchCard {
       const prize = this.area[y][x].result;
       await giveLootPoolResult(this.member.user.id, prize);
 
-      const eventProgress = await addEventProgress(
-        this.member.client as NypsiClient,
-        this.member,
-        "gamble",
-        1,
-      );
+      let isPumpkin = false;
+
+      if (Object.hasOwn(prize, "item")) {
+        if (prize.item === "pumpkin") isPumpkin = true;
+      }
+
+      const eventProgress =
+        (await addEventProgress(this.member.client as NypsiClient, this.member, "gamble", 1)) ||
+        (isPumpkin &&
+          (await addEventProgress(this.member.client as NypsiClient, this.member, "halloween", 1)));
       const eventData: { event?: EventData; target: number } = { target: 0 };
 
       if (eventProgress) {

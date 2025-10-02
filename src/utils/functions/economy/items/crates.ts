@@ -6,6 +6,7 @@ import {
   MessageActionRowComponentBuilder,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
+import { NypsiClient } from "../../../../models/Client";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
@@ -14,6 +15,7 @@ import { getTier, isPremium } from "../../premium/premium";
 import sleep from "../../sleep";
 import { pluralize } from "../../string";
 import { addProgress } from "../achievements";
+import { addEventProgress } from "../events";
 import { calcItemValue, getInventory, selectItem } from "../inventory";
 import { openCrate } from "../loot_pools";
 import { addStat } from "../stats";
@@ -145,6 +147,10 @@ module.exports = new ItemUse(
     const pages = PageManager.createPages(desc, 15);
 
     embed.setDescription(pages.get(1).join("\n"));
+
+    if (foundAll.items["pumpkin"]) {
+      await addEventProgress(message.client as NypsiClient, message.member, "halloween", 1);
+    }
 
     await sleep(2500);
 
