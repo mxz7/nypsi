@@ -39,7 +39,12 @@ import { addProgress, setProgress } from "../functions/economy/achievements";
 import { getBankBalance } from "../functions/economy/balance";
 import { addBooster } from "../functions/economy/boosters";
 import { addEventProgress } from "../functions/economy/events";
-import { commandGemCheck, gemBreak, getInventory } from "../functions/economy/inventory";
+import {
+  addInventoryItem,
+  commandGemCheck,
+  gemBreak,
+  getInventory,
+} from "../functions/economy/inventory";
 import { runItemInfo } from "../functions/economy/item_info";
 import { getLevelRequirements, getRawLevel } from "../functions/economy/levelling";
 import { addTaskProgress } from "../functions/economy/tasks";
@@ -1088,6 +1093,29 @@ export async function runCommand(
         embeds.push(embed);
 
         await redis.del(`nypsi:levelup:${message.author.id}`);
+      }
+
+      if (!(await redis.exists(Constants.redis.nypsi.LAST_PUMPKIN)) && percentChance(7.7)) {
+        let amount = Math.floor(Math.random() * 4) + 1;
+
+        const inventory = await getInventory(message.member);
+
+        if ((await inventory.hasGem("white_gem")).any) {
+          // squared
+          amount **= 2;
+        }
+
+        await Promise.all([
+          redis.set(Constants.redis.nypsi.LAST_PUMPKIN, message.author.id, "EX", 300),
+          addInventoryItem(message.member, "pumpkin", amount),
+        ]);
+
+        const embed = new CustomEmbed(
+          message.member,
+          `🎃 you found ${amount} **${pluralize("pumpkin", amount)}**!!`,
+        );
+
+        embeds.push(embed);
       }
 
       if (embeds.length > 0) {

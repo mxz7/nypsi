@@ -253,6 +253,7 @@ export default {
       MARKET_DM: "nypsi:market:dm",
       DOCS_CONTENT: "nypsi:docs",
       COUNTER_ERROR: "nypsi:counter:error",
+      LAST_PUMPKIN: "nypsi:last_pumpkin",
     },
   },
   ANNOUNCEMENTS_CHANNEL_ID: "747057465245564939",
