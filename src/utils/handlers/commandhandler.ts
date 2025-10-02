@@ -1096,12 +1096,24 @@ export async function runCommand(
       }
 
       if (!(await redis.exists(Constants.redis.nypsi.LAST_PUMPKIN)) && percentChance(0.5)) {
+        let amount = Math.floor(Math.random() * 3) + 1;
+
+        const inventory = await getInventory(message.member);
+
+        if ((await inventory.hasGem("white_gem")).any) {
+          // squared
+          amount **= 2;
+        }
+
         await Promise.all([
           redis.set(Constants.redis.nypsi.LAST_PUMPKIN, message.author.id, "EX", 300),
-          addInventoryItem(message.member, "pumpkin", 1),
+          addInventoryItem(message.member, "pumpkin", amount),
         ]);
 
-        const embed = new CustomEmbed(message.member, "🎃 you found a **pumpkin**!!");
+        const embed = new CustomEmbed(
+          message.member,
+          `🎃 you found ${amount} **${pluralize("pumpkin", amount)}**!!`,
+        );
 
         embeds.push(embed);
       }
