@@ -88,5 +88,10 @@
     "id": "chatreaction",
     "name": "fast typers",
     "description": "play {target} chat reaction games"
+  },
+  "halloween": {
+    "id": "halloween",
+    "name": "halloween",
+    "description": "collect {target} pumpkins"
   }
 }
