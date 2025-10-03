@@ -1097,7 +1097,7 @@ export async function runCommand(
 
       if (
         !getItems()["pumpkin"].unique &&
-        (await redis.exists(Constants.redis.nypsi.LAST_PUMPKIN)) &&
+        !(await redis.exists(Constants.redis.nypsi.LAST_PUMPKIN)) &&
         percentChance(7.7)
       ) {
         let amount = Math.floor(Math.random() * 4) + 1;

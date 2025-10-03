@@ -3502,6 +3502,7 @@
     "longDesc": "spooky scary skeletons send shivers down your spine",
     "rarity": 0,
     "role": "item",
-    "in_crates": true
+    "in_crates": true,
+    "unique": false
   }
 }
