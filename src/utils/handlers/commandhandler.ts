@@ -65,6 +65,7 @@ import { addKarma, getKarma } from "../functions/karma/karma";
 import { getAllGroupAccountIds } from "../functions/moderation/alts";
 import { getUserAliases } from "../functions/premium/aliases";
 import { addUse, getCommand } from "../functions/premium/command";
+import { isPremium } from "../functions/premium/premium";
 import { percentChance } from "../functions/random";
 import { cleanString, pluralize } from "../functions/string";
 import { hasAdminPermission } from "../functions/users/admin";
@@ -1100,14 +1101,18 @@ export async function runCommand(
         !(await redis.exists(Constants.redis.nypsi.LAST_PUMPKIN)) &&
         percentChance(7.7)
       ) {
+        const inventory = await getInventory(message.member);
         let amount = Math.floor(Math.random() * 4) + 1;
 
-        const inventory = await getInventory(message.member);
-
-        if ((await inventory.hasGem("white_gem")).any) {
-          // squared
-          amount **= 2;
+        if ((await inventory.hasGem("white_gem")).any && percentChance(50)) {
+          amount **= 1.5;
         }
+
+        if ((await isPremium(message.member)) && percentChance(50)) {
+          amount **= 1.5;
+        }
+
+        amount = Math.ceil(amount);
 
         const [eventProgress] = await Promise.all([
           addEventProgress(message.client as NypsiClient, message.member, "halloween", amount),
