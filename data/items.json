@@ -3503,6 +3503,6 @@
     "rarity": 0,
     "role": "item",
     "in_crates": true,
-    "unique": false
+    "unique": true
   }
 }

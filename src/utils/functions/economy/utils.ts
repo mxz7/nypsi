@@ -132,6 +132,11 @@ export function loadItems(crypto = true) {
   logger.info(`${Object.keys(lootPools).length} loot pools loaded`);
   logger.info(`max prestige set at P${maxPrestige}`);
 
+  if (new Date().getMonth() === 9) {
+    items["pumpkin"].unique = false;
+    logger.info("pumpkins enabled");
+  }
+
   if (crypto) {
     setTimeout(() => {
       updateCryptoWorth();
