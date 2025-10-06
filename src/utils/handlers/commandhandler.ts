@@ -1102,14 +1102,14 @@ export async function runCommand(
         percentChance(7.7)
       ) {
         const inventory = await getInventory(message.member);
-        let amount = Math.floor(Math.random() * 4) + 1;
+        let amount = Math.random() * 4 + 1;
 
         if ((await inventory.hasGem("white_gem")).any && percentChance(50)) {
-          amount **= 1.5;
+          amount **= 1.7;
         }
 
         if ((await isPremium(message.member)) && percentChance(50)) {
-          amount **= 1.5;
+          amount **= 1.7;
         }
 
         amount = Math.ceil(amount);
