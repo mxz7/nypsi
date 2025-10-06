@@ -454,7 +454,11 @@
       "ethel": 5,
       "rain": 0.75,
       "charger_skin": 7,
-      "pot_of_gold": 1.5
+      "pot_of_gold": 1.5,
+      "pumpkin": {
+        "weight": 100,
+        "count": 30
+      }
     }
   },
   "pot_of_gold": {
