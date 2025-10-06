@@ -458,7 +458,8 @@
       "pumpkin": {
         "weight": 100,
         "count": 30
-      }
+      },
+      "white_rose": 1
     }
   },
   "pot_of_gold": {

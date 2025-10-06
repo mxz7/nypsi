@@ -1,3 +1,11 @@
+# october 2025
+
+## changes you'll probably care about
+
+- added white rose <:white_rose:1424820014959165500>
+
+---
+
 # september 2025
 
 ## changes you'll probably care about

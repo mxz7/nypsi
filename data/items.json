@@ -3504,5 +3504,17 @@
     "role": "item",
     "in_crates": true,
     "unique": true
+  },
+  "white_rose": {
+    "id": "white_rose",
+    "name": "white rose",
+    "plural": "white roses",
+    "article": "a",
+    "emoji": "<:white_rose:1424820014959165500>",
+    "longDesc": "wow majestic",
+    "rarity": 6,
+    "role": "flower",
+    "sell": 100000,
+    "in_crates": true
   }
 }
