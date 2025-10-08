@@ -1099,10 +1099,10 @@ export async function runCommand(
       if (
         !getItems()["pumpkin"].unique &&
         !(await redis.exists(Constants.redis.nypsi.LAST_PUMPKIN)) &&
-        percentChance(7.7)
+        percentChance(15)
       ) {
         const inventory = await getInventory(message.member);
-        let amount = Math.random() * 4 + 1;
+        let amount = Math.random() * 6 + 1;
 
         if ((await inventory.hasGem("white_gem")).any && percentChance(50)) {
           amount **= 1.7;
