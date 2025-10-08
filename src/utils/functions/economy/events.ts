@@ -156,7 +156,7 @@ export async function getCurrentEvent(useCache = true): Promise<EventData> {
     },
     include: {
       contributions: {
-        orderBy: { contribution: "desc" },
+        orderBy: [{ contribution: "desc" }, { user: { lastKnownUsername: "asc" } }],
       },
     },
   });
