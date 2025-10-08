@@ -19,7 +19,7 @@ importers:
         version: 2.5.1
       '@hono/node-server':
         specifier: ^1.19.5
-        version: 1.19.5(hono@4.9.9)
+        version: 1.19.5(hono@4.9.10)
       '@prisma/adapter-pg':
         specifier: ^6.16.3
         version: 6.16.3
@@ -66,11 +66,11 @@ importers:
         specifier: 3.4.1
         version: 3.4.1
       hono:
-        specifier: ^4.9.9
-        version: 4.9.9
+        specifier: ^4.9.10
+        version: 4.9.10
       ioredis:
-        specifier: 5.8.0
-        version: 5.8.0
+        specifier: 5.8.1
+        version: 5.8.1
       lodash:
         specifier: 4.17.21
         version: 4.17.21
@@ -2061,8 +2061,8 @@ packages:
     resolution: {integrity: sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==}
     engines: {node: '>=8'}
 
-  hono@4.9.9:
-    resolution: {integrity: sha512-Hxw4wT6zjJGZJdkJzAx9PyBdf7ZpxaTSA0NfxqjLghwMrLBX8p33hJBzoETRakF3UJu6OdNQBZAlNSkGqKFukw==}
+  hono@4.9.10:
+    resolution: {integrity: sha512-AlI15ijFyKTXR7eHo7QK7OR4RoKIedZvBuRjO8iy4zrxvlY5oFCdiRG/V/lFJHCNXJ0k72ATgnyzx8Yqa5arug==}
     engines: {node: '>=16.9.0'}
 
   html-escaper@2.0.2:
@@ -2108,8 +2108,8 @@ packages:
   inherits@2.0.4:
     resolution: {integrity: sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==}
 
-  ioredis@5.8.0:
-    resolution: {integrity: sha512-AUXbKn9gvo9hHKvk6LbZJQSKn/qIfkWXrnsyL9Yrf+oeXmla9Nmf6XEumOddyhM8neynpK5oAV6r9r99KBuwzA==}
+  ioredis@5.8.1:
+    resolution: {integrity: sha512-Qho8TgIamqEPdgiMadJwzRMW3TudIg6vpg4YONokGDudy4eqRIJtDbVX72pfLBcWxvbn3qm/40TyGUObdW4tLQ==}
     engines: {node: '>=12.22.0'}
 
   is-arrayish@0.2.1:
@@ -3895,9 +3895,9 @@ snapshots:
 
   '@eslint/js@8.57.1': {}
 
-  '@hono/node-server@1.19.5(hono@4.9.9)':
+  '@hono/node-server@1.19.5(hono@4.9.10)':
     dependencies:
-      hono: 4.9.9
+      hono: 4.9.10
 
   '@humanwhocodes/config-array@0.13.0':
     dependencies:
@@ -5171,7 +5171,7 @@ snapshots:
   bullmq@5.60.0:
     dependencies:
       cron-parser: 4.9.0
-      ioredis: 5.8.0
+      ioredis: 5.8.1
       msgpackr: 1.11.5
       node-abort-controller: 3.1.1
       semver: 7.7.2
@@ -5628,7 +5628,7 @@ snapshots:
 
   has-flag@4.0.0: {}
 
-  hono@4.9.9: {}
+  hono@4.9.10: {}
 
   html-escaper@2.0.2: {}
 
@@ -5661,7 +5661,7 @@ snapshots:
 
   inherits@2.0.4: {}
 
-  ioredis@5.8.0:
+  ioredis@5.8.1:
     dependencies:
       '@ioredis/commands': 1.4.0
       cluster-key-slot: 1.1.2
