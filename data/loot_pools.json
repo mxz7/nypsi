@@ -193,7 +193,7 @@
       "big_tiddy_goth_gf": 20,
       "69420_crate": 40,
       "banana_seed": 1,
-      "fertiliser": 3,
+      "fertiliser": 10,
       "toe": 50,
       "pumpkin": 10
     }
@@ -245,7 +245,7 @@
       "banana_seed": 1,
       "fertiliser": {
         "weight": 40,
-        "count": 3
+        "count": 5
       },
       "toe": 10,
       "unbreaking": 2,
@@ -301,7 +301,11 @@
       "gem_shard": 0.9,
       "omega_crate": 0.05,
       "apple_seed": 7,
-      "stick": 5
+      "stick": 5,
+      "fertiliser": {
+        "weight": 15,
+        "count": 10
+      }
     }
   },
   "karma_scratch_card": {
@@ -459,7 +463,11 @@
         "weight": 100,
         "count": 30
       },
-      "white_rose": 1
+      "white_rose": 1,
+      "fertiliser": {
+        "weight": 10,
+        "count": 15
+      }
     }
   },
   "pot_of_gold": {

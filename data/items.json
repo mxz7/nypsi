@@ -2980,7 +2980,8 @@
     "buy": 0,
     "sell": 10000,
     "in_crates": true,
-    "aliases": ["fert", "fertilizer"]
+    "aliases": ["fert", "fertilizer"],
+    "default_count": 2
   },
   "strawberry": {
     "id": "strawberry",
