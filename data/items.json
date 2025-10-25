@@ -2980,7 +2980,8 @@
     "buy": 0,
     "sell": 10000,
     "in_crates": true,
-    "aliases": ["fert", "fertilizer"]
+    "aliases": ["fert", "fertilizer"],
+    "default_count": 2
   },
   "strawberry": {
     "id": "strawberry",
@@ -3492,5 +3493,29 @@
     "loot_pools": {
       "pot_of_gold": 1
     }
+  },
+  "pumpkin": {
+    "id": "pumpkin",
+    "name": "pumpkin",
+    "article": "a",
+    "plural": "pumpkins",
+    "emoji": "🎃",
+    "longDesc": "[PUMPKIN](https://www.youtube.com/shorts/QlKRD2bqTiQ)",
+    "rarity": 0,
+    "role": "item",
+    "in_crates": true,
+    "unique": true
+  },
+  "white_rose": {
+    "id": "white_rose",
+    "name": "white rose",
+    "plural": "white roses",
+    "article": "a",
+    "emoji": "<:white_rose:1424820014959165500>",
+    "longDesc": "wow majestic",
+    "rarity": 6,
+    "role": "flower",
+    "sell": 100000,
+    "in_crates": true
   }
 }

@@ -1,3 +1,11 @@
+# october 2025
+
+## changes you'll probably care about
+
+- added white rose <:white_rose:1424820014959165500>
+
+---
+
 # september 2025
 
 ## changes you'll probably care about
@@ -5,6 +13,7 @@
 - increase xp from tasks - improves new player experience
 - increase returning player booster to 1 week
 - increase max guild level to 1000 and increase (high) levelling difficulty
+- add pumpkins 🎃
 
 ## other
 

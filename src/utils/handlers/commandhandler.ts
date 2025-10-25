@@ -38,8 +38,13 @@ import { a } from "../functions/anticheat";
 import { addProgress, setProgress } from "../functions/economy/achievements";
 import { getBankBalance } from "../functions/economy/balance";
 import { addBooster } from "../functions/economy/boosters";
-import { addEventProgress } from "../functions/economy/events";
-import { commandGemCheck, gemBreak, getInventory } from "../functions/economy/inventory";
+import { addEventProgress, EventData, getCurrentEvent } from "../functions/economy/events";
+import {
+  addInventoryItem,
+  commandGemCheck,
+  gemBreak,
+  getInventory,
+} from "../functions/economy/inventory";
 import { runItemInfo } from "../functions/economy/item_info";
 import { getLevelRequirements, getRawLevel } from "../functions/economy/levelling";
 import { addTaskProgress } from "../functions/economy/tasks";
@@ -60,6 +65,7 @@ import { addKarma, getKarma } from "../functions/karma/karma";
 import { getAllGroupAccountIds } from "../functions/moderation/alts";
 import { getUserAliases } from "../functions/premium/aliases";
 import { addUse, getCommand } from "../functions/premium/command";
+import { isPremium } from "../functions/premium/premium";
 import { percentChance } from "../functions/random";
 import { cleanString, pluralize } from "../functions/string";
 import { hasAdminPermission } from "../functions/users/admin";
@@ -1088,6 +1094,53 @@ export async function runCommand(
         embeds.push(embed);
 
         await redis.del(`nypsi:levelup:${message.author.id}`);
+      }
+
+      if (
+        !getItems()["pumpkin"].unique &&
+        !(await redis.exists(Constants.redis.nypsi.LAST_PUMPKIN)) &&
+        percentChance(15)
+      ) {
+        const inventory = await getInventory(message.member);
+        let amount = Math.random() * 6 + 1;
+
+        if ((await inventory.hasGem("white_gem")).any && percentChance(50)) {
+          amount **= 1.7;
+        }
+
+        if ((await isPremium(message.member)) && percentChance(50)) {
+          amount **= 1.7;
+        }
+
+        amount = Math.ceil(amount);
+
+        const [eventProgress] = await Promise.all([
+          addEventProgress(message.client as NypsiClient, message.member, "halloween", amount),
+          redis.set(Constants.redis.nypsi.LAST_PUMPKIN, message.author.id, "EX", 300),
+          addInventoryItem(message.member, "pumpkin", amount),
+        ]);
+
+        const embed = new CustomEmbed(
+          message.member,
+          `🎃 you found ${amount} **${pluralize("pumpkin", amount)}**!!`,
+        );
+
+        if (eventProgress) {
+          const eventData: { event?: EventData; target: number } = { target: 0 };
+
+          eventData.event = await getCurrentEvent();
+
+          if (eventData.event) {
+            eventData.target = Number(eventData.event.target);
+          }
+
+          embed.addField(
+            "event progress",
+            `🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`,
+          );
+        }
+
+        embeds.push(embed);
       }
 
       if (embeds.length > 0) {

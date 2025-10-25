@@ -48,7 +48,7 @@ async function run(
     });
   }
 
-  const contribution = event.contributions.find(
+  const contributionIndex = event.contributions.findIndex(
     (contribution) => contribution.userId === message.author.id,
   );
 
@@ -58,11 +58,10 @@ async function run(
       `> ${getEventsData()[event.type].description.replaceAll("{target}", event.target.toLocaleString())}\n\n` +
       `ends on <t:${Math.floor(event.expiresAt.getTime() / 1000)}> (<t:${Math.floor(event.expiresAt.getTime() / 1000)}:R>)\n\n` +
       `${getEventProgress(event).toLocaleString()}/${event.target.toLocaleString()}\n` +
-      (contribution
-        ? `your contribution: ${event.contributions
-            .find((contribution) => contribution.userId === message.author.id)
-            ?.contribution.toLocaleString()} ` +
-          `(#${(event.contributions.findIndex((contribution) => contribution.userId === message.author.id) + 1).toLocaleString()})`
+      (contributionIndex
+        ? `your contribution: ${event.contributions[
+            contributionIndex
+          ].contribution.toLocaleString()} ` + `(#${contributionIndex.toLocaleString()})`
         : ""),
   ).setHeader("current event", message.author.avatarURL());
 

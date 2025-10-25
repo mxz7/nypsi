@@ -17,6 +17,7 @@ import Constants from "../../utils/Constants";
 import { findChannelCluster } from "../../utils/functions/clusters";
 import { MStoTime } from "../../utils/functions/date";
 import { addProgress } from "../../utils/functions/economy/achievements";
+import { addEventProgress } from "../../utils/functions/economy/events";
 import { itemExists } from "../../utils/functions/economy/inventory";
 import {
   describeLootPoolResult,
@@ -146,6 +147,11 @@ async function randomDrop(client: NypsiClient) {
             false,
           )}) prize: ${JSON.stringify(prize)}`,
         );
+
+        if (prize.item === "pumpkin") {
+          addEventProgress(client, winner, "halloween", prize.count || 1);
+        }
+
         giveLootPoolResult(winner, prize);
         addProgress(winner, "lootdrops_pro", 1);
         addTaskProgress(winner, "lootdrops");

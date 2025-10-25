@@ -79,14 +79,14 @@ jobs:
 
       - name: initialize codeql (partial)
         if: github.event_name == 'pull_request' && steps.changed-files.outputs.any_changed == 'true' && steps.lockfile-check.outputs.lockfile_changed == 'false'
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
           config-file: codeql-config.yml
 
       - name: initialize codeql (full)
         if: github.event_name != 'pull_request' || steps.lockfile-check.outputs.lockfile_changed == 'true'
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
           # If you wish to specify custom queries, you can do so here or in a config file.
@@ -112,5 +112,5 @@ jobs:
       #   ./location_of_script_within_repo/buildscript.sh
 
       - name: perform codeQL analysis
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4
         if: github.event_name != 'pull_request' || (github.event_name == 'pull_request' && steps.changed-files.outputs.any_changed == 'true')
