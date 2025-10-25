@@ -199,7 +199,7 @@ async function run(
         );
 
         if (res) {
-          const value = res.fields.fields.get("number").value;
+          const value = res.fields.getTextInputValue("number");
 
           if (isNaN(parseInt(value)) && value != "0") {
             await res.reply({
@@ -233,7 +233,7 @@ async function run(
         );
 
         if (res) {
-          const value = res.fields.fields.get("number").value;
+          const value = res.fields.getTextInputValue("number");
 
           if (isNaN(value) && value !== "reset") {
             await res.reply({
@@ -388,7 +388,7 @@ async function run(
         if (interaction.values[0] == "other") {
           const res = await countrySelectionModal(interaction);
           if (res) {
-            const value = await getCountryCode(res.fields.fields.get("country").value);
+            const value = await getCountryCode(res.fields.getTextInputValue("country"));
             const found = data.providers.find((i) => i.countryCode === value);
 
             if (found) {
@@ -514,7 +514,7 @@ async function run(
         );
 
         if (res) {
-          const value = res.fields.fields.get("number").value;
+          const value = res.fields.getTextInputValue("number");
 
           if (!parseInt(value) || isNaN(parseInt(value))) {
             await res.reply({
@@ -560,7 +560,7 @@ async function run(
         );
 
         if (res) {
-          const value = res.fields.fields.get("number").value;
+          const value = res.fields.getTextInputValue("number");
 
           if (!parseInt(value) || isNaN(parseInt(value))) {
             await res.reply({
@@ -676,7 +676,7 @@ async function run(
         );
 
         if (res) {
-          const value = res.fields.fields.get("number").value;
+          const value = res.fields.getTextInputValue("number");
 
           if (isNaN(parseInt(value)) && value != "0") {
             await res.reply({

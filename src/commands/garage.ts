@@ -262,7 +262,7 @@ async function run(
           if (!res) return;
           if (!res.isModalSubmit()) return;
 
-          const name = res.fields.fields.first().value;
+          const name = res.fields.getTextInputValue("name");
 
           for (const word of filter) {
             if (cleanString(name).includes(word)) {

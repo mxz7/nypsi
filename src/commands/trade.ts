@@ -205,8 +205,8 @@ async function run(
         const res = await addRequestedItem(interaction).catch(() => {});
 
         if (res) {
-          const item = res.fields.fields.get("item").value;
-          const amount = res.fields.fields.get("amount").value;
+          const item = res.fields.getTextInputValue("item");
+          const amount = res.fields.getTextInputValue("amount");
 
           const selected = selectItem(item);
 
@@ -245,8 +245,8 @@ async function run(
         const res = await addOfferedItem(interaction).catch(() => {});
 
         if (res) {
-          const item = res.fields.fields.get("item").value;
-          let amount = res.fields.fields.get("amount").value;
+          const item = res.fields.getTextInputValue("item");
+          let amount = res.fields.getTextInputValue("amount");
 
           inventory = await getInventory(message.member);
 
@@ -297,7 +297,7 @@ async function run(
         const res = await addOfferedMoney(interaction).catch(() => {});
 
         if (res) {
-          const amount = res.fields.fields.get("amount").value;
+          const amount = res.fields.getTextInputValue("amount");
 
           if (amount.toLowerCase() === "all") {
             await res.deferUpdate();
