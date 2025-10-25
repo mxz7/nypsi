@@ -189,21 +189,19 @@ async function run(
 
         if (currentFilter) inventory = (await getInventory(message.member)).entries;
 
-        inventory = setFilter(inventory, res.fields.fields.first().value.toLowerCase());
+        const value = res.fields.getTextInputValue("filter").toLowerCase();
+
+        inventory = setFilter(inventory, value);
 
         if (inventory.length == 0) {
           await res.reply({
-            embeds: [
-              new ErrorEmbed(
-                `no items matched the filter: \`${res.fields.fields.first().value.toLowerCase()}\``,
-              ),
-            ],
+            embeds: [new ErrorEmbed(`no items matched the filter: \`${value}\``)],
             flags: MessageFlags.Ephemeral,
           });
           return manager.listen();
         }
 
-        args = res.fields.fields.first().value.toLowerCase().split(" ");
+        args = value.split(" ");
 
         manager.pages = PageManager.createPages(
           inventory.map((i) => items[i.item]),

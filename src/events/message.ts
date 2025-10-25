@@ -199,7 +199,7 @@ export default async function messageCreate(message: Message) {
 
         await modalSubmit.deferReply();
 
-        const helpMessage = modalSubmit.fields.fields.first().value;
+        const helpMessage = modalSubmit.fields.getTextInputValue("ticket_message");
 
         const a = await getSupportRequest(message.author.id);
 

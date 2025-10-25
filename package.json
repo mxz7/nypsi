@@ -23,7 +23,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "3.726.1",
     "@catppuccin/palette": "1.7.1",
-    "@discordjs/rest": "2.5.1",
+    "@discordjs/rest": "2.6.0",
     "@hono/node-server": "^1.19.5",
     "@prisma/adapter-pg": "^6.18.0",
     "@prisma/client": "6.18.0",
@@ -37,7 +37,7 @@
     "crypto-js": "4.2.0",
     "dayjs": "1.11.18",
     "discord-hybrid-sharding": "3.0.1",
-    "discord.js": "14.22.1",
+    "discord.js": "14.24.0",
     "dotenv": "17.2.3",
     "fast-sort": "3.4.1",
     "hono": "^4.10.2",

@@ -137,7 +137,7 @@ export async function startGTFGame(
     if (!res) return;
     if (!res.isModalSubmit()) return;
 
-    const guess = res.fields.fields.first().value;
+    const guess = res.fields.getTextInputValue("guess");
 
     if (
       secondPlayer
