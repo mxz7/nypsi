@@ -19,7 +19,7 @@ importers:
         version: 2.6.0
       '@hono/node-server':
         specifier: ^1.19.5
-        version: 1.19.5(hono@4.10.3)
+        version: 1.19.5(hono@4.10.4)
       '@prisma/adapter-pg':
         specifier: ^6.18.0
         version: 6.18.0
@@ -57,8 +57,8 @@ importers:
         specifier: 3.0.1
         version: 3.0.1
       discord.js:
-        specifier: 14.24.0
-        version: 14.24.0(bufferutil@4.0.9)
+        specifier: 14.24.1
+        version: 14.24.1(bufferutil@4.0.9)
       dotenv:
         specifier: 17.2.3
         version: 17.2.3
@@ -66,8 +66,8 @@ importers:
         specifier: 3.4.1
         version: 3.4.1
       hono:
-        specifier: ^4.10.2
-        version: 4.10.3
+        specifier: ^4.10.4
+        version: 4.10.4
       ioredis:
         specifier: 5.8.2
         version: 5.8.2
@@ -1455,6 +1455,10 @@ packages:
     resolution: {integrity: sha512-RaI5qZo6D2CVS6sTHFKg1v5Ohq/+Bo2LZ5gzUEwZ/WkHhwtGTCB/sVLw8ijOkAUxasZ+WshN/Rzj4ywsABJ5ZA==}
     engines: {node: '>=v14.0.0', npm: '>=7.0.0'}
 
+  '@vladfrangu/async_event_emitter@2.4.7':
+    resolution: {integrity: sha512-Xfe6rpCTxSxfbswi/W/Pz7zp1WWSNn4A0eW4mLkQUewCrXXtMj31lCg+iQyTkh/CkusZSq9eDflu7tjEDXUY6g==}
+    engines: {node: '>=v14.0.0', npm: '>=7.0.0'}
+
   '@yusifaliyevpro/countries@2.2.2':
     resolution: {integrity: sha512-2chsv5XtnBFFz3dG25xWHx+E0lKRZuyP+T/3aICBHXCWvcsCO4OUhIibRKrJcmZQyD4cMiwkG/kFoXBkb8vMEw==}
 
@@ -1780,8 +1784,8 @@ packages:
   discord-hybrid-sharding@3.0.1:
     resolution: {integrity: sha512-a4MhJs9Ga2yiIGEz+Lj0WgBOS785DSqX3PIr/vkOMpqugS1QJk79T8YFvGr26JmOVRAhgqaWE2eUjuekR/8MJA==}
 
-  discord.js@14.24.0:
-    resolution: {integrity: sha512-KNq/ekT8bsmT3ZAfVre8cPbl+DfVYSdlLnDmGZPoz7Cw21LYeWHllRA9MivqNq5b1GPGAxGvyUN1vxbTb/PQWw==}
+  discord.js@14.24.1:
+    resolution: {integrity: sha512-LzL+MTGxB9mBwD8FjvkMwcIL4UtgG04e713U3+euqPCvOphhoVEoPpUNTvBPw4iJOas2uiuuh3JcveYSxIn8Tg==}
     engines: {node: '>=18'}
 
   doctrine@3.0.0:
@@ -2027,8 +2031,8 @@ packages:
     resolution: {integrity: sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==}
     engines: {node: '>=8'}
 
-  hono@4.10.3:
-    resolution: {integrity: sha512-2LOYWUbnhdxdL8MNbNg9XZig6k+cZXm5IjHn2Aviv7honhBMOHb+jxrKIeJRZJRmn+htUCKhaicxwXuUDlchRA==}
+  hono@4.10.4:
+    resolution: {integrity: sha512-YG/fo7zlU3KwrBL5vDpWKisLYiM+nVstBQqfr7gCPbSYURnNEP9BDxEMz8KfsDR9JX0lJWDRNc6nXX31v7ZEyg==}
     engines: {node: '>=16.9.0'}
 
   html-escaper@2.0.2:
@@ -3791,7 +3795,7 @@ snapshots:
       '@discordjs/util': 1.1.1
       '@sapphire/async-queue': 1.5.5
       '@types/ws': 8.18.1
-      '@vladfrangu/async_event_emitter': 2.4.6
+      '@vladfrangu/async_event_emitter': 2.4.7
       discord-api-types: 0.38.31
       tslib: 2.8.1
       ws: 8.18.3(bufferutil@4.0.9)
@@ -3845,9 +3849,9 @@ snapshots:
 
   '@eslint/js@8.57.1': {}
 
-  '@hono/node-server@1.19.5(hono@4.10.3)':
+  '@hono/node-server@1.19.5(hono@4.10.4)':
     dependencies:
-      hono: 4.10.3
+      hono: 4.10.4
 
   '@humanwhocodes/config-array@0.13.0':
     dependencies:
@@ -4926,6 +4930,8 @@ snapshots:
 
   '@vladfrangu/async_event_emitter@2.4.6': {}
 
+  '@vladfrangu/async_event_emitter@2.4.7': {}
+
   '@yusifaliyevpro/countries@2.2.2': {}
 
   '@zeyrbot/urbandictionary@1.0.3':
@@ -5233,7 +5239,7 @@ snapshots:
 
   discord-hybrid-sharding@3.0.1: {}
 
-  discord.js@14.24.0(bufferutil@4.0.9):
+  discord.js@14.24.1(bufferutil@4.0.9):
     dependencies:
       '@discordjs/builders': 1.13.0
       '@discordjs/collection': 1.5.3
@@ -5537,7 +5543,7 @@ snapshots:
 
   has-flag@4.0.0: {}
 
-  hono@4.10.3: {}
+  hono@4.10.4: {}
 
   html-escaper@2.0.2: {}
 
