@@ -3207,7 +3207,7 @@ async function run(
       },
     };
 
-    const foundAll = {
+    let foundAll = {
       money: 0,
       xp: 0,
       karma: 0,
@@ -3282,6 +3282,13 @@ async function run(
         embed.setDescription(desc.join("\n"));
 
         addInlineNotification({ memberId: user.userId, embed });
+
+        foundAll = {
+          money: 0,
+          xp: 0,
+          karma: 0,
+          items: {},
+        };
       }
 
       await setInventoryItem(user.userId, "pumpkin", 0);
