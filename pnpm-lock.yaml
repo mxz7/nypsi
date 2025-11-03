@@ -18,8 +18,8 @@ importers:
         specifier: 2.6.0
         version: 2.6.0
       '@hono/node-server':
-        specifier: ^1.19.5
-        version: 1.19.5(hono@4.10.4)
+        specifier: ^1.19.6
+        version: 1.19.6(hono@4.10.4)
       '@prisma/adapter-pg':
         specifier: ^6.18.0
         version: 6.18.0
@@ -51,14 +51,14 @@ importers:
         specifier: 4.2.0
         version: 4.2.0
       dayjs:
-        specifier: 1.11.18
-        version: 1.11.18
+        specifier: 1.11.19
+        version: 1.11.19
       discord-hybrid-sharding:
         specifier: 3.0.1
         version: 3.0.1
       discord.js:
-        specifier: 14.24.1
-        version: 14.24.1(bufferutil@4.0.9)
+        specifier: 14.24.2
+        version: 14.24.2(bufferutil@4.0.9)
       dotenv:
         specifier: 17.2.3
         version: 17.2.3
@@ -567,8 +567,8 @@ packages:
     resolution: {integrity: sha512-d9zaMRSTIKDLhctzH12MtXvJKSSUhaHcjV+2Z+GK+EEY7XKpP5yR4x+N3TAcHTcu963nIr+TMcCb4DBCYX1z6Q==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
 
-  '@hono/node-server@1.19.5':
-    resolution: {integrity: sha512-iBuhh+uaaggeAuf+TftcjZyWh2GEgZcVGXkNtskLVoWaXhnJtC5HLHrU8W1KHDoucqO1MswwglmkWLFyiDn4WQ==}
+  '@hono/node-server@1.19.6':
+    resolution: {integrity: sha512-Shz/KjlIeAhfiuE93NDKVdZ7HdBVLQAfdbaXEaoAVO3ic9ibRSLGIQGkcBbFyuLr+7/1D5ZCINM8B+6IvXeMtw==}
     engines: {node: '>=18.14.1'}
     peerDependencies:
       hono: ^4
@@ -1702,8 +1702,8 @@ packages:
   crypto-js@4.2.0:
     resolution: {integrity: sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q==}
 
-  dayjs@1.11.18:
-    resolution: {integrity: sha512-zFBQ7WFRvVRhKcWoUh+ZA1g2HVgUbsZm9sbddh8EC5iv93sui8DVVz1Npvz+r6meo9VKfa8NyLWBsQK1VvIKPA==}
+  dayjs@1.11.19:
+    resolution: {integrity: sha512-t5EcLVS6QPBNqM2z8fakk/NKel+Xzshgt8FFKAn+qwlD1pzZWxh0nVCrvFK7ZDb6XucZeF9z8C7CBWTRIVApAw==}
 
   debug@4.3.5:
     resolution: {integrity: sha512-pt0bNEmneDIvdL1Xsd9oDQ/wrQRkXDT4AUWlNZNPKvW5x/jyO9VFXkJUP07vQ2upmw5PlaITaPKc31jK13V+jg==}
@@ -1784,8 +1784,8 @@ packages:
   discord-hybrid-sharding@3.0.1:
     resolution: {integrity: sha512-a4MhJs9Ga2yiIGEz+Lj0WgBOS785DSqX3PIr/vkOMpqugS1QJk79T8YFvGr26JmOVRAhgqaWE2eUjuekR/8MJA==}
 
-  discord.js@14.24.1:
-    resolution: {integrity: sha512-LzL+MTGxB9mBwD8FjvkMwcIL4UtgG04e713U3+euqPCvOphhoVEoPpUNTvBPw4iJOas2uiuuh3JcveYSxIn8Tg==}
+  discord.js@14.24.2:
+    resolution: {integrity: sha512-VMEDbmguRdX/EeMaTsf9Mb0IQA90WdYF2cn4QDfslQFXgQ6LFtmlPn0FSotnS0kcFbFp+JBSIxtnF+bnAHG/hQ==}
     engines: {node: '>=18'}
 
   doctrine@3.0.0:
@@ -3849,7 +3849,7 @@ snapshots:
 
   '@eslint/js@8.57.1': {}
 
-  '@hono/node-server@1.19.5(hono@4.10.4)':
+  '@hono/node-server@1.19.6(hono@4.10.4)':
     dependencies:
       hono: 4.10.4
 
@@ -5194,7 +5194,7 @@ snapshots:
 
   crypto-js@4.2.0: {}
 
-  dayjs@1.11.18: {}
+  dayjs@1.11.19: {}
 
   debug@4.3.5:
     dependencies:
@@ -5239,7 +5239,7 @@ snapshots:
 
   discord-hybrid-sharding@3.0.1: {}
 
-  discord.js@14.24.1(bufferutil@4.0.9):
+  discord.js@14.24.2(bufferutil@4.0.9):
     dependencies:
       '@discordjs/builders': 1.13.0
       '@discordjs/collection': 1.5.3
