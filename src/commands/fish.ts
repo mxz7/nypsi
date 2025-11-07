@@ -20,6 +20,7 @@ import {
   gemBreak,
   getInventory,
   isGem,
+  itemExists,
   removeInventoryItem,
 } from "../utils/functions/economy/inventory";
 import { addStat } from "../utils/functions/economy/stats";
@@ -102,6 +103,7 @@ async function run(
     if (items[i].role === "worker-upgrade" && !percentChance(20)) continue;
     if (items[i].role == "crate" && !percentChance(35)) continue;
     if (items[i].id.includes("gem") && !percentChance(0.77)) continue;
+    if (items[i].unique && (await itemExists(i))) continue;
 
     if (
       [
