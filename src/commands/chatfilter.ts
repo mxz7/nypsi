@@ -146,8 +146,6 @@ async function run(
 
     return send({ embeds: [embed] });
   } else if (args[0].toLowerCase() == "reset") {
-    filter = [];
-
     for (const word of filter) {
       await deleteChatFilterWord(message.guildId, word.content);
     }
