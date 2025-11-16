@@ -16,25 +16,19 @@ export async function randomPresence(): Promise<ActivitiesOptions> {
     { name: "nypsi.xyz", type: ActivityType.Custom },
     { name: "nypsi.xyz", type: ActivityType.Custom },
     { name: "xmas", type: ActivityType.Custom },
-    { name: "with your mother", type: ActivityType.Playing },
     {
       name: "nothing. me? just hanging around",
       type: ActivityType.Streaming,
       url: "https://www.youtube.com/watch?v=d2r_LU6beVw",
     },
     {
-      name: "ronnie pickering",
+      name: "PUMPKIN",
       type: ActivityType.Streaming,
-      url: "https://youtube.com/watch?v=r0dcv6GKNNw&t=102s",
-    },
-    {
-      name: "this",
-      type: ActivityType.Streaming,
-      url: "https://www.youtube.com/watch?v=7fMrijCFVdE",
+      url: "https://www.youtube.com/watch?v=QlKRD2bqTiQ",
     },
     {
       name: "item",
-      type: ActivityType.Watching,
+      type: ActivityType.Custom,
     },
   ];
 
