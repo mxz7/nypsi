@@ -195,7 +195,8 @@
       "banana_seed": 1,
       "fertiliser": 10,
       "toe": 50,
-      "pumpkin": 10
+      "pumpkin": 10,
+      "christmas_tree": 15
     }
   },
   "daily_scratch_card": {
@@ -250,7 +251,8 @@
       "toe": 10,
       "unbreaking": 2,
       "mango_seed": 4,
-      "pumpkin": 80
+      "pumpkin": 80,
+      "christmas_tree": 100
     }
   },
   "lucky_scratch_card": {
@@ -460,6 +462,10 @@
       "charger_skin": 7,
       "pot_of_gold": 1.5,
       "pumpkin": {
+        "weight": 100,
+        "count": 30
+      },
+      "christmas_tree": {
         "weight": 100,
         "count": 30
       },

@@ -3517,5 +3517,18 @@
     "role": "flower",
     "sell": 100000,
     "in_crates": true
+  },
+  "christmas_tree": {
+    "id": "christmas_tree",
+    "name": "christmas tree",
+    "article": "a",
+    "plural": "christmas trees",
+    "emoji": "🎄",
+    "longDesc": "[KEVIN](https://www.youtube.com/watch?v=5LZDuPcve9U)",
+    "aliases": ["tree"],
+    "rarity": 0,
+    "role": "item",
+    "in_crates": true,
+    "unique": true
   }
 }

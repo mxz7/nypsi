@@ -93,5 +93,10 @@
     "id": "halloween",
     "name": "halloween",
     "description": "collect {target} pumpkins"
+  },
+  "christmas": {
+    "id": "christmas",
+    "name": "christmas",
+    "description": "collect {target} christmas trees"
   }
 }

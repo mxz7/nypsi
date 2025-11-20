@@ -150,6 +150,8 @@ module.exports = new ItemUse(
 
     if (foundAll.items["pumpkin"]) {
       await addEventProgress(message.client as NypsiClient, message.member, "halloween", 1);
+    } else if (foundAll.items["christmas_tree"]) {
+      await addEventProgress(message.client as NypsiClient, message.member, "christmas", 1);
     }
 
     await sleep(2500);

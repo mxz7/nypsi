@@ -148,8 +148,13 @@ async function randomDrop(client: NypsiClient) {
           )}) prize: ${JSON.stringify(prize)}`,
         );
 
-        if (prize.item === "pumpkin") {
-          addEventProgress(client, winner, "halloween", prize.count || 1);
+        switch (prize.item) {
+          case "pumpkin":
+            addEventProgress(client, winner, "halloween", prize.count || 1);
+            break;
+          case "christmas_tree":
+            addEventProgress(client, winner, "christmas", prize.count || 1);
+            break;
         }
 
         giveLootPoolResult(winner, prize);

@@ -137,6 +137,11 @@ export function loadItems(crypto = true) {
     logger.info("pumpkins enabled");
   }
 
+  if (new Date().getMonth() === 11) {
+    items["christmas_tree"].unique = false;
+    logger.info("christmas trees enabled");
+  }
+
   if (crypto) {
     setTimeout(() => {
       updateCryptoWorth();

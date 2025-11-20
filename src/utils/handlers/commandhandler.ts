@@ -1098,7 +1098,7 @@ export async function runCommand(
 
       if (
         !getItems()["pumpkin"].unique &&
-        !(await redis.exists(Constants.redis.nypsi.LAST_PUMPKIN)) &&
+        !(await redis.exists(Constants.redis.nypsi.LAST_SEASONAL_ITEM)) &&
         percentChance(15)
       ) {
         const inventory = await getInventory(message.member);
@@ -1116,13 +1116,60 @@ export async function runCommand(
 
         const [eventProgress] = await Promise.all([
           addEventProgress(message.client as NypsiClient, message.member, "halloween", amount),
-          redis.set(Constants.redis.nypsi.LAST_PUMPKIN, message.author.id, "EX", 300),
+          redis.set(Constants.redis.nypsi.LAST_SEASONAL_ITEM, message.author.id, "EX", 300),
           addInventoryItem(message.member, "pumpkin", amount),
         ]);
 
         const embed = new CustomEmbed(
           message.member,
           `🎃 you found ${amount} **${pluralize("pumpkin", amount)}**!!`,
+        );
+
+        if (eventProgress) {
+          const eventData: { event?: EventData; target: number } = { target: 0 };
+
+          eventData.event = await getCurrentEvent();
+
+          if (eventData.event) {
+            eventData.target = Number(eventData.event.target);
+          }
+
+          embed.addField(
+            "event progress",
+            `🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`,
+          );
+        }
+
+        embeds.push(embed);
+      }
+
+      if (
+        !getItems()["christmas_Tree"].unique &&
+        !(await redis.exists(Constants.redis.nypsi.LAST_SEASONAL_ITEM)) &&
+        percentChance(15)
+      ) {
+        const inventory = await getInventory(message.member);
+        let amount = Math.random() * 6 + 1;
+
+        if ((await inventory.hasGem("white_gem")).any && percentChance(50)) {
+          amount **= 1.3;
+        }
+
+        if ((await isPremium(message.member)) && percentChance(50)) {
+          amount **= 1.7;
+        }
+
+        amount = Math.ceil(amount);
+
+        const [eventProgress] = await Promise.all([
+          addEventProgress(message.client as NypsiClient, message.member, "christmas", amount),
+          redis.set(Constants.redis.nypsi.LAST_SEASONAL_ITEM, message.author.id, "EX", 300),
+          addInventoryItem(message.member, "christmas_tree", amount),
+        ]);
+
+        const embed = new CustomEmbed(
+          message.member,
+          `🎄 you found ${amount} **${pluralize("christmas tree", amount)}**!!`,
         );
 
         if (eventProgress) {
