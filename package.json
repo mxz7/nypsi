@@ -27,7 +27,7 @@
     "@hono/node-server": "^1.19.6",
     "@prisma/adapter-pg": "^6.19.0",
     "@prisma/client": "6.19.0",
-    "@twemoji/parser": "^16.0.0",
+    "@twemoji/parser": "^17.0.1",
     "@yusifaliyevpro/countries": "^2.2.2",
     "@zeyrbot/urbandictionary": "^1.0.3",
     "bufferutil": "4.0.9",

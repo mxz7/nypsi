@@ -27,8 +27,8 @@ importers:
         specifier: 6.19.0
         version: 6.19.0(prisma@6.19.0(typescript@5.9.3))(typescript@5.9.3)
       '@twemoji/parser':
-        specifier: ^16.0.0
-        version: 16.0.0
+        specifier: ^17.0.1
+        version: 17.0.1
       '@yusifaliyevpro/countries':
         specifier: ^2.2.2
         version: 2.2.2
@@ -1210,8 +1210,8 @@ packages:
   '@tsconfig/node16@1.0.4':
     resolution: {integrity: sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==}
 
-  '@twemoji/parser@16.0.0':
-    resolution: {integrity: sha512-jmuIjkp3OIaEemwMy3sArBwZSuZkRqmueGwRe2Zk4cFzbUJISFBJSZLDUUBNIgq3c+nY49ideYN2OiII6JUqwA==}
+  '@twemoji/parser@17.0.1':
+    resolution: {integrity: sha512-Uiq5sq1Wx91Y6C0DczMlu4Gj4nC/0z8UIhT7S53hi/JATaS1oLM5jXygjot7STtyVoIagfnpsBCWaNy3ayfyFw==}
 
   '@tybys/wasm-util@0.10.1':
     resolution: {integrity: sha512-9tTaPJLSiejZKx+Bmog4uSubteqTvFrVrURwkmHixBo0G4seD0zUxp98E1DzUBJxLQ3NPwXrGKDiVjwx/DpPsg==}
@@ -4683,7 +4683,7 @@ snapshots:
 
   '@tsconfig/node16@1.0.4': {}
 
-  '@twemoji/parser@16.0.0': {}
+  '@twemoji/parser@17.0.1': {}
 
   '@tybys/wasm-util@0.10.1':
     dependencies:
