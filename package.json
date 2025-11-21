@@ -37,7 +37,7 @@
     "crypto-js": "4.2.0",
     "dayjs": "1.11.19",
     "discord-hybrid-sharding": "3.0.1",
-    "discord.js": "14.24.2",
+    "discord.js": "14.25.0",
     "dotenv": "17.2.3",
     "fast-sort": "3.4.1",
     "hono": "^4.10.6",
