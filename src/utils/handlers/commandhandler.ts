@@ -1144,7 +1144,7 @@ export async function runCommand(
       }
 
       if (
-        !getItems()["christmas_Tree"].unique &&
+        !getItems()["christmas_tree"].unique &&
         !(await redis.exists(Constants.redis.nypsi.LAST_SEASONAL_ITEM)) &&
         percentChance(15)
       ) {
