@@ -389,13 +389,21 @@ model EconomyWorkerUpgrades {
   @@id([userId, workerId, upgradeId])
 }
 
+enum BoosterScope {
+  global
+  user
+}
+
 model Booster {
-  id        Int      @id @default(autoincrement())
+  id        Int          @id @default(autoincrement())
   userId    String
   boosterId String
   expire    DateTime
+  scope     BoosterScope @default(user)
 
   Economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@index([scope])
 }
 
 model Game {
