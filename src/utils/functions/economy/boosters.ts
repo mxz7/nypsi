@@ -1,3 +1,4 @@
+import { BoosterScope } from "#generated/prisma";
 import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
@@ -201,6 +202,7 @@ export async function addBooster(
   boosterId: string,
   amount = 1,
   expire?: Date,
+  scope: BoosterScope = "user",
 ) {
   const userId = getUserId(member);
   const items = getItems();
@@ -210,6 +212,7 @@ export async function addBooster(
       boosterId: boosterId,
       expire: expire || new Date(Date.now() + items[boosterId].boosterEffect.time * 1000),
       userId,
+      scope,
     }),
   });
 
