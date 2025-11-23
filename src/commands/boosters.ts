@@ -6,11 +6,9 @@ import {
   MessageActionRowComponentBuilder,
   MessageFlags,
 } from "discord.js";
-import { sort } from "fast-sort";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
-import { getBoosters } from "../utils/functions/economy/boosters";
-import { getItems } from "../utils/functions/economy/utils";
+import { getBoosters, getBoostersDisplay } from "../utils/functions/economy/boosters";
 import PageManager from "../utils/functions/page";
 import { getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -35,41 +33,12 @@ async function run(
 
   embed.setHeader("your boosters", message.author.avatarURL());
 
-  const desc: string[] = [];
+  const pages = await getBoostersDisplay(await getBoosters(message.member), embed);
 
-  const items = getItems();
-  const boosters = await getBoosters(message.member);
-
-  if (boosters.size == 0) {
+  if (!pages) {
     embed.setDescription("you have no active boosters");
     return send({ embeds: [embed] });
   }
-
-  for (const boosterId of sort(Array.from(boosters.keys())).asc((i) => i)) {
-    if (boosters.get(boosterId).length == 1) {
-      desc.push(
-        `**${items[boosterId].name}** ${items[boosterId].emoji} - expires <t:${Math.round(
-          boosters.get(boosterId)[0].expire / 1000,
-        )}:R>`,
-      );
-    } else {
-      let lowest = boosters.get(boosterId)[0].expire;
-
-      for (const booster of boosters.get(boosterId)) {
-        if (booster.expire < lowest) lowest = booster.expire;
-      }
-
-      desc.push(
-        `**${items[boosterId].name}** ${items[boosterId].emoji} \`x${
-          boosters.get(boosterId).length
-        }\` - next expires <t:${Math.round(boosters.get(boosterId)[0].expire / 1000)}:R>`,
-      );
-    }
-  }
-
-  const pages = PageManager.createPages(desc, 10);
-
-  embed.setDescription(pages.get(1).join("\n"));
 
   if (pages.size <= 1) return send({ embeds: [embed] });
 

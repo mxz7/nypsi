@@ -1,5 +1,6 @@
 import { BoosterScope } from "#generated/prisma";
 import { GuildMember } from "discord.js";
+import { sort } from "fast-sort";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
@@ -7,8 +8,10 @@ import { Booster } from "../../../types/Economy";
 import { SteveData } from "../../../types/Workers";
 import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
+import PageManager from "../page";
 import { pluralize } from "../string";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
+import { getLastKnownUsername } from "../users/username";
 import { getItems } from "./utils";
 import _ = require("lodash");
 
@@ -228,4 +231,79 @@ export async function addBooster(
   });
 
   await redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${userId}`);
+}
+
+export async function getBoostersDisplay(
+  boosters: Map<string, Booster[]>,
+  embed: CustomEmbed,
+  showGlobal = true,
+): Promise<null | Map<number, string[]>> {
+  const desc: string[] = [];
+
+  const items = getItems();
+
+  if (boosters.size == 0) {
+    return null;
+  }
+
+  const globalBoosters: string[] = [];
+
+  for (const boosterId of sort(Array.from(boosters.keys())).asc((i) => i)) {
+    if (boosters.get(boosterId)[0].scope === "global") {
+      if (!showGlobal) {
+        continue;
+      }
+
+      const count = boosters.get(boosterId).length;
+      const ownerId = boosters.get(boosterId)[0].userId;
+      const username = await getLastKnownUsername(ownerId);
+
+      if (count === 1) {
+        globalBoosters.push(
+          `${items[boosterId].emoji} **${items[boosterId].name}** - expires <t:${Math.round(
+            boosters.get(boosterId)[0].expire / 1000,
+          )}:R>, by [${username}](https://nypsi.xyz/users/${ownerId}?ref=bot-global-booster)`,
+        );
+      } else {
+        globalBoosters.push(
+          `${items[boosterId].emoji} **${items[boosterId].name}** \`x${count}\` - next expires <t:${Math.round(
+            boosters.get(boosterId)[0].expire / 1000,
+          )}:R>, by [${username}](https://nypsi.xyz/users/${ownerId}?ref=bot-global-booster)`,
+        );
+      }
+    } else {
+      if (boosters.get(boosterId).length == 1) {
+        desc.push(
+          `${items[boosterId].emoji} **${items[boosterId].name}** - expires <t:${Math.round(
+            boosters.get(boosterId)[0].expire / 1000,
+          )}:R>`,
+        );
+      } else {
+        let lowest = boosters.get(boosterId)[0].expire;
+
+        for (const booster of boosters.get(boosterId)) {
+          if (booster.expire < lowest) lowest = booster.expire;
+        }
+
+        desc.push(
+          `${items[boosterId].emoji} **${items[boosterId].name}** \`x${
+            boosters.get(boosterId).length
+          }\` - next expires <t:${Math.round(boosters.get(boosterId)[0].expire / 1000)}:R>`,
+        );
+      }
+    }
+  }
+
+  const pages = PageManager.createPages(desc, 10);
+
+  embed.setDescription(pages.get(1).join("\n"));
+
+  if (globalBoosters.length > 0) {
+    embed.addFields({
+      name: "global boosters",
+      value: globalBoosters.join("\n"),
+    });
+  }
+
+  return pages;
 }
