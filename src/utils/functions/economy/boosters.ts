@@ -49,6 +49,18 @@ async function checkBoosters(member: MemberResolvable, boosters: Map<string, Boo
           })
           .catch(() => {});
 
+        if (booster.scope === "global" && (await getDmSettings(booster.userId)).booster) {
+          addNotificationToQueue({
+            memberId: booster.userId,
+            payload: {
+              embed: new CustomEmbed(
+                booster.userId,
+                `your ${getItems()[booster.boosterId].emoji} **${getItems()[booster.boosterId].name}** global booster has expired`,
+              ),
+            },
+          });
+        }
+
         if (expired.has(booster.boosterId)) {
           expired.set(booster.boosterId, expired.get(booster.boosterId) + 1);
         } else {
@@ -156,12 +168,7 @@ export async function getBoosters(member: MemberResolvable): Promise<Map<string,
 
   const query = await prisma.booster.findMany({
     where: {
-      userId,
-    },
-    select: {
-      boosterId: true,
-      expire: true,
-      id: true,
+      OR: [{ scope: "global" }, { userId }],
     },
   });
 
@@ -173,6 +180,8 @@ export async function getBoosters(member: MemberResolvable): Promise<Map<string,
         boosterId: i.boosterId,
         expire: i.expire.getTime(),
         id: i.id,
+        scope: i.scope,
+        userId: i.userId,
       });
     } else {
       map.set(i.boosterId, [
@@ -180,6 +189,8 @@ export async function getBoosters(member: MemberResolvable): Promise<Map<string,
           boosterId: i.boosterId,
           expire: i.expire.getTime(),
           id: i.id,
+          scope: i.scope,
+          userId: i.userId,
         },
       ]);
     }
