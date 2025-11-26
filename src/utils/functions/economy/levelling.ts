@@ -147,7 +147,7 @@ levellingRewards.set(7000, {
 });
 levellingRewards.set(8000, {
   text: ["- 💚 prestige 80 tag"],
-  rewards: ["tag:p70"],
+  rewards: ["tag:80"],
 });
 
 const xpFormula = (level: number, prestige: number) => {
