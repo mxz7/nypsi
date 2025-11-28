@@ -2,6 +2,7 @@ import { CommandInteraction, GuildMember } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getMember } from "../utils/functions/member";
+import { escapeFormattingCharacters } from "../utils/functions/string";
 
 const cmd = new Command("banner", "get a person's banner", "info");
 
@@ -28,7 +29,7 @@ async function run(
     return send({
       embeds: [
         new ErrorEmbed(
-          `${member == message.member ? "you do" : `${user.username.replaceAll("_", "\\_")} does`} not have a banner`,
+          `${member == message.member ? "you do" : `${escapeFormattingCharacters(user.username)} does`} not have a banner`,
         ),
       ],
     });

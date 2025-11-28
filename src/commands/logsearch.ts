@@ -30,7 +30,7 @@ async function run(
   const msg = send({ content: "searching..." });
 
   const success = await execCmd(
-    `grep -rh "${escapeForShellGrep(args.join(" "))}" out > ${path}`,
+    `grep -rh "${escapeForShellGrep(args.join(" "))}" /var/log/nypsi > ${path}`,
   ).catch((err) => {
     console.error(err);
     logger.error("failed to complete logsearch", { err });
@@ -44,7 +44,7 @@ async function run(
   const res = await fetch("https://nypsi-logprocess.fly.dev/process", {
     method: "POST",
     headers: { authorization: process.env.LOGSEARCH_TOKEN },
-    body: await readFile(path),
+    body: Buffer.from(await readFile(path)),
   });
 
   if (!res.ok) {

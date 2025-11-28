@@ -6,7 +6,7 @@ import Constants from "../Constants";
 import { logger } from "../logger";
 import sleep from "./sleep";
 import { addNotificationToQueue } from "./users/notifications";
-import { getLastKnownUsername } from "./users/tag";
+import { getLastKnownUsername } from "./users/username";
 
 export type z = {
   invitedBy: {

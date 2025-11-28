@@ -6,7 +6,7 @@ import { Job } from "../../types/Jobs";
 import Constants from "../../utils/Constants";
 import { isEcoBanned, setEcoBan } from "../../utils/functions/economy/utils";
 import { addNotificationToQueue } from "../../utils/functions/users/notifications";
-import { getLastKnownUsername } from "../../utils/functions/users/tag";
+import { getLastKnownUsername } from "../../utils/functions/users/username";
 import { getTimestamp } from "../../utils/logger";
 
 export default {

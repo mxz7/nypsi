@@ -65,6 +65,43 @@ export default class ScratchCard {
 
     const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [];
 
+    const labelButton = (button: ButtonBuilder, result: LootPoolResult) => {
+      if (Object.hasOwn(result, "item")) {
+        button.setEmoji(items[result.item].emoji);
+      } else if (Object.hasOwn(result, "xp")) {
+        button.setEmoji("✨");
+      } else if (Object.hasOwn(result, "money")) {
+        if (this.item.id === "pot_of_gold") {
+          switch (result.money) {
+            case 50000000:
+              button.setEmoji("🪙");
+              break;
+            case 100000000:
+              button.setEmoji("💵");
+              break;
+            case 250000000:
+              button.setEmoji("💸");
+              break;
+            case 500000000:
+              button.setEmoji("💰");
+              break;
+            case 1000000000:
+              button.setEmoji("🤑");
+              break;
+            default:
+              button.setEmoji("💰");
+              break;
+          }
+        } else {
+          button.setEmoji("💰");
+        }
+      } else if (Object.hasOwn(result, "karma")) {
+        button.setEmoji("🔮");
+      } else {
+        button.setLabel("\u200B");
+      }
+    };
+
     const index = [0, 0];
     for (const row of this.area) {
       const buttonRow = new ActionRowBuilder<MessageActionRowComponentBuilder>();
@@ -74,50 +111,22 @@ export default class ScratchCard {
         if (col.clicks === 2) {
           button.setDisabled(true);
           button.setStyle(ButtonStyle.Success);
-          if (Object.hasOwn(col.result, "item")) {
-            button.setEmoji(items[col.result.item].emoji);
-          } else if (Object.hasOwn(col.result, "xp")) {
-            button.setEmoji("✨");
-          } else if (Object.hasOwn(col.result, "money")) {
-            button.setEmoji("💰");
-          } else if (Object.hasOwn(col.result, "karma")) {
-            button.setEmoji("🔮");
-          } else {
-            button.setLabel("\u200B");
-            button.setStyle(ButtonStyle.Danger);
-          }
+          labelButton(button, col.result);
         } else if (col.clicks === 1) {
           button.setDisabled(true);
           button.setStyle(ButtonStyle.Secondary);
-          if (end) button.setStyle(ButtonStyle.Danger);
-          if (Object.hasOwn(col.result, "item")) {
-            button.setEmoji(items[col.result.item].emoji);
-          } else if (Object.hasOwn(col.result, "xp")) {
-            button.setEmoji("✨");
-          } else if (Object.hasOwn(col.result, "money")) {
-            button.setEmoji("💰");
-          } else if (Object.hasOwn(col.result, "karma")) {
-            button.setEmoji("🔮");
-          } else {
-            button.setLabel("\u200B");
-            button.setStyle(ButtonStyle.Danger);
-          }
+
+          if (end || !Object.keys(col.result).length) button.setStyle(ButtonStyle.Danger);
+
+          labelButton(button, col.result);
         } else if (end) {
           button.setStyle(ButtonStyle.Secondary);
           button.setDisabled(true);
+
           if (col.clicks === 2) button.setStyle(ButtonStyle.Success);
           if (col.clicks === 1) button.setStyle(ButtonStyle.Danger);
-          if (Object.hasOwn(col.result, "item")) {
-            button.setEmoji(items[col.result.item].emoji);
-          } else if (Object.hasOwn(col.result, "xp")) {
-            button.setEmoji("✨");
-          } else if (Object.hasOwn(col.result, "money")) {
-            button.setEmoji("💰");
-          } else if (Object.hasOwn(col.result, "karma")) {
-            button.setEmoji("🔮");
-          } else {
-            button.setLabel("\u200B");
-          }
+
+          labelButton(button, col.result);
         } else {
           button.setStyle(ButtonStyle.Secondary);
           button.setLabel("\u200B");
@@ -208,13 +217,36 @@ export default class ScratchCard {
       const prize = this.area[y][x].result;
       await giveLootPoolResult(this.member.user.id, prize);
 
-      const eventProgress = await addEventProgress(
-        this.member.client as NypsiClient,
-        this.member,
-        "gamble",
-        1,
-      );
+      let eventProgress: Awaited<ReturnType<typeof addEventProgress>>;
       const eventData: { event?: EventData; target: number } = { target: 0 };
+
+      if (Object.hasOwn(prize, "item")) {
+        switch (prize.item) {
+          case "pumpkin":
+            eventProgress = await addEventProgress(
+              this.member.client as NypsiClient,
+              this.member,
+              "halloween",
+              1,
+            );
+            break;
+          case "christmas_tree":
+            eventProgress = await addEventProgress(
+              this.member.client as NypsiClient,
+              this.member,
+              "christmas",
+              1,
+            );
+            break;
+          default:
+            eventProgress = await addEventProgress(
+              this.member.client as NypsiClient,
+              this.member,
+              "gamble",
+              1,
+            );
+        }
+      }
 
       if (eventProgress) {
         eventData.event = await getCurrentEvent();

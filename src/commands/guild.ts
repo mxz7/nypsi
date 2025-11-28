@@ -1,4 +1,4 @@
-import { EconomyGuild, EconomyGuildMember, EconomyGuildRole } from "@prisma/client";
+import { EconomyGuild, EconomyGuildMember, EconomyGuildRole } from "#generated/prisma";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -52,7 +52,7 @@ import { deleteImage, uploadImage } from "../utils/functions/image";
 import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import PageManager from "../utils/functions/page";
 import { cleanString, pluralize } from "../utils/functions/string";
-import { getLastKnownAvatar, getLastKnownUsername } from "../utils/functions/users/tag";
+import { getLastKnownAvatar, getLastKnownUsername } from "../utils/functions/users/username";
 import { addCooldown, addExpiry, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
 import sharp = require("sharp");
@@ -556,7 +556,7 @@ async function run(
   }
 
   if (args[0].toLowerCase() == "forcekick") {
-    if (message.author.id != Constants.TEKOH_ID) return;
+    if (message.author.id != Constants.OWNER_ID) return;
 
     if (args.length == 1) {
       return send({ embeds: [new ErrorEmbed(`${prefix}guild kick <tag>`)] });
@@ -566,7 +566,7 @@ async function run(
   }
 
   if (args[0].toLowerCase() == "setowner") {
-    if (message.author.id != Constants.TEKOH_ID) return;
+    if (message.author.id != Constants.OWNER_ID) return;
 
     if (args.length != 3) {
       return send({ embeds: [new ErrorEmbed(`${prefix}guild setowner <guild> <newid>`)] });
@@ -650,7 +650,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          `✅ \`${getLastKnownUsername(target.id, false)}\` has been kicked from **${guild.guildName}**`,
+          `✅ \`${await getLastKnownUsername(target.id, false)}\` has been kicked from **${guild.guildName}**`,
         ),
       ],
     });
@@ -721,7 +721,7 @@ async function run(
   }
 
   if (args[0].toLowerCase() == "forcedelete") {
-    if (message.author.id != Constants.TEKOH_ID) return;
+    if (message.author.id != Constants.OWNER_ID) return;
 
     args.shift();
 

@@ -17,7 +17,7 @@ import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import PageManager from "../utils/functions/page";
 import { createAuraTransaction, getAura, getAuraTransactions } from "../utils/functions/users/aura";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
-import { getLastKnownUsername } from "../utils/functions/users/tag";
+import { getLastKnownUsername } from "../utils/functions/users/username";
 import { hasProfile } from "../utils/functions/users/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");

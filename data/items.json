@@ -2980,7 +2980,8 @@
     "buy": 0,
     "sell": 10000,
     "in_crates": true,
-    "aliases": ["fert", "fertilizer"]
+    "aliases": ["fert", "fertilizer"],
+    "default_count": 2
   },
   "strawberry": {
     "id": "strawberry",
@@ -3475,5 +3476,59 @@
       "pandora_box": 1
     },
     "in_crates": true
+  },
+  "pot_of_gold": {
+    "id": "pot_of_gold",
+    "name": "pot of gold",
+    "plural": "pots of gold",
+    "article": "a",
+    "emoji": "<:pot_of_gold:1404088756415234048>",
+    "role": "scratch-card",
+    "longDesc": "match 3 in a row to win!",
+    "aliases": ["mpot", "pog"],
+    "rarity": 5,
+    "in_crates": false,
+    "sell": 1000000,
+    "clicks": 6,
+    "loot_pools": {
+      "pot_of_gold": 1
+    }
+  },
+  "pumpkin": {
+    "id": "pumpkin",
+    "name": "pumpkin",
+    "article": "a",
+    "plural": "pumpkins",
+    "emoji": "🎃",
+    "longDesc": "[PUMPKIN](https://www.youtube.com/shorts/QlKRD2bqTiQ)",
+    "rarity": 0,
+    "role": "item",
+    "in_crates": true,
+    "unique": true
+  },
+  "white_rose": {
+    "id": "white_rose",
+    "name": "white rose",
+    "plural": "white roses",
+    "article": "a",
+    "emoji": "<:white_rose:1424820014959165500>",
+    "longDesc": "wow majestic",
+    "rarity": 6,
+    "role": "flower",
+    "sell": 100000,
+    "in_crates": true
+  },
+  "christmas_tree": {
+    "id": "christmas_tree",
+    "name": "christmas tree",
+    "article": "a",
+    "plural": "christmas trees",
+    "emoji": "🎄",
+    "longDesc": "[KEVIN](https://www.youtube.com/watch?v=5LZDuPcve9U)",
+    "aliases": ["tree"],
+    "rarity": 0,
+    "role": "item",
+    "in_crates": true,
+    "unique": true
   }
 }

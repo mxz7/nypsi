@@ -26,6 +26,7 @@ import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { createUser, userExists } from "../utils/functions/economy/utils.js";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { percentChance } from "../utils/functions/random";
+import { escapeFormattingCharacters } from "../utils/functions/string";
 import {
   addToNypsiBank,
   getNypsiBankBalance,
@@ -272,7 +273,7 @@ async function run(
             url: process.env.ANTICHEAT_HOOK,
           });
           await hook.send({
-            content: `[${getTimestamp()}] ${message.member.user.username.replaceAll("_", "\\_")} (${message.author.id}) given captcha randomly in bankrob`,
+            content: `[${getTimestamp()}] ${escapeFormattingCharacters(message.member.user.username)} (${message.author.id}) given captcha randomly in bankrob`,
           });
           hook.destroy();
         }
@@ -313,7 +314,7 @@ async function run(
             `${Constants.redis.nypsi.RESTART}:${(message.client as NypsiClient).cluster.id}`,
           )) == "t"
         ) {
-          if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
+          if (message.author.id == Constants.OWNER_ID && message instanceof Message) {
             message.react("💀");
           } else {
             return msg.edit({

@@ -1,4 +1,4 @@
-import { EconomyWorker, EconomyWorkerUpgrades } from "@prisma/client";
+import { EconomyWorker, EconomyWorkerUpgrades } from "#generated/prisma";
 import { ClusterManager } from "discord-hybrid-sharding";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";

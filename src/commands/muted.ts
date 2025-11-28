@@ -4,7 +4,8 @@ import { CustomEmbed } from "../models/EmbedBuilders";
 import { getMutedUsers } from "../utils/functions/moderation/mute";
 
 import PageManager from "../utils/functions/page";
-import { getLastKnownUsername } from "../utils/functions/users/tag";
+import { escapeFormattingCharacters } from "../utils/functions/string";
+import { getLastKnownUsername } from "../utils/functions/users/username";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command(
@@ -40,12 +41,11 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
   const pageItems: string[] = [];
 
   for (const m of muted) {
-    const username =
+    const username = escapeFormattingCharacters(
       (await getLastKnownUsername(m.userId)) ??
-      (
-        await message.client.users.fetch(m.userId).catch(() => undefined as User)
-      )?.username.replaceAll("_", "\\_") ??
-      "";
+        (await message.client.users.fetch(m.userId).catch(() => undefined as User))?.username ??
+        "",
+    );
 
     const msg = `${username ? `${username} ` : ""} \`${m.userId}\` ${
       m.expire.getTime() >= 3130000000000

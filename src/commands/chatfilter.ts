@@ -36,7 +36,7 @@ async function run(
     return;
   }
 
-  let filter = await getChatFilter(message.guild);
+  const filter = await getChatFilter(message.guild);
   const prefix = (await getPrefix(message.guild))[0];
 
   if (args.length == 0) {
@@ -146,8 +146,6 @@ async function run(
 
     return send({ embeds: [embed] });
   } else if (args[0].toLowerCase() == "reset") {
-    filter = [];
-
     for (const word of filter) {
       await deleteChatFilterWord(message.guildId, word.content);
     }

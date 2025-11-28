@@ -12,6 +12,7 @@ import Constants from "../../../Constants";
 import { getDisabledCommands } from "../../guilds/disabledcommands";
 import { getMember } from "../../member";
 import sleep from "../../sleep";
+import { escapeFormattingCharacters } from "../../string";
 import { isUserBlacklisted } from "../../users/blacklist";
 import { getDmSettings } from "../../users/notifications";
 import { hasPadlock, setPadlock } from "../balance";
@@ -137,7 +138,7 @@ module.exports = new ItemUse(
     targetEmbed.setTitle("your padlock has been picked");
     targetEmbed.setDescription(
       "**" +
-        message.author.username.replaceAll("_", "\\_") +
+        escapeFormattingCharacters(message.author.username) +
         "** has picked your padlock in **" +
         message.guild.name +
         "**\n" +

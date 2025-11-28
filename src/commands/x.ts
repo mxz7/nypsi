@@ -1,5 +1,5 @@
 import dayjs = require("dayjs");
-import { Prisma } from "@prisma/client";
+import { Prisma } from "#generated/prisma";
 import { exec } from "child_process";
 import {
   ActionRowBuilder,
@@ -18,7 +18,7 @@ import {
   TextChannel,
   User,
 } from "discord.js";
-import { sort } from "fast-sort";
+import { inPlaceSort, sort } from "fast-sort";
 import * as fs from "fs/promises";
 import { promisify } from "util";
 import { gzip } from "zlib";
@@ -28,6 +28,7 @@ import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { startRandomDrop } from "../scheduled/clusterjobs/random-drops";
+import { LootPool } from "../types/LootPool";
 import Constants, { AdminPermission } from "../utils/Constants";
 import { b, c } from "../utils/functions/anticheat";
 import {
@@ -51,10 +52,13 @@ import { createEvent, getCurrentEvent } from "../utils/functions/economy/events"
 import { getGuildByUser } from "../utils/functions/economy/guilds";
 import {
   addInventoryItem,
+  calcItemValue,
   removeInventoryItem,
   setInventoryItem,
 } from "../utils/functions/economy/inventory";
 import { getPrestige, setLevel, setPrestige } from "../utils/functions/economy/levelling";
+import { giveLootPoolResult, rollLootPool } from "../utils/functions/economy/loot_pools";
+import { deleteMarketOrder } from "../utils/functions/economy/market";
 import { getTaskStreaks, setTaskStreak } from "../utils/functions/economy/tasks";
 import { topBalanceGlobal } from "../utils/functions/economy/top";
 import {
@@ -102,9 +106,12 @@ import { setBirthday } from "../utils/functions/users/birthday";
 import { isUserBlacklisted, setUserBlacklist } from "../utils/functions/users/blacklist";
 import { getCommandUses, getLastCommand } from "../utils/functions/users/commands";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
-import { addNotificationToQueue } from "../utils/functions/users/notifications";
-import { getLastKnownUsername } from "../utils/functions/users/tag";
+import {
+  addInlineNotification,
+  addNotificationToQueue,
+} from "../utils/functions/users/notifications";
 import { addTag, getTags, removeTag } from "../utils/functions/users/tags";
+import { getLastKnownUsername } from "../utils/functions/users/username";
 import { hasProfile } from "../utils/functions/users/utils";
 import {
   commandAliasExists,
@@ -2718,11 +2725,19 @@ async function run(
       return send({ embeds: [new ErrorEmbed("invalid amount of days")] });
     }
 
+    const ends = dayjs()
+      .add(days, "day")
+      .set("hours", 0)
+      .set("minute", 0)
+      .set("second", 0)
+      .set("millisecond", 0)
+      .toDate();
+
     const confirmMessage = await send({
       embeds: [
         new CustomEmbed(
           message.member,
-          `confirm you want to start a ${type} event with target of ${target} for ${days} days`,
+          `confirm you want to start a ${type} event with target of ${target} that ends on ${ends.toISOString()}`,
         ),
       ],
       components: [
@@ -3152,6 +3167,138 @@ async function run(
     }
 
     return startEvent();
+  } else if (args[0].toLowerCase() === "dopumpkin") {
+    if (message.author.id !== Constants.OWNER_ID) {
+      return send({
+        embeds: [new ErrorEmbed("haha loser")],
+      });
+    }
+
+    const orders = await prisma.market.findMany({
+      where: {
+        AND: [{ completed: false }, { orderType: "sell" }, { itemId: "pumpkin" }],
+      },
+    });
+
+    for (const order of orders) {
+      await deleteMarketOrder(order.id, message.client as NypsiClient);
+    }
+
+    const pumpkins = await prisma.inventory.findMany({
+      select: {
+        amount: true,
+        userId: true,
+      },
+      where: {
+        item: "pumpkin",
+      },
+    });
+
+    const pool: LootPool = {
+      nothing: 100,
+      xp: {
+        69: 100,
+      },
+      items: {
+        basic_crate: 1,
+        pandora_box: 0.5,
+        lucky_scratch_card: 0.75,
+        fertiliser: 2,
+      },
+    };
+
+    let foundAll = {
+      money: 0,
+      xp: 0,
+      karma: 0,
+      items: {},
+    } as {
+      money: number;
+      xp: number;
+      karma: number;
+      items: {
+        [item: string]: number;
+      };
+    };
+
+    for (const user of pumpkins) {
+      logger.debug(`pumpkin: ${user.userId} ${user.amount}`);
+      for (let i = 0; i < user.amount; i++) {
+        const found = await rollLootPool(pool);
+        await giveLootPoolResult(user.userId, found);
+
+        foundAll.money += found.money ?? 0;
+        foundAll.xp += found.xp ?? 0;
+        foundAll.karma += found.karma ?? 0;
+        if (Object.hasOwn(found, "item")) {
+          if (Object.hasOwn(foundAll.items, found.item)) {
+            foundAll.items[found.item] += found.count ?? 1;
+          } else {
+            foundAll.items[found.item] = found.count ?? 1;
+          }
+        }
+      }
+
+      if (
+        foundAll.money > 0 ||
+        foundAll.xp > 0 ||
+        foundAll.karma > 0 ||
+        Object.keys(foundAll.items).length > 0
+      ) {
+        const embed = new CustomEmbed(user.userId).setHeader("pumpkin rewards");
+        const desc: string[] = [];
+
+        desc.push("thank you for playing during the pumpkin events!!");
+        desc.push("you have received:");
+
+        if (foundAll.money > 0) {
+          desc.push(`- $${foundAll.money.toLocaleString()}`);
+        }
+
+        if (foundAll.xp > 0 || foundAll.karma > 0) {
+          const xpText = foundAll.xp > 0 ? `+${foundAll.xp.toLocaleString()}xp` : "";
+          const karmaText = foundAll.karma > 0 ? `+${foundAll.karma.toLocaleString()}🔮` : "";
+          const joiner = foundAll.xp > 0 && foundAll.karma > 0 ? "    " : "";
+          embed.setFooter({ text: `${xpText}${joiner}${karmaText}` });
+        }
+
+        const values = new Map<string, number>();
+        const items = Object.keys(foundAll.items);
+
+        for (const itemKey in foundAll.items) {
+          values.set(
+            itemKey,
+            ((await calcItemValue(itemKey).catch(() => 0)) || 0) * foundAll.items[itemKey],
+          );
+        }
+        inPlaceSort(items).desc((i) => values.get(i));
+
+        for (const item of items) {
+          desc.push(
+            `- \`${foundAll.items[item]}x\` ${getItems()[item].emoji} ${getItems()[item].name}`,
+          );
+        }
+
+        embed.setDescription(desc.join("\n"));
+
+        addInlineNotification({ memberId: user.userId, embed });
+
+        foundAll = {
+          money: 0,
+          xp: 0,
+          karma: 0,
+          items: {},
+        };
+      }
+
+      await setInventoryItem(user.userId, "pumpkin", 0);
+    }
+
+    const randomUser = pumpkins[Math.floor(Math.random() * pumpkins.length)];
+
+    await addInventoryItem(randomUser.userId, "pumpkin", 1);
+
+    logger.debug(`pumpkin: random pumpkin given to ${randomUser.userId}`);
   } else {
     return send({
       embeds: [new CustomEmbed(message.member, await getUsableCommands(message.member))],

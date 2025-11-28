@@ -1,8 +1,8 @@
-import { Prisma, Transaction } from "@prisma/client";
+import { Prisma, Transaction } from "#generated/prisma";
 import { createWriteStream } from "node:fs";
 import prisma from "../../init/database";
 import { logger } from "../logger";
-import { getLastKnownUsername } from "./users/tag";
+import { getLastKnownUsername } from "./users/username";
 import dayjs = require("dayjs");
 
 export async function formatTransaction(transaction: Transaction, dest?: "discord") {

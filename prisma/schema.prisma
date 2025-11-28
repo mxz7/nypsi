@@ -1,19 +1,19 @@
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["relationJoins", "typedSql"]
+  provider   = "prisma-client"
+  output     = "../src/generated/prisma"
+  engineType = "client"
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DATABASE_DIRECT_URL")
+  provider = "postgresql"
 }
 
 // user specific tables (economy etc.)
 
 model User {
   id                String   @id
-  lastKnownUsername String   @map("lastKnownTag")
+  lastKnownUsername String
+  usernameUpdatedAt DateTime @default("1970-01-01T14:21:00+02:00")
   avatar            String   @default("https://cdn.discordapp.com/embed/avatars/0.png")
   karma             Int      @default(1)
   lastCommand       DateTime
@@ -50,6 +50,7 @@ model User {
   FlagGame                 FlagGame[]
   Event                    Event[]
   EventContribution        EventContribution[]
+  tmdbRatings              tmdbRatings[]
 }
 
 model ProfileView {
@@ -614,6 +615,18 @@ model Guild {
   ModerationEvidence  ModerationEvidence[]
   GuildEvidenceCredit GuildEvidenceCredit[]
   ChatFilter          ChatFilter[]
+  members             GuildMember[]
+}
+
+model GuildMember {
+  createdAt DateTime @default(now())
+
+  guildId String
+  userId  String
+
+  guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@id([guildId, userId])
 }
 
 model ChatFilter {
@@ -847,17 +860,17 @@ enum EconomyGuildRole {
 }
 
 model EconomyGuildMember {
-  userId    String   @unique
+  userId    String           @unique
   guildName String
   joinedAt  DateTime
   role      EconomyGuildRole @default(member)
 
-  contributedMoney          BigInt   @default(0)
-  contributedXp             Int      @default(0)
-  contributedMoneyThisLevel BigInt   @default(0)
-  contributedXpThisLevel    Int      @default(0)
-  contributedMoneyToday     BigInt   @default(0)
-  contributedXpToday        Int      @default(0)
+  contributedMoney          BigInt @default(0)
+  contributedXp             Int    @default(0)
+  contributedMoneyThisLevel BigInt @default(0)
+  contributedXpThisLevel    Int    @default(0)
+  contributedMoneyToday     BigInt @default(0)
+  contributedXpToday        Int    @default(0)
 
   economy Economy      @relation(fields: [userId], references: [userId], onDelete: Cascade)
   guild   EconomyGuild @relation(fields: [guildName], references: [guildName], onDelete: Cascade)
@@ -954,7 +967,7 @@ model Session {
 }
 
 model Captcha {
-  id     String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id     String @id @default(uuid(7)) @db.Uuid
   userId String
 
   solved   Boolean    @default(false)
@@ -1030,6 +1043,8 @@ model tmdbRatings {
   id     Int
   name   String
   rating Decimal    @db.Decimal(2, 1)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, type, id])
 }

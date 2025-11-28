@@ -45,6 +45,7 @@ import { addXp, calcEarnedGambleXp } from "../utils/functions/economy/xp";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { percentChance, shuffle } from "../utils/functions/random";
 import sleep from "../utils/functions/sleep";
+import { escapeFormattingCharacters } from "../utils/functions/string";
 import { hasAdminPermission } from "../utils/functions/users/admin";
 import { recentCommands } from "../utils/functions/users/commands";
 import { addHourlyCommand } from "../utils/handlers/commandhandler";
@@ -296,16 +297,17 @@ async function prepareGame(
   );
 
   if (msg) {
-    const editedMsg = await msg.edit({ embeds: [embed], components: [row] });
+    // const editedMsg = await msg.edit({ embeds: [embed], components: [row] });
+    await msg.edit({ embeds: [embed], components: [row] });
 
-    try {
-      logger.debug(`blackjack: ${message.member.id} message edited for replay, `, {
-        id: editedMsg.id,
-        embeds: editedMsg.embeds,
-      });
-    } catch {
-      logger.error(`blackjack: ${message.author.id} failed to get response from edit`);
-    }
+    // try {
+    //   logger.debug(`blackjack: ${message.member.id} message edited for replay, `, {
+    //     id: editedMsg.id,
+    //     embeds: editedMsg.embeds,
+    //   });
+    // } catch {
+    //   logger.error(`blackjack: ${message.author.id} failed to get response from edit`);
+    // }
   } else {
     msg = await send({ embeds: [embed], components: [row] });
   }
@@ -398,13 +400,13 @@ async function playGame(
     if (!interaction || interaction.deferred || interaction.replied) res = await m.edit(data);
     else res = await interaction.update(data).catch(() => m.edit(data));
 
-    try {
-      logger.debug(`blackjack: ${message.member.id} message edited for ${reason}`, {
-        components: await res.fetch().then((m) => m.components),
-      });
-    } catch {
-      logger.error(`blackjack: ${message.author.id} failed to get response from edit`);
-    }
+    // try {
+    //   logger.debug(`blackjack: ${message.member.id} message edited for ${reason}`, {
+    //     components: await res.fetch().then((m) => m.components),
+    //   });
+    // } catch {
+    //   logger.error(`blackjack: ${message.author.id} failed to get response from edit`);
+    // }
 
     return res;
   };
@@ -433,7 +435,7 @@ async function playGame(
           url: process.env.ANTICHEAT_HOOK,
         });
         await hook.send({
-          content: `[${getTimestamp()}] ${message.member.user.username.replaceAll("_", "\\_")} (${message.author.id}) given captcha randomly in blackjack`,
+          content: `[${getTimestamp()}] ${escapeFormattingCharacters(message.member.user.username)} (${message.author.id}) given captcha randomly in blackjack`,
         });
         hook.destroy();
       }
@@ -458,9 +460,9 @@ async function playGame(
         return;
       });
 
-    logger.debug(
-      `blackjack: ${message.author.id} received replay response: ${res ? res.customId : null}`,
-    );
+    // logger.debug(
+    //   `blackjack: ${message.author.id} received replay response: ${res ? res.customId : null}`,
+    // );
 
     if (res && res.customId == "rp") {
       await res.deferUpdate().catch(() => {
@@ -481,7 +483,7 @@ async function playGame(
           `${Constants.redis.nypsi.RESTART}:${(message.client as NypsiClient).cluster.id}`,
         )) == "t"
       ) {
-        if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
+        if (message.author.id == Constants.OWNER_ID && message instanceof Message) {
           message.react("💀");
         } else {
           return m.edit({

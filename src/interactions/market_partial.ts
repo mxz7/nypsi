@@ -1,4 +1,4 @@
-import { OrderType } from "@prisma/client";
+import { OrderType } from "#generated/prisma";
 import {
   ActionRowBuilder,
   ButtonInteraction,
@@ -75,7 +75,7 @@ export default {
 
     if (!res || !res.isModalSubmit()) return userFulfilling.delete(interaction.user.id);
 
-    let input = res.fields.fields.first().value;
+    let input = res.fields.getTextInputValue("amount");
 
     if (input.toLowerCase() == "all") {
       if (order.orderType == "buy") {

@@ -22,7 +22,7 @@ import { getTimestamp, logger } from "../../../logger";
 import { a } from "../../anticheat";
 import { giveCaptcha, isLockedOut, verifyUser } from "../../captcha";
 import { percentChance } from "../../random";
-import { pluralize } from "../../string";
+import { escapeFormattingCharacters, pluralize } from "../../string";
 import { hasAdminPermission } from "../../users/admin";
 import { recentCommands } from "../../users/commands";
 import { getInventory, removeInventoryItem, selectItem } from "../inventory";
@@ -125,7 +125,7 @@ async function prepare(
             url: process.env.ANTICHEAT_HOOK,
           });
           await hook.send({
-            content: `[${getTimestamp()}] ${message.author.username.replaceAll("_", "\\_")} (${message.author.id}) given captcha randomly in scratch card`,
+            content: `[${getTimestamp()}] ${escapeFormattingCharacters(message.author.username)} (${message.author.id}) given captcha randomly in scratch card`,
           });
           hook.destroy();
         }
@@ -178,7 +178,7 @@ async function prepare(
               `${Constants.redis.nypsi.RESTART}:${(message.client as NypsiClient).cluster.id}`,
             )) == "t"
           ) {
-            if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
+            if (message.author.id == Constants.OWNER_ID && message instanceof Message) {
               message.react("💀");
             } else {
               response.message.edit({

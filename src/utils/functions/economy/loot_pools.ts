@@ -90,53 +90,53 @@ export function describeLootPoolResult(result: LootPoolResult): string {
 }
 
 export async function rollLootPool(
-  loot_pool: LootPool,
+  lootPool: LootPool,
   exclusionPredicate?: (itemId: string) => Promise<boolean>, // only works on items
 ): Promise<LootPoolResult> {
   let excludedItems = [] as string[];
   if (exclusionPredicate) {
-    const poolItems = Object.keys(loot_pool.items ?? {});
+    const poolItems = Object.keys(lootPool.items ?? {});
     const exclusionResults = await Promise.all(poolItems.map(exclusionPredicate));
     excludedItems = poolItems.filter((e, i) => exclusionResults[i]);
   }
-  let randomValue = Math.random() * getTotalWeight(loot_pool, excludedItems);
+  let randomValue = Math.random() * getTotalWeight(lootPool, excludedItems);
 
-  if (Object.hasOwn(loot_pool, "nothing")) {
-    if (randomValue < loot_pool.nothing) {
+  if (Object.hasOwn(lootPool, "nothing")) {
+    if (randomValue < lootPool.nothing) {
       return {};
     }
-    randomValue -= loot_pool.nothing;
+    randomValue -= lootPool.nothing;
   }
-  if (Object.hasOwn(loot_pool, "money")) {
-    for (const amount in loot_pool.money) {
-      if (randomValue < loot_pool.money[amount]) {
+  if (Object.hasOwn(lootPool, "money")) {
+    for (const amount in lootPool.money) {
+      if (randomValue < lootPool.money[amount]) {
         return { money: parseInt(amount) };
       }
-      randomValue -= loot_pool.money[amount];
+      randomValue -= lootPool.money[amount];
     }
   }
-  if (Object.hasOwn(loot_pool, "xp")) {
-    for (const amount in loot_pool.xp) {
-      if (randomValue < loot_pool.xp[amount]) {
+  if (Object.hasOwn(lootPool, "xp")) {
+    for (const amount in lootPool.xp) {
+      if (randomValue < lootPool.xp[amount]) {
         return { xp: parseInt(amount) };
       }
-      randomValue -= loot_pool.xp[amount];
+      randomValue -= lootPool.xp[amount];
     }
   }
-  if (Object.hasOwn(loot_pool, "karma")) {
-    for (const amount in loot_pool.karma) {
-      if (randomValue < loot_pool.karma[amount]) {
+  if (Object.hasOwn(lootPool, "karma")) {
+    for (const amount in lootPool.karma) {
+      if (randomValue < lootPool.karma[amount]) {
         return { karma: parseInt(amount) };
       }
-      randomValue -= loot_pool.karma[amount];
+      randomValue -= lootPool.karma[amount];
     }
   }
-  if (Object.hasOwn(loot_pool, "items")) {
-    for (const itemKey in loot_pool.items) {
+  if (Object.hasOwn(lootPool, "items")) {
+    for (const itemKey in lootPool.items) {
       if (excludedItems.includes(itemKey)) {
         continue;
       }
-      const itemLootData = loot_pool.items[itemKey];
+      const itemLootData = lootPool.items[itemKey];
       const itemWeight = getItemWeight(itemLootData);
       if (randomValue < itemWeight) {
         return { item: itemKey, count: getItemCount(itemLootData, itemKey) };
@@ -149,33 +149,33 @@ export async function rollLootPool(
   return {}; // this shouldnt be reached
 }
 
-export function getTotalWeight(loot_pool: LootPool, excludedItems: string[]): number {
+export function getTotalWeight(lootPool: LootPool, excludedItems: string[]): number {
   let totalWeight = 0;
 
-  if (Object.hasOwn(loot_pool, "nothing")) {
-    totalWeight += loot_pool.nothing;
+  if (Object.hasOwn(lootPool, "nothing")) {
+    totalWeight += lootPool.nothing;
   }
-  if (Object.hasOwn(loot_pool, "money")) {
-    for (const amount in loot_pool.money) {
-      totalWeight += loot_pool.money[amount];
+  if (Object.hasOwn(lootPool, "money")) {
+    for (const amount in lootPool.money) {
+      totalWeight += lootPool.money[amount];
     }
   }
-  if (Object.hasOwn(loot_pool, "xp")) {
-    for (const amount in loot_pool.xp) {
-      totalWeight += loot_pool.xp[amount];
+  if (Object.hasOwn(lootPool, "xp")) {
+    for (const amount in lootPool.xp) {
+      totalWeight += lootPool.xp[amount];
     }
   }
-  if (Object.hasOwn(loot_pool, "karma")) {
-    for (const amount in loot_pool.karma) {
-      totalWeight += loot_pool.karma[amount];
+  if (Object.hasOwn(lootPool, "karma")) {
+    for (const amount in lootPool.karma) {
+      totalWeight += lootPool.karma[amount];
     }
   }
-  if (Object.hasOwn(loot_pool, "items")) {
-    for (const item in loot_pool.items) {
+  if (Object.hasOwn(lootPool, "items")) {
+    for (const item in lootPool.items) {
       if (excludedItems.includes(item)) {
         continue;
       }
-      totalWeight += getItemWeight(loot_pool.items[item]);
+      totalWeight += getItemWeight(lootPool.items[item]);
     }
   }
   return totalWeight;

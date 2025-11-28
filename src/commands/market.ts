@@ -1,5 +1,5 @@
 import dayjs = require("dayjs");
-import { OrderType } from "@prisma/client";
+import { OrderType } from "#generated/prisma";
 import {
   ActionRowBuilder,
   APIMessageComponentEmoji,
@@ -425,9 +425,9 @@ async function run(
         );
 
         if (res) {
-          const item = res.fields.fields.get("item").value;
-          let amount = res.fields.fields.get("amount").value;
-          const price = res.fields.fields.get("price").value;
+          const item = res.fields.getTextInputValue("item");
+          let amount = res.fields.getTextInputValue("amount");
+          const price = res.fields.getTextInputValue("price");
 
           const selected = selectItem(item);
 
@@ -1683,7 +1683,7 @@ async function run(
         );
 
         if (res) {
-          const amount = res.fields.fields.get("amount").value;
+          const amount = res.fields.getTextInputValue("amount");
 
           if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
             await res.reply({
@@ -1776,7 +1776,7 @@ async function run(
         );
 
         if (res) {
-          const amount = res.fields.fields.get("amount").value;
+          const amount = res.fields.getTextInputValue("amount");
 
           if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
             await res.reply({

@@ -1,3 +1,26 @@
+# october 2025
+
+## changes you'll probably care about
+
+- added white rose <:white_rose:1424820014959165500>
+
+---
+
+# september 2025
+
+## changes you'll probably care about
+
+- increase xp from tasks - improves new player experience
+- increase returning player booster to 1 week
+- increase max guild level to 1000 and increase (high) levelling difficulty
+- add pumpkins 🎃
+
+## other
+
+- add levelling tip for new / low level players
+
+---
+
 # august 2025
 
 ## changes you'll probably care about
@@ -7,6 +30,8 @@
 - added guild admins to buy shop items and invite/kick members (@growling_grizzly)
 - can get married for free from 100% love
 - auto divorce when you get 100% love with someone else
+- added pot of gold item
+- fertiliser now works on 5 plants each, and more common from daily scratches
 
 ## other
 

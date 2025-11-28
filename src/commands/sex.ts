@@ -12,8 +12,8 @@ import { addTaskProgress } from "../utils/functions/economy/tasks.js";
 import { getTagsData } from "../utils/functions/economy/utils.js";
 import { cleanString } from "../utils/functions/string.js";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications.js";
-import { getLastKnownUsername } from "../utils/functions/users/tag.js";
 import { getActiveTag } from "../utils/functions/users/tags.js";
+import { getLastKnownUsername } from "../utils/functions/users/username.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 
 const cmd = new Command("sex", "find horny milfs in ur area 😏", "fun").setAliases([

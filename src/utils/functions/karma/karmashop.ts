@@ -68,9 +68,13 @@ export async function openKarmaShop(client: NypsiClient, now = false) {
     if (!now && (await getNextKarmaShopOpen()).getTime() > Date.now()) return;
     restock();
     await createNextDate();
-    await redis.set(Constants.redis.nypsi.KARMA_LAST_OPEN, Date.now());
 
+    await redis.set(Constants.redis.nypsi.KARMA_LAST_OPEN, Date.now());
     await redis.set(Constants.redis.nypsi.KARMA_SHOP_OPEN, "t", "EX", ms("1 hour") / 1000);
+
+    setTimeout(() => {
+      openKarmaShop(client);
+    }, ms("1 hour"));
 
     logger.info("karma shop has been opened");
 

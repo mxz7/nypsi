@@ -1,4 +1,4 @@
-import { Task as PrismaTask } from "@prisma/client";
+import { Task as PrismaTask } from "#generated/prisma";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
@@ -9,7 +9,7 @@ import { addKarma } from "../karma/karma";
 import { getUserId, MemberResolvable } from "../member";
 import sleep from "../sleep";
 import { addInlineNotification } from "../users/notifications";
-import { getLastKnownAvatar } from "../users/tag";
+import { getLastKnownAvatar } from "../users/username";
 import { addProgress } from "./achievements";
 import { addBalance } from "./balance";
 import { addToGuildXP, getGuildName } from "./guilds";

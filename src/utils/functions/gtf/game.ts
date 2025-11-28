@@ -23,6 +23,7 @@ import Constants from "../../Constants";
 import { MStoTime } from "../date";
 import { addProgress } from "../economy/achievements";
 import { addTaskProgress } from "../economy/tasks";
+import { escapeFormattingCharacters } from "../string";
 import { fetchCountryData } from "./countries";
 
 export async function startGTFGame(
@@ -62,7 +63,7 @@ export async function startGTFGame(
 
     embed.setDescription(
       "guess the country of the flag below\n\n" +
-        `${message.author.username.replaceAll("_", "\\_")} vs ${secondPlayer.username.replaceAll("_", "\\_")}`,
+        `${escapeFormattingCharacters(message.author.username)} vs ${secondPlayer.username.replaceAll("_", "\\_")}`,
     );
     embed.setHeader("guess the flag");
   }
@@ -136,7 +137,7 @@ export async function startGTFGame(
     if (!res) return;
     if (!res.isModalSubmit()) return;
 
-    const guess = res.fields.fields.first().value;
+    const guess = res.fields.getTextInputValue("guess");
 
     if (
       secondPlayer

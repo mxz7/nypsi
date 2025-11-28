@@ -1,12 +1,11 @@
 import dayjs = require("dayjs");
-import { Event, EventContribution } from "@prisma/client";
+import { Event, EventContribution } from "#generated/prisma";
 import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
   MessageActionRowComponentBuilder,
 } from "discord.js";
-import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
@@ -16,7 +15,7 @@ import { logger } from "../../logger";
 import { MStoTime } from "../date";
 import { getUserId, MemberResolvable } from "../member";
 import { addNotificationToQueue, getPreferences } from "../users/notifications";
-import { getLastKnownUsername } from "../users/tag";
+import { getLastKnownUsername } from "../users/username";
 import { hasProfile } from "../users/utils";
 import { addProgress } from "./achievements";
 import { addInventoryItem } from "./inventory";
@@ -65,7 +64,7 @@ export async function createEvent(
     },
   });
 
-  await redis.del(Constants.redis.cache.economy.event);
+  await redis.del(Constants.redis.cache.economy.event, Constants.redis.cache.economy.eventProgress);
 
   const targetChannel =
     client.user.id === Constants.BOT_USER_ID
@@ -157,7 +156,7 @@ export async function getCurrentEvent(useCache = true): Promise<EventData> {
     },
     include: {
       contributions: {
-        orderBy: { contribution: "desc" },
+        orderBy: [{ contribution: "desc" }, { user: { lastKnownUsername: "asc" } }],
       },
     },
   });
@@ -204,6 +203,7 @@ export async function addEventProgress(
         "slots",
         "rps",
         "coinflip",
+        "chatreaction",
         "rob",
       ].includes(type)
     ) {
@@ -462,7 +462,7 @@ async function completeEvent(client: NypsiClient, lastUser: string) {
 
   completing = false;
 
-  const rewards = await giveRewards(event);
+  await giveRewards(event);
   const privacy = await getPreferences(lastUser).then((r) => r.leaderboards);
 
   let content =
@@ -473,24 +473,7 @@ async function completeEvent(client: NypsiClient, lastUser: string) {
     content += `the final contributing participant was **${await getLastKnownUsername(lastUser)}**\n\n`;
   }
 
-  content += `**winning participants**\n`;
-
-  for (const [userId, amount] of inPlaceSort(Array.from(rewards.entries())).desc((i) => i[1])) {
-    let username: string;
-
-    if ((await getPreferences(userId)).leaderboards) {
-      username = `[${await getLastKnownUsername(userId, false)}](<https://nypsi.xyz/users/${userId}?ref=event-winners>)`;
-    } else {
-      username =
-        "[[hidden]](<https://nypsi.xyz/docs/economy/user-settings/hidden?ref=event-winners>)";
-    }
-
-    content +=
-      `**${amount}x** ${getItems()["pandora_box"].emoji} ${getItems()["pandora_box"].name} ` +
-      `for **${username}**\n`;
-  }
-
-  content += `\n\n<@&${Constants.EVENTS_ROLE_ID}>`;
+  content += `<@&${Constants.EVENTS_ROLE_ID}>`;
 
   const targetChannel =
     client.user.id === Constants.BOT_USER_ID

@@ -5,7 +5,7 @@ import { Job } from "../../types/Jobs";
 import { addBalance } from "../../utils/functions/economy/balance";
 import { getItems } from "../../utils/functions/economy/utils";
 import { addNotificationToQueue } from "../../utils/functions/users/notifications";
-import { getLastKnownUsername } from "../../utils/functions/users/tag";
+import { getLastKnownUsername } from "../../utils/functions/users/username";
 
 export default {
   name: "offerexpire",

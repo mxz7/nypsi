@@ -11,7 +11,7 @@ import { isEcoBanned } from "../economy/utils";
 import { getUserId, MemberResolvable } from "../member";
 import sleep from "../sleep";
 import { addNewAvatar, addNewUsername, fetchUsernameHistory, isTracking } from "./history";
-import { getLastKnownAvatar, getLastKnownUsername } from "./tag";
+import { getLastKnownAvatar, getLastKnownUsername } from "./username";
 import ms = require("ms");
 
 export const recentCommands = new Map<string, number>();
@@ -90,20 +90,23 @@ export async function updateUser(user: User, command: string) {
   );
 
   const [username, avatar] = await Promise.all([
-    getLastKnownUsername(user.id, false),
+    getLastKnownUsername(user.id, false, true),
     getLastKnownAvatar(user.id),
   ]);
 
   let updateUsername = false;
   let updateAvatar = false;
 
-  if (username !== user.username) {
+  if (
+    username.lastKnownUsername !== user.username ||
+    username.usernameUpdatedAt.getTime() < date.getTime() - ms("1 week")
+  ) {
     updateUsername = true;
-    if (await isTracking(user.id)) {
+    if ((await isTracking(user.id)) && username.lastKnownUsername !== user.username) {
       const history = await fetchUsernameHistory(user.id, 1);
 
-      if (history[0]?.value !== username) {
-        addNewUsername(user.id, username);
+      if (history[0]?.value !== username.lastKnownUsername) {
+        addNewUsername(user.id, username.lastKnownUsername);
       }
     }
   }
@@ -156,6 +159,7 @@ export async function updateUser(user: User, command: string) {
     data: {
       lastCommand: date,
       lastKnownUsername: updateUsername ? user.username : undefined,
+      usernameUpdatedAt: updateUsername ? date : undefined,
       avatar: updateAvatar ? newAvatar : undefined,
       CommandUse: {
         upsert: {

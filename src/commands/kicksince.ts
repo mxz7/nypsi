@@ -1,9 +1,10 @@
 import { CommandInteraction, MessageReaction, PermissionFlagsBits, User } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import { getAllMembers } from "../utils/functions/guilds/members";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { newCase } from "../utils/functions/moderation/cases";
-import { getDuration } from "../utils/functions/string";
+import { escapeFormattingCharacters, getDuration } from "../utils/functions/string";
 
 const cmd = new Command("kicksince", "kick members that joined after a certain time", "admin")
   .setPermissions(["ADMINISTRATOR"])
@@ -60,7 +61,7 @@ async function run(
     return send({ embeds: [new ErrorEmbed("lol dont even try")] });
   }
 
-  let members = await message.guild.members.fetch();
+  let members = await getAllMembers(message.guild, true);
 
   members = members.filter((m) => m.joinedTimestamp >= time);
 
@@ -187,7 +188,7 @@ async function run(
   if (failed.length != 0) {
     const failedTags = [];
     for (const fail1 of failed) {
-      failedTags.push(fail1.username.replaceAll("_", "\\_"));
+      failedTags.push(escapeFormattingCharacters(fail1.username));
     }
 
     embed.addField("error", "unable to kick: " + failedTags.join(", "));
@@ -196,12 +197,12 @@ async function run(
   if (count == 1) {
     if (reason.split(": ")[1] == "no reason given") {
       embed.setDescription(
-        "✅ `" + members.first().user.username.replaceAll("_", "\\_") + "` has been kicked",
+        "✅ `" + escapeFormattingCharacters(members.first().user.username) + "` has been kicked",
       );
     } else {
       embed.setDescription(
         "✅ `" +
-          members.first().user.username.replaceAll("_", "\\_") +
+          escapeFormattingCharacters(members.first().user.username) +
           "` has been kicked for: " +
           reason.split(": ")[1],
       );

@@ -1,4 +1,4 @@
-import { TradeRequest } from "@prisma/client";
+import { TradeRequest } from "#generated/prisma";
 import { ClusterManager } from "discord-hybrid-sharding";
 import {
   ActionRowBuilder,
@@ -523,8 +523,8 @@ export async function fulfillTradeRequest(
       await interaction.client.users.fetch(tradeRequest.ownerId),
       interaction.user,
       "item",
-      parseInt(item.split(":")[0]),
-      item.split(":")[1],
+      parseInt(item.split(":")[1]),
+      item.split(":")[0],
       "trade request",
     );
   }

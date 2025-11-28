@@ -1,4 +1,4 @@
-import { GuildCounter, TrackingType } from "@prisma/client";
+import { GuildCounter, TrackingType } from "#generated/prisma";
 import { ClusterClient, ClusterManager } from "discord-hybrid-sharding";
 import { ChannelType, Client, Guild, PermissionFlagsBits } from "discord.js";
 import prisma from "../../../init/database";
@@ -7,6 +7,7 @@ import { NypsiClient } from "../../../models/Client";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { getItems } from "../economy/utils";
+import { getAllMembers } from "./members";
 import ms = require("ms");
 
 export async function updateChannel(data: GuildCounter, client: NypsiClient | ClusterManager) {
@@ -104,13 +105,8 @@ async function getCounterText(
 ) {
   let value: string;
 
-  const members: string[] = await (clusterOrGuild instanceof Guild
-    ? (async () => {
-        if (clusterOrGuild.memberCount !== clusterOrGuild.members.cache.size) {
-          return Array.from(await clusterOrGuild.members.fetch().then((members) => members.keys()));
-        }
-        return Array.from(clusterOrGuild.members.cache.keys());
-      })()
+  const members = await (clusterOrGuild instanceof Guild
+    ? getAllMembers(clusterOrGuild)
     : clusterOrGuild
         .broadcastEval(
           async (c, { channelId, shard }) => {
@@ -141,8 +137,12 @@ async function getCounterText(
   if (data.tracks === TrackingType.HUMANS) {
     if (clusterOrGuild instanceof Guild) {
       if (clusterOrGuild.memberCount != clusterOrGuild.members.cache.size) {
-        value = await clusterOrGuild.members.fetch().then((m) => m.size.toLocaleString());
-      } else value = clusterOrGuild.memberCount.toLocaleString();
+        value = await clusterOrGuild.members
+          .fetch()
+          .then((m) => m.filter((m) => !m.user.bot).size.toLocaleString());
+      } else {
+        value = clusterOrGuild.members.cache.filter((m) => !m.user.bot).size.toLocaleString();
+      }
     } else {
       value = await clusterOrGuild
         .broadcastEval(
@@ -156,9 +156,11 @@ async function getCounterText(
             if (channel.isDMBased()) return;
 
             if (channel.guild.memberCount != channel.guild.members.cache.size) {
-              return await channel.guild.members.fetch().then((m) => m.size.toLocaleString());
+              return await channel.guild.members
+                .fetch()
+                .then((m) => m.filter((m) => !m.user.bot).size.toLocaleString());
             }
-            return channel.guild.memberCount.toLocaleString();
+            return channel.guild.members.cache.filter((m) => !m.user.bot).size.toLocaleString();
           },
           { context: { channelId: data.channel, shard } },
         )

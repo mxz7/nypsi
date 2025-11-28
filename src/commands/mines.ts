@@ -48,6 +48,7 @@ import {
 import { addXp, calcEarnedGambleXp } from "../utils/functions/economy/xp.js";
 import { getTier, isPremium } from "../utils/functions/premium/premium.js";
 import { percentChance } from "../utils/functions/random.js";
+import { escapeFormattingCharacters } from "../utils/functions/string.js";
 import { hasAdminPermission } from "../utils/functions/users/admin.js";
 import { recentCommands } from "../utils/functions/users/commands.js";
 import { addHourlyCommand } from "../utils/handlers/commandhandler.js";
@@ -491,14 +492,14 @@ async function playGame(
     if (!interaction || interaction.deferred || interaction.replied) res = await msg.edit(data);
     else res = await interaction.update(data).catch(() => msg.edit(data));
 
-    try {
-      const updatedMsg = await res.fetch();
-      logger.debug(`mines: ${message.member.id} message edited for ${reason}`, {
-        embed: updatedMsg.embeds[0],
-      });
-    } catch {
-      logger.error(`mines: ${message.author.id} failed to get response from edit`);
-    }
+    // try {
+    //   const updatedMsg = await res.fetch();
+    //   logger.debug(`mines: ${message.member.id} message edited for ${reason}`, {
+    //     embed: updatedMsg.embeds[0],
+    //   });
+    // } catch {
+    //   logger.error(`mines: ${message.author.id} failed to get response from edit`);
+    // }
 
     return res;
   };
@@ -520,7 +521,7 @@ async function playGame(
           url: process.env.ANTICHEAT_HOOK,
         });
         await hook.send({
-          content: `[${getTimestamp()}] ${message.member.user.username.replaceAll("_", "\\_")} (${message.author.id}) given captcha randomly in mines`,
+          content: `[${getTimestamp()}] ${escapeFormattingCharacters(message.member.user.username)} (${message.author.id}) given captcha randomly in mines`,
         });
         hook.destroy();
       }
@@ -593,7 +594,7 @@ async function playGame(
               `${Constants.redis.nypsi.RESTART}:${(message.client as NypsiClient).cluster.id}`,
             )) == "t"
           ) {
-            if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
+            if (message.author.id == Constants.OWNER_ID && message instanceof Message) {
               message.react("💀");
             } else {
               return msg.edit({
@@ -624,7 +625,7 @@ async function playGame(
 
           return prepareGame(message, send, args, msg);
         } else {
-          logger.debug(`mines: ${message.author.id} rerendering end (replay) message`);
+          // logger.debug(`mines: ${message.author.id} rerendering end (replay) message`);
           return renderAndListen();
         }
       };
@@ -772,7 +773,7 @@ async function playGame(
 
   if (!response) return;
 
-  logger.debug(`mines: ${message.author.id} received interaction: ${response.customId}`);
+  // logger.debug(`mines: ${message.author.id} received interaction: ${response.customId}`);
 
   if (response.customId.length != 2 && response.customId != "finish") {
     logger.error(`mines: ${message.author.id} weird coordinate thing`, { response, game });
@@ -840,8 +841,6 @@ async function playGame(
 
   let followUp: InteractionReplyOptions;
 
-  logger.debug(`mines: ${message.author.id} at location: ${game.grid[location]}`);
-
   switch (game.grid[location]) {
     case "b":
       game.grid[location] = "x";
@@ -895,7 +894,6 @@ async function playGame(
 
       game.win += game.increment;
 
-      logger.debug(`mines: ${message.author.id} rendering`);
       const desc = await renderGambleScreen({
         state: "playing",
         bet: game.bet,
@@ -913,8 +911,6 @@ async function playGame(
       if (game.win < 1) {
         components[4].components[4].setDisabled(true);
       }
-
-      logger.debug(`mines: ${message.author.id} editing`);
 
       await edit({ embeds: [embed], components }, "rerendering game", response).then(() => {
         if (followUp) {

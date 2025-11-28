@@ -139,7 +139,8 @@
       "strawberry_seed": 50,
       "mango_seed": 25,
       "coconut_seed": 25,
-      "rain": 7
+      "rain": 7,
+      "pot_of_gold": 15
     }
   },
   "corner_shop_scratchie": {
@@ -192,8 +193,10 @@
       "big_tiddy_goth_gf": 20,
       "69420_crate": 40,
       "banana_seed": 1,
-      "fertiliser": 3,
-      "toe": 50
+      "fertiliser": 10,
+      "toe": 50,
+      "pumpkin": 10,
+      "christmas_tree": 15
     }
   },
   "daily_scratch_card": {
@@ -241,10 +244,15 @@
       "lucky_cheese": 5,
       "reroll_token": 0.05,
       "banana_seed": 1,
-      "fertiliser": 50,
+      "fertiliser": {
+        "weight": 40,
+        "count": 5
+      },
       "toe": 10,
       "unbreaking": 2,
-      "mango_seed": 4
+      "mango_seed": 4,
+      "pumpkin": 80,
+      "christmas_tree": 100
     }
   },
   "lucky_scratch_card": {
@@ -295,7 +303,11 @@
       "gem_shard": 0.9,
       "omega_crate": 0.05,
       "apple_seed": 7,
-      "stick": 5
+      "stick": 5,
+      "fertiliser": {
+        "weight": 15,
+        "count": 10
+      }
     }
   },
   "karma_scratch_card": {
@@ -342,7 +354,8 @@
       "stick": 20,
       "unbreaking": 10,
       "apple_seed": 30,
-      "rain": 5
+      "rain": 5,
+      "pot_of_gold": 2
     }
   },
   "legendary_scratch_card": {
@@ -386,7 +399,8 @@
       "veilside_rx7_skin": 5,
       "stick": 40,
       "rain": 10,
-      "apple_seed": 50
+      "apple_seed": 50,
+      "pot_of_gold": 2.5
     }
   },
   "random_drop": {
@@ -445,7 +459,30 @@
       "oye": 3,
       "ethel": 5,
       "rain": 0.75,
-      "charger_skin": 7
+      "charger_skin": 7,
+      "pot_of_gold": 1.5,
+      "pumpkin": {
+        "weight": 100,
+        "count": 30
+      },
+      "christmas_tree": {
+        "weight": 100,
+        "count": 30
+      },
+      "white_rose": 1,
+      "fertiliser": {
+        "weight": 10,
+        "count": 15
+      }
+    }
+  },
+  "pot_of_gold": {
+    "money": {
+      "50000000": 100,
+      "100000000": 80,
+      "250000000": 50,
+      "500000000": 15,
+      "1000000000": 5
     }
   }
 }

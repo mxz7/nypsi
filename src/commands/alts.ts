@@ -30,7 +30,7 @@ import {
 } from "../utils/functions/moderation/alts";
 import { newBan } from "../utils/functions/moderation/ban";
 import { getMuteRole, isMuted, newMute } from "../utils/functions/moderation/mute";
-import { getLastKnownAvatar, getLastKnownUsername } from "../utils/functions/users/tag";
+import { getLastKnownAvatar, getLastKnownUsername } from "../utils/functions/users/username";
 import { getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
 import ms = require("ms");

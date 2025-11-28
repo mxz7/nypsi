@@ -1,4 +1,4 @@
-import { EconomyGuildUpgrades } from "@prisma/client";
+import { EconomyGuildUpgrades } from "#generated/prisma";
 import { GuildMember } from "discord.js";
 import { sort } from "fast-sort";
 import prisma from "../../../init/database";
@@ -9,6 +9,7 @@ import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { deleteImage } from "../image";
 import { getUserId, MemberResolvable } from "../member";
+import { Mutex } from "../mutex";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { addInventoryItem } from "./inventory";
 import { getUpgrades } from "./levelling";
@@ -358,14 +359,34 @@ export async function getRequiredForGuildUpgrade(
     slots = guild.members.length;
   }
 
-  const bonusMoney = 50_000_000 * slots * (guild.level / 10);
-  const bonusXP = 10_000 * slots * (guild.level / 10);
+  const slotBonus = {
+    money: 50_000_000 * slots * (guild.level / 10),
+    xp: 10_000 * slots * (guild.level / 10),
+  };
+
+  const levelBonus = {
+    money: 1_000_000_000 * (guild.level / 100),
+    xp: 1_000_000 * (guild.level / 100),
+  };
+
+  /**
+   * TODO: remove for season 11
+   * this stops already higher levelled guilds from having an unfair advantage with the change
+   */
+  if (guild.level < 420) {
+    levelBonus.money = 0;
+    levelBonus.xp = 0;
+  }
+
+  const total = {
+    money: Math.floor(money + slotBonus.money + levelBonus.money),
+    xp: Math.floor(xp + slotBonus.xp + levelBonus.xp),
+  };
 
   await redis.set(
     `${Constants.redis.cache.economy.GUILD_REQUIREMENTS}:${name}`,
     JSON.stringify({
-      money: Math.floor(money + bonusMoney),
-      xp: Math.floor(xp + bonusXP),
+      ...total,
       members: guild.members.length,
     }),
     "EX",
@@ -373,8 +394,7 @@ export async function getRequiredForGuildUpgrade(
   );
 
   return {
-    money: Math.floor(money + bonusMoney),
-    xp: Math.floor(xp + bonusXP),
+    ...total,
     members: guild.members.length,
   };
 }
@@ -429,6 +449,8 @@ interface EconomyGuildMember {
   contributedXpThisLevel: number;
 }
 
+const checkUpgradeMutex = new Mutex();
+
 async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
   if (await redis.exists("nypsi:infinitemaxbet")) return false;
 
@@ -436,114 +458,119 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
     guild = await getGuildByName(guild);
   }
 
-  if (guild.level >= Constants.MAX_GUILD_LEVEL) return;
-  let requirements = await getRequiredForGuildUpgrade(guild.guildName);
-  if (guild.members?.length !== requirements.members)
-    requirements = await getRequiredForGuildUpgrade(guild.guildName, false);
+  await checkUpgradeMutex.acquire(guild.guildName);
+  try {
+    if (guild.level >= Constants.MAX_GUILD_LEVEL) return;
+    let requirements = await getRequiredForGuildUpgrade(guild.guildName);
+    if (guild.members?.length !== requirements.members)
+      requirements = await getRequiredForGuildUpgrade(guild.guildName, false);
 
-  if (Number(guild.balance) >= requirements.money && guild.xp >= requirements.xp) {
-    await prisma.economyGuild.update({
-      where: {
-        guildName: guild.guildName,
-      },
-      data: {
-        level: { increment: 1 },
-        tokens: { increment: 1 },
-      },
-    });
-
-    await prisma.economyGuildMember.updateMany({
-      where: {
-        guildName: guild.guildName,
-      },
-      data: {
-        contributedMoneyThisLevel: 0,
-        contributedXpThisLevel: 0,
-      },
-    });
-
-    logger.info(`${guild.guildName} has upgraded to level ${guild.level + 1}`);
-
-    await redis.del(`${Constants.redis.cache.economy.GUILD_REQUIREMENTS}:${guild.guildName}`);
-    await redis.del(
-      `${Constants.redis.cache.economy.GUILD_LEVEL}:${guild.guildName.toLowerCase()}`,
-    );
-
-    const upgradeMsg = `**${guild.guildName}** has upgraded to level **${guild.level + 1}**`;
-
-    let rewards = upgrades.get(guild.level);
-
-    while (!rewards) rewards = upgrades.get(guild.level--);
-
-    const dms: { id: string; embed: CustomEmbed }[] = [];
-
-    for (const member of guild.members) {
-      dms.push({
-        id: member.userId,
-        embed: new CustomEmbed()
-          .setColor(Constants.EMBED_SUCCESS_COLOR)
-          .setDescription(`${upgradeMsg}`),
+    if (Number(guild.balance) >= requirements.money && guild.xp >= requirements.xp) {
+      await prisma.economyGuild.update({
+        where: {
+          guildName: guild.guildName,
+        },
+        data: {
+          level: { increment: 1 },
+          tokens: { increment: 1 },
+        },
       });
-    }
 
-    const top4Xp = sort(guild.members)
-      .desc((i) => i.contributedXp)
-      .slice(0, 4)
-      .filter((i) => i.contributedXp > 0);
+      await prisma.economyGuildMember.updateMany({
+        where: {
+          guildName: guild.guildName,
+        },
+        data: {
+          contributedMoneyThisLevel: 0,
+          contributedXpThisLevel: 0,
+        },
+      });
 
-    const top4Money = sort(guild.members)
-      .desc((i) => i.contributedMoney)
-      .slice(0, 4)
-      .filter((i) => i.contributedMoney > 0);
+      logger.info(`${guild.guildName} has upgraded to level ${guild.level + 1}`);
 
-    for (const member of top4Xp) {
-      if ((await isEcoBanned(member.userId)).banned) continue;
-      const desc: string[] = [];
-      for (const reward of rewards) {
-        const [itemId, amount] = reward.split(":");
-        await addInventoryItem(member.userId, itemId, parseInt(amount) || 0);
-        desc.push(`\`${amount}x\` ${getItems()[itemId].emoji} ${getItems()[itemId].name}`);
-      }
+      await redis.del(`${Constants.redis.cache.economy.GUILD_REQUIREMENTS}:${guild.guildName}`);
+      await redis.del(
+        `${Constants.redis.cache.economy.GUILD_LEVEL}:${guild.guildName.toLowerCase()}`,
+      );
 
-      dms.find((i) => i.id === member.userId).embed.data.description +=
-        `\n\nas you are a **top 4 xp** contributor you have received:\n${desc.join("\n")}`;
-    }
+      const upgradeMsg = `**${guild.guildName}** has upgraded to level **${guild.level + 1}**`;
 
-    for (const member of top4Money) {
-      if ((await isEcoBanned(member.userId)).banned) continue;
-      const desc: string[] = [];
-      for (const reward of rewards) {
-        const [itemId, amount] = reward.split(":");
-        await addInventoryItem(member.userId, itemId, parseInt(amount) || 0);
-        desc.push(`\`${amount}x\` ${getItems()[itemId].emoji} ${getItems()[itemId].name}`);
-      }
+      let rewards = upgrades.get(guild.level);
 
-      dms.find((i) => i.id === member.userId).embed.data.description +=
-        `\n\nas you are a **top 4 money** contributor you have received:\n${desc.join("\n")}`;
-    }
+      while (!rewards) rewards = upgrades.get(guild.level--);
 
-    for (const dm of dms) {
-      dm.embed.setAuthor({ name: guild.guildName });
-      dm.embed.data.description += `\n\nyou contributed ${guild.members
-        .find((i) => i.userId === dm.id)
-        .contributedXpThisLevel.toLocaleString()}xp | $${guild.members
-        .find((i) => i.userId === dm.id)
-        .contributedMoneyThisLevel.toLocaleString()} for this level`;
+      const dms: { id: string; embed: CustomEmbed }[] = [];
 
-      if ((await getDmSettings(dm.id)).other) {
-        addNotificationToQueue({
-          memberId: dm.id,
-          payload: {
-            embed: dm.embed,
-            content: `${guild.guildName} has levelled up!`,
-          },
+      for (const member of guild.members) {
+        dms.push({
+          id: member.userId,
+          embed: new CustomEmbed()
+            .setColor(Constants.EMBED_SUCCESS_COLOR)
+            .setDescription(`${upgradeMsg}`),
         });
       }
-    }
 
-    return true;
+      const top4Xp = sort(guild.members)
+        .desc((i) => i.contributedXp)
+        .slice(0, 4)
+        .filter((i) => i.contributedXp > 0);
+
+      const top4Money = sort(guild.members)
+        .desc((i) => i.contributedMoney)
+        .slice(0, 4)
+        .filter((i) => i.contributedMoney > 0);
+
+      for (const member of top4Xp) {
+        if ((await isEcoBanned(member.userId)).banned) continue;
+        const desc: string[] = [];
+        for (const reward of rewards) {
+          const [itemId, amount] = reward.split(":");
+          await addInventoryItem(member.userId, itemId, parseInt(amount) || 0);
+          desc.push(`\`${amount}x\` ${getItems()[itemId].emoji} ${getItems()[itemId].name}`);
+        }
+
+        dms.find((i) => i.id === member.userId).embed.data.description +=
+          `\n\nas you are a **top 4 xp** contributor you have received:\n${desc.join("\n")}`;
+      }
+
+      for (const member of top4Money) {
+        if ((await isEcoBanned(member.userId)).banned) continue;
+        const desc: string[] = [];
+        for (const reward of rewards) {
+          const [itemId, amount] = reward.split(":");
+          await addInventoryItem(member.userId, itemId, parseInt(amount) || 0);
+          desc.push(`\`${amount}x\` ${getItems()[itemId].emoji} ${getItems()[itemId].name}`);
+        }
+
+        dms.find((i) => i.id === member.userId).embed.data.description +=
+          `\n\nas you are a **top 4 money** contributor you have received:\n${desc.join("\n")}`;
+      }
+
+      for (const dm of dms) {
+        dm.embed.setAuthor({ name: guild.guildName });
+        dm.embed.data.description += `\n\nyou contributed ${guild.members
+          .find((i) => i.userId === dm.id)
+          .contributedXpThisLevel.toLocaleString()}xp | $${guild.members
+          .find((i) => i.userId === dm.id)
+          .contributedMoneyThisLevel.toLocaleString()} for this level`;
+
+        if ((await getDmSettings(dm.id)).other) {
+          addNotificationToQueue({
+            memberId: dm.id,
+            payload: {
+              embed: dm.embed,
+              content: `${guild.guildName} has levelled up!`,
+            },
+          });
+        }
+      }
+
+      return true;
+    }
+    return false;
+  } finally {
+    checkUpgradeMutex.release(guild.guildName);
   }
-  return false;
 }
 
 export async function setGuildMOTD(name: string, motd: string) {

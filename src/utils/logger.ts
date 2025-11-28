@@ -1,10 +1,11 @@
+import { TransactionType } from "#generated/prisma";
 import { flavors } from "@catppuccin/palette";
-import { TransactionType } from "@prisma/client";
 import { Client, User, WebhookClient } from "discord.js";
 import { WriteStream, createWriteStream } from "fs";
 import prisma from "../init/database";
 import DiscordTransport from "../models/DiscordLogs";
 import Constants from "./Constants";
+import { escapeFormattingCharacters } from "./functions/string";
 import { formatTransaction } from "./functions/transactions";
 import chalk = require("chalk");
 import dayjs = require("dayjs");
@@ -402,7 +403,7 @@ export function gamble(
   if (!nextLogMsg.get("gamble")) {
     nextLogMsg.set(
       "gamble",
-      `**${user.username.replaceAll("_", "\\_")}** (${user.id})\n` +
+      `**${escapeFormattingCharacters(user.username)}** (${user.id})\n` +
         `- **game** ${game}\n` +
         `- **bet** $${amount.toLocaleString()}\n` +
         `- **result** ${result}${
@@ -415,7 +416,7 @@ export function gamble(
     nextLogMsg.set(
       "gamble",
       nextLogMsg.get("gamble") +
-        `**${user.username.replaceAll("_", "\\_")}** (${user.id})\n` +
+        `**${escapeFormattingCharacters(user.username)}** (${user.id})\n` +
         `- **game** ${game}\n` +
         `- **bet** $${amount.toLocaleString()}\n` +
         `- **result** ${result}${

@@ -1,4 +1,4 @@
-import { DMSettings, Preferences } from "@prisma/client";
+import { DMSettings, Preferences } from "#generated/prisma";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -370,7 +370,7 @@ async function run(
 
           if (!modalResponse.isModalSubmit()) return;
 
-          const value = formatNumber(modalResponse.fields.fields.first().value.toLowerCase());
+          const value = formatNumber(modalResponse.fields.getTextInputValue("val").toLowerCase());
 
           if (typeof value !== "number" || value < 0) {
             await modalResponse.reply({
@@ -601,7 +601,7 @@ async function run(
 
           if (!modalResponse.isModalSubmit()) return;
 
-          const value = formatNumber(modalResponse.fields.fields.first().value.toLowerCase());
+          const value = formatNumber(modalResponse.fields.getTextInputValue("val").toLowerCase());
 
           if (typeof value !== "number" || value < 0) {
             await modalResponse.reply({
@@ -906,7 +906,7 @@ async function run(
 
       if (!modalSubmit.isModalSubmit()) return;
 
-      const value = modalSubmit.fields.fields.first().value;
+      const value = modalSubmit.fields.getTextInputValue("emailtext");
 
       if (!value) return;
 

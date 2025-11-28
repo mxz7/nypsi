@@ -9,8 +9,8 @@ import { addKarma } from "../karma/karma";
 import { getUserId, MemberResolvable } from "../member";
 import { pluralize } from "../string";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
-import { getLastKnownAvatar } from "../users/tag";
 import { addTag } from "../users/tags";
+import { getLastKnownAvatar } from "../users/username";
 import { addBalance, getBankBalance, removeBankBalance } from "./balance";
 import { addBooster, getBoosters } from "./boosters";
 import { addInventoryItem } from "./inventory";
@@ -147,7 +147,7 @@ levellingRewards.set(7000, {
 });
 levellingRewards.set(8000, {
   text: ["- 💚 prestige 80 tag"],
-  rewards: ["tag:p70"],
+  rewards: ["tag:80"],
 });
 
 const xpFormula = (level: number, prestige: number) => {
@@ -330,13 +330,22 @@ export async function setLevel(member: MemberResolvable, amount: number) {
   return query.level;
 }
 
-export function getLevelRequirements(prestige: number, level: number) {
-  while (level >= 100) {
-    prestige++;
-    level -= 100;
-  }
+export function getLevelRequirements(rawLevel: number): { xp: number; money: number };
+export function getLevelRequirements(
+  prestige: number,
+  level: number,
+): { xp: number; money: number };
+export function getLevelRequirements(prestige: number, level?: number) {
+  let rawLevel = prestige;
 
-  const rawLevel = prestige * 100 + level;
+  if (level) {
+    while (level >= 100) {
+      prestige++;
+      level -= 100;
+    }
+
+    rawLevel = prestige * 100 + level;
+  }
 
   const requiredXp = xpFormula(level, prestige);
   const requiredMoney = moneyFormula(rawLevel);

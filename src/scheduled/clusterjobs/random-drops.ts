@@ -17,6 +17,7 @@ import Constants from "../../utils/Constants";
 import { findChannelCluster } from "../../utils/functions/clusters";
 import { MStoTime } from "../../utils/functions/date";
 import { addProgress } from "../../utils/functions/economy/achievements";
+import { addEventProgress } from "../../utils/functions/economy/events";
 import { itemExists } from "../../utils/functions/economy/inventory";
 import {
   describeLootPoolResult,
@@ -34,8 +35,8 @@ import {
 import { getPrefix } from "../../utils/functions/guilds/utils";
 import { percentChance, shuffle } from "../../utils/functions/random";
 import sleep from "../../utils/functions/sleep";
-import { getZeroWidth } from "../../utils/functions/string";
-import { getLastKnownUsername } from "../../utils/functions/users/tag";
+import { escapeFormattingCharacters, getZeroWidth } from "../../utils/functions/string";
+import { getLastKnownUsername } from "../../utils/functions/users/username";
 import { createProfile, hasProfile } from "../../utils/functions/users/utils";
 import { logger } from "../../utils/logger";
 import dayjs = require("dayjs");
@@ -146,6 +147,16 @@ async function randomDrop(client: NypsiClient) {
             false,
           )}) prize: ${JSON.stringify(prize)}`,
         );
+
+        switch (prize.item) {
+          case "pumpkin":
+            addEventProgress(client, winner, "halloween", prize.count || 1);
+            break;
+          case "christmas_tree":
+            addEventProgress(client, winner, "christmas", prize.count || 1);
+            break;
+        }
+
         giveLootPoolResult(winner, prize);
         addProgress(winner, "lootdrops_pro", 1);
         addTaskProgress(winner, "lootdrops");
@@ -706,7 +717,7 @@ export async function startLootRain(channel: GuildTextBasedChannel, user: User) 
     embeds: [
       new CustomEmbed(
         null,
-        `**${user.username.replaceAll("_", "\\_")}'s loot rain is starting!!!**`,
+        `**${escapeFormattingCharacters(user.username)}'s loot rain is starting!!!**`,
       ).setColor(0xffffff),
     ],
   });
@@ -726,7 +737,7 @@ export async function startLootRain(channel: GuildTextBasedChannel, user: User) 
         embeds: [
           new CustomEmbed(
             null,
-            `**${user.username.replaceAll("_", "\\_")}'s loot rain has ended.**`,
+            `**${escapeFormattingCharacters(user.username)}'s loot rain has ended.**`,
           ).setColor(0xffffff),
         ],
       });

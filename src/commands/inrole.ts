@@ -2,9 +2,7 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
-  Collection,
   CommandInteraction,
-  GuildMember,
   Interaction,
   Message,
   MessageActionRowComponentBuilder,
@@ -13,10 +11,10 @@ import {
 import { inPlaceSort } from "fast-sort";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import { getAllMembers } from "../utils/functions/guilds/members";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import PageManager from "../utils/functions/page";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { logger } from "../utils/logger";
 
 const cmd = new Command("inrole", "get the members in a role", "utility");
 
@@ -58,16 +56,7 @@ async function run(
 
   await addCooldown(cmd.name, message.member, 10);
 
-  let members: Collection<string, GuildMember>;
-
-  if (message.guild.memberCount == message.guild.members.cache.size) {
-    members = message.guild.members.cache;
-  } else {
-    members = await message.guild.members.fetch().catch((e) => {
-      logger.error("failed to fetch members for inrole cmd", e);
-      return message.guild.members.cache;
-    });
-  }
+  const members = await getAllMembers(message.guild, true);
 
   const memberList: string[] = [];
 

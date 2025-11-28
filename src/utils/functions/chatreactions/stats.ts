@@ -1,9 +1,9 @@
-import { Collection, Guild, GuildMember } from "discord.js";
+import { Guild, GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
-import { logger } from "../../logger";
 import { formatUsername } from "../economy/top";
 import { isEcoBanned } from "../economy/utils";
+import { getAllMembers } from "../guilds/members";
 import { getBlacklisted } from "./blacklisted";
 
 export async function getReactionStats(guild: Guild, member: GuildMember) {
@@ -90,18 +90,7 @@ export async function add3rdPlace(guild: Guild, member: GuildMember) {
 }
 
 export async function getServerLeaderboard(guild: Guild): Promise<Map<string, string>> {
-  let members: Collection<string, GuildMember>;
-
-  if (guild.memberCount == guild.members.cache.size) {
-    members = guild.members.cache;
-  } else {
-    members = await guild.members.fetch().catch((e) => {
-      logger.error("failed to fetch guild members for chat reaction stats", e);
-      return guild.members.cache;
-    });
-  }
-
-  if (!members) members = guild.members.cache;
+  let members = await getAllMembers(guild, true);
 
   members = members.filter((m) => {
     return !m.user.bot;
@@ -135,17 +124,17 @@ export async function getServerLeaderboard(guild: Guild): Promise<Map<string, st
 
     if (blacklisted.includes(user.userId)) continue;
 
-    if (members.find((member) => member.user.id == user.userId) && user.wins != 0) {
+    if (members.get(user.userId) && user.wins != 0) {
       usersWins.push(user.userId);
       winsStats.set(user.userId, user.wins);
       overall = true;
     }
-    if (members.find((member) => member.user.id == user.userId) && user.second != 0) {
+    if (members.get(user.userId) && user.second != 0) {
       usersSecond.push(user.userId);
       secondStats.set(user.userId, user.second);
       overall = true;
     }
-    if (members.find((member) => member.user.id == user.userId) && user.third != 0) {
+    if (members.get(user.userId) && user.third != 0) {
       usersThird.push(user.userId);
       thirdStats.set(user.userId, user.third);
       overall = true;

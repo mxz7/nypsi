@@ -1,4 +1,4 @@
-import { Game, Prisma } from "@prisma/client";
+import { Game, Prisma } from "#generated/prisma";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -14,7 +14,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { fetchGame } from "../utils/functions/economy/stats";
 import PageManager from "../utils/functions/page";
 import { getPreferences } from "../utils/functions/users/notifications";
-import { getLastKnownAvatar, getLastKnownUsername } from "../utils/functions/users/tag";
+import { getLastKnownAvatar, getLastKnownUsername } from "../utils/functions/users/username";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import dayjs = require("dayjs");
 

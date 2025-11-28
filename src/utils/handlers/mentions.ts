@@ -1,4 +1,4 @@
-import { Mention } from "@prisma/client";
+import { Mention } from "#generated/prisma";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import Constants from "../Constants";
@@ -29,12 +29,12 @@ export function startMentionInterval() {
 
     if (
       (await redis.llen(Constants.redis.nypsi.MENTION_QUEUE)) >
-        (Number(await redis.get(Constants.redis.nypsi.MENTION_DM_TEKOH_THRESHOLD)) || 100) ||
+        (Number(await redis.get(Constants.redis.nypsi.MENTION_DM_OWNER_THRESHOLD)) || 100) ||
       (0 && lastWarn < Date.now() - ms("1 hour"))
     ) {
       lastWarn = Date.now();
       addNotificationToQueue({
-        memberId: Constants.TEKOH_ID,
+        memberId: Constants.OWNER_ID,
         payload: {
           content: `mention queue over threshold: ${Number(
             await redis.llen(Constants.redis.nypsi.MENTION_QUEUE),

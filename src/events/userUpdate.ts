@@ -2,7 +2,7 @@ import { User } from "discord.js";
 import { NypsiClient } from "../models/Client";
 import { clearMemberCache } from "../utils/functions/member";
 import { addNewUsername, fetchUsernameHistory, isTracking } from "../utils/functions/users/history";
-import { updateLastKnownUsername } from "../utils/functions/users/tag";
+import { updateLastKnownUsername } from "../utils/functions/users/username";
 import { hasProfile } from "../utils/functions/users/utils";
 
 export default async function userUpdate(oldUser: User, newUser: User) {

@@ -31,6 +31,9 @@ cmd.slashData
     option.setName("user").setDescription("member to ban from the server").setRequired(true),
   )
   .addStringOption((option) =>
+    option.setName("duration").setDescription("duration of the ban, e.g: 3d, 3h, 3m"),
+  )
+  .addStringOption((option) =>
     option.setName("reason").setDescription("reason for the ban").setRequired(false),
   );
 

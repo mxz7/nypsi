@@ -2,8 +2,9 @@ import { CommandInteraction } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders.js";
 import { formatDate } from "../utils/functions/date";
+import { getAllMembers } from "../utils/functions/guilds/members";
 import { getPeaks, updateGuild } from "../utils/functions/guilds/utils";
-import { logger } from "../utils/logger";
+import { escapeFormattingCharacters } from "../utils/functions/string";
 
 const cmd = new Command("server", "view information about the server", "info").setAliases([
   "serverinfo",
@@ -21,16 +22,7 @@ async function run(
 
   const created = formatDate(server.createdAt).toLowerCase();
 
-  let members;
-
-  if (message.guild.memberCount == message.guild.members.cache.size) {
-    members = server.members.cache;
-  } else {
-    members = await server.members.fetch().catch((e) => {
-      logger.error("failed to fetch members for guild peaks on $server", e);
-      return message.guild.members.cache;
-    });
-  }
+  const members = await getAllMembers(message.guild, true);
 
   const users = members.filter((member) => !member.user.bot);
   const bots = members.filter((member) => member.user.bot);
@@ -66,7 +58,7 @@ async function run(
     .addField(
       "info",
       "**owner** " +
-        server.members.cache.get(server.ownerId).user.username.replaceAll("_", "\\_") +
+        escapeFormattingCharacters(server.members.cache.get(server.ownerId).user.username) +
         "\n" +
         "**created** " +
         created,

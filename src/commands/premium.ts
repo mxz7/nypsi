@@ -6,6 +6,7 @@ import Constants from "../utils/Constants";
 import { daysAgo, daysUntil, formatDate } from "../utils/functions/date";
 import { getRawLevel } from "../utils/functions/economy/levelling";
 import { userExists } from "../utils/functions/economy/utils";
+import { getAllMembers } from "../utils/functions/guilds/members";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import PageManager from "../utils/functions/page";
 import { addUserAlias, getUserAliases, removeUserAlias } from "../utils/functions/premium/aliases";
@@ -149,12 +150,14 @@ async function run(
     if (message.guildId !== Constants.NYPSI_SERVER_ID) return;
     doingRoles = true;
 
-    let members = await message.guild.members.fetch();
+    setTimeout(() => {
+      doingRoles = false;
+    }, ms("1 hour"));
 
-    if (members.size !== message.guild.memberCount) members = await message.guild.members.fetch();
+    const members = await getAllMembers(message.guild, true);
 
     for (const guildMember of members.values()) {
-      if (guildMember.user.id === Constants.TEKOH_ID) continue; // no roles for me teehee
+      if (guildMember.user.id === Constants.OWNER_ID) continue; // no roles for me teehee
       if (!(await userExists(guildMember))) continue;
 
       const level = await getRawLevel(guildMember);
@@ -787,7 +790,7 @@ async function run(
   if (args.length == 0 || args[0].toLowerCase() == "view") {
     return defaultMessage();
   } else if (args[0].toLowerCase() == "check" || args[0].toLowerCase() == "status") {
-    if (message.author.id != Constants.TEKOH_ID) {
+    if (message.author.id != Constants.OWNER_ID) {
       return defaultMessage();
     }
 
@@ -831,7 +834,7 @@ async function run(
       return send({ embeds: [embed] });
     }
   } else if (args[0].toLowerCase() == "update") {
-    if (message.author.id != Constants.TEKOH_ID) {
+    if (message.author.id != Constants.OWNER_ID) {
       return defaultMessage();
     }
 
@@ -867,7 +870,7 @@ async function run(
         });
     }
   } else if (args[0].toLowerCase() == "add") {
-    if (message.author.id != Constants.TEKOH_ID) {
+    if (message.author.id != Constants.OWNER_ID) {
       return defaultMessage();
     }
 
@@ -881,7 +884,7 @@ async function run(
       embeds: [new CustomEmbed(message.member, "✅ created profile at tier " + args[2])],
     });
   } else if (args[0].toLowerCase() == "renew") {
-    if (message.author.id != Constants.TEKOH_ID) {
+    if (message.author.id != Constants.OWNER_ID) {
       return defaultMessage();
     }
 
@@ -893,7 +896,7 @@ async function run(
 
     return send({ embeds: [new CustomEmbed(message.member, "✅ membership renewed")] });
   } else if (args[0].toLowerCase() == "expire") {
-    if (message.author.id != Constants.TEKOH_ID) {
+    if (message.author.id != Constants.OWNER_ID) {
       return defaultMessage();
     }
 

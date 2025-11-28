@@ -44,6 +44,7 @@ import {
 import { addXp, calcEarnedGambleXp } from "../utils/functions/economy/xp";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { percentChance } from "../utils/functions/random";
+import { escapeFormattingCharacters } from "../utils/functions/string";
 import { hasAdminPermission } from "../utils/functions/users/admin";
 import { recentCommands } from "../utils/functions/users/commands";
 import { addHourlyCommand } from "../utils/handlers/commandhandler";
@@ -482,7 +483,7 @@ async function playGame(
             url: process.env.ANTICHEAT_HOOK,
           });
           await hook.send({
-            content: `[${getTimestamp()}] ${message.member.user.username.replaceAll("_", "\\_")} (${message.author.id}) given captcha randomly in tower`,
+            content: `[${getTimestamp()}] ${escapeFormattingCharacters(message.member.user.username)} (${message.author.id}) given captcha randomly in tower`,
           });
           hook.destroy();
         }
@@ -533,7 +534,7 @@ async function playGame(
           `${Constants.redis.nypsi.RESTART}:${(message.client as NypsiClient).cluster.id}`,
         )) == "t"
       ) {
-        if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
+        if (message.author.id == Constants.OWNER_ID && message instanceof Message) {
           message.react("💀");
         } else {
           return msg.edit({

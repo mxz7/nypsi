@@ -37,6 +37,15 @@ export async function getUserCommand(member: MemberResolvable) {
 export async function setCommand(member: MemberResolvable, trigger: string, content: string) {
   const userId = getUserId(member);
 
+  const check = await prisma.premiumCommand.findUnique({
+    where: { trigger },
+    select: { premium: { select: { level: true } } },
+  });
+
+  if (check && check.premium.level === 0) {
+    await prisma.premiumCommand.delete({ where: { trigger } });
+  }
+
   await prisma.premiumCommand.upsert({
     where: {
       owner: userId,

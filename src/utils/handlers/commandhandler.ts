@@ -36,11 +36,17 @@ import { Item } from "../../types/Economy";
 import Constants from "../Constants";
 import { a } from "../functions/anticheat";
 import { addProgress, setProgress } from "../functions/economy/achievements";
+import { getBankBalance } from "../functions/economy/balance";
 import { addBooster } from "../functions/economy/boosters";
-import { addEventProgress } from "../functions/economy/events";
-import { commandGemCheck, gemBreak, getInventory } from "../functions/economy/inventory";
+import { addEventProgress, EventData, getCurrentEvent } from "../functions/economy/events";
+import {
+  addInventoryItem,
+  commandGemCheck,
+  gemBreak,
+  getInventory,
+} from "../functions/economy/inventory";
 import { runItemInfo } from "../functions/economy/item_info";
-import { getRawLevel } from "../functions/economy/levelling";
+import { getLevelRequirements, getRawLevel } from "../functions/economy/levelling";
 import { addTaskProgress } from "../functions/economy/tasks";
 import {
   createUser,
@@ -50,14 +56,16 @@ import {
   isHandcuffed,
   userExists,
 } from "../functions/economy/utils";
-import { addXp } from "../functions/economy/xp";
+import { addXp, getXp } from "../functions/economy/xp";
 import { getDisabledChannels } from "../functions/guilds/channels";
 import { getDisabledCommands } from "../functions/guilds/disabledcommands";
 import { getChatFilter } from "../functions/guilds/filters";
 import { getPrefix } from "../functions/guilds/utils";
 import { addKarma, getKarma } from "../functions/karma/karma";
+import { getAllGroupAccountIds } from "../functions/moderation/alts";
 import { getUserAliases } from "../functions/premium/aliases";
 import { addUse, getCommand } from "../functions/premium/command";
+import { isPremium } from "../functions/premium/premium";
 import { percentChance } from "../functions/random";
 import { cleanString, pluralize } from "../functions/string";
 import { hasAdminPermission } from "../functions/users/admin";
@@ -70,7 +78,7 @@ import {
   getInlineNotifications,
   getPreferences,
 } from "../functions/users/notifications";
-import { getLastKnownUsername } from "../functions/users/tag";
+import { getLastKnownUsername } from "../functions/users/username";
 import { createProfile, hasProfile } from "../functions/users/utils";
 import dayjs = require("dayjs");
 import ms = require("ms");
@@ -765,7 +773,7 @@ export async function runCommand(
         `${Constants.redis.nypsi.RESTART}:${(message.client as NypsiClient).cluster.id}`,
       )) == "t"
     ) {
-      if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
+      if (message.author.id == Constants.OWNER_ID && message instanceof Message) {
         message.react("💀");
       } else {
         if (message instanceof Message) {
@@ -970,37 +978,52 @@ export async function runCommand(
   setTimeout(
     async () => {
       if (command.category === "money") {
-        if (
-          percentChance(0.77777) &&
-          (await getRawLevel(message.author.id)) < 250 &&
-          (await getPreferences(message.author.id)).tips
-        ) {
+        const rawLevel = await getRawLevel(message.author.id);
+        const levelRequirements = getLevelRequirements(rawLevel);
+        const preferences = await getPreferences(message.author.id);
+
+        if (percentChance(0.77777) && rawLevel < 250 && preferences.tips) {
           const tip = tips[Math.floor(Math.random() * tips.length)];
 
           await addInlineNotification({
             memberId: message.author.id,
             embed: new CustomEmbed(message.member, tip),
           });
+        } else if (
+          percentChance(1) &&
+          rawLevel < 75 &&
+          levelRequirements.xp < (await getXp(message.author.id))
+        ) {
+          const bankBalance = await getBankBalance(message.author.id);
+          await addInlineNotification({
+            memberId: message.author.id,
+            embed: new CustomEmbed(
+              message.member,
+              `you have enough xp for a **level up**!!! you only need to deposit $${(levelRequirements.money - bankBalance).toLocaleString()} more into your bank to level up!\n\n[more information about levelling](https://nypsi.xyz/docs/economy/level?ref=bot-level-tip)`,
+            ),
+          });
         }
 
         if (!(await redis.exists(`nypsi:inactiveuserthing:${message.author.id}`))) {
           await redis.set(`nypsi:inactiveuserthing:${message.author.id}`, "boobies", "EX", 2.628e6);
           const lastCommand = await getLastCommand(message.author.id);
-          const rawLevel = await getRawLevel(message.author.id);
+          const alts = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, message.author.id);
 
           if (
             dayjs(lastCommand).isBefore(dayjs().subtract(3, "months")) &&
             dayjs(lastCommand).isAfter(dayjs().subtract(5, "year")) &&
-            rawLevel > 100
+            rawLevel > 100 &&
+            // first is always the 'main' account
+            alts[0] === message.author.id
           ) {
-            await addBooster(message.author.id, "xp_booster", 2, dayjs().add(1, "day").toDate());
+            await addBooster(message.author.id, "xp_booster", 2, dayjs().add(7, "day").toDate());
 
             await addInlineNotification({
               memberId: message.author.id,
               embed: new CustomEmbed(
                 message.member,
-                "**welcome back!!**\n\nwelcome back to nypsi, since it's been a while, we've given you a 24 hour xp booster. enjoy!",
-              ),
+                "welcome back to nypsi, since it's been a while, we've given you a 1 week xp booster. enjoy!",
+              ).setHeader("welcome back!!", message.author.avatarURL()),
             });
           }
         }
@@ -1071,6 +1094,100 @@ export async function runCommand(
         embeds.push(embed);
 
         await redis.del(`nypsi:levelup:${message.author.id}`);
+      }
+
+      if (
+        !getItems()["pumpkin"].unique &&
+        !(await redis.exists(Constants.redis.nypsi.LAST_SEASONAL_ITEM)) &&
+        percentChance(15)
+      ) {
+        const inventory = await getInventory(message.member);
+        let amount = Math.random() * 6 + 1;
+
+        if ((await inventory.hasGem("white_gem")).any && percentChance(50)) {
+          amount **= 1.7;
+        }
+
+        if ((await isPremium(message.member)) && percentChance(50)) {
+          amount **= 1.7;
+        }
+
+        amount = Math.ceil(amount);
+
+        const [eventProgress] = await Promise.all([
+          addEventProgress(message.client as NypsiClient, message.member, "halloween", amount),
+          redis.set(Constants.redis.nypsi.LAST_SEASONAL_ITEM, message.author.id, "EX", 300),
+          addInventoryItem(message.member, "pumpkin", amount),
+        ]);
+
+        const embed = new CustomEmbed(
+          message.member,
+          `🎃 you found ${amount} **${pluralize("pumpkin", amount)}**!!`,
+        );
+
+        if (eventProgress) {
+          const eventData: { event?: EventData; target: number } = { target: 0 };
+
+          eventData.event = await getCurrentEvent();
+
+          if (eventData.event) {
+            eventData.target = Number(eventData.event.target);
+          }
+
+          embed.addField(
+            "event progress",
+            `🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`,
+          );
+        }
+
+        embeds.push(embed);
+      }
+
+      if (
+        !getItems()["christmas_tree"].unique &&
+        !(await redis.exists(Constants.redis.nypsi.LAST_SEASONAL_ITEM)) &&
+        percentChance(15)
+      ) {
+        const inventory = await getInventory(message.member);
+        let amount = Math.random() * 6 + 1;
+
+        if ((await inventory.hasGem("white_gem")).any && percentChance(50)) {
+          amount **= 1.3;
+        }
+
+        if ((await isPremium(message.member)) && percentChance(50)) {
+          amount **= 1.7;
+        }
+
+        amount = Math.ceil(amount);
+
+        const [eventProgress] = await Promise.all([
+          addEventProgress(message.client as NypsiClient, message.member, "christmas", amount),
+          redis.set(Constants.redis.nypsi.LAST_SEASONAL_ITEM, message.author.id, "EX", 300),
+          addInventoryItem(message.member, "christmas_tree", amount),
+        ]);
+
+        const embed = new CustomEmbed(
+          message.member,
+          `🎄 you found ${amount} **${pluralize("christmas tree", amount)}**!!`,
+        );
+
+        if (eventProgress) {
+          const eventData: { event?: EventData; target: number } = { target: 0 };
+
+          eventData.event = await getCurrentEvent();
+
+          if (eventData.event) {
+            eventData.target = Number(eventData.event.target);
+          }
+
+          embed.addField(
+            "event progress",
+            `🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`,
+          );
+        }
+
+        embeds.push(embed);
       }
 
       if (embeds.length > 0) {

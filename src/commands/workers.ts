@@ -524,7 +524,7 @@ async function run(
       .disableFooter();
 
     return send({ embeds: [embed] });
-  } else if (args[0].toLowerCase() == "debug" && message.author.id === Constants.TEKOH_ID) {
+  } else if (args[0].toLowerCase() == "debug" && message.author.id === Constants.OWNER_ID) {
     const debugInfoEmbed = new CustomEmbed(
       message.member,
       "$workers debug set <worker> <amount> - set a worker's stored amount" +

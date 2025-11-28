@@ -13,10 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: setup node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
 
@@ -70,10 +70,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: setup node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
 
@@ -160,10 +160,10 @@ jobs:
           env: prod
 
       - name: checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: setup node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 20
 
@@ -233,7 +233,7 @@ jobs:
           mv tsconfig.json deploy/
 
       - name: deploy
-        uses: burnett01/rsync-deployments@7.0.2
+        uses: burnett01/rsync-deployments@7.1.0
         with:
           switches: -rtvh --partial --progress --delete --exclude='dist/utils/functions/anticheat.js' --exclude='node_modules/' --exclude='out/' --exclude='.env'
           path: deploy/

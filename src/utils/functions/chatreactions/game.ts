@@ -1,10 +1,12 @@
 import { Guild, GuildMember, Message, TextChannel, User } from "discord.js";
 import { inPlaceSort } from "fast-sort";
+import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed, getColor } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { gamble } from "../../logger";
 import { addProgress } from "../economy/achievements";
 import { addBalance } from "../economy/balance";
+import { addEventProgress, EventData, getCurrentEvent, getEventProgress } from "../economy/events";
 import { createGame } from "../economy/stats";
 import { addTaskProgress } from "../economy/tasks";
 import { topChatReactionGlobal } from "../economy/top";
@@ -76,6 +78,9 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel, 
 
   let ended = false;
 
+  const eventData: { event?: EventData; target: number } = { target: 0 };
+  let eventProgress: Awaited<ReturnType<typeof getEventProgress>>;
+
   const updateWinnersText = () => {
     winnersText.length = 0;
 
@@ -99,6 +104,15 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel, 
     }, 10000);
 
     updateWinnersText();
+
+    if (eventProgress) {
+      embed.setDescription(
+        `type: \`${word.display}\`` +
+          (eventProgress
+            ? `\n\n🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`
+            : ""),
+      );
+    }
 
     embed.setFields([
       { name: `${pluralize("winner", winnersText.length)}`, value: winnersText.join("\n") },
@@ -138,6 +152,21 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel, 
     }, 500);
 
     if (!forced && wordListType !== "custom") {
+      eventProgress = await addEventProgress(
+        message.client as NypsiClient,
+        message.author,
+        "chatreaction",
+        1,
+      );
+
+      if (eventProgress) {
+        eventData.event = await getCurrentEvent();
+
+        if (eventData.event) {
+          eventData.target = Number(eventData.event.target);
+        }
+      }
+
       const update = await addLeaderboardEntry(message.author.id, time).catch(() => ({
         daily: false,
         global: false,
@@ -255,11 +284,23 @@ export async function startChatReactionDuel(
     let tax = 0;
     let editing = false;
 
+    const eventData: { event?: EventData; target: number } = { target: 0 };
+    let eventProgress: Awaited<ReturnType<typeof getEventProgress>>;
+
     const interval = setInterval(() => {
       if (editing) return;
       if (collector.ended) clearInterval(interval);
       if (winners.length === 0) return;
       else if (winners.length === 2) clearInterval(interval);
+
+      if (eventProgress) {
+        embed.setDescription(
+          `${wager > 0 ? ` **wager** $${wager.toLocaleString()}\n\n` : ""}type: \`${word.display}\`\n\n` +
+            (eventProgress
+              ? `🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`
+              : ""),
+        );
+      }
 
       embed.setFields({
         name: "winner",
@@ -382,6 +423,23 @@ export async function startChatReactionDuel(
           message.react("🐌");
         }
       }, 500);
+
+      if (winners[0].user.id === message.author.id) {
+        eventProgress = await addEventProgress(
+          message.client as NypsiClient,
+          message.author,
+          "chatreaction",
+          1,
+        );
+
+        if (eventProgress) {
+          eventData.event = await getCurrentEvent();
+
+          if (eventData.event) {
+            eventData.target = Number(eventData.event.target);
+          }
+        }
+      }
     });
 
     collector.on("end", async () => {

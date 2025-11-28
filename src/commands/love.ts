@@ -15,9 +15,10 @@ import { getItems } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
 import { percentChance } from "../utils/functions/random";
+import { escapeFormattingCharacters } from "../utils/functions/string";
 import { addMarriage, isMarried, removeMarriage } from "../utils/functions/users/marriage";
 import { addNotificationToQueue } from "../utils/functions/users/notifications";
-import { getLastKnownUsername } from "../utils/functions/users/tag";
+import { getLastKnownUsername } from "../utils/functions/users/username";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cache = new Map<string, number>();
@@ -185,7 +186,7 @@ async function run(
   }
 
   let desc =
-    `${target1.user.username.replaceAll("_", "\\_")} **x** ${target2.user.username.replaceAll("_", "\\_")}\n\n` +
+    `${escapeFormattingCharacters(target1.user.username)} **x** ${escapeFormattingCharacters(target2.user.username)}\n\n` +
     `${loveBar}\n**${lovePercent}**% **-** ${loveLevel} ${loveEmoji}`;
 
   // undefined if author isn't one of the love birds
@@ -220,7 +221,7 @@ async function run(
       payload: {
         embed: new CustomEmbed(
           marriage.partnerId,
-          `${getItems()["broken_ring"].emoji} **${message.member.user.username.replaceAll("_", "\\_")}** has cheated on you!`,
+          `${getItems()["broken_ring"].emoji} **${escapeFormattingCharacters(message.member.user.username)}** has cheated on you!`,
         ).setFooter({ text: `+1 broken ring` }),
       },
     });

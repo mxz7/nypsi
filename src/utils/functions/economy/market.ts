@@ -1,4 +1,4 @@
-import { Market, MarketWatch, OrderType, Prisma, PrismaClient } from "@prisma/client";
+import { Market, MarketWatch, OrderType, Prisma, PrismaClient } from "#generated/prisma";
 import { ClusterManager } from "discord-hybrid-sharding";
 import {
   ActionRowBuilder,
@@ -29,7 +29,7 @@ import { getTier } from "../premium/premium";
 import { pluralize } from "../string";
 import { addToNypsiBank, getTax } from "../tax";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
-import { getLastKnownAvatar, getLastKnownUsername } from "../users/tag";
+import { getLastKnownAvatar, getLastKnownUsername } from "../users/username";
 import { addBalance, getBalance, removeBalance } from "./balance";
 import { addInventoryItem, getInventory, isGem, removeInventoryItem } from "./inventory";
 import { addStat } from "./stats";
@@ -1185,7 +1185,7 @@ export async function showMarketConfirmationModal(
 
   if (!res.isModalSubmit()) return;
 
-  if (res.fields.fields.first().value.toLowerCase() != "yes") {
+  if (res.fields.getTextInputValue("confirmation") != "yes") {
     res.reply({
       embeds: [new CustomEmbed().setDescription("✅ cancelled purchase")],
       flags: MessageFlags.Ephemeral,

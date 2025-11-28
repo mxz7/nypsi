@@ -1,4 +1,4 @@
-import { WordleGame } from "@prisma/client";
+import { WordleGame } from "#generated/prisma";
 import prisma from "../../../init/database";
 import { addProgress } from "../economy/achievements";
 import { addTaskProgress } from "../economy/tasks";

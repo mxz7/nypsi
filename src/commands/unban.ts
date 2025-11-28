@@ -9,7 +9,7 @@ import { newCase } from "../utils/functions/moderation/cases";
 
 import { deleteBan } from "../utils/functions/moderation/ban";
 import { pluralize } from "../utils/functions/string";
-import { getIdFromUsername, getLastKnownUsername } from "../utils/functions/users/tag";
+import { getIdFromUsername, getLastKnownUsername } from "../utils/functions/users/username";
 
 const cmd = new Command("unban", "unban one or more users", "moderation").setPermissions([
   "BAN_MEMBERS",

@@ -3,7 +3,6 @@ import {
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
-  GuildMember,
   Message,
   MessageActionRowComponentBuilder,
   PermissionFlagsBits,
@@ -13,17 +12,17 @@ import { sort } from "fast-sort";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { MStoTime } from "../utils/functions/date";
+import { getAllMembers } from "../utils/functions/guilds/members";
 import {
   getAutoJoinRoles,
   getPersistentRoles,
   setAutoJoinRoles,
   setPersistentRoles,
 } from "../utils/functions/guilds/roles";
-import { getMember, getRole } from "../utils/functions/member";
+import { getRole } from "../utils/functions/member";
 import PageManager from "../utils/functions/page";
 import sleep from "../utils/functions/sleep";
 import { pluralize } from "../utils/functions/string";
-import { logger } from "../utils/logger";
 
 const cmd = new Command("role", "role utilities", "utility");
 
@@ -148,23 +147,7 @@ async function run(
   }
 
   const getMembers = async () => {
-    if (args[1].toLowerCase() == "all") {
-      if (message.guild.members.cache.size == message.guild.memberCount) {
-        return Array.from(message.guild.members.cache.values());
-      } else {
-        return await message.guild.members.fetch().then((r) => Array.from(r.values()));
-      }
-    } else {
-      if (message.mentions?.members?.first()) {
-        return [message.mentions.members.first()];
-      } else {
-        const member = await getMember(message.guild, args[2]);
-
-        if (!member) {
-          return [];
-        }
-      }
-    }
+    return Array.from((await getAllMembers(message.guild, true)).values());
   };
 
   if (args.length == 0) {
@@ -253,8 +236,8 @@ async function run(
 
       const i = setInterval(async () => {
         if (fail) {
-          massOperations.delete(message.guild.id);
           clearInterval(i);
+          massOperations.delete(message.guild.id);
 
           return msg.edit({
             embeds: [
@@ -266,8 +249,8 @@ async function run(
         }
 
         if (cancelled) {
-          massOperations.delete(message.guild.id);
           clearInterval(i);
+          massOperations.delete(message.guild.id);
 
           return message.channel.send({
             embeds: [new ErrorEmbed("operation cancelled")],
@@ -275,8 +258,8 @@ async function run(
         }
 
         if (done) {
-          massOperations.delete(message.guild.id);
           clearInterval(i);
+          massOperations.delete(message.guild.id);
 
           return msg.edit({
             embeds: [
@@ -410,8 +393,8 @@ async function run(
 
       const i = setInterval(async () => {
         if (fail) {
-          massOperations.delete(message.guild.id);
           clearInterval(i);
+          massOperations.delete(message.guild.id);
 
           return msg.edit({
             embeds: [
@@ -423,8 +406,8 @@ async function run(
         }
 
         if (cancelled) {
-          massOperations.delete(message.guild.id);
           clearInterval(i);
+          massOperations.delete(message.guild.id);
 
           return message.channel.send({
             embeds: [new ErrorEmbed("operation cancelled")],
@@ -432,8 +415,8 @@ async function run(
         }
 
         if (done) {
-          massOperations.delete(message.guild.id);
           clearInterval(i);
+          massOperations.delete(message.guild.id);
 
           return msg.edit({
             embeds: [
@@ -668,20 +651,7 @@ async function run(
       });
     }
 
-    let members: GuildMember[];
-
-    if (message.guild.memberCount == message.guild.members.cache.size) {
-      members = Array.from(message.guild.members.cache.values());
-    } else {
-      members = Array.from(
-        (
-          await message.guild.members.fetch().catch((e) => {
-            logger.error("failed to fetch members for role cmd", e);
-            return message.guild.members.cache;
-          })
-        ).values(),
-      );
-    }
+    const members = await getMembers();
 
     const filteredMembers = sort(
       members.filter((m) => m.roles.cache.has(role.id)).map((m) => `\`${m.user.username}\``),

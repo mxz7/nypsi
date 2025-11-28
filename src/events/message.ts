@@ -29,6 +29,7 @@ import { addEventProgress } from "../utils/functions/economy/events";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { userExists } from "../utils/functions/economy/utils";
 import { checkAutoMute, checkMessageContent } from "../utils/functions/guilds/filters";
+import { getAllMembers } from "../utils/functions/guilds/members";
 import { isSlashOnly } from "../utils/functions/guilds/slash";
 import { getGuildName, getPrefix, hasGuild } from "../utils/functions/guilds/utils";
 import { getKarma } from "../utils/functions/karma/karma";
@@ -36,7 +37,6 @@ import { isPremium } from "../utils/functions/premium/premium";
 import sleep from "../utils/functions/sleep";
 import {
   createSupportRequest,
-  getQuickSupportResponse,
   getSupportRequest,
   handleAttachments,
   isRequestSuitable,
@@ -46,7 +46,7 @@ import { createAuraTransaction } from "../utils/functions/users/aura";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { getLastCommand } from "../utils/functions/users/commands";
 import { MentionQueueItem } from "../utils/functions/users/mentions";
-import { getLastKnownUsername } from "../utils/functions/users/tag";
+import { getLastKnownUsername } from "../utils/functions/users/username";
 import { hasProfile } from "../utils/functions/users/utils";
 import { runCommand } from "../utils/handlers/commandhandler";
 import { logger } from "../utils/logger";
@@ -199,7 +199,7 @@ export default async function messageCreate(message: Message) {
 
         await modalSubmit.deferReply();
 
-        const helpMessage = modalSubmit.fields.fields.first().value;
+        const helpMessage = modalSubmit.fields.getTextInputValue("ticket_message");
 
         const a = await getSupportRequest(message.author.id);
 
@@ -225,8 +225,6 @@ export default async function messageCreate(message: Message) {
             ],
           });
         }
-
-        const quickResponse = await getQuickSupportResponse(helpMessage);
 
         const r = await createSupportRequest(
           message.author.id,
@@ -261,26 +259,7 @@ export default async function messageCreate(message: Message) {
           ],
         });
 
-        if (quickResponse) {
-          const embed = new CustomEmbed()
-            .setHeader("nypsi", message.client.user.avatarURL())
-            .setColor(Constants.PURPLE)
-            .setDescription(quickResponse)
-            .setFooter({
-              text: "this is an automatic message. please tell us if this doesn't match your query",
-            });
-
-          sendToRequestChannel(
-            message.author.id,
-            embed,
-            message.author.id,
-            message.client as NypsiClient,
-          );
-          modalSubmit.followUp({
-            embeds: [embed],
-            content: "you have received a message from your support ticket",
-          });
-        } else if (aiResponse.answer) {
+        if (aiResponse.answer) {
           const embed = new CustomEmbed()
             .setHeader("nypsi", message.client.user.avatarURL())
             .setColor(Constants.PURPLE)
@@ -417,12 +396,12 @@ export default async function messageCreate(message: Message) {
 
     const lastContents = lastContent.get(message.author.id);
 
-    if (message.author.id === Constants.TEKOH_ID) redis.set("nypsi:tekoh:lastchat", Date.now());
+    if (message.author.id === Constants.OWNER_ID) redis.set("nypsi:owner:lastchat", Date.now());
 
     if (
       (message.channel as TextChannel).parentId === "1246516186171314337" &&
-      message.content.includes(`<@${Constants.TEKOH_ID}>`) &&
-      parseInt(await redis.get("nypsi:tekoh:lastchat")) < Date.now() - ms("15 minutes")
+      message.content.includes(`<@${Constants.OWNER_ID}>`) &&
+      parseInt(await redis.get("nypsi:owner:lastchat")) < Date.now() - ms("15 minutes")
     ) {
       message.reply({
         content: message.author.toString(),
@@ -583,9 +562,7 @@ export default async function messageCreate(message: Message) {
 
     if (message.mentions.everyone) {
       if (message.guild.members.cache.size != message.guild.memberCount) {
-        await message.guild.members.fetch().catch((e) => {
-          logger.error("failed to fetch guild members for @everyone mention", e);
-        });
+        await getAllMembers(message.guild, true);
       }
 
       let members: Collection<string, GuildMember | ThreadMember> | ThreadMemberManager =
@@ -598,9 +575,7 @@ export default async function messageCreate(message: Message) {
       mentionMembers = Array.from(members.mapValues((m) => m.user.id).values());
     } else if (message.mentions.roles.first()) {
       if (message.guild.members.cache.size != message.guild.memberCount) {
-        await message.guild.members.fetch().catch((e) => {
-          logger.error("failed to fetch members for role mention", e);
-        });
+        await getAllMembers(message.guild, true);
       }
 
       message.mentions.roles.forEach((r) => {

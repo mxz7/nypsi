@@ -29,7 +29,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
           message.member,
           "✅ username and avatar tracking has been disabled",
         ).setFooter({
-          text: `use ${(await getPrefix(message.guild))[0]}(un/avh) -clear to clear your history`,
+          text: `use ${(await getPrefix(message.guild))[0]}(un/avh) clear to clear your history`,
         }),
       ],
     });

@@ -5,6 +5,7 @@ import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import Constants from "../../../Constants";
 import { getMember } from "../../member";
+import { escapeFormattingCharacters } from "../../string";
 import { removeInventoryItem } from "../inventory";
 import { addStat } from "../stats";
 
@@ -25,7 +26,7 @@ module.exports = new ItemUse(
       return ItemUse.send(message, {
         embeds: [
           new ErrorEmbed(
-            `${target.user.username.replaceAll("_", "\\_")} already has a rick roll queued`,
+            `${escapeFormattingCharacters(target.user.username)} already has a rick roll queued`,
           ),
         ],
       });
@@ -39,7 +40,7 @@ module.exports = new ItemUse(
       embeds: [
         new CustomEmbed(
           message.member,
-          `<a:rick_astley:1100529748796506203> **${target.user.username.replaceAll("_", "\\_")}** will be rick rolled soon xd !!!!`,
+          `<a:rick_astley:1100529748796506203> **${escapeFormattingCharacters(target.user.username)}** will be rick rolled soon xd !!!!`,
         ),
       ],
     });

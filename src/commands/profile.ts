@@ -50,8 +50,8 @@ import { percentChance } from "../utils/functions/random";
 import { pluralize } from "../utils/functions/string";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { isMarried } from "../utils/functions/users/marriage";
-import { getLastKnownUsername } from "../utils/functions/users/tag";
 import { getActiveTag, getTags } from "../utils/functions/users/tags";
+import { getLastKnownUsername } from "../utils/functions/users/username";
 import { hasProfile } from "../utils/functions/users/utils";
 import { addView, getViews } from "../utils/functions/users/views";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -509,7 +509,7 @@ async function run(
           new CustomEmbed(
             target,
             `${tags
-              .map((i) => `- ${getTagsData()[i.tagId].emoji} ${getTagsData()[i.tagId].name}`)
+              .map((i) => `- ${getTagsData()[i.tagId].emoji} \`${getTagsData()[i.tagId].name}\``)
               .join("\n")}`,
           ).setHeader(`${target.user.username}'s tags`, target.user.avatarURL()),
         ],
