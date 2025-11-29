@@ -3525,7 +3525,7 @@
     "plural": "christmas trees",
     "emoji": "🎄",
     "longDesc": "[KEVIN](https://www.youtube.com/watch?v=5LZDuPcve9U)",
-    "aliases": ["tree"],
+    "aliases": ["ctree"],
     "rarity": 0,
     "role": "item",
     "in_crates": true,
