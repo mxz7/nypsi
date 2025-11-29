@@ -9,7 +9,6 @@ import { logger } from "../../logger";
 import { getItems } from "../economy/utils";
 import { getAllMembers } from "./members";
 import ms = require("ms");
-import { Guild$membersArgs } from "../../../generated/prisma/models";
 
 export async function updateChannel(data: GuildCounter, client: NypsiClient | ClusterManager) {
   const clusterThing = client instanceof ClusterManager ? client : client.cluster;
@@ -111,7 +110,7 @@ async function getCounterText(
       ? Array.from((await getAllMembers(clusterOrGuild, true)).values())
       : clusterOrGuild
           .broadcastEval(
-            async (c, { channelId, shard, filter }) => {
+            async (c, { channelId, shard }) => {
               const client = c as unknown as NypsiClient;
 
               if (client.cluster.id != shard) return [];
@@ -127,7 +126,7 @@ async function getCounterText(
 
               return Array.from(channel.guild.members.cache.values());
             },
-            { context: { channelId: data.channel, shard, filter } },
+            { context: { channelId: data.channel, shard } },
           )
           .then((res) => {
             for (const r of res) {
