@@ -74,17 +74,16 @@ export async function getAllMembers(
     if (guild.memberCount === guild.members.cache.size) {
       discordMembers = guild.members.cache;
     } else {
+      await redis.set(
+        `${Constants.redis.cache.guild.MEMBERS_LAST_FETCHED}:${guild.id}`,
+        Date.now(),
+        "EX",
+        ms("10 minute") / 1000,
+      );
       discordMembers = await guild.members.fetch();
     }
 
     const discordMemberIds = discordMembers.map((i) => i.id);
-
-    await redis.set(
-      `${Constants.redis.cache.guild.MEMBERS_LAST_FETCHED}:${guild.id}`,
-      Date.now(),
-      "EX",
-      ms("10 minute") / 1000,
-    );
 
     await checkMembers(guild.id, discordMemberIds);
 
