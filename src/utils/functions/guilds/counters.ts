@@ -1,6 +1,6 @@
 import { GuildCounter, TrackingType } from "#generated/prisma";
 import { ClusterClient, ClusterManager } from "discord-hybrid-sharding";
-import { ChannelType, Client, Guild, PermissionFlagsBits } from "discord.js";
+import { ChannelType, Client, Guild, GuildMember, PermissionFlagsBits } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
@@ -9,6 +9,7 @@ import { logger } from "../../logger";
 import { getItems } from "../economy/utils";
 import { getAllMembers } from "./members";
 import ms = require("ms");
+import { Guild$membersArgs } from "../../../generated/prisma/models";
 
 export async function updateChannel(data: GuildCounter, client: NypsiClient | ClusterManager) {
   const clusterThing = client instanceof ClusterManager ? client : client.cluster;
@@ -105,71 +106,45 @@ async function getCounterText(
 ) {
   let value: string;
 
-  const members = await (clusterOrGuild instanceof Guild
-    ? getAllMembers(clusterOrGuild)
-    : clusterOrGuild
-        .broadcastEval(
-          async (c, { channelId, shard }) => {
-            const client = c as unknown as NypsiClient;
+  const members = async (filter?: (member: GuildMember) => boolean) => {
+    let res = await (clusterOrGuild instanceof Guild
+      ? Array.from((await getAllMembers(clusterOrGuild, true)).values())
+      : clusterOrGuild
+          .broadcastEval(
+            async (c, { channelId, shard, filter }) => {
+              const client = c as unknown as NypsiClient;
 
-            if (client.cluster.id != shard) return;
+              if (client.cluster.id != shard) return [];
 
-            const channel = client.channels.cache.get(channelId);
-            if (!channel || channel.isDMBased()) return;
+              const channel = client.channels.cache.get(channelId);
+              if (!channel || channel.isDMBased()) return [];
 
-            if (channel.guild.memberCount !== channel.guild.members.cache.size) {
-              return Array.from(
-                await channel.guild.members.fetch().then((members) => members.keys()),
-              );
+              if (channel.guild.memberCount !== channel.guild.members.cache.size) {
+                return Array.from(
+                  await channel.guild.members.fetch().then((members) => members.values()),
+                );
+              }
+
+              return Array.from(channel.guild.members.cache.values());
+            },
+            { context: { channelId: data.channel, shard, filter } },
+          )
+          .then((res) => {
+            for (const r of res) {
+              if (r) return r as GuildMember[];
             }
+            return [] as GuildMember[];
+          }));
 
-            return Array.from(channel.guild.members.cache.keys());
-          },
-          { context: { channelId: data.channel, shard } },
-        )
-        .then((res) => {
-          for (const r of res) {
-            if (r) return r;
-          }
-          return [];
-        }));
+    if (filter) {
+      res = res.filter(filter);
+    }
+
+    return res;
+  };
 
   if (data.tracks === TrackingType.HUMANS) {
-    if (clusterOrGuild instanceof Guild) {
-      if (clusterOrGuild.memberCount != clusterOrGuild.members.cache.size) {
-        value = await clusterOrGuild.members
-          .fetch()
-          .then((m) => m.filter((m) => !m.user.bot).size.toLocaleString());
-      } else {
-        value = clusterOrGuild.members.cache.filter((m) => !m.user.bot).size.toLocaleString();
-      }
-    } else {
-      value = await clusterOrGuild
-        .broadcastEval(
-          async (c, { channelId, shard }) => {
-            const client = c as unknown as NypsiClient;
-
-            if (client.cluster.id != shard) return;
-
-            const channel = client.channels.cache.get(channelId);
-
-            if (channel.isDMBased()) return;
-
-            if (channel.guild.memberCount != channel.guild.members.cache.size) {
-              return await channel.guild.members
-                .fetch()
-                .then((m) => m.filter((m) => !m.user.bot).size.toLocaleString());
-            }
-            return channel.guild.members.cache.filter((m) => !m.user.bot).size.toLocaleString();
-          },
-          { context: { channelId: data.channel, shard } },
-        )
-        .then((res) => {
-          for (const r of res) {
-            if (r) return r;
-          }
-        });
-    }
+    value = (await members((m) => !m.user.bot)).length.toLocaleString();
   } else if (data.tracks === TrackingType.MEMBERS) {
     if (clusterOrGuild instanceof Guild) {
       value = clusterOrGuild.memberCount.toLocaleString();
@@ -185,13 +160,13 @@ async function getCounterText(
 
             if (channel.isDMBased()) return;
 
-            return channel.guild.memberCount.toLocaleString();
+            return channel.guild.memberCount;
           },
           { context: { channelId: data.channel, shard } },
         )
         .then((res) => {
           for (const r of res) {
-            if (r) return r;
+            if (r) return r.toLocaleString();
           }
         });
     }
@@ -210,20 +185,20 @@ async function getCounterText(
 
             if (channel.isDMBased()) return;
 
-            return (channel.guild.premiumSubscriptionCount || 0).toLocaleString();
+            return channel.guild.premiumSubscriptionCount || 0;
           },
           { context: { channelId: data.channel, shard } },
         )
         .then((res) => {
           for (const r of res) {
-            if (r) return r;
+            if (r) return r.toLocaleString();
           }
         });
     }
   } else if (data.tracks === TrackingType.RICHEST_MEMBER) {
     const topMember = await prisma.economy.findFirst({
       where: {
-        userId: { in: members },
+        userId: { in: (await members()).map((m) => m.id) },
       },
       select: {
         user: {
@@ -239,7 +214,7 @@ async function getCounterText(
   } else if (data.tracks === TrackingType.TOTAL_BALANCE) {
     const total = await prisma.economy.aggregate({
       where: {
-        userId: { in: members },
+        userId: { in: (await members()).map((m) => m.id) },
       },
       _sum: {
         money: true,
@@ -255,7 +230,7 @@ async function getCounterText(
 
     const query = await prisma.inventory.aggregate({
       where: {
-        AND: [{ userId: { in: members } }, { item: data.totalItem }],
+        AND: [{ userId: { in: (await members()).map((m) => m.id) } }, { item: data.totalItem }],
       },
       _sum: {
         amount: true,
