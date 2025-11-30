@@ -10,7 +10,7 @@ import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
 import PageManager from "../page";
 import { pluralize } from "../string";
-import { addNotificationToQueue, getDmSettings } from "../users/notifications";
+import { addNotificationToQueue, getDmSettings, getPreferences } from "../users/notifications";
 import { getLastKnownUsername } from "../users/username";
 import { getItems } from "./utils";
 import _ = require("lodash");
@@ -256,7 +256,11 @@ export async function getBoostersDisplay(
 
       const count = boosters.get(boosterId).length;
       const ownerId = boosters.get(boosterId)[0].userId;
-      const username = await getLastKnownUsername(ownerId);
+      let username = "/`[hidden]/`";
+
+      if ((await getPreferences(ownerId)).leaderboards) {
+        username = await getLastKnownUsername(ownerId);
+      }
 
       if (count === 1) {
         globalBoosters.push(
