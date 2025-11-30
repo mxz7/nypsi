@@ -1,4 +1,4 @@
-import { CarUpgradeType } from "#generated/prisma";
+import { BoosterScope, CarUpgradeType } from "#generated/prisma";
 
 export interface Item {
   id: string;
@@ -57,6 +57,8 @@ export interface Booster {
   boosterId: string;
   expire: number;
   id: number;
+  scope: BoosterScope;
+  userId: string;
 }
 
 export interface AchievementData {
