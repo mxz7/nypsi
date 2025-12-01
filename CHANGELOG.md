@@ -2,6 +2,7 @@
 
 - increased guild level requirements for higher levelled guilds
 - reduced sell value of plant produce
+- reduce sell value of cookies
 
 # october 2025
 
