@@ -61,7 +61,7 @@ async function run(
       (contributionIndex > -1
         ? `your contribution: ${event.contributions[
             contributionIndex
-          ].contribution.toLocaleString()} ` + `(#${contributionIndex.toLocaleString()})`
+          ].contribution.toLocaleString()} ` + `(#${(contributionIndex + 1).toLocaleString()})`
         : ""),
   ).setHeader("current event", message.author.avatarURL());
 
