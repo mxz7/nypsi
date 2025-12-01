@@ -310,7 +310,7 @@ export default {
       [100, 5],
     ]),
   },
-  SEASON_START: new Date("2025-06-01"), // todo: update on decided date
+  SEASON_START: new Date("2025-12-27"),
   SEASON_NUMBER: 11,
   SNOWFLAKE_REGEX: /^\d{17,19}$/,
   PURPLE: "#8b5cf6" as ColorResolvable,
