@@ -58,7 +58,7 @@ async function run(
       `> ${getEventsData()[event.type].description.replaceAll("{target}", event.target.toLocaleString())}\n\n` +
       `ends on <t:${Math.floor(event.expiresAt.getTime() / 1000)}> (<t:${Math.floor(event.expiresAt.getTime() / 1000)}:R>)\n\n` +
       `${getEventProgress(event).toLocaleString()}/${event.target.toLocaleString()}\n` +
-      (contributionIndex
+      (contributionIndex > -1
         ? `your contribution: ${event.contributions[
             contributionIndex
           ].contribution.toLocaleString()} ` + `(#${contributionIndex.toLocaleString()})`
