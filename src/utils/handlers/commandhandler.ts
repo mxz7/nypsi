@@ -1148,15 +1148,10 @@ export async function runCommand(
         !(await redis.exists(Constants.redis.nypsi.LAST_SEASONAL_ITEM)) &&
         percentChance(15)
       ) {
-        const inventory = await getInventory(message.member);
-        let amount = Math.random() * 6 + 1;
-
-        if ((await inventory.hasGem("white_gem")).any && percentChance(50)) {
-          amount **= 1.3;
-        }
+        let amount = Math.random() * 9 + 1;
 
         if ((await isPremium(message.member)) && percentChance(50)) {
-          amount **= 1.7;
+          amount **= 1.33;
         }
 
         amount = Math.ceil(amount);
