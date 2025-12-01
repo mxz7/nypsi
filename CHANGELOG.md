@@ -1,6 +1,7 @@
 # season 11
 
 - increased guild level requirements for higher levelled guilds
+- reduced sell value of plant produce
 
 # october 2025
 
