@@ -4,6 +4,7 @@
 - reduced sell value of plant produce
 - reduce sell value of cookies
 - count total cookies baked and average per bake @growlinggrizzly
+- allow non premium members to view item history graph
 
 # october 2025
 
