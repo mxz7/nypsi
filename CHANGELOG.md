@@ -1,3 +1,7 @@
+# season 11
+
+- increased guild level requirements for higher levelled guilds
+
 # october 2025
 
 ## changes you'll probably care about

@@ -366,7 +366,7 @@ export async function getRequiredForGuildUpgrade(
 
   const levelBonus = {
     money: 1_000_000_000 * (guild.level / 100),
-    xp: 1_000_000 * (guild.level / 100),
+    xp: 2_500_000 * (guild.level / 100),
   };
 
   const total = {
