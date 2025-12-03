@@ -5,6 +5,7 @@
 - reduce sell value of cookies
 - count total cookies baked and average per bake @growlinggrizzly
 - allow non premium members to view item history graph
+- item values reset bi-seasonally
 
 # october 2025
 
