@@ -1,6 +1,6 @@
 import { GuildCounter, TrackingType } from "#generated/prisma";
 import { ClusterClient, ClusterManager } from "discord-hybrid-sharding";
-import { ChannelType, Client, Guild, GuildMember, PermissionFlagsBits } from "discord.js";
+import { ChannelType, Client, Guild, PermissionFlagsBits, User } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
@@ -105,9 +105,9 @@ async function getCounterText(
 ) {
   let value: string;
 
-  const members = async (filter?: (member: GuildMember) => boolean) => {
+  const members = async (filter?: (user: User) => boolean) => {
     let res = await (clusterOrGuild instanceof Guild
-      ? Array.from((await getAllMembers(clusterOrGuild, true)).values())
+      ? (await getAllMembers(clusterOrGuild, true)).map((m) => m.user)
       : clusterOrGuild
           .broadcastEval(
             async (c, { channelId, shard }) => {
@@ -119,20 +119,20 @@ async function getCounterText(
               if (!channel || channel.isDMBased()) return [];
 
               if (channel.guild.memberCount !== channel.guild.members.cache.size) {
-                return Array.from(
-                  await channel.guild.members.fetch().then((members) => members.values()),
-                );
+                return await channel.guild.members
+                  .fetch()
+                  .then((members) => members.map((m) => m.user));
               }
 
-              return Array.from(channel.guild.members.cache.values());
+              return channel.guild.members.cache.map((m) => m.user);
             },
             { context: { channelId: data.channel, shard } },
           )
           .then((res) => {
             for (const r of res) {
-              if (r) return r as GuildMember[];
+              if (r) return r as User[];
             }
-            return [] as GuildMember[];
+            return [] as User[];
           }));
 
     if (filter) {
@@ -143,7 +143,7 @@ async function getCounterText(
   };
 
   if (data.tracks === TrackingType.HUMANS) {
-    value = (await members((m) => !m.user.bot)).length.toLocaleString();
+    value = (await members((m) => !m.bot)).length.toLocaleString();
   } else if (data.tracks === TrackingType.MEMBERS) {
     if (clusterOrGuild instanceof Guild) {
       value = clusterOrGuild.memberCount.toLocaleString();
