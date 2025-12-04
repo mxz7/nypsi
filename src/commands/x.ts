@@ -2664,7 +2664,7 @@ async function run(
 
     const guild = await getGuildByUser(from.id);
 
-    if (guild.ownerId === from.id)
+    if (guild?.ownerId === from.id)
       return send({ embeds: [new ErrorEmbed("user is owner of a guild")] });
 
     await redis.set(`${Constants.redis.nypsi.PROFILE_TRANSFER}:${to.id}`, from.id, "EX", 600);
