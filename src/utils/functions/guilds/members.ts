@@ -55,18 +55,22 @@ export async function getAllMembers(
   forceFetch: true,
 ): Promise<Collection<string, GuildMember>>;
 export async function getAllMembers(guild: Guild, forceFetch?: false): Promise<string[]>;
+export async function getAllMembers(guild: string): Promise<string[]>;
 export async function getAllMembers(
-  guild: Guild,
+  guild: Guild | string,
   forceFetch = false,
 ): Promise<string[] | Collection<string, GuildMember>> {
-  await mutex.acquire(`member_fetch_${guild.id}`);
+  const guildId = guild instanceof Guild ? guild.id : guild;
+
+  const mutexKey = `member_fetch_${guildId}`;
+  await mutex.acquire(mutexKey);
   try {
     const lastFetched = await redis
-      .get(`${Constants.redis.cache.guild.MEMBERS_LAST_FETCHED}:${guild.id}`)
+      .get(`${Constants.redis.cache.guild.MEMBERS_LAST_FETCHED}:${guildId}`)
       .then((v) => (v ? parseInt(v) : 0));
 
-    if (lastFetched > Date.now() - ms("10 minute") && !forceFetch) {
-      return getDatabaseMembers(guild.id);
+    if ((lastFetched > Date.now() - ms("10 minute") && !forceFetch) || !(guild instanceof Guild)) {
+      return getDatabaseMembers(guildId);
     }
 
     let discordMembers: Collection<string, GuildMember>;
@@ -89,6 +93,6 @@ export async function getAllMembers(
 
     return forceFetch ? discordMembers : discordMemberIds;
   } finally {
-    mutex.release(`member_fetch_${guild.id}`);
+    mutex.release(mutexKey);
   }
 }
