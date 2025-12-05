@@ -254,6 +254,7 @@ export default {
       DOCS_CONTENT: "nypsi:docs",
       COUNTER_ERROR: "nypsi:counter:error",
       LAST_SEASONAL_ITEM: "nypsi:last_seasonal_item",
+      GLOBAL_BOOSTER_PROGRESS: "nypsi:global_booster:progress",
     },
   },
   ANNOUNCEMENTS_CHANNEL_ID: "747057465245564939",

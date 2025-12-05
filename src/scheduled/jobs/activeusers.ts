@@ -1,13 +1,19 @@
 import dayjs = require("dayjs");
+import { ClusterManager } from "discord-hybrid-sharding";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { Job } from "../../types/Jobs";
 import Constants from "../../utils/Constants";
+import { addBooster } from "../../utils/functions/economy/boosters";
+import { getItems } from "../../utils/functions/economy/utils";
+import { sendToAnnouncements } from "../../utils/functions/news";
+
+const GLOBAL_BOOSTER_TARGET = 500_000;
 
 export default {
   name: "active users",
   cron: "0 0 * * *",
-  async run(log) {
+  async run(log, manager) {
     const date = dayjs();
 
     if (date.date() === 1) {
@@ -50,5 +56,29 @@ export default {
         value: commandsCount,
       },
     });
+
+    const currentCount = await redis.incrby(
+      Constants.redis.nypsi.GLOBAL_BOOSTER_PROGRESS,
+      commandsCount,
+    );
+
+    if (currentCount >= GLOBAL_BOOSTER_TARGET) {
+      activateGlobalBooster(manager);
+    }
   },
 } satisfies Job;
+
+async function activateGlobalBooster(manager: ClusterManager) {
+  await redis.set(Constants.redis.nypsi.GLOBAL_BOOSTER_PROGRESS, 0);
+  await addBooster(
+    Constants.BOT_USER_ID,
+    "global_double_xp",
+    1,
+    dayjs().add(getItems()["global_double_xp"].boosterEffect.time, "seconds").toDate(),
+    "global",
+  );
+
+  await sendToAnnouncements(manager, {
+    content: "✨ a **12 hour** global double xp booster has been activated!!",
+  });
+}
