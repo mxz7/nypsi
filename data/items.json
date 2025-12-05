@@ -3547,9 +3547,30 @@
     "boosterEffect": {
       "boosts": ["xp"],
       "effect": 1,
-      "time": 43200
+      "time": 43200,
+      "global": true
     },
     "in_crates": false,
     "hidden": true
+  },
+  "magic_potato": {
+    "id": "magic_potato",
+    "name": "magic potato",
+    "plural": "magic potatoes",
+    "article": "a",
+    "emoji": "🥔",
+    "longDesc": "improve farm outputs by 20% for 24 hours",
+    "buy": 0,
+    "sell": 10000000,
+    "role": "booster",
+    "stackable": false,
+    "rarity": 5,
+    "boosterEffect": {
+      "boosts": ["farm_output"],
+      "effect": 0.2,
+      "time": 86400,
+      "global": true
+    },
+    "in_crates": false
   }
 }

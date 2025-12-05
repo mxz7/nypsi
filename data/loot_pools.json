@@ -57,7 +57,8 @@
       "strawberry_seed": 10,
       "orange_seed": 15,
       "pineapple_seed": 5,
-      "rain": 2
+      "rain": 2,
+      "magic_potato": 2
     }
   },
   "mineshaft_chest": {
@@ -140,7 +141,8 @@
       "mango_seed": 25,
       "coconut_seed": 25,
       "rain": 7,
-      "pot_of_gold": 15
+      "pot_of_gold": 15,
+      "magic_potato": 15
     }
   },
   "corner_shop_scratchie": {
@@ -473,7 +475,8 @@
       "fertiliser": {
         "weight": 10,
         "count": 15
-      }
+      },
+      "magic_potato": 2
     }
   },
   "pot_of_gold": {
