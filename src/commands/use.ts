@@ -163,8 +163,10 @@ async function run(
     if (inventory.count(selected.id) < amount)
       return send({ embeds: [new ErrorEmbed(`you don't have ${amount}x ${selected.name}`)] });
 
+    const global = Boolean(selected.boosterEffect.global);
+
     await Promise.all([
-      addBooster(message.member, selected.id, amount),
+      addBooster(message.member, selected.id, amount, undefined, global ? "global" : "user"),
       addStat(message.member, selected.id, amount),
       removeInventoryItem(message.member, selected.id, amount),
     ]);
@@ -174,7 +176,7 @@ async function run(
     const embed = new CustomEmbed(message.member).setHeader("boosters", message.author.avatarURL());
 
     let desc = `activating ${amount > 1 ? `${amount}x ` : ""}**${selected.name}** booster...`;
-    let desc2 = `you have activated ${amount > 1 ? `${amount}x ` : ""}**${selected.name}**`;
+    let desc2 = `you have activated ${amount > 1 ? `${amount}x ` : ""}**${selected.name}**${global ? " (global)" : ""}`;
 
     if (["cake", "cookie", "lucky_cheese"].includes(selected.id)) {
       addTaskProgress(message.author.id, "eat_cookies", amount);
@@ -189,10 +191,12 @@ async function run(
 
     const msg = await send({ embeds: [embed] });
 
-    const pages = await getBoostersDisplay(boosters, embed, false);
+    const pages = await getBoostersDisplay(boosters, embed);
 
     embed.setDescription(desc2);
-    embed.addField("current boosters", pages.get(1).join("\n"));
+    if (pages.get(1)) {
+      embed.addField("current boosters", pages.get(1).join("\n"));
+    }
 
     setTimeout(async () => {
       if (pages.size <= 1) return msg.edit({ embeds: [embed] });

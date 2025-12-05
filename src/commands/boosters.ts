@@ -31,7 +31,7 @@ async function run(
 
   const embed = new CustomEmbed(message.member);
 
-  embed.setHeader("your boosters", message.author.avatarURL());
+  embed.setHeader("boosters", message.author.avatarURL());
 
   const pages = await getBoostersDisplay(await getBoosters(message.member), embed);
 

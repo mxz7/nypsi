@@ -22,6 +22,7 @@ export interface Item {
     boosts: string[];
     effect: number;
     time: number;
+    global?: boolean;
   };
   worker_upgrade_id?: string;
   plural: string;

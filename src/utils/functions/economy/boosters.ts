@@ -236,7 +236,6 @@ export async function addBooster(
 export async function getBoostersDisplay(
   boosters: Map<string, Booster[]>,
   embed: CustomEmbed,
-  showGlobal = true,
 ): Promise<null | Map<number, string[]>> {
   const desc: string[] = [];
 
@@ -250,13 +249,9 @@ export async function getBoostersDisplay(
 
   for (const boosterId of sort(Array.from(boosters.keys())).asc((i) => i)) {
     if (boosters.get(boosterId)[0].scope === "global") {
-      if (!showGlobal) {
-        continue;
-      }
-
       const count = boosters.get(boosterId).length;
       const ownerId = boosters.get(boosterId)[0].userId;
-      let username = "/`[hidden]/`";
+      let username: string;
 
       if ((await getPreferences(ownerId)).leaderboards) {
         username = await getLastKnownUsername(ownerId);
@@ -266,13 +261,13 @@ export async function getBoostersDisplay(
         globalBoosters.push(
           `${items[boosterId].emoji} **${items[boosterId].name}** - expires <t:${Math.round(
             boosters.get(boosterId)[0].expire / 1000,
-          )}:R>, by [${username}](https://nypsi.xyz/users/${ownerId}?ref=bot-global-booster)`,
+          )}:R>${username ? `, by **[${username}](https://nypsi.xyz/users/${ownerId}?ref=bot-global-booster)**` : ""}`,
         );
       } else {
         globalBoosters.push(
           `${items[boosterId].emoji} **${items[boosterId].name}** \`x${count}\` - next expires <t:${Math.round(
             boosters.get(boosterId)[0].expire / 1000,
-          )}:R>, by [${username}](https://nypsi.xyz/users/${ownerId}?ref=bot-global-booster)`,
+          )}:R>${username ? `, by **[${username}](https://nypsi.xyz/users/${ownerId}?ref=bot-global-booster)**` : ""}`,
         );
       }
     } else {
@@ -299,8 +294,11 @@ export async function getBoostersDisplay(
   }
 
   const pages = PageManager.createPages(desc, 10);
+  const firstPage = pages.get(1);
 
-  embed.setDescription(pages.get(1).join("\n"));
+  if (firstPage) {
+    embed.setDescription(firstPage.join("\n"));
+  }
 
   if (globalBoosters.length > 0) {
     embed.addFields({
