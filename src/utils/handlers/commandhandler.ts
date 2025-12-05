@@ -1158,7 +1158,7 @@ export async function runCommand(
 
         const [eventProgress] = await Promise.all([
           addEventProgress(message.client as NypsiClient, message.member, "christmas", amount),
-          redis.set(Constants.redis.nypsi.LAST_SEASONAL_ITEM, message.author.id, "EX", 300),
+          redis.set(Constants.redis.nypsi.LAST_SEASONAL_ITEM, message.author.id, "EX", 120),
           addInventoryItem(message.member, "christmas_tree", amount),
         ]);
 
