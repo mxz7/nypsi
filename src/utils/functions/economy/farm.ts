@@ -147,20 +147,20 @@ export function getClaimable(
   plantId: string,
   claim: true,
   client: NypsiClient,
-): Promise<{ sold: number; eventProgress?: number; multiplier?: number }>;
+): Promise<{ sold: number; eventProgress?: number; multiplier?: string }>;
 export function getClaimable(
   member: MemberResolvable,
   plantId: string,
   claim: false,
-): Promise<{ items: number; multiplier?: number }>;
+): Promise<{ items: number; multiplier?: string }>;
 export async function getClaimable(
   member: MemberResolvable,
   plantId: string,
   claim: boolean,
   client?: NypsiClient,
 ): Promise<
-  | { items: number; multiplier?: number }
-  | { sold: number; eventProgress?: number; multiplier?: number }
+  | { items: number; multiplier?: string }
+  | { sold: number; eventProgress?: number; multiplier?: string }
 > {
   const mutexKey = `farm_claimable_${getUserId(member)}`;
   await farmClaimMutex.acquire(mutexKey);
@@ -311,10 +311,10 @@ export async function getClaimable(
       await addProgress(member, "green_fingers", items);
       const eventProgress = await addEventProgress(client, member, "farming", items);
 
-      return { sold: items, eventProgress, multiplier: Math.floor((outputMulti - 1) * 100) };
+      return { sold: items, eventProgress, multiplier: `${outputMulti * 100}`.substring(1) };
     }
 
-    return { items, multiplier: Math.floor((outputMulti - 1) * 100) };
+    return { items, multiplier: `${outputMulti * 100}`.substring(1) };
   } finally {
     farmClaimMutex.release(mutexKey);
   }
