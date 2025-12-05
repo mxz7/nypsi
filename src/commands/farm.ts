@@ -392,22 +392,26 @@ async function run(
     const earned = new Map<string, number>();
     let eventProgress = 0;
 
+    const multiplierValues: number[] = [];
+
     for (const plant of plantTypes) {
       promises.push(
         (async () => {
-          const items = await getClaimable(
+          const result = await getClaimable(
             message.member,
             plant,
             true,
             message.client as NypsiClient,
           );
 
-          if (items.sold > 0) {
-            earned.set(plant, items.sold);
+          if (result.sold > 0) {
+            earned.set(plant, result.sold);
           }
 
-          if (items.eventProgress > eventProgress) {
-            eventProgress = items.eventProgress;
+          multiplierValues.push(parseInt(result.multiplier) || 0);
+
+          if (result.eventProgress > eventProgress) {
+            eventProgress = result.eventProgress;
           }
         })(),
       );
@@ -421,6 +425,14 @@ async function run(
 
     for (const [plantId, value] of inPlaceSort(Array.from(earned.entries())).desc((i) => i[1])) {
       desc += `\n\`${value.toLocaleString()}x\` ${getItems()[getPlantsData()[plantId].item].emoji} ${getItems()[getPlantsData()[plantId].item].name}`;
+    }
+
+    const multiplierAverage = Math.floor(
+      multiplierValues.reduce((a, b) => a + b, 0) / multiplierValues.length,
+    );
+
+    if (multiplierAverage > 0) {
+      desc += `\n\n**+${multiplierAverage}%** bonus`;
     }
 
     if (eventProgress) {
