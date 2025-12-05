@@ -412,9 +412,9 @@ export async function getTotalAmountOfItem(itemId: string) {
 
 export function selectItem(search: string) {
   search = search.toLowerCase();
-  const items = getItems();
+  const items = Array.from(Object.values(getItems())).filter((i) => !i.hidden);
 
-  for (const item of Array.from(Object.values(items))) {
+  for (const item of items) {
     const aliases = item.aliases || [];
     if (search === item.id) {
       return item;

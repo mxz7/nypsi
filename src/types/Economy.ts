@@ -40,6 +40,7 @@ export interface Item {
   upgrades?: CarUpgradeType;
   plantId: string; // for seeds
   unique: boolean; // only allow one in world at a time
+  hidden?: boolean; // can be viewed by users
 }
 
 export interface LotteryTicket {
