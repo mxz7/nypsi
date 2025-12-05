@@ -195,9 +195,11 @@ async function getCounterText(
         });
     }
   } else if (data.tracks === TrackingType.RICHEST_MEMBER) {
+    const memberIds = await getAllMembers(data.guildId);
+
     const topMember = await prisma.economy.findFirst({
       where: {
-        userId: { in: (await members()).map((m) => m.id) },
+        userId: { in: memberIds },
       },
       select: {
         user: {
@@ -211,9 +213,11 @@ async function getCounterText(
 
     value = topMember?.user?.lastKnownUsername || "null";
   } else if (data.tracks === TrackingType.TOTAL_BALANCE) {
+    const memberIds = await getAllMembers(data.guildId);
+
     const total = await prisma.economy.aggregate({
       where: {
-        userId: { in: (await members()).map((m) => m.id) },
+        userId: { in: memberIds },
       },
       _sum: {
         money: true,
@@ -227,9 +231,11 @@ async function getCounterText(
       return;
     }
 
+    const memberIds = await getAllMembers(data.guildId);
+
     const query = await prisma.inventory.aggregate({
       where: {
-        AND: [{ userId: { in: (await members()).map((m) => m.id) } }, { item: data.totalItem }],
+        AND: [{ userId: { in: memberIds } }, { item: data.totalItem }],
       },
       _sum: {
         amount: true,
