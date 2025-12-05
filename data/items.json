@@ -3531,5 +3531,24 @@
     "role": "item",
     "in_crates": true,
     "unique": true
+  },
+  "global_double_xp": {
+    "id": "global_double_xp",
+    "name": "double xp",
+    "plural": "double xps",
+    "article": "a",
+    "emoji": "✨",
+    "longDesc": "earn double xp for 12 hours",
+    "buy": 0,
+    "sell": 0,
+    "role": "booster",
+    "stackable": false,
+    "boosterEffect": {
+      "boosts": ["xp"],
+      "effect": 1,
+      "time": 43200
+    },
+    "in_crates": false,
+    "hidden": true
   }
 }
