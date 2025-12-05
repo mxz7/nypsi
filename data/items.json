@@ -2443,7 +2443,7 @@
     "plural": "xp boosters",
     "emoji": "✨",
     "longDesc": "earn 20% more xp",
-    "rarity": 10,
+    "rarity": 100,
     "buy": 0,
     "sell": 0,
     "role": "booster",
@@ -3542,6 +3542,7 @@
     "buy": 0,
     "sell": 0,
     "role": "booster",
+    "rarity": 100,
     "stackable": false,
     "boosterEffect": {
       "boosts": ["xp"],
