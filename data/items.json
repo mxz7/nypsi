@@ -2454,7 +2454,8 @@
       "boosts": ["xp"],
       "effect": 0.2,
       "time": 1800
-    }
+    },
+    "hidden": true
   },
   "reroll_token": {
     "id": "reroll_token",
