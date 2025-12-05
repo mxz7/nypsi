@@ -136,7 +136,7 @@ async function run(
         }
       });
 
-      const ready = await getClaimable(message.member, plantId, false);
+      const { items: ready, multiplier } = await getClaimable(message.member, plantId, false);
 
       embed.setDescription(
         `${getItems()[getPlantsData()[plantId].item].emoji} **${getPlantsData()[plantId].name}** farm\n\n` +
@@ -149,7 +149,8 @@ async function run(
           `${dead > 0 ? `${dead.toLocaleString()} dead\n` : ""}` +
           `${unhealthy > 0 ? `${unhealthy.toLocaleString()} unhealthy\n` : ""}` +
           `${healthy > 0 ? `${healthy.toLocaleString()} healthy\n` : ""}` +
-          `${ready > 0 ? `\n\`${ready.toLocaleString()}x\` ${getItems()[getPlantsData()[plantId].item].emoji} ${pluralize(getItems()[getPlantsData()[plantId].item], ready)} ready for harvest` : ""}`,
+          `${ready > 0 ? `\n\`${ready.toLocaleString()}x\` ${getItems()[getPlantsData()[plantId].item].emoji} ${pluralize(getItems()[getPlantsData()[plantId].item], ready)} ready for harvest` : ""}` +
+          `${multiplier ? `\n**+${multiplier}%** bonus` : ""}`,
       );
 
       return embed;
