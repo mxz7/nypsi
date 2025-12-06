@@ -7,6 +7,8 @@
 - allow non premium members to view item history graph
 - item values reset bi-seasonally
 - add top shagger (marriage) achievement
+- added global booster functionality
+- added magic potato
 
 # october 2025
 
