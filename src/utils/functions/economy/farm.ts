@@ -247,6 +247,35 @@ export async function getClaimable(
       outputMulti += getUpgradesData()[prestigeUpgrade.upgradeId].effect * prestigeUpgrade.amount;
     }
 
+    if ((await inventory.hasGem("green_gem")).any) {
+      storageMulti += 0.2;
+
+      gemBreak(
+        member,
+        0.01,
+        "green_gem",
+        member instanceof GuildMember && (member.client as NypsiClient),
+      );
+    }
+
+    if ((await inventory.hasGem("pink_gem")).any && (await inventory.hasGem("purple_gem")).any) {
+      storageMulti += 0.2;
+
+      gemBreak(
+        member,
+        0.005,
+        "pink_gem",
+        member instanceof GuildMember && (member.client as NypsiClient),
+      );
+
+      gemBreak(
+        member,
+        0.005,
+        "purple_gem",
+        member instanceof GuildMember && (member.client as NypsiClient),
+      );
+    }
+
     for (const plant of plants) {
       const start = Date.now() - plant.harvestedAt.getTime();
       let hours = start / 3600000; // hours - chatgpt
@@ -268,40 +297,14 @@ export async function getClaimable(
         }
       }
 
-      if ((await inventory.hasGem("green_gem")).any) {
-        storageMulti += 0.2;
-
-        gemBreak(
-          member,
-          0.01,
-          "green_gem",
-          member instanceof GuildMember && (member.client as NypsiClient),
-        );
-      }
-
-      if ((await inventory.hasGem("pink_gem")).any && (await inventory.hasGem("purple_gem")).any) {
-        storageMulti += 0.2;
-
-        gemBreak(
-          member,
-          0.005,
-          "pink_gem",
-          member instanceof GuildMember && (member.client as NypsiClient),
-        );
-
-        gemBreak(
-          member,
-          0.005,
-          "purple_gem",
-          member instanceof GuildMember && (member.client as NypsiClient),
-        );
-      }
-
       const earned = hours * plantData.hourly;
       const adjustedEarned = earned * outputMulti;
 
-      if (adjustedEarned > plantData.max) items += Math.floor(plantData.max * storageMulti);
-      else items += Math.floor(adjustedEarned * storageMulti);
+      if (adjustedEarned > plantData.max) {
+        items += plantData.max * storageMulti;
+      } else {
+        items += adjustedEarned;
+      }
     }
 
     items = Math.floor(items);
