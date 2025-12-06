@@ -376,6 +376,10 @@ async function run(
       return send({ embeds: [new ErrorEmbed("you can never get rid of gold stars 😈")] });
     }
 
+    if (selected.id === "dave") {
+      return send({ embeds: [new ErrorEmbed("you can't sell dave 😡")] });
+    }
+
     let msg: Message;
 
     const marketWorth = await calcItemValue(selected.id);
