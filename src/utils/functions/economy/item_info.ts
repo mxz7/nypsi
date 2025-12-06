@@ -347,7 +347,13 @@ function getGeneralMessage(
     }
 
     if (selected.role) {
-      description.push(`\n**role** ${selected.role}`);
+      let isGlobalBooster = false;
+
+      if (selected.role === "booster" && selected.boosterEffect.global) {
+        isGlobalBooster = true;
+      }
+
+      description.push(`\n**role** ${selected.role}${isGlobalBooster ? " (global)" : ""}`);
 
       let roleDescription = "";
       if (selected.role === "booster") {
