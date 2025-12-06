@@ -140,5 +140,16 @@
     "value": "pot_of_gold",
     "aliases": ["mpot", "pog"],
     "limit": 1
+  },
+  "magic_potato": {
+    "name": "magic potato",
+    "emoji": "🥔",
+    "id": "magic_potato",
+    "cost": 1500,
+    "items_left": 1,
+    "type": "item",
+    "value": "magic_potato",
+    "aliases": ["potato"],
+    "limit": 1
   }
 }
