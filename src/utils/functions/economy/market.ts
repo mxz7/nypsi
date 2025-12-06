@@ -109,9 +109,22 @@ export async function getMarketAverage(item: string) {
   if (await redis.exists(`${Constants.redis.cache.economy.MARKET_AVG}:${item}`))
     return parseInt(await redis.get(`${Constants.redis.cache.economy.MARKET_AVG}:${item}`));
 
+  let date: Date;
+
+  switch (Constants.SEASON_NUMBER % 2) {
+    case 0:
+      // season before
+      date = Constants.SEASON_START_HISTORY[Constants.SEASON_NUMBER - 2];
+      break;
+    case 1:
+      // current season
+      date = Constants.SEASON_START_HISTORY[Constants.SEASON_NUMBER - 1];
+      break;
+  }
+
   const orders = await prisma.market.findMany({
     where: {
-      AND: [{ completed: true }, { itemId: item }],
+      AND: [{ completed: true }, { itemId: item }, { createdAt: { gte: date } }],
     },
     select: {
       price: true,

@@ -1530,5 +1530,45 @@
       "platinum_credit:1",
       "tag:trident"
     ]
+  },
+  "top_shagger_i": {
+    "id": "top_shagger_i",
+    "name": "top shagger **I**",
+    "emoji": "💒",
+    "target": 1,
+    "description": "get married 1 time",
+    "prize": ["lucky_scratch_card:1"]
+  },
+  "top_shagger_ii": {
+    "id": "top_shagger_ii",
+    "name": "top shagger **II**",
+    "emoji": "💒",
+    "target": 5,
+    "description": "get married 5 times",
+    "prize": ["lucky_scratch_card:3"]
+  },
+  "top_shagger_iii": {
+    "id": "top_shagger_iii",
+    "name": "top shagger **III**",
+    "emoji": "💒",
+    "target": 10,
+    "description": "get married 10 times",
+    "prize": ["lucky_scratch_card:4", "nypsi_crate:1"]
+  },
+  "top_shagger_iv": {
+    "id": "top_shagger_iv",
+    "name": "top shagger **IV**",
+    "emoji": "💒",
+    "target": 50,
+    "description": "get married 50 times",
+    "prize": ["legendary_scratch_card:1", "lucky_scratch_card:5", "nypsi_crate:1"]
+  },
+  "top_shagger_v": {
+    "id": "top_shagger_v",
+    "name": "top shagger **V**",
+    "emoji": "💒",
+    "target": 100,
+    "description": "get married 100 times",
+    "prize": ["legendary_scratch_card:2", "lucky_scratch_card:5", "nypsi_crate:2"]
   }
 }
