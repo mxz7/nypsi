@@ -101,6 +101,14 @@ async function run(
     return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] });
   }
 
+  if (selected.id === "gold_star") {
+    return send({ embeds: [new ErrorEmbed("you can never get rid of gold stars 😈")] });
+  }
+
+  if (selected.id === "dave") {
+    return send({ embeds: [new ErrorEmbed("you can't sell dave 😡")] });
+  }
+
   let desc = "";
 
   if (current.includes(selected.id)) {
