@@ -402,7 +402,8 @@
       "stick": 40,
       "rain": 10,
       "apple_seed": 50,
-      "pot_of_gold": 2.5
+      "pot_of_gold": 2.5,
+      "magic_potato": 3
     }
   },
   "random_drop": {
@@ -476,7 +477,7 @@
         "weight": 10,
         "count": 15
       },
-      "magic_potato": 2
+      "magic_potato": 4
     }
   },
   "pot_of_gold": {
