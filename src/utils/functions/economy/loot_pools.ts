@@ -25,10 +25,12 @@ export function getDefaultLootPool(predicate?: (item: Item) => boolean): LootPoo
   const rarityToWeight = [1000, 400, 100, 100 / 3, 20 / 3, 2, 0.05];
   for (const i in items) {
     const item = items[i];
-    if (predicate && !predicate(item)) {
+
+    if (item.hidden) {
       continue;
-    }
-    if (item.rarity > rarityToWeight.length) {
+    } else if (predicate && !predicate(item)) {
+      continue;
+    } else if (item.rarity > rarityToWeight.length) {
       continue;
     }
 

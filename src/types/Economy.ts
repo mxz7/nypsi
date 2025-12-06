@@ -1,4 +1,4 @@
-import { CarUpgradeType } from "#generated/prisma";
+import { BoosterScope, CarUpgradeType } from "#generated/prisma";
 
 export interface Item {
   id: string;
@@ -22,6 +22,7 @@ export interface Item {
     boosts: string[];
     effect: number;
     time: number;
+    global?: boolean;
   };
   worker_upgrade_id?: string;
   plural: string;
@@ -40,6 +41,7 @@ export interface Item {
   upgrades?: CarUpgradeType;
   plantId: string; // for seeds
   unique: boolean; // only allow one in world at a time
+  hidden?: boolean; // can be viewed by users
 }
 
 export interface LotteryTicket {
@@ -57,6 +59,8 @@ export interface Booster {
   boosterId: string;
   expire: number;
   id: number;
+  scope: BoosterScope;
+  userId: string;
 }
 
 export interface AchievementData {

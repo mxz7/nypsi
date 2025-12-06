@@ -5,15 +5,20 @@ import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
+import { Mutex } from "../mutex";
 import { addProgress } from "./achievements";
+import { getBoosters } from "./boosters";
 import { addEventProgress } from "./events";
 import { addInventoryItem, gemBreak, getInventory, removeInventoryItem } from "./inventory";
+import { getUpgrades } from "./levelling";
 import { addStat } from "./stats";
-import { getPlantsData, getPlantUpgrades, getUpgradesData } from "./utils";
+import { getItems, getPlantsData, getPlantUpgrades, getUpgradesData } from "./utils";
 import dayjs = require("dayjs");
 import ms = require("ms");
 
 const PLANTS_PER_FERTILISER = 5;
+
+const farmClaimMutex = new Mutex();
 
 export async function getFarm(member: MemberResolvable) {
   const userId = getUserId(member);
@@ -59,18 +64,23 @@ export async function getFarm(member: MemberResolvable) {
   return query;
 }
 
-export async function getFarmUpgrades(member: MemberResolvable) {
+export async function getFarmUpgrades(member: MemberResolvable, plantId?: string) {
   const userId = getUserId(member);
 
   const cache = await redis.get(`${Constants.redis.cache.economy.farmUpgrades}:${userId}`);
 
   if (cache) {
-    return JSON.parse(cache) as {
+    const data = JSON.parse(cache) as {
       userId: string;
       plantId: string;
       upgradeId: string;
       amount: number;
     }[];
+
+    if (plantId) {
+      return data.filter((i) => i.plantId === plantId);
+    }
+    return data;
   }
 
   const query = await prisma.farmUpgrades.findMany({
@@ -85,6 +95,10 @@ export async function getFarmUpgrades(member: MemberResolvable) {
     "EX",
     Math.floor(ms("3 hour") / 1000),
   );
+
+  if (plantId) {
+    return query.filter((i) => i.plantId === plantId);
+  }
 
   return query;
 }
@@ -133,160 +147,177 @@ export function getClaimable(
   plantId: string,
   claim: true,
   client: NypsiClient,
-): Promise<{ sold: number; eventProgress?: number }>;
+): Promise<{ sold: number; eventProgress?: number; multiplier?: string }>;
 export function getClaimable(
   member: MemberResolvable,
   plantId: string,
   claim: false,
-): Promise<number>;
+): Promise<{ items: number; multiplier?: string }>;
 export async function getClaimable(
   member: MemberResolvable,
   plantId: string,
   claim: boolean,
   client?: NypsiClient,
-): Promise<number | { sold: number; eventProgress?: number }> {
-  const inventory = await getInventory(member);
-  const farm = await getFarm(member);
-  const plantData = getPlantsData()[plantId];
+): Promise<
+  | { items: number; multiplier?: string }
+  | { sold: number; eventProgress?: number; multiplier?: string }
+> {
+  const mutexKey = `farm_claimable_${getUserId(member)}`;
+  await farmClaimMutex.acquire(mutexKey);
 
-  const growthTime = dayjs().subtract(plantData.growthTime, "seconds").valueOf();
-  const hourlyTime = dayjs()
-    .subtract(60 / plantData.hourly, "minutes")
-    .valueOf();
-  const waterTime = dayjs()
-    .subtract(plantData.water.every * 1.5, "seconds")
-    .valueOf();
-  const fertiliseTime = dayjs()
-    .subtract(plantData.fertilise.every * 1.5, "seconds")
-    .valueOf();
+  try {
+    const [inventory, farm, farmUpgrades, userUpgrades, boosters] = await Promise.all([
+      getInventory(member),
+      getFarm(member),
+      getFarmUpgrades(member, plantId),
+      getUpgrades(member),
+      getBoosters(member),
+    ]);
+    const plantData = getPlantsData()[plantId];
 
-  const plants = farm.filter(
-    (plant) =>
-      plant.plantId === plantId &&
-      plant.plantedAt.valueOf() < growthTime &&
-      plant.harvestedAt.valueOf() < hourlyTime &&
-      plant.wateredAt.valueOf() > waterTime &&
-      plant.fertilisedAt.valueOf() > fertiliseTime,
-  );
+    const growthTime = dayjs().subtract(plantData.growthTime, "seconds").valueOf();
+    const hourlyTime = dayjs()
+      .subtract(60 / plantData.hourly, "minutes")
+      .valueOf();
+    const waterTime = dayjs()
+      .subtract(plantData.water.every * 1.5, "seconds")
+      .valueOf();
+    const fertiliseTime = dayjs()
+      .subtract(plantData.fertilise.every * 1.5, "seconds")
+      .valueOf();
 
-  if (plants.length === 0) return 0;
+    const plants = farm.filter(
+      (plant) =>
+        plant.plantId === plantId &&
+        plant.plantedAt.valueOf() < growthTime &&
+        plant.harvestedAt.valueOf() < hourlyTime &&
+        plant.wateredAt.valueOf() > waterTime &&
+        plant.fertilisedAt.valueOf() > fertiliseTime,
+    );
 
-  if (claim) {
-    await prisma.farm.updateMany({
-      where: {
-        id: { in: plants.map((i) => i.id) },
-      },
-      data: {
-        harvestedAt: new Date(),
-      },
-    });
+    if (plants.length === 0) return { items: 0 };
 
-    await redis.del(`${Constants.redis.cache.economy.farm}:${getUserId(member)}`);
-  }
+    if (claim) {
+      await prisma.farm.updateMany({
+        where: {
+          id: { in: plants.map((i) => i.id) },
+        },
+        data: {
+          harvestedAt: new Date(),
+        },
+      });
 
-  let items = 0;
-
-  const upgrades = getPlantUpgrades();
-  const userUpgrades = await getFarmUpgrades(member);
-
-  for (const plant of plants) {
-    const start = Date.now() - plant.harvestedAt.getTime();
-    let hours = start / 3600000; // hours - chatgpt
-
-    let intervalMulti = 1;
-
-    for (const upgradeId of Object.keys(upgrades).filter(
-      (u) => upgrades[u].upgrades === "interval",
-    )) {
-      intervalMulti +=
-        upgrades[upgradeId].effect *
-          userUpgrades.find((u) => u.upgradeId == upgradeId && u.plantId === plant.plantId)
-            ?.amount || 0;
+      await redis.del(`${Constants.redis.cache.economy.farm}:${getUserId(member)}`);
     }
 
-    hours *= intervalMulti;
+    const upgradesData = getPlantUpgrades();
 
-    if ((await inventory.hasGem("pink_gem")).any) {
-      const chance = Math.floor(Math.random() * 10);
-      if (chance < 3) {
-        hours *= 0.8;
-      } else {
-        hours *= 1.25;
-        gemBreak(
-          member,
-          0.01,
-          "pink_gem",
-          member instanceof GuildMember && (member.client as NypsiClient),
-        );
+    let items = 0;
+
+    // multipliers
+    let intervalMulti = 1; // upgrades interval (max afk time cookie clicker esque)
+    let outputMulti = 1; // upgrades farm direct output
+    let storageMulti = 1; // upgrades farm max item storage
+
+    // checking farm/plant upgrades
+    for (const upgrade of Object.values(farmUpgrades)) {
+      switch (upgradesData[upgrade.upgradeId].upgrades) {
+        case "interval":
+          intervalMulti += upgradesData[upgrade.upgradeId].effect * upgrade.amount;
+          break;
+        case "max_storage":
+          storageMulti += upgradesData[upgrade.upgradeId].effect * upgrade.amount;
+          break;
       }
     }
 
-    const earned = hours * plantData.hourly;
+    // checking boosters
+    for (const [boosterId, booster] of boosters.entries()) {
+      const item = getItems()[boosterId];
 
+      if (item.boosterEffect.boosts.includes("farm_output")) {
+        outputMulti += item.boosterEffect.effect * booster.length;
+      }
+    }
+
+    // checking prestige upgrade
     const prestigeUpgrade = userUpgrades.find((u) => u.upgradeId === "farm_output");
-    let outputMulti = 1;
 
     if (prestigeUpgrade) {
-      outputMulti += prestigeUpgrade.amount * getUpgradesData()[prestigeUpgrade.upgradeId].effect;
+      outputMulti += getUpgradesData()[prestigeUpgrade.upgradeId].effect * prestigeUpgrade.amount;
     }
 
-    let storageMulti = 1;
+    for (const plant of plants) {
+      const start = Date.now() - plant.harvestedAt.getTime();
+      let hours = start / 3600000; // hours - chatgpt
 
-    for (const upgradeId of Object.keys(upgrades).filter(
-      (u) => upgrades[u].upgrades === "max_storage",
-    )) {
-      storageMulti +=
-        upgrades[upgradeId].effect *
-          userUpgrades.find((u) => u.upgradeId == upgradeId && u.plantId === plant.plantId)
-            ?.amount || 0;
+      hours *= intervalMulti;
+
+      if ((await inventory.hasGem("pink_gem")).any) {
+        const chance = Math.floor(Math.random() * 10);
+        if (chance < 3) {
+          hours *= 0.8;
+        } else {
+          hours *= 1.25;
+          gemBreak(
+            member,
+            0.01,
+            "pink_gem",
+            member instanceof GuildMember && (member.client as NypsiClient),
+          );
+        }
+      }
+
+      if ((await inventory.hasGem("green_gem")).any) {
+        storageMulti += 0.2;
+
+        gemBreak(
+          member,
+          0.01,
+          "green_gem",
+          member instanceof GuildMember && (member.client as NypsiClient),
+        );
+      }
+
+      if ((await inventory.hasGem("pink_gem")).any && (await inventory.hasGem("purple_gem")).any) {
+        storageMulti += 0.2;
+
+        gemBreak(
+          member,
+          0.005,
+          "pink_gem",
+          member instanceof GuildMember && (member.client as NypsiClient),
+        );
+
+        gemBreak(
+          member,
+          0.005,
+          "purple_gem",
+          member instanceof GuildMember && (member.client as NypsiClient),
+        );
+      }
+
+      const earned = hours * plantData.hourly;
+      const adjustedEarned = earned * outputMulti;
+
+      if (adjustedEarned > plantData.max) items += Math.floor(plantData.max * storageMulti);
+      else items += Math.floor(adjustedEarned * storageMulti);
     }
 
-    if ((await inventory.hasGem("green_gem")).any) {
-      storageMulti += 0.2;
+    items = Math.floor(items);
 
-      gemBreak(
-        member,
-        0.01,
-        "green_gem",
-        member instanceof GuildMember && (member.client as NypsiClient),
-      );
+    if (claim && items > 0) {
+      await addInventoryItem(member, plantData.item, items);
+      await addProgress(member, "green_fingers", items);
+      const eventProgress = await addEventProgress(client, member, "farming", items);
+
+      return { sold: items, eventProgress, multiplier: `${outputMulti * 100}`.substring(1) };
     }
 
-    if ((await inventory.hasGem("pink_gem")).any && (await inventory.hasGem("purple_gem")).any) {
-      storageMulti += 0.2;
-
-      gemBreak(
-        member,
-        0.005,
-        "pink_gem",
-        member instanceof GuildMember && (member.client as NypsiClient),
-      );
-
-      gemBreak(
-        member,
-        0.005,
-        "purple_gem",
-        member instanceof GuildMember && (member.client as NypsiClient),
-      );
-    }
-
-    const adjustedEarned = earned * outputMulti;
-
-    if (adjustedEarned > plantData.max) items += Math.floor(plantData.max * storageMulti);
-    else items += Math.floor(adjustedEarned * storageMulti);
+    return { items, multiplier: `${outputMulti * 100}`.substring(1) };
+  } finally {
+    farmClaimMutex.release(mutexKey);
   }
-
-  items = Math.floor(items);
-
-  if (claim && items > 0) {
-    await addInventoryItem(member, plantData.item, items);
-    await addProgress(member, "green_fingers", items);
-    const eventProgress = await addEventProgress(client, member, "farming", items);
-
-    return { sold: items, eventProgress };
-  }
-
-  return items;
 }
 
 export async function deletePlant(id: number) {

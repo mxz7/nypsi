@@ -6,13 +6,12 @@ import {
   MessageActionRowComponentBuilder,
   MessageFlags,
 } from "discord.js";
-import { sort } from "fast-sort";
 import { readdir } from "fs/promises";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { ItemUse } from "../models/ItemUse";
 import { addBakeryUpgrade, getBakeryUpgrades } from "../utils/functions/economy/bakery";
-import { addBooster, getBoosters } from "../utils/functions/economy/boosters";
+import { addBooster, getBoosters, getBoostersDisplay } from "../utils/functions/economy/boosters";
 import { addFarm, getFarm } from "../utils/functions/economy/farm";
 import {
   getInventory,
@@ -164,8 +163,10 @@ async function run(
     if (inventory.count(selected.id) < amount)
       return send({ embeds: [new ErrorEmbed(`you don't have ${amount}x ${selected.name}`)] });
 
+    const global = Boolean(selected.boosterEffect.global);
+
     await Promise.all([
-      addBooster(message.member, selected.id, amount),
+      addBooster(message.member, selected.id, amount, undefined, global ? "global" : "user"),
       addStat(message.member, selected.id, amount),
       removeInventoryItem(message.member, selected.id, amount),
     ]);
@@ -174,32 +175,8 @@ async function run(
 
     const embed = new CustomEmbed(message.member).setHeader("boosters", message.author.avatarURL());
 
-    const currentBoosters: string[] = [];
-
-    for (const boosterId of sort(Array.from(boosters.keys())).asc((i) => i)) {
-      if (boosters.get(boosterId).length == 1) {
-        currentBoosters.push(
-          `**${items[boosterId].name}** ${items[boosterId].emoji} - expires <t:${Math.round(
-            boosters.get(boosterId)[0].expire / 1000,
-          )}:R>`,
-        );
-      } else {
-        let lowest = boosters.get(boosterId)[0].expire;
-
-        for (const booster of boosters.get(boosterId)) {
-          if (booster.expire < lowest) lowest = booster.expire;
-        }
-
-        currentBoosters.push(
-          `**${items[boosterId].name}** ${items[boosterId].emoji} \`x${
-            boosters.get(boosterId).length
-          }\` - next expires <t:${Math.round(boosters.get(boosterId)[0].expire / 1000)}:R>`,
-        );
-      }
-    }
-
     let desc = `activating ${amount > 1 ? `${amount}x ` : ""}**${selected.name}** booster...`;
-    let desc2 = `you have activated ${amount > 1 ? `${amount}x ` : ""}**${selected.name}**`;
+    let desc2 = `you have activated ${amount > 1 ? `${amount}x ` : ""}**${selected.name}**${global ? " (global)" : ""}`;
 
     if (["cake", "cookie", "lucky_cheese"].includes(selected.id)) {
       addTaskProgress(message.author.id, "eat_cookies", amount);
@@ -214,10 +191,12 @@ async function run(
 
     const msg = await send({ embeds: [embed] });
 
-    const pages = PageManager.createPages(currentBoosters, 10);
+    const pages = await getBoostersDisplay(boosters, embed);
 
     embed.setDescription(desc2);
-    embed.addField("current boosters", pages.get(1).join("\n"));
+    if (pages.get(1)) {
+      embed.addField("current boosters", pages.get(1).join("\n"));
+    }
 
     setTimeout(async () => {
       if (pages.size <= 1) return msg.edit({ embeds: [embed] });

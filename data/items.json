@@ -2443,7 +2443,7 @@
     "plural": "xp boosters",
     "emoji": "✨",
     "longDesc": "earn 20% more xp",
-    "rarity": 10,
+    "rarity": 100,
     "buy": 0,
     "sell": 0,
     "role": "booster",
@@ -2454,7 +2454,8 @@
       "boosts": ["xp"],
       "effect": 0.2,
       "time": 1800
-    }
+    },
+    "hidden": true
   },
   "reroll_token": {
     "id": "reroll_token",
@@ -3530,5 +3531,46 @@
     "role": "item",
     "in_crates": true,
     "unique": true
+  },
+  "global_double_xp": {
+    "id": "global_double_xp",
+    "name": "double xp",
+    "plural": "double xps",
+    "article": "a",
+    "emoji": "✨",
+    "longDesc": "earn double xp for 12 hours",
+    "buy": 0,
+    "sell": 0,
+    "role": "booster",
+    "rarity": 100,
+    "stackable": false,
+    "boosterEffect": {
+      "boosts": ["xp"],
+      "effect": 1,
+      "time": 43200,
+      "global": true
+    },
+    "in_crates": false,
+    "hidden": true
+  },
+  "magic_potato": {
+    "id": "magic_potato",
+    "name": "magic potato",
+    "plural": "magic potatoes",
+    "article": "a",
+    "emoji": "🥔",
+    "longDesc": "improve farm outputs by 20% for 24 hours",
+    "buy": 0,
+    "sell": 10000000,
+    "role": "booster",
+    "stackable": false,
+    "rarity": 5,
+    "boosterEffect": {
+      "boosts": ["farm_output"],
+      "effect": 0.2,
+      "time": 86400,
+      "global": true
+    },
+    "in_crates": false
   }
 }

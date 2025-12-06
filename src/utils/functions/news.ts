@@ -1,4 +1,7 @@
+import { ClusterManager } from "discord-hybrid-sharding";
+import { MessageCreateOptions } from "discord.js";
 import redis from "../../init/redis";
+import { NypsiClient } from "../../models/Client";
 import Constants from "../Constants";
 import { getUserId, MemberResolvable } from "./member";
 
@@ -36,4 +39,23 @@ export async function hasSeenNews(member: MemberResolvable) {
   if (index == null) return null;
 
   return index + 1;
+}
+
+export async function sendToAnnouncements(
+  client: NypsiClient | ClusterManager,
+  payload: MessageCreateOptions,
+) {
+  const cluster = client instanceof NypsiClient ? client.cluster : client;
+
+  cluster.broadcastEval(
+    async (c, { payload }) => {
+      const channel = c.channels.cache.get(Constants.ANNOUNCEMENTS_CHANNEL_ID);
+
+      if (!channel || !channel.isSendable() || !channel.isTextBased()) return;
+
+      // @ts-expect-error fuck discordjs it's a fucking message payload stupid fucking types
+      await channel.send(payload);
+    },
+    { context: { payload } },
+  );
 }

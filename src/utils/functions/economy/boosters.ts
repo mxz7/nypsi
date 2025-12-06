@@ -1,4 +1,6 @@
+import { BoosterScope } from "#generated/prisma";
 import { GuildMember } from "discord.js";
+import { sort } from "fast-sort";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
@@ -6,8 +8,10 @@ import { Booster } from "../../../types/Economy";
 import { SteveData } from "../../../types/Workers";
 import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
+import PageManager from "../page";
 import { pluralize } from "../string";
-import { addNotificationToQueue, getDmSettings } from "../users/notifications";
+import { addNotificationToQueue, getDmSettings, getPreferences } from "../users/notifications";
+import { getLastKnownUsername } from "../users/username";
 import { getItems } from "./utils";
 import _ = require("lodash");
 
@@ -47,6 +51,18 @@ async function checkBoosters(member: MemberResolvable, boosters: Map<string, Boo
             },
           })
           .catch(() => {});
+
+        if (booster.scope === "global" && (await getDmSettings(booster.userId)).booster) {
+          addNotificationToQueue({
+            memberId: booster.userId,
+            payload: {
+              embed: new CustomEmbed(
+                booster.userId,
+                `your ${getItems()[booster.boosterId].emoji} **${getItems()[booster.boosterId].name}** global booster has expired`,
+              ),
+            },
+          });
+        }
 
         if (expired.has(booster.boosterId)) {
           expired.set(booster.boosterId, expired.get(booster.boosterId) + 1);
@@ -155,12 +171,7 @@ export async function getBoosters(member: MemberResolvable): Promise<Map<string,
 
   const query = await prisma.booster.findMany({
     where: {
-      userId,
-    },
-    select: {
-      boosterId: true,
-      expire: true,
-      id: true,
+      OR: [{ scope: "global" }, { userId }],
     },
   });
 
@@ -172,6 +183,8 @@ export async function getBoosters(member: MemberResolvable): Promise<Map<string,
         boosterId: i.boosterId,
         expire: i.expire.getTime(),
         id: i.id,
+        scope: i.scope,
+        userId: i.userId,
       });
     } else {
       map.set(i.boosterId, [
@@ -179,6 +192,8 @@ export async function getBoosters(member: MemberResolvable): Promise<Map<string,
           boosterId: i.boosterId,
           expire: i.expire.getTime(),
           id: i.id,
+          scope: i.scope,
+          userId: i.userId,
         },
       ]);
     }
@@ -201,6 +216,7 @@ export async function addBooster(
   boosterId: string,
   amount = 1,
   expire?: Date,
+  scope: BoosterScope = "user",
 ) {
   const userId = getUserId(member);
   const items = getItems();
@@ -210,8 +226,86 @@ export async function addBooster(
       boosterId: boosterId,
       expire: expire || new Date(Date.now() + items[boosterId].boosterEffect.time * 1000),
       userId,
+      scope,
     }),
   });
 
   await redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${userId}`);
+}
+
+export async function getBoostersDisplay(
+  boosters: Map<string, Booster[]>,
+  embed: CustomEmbed,
+): Promise<null | Map<number, string[]>> {
+  const desc: string[] = [];
+
+  const items = getItems();
+
+  if (boosters.size == 0) {
+    return null;
+  }
+
+  const globalBoosters: string[] = [];
+
+  for (const boosterId of sort(Array.from(boosters.keys())).asc((i) => i)) {
+    if (boosters.get(boosterId)[0].scope === "global") {
+      const count = boosters.get(boosterId).length;
+      const ownerId = boosters.get(boosterId)[0].userId;
+      let username: string;
+
+      if ((await getPreferences(ownerId)).leaderboards) {
+        username = await getLastKnownUsername(ownerId);
+      }
+
+      if (count === 1) {
+        globalBoosters.push(
+          `${items[boosterId].emoji} **${items[boosterId].name}** - expires <t:${Math.round(
+            boosters.get(boosterId)[0].expire / 1000,
+          )}:R>${username ? `, by **[${username}](https://nypsi.xyz/users/${ownerId}?ref=bot-global-booster)**` : ""}`,
+        );
+      } else {
+        globalBoosters.push(
+          `${items[boosterId].emoji} **${items[boosterId].name}** \`x${count}\` - next expires <t:${Math.round(
+            boosters.get(boosterId)[0].expire / 1000,
+          )}:R>${username ? `, by **[${username}](https://nypsi.xyz/users/${ownerId}?ref=bot-global-booster)**` : ""}`,
+        );
+      }
+    } else {
+      if (boosters.get(boosterId).length == 1) {
+        desc.push(
+          `${items[boosterId].emoji} **${items[boosterId].name}** - expires <t:${Math.round(
+            boosters.get(boosterId)[0].expire / 1000,
+          )}:R>`,
+        );
+      } else {
+        let lowest = boosters.get(boosterId)[0].expire;
+
+        for (const booster of boosters.get(boosterId)) {
+          if (booster.expire < lowest) lowest = booster.expire;
+        }
+
+        desc.push(
+          `${items[boosterId].emoji} **${items[boosterId].name}** \`x${
+            boosters.get(boosterId).length
+          }\` - next expires <t:${Math.round(boosters.get(boosterId)[0].expire / 1000)}:R>`,
+        );
+      }
+    }
+  }
+
+  const pages = PageManager.createPages(desc, 10);
+  const firstPage = pages.get(1);
+
+  if (firstPage) {
+    embed.setDescription(firstPage.join("\n"));
+  }
+
+  if (globalBoosters.length > 0) {
+    embed.addFields({
+      name: "global boosters",
+      value: globalBoosters.join("\n"),
+    });
+  }
+
+  return pages;
 }

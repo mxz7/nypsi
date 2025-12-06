@@ -961,7 +961,7 @@ export async function calcNetWorth(
     const seedValue =
       farms.filter((i) => i.plantId === farm.plantId).length * ((await calcItemValue(seed)) || 0);
     const harvestValue =
-      (await getClaimable(userId, farm.plantId, false)) *
+      (await getClaimable(userId, farm.plantId, false)).items *
       ((await calcItemValue(getPlantsData()[farm.plantId].item)) || 0);
 
     let upgradesValue = 0;
