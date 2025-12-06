@@ -231,6 +231,7 @@ jobs:
           mv data/ deploy/
           mv prisma/ deploy/
           mv tsconfig.json deploy/
+          mv prisma.config.ts deploy/
 
       - name: deploy
         uses: burnett01/rsync-deployments@7.1.0
