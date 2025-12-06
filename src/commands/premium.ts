@@ -157,7 +157,6 @@ async function run(
     const members = await getAllMembers(message.guild, true);
 
     for (const guildMember of members.values()) {
-      if (guildMember.user.id === Constants.OWNER_ID) continue; // no roles for me teehee
       if (!(await userExists(guildMember))) continue;
 
       const level = await getRawLevel(guildMember);
@@ -187,6 +186,8 @@ async function run(
           }
         }
       }
+
+      if (guildMember.user.id === Constants.OWNER_ID) continue; // no roles for me teehee
 
       const roleIds = Array.from(guildMember.roles.cache.keys());
 
