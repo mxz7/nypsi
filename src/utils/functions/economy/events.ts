@@ -26,9 +26,10 @@ export type EventData = Event & { contributions: EventContribution[] };
 
 let completing = false;
 
-const REWARDS_TOP5P = 5;
-const REWARDS_TOP10P = 4;
-const REWARDS_TOP50P = 3;
+const REWARDS_TOP5P = 4;
+const REWARDS_TOP10P = 7;
+const REWARDS_TOP50P = 5;
+const REWARDS_BOTTOM50P = 2;
 
 export async function createEvent(
   client: NypsiClient,
@@ -272,6 +273,7 @@ async function giveRewards(event: EventData) {
   const top5p = event.contributions.slice(0, Math.ceil(event.contributions.length * 0.05));
   const top10p = event.contributions.slice(0, Math.ceil(event.contributions.length * 0.1));
   const top50p = event.contributions.slice(0, Math.ceil(event.contributions.length * 0.5));
+  const bottom50p = event.contributions.slice(top50p.length);
 
   logger.debug(`event: rewards`, { top1p: achGroup, top5p, top10p });
 
@@ -286,23 +288,6 @@ async function giveRewards(event: EventData) {
   if (!(await isEcoBanned(top5[0].userId)).banned) {
     givenRewards.set(top5[0].userId, 1);
     await addInventoryItem(top5[0].userId, "pandora_box", 1);
-  }
-
-  for (let i = 0; i < 2; i++) {
-    const chosen = top5[Math.floor(Math.random() * top5.length)];
-
-    if ((await isEcoBanned(chosen.userId)).banned) {
-      logger.debug(`event: rewards: banned`, { userId: chosen.userId });
-      i--;
-      continue;
-    }
-
-    if (!givenRewards.has(chosen.userId)) {
-      givenRewards.set(chosen.userId, 0);
-    }
-
-    givenRewards.set(chosen.userId, givenRewards.get(chosen.userId) + 1);
-    await addInventoryItem(chosen.userId, "pandora_box", 1);
   }
 
   const giveRewardToGroup = async (group: EventContribution[], toGive: number) => {
@@ -328,6 +313,7 @@ async function giveRewards(event: EventData) {
   await giveRewardToGroup(top5p, REWARDS_TOP5P);
   await giveRewardToGroup(top10p, REWARDS_TOP10P);
   await giveRewardToGroup(top50p, REWARDS_TOP50P);
+  await giveRewardToGroup(bottom50p, REWARDS_BOTTOM50P);
 
   for (const [userId, amount] of givenRewards) {
     await addNotificationToQueue({
