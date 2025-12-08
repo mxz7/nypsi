@@ -301,10 +301,10 @@ async function run(
       birthday
         ? `your birthday is ${dayjs(birthday).format("MMMM D, YYYY")}\n\n`
         : "/**birthday set <YYYY-MM-DD>** *set your birthday*\n" +
-          "/**birthday toggle** *enable/disable your birthday from being announced in servers*\n" +
-          "/**birthday channel <channel>** *set a channel to be used as the birthday announcement channel*\n" +
-          "/**birthday disable** *disable birthday announcements in your server*\n" +
-          "/**birthday upcoming** *view upcoming birthdays in the server*",
+            "/**birthday toggle** *enable/disable your birthday from being announced in servers*\n" +
+            "/**birthday channel <channel>** *set a channel to be used as the birthday announcement channel*\n" +
+            "/**birthday disable** *disable birthday announcements in your server*\n" +
+            "/**birthday upcoming** *view upcoming birthdays in the server*",
     );
 
     const todaysBirthdays = await getTodaysBirthdays();
