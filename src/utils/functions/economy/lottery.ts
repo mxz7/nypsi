@@ -20,19 +20,6 @@ export async function getApproximatePrizePool() {
   };
 }
 
-export async function getTicketCount() {
-  const query = await prisma.inventory.aggregate({
-    where: {
-      item: "lottery_ticket",
-    },
-    _sum: {
-      amount: true,
-    },
-  });
-
-  return Number(query._sum.amount);
-}
-
 export async function getDailyLottoTickets(member: MemberResolvable) {
   const query = await prisma.economy.findUnique({
     where: {

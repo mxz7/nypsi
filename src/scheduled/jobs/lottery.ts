@@ -1,7 +1,6 @@
 import { flavors } from "@catppuccin/palette";
-import { exec } from "child_process";
+import { randomInt } from "crypto";
 import { ColorResolvable, WebhookClient } from "discord.js";
-import { clone } from "lodash";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { CustomEmbed } from "../../models/EmbedBuilders";
@@ -9,16 +8,15 @@ import { Job } from "../../types/Jobs";
 import Constants from "../../utils/Constants";
 import { addProgress } from "../../utils/functions/economy/achievements";
 import { addBalance, getBalance, removeBalance } from "../../utils/functions/economy/balance";
-import { addInventoryItem } from "../../utils/functions/economy/inventory";
-import { getTicketCount } from "../../utils/functions/economy/lottery";
+import { addInventoryItem, setInventoryItem } from "../../utils/functions/economy/inventory";
 import { addStat } from "../../utils/functions/economy/stats";
 import { getItems } from "../../utils/functions/economy/utils";
 import { percentChance } from "../../utils/functions/random";
-import sleep from "../../utils/functions/sleep";
 import { getTax } from "../../utils/functions/tax";
 import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
 import { getLastKnownAvatar, getLastKnownUsername } from "../../utils/functions/users/username";
 import { logger } from "../../utils/logger";
+import pAll = require("p-all");
 
 export default {
   name: "lottery",
@@ -27,16 +25,20 @@ export default {
     await redis.set("nypsi:lottery", "boobies", "EX", 3600);
     const hook = new WebhookClient({ url: process.env.LOTTERY_HOOK });
 
-    const ticketCount = await getTicketCount();
+    const tickets = await prisma.inventory.findMany({
+      where: { item: "lottery_ticket" },
+      select: { userId: true, amount: true },
+    });
+    const total = Number(tickets.map((i) => i.amount).reduce((a, b) => a + b, 0n));
 
-    if (ticketCount < 100) {
-      log(`${ticketCount} tickets were bought ): maybe tomorrow you'll have something to live for`);
+    if (total < 100) {
+      log(`${total} tickets were bought ): maybe tomorrow you'll have something to live for`);
 
       const embed = new CustomEmbed();
 
       embed.setTitle("lottery cancelled");
       embed.setDescription(
-        `the lottery has been cancelled as only **${ticketCount}** tickets were bought ):\n\nthese tickets will remain and the lottery will happen tomorrow`,
+        `the lottery has been cancelled as only **${total}** tickets were bought ):\n\nthese tickets will remain and the lottery will happen tomorrow`,
       );
       embed.setColor(flavors.latte.colors.base.hex as ColorResolvable);
       embed.disableFooter();
@@ -45,12 +47,12 @@ export default {
       hook.destroy();
     } else {
       const taxedAmount =
-        Math.floor(ticketCount * getItems()["lottery_ticket"].buy * (await getTax())) * 1.5;
+        Math.floor(total * getItems()["lottery_ticket"].buy * (await getTax())) * 1.5;
 
-      const total = Math.floor(ticketCount * getItems()["lottery_ticket"].buy - taxedAmount);
+      const totalPrize = Math.floor(total * getItems()["lottery_ticket"].buy - taxedAmount);
 
       const before = performance.now();
-      const winner = await findWinner();
+      const winner = await findWinner(tickets);
       const after = performance.now();
 
       log(`winner found in ${after - before}ms`);
@@ -61,18 +63,17 @@ export default {
         return;
       }
 
-      const winnerUsername = await getLastKnownUsername(winner.winner, false);
-      const winnerAvatar = await getLastKnownAvatar(winner.winner);
-      prisma.inventory
-        .deleteMany({ where: { item: "lottery_ticket" } })
-        .then(() => exec('redis-cli KEYS "*inventory*" | xargs redis-cli DEL'));
+      const winnerUsername = await getLastKnownUsername(winner.userId, false);
+      const winnerAvatar = await getLastKnownAvatar(winner.userId);
 
-      log(`winner: ${winner.winner} (${winnerUsername})`);
+      deleteAllTickets(tickets);
+
+      log(`winner: ${winner.userId} (${winnerUsername})`);
 
       await Promise.all([
-        addBalance(winner.winner, total),
-        addProgress(winner.winner, "lucky", 1),
-        addStat(winner.winner, "earned-lottery", total),
+        addBalance(winner.userId, totalPrize),
+        addProgress(winner.userId, "lucky", 1),
+        addStat(winner.userId, "earned-lottery", totalPrize),
       ]);
 
       const embed = new CustomEmbed();
@@ -80,35 +81,35 @@ export default {
       embed.setHeader("lottery winner", winnerAvatar);
       embed.setDescription(
         `**${winnerUsername.replaceAll("_", "\\_")}** has won the lottery with ${winner.amount.toLocaleString()} tickets!!\n\n` +
-          `they have won $**${total.toLocaleString()}**`,
+          `they have won $**${totalPrize.toLocaleString()}**`,
       );
-      embed.setFooter({ text: `a total of ${ticketCount.toLocaleString()} tickets were bought` });
+      embed.setFooter({ text: `a total of ${total.toLocaleString()} tickets were bought` });
       embed.setColor(flavors.latte.colors.base.hex as ColorResolvable);
 
       await hook.send({ embeds: [embed] });
 
       hook.destroy();
 
-      if ((await getDmSettings(winner.winner)).lottery) {
+      if ((await getDmSettings(winner.userId)).lottery) {
         embed.setTitle("you have won the lottery!");
         embed.setDescription(
-          `you have won a total of $**${total.toLocaleString()}**\n\nyou had ${winner.amount.toLocaleString()} tickets`,
+          `you have won a total of $**${totalPrize.toLocaleString()}**\n\nyou had ${winner.amount.toLocaleString()} tickets`,
         );
         embed.setColor(flavors.latte.colors.base.hex as ColorResolvable);
 
-        addNotificationToQueue({ memberId: winner.winner, payload: { embed } });
+        addNotificationToQueue({ memberId: winner.userId, payload: { embed } });
 
         if (percentChance(0.9) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
           await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t", "EX", 86400);
-          logger.info(`${winner.winner} received purple_gem randomly (mines)`);
-          await addInventoryItem(winner.winner, "purple_gem", 1);
-          addProgress(winner.winner, "gem_hunter", 1);
+          logger.info(`${winner.userId} received purple_gem randomly (mines)`);
+          await addInventoryItem(winner.userId, "purple_gem", 1);
+          addProgress(winner.userId, "gem_hunter", 1);
 
-          if ((await getDmSettings(winner.winner)).other) {
+          if ((await getDmSettings(winner.userId)).other) {
             addNotificationToQueue({
-              memberId: winner.winner,
+              memberId: winner.userId,
               payload: {
-                embed: new CustomEmbed(winner.winner)
+                embed: new CustomEmbed(winner.userId)
                   .setDescription(
                     `${
                       getItems()["purple_gem"].emoji
@@ -168,49 +169,28 @@ export default {
   },
 } satisfies Job;
 
-async function findWinner() {
-  const ticketUsers = await prisma.inventory.findMany({
-    where: { item: "lottery_ticket" },
-    select: { amount: true, userId: true },
-  });
-  const ticketCount = ticketUsers.map((i) => i.amount).reduce((a, b) => a + b);
+async function findWinner(tickets: { userId: string; amount: bigint }[]) {
+  const ticketCount = tickets.map((i) => i.amount).reduce((a, b) => a + b);
 
-  let percentages: { userId: string; percentage: number; amount: bigint }[] = [];
+  let r = BigInt(randomInt(Number(ticketCount) + 1));
 
-  const fillPercentages = (data: { userId: string; amount: bigint }[]) => {
-    percentages.length = 0;
-    for (const item of data) {
-      percentages.push({
-        userId: item.userId,
-        amount: item.amount,
-        percentage: (Number(item.amount) / Number(ticketCount)) * 100,
-      });
-    }
-  };
-
-  fillPercentages(ticketUsers);
-
-  while (percentages.length > 1) {
-    await sleep(50);
-    fillPercentages(clone(percentages));
-
-    const roundWinners: string[] = [];
-
-    for (const item of percentages) {
-      if (percentChance(item.percentage)) {
-        roundWinners.push(item.userId);
-      }
-    }
-
-    if (roundWinners.length > 0) {
-      percentages = percentages.filter((i) => roundWinners.includes(i.userId));
+  for (const ticketUser of tickets) {
+    r -= ticketUser.amount;
+    if (r <= 0n) {
+      return { userId: ticketUser.userId, amount: Number(ticketUser.amount) };
     }
   }
 
-  const winner = percentages[0];
+  // this should never happen
+  return { userId: Constants.BOT_USER_ID, tickets: -1 };
+}
 
-  return {
-    winner: winner.userId,
-    amount: winner.amount,
-  };
+async function deleteAllTickets(tickets: { userId: string }[]) {
+  const promises: (() => Promise<void>)[] = [];
+
+  for (const ticket of tickets) {
+    promises.push(() => setInventoryItem(ticket.userId, "lottery_ticket", 0));
+  }
+
+  await pAll(promises, { concurrency: 5 });
 }
