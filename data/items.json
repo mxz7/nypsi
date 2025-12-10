@@ -1584,7 +1584,7 @@
     "article": "a",
     "emoji": "✨",
     "longDesc": "increase your multiplier by 3% from voting",
-    "rarity": 69,
+    "rarity": 100,
     "role": "booster",
     "stackable": false,
     "boosterEffect": {
@@ -1592,7 +1592,8 @@
       "effect": 3,
       "time": 3600
     },
-    "in_crates": false
+    "in_crates": false,
+    "hidden": true
   },
   "coffee": {
     "id": "coffee",
