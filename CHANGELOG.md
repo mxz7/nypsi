@@ -9,6 +9,7 @@
 - add top shagger (marriage) achievement
 - added global booster functionality
 - added magic potato
+- calendar only affects daily streak
 
 # october 2025
 
