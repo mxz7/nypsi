@@ -912,7 +912,7 @@
     "role": "booster",
     "booster_desc": "eat a cookie to get +**1**% multi for 30 seconds (stacks up to 3)",
     "buy": 0,
-    "sell": 500,
+    "sell": 300,
     "stackable": true,
     "max": 3,
     "boosterEffect": {
