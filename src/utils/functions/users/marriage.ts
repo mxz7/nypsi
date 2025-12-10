@@ -2,6 +2,7 @@ import { Marriage } from "#generated/prisma";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
+import { addAchievementProgress } from "../economy/achievements";
 import { getUserId, MemberResolvable } from "../member";
 
 export async function isMarried(member: MemberResolvable): Promise<false | Marriage> {
@@ -43,6 +44,9 @@ export async function addMarriage(userId: string, targetId: string) {
     `${Constants.redis.cache.user.MARRIED}:${userId}`,
     `${Constants.redis.cache.user.MARRIED}:${targetId}`,
   );
+
+  addAchievementProgress(userId, "top_shagger");
+  addAchievementProgress(targetId, "top_shagger");
 }
 
 export async function removeMarriage(member: MemberResolvable) {

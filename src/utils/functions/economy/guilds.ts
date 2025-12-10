@@ -366,17 +366,8 @@ export async function getRequiredForGuildUpgrade(
 
   const levelBonus = {
     money: 1_000_000_000 * (guild.level / 100),
-    xp: 1_000_000 * (guild.level / 100),
+    xp: 2_500_000 * (guild.level / 100),
   };
-
-  /**
-   * TODO: remove for season 11
-   * this stops already higher levelled guilds from having an unfair advantage with the change
-   */
-  if (guild.level < 420) {
-    levelBonus.money = 0;
-    levelBonus.xp = 0;
-  }
 
   const total = {
     money: Math.floor(money + slotBonus.money + levelBonus.money),
