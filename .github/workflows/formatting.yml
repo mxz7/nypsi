@@ -29,7 +29,7 @@ jobs:
         run: |
           echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         name: setup pnpm cache
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
@@ -41,7 +41,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: restore prettiercache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         id: cache
         with:
           path: .prettiercache
@@ -60,7 +60,7 @@ jobs:
         run: gh cache delete --repo ${{ github.repository }} ${{ steps.cache.outputs.cache-primary-key }}
 
       - name: save prettiercache
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         with:
           path: .prettiercache
