@@ -1,17 +1,11 @@
-import {
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  EmbedField,
-  MessageActionRowComponentBuilder,
-} from "discord.js";
+import { EmbedField } from "discord.js";
 import { sort } from "fast-sort";
 import { Command } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Tag } from "../types/Tags";
 import { getTagsData } from "../utils/functions/economy/utils";
 import PageManager from "../utils/functions/page";
-import { getTagCount, getTags, setActiveTag } from "../utils/functions/users/tags";
+import { getTagCount, getTags, setActiveTag, showTags } from "../utils/functions/users/tags";
 
 const cmd = new Command(
   "tags",
@@ -21,44 +15,15 @@ const cmd = new Command(
 
 cmd.setRun((message, send, args) => {
   const listTags = async () => {
-    const tags = await getTags(message.member);
-    const tagData = getTagsData();
+    const { pages, embed } = await showTags(message.member);
 
-    if (tags.length === 0) {
-      return send({ embeds: [new ErrorEmbed("you have no tags")] });
-    }
+    const row = PageManager.defaultRow();
 
-    let pages: Map<number, string[]>;
-
-    if (!tags.find((i) => i.selected))
-      pages = PageManager.createPages(
-        tags.map((i) => `${tagData[i.tagId].emoji} \`${tagData[i.tagId].name}\``),
-      );
-    else
-      pages = PageManager.createPages([
-        `active: ${tagData[tags.find((i) => i.selected).tagId].emoji} \`${
-          tagData[tags.find((i) => i.selected).tagId].name
-        }\``,
-        "",
-        ...tags.map((i) => `${tagData[i.tagId].emoji} \`${tagData[i.tagId].name}\``),
-      ]);
-
-    const embed = new CustomEmbed(message.member, pages.get(1).join("\n")).setHeader(
-      `${message.author.username}'s tags`,
-      message.author.displayAvatarURL(),
-    );
-
-    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder()
-        .setCustomId("⬅")
-        .setLabel("back")
-        .setStyle(ButtonStyle.Primary)
-        .setDisabled(true),
-      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
-    );
-
-    if (pages.size === 1) {
-      return send({ embeds: [embed] });
+    switch (pages.size) {
+      case 0:
+        return send({ embeds: [new ErrorEmbed("you have no tags")] });
+      case 1:
+        return send({ embeds: [embed] });
     }
 
     const msg = await send({ embeds: [embed], components: [row] });

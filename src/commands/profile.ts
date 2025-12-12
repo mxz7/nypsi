@@ -51,7 +51,7 @@ import { percentChance } from "../utils/functions/random";
 import { pluralize } from "../utils/functions/string";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { isMarried } from "../utils/functions/users/marriage";
-import { getActiveTag, getTags } from "../utils/functions/users/tags";
+import { getActiveTag, getTags, showTags } from "../utils/functions/users/tags";
 import { getLastKnownUsername } from "../utils/functions/users/username";
 import { hasProfile } from "../utils/functions/users/utils";
 import { addView, getViews } from "../utils/functions/users/views";
@@ -503,44 +503,17 @@ async function run(
 
       await addCooldown("p-tag", message.member, 5);
 
-      const tags = await getTags(target);
-      const tagData = getTagsData();
-
-      let pages: Map<number, string[]>;
-
-      if (tags.find((i) => i.selected)) {
-        pages = PageManager.createPages([
-          `active: ${tagData[tags.find((i) => i.selected).tagId].emoji} \`${
-            tagData[tags.find((i) => i.selected).tagId].name
-          }\``,
-          "",
-          ...tags.map((i) => `${tagData[i.tagId].emoji} \`${tagData[i.tagId].name}\``),
-        ]);
-      } else {
-        pages = PageManager.createPages(
-          tags.map((i) => `${tagData[i.tagId].emoji} \`${tagData[i.tagId].name}\``),
-        );
-      }
-
-      const embed = new CustomEmbed(target, pages.get(1).join("\n")).setHeader(
-        `${target.user.username}'s tags`,
-        target.user.displayAvatarURL(),
-      );
-
-      const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder()
-          .setCustomId("⬅")
-          .setLabel("back")
-          .setStyle(ButtonStyle.Primary)
-          .setDisabled(true),
-        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
-      );
+      const { pages, embed } = await showTags(target);
 
       if (pages.size === 1) {
-        return send({ embeds: [embed] });
+        return reaction.reply({ embeds: [embed] });
       }
 
-      const msg = await send({ embeds: [embed], components: [row] });
+      const row = PageManager.defaultRow();
+
+      const msg = await reaction
+        .reply({ embeds: [embed], components: [row] })
+        .then((m) => m.fetch());
 
       const manager = new PageManager({
         embed,

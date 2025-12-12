@@ -1,9 +1,12 @@
+import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
+import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { getTagsData } from "../economy/utils";
 import { getUserId, MemberResolvable } from "../member";
+import PageManager from "../page";
 
 export async function getTags(member: MemberResolvable) {
   const userId = getUserId(member);
@@ -119,4 +122,32 @@ export async function getTagCount(tagId: string) {
   await redis.set(`${Constants.redis.cache.user.tagCount}:${tagId}`, query, "EX", 84000);
 
   return query;
+}
+
+export async function showTags(target: GuildMember) {
+  const tags = await getTags(target);
+  const tagData = getTagsData();
+
+  let pages: Map<number, string[]>;
+
+  if (tags.find((i) => i.selected)) {
+    pages = PageManager.createPages([
+      `active: ${tagData[tags.find((i) => i.selected).tagId].emoji} \`${
+        tagData[tags.find((i) => i.selected).tagId].name
+      }\``,
+      "",
+      ...tags.map((i) => `${tagData[i.tagId].emoji} \`${tagData[i.tagId].name}\``),
+    ]);
+  } else {
+    pages = PageManager.createPages(
+      tags.map((i) => `${tagData[i.tagId].emoji} \`${tagData[i.tagId].name}\``),
+    );
+  }
+
+  const embed = new CustomEmbed(target, pages.get(1).join("\n")).setHeader(
+    `${target.user.username}'s tags`,
+    target.user.displayAvatarURL(),
+  );
+
+  return { pages, embed };
 }
