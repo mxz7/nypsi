@@ -45,6 +45,7 @@ import {
 } from "../utils/functions/economy/utils.js";
 import { getXp } from "../utils/functions/economy/xp";
 import { getMember } from "../utils/functions/member.js";
+import PageManager from "../utils/functions/page";
 import { getTier } from "../utils/functions/premium/premium";
 import { percentChance } from "../utils/functions/random";
 import { pluralize } from "../utils/functions/string";
@@ -503,17 +504,54 @@ async function run(
       await addCooldown("p-tag", message.member, 5);
 
       const tags = await getTags(target);
+      const tagData = getTagsData();
 
-      await reaction.reply({
-        embeds: [
-          new CustomEmbed(
-            target,
-            `${tags
-              .map((i) => `- ${getTagsData()[i.tagId].emoji} \`${getTagsData()[i.tagId].name}\``)
-              .join("\n")}`,
-          ).setHeader(`${target.user.username}'s tags`, target.user.avatarURL()),
-        ],
+      let pages: Map<number, string[]>;
+
+      if (tags.find((i) => i.selected)) {
+        pages = PageManager.createPages([
+          `active: ${tagData[tags.find((i) => i.selected).tagId].emoji} \`${
+            tagData[tags.find((i) => i.selected).tagId].name
+          }\``,
+          "",
+          ...tags.map((i) => `${tagData[i.tagId].emoji} \`${tagData[i.tagId].name}\``),
+        ]);
+      } else {
+        pages = PageManager.createPages(
+          tags.map((i) => `${tagData[i.tagId].emoji} \`${tagData[i.tagId].name}\``),
+        );
+      }
+
+      const embed = new CustomEmbed(target, pages.get(1).join("\n")).setHeader(
+        `${target.user.username}'s tags`,
+        target.user.displayAvatarURL(),
+      );
+
+      const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder()
+          .setCustomId("⬅")
+          .setLabel("back")
+          .setStyle(ButtonStyle.Primary)
+          .setDisabled(true),
+        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+      );
+
+      if (pages.size === 1) {
+        return send({ embeds: [embed] });
+      }
+
+      const msg = await send({ embeds: [embed], components: [row] });
+
+      const manager = new PageManager({
+        embed,
+        message: msg,
+        row,
+        userId: message.author.id,
+        allowMessageDupe: true,
+        pages,
       });
+
+      manager.listen();
       return awaitButton();
     }
   };
