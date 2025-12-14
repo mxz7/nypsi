@@ -14,6 +14,7 @@ import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { MStoTime } from "../date";
 import { getUserId, MemberResolvable } from "../member";
+import { percentChance } from "../random";
 import { addNotificationToQueue, getPreferences } from "../users/notifications";
 import { getLastKnownUsername } from "../users/username";
 import { hasProfile } from "../users/utils";
@@ -241,12 +242,10 @@ export async function addEventProgress(
     progress = await redis.incrby(Constants.redis.cache.economy.eventProgress, amount);
   }
 
-  // keeps in sync
-  if (progress % 1000 === 0) {
-    await redis.set(
-      Constants.redis.cache.economy.eventProgress,
-      getEventProgress(await getCurrentEvent(false)),
-    );
+  // keeps in sync - approximately every 20 times it'll update from db
+  if (percentChance(5)) {
+    progress = getEventProgress(await getCurrentEvent(false));
+    await redis.set(Constants.redis.cache.economy.eventProgress, progress);
   }
 
   if (progress >= event.target) {
