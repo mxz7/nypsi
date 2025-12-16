@@ -693,6 +693,15 @@ export async function startRandomDrop(client: NypsiClient, channelId: string, ra
       )}) prize: ${JSON.stringify(prize)} ${rain ? "(rain)" : ""}`,
     );
 
+    switch (prize.item) {
+      case "pumpkin":
+        addEventProgress(client, winner, "halloween", prize.count || 1);
+        break;
+      case "christmas_tree":
+        addEventProgress(client, winner, "christmas", prize.count || 1);
+        break;
+    }
+
     if (!rain) {
       addProgress(winner, "lootdrops_pro", 1);
       addTaskProgress(winner, "lootdrops");
