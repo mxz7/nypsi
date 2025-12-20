@@ -1757,7 +1757,7 @@
     "name": "highroller",
     "article": "a",
     "plural": "highrollers",
-    "aliases": ["high", "roller"],
+    "aliases": ["roller"],
     "emoji": "💸",
     "longDesc": "burn your money away even faster by doubling your max bet for 30 minutes",
     "rarity": 3,
