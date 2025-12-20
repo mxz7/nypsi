@@ -95,7 +95,7 @@ const client = new NypsiClient({
     GuildTextThreadManager: 0,
     DMMessageManager: 0,
     UserManager: {
-      maxSize: 2_500,
+      maxSize: 10_000,
       keepOverLimit: (user) => {
         if (user.id === user.client.user.id) return true;
 
@@ -117,7 +117,7 @@ const client = new NypsiClient({
       },
     },
     GuildMemberManager: {
-      maxSize: 2_500,
+      maxSize: 7_500,
       keepOverLimit: (user) => {
         if (user.id === user.client.user.id) return true;
 
