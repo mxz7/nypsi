@@ -3566,7 +3566,7 @@
     "role": "booster",
     "stackable": false,
     "rarity": 5,
-    "aliases": ["potato"],
+    "aliases": ["mpotato", "potato"],
     "boosterEffect": {
       "boosts": ["farm_output"],
       "effect": 0.2,
