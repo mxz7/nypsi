@@ -52,13 +52,13 @@ const mutex = new Mutex();
 
 export async function getAllMembers(
   guild: Guild,
-  forceFetch: true,
+  getCollection: true,
 ): Promise<Collection<string, GuildMember>>;
-export async function getAllMembers(guild: Guild, forceFetch?: false): Promise<string[]>;
+export async function getAllMembers(guild: Guild, getCollection?: false): Promise<string[]>;
 export async function getAllMembers(guild: string): Promise<string[]>;
 export async function getAllMembers(
   guild: Guild | string,
-  forceFetch = false,
+  getCollection = false,
 ): Promise<string[] | Collection<string, GuildMember>> {
   const guildId = guild instanceof Guild ? guild.id : guild;
 
@@ -69,7 +69,10 @@ export async function getAllMembers(
       .get(`${Constants.redis.cache.guild.MEMBERS_LAST_FETCHED}:${guildId}`)
       .then((v) => (v ? parseInt(v) : 0));
 
-    if ((lastFetched > Date.now() - ms("10 minute") && !forceFetch) || !(guild instanceof Guild)) {
+    if (
+      (lastFetched > Date.now() - ms("10 minute") && !getCollection) ||
+      !(guild instanceof Guild)
+    ) {
       return getDatabaseMembers(guildId);
     }
 
@@ -91,7 +94,7 @@ export async function getAllMembers(
 
     await checkMembers(guild.id, discordMemberIds);
 
-    return forceFetch ? discordMembers : discordMemberIds;
+    return getCollection ? discordMembers : discordMemberIds;
   } finally {
     mutex.release(mutexKey);
   }
