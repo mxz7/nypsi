@@ -2175,7 +2175,7 @@ async function run(
         )
         .addField(
           "member info",
-          `**members** ${guild.members.length}
+          `**members** ${guild.memberCount}
     **peak** ${await getPeaks(guild)}`,
           true,
         ); // if guild.members.length works add members field back
