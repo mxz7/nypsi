@@ -121,8 +121,8 @@ export async function createEvent(
               .setURL("https://nypsi.xyz/events?ref=bot-event-announcement"),
             new ButtonBuilder()
               .setStyle(ButtonStyle.Link)
-              .setLabel("more information")
-              .setEmoji("🔱")
+              .setLabel("what's this?")
+              .setEmoji("❓")
               .setURL("https://nypsi.xyz/docs/economy/events?ref=bot-event-announcement"),
           ),
           channelId: targetChannel,
