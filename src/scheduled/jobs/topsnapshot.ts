@@ -256,7 +256,7 @@ async function clearOld(log: (msg: string) => void) {
             { category: { contains: "item-value" } },
           ],
         },
-        { date: { lt: dayjs().subtract(180, "day").toDate() } },
+        { date: { lt: dayjs().subtract(2, "year").toDate() } },
       ],
     },
   });
