@@ -98,7 +98,7 @@ export default {
       log(`${sellOrders.length} sell orders expired`);
     }
 
-    limit = dayjs().subtract(180, "days").toDate();
+    limit = dayjs().subtract(2, "year").toDate();
 
     const { count: deletedCompletedOrders } = await prisma.market.deleteMany({
       where: {
