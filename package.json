@@ -30,7 +30,7 @@
     "@twemoji/parser": "^17.0.1",
     "@yusifaliyevpro/countries": "^2.2.2",
     "@zeyrbot/urbandictionary": "^1.0.3",
-    "bufferutil": "4.0.9",
+    "bufferutil": "4.1.0",
     "bullmq": "^5.66.3",
     "chalk": "4.1.2",
     "cron": "^4.4.0",
