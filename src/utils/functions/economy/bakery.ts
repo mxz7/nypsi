@@ -312,6 +312,7 @@ export async function runBakery(member: GuildMember) {
     );
   }
 
+  addStat(member, "times-baked");
   addProgress(member.user.id, "baker", Math.round(total));
   addProgress(member.user.id, "super_baker", Math.round(total));
   addTaskProgress(member.user.id, "bake_daily", Math.round(total));

@@ -59,11 +59,6 @@ async function doDailyStreaks(manager: ClusterManager) {
           },
         },
       },
-      Inventory: {
-        where: {
-          OR: [{ item: "calendar" }, { item: { contains: "gem" } }],
-        },
-      },
     },
   });
 
@@ -171,20 +166,8 @@ async function doVoteStreaks(manager: ClusterManager) {
           },
         },
       },
-      Inventory: {
-        where: {
-          OR: [{ item: "calendar" }, { item: { contains: "gem" } }],
-        },
-      },
     },
   });
-
-  const calendarSavedEmbed = new CustomEmbed()
-    .setColor(Constants.EMBED_FAIL_COLOR)
-    .setTitle("your vote streak has been saved by a calendar!")
-    .setDescription(
-      "calendars in your inventory protect your streaks, make sure to vote to continue your streak",
-    );
 
   const gemSavedEmbed = new CustomEmbed()
     .setColor(Constants.EMBED_FAIL_COLOR)
@@ -235,26 +218,7 @@ async function doVoteStreaks(manager: ClusterManager) {
     promises.push(async () => {
       const inventory = await getInventory(user.userId);
 
-      if (inventory.has("calendar")) {
-        if (user.user.DMSettings?.other) {
-          if (user.user.DMSettings.voteReminder) {
-            notifications.push({
-              memberId: user.userId,
-              payload: { embed: calendarSavedEmbed, components: voteRow },
-            });
-          } else {
-            notifications.push({
-              memberId: user.userId,
-              payload: { embed: calendarSavedEmbed, components: remindersRow },
-            });
-          }
-        }
-
-        await removeInventoryItem(user.userId, "calendar", 1);
-        await addStat(user.userId, "calendar");
-
-        return;
-      } else if ((await inventory.hasGem("white_gem")).any) {
+      if ((await inventory.hasGem("white_gem")).any) {
         const gemSaveChance = Math.floor(Math.random() * 10);
 
         if (gemSaveChance < 5) {
