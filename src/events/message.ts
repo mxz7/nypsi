@@ -81,6 +81,14 @@ const brainrotFilter = [
   "whats up chat",
   "mogging",
   "hawk tua",
+  "67",
+  "mogged",
+  "based",
+  "lock in",
+  "aura farm",
+  "crash out",
+  "tweaking",
+  "tweak out",
 ];
 
 const helpContent = [
