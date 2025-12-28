@@ -79,7 +79,7 @@ export default {
     if (
       Number(offer.money / offer.itemAmount) < 50_000 ||
       accounts.includes(offer.targetId) ||
-      (await redis.exists("nypsi:infinitemaxbet"))
+      (await redis.exists(Constants.redis.nypsi.INFINITE_MAX_BET))
     ) {
       await prisma.offer.delete({
         where: {

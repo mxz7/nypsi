@@ -628,7 +628,7 @@ export async function setDefaultBet(member: MemberResolvable, setting: number) {
 }
 
 export async function calcMaxBet(member: MemberResolvable): Promise<number> {
-  if (await redis.exists("nypsi:infinitemaxbet")) return 1000000000000;
+  if (await redis.exists(Constants.redis.nypsi.INFINITE_MAX_BET)) return 1000000000000;
 
   let total = 1_000_000;
 

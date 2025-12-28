@@ -415,7 +415,7 @@ export async function checkMarketOrder(
 
       if (remaining === 0) {
         // we delete instead of keeping for status during season interim
-        if (await redis.exists("nypsi:infinitemaxbet")) {
+        if (await redis.exists(Constants.redis.nypsi.INFINITE_MAX_BET)) {
           await prisma.market.delete({ where: { id: order.id } });
         } else {
           await prisma.market.update({
@@ -438,7 +438,7 @@ export async function checkMarketOrder(
         });
 
         // don't create another during season interim
-        if (order.price > 10_000 && !(await redis.exists("nypsi:infinitemaxbet"))) {
+        if (order.price > 10_000 && !(await redis.exists(Constants.redis.nypsi.INFINITE_MAX_BET))) {
           await prisma.market.create({
             data: {
               ownerId: order.ownerId,
@@ -771,7 +771,7 @@ export async function completeOrder(
     order.completed = true;
 
     // delete during season interim
-    if (isAlt && (await redis.exists("nypsi:infinitemaxbet"))) {
+    if (isAlt && (await redis.exists(Constants.redis.nypsi.INFINITE_MAX_BET))) {
       await prisma.market.delete({
         where: { id: order.id },
       });
@@ -783,7 +783,7 @@ export async function completeOrder(
     }
   } else {
     // only create during normal season play
-    if (!isAlt && !(await redis.exists("nypsi:infinitemaxbet"))) {
+    if (!isAlt && !(await redis.exists(Constants.redis.nypsi.INFINITE_MAX_BET))) {
       await prisma.market.create({
         data: {
           itemId: order.itemId,

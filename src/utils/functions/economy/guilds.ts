@@ -443,7 +443,7 @@ interface EconomyGuildMember {
 const checkUpgradeMutex = new Mutex();
 
 async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
-  if (await redis.exists("nypsi:infinitemaxbet")) return false;
+  if (await redis.exists(Constants.redis.nypsi.INFINITE_MAX_BET)) return false;
 
   if (typeof guild == "string") {
     guild = await getGuildByName(guild);

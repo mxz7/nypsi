@@ -95,7 +95,7 @@ export async function calcEarnedGambleXp(
   bet: number,
   multiplier: number,
 ): Promise<number> {
-  if (await redis.exists("nypsi:infinitemaxbet")) return 0;
+  if (await redis.exists(Constants.redis.nypsi.INFINITE_MAX_BET)) return 0;
 
   const requiredBet = await getRequiredBetForXp(member);
 

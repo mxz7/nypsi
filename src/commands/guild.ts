@@ -372,7 +372,7 @@ async function run(
       return send({ embeds: [new ErrorEmbed("you are not a guild admin")] });
     }
 
-    if (await redis.exists("nypsi:infinitemaxbet")) {
+    if (await redis.exists(Constants.redis.nypsi.INFINITE_MAX_BET)) {
       return send({ embeds: [new ErrorEmbed("guild invites/leaves are currently disabled")] });
     }
 
@@ -467,7 +467,7 @@ async function run(
     if (fail) return;
 
     if (reaction == "yes") {
-      if (await redis.exists("nypsi:infinitemaxbet")) {
+      if (await redis.exists(Constants.redis.nypsi.INFINITE_MAX_BET)) {
         return send({ embeds: [new ErrorEmbed("guild invites/leaves are currently disabled")] });
       }
       invited.delete(target.user.id);
@@ -502,7 +502,7 @@ async function run(
       });
     }
 
-    if (await redis.exists("nypsi:infinitemaxbet")) {
+    if (await redis.exists(Constants.redis.nypsi.INFINITE_MAX_BET)) {
       return send({ embeds: [new ErrorEmbed("guild invites/leaves are currently disabled")] });
     }
 
@@ -596,7 +596,7 @@ async function run(
       return send({ embeds: [new ErrorEmbed(`${prefix}guild kick <tag>`)] });
     }
 
-    if (await redis.exists("nypsi:infinitemaxbet")) {
+    if (await redis.exists(Constants.redis.nypsi.INFINITE_MAX_BET)) {
       return send({ embeds: [new ErrorEmbed("guild invites/leaves are currently disabled")] });
     }
 
@@ -667,7 +667,7 @@ async function run(
       return send({ embeds: [new ErrorEmbed("you are not the guild owner")] });
     }
 
-    if (await redis.exists("nypsi:infinitemaxbet")) {
+    if (await redis.exists(Constants.redis.nypsi.INFINITE_MAX_BET)) {
       return send({ embeds: [new ErrorEmbed("guild invites/leaves are currently disabled")] });
     }
 

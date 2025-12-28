@@ -443,7 +443,7 @@ export async function doLevelUp(member: MemberResolvable) {
   const userId = getUserId(member);
 
   if (await redis.exists(`${Constants.redis.cache.economy.LEVELLING_UP}:${userId}`)) return;
-  if (await redis.exists("nypsi:infinitemaxbet")) return;
+  if (await redis.exists(Constants.redis.nypsi.INFINITE_MAX_BET)) return;
 
   const [beforePrestige, beforeLevel] = await Promise.all([getPrestige(userId), getLevel(userId)]);
   let requirements = getLevelRequirements(beforePrestige, beforeLevel);
