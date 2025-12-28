@@ -185,7 +185,7 @@ export async function createMarketOrder(
   let sold = false;
 
   if (checkSold) {
-    const { completed, itemAmount } = await prisma.market.findUnique({
+    const query = await prisma.market.findUnique({
       where: {
         id: order.id,
       },
@@ -195,8 +195,14 @@ export async function createMarketOrder(
       },
     });
 
-    if (completed) sold = true;
-    else if (itemAmount !== amount) amount = itemAmount;
+    if (!query) {
+      sold = true;
+    } else {
+      const { completed, itemAmount } = query;
+
+      if (completed) sold = true;
+      else if (itemAmount !== amount) amount = itemAmount;
+    }
   }
 
   const response: { sold: boolean; amount: number; url?: string } = {
@@ -408,14 +414,19 @@ export async function checkMarketOrder(
       }
 
       if (remaining === 0) {
-        await prisma.market.update({
-          where: {
-            id: order.id,
-          },
-          data: {
-            completed: true,
-          },
-        });
+        // we delete instead of keeping for status during season interim
+        if (await redis.exists("nypsi:infinitemaxbet")) {
+          await prisma.market.delete({ where: { id: order.id } });
+        } else {
+          await prisma.market.update({
+            where: {
+              id: order.id,
+            },
+            data: {
+              completed: true,
+            },
+          });
+        }
       } else if (remaining < order.itemAmount) {
         await prisma.market.update({
           where: {
@@ -426,7 +437,8 @@ export async function checkMarketOrder(
           },
         });
 
-        if (order.price > 10_000) {
+        // don't create another during season interim
+        if (order.price > 10_000 && !(await redis.exists("nypsi:infinitemaxbet"))) {
           await prisma.market.create({
             data: {
               ownerId: order.ownerId,
@@ -757,7 +769,9 @@ export async function completeOrder(
 
   if (order.itemAmount === amount) {
     order.completed = true;
-    if (isAlt) {
+
+    // delete during season interim
+    if (isAlt && (await redis.exists("nypsi:infinitemaxbet"))) {
       await prisma.market.delete({
         where: { id: order.id },
       });
@@ -768,7 +782,8 @@ export async function completeOrder(
       });
     }
   } else {
-    if (!isAlt) {
+    // only create during normal season play
+    if (!isAlt && !(await redis.exists("nypsi:infinitemaxbet"))) {
       await prisma.market.create({
         data: {
           itemId: order.itemId,

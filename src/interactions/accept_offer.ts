@@ -76,7 +76,11 @@ export default {
 
     const accounts = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, offer.ownerId);
 
-    if (Number(offer.money / offer.itemAmount) < 50_000 || accounts.includes(offer.targetId)) {
+    if (
+      Number(offer.money / offer.itemAmount) < 50_000 ||
+      accounts.includes(offer.targetId) ||
+      (await redis.exists("nypsi:infinitemaxbet"))
+    ) {
       await prisma.offer.delete({
         where: {
           messageId: offer.messageId,
