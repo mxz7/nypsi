@@ -3299,6 +3299,136 @@ async function run(
     await addInventoryItem(randomUser.userId, "pumpkin", 1);
 
     logger.debug(`pumpkin: random pumpkin given to ${randomUser.userId}`);
+  } else if (args[0].toLowerCase() === "dotree") {
+    if (message.author.id !== Constants.OWNER_ID) {
+      return send({
+        embeds: [new ErrorEmbed("haha loser")],
+      });
+    }
+
+    const orders = await prisma.market.findMany({
+      where: {
+        AND: [{ completed: false }, { orderType: "sell" }, { itemId: "christmas_tree" }],
+      },
+    });
+
+    for (const order of orders) {
+      await deleteMarketOrder(order.id, message.client as NypsiClient);
+    }
+
+    const trees = await prisma.inventory.findMany({
+      select: {
+        amount: true,
+        userId: true,
+      },
+      where: {
+        item: "christmas_tree",
+      },
+    });
+
+    const pool: LootPool = {
+      nothing: 100,
+      xp: {
+        10: 0.1,
+      },
+      items: {
+        basic_crate: 0.007,
+        pandora_box: 0.001,
+      },
+    };
+
+    let foundAll = {
+      money: 0,
+      xp: 0,
+      karma: 0,
+      items: {},
+    } as {
+      money: number;
+      xp: number;
+      karma: number;
+      items: {
+        [item: string]: number;
+      };
+    };
+
+    for (const user of trees) {
+      logger.debug(`tree: ${user.userId} ${user.amount}`);
+      for (let i = 0; i < user.amount; i++) {
+        const found = await rollLootPool(pool);
+        await giveLootPoolResult(user.userId, found);
+
+        foundAll.money += found.money ?? 0;
+        foundAll.xp += found.xp ?? 0;
+        foundAll.karma += found.karma ?? 0;
+        if (Object.hasOwn(found, "item")) {
+          if (Object.hasOwn(foundAll.items, found.item)) {
+            foundAll.items[found.item] += found.count ?? 1;
+          } else {
+            foundAll.items[found.item] = found.count ?? 1;
+          }
+        }
+      }
+
+      if (
+        foundAll.money > 0 ||
+        foundAll.xp > 0 ||
+        foundAll.karma > 0 ||
+        Object.keys(foundAll.items).length > 0
+      ) {
+        const embed = new CustomEmbed(user.userId).setHeader("christmas rewards");
+        const desc: string[] = [];
+
+        desc.push("thank you for playing during the christmas events!!");
+        desc.push("you have received:");
+
+        if (foundAll.money > 0) {
+          desc.push(`- $${foundAll.money.toLocaleString()}`);
+        }
+
+        if (foundAll.xp > 0 || foundAll.karma > 0) {
+          const xpText = foundAll.xp > 0 ? `+${foundAll.xp.toLocaleString()}xp` : "";
+          const karmaText = foundAll.karma > 0 ? `+${foundAll.karma.toLocaleString()}🔮` : "";
+          const joiner = foundAll.xp > 0 && foundAll.karma > 0 ? "    " : "";
+          embed.setFooter({ text: `${xpText}${joiner}${karmaText}` });
+        }
+
+        const values = new Map<string, number>();
+        const items = Object.keys(foundAll.items);
+
+        for (const itemKey in foundAll.items) {
+          values.set(
+            itemKey,
+            ((await calcItemValue(itemKey).catch(() => 0)) || 0) * foundAll.items[itemKey],
+          );
+        }
+        inPlaceSort(items).desc((i) => values.get(i));
+
+        for (const item of items) {
+          desc.push(
+            `- \`${foundAll.items[item]}x\` ${getItems()[item].emoji} ${getItems()[item].name}`,
+          );
+        }
+
+        embed.setDescription(desc.join("\n"));
+
+        addInlineNotification({ memberId: user.userId, embed });
+
+        foundAll = {
+          money: 0,
+          xp: 0,
+          karma: 0,
+          items: {},
+        };
+      }
+
+      await setInventoryItem(user.userId, "christmas_tree", 0);
+    }
+
+    const randomUser = trees[Math.floor(Math.random() * trees.length)];
+
+    await addInventoryItem(randomUser.userId, "christmas_tree", 1);
+
+    logger.debug(`tree: random christmas_tree given to ${randomUser.userId}`);
   } else {
     return send({
       embeds: [new CustomEmbed(message.member, await getUsableCommands(message.member))],
