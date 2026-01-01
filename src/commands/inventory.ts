@@ -5,6 +5,7 @@ import {
   ButtonStyle,
   CommandInteraction,
   Interaction,
+  LabelBuilder,
   Message,
   MessageActionRowComponentBuilder,
   MessageFlags,
@@ -166,15 +167,16 @@ async function run(
         const modal = new ModalBuilder()
           .setCustomId("inv-filter")
           .setTitle("filter inventory")
-          .addComponents(
-            new ActionRowBuilder<TextInputBuilder>().addComponents(
-              new TextInputBuilder()
-                .setCustomId("filter")
-                .setLabel("enter term to filter by")
-                .setPlaceholder("filter")
-                .setRequired(true)
-                .setStyle(TextInputStyle.Short),
-            ),
+          .addLabelComponents(
+            new LabelBuilder()
+              .setLabel("enter term to filter by")
+              .setTextInputComponent(
+                new TextInputBuilder()
+                  .setCustomId("filter")
+                  .setPlaceholder("filter")
+                  .setRequired(true)
+                  .setStyle(TextInputStyle.Short),
+              ),
           );
 
         await interaction.showModal(modal);

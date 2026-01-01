@@ -3,10 +3,10 @@ import {
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
+  LabelBuilder,
   Message,
   MessageActionRowComponentBuilder,
   MessageFlags,
-  ModalActionRowComponentBuilder,
   ModalBuilder,
   TextBasedChannel,
   TextInputBuilder,
@@ -227,21 +227,23 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
   const modal = new ModalBuilder()
     .setCustomId("crash-join-modal")
     .setTitle("join crash")
-    .addComponents(
-      new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
-        new TextInputBuilder()
-          .setLabel("bet")
-          .setRequired(true)
-          .setCustomId("bet")
-          .setStyle(TextInputStyle.Short),
-      ),
-      new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
-        new TextInputBuilder()
-          .setLabel("auto stop")
-          .setCustomId("auto-stop")
-          .setStyle(TextInputStyle.Short)
-          .setRequired(false),
-      ),
+    .addLabelComponents(
+      new LabelBuilder()
+        .setLabel("bet")
+        .setTextInputComponent(
+          new TextInputBuilder()
+            .setRequired(true)
+            .setCustomId("bet")
+            .setStyle(TextInputStyle.Short),
+        ),
+      new LabelBuilder()
+        .setLabel("auto stop")
+        .setTextInputComponent(
+          new TextInputBuilder()
+            .setCustomId("auto-stop")
+            .setStyle(TextInputStyle.Short)
+            .setRequired(false),
+        ),
     );
 
   a(interaction.user.id, interaction.user.username, "crash", "crash");

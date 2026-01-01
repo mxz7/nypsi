@@ -10,6 +10,7 @@ import {
   Interaction,
   InteractionEditReplyOptions,
   InteractionResponse,
+  LabelBuilder,
   Message,
   MessageActionRowComponentBuilder,
   MessageEditOptions,
@@ -709,31 +710,34 @@ async function run(
     const id = `market-${type}-order-${Math.floor(Math.random() * 69420)}`;
     const modal = new ModalBuilder().setCustomId(id).setTitle(`create ${type} order`);
 
-    modal.addComponents(
-      new ActionRowBuilder<TextInputBuilder>().addComponents(
-        new TextInputBuilder()
-          .setCustomId("item")
-          .setLabel(`what item do you want to ${type}?`)
-          .setStyle(TextInputStyle.Short)
-          .setRequired(true)
-          .setMaxLength(25),
-      ),
-      new ActionRowBuilder<TextInputBuilder>().addComponents(
-        new TextInputBuilder()
-          .setCustomId("amount")
-          .setLabel("how many of this item?")
-          .setStyle(TextInputStyle.Short)
-          .setRequired(true)
-          .setMaxLength(10),
-      ),
-      new ActionRowBuilder<TextInputBuilder>().addComponents(
-        new TextInputBuilder()
-          .setCustomId("price")
-          .setLabel(`how much do you want to ${type} each item for?`)
-          .setStyle(TextInputStyle.Short)
-          .setRequired(true)
-          .setMaxLength(10),
-      ),
+    modal.addLabelComponents(
+      new LabelBuilder()
+        .setLabel(`what item do you want to ${type}?`)
+        .setTextInputComponent(
+          new TextInputBuilder()
+            .setCustomId("item")
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true)
+            .setMaxLength(25),
+        ),
+      new LabelBuilder()
+        .setLabel("how many of this item?")
+        .setTextInputComponent(
+          new TextInputBuilder()
+            .setCustomId("amount")
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true)
+            .setMaxLength(10),
+        ),
+      new LabelBuilder()
+        .setLabel(`how much do you want to ${type} each item for?`)
+        .setTextInputComponent(
+          new TextInputBuilder()
+            .setCustomId("price")
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true)
+            .setMaxLength(10),
+        ),
     );
 
     await interaction.showModal(modal);
@@ -1971,11 +1975,10 @@ async function run(
     const id = `market-quantity-${Math.floor(Math.random() * 69420)}`;
     const modal = new ModalBuilder().setCustomId(id).setTitle("select quantity");
 
-    modal.addComponents(
-      new ActionRowBuilder<TextInputBuilder>().addComponents(
+    modal.addLabelComponents(
+      new LabelBuilder().setLabel(`how many would you like to ${type}?`).setTextInputComponent(
         new TextInputBuilder()
           .setCustomId("amount")
-          .setLabel(`how many would you like to ${type}?`)
           .setPlaceholder(
             type == "sell"
               ? `${inOrders.toLocaleString()} in buy orders, ${inInventory.toLocaleString()} in inventory`

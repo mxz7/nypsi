@@ -4,6 +4,7 @@ import {
   ButtonStyle,
   CommandInteraction,
   ComponentType,
+  LabelBuilder,
   Message,
   MessageActionRowComponentBuilder,
   MessageFlags,
@@ -115,14 +116,15 @@ export async function startGTFGame(
     const modal = new ModalBuilder()
       .setCustomId(id)
       .setTitle("guess the flag")
-      .addComponents(
-        new ActionRowBuilder<TextInputBuilder>().addComponents(
-          new TextInputBuilder()
-            .setCustomId("guess")
-            .setLabel("your guess")
-            .setRequired(true)
-            .setStyle(TextInputStyle.Short),
-        ),
+      .addLabelComponents(
+        new LabelBuilder()
+          .setLabel("your guess")
+          .setTextInputComponent(
+            new TextInputBuilder()
+              .setCustomId("guess")
+              .setRequired(true)
+              .setStyle(TextInputStyle.Short),
+          ),
       );
 
     await interaction.showModal(modal);
