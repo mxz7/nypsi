@@ -1,13 +1,13 @@
 import pAll = require("p-all");
+import prisma from "../../init/database";
+import { NypsiClient } from "../../models/Client";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import { Job } from "../../types/Jobs";
+import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { getItems } from "../../utils/functions/economy/utils";
 import { pluralize } from "../../utils/functions/string";
 import { getTodaysBirthdays } from "../../utils/functions/users/birthday";
 import { addNotificationToQueue } from "../../utils/functions/users/notifications";
-import { addInventoryItem } from "../../utils/functions/economy/inventory";
-import { NypsiClient } from "../../models/Client";
-import prisma from "../../init/database";
 
 export default {
   name: "birthdays",
@@ -64,6 +64,14 @@ export default {
 
                 for (const member of members.values()) {
                   try {
+                    if (
+                      member.user.username === "Deleted User" &&
+                      member.user.discriminator === "0000"
+                    ) {
+                      // deleted user
+                      continue;
+                    }
+
                     const birthday = birthdayMembers.find((i) => i.id === member.id);
 
                     if (!birthday) continue;
