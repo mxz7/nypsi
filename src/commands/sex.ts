@@ -10,6 +10,8 @@ import { addProgress } from "../utils/functions/economy/achievements.js";
 import { addEventProgress, EventData, getCurrentEvent } from "../utils/functions/economy/events.js";
 import { addTaskProgress } from "../utils/functions/economy/tasks.js";
 import { getTagsData } from "../utils/functions/economy/utils.js";
+import { checkMessageContent } from "../utils/functions/guilds/filters.js";
+import { isMuted } from "../utils/functions/moderation/mute.js";
 import { cleanString } from "../utils/functions/string.js";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications.js";
 import { getActiveTag } from "../utils/functions/users/tags.js";
@@ -170,7 +172,11 @@ async function run(
           }?ref=bot-milf) a *private* message 😉😏`,
       ).setHeader("milf finder");
 
-      if (milf.description != "") {
+      if (
+        milf.description != "" &&
+        (await checkMessageContent(message.guild, milf.description, false)) &&
+        !(await isMuted(message.guild, milf.userId))
+      ) {
         embed.setDescription(
           `a match has been made from **${
             milf.guildId == Constants.NYPSI_SERVER_ID
@@ -227,35 +233,35 @@ async function run(
         .setHeader("milf finder")
         .setColor(Constants.EMBED_SUCCESS_COLOR);
 
+      let userMessage = "";
       let description = "";
 
       if (args.length > 0) {
-        description = args.join(" ");
-        const descriptionCheck = cleanString(description);
+        userMessage = args.join(" ");
+        const descriptionCheck = cleanString(userMessage);
 
         for (const word of descFilter) {
           if (descriptionCheck.includes(word)) {
-            description = "";
+            userMessage = "";
             break;
           }
         }
-        if (description.length > 50) {
-          description = description.substring(0, 50) + "...";
+        if (userMessage.length > 50) {
+          userMessage = userMessage.substring(0, 50) + "...";
         }
       }
 
-      if (description !== "") {
-        embed2.setDescription(
+      if (userMessage !== "") {
+        description =
           `a match has been made from **${
             message.guild.id == Constants.NYPSI_SERVER_ID
               ? `[nypsi](${Constants.NYPSI_SERVER_INVITE_LINK})`
               : message.guild.name
           }**\n\n` +
-            `[${authorTag ? `[${getTagsData()[authorTag.tagId].emoji}] ` : ""}**${
-              message.author.username
-            }**](https://nypsi.xyz/users/${message.author.id}?ref=bot-milf) - ${description}\n\n` +
-            "go ahead and send them a *private* message 😉😏",
-        );
+          `[${authorTag ? `[${getTagsData()[authorTag.tagId].emoji}] ` : ""}**${
+            message.author.username
+          }**](https://nypsi.xyz/users/${message.author.id}?ref=bot-milf) - ${userMessage}\n\n` +
+          "go ahead and send them a *private* message 😉😏";
       }
 
       const clusters = await (message.client as NypsiClient).cluster.broadcastEval(
@@ -278,7 +284,20 @@ async function run(
       }
 
       return await (message.client as NypsiClient).cluster.broadcastEval(
-        async (client, { embed, cluster, userId, channelId, guildId }) => {
+        async (
+          client,
+          { embed, userMessage, description, cluster, milfId, userId, channelId, guildId },
+        ) => {
+          const path = await import("path");
+
+          const { checkMessageContent } = await import(
+            path.join(process.cwd(), "dist", "utils", "functions", "guilds", "filters.js")
+          );
+
+          const { isMuted } = await import(
+            path.join(process.cwd(), "dist", "utils", "functions", "moderation", "mute.js")
+          );
+
           if ((client as unknown as NypsiClient).cluster.id != cluster) return;
           const guild = client.guilds.cache.get(guildId);
 
@@ -291,6 +310,15 @@ async function run(
           if (channel.isTextBased()) {
             const member = await guild.members.fetch(userId);
             if (!member) return;
+
+            if (
+              description !== "" &&
+              (await checkMessageContent(guild, userMessage, false)) &&
+              !(await isMuted(guild, milfId))
+            ) {
+              embed.description = description;
+            }
+
             await channel.send({ content: member.toString(), embeds: [embed] });
 
             return;
@@ -299,7 +327,10 @@ async function run(
         {
           context: {
             embed: embed2.toJSON(),
+            userMessage: userMessage,
+            description: description,
             cluster: cluster,
+            milfId: message.author.id,
             userId: milf.userId,
             channelId: milf.channelId,
             guildId: milf.guildId,
