@@ -7,9 +7,9 @@ import {
   EmbedBuilder,
   GuildMember,
   Interaction,
+  LabelBuilder,
   Message,
   MessageActionRowComponentBuilder,
-  ModalActionRowComponentBuilder,
   ModalBuilder,
   PermissionsBitField,
   TextChannel,
@@ -165,17 +165,18 @@ export default async function messageCreate(message: Message) {
       const modal = new ModalBuilder()
         .setCustomId("support_ticket")
         .setTitle("nypsi support request")
-        .addComponents(
-          new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
-            new TextInputBuilder()
-              .setCustomId("ticket_message")
-              .setLabel("message")
-              .setPlaceholder("what do you need help with?")
-              .setStyle(TextInputStyle.Paragraph)
-              .setRequired(true)
-              .setMinLength(15)
-              .setMaxLength(300),
-          ),
+        .addLabelComponents(
+          new LabelBuilder()
+            .setLabel("message")
+            .setTextInputComponent(
+              new TextInputBuilder()
+                .setCustomId("ticket_message")
+                .setPlaceholder("what do you need help with?")
+                .setStyle(TextInputStyle.Paragraph)
+                .setRequired(true)
+                .setMinLength(15)
+                .setMaxLength(300),
+            ),
         );
 
       const filter = (i: Interaction) => i.user.id == message.author.id;

@@ -6,6 +6,7 @@ import {
   Channel,
   CommandInteraction,
   Interaction,
+  LabelBuilder,
   Message,
   MessageActionRowComponentBuilder,
   MessageFlags,
@@ -345,16 +346,17 @@ async function run(
             .setCustomId("settings-update")
             .setTitle("net worth notifications");
 
-          modal.addComponents(
-            new ActionRowBuilder<TextInputBuilder>().addComponents(
-              new TextInputBuilder()
-                .setCustomId("val")
-                .setLabel("amount to be notified for")
-                .setPlaceholder("number")
-                .setStyle(TextInputStyle.Short)
-                .setRequired(true)
-                .setMinLength(0),
-            ),
+          modal.addLabelComponents(
+            new LabelBuilder()
+              .setLabel("amount to be notified for")
+              .setTextInputComponent(
+                new TextInputBuilder()
+                  .setCustomId("val")
+                  .setPlaceholder("number")
+                  .setStyle(TextInputStyle.Short)
+                  .setRequired(true)
+                  .setMinLength(0),
+              ),
           );
 
           await res.showModal(modal);
@@ -574,18 +576,19 @@ async function run(
         if (typeof settings[selected] == "number" || typeof settings[selected] === "bigint") {
           const modal = new ModalBuilder().setCustomId("settings-update").setTitle("update amount");
 
-          modal.addComponents(
-            new ActionRowBuilder<TextInputBuilder>().addComponents(
-              new TextInputBuilder()
-                .setCustomId("val")
-                .setLabel(
-                  selected === "marketDelay" ? "time in seconds" : "amount to be notified for",
-                )
-                .setPlaceholder("number")
-                .setStyle(TextInputStyle.Short)
-                .setRequired(true)
-                .setMinLength(0),
-            ),
+          modal.addLabelComponents(
+            new LabelBuilder()
+              .setLabel(
+                selected === "marketDelay" ? "time in seconds" : "amount to be notified for",
+              )
+              .setTextInputComponent(
+                new TextInputBuilder()
+                  .setCustomId("val")
+                  .setPlaceholder("number")
+                  .setStyle(TextInputStyle.Short)
+                  .setRequired(true)
+                  .setMinLength(0),
+              ),
           );
 
           await res.showModal(modal);
@@ -886,16 +889,17 @@ async function run(
       const modal = new ModalBuilder()
         .setCustomId("email")
         .setTitle("email")
-        .addComponents(
-          new ActionRowBuilder<TextInputBuilder>().addComponents(
-            new TextInputBuilder()
-              .setCustomId("emailtext")
-              .setLabel("enter your email below")
-              .setPlaceholder("nypsi@example.com")
-              .setStyle(TextInputStyle.Short)
-              .setRequired(true)
-              .setMaxLength(50),
-          ),
+        .addLabelComponents(
+          new LabelBuilder()
+            .setLabel("enter your email below")
+            .setTextInputComponent(
+              new TextInputBuilder()
+                .setCustomId("emailtext")
+                .setPlaceholder("nypsi@example.com")
+                .setStyle(TextInputStyle.Short)
+                .setRequired(true)
+                .setMaxLength(50),
+            ),
         );
 
       await res.showModal(modal);

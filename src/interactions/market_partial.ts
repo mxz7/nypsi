@@ -1,7 +1,7 @@
 import { OrderType } from "#generated/prisma";
 import {
-  ActionRowBuilder,
   ButtonInteraction,
+  LabelBuilder,
   MessageFlags,
   ModalBuilder,
   ModalSubmitInteraction,
@@ -164,16 +164,17 @@ async function showMultiModal(
   const id = `market-confirm-${Math.floor(Math.random() * 69420)}`;
   const modal = new ModalBuilder().setCustomId(id).setTitle(`${action} multiple`);
 
-  modal.addComponents(
-    new ActionRowBuilder<TextInputBuilder>().addComponents(
-      new TextInputBuilder()
-        .setCustomId("amount")
-        .setLabel(`how many do you want to ${action}?`)
-        .setPlaceholder(`maximum amount: ${maxAmount}`)
-        .setStyle(TextInputStyle.Short)
-        .setRequired(true)
-        .setMaxLength(10),
-    ),
+  modal.addLabelComponents(
+    new LabelBuilder()
+      .setLabel(`how many do you want to ${action}?`)
+      .setTextInputComponent(
+        new TextInputBuilder()
+          .setCustomId("amount")
+          .setPlaceholder(`maximum amount: ${maxAmount}`)
+          .setStyle(TextInputStyle.Short)
+          .setRequired(true)
+          .setMaxLength(10),
+      ),
   );
 
   await interaction.showModal(modal);

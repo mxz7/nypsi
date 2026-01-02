@@ -5,6 +5,7 @@ import {
   ButtonStyle,
   CommandInteraction,
   ComponentType,
+  LabelBuilder,
   Message,
   MessageActionRowComponentBuilder,
   MessageEditOptions,
@@ -242,15 +243,16 @@ async function run(
           const modal = new ModalBuilder()
             .setCustomId("rename_modal")
             .setTitle(`rename ${cars[index].name}`)
-            .addComponents(
-              new ActionRowBuilder<TextInputBuilder>().addComponents(
-                new TextInputBuilder()
-                  .setCustomId("name")
-                  .setLabel("new car name")
-                  .setPlaceholder(cars[index].name)
-                  .setRequired(true)
-                  .setStyle(TextInputStyle.Short),
-              ),
+            .addLabelComponents(
+              new LabelBuilder()
+                .setLabel("new car name")
+                .setTextInputComponent(
+                  new TextInputBuilder()
+                    .setCustomId("name")
+                    .setPlaceholder(cars[index].name)
+                    .setRequired(true)
+                    .setStyle(TextInputStyle.Short),
+                ),
             );
 
           await interaction.showModal(modal);

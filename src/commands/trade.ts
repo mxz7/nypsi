@@ -10,6 +10,7 @@ import {
   Interaction,
   InteractionEditReplyOptions,
   InteractionResponse,
+  LabelBuilder,
   Message,
   MessageActionRowComponentBuilder,
   MessageEditOptions,
@@ -438,23 +439,25 @@ async function run(
     const id = `request-item-${Math.floor(Math.random() * 69420)}`;
     const modal = new ModalBuilder().setCustomId(id).setTitle("request item");
 
-    modal.addComponents(
-      new ActionRowBuilder<TextInputBuilder>().addComponents(
-        new TextInputBuilder()
-          .setCustomId("item")
-          .setLabel("what item do you want to request?")
-          .setStyle(TextInputStyle.Short)
-          .setRequired(true)
-          .setMaxLength(25),
-      ),
-      new ActionRowBuilder<TextInputBuilder>().addComponents(
-        new TextInputBuilder()
-          .setCustomId("amount")
-          .setLabel("how many do you want to request?")
-          .setStyle(TextInputStyle.Short)
-          .setRequired(true)
-          .setMaxLength(10),
-      ),
+    modal.addLabelComponents(
+      new LabelBuilder()
+        .setLabel("what item do you want to request?")
+        .setTextInputComponent(
+          new TextInputBuilder()
+            .setCustomId("item")
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true)
+            .setMaxLength(25),
+        ),
+      new LabelBuilder()
+        .setLabel("how many do you want to request?")
+        .setTextInputComponent(
+          new TextInputBuilder()
+            .setCustomId("amount")
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true)
+            .setMaxLength(10),
+        ),
     );
 
     await interaction.showModal(modal);
@@ -469,23 +472,25 @@ async function run(
     const id = `offer-item-${Math.floor(Math.random() * 69420)}`;
     const modal = new ModalBuilder().setCustomId(id).setTitle("offer item");
 
-    modal.addComponents(
-      new ActionRowBuilder<TextInputBuilder>().addComponents(
-        new TextInputBuilder()
-          .setCustomId("item")
-          .setLabel("what item do you want to offer?")
-          .setStyle(TextInputStyle.Short)
-          .setRequired(true)
-          .setMaxLength(25),
-      ),
-      new ActionRowBuilder<TextInputBuilder>().addComponents(
-        new TextInputBuilder()
-          .setCustomId("amount")
-          .setLabel("how many do you want to offer?")
-          .setStyle(TextInputStyle.Short)
-          .setRequired(true)
-          .setMaxLength(10),
-      ),
+    modal.addLabelComponents(
+      new LabelBuilder()
+        .setLabel("what item do you want to offer?")
+        .setTextInputComponent(
+          new TextInputBuilder()
+            .setCustomId("item")
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true)
+            .setMaxLength(25),
+        ),
+      new LabelBuilder()
+        .setLabel("how many do you want to offer?")
+        .setTextInputComponent(
+          new TextInputBuilder()
+            .setCustomId("amount")
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true)
+            .setMaxLength(10),
+        ),
     );
 
     await interaction.showModal(modal);
@@ -500,15 +505,16 @@ async function run(
     const id = `offer-money-${Math.floor(Math.random() * 69420)}`;
     const modal = new ModalBuilder().setCustomId(id).setTitle("offer money");
 
-    modal.addComponents(
-      new ActionRowBuilder<TextInputBuilder>().addComponents(
-        new TextInputBuilder()
-          .setCustomId("amount")
-          .setLabel("how much money do you want to offer?")
-          .setStyle(TextInputStyle.Short)
-          .setRequired(true)
-          .setMaxLength(15),
-      ),
+    modal.addLabelComponents(
+      new LabelBuilder()
+        .setLabel("how much money do you want to offer?")
+        .setTextInputComponent(
+          new TextInputBuilder()
+            .setCustomId("amount")
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true)
+            .setMaxLength(15),
+        ),
     );
 
     await interaction.showModal(modal);

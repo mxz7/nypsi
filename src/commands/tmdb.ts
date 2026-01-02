@@ -5,6 +5,7 @@ import {
   ButtonStyle,
   CommandInteraction,
   Interaction,
+  LabelBuilder,
   Message,
   MessageActionRowComponentBuilder,
   MessageFlags,
@@ -1073,15 +1074,16 @@ async function run(
     const id = `tmdb-country-select-${Math.floor(Math.random() * 69420)}`;
     const modal = new ModalBuilder().setCustomId(id).setTitle("enter country");
 
-    modal.addComponents(
-      new ActionRowBuilder<TextInputBuilder>().addComponents(
-        new TextInputBuilder()
-          .setCustomId("country")
-          .setLabel("enter country name or code")
-          .setStyle(TextInputStyle.Short)
-          .setRequired(true)
-          .setMaxLength(25),
-      ),
+    modal.addLabelComponents(
+      new LabelBuilder()
+        .setLabel("enter country name or code")
+        .setTextInputComponent(
+          new TextInputBuilder()
+            .setCustomId("country")
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true)
+            .setMaxLength(25),
+        ),
     );
 
     await interaction.showModal(modal);
@@ -1101,16 +1103,17 @@ async function run(
     const id = `tmdb-number-select-${Math.floor(Math.random() * 69420)}`;
     const modal = new ModalBuilder().setCustomId(id).setTitle(title);
 
-    modal.addComponents(
-      new ActionRowBuilder<TextInputBuilder>().addComponents(
-        new TextInputBuilder()
-          .setCustomId("number")
-          .setLabel(label)
-          .setPlaceholder(placeholder)
-          .setStyle(TextInputStyle.Short)
-          .setRequired(true)
-          .setMaxLength(5),
-      ),
+    modal.addLabelComponents(
+      new LabelBuilder()
+        .setLabel(label)
+        .setTextInputComponent(
+          new TextInputBuilder()
+            .setCustomId("number")
+            .setPlaceholder(placeholder)
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true)
+            .setMaxLength(5),
+        ),
     );
 
     await interaction.showModal(modal);

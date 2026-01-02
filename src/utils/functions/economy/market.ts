@@ -5,6 +5,7 @@ import {
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
+  LabelBuilder,
   MessageActionRowComponentBuilder,
   MessageFlags,
   ModalBuilder,
@@ -1186,11 +1187,10 @@ export async function showMarketConfirmationModal(
 
   const modal = new ModalBuilder().setCustomId(id).setTitle("confirmation");
 
-  modal.addComponents(
-    new ActionRowBuilder<TextInputBuilder>().addComponents(
+  modal.addLabelComponents(
+    new LabelBuilder().setLabel("type 'yes' to confirm").setTextInputComponent(
       new TextInputBuilder()
         .setCustomId("confirmation")
-        .setLabel("type 'yes' to confirm")
         .setPlaceholder(
           action == "buy"
             ? `this will cost $${cost.toLocaleString()}`
