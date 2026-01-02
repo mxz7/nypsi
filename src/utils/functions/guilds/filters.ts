@@ -61,25 +61,27 @@ export async function updateSnipeFilter(guild: Guild, array: string[]) {
   if (snipeFilterCache.has(guild.id)) snipeFilterCache.delete(guild.id);
 }
 
-export async function getChatFilter(guild: Guild): Promise<
+export async function getChatFilter(guild: Guild | string): Promise<
   {
     content: string;
     percentMatch: number;
     guildId: string;
   }[]
 > {
-  const cache = await redis.get(`${Constants.redis.cache.guild.CHATFILTER}:${guild.id}`);
+  const guildId = typeof guild === "string" ? guild : guild.id;
+
+  const cache = await redis.get(`${Constants.redis.cache.guild.CHATFILTER}:${guildId}`);
 
   if (cache) return JSON.parse(cache);
 
   const query = await prisma.chatFilter.findMany({
     where: {
-      guildId: guild.id,
+      guildId,
     },
   });
 
   await redis.set(
-    `${Constants.redis.cache.guild.CHATFILTER}:${guild.id}`,
+    `${Constants.redis.cache.guild.CHATFILTER}:${guildId}`,
     JSON.stringify(query),
     "EX",
     3600,
@@ -127,9 +129,16 @@ export async function checkMessageContent(
   message?: undefined,
 ): Promise<boolean>;
 
+export async function checkMessageContent(
+  guild: string,
+  content: string,
+  modlog: false,
+  message?: undefined,
+): Promise<boolean>;
+
 // Implementation
 export async function checkMessageContent(
-  guild: Guild,
+  guild: Guild | string,
   content: string,
   modlog: boolean,
   message?: Message,
@@ -144,7 +153,7 @@ export async function checkMessageContent(
         if (word.content.includes(" ")) {
           if (content.includes(word.content)) {
             const contentModified = content.replace(word.content, `**${word.content}**`);
-            if (modlog) {
+            if (modlog && guild instanceof Guild) {
               addModLog(
                 guild,
                 "filter violation",
@@ -161,7 +170,7 @@ export async function checkMessageContent(
         } else {
           if (content.split(" ").indexOf(word.content) != -1) {
             const contentModified = content.replace(word.content, `**${word.content}**`);
-            if (modlog) {
+            if (modlog && guild instanceof Guild) {
               addModLog(
                 guild,
                 "filter violation",
@@ -182,7 +191,7 @@ export async function checkMessageContent(
         if (word.content.includes(" ")) {
           if (content.includes(word.content)) {
             const contentModified = content.replace(word.content, `**${word.content}**`);
-            if (modlog) {
+            if (modlog && guild instanceof Guild) {
               addModLog(
                 guild,
                 "filter violation",
@@ -203,7 +212,7 @@ export async function checkMessageContent(
             if (similarity >= (word.percentMatch || 100) / 100) {
               const contentModified = content.replace(contentWord, `**${contentWord}**`);
 
-              if (modlog) {
+              if (modlog && guild instanceof Guild) {
                 addModLog(
                   message.guild,
                   "filter violation",

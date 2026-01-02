@@ -38,10 +38,10 @@ export async function newMute(guild: Guild, userIDs: string[], date: Date) {
   }
 }
 
-export async function isMuted(guild: Guild, member: MemberResolvable) {
+export async function isMuted(guild: Guild | string, member: MemberResolvable) {
   const query = await prisma.moderationMute.findFirst({
     where: {
-      AND: [{ guildId: guild.id }, { userId: getUserId(member) }],
+      AND: [{ guildId: guild instanceof Guild ? guild.id : guild }, { userId: getUserId(member) }],
     },
     select: {
       userId: true,
