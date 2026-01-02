@@ -10,6 +10,8 @@ import { addProgress } from "../utils/functions/economy/achievements.js";
 import { addEventProgress, EventData, getCurrentEvent } from "../utils/functions/economy/events.js";
 import { addTaskProgress } from "../utils/functions/economy/tasks.js";
 import { getTagsData } from "../utils/functions/economy/utils.js";
+import { checkMessageContent } from "../utils/functions/guilds/filters.js";
+import { isMuted } from "../utils/functions/moderation/mute.js";
 import { cleanString } from "../utils/functions/string.js";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications.js";
 import { getActiveTag } from "../utils/functions/users/tags.js";
@@ -170,7 +172,11 @@ async function run(
           }?ref=bot-milf) a *private* message 😉😏`,
       ).setHeader("milf finder");
 
-      if (milf.description != "") {
+      if (
+        milf.description != "" &&
+        (await checkMessageContent(message.guild, milf.description, false)) &&
+        !(await isMuted(message.guild, milf.userId))
+      ) {
         embed.setDescription(
           `a match has been made from **${
             milf.guildId == Constants.NYPSI_SERVER_ID
@@ -244,7 +250,11 @@ async function run(
         }
       }
 
-      if (description !== "") {
+      if (
+        description != "" &&
+        (await checkMessageContent(milf.guildId, description, false)) &&
+        !(await isMuted(milf.guildId, message.author.id))
+      ) {
         embed2.setDescription(
           `a match has been made from **${
             message.guild.id == Constants.NYPSI_SERVER_ID
@@ -291,6 +301,7 @@ async function run(
           if (channel.isTextBased()) {
             const member = await guild.members.fetch(userId);
             if (!member) return;
+
             await channel.send({ content: member.toString(), embeds: [embed] });
 
             return;
