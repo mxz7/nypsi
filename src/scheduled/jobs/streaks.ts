@@ -189,7 +189,7 @@ async function doVoteStreaks(manager: ClusterManager) {
     .setColor(Constants.EMBED_FAIL_COLOR)
     .setTitle("you have lost your vote streak!")
     .setDescription(
-      "you have lost your vote streak by not doing voting in over a day.\ncalendars can be used to protect your streaks from being reset",
+      "you have lost your vote streak by not doing voting in over a day.\nvote at least **once every 24 hours** to maintain your streak!",
     );
 
   const voteRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
