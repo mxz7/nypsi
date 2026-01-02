@@ -176,7 +176,9 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel, 
         const pos = await topChatReactionGlobal(message.author.id, false, 5000, true);
 
         const embed = new CustomEmbed(message.member);
-        embed.setDescription(`you've set a new **personal best** ${pos ? ` (#${pos})` : ""}`);
+        embed.setDescription(
+          `you've set a new **personal best** ${pos > -1 ? ` (#${(pos + 1).toLocaleString()})` : ""}`,
+        );
 
         setTimeout(() => {
           message.reply({ embeds: [embed] });
