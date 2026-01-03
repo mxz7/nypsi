@@ -78,7 +78,7 @@ async function run(
           .setEmoji("🔱")
           .setLabel("live data")
           .setStyle(ButtonStyle.Link)
-          .setURL("https://nypsi.xyz/events?ref=bot-event-command"),
+          .setURL(`https://nypsi.xyz/events/${event.id}?ref=bot-event-command`),
       ),
     ],
   });
