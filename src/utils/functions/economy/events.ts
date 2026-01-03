@@ -189,7 +189,7 @@ export async function getCurrentEvent(useCache = true): Promise<EventData> {
       Constants.redis.cache.economy.event,
       JSON.stringify(query),
       "EX",
-      Math.min(query.expiresAt.getTime(), ms("12 hours")) / 1000,
+      Math.min(query.expiresAt?.getTime() || ms("12 hours"), ms("12 hours")) / 1000,
     );
   } else {
     await redis.set(Constants.redis.cache.economy.event, "none");
