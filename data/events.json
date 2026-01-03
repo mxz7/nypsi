@@ -2,72 +2,72 @@
   "blackjack": {
     "id": "blackjack",
     "name": "blackjack",
-    "description": "win {target} games of blackjack"
+    "description": "win {target} games of blackjack!"
   },
   "mines": {
     "id": "mines",
     "name": "mines",
-    "description": "win {target} games of mines"
+    "description": "win {target} games of mines!"
   },
   "highlow": {
     "id": "highlow",
     "name": "highlow",
-    "description": "win {target} games of highlow"
+    "description": "win {target} games of highlow!"
   },
   "dragontower": {
     "id": "dragontower",
     "name": "dragon tower",
-    "description": "win {target} games of dragon tower"
+    "description": "win {target} games of dragon tower!"
   },
   "roulette": {
     "id": "roulette",
     "name": "roulette",
-    "description": "win {target} games of roulette"
+    "description": "win {target} games of roulette!"
   },
   "slots": {
     "id": "slots",
     "name": "slots",
-    "description": "win {target} games of slots"
+    "description": "win {target} games of slots!"
   },
   "rps": {
     "id": "rps",
     "name": "rock paper scissors",
-    "description": "win {target} games of rock paper scissors (rps)"
+    "description": "win {target} games of rock paper scissors (rps)!"
   },
   "coinflip": {
     "id": "coinflip",
     "name": "coinflip",
-    "description": "win {target} games of coinflip"
+    "description": "win {target} games of coinflip!"
   },
   "rob": {
     "id": "rob",
     "name": "robbery",
-    "description": "win {target} robberies"
+    "description": "win {target} robberies!"
   },
   "gamble": {
     "id": "gamble",
     "name": "gambling addiction",
-    "description": "win {target} gambles"
+    "description": "win {target} gambles!"
   },
   "farming": {
     "id": "farming",
     "name": "green thumbs",
-    "description": "harvest {target} fruits/plants"
+    "description": "harvest {target} fruits/plants!"
   },
   "commands": {
     "id": "commands",
     "name": "nypsi addicts",
-    "description": "do {target} commands"
+    "description": "do {target} commands!"
   },
   "cookies": {
     "id": "cookies",
     "name": "cookie collector",
-    "description": "bake {target} cookies"
+    "description": "bake {target} cookies!"
   },
   "milfs": {
     "id": "milfs",
     "name": "milf finder",
-    "description": "find {target} milfs"
+    "description": "find {target} milfs!"
   },
   "messages": {
     "id": "messages",
@@ -77,26 +77,26 @@
   "animals": {
     "id": "animals",
     "name": "animals",
-    "description": "look at {target} pictures of animals"
+    "description": "look at {target} pictures of animals!"
   },
   "grind": {
     "id": "grind",
     "name": "grind",
-    "description": "get {target} items from fish/hunt/mine"
+    "description": "get {target} items from fish/hunt/mine!"
   },
   "chatreaction": {
     "id": "chatreaction",
     "name": "fast typers",
-    "description": "play {target} chat reaction games"
+    "description": "play {target} chat reaction games!"
   },
   "halloween": {
     "id": "halloween",
     "name": "halloween",
-    "description": "collect {target} pumpkins"
+    "description": "collect {target} pumpkins!"
   },
   "christmas": {
     "id": "christmas",
     "name": "christmas",
-    "description": "collect {target} christmas trees"
+    "description": "collect {target} christmas trees!"
   }
 }
