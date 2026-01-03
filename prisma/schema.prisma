@@ -1087,8 +1087,8 @@ model Event {
   completedAt DateTime?
 
   type      String
-  target    BigInt
-  expiresAt DateTime
+  target    BigInt?
+  expiresAt DateTime?
 
   owner         User                @relation(fields: [ownerId], references: [id])
   contributions EventContribution[]
