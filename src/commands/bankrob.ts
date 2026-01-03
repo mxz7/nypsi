@@ -19,7 +19,12 @@ import { a } from "../utils/functions/anticheat";
 import { giveCaptcha, isLockedOut, verifyUser } from "../utils/functions/captcha";
 import { addProgress } from "../utils/functions/economy/achievements.js";
 import { addBalance, getBalance, removeBalance } from "../utils/functions/economy/balance.js";
-import { addEventProgress, EventData, getCurrentEvent } from "../utils/functions/economy/events";
+import {
+  addEventProgress,
+  EventData,
+  formatEventProgress,
+  getCurrentEvent,
+} from "../utils/functions/economy/events";
 import { getInventory, removeInventoryItem } from "../utils/functions/economy/inventory.js";
 import { createGame } from "../utils/functions/economy/stats.js";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
@@ -174,20 +179,16 @@ async function run(
         outcome: `${message.author.username} robbed ${bank}`,
       });
 
-      const eventData: { event?: EventData; target: number } = { target: 0 };
+      let eventData: EventData;
 
       if (eventProgress) {
-        eventData.event = await getCurrentEvent();
-
-        if (eventData.event) {
-          eventData.target = Number(eventData.event.target);
-        }
+        eventData = await getCurrentEvent();
       }
 
       embed.setDescription(
         `**success!**\n\n**you stole** $${stolen.toLocaleString()} from **${bank}**` +
           (eventProgress
-            ? `\n\n🔱${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`
+            ? `\n\n${formatEventProgress(eventData, eventProgress, message.author.id)}`
             : ""),
       );
       embed.setColor(Constants.EMBED_SUCCESS_COLOR);

@@ -11,7 +11,7 @@ import { getTier, isPremium } from "../premium/premium";
 import { percentChance } from "../random";
 import { pluralize } from "../string";
 import { addProgress } from "./achievements";
-import { addEventProgress, EventData, getCurrentEvent } from "./events";
+import { addEventProgress, formatEventProgress, getCurrentEvent } from "./events";
 import { getGuildName, getGuildUpgradesByUser } from "./guilds";
 import { addInventoryItem, getInventory } from "./inventory";
 import { getUpgrades } from "./levelling";
@@ -298,18 +298,8 @@ export async function runBakery(member: GuildMember) {
   );
 
   if (eventProgress) {
-    const eventData: { event?: EventData; target: number } = { target: 0 };
-
-    eventData.event = await getCurrentEvent();
-
-    if (eventData.event) {
-      eventData.target = Number(eventData.event.target);
-    }
-
-    embed.addField(
-      "event progress",
-      `🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`,
-    );
+    const eventData = await getCurrentEvent();
+    embed.addField("event progress", formatEventProgress(eventData, eventProgress, member.user.id));
   }
 
   addStat(member, "times-baked");

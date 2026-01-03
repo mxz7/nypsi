@@ -18,7 +18,12 @@ import {
   removeBalance,
   setPadlock,
 } from "../utils/functions/economy/balance";
-import { addEventProgress, EventData, getCurrentEvent } from "../utils/functions/economy/events";
+import {
+  addEventProgress,
+  EventData,
+  formatEventProgress,
+  getCurrentEvent,
+} from "../utils/functions/economy/events";
 import { addToGuildXP, getGuildByUser, getGuildName } from "../utils/functions/economy/guilds";
 import { getInventory, removeInventoryItem } from "../utils/functions/economy/inventory";
 import { isPassive } from "../utils/functions/economy/passive";
@@ -294,14 +299,10 @@ async function run(
 
       embed2.setColor(Constants.EMBED_SUCCESS_COLOR);
 
-      const eventData: { event?: EventData; target: number } = { target: 0 };
+      let eventData: EventData;
 
       if (eventProgress) {
-        eventData.event = await getCurrentEvent();
-
-        if (eventData.event) {
-          eventData.target = Number(eventData.event.target);
-        }
+        eventData = await getCurrentEvent();
       }
 
       embed2.addField(
@@ -310,7 +311,7 @@ async function run(
           amountMoney.toLocaleString() +
           "**" +
           (eventProgress
-            ? `\n\n🔱${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`
+            ? `\n\n${formatEventProgress(eventData, eventProgress, message.member)}`
             : ""),
       );
 

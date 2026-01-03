@@ -476,7 +476,7 @@ function hasEventEnded(event: EventData, progress: number) {
 /**
  * used for events that are supposed to be completed / finished
  */
-function hasEventCompleted(event: EventData) {
+function hasEventCompleted(event: Event) {
   return Boolean(event.endedAt);
 }
 
@@ -486,19 +486,23 @@ export function formatEventDescription(event: Event) {
   return data.description.replaceAll("{target}", event.target ? event.target.toLocaleString() : "");
 }
 
-export function formatEventProgress(event: EventData, progress: number, userId: string) {
+export function formatEventProgress(event: EventData, progress: number, user?: MemberResolvable) {
   let message = `🔱 ${progress.toLocaleString()}`;
 
   if (event.target) {
     message += `/${event.target.toLocaleString()}`;
   }
 
-  const contributionIndex = event.contributions.findIndex(
-    (contribution) => contribution.userId === userId,
-  );
+  if (user) {
+    const userId = getUserId(user);
 
-  if (contributionIndex > -1) {
-    message += ` (you are #${(contributionIndex + 1).toLocaleString()})`;
+    const contributionIndex = event.contributions.findIndex(
+      (contribution) => contribution.userId === userId,
+    );
+
+    if (contributionIndex > -1) {
+      message += ` (you are #${(contributionIndex + 1).toLocaleString()})`;
+    }
   }
 
   if (event.expiresAt) {

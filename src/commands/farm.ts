@@ -12,7 +12,7 @@ import { inPlaceSort } from "fast-sort";
 import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { EventData, getCurrentEvent } from "../utils/functions/economy/events";
+import { EventData, formatEventProgress, getCurrentEvent } from "../utils/functions/economy/events";
 import {
   addFarmUpgrade,
   deletePlant,
@@ -436,15 +436,13 @@ async function run(
     }
 
     if (eventProgress) {
-      const eventData: { event?: EventData; target: number } = { target: 0 };
+      let eventData: EventData;
 
-      eventData.event = await getCurrentEvent();
-
-      if (eventData.event) {
-        eventData.target = Number(eventData.event.target);
+      if (eventProgress) {
+        eventData = await getCurrentEvent();
       }
 
-      desc += `\n\n🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`;
+      desc += `\n\n${formatEventProgress(eventData, eventProgress, message.author.id)}`;
     }
 
     const embed = new CustomEmbed(message.member, desc).setHeader(

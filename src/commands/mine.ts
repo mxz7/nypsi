@@ -12,7 +12,12 @@ import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getBoosters } from "../utils/functions/economy/boosters";
-import { addEventProgress, EventData, getCurrentEvent } from "../utils/functions/economy/events";
+import {
+  addEventProgress,
+  EventData,
+  formatEventProgress,
+  getCurrentEvent,
+} from "../utils/functions/economy/events";
 import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds";
 import {
   addInventoryItem,
@@ -344,14 +349,10 @@ async function run(
     total,
   );
 
-  const eventData: { event?: EventData; target: number } = { target: 0 };
+  let eventData: EventData;
 
   if (eventProgress) {
-    eventData.event = await getCurrentEvent();
-
-    if (eventData.event) {
-      eventData.target = Number(eventData.event.target);
-    }
+    eventData = await getCurrentEvent();
   }
 
   embed.setDescription(
@@ -365,10 +366,7 @@ async function run(
   );
 
   if (eventProgress) {
-    embed.addField(
-      "event progress",
-      `🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`,
-    );
+    embed.addField("event progress", formatEventProgress(eventData, eventProgress, message.member));
   }
 
   send({ embeds: [embed], components: [row] });

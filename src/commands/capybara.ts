@@ -3,7 +3,12 @@ import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
-import { addEventProgress, EventData, getCurrentEvent } from "../utils/functions/economy/events";
+import {
+  addEventProgress,
+  EventData,
+  formatEventProgress,
+  getCurrentEvent,
+} from "../utils/functions/economy/events";
 import { getRandomImage } from "../utils/functions/image";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -35,21 +40,15 @@ async function run(
     1,
   );
 
-  const eventData: { event?: EventData; target: number } = { target: 0 };
+  let eventData: EventData;
 
   if (eventProgress) {
-    eventData.event = await getCurrentEvent();
-
-    if (eventData.event) {
-      eventData.target = Number(eventData.event.target);
-    }
+    eventData = await getCurrentEvent();
   }
 
   const embed = new CustomEmbed(
     message.member,
-    eventProgress
-      ? `🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`
-      : undefined,
+    eventProgress ? formatEventProgress(eventData, eventProgress, message.author.id) : undefined,
   )
     .disableFooter()
     .setImage(image.url);

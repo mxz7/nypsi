@@ -21,7 +21,12 @@ import {
   getBalance,
   removeBalance,
 } from "../utils/functions/economy/balance";
-import { addEventProgress, EventData, getCurrentEvent } from "../utils/functions/economy/events";
+import {
+  addEventProgress,
+  EventData,
+  formatEventProgress,
+  getCurrentEvent,
+} from "../utils/functions/economy/events";
 import {
   addInventoryItem,
   getInventory,
@@ -225,21 +230,15 @@ async function run(
         )}** +$${winnings.toLocaleString()}${tax ? ` (${(tax * 100).toFixed(1)}% tax)` : ""}`;
       }
 
-      const eventData: { event?: EventData; target: number } = { target: 0 };
+      let eventData: EventData;
 
       if (eventProgress) {
-        eventData.event = await getCurrentEvent();
-
-        if (eventData.event) {
-          eventData.target = Number(eventData.event.target);
-        }
+        eventData = await getCurrentEvent();
       }
 
       embed.setDescription(
         `**winner** ${escapeFormattingCharacters(winner.user.username)}\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}` +
-          (eventProgress
-            ? `\n\n🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`
-            : ""),
+          (eventProgress ? `\n\n${formatEventProgress(eventData, eventProgress)}` : ""),
       );
       embed.setColor(winner.displayHexColor);
       embed.setFooter({ text: `id: ${id}` });
@@ -280,21 +279,15 @@ async function run(
         thingy = `${escapeFormattingCharacters(message.author.username)}\n**${escapeFormattingCharacters(player2.user.username)}** +${(itemAmount * 2).toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-cf)**`;
       }
 
-      const eventData: { event?: EventData; target: number } = { target: 0 };
+      let eventData: EventData;
 
       if (eventProgress) {
-        eventData.event = await getCurrentEvent();
-
-        if (eventData.event) {
-          eventData.target = Number(eventData.event.target);
-        }
+        eventData = await getCurrentEvent();
       }
 
       embed.setDescription(
         `**winner** ${escapeFormattingCharacters(winner.user.username)}\n\n${thingy}\n\n**bet** ${itemAmount.toLocaleString()}x ${item.emoji} **[${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-cf)**` +
-          (eventProgress
-            ? `\n\n🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`
-            : ""),
+          (eventProgress ? `\n\n${formatEventProgress(eventData, eventProgress)}` : ""),
       );
       embed.setColor(winner.displayHexColor);
       embed.setFooter({ text: `id: ${id}` });

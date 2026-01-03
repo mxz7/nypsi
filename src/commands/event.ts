@@ -68,6 +68,10 @@ async function run(
     content += `ends on <t:${Math.floor(event.expiresAt.getTime() / 1000)}> (<t:${Math.floor(event.expiresAt.getTime() / 1000)}:R>)\n\n`;
   }
 
+  if (event.expiresAt) {
+    content += "total: ";
+  }
+
   content += getEventProgress(event).toLocaleString();
 
   if (event.target) {
