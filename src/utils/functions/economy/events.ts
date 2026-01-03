@@ -72,6 +72,16 @@ export async function createEvent(
 
   await redis.del(Constants.redis.cache.economy.event, Constants.redis.cache.economy.eventProgress);
 
+  let message = `🔱 the **${getEventsData()[type].name}** event has started!!\n\n`;
+
+  if (event.target) {
+    message += `> ${getEventsData()[type].description.replace("{target}", target.toLocaleString())}\n\n`;
+  } else {
+    message += `> ends on <t:${Math.floor(event.expiresAt.getTime() / 1000)}> (<t:${Math.floor(event.expiresAt.getTime() / 1000)}:R>)\n\n`;
+  }
+
+  message += `<@&${Constants.EVENTS_ROLE_ID}>`;
+
   const targetChannel =
     client.user.id === Constants.BOT_USER_ID
       ? Constants.ANNOUNCEMENTS_CHANNEL_ID
@@ -112,11 +122,7 @@ export async function createEvent(
       },
       {
         context: {
-          content:
-            `🔱 the **${getEventsData()[type].name}** event has started!!\n\n` +
-            `> ${getEventsData()[type].description.replace("{target}", target.toLocaleString())}\n\n` +
-            `ends on <t:${Math.floor(event.expiresAt.getTime() / 1000)}> (<t:${Math.floor(event.expiresAt.getTime() / 1000)}:R>)\n\n` +
-            `<@&${Constants.EVENTS_ROLE_ID}>`,
+          content: message,
           components: new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
             new ButtonBuilder()
               .setStyle(ButtonStyle.Link)
@@ -156,16 +162,31 @@ export async function getCurrentEvent(useCache = true): Promise<EventData> {
     }
   }
 
-  const query = await prisma.event.findFirst({
+  let query = await prisma.event.findFirst({
     where: {
-      AND: [{ completed: false, expiresAt: { gt: new Date() } }],
+      OR: [
+        // target based
+        { AND: [{ target: { not: null } }, { endedAt: null }] },
+
+        // time based
+        { AND: [{ expiresAt: { not: null } }, { expiresAt: { gt: new Date() } }] },
+      ],
     },
     include: {
       contributions: {
         orderBy: [{ contribution: "desc" }, { user: { lastKnownUsername: "asc" } }],
       },
     },
+
+    // this assumes that the only active event is the most recent one
+    orderBy: { id: "desc" },
+    take: 1,
   });
+
+  if (query && hasEventEnded(query)) {
+    // something broken with the event that was fetched
+    query = undefined;
+  }
 
   if (query) {
     await redis.set(
@@ -520,4 +541,15 @@ async function completeEvent(client: NypsiClient, lastUser: string) {
     .then((res) => {
       return res.filter((i) => Boolean(i));
     });
+}
+
+function hasEventEnded(event: EventData) {
+  if (event.target) {
+    const progress = getEventProgress(event);
+    return progress >= event.target;
+  } else if (event.expiresAt) {
+    return event.expiresAt.getTime() < Date.now();
+  } else {
+    throw new Error(`event: ${event.id} has neither target or expiresAt... BROKEN`);
+  }
 }
