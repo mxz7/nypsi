@@ -160,7 +160,13 @@ export async function getCurrentEvent(useCache = true): Promise<EventData> {
       if (cache === "none") {
         return undefined;
       } else {
-        return JSON.parse(cache);
+        const data: EventData = JSON.parse(cache);
+
+        data.createdAt = new Date(data.createdAt);
+        data.expiresAt = data.expiresAt ? new Date(data.expiresAt) : null;
+        data.endedAt = data.endedAt ? new Date(data.endedAt) : null;
+
+        return data;
       }
     }
   }
