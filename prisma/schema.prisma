@@ -1086,11 +1086,12 @@ model Event {
   type String
 
   // for target based events
-  endedAt DateTime?
-  target  BigInt?
+  target BigInt?
 
   // for time based events
   expiresAt DateTime?
+
+  endedAt DateTime?
 
   owner         User                @relation(fields: [ownerId], references: [id])
   contributions EventContribution[]

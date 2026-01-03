@@ -10,7 +10,8 @@ ALTER TABLE "Event" DROP COLUMN "completed",
 ADD COLUMN     "endedAt" TIMESTAMP(3);
 
 -- UpdateTable
-UPDATE "Event" SET "endedAt" = "completedAt";
+UPDATE "Event"
+SET "endedAt" = COALESCE("completedAt", "expiresAt");
 
 -- AlterTable
 ALTER TABLE "Event" DROP COLUMN "completedAt";

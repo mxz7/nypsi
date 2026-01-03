@@ -162,13 +162,7 @@ export async function getCurrentEvent(useCache = true): Promise<EventData> {
 
   let query = await prisma.event.findFirst({
     where: {
-      OR: [
-        // target based
-        { AND: [{ target: { not: null } }, { endedAt: null }] },
-
-        // time based
-        { AND: [{ expiresAt: { not: null } }, { expiresAt: { gt: new Date() } }] },
-      ],
+      endedAt: null,
     },
     include: {
       contributions: {
@@ -176,12 +170,11 @@ export async function getCurrentEvent(useCache = true): Promise<EventData> {
       },
     },
 
-    // this assumes that the only active event is the most recent one
+    // this assumes that the only active event is the most recent one, take 1 is assumed by findFirst
     orderBy: { id: "desc" },
-    take: 1,
   });
 
-  if (query && hasEventEnded(query)) {
+  if (query && hasEventCompleted(query)) {
     // something broken with the event that was fetched
     query = undefined;
   }
@@ -361,15 +354,15 @@ async function completeEvent(client: NypsiClient, lastUser: string) {
   completing = true;
   let event = await getCurrentEvent(false);
 
-  if (event.completed) {
+  if (hasEventCompleted(event)) {
+    logger.error(`event: tried to complete event that was already completed: ${event.id}`);
     return;
   }
 
   event = await prisma.event.update({
     where: { id: event.id },
     data: {
-      completed: true,
-      completedAt: new Date(),
+      endedAt: new Date(),
     },
     include: {
       contributions: {
@@ -385,9 +378,12 @@ async function completeEvent(client: NypsiClient, lastUser: string) {
   await giveRewards(event);
   const privacy = await getPreferences(lastUser).then((r) => r.leaderboards);
 
-  let content =
-    `🔱 the **${getEventsData()[event.type].name}** event has been completed! ` +
-    `completed in ${MStoTime(event.completedAt.getTime() - event.createdAt.getTime())}\n\n`;
+  let content = `🔱 the **${getEventsData()[event.type].name}** event has been completed!`;
+  if (event.target) {
+    content += ` completed in ${MStoTime(event.endedAt.getTime() - event.createdAt.getTime())}`;
+  }
+
+  content += "\n\n";
 
   if (privacy) {
     content += `the final contributing participant was **${await getLastKnownUsername(lastUser)}**\n\n`;
@@ -453,11 +449,10 @@ async function completeEvent(client: NypsiClient, lastUser: string) {
     });
 }
 
-function hasEventEnded(event: EventData, progress?: number) {
-  if (!progress) {
-    progress = getEventProgress(event);
-  }
-
+/**
+ * used for events that are supposed to be in progress
+ */
+function hasEventEnded(event: EventData, progress: number) {
   if (event.target) {
     return progress >= event.target;
   } else if (event.expiresAt) {
@@ -465,4 +460,11 @@ function hasEventEnded(event: EventData, progress?: number) {
   } else {
     throw new Error(`event: ${event.id} has neither target or expiresAt... BROKEN`);
   }
+}
+
+/**
+ * used for events that are supposed to be completed / finished
+ */
+function hasEventCompleted(event: EventData) {
+  return Boolean(event.endedAt);
 }
