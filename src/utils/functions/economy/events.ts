@@ -79,7 +79,7 @@ export async function createEvent(
 
   let message =
     `🔱 the **${getEventsData()[type].name}** event has started!!\n\n` +
-    `> ${formatEventDescription(getEventsData()[type], progressTarget)}\n\n`;
+    `> ${formatEventDescription(event)}\n\n`;
 
   if (event.expiresAt) {
     message += `ends on <t:${Math.floor(event.expiresAt.getTime() / 1000)}> (<t:${Math.floor(event.expiresAt.getTime() / 1000)}:R>)\n\n`;
@@ -480,9 +480,30 @@ function hasEventCompleted(event: EventData) {
   return Boolean(event.endedAt);
 }
 
-export function formatEventDescription(
-  event: ReturnType<typeof getEventsData>[string],
-  target?: number,
-) {
-  return event.description.replaceAll("{target}", target?.toLocaleString() ?? "");
+export function formatEventDescription(event: Event) {
+  const data = getEventsData()[event.type];
+
+  return data.description.replaceAll("{target}", event.target ? event.target.toLocaleString() : "");
+}
+
+export function formatEventProgress(event: EventData, progress: number, userId: string) {
+  let message = `🔱 ${progress.toLocaleString()}`;
+
+  if (event.target) {
+    message += `/${event.target.toLocaleString()}`;
+  }
+
+  const contributionIndex = event.contributions.findIndex(
+    (contribution) => contribution.userId === userId,
+  );
+
+  if (contributionIndex > -1) {
+    message += ` (you are #${(contributionIndex + 1).toLocaleString()})`;
+  }
+
+  if (event.expiresAt) {
+    message += `\n-# ends <t:${Math.floor(event.expiresAt.getTime() / 1000)}:R>`;
+  }
+
+  return message;
 }

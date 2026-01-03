@@ -62,8 +62,7 @@ async function run(
   );
 
   let content =
-    `**${getEventsData()[event.type].name}**\n` +
-    `> ${formatEventDescription(getEventsData()[event.type], Number(event.target))}\n\n`;
+    `**${getEventsData()[event.type].name}**\n` + `> ${formatEventDescription(event)}\n\n`;
 
   if (event.expiresAt) {
     content += `ends on <t:${Math.floor(event.expiresAt.getTime() / 1000)}> (<t:${Math.floor(event.expiresAt.getTime() / 1000)}:R>)\n\n`;
