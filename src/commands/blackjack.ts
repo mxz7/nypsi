@@ -278,7 +278,7 @@ async function prepareGame(
     total(game.playerHand) == 21,
   );
 
-  const desc = await renderGambleScreen({ state: "playing", bet });
+  const desc = await renderGambleScreen({ state: "playing", bet, userId: message.author.id });
 
   const embed = new CustomEmbed(message.member, desc).setHeader(
     "blackjack",
@@ -541,6 +541,7 @@ async function playGame(
         winnings,
         multiplier: multi,
         eventProgress,
+        userId: message.author.id,
       }),
     ).setHeader("blackjack", message.member.avatarURL() || message.member.user.avatarURL());
 

@@ -267,7 +267,12 @@ async function prepareGame(
 
   components[components.length - 1].components[0].setDisabled(true);
 
-  const desc = await renderGambleScreen({ state: "playing", bet, insert: "**0**x ($0)" });
+  const desc = await renderGambleScreen({
+    state: "playing",
+    bet,
+    insert: "**0**x ($0)",
+    userId: message.author.id,
+  });
 
   const embed = new CustomEmbed(message.member, desc)
     .setHeader("dragon tower", message.author.avatarURL())
@@ -590,6 +595,7 @@ async function playGame(
       state: "lose",
       bet: game.bet,
       insert: `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
+      userId: message.author.id,
     });
     game.embed.setDescription(desc);
 
@@ -618,6 +624,7 @@ async function playGame(
       winnings,
       multiplier: multi,
       eventProgress: eventProgress,
+      userId: message.author.id,
     });
     game.embed.setDescription(desc);
 
@@ -694,6 +701,7 @@ async function playGame(
       state: "draw",
       bet: game.bet,
       insert: `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
+      userId: message.author.id,
     });
     game.embed.setDescription(desc);
     await addBalance(message.member, game.bet);
@@ -776,6 +784,7 @@ async function playGame(
           state: "playing",
           bet: game.bet,
           insert: `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
+          userId: message.author.id,
         });
         game.embed.setDescription(desc);
 

@@ -352,7 +352,12 @@ async function prepareGame(
     increment: incrementAmount,
   };
 
-  const desc = await renderGambleScreen({ state: "playing", bet, insert: "**0**x ($0)" });
+  const desc = await renderGambleScreen({
+    state: "playing",
+    bet,
+    insert: "**0**x ($0)",
+    userId: message.author.id,
+  });
   const embed = new CustomEmbed(message.member, desc).setHeader(
     "mines",
     message.author.avatarURL(),
@@ -650,6 +655,7 @@ async function playGame(
       state: "lose",
       bet: game.bet,
       insert: `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
+      userId: message.author.id,
     });
     embed.setDescription(desc);
     return replay(embed, interaction);
@@ -677,6 +683,7 @@ async function playGame(
       winnings,
       multiplier: game.multi,
       eventProgress,
+      userId: message.author.id,
     });
     embed.setDescription(desc);
 
@@ -735,6 +742,7 @@ async function playGame(
       state: "draw",
       bet: game.bet,
       insert: `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
+      userId: message.author.id,
     });
     embed.setDescription(desc);
     await addBalance(message.member, game.bet);
@@ -801,6 +809,7 @@ async function playGame(
       state: "playing",
       bet: game.bet,
       insert: `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
+      userId: message.author.id,
     });
     embed.setDescription(desc);
 
@@ -898,6 +907,7 @@ async function playGame(
         state: "playing",
         bet: game.bet,
         insert: `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
+        userId: message.author.id,
       });
       embed.setDescription(desc);
 
@@ -929,6 +939,7 @@ async function playGame(
           state: "playing",
           bet: game.bet,
           insert: `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
+          userId: message.author.id,
         }),
       );
 

@@ -291,7 +291,12 @@ async function prepareGame(
       .setDisabled(true),
   );
 
-  const desc = await renderGambleScreen({ state: "playing", bet, insert: `**0**x ($0)` });
+  const desc = await renderGambleScreen({
+    state: "playing",
+    bet,
+    insert: `**0**x ($0)`,
+    userId: message.author.id,
+  });
 
   const embed = new CustomEmbed(message.member, desc)
     .setHeader("highlow", message.author.avatarURL())
@@ -488,6 +493,7 @@ async function playGame(
       state: "lose",
       bet,
       insert: `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
+      userId: message.author.id,
     });
     newEmbed.setDescription(desc);
     newEmbed.addField("card", "| " + card + " |");
@@ -517,6 +523,7 @@ async function playGame(
       winnings,
       multiplier: games.get(message.author.id).voted,
       eventProgress,
+      userId: message.author.id,
     });
 
     newEmbed.setDescription(desc);
@@ -584,6 +591,7 @@ async function playGame(
       state: "draw",
       bet,
       insert: `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
+      userId: message.author.id,
     });
     newEmbed.setDescription(desc);
     newEmbed.addField("card", "| " + card + " |");
@@ -669,6 +677,7 @@ async function playGame(
         state: "playing",
         bet,
         insert: `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
+        userId: message.author.id,
       });
       newEmbed.setDescription(desc);
       newEmbed.addField("card", "| " + card + " |");
@@ -679,6 +688,7 @@ async function playGame(
         state: "playing",
         bet,
         insert: `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
+        userId: message.author.id,
       });
       newEmbed.setDescription(desc);
       newEmbed.addField("card", "| " + card + " |");
@@ -739,6 +749,7 @@ async function playGame(
         state: "playing",
         bet,
         insert: `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
+        userId: message.author.id,
       });
       newEmbed.setDescription(desc);
       newEmbed.addField("card", "| " + card + " |");
@@ -749,6 +760,7 @@ async function playGame(
         state: "playing",
         bet,
         insert: `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
+        userId: message.author.id,
       });
       newEmbed.setDescription(desc);
       newEmbed.addField("card", "| " + card + " |");
