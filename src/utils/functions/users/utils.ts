@@ -1,10 +1,10 @@
 import { exec } from "child_process";
-import { User } from "discord.js";
+import { User, WebhookClient } from "discord.js";
 import { promisify } from "util";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
-import { logger } from "../../logger";
+import { getTimestamp, logger } from "../../logger";
 import { getGuildByUser } from "../economy/guilds";
 import { deleteOffer, getTargetedOffers } from "../economy/offers";
 import { deleteImage } from "../image";
@@ -241,4 +241,10 @@ export async function dataDelete(member: MemberResolvable) {
   }
 
   logger.info(`data deleted for ${userId}`);
+
+  const hook = new WebhookClient({
+    url: process.env.ANTICHEAT_HOOK,
+  });
+  await hook.send({ content: `[${getTimestamp()}] \`${userId}\` data deleted` });
+  hook.destroy();
 }
