@@ -1,4 +1,3 @@
-import dayjs = require("dayjs");
 import { Event, EventContribution } from "#generated/prisma";
 import {
   ActionRowBuilder,
