@@ -144,8 +144,6 @@ export async function createEvent(
       return res.filter((i) => Boolean(i));
     });
 
-  checkEventExpire(client);
-
   return true;
 }
 
@@ -353,94 +351,6 @@ async function giveRewards(event: EventData) {
   }
 
   return givenRewards;
-}
-
-export async function checkEventExpire(client: NypsiClient) {
-  const event = await getCurrentEvent(false);
-
-  if (!event) {
-    return;
-  }
-
-  if (event.expiresAt.getTime() > Date.now() + ms("12 hours")) {
-    setTimeout(() => {
-      checkEventExpire(client);
-    }, ms("10 hours"));
-
-    return;
-  }
-
-  const doExpire = async (event: EventData) => {
-    if (event.completed || event.expiresAt.getTime() < Date.now()) {
-      return;
-    }
-    logger.info(`event: ${event.id} expired`);
-    await redis.del(
-      Constants.redis.cache.economy.event,
-      Constants.redis.cache.economy.eventProgress,
-    );
-
-    const targetChannel =
-      client.user.id === Constants.BOT_USER_ID
-        ? Constants.ANNOUNCEMENTS_CHANNEL_ID
-        : "819640200699052052"; // dev channel
-
-    const clusters = await client.cluster.broadcastEval(
-      (client, { channelId }) => {
-        const guild = client.channels.cache.get(channelId);
-
-        if (guild) return (client as unknown as NypsiClient).cluster.id;
-        return "not-found";
-      },
-      { context: { channelId: targetChannel } },
-    );
-
-    let cluster: number;
-
-    for (const i of clusters) {
-      if (i != "not-found") {
-        cluster = i;
-        break;
-      }
-    }
-
-    await client.cluster
-      .broadcastEval(
-        async (client, { content, channelId, cluster }) => {
-          if ((client as unknown as NypsiClient).cluster.id != cluster) return;
-
-          const channel = client.channels.cache.get(channelId);
-
-          if (!channel) return;
-
-          if (channel.isTextBased() && channel.isSendable()) {
-            const msg = await channel.send({ content });
-            msg.crosspost().catch(() => {});
-          }
-        },
-        {
-          context: {
-            content:
-              `🔱 the **${getEventsData()[event.type].name}** event has come to an end without being completed **):**\n\n` +
-              `${getEventProgress(event).toLocaleString()}/${event.target.toLocaleString()}\n\n` +
-              `<@&${Constants.EVENTS_ROLE_ID}>`,
-            channelId: targetChannel,
-            cluster: cluster,
-          },
-        },
-      )
-      .then((res) => {
-        return res.filter((i) => Boolean(i));
-      });
-  };
-
-  setTimeout(async () => {
-    const event = await getCurrentEvent(false);
-
-    if (event) {
-      doExpire(event);
-    }
-  }, event.expiresAt.getTime() - Date.now());
 }
 
 async function completeEvent(client: NypsiClient, lastUser: string) {
