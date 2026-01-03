@@ -21,6 +21,7 @@ import { addProgress } from "./achievements";
 import { addInventoryItem } from "./inventory";
 import { getEventsData, getItems, isEcoBanned } from "./utils";
 import ms = require("ms");
+import dayjs = require("dayjs");
 
 export type EventData = Event & { contributions: EventContribution[] };
 
@@ -56,7 +57,12 @@ export async function createEvent(
     progressTarget = target;
     date = null;
   } else {
-    date = target;
+    date = dayjs(target)
+      .set("hours", 0)
+      .set("minute", 0)
+      .set("second", 0)
+      .set("millisecond", 0)
+      .toDate();
     progressTarget = null;
   }
 
