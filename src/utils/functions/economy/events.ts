@@ -36,9 +36,8 @@ export async function createEvent(
   client: NypsiClient,
   member: MemberResolvable,
   type: string,
-  target: number,
-  days: number,
-) {
+  target: number | Date,
+): Promise<true | "event already in process" | "invalid event type"> {
   const userId = getUserId(member);
 
   const check = await getCurrentEvent(true);
@@ -51,18 +50,23 @@ export async function createEvent(
     return "invalid event type";
   }
 
+  let progressTarget: number;
+  let date: Date;
+
+  if (typeof target === "number") {
+    progressTarget = target;
+    date = null;
+  } else {
+    date = target;
+    progressTarget = null;
+  }
+
   const event = await prisma.event.create({
     data: {
       ownerId: userId,
       type,
-      target,
-      expiresAt: dayjs()
-        .add(days, "day")
-        .set("hours", 0)
-        .set("minute", 0)
-        .set("second", 0)
-        .set("millisecond", 0)
-        .toDate(),
+      target: progressTarget,
+      expiresAt: date,
     },
   });
 
