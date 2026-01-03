@@ -271,7 +271,7 @@ export async function addEventProgress(
     await redis.set(Constants.redis.cache.economy.eventProgress, progress);
   }
 
-  if (progress >= event.target) {
+  if (hasEventEnded(event, progress)) {
     completeEvent(client, userId);
   }
 
@@ -453,9 +453,12 @@ async function completeEvent(client: NypsiClient, lastUser: string) {
     });
 }
 
-function hasEventEnded(event: EventData) {
+function hasEventEnded(event: EventData, progress?: number) {
+  if (!progress) {
+    progress = getEventProgress(event);
+  }
+
   if (event.target) {
-    const progress = getEventProgress(event);
     return progress >= event.target;
   } else if (event.expiresAt) {
     return event.expiresAt.getTime() < Date.now();
