@@ -8,7 +8,11 @@ import {
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
-import { getCurrentEvent, getEventProgress } from "../utils/functions/economy/events";
+import {
+  formatEventDescription,
+  getCurrentEvent,
+  getEventProgress,
+} from "../utils/functions/economy/events";
 import { createUser, getEventsData, userExists } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -57,18 +61,30 @@ async function run(
     (contribution) => contribution.userId === message.author.id,
   );
 
-  const embed = new CustomEmbed(
-    message.member,
+  let content =
     `**${getEventsData()[event.type].name}**\n` +
-      `> ${getEventsData()[event.type].description.replaceAll("{target}", event.target.toLocaleString())}\n\n` +
-      `ends on <t:${Math.floor(event.expiresAt.getTime() / 1000)}> (<t:${Math.floor(event.expiresAt.getTime() / 1000)}:R>)\n\n` +
-      `${getEventProgress(event).toLocaleString()}/${event.target.toLocaleString()}\n` +
-      (contributionIndex > -1
-        ? `your contribution: ${event.contributions[
-            contributionIndex
-          ].contribution.toLocaleString()} ` + `(#${(contributionIndex + 1).toLocaleString()})`
-        : ""),
-  ).setHeader("current event", message.author.avatarURL());
+    `> ${formatEventDescription(getEventsData()[event.type], Number(event.target))}\n\n`;
+
+  if (event.expiresAt) {
+    content += `ends on <t:${Math.floor(event.expiresAt.getTime() / 1000)}> (<t:${Math.floor(event.expiresAt.getTime() / 1000)}:R>)\n\n`;
+  }
+
+  content += getEventProgress(event).toLocaleString();
+
+  if (event.target) {
+    content += `/${event.target.toLocaleString()}`;
+  }
+
+  if (contributionIndex > -1) {
+    content +=
+      `\nyour contribution: ${event.contributions[contributionIndex].contribution.toLocaleString()} ` +
+      `(#${(contributionIndex + 1).toLocaleString()})`;
+  }
+
+  const embed = new CustomEmbed(message.member, content).setHeader(
+    "current event",
+    message.author.avatarURL(),
+  );
 
   return send({
     embeds: [embed],

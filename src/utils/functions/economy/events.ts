@@ -71,12 +71,12 @@ export async function createEvent(
 
   await redis.del(Constants.redis.cache.economy.event, Constants.redis.cache.economy.eventProgress);
 
-  let message = `🔱 the **${getEventsData()[type].name}** event has started!!\n\n`;
+  let message =
+    `🔱 the **${getEventsData()[type].name}** event has started!!\n\n` +
+    `> ${formatEventDescription(getEventsData()[type], progressTarget)}\n\n`;
 
-  if (event.target) {
-    message += `> ${getEventsData()[type].description.replace("{target}", target.toLocaleString())}\n\n`;
-  } else {
-    message += `> ends on <t:${Math.floor(event.expiresAt.getTime() / 1000)}> (<t:${Math.floor(event.expiresAt.getTime() / 1000)}:R>)\n\n`;
+  if (event.expiresAt) {
+    message += `ends on <t:${Math.floor(event.expiresAt.getTime() / 1000)}> (<t:${Math.floor(event.expiresAt.getTime() / 1000)}:R>)\n\n`;
   }
 
   message += `<@&${Constants.EVENTS_ROLE_ID}>`;
@@ -466,4 +466,11 @@ function hasEventEnded(event: EventData, progress: number) {
  */
 function hasEventCompleted(event: EventData) {
   return Boolean(event.endedAt);
+}
+
+export function formatEventDescription(
+  event: ReturnType<typeof getEventsData>[string],
+  target?: number,
+) {
+  return event.description.replaceAll("{target}", target?.toLocaleString() ?? "");
 }
