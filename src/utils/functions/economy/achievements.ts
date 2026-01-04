@@ -293,30 +293,45 @@ export async function addProgress(
     return;
   }
 
+  const doProgress = async (
+    achievement: { achievementId: string; progress: number | bigint },
+    incrementNext = true,
+  ) => {
+    const res = await addAchievementProgress(userId, achievement.achievementId, amount);
+
+    if (res && !achievement.achievementId.endsWith("_v")) {
+      let nextId: string;
+      if (achievement.achievementId.endsWith("_i")) {
+        nextId = `${achievementStartName}_ii`;
+      } else if (achievement.achievementId.endsWith("_ii")) {
+        nextId = `${achievementStartName}_iii`;
+      } else if (achievement.achievementId.endsWith("_iii")) {
+        nextId = `${achievementStartName}_iv`;
+      } else if (achievement.achievementId.endsWith("iv")) {
+        nextId = `${achievementStartName}_v`;
+      }
+
+      if (nextId) {
+        let progress = Number(achievement.progress) + amount;
+
+        if (!incrementNext) {
+          progress = amount;
+        }
+
+        await addAchievementProgress(userId, nextId, progress);
+      }
+    }
+  };
+
   const achievements = await getAllAchievements(userId, achievementStartName);
   let count = 0;
 
   for (const achievement of achievements) {
     if (achievement.achievementId.includes(achievementStartName)) count++;
+
     // will always return if a valid achievement is found
     if (achievement.achievementId.includes(achievementStartName) && !achievement.completed) {
-      const res = await addAchievementProgress(userId, achievement.achievementId, amount);
-
-      if (res && !achievement.achievementId.endsWith("_v")) {
-        let thing: string;
-        if (achievement.achievementId.endsWith("_i")) {
-          thing = `${achievementStartName}_ii`;
-        } else if (achievement.achievementId.endsWith("_ii")) {
-          thing = `${achievementStartName}_iii`;
-        } else if (achievement.achievementId.endsWith("_iii")) {
-          thing = `${achievementStartName}_iv`;
-        } else if (achievement.achievementId.endsWith("iv")) {
-          thing = `${achievementStartName}_v`;
-        }
-
-        if (thing)
-          await setAchievementProgress(userId, thing, Number(achievement.progress) + amount);
-      }
+      await doProgress(achievement);
       addProgressMutex.delete(userId);
       return;
     }
@@ -324,19 +339,19 @@ export async function addProgress(
 
   switch (count) {
     case 0:
-      await setAchievementProgress(userId, `${achievementStartName}_i`, amount);
+      await doProgress({ achievementId: `${achievementStartName}_i`, progress: amount }, false);
       break;
     case 1:
-      await setAchievementProgress(userId, `${achievementStartName}_ii`, amount);
+      await doProgress({ achievementId: `${achievementStartName}_ii`, progress: amount }, false);
       break;
     case 2:
-      await setAchievementProgress(userId, `${achievementStartName}_iii`, amount);
+      await doProgress({ achievementId: `${achievementStartName}_iii`, progress: amount }, false);
       break;
     case 3:
-      await setAchievementProgress(userId, `${achievementStartName}_iv`, amount);
+      await doProgress({ achievementId: `${achievementStartName}_iv`, progress: amount }, false);
       break;
     case 4:
-      await setAchievementProgress(userId, `${achievementStartName}_v`, amount);
+      await doProgress({ achievementId: `${achievementStartName}_v`, progress: amount }, false);
       break;
   }
 
