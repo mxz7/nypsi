@@ -1,4 +1,3 @@
-import dayjs = require("dayjs");
 import { Event, EventContribution } from "#generated/prisma";
 import {
   ActionRowBuilder,
@@ -22,6 +21,7 @@ import { addProgress } from "./achievements";
 import { addInventoryItem } from "./inventory";
 import { getEventsData, getItems, isEcoBanned } from "./utils";
 import ms = require("ms");
+import dayjs = require("dayjs");
 
 export type EventData = Event & { contributions: EventContribution[] };
 
@@ -36,9 +36,8 @@ export async function createEvent(
   client: NypsiClient,
   member: MemberResolvable,
   type: string,
-  target: number,
-  days: number,
-) {
+  target: number | Date,
+): Promise<true | "event already in process" | "invalid event type"> {
   const userId = getUserId(member);
 
   const check = await getCurrentEvent(true);
@@ -51,22 +50,42 @@ export async function createEvent(
     return "invalid event type";
   }
 
+  let progressTarget: number;
+  let date: Date;
+
+  if (typeof target === "number") {
+    progressTarget = target;
+    date = null;
+  } else {
+    date = dayjs(target)
+      .set("hours", 0)
+      .set("minute", 0)
+      .set("second", 0)
+      .set("millisecond", 0)
+      .toDate();
+    progressTarget = null;
+  }
+
   const event = await prisma.event.create({
     data: {
       ownerId: userId,
       type,
-      target,
-      expiresAt: dayjs()
-        .add(days, "day")
-        .set("hours", 0)
-        .set("minute", 0)
-        .set("second", 0)
-        .set("millisecond", 0)
-        .toDate(),
+      target: progressTarget,
+      expiresAt: date,
     },
   });
 
   await redis.del(Constants.redis.cache.economy.event, Constants.redis.cache.economy.eventProgress);
+
+  let message =
+    `🔱 the **${getEventsData()[type].name}** event has started!!\n\n` +
+    `> ${formatEventDescription(event)}\n\n`;
+
+  if (event.expiresAt) {
+    message += `ends on <t:${Math.floor(event.expiresAt.getTime() / 1000)}> (<t:${Math.floor(event.expiresAt.getTime() / 1000)}:R>)\n\n`;
+  }
+
+  message += `<@&${Constants.EVENTS_ROLE_ID}>`;
 
   const targetChannel =
     client.user.id === Constants.BOT_USER_ID
@@ -108,11 +127,7 @@ export async function createEvent(
       },
       {
         context: {
-          content:
-            `🔱 the **${getEventsData()[type].name}** event has started!!\n\n` +
-            `> ${getEventsData()[type].description.replace("{target}", target.toLocaleString())}\n\n` +
-            `ends on <t:${Math.floor(event.expiresAt.getTime() / 1000)}> (<t:${Math.floor(event.expiresAt.getTime() / 1000)}:R>)\n\n` +
-            `<@&${Constants.EVENTS_ROLE_ID}>`,
+          content: message,
           components: new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
             new ButtonBuilder()
               .setStyle(ButtonStyle.Link)
@@ -134,8 +149,6 @@ export async function createEvent(
       return res.filter((i) => Boolean(i));
     });
 
-  checkEventExpire(client);
-
   return true;
 }
 
@@ -147,28 +160,42 @@ export async function getCurrentEvent(useCache = true): Promise<EventData> {
       if (cache === "none") {
         return undefined;
       } else {
-        return JSON.parse(cache);
+        const data: EventData = JSON.parse(cache);
+
+        data.createdAt = new Date(data.createdAt);
+        data.expiresAt = data.expiresAt ? new Date(data.expiresAt) : null;
+        data.endedAt = data.endedAt ? new Date(data.endedAt) : null;
+
+        return data;
       }
     }
   }
 
-  const query = await prisma.event.findFirst({
+  let query = await prisma.event.findFirst({
     where: {
-      AND: [{ completed: false, expiresAt: { gt: new Date() } }],
+      endedAt: null,
     },
     include: {
       contributions: {
         orderBy: [{ contribution: "desc" }, { user: { lastKnownUsername: "asc" } }],
       },
     },
+
+    // this assumes that the only active event is the most recent one, take 1 is assumed by findFirst
+    orderBy: { id: "desc" },
   });
+
+  if (query && hasEventCompleted(query)) {
+    // something broken with the event that was fetched
+    query = undefined;
+  }
 
   if (query) {
     await redis.set(
       Constants.redis.cache.economy.event,
       JSON.stringify(query),
       "EX",
-      Math.min(query.expiresAt.getTime(), ms("12 hours")) / 1000,
+      Math.min(query.expiresAt?.getTime() || ms("12 hours"), ms("12 hours")) / 1000,
     );
   } else {
     await redis.set(Constants.redis.cache.economy.event, "none");
@@ -248,7 +275,7 @@ export async function addEventProgress(
     await redis.set(Constants.redis.cache.economy.eventProgress, progress);
   }
 
-  if (progress >= event.target) {
+  if (hasEventEnded(event, progress)) {
     completeEvent(client, userId);
   }
 
@@ -330,94 +357,6 @@ async function giveRewards(event: EventData) {
   return givenRewards;
 }
 
-export async function checkEventExpire(client: NypsiClient) {
-  const event = await getCurrentEvent(false);
-
-  if (!event) {
-    return;
-  }
-
-  if (event.expiresAt.getTime() > Date.now() + ms("12 hours")) {
-    setTimeout(() => {
-      checkEventExpire(client);
-    }, ms("10 hours"));
-
-    return;
-  }
-
-  const doExpire = async (event: EventData) => {
-    if (event.completed || event.expiresAt.getTime() < Date.now()) {
-      return;
-    }
-    logger.info(`event: ${event.id} expired`);
-    await redis.del(
-      Constants.redis.cache.economy.event,
-      Constants.redis.cache.economy.eventProgress,
-    );
-
-    const targetChannel =
-      client.user.id === Constants.BOT_USER_ID
-        ? Constants.ANNOUNCEMENTS_CHANNEL_ID
-        : "819640200699052052"; // dev channel
-
-    const clusters = await client.cluster.broadcastEval(
-      (client, { channelId }) => {
-        const guild = client.channels.cache.get(channelId);
-
-        if (guild) return (client as unknown as NypsiClient).cluster.id;
-        return "not-found";
-      },
-      { context: { channelId: targetChannel } },
-    );
-
-    let cluster: number;
-
-    for (const i of clusters) {
-      if (i != "not-found") {
-        cluster = i;
-        break;
-      }
-    }
-
-    await client.cluster
-      .broadcastEval(
-        async (client, { content, channelId, cluster }) => {
-          if ((client as unknown as NypsiClient).cluster.id != cluster) return;
-
-          const channel = client.channels.cache.get(channelId);
-
-          if (!channel) return;
-
-          if (channel.isTextBased() && channel.isSendable()) {
-            const msg = await channel.send({ content });
-            msg.crosspost().catch(() => {});
-          }
-        },
-        {
-          context: {
-            content:
-              `🔱 the **${getEventsData()[event.type].name}** event has come to an end without being completed **):**\n\n` +
-              `${getEventProgress(event).toLocaleString()}/${event.target.toLocaleString()}\n\n` +
-              `<@&${Constants.EVENTS_ROLE_ID}>`,
-            channelId: targetChannel,
-            cluster: cluster,
-          },
-        },
-      )
-      .then((res) => {
-        return res.filter((i) => Boolean(i));
-      });
-  };
-
-  setTimeout(async () => {
-    const event = await getCurrentEvent(false);
-
-    if (event) {
-      doExpire(event);
-    }
-  }, event.expiresAt.getTime() - Date.now());
-}
-
 async function completeEvent(client: NypsiClient, lastUser: string) {
   if (completing) {
     return;
@@ -426,15 +365,15 @@ async function completeEvent(client: NypsiClient, lastUser: string) {
   completing = true;
   let event = await getCurrentEvent(false);
 
-  if (event.completed) {
+  if (hasEventCompleted(event)) {
+    logger.error(`event: tried to complete event that was already completed: ${event.id}`);
     return;
   }
 
   event = await prisma.event.update({
     where: { id: event.id },
     data: {
-      completed: true,
-      completedAt: new Date(),
+      endedAt: new Date(),
     },
     include: {
       contributions: {
@@ -450,9 +389,12 @@ async function completeEvent(client: NypsiClient, lastUser: string) {
   await giveRewards(event);
   const privacy = await getPreferences(lastUser).then((r) => r.leaderboards);
 
-  let content =
-    `🔱 the **${getEventsData()[event.type].name}** event has been completed! ` +
-    `completed in ${MStoTime(event.completedAt.getTime() - event.createdAt.getTime())}\n\n`;
+  let content = `🔱 the **${getEventsData()[event.type].name}** event has been completed!`;
+  if (event.target) {
+    content += ` completed in ${MStoTime(event.endedAt.getTime() - event.createdAt.getTime())}`;
+  }
+
+  content += "\n\n";
 
   if (privacy) {
     content += `the final contributing participant was **${await getLastKnownUsername(lastUser)}**\n\n`;
@@ -516,4 +458,56 @@ async function completeEvent(client: NypsiClient, lastUser: string) {
     .then((res) => {
       return res.filter((i) => Boolean(i));
     });
+}
+
+/**
+ * used for events that are supposed to be in progress
+ */
+function hasEventEnded(event: EventData, progress: number) {
+  if (event.target) {
+    return progress >= event.target;
+  } else if (event.expiresAt) {
+    return event.expiresAt.getTime() < Date.now();
+  } else {
+    throw new Error(`event: ${event.id} has neither target or expiresAt... BROKEN`);
+  }
+}
+
+/**
+ * used for events that are supposed to be completed / finished
+ */
+function hasEventCompleted(event: Event) {
+  return Boolean(event.endedAt);
+}
+
+export function formatEventDescription(event: Event) {
+  const data = getEventsData()[event.type];
+
+  return data.description.replaceAll("{target}", event.target ? event.target.toLocaleString() : "");
+}
+
+export function formatEventProgress(event: EventData, progress: number, user?: MemberResolvable) {
+  let message = `🔱 ${progress.toLocaleString()}`;
+
+  if (event.target) {
+    message += `/${event.target.toLocaleString()}`;
+  }
+
+  if (user) {
+    const userId = getUserId(user);
+
+    const contributionIndex = event.contributions.findIndex(
+      (contribution) => contribution.userId === userId,
+    );
+
+    if (contributionIndex > -1) {
+      message += ` (you are #${(contributionIndex + 1).toLocaleString()})`;
+    }
+  }
+
+  if (event.expiresAt) {
+    message += `\n-# ends <t:${Math.floor(event.expiresAt.getTime() / 1000)}:R>`;
+  }
+
+  return message;
 }

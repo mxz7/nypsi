@@ -15,7 +15,7 @@ import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { percentChance, shuffle } from "../random";
 import { addProgress } from "./achievements";
-import { addEventProgress, EventData, getCurrentEvent } from "./events";
+import { addEventProgress, EventData, formatEventProgress, getCurrentEvent } from "./events";
 import { isGem, itemExists } from "./inventory";
 import { describeLootPoolResult, giveLootPoolResult, rollLootPool } from "./loot_pools";
 import { addStat } from "./stats";
@@ -218,7 +218,7 @@ export default class ScratchCard {
       await giveLootPoolResult(this.member.user.id, prize);
 
       let eventProgress: Awaited<ReturnType<typeof addEventProgress>>;
-      const eventData: { event?: EventData; target: number } = { target: 0 };
+      let eventData: EventData;
 
       if (Object.hasOwn(prize, "item")) {
         switch (prize.item) {
@@ -249,15 +249,11 @@ export default class ScratchCard {
       }
 
       if (eventProgress) {
-        eventData.event = await getCurrentEvent();
-
-        if (eventData.event) {
-          eventData.target = Number(eventData.event.target);
-        }
+        eventData = await getCurrentEvent();
       }
 
       embed.setDescription(
-        `you found ${describeLootPoolResult(prize)}!${eventProgress ? `\n\n🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}` : ""}`,
+        `you found ${describeLootPoolResult(prize)}!${eventProgress ? `\n\n${formatEventProgress(eventData, eventProgress, this.member)}` : ""}`,
       );
 
       if (Object.hasOwn(prize, "money")) {

@@ -30,7 +30,7 @@ import { isUserBlacklisted } from "../users/blacklist";
 import { createProfile, hasProfile } from "../users/utils";
 import { setProgress } from "./achievements";
 import { addBalance, calcMaxBet, getBalance } from "./balance";
-import { getCurrentEvent } from "./events";
+import { formatEventProgress, getCurrentEvent } from "./events";
 import { addToGuildXP, getGuildByUser, getGuildName } from "./guilds";
 import { addInventoryItem } from "./inventory";
 import { getDefaultLootPool } from "./loot_pools";
@@ -822,12 +822,14 @@ type BaseRenderGambleScreenArgs = {
   state: "playing" | "lose" | "draw";
   bet: number;
   insert?: string;
+  userId: string;
 };
 
 type WinRenderGambleScreenArgs = {
   state: "win";
   bet: number;
   insert?: string;
+  userId: string;
   winnings: number;
   multiplier?: number;
   eventProgress?: number;
@@ -862,11 +864,8 @@ export async function renderGambleScreen(
 
     if (args.eventProgress) {
       const event = await getCurrentEvent();
-      let target = 0;
-      if (event.target) {
-        target = Number(event.target);
-      }
-      output += `\n\n🔱 ${args.eventProgress.toLocaleString()}/${target.toLocaleString()}`;
+
+      output += `\n\n${formatEventProgress(event, args.eventProgress, args.userId)}`;
     }
   }
 

@@ -1083,12 +1083,15 @@ model Event {
 
   ownerId String
 
-  completed   Boolean   @default(false)
-  completedAt DateTime?
+  type String
 
-  type      String
-  target    BigInt
-  expiresAt DateTime
+  // for target based events
+  target BigInt?
+
+  // for time based events
+  expiresAt DateTime?
+
+  endedAt DateTime?
 
   owner         User                @relation(fields: [ownerId], references: [id])
   contributions EventContribution[]

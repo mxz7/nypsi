@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Event" ALTER COLUMN "target" DROP NOT NULL,
+ALTER COLUMN "expiresAt" DROP NOT NULL;

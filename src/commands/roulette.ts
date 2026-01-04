@@ -20,7 +20,12 @@ import {
   getGambleMulti,
   removeBalance,
 } from "../utils/functions/economy/balance.js";
-import { addEventProgress, EventData, getCurrentEvent } from "../utils/functions/economy/events";
+import {
+  addEventProgress,
+  EventData,
+  formatEventProgress,
+  getCurrentEvent,
+} from "../utils/functions/economy/events";
 import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds.js";
 import { createGame } from "../utils/functions/economy/stats";
 import { createUser, formatBet, userExists } from "../utils/functions/economy/utils.js";
@@ -313,14 +318,10 @@ async function run(
 
     if (win) {
       if (multi > 0) {
-        const eventData: { event?: EventData; target: number } = { target: 0 };
+        let eventData: EventData;
 
         if (eventProgress) {
-          eventData.event = await getCurrentEvent();
-
-          if (eventData.event) {
-            eventData.target = Number(eventData.event.target);
-          }
+          eventData = await getCurrentEvent();
         }
 
         embed.addField(
@@ -332,7 +333,7 @@ async function run(
             Math.floor(multi * 100).toString() +
             "**% bonus" +
             (eventProgress
-              ? `\n\n🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`
+              ? `\n\n${formatEventProgress(eventData, eventProgress, message.member)}`
               : ""),
         );
       } else {

@@ -7,7 +7,12 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants.js";
 import { MStoTime } from "../utils/functions/date.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
-import { addEventProgress, EventData, getCurrentEvent } from "../utils/functions/economy/events.js";
+import {
+  addEventProgress,
+  EventData,
+  formatEventProgress,
+  getCurrentEvent,
+} from "../utils/functions/economy/events.js";
 import { addTaskProgress } from "../utils/functions/economy/tasks.js";
 import { getTagsData } from "../utils/functions/economy/utils.js";
 import { checkMessageContent } from "../utils/functions/guilds/filters.js";
@@ -205,14 +210,10 @@ async function run(
 
       const authorTag = await getActiveTag(message.member);
 
-      const eventData: { event?: EventData; target: number } = { target: 0 };
+      let eventData: EventData;
 
       if (eventProgress) {
-        eventData.event = await getCurrentEvent();
-
-        if (eventData.event) {
-          eventData.target = Number(eventData.event.target);
-        }
+        eventData = await getCurrentEvent();
       }
 
       const embed2 = new CustomEmbed(
@@ -226,9 +227,7 @@ async function run(
         }**${message.author.username}**](https://nypsi.xyz/users/${
           message.author.id
         }?ref=bot-milf) a *private* message 😉😏` +
-          (eventProgress
-            ? `\n\n🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`
-            : ""),
+          (eventProgress ? `\n\n${formatEventProgress(eventData, eventProgress)}` : ""),
       )
         .setHeader("milf finder")
         .setColor(Constants.EMBED_SUCCESS_COLOR);

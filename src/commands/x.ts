@@ -2705,39 +2705,47 @@ async function run(
   };
 
   const startEvent = async () => {
-    if (args.length < 4) {
-      return send({ embeds: [new ErrorEmbed("$x event <type> <target> <days>")] });
+    if (args.length < 3) {
+      return send({ embeds: [new ErrorEmbed("$x event <type> <target or date>")] });
     }
 
     const type = args[1];
-    const target = parseInt(args[2]);
-    const days = parseInt(args[3]);
+    const target = args[2];
+
+    let eventType: "target" | "time";
+    let ends: Date;
+    let targetNumber;
 
     if (!getEventsData()[type]) {
       return send({ embeds: [new ErrorEmbed("invalid event type")] });
     }
 
-    if (isNaN(target) || target < 1) {
-      return send({ embeds: [new ErrorEmbed("invalid target")] });
-    }
+    if (isNaN(Number(target))) {
+      eventType = "time";
+      ends = dayjs(target)
+        .set("hours", 0)
+        .set("minute", 0)
+        .set("second", 0)
+        .set("millisecond", 0)
+        .toDate();
 
-    if (isNaN(days) || days < 1) {
-      return send({ embeds: [new ErrorEmbed("invalid amount of days")] });
-    }
+      if (ends.getTime() < Date.now()) {
+        return send({ embeds: [new ErrorEmbed("end date must be in the future")] });
+      }
+    } else {
+      eventType = "target";
+      targetNumber = Number(target);
 
-    const ends = dayjs()
-      .add(days, "day")
-      .set("hours", 0)
-      .set("minute", 0)
-      .set("second", 0)
-      .set("millisecond", 0)
-      .toDate();
+      if (targetNumber <= 0) {
+        return send({ embeds: [new ErrorEmbed("target must be greater than 0")] });
+      }
+    }
 
     const confirmMessage = await send({
       embeds: [
         new CustomEmbed(
           message.member,
-          `confirm you want to start a ${type} event with target of ${target} that ends on ${ends.toISOString()}`,
+          `confirm you want to start a ${type} event with target of ${targetNumber} that ends on ${ends?.toISOString()}`,
         ),
       ],
       components: [
@@ -2774,8 +2782,7 @@ async function run(
       message.client as NypsiClient,
       message.member,
       type,
-      target,
-      days,
+      eventType === "target" ? targetNumber : ends,
     );
 
     if (typeof eventRes == "string") {
@@ -3518,7 +3525,7 @@ async function getUsableCommands(member: MemberResolvable) {
       permission: "reseteco",
     },
     {
-      command: "$x event <type> <target> <days>",
+      command: "$x event <type> <target or date>",
       description: "start an event",
       permission: "create-event",
     },

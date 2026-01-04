@@ -6,7 +6,13 @@ import Constants from "../../Constants";
 import { gamble } from "../../logger";
 import { addProgress } from "../economy/achievements";
 import { addBalance } from "../economy/balance";
-import { addEventProgress, EventData, getCurrentEvent, getEventProgress } from "../economy/events";
+import {
+  addEventProgress,
+  EventData,
+  formatEventProgress,
+  getCurrentEvent,
+  getEventProgress,
+} from "../economy/events";
 import { createGame } from "../economy/stats";
 import { addTaskProgress } from "../economy/tasks";
 import { topChatReactionGlobal } from "../economy/top";
@@ -78,7 +84,7 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel, 
 
   let ended = false;
 
-  const eventData: { event?: EventData; target: number } = { target: 0 };
+  let eventData: EventData;
   let eventProgress: Awaited<ReturnType<typeof getEventProgress>>;
 
   const updateWinnersText = () => {
@@ -108,9 +114,7 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel, 
     if (eventProgress) {
       embed.setDescription(
         `type: \`${word.display}\`` +
-          (eventProgress
-            ? `\n\n🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`
-            : ""),
+          (eventProgress ? `\n\n${formatEventProgress(eventData, eventProgress)}` : ""),
       );
     }
 
@@ -160,11 +164,7 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel, 
       );
 
       if (eventProgress) {
-        eventData.event = await getCurrentEvent();
-
-        if (eventData.event) {
-          eventData.target = Number(eventData.event.target);
-        }
+        eventData = await getCurrentEvent();
       }
 
       const update = await addLeaderboardEntry(message.author.id, time).catch(() => ({
@@ -286,7 +286,7 @@ export async function startChatReactionDuel(
     let tax = 0;
     let editing = false;
 
-    const eventData: { event?: EventData; target: number } = { target: 0 };
+    let eventData: EventData;
     let eventProgress: Awaited<ReturnType<typeof getEventProgress>>;
 
     const interval = setInterval(() => {
@@ -298,9 +298,7 @@ export async function startChatReactionDuel(
       if (eventProgress) {
         embed.setDescription(
           `${wager > 0 ? ` **wager** $${wager.toLocaleString()}\n\n` : ""}type: \`${word.display}\`\n\n` +
-            (eventProgress
-              ? `🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`
-              : ""),
+            (eventProgress ? formatEventProgress(eventData, eventProgress) : ""),
         );
       }
 
@@ -435,11 +433,7 @@ export async function startChatReactionDuel(
         );
 
         if (eventProgress) {
-          eventData.event = await getCurrentEvent();
-
-          if (eventData.event) {
-            eventData.target = Number(eventData.event.target);
-          }
+          eventData = await getCurrentEvent();
         }
       }
     });

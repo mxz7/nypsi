@@ -38,7 +38,12 @@ import { a } from "../functions/anticheat";
 import { addProgress, setProgress } from "../functions/economy/achievements";
 import { getBankBalance } from "../functions/economy/balance";
 import { addBooster } from "../functions/economy/boosters";
-import { addEventProgress, EventData, getCurrentEvent } from "../functions/economy/events";
+import {
+  addEventProgress,
+  EventData,
+  formatEventProgress,
+  getCurrentEvent,
+} from "../functions/economy/events";
 import {
   addInventoryItem,
   commandGemCheck,
@@ -1126,17 +1131,15 @@ export async function runCommand(
         );
 
         if (eventProgress) {
-          const eventData: { event?: EventData; target: number } = { target: 0 };
+          let eventData: EventData;
 
-          eventData.event = await getCurrentEvent();
-
-          if (eventData.event) {
-            eventData.target = Number(eventData.event.target);
+          if (eventProgress) {
+            eventData = await getCurrentEvent();
           }
 
           embed.addField(
             "event progress",
-            `🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`,
+            formatEventProgress(eventData, eventProgress, message.member),
           );
         }
 
@@ -1168,17 +1171,15 @@ export async function runCommand(
         );
 
         if (eventProgress) {
-          const eventData: { event?: EventData; target: number } = { target: 0 };
+          let eventData: EventData;
 
-          eventData.event = await getCurrentEvent();
-
-          if (eventData.event) {
-            eventData.target = Number(eventData.event.target);
+          if (eventProgress) {
+            eventData = await getCurrentEvent();
           }
 
           embed.addField(
             "event progress",
-            `🔱 ${eventProgress.toLocaleString()}/${eventData.target.toLocaleString()}`,
+            formatEventProgress(eventData, eventProgress, message.member),
           );
         }
 

@@ -1,3 +1,7 @@
+# january 2026
+
+- events are now target based or time based, they cannot 'expire'
+
 # season 11
 
 - increased guild level requirements for higher levelled guilds
