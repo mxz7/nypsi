@@ -1,6 +1,7 @@
 # january 2026
 
 - events are now target based or time based, they cannot 'expire'
+- 5% discount for tickets bought with /lottery autobuy
 
 # season 11
 

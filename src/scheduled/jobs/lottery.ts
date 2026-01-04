@@ -147,10 +147,12 @@ export default {
     for (const user of autoBuys) {
       const balance = await getBalance(user.userId);
 
-      if (balance >= getItems()["lottery_ticket"].buy * user.dailyLottery) {
+      const cost = Math.ceil(getItems()["lottery_ticket"].buy * user.dailyLottery * 0.95);
+
+      if (balance >= cost) {
         log(`auto buying ${user.dailyLottery} lottery tickets for ${user.userId}`);
-        await removeBalance(user.userId, getItems()["lottery_ticket"].buy * user.dailyLottery);
-        addStat(user.userId, "spent-shop", getItems()["lottery_ticket"].buy * user.dailyLottery);
+        await removeBalance(user.userId, cost);
+        addStat(user.userId, "spent-shop", cost);
         await addInventoryItem(user.userId, "lottery_ticket", user.dailyLottery);
 
         if (user.user.DMSettings.other) {

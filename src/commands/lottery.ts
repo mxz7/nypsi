@@ -24,7 +24,7 @@ cmd.slashData
   .addSubcommand((autobuy) =>
     autobuy
       .setName("autobuy")
-      .setDescription("auto buy lottery tickets")
+      .setDescription("auto buy lottery tickets at a discount")
       .addStringOption((option) =>
         option
           .setName("amount")
@@ -97,7 +97,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          `you will now auto buy **${amount}** lottery tickets daily ($${(amount * getItems()["lottery_ticket"].buy).toLocaleString()})`,
+          `you will now auto buy **${amount}** lottery tickets daily ($${(amount * getItems()["lottery_ticket"].buy).toLocaleString()}) at a **5%** discount`,
         ),
       ],
     });
