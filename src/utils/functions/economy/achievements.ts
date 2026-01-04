@@ -27,11 +27,7 @@ import { addXp } from "./xp";
 /**
  * returns true if user has met requirements for achievement
  */
-export async function addAchievementProgress(
-  member: MemberResolvable,
-  achievementId: string,
-  amount = 1,
-) {
+async function addAchievementProgress(member: MemberResolvable, achievementId: string, amount = 1) {
   const userId = getUserId(member);
 
   if ((await isEcoBanned(userId)).banned) return;
