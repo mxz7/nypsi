@@ -140,6 +140,7 @@ export default {
         views: "cache:user:views",
         aura: "cache:user:aura",
         CAPTCHA_HISTORY: "cache:user:captcha:history",
+        LAST_MARRIED: "cache:user:married:last",
       },
       guild: {
         EXISTS: "cache:guild:exists",

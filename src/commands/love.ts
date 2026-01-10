@@ -8,8 +8,10 @@ import {
   MessageActionRowComponentBuilder,
   MessageFlags,
 } from "discord.js";
+import redis from "../init/redis";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import Constants from "../utils/Constants";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
 import { getItems } from "../utils/functions/economy/utils";
@@ -277,7 +279,26 @@ async function run(
       });
     }
 
+    const target1LastMarried = await redis.get(
+      `${Constants.redis.cache.user.LAST_MARRIED}:${target1.user.id}`,
+    );
+    const target2LastMarried = await redis.get(
+      `${Constants.redis.cache.user.LAST_MARRIED}:${target2.user.id}`,
+    );
+
+    if (
+      target1LastMarried &&
+      target1LastMarried === target2.user.id &&
+      target2LastMarried &&
+      target2LastMarried === target1.user.id
+    ) {
+      return i.followUp({
+        embeds: [new ErrorEmbed("some trickery has gone on and you can't be married... cunts")],
+      });
+    }
+
     await addMarriage(target1.user.id, target2.user.id);
+    cache.delete(combo);
 
     return i.followUp({
       embeds: [new CustomEmbed(message.member, "you may now kiss the bride!")],

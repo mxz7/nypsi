@@ -45,6 +45,9 @@ export async function addMarriage(userId: string, targetId: string) {
     `${Constants.redis.cache.user.MARRIED}:${targetId}`,
   );
 
+  await redis.set(`${Constants.redis.cache.user.LAST_MARRIED}:${userId}`, targetId, "EX", 60);
+  await redis.set(`${Constants.redis.cache.user.LAST_MARRIED}:${targetId}`, userId, "EX", 60);
+
   addProgress(userId, "top_shagger", 1);
   addProgress(targetId, "top_shagger", 1);
 }
