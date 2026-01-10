@@ -4,6 +4,7 @@ import {
   ButtonStyle,
   CommandInteraction,
   ComponentType,
+  GuildMember,
   MessageActionRowComponentBuilder,
   MessageFlags,
 } from "discord.js";
@@ -12,7 +13,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
 import { getItems } from "../utils/functions/economy/utils";
-import { getPrefix } from "../utils/functions/guilds/utils";
+import { getAllMembers } from "../utils/functions/guilds/members";
 import { getMember } from "../utils/functions/member";
 import { percentChance } from "../utils/functions/random";
 import { escapeFormattingCharacters } from "../utils/functions/string";
@@ -42,55 +43,21 @@ async function run(
     return;
   }
 
-  const prefix = (await getPrefix(message.guild))[0];
-
-  let target1;
-  let target2;
+  let target1: GuildMember;
+  let target2: GuildMember;
 
   if (args.length == 0) {
     target1 = message.member;
 
-    const members: string[] = [];
-    const members1 = message.guild.members.cache;
-
-    members1.forEach((m) => {
-      if (!m.user.bot) {
-        members.push(m.user.id);
-      }
-    });
+    const members = Array.from((await getAllMembers(message.guild, true)).values());
 
     target2 = members[Math.floor(Math.random() * members.length)];
-
-    target2 = await message.guild.members.fetch(target2);
   } else if (args.length == 1) {
     target1 = message.member;
-
-    if (!message.mentions.members.first()) {
-      target2 = await getMember(message.guild, args[0]);
-    } else {
-      target2 = message.mentions.members.first();
-    }
+    target2 = await getMember(message.guild, args[0]);
   } else {
-    if (message.mentions.members.size == 2) {
-      target1 = message.mentions.members.first();
-
-      target2 = message.mentions.members.get(Array.from(message.mentions.members.keys())[1]);
-    } else if (message.mentions.members.size == 1) {
-      if (args[0].startsWith("<@")) {
-        target1 = message.mentions.members.first();
-
-        target2 = await getMember(message.guild, args[1]);
-      } else {
-        target2 = message.mentions.members.first();
-
-        target1 = await getMember(message.guild, args[0]);
-      }
-    } else if (message.mentions.members.size == 0) {
-      target1 = await getMember(message.guild, args[0]);
-      target2 = await getMember(message.guild, args[1]);
-    } else {
-      return send({ embeds: [new ErrorEmbed(`${prefix}love <user> (user)`)] });
-    }
+    target1 = await getMember(message.guild, args[0]);
+    target2 = await getMember(message.guild, args[1]);
   }
 
   if (!target1 || !target2) {
