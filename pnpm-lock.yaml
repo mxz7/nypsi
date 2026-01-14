@@ -19,7 +19,7 @@ importers:
         version: 2.6.0
       '@hono/node-server':
         specifier: ^1.19.7
-        version: 1.19.7(hono@4.11.3)
+        version: 1.19.7(hono@4.11.4)
       '@prisma/adapter-pg':
         specifier: ^7.2.0
         version: 7.2.0
@@ -66,8 +66,8 @@ importers:
         specifier: 3.4.1
         version: 3.4.1
       hono:
-        specifier: ^4.11.3
-        version: 4.11.3
+        specifier: ^4.11.4
+        version: 4.11.4
       ioredis:
         specifier: 5.8.2
         version: 5.8.2
@@ -2135,8 +2135,8 @@ packages:
     resolution: {integrity: sha512-BIdolzGpDO9MQ4nu3AUuDwHZZ+KViNm+EZ75Ae55eMXMqLVhDFqEMXxtUe9Qh8hjL+pIna/frs2j6Y2yD5Ua/g==}
     engines: {node: '>=16.9.0'}
 
-  hono@4.11.3:
-    resolution: {integrity: sha512-PmQi306+M/ct/m5s66Hrg+adPnkD5jiO6IjA7WhWw0gSBSo1EcRegwuI1deZ+wd5pzCGynCcn2DprnE4/yEV4w==}
+  hono@4.11.4:
+    resolution: {integrity: sha512-U7tt8JsyrxSRKspfhtLET79pU8K+tInj5QZXs1jSugO1Vq5dFj3kmZsRldo29mTBfcjDRVRXrEZ6LS63Cog9ZA==}
     engines: {node: '>=16.9.0'}
 
   html-escaper@2.0.2:
@@ -4080,9 +4080,9 @@ snapshots:
     dependencies:
       hono: 4.10.6
 
-  '@hono/node-server@1.19.7(hono@4.11.3)':
+  '@hono/node-server@1.19.7(hono@4.11.4)':
     dependencies:
-      hono: 4.11.3
+      hono: 4.11.4
 
   '@humanwhocodes/config-array@0.13.0':
     dependencies:
@@ -5853,7 +5853,7 @@ snapshots:
 
   hono@4.10.6: {}
 
-  hono@4.11.3: {}
+  hono@4.11.4: {}
 
   html-escaper@2.0.2: {}
 
