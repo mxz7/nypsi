@@ -397,8 +397,14 @@ async function playGame(
   ) => {
     let res: InteractionResponse<boolean> | OmitPartialGroupDMChannel<Message<boolean>>;
 
+    logger.debug(`blackjack: ${message.author.id} message edited for ${reason}`, {});
+
     if (!interaction || interaction.deferred || interaction.replied) res = await m.edit(data);
-    else res = await interaction.update(data).catch(() => m.edit(data));
+    else
+      res = await interaction.update(data).catch(() => {
+        logger.error(`blackjack: ${message.author.id} update interaction failed, editing`);
+        return m.edit(data);
+      });
 
     // try {
     //   logger.debug(`blackjack: ${message.member.id} message edited for ${reason}`, {
