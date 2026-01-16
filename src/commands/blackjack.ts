@@ -417,7 +417,7 @@ async function playGame(
     return res;
   };
 
-  const replay = async (embed: CustomEmbed, interaction: ButtonInteraction) => {
+  const replay = async (embed: CustomEmbed, interaction: ButtonInteraction, retry = false) => {
     await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
     if (
       !(await isPremium(message.member)) ||
@@ -454,7 +454,11 @@ async function playGame(
       new ButtonBuilder().setLabel("play again").setStyle(ButtonStyle.Success).setCustomId("rp"),
     );
 
-    await edit({ embeds: [embed], components: [row] }, "replay prep", interaction);
+    await edit(
+      { embeds: [embed], components: [row] },
+      "replay prep",
+      retry ? undefined : interaction,
+    );
 
     const res = await m
       .awaitMessageComponent({
@@ -519,6 +523,11 @@ async function playGame(
       }
 
       return prepareGame(message, send, args, m);
+    } else if (res) {
+      logger.warn(
+        `blackjack: ${message.author.id} received invalid interaction for replay view: ${res.customId}`,
+      );
+      return replay(embed, interaction, true);
     }
   };
 
