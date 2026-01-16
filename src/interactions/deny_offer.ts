@@ -47,8 +47,6 @@ export default {
       return interaction.reply({ embeds: [new ErrorEmbed("they are banned.")] });
     }
 
-    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
-
     await prisma.offer.delete({
       where: {
         messageId: offer.messageId,
@@ -56,19 +54,14 @@ export default {
     });
 
     await addBalance(offer.ownerId, Number(offer.money));
-
-    await interaction.editReply({
-      embeds: [new CustomEmbed(null, "offer denied").setColor(Constants.EMBED_SUCCESS_COLOR)],
-    });
+    await redis.del(`${Constants.redis.nypsi.OFFER_PROCESS}:${interaction.user.id}`);
 
     const embed = new EmbedBuilder(interaction.message.embeds[0]);
 
     embed.setDescription((embed.data.description.split("\n")[0] += "\n\n**offer denied**"));
     embed.setColor(Constants.EMBED_FAIL_COLOR);
 
-    await redis.del(`${Constants.redis.nypsi.OFFER_PROCESS}:${interaction.user.id}`);
-
-    await interaction.message.edit({ embeds: [embed], components: [] });
+    await interaction.update({ embeds: [embed], components: [] });
 
     if ((await getDmSettings(offer.ownerId)).market) {
       addNotificationToQueue({
