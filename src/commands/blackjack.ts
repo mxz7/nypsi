@@ -605,7 +605,7 @@ async function playGame(
     });
     gamble(message.author, "blackjack", game.bet, "lose", id, 0);
 
-    const embed = await render("lose");
+    const embed = await render("lose", undefined, undefined, undefined, id);
     game.state = "end";
     return replay(embed, interaction);
   };
@@ -678,7 +678,7 @@ async function playGame(
     });
     gamble(message.author, "blackjack", game.bet, "draw", id, game.bet);
     await addBalance(message.member, game.bet);
-    const embed = await render("draw", game.bet);
+    const embed = await render("draw", game.bet, undefined, undefined, id);
 
     game.state = "end";
     return replay(embed, interaction);
