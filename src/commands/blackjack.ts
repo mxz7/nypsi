@@ -397,7 +397,7 @@ async function playGame(
   ) => {
     let res: InteractionResponse<boolean> | OmitPartialGroupDMChannel<Message<boolean>>;
 
-    logger.debug(`blackjack: ${message.author.id} message edited for ${reason}`, {});
+    logger.debug(`blackjack: ${message.author.id} message edited for ${reason}`);
 
     if (!interaction || interaction.deferred || interaction.replied) res = await m.edit(data);
     else
