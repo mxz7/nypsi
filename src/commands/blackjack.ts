@@ -784,7 +784,14 @@ async function playGame(
       } else return playerDone(reaction);
     } else if (reaction.customId === "rp") {
       const embed = await render("playing");
-      const row = getRow(false, false);
+
+      let doubleDown = false;
+
+      if (game.playerHand.length === 2 && game.dealerHand.length === 2) {
+        doubleDown = true;
+      }
+
+      const row = getRow(doubleDown, false);
       await edit({ embeds: [embed], components: [row] }, "rerender", reaction);
       return listen();
     }
