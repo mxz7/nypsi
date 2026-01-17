@@ -1,4 +1,4 @@
-import { ColorResolvable, EmbedBuilder } from "discord.js";
+import { ColorResolvable, ContainerBuilder, EmbedBuilder } from "discord.js";
 import Constants from "../utils/Constants";
 import { getUserId, MemberResolvable } from "../utils/functions/member";
 import { getEmbedColor } from "../utils/functions/premium/color";
@@ -18,6 +18,24 @@ setInterval(() => {
 
   logger.debug(`removed ${count} from color cache. size: ${colorCache.size}`);
 }, ms("1 hour"));
+
+export class CustomContainer extends ContainerBuilder {
+  constructor(member?: MemberResolvable, text?: string) {
+    super();
+
+    this.setColor(getColor(member));
+
+    if (text) {
+      super.addTextDisplayComponents((display) => display.setContent(text));
+    }
+  }
+
+  setColor(color: ColorResolvable) {
+    const hex = parseInt(color.toString().replaceAll("#", ""), 16);
+
+    super.setAccentColor(hex);
+  }
+}
 
 export class CustomEmbed extends EmbedBuilder {
   constructor(member?: MemberResolvable, text?: string, disableFooter = false) {
