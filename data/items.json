@@ -183,6 +183,20 @@
     "sell": 20000,
     "in_crates": false
   },
+  "copper_ingot": {
+    "id": "copper_ingot",
+    "name": "copper ingot",
+    "article": "a",
+    "plural": "copper ingots",
+    "emoji": "<:copper_ingot:1462062346540154963>",
+    "longDesc": "product of smelting copper ore",
+    "role": "sellable",
+    "rarity": 69,
+    "aliases": ["copper"],
+    "buy": 0,
+    "sell": 17500,
+    "in_crates": false
+  },
   "gold_ingot": {
     "id": "gold_ingot",
     "name": "gold ingot",
@@ -278,6 +292,20 @@
     "ingot": "iron_ingot",
     "buy": 0,
     "sell": 200,
+    "in_crates": false
+  },
+  "copper_ore": {
+    "id": "copper_ore",
+    "name": "copper ore",
+    "article": "a",
+    "plural": "copper ore",
+    "emoji": "<:copper_ore:1462062343977439350>",
+    "longDesc": "can be smelted into a copper ingot with a furnace and coal",
+    "role": "ore",
+    "rarity": 1,
+    "ingot": "copper_ingot",
+    "buy": 0,
+    "sell": 150,
     "in_crates": false
   },
   "gold_nugget": {
