@@ -7,8 +7,9 @@ import { setProgress } from "../utils/functions/economy/achievements";
 import { calcItemValue } from "../utils/functions/economy/inventory";
 import sleep from "../utils/functions/sleep";
 import { logger } from "../utils/logger";
-import kofi from "./controllers/kofi";
-import vote from "./controllers/vote";
+import itemController from "./controllers/item";
+import kofiController from "./controllers/kofi";
+import voteController from "./controllers/vote";
 import loggerMiddleware from "./middleware/logger";
 import ms = require("ms");
 
@@ -87,8 +88,9 @@ app.post("/pausestreak", bearerAuth({ token: process.env.API_AUTH }), async (c) 
   return c.body("streaks will be paused for the next 24 hours", 200);
 });
 
-app.route("/vote", vote);
-app.route("/kofi", kofi);
+app.route("/vote", voteController);
+app.route("/kofi", kofiController);
+app.route("/item", itemController);
 
 // app.onError((err, c) => {
 //   logger.warn(`api: error ${c.req.method} ${c.req.path}`, err);
