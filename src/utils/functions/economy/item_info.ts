@@ -449,6 +449,7 @@ function getObtainingMessage(selected: Item, member: ItemMessageMember): ItemMes
     "emerald",
     "iron_ore",
     "gold_ore",
+    "copper_ore",
     "obsidian",
     "mineshaft_chest",
   ];

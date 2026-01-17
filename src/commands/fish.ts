@@ -114,6 +114,7 @@ async function run(
       [
         "cobblestone",
         "iron_ore",
+        "copper_ore",
         "gold_ore",
         "coal",
         "iron_ingot",
