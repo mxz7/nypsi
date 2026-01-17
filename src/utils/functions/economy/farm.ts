@@ -314,10 +314,14 @@ export async function getClaimable(
       await addProgress(member, "green_fingers", items);
       const eventProgress = await addEventProgress(client, member, "farming", items);
 
-      return { sold: items, eventProgress, multiplier: `${outputMulti * 100}`.substring(1) };
+      return {
+        sold: items,
+        eventProgress,
+        multiplier: outputMulti > 0 ? `${outputMulti * 100}`.substring(1) : null,
+      };
     }
 
-    return { items, multiplier: `${outputMulti * 100}`.substring(1) };
+    return { items, multiplier: outputMulti > 0 ? `${outputMulti * 100}`.substring(1) : null };
   } finally {
     farmClaimMutex.release(mutexKey);
   }

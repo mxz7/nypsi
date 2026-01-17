@@ -408,7 +408,9 @@ async function run(
             earned.set(plant, result.sold);
           }
 
-          multiplierValues.push(parseInt(result.multiplier) || 0);
+          if (result.multiplier) {
+            multiplierValues.push(parseInt(result.multiplier) || 0);
+          }
 
           if (result.eventProgress > eventProgress) {
             eventProgress = result.eventProgress;
