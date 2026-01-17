@@ -43,7 +43,7 @@ const rarities = [
   "even more impossible", // 7
 ];
 
-const karmashop = require("../../../../data/karmashop.json") as { [key: string]: KarmaShopItem };
+const karmaShop = require("../../../../data/karmashop.json") as { [key: string]: KarmaShopItem };
 
 type ItemMessageMember = GuildMember | (GuildMember & APIInteractionGuildMember);
 
@@ -451,7 +451,7 @@ function getObtainingMessage(selected: Item, member: ItemMessageMember): ItemMes
   }
 
   if (
-    Object.values(karmashop)
+    Object.values(karmaShop)
       .filter((i) => i.type === "item")
       .map((i) => i.value)
       .includes(selected.id)
