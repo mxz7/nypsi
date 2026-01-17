@@ -512,6 +512,20 @@ function getObtainingMessage(selected: Item, member: ItemMessageMember): ItemMes
     );
   }
 
+  // smelt sources: find ores that smelt into this item
+  const smeltSources: string[] = [];
+  for (const item of Object.values(items)) {
+    if (item.role === "ore" && item.ingot === selected.id) {
+      smeltSources.push(
+        `${item.emoji} [${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-item)`,
+      );
+    }
+  }
+
+  if (smeltSources.length > 0) {
+    description.push(`<:furnace:1354808306698293379> smelted from ${smeltSources.join(", ")}`);
+  }
+
   if (selected.role === "prey") {
     if (["blaze", "wither_skeleton", "piglin", "ghast"].includes(selected.id)) {
       description.push("🔫 hunting in the nether ([odds](https://github.com/mxz7/nypsi-odds/))");
