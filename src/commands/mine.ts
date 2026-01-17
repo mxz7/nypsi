@@ -37,6 +37,7 @@ const veins = new Map<string, number[]>();
 veins.set("cobblestone", [5, 7, 15, 25]);
 veins.set("coal", [2, 4, 5, 8, 16]);
 veins.set("iron_ore", [1, 3, 7]);
+veins.set("copper_ore", [1, 4, 8]);
 veins.set("gold_ore", [1, 2, 4]);
 veins.set("diamond", [1, 2]);
 veins.set("amethyst", [1, 2, 3]);
@@ -235,6 +236,7 @@ async function run(
               "emerald",
               "iron_ore",
               "gold_ore",
+              "copper_ore",
               "obsidian",
               "mineshaft_chest",
             ].includes(items[i].id)
