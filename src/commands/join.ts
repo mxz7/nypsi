@@ -1,8 +1,8 @@
-import { CommandInteraction, GuildMember, Message } from "discord.js";
+import { CommandInteraction, GuildMember, Message, MessageFlags, SectionBuilder } from "discord.js";
 import { sort } from "fast-sort";
 import redis from "../init/redis";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
-import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { CustomContainer, CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { daysAgo, formatDate } from "../utils/functions/date";
 import { getAllMembers } from "../utils/functions/guilds/members";
@@ -96,17 +96,22 @@ async function run(
   const joinedServer = formatDate(member.joinedAt).toLowerCase();
   const timeAgo = daysAgo(new Date(member.joinedAt));
 
-  const embed = new CustomEmbed(
-    message.member,
-    `joined on **${joinedServer}**\n- **${timeAgo.toLocaleString()}** ${pluralize("day", timeAgo)} ago\njoin position is **${
-      joinPos !== 0 ? joinPos.toLocaleString() : "--"
-    }**`,
-  )
-    .setTitle(member.user.username)
-    .setThumbnail(member.user.displayAvatarURL({ size: 128 }));
+  const container = new CustomContainer(member).addSectionComponents(
+    new SectionBuilder()
+      .addTextDisplayComponents((text) =>
+        text.setContent(
+          `### ${member.user.username}\njoined: **${joinedServer}**` +
+            `\n> ${timeAgo.toLocaleString()} ${pluralize("day", timeAgo)} ago` +
+            `\nposition: **#${joinPos !== 0 ? joinPos.toLocaleString() : "--"}**`,
+        ),
+      )
+      .setThumbnailAccessory((thumbnail) =>
+        thumbnail.setURL(member.user.displayAvatarURL({ size: 128 })),
+      ),
+  );
 
-  if (msg) msg.edit({ embeds: [embed] });
-  else send({ embeds: [embed] });
+  if (msg) msg.edit({ components: [container], content: null, flags: MessageFlags.IsComponentsV2 });
+  else send({ components: [container], flags: MessageFlags.IsComponentsV2 });
 }
 
 cmd.setRun(run);
