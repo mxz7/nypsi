@@ -46,6 +46,7 @@ const rarities = [
 const karmashop = require("../../../../data/karmashop.json") as { [key: string]: KarmaShopItem };
 
 type ItemMessageMember = GuildMember | (GuildMember & APIInteractionGuildMember);
+
 type ItemMessageData = {
   embed: CustomEmbed | CustomEmbed[];
   subEmbeds?: { [subTab: string]: CustomEmbed | CustomEmbed[] };
@@ -102,6 +103,7 @@ export async function runItemInfo(
       ingredientIn.push(item.id);
     }
   }
+
   if (
     (selected.craft !== undefined && selected.craft.ingredients.length > 0) ||
     ingredientIn.length > 0
@@ -140,6 +142,7 @@ export async function runItemInfo(
   for (const tab of metaTabs) {
     tab.setDefault(tab.data.value === defaultTab);
   }
+
   if (tabs[defaultTab] === undefined) {
     return false;
   }
@@ -157,6 +160,7 @@ export async function runItemInfo(
         .setTitle(`${selected.emoji} ${selected.name}`)
         .setThumbnail(getEmojiImage(selected.emoji))
         .disableFooter();
+
       if (inventory.has(selected.id)) {
         target.setFooter({
           text: `you have ${inventory.count(selected.id).toLocaleString()} ${pluralize(
@@ -184,6 +188,7 @@ export async function runItemInfo(
       for (const tab of metaTabs) {
         tab.setDefault(tab.data.value === tabName);
       }
+
       if (tabs[tabName].subTabs !== undefined) {
         for (const tab of tabs[tabName].subTabs) {
           tab.setDefault(tab.data.value === subTab);
@@ -196,6 +201,7 @@ export async function runItemInfo(
           new StringSelectMenuBuilder().setCustomId("tabs").setOptions(metaTabs),
         ),
       );
+
       if (tabs[tabName].subTabs !== undefined) {
         rows.push(
           new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -205,6 +211,7 @@ export async function runItemInfo(
       }
 
       let target = subTab === undefined ? tabs[tabName].embed : tabs[tabName].subEmbeds[subTab];
+
       if (target instanceof Array) {
         if (target.length > 1) {
           rows.push(
@@ -224,9 +231,11 @@ export async function runItemInfo(
         }
         target = target[page ?? 0];
       }
+
       if (tabs[tabName].widgets !== undefined) {
         rows.push(tabs[tabName].widgets);
       }
+
       return { embed: target, widgetRows: rows };
     };
 
@@ -252,13 +261,16 @@ export async function runItemInfo(
       let targetTab = tabName;
       let targetSub = subTab;
       let targetPage = page;
+
       if (res.isButton() && ["⬅", "➡"].includes(res.customId)) {
         targetPage = (page ?? 0) + +(res.customId === "➡") - +(res.customId === "⬅");
       }
+
       if (res.isStringSelectMenu() && res.customId === "subtabs") {
         targetSub = res.values[0];
         targetPage = undefined;
       }
+
       if (res.isStringSelectMenu() && res.customId === "tabs") {
         targetTab = res.values[0];
         targetSub = undefined;
@@ -304,19 +316,25 @@ function getGeneralMessage(
   const description: string[] = [
     `[\`${selected.id}\`](https://nypsi.xyz/items/${selected.id}?ref=bot-item)`,
   ];
+
   if (selected.unique) {
     description.push("*unique*");
   }
+
   description.push(`\n> ${selected.longDesc}\n`);
+
   if (selected.booster_desc !== undefined) {
     description.push(`*${selected.booster_desc}*\n`);
   }
+
   if (selected.aliases) {
     description.push(`**aliases** \`${selected.aliases.join("`, `")}\`\n`);
   }
+
   if (selected.buy) {
     description.push(`**buy** $${selected.buy.toLocaleString()}`);
   }
+
   if (selected.sell) {
     description.push(`**sell** $${selected.sell.toLocaleString()}`);
     if (["sellable", "prey", "fish"].includes(selected.role)) {
@@ -326,18 +344,22 @@ function getGeneralMessage(
       );
     }
   }
+
   if (selected.account_locked) {
     description.push("**account locked**");
   } else {
     description.push(
       `**worth** ${value ? `$${Math.floor(value).toLocaleString()}` : "[unvalued](https://nypsi.xyz/docs/economy/items/worth?ref=bot-item#unvalued)"}`,
     );
+
     if (total && selected.id !== "lottery_ticket") {
       description.push(`\n**in world** ${total.toLocaleString()}`);
     }
+
     if (inMarket) {
       description.push(`**in market** ${inMarket.toLocaleString()}`);
     }
+
     if (
       typeof selected.rarity === "number" &&
       selected.rarity >= 0 &&
@@ -356,23 +378,29 @@ function getGeneralMessage(
       description.push(`\n**role** ${selected.role}${isGlobalBooster ? " (global)" : ""}`);
 
       let roleDescription = "";
+
       if (selected.role === "booster") {
         roleDescription = `you can activate your booster with **/use <booster>**`;
       }
+
       if (["collectable", "flower", "cat"].includes(selected.role)) {
         roleDescription =
           "collectables don't do anything, they're just *collectables*. if you dont want them, you can get rid of them by selling them";
       }
+
       if (["sellable", "prey", "fish"].includes(selected.role)) {
         roleDescription = `this item is just meant to be sold. you can use the **/sell all** command to do so quickly`;
       }
+
       if (selected.role === "car") {
         description.push(`**speed** ${selected.speed}`);
         roleDescription = `cars are used for races (**/race**)`;
       }
+
       if (roleDescription.length) description.push(`\n${roleDescription}`);
     }
   }
+
   return {
     embed: embed.setDescription(description.join("\n")),
     widgets: new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -396,26 +424,32 @@ function isOnStore(itemId: string) {
       return { storeId: id };
     }
   }
+
   return false;
 }
 
 function getObtainingMessage(selected: Item, member: ItemMessageMember): ItemMessageData {
   const embed = new CustomEmbed(member);
+
   const description: string[] = [];
   const workersDescription: string[] = [];
   const farmDescription: string[] = [];
   const poolsDescription: Map<string, number> = new Map<string, number>();
+
   const items = getItems();
   const lootPools = getLootPools();
   const workers = getBaseWorkers();
   const plants = getPlantsData();
   const onStore = isOnStore(selected.id);
+
   if (selected.buy) {
     description.push("💰 shop");
   }
+
   if (onStore) {
     description.push(`💰 [nypsi store](https://ko-fi.com/s/${onStore.storeId})`);
   }
+
   if (
     Object.values(karmashop)
       .filter((i) => i.type === "item")
@@ -424,23 +458,29 @@ function getObtainingMessage(selected: Item, member: ItemMessageMember): ItemMes
   ) {
     description.push("🔮 karma shop");
   }
+
   if (selected.craft) {
     description.push("<:Craft:615426524862087191> crafting");
   }
+
   if (["vote_crate", "lottery_ticket"].includes(selected.id)) {
     description.push(
       "<:topgg:1355915569286610964> [voting](https://top.gg/bot/678711738845102087/vote)",
     );
   }
+
   if (["daily_scratch_card", "basic_crate", "nypsi_crate", "gem_crate"].includes(selected.id)) {
     description.push("📅 streak");
   }
+
   if (["cookie", "cake"].includes(selected.id)) {
     description.push("🧁 baking");
   }
+
   if (selected.id === "broken_ring") {
     description.push(`${selected.emoji} divorce`);
   }
+
   const mineItems = [
     "cobblestone",
     "coal",
@@ -453,21 +493,25 @@ function getObtainingMessage(selected: Item, member: ItemMessageMember): ItemMes
     "obsidian",
     "mineshaft_chest",
   ];
+
   if (mineItems.includes(selected.id) || selected.id === "stick") {
     description.push(
       "<:iron_pickaxe:1354809169198186607> mining ([odds](https://github.com/mxz7/nypsi-odds/))",
     );
   }
+
   if (["netherrack", "ancient_debris", "quartz", "gold_nugget", "stick"].includes(selected.id)) {
     description.push(
       "<:iron_pickaxe:1354809169198186607> mining in the nether ([odds](https://github.com/mxz7/nypsi-odds/))",
     );
   }
+
   if (["end_stone", "purpur", "obsidian", "dragon_egg", "chorus", "stick"].includes(selected.id)) {
     description.push(
       "<:iron_pickaxe:1354809169198186607> mining in the end ([odds](https://github.com/mxz7/nypsi-odds/))",
     );
   }
+
   if (selected.role === "prey") {
     if (["blaze", "wither_skeleton", "piglin", "ghast"].includes(selected.id)) {
       description.push("🔫 hunting in the nether ([odds](https://github.com/mxz7/nypsi-odds/))");
@@ -475,6 +519,7 @@ function getObtainingMessage(selected: Item, member: ItemMessageMember): ItemMes
       description.push("🔫 hunting ([odds](https://github.com/mxz7/nypsi-odds/))");
     }
   }
+
   if (
     !["booster", "car", "tool", "prey", "sellable", "ore"].includes(selected.role) &&
     selected.rarity <= 4 &&
@@ -484,39 +529,48 @@ function getObtainingMessage(selected: Item, member: ItemMessageMember): ItemMes
   ) {
     description.push("🎣 fishing ([odds](https://github.com/mxz7/nypsi-odds/))");
   }
+
   if (isGem(selected.id) || selected.id === "gem_shard") {
     description.push(
       `${selected.emoji} [mysterious activities](https://nypsi.xyz/docs/economy/items/gems)`,
     );
   }
+
   if (selected.id === "gold_star") {
     description.push("find a bug and report it (dm nypsi to create a ticket)");
   }
+
   if (selected.id === "beginner_booster") {
     description.push("given one to begin your nypsi journey");
   }
+
   if (selected.id === "pandora_box") {
     description.push("[events](https://nypsi.xyz/docs/economy/events?ref=bot-item-pandora)");
   }
+
   const randomDropPool = lootPools["random_drop"];
   if (Object.keys(randomDropPool.items ?? {}).includes(selected.id)) {
     const weight =
       (getItemWeight(randomDropPool.items[selected.id]) * 100) / getTotalWeight(randomDropPool, []);
     description.push(`💧 loot drop: \`${weight.toFixed(4)}%\``);
   }
+
   for (const worker of Object.values(workers).filter((w) => w.base.byproducts)) {
     if (Object.keys(worker.base.byproducts).includes(selected.id)) {
       workersDescription.push(`${worker.item_emoji} ${worker.name}`);
     }
   }
+
   for (const plant of Object.values(plants)) {
     if (plant.item === selected.id) {
       farmDescription.push(`${selected.emoji} ${plant.name}`);
     }
   }
+
   for (const item of Object.values(items).filter((i) => i.loot_pools)) {
     let totalEntries = 0;
     let itemWeight = 0;
+
     for (const pool of Object.keys(item.loot_pools)) {
       if (Object.keys(lootPools[pool].items ?? {}).includes(selected.id)) {
         itemWeight +=
@@ -524,17 +578,21 @@ function getObtainingMessage(selected: Item, member: ItemMessageMember): ItemMes
         totalEntries++;
       }
     }
+
     if (itemWeight > 0 && totalEntries > 0) {
       const weight = (itemWeight * 100) / totalEntries;
       poolsDescription.set(`${item.emoji} ${item.name}: \`${weight.toFixed(4)}%\``, weight);
     }
   }
+
   if (workersDescription.length > 0) {
     embed.addField("workers", workersDescription.join("\n"));
   }
+
   if (farmDescription.length > 0) {
     embed.addField("farm", farmDescription.join("\n"));
   }
+
   if (poolsDescription.entries().toArray().length > 0) {
     embed.addField(
       "crates and scratches",
@@ -543,11 +601,13 @@ function getObtainingMessage(selected: Item, member: ItemMessageMember): ItemMes
         .join("\n"),
     );
   }
+
   if (description.length > 0) {
     embed.setDescription(description.join("\n"));
   } else if ((embed.data?.fields?.length ?? 0) === 0) {
     embed.setDescription("no sources found");
   }
+
   return { embed: embed };
 }
 
@@ -558,8 +618,10 @@ function getCraftingMessage(
 ): ItemMessageData {
   const embed = new CustomEmbed(member);
   const items = getItems();
+
   if (selected.craft !== undefined) {
     embed.setDescription(`**${MStoTime(selected.craft.time * 1000)}** craft time`);
+
     const ingredientsDescription: string[] = [];
     for (const ingredient of selected.craft.ingredients) {
       const split = ingredient.split(":");
@@ -567,8 +629,10 @@ function getCraftingMessage(
         `\`${split[1]}x\` ${items[split[0]].emoji} ${items[split[0]].name}`,
       );
     }
+
     embed.addField("recipe", ingredientsDescription.join("\n"));
   }
+
   const ingredientInItems = ingredientIn.map((i) => items[i]);
   if (ingredientInItems.length > 0) {
     embed.addField(
@@ -576,6 +640,7 @@ function getCraftingMessage(
       ingredientInItems.map((i) => `${i.emoji} ${i.name}`).join("\n"),
     );
   }
+
   return { embed: embed };
 }
 
@@ -597,17 +662,24 @@ function getLootPoolsMessage(selected: Item, member: ItemMessageMember): ItemMes
   const lootPools = getLootPools();
   const poolOptions: StringSelectMenuOptionBuilder[] = [];
   const subEmbeds: { [subTab: string]: CustomEmbed[] } = {};
+
   const poolsMap: { [pool: string]: number | string } =
     selected.id === "rain" ? { random_drop: "?" } : selected.loot_pools;
+
   const pools: string[] = Object.keys(poolsMap);
+
   for (const poolName in poolsMap) {
     const count = poolsMap[poolName];
+
     poolOptions.push(
       new StringSelectMenuOptionBuilder().setLabel(poolName).setValue(poolName).setDefault(false),
     );
+
     description.push(`**${count}** draw${count === 1 ? "" : "s"} from pool \`${poolName}\``);
+
     const breakdown = poolBreakdown(lootPools[poolName]);
     subEmbeds[poolName] = [];
+
     for (let i = 0; i < breakdown.length; i += pageLength) {
       subEmbeds[poolName].push(
         new CustomEmbed(member).setDescription(
@@ -617,6 +689,7 @@ function getLootPoolsMessage(selected: Item, member: ItemMessageMember): ItemMes
         ),
       );
     }
+
     if (subEmbeds[poolName].length === 0) {
       subEmbeds[poolName].push(
         new CustomEmbed(member).setDescription(
@@ -627,17 +700,21 @@ function getLootPoolsMessage(selected: Item, member: ItemMessageMember): ItemMes
       );
     }
   }
+
   if (selected.role === "scratch-card") {
     for (const embed of subEmbeds[pools[0]]) {
       embed.setDescription(
         `**${selected.clicks}** click${selected.clicks === 1 ? "" : "s"} with pool \`${pools[0]}\``,
       );
     }
+
     return { embed: subEmbeds[pools[0]] };
   }
+
   if (pools.length === 1) {
     return { embed: subEmbeds[pools[0]] };
   }
+
   return {
     embed: new CustomEmbed(member).setDescription(description.join("\n")),
     subEmbeds: subEmbeds,
@@ -654,6 +731,7 @@ function getSeedStatsMessage(
   const items = getItems();
   const plant = getPlantsData()[selected.plantId];
   const product = items[plant.item];
+
   let sellString = `**sell** $${product.sell.toLocaleString()}`;
   if (["sellable", "prey", "fish"].includes(product.role)) {
     sellString = sellString.concat(
@@ -661,22 +739,27 @@ function getSeedStatsMessage(
       `$${Math.floor(product.sell + product.sell * sellMulti).toLocaleString()})`,
     );
   }
+
   embed.setDescription(
     `**growth time** ${MStoTime(plant.growthTime * 1000)}\n` +
       `**hourly production** ${plant.hourly}\n` +
       `**max product accumulation** ${plant.max}\n`,
   );
+
   embed.addField("produces", `${product.emoji} ${product.name}\n` + sellString);
+
   embed.addField(
     "water",
     `**time until unhealthy** ${MStoTime(plant.water.every * 1000)}\n` +
       `**time until dead** ${MStoTime(plant.water.dead * 1000)}`,
   );
+
   embed.addField(
     "fertilise",
     `**time until unhealthy** ${MStoTime(plant.fertilise.every * 1000)}\n` +
       `**time until dead** ${MStoTime(plant.fertilise.dead * 1000)}`,
   );
+
   return { embed: embed };
 }
 
@@ -684,34 +767,41 @@ function poolBreakdown(pool: LootPool): string[] {
   const description: Map<string, number> = new Map<string, number>();
   const items = getItems();
   const factor = 100 / getTotalWeight(pool, []);
+
   if (Object.hasOwn(pool, "nothing")) {
     const weight = pool.nothing * factor;
     description.set(`nothing: ${weight}%`, weight);
   }
+
   for (const key in pool.money) {
     const weight = pool.money[key] * factor;
     description.set(`💰 $${(+key).toLocaleString()}: \`${weight.toFixed(4)}%\``, weight);
   }
+
   for (const key in pool.xp) {
     const weight = pool.xp[key] * factor;
     description.set(`✨ ${(+key).toLocaleString()} xp: \`${weight.toFixed(4)}%\``, weight);
   }
+
   for (const key in pool.karma) {
     const weight = pool.karma[key] * factor;
     description.set(`🔮 ${(+key).toLocaleString()} karma: \`${weight.toFixed(4)}%\``, weight);
   }
+
   for (const key in pool.items ?? {}) {
     const countObj = typeof pool.items[key] === "object" ? pool.items[key].count : {};
     const countString = Object.hasOwn(countObj, "min")
       ? // @ts-expect-error ts doesnt realize min has to be present
         `${countObj.min}-${countObj.max}`
       : `${getItemCount(pool.items[key], key)}`;
+
     const weight = getItemWeight(pool.items[key]) * factor;
     description.set(
       `\`${countString}x\` ${items[key].emoji} ${items[key].name}: \`${weight.toFixed(4)}%\``,
       weight,
     );
   }
+
   return inPlaceSort(description.keys().toArray()).by([
     { desc: (e) => description.get(e) },
     { asc: (e) => e },
