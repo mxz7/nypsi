@@ -28,7 +28,7 @@ import {
 } from "../../utils/functions/users/notifications";
 import { logger } from "../../utils/logger";
 
-const kofi = new Hono();
+const kofiController = new Hono();
 
 const schema = z.object({
   type: z.string(),
@@ -43,7 +43,7 @@ const schema = z.object({
   amount: z.string(),
 });
 
-kofi.post(
+kofiController.post(
   "/",
   validator("form", (value, c) => {
     console.log(value);
@@ -71,7 +71,7 @@ kofi.post(
   },
 );
 
-export default kofi;
+export default kofiController;
 
 async function handleKofiData(data: z.infer<typeof schema>) {
   const user = await prisma.user.findFirst({

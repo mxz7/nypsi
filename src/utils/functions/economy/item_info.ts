@@ -428,12 +428,27 @@ function isOnStore(itemId: string) {
   return false;
 }
 
-function getObtainingMessage(selected: Item, member: ItemMessageMember): ItemMessageData {
-  const embed = new CustomEmbed(member);
+export type ObtainingPool = {
+  poolName: string;
+  count: number | string;
+  breakdown: { entry: string; weight: number }[];
+};
 
+export type ObtainingData = {
+  sources: string[];
+  workers: string[];
+  farm: string[];
+  // human-facing summary strings for embed display
+  poolsSummary: string[];
+  // programmatic detailed pools for API consumers
+  poolsDetailed: ObtainingPool[];
+};
+
+export function getObtainingData(selected: Item): ObtainingData {
   const description: string[] = [];
   const workersDescription: string[] = [];
   const farmDescription: string[] = [];
+  const poolsDetailed: ObtainingPool[] = [];
   const poolsDescription: Map<string, number> = new Map<string, number>();
 
   const items = getItems();
@@ -516,9 +531,7 @@ function getObtainingMessage(selected: Item, member: ItemMessageMember): ItemMes
   const smeltSources: string[] = [];
   for (const item of Object.values(items)) {
     if (item.role === "ore" && item.ingot === selected.id) {
-      smeltSources.push(
-        `${item.emoji} [${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-item)`,
-      );
+      smeltSources.push(`${item.emoji} ${item.name}`);
     }
   }
 
@@ -599,26 +612,87 @@ function getObtainingMessage(selected: Item, member: ItemMessageMember): ItemMes
     }
   }
 
-  if (workersDescription.length > 0) {
-    embed.addField("workers", workersDescription.join("\n"));
+  // detailed pools where selected appears
+  for (const poolName of Object.keys(selected.loot_pools ?? {})) {
+    const count = selected.loot_pools![poolName];
+    const breakdown = poolBreakdownData(lootPools[poolName]);
+    poolsDetailed.push({ poolName, count, breakdown });
   }
 
-  if (farmDescription.length > 0) {
-    embed.addField("farm", farmDescription.join("\n"));
+  return {
+    sources: description,
+    workers: workersDescription,
+    farm: farmDescription,
+    poolsSummary: inPlaceSort(poolsDescription.keys().toArray()).desc((e) =>
+      poolsDescription.get(e),
+    ),
+    poolsDetailed,
+  };
+}
+
+export function poolBreakdownData(pool: LootPool): { entry: string; weight: number }[] {
+  const description: Map<string, number> = new Map<string, number>();
+  const items = getItems();
+  const factor = 100 / getTotalWeight(pool, []);
+
+  if (Object.hasOwn(pool, "nothing")) {
+    const weight = pool.nothing * factor;
+    description.set(`nothing`, weight);
   }
 
-  if (poolsDescription.entries().toArray().length > 0) {
-    embed.addField(
-      "crates and scratches",
-      inPlaceSort(poolsDescription.keys().toArray())
-        .desc((e) => poolsDescription.get(e))
-        .join("\n"),
-    );
+  for (const key in pool.money) {
+    const weight = pool.money[key] * factor;
+    description.set(`$${(+key).toLocaleString()}`, weight);
   }
 
-  if (description.length > 0) {
-    embed.setDescription(description.join("\n"));
-  } else if ((embed.data?.fields?.length ?? 0) === 0) {
+  for (const key in pool.xp) {
+    const weight = pool.xp[key] * factor;
+    description.set(`${(+key).toLocaleString()} xp`, weight);
+  }
+
+  for (const key in pool.karma) {
+    const weight = pool.karma[key] * factor;
+    description.set(`${(+key).toLocaleString()} karma`, weight);
+  }
+
+  for (const key in pool.items ?? {}) {
+    const countObj = typeof pool.items[key] === "object" ? pool.items[key].count : {};
+    const countString = Object.hasOwn(countObj, "min")
+      ? // @ts-expect-error ts doesnt realize min has to be present
+        `${countObj.min}-${countObj.max}`
+      : `${getItemCount(pool.items[key], key)}`;
+
+    const weight = getItemWeight(pool.items[key]) * factor;
+    description.set(`${countString}x ${items[key].emoji} ${items[key].name}`, weight);
+  }
+
+  const sorted = inPlaceSort(Array.from(description.entries())).by([
+    { desc: (e) => e[1] },
+    { asc: (e) => e[0] },
+  ]);
+
+  return sorted.map((e) => ({ entry: e[0], weight: e[1] }));
+}
+
+function getObtainingMessage(selected: Item, member: ItemMessageMember): ItemMessageData {
+  const embed = new CustomEmbed(member);
+  const data = getObtainingData(selected);
+
+  if (data.sources.length > 0) embed.setDescription(data.sources.join("\n"));
+
+  if (data.workers.length > 0) {
+    embed.addField("workers", data.workers.join("\n"));
+  }
+
+  if (data.farm.length > 0) {
+    embed.addField("farm", data.farm.join("\n"));
+  }
+
+  if (data.poolsSummary.length > 0) {
+    embed.addField("crates and scratches", data.poolsSummary.join("\n"));
+  }
+
+  if ((embed.data?.fields?.length ?? 0) === 0 && !embed.data?.description) {
     embed.setDescription("no sources found");
   }
 

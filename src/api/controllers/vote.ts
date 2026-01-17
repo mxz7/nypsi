@@ -8,9 +8,9 @@ import { isUserBlacklisted } from "../../utils/functions/users/blacklist";
 import { addNotificationToQueue } from "../../utils/functions/users/notifications";
 import { logger } from "../../utils/logger";
 
-const vote = new Hono();
+const voteController = new Hono();
 
-vote.post("/", async (c) => {
+voteController.post("/", async (c) => {
   if (c.req.header("Authorization") !== process.env.TOPGG_AUTH) {
     c.status(403);
     return c.json({ error: "unauthorized" });
@@ -35,7 +35,7 @@ vote.post("/", async (c) => {
   return c.body(null, 200);
 });
 
-export default vote;
+export default voteController;
 
 async function doVote(user: string) {
   logger.info(`vote: received ${user}`);
