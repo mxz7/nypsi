@@ -2,6 +2,7 @@
 
 - events are now target based or time based, they cannot 'expire'
 - 5% discount for tickets bought with /lottery autobuy
+- add copper ore/ingot
 
 # season 11
 
