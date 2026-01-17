@@ -90,7 +90,7 @@ app.post("/pausestreak", bearerAuth({ token: process.env.API_AUTH }), async (c) 
 
 app.route("/vote", voteController);
 app.route("/kofi", kofiController);
-app.route("/item", itemController);
+app.route("/items", itemController);
 
 // app.onError((err, c) => {
 //   logger.warn(`api: error ${c.req.method} ${c.req.path}`, err);
