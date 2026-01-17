@@ -5,6 +5,7 @@ import {
   MessageEditOptions,
   MessageFlags,
 } from "discord.js";
+import { inPlaceSort } from "fast-sort";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import {
@@ -73,6 +74,19 @@ async function run(
       embeds: [new ErrorEmbed("you need ore to smelt. ores can be found through mining")],
     });
   }
+
+  inPlaceSort(ores).desc((itemId) => {
+    switch (itemId) {
+      case "gold_ore":
+        return 3;
+      case "iron_ore":
+        return 2;
+      case "copper_ore":
+        return 1;
+      default:
+        return 0;
+    }
+  });
 
   if (inventory.has("coal")) {
     coal = inventory.count("coal");
