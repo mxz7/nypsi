@@ -361,7 +361,7 @@
     "rarity": 3,
     "ingot": "netherite_scrap",
     "buy": 0,
-    "sell": 75000,
+    "sell": 50000,
     "in_crates": false
   },
   "netherite_scrap": {
@@ -374,7 +374,7 @@
     "role": "resource",
     "rarity": 3,
     "buy": 0,
-    "sell": 100000,
+    "sell": 75000,
     "in_crates": false
   },
   "netherite_ingot": {
