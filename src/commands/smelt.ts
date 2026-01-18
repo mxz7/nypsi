@@ -76,16 +76,13 @@ async function run(
   }
 
   inPlaceSort(ores).desc((itemId) => {
-    switch (itemId) {
-      case "gold_ore":
-        return 3;
-      case "iron_ore":
-        return 2;
-      case "copper_ore":
-        return 1;
-      default:
-        return 0;
+    const ingot = items[itemId].ingot;
+
+    if (ingot) {
+      return items[ingot].sell;
     }
+
+    return 0;
   });
 
   if (inventory.has("coal")) {
