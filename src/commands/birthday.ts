@@ -39,11 +39,41 @@ cmd.slashData
     set
       .setName("set")
       .setDescription("set your birthday")
-      .addStringOption((birthday) =>
-        birthday
-          .setName("birthday")
-          .setDescription("your birthday in the format YYYY-MM-DD")
+      .addStringOption((month) =>
+        month
+          .setName("month")
+          .setDescription("the month you were born")
+          .setChoices(
+            { name: "january", value: "01" },
+            { name: "february", value: "02" },
+            { name: "march", value: "03" },
+            { name: "april", value: "04" },
+            { name: "may", value: "05" },
+            { name: "june", value: "06" },
+            { name: "july", value: "07" },
+            { name: "august", value: "08" },
+            { name: "september", value: "09" },
+            { name: "october", value: "10" },
+            { name: "november", value: "11" },
+            { name: "december", value: "12" },
+          )
           .setRequired(true),
+      )
+      .addIntegerOption((day) =>
+        day
+          .setName("day")
+          .setDescription("the day you were born")
+          .setMinValue(1)
+          .setMaxValue(31)
+          .setRequired(true),
+      )
+      .addIntegerOption((year) =>
+        year
+          .setName("year")
+          .setDescription("(optional) the year you were born")
+          .setMinValue(new Date().getFullYear() - 60)
+          .setMaxValue(new Date().getFullYear() - 13)
+          .setRequired(false),
       ),
   )
   .addSubcommand((toggle) =>
@@ -79,8 +109,13 @@ async function run(
 
     let birthday = new Date(args[1].trim().replaceAll("/", "-").replaceAll(" ", "-"));
 
+    if (message instanceof CommandInteraction) {
+      birthday = new Date(`${args.length == 3 ? "0069" : args[3]}-${args[1]}-${args[2]}`);
+    }
     if (isNaN(birthday as unknown as number))
       return send({ embeds: [new ErrorEmbed("invalid date, use the format YYYY-MM-DD")] });
+
+    const yearSet = birthday.getFullYear() !== 69;
 
     birthday = dayjs(birthday)
       .set("hours", 0)
@@ -94,7 +129,7 @@ async function run(
     if (years < 13)
       return send({ embeds: [new ErrorEmbed("you must be at least 13 to use discord")] });
 
-    if (years > 60) return send({ embeds: [new ErrorEmbed("HAHAHA")] });
+    if (years > 60 && yearSet) return send({ embeds: [new ErrorEmbed("HAHAHA")] });
 
     if (message.author.createdTimestamp > Date.now() - ms("30 days"))
       return send({ embeds: [new ErrorEmbed("your account is too new to use this feature ☹️")] });
@@ -119,7 +154,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          `confirm that your birthday is ${dayjs(birthday).format("MMMM D, YYYY")}, you are ${years} years old`,
+          `confirm that your birthday is ${yearSet ? `${dayjs(birthday).format("MMMM D, YYYY")}, you are ${years} years old` : dayjs(birthday).format("MMMM D")}`,
         ),
       ],
       components: [row],
@@ -145,7 +180,7 @@ async function run(
         embeds: [
           new CustomEmbed(
             message.member,
-            `your birthday has been set to ${dayjs(birthday).format("MMMM D, YYYY")}`,
+            `your birthday has been set to ${dayjs(birthday).format(`MMMM D${yearSet ? ", YYYY" : ""}`)}`,
           ),
         ],
         components: [],
@@ -299,8 +334,8 @@ async function run(
     const embed = new CustomEmbed(
       message.member,
       birthday
-        ? `your birthday is ${dayjs(birthday).format("MMMM D, YYYY")}\n\n`
-        : "/**birthday set <YYYY-MM-DD>** *set your birthday*\n" +
+        ? `your birthday is ${dayjs(birthday).format(`MMMM D${birthday.getFullYear() == 69 ? "" : ", YYYY"}`)}\n\n`
+        : "/**birthday set <YYYY-MM-DD>** *set your birthday*\n-# tip: use the slash command for an optional year if you dont want your age\n" +
             "/**birthday toggle** *enable/disable your birthday from being announced in servers*\n" +
             "/**birthday channel <channel>** *set a channel to be used as the birthday announcement channel*\n" +
             "/**birthday disable** *disable birthday announcements in your server*\n" +
