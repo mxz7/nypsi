@@ -3,7 +3,7 @@
 - events are now target based or time based, they cannot 'expire'
 - 5% discount for tickets bought with /lottery autobuy
 - add copper ore/ingot
-- birthday year is now optional with slash command (@growlinggrizzly)
+- setting birthday moved to modal and year is now optional (@growlinggrizzly)
 
 # season 11
 

@@ -7,9 +7,16 @@ import {
   CommandInteraction,
   ComponentType,
   GuildMember,
+  LabelBuilder,
   MessageActionRowComponentBuilder,
   MessageFlags,
+  ModalBuilder,
+  ModalSubmitInteraction,
   PermissionFlagsBits,
+  StringSelectMenuBuilder,
+  StringSelectMenuOptionBuilder,
+  TextInputBuilder,
+  TextInputStyle,
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
@@ -35,47 +42,6 @@ const cmd = new Command(
 
 cmd.slashEnabled = true;
 cmd.slashData
-  .addSubcommand((set) =>
-    set
-      .setName("set")
-      .setDescription("set your birthday")
-      .addStringOption((month) =>
-        month
-          .setName("month")
-          .setDescription("the month you were born")
-          .setChoices(
-            { name: "january", value: "01" },
-            { name: "february", value: "02" },
-            { name: "march", value: "03" },
-            { name: "april", value: "04" },
-            { name: "may", value: "05" },
-            { name: "june", value: "06" },
-            { name: "july", value: "07" },
-            { name: "august", value: "08" },
-            { name: "september", value: "09" },
-            { name: "october", value: "10" },
-            { name: "november", value: "11" },
-            { name: "december", value: "12" },
-          )
-          .setRequired(true),
-      )
-      .addIntegerOption((day) =>
-        day
-          .setName("day")
-          .setDescription("the day you were born")
-          .setMinValue(1)
-          .setMaxValue(31)
-          .setRequired(true),
-      )
-      .addIntegerOption((year) =>
-        year
-          .setName("year")
-          .setDescription("(optional) the year you were born")
-          .setMinValue(new Date().getFullYear() - 60)
-          .setMaxValue(new Date().getFullYear() - 13)
-          .setRequired(false),
-      ),
-  )
   .addSubcommand((toggle) =>
     toggle.setName("toggle").setDescription("toggle birthday announcements for yourself on/off"),
   )
@@ -102,94 +68,7 @@ async function run(
   send: SendMessage,
   args: string[],
 ) {
-  if (args[0]?.toLowerCase() === "set") {
-    if (args.length === 1) {
-      return send({ embeds: [new ErrorEmbed("you forgot your birthday..... idiot.....")] });
-    }
-
-    let birthday = new Date(args[1].trim().replaceAll("/", "-").replaceAll(" ", "-"));
-
-    if (message instanceof CommandInteraction) {
-      birthday = new Date(`${args.length == 3 ? "0069" : args[3]}-${args[1]}-${args[2]}`);
-    }
-    if (isNaN(birthday as unknown as number))
-      return send({ embeds: [new ErrorEmbed("invalid date, use the format YYYY-MM-DD")] });
-
-    const yearSet = birthday.getFullYear() !== 69;
-
-    birthday = dayjs(birthday)
-      .set("hours", 0)
-      .set("minute", 0)
-      .set("second", 0)
-      .set("millisecond", 0)
-      .toDate();
-
-    const years = dayjs().diff(birthday, "years");
-
-    if (years < 13)
-      return send({ embeds: [new ErrorEmbed("you must be at least 13 to use discord")] });
-
-    if (years > 60 && yearSet) return send({ embeds: [new ErrorEmbed("HAHAHA")] });
-
-    if (message.author.createdTimestamp > Date.now() - ms("30 days"))
-      return send({ embeds: [new ErrorEmbed("your account is too new to use this feature ☹️")] });
-
-    const birthdayCheck = await getBirthday(message.member);
-
-    if (birthdayCheck)
-      return send({
-        embeds: [
-          new ErrorEmbed(
-            "you already have a birthday set\n\nsend me a DM to create a support ticket if this is an error",
-          ),
-        ],
-      });
-
-    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("confirm").setLabel("confirm").setStyle(ButtonStyle.Success),
-      new ButtonBuilder().setCustomId("cancel").setLabel("cancel").setStyle(ButtonStyle.Danger),
-    );
-
-    const confirmationMsg = await send({
-      embeds: [
-        new CustomEmbed(
-          message.member,
-          `confirm that your birthday is ${yearSet ? `${dayjs(birthday).format("MMMM D, YYYY")}, you are ${years} years old` : dayjs(birthday).format("MMMM D")}`,
-        ),
-      ],
-      components: [row],
-    });
-
-    const interaction = await confirmationMsg
-      .awaitMessageComponent({
-        filter: (i) => i.user.id === message.author.id,
-        time: 30000,
-        componentType: ComponentType.Button,
-      })
-      .catch(() => {
-        row.components.forEach((b) => b.setDisabled(true));
-        confirmationMsg.edit({ components: [row] });
-      });
-
-    if (!interaction) return;
-
-    if (interaction.customId === "confirm") {
-      await setBirthday(message.member, birthday);
-
-      interaction.update({
-        embeds: [
-          new CustomEmbed(
-            message.member,
-            `your birthday has been set to ${dayjs(birthday).format(`MMMM D${yearSet ? ", YYYY" : ""}`)}`,
-          ),
-        ],
-        components: [],
-      });
-    } else {
-      row.components.forEach((b) => b.setDisabled(true));
-      interaction.update({ components: [row] });
-    }
-  } else if (args[0]?.toLowerCase() === "toggle") {
+  if (args[0]?.toLowerCase() === "toggle") {
     const current = await isBirthdayEnabled(message.member);
 
     await setBirthdayEnabled(message.member, !current);
@@ -333,13 +212,20 @@ async function run(
 
     const embed = new CustomEmbed(
       message.member,
-      birthday
-        ? `your birthday is ${dayjs(birthday).format(`MMMM D${birthday.getFullYear() == 69 ? "" : ", YYYY"}`)}\n\n`
-        : "/**birthday set <YYYY-MM-DD>** *set your birthday*\n-# tip: use the slash command for an optional year if you dont want your age\n" +
-            "/**birthday toggle** *enable/disable your birthday from being announced in servers*\n" +
-            "/**birthday channel <channel>** *set a channel to be used as the birthday announcement channel*\n" +
-            "/**birthday disable** *disable birthday announcements in your server*\n" +
-            "/**birthday upcoming** *view upcoming birthdays in the server*",
+      (birthday
+        ? `your birthday is ${dayjs(birthday).format(`MMMM D${birthday.getFullYear() == 69 ? "" : ", YYYY"}`)}\n-# incorrect? make a support ticket\n\n`
+        : "") +
+        "/**birthday toggle** *enable/disable your birthday from being announced in servers*\n" +
+        "/**birthday channel <channel>** *set a channel to be used as the birthday announcement channel*\n" +
+        "/**birthday disable** *disable birthday announcements in your server*\n" +
+        "/**birthday upcoming** *view upcoming birthdays in the server*",
+    );
+
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId("set-birthday")
+        .setLabel("set birthday")
+        .setStyle(ButtonStyle.Success),
     );
 
     const todaysBirthdays = await getTodaysBirthdays();
@@ -357,7 +243,203 @@ async function run(
       }
     }
 
-    return send({ embeds: [embed] });
+    if (birthday) return send({ embeds: [embed] });
+
+    let msg = await send({
+      embeds: [embed],
+      components: [row],
+    });
+
+    const interaction = await msg
+      .awaitMessageComponent({
+        filter: (i) => i.user.id === message.author.id,
+        time: 30000,
+        componentType: ComponentType.Button,
+      })
+      .catch(() => {
+        msg.edit({ components: [] });
+      });
+
+    if (!interaction) return;
+
+    msg.edit({ components: [] });
+
+    if (interaction.customId === "set-birthday") {
+      const id = `set-birthday-${Math.floor(Math.random() * 69420)}`;
+      const modal = new ModalBuilder()
+        .setCustomId(id)
+        .setTitle("your birthday")
+        .addLabelComponents(
+          new LabelBuilder()
+            .setLabel("what month?")
+            .setStringSelectMenuComponent(
+              new StringSelectMenuBuilder()
+                .setCustomId("month")
+                .setPlaceholder("month")
+                .setRequired(true)
+                .addOptions(
+                  new StringSelectMenuOptionBuilder().setLabel("january").setValue("01"),
+                  new StringSelectMenuOptionBuilder().setLabel("february").setValue("02"),
+                  new StringSelectMenuOptionBuilder().setLabel("march").setValue("03"),
+                  new StringSelectMenuOptionBuilder().setLabel("april").setValue("04"),
+                  new StringSelectMenuOptionBuilder().setLabel("may").setValue("05"),
+                  new StringSelectMenuOptionBuilder().setLabel("june").setValue("06"),
+                  new StringSelectMenuOptionBuilder().setLabel("july").setValue("07"),
+                  new StringSelectMenuOptionBuilder().setLabel("august").setValue("08"),
+                  new StringSelectMenuOptionBuilder().setLabel("september").setValue("09"),
+                  new StringSelectMenuOptionBuilder().setLabel("october").setValue("10"),
+                  new StringSelectMenuOptionBuilder().setLabel("november").setValue("11"),
+                  new StringSelectMenuOptionBuilder().setLabel("december").setValue("12"),
+                ),
+            ),
+          new LabelBuilder()
+            .setLabel(`what day of the month?`)
+            .setTextInputComponent(
+              new TextInputBuilder()
+                .setCustomId("day")
+                .setPlaceholder("day")
+                .setStyle(TextInputStyle.Short)
+                .setRequired(true)
+                .setMaxLength(2),
+            ),
+          new LabelBuilder()
+            .setLabel(`what year?`)
+            .setTextInputComponent(
+              new TextInputBuilder()
+                .setCustomId("year")
+                .setPlaceholder("year")
+                .setStyle(TextInputStyle.Short)
+                .setRequired(false)
+                .setMaxLength(4),
+            ),
+        );
+
+      await interaction.showModal(modal);
+
+      const filter = (i: ModalSubmitInteraction) =>
+        i.user.id == interaction.user.id && i.customId === id;
+
+      const res = await interaction.awaitModalSubmit({ filter, time: 30000 }).catch(() => {});
+
+      if (res) {
+        const month = res.fields.getStringSelectValues("month");
+        const day = res.fields.getTextInputValue("day");
+        const year = res.fields.getTextInputValue("year") || "0069";
+
+        if (!parseInt(day) || isNaN(parseInt(day)) || parseInt(day) < 1) {
+          return res.reply({
+            embeds: [new ErrorEmbed("invalid day")],
+            flags: MessageFlags.Ephemeral,
+          });
+        }
+
+        if (!parseInt(year) || isNaN(parseInt(year)) || parseInt(year) < 1) {
+          return res.reply({
+            embeds: [new ErrorEmbed("invalid year")],
+            flags: MessageFlags.Ephemeral,
+          });
+        }
+
+        let birthday = new Date(`${year}-${month}-${day}`);
+
+        if (isNaN(birthday as unknown as number))
+          return res.reply({
+            embeds: [new ErrorEmbed("invalid date")],
+            flags: MessageFlags.Ephemeral,
+          });
+
+        const yearSet = birthday.getFullYear() !== 69;
+
+        birthday = dayjs(birthday)
+          .set("hours", 0)
+          .set("minute", 0)
+          .set("second", 0)
+          .set("millisecond", 0)
+          .toDate();
+
+        const years = dayjs().diff(birthday, "years");
+
+        if (years < 13)
+          return res.reply({
+            embeds: [new ErrorEmbed("you must be at least 13 to use discord")],
+            flags: MessageFlags.Ephemeral,
+          });
+
+        if (years > 60 && yearSet)
+          return res.reply({
+            embeds: [new ErrorEmbed("HAHAHA")],
+            flags: MessageFlags.Ephemeral,
+          });
+
+        if (message.author.createdTimestamp > Date.now() - ms("30 days"))
+          return res.reply({
+            embeds: [new ErrorEmbed("your account is too new to use this feature ☹️")],
+            flags: MessageFlags.Ephemeral,
+          });
+
+        const birthdayCheck = await getBirthday(message.member);
+
+        if (birthdayCheck)
+          return res.reply({
+            embeds: [
+              new ErrorEmbed(
+                "you already have a birthday set\n\nsend me a DM to create a support ticket if this is an error",
+              ),
+            ],
+            flags: MessageFlags.Ephemeral,
+          });
+
+        const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+          new ButtonBuilder()
+            .setCustomId("confirm")
+            .setLabel("confirm")
+            .setStyle(ButtonStyle.Success),
+          new ButtonBuilder().setCustomId("cancel").setLabel("cancel").setStyle(ButtonStyle.Danger),
+        );
+
+        await res.deferUpdate();
+
+        msg = await msg.edit({
+          embeds: [
+            new CustomEmbed(
+              message.member,
+              `confirm that your birthday is ${yearSet ? `${dayjs(birthday).format("MMMM D, YYYY")}, you are ${years} years old` : dayjs(birthday).format("MMMM D")}`,
+            ),
+          ],
+          components: [row],
+        });
+
+        const interaction = await msg
+          .awaitMessageComponent({
+            filter: (i) => i.user.id === message.author.id,
+            time: 30000,
+            componentType: ComponentType.Button,
+          })
+          .catch(() => {
+            row.components.forEach((b) => b.setDisabled(true));
+            msg.edit({ components: [row] });
+          });
+
+        if (!interaction) return;
+
+        if (interaction.customId === "confirm") {
+          await setBirthday(message.member, birthday);
+
+          interaction.update({
+            embeds: [
+              new CustomEmbed(
+                message.member,
+                `your birthday has been set to ${dayjs(birthday).format(`MMMM D${yearSet ? ", YYYY" : ""}`)}`,
+              ),
+            ],
+            components: [],
+          });
+        } else {
+          row.components.forEach((b) => b.setDisabled(true));
+          interaction.update({ components: [row] });
+        }
+      }
+    }
   }
 }
 
