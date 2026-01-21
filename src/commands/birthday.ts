@@ -1,6 +1,7 @@
 import {
   ActionRowBuilder,
   ButtonBuilder,
+  ButtonInteraction,
   ButtonStyle,
   Channel,
   Collection,
@@ -208,12 +209,12 @@ async function run(
     manager.listen();
     return;
   } else {
-    const birthday = await getBirthday(message.member);
+    let birthday = await getBirthday(message.member);
 
     const embed = new CustomEmbed(
       message.member,
       (birthday
-        ? `your birthday is ${dayjs(birthday).format(`MMMM D${birthday.getFullYear() == 69 ? "" : ", YYYY"}`)}\n-# incorrect? make a support ticket\n\n`
+        ? `your birthday is ${dayjs(birthday).format(`MMMM D${birthday.getFullYear() == 69 ? "" : ", YYYY"}`)}\n-# incorrect? [make a support ticket](https://nypsi.xyz/docs/faq#how-do-i-make-a-support-ticket)\n\n`
         : "") +
         "/**birthday toggle** *enable/disable your birthday from being announced in servers*\n" +
         "/**birthday channel <channel>** *set a channel to be used as the birthday announcement channel*\n" +
@@ -221,7 +222,7 @@ async function run(
         "/**birthday upcoming** *view upcoming birthdays in the server*",
     );
 
-    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+    let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
         .setCustomId("set-birthday")
         .setLabel("set birthday")
@@ -250,7 +251,7 @@ async function run(
       components: [row],
     });
 
-    const interaction = await msg
+    let interaction = await msg
       .awaitMessageComponent({
         filter: (i) => i.user.id === message.author.id,
         time: 30000,
@@ -264,181 +265,178 @@ async function run(
 
     msg.edit({ components: [] });
 
-    if (interaction.customId === "set-birthday") {
-      const id = `set-birthday-${Math.floor(Math.random() * 69420)}`;
-      const modal = new ModalBuilder()
-        .setCustomId(id)
-        .setTitle("your birthday")
-        .addLabelComponents(
-          new LabelBuilder()
-            .setLabel("what month?")
-            .setStringSelectMenuComponent(
-              new StringSelectMenuBuilder()
-                .setCustomId("month")
-                .setPlaceholder("month")
-                .setRequired(true)
-                .addOptions(
-                  new StringSelectMenuOptionBuilder().setLabel("january").setValue("01"),
-                  new StringSelectMenuOptionBuilder().setLabel("february").setValue("02"),
-                  new StringSelectMenuOptionBuilder().setLabel("march").setValue("03"),
-                  new StringSelectMenuOptionBuilder().setLabel("april").setValue("04"),
-                  new StringSelectMenuOptionBuilder().setLabel("may").setValue("05"),
-                  new StringSelectMenuOptionBuilder().setLabel("june").setValue("06"),
-                  new StringSelectMenuOptionBuilder().setLabel("july").setValue("07"),
-                  new StringSelectMenuOptionBuilder().setLabel("august").setValue("08"),
-                  new StringSelectMenuOptionBuilder().setLabel("september").setValue("09"),
-                  new StringSelectMenuOptionBuilder().setLabel("october").setValue("10"),
-                  new StringSelectMenuOptionBuilder().setLabel("november").setValue("11"),
-                  new StringSelectMenuOptionBuilder().setLabel("december").setValue("12"),
-                ),
-            ),
-          new LabelBuilder()
-            .setLabel(`what day of the month?`)
-            .setTextInputComponent(
-              new TextInputBuilder()
-                .setCustomId("day")
-                .setPlaceholder("day")
-                .setStyle(TextInputStyle.Short)
-                .setRequired(true)
-                .setMaxLength(2),
-            ),
-          new LabelBuilder()
-            .setLabel(`what year?`)
-            .setTextInputComponent(
-              new TextInputBuilder()
-                .setCustomId("year")
-                .setPlaceholder("year")
-                .setStyle(TextInputStyle.Short)
-                .setRequired(false)
-                .setMaxLength(4),
-            ),
-        );
+    if (interaction.customId !== "set-birthday") return;
 
-      await interaction.showModal(modal);
-
-      const filter = (i: ModalSubmitInteraction) =>
-        i.user.id == interaction.user.id && i.customId === id;
-
-      const res = await interaction.awaitModalSubmit({ filter, time: 30000 }).catch(() => {});
-
-      if (res) {
-        const month = res.fields.getStringSelectValues("month");
-        const day = res.fields.getTextInputValue("day");
-        const year = res.fields.getTextInputValue("year") || "0069";
-
-        if (!parseInt(day) || isNaN(parseInt(day)) || parseInt(day) < 1) {
-          return res.reply({
-            embeds: [new ErrorEmbed("invalid day")],
-            flags: MessageFlags.Ephemeral,
-          });
-        }
-
-        if (!parseInt(year) || isNaN(parseInt(year)) || parseInt(year) < 1) {
-          return res.reply({
-            embeds: [new ErrorEmbed("invalid year")],
-            flags: MessageFlags.Ephemeral,
-          });
-        }
-
-        let birthday = new Date(`${year}-${month}-${day}`);
-
-        if (isNaN(birthday as unknown as number))
-          return res.reply({
-            embeds: [new ErrorEmbed("invalid date")],
-            flags: MessageFlags.Ephemeral,
-          });
-
-        const yearSet = birthday.getFullYear() !== 69;
-
-        birthday = dayjs(birthday)
-          .set("hours", 0)
-          .set("minute", 0)
-          .set("second", 0)
-          .set("millisecond", 0)
-          .toDate();
-
-        const years = dayjs().diff(birthday, "years");
-
-        if (years < 13)
-          return res.reply({
-            embeds: [new ErrorEmbed("you must be at least 13 to use discord")],
-            flags: MessageFlags.Ephemeral,
-          });
-
-        if (years > 60 && yearSet)
-          return res.reply({
-            embeds: [new ErrorEmbed("HAHAHA")],
-            flags: MessageFlags.Ephemeral,
-          });
-
-        if (message.author.createdTimestamp > Date.now() - ms("30 days"))
-          return res.reply({
-            embeds: [new ErrorEmbed("your account is too new to use this feature ☹️")],
-            flags: MessageFlags.Ephemeral,
-          });
-
-        const birthdayCheck = await getBirthday(message.member);
-
-        if (birthdayCheck)
-          return res.reply({
-            embeds: [
-              new ErrorEmbed(
-                "you already have a birthday set\n\nsend me a DM to create a support ticket if this is an error",
+    const id = `set-birthday-${Math.floor(Math.random() * 69420)}`;
+    const modal = new ModalBuilder()
+      .setCustomId(id)
+      .setTitle("your birthday")
+      .addLabelComponents(
+        new LabelBuilder()
+          .setLabel("what month?")
+          .setStringSelectMenuComponent(
+            new StringSelectMenuBuilder()
+              .setCustomId("month")
+              .setPlaceholder("month")
+              .setRequired(true)
+              .addOptions(
+                new StringSelectMenuOptionBuilder().setLabel("january").setValue("01"),
+                new StringSelectMenuOptionBuilder().setLabel("february").setValue("02"),
+                new StringSelectMenuOptionBuilder().setLabel("march").setValue("03"),
+                new StringSelectMenuOptionBuilder().setLabel("april").setValue("04"),
+                new StringSelectMenuOptionBuilder().setLabel("may").setValue("05"),
+                new StringSelectMenuOptionBuilder().setLabel("june").setValue("06"),
+                new StringSelectMenuOptionBuilder().setLabel("july").setValue("07"),
+                new StringSelectMenuOptionBuilder().setLabel("august").setValue("08"),
+                new StringSelectMenuOptionBuilder().setLabel("september").setValue("09"),
+                new StringSelectMenuOptionBuilder().setLabel("october").setValue("10"),
+                new StringSelectMenuOptionBuilder().setLabel("november").setValue("11"),
+                new StringSelectMenuOptionBuilder().setLabel("december").setValue("12"),
               ),
-            ],
-            flags: MessageFlags.Ephemeral,
-          });
+          ),
+        new LabelBuilder()
+          .setLabel(`what day of the month?`)
+          .setTextInputComponent(
+            new TextInputBuilder()
+              .setCustomId("day")
+              .setPlaceholder("day")
+              .setStyle(TextInputStyle.Short)
+              .setRequired(true)
+              .setMaxLength(2),
+          ),
+        new LabelBuilder()
+          .setLabel(`what year?`)
+          .setTextInputComponent(
+            new TextInputBuilder()
+              .setCustomId("year")
+              .setPlaceholder("year")
+              .setStyle(TextInputStyle.Short)
+              .setRequired(false)
+              .setMaxLength(4),
+          ),
+      );
 
-        const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-          new ButtonBuilder()
-            .setCustomId("confirm")
-            .setLabel("confirm")
-            .setStyle(ButtonStyle.Success),
-          new ButtonBuilder().setCustomId("cancel").setLabel("cancel").setStyle(ButtonStyle.Danger),
-        );
+    await interaction.showModal(modal);
 
-        await res.deferUpdate();
+    const filter = (i: ModalSubmitInteraction) =>
+      i.user.id == (interaction as ButtonInteraction).user.id && i.customId === id;
 
-        msg = await msg.edit({
-          embeds: [
-            new CustomEmbed(
-              message.member,
-              `confirm that your birthday is ${yearSet ? `${dayjs(birthday).format("MMMM D, YYYY")}, you are ${years} years old` : dayjs(birthday).format("MMMM D")}`,
-            ),
-          ],
-          components: [row],
-        });
+    const res = await interaction.awaitModalSubmit({ filter, time: 30000 }).catch(() => {});
 
-        const interaction = await msg
-          .awaitMessageComponent({
-            filter: (i) => i.user.id === message.author.id,
-            time: 30000,
-            componentType: ComponentType.Button,
-          })
-          .catch(() => {
-            row.components.forEach((b) => b.setDisabled(true));
-            msg.edit({ components: [row] });
-          });
+    if (!res) return;
 
-        if (!interaction) return;
+    const month = res.fields.getStringSelectValues("month");
+    const day = res.fields.getTextInputValue("day");
+    const year = res.fields.getTextInputValue("year") || "0069";
 
-        if (interaction.customId === "confirm") {
-          await setBirthday(message.member, birthday);
+    if (!parseInt(day) || isNaN(parseInt(day)) || parseInt(day) < 1) {
+      return res.reply({
+        embeds: [new ErrorEmbed("invalid day")],
+        flags: MessageFlags.Ephemeral,
+      });
+    }
 
-          interaction.update({
-            embeds: [
-              new CustomEmbed(
-                message.member,
-                `your birthday has been set to ${dayjs(birthday).format(`MMMM D${yearSet ? ", YYYY" : ""}`)}`,
-              ),
-            ],
-            components: [],
-          });
-        } else {
-          row.components.forEach((b) => b.setDisabled(true));
-          interaction.update({ components: [row] });
-        }
-      }
+    if (!parseInt(year) || isNaN(parseInt(year)) || parseInt(year) < 1) {
+      return res.reply({
+        embeds: [new ErrorEmbed("invalid year")],
+        flags: MessageFlags.Ephemeral,
+      });
+    }
+
+    birthday = new Date(`${year}-${month}-${day}`);
+
+    if (isNaN(birthday.getTime()))
+      return res.reply({
+        embeds: [new ErrorEmbed("invalid date")],
+        flags: MessageFlags.Ephemeral,
+      });
+
+    const yearSet = birthday.getFullYear() !== 69;
+
+    birthday = dayjs(birthday)
+      .set("hours", 0)
+      .set("minute", 0)
+      .set("second", 0)
+      .set("millisecond", 0)
+      .toDate();
+
+    const years = dayjs().diff(birthday, "years");
+
+    if (years < 13)
+      return res.reply({
+        embeds: [new ErrorEmbed("you must be at least 13 to use discord")],
+        flags: MessageFlags.Ephemeral,
+      });
+
+    if (years > 60 && yearSet)
+      return res.reply({
+        embeds: [new ErrorEmbed("HAHAHA")],
+        flags: MessageFlags.Ephemeral,
+      });
+
+    if (message.author.createdTimestamp > Date.now() - ms("30 days"))
+      return res.reply({
+        embeds: [new ErrorEmbed("your account is too new to use this feature ☹️")],
+        flags: MessageFlags.Ephemeral,
+      });
+
+    const birthdayCheck = await getBirthday(message.member);
+
+    if (birthdayCheck)
+      return res.reply({
+        embeds: [
+          new ErrorEmbed(
+            "you already have a birthday set\n\nsend me a DM to create a support ticket if this is an error",
+          ),
+        ],
+        flags: MessageFlags.Ephemeral,
+      });
+
+    row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder().setCustomId("confirm").setLabel("confirm").setStyle(ButtonStyle.Success),
+      new ButtonBuilder().setCustomId("cancel").setLabel("cancel").setStyle(ButtonStyle.Danger),
+    );
+
+    await res.deferUpdate();
+
+    msg = await res.editReply({
+      embeds: [
+        new CustomEmbed(
+          message.member,
+          `confirm that your birthday is ${yearSet ? `${dayjs(birthday).format("MMMM D, YYYY")}, you are ${years} years old` : dayjs(birthday).format("MMMM D")}`,
+        ),
+      ],
+      components: [row],
+    });
+
+    interaction = await msg
+      .awaitMessageComponent({
+        filter: (i) => i.user.id === message.author.id,
+        time: 30000,
+        componentType: ComponentType.Button,
+      })
+      .catch(() => {
+        row.components.forEach((b) => b.setDisabled(true));
+        msg.edit({ components: [row] });
+      });
+
+    if (!interaction) return;
+
+    if (interaction.customId === "confirm") {
+      await setBirthday(message.member, birthday);
+
+      interaction.update({
+        embeds: [
+          new CustomEmbed(
+            message.member,
+            `your birthday has been set to ${dayjs(birthday).format(`MMMM D${yearSet ? ", YYYY" : ""}`)}`,
+          ),
+        ],
+        components: [],
+      });
+    } else {
+      row.components.forEach((b) => b.setDisabled(true));
+      interaction.update({ components: [row] });
     }
   }
 }
