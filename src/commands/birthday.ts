@@ -215,7 +215,9 @@ async function run(
     const embed = new CustomEmbed(
       message.member,
       (birthday
-        ? `your birthday is ${dayjs(birthday).format(`MMMM D${birthday.getFullYear() == 69 ? "" : ", YYYY"}`)}\n-# incorrect? [make a support ticket](https://nypsi.xyz/docs/faq#how-do-i-make-a-support-ticket)\n\n`
+        ? `your birthday is **${dayjs(birthday)
+            .format(`MMMM D${birthday.getFullYear() == 69 ? "" : ", YYYY"}`)
+            .toLowerCase()}**\n-# incorrect? [make a support ticket](https://nypsi.xyz/docs/faq#how-do-i-make-a-support-ticket)\n\n`
         : "") +
         "/**birthday toggle** *enable/disable your birthday from being announced in servers*\n" +
         "/**birthday channel <channel>** *set a channel to be used as the birthday announcement channel*\n" +
@@ -404,7 +406,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          `confirm that your birthday is ${yearSet ? `${dayjs(birthday).format("MMMM D, YYYY")}, you are ${years} years old` : dayjs(birthday).format("MMMM D")}`,
+          `confirm that your birthday is ${yearSet ? `**${dayjs(birthday).format("MMMM D, YYYY").toLowerCase()}**, you are ${years} years old` : dayjs(birthday).format("MMMM D")}`,
         ),
       ],
       components: [row],
