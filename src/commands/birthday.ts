@@ -43,6 +43,7 @@ const cmd = new Command(
 
 cmd.slashEnabled = true;
 cmd.slashData
+  .addSubcommand((view) => view.setName("view").setDescription("view or set your birthday"))
   .addSubcommand((toggle) =>
     toggle.setName("toggle").setDescription("toggle birthday announcements for yourself on/off"),
   )
