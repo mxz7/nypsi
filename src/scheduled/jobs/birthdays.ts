@@ -78,7 +78,7 @@ export default {
 
                     const years = dayjs().diff(birthday.birthday, "years");
 
-                    const msg = `it's ${member.toString()}'s **${years}${getOrdinalSuffix(years)}** birthday today!`;
+                    const msg = `it's ${member.toString()}'s ${parseInt(birthday.birthday.split("-")[0]) == 69 ? "" : `**${years}${getOrdinalSuffix(years)}** `}birthday today!`;
 
                     await hook
                       .send({ content: msg })
