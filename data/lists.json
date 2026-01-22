@@ -122,7 +122,8 @@
     "have a rare item? don't sell it with **$sell**!!!!!! you're likely to get a lot more money from it with **/market**",
     "did you know you *don't have to* @ someone to use commands with them? you can just use their username. even if you mistype it nypsi will try to find the correct person that you meant to target",
     "does someone have an item that you want? send them an offer for it! **$offer <user> <item> <amount> <price>**",
-    "looking for more nypsi players to trade/play with? join the **[official nypsi discord server!!](https://nypsi.xyz/discord)**"
+    "looking for more nypsi players to trade/play with? join the **[official nypsi discord server!!](https://nypsi.xyz/discord)**",
+    "add your birthday to nypsi with **/birthday** to get a birthday cake on your birthday!"
   ],
   "countries": [
     "AF",
