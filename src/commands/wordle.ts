@@ -143,7 +143,7 @@ async function run(
       return;
     }
 
-    await addCooldown(cmd.name, message.member, 75);
+    await addCooldown(cmd.name, message.member, 60);
     await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
 
     const board = createBoard();
