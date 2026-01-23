@@ -14,6 +14,16 @@ export async function getBirthday(member: MemberResolvable) {
   return query.birthday;
 }
 
+export async function getFormattedBirthday(birthday: Date): Promise<string>;
+export async function getFormattedBirthday(member: MemberResolvable): Promise<string>;
+export async function getFormattedBirthday(value: MemberResolvable | Date) {
+  const birthday = value instanceof Date ? value : await getBirthday(value);
+
+  return dayjs(birthday)
+    .format(birthday.getFullYear() === 69 ? "MMMM D" : "MMMM D, YYYY")
+    .toLowerCase();
+}
+
 export async function setBirthday(member: MemberResolvable, birthday: Date) {
   await prisma.user.update({ where: { id: getUserId(member) }, data: { birthday } });
 }
