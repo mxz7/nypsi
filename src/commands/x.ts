@@ -13,9 +13,17 @@ import {
   ComponentType,
   Guild,
   Interaction,
+  LabelBuilder,
   Message,
   MessageActionRowComponentBuilder,
+  MessageFlags,
+  ModalBuilder,
+  ModalSubmitInteraction,
+  StringSelectMenuBuilder,
+  StringSelectMenuOptionBuilder,
   TextChannel,
+  TextInputBuilder,
+  TextInputStyle,
   User,
 } from "discord.js";
 import { inPlaceSort, sort } from "fast-sort";
@@ -102,7 +110,7 @@ import { getDuration } from "../utils/functions/string";
 import { createSupportRequest } from "../utils/functions/supportrequest";
 import { exportTransactions } from "../utils/functions/transactions";
 import { getAdminLevel, hasAdminPermission, setAdminLevel } from "../utils/functions/users/admin";
-import { setBirthday } from "../utils/functions/users/birthday";
+import { getBirthday, getFormattedBirthday, setBirthday } from "../utils/functions/users/birthday";
 import { isUserBlacklisted, setUserBlacklist } from "../utils/functions/users/blacklist";
 import { getCommandUses, getLastCommand } from "../utils/functions/users/commands";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
@@ -334,11 +342,11 @@ async function run(
           .setStyle(ButtonStyle.Primary)
           .setDisabled(!(await hasAdminPermission(message.member, "add-purchase"))),
         new ButtonBuilder()
-          .setCustomId("set-birthday")
-          .setLabel("set birthday")
+          .setCustomId("view-birthday")
+          .setLabel("birthday")
           .setEmoji("🎂")
           .setStyle(ButtonStyle.Primary)
-          .setDisabled(!(await hasAdminPermission(message.member, "set-birthday"))),
+          .setDisabled(!(await hasAdminPermission(message.member, "view-user-info"))),
         new ButtonBuilder()
           .setCustomId("view-streak")
           .setLabel("streaks")
@@ -627,45 +635,17 @@ async function run(
         }
 
         msgResponse.first().react("✅");
-      } else if (res.customId === "set-birthday") {
-        if (!(await hasAdminPermission(message.member, "set-birthday"))) {
+      } else if (res.customId === "view-birthday") {
+        if (!(await hasAdminPermission(message.member, "view-user-info"))) {
           await res.editReply({
-            embeds: [requiredLevelEmbed("set-birthday")],
+            embeds: [requiredLevelEmbed("view-user-info")],
           });
           return waitForButton();
         }
-
-        await res.editReply({
-          embeds: [new CustomEmbed(message.member, "enter new birthday")],
-        });
-
-        const msg = await message.channel
-          .awaitMessages({
-            filter: (msg: Message) => msg.author.id === message.author.id,
-            max: 1,
-            time: 30000,
-          })
-          .then((collected) => collected.first())
-          .catch(() => {
-            res.editReply({ embeds: [new CustomEmbed(message.member, "expired")] });
-          });
-
-        if (!msg) return;
-
-        const birthday = new Date(msg.content);
-
-        if (isNaN(birthday as unknown as number)) {
-          await res.editReply({
-            embeds: [new ErrorEmbed("invalid date, use the format YYYY-MM-DD")],
-          });
-          return waitForButton();
-        }
-
         logger.info(
-          `admin: ${message.author.id} (${message.author.username}) set ${user.id} birthday to ${birthday}`,
+          `admin: ${message.author.id} (${message.author.username}) viewed ${user.id} birthday info`,
         );
-        await setBirthday(user, birthday);
-        msg.react("✅");
+        doBirthday(user, res as ButtonInteraction);
         return waitForButton();
       } else if (res.customId === "view-streak") {
         if (!(await hasAdminPermission(message.member, "view-user-info"))) {
@@ -1848,6 +1828,186 @@ async function run(
 
         logger.info(
           `admin: ${message.author.id} (${message.author.username}) reran ${user.id} vote streak`,
+        );
+
+        return waitForButton();
+      }
+    };
+    return waitForButton();
+  };
+
+  const doBirthday = async (user: User, response: ButtonInteraction) => {
+    const render = async () => {
+      const birthday = await getBirthday(user);
+
+      const canSetBirthday = await hasAdminPermission(message.member, "set-birthday");
+
+      const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [
+        new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+          new ButtonBuilder()
+            .setCustomId("set-bday")
+            .setLabel("set birthday")
+            .setStyle(ButtonStyle.Primary)
+            .setEmoji("🎂")
+            .setDisabled(!canSetBirthday),
+          new ButtonBuilder()
+            .setCustomId("reset-bday")
+            .setLabel("reset birthday")
+            .setStyle(ButtonStyle.Primary)
+            .setEmoji("❌")
+            .setDisabled(!canSetBirthday || !birthday),
+        ),
+      ];
+
+      const embed = new CustomEmbed(message.member);
+      embed.setDescription(
+        birthday ? `birthday: **${await getFormattedBirthday(birthday)}**` : "no birthday set",
+      );
+
+      return { rows, embed };
+    };
+
+    const waitForButton = async (): Promise<void> => {
+      const { rows, embed } = await render();
+
+      const msg = await response.editReply({ embeds: [embed], components: rows });
+
+      const filter = (i: Interaction) => i.user.id == message.author.id;
+
+      const interaction = await msg
+        .awaitMessageComponent({ filter, time: 120000 })
+        .catch(async () => {
+          await msg.edit({ components: [] });
+        });
+
+      if (!interaction) return;
+
+      if (interaction.customId === "set-bday") {
+        if (!(await hasAdminPermission(message.member, "set-birthday"))) {
+          await interaction.editReply({
+            embeds: [requiredLevelEmbed("set-birthday")],
+          });
+          return waitForButton();
+        }
+
+        const id = `set-birthday-${Math.floor(Math.random() * 69420)}`;
+        const modal = new ModalBuilder()
+          .setCustomId(id)
+          .setTitle(`${user.username}'s birthday`)
+          .addLabelComponents(
+            new LabelBuilder()
+              .setLabel("what month?")
+              .setStringSelectMenuComponent(
+                new StringSelectMenuBuilder()
+                  .setCustomId("month")
+                  .setPlaceholder("month")
+                  .setRequired(true)
+                  .addOptions(
+                    new StringSelectMenuOptionBuilder().setLabel("january").setValue("01"),
+                    new StringSelectMenuOptionBuilder().setLabel("february").setValue("02"),
+                    new StringSelectMenuOptionBuilder().setLabel("march").setValue("03"),
+                    new StringSelectMenuOptionBuilder().setLabel("april").setValue("04"),
+                    new StringSelectMenuOptionBuilder().setLabel("may").setValue("05"),
+                    new StringSelectMenuOptionBuilder().setLabel("june").setValue("06"),
+                    new StringSelectMenuOptionBuilder().setLabel("july").setValue("07"),
+                    new StringSelectMenuOptionBuilder().setLabel("august").setValue("08"),
+                    new StringSelectMenuOptionBuilder().setLabel("september").setValue("09"),
+                    new StringSelectMenuOptionBuilder().setLabel("october").setValue("10"),
+                    new StringSelectMenuOptionBuilder().setLabel("november").setValue("11"),
+                    new StringSelectMenuOptionBuilder().setLabel("december").setValue("12"),
+                  ),
+              ),
+            new LabelBuilder()
+              .setLabel(`what day of the month?`)
+              .setTextInputComponent(
+                new TextInputBuilder()
+                  .setCustomId("day")
+                  .setPlaceholder("day")
+                  .setStyle(TextInputStyle.Short)
+                  .setRequired(true)
+                  .setMaxLength(2),
+              ),
+            new LabelBuilder()
+              .setLabel(`what year?`)
+              .setTextInputComponent(
+                new TextInputBuilder()
+                  .setCustomId("year")
+                  .setPlaceholder("year")
+                  .setStyle(TextInputStyle.Short)
+                  .setRequired(false)
+                  .setMaxLength(4),
+              ),
+          );
+
+        await interaction.showModal(modal);
+
+        const filter = (i: ModalSubmitInteraction) =>
+          i.user.id == (interaction as ButtonInteraction).user.id && i.customId === id;
+
+        const res = await interaction.awaitModalSubmit({ filter, time: 30000 }).catch(() => {});
+
+        if (!res) return;
+
+        const month = res.fields.getStringSelectValues("month");
+        const day = res.fields.getTextInputValue("day").padStart(2, "0");
+        const year = res.fields.getTextInputValue("year") || "0069";
+
+        if (!parseInt(day) || isNaN(parseInt(day)) || parseInt(day) < 1) {
+          res.reply({
+            embeds: [new ErrorEmbed("invalid day")],
+            flags: MessageFlags.Ephemeral,
+          });
+          return waitForButton();
+        }
+
+        if (!parseInt(year) || isNaN(parseInt(year)) || parseInt(year) < 1) {
+          res.reply({
+            embeds: [new ErrorEmbed("invalid year")],
+            flags: MessageFlags.Ephemeral,
+          });
+          return waitForButton();
+        }
+
+        let birthday = new Date(`${year}-${month}-${day}`);
+
+        if (isNaN(birthday.getTime())) {
+          res.reply({
+            embeds: [new ErrorEmbed("invalid date")],
+            flags: MessageFlags.Ephemeral,
+          });
+          return waitForButton();
+        }
+
+        res.deferUpdate();
+
+        birthday = dayjs(birthday)
+          .set("hours", 0)
+          .set("minute", 0)
+          .set("second", 0)
+          .set("millisecond", 0)
+          .toDate();
+
+        logger.info(
+          `admin: ${message.author.id} (${message.author.username}) set ${user.id} birthday to ${await getFormattedBirthday(birthday)}`,
+        );
+
+        await setBirthday(user.id, birthday);
+
+        return waitForButton();
+      } else if (interaction.customId === "reset-bday") {
+        if (!(await hasAdminPermission(message.member, "set-birthday"))) {
+          await interaction.editReply({
+            embeds: [requiredLevelEmbed("set-birthday")],
+          });
+          return waitForButton();
+        }
+
+        interaction.deferUpdate();
+
+        await setBirthday(user.id, null);
+
+        logger.info(
+          `admin: ${message.author.id} (${message.author.username}) reset ${user.id} birthday`,
         );
 
         return waitForButton();
