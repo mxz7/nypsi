@@ -4,6 +4,7 @@
 - 5% discount for tickets bought with /lottery autobuy
 - add copper ore/ingot
 - setting birthday moved to modal and year is now optional (@growlinggrizzly)
+- add chicken dino nuggie item
 
 # season 11
 

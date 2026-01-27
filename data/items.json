@@ -3602,5 +3602,17 @@
       "global": true
     },
     "in_crates": false
+  },
+  "dino_nugget": {
+    "id": "dino_nugget",
+    "name": "dino nuggie",
+    "article": "a",
+    "plural": "dino nuggies",
+    "aliases": ["dino", "nuggie"],
+    "emoji": "<:dinonug_tri:1171848700172189716>",
+    "longDesc": "nom nom nom nom",
+    "rarity": 1,
+    "role": "collectable",
+    "in_crates": true
   }
 }
