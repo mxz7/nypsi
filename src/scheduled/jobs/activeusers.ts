@@ -63,6 +63,7 @@ export default {
     );
 
     if (currentCount >= GLOBAL_BOOSTER_TARGET) {
+      log("booster target hit");
       activateGlobalBooster(manager);
     }
   },
