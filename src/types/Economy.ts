@@ -150,3 +150,8 @@ export interface Event {
   name: string;
   description: string; // with {target} to be replaced with actual target
 }
+
+export type DabloonShopItem = {
+  itemId: string;
+  cost: number;
+};
