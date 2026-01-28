@@ -130,13 +130,19 @@ async function handleKofiData(data: z.infer<typeof schema>) {
         return;
       }
 
+      let purchaseName = item.name;
+
+      if (item.itemId && item.itemId === "dabloon") {
+        purchaseName = `${item.name} (${item.itemAmount})`;
+      }
+
       if (user) {
         createAuraTransaction(user.id, Constants.BOT_USER_ID, 500);
 
         await prisma.purchases.create({
           data: {
             userId: user.id,
-            item: item.name,
+            item: purchaseName,
             amount: shopItem.quantity,
             cost: new Prisma.Decimal(item.cost).mul(new Prisma.Decimal(shopItem.quantity)),
             email: data.email,
@@ -172,9 +178,13 @@ async function handleKofiData(data: z.infer<typeof schema>) {
             }
           }
         } else {
-          await addInventoryItem(user.id, item.name, shopItem.quantity || 1);
+          const itemName = getItems()[item.name] || item.name;
+          const itemId = item.itemId || item.name;
+          const amount = item.itemAmount ? item.itemAmount * (shopItem.quantity || 1) : 1;
 
-          logger.info(`given to ${user.id} (${user.email})`, item);
+          await addInventoryItem(user.id, itemId, amount);
+
+          logger.info(`given to ${user.id} (${user.email})`, { itemName, itemId, amount });
 
           if ((await getDmSettings(user.id)).premium) {
             const payload: NotificationPayload = {
@@ -182,9 +192,9 @@ async function handleKofiData(data: z.infer<typeof schema>) {
               payload: {
                 content: "thank you for your purchase",
                 embed: new CustomEmbed(user.id).setDescription(
-                  `you have received ${shopItem.quantity} ${getItems()[item.name].emoji} **${
+                  `you have received \`${amount}x\` ${getItems()[item.name].emoji} **${
                     getItems()[item.name].name
-                  }**`,
+                  }**${itemId === "dabloon" ? "\n\nuse **/dabloons** to view the dabloons shop" : ""}`,
                 ),
               },
             };
@@ -192,14 +202,24 @@ async function handleKofiData(data: z.infer<typeof schema>) {
             addNotificationToQueue(payload);
             if (data.is_public && (await getPreferences(user.id)).leaderboards) {
               const hook = new WebhookClient({ url: process.env.THANKYOU_HOOK });
+
+              let content = `${user.lastKnownUsername} just bought `;
+
+              if (shopItem.quantity > 1) {
+                content += `\`${shopItem.quantity.toLocaleString()}x\` `;
+              }
+
+              if (itemId === "dabloon") {
+                content += `${getItems()[itemId].emoji} **${item.name}**!!!`;
+              } else {
+                content += `${getItems()[item.name].emoji} **${getItems()[item.name].name}**!!!`;
+              }
+
               await hook.send({
                 embeds: [
-                  new CustomEmbed(
-                    user.id,
-                    `${user.lastKnownUsername} just bought ${shopItem.quantity}x ${
-                      getItems()[item.name].emoji
-                    } **${getItems()[item.name].name}**!!!!`,
-                  ).setFooter({ text: "thank you for your purchase (:" }),
+                  new CustomEmbed(user.id, content).setFooter({
+                    text: "thank you for your purchase (:",
+                  }),
                 ],
               });
               hook.destroy();
@@ -306,7 +326,7 @@ async function handleKofiData(data: z.infer<typeof schema>) {
         await prisma.purchases.create({
           data: {
             email: data.email,
-            item: item.name,
+            item: purchaseName,
             amount: shopItem.quantity,
             cost: new Prisma.Decimal(item.cost).mul(new Prisma.Decimal(shopItem.quantity)),
             source: "kofi",
