@@ -38,7 +38,7 @@ async function run(
 
   await addCooldown(cmd.name, message.member, 5);
 
-  const baseMsg = await buildBaseMessage(message.member);
+  const baseMsg = await buildMessage(message.member);
 
   const msg = await send({ components: [baseMsg], flags: MessageFlags.IsComponentsV2 });
 }
@@ -47,7 +47,7 @@ cmd.setRun(run);
 
 module.exports = cmd;
 
-async function buildBaseMessage(member: GuildMember) {
+async function buildMessage(member: GuildMember) {
   const items = getDabloonsShop();
   const itemData = getItems();
   const inventory = await getInventory(member);
