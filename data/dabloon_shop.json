@@ -1,0 +1,22 @@
+{
+  "69420_crate": {
+    "itemId": "69420_crate",
+    "cost": 75
+  },
+  "nypsi_crate": {
+    "itemId": "nypsi_crate",
+    "cost": 700
+  },
+  "rain": {
+    "itemId": "rain",
+    "cost": 850
+  },
+  "omega_crate": {
+    "itemId": "omega_crate",
+    "cost": 1750
+  },
+  "gem_crate": {
+    "itemId": "gem_crate",
+    "cost": 2800
+  }
+}
