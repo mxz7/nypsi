@@ -3624,6 +3624,7 @@
     "longDesc": "ooooo shiny",
     "rarity": 10,
     "in_crates": false,
-    "role": "currency"
+    "role": "currency",
+    "sell": 1000000
   }
 }
