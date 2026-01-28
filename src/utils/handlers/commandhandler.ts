@@ -166,8 +166,7 @@ export function loadCommands() {
         logger.error(file + " missing name, description, category or run");
       }
     } catch (e) {
-      logger.error(`failed to load ${file}`);
-      logger.error(e);
+      logger.error(`failed to load ${file}`, e);
     }
   }
   aliasesSize = aliases.size;
