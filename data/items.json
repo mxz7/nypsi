@@ -3614,5 +3614,16 @@
     "rarity": 1,
     "role": "collectable",
     "in_crates": true
+  },
+  "dabloon": {
+    "id": "dabloon",
+    "name": "dabloon",
+    "article": "a",
+    "aliases": ["dabloons"],
+    "emoji": "<:dabloon:1466052484052160646>",
+    "longDesc": "ooooo shiny",
+    "rarity": 10,
+    "in_crates": false,
+    "role": "currency"
   }
 }
