@@ -3625,6 +3625,6 @@
     "rarity": 10,
     "in_crates": false,
     "role": "currency",
-    "sell": 1000000
+    "sell": 100000
   }
 }
