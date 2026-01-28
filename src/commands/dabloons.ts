@@ -86,7 +86,7 @@ async function buildBaseMessage(member: GuildMember) {
     .addActionRowComponents((row) => row.addComponents(amountSelectButton, buyButton));
 }
 
-function buildSelectMenu() {
+function buildSelectMenu(selected?: string) {
   const items = getDabloonsShop();
   const itemData = getItems();
 
@@ -98,7 +98,9 @@ function buildSelectMenu() {
         new StringSelectMenuOptionBuilder()
           .setLabel(itemData[i.itemId].name)
           .setDescription(`${i.cost.toLocaleString()} dabloons`)
-          .setValue(i.itemId),
+          .setValue(i.itemId)
+          .setEmoji(itemData[i.itemId].emoji)
+          .setDefault(selected === i.itemId),
       ),
     );
 }
