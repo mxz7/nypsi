@@ -344,65 +344,23 @@ async function run(
       } else if (!guildMember.roles.cache.find((i) => i.name === "custom")) {
         await sleep(250);
 
-        const existingRole = guildMember.guild.roles.cache.find(
-          (i) => i.name === "custom" && i.hexColor === colour,
-        );
+        const separatorRole = guildMember.guild.roles.cache.get("1329425677614845972");
 
-        if (existingRole) {
-          logger.info(`premium: adding custom role to ${guildMember.user.id}`);
-          await guildMember.roles.add(existingRole);
-        } else {
-          const separatorRole = guildMember.guild.roles.cache.get("1329425677614845972");
+        logger.info(`premium: adding custom role to ${guildMember.user.id}`);
+        const role = await guildMember.guild.roles.create({
+          name: "custom",
+          color: colour,
+          position: separatorRole.position + 1,
+          permissions: [],
+        });
 
-          logger.info(`premium: adding custom role to ${guildMember.user.id}`);
-          const role = await guildMember.guild.roles.create({
-            name: "custom",
-            color: colour,
-            position: separatorRole.position + 1,
-            permissions: [],
-          });
-
-          await guildMember.roles.add(role);
-        }
+        await guildMember.roles.add(role);
       } else {
         const role = guildMember.roles.cache.find((i) => i.name === "custom");
 
         if (role.hexColor !== colour) {
-          if (role.members.size === 1) {
-            await sleep(250);
-            await guildMember.guild.roles.edit(role, { color: colour });
-          } else {
-            logger.info(`premium: removing custom role from ${guildMember.user.id}`);
-            await sleep(250);
-            await guildMember.roles.remove(role);
-
-            const existingRole = guildMember.guild.roles.cache.find(
-              (i) => i.name === "custom" && i.hexColor === colour,
-            );
-
-            if (existingRole) {
-              logger.info(`premium: adding custom role to ${guildMember.user.id}`);
-              await sleep(250);
-              await guildMember.roles.add(existingRole);
-            } else {
-              const seperatorRole = guildMember.guild.roles.cache.get("1329425677614845972");
-
-              await sleep(250);
-
-              logger.info(`premium: adding custom role to ${guildMember.user.id}`);
-
-              const role = await guildMember.guild.roles.create({
-                name: "custom",
-                color: colour,
-                position: seperatorRole.position + 1,
-                permissions: [],
-              });
-
-              await sleep(250);
-
-              await guildMember.roles.add(role);
-            }
-          }
+          await sleep(250);
+          await guildMember.guild.roles.edit(role, { color: colour });
         }
       }
     }
@@ -537,52 +495,24 @@ async function run(
     await setEmbedColor(message.member, color.toLowerCase());
 
     if (message.guildId === Constants.NYPSI_SERVER_ID) {
-      let existingRole = message.member.roles.cache.find((i) => i.name === "custom");
+      const existingRole = message.member.roles.cache.find((i) => i.name === "custom");
 
       if (existingRole) {
-        if (existingRole.members.size > 1) {
-          await message.member.roles.remove(existingRole);
-
-          existingRole = message.guild.roles.cache.find(
-            (i) => i.name === "custom" && i.hexColor === color,
-          );
-
-          if (existingRole && color !== "default") {
-            await message.member.roles.add(existingRole);
-          } else if (color !== "default") {
-            const seperatorRole = message.guild.roles.cache.get("1329425677614845972");
-            const newRole = await message.guild.roles.create({
-              name: "custom",
-              color: color as ColorResolvable,
-              position: seperatorRole.position + 1,
-              permissions: [],
-            });
-
-            await message.member.roles.add(newRole);
-          }
-        } else if (color !== "default") {
+        if (color !== "default") {
           await existingRole.edit({ color: color as ColorResolvable });
         } else {
           await message.member.roles.remove(existingRole);
         }
       } else {
-        existingRole = message.guild.roles.cache.find(
-          (i) => i.name === "custom" && i.hexColor === color,
-        );
+        const seperatorRole = message.guild.roles.cache.get("1329425677614845972");
+        const newRole = await message.guild.roles.create({
+          name: "custom",
+          color: color as ColorResolvable,
+          position: seperatorRole.position + 1,
+          permissions: [],
+        });
 
-        if (existingRole && color !== "default") {
-          await message.member.roles.add(existingRole);
-        } else if (color !== "default") {
-          const seperatorRole = message.guild.roles.cache.get("1329425677614845972");
-          const newRole = await message.guild.roles.create({
-            name: "custom",
-            color: color as ColorResolvable,
-            position: seperatorRole.position + 1,
-            permissions: [],
-          });
-
-          await message.member.roles.add(newRole);
-        }
+        await message.member.roles.add(newRole);
       }
     }
 
