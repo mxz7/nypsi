@@ -3,14 +3,18 @@ import {
   ButtonStyle,
   CommandInteraction,
   GuildMember,
+  LabelBuilder,
   Message,
   MessageFlags,
+  ModalBuilder,
   StringSelectMenuBuilder,
   StringSelectMenuInteraction,
   StringSelectMenuOptionBuilder,
+  TextInputBuilder,
+  TextInputStyle,
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
-import { CustomContainer } from "../models/EmbedBuilders";
+import { CustomContainer, ErrorEmbed } from "../models/EmbedBuilders";
 import { getInventory } from "../utils/functions/economy/inventory";
 import { getDabloonsShop, getItems } from "../utils/functions/economy/utils";
 import { getEmojiImage } from "../utils/functions/image";
@@ -25,6 +29,7 @@ const componentIds = {
   select: "dabloons-item-select",
   amount: "dabloons-amount",
   buy: "dabloons-buy",
+  amountModal: "dabloons-amount-modal",
 } as const;
 
 type Order = {
@@ -117,9 +122,12 @@ async function listen(
   msg: Message,
   item?: Order,
 ) {
-  const interaction = await msg.awaitMessageComponent({
-    filter: (i) => i.user.id === message.author.id,
-  });
+  const interaction = await msg
+    .awaitMessageComponent({
+      filter: (i) => i.user.id === message.author.id,
+      time: 120000,
+    })
+    .catch(() => {});
 
   if (!interaction) {
     const newMsg = await buildMessage(message.member, true);
@@ -137,6 +145,64 @@ async function listen(
 
     const newMsg = await buildMessage(message.member, false, item);
     interaction.update({ components: [newMsg] });
+    return listen(message, msg, item);
+  } else if (interaction.customId === componentIds.amount) {
+    if (!item) {
+      // wtf!
+      const newMsg = await buildMessage(message.member);
+      interaction.update({ components: [newMsg] });
+      return listen(message, msg);
+    }
+
+    const modal = new ModalBuilder()
+      .setCustomId(componentIds.amountModal)
+      .setTitle("dabloons shop")
+      .setLabelComponents(
+        new LabelBuilder()
+          .setLabel(`how many ${getItems()[item.itemId].plural} do you want to buy?`)
+          .setTextInputComponent(
+            new TextInputBuilder()
+              .setCustomId(componentIds.amount)
+              .setStyle(TextInputStyle.Short)
+              .setRequired(true)
+              .setMaxLength(3),
+          ),
+      );
+
+    await interaction.showModal(modal);
+
+    const modalInteraction = await interaction
+      .awaitModalSubmit({
+        filter: (i) => i.user.id === message.author.id,
+        time: 30000,
+      })
+      .catch(() => {});
+
+    if (!modalInteraction) {
+      return listen(message, msg, item);
+    }
+
+    let amount = parseInt(modalInteraction.fields.getTextInputValue(componentIds.amount));
+
+    if (isNaN(amount) || amount <= 0) {
+      modalInteraction.reply({
+        embeds: [new ErrorEmbed("lol nice one loser")],
+        flags: MessageFlags.Ephemeral,
+      });
+      return listen(message, msg, item);
+    }
+
+    modalInteraction.deferUpdate();
+
+    if (amount > 999) {
+      amount = 999;
+    }
+
+    item.amount = amount;
+    item.cost = await getCost(item);
+
+    const newMsg = await buildMessage(message.member, false, item);
+    await msg.edit({ components: [newMsg] });
     return listen(message, msg, item);
   }
 }
