@@ -517,19 +517,41 @@ async function run(
     if (message.guildId === Constants.NYPSI_SERVER_ID) {
       const existingRole = message.member.roles.cache.find((i) => i.name === "custom");
 
+      const tag = await getActiveTag(message.member);
+      const tagEmoji = tag ? getTagsData()[tag.tagId].emoji : null;
+      const isTagUnicode = Constants.EMOJI_REGEX.test(tagEmoji || "");
+      let emojiBuffer: Buffer<ArrayBufferLike>;
+
+      if (tagEmoji && !isTagUnicode) {
+        emojiBuffer = await readFile(`data/emojis/${getTagsData()[tag.tagId].image}`);
+      }
+
       if (existingRole) {
         if (color !== "default") {
           await existingRole.edit({ color: color as ColorResolvable });
+
+          if (tagEmoji) {
+            if (isTagUnicode) {
+              await existingRole.setUnicodeEmoji(tagEmoji);
+              await existingRole.setIcon(null);
+            } else {
+              await existingRole.setUnicodeEmoji(null);
+              await existingRole.setIcon(emojiBuffer);
+            }
+          }
         } else {
           await message.member.roles.remove(existingRole);
         }
       } else {
         const seperatorRole = message.guild.roles.cache.get("1329425677614845972");
+
         const newRole = await message.guild.roles.create({
           name: "custom",
           color: color as ColorResolvable,
           position: seperatorRole.position + 1,
           permissions: [],
+          unicodeEmoji: tagEmoji && isTagUnicode ? tagEmoji : undefined,
+          icon: tagEmoji && !isTagUnicode ? emojiBuffer : undefined,
         });
 
         await message.member.roles.add(newRole);
