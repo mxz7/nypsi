@@ -1,10 +1,12 @@
 import {
+  ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
   GuildMember,
   LabelBuilder,
   Message,
+  MessageActionRowComponentBuilder,
   MessageFlags,
   ModalBuilder,
   StringSelectMenuBuilder,
@@ -204,6 +206,26 @@ async function listen(
     const newMsg = await buildMessage(message.member, false, item);
     await msg.edit({ components: [newMsg] });
     return listen(message, msg, item);
+  } else if (interaction.customId === componentIds.buy) {
+    if (!item || !item.cost) {
+      // wtf!
+      const newMsg = await buildMessage(message.member);
+      interaction.update({ components: [newMsg] });
+      return listen(message, msg);
+    }
+
+    const inventory = await getInventory(message.member);
+
+    if (inventory.count("dabloom") < item.cost) {
+      interaction.reply({
+        embeds: [new ErrorEmbed("you don't have enough dabloons")],
+        components: [
+          new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(buildShopButton()),
+        ],
+        flags: MessageFlags.Ephemeral,
+      });
+      return listen(message, msg, item);
+    }
   }
 }
 
