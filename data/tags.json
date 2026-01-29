@@ -9,7 +9,8 @@
     "id": "cat",
     "name": "cat",
     "description": "found in crates",
-    "emoji": "<:nypsi_cat_tag:1134176717167149146>"
+    "emoji": "<:nypsi_cat_tag:1134176717167149146>",
+    "image": "cat.png"
   },
   "clown": {
     "id": "clown",
@@ -21,7 +22,8 @@
     "id": "nypsi",
     "name": "nypsi",
     "description": "if you have this you genuinely have a problem",
-    "emoji": "<:xnypsi:1135923012458254416>"
+    "emoji": "<:xnypsi:1135923012458254416>",
+    "image": "nypsi.png"
   },
   "discordian": {
     "id": "discordian",
@@ -33,7 +35,8 @@
     "id": "owner",
     "name": "owner",
     "description": "owner of the bot",
-    "emoji": "<:nypsi_crown_tag:1348048296370770091>"
+    "emoji": "<:nypsi_crown_tag:1348048296370770091>",
+    "image": "crown.png"
   },
   "highroller": {
     "id": "highroller",
@@ -63,7 +66,8 @@
     "id": "contributor",
     "name": "contributor",
     "description": "contributed code to nypsi",
-    "emoji": "<:nypsi_contributor_tag:1134128166567415846>"
+    "emoji": "<:nypsi_contributor_tag:1134128166567415846>",
+    "image": "contributor.png"
   },
   "bug_catcher": {
     "id": "bug_catcher",
@@ -111,7 +115,8 @@
     "id": "cum",
     "name": "cum",
     "description": "found in the horny v achievement (no longer obtainable)",
-    "emoji": "<:nypsi_cum:1142769642352414780>"
+    "emoji": "<:nypsi_cum:1142769642352414780>",
+    "image": "cum.png"
   },
   "dog": {
     "id": "dog",
@@ -207,7 +212,8 @@
     "id": "omega_heart",
     "name": "omega heart",
     "description": "the most powerful heart. unfortunately relegated to only be used as a decoration",
-    "emoji": "<:nypsi_gem_hunter_Tag:1291367431540969472>"
+    "emoji": "<:nypsi_gem_hunter_Tag:1291367431540969472>",
+    "image": "gem_hunter.png"
   },
   "animal_lover": {
     "id": "animal_lover",
