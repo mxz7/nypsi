@@ -9,7 +9,7 @@
     "id": "cat",
     "name": "cat",
     "description": "found in crates",
-    "emoji": "<:cat_tag:1466507330408681770>"
+    "emoji": "<:nypsi_cat_tag:1134176717167149146>"
   },
   "clown": {
     "id": "clown",
@@ -33,7 +33,7 @@
     "id": "owner",
     "name": "owner",
     "description": "owner of the bot",
-    "emoji": "<:crown_tag:1466507712312381442>"
+    "emoji": "<:nypsi_crown_tag:1348048296370770091>"
   },
   "highroller": {
     "id": "highroller",
@@ -63,7 +63,7 @@
     "id": "contributor",
     "name": "contributor",
     "description": "contributed code to nypsi",
-    "emoji": "<:contributor_tag:1466508164101837042>"
+    "emoji": "<:nypsi_contributor_tag:1134128166567415846>"
   },
   "bug_catcher": {
     "id": "bug_catcher",
@@ -111,7 +111,7 @@
     "id": "cum",
     "name": "cum",
     "description": "found in the horny v achievement (no longer obtainable)",
-    "emoji": "<:cum:1466508365105729660>"
+    "emoji": "<:nypsi_cum:1142769642352414780>"
   },
   "dog": {
     "id": "dog",
@@ -207,7 +207,7 @@
     "id": "omega_heart",
     "name": "omega heart",
     "description": "the most powerful heart. unfortunately relegated to only be used as a decoration",
-    "emoji": "<:gem_hunter_tag:1466508512757813248>"
+    "emoji": "<:nypsi_gem_hunter_Tag:1291367431540969472>"
   },
   "animal_lover": {
     "id": "animal_lover",
