@@ -1,5 +1,6 @@
 import { EmbedField } from "discord.js";
 import { sort } from "fast-sort";
+import { readFile } from "fs/promises";
 import { Command } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Tag } from "../types/Tags";
@@ -98,6 +99,10 @@ cmd.setRun((message, send, args) => {
         const tagEmoji = getTagsData()[selected.id].emoji;
         const isTagUnicode = Constants.EMOJI_REGEX.test(tagEmoji || "");
         let emojiBuffer: Buffer<ArrayBufferLike>;
+
+        if (tagEmoji && !isTagUnicode) {
+          emojiBuffer = await readFile(`data/emojis/${getTagsData()[selected.id].image}`);
+        }
 
         if (isTagUnicode) {
           await role.setUnicodeEmoji(tagEmoji);
