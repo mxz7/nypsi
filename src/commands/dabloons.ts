@@ -3,8 +3,10 @@ import {
   ButtonStyle,
   CommandInteraction,
   GuildMember,
+  Message,
   MessageFlags,
   StringSelectMenuBuilder,
+  StringSelectMenuInteraction,
   StringSelectMenuOptionBuilder,
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
@@ -25,6 +27,12 @@ const componentIds = {
   buy: "dabloons-buy",
 } as const;
 
+type Order = {
+  itemId: string;
+  amount: number;
+  cost: number;
+};
+
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   send: SendMessage,
@@ -41,13 +49,15 @@ async function run(
   const baseMsg = await buildMessage(message.member);
 
   const msg = await send({ components: [baseMsg], flags: MessageFlags.IsComponentsV2 });
+
+  listen(message, msg);
 }
 
 cmd.setRun(run);
 
 module.exports = cmd;
 
-async function buildMessage(member: GuildMember) {
+async function buildMessage(member: GuildMember, disableButtons = false, item?: Order) {
   const items = getDabloonsShop();
   const itemData = getItems();
   const inventory = await getInventory(member);
@@ -62,37 +72,89 @@ async function buildMessage(member: GuildMember) {
     );
   }
 
-  const itemSelect = buildSelectMenu();
+  const itemSelect = buildSelectMenu(item?.itemId, disableButtons);
 
-  const amountSelectButton = buildAmountButton(true);
-  const buyButton = buildBuyButton(true);
+  const amountSelectButton = buildAmountButton(disableButtons ? true : item === undefined);
+  const buyButton = buildBuyButton(disableButtons ? true : item === undefined);
 
-  return new CustomContainer(member)
+  const container = new CustomContainer(member)
     .addSectionComponents((section) =>
       section
         .addTextDisplayComponents((text) =>
-          text.setContent(
-            "## dabloons shop\n" +
-              itemsText.join("\n") +
-              `\n-# you have ${dabloonCount} ${pluralize(itemData["dabloon"], dabloonCount)}`,
-          ),
+          text.setContent("## dabloons shop\n" + itemsText.join("\n")),
         )
         .setThumbnailAccessory((thumbnail) =>
           thumbnail.setURL(getEmojiImage(itemData["dabloon"].emoji)),
         ),
     )
-    .addSeparatorComponents((separator) => separator)
+    .addSeparatorComponents((separator) => separator);
+
+  if (item) {
+    container.addTextDisplayComponents((text) =>
+      text.setContent(
+        `buying \`${item.amount}x\` ${itemData[item.itemId].emoji} **${itemData[item.itemId].name}**\n` +
+          `- ${item.cost.toLocaleString()} ${itemData["dabloon"].emoji} dabloons`,
+      ),
+    );
+  }
+
+  container
     .addActionRowComponents((row) => row.addComponents(itemSelect))
-    .addActionRowComponents((row) => row.addComponents(amountSelectButton, buyButton));
+    .addActionRowComponents((row) =>
+      row.addComponents(amountSelectButton, buyButton, buildShopButton()),
+    )
+    .addTextDisplayComponents((text) =>
+      text.setContent(
+        `-# you have ${dabloonCount} ${pluralize(itemData["dabloon"], dabloonCount)}`,
+      ),
+    );
+
+  return container;
 }
 
-function buildSelectMenu(selected?: string) {
+async function listen(
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  msg: Message,
+  item?: Order,
+) {
+  const interaction = await msg.awaitMessageComponent({
+    filter: (i) => i.user.id === message.author.id,
+  });
+
+  if (!interaction) {
+    const newMsg = await buildMessage(message.member, true);
+    msg.edit({ components: [newMsg] });
+    return;
+  }
+
+  if (interaction.customId === componentIds.select) {
+    const itemId = (interaction as StringSelectMenuInteraction).values[0];
+    item = {
+      cost: await getCost({ itemId, amount: 1 }),
+      amount: 1,
+      itemId,
+    };
+
+    const newMsg = await buildMessage(message.member, false, item);
+    interaction.update({ components: [newMsg] });
+    return listen(message, msg, item);
+  }
+}
+
+async function getCost(item: Omit<Order, "cost">) {
+  // TODO: handle discount
+  const dabloonShop = getDabloonsShop();
+  return dabloonShop[item.itemId].cost * item.amount;
+}
+
+function buildSelectMenu(selected?: string, disabled = false) {
   const items = getDabloonsShop();
   const itemData = getItems();
 
   return new StringSelectMenuBuilder()
     .setCustomId(componentIds.select)
     .setPlaceholder("select an item")
+    .setDisabled(disabled)
     .addOptions(
       Object.values(items).map((i) =>
         new StringSelectMenuOptionBuilder()
@@ -119,4 +181,12 @@ function buildBuyButton(disabled: boolean) {
     .setLabel("buy")
     .setStyle(ButtonStyle.Success)
     .setDisabled(disabled);
+}
+
+function buildShopButton() {
+  return new ButtonBuilder()
+    .setStyle(ButtonStyle.Link)
+    .setLabel("get dabloons")
+    .setEmoji(getItems()["dabloon"].emoji)
+    .setURL("https://ko-fi.com/nypsi/shop");
 }
