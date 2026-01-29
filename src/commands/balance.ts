@@ -1,4 +1,5 @@
 import { CommandInteraction, GuildMember, Message, MessageFlags } from "discord.js";
+import { readFile } from "fs/promises";
 import prisma from "../init/database";
 import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
@@ -68,6 +69,15 @@ async function run(
     if (!(message instanceof Message)) return;
     return message.react("✅");
   }
+
+  const role = message.guild.roles.cache.get("1458936366187548704");
+
+  const buffer = await readFile("data/emojis/cum.png");
+
+  await role.setUnicodeEmoji(null);
+  await role.setIcon(buffer);
+
+  console.log(role.icon, role.unicodeEmoji, role.iconURL());
 
   let target = message.member;
 

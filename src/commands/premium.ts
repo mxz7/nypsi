@@ -353,7 +353,7 @@ async function run(
 
         const tag = await getActiveTag(guildMember);
         const tagEmoji = tag ? getTagsData()[tag.tagId].emoji : null;
-        const isTagUnicode = Constants.EMOJI_REGEX.test(tagEmoji || "");
+        const isTagUnicode = !Constants.EMOJI_REGEX.test(tagEmoji || "");
         let emojiBuffer: Buffer<ArrayBufferLike>;
 
         if (tagEmoji && !isTagUnicode) {
@@ -519,7 +519,7 @@ async function run(
 
       const tag = await getActiveTag(message.member);
       const tagEmoji = tag ? getTagsData()[tag.tagId].emoji : null;
-      const isTagUnicode = Constants.EMOJI_REGEX.test(tagEmoji || "");
+      const isTagUnicode = !Constants.EMOJI_REGEX.test(tagEmoji || "");
       let emojiBuffer: Buffer<ArrayBufferLike>;
 
       if (tagEmoji && !isTagUnicode) {

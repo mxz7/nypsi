@@ -97,7 +97,7 @@ cmd.setRun((message, send, args) => {
 
       if (role) {
         const tagEmoji = getTagsData()[selected.id].emoji;
-        const isTagUnicode = Constants.EMOJI_REGEX.test(tagEmoji || "");
+        const isTagUnicode = !Constants.EMOJI_REGEX.test(tagEmoji || "");
         let emojiBuffer: Buffer<ArrayBufferLike>;
 
         if (tagEmoji && !isTagUnicode) {
