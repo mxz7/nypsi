@@ -116,7 +116,7 @@ async function buildMessage(member: GuildMember, disableButtons = false, item?: 
     )
     .addTextDisplayComponents((text) =>
       text.setContent(
-        `-# you have ${dabloonCount} ${pluralize(itemData["dabloon"], dabloonCount)}`,
+        `-# you have ${dabloonCount.toLocaleString()} ${pluralize(itemData["dabloon"], dabloonCount)}`,
       ),
     );
 
