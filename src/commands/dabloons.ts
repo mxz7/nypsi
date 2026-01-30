@@ -16,8 +16,12 @@ import {
   TextInputStyle,
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
-import { CustomContainer, ErrorEmbed } from "../models/EmbedBuilders";
-import { getInventory } from "../utils/functions/economy/inventory";
+import { CustomContainer, CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import {
+  addInventoryItem,
+  getInventory,
+  removeInventoryItem,
+} from "../utils/functions/economy/inventory";
 import { getDabloonsShop, getItems } from "../utils/functions/economy/utils";
 import { getEmojiImage } from "../utils/functions/image";
 import { pluralize } from "../utils/functions/string";
@@ -216,7 +220,7 @@ async function listen(
 
     const inventory = await getInventory(message.member);
 
-    if (inventory.count("dabloom") < item.cost) {
+    if (inventory.count("dabloon") < item.cost) {
       interaction.reply({
         embeds: [new ErrorEmbed("you don't have enough dabloons")],
         components: [
@@ -226,6 +230,22 @@ async function listen(
       });
       return listen(message, msg, item);
     }
+
+    await removeInventoryItem(message.member, "dabloon", item.cost);
+    await addInventoryItem(message.member, item.itemId, item.amount);
+
+    interaction.reply({
+      embeds: [
+        new CustomEmbed(
+          message.member,
+          `✅ bought \`${item.amount}x\` ${getItems()[item.itemId].emoji} **${getItems()[item.itemId].name}** for **${item.cost.toLocaleString()}** dabloons`,
+        ),
+      ],
+      flags: MessageFlags.Ephemeral,
+    });
+    const newMsg = await buildMessage(message.member);
+    await msg.edit({ components: [newMsg] });
+    return;
   }
 }
 
