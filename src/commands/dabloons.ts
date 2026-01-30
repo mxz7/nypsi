@@ -251,6 +251,7 @@ async function listen(
     });
     const newMsg = await buildMessage(message.member);
     await msg.edit({ components: [newMsg] });
+    listen(message, msg);
     return;
   }
 }
