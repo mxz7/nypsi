@@ -401,20 +401,32 @@ function getGeneralMessage(
     }
   }
 
+  const widgets = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+    new ButtonBuilder()
+      .setStyle(ButtonStyle.Link)
+      .setLabel("leaderboard")
+      .setEmoji("🏆")
+      .setURL(`https://nypsi.xyz/leaderboards/${selected.id}?ref=bot-item`),
+    new ButtonBuilder()
+      .setStyle(ButtonStyle.Link)
+      .setLabel("history")
+      .setEmoji("📈")
+      .setURL(`https://nypsi.xyz/items/history/${selected.id}?ref=bot-item`),
+  );
+
+  if (selected.id === "dabloon") {
+    widgets.addComponents(
+      new ButtonBuilder()
+        .setStyle(ButtonStyle.Link)
+        .setLabel("get dabloons")
+        .setEmoji(selected.emoji)
+        .setURL("https://ko-fi.com/nypsi/shop"),
+    );
+  }
+
   return {
     embed: embed.setDescription(description.join("\n")),
-    widgets: new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder()
-        .setStyle(ButtonStyle.Link)
-        .setLabel("leaderboard")
-        .setEmoji("🏆")
-        .setURL(`https://nypsi.xyz/leaderboards/${selected.id}?ref=bot-item`),
-      new ButtonBuilder()
-        .setStyle(ButtonStyle.Link)
-        .setLabel("history")
-        .setEmoji("📈")
-        .setURL(`https://nypsi.xyz/items/history/${selected.id}?ref=bot-item`),
-    ),
+    widgets,
   };
 }
 
