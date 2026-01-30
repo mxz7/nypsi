@@ -18,6 +18,7 @@ import {
 import redis from "../init/redis";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomContainer, CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { DabloonShopItem } from "../types/Economy";
 import Constants from "../utils/Constants";
 import {
   addInventoryItem,
@@ -85,19 +86,8 @@ async function buildMessage(member: GuildMember, disableButtons = false, item?: 
 
   const saleItem = await getSaleItem();
 
-  for (const { itemId } of Object.values(items)) {
-    const cost = await getCost({ itemId, amount: 1 });
-    const isSale = saleItem && saleItem.itemId === itemId;
-
-    let msg =
-      `${itemData[itemId].emoji} **${itemData[itemId].name}**\n` +
-      `- ${cost.toLocaleString()} ${itemData["dabloon"].emoji} dabloons`;
-
-    if (isSale) {
-      msg += ` **${saleItem.sale}% SALE!!**`;
-    }
-
-    itemsText.push(msg);
+  for (const item of Object.values(items)) {
+    itemsText.push(buildItemString(item, 1, saleItem));
   }
 
   const itemSelect = await buildSelectMenu(item?.itemId, disableButtons);
@@ -120,10 +110,7 @@ async function buildMessage(member: GuildMember, disableButtons = false, item?: 
   if (item) {
     container.addTextDisplayComponents((text) =>
       text.setContent(
-        `buying \`${item.amount}x\` ${itemData[item.itemId].emoji} **${itemData[item.itemId].name}**\n` +
-          `- ${item.cost.toLocaleString()} ${itemData["dabloon"].emoji} dabloons${
-            saleItem && saleItem.itemId === item.itemId ? ` **${saleItem.sale}% SALE!!**` : ""
-          }`,
+        `buying \`${item.amount}x\` ${buildItemString(items[item.itemId], item.amount, saleItem)}`,
       ),
     );
   }
@@ -333,4 +320,25 @@ function buildShopButton() {
     .setLabel("get dabloons")
     .setEmoji(getItems()["dabloon"].emoji)
     .setURL("https://ko-fi.com/nypsi/shop");
+}
+
+function buildItemString(item: DabloonShopItem, amount = 1, saleItem?: SaleItem) {
+  const { itemId, cost: itemCost } = item;
+
+  const itemData = getItems();
+
+  const isSale = saleItem && saleItem.itemId === item.itemId;
+  const cost = Math.ceil(
+    isSale ? (item.cost - item.cost / saleItem.sale) * amount : item.cost * amount,
+  );
+
+  let msg =
+    `${itemData[itemId].emoji} **${itemData[itemId].name}**\n` +
+    `- ${isSale ? `~~${(itemCost * amount).toLocaleString()}~~ **${cost.toLocaleString()}**` : itemCost.toLocaleString()} ${itemData["dabloon"].emoji} dabloons`;
+
+  if (isSale) {
+    msg += ` **${saleItem.sale}% SALE!!**`;
+  }
+
+  return msg;
 }
