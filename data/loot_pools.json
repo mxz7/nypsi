@@ -142,7 +142,14 @@
       "coconut_seed": 25,
       "rain": 7,
       "pot_of_gold": 15,
-      "magic_potato": 12
+      "magic_potato": 12,
+      "dabloon": {
+        "weight": 10,
+        "count": {
+          "min": 100,
+          "max": 1250
+        }
+      }
     }
   },
   "corner_shop_scratchie": {
@@ -309,6 +316,13 @@
       "fertiliser": {
         "weight": 15,
         "count": 10
+      },
+      "dabloon": {
+        "weight": 1,
+        "count": {
+          "min": 50,
+          "max": 250
+        }
       }
     }
   },
@@ -357,7 +371,11 @@
       "unbreaking": 10,
       "apple_seed": 30,
       "rain": 5,
-      "pot_of_gold": 2
+      "pot_of_gold": 2,
+      "dabloon": {
+        "weight": 5,
+        "count": 125
+      }
     }
   },
   "legendary_scratch_card": {
@@ -403,7 +421,11 @@
       "rain": 10,
       "apple_seed": 50,
       "pot_of_gold": 2.5,
-      "magic_potato": 2
+      "magic_potato": 2,
+      "dabloon": {
+        "weight": 10,
+        "count": 200
+      }
     }
   },
   "random_drop": {
@@ -477,7 +499,11 @@
         "weight": 10,
         "count": 15
       },
-      "magic_potato": 5
+      "magic_potato": 5,
+      "dabloon": {
+        "weight": 3,
+        "count": 200
+      }
     }
   },
   "pot_of_gold": {
