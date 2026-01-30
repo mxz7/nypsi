@@ -15,8 +15,10 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
+import redis from "../init/redis";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomContainer, CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import Constants from "../utils/Constants";
 import {
   addInventoryItem,
   getInventory,
@@ -42,6 +44,11 @@ type Order = {
   itemId: string;
   amount: number;
   cost: number;
+};
+
+type SaleItem = {
+  itemId: string;
+  sale: number;
 };
 
 async function run(
@@ -76,14 +83,24 @@ async function buildMessage(member: GuildMember, disableButtons = false, item?: 
 
   const itemsText: string[] = [];
 
-  for (const { itemId, cost } of Object.values(items)) {
-    itemsText.push(
+  const saleItem = await getSaleItem();
+
+  for (const { itemId } of Object.values(items)) {
+    const cost = await getCost({ itemId, amount: 1 });
+    const isSale = saleItem && saleItem.itemId === itemId;
+
+    let msg =
       `${itemData[itemId].emoji} **${itemData[itemId].name}**\n` +
-        `- ${cost.toLocaleString()} ${itemData["dabloon"].emoji} dabloons`,
-    );
+      `- ${cost.toLocaleString()} ${itemData["dabloon"].emoji} dabloons`;
+
+    if (isSale) {
+      msg += ` **${saleItem.sale}% SALE!!**`;
+    }
+
+    itemsText.push(msg);
   }
 
-  const itemSelect = buildSelectMenu(item?.itemId, disableButtons);
+  const itemSelect = await buildSelectMenu(item?.itemId, disableButtons);
 
   const amountSelectButton = buildAmountButton(disableButtons ? true : item === undefined);
   const buyButton = buildBuyButton(disableButtons ? true : item === undefined);
@@ -104,7 +121,9 @@ async function buildMessage(member: GuildMember, disableButtons = false, item?: 
     container.addTextDisplayComponents((text) =>
       text.setContent(
         `buying \`${item.amount}x\` ${itemData[item.itemId].emoji} **${itemData[item.itemId].name}**\n` +
-          `- ${item.cost.toLocaleString()} ${itemData["dabloon"].emoji} dabloons`,
+          `- ${item.cost.toLocaleString()} ${itemData["dabloon"].emoji} dabloons${
+            saleItem && saleItem.itemId === item.itemId ? ` **${saleItem.sale}% SALE!!**` : ""
+          }`,
       ),
     );
   }
@@ -250,29 +269,46 @@ async function listen(
 }
 
 async function getCost(item: Omit<Order, "cost">) {
-  // TODO: handle discount
   const dabloonShop = getDabloonsShop();
-  return dabloonShop[item.itemId].cost * item.amount;
+
+  const saleItem = await getSaleItem();
+
+  let cost = dabloonShop[item.itemId].cost;
+
+  if (saleItem && saleItem.itemId === item.itemId) {
+    cost -= cost / saleItem.sale;
+  }
+
+  return Math.ceil(cost * item.amount);
 }
 
-function buildSelectMenu(selected?: string, disabled = false) {
+async function getSaleItem() {
+  const saleData = await redis.get(Constants.redis.nypsi.DABLOONS_SALE);
+  if (!saleData) return undefined;
+  return JSON.parse(saleData) as SaleItem;
+}
+
+async function buildSelectMenu(selected?: string, disabled = false) {
   const items = getDabloonsShop();
   const itemData = getItems();
 
-  return new StringSelectMenuBuilder()
+  const builder = new StringSelectMenuBuilder()
     .setCustomId(componentIds.select)
     .setPlaceholder("select an item")
-    .setDisabled(disabled)
-    .addOptions(
-      Object.values(items).map((i) =>
-        new StringSelectMenuOptionBuilder()
-          .setLabel(itemData[i.itemId].name)
-          .setDescription(`${i.cost.toLocaleString()} dabloons`)
-          .setValue(i.itemId)
-          .setEmoji(itemData[i.itemId].emoji)
-          .setDefault(selected === i.itemId),
-      ),
+    .setDisabled(disabled);
+
+  for (const item of Object.values(items)) {
+    builder.addOptions(
+      new StringSelectMenuOptionBuilder()
+        .setLabel(`${itemData[item.itemId].plural}`)
+        .setDescription(`${await getCost({ itemId: item.itemId, amount: 1 })} dabloons`)
+        .setValue(item.itemId)
+        .setEmoji(itemData[item.itemId].emoji)
+        .setDefault(selected === item.itemId),
     );
+  }
+
+  return builder;
 }
 
 function buildAmountButton(disabled: boolean) {

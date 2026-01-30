@@ -297,6 +297,7 @@ export default {
       LAST_SEASONAL_ITEM: "nypsi:last_seasonal_item",
       GLOBAL_BOOSTER_PROGRESS: "nypsi:global_booster:progress",
       INFINITE_MAX_BET: "nypsi:infinitemaxbet", // season interim
+      DABLOONS_SALE: "nypsi:dabloons:sale",
     },
   },
   ANNOUNCEMENTS_CHANNEL_ID: "747057465245564939",
