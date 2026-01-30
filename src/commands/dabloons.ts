@@ -335,7 +335,7 @@ function buildItemString(item: DabloonShopItem, amount = 1, saleItem?: SaleItem)
 
   let msg =
     `${itemData[itemId].emoji} **${itemData[itemId].name}**\n` +
-    `- ${isSale ? `~~${(itemCost * amount).toLocaleString()}~~ **${cost.toLocaleString()}**` : itemCost.toLocaleString()} ${itemData["dabloon"].emoji} dabloons`;
+    `- ${isSale ? `~~${(itemCost * amount).toLocaleString()}~~ **${cost.toLocaleString()}**` : cost.toLocaleString()} ${itemData["dabloon"].emoji} dabloons`;
 
   if (isSale) {
     msg += ` **${Math.floor(saleItem.sale * 100)}% SALE!!**`;
