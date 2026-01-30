@@ -1,8 +1,10 @@
 import { EmbedField } from "discord.js";
 import { sort } from "fast-sort";
+import { readFile } from "fs/promises";
 import { Command } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Tag } from "../types/Tags";
+import Constants from "../utils/Constants";
 import { getTagsData } from "../utils/functions/economy/utils";
 import PageManager from "../utils/functions/page";
 import { getTagCount, getTags, setActiveTag, showTags } from "../utils/functions/users/tags";
@@ -65,14 +67,23 @@ cmd.setRun((message, send, args) => {
     if (search === "none") {
       await setActiveTag(message.member, "none");
 
-      return send({
+      send({
         embeds: [new CustomEmbed(message.member, `disabled any active tag`)],
       });
+
+      if (message.guildId === Constants.NYPSI_SERVER_ID) {
+        const role = message.member.roles.cache.find((r) => r.name === "custom");
+
+        if (role) {
+          await role.setUnicodeEmoji(null);
+          await role.setIcon(null);
+        }
+      }
     }
 
     await setActiveTag(message.member, selected.id);
 
-    return send({
+    send({
       embeds: [
         new CustomEmbed(
           message.member,
@@ -80,6 +91,28 @@ cmd.setRun((message, send, args) => {
         ),
       ],
     });
+
+    if (message.guildId === Constants.NYPSI_SERVER_ID) {
+      const role = message.member.roles.cache.find((r) => r.name === "custom");
+
+      if (role) {
+        const tagEmoji = getTagsData()[selected.id].emoji;
+        const isTagUnicode = !Constants.EMOJI_REGEX.test(tagEmoji || "");
+        let emojiBuffer: Buffer<ArrayBufferLike>;
+
+        if (tagEmoji && !isTagUnicode) {
+          emojiBuffer = await readFile(`data/emojis/${getTagsData()[selected.id].image}`);
+        }
+
+        if (isTagUnicode) {
+          await role.setUnicodeEmoji(tagEmoji);
+          await role.setIcon(null);
+        } else {
+          await role.setUnicodeEmoji(null);
+          await role.setIcon(emojiBuffer);
+        }
+      }
+    }
   };
 
   const listAllTags = async () => {
