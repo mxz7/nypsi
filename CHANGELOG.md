@@ -5,6 +5,7 @@
 - add copper ore/ingot
 - setting birthday moved to modal and year is now optional (@growlinggrizzly)
 - add chicken dino nuggie item
+- add dabloons to replace buying crates directly from the shop
 
 # season 11
 
