@@ -178,23 +178,22 @@ async function handleKofiData(data: z.infer<typeof schema>) {
             }
           }
         } else {
-          const itemName = getItems()[item.name] || item.name;
-          const itemId = item.itemId || item.name;
+          const itemData = getItems()[item.itemId || item.name];
           const amount = item.itemAmount ? item.itemAmount * (shopItem.quantity || 1) : 1;
 
-          await addInventoryItem(user.id, itemId, amount);
+          await addInventoryItem(user.id, itemData.id, amount);
 
-          logger.info(`given to ${user.id} (${user.email})`, { itemName, itemId, amount });
+          logger.info(`given to ${user.id} (${user.email})`, { item, amount });
 
           if ((await getDmSettings(user.id)).premium) {
             const payload: NotificationPayload = {
               memberId: user.id,
               payload: {
-                content: "thank you for your purchase",
+                content: "thank you for your purchase!!",
                 embed: new CustomEmbed(user.id).setDescription(
-                  `you have received \`${amount}x\` ${getItems()[item.name].emoji} **${
-                    getItems()[item.name].name
-                  }**${itemId === "dabloon" ? "\n\nuse **/dabloons** to view the dabloons shop" : ""}`,
+                  `you have received \`${amount.toLocaleString()}x\` ${itemData.emoji} **${
+                    itemData.name
+                  }**${itemData.id === "dabloon" ? "\n\nuse **/dabloons** to view the dabloons shop" : ""}`,
                 ),
               },
             };
@@ -209,10 +208,10 @@ async function handleKofiData(data: z.infer<typeof schema>) {
                 content += `\`${shopItem.quantity.toLocaleString()}x\` `;
               }
 
-              if (itemId === "dabloon") {
-                content += `${getItems()[itemId].emoji} **${item.name}**!!!`;
+              if (itemData.id === "dabloon") {
+                content += `${itemData.emoji} **${item.name}**!!!`;
               } else {
-                content += `${getItems()[item.name].emoji} **${getItems()[item.name].name}**!!!`;
+                content += `${itemData.emoji} **${itemData.name}**!!!`;
               }
 
               await hook.send({
