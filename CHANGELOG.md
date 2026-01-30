@@ -6,6 +6,7 @@
 - setting birthday moved to modal and year is now optional (@growlinggrizzly)
 - add chicken dino nuggie item
 - show active tag as role icon
+- add dabloons to replace buying crates directly from the shop
 
 # season 11
 

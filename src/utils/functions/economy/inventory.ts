@@ -239,6 +239,10 @@ export async function addInventoryItem(member: MemberResolvable, itemId: string,
     logger.debug(`gems: ${userId} added ${amount}x ${itemId}`);
   }
 
+  if (itemId === "dabloon") {
+    logger.debug(`dabloon: ${userId} added ${amount}x ${itemId}`);
+  }
+
   if (amount <= 0) return;
 
   if (!(await userExists(userId))) await createUser(userId);
@@ -342,6 +346,10 @@ export async function setInventoryItem(member: MemberResolvable, itemId: string,
 
   if (itemId.includes("gem")) {
     logger.debug(`gems: ${userId} set ${amount}x ${itemId}`);
+  }
+
+  if (itemId === "dabloon") {
+    logger.debug(`dabloon: ${userId} set ${amount}x ${itemId}`);
   }
 
   if (!getItems()[itemId]) {

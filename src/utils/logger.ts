@@ -55,7 +55,7 @@ class Logger {
   private async baseLog(message: string, level: number, meta?: Record<string, any>) {
     let data: WriteData = {
       date: Date.now(),
-      message: message.trim(),
+      message: message?.trim(),
       label: levelLabelMap.get(level),
       level,
       meta: {},
