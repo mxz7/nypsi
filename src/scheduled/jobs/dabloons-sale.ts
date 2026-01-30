@@ -11,7 +11,7 @@ export default {
 
     const item = items[Math.floor(Math.random() * items.length)];
 
-    const saleOptions = [5, 10, 20];
+    const saleOptions = [0.05, 0.01, 0.2];
 
     const sale = saleOptions[Math.floor(Math.random() * saleOptions.length)];
 
@@ -22,6 +22,6 @@ export default {
       86400, // 1 day
     );
 
-    log(`${item.itemId} on sale for ${sale}% off`);
+    log(`${item.itemId} on sale for ${Math.floor(sale * 100)}% off`);
   },
 } satisfies Job;

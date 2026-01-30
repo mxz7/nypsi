@@ -263,7 +263,7 @@ async function getCost(item: Omit<Order, "cost">) {
   let cost = dabloonShop[item.itemId].cost;
 
   if (saleItem && saleItem.itemId === item.itemId) {
-    cost -= cost / saleItem.sale;
+    cost -= cost * saleItem.sale;
   }
 
   return Math.ceil(cost * item.amount);
@@ -329,7 +329,7 @@ function buildItemString(item: DabloonShopItem, amount = 1, saleItem?: SaleItem)
 
   const isSale = saleItem && saleItem.itemId === item.itemId;
   const cost = Math.ceil(
-    isSale ? (item.cost - item.cost / saleItem.sale) * amount : item.cost * amount,
+    isSale ? (item.cost - item.cost * saleItem.sale) * amount : item.cost * amount,
   );
 
   let msg =
@@ -337,7 +337,7 @@ function buildItemString(item: DabloonShopItem, amount = 1, saleItem?: SaleItem)
     `- ${isSale ? `~~${(itemCost * amount).toLocaleString()}~~ **${cost.toLocaleString()}**` : itemCost.toLocaleString()} ${itemData["dabloon"].emoji} dabloons`;
 
   if (isSale) {
-    msg += ` **${saleItem.sale}% SALE!!**`;
+    msg += ` **${Math.floor(saleItem.sale * 100)}% SALE!!**`;
   }
 
   return msg;
