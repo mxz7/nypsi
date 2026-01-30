@@ -131,9 +131,11 @@ async function handleKofiData(data: z.infer<typeof schema>) {
       }
 
       let purchaseName = item.name;
+      let purchaseQuantity = shopItem.quantity;
 
       if (item.itemId && item.itemId === "dabloon") {
-        purchaseName = `${item.name} (${item.itemAmount})`;
+        purchaseName = "dabloon";
+        purchaseQuantity = item.itemAmount * shopItem.quantity;
       }
 
       if (user) {
@@ -143,7 +145,7 @@ async function handleKofiData(data: z.infer<typeof schema>) {
           data: {
             userId: user.id,
             item: purchaseName,
-            amount: shopItem.quantity,
+            amount: purchaseQuantity,
             cost: new Prisma.Decimal(item.cost).mul(new Prisma.Decimal(shopItem.quantity)),
             email: data.email,
             source: "kofi",
@@ -326,7 +328,7 @@ async function handleKofiData(data: z.infer<typeof schema>) {
           data: {
             email: data.email,
             item: purchaseName,
-            amount: shopItem.quantity,
+            amount: purchaseQuantity,
             cost: new Prisma.Decimal(item.cost).mul(new Prisma.Decimal(shopItem.quantity)),
             source: "kofi",
           },
