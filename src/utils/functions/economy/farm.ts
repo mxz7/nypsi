@@ -320,13 +320,14 @@ export async function getClaimable(
       return {
         sold: items,
         eventProgress,
-        multiplier: outputMulti > 0 ? Math.floor(outputMulti * 100).toString() : null,
+        multiplier:
+          outputMulti > 1 ? Math.floor((outputMulti - 1) * 100).toString() : null,
       };
     }
 
     logger.debug(`farm: multiplier: ${outputMulti}`);
 
-    return { items, multiplier: outputMulti > 0 ? Math.floor(outputMulti * 100).toString() : null };
+    return { items, multiplier: outputMulti > 1 ? Math.floor((outputMulti - 1) * 100).toString() : null };
   } finally {
     farmClaimMutex.release(mutexKey);
   }
