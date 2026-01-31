@@ -437,10 +437,6 @@ export type ObtainingPool = {
     itemId?: string | null;
     // number or range string (e.g. "1-3")
     amount?: number | string | null;
-    // type of non-item entries: 'money'|'xp'|'karma'|'nothing'
-    type?: "money" | "xp" | "karma" | "nothing" | "item";
-    // numeric or string value for money/xp/karma
-    value?: number | string | null;
   }[];
 };
 
@@ -449,16 +445,16 @@ export type ObtainingData = {
   workers: string[];
   farm: string[];
   // human-facing summary strings for embed display
-  poolsSummary: string[];
+  obtaining: { itemId: string; chance: number }[];
   // programmatic detailed pools for API consumers
-  poolsDetailed: ObtainingPool[];
+  pools: ObtainingPool[];
 };
 
 export function getObtainingData(selected: Item): ObtainingData {
   const description: string[] = [];
   const workersDescription: string[] = [];
   const farmDescription: string[] = [];
-  const poolsDetailed: ObtainingPool[] = [];
+  const pools: ObtainingPool[] = [];
   const poolsDescription: Map<string, number> = new Map<string, number>();
 
   const items = getItems();
@@ -618,25 +614,30 @@ export function getObtainingData(selected: Item): ObtainingData {
 
     if (itemWeight > 0 && totalEntries > 0) {
       const weight = (itemWeight * 100) / totalEntries;
-      poolsDescription.set(`${item.emoji} ${item.name}: \`${weight.toFixed(4)}%\``, weight);
+      poolsDescription.set(item.id, weight);
     }
   }
+
 
   // detailed pools where selected appears
   for (const poolName of Object.keys(selected.loot_pools ?? {})) {
     const count = selected.loot_pools![poolName];
-    const breakdown = poolBreakdownData(lootPools[poolName]);
-    poolsDetailed.push({ poolName, count, breakdown });
+    const breakdownRaw = poolBreakdownData(lootPools[poolName]);
+    const breakdown = breakdownRaw
+      .filter((e) => e.itemId)
+      .map((e) => ({ itemId: e.itemId!, amount: e.amount ?? null, chance: e.chance }));
+
+    pools.push({ poolName, count, breakdown });
   }
 
   return {
     sources: description,
     workers: workersDescription,
     farm: farmDescription,
-    poolsSummary: inPlaceSort(poolsDescription.keys().toArray()).desc((e) =>
-      poolsDescription.get(e),
-    ),
-    poolsDetailed,
+    obtaining: inPlaceSort(Array.from(poolsDescription.keys()))
+      .desc((e) => poolsDescription.get(e))
+      .map((id) => ({ itemId: id, chance: poolsDescription.get(id)! })),
+    pools,
   };
 }
 
@@ -721,7 +722,6 @@ export function poolBreakdownData(
 function getObtainingMessage(selected: Item, member: ItemMessageMember): ItemMessageData {
   const embed = new CustomEmbed(member);
   const data = getObtainingData(selected);
-
   if (data.sources.length > 0) embed.setDescription(data.sources.join("\n"));
 
   if (data.workers.length > 0) {
@@ -732,8 +732,14 @@ function getObtainingMessage(selected: Item, member: ItemMessageMember): ItemMes
     embed.addField("farm", data.farm.join("\n"));
   }
 
-  if (data.poolsSummary.length > 0) {
-    embed.addField("crates and scratches", data.poolsSummary.join("\n"));
+  if (data.obtaining.length > 0) {
+    const items = getItems();
+    embed.addField(
+      "crates and scratches",
+      data.obtaining
+        .map((p) => `${items[p.itemId].emoji} ${items[p.itemId].name}: \`${p.chance.toFixed(4)}%\``)
+        .join("\n"),
+    );
   }
 
   if ((embed.data?.fields?.length ?? 0) === 0 && !embed.data?.description) {

@@ -16,10 +16,7 @@ itemController.get("/:itemId/obtaining", bearerAuth({ token: process.env.API_AUT
   }
 
   const data = getObtainingData(selected);
-  return c.json({ sources: data.sources, pools: data.poolsDetailed ?? [] } as {
-    sources: string[];
-    pools: ObtainingData["poolsDetailed"];
-  });
+  return c.json(data as ObtainingData);
 });
 
 export default itemController;
