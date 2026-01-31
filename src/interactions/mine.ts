@@ -41,7 +41,8 @@ export default {
     if (await isLockedOut(interaction.user.id)) {
       if (
         existingRow.data.type === ComponentType.ActionRow &&
-        existingRow.data.components.length > 1
+        // @ts-expect-error the type is lying
+        existingRow.components.length > 1
       ) {
         // already has button
         return;
@@ -60,7 +61,8 @@ export default {
     } else {
       if (
         existingRow.data.type === ComponentType.ActionRow &&
-        existingRow.data.components.length === 1
+        // @ts-expect-error the type is lying
+        existingRow.components.length === 1
       ) {
         // doesn't have captcha warning
         return;
