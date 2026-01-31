@@ -450,8 +450,8 @@ export default async function messageCreate(message: Message) {
     addProgress();
   };
 
-  const checkNeedSupport = () => {
-    const response = checkTriggers(message.author.id, message.content);
+  const checkNeedSupport = async () => {
+    const response = await checkTriggers(message.author.id, message.content);
 
     if (response) {
       message.reply({ embeds: [response] });

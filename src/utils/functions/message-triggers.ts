@@ -19,13 +19,13 @@ const messages: Record<string, string> = {
   help: `need help? you can dm <@${Constants.BOT_USER_ID}> to create a support request and talk directly to staff`,
 };
 
-const triggers = new Map<RegExp, string>();
+const triggers = new Map<RegExp, { response: string; maxLevel?: number }>();
 
-triggers.set(new RegExp(helpContent.join("|"), "i"), messages.help);
+triggers.set(new RegExp(helpContent.join("|"), "i"), { response: messages.help });
 
 const triggerCooldown = new Set<string>();
 
-export function checkTriggers(userId: string, content: string) {
+export async function checkTriggers(userId: string, content: string) {
   if (content.length < 10) {
     return;
   }
@@ -34,7 +34,11 @@ export function checkTriggers(userId: string, content: string) {
     return;
   }
 
-  for (const [trigger, response] of triggers.entries()) {
+  const level = await getRawLevel(userId);
+
+  for (const [trigger, { response, maxLevel }] of triggers.entries()) {
+    if (maxLevel && level > maxLevel) continue;
+
     if (trigger.test(content)) {
       return triggered(userId, response);
     }
