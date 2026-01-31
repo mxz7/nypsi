@@ -359,22 +359,46 @@ async function run(
       "offer blocklist",
       message.author.avatarURL(),
     );
-
-    if (current.length > 0) {
-      embed.addField(
-        "blocklist:",
-        current
-          .map((i) => {
-            if (items[i]) return `${items[i].emoji} ${items[i].name}`;
-            if (message.guild.members.cache.has(i))
-              return `\`${i}\` (${message.guild.members.cache.get(i).user.username})`;
-            return `\`${i}\``;
-          })
-          .join("\n"),
-      );
+    if (current.length === 0) {
+      return send({ embeds: [embed] });
     }
 
-    return send({ embeds: [embed] });
+    const pageLines = current.map((i) => {
+      if (items[i]) return `${items[i].emoji} ${items[i].name}`;
+      if (message.guild.members.cache.has(i))
+        return `\`${i}\` (${message.guild.members.cache.get(i).user.username})`;
+      return `\`${i}\``;
+    });
+
+    const pages = PageManager.createPages(pageLines);
+
+    embed.addField("blocklist:", pages.get(1).join("\n"));
+
+    if (pages.size === 1) {
+      return send({ embeds: [embed] });
+    }
+
+    const row = PageManager.defaultRow();
+
+    const msg = await send({ embeds: [embed], components: [row] });
+
+    const manager = new PageManager({
+      embed,
+      pages,
+      row,
+      userId: message.author.id,
+      allowMessageDupe: true,
+      message: msg,
+      updateEmbed: (page, e) => {
+        const value = page.join("\n");
+
+        e.setFields({ name: "blocklist", value });
+
+        return e;
+      },
+    });
+
+    return manager.listen();
   } else {
     if (args.length < 3)
       return send({ embeds: [new ErrorEmbed("/offer create <target> <item> <amount> <money>")] });
