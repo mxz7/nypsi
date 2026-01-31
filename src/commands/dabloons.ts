@@ -29,6 +29,7 @@ import { getDabloonsShop, getItems } from "../utils/functions/economy/utils";
 import { getEmojiImage } from "../utils/functions/image";
 import { pluralize } from "../utils/functions/string";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import dayjs = require("dayjs");
 
 const cmd = new Command("dabloons", "view the dabloons shop", "money").setAliases(["dabloon"]);
 
@@ -95,11 +96,17 @@ async function buildMessage(member: GuildMember, disableButtons = false, item?: 
   const amountSelectButton = buildAmountButton(disableButtons ? true : item === undefined);
   const buyButton = buildBuyButton(disableButtons ? true : item === undefined);
 
+  const nextSale = dayjs().add(1, "day").set("hour", 0).set("minute", 0).set("second", 0);
+
   const container = new CustomContainer(member)
     .addSectionComponents((section) =>
       section
         .addTextDisplayComponents((text) =>
-          text.setContent("## dabloons shop\n" + itemsText.join("\n")),
+          text.setContent(
+            "## dabloons shop\n" +
+              itemsText.join("\n") +
+              `\n\n-# new sale <t:${nextSale.unix()}:R>`,
+          ),
         )
         .setThumbnailAccessory((thumbnail) =>
           thumbnail.setURL(getEmojiImage(itemData["dabloon"].emoji)),
