@@ -24,15 +24,15 @@ const begContent = [
   "give me some money",
 ];
 
-const messages: Record<string, string> = {
+const messages = {
   help: `need help? you can dm <@${Constants.BOT_USER_ID}> to create a support request and talk directly to staff`,
   beg: "need some money? you can do $daily, $freemoney and $vote for some quick cash",
-};
+} as const;
 
 const triggers = new Map<RegExp, { response: string; maxLevel?: number }>();
 
 triggers.set(new RegExp(helpContent.join("|"), "i"), { response: messages.help });
-triggers.set(new RegExp(begContent.join("|"), "i"), { response: messages.help, maxLevel: 300 });
+triggers.set(new RegExp(begContent.join("|"), "i"), { response: messages.beg, maxLevel: 300 });
 
 const triggerCooldown = new Set<string>();
 
