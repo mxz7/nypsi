@@ -1,5 +1,13 @@
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  ComponentType,
+  MessageActionRowComponentBuilder,
+} from "discord.js";
 import { NypsiCommandInteraction } from "../models/Command";
 import { InteractionHandler } from "../types/InteractionHandler";
+import { isLockedOut } from "../utils/functions/captcha";
 import { isEcoBanned } from "../utils/functions/economy/utils";
 import { runCommand } from "../utils/handlers/commandhandler";
 
@@ -22,6 +30,43 @@ export default {
       }
     }, 2500);
 
-    return runCommand("hunt", int, []);
+    runCommand("hunt", int, []);
+
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder().setCustomId("hunt").setLabel("hunt").setStyle(ButtonStyle.Success),
+    );
+
+    const existingRow = interaction.message.components[0];
+
+    if (await isLockedOut(interaction.user.id)) {
+      if (
+        existingRow.data.type === ComponentType.ActionRow &&
+        existingRow.data.components.length > 1
+      ) {
+        // already has button
+        return;
+      }
+
+      row.addComponents(
+        new ButtonBuilder()
+          .setCustomId("captcha")
+          .setLabel("you must complete a captcha")
+          .setStyle(ButtonStyle.Secondary)
+          .setDisabled(true)
+          .setEmoji("⚠️"),
+      );
+
+      interaction.message.edit({ components: [row] });
+    } else {
+      if (
+        existingRow.data.type === ComponentType.ActionRow &&
+        existingRow.data.components.length === 1
+      ) {
+        // doesn't have captcha warning
+        return;
+      }
+
+      interaction.message.edit({ components: [row] });
+    }
   },
 } as InteractionHandler;
