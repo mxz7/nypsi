@@ -483,6 +483,16 @@ async function clickSpecificGame(
         { name: "eye rolling", label: "🙄" },
       ],
     },
+    {
+      type: "emoji6",
+      values: [
+        { name: "detective", label: "🕵️‍♂️" },
+        { name: "sponge", label: "🧽" },
+        { name: "egg", label: "🍳" },
+        { name: "otter", label: "🦦" },
+        { name: "badminton", label: "🏸" },
+      ],
+    },
   ];
 
   const chosenType = types[Math.floor(Math.random() * types.length)];
