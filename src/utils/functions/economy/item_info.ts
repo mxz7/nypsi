@@ -22,7 +22,6 @@ import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { Item } from "../../../types/Economy";
 import { KarmaShopItem } from "../../../types/Karmashop";
 import { LootPool } from "../../../types/LootPool";
-import Constants from "../../Constants";
 import { MStoTime } from "../date";
 import { getEmojiImage } from "../image";
 import { pluralize } from "../string";
@@ -431,11 +430,14 @@ function getGeneralMessage(
 }
 
 function isOnStore(itemId: string) {
-  for (const [id, product] of Constants.KOFI_PRODUCTS) {
-    if (product.name == itemId) {
-      return { storeId: id };
-    }
-  }
+  // old
+  // for (const [id, product] of Constants.KOFI_PRODUCTS) {
+  //   if (product.name == itemId) {
+  //     return { storeId: id };
+  //   }
+  // }
+
+  if (itemId === "dabloon") return { storeId: "badfde4621" };
 
   return false;
 }
