@@ -1,5 +1,6 @@
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import Constants from "../Constants";
+import { getRawLevel } from "./economy/levelling";
 
 const helpContent = [
   "i need help",
@@ -15,13 +16,23 @@ const helpContent = [
   "i need support",
 ];
 
+const begContent = [
+  "give me money",
+  "pls give money",
+  "can i get some money",
+  "give money",
+  "give me some money",
+];
+
 const messages: Record<string, string> = {
   help: `need help? you can dm <@${Constants.BOT_USER_ID}> to create a support request and talk directly to staff`,
+  beg: "need some money? you can do $daily, $freemoney and $vote for some quick cash",
 };
 
 const triggers = new Map<RegExp, { response: string; maxLevel?: number }>();
 
 triggers.set(new RegExp(helpContent.join("|"), "i"), { response: messages.help });
+triggers.set(new RegExp(begContent.join("|"), "i"), { response: messages.help, maxLevel: 300 });
 
 const triggerCooldown = new Set<string>();
 
