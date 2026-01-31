@@ -317,11 +317,11 @@ export async function getClaimable(
       return {
         sold: items,
         eventProgress,
-        multiplier: outputMulti > 0 ? `${outputMulti * 100}`.substring(1) : null,
+        multiplier: outputMulti > 0 ? Math.floor(outputMulti * 100).toString() : null,
       };
     }
 
-    return { items, multiplier: outputMulti > 0 ? `${outputMulti * 100}`.substring(1) : null };
+    return { items, multiplier: outputMulti > 0 ? Math.floor(outputMulti * 100).toString() : null };
   } finally {
     farmClaimMutex.release(mutexKey);
   }
