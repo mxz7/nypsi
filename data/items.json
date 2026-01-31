@@ -3622,8 +3622,8 @@
     "article": "a",
     "emoji": "<:dabloon:1466809943809196349>",
     "longDesc": "ooooo shiny",
-    "rarity": 10,
-    "in_crates": false,
+    "rarity": 3,
+    "in_crates": true,
     "role": "currency",
     "sell": 100000
   }
