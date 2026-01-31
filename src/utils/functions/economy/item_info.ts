@@ -618,7 +618,6 @@ export function getObtainingData(selected: Item): ObtainingData {
     }
   }
 
-
   // detailed pools where selected appears
   for (const poolName of Object.keys(selected.loot_pools ?? {})) {
     const count = selected.loot_pools![poolName];
@@ -641,9 +640,7 @@ export function getObtainingData(selected: Item): ObtainingData {
   };
 }
 
-export function poolBreakdownData(
-  pool: LootPool,
-): {
+export function poolBreakdownData(pool: LootPool): {
   chance: number;
   itemId?: string | null;
   amount?: number | string | null;
