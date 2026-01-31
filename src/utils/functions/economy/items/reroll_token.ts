@@ -15,7 +15,7 @@ import sleep from "../../sleep";
 import { addInventoryItem, getInventory, removeInventoryItem } from "../inventory";
 import { getUpgrades, setUpgrade } from "../levelling";
 import { addStat } from "../stats";
-import { getUpgradesData } from "../utils";
+import { getUpgradesData, maxPrestige } from "../utils";
 
 module.exports = new ItemUse(
   "reroll_token",
@@ -33,6 +33,10 @@ module.exports = new ItemUse(
           new ErrorEmbed("you have no upgrades to reroll, you must prestige to receive an upgrade"),
         ],
       });
+
+    if (upgrades.length >= maxPrestige) {
+      return ItemUse.send(message, { embeds: [new ErrorEmbed("you already have all upgrades")] });
+    }
 
     if (!inventory.has("reroll_token"))
       return ItemUse.send(message, { embeds: [new ErrorEmbed("you don't have a reroll token")] });

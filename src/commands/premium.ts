@@ -1,11 +1,12 @@
 import { ColorResolvable, CommandInteraction } from "discord.js";
+import { readFile } from "fs/promises";
 import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { daysAgo, daysUntil, formatDate } from "../utils/functions/date";
 import { getRawLevel } from "../utils/functions/economy/levelling";
-import { userExists } from "../utils/functions/economy/utils";
+import { getTagsData, userExists } from "../utils/functions/economy/utils";
 import { getAllMembers } from "../utils/functions/guilds/members";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import PageManager from "../utils/functions/page";
@@ -28,7 +29,7 @@ import {
 import sleep from "../utils/functions/sleep";
 import { cleanString, pluralize } from "../utils/functions/string";
 import { getTotalSpend } from "../utils/functions/users/email";
-import { addTag, getTags, removeTag } from "../utils/functions/users/tags";
+import { addTag, getActiveTag, getTags, removeTag } from "../utils/functions/users/tags";
 import {
   commandAliasExists,
   commandExists,
@@ -155,6 +156,8 @@ async function run(
     }, ms("1 hour"));
 
     const members = await getAllMembers(message.guild, true);
+
+    const buffers: Record<string, Buffer<ArrayBufferLike>> = {};
 
     for (const guildMember of members.values()) {
       if (!(await userExists(guildMember))) continue;
@@ -344,65 +347,40 @@ async function run(
       } else if (!guildMember.roles.cache.find((i) => i.name === "custom")) {
         await sleep(250);
 
-        const existingRole = guildMember.guild.roles.cache.find(
-          (i) => i.name === "custom" && i.hexColor === colour,
-        );
+        const separatorRole = guildMember.guild.roles.cache.get("1329425677614845972");
 
-        if (existingRole) {
-          logger.info(`premium: adding custom role to ${guildMember.user.id}`);
-          await guildMember.roles.add(existingRole);
-        } else {
-          const separatorRole = guildMember.guild.roles.cache.get("1329425677614845972");
+        logger.info(`premium: adding custom role to ${guildMember.user.id}`);
 
-          logger.info(`premium: adding custom role to ${guildMember.user.id}`);
-          const role = await guildMember.guild.roles.create({
-            name: "custom",
-            color: colour,
-            position: separatorRole.position + 1,
-            permissions: [],
-          });
+        const tag = await getActiveTag(guildMember);
+        const tagEmoji = tag ? getTagsData()[tag.tagId].emoji : null;
+        const isTagUnicode = !Constants.EMOJI_REGEX.test(tagEmoji || "");
+        let emojiBuffer: Buffer<ArrayBufferLike>;
 
-          await guildMember.roles.add(role);
+        if (tagEmoji && !isTagUnicode) {
+          emojiBuffer = buffers[tagEmoji];
+
+          if (!emojiBuffer) {
+            emojiBuffer = await readFile(`data/emojis/${getTagsData()[tag.tagId].image}`);
+            buffers[tagEmoji] = emojiBuffer;
+          }
         }
+
+        const role = await guildMember.guild.roles.create({
+          name: "custom",
+          color: colour,
+          position: separatorRole.position + 1,
+          permissions: [],
+          unicodeEmoji: tagEmoji && isTagUnicode ? tagEmoji : undefined,
+          icon: tagEmoji && !isTagUnicode ? emojiBuffer : undefined,
+        });
+
+        await guildMember.roles.add(role);
       } else {
         const role = guildMember.roles.cache.find((i) => i.name === "custom");
 
         if (role.hexColor !== colour) {
-          if (role.members.size === 1) {
-            await sleep(250);
-            await guildMember.guild.roles.edit(role, { color: colour });
-          } else {
-            logger.info(`premium: removing custom role from ${guildMember.user.id}`);
-            await sleep(250);
-            await guildMember.roles.remove(role);
-
-            const existingRole = guildMember.guild.roles.cache.find(
-              (i) => i.name === "custom" && i.hexColor === colour,
-            );
-
-            if (existingRole) {
-              logger.info(`premium: adding custom role to ${guildMember.user.id}`);
-              await sleep(250);
-              await guildMember.roles.add(existingRole);
-            } else {
-              const seperatorRole = guildMember.guild.roles.cache.get("1329425677614845972");
-
-              await sleep(250);
-
-              logger.info(`premium: adding custom role to ${guildMember.user.id}`);
-
-              const role = await guildMember.guild.roles.create({
-                name: "custom",
-                color: colour,
-                position: seperatorRole.position + 1,
-                permissions: [],
-              });
-
-              await sleep(250);
-
-              await guildMember.roles.add(role);
-            }
-          }
+          await sleep(250);
+          await guildMember.guild.roles.edit(role, { color: colour });
         }
       }
     }
@@ -537,52 +515,46 @@ async function run(
     await setEmbedColor(message.member, color.toLowerCase());
 
     if (message.guildId === Constants.NYPSI_SERVER_ID) {
-      let existingRole = message.member.roles.cache.find((i) => i.name === "custom");
+      const existingRole = message.member.roles.cache.find((i) => i.name === "custom");
+
+      const tag = await getActiveTag(message.member);
+      const tagEmoji = tag ? getTagsData()[tag.tagId].emoji : null;
+      const isTagUnicode = !Constants.EMOJI_REGEX.test(tagEmoji || "");
+      let emojiBuffer: Buffer<ArrayBufferLike>;
+
+      if (tagEmoji && !isTagUnicode) {
+        emojiBuffer = await readFile(`data/emojis/${getTagsData()[tag.tagId].image}`);
+      }
 
       if (existingRole) {
-        if (existingRole.members.size > 1) {
-          await message.member.roles.remove(existingRole);
-
-          existingRole = message.guild.roles.cache.find(
-            (i) => i.name === "custom" && i.hexColor === color,
-          );
-
-          if (existingRole && color !== "default") {
-            await message.member.roles.add(existingRole);
-          } else if (color !== "default") {
-            const seperatorRole = message.guild.roles.cache.get("1329425677614845972");
-            const newRole = await message.guild.roles.create({
-              name: "custom",
-              color: color as ColorResolvable,
-              position: seperatorRole.position + 1,
-              permissions: [],
-            });
-
-            await message.member.roles.add(newRole);
-          }
-        } else if (color !== "default") {
+        if (color !== "default") {
           await existingRole.edit({ color: color as ColorResolvable });
+
+          if (tagEmoji) {
+            if (isTagUnicode) {
+              await existingRole.setUnicodeEmoji(tagEmoji);
+              await existingRole.setIcon(null);
+            } else {
+              await existingRole.setUnicodeEmoji(null);
+              await existingRole.setIcon(emojiBuffer);
+            }
+          }
         } else {
           await message.member.roles.remove(existingRole);
         }
       } else {
-        existingRole = message.guild.roles.cache.find(
-          (i) => i.name === "custom" && i.hexColor === color,
-        );
+        const seperatorRole = message.guild.roles.cache.get("1329425677614845972");
 
-        if (existingRole && color !== "default") {
-          await message.member.roles.add(existingRole);
-        } else if (color !== "default") {
-          const seperatorRole = message.guild.roles.cache.get("1329425677614845972");
-          const newRole = await message.guild.roles.create({
-            name: "custom",
-            color: color as ColorResolvable,
-            position: seperatorRole.position + 1,
-            permissions: [],
-          });
+        const newRole = await message.guild.roles.create({
+          name: "custom",
+          color: color as ColorResolvable,
+          position: seperatorRole.position + 1,
+          permissions: [],
+          unicodeEmoji: tagEmoji && isTagUnicode ? tagEmoji : undefined,
+          icon: tagEmoji && !isTagUnicode ? emojiBuffer : undefined,
+        });
 
-          await message.member.roles.add(newRole);
-        }
+        await message.member.roles.add(newRole);
       }
     }
 

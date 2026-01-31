@@ -51,6 +51,7 @@ async function run(
 
       return (
         item.id.includes(filter) ||
+        item.id.replaceAll("_", "").includes(filter) ||
         item.name.includes(filter) ||
         item.longDesc.includes(filter) ||
         item.shortDesc?.includes(filter) ||

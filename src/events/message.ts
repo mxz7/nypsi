@@ -33,6 +33,7 @@ import { getAllMembers } from "../utils/functions/guilds/members";
 import { isSlashOnly } from "../utils/functions/guilds/slash";
 import { getGuildName, getPrefix, hasGuild } from "../utils/functions/guilds/utils";
 import { getKarma } from "../utils/functions/karma/karma";
+import { checkTriggers } from "../utils/functions/message-triggers";
 import { isPremium } from "../utils/functions/premium/premium";
 import sleep from "../utils/functions/sleep";
 import {
@@ -90,21 +91,6 @@ const brainrotFilter = [
   "tweaking",
   "tweak out",
 ];
-
-const helpContent = [
-  "i need help",
-  "i need mod",
-  "i need staff",
-  "help me staff",
-  "who is owner",
-  "help me owner",
-  "i got scammed",
-  "i found a glitch",
-  "i found a bug",
-  "i found a problem",
-  "i need support",
-];
-const helpCooldown = new Set<string>();
 
 export default async function messageCreate(message: Message) {
   if (!message.channel.isSendable()) return;
@@ -465,25 +451,10 @@ export default async function messageCreate(message: Message) {
   };
 
   const checkNeedSupport = async () => {
-    if (helpCooldown.has(message.author.id)) return;
-    if (message.member.roles.cache.has("1310619772714614825")) return;
+    const response = await checkTriggers(message.author.id, message.content);
 
-    for (const i of helpContent) {
-      if (message.content.toLowerCase().includes(i)) {
-        helpCooldown.add(message.author.id);
-        setTimeout(() => {
-          helpCooldown.delete(message.author.id);
-        }, 60000);
-        return message.reply({
-          embeds: [
-            new CustomEmbed(
-              message.member,
-              `need help? you can dm ${message.client.user.toString()} to create a support request and talk directly to staff`,
-            ),
-          ],
-          content: message.member.toString(),
-        });
-      }
+    if (response) {
+      message.reply({ embeds: [response] });
     }
   };
 

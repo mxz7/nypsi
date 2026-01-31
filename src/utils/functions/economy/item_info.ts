@@ -401,20 +401,32 @@ function getGeneralMessage(
     }
   }
 
+  const widgets = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+    new ButtonBuilder()
+      .setStyle(ButtonStyle.Link)
+      .setLabel("leaderboard")
+      .setEmoji("🏆")
+      .setURL(`https://nypsi.xyz/leaderboards/${selected.id}?ref=bot-item`),
+    new ButtonBuilder()
+      .setStyle(ButtonStyle.Link)
+      .setLabel("history")
+      .setEmoji("📈")
+      .setURL(`https://nypsi.xyz/items/history/${selected.id}?ref=bot-item`),
+  );
+
+  if (selected.id === "dabloon") {
+    widgets.addComponents(
+      new ButtonBuilder()
+        .setStyle(ButtonStyle.Link)
+        .setLabel("get dabloons")
+        .setEmoji(selected.emoji)
+        .setURL("https://ko-fi.com/nypsi/shop"),
+    );
+  }
+
   return {
     embed: embed.setDescription(description.join("\n")),
-    widgets: new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder()
-        .setStyle(ButtonStyle.Link)
-        .setLabel("leaderboard")
-        .setEmoji("🏆")
-        .setURL(`https://nypsi.xyz/leaderboards/${selected.id}?ref=bot-item`),
-      new ButtonBuilder()
-        .setStyle(ButtonStyle.Link)
-        .setLabel("history")
-        .setEmoji("📈")
-        .setURL(`https://nypsi.xyz/items/history/${selected.id}?ref=bot-item`),
-    ),
+    widgets,
   };
 }
 
@@ -428,12 +440,33 @@ function isOnStore(itemId: string) {
   return false;
 }
 
-function getObtainingMessage(selected: Item, member: ItemMessageMember): ItemMessageData {
-  const embed = new CustomEmbed(member);
+export type ObtainingPool = {
+  poolName: string;
+  count: number | string;
+  breakdown: {
+    chance: number;
+    // present when this entry corresponds to an item in the pool
+    itemId?: string | null;
+    // number or range string (e.g. "1-3")
+    amount?: number | string | null;
+  }[];
+};
 
+export type ObtainingData = {
+  sources: string[];
+  workers: string[];
+  farm: string[];
+  // human-facing summary strings for embed display
+  obtaining: { itemId: string; chance: number }[];
+  // programmatic detailed pools for API consumers
+  pools: ObtainingPool[];
+};
+
+export function getObtainingData(selected: Item): ObtainingData {
   const description: string[] = [];
   const workersDescription: string[] = [];
   const farmDescription: string[] = [];
+  const pools: ObtainingPool[] = [];
   const poolsDescription: Map<string, number> = new Map<string, number>();
 
   const items = getItems();
@@ -516,9 +549,7 @@ function getObtainingMessage(selected: Item, member: ItemMessageMember): ItemMes
   const smeltSources: string[] = [];
   for (const item of Object.values(items)) {
     if (item.role === "ore" && item.ingot === selected.id) {
-      smeltSources.push(
-        `${item.emoji} [${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-item)`,
-      );
+      smeltSources.push(`${item.emoji} ${item.name}`);
     }
   }
 
@@ -595,30 +626,132 @@ function getObtainingMessage(selected: Item, member: ItemMessageMember): ItemMes
 
     if (itemWeight > 0 && totalEntries > 0) {
       const weight = (itemWeight * 100) / totalEntries;
-      poolsDescription.set(`${item.emoji} ${item.name}: \`${weight.toFixed(4)}%\``, weight);
+      poolsDescription.set(item.id, weight);
     }
   }
 
-  if (workersDescription.length > 0) {
-    embed.addField("workers", workersDescription.join("\n"));
+  // detailed pools where selected appears
+  for (const poolName of Object.keys(selected.loot_pools ?? {})) {
+    const count = selected.loot_pools![poolName];
+    const breakdownRaw = poolBreakdownData(lootPools[poolName]);
+    const breakdown = breakdownRaw
+      .filter((e) => e.itemId)
+      .map((e) => ({ itemId: e.itemId!, amount: e.amount ?? null, chance: e.chance }));
+
+    pools.push({ poolName, count, breakdown });
   }
 
-  if (farmDescription.length > 0) {
-    embed.addField("farm", farmDescription.join("\n"));
+  return {
+    sources: description,
+    workers: workersDescription,
+    farm: farmDescription,
+    obtaining: inPlaceSort(Array.from(poolsDescription.keys()))
+      .desc((e) => poolsDescription.get(e))
+      .map((id) => ({ itemId: id, chance: poolsDescription.get(id)! })),
+    pools,
+  };
+}
+
+export function poolBreakdownData(pool: LootPool): {
+  chance: number;
+  itemId?: string | null;
+  amount?: number | string | null;
+  type?: "money" | "xp" | "karma" | "nothing" | "item";
+  value?: number | string | null;
+}[] {
+  const items = getItems();
+  const factor = 100 / getTotalWeight(pool, []);
+
+  const entries: {
+    chance: number;
+    itemId?: string | null;
+    amount?: number | string | null;
+    type?: "money" | "xp" | "karma" | "nothing" | "item";
+    value?: number | string | null;
+  }[] = [];
+
+  if (Object.hasOwn(pool, "nothing")) {
+    const chance = pool.nothing * factor;
+    entries.push({ type: "nothing", chance });
   }
 
-  if (poolsDescription.entries().toArray().length > 0) {
+  for (const key in pool.money) {
+    const chance = pool.money[key] * factor;
+    entries.push({ type: "money", value: +key, chance });
+  }
+
+  for (const key in pool.xp) {
+    const chance = pool.xp[key] * factor;
+    entries.push({ type: "xp", value: +key, chance });
+  }
+
+  for (const key in pool.karma) {
+    const chance = pool.karma[key] * factor;
+    entries.push({ type: "karma", value: +key, chance });
+  }
+
+  for (const key in pool.items ?? {}) {
+    const countObj = typeof pool.items[key] === "object" ? pool.items[key].count : {};
+    const countString = Object.hasOwn(countObj, "min")
+      ? // @ts-expect-error ts doesnt realize min has to be present
+        `${countObj.min}-${countObj.max}`
+      : `${getItemCount(pool.items[key], key)}`;
+
+    const chance = getItemWeight(pool.items[key]) * factor;
+    entries.push({
+      chance,
+      itemId: key,
+      amount: countString.includes("-") ? countString : Number(countString),
+      type: "item",
+    });
+  }
+
+  const sorted = inPlaceSort(entries).by([
+    { desc: (e) => e.chance },
+    {
+      asc: (e) => {
+        if (e.itemId) return `${items[e.itemId].emoji} ${items[e.itemId].name}`;
+        if (e.type === "money") return `money_${e.value}`;
+        if (e.type === "xp") return `xp_${e.value}`;
+        if (e.type === "karma") return `karma_${e.value}`;
+        return `zzz_${e.type ?? ""}`;
+      },
+    },
+  ]);
+
+  return sorted.map((e) => ({
+    chance: e.chance,
+    itemId: e.itemId ?? null,
+    amount: e.amount ?? null,
+    type: e.type ?? (e.itemId ? "item" : undefined),
+    value: e.value ?? null,
+  }));
+}
+
+function getObtainingMessage(selected: Item, member: ItemMessageMember): ItemMessageData {
+  const embed = new CustomEmbed(member);
+  const data = getObtainingData(selected);
+  if (data.sources.length > 0) embed.setDescription(data.sources.join("\n"));
+
+  if (data.workers.length > 0) {
+    embed.addField("workers", data.workers.join("\n"));
+  }
+
+  if (data.farm.length > 0) {
+    embed.addField("farm", data.farm.join("\n"));
+  }
+
+  if (data.obtaining.length > 0) {
+    const items = getItems();
     embed.addField(
       "crates and scratches",
-      inPlaceSort(poolsDescription.keys().toArray())
-        .desc((e) => poolsDescription.get(e))
+      data.obtaining
+        .map((p) => `${items[p.itemId].emoji} ${items[p.itemId].name}: \`${p.chance.toFixed(4)}%\``)
         .join("\n"),
     );
   }
 
-  if (description.length > 0) {
-    embed.setDescription(description.join("\n"));
-  } else if ((embed.data?.fields?.length ?? 0) === 0) {
+  if ((embed.data?.fields?.length ?? 0) === 0 && !embed.data?.description) {
     embed.setDescription("no sources found");
   }
 
@@ -778,48 +911,43 @@ function getSeedStatsMessage(
 }
 
 function poolBreakdown(pool: LootPool): string[] {
-  const description: Map<string, number> = new Map<string, number>();
   const items = getItems();
-  const factor = 100 / getTotalWeight(pool, []);
+  const breakdown = poolBreakdownData(pool);
 
-  if (Object.hasOwn(pool, "nothing")) {
-    const weight = pool.nothing * factor;
-    description.set(`nothing: ${weight}%`, weight);
-  }
+  return inPlaceSort(breakdown)
+    .by([
+      { desc: (e) => e.chance },
+      {
+        asc: (e) => {
+          if (e.itemId) return `${items[e.itemId].emoji} ${items[e.itemId].name}`;
+          if (e.type === "money") return `money_${e.value}`;
+          if (e.type === "xp") return `xp_${e.value}`;
+          if (e.type === "karma") return `karma_${e.value}`;
+          return `zzz_${e.type ?? ""}`;
+        },
+      },
+    ])
+    .map((e) => {
+      if (e.itemId) {
+        const it = items[e.itemId];
+        const countStr = typeof e.amount === "string" ? e.amount : `${e.amount}`;
+        return `\`${countStr}x\` ${it.emoji} ${it.name}: \`${e.chance.toFixed(4)}%\``;
+      }
 
-  for (const key in pool.money) {
-    const weight = pool.money[key] * factor;
-    description.set(`💰 $${(+key).toLocaleString()}: \`${weight.toFixed(4)}%\``, weight);
-  }
+      if (e.type === "money") {
+        return `💰 $${(+e.value).toLocaleString()}: \`${e.chance.toFixed(4)}%\``;
+      }
 
-  for (const key in pool.xp) {
-    const weight = pool.xp[key] * factor;
-    description.set(`✨ ${(+key).toLocaleString()} xp: \`${weight.toFixed(4)}%\``, weight);
-  }
+      if (e.type === "xp") {
+        return `✨ ${e.value} xp: \`${e.chance.toFixed(4)}%\``;
+      }
 
-  for (const key in pool.karma) {
-    const weight = pool.karma[key] * factor;
-    description.set(`🔮 ${(+key).toLocaleString()} karma: \`${weight.toFixed(4)}%\``, weight);
-  }
+      if (e.type === "karma") {
+        return `🔮 ${e.value} karma: \`${e.chance.toFixed(4)}%\``;
+      }
 
-  for (const key in pool.items ?? {}) {
-    const countObj = typeof pool.items[key] === "object" ? pool.items[key].count : {};
-    const countString = Object.hasOwn(countObj, "min")
-      ? // @ts-expect-error ts doesnt realize min has to be present
-        `${countObj.min}-${countObj.max}`
-      : `${getItemCount(pool.items[key], key)}`;
-
-    const weight = getItemWeight(pool.items[key]) * factor;
-    description.set(
-      `\`${countString}x\` ${items[key].emoji} ${items[key].name}: \`${weight.toFixed(4)}%\``,
-      weight,
-    );
-  }
-
-  return inPlaceSort(description.keys().toArray()).by([
-    { desc: (e) => description.get(e) },
-    { asc: (e) => e },
-  ]);
+      return `nothing: \`${e.chance.toFixed(4)}%\``;
+    });
 }
 
 // END HELPERS

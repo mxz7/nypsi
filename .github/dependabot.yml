@@ -13,6 +13,7 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    versioning-strategy: increase
     labels:
       - "dependencies"
     groups:

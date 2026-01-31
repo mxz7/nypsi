@@ -1,21 +1,86 @@
 import { ColorResolvable } from "discord.js";
 
-const products = new Map<string, { name: string; cost: number }>();
+const products = new Map<
+  string,
+  { name: string; cost: number; itemId?: string; itemAmount?: number }
+>();
 
 products.set("platinum", { name: "platinum", cost: 7 });
 products.set("gold", { name: "gold", cost: 3 });
 products.set("silver", { name: "silver", cost: 2.5 });
 products.set("bronze", { name: "bronze", cost: 1 });
-products.set("dfcfa66092", { name: "basic_crate", cost: 1 });
-products.set("595ba15808", { name: "69420_crate", cost: 0.5 });
-products.set("5569964b90", { name: "nypsi_crate", cost: 3.99 });
-products.set("1e62c44770", { name: "workers_crate", cost: 2.99 });
-products.set("4b1d3a70b2", { name: "boosters_crate", cost: 2.99 });
-products.set("4ec1ebe6b4", { name: "gem_crate", cost: 14.99 });
-products.set("d18331a5bb", { name: "gem_shard", cost: 0 });
+products.set("dfcfa66092", { name: "basic_crate", cost: 1, itemId: "basic_crate", itemAmount: 1 });
+products.set("595ba15808", {
+  name: "69420_crate",
+  cost: 0.5,
+  itemId: "69420_crate",
+  itemAmount: 1,
+});
+products.set("5569964b90", {
+  name: "nypsi_crate",
+  cost: 3.99,
+  itemId: "nypsi_crate",
+  itemAmount: 1,
+});
+products.set("1e62c44770", {
+  name: "workers_crate",
+  cost: 2.99,
+  itemId: "workers_crate",
+  itemAmount: 1,
+});
+products.set("4b1d3a70b2", {
+  name: "boosters_crate",
+  cost: 2.99,
+  itemId: "boosters_crate",
+  itemAmount: 1,
+});
+products.set("4ec1ebe6b4", { name: "gem_crate", cost: 14.99, itemId: "gem_crate", itemAmount: 1 });
+products.set("d18331a5bb", { name: "gem_shard", cost: 0, itemId: "gem_shard", itemAmount: 1 });
 products.set("1d78b621a5", { name: "unecoban", cost: 19.99 });
-products.set("0aec346b01", { name: "omega_crate", cost: 9.99 });
-products.set("23110fff7b", { name: "rain", cost: 4.99 });
+products.set("0aec346b01", {
+  name: "omega_crate",
+  cost: 9.99,
+  itemId: "omega_crate",
+  itemAmount: 1,
+});
+products.set("23110fff7b", { name: "rain", cost: 4.99, itemId: "rain", itemAmount: 1 });
+
+products.set("709635f519", {
+  name: "pile of dabloons",
+  cost: 0.99,
+  itemId: "dabloon",
+  itemAmount: 175,
+});
+products.set("badfde4621", {
+  name: "bag of dabloons",
+  cost: 4.99,
+  itemId: "dabloon",
+  itemAmount: 925,
+});
+products.set("af019e4514", {
+  name: "bucket of dabloons",
+  cost: 9.99,
+  itemId: "dabloon",
+  itemAmount: 1_900,
+});
+products.set("a0c0b8c58c", {
+  name: "barrel of dabloons",
+  cost: 19.99,
+  itemId: "dabloon",
+  itemAmount: 3_750,
+});
+products.set("bf1f1a7c61", {
+  name: "chest of dabloons",
+  cost: 29.99,
+  itemId: "dabloon",
+  itemAmount: 5_750,
+});
+products.set("583c63b0b3", {
+  name: "safe of dabloons",
+  cost: 49.99,
+  itemId: "dabloon",
+  itemAmount: 10_000,
+});
 
 const adminPermissionLevels = {
   "1": [
@@ -257,6 +322,7 @@ export default {
       LAST_SEASONAL_ITEM: "nypsi:last_seasonal_item",
       GLOBAL_BOOSTER_PROGRESS: "nypsi:global_booster:progress",
       INFINITE_MAX_BET: "nypsi:infinitemaxbet", // season interim
+      DABLOONS_SALE: "nypsi:dabloons:sale",
     },
   },
   ANNOUNCEMENTS_CHANNEL_ID: "747057465245564939",
