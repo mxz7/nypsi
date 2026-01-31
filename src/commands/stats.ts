@@ -827,7 +827,19 @@ async function run(
 
     const msg = await send({ embeds: [embed], components: [row] });
 
-    const manager = new PageManager({ embed, message: msg, row, userId: message.author.id, pages });
+    const manager = new PageManager({
+      embed,
+      message: msg,
+      row,
+      userId: message.author.id,
+      pages,
+      onPageUpdate(manager) {
+        manager.embed.setFooter({
+          text: `page ${manager.currentPage}/${manager.lastPage}`,
+        });
+        return manager.embed;
+      },
+    });
 
     return manager.listen();
   };
