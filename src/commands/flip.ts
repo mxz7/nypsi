@@ -45,7 +45,7 @@ async function run(
 
   if (args.length == 0) {
     const answer = headTails[Math.floor(Math.random() * headTails.length)];
-    embed.setDescription(`💸 you threw **${answer}**`);
+    embed.setDescription(`🪙 you threw **${answer}**`);
   } else {
     if (!parseInt(args[0])) {
       return send({
@@ -68,7 +68,7 @@ async function run(
 
     if (amount == 2) {
       const answer = headTails[Math.floor(Math.random() * headTails.length)];
-      embed.setDescription(`💸 you threw **${answer}**`);
+      embed.setDescription(`🪙 you threw **${answer}**`);
     } else {
       let heads = 0;
       let tails = 0;
