@@ -98,6 +98,11 @@ async function run(
           .setLabel("live data")
           .setStyle(ButtonStyle.Link)
           .setURL(`https://nypsi.xyz/events/${event.id}?ref=bot-event-command`),
+        new ButtonBuilder()
+          .setStyle(ButtonStyle.Link)
+          .setLabel("what's this?")
+          .setEmoji("❓")
+          .setURL("https://nypsi.xyz/docs/economy/events?ref=bot-event-command"),
       ),
     ],
   });
