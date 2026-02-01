@@ -1570,5 +1570,50 @@
     "target": 100,
     "description": "get married 100 times",
     "prize": ["legendary_scratch_card:2", "lucky_scratch_card:5", "nypsi_crate:2"]
+  },
+  "never_gonna_give_you_up_i": {
+    "id": "never_gonna_give_you_up_i",
+    "name": "never gonna give you up **I**",
+    "emoji": "<a:rick_astley:1100529748796506203>",
+    "target": 1,
+    "description": "rick roll 1 person",
+    "prize": ["lucky_scratch_card:1"]
+  },
+  "never_gonna_give_you_up_ii": {
+    "id": "never_gonna_give_you_up_ii",
+    "name": "never gonna give you up **II**",
+    "emoji": "<a:rick_astley:1100529748796506203>",
+    "target": 25,
+    "description": "rick roll 25 people",
+    "prize": ["lucky_scratch_card:3"]
+  },
+  "never_gonna_give_you_up_iii": {
+    "id": "never_gonna_give_you_up_iii",
+    "name": "never gonna give you up **III**",
+    "emoji": "<a:rick_astley:1100529748796506203>",
+    "target": 75,
+    "description": "rick roll 75 people",
+    "prize": ["lucky_scratch_card:4", "nypsi_crate:1"]
+  },
+  "never_gonna_give_you_up_iv": {
+    "id": "never_gonna_give_you_up_iv",
+    "name": "never gonna give you up **IV**",
+    "emoji": "<a:rick_astley:1100529748796506203>",
+    "target": 250,
+    "description": "rick roll 250 people",
+    "prize": ["legendary_scratch_card:1", "lucky_scratch_card:5", "nypsi_crate:1"]
+  },
+  "never_gonna_give_you_up_v": {
+    "id": "never_gonna_give_you_up_v",
+    "name": "never gonna give you up **V**",
+    "emoji": "<a:rick_astley:1100529748796506203>",
+    "target": 1000,
+    "description": "rick roll 1,000 people",
+    "prize": [
+      "legendary_scratch_card:2",
+      "lucky_scratch_card:5",
+      "nypsi_crate:2",
+      "tag:rick_astley"
+    ]
   }
 }

@@ -1,3 +1,7 @@
+# february 2026
+
+- add rick roll achievement (with rick astley tag)
+
 # january 2026
 
 - events are now target based or time based, they cannot 'expire'

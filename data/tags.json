@@ -245,6 +245,13 @@
     "description": "found in the events pro v achievement",
     "emoji": "🔱"
   },
+  "rick_astley": {
+    "id": "rick_astley",
+    "name": "rick astley",
+    "description": "found in the never gonna give you up v achievement",
+    "emoji": "<a:rick_astley:1100529748796506203>",
+    "image": "rick_astley.png"
+  },
   "year1": {
     "id": "year1",
     "name": "year 1",

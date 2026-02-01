@@ -1084,6 +1084,7 @@ export async function runCommand(
         await redis.del(`${Constants.redis.nypsi.RICKROLL}:${message.author.id}`);
 
         addTaskProgress(userId, "rickroll");
+        addProgress(userId, "never_gonna_give_you_up", 1);
 
         await message.channel.send({
           content: `${message.author.toString()} you have been **RICK ROLLED** by ${await getLastKnownUsername(
