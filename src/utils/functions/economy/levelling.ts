@@ -250,12 +250,12 @@ export async function getPrestige(member: MemberResolvable): Promise<number> {
 
   await redis.set(
     `${Constants.redis.cache.economy.PRESTIGE}:${userId}`,
-    query.prestige,
+    query?.prestige || 0,
     "EX",
     ms("6 hour") / 1000,
   );
 
-  return query.prestige;
+  return query?.prestige || 0;
 }
 
 export async function setPrestige(member: MemberResolvable, amount: number) {
@@ -293,12 +293,12 @@ export async function getLevel(member: MemberResolvable): Promise<number> {
 
   await redis.set(
     `${Constants.redis.cache.economy.LEVEL}:${userId}`,
-    query.level,
+    query?.level || 0,
     "EX",
     ms("12 hours") / 1000,
   );
 
-  return query.level;
+  return query?.level || 0;
 }
 
 export async function getRawLevel(member: MemberResolvable) {
