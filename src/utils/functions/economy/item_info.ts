@@ -530,21 +530,15 @@ export function getObtainingData(selected: Item): ObtainingData {
   ];
 
   if (mineItems.includes(selected.id) || selected.id === "stick") {
-    description.push(
-      "<:iron_pickaxe:1354809169198186607> mining ([odds](https://github.com/mxz7/nypsi-odds/))",
-    );
+    description.push("<:iron_pickaxe:1354809169198186607> mining");
   }
 
   if (["netherrack", "ancient_debris", "quartz", "gold_nugget", "stick"].includes(selected.id)) {
-    description.push(
-      "<:iron_pickaxe:1354809169198186607> mining in the nether ([odds](https://github.com/mxz7/nypsi-odds/))",
-    );
+    description.push("<:iron_pickaxe:1354809169198186607> mining in the nether");
   }
 
   if (["end_stone", "purpur", "obsidian", "dragon_egg", "chorus", "stick"].includes(selected.id)) {
-    description.push(
-      "<:iron_pickaxe:1354809169198186607> mining in the end ([odds](https://github.com/mxz7/nypsi-odds/))",
-    );
+    description.push("<:iron_pickaxe:1354809169198186607> mining in the end");
   }
 
   // smelt sources: find ores that smelt into this item
@@ -561,9 +555,9 @@ export function getObtainingData(selected: Item): ObtainingData {
 
   if (selected.role === "prey") {
     if (["blaze", "wither_skeleton", "piglin", "ghast"].includes(selected.id)) {
-      description.push("🔫 hunting in the nether ([odds](https://github.com/mxz7/nypsi-odds/))");
+      description.push("🔫 hunting in the nether");
     } else {
-      description.push("🔫 hunting ([odds](https://github.com/mxz7/nypsi-odds/))");
+      description.push("🔫 hunting");
     }
   }
 
@@ -574,7 +568,7 @@ export function getObtainingData(selected: Item): ObtainingData {
     !selected.id.includes("credit") &&
     selected.id !== "crystal_heart"
   ) {
-    description.push("🎣 fishing ([odds](https://github.com/mxz7/nypsi-odds/))");
+    description.push("🎣 fishing");
   }
 
   if (isGem(selected.id) || selected.id === "gem_shard") {
