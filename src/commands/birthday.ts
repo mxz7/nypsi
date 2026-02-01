@@ -64,7 +64,8 @@ cmd.slashData
   )
   .addSubcommand((upcoming) =>
     upcoming.setName("upcoming").setDescription("view upcoming birthdays in the server"),
-  );
+  )
+  .addSubcommand((set) => set.setName("set").setDescription("set your birthday"));
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
