@@ -1575,8 +1575,8 @@
     "id": "rick_roll_i",
     "name": "never gonna give you up **I**",
     "emoji": "<a:rick_astley:1100529748796506203>",
-    "target": 1,
-    "description": "rick roll 1 person",
+    "target": 5,
+    "description": "rick roll 5 people",
     "prize": ["lucky_scratch_card:1"]
   },
   "rick_roll_ii": {
