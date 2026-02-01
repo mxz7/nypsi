@@ -410,7 +410,7 @@ function getGeneralMessage(
       .setStyle(ButtonStyle.Link)
       .setLabel("history")
       .setEmoji("📈")
-      .setURL(`https://nypsi.xyz/items/history/${selected.id}?ref=bot-item`),
+      .setURL(`https://nypsi.xyz/items/${selected.id}/history?ref=bot-item`),
   );
 
   if (selected.id === "dabloon") {
