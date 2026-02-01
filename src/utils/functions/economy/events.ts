@@ -27,10 +27,10 @@ export type EventData = Event & { contributions: EventContribution[] };
 
 let completing = false;
 
-const REWARDS_TOP5P = 4;
+const REWARDS_TOP5P = 5;
 const REWARDS_TOP10P = 7;
 const REWARDS_TOP50P = 5;
-const REWARDS_BOTTOM50P = 2;
+const REWARDS_BOTTOM50P = 3;
 
 export async function createEvent(
   client: NypsiClient,
@@ -312,8 +312,8 @@ async function giveRewards(event: EventData) {
   const givenRewards = new Map<string, number>();
 
   if (!(await isEcoBanned(top5[0].userId)).banned) {
-    givenRewards.set(top5[0].userId, 1);
-    await addInventoryItem(top5[0].userId, "pandora_box", 1);
+    givenRewards.set(top5[0].userId, 3);
+    await addInventoryItem(top5[0].userId, "pandora_box", 3);
   }
 
   const giveRewardToGroup = async (group: EventContribution[], toGive: number) => {
@@ -336,6 +336,7 @@ async function giveRewards(event: EventData) {
     }
   };
 
+  await giveRewardToGroup(top5, 3);
   await giveRewardToGroup(top5p, REWARDS_TOP5P);
   await giveRewardToGroup(top10p, REWARDS_TOP10P);
   await giveRewardToGroup(top50p, REWARDS_TOP50P);
