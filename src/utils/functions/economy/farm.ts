@@ -4,7 +4,6 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import Constants from "../../Constants";
-import { logger } from "../../logger";
 import { getUserId, MemberResolvable } from "../member";
 import { Mutex } from "../mutex";
 import { addProgress } from "./achievements";
@@ -315,16 +314,12 @@ export async function getClaimable(
       await addProgress(member, "green_fingers", items);
       const eventProgress = await addEventProgress(client, member, "farming", items);
 
-      logger.debug(`farm: multiplier: ${outputMulti}`);
-
       return {
         sold: items,
         eventProgress,
         multiplier: outputMulti > 1 ? Math.floor((outputMulti - 1) * 100).toString() : null,
       };
     }
-
-    logger.debug(`farm: multiplier: ${outputMulti}`);
 
     return {
       items,
