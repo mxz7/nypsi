@@ -244,7 +244,9 @@ async function fastClickGame(
             },
             time: 30000,
           })
-          .catch((err) => logger.error("lootdrop: awaitInteraction failed in fastClick", { err }));
+          .catch((err) => {
+            logger.error("lootdrop: awaitInteraction failed in fastClick", { err });
+          });
 
         row.components.forEach((b) => (b.disabled = true));
 
@@ -260,9 +262,8 @@ async function fastClickGame(
           1000
         ).toFixed(2)}s\`!!`;
 
-        res
-          .update({ embeds: [embed], components: [row] })
-          .then(() => res.followUp({ embeds: [winEmbed], flags: 64 }));
+        msg.edit({ embeds: [embed], components: [row] });
+        res.reply({ embeds: [winEmbed], flags: 64 });
 
         return res.user.id;
       } catch (err) {
