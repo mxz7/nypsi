@@ -64,7 +64,6 @@ async function run(
     if (items[i.item].role != "ore") continue;
 
     for (let x = 0; x < i.amount; x++) {
-      if (ores.length >= max) break;
       ores.push(i.item);
     }
   }
@@ -84,6 +83,8 @@ async function run(
 
     return 0;
   });
+
+  ores.length = Math.min(ores.length, max);
 
   if (inventory.has("coal")) {
     coal = inventory.count("coal");
