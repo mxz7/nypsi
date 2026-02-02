@@ -9,7 +9,7 @@
       "id:legendary_scratch_card:1",
       "karma:750",
       "xp:25000",
-      "id:dabloon:750"
+      "id:dabloon:500"
     ],
     "type": "weekly"
   },
@@ -26,7 +26,7 @@
     "name": "baking",
     "description": "bake cookies",
     "target": [500, 1000, 1500],
-    "prizes": ["id:basic_crate:2", "id:69420_crate:2", "xp:1000", "id:dabloon:75"],
+    "prizes": ["id:basic_crate:2", "id:69420_crate:2", "xp:1000", "id:dabloon:40"],
     "type": "weekly"
   },
   "commands_weekly": {
@@ -34,7 +34,7 @@
     "name": "nypsi addict",
     "description": "use commands",
     "target": [500, 1000, 2000, 4000],
-    "prizes": ["id:lucky_scratch_card:2", "xp:1500", "karma:250", "id:dabloon:100"],
+    "prizes": ["id:lucky_scratch_card:2", "xp:1500", "karma:250", "id:dabloon:75"],
     "type": "weekly"
   },
   "commands_daily": {
@@ -55,7 +55,7 @@
       "id:69420_crate:1",
       "xp:500",
       "id:lucky_scratch_card:1",
-      "id:dabloon:75"
+      "id:dabloon:20"
     ],
     "type": "daily"
   },
@@ -69,7 +69,7 @@
       "id:69420_crate:5",
       "id:lucky_scratch_card:2",
       "xp:2000",
-      "id:dabloon:100"
+      "id:dabloon:75"
     ],
     "type": "weekly"
   },
@@ -86,7 +86,7 @@
     "name": "meow",
     "description": "look at pictures of cats",
     "target": [5, 10, 10, 10, 10, 10, 25],
-    "prizes": ["id:basic_crate:1", "id:69420_crate:1", "xp:500", "id:dabloon:25"],
+    "prizes": ["id:basic_crate:1", "id:69420_crate:1", "xp:500", "id:dabloon:10"],
     "type": "daily"
   },
   "dogs_daily": {
@@ -115,7 +115,7 @@
       "id:69420_crate:3",
       "xp:1500",
       "karma:500",
-      "id:dabloon:100"
+      "id:dabloon:50"
     ],
     "type": "weekly"
   },
@@ -129,11 +129,9 @@
       "id:69420_crate:5",
       "xp:5000",
       "id:nypsi_crate:1",
-      "id:dabloon:125"
+      "id:dabloon:75"
     ],
-    "exclude": [
-      "max_prestige"
-    ],
+    "exclude": ["max_prestige"],
     "type": "weekly"
   },
   "gamble_weekly": {
@@ -146,7 +144,7 @@
       "xp:2000",
       "karma:300",
       "id:basic_crate:5",
-      "id:dabloon:100"
+      "id:dabloon:75"
     ],
     "type": "weekly"
   },
@@ -163,7 +161,7 @@
     "name": "gambling addiction",
     "description": "get a gambling win streak",
     "target": [10, 15],
-    "prizes": ["id:lucky_scratch_card:3", "xp:5000", "id:basic_crate:5", "id:dabloon:150"],
+    "prizes": ["id:lucky_scratch_card:3", "xp:5000", "id:basic_crate:5", "id:dabloon:115"],
     "type": "weekly"
   },
   "eat_cookies": {
@@ -299,7 +297,7 @@
     "name": "loot drop professional",
     "description": "win loot drops",
     "target": [1, 2, 3],
-    "prizes": ["id:lucky_scratch_card:2", "id:69420_crate:3", "id:dabloon:100"],
+    "prizes": ["id:lucky_scratch_card:2", "id:69420_crate:3", "id:dabloon:75"],
     "type": "weekly"
   },
   "wordles_daily": {
@@ -371,7 +369,7 @@
     "name": "couch potato",
     "description": "rate a movie or tv show (/tmdb)",
     "target": [1],
-    "prizes": ["id:basic_crate:1", "xp:1000", "id:dabloon:50"],
+    "prizes": ["id:basic_crate:1", "xp:1000", "id:dabloon:30"],
     "type": "daily"
   }
 }
