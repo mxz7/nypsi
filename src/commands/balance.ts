@@ -13,7 +13,12 @@ import {
   updateBalance,
 } from "../utils/functions/economy/balance.js";
 import { getInventory } from "../utils/functions/economy/inventory";
-import { getLevel, getPrestige } from "../utils/functions/economy/levelling.js";
+import {
+  calculateRawLevel,
+  getLevel,
+  getLevelRequirements,
+  getPrestige,
+} from "../utils/functions/economy/levelling.js";
 import { createUser, deleteUser, getItems, userExists } from "../utils/functions/economy/utils.js";
 import { getMember, getUserId } from "../utils/functions/member.js";
 import { getNypsiBankBalance, getTax, getTaxRefreshTime } from "../utils/functions/tax.js";
@@ -116,6 +121,8 @@ async function run(
       getLevel(target),
     ]);
 
+  const rawLevel = calculateRawLevel(level, prestige);
+
   let footer = `level ${level}`;
 
   if (prestige > 0) {
@@ -138,12 +145,23 @@ async function run(
   if ((await inventory.hasGem("blue_gem")).any) gemLine += `${getItems()["blue_gem"].emoji}`;
   if ((await inventory.hasGem("green_gem")).any) gemLine += `${getItems()["green_gem"].emoji}`;
 
+  let levelNotice = "";
+
+  if (
+    target.user.id === message.author.id &&
+    getLevelRequirements(rawLevel).money > bankMaxBalance &&
+    rawLevel < 700
+  ) {
+    levelNotice =
+      "\n\nyour bank is too small for the next level up, you can use [stolen credit cards](https://nypsi.xyz/items/stolen_credit_card?ref=bot-level) to increase your bank size";
+  }
+
   const embed = new CustomEmbed(target)
     .setDescription(
       `${padlockStatus ? "🔒" : "💰"} $**${balance.toLocaleString()}**\n` +
         `💳 $**${bankBalance.toLocaleString()}** / $**${bankMaxBalance.toLocaleString()}**${
           net.amount > 15_000_000 ? `\n${gemLine}\n🌍 $**${net.amount.toLocaleString()}**` : ""
-        }`,
+        }${levelNotice}`,
     )
     .setFooter({ text: footer });
 

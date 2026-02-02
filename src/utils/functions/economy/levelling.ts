@@ -302,8 +302,12 @@ export async function getLevel(member: MemberResolvable): Promise<number> {
 }
 
 export async function getRawLevel(member: MemberResolvable) {
-  let [level, prestige] = await Promise.all([getLevel(member), getPrestige(member)]);
+  const [level, prestige] = await Promise.all([getLevel(member), getPrestige(member)]);
 
+  return calculateRawLevel(level, prestige);
+}
+
+export function calculateRawLevel(level: number, prestige: number) {
   while (prestige > 0) {
     prestige--;
     level += 100;

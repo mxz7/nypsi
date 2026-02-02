@@ -25,6 +25,7 @@ import {
 import { getGuildByUser } from "../utils/functions/economy/guilds";
 import { getInventory } from "../utils/functions/economy/inventory";
 import {
+  calculateRawLevel,
   getLevel,
   getLevelRequirements,
   getPrestige,
@@ -180,8 +181,17 @@ async function run(
 
     const marriage = await isMarried(target);
 
-    if (marriage)
+    if (marriage) {
       desc += `${desc ? "\n" : ""}${getItems()["ring"].emoji} married to **${await getLastKnownUsername(marriage.partnerId)}**`;
+    }
+
+    if (
+      message.author.id === target.user.id &&
+      levelRequirements.money > bankMaxBalance &&
+      calculateRawLevel(level, prestige) < 700
+    ) {
+      desc += `${desc ? "\n\n" : ""}your bank is too small for the next level up, you can use [stolen credit cards](https://nypsi.xyz/items/stolen_credit_card?ref=bot-level) to increase your bank size`;
+    }
 
     const balanceSection =
       `${padlockStatus ? "🔒" : "💰"} $**${formatNumberPretty(balance)}**\n` +
