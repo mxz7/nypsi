@@ -14,7 +14,8 @@ import { addProgress } from "./achievements";
 import { addBalance } from "./balance";
 import { addToGuildXP, getGuildName } from "./guilds";
 import { addInventoryItem } from "./inventory";
-import { getItems, getTasksData, isEcoBanned, userExists } from "./utils";
+import { getPrestige } from "./levelling";
+import { getItems, getTasksData, isEcoBanned, maxPrestige, userExists } from "./utils";
 import { addXp } from "./xp";
 
 const taskGeneration = new Map<string, number>();
@@ -51,8 +52,12 @@ async function generateDailyTasks(member: MemberResolvable, count: number) {
 }
 
 async function generateWeeklyTasks(member: MemberResolvable, count: number) {
-  const tasks = Object.values(getTasksData()).filter((i) => i.type === "weekly");
+  let tasks = Object.values(getTasksData()).filter((i) => i.type === "weekly");
   const userId = getUserId(member);
+
+  if ((await getPrestige(member)) >= maxPrestige) {
+    tasks = tasks.filter((i) => !i.exclude?.includes("max_prestige"));
+  }
 
   const usersTasks: Task[] = [];
 
