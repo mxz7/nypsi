@@ -293,6 +293,7 @@ export function getEventProgress(event: EventData) {
 async function giveRewards(event: EventData) {
   if (!event) return undefined;
 
+  const top3 = event.contributions.slice(0, 3);
   const top5 = event.contributions.slice(0, 5);
 
   const achGroup = event.contributions.slice(0, Math.ceil(event.contributions.length * 0.025));
@@ -308,15 +309,14 @@ async function giveRewards(event: EventData) {
     await addProgress(userId, "event_pro", 1);
   }
 
-  // userid -> amount
-  const givenRewards = new Map<string, number>();
+  const givenRewards = new Map<string, { itemId: string; amount: number }[]>();
 
   if (!(await isEcoBanned(top5[0].userId)).banned) {
-    givenRewards.set(top5[0].userId, 3);
+    givenRewards.set(top5[0].userId, [{ itemId: "pandora_box", amount: 3 }]);
     await addInventoryItem(top5[0].userId, "pandora_box", 3);
   }
 
-  const giveRewardToGroup = async (group: EventContribution[], toGive: number) => {
+  const giveRewardToGroup = async (group: EventContribution[], toGive: number, itemId: string) => {
     while (toGive > 0) {
       toGive--;
       const chosen = group[Math.floor(Math.random() * group.length)];
@@ -328,19 +328,26 @@ async function giveRewards(event: EventData) {
       }
 
       if (!givenRewards.has(chosen.userId)) {
-        givenRewards.set(chosen.userId, 0);
+        givenRewards.set(chosen.userId, []);
       }
 
-      givenRewards.set(chosen.userId, givenRewards.get(chosen.userId) + 1);
-      await addInventoryItem(chosen.userId, "pandora_box", 1);
+      const rewards = givenRewards.get(chosen.userId);
+      if (!rewards.find((i) => i.itemId === itemId)) {
+        rewards.push({ itemId, amount: 1 });
+      } else {
+        rewards.find((i) => i.itemId === itemId).amount++;
+      }
+
+      await addInventoryItem(chosen.userId, itemId, 1);
     }
   };
 
-  await giveRewardToGroup(top5, 3);
-  await giveRewardToGroup(top5p, REWARDS_TOP5P);
-  await giveRewardToGroup(top10p, REWARDS_TOP10P);
-  await giveRewardToGroup(top50p, REWARDS_TOP50P);
-  await giveRewardToGroup(bottom50p, REWARDS_BOTTOM50P);
+  await giveRewardToGroup(top3, 300, "dabloon");
+  await giveRewardToGroup(top5, 3, "pandora_box");
+  await giveRewardToGroup(top5p, REWARDS_TOP5P, "pandora_box");
+  await giveRewardToGroup(top10p, REWARDS_TOP10P, "pandora_box");
+  await giveRewardToGroup(top50p, REWARDS_TOP50P, "pandora_box");
+  await giveRewardToGroup(bottom50p, REWARDS_BOTTOM50P, "pandora_box");
 
   for (const [userId, amount] of givenRewards) {
     await addNotificationToQueue({
