@@ -713,6 +713,28 @@ async function playGame(
   const clickSquare = async (response: ButtonInteraction, x: number, y: number) => {
     const row = board[y];
 
+    if (!row) {
+      // invalid
+      logger.debug(`tower: ${message.author.id} invalid row ${x}, ${y}. rerendering`, {
+        board,
+        activeRow: getActiveRow(board),
+      });
+
+      const desc = await renderGambleScreen({
+        state: "playing",
+        bet: game.bet,
+        insert: `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
+        userId: message.author.id,
+      });
+      game.embed.setDescription(desc);
+
+      const components = createRows(board, false);
+
+      edit({ embeds: [game.embed], components }, response);
+
+      return playGame(message, send, msg, args);
+    }
+
     for (const item of row) {
       if (["c", "gc"].includes(item)) {
         logger.debug(`tower: ${message.author.id} invalid square ${x}, ${y}. rerendering`, {
