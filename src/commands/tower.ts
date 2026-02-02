@@ -603,7 +603,7 @@ async function playGame(
     return games.delete(message.author.id);
   };
 
-  const win1 = async (interaction: ButtonInteraction) => {
+  const win = async (interaction: ButtonInteraction) => {
     const eventProgress = await addEventProgress(
       message.client as NypsiClient,
       message.member,
@@ -714,16 +714,23 @@ async function playGame(
 
     for (const item of row) {
       if (["c", "gc"].includes(item)) {
-        if (response.deferred || response.replied)
+        logger.debug(`tower: ${message.author.id} invalid square ${x}, ${y}`, {
+          board,
+          activeRow: getActiveRow(board),
+        });
+
+        if (response.deferred || response.replied) {
           await response.followUp({
             embeds: [new ErrorEmbed("invalid square")],
             flags: MessageFlags.Ephemeral,
           });
-        else
+        } else {
           await response.reply({
             embeds: [new ErrorEmbed("invalid square")],
             flags: MessageFlags.Ephemeral,
           });
+        }
+
         return playGame(message, send, msg, args);
       }
     }
@@ -743,7 +750,7 @@ async function playGame(
 
           if (percentChance(0.5) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
             await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t", "EX", 86400);
-            logger.info(`${message.author.id} received green_gem randomly (tower)`);
+            logger.info(`gems: ${message.author.id} received green_gem randomly (tower)`);
             addInventoryItem(message.member, "green_gem", 1);
             addProgress(message.member, "gem_hunter", 1);
             if (response.replied || response.deferred)
@@ -790,7 +797,7 @@ async function playGame(
 
         if (y >= 8) {
           addProgress(message.member, "tower_pro", 1);
-          win1(response);
+          win(response);
           return;
         }
 
@@ -849,10 +856,11 @@ async function playGame(
       draw(response);
       return;
     } else {
-      win1(response);
+      win(response);
       return;
     }
   }
+
   const [y, x] = response.customId.split("").map((i) => parseInt(i));
 
   return clickSquare(response, x, y);
