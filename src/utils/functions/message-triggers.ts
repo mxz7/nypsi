@@ -26,7 +26,7 @@ const begContent = [
 
 const messages = {
   help: `need help? you can dm <@${Constants.BOT_USER_ID}> to create a support request and talk directly to staff`,
-  beg: "need some money? you can do $daily, $freemoney and $vote for some quick cash",
+  beg: "need some money? you can do **$daily**, **$freemoney** and **$vote** for some quick cash",
 } as const;
 
 const triggers = new Map<RegExp, { response: string; maxLevel?: number }>();
