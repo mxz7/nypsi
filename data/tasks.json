@@ -131,6 +131,9 @@
       "id:nypsi_crate:1",
       "id:dabloon:125"
     ],
+    "exclude": [
+      "max_prestige"
+    ],
     "type": "weekly"
   },
   "gamble_weekly": {
