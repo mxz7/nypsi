@@ -315,9 +315,10 @@ async function prepareGame(
     logger.error("tower error", e);
     console.trace();
     redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
-    return send({
+    send({
       embeds: [new ErrorEmbed("an error occurred while running - join support server")],
     });
+    throw e;
   });
 }
 
@@ -714,22 +715,22 @@ async function playGame(
 
     for (const item of row) {
       if (["c", "gc"].includes(item)) {
-        logger.debug(`tower: ${message.author.id} invalid square ${x}, ${y}`, {
+        logger.debug(`tower: ${message.author.id} invalid square ${x}, ${y}. rerendering`, {
           board,
           activeRow: getActiveRow(board),
         });
 
-        if (response.deferred || response.replied) {
-          await response.followUp({
-            embeds: [new ErrorEmbed("invalid square")],
-            flags: MessageFlags.Ephemeral,
-          });
-        } else {
-          await response.reply({
-            embeds: [new ErrorEmbed("invalid square")],
-            flags: MessageFlags.Ephemeral,
-          });
-        }
+        const desc = await renderGambleScreen({
+          state: "playing",
+          bet: game.bet,
+          insert: `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
+          userId: message.author.id,
+        });
+        game.embed.setDescription(desc);
+
+        const components = createRows(board, false);
+
+        edit({ embeds: [game.embed], components }, response);
 
         return playGame(message, send, msg, args);
       }
