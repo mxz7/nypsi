@@ -1,6 +1,7 @@
 # february 2026
 
 - add rick roll achievement (with rick astley tag)
+- improve event rewards
 
 # january 2026
 

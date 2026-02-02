@@ -293,8 +293,8 @@ export function getEventProgress(event: EventData) {
 async function giveRewards(event: EventData) {
   if (!event) return undefined;
 
-  const top3 = event.contributions.slice(0, 3);
   const top5 = event.contributions.slice(0, 5);
+  const top10 = event.contributions.slice(0, 10);
 
   const achGroup = event.contributions.slice(0, Math.ceil(event.contributions.length * 0.025));
   const top5p = event.contributions.slice(0, Math.ceil(event.contributions.length * 0.05));
@@ -342,8 +342,8 @@ async function giveRewards(event: EventData) {
     }
   };
 
-  await giveRewardToGroup(top3, 300, "dabloon");
   await giveRewardToGroup(top5, 3, "pandora_box");
+  await giveRewardToGroup(top10, 300, "dabloon");
   await giveRewardToGroup(top5p, REWARDS_TOP5P, "pandora_box");
   await giveRewardToGroup(top10p, REWARDS_TOP10P, "pandora_box");
   await giveRewardToGroup(top50p, REWARDS_TOP50P, "pandora_box");
