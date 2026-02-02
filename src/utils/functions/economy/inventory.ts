@@ -809,13 +809,17 @@ export async function calcItemValue(item: string) {
       getOffersAverage(item),
     ]);
 
-    if (!offersAvg && marketAvg) return marketAvg;
-    if (!marketAvg && offersAvg) return offersAvg;
-    if (!marketAvg && !offersAvg) return undefined;
-
-    itemValue = Math.floor(
-      [offersAvg, marketAvg, marketAvg, marketAvg].reduce((a, b) => a + b) / 4,
-    );
+    if (!offersAvg && marketAvg) {
+      itemValue = marketAvg;
+    } else if (!marketAvg && offersAvg) {
+      itemValue = offersAvg;
+    } else if (!marketAvg && !offersAvg) {
+      itemValue = undefined;
+    } else {
+      itemValue = Math.floor(
+        [offersAvg, marketAvg, marketAvg, marketAvg].reduce((a, b) => a + b) / 4,
+      );
+    }
   }
 
   (async () => {
@@ -847,7 +851,7 @@ export async function calcItemValue(item: string) {
         date,
         category: `item-value-${item}`,
         userId: "global",
-        value: itemValue,
+        value: itemValue || getItems()[item].sell || 1000,
       },
     });
   })();
