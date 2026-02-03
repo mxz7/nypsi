@@ -343,7 +343,7 @@ async function giveRewards(event: EventData) {
   };
 
   await giveRewardToGroup(top5, 3, "pandora_box");
-  await giveRewardToGroup(top10, 300, "dabloon");
+  await giveRewardToGroup(top10, 200, "dabloon");
   await giveRewardToGroup(top5p, REWARDS_TOP5P, "pandora_box");
   await giveRewardToGroup(top10p, REWARDS_TOP10P, "pandora_box");
   await giveRewardToGroup(top50p, REWARDS_TOP50P, "pandora_box");
