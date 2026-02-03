@@ -64,8 +64,14 @@ export async function createOffer(
   ).setHeader(`${owner.user.username}'s offer`, owner.user.avatarURL());
 
   if (itemAmount > 1 && money > 1000) {
+    let perItem = money / itemAmount;
+
+    if (taxedAmount !== 0) {
+      perItem -= taxedAmount / itemAmount;
+    }
+
     embed.setFooter({
-      text: `$${Math.floor(money / itemAmount).toLocaleString()} per ${getItems()[itemId].name}`,
+      text: `$${Math.floor(perItem).toLocaleString()} per ${getItems()[itemId].name}`,
     });
   }
 
