@@ -68,6 +68,8 @@ manager.on("clusterCreate", (cluster) => {
     logger.info(`cluster ${cluster.id} reconnecting..`);
   });
   cluster.on("message", (message) => {
+    logger.debug(`received message: ${message}`, { message });
+
     if (message == "restart") {
       dmQueueWorker.pause();
       const before = Date.now();
