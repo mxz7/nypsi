@@ -92,6 +92,12 @@ const brainrotFilter = [
   "tweak out",
 ];
 
+let processedCount = 0;
+
+setInterval(() => {
+  logger.info(`processed messages: ${processedCount.toLocaleString()} last minute`);
+}, 60000);
+
 export default async function messageCreate(message: Message) {
   if (!message.channel.isSendable()) return;
 
@@ -380,6 +386,8 @@ export default async function messageCreate(message: Message) {
       );
     return await message.channel.send({ embeds: [embed] });
   }
+
+  processedCount++;
 
   a(message.author.id, message.author.username, message.content);
   if (message.channel.isDMBased()) return;
