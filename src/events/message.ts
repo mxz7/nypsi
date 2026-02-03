@@ -98,6 +98,8 @@ setInterval(() => {
   logger.info(`processed messages: ${processedCount.toLocaleString()} last minute`);
 }, 60000);
 
+const removeExtraSpacesRegex = / +(?= )/g;
+
 export default async function messageCreate(message: Message) {
   if (!message.channel.isSendable()) return;
 
@@ -497,16 +499,14 @@ export default async function messageCreate(message: Message) {
     }
   }
 
-  message.content = message.content.replace(/ +(?= )/g, ""); // remove any additional spaces
-
-  const prefixes = await getPrefix(message.guild);
-
-  if (message.client.user.id == "685193083570094101") prefixes.push("£");
-
   if (
     message.content == `<@!${message.client.user.id}>` ||
     message.content == `<@${message.client.user.id}>`
   ) {
+    const prefixes = await getPrefix(message.guild);
+
+    if (message.client.user.id == "685193083570094101") prefixes.push("£");
+
     return message.channel
       .send({ content: `my prefixes for this server: \`${prefixes.join("` `")}\`` })
       .catch(() => {
@@ -515,6 +515,8 @@ export default async function messageCreate(message: Message) {
         });
       });
   }
+
+  message.content = message.content.replace(removeExtraSpacesRegex, ""); // remove any additional spaces
 
   if (
     (await hasGuild(message.guild)) &&
@@ -527,6 +529,10 @@ export default async function messageCreate(message: Message) {
       return;
     }
   }
+
+  const prefixes = await getPrefix(message.guild);
+
+  if (message.client.user.id == "685193083570094101") prefixes.push("£");
 
   for (const prefix of prefixes) {
     if (message.content.startsWith(prefix) && !(await isSlashOnly(message.guild))) {
