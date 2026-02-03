@@ -495,10 +495,10 @@ export function formatEventDescription(event: Event) {
 }
 
 export function formatEventProgress(event: EventData, progress: number, user?: MemberResolvable) {
-  let message = `🔱 ${progress.toLocaleString()}`;
+  let message = `🔱 ${Number(progress).toLocaleString()}`;
 
   if (event.target) {
-    message += `/${event.target.toLocaleString()}`;
+    message += `/${Number(event.target).toLocaleString()}`;
   }
 
   if (user) {
