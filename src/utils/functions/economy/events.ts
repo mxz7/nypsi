@@ -349,15 +349,17 @@ async function giveRewards(event: EventData) {
   await giveRewardToGroup(top50p, REWARDS_TOP50P, "pandora_box");
   await giveRewardToGroup(bottom50p, REWARDS_BOTTOM50P, "pandora_box");
 
-  for (const [userId, amount] of givenRewards) {
+  for (const [userId, rewards] of givenRewards) {
+    let desc = `thank you for participating in the **${getEventsData()[event.type].name} event**!!\n\nyou have received:\n`;
+
+    for (const reward of rewards) {
+      desc += `- ${reward.amount}x ${getItems()[reward.itemId].emoji} ${getItems()[reward.itemId].name}\n`;
+    }
+
     await addNotificationToQueue({
       memberId: userId,
       payload: {
-        embed: new CustomEmbed(
-          userId,
-          `you have received **${amount}x** ${getItems()["pandora_box"].emoji} ${getItems()["pandora_box"].name} ` +
-            `for participating in the **${getEventsData()[event.type].name} event**!!`,
-        ),
+        embed: new CustomEmbed(userId, desc),
       },
     });
   }
