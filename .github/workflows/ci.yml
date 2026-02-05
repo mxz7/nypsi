@@ -234,7 +234,7 @@ jobs:
           mv prisma.config.ts deploy/
 
       - name: deploy
-        uses: burnett01/rsync-deployments@8.0.3
+        uses: burnett01/rsync-deployments@8.0.4
         with:
           switches: -rtvh --partial --progress --delete --exclude='dist/utils/functions/anticheat.js' --exclude='node_modules/' --exclude='out/' --exclude='.env'
           path: deploy/
