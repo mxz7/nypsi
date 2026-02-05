@@ -427,7 +427,7 @@ async function start(client: NypsiClient) {
     },
     (i: number) => {
       if (i < 1) i += 0.045;
-      return i * 1.18779;
+      return i * 1.2;
     },
   ];
 
