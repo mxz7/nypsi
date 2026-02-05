@@ -22,6 +22,10 @@ const begContent = [
   "can i get some money",
   "give money",
   "give me some money",
+  "give me cash",
+  "give me some cash",
+  "can i get some cash",
+  "pls give cash",
 ];
 
 const messages = {
