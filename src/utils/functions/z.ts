@@ -14,7 +14,6 @@ export type z = {
     createdAt: Date;
     hasInvite: boolean;
     removed: boolean;
-    rating: number;
     voteKickId: number[];
     invitedById: string | null;
   };
@@ -23,7 +22,6 @@ export type z = {
     createdAt: Date;
     hasInvite: boolean;
     removed: boolean;
-    rating: number;
     voteKickId: number[];
     invitedById: string | null;
   }[];
@@ -39,12 +37,12 @@ export type z = {
   invitedById: string | null;
 };
 
-export async function getZProfile(userId: string) {
+export async function getZProfile(userId: string): Promise<z> {
   const cache = await redis.get(`${Constants.redis.cache.z.profile}:${userId}`);
 
   if (cache) {
     if (cache === "null") return null;
-    return JSON.parse(cache) as z;
+    return JSON.parse(cache);
   }
 
   const query = await prisma.z.findUnique({
@@ -59,14 +57,23 @@ export async function getZProfile(userId: string) {
     },
   });
 
+  if (!query) {
+    await redis.set(`${Constants.redis.cache.z.profile}:${userId}`, "null", "EX", 3600);
+    return null;
+  }
+
+  const rating = query.invitees.filter((i) => i.removed).length;
+
+  const z = { ...query, rating: -rating };
+
   await redis.set(
     `${Constants.redis.cache.z.profile}:${userId}`,
-    query ? JSON.stringify(query) : "null",
+    z ? JSON.stringify(z) : "null",
     "EX",
     3600,
   );
 
-  return query;
+  return z;
 }
 
 export async function checkZPeoples(guild: Guild) {
@@ -150,9 +157,7 @@ export async function castVoteKick(
     `${Constants.redis.cache.z.profile}:${targetId}`,
   );
 
-  const count = await prisma.z.count({ where: { removed: false } });
-
-  if (target.voteKicks.length + 1 >= count / 5) {
+  if (target.voteKicks.length + 1 >= (await getTargetKicks())) {
     removeZUser(targetId, guild);
 
     return "kicked";
@@ -173,25 +178,6 @@ export async function removeZUser(userId: string, guild: Guild) {
       invitedById: true,
     },
   });
-
-  if (query.invitedById) {
-    const inviter = await prisma.z.update({
-      where: {
-        userId: query.invitedById,
-      },
-      data: {
-        rating: { decrement: 1 },
-      },
-      select: {
-        rating: true,
-        userId: true,
-      },
-    });
-
-    if (inviter.rating <= -3) {
-      removeZUser(inviter.userId, guild);
-    }
-  }
 
   await redis.del(
     `${Constants.redis.cache.z.profile}:${userId}`,
@@ -317,4 +303,10 @@ export async function invite(userId: string, targetId: string, guild: Guild) {
       content: `<@${targetId}>`,
     });
   }
+}
+
+export async function getTargetKicks() {
+  const count = await prisma.z.count({ where: { removed: false } });
+
+  return Math.ceil(count / 5);
 }

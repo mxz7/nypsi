@@ -1014,7 +1014,6 @@ model z {
   createdAt DateTime @default(now())
   hasInvite Boolean  @default(false)
   removed   Boolean  @default(false)
-  rating    Int      @default(0) @db.SmallInt
 
   voteKickId  Int[]   @default([])
   invitedById String?

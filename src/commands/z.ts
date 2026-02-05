@@ -17,6 +17,7 @@ import { getLastKnownAvatar, getLastKnownUsername } from "../utils/functions/use
 import {
   castVoteKick,
   checkZPeoples,
+  getTargetKicks,
   getZProfile,
   invite,
   removeVoteKick,
@@ -56,7 +57,7 @@ async function run(
           `has invite: ${profile.hasInvite}\n` +
           `removed: ${profile.removed}\n` +
           `rating: ${profile.rating}\n` +
-          `kick: ${profile.voteKicks.length}/${Math.ceil((await prisma.z.count({ where: { removed: false } })) / 5)}`,
+          `kick: ${profile.voteKicks.length}/${await getTargetKicks()}`,
       ).setHeader(
         await getLastKnownUsername(profile.userId, false),
         await getLastKnownAvatar(profile.userId),
