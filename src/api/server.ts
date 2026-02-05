@@ -99,7 +99,7 @@ authedApp.route("/items", itemController);
 app.route("/", authedApp);
 
 export function startAPI() {
-  serve({ fetch: app.fetch, port: parseInt(process.env.EXPRESS_PORT) || 5000 });
+  serve({ fetch: app.fetch, port: parseInt(process.env.API_PORT) || 5000 });
 
-  logger.info(`api: running on port ${process.env.EXPRESS_PORT || 5000}`);
+  logger.info(`api: running on port ${process.env.API_PORT || 5000}`);
 }
