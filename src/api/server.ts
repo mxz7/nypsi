@@ -22,13 +22,17 @@ app.get("/", (c) => {
   return c.json({ meow: "meow" });
 });
 
-app.get("/status", bearerAuth({ token: process.env.API_AUTH }), async (c) => {
+const authedApp = new Hono();
+
+authedApp.use(bearerAuth({ token: process.env.API_AUTH }));
+
+authedApp.get("/status", async (c) => {
   const status = await checkStatus();
 
   return c.json(status);
 });
 
-app.post(
+authedApp.post(
   "/achievement/animal_lover/progress/:userid",
   bearerAuth({ token: process.env.API_AUTH }),
   async (c) => {
@@ -52,7 +56,7 @@ app.post(
   },
 );
 
-app.delete("/redis", bearerAuth({ token: process.env.API_AUTH }), async (c) => {
+authedApp.delete("/redis", async (c) => {
   const keys = await c.req.text().then((r) => r.split("\n"));
 
   logger.info(`api: deleting redis keys (${keys.join(", ")})`);
@@ -62,13 +66,13 @@ app.delete("/redis", bearerAuth({ token: process.env.API_AUTH }), async (c) => {
   return c.body(null, 200);
 });
 
-app.get("/item/value/:itemId", bearerAuth({ token: process.env.API_AUTH }), async (c) => {
+authedApp.get("/item/value/:itemId", async (c) => {
   const itemId = c.req.param("itemId");
   const value = await calcItemValue(itemId);
   return c.json({ value });
 });
 
-app.post("/reboot", bearerAuth({ token: process.env.API_AUTH }), async (c) => {
+authedApp.post("/reboot", async (c) => {
   logger.info(`api: forced reboot triggered`);
 
   setTimeout(async () => {
@@ -83,27 +87,16 @@ app.post("/reboot", bearerAuth({ token: process.env.API_AUTH }), async (c) => {
   return c.body(null, 200);
 });
 
-app.post("/pausestreak", bearerAuth({ token: process.env.API_AUTH }), async (c) => {
+authedApp.post("/pausestreak", async (c) => {
   await redis.set("nypsi:streakpause", 69, "EX", ms("1 day") / 1000);
   return c.body("streaks will be paused for the next 24 hours", 200);
 });
 
-app.route("/vote", voteController);
-app.route("/kofi", kofiController);
-app.route("/items", itemController);
+authedApp.route("/vote", voteController);
+authedApp.route("/kofi", kofiController);
+authedApp.route("/items", itemController);
 
-// app.onError((err, c) => {
-//   logger.warn(`api: error ${c.req.method} ${c.req.path}`, err);
-
-//   if (err instanceof HTTPException) {
-//     return err.getResponse();
-//   }
-
-//   c.status(500);
-//   return c.json({
-//     message: err.message || "Internal Server Error",
-//   });
-// });
+app.route("/", authedApp);
 
 export function startAPI() {
   serve({ fetch: app.fetch, port: parseInt(process.env.EXPRESS_PORT) || 5000 });
