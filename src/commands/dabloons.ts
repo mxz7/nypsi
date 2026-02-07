@@ -296,7 +296,9 @@ async function buildSelectMenu(selected?: string, disabled = false) {
     builder.addOptions(
       new StringSelectMenuOptionBuilder()
         .setLabel(`${itemData[item.itemId].plural}`)
-        .setDescription(`${await getCost({ itemId: item.itemId, amount: 1 })} dabloons`)
+        .setDescription(
+          `${(await getCost({ itemId: item.itemId, amount: 1 })).toLocaleString()} dabloons`,
+        )
         .setValue(item.itemId)
         .setEmoji(itemData[item.itemId].emoji)
         .setDefault(selected === item.itemId),
