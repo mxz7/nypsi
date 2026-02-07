@@ -125,6 +125,24 @@
         "every": 604800,
         "dead": 2.628e6
       }
+    },
+    "wheat_plant": {
+      "id": "wheat_plant",
+      "name": "wheat plant",
+      "growthTime": 115200,
+      "hourly": 0.8,
+      "max": 3,
+      "item": "wheat",
+      "type": "plant",
+      "type_plural": "plants",
+      "water": {
+        "every": 259200,
+        "dead": 604800
+      },
+      "fertilise": {
+        "every": 1.037e6,
+        "dead": 3.456e6
+      }
     }
   },
   "upgrades": {

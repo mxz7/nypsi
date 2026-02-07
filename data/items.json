@@ -3626,5 +3626,33 @@
     "in_crates": true,
     "role": "currency",
     "sell": 100000
+  },
+  "wheat_seed": {
+    "id": "wheat_seed",
+    "name": "wheat seed",
+    "article": "a",
+    "plural": "wheat seeds",
+    "emoji": "<:wheat_seed:1469345193630240959>",
+    "longDesc": "plant to grow a wheat crop",
+    "rarity": 1,
+    "role": "seed",
+    "plantId": "wheat_plant",
+    "buy": 0,
+    "sell": 10000,
+    "in_crates": true,
+    "aliases": ["wseed"]
+  },
+  "wheat": {
+    "id": "wheat",
+    "name": "wheat",
+    "article": "a",
+    "plural": "wheat",
+    "emoji": "<:wheat:1469701938684629053>",
+    "longDesc": "maybe make some bread",
+    "rarity": 69,
+    "role": "sellable",
+    "buy": 0,
+    "sell": 3000,
+    "in_crates": false
   }
 }

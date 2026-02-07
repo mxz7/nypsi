@@ -201,11 +201,12 @@
       "quarry_scrap": 3,
       "big_tiddy_goth_gf": 20,
       "69420_crate": 40,
-      "banana_seed": 1,
+      "banana_seed": 0.5,
       "fertiliser": 10,
       "toe": 50,
       "pumpkin": 10,
-      "christmas_tree": 15
+      "christmas_tree": 15,
+      "wheat_seed": 1
     }
   },
   "daily_scratch_card": {
@@ -261,7 +262,8 @@
       "unbreaking": 2,
       "mango_seed": 4,
       "pumpkin": 80,
-      "christmas_tree": 100
+      "christmas_tree": 100,
+      "wheat_seed": 25
     }
   },
   "lucky_scratch_card": {
