@@ -315,6 +315,7 @@
       "omega_crate": 0.05,
       "apple_seed": 7,
       "stick": 5,
+      "rice_seed": 50,
       "fertiliser": {
         "weight": 15,
         "count": 10

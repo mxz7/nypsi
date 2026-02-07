@@ -3633,7 +3633,7 @@
     "article": "a",
     "plural": "wheat seeds",
     "emoji": "<:wheat_seed:1469345193630240959>",
-    "longDesc": "plant to grow a wheat crop",
+    "longDesc": "plant to grow a wheat plant",
     "rarity": 1,
     "role": "seed",
     "plantId": "wheat_plant",
@@ -3653,6 +3653,34 @@
     "role": "sellable",
     "buy": 0,
     "sell": 3000,
+    "in_crates": false
+  },
+  "rice_seed": {
+    "id": "rice_seed",
+    "name": "rice seed",
+    "article": "a",
+    "plural": "rice seeds",
+    "emoji": "<:wheat_seed:1469345193630240959>",
+    "longDesc": "plant to grow a rice plant",
+    "rarity": 1,
+    "role": "seed",
+    "plantId": "rice_plant",
+    "buy": 0,
+    "sell": 10000,
+    "in_crates": true,
+    "aliases": ["rseed"]
+  },
+  "rice": {
+    "id": "rice",
+    "name": "rice",
+    "article": "a",
+    "plural": "rice",
+    "emoji": "🍚",
+    "longDesc": "delicious with chicken",
+    "rarity": 69,
+    "role": "sellable",
+    "buy": 0,
+    "sell": 2000,
     "in_crates": false
   }
 }

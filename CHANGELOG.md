@@ -2,7 +2,7 @@
 
 - add rick roll achievement (with rick astley tag)
 - improve event rewards
-- add wheat plant
+- add wheat & rice plants
 
 # january 2026
 

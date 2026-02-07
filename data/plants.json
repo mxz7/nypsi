@@ -143,6 +143,24 @@
         "every": 1.037e6,
         "dead": 3.456e6
       }
+    },
+    "rice_plant": {
+      "id": "rice_plant",
+      "name": "rice plant",
+      "growthTime": 115200,
+      "hourly": 1.2,
+      "max": 3,
+      "item": "rice",
+      "type": "plant",
+      "type_plural": "plants",
+      "water": {
+        "every": 259200,
+        "dead": 604800
+      },
+      "fertilise": {
+        "every": 1.037e6,
+        "dead": 3.456e6
+      }
     }
   },
   "upgrades": {
