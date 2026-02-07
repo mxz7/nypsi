@@ -325,18 +325,18 @@ async function run(
       return send({ embeds: [new ErrorEmbed(`you don't have this many ${selected.name}`)] });
 
     const bakeryUpgrades = await getBakeryUpgrades(message.member);
+    const maxUses = getBakeryUpgradesData()[selected.id].max;
 
-    if (getBakeryUpgradesData()[selected.id].max) {
+    if (maxUses) {
       const current = bakeryUpgrades.find((i) => i.upgradeId === selected.id)?.amount || 0;
 
-      if (current + amount > getBakeryUpgradesData()[selected.id].max)
+      if (current >= maxUses) {
         return send({
-          embeds: [
-            new ErrorEmbed(
-              `you can only use ${getBakeryUpgradesData()[selected.id].max} of this item`,
-            ),
-          ],
+          embeds: [new ErrorEmbed(`you have already used the maximum amount of this item`)],
         });
+      }
+
+      if (current + amount > maxUses) amount = maxUses - current;
     }
 
     await removeInventoryItem(message.member, selected.id, amount);
