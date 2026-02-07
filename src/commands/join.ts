@@ -2,7 +2,7 @@ import { CommandInteraction, GuildMember, Message, MessageFlags, SectionBuilder 
 import { sort } from "fast-sort";
 import redis from "../init/redis";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
-import { CustomContainer, CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { CustomContainer, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { daysAgo, formatDate } from "../utils/functions/date";
 import { getAllMembers } from "../utils/functions/guilds/members";
@@ -53,12 +53,7 @@ async function run(
     if (members.size > 2000) {
       if (members.size > 5000)
         msg = await message.channel.send({
-          embeds: [
-            new CustomEmbed(
-              message.member,
-              `sorting ${membersSorted.length.toLocaleString()} members..`,
-            ),
-          ],
+          content: `sorting ${membersSorted.length.toLocaleString()} members..`,
         });
 
       membersSorted = await workerSort(
