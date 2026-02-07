@@ -5,6 +5,8 @@ import Constants from "../../Constants";
 import { Mutex } from "../mutex";
 import ms = require("ms");
 
+const mutex = new Mutex(true);
+
 async function getDatabaseMembers(guildId: string) {
   const cache = await redis.get(`${Constants.redis.cache.guild.MEMBERS}:${guildId}`);
 
@@ -47,8 +49,6 @@ async function checkMembers(guildId: string, discordMembers: string[]) {
     redis.del(`${Constants.redis.cache.guild.MEMBERS}:${guildId}`);
   }
 }
-
-const mutex = new Mutex();
 
 export async function getAllMembers(
   guild: Guild,

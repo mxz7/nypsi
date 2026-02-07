@@ -3,8 +3,17 @@ import { logger } from "../logger";
 export class Mutex {
   private locks = new Map<string, { locked: boolean; queue: (() => void)[] }>();
 
+  private shouldLog: boolean;
+
+  constructor(shouldLog = false) {
+    this.shouldLog = shouldLog;
+  }
+
   async acquire(key: string): Promise<void> {
-    logger.debug(`mutex: requested ${key}`);
+    if (this.shouldLog) {
+      logger.debug(`mutex: requested ${key}`);
+    }
+
     if (!this.locks.has(key)) {
       this.locks.set(key, { locked: false, queue: [] });
     }
@@ -12,21 +21,28 @@ export class Mutex {
     const lock = this.locks.get(key)!;
 
     if (!lock.locked) {
-      logger.debug(`mutex: acquired instantly ${key}`);
+      if (this.shouldLog) {
+        logger.debug(`mutex: acquired instantly ${key}`);
+      }
       lock.locked = true;
       return;
     }
 
     return new Promise((resolve) => {
       lock.queue.push(() => {
-        logger.debug(`mutex: acquired ${key}`);
+        if (this.shouldLog) {
+          logger.debug(`mutex: acquired ${key}`);
+        }
         resolve();
       });
     });
   }
 
   release(key: string): void {
-    logger.debug(`mutex: release ${key}`);
+    if (this.shouldLog) {
+      logger.debug(`mutex: release ${key}`);
+    }
+
     const lock = this.locks.get(key);
     if (!lock) return;
 
