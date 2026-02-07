@@ -381,7 +381,9 @@
           "min": 5,
           "max": 150
         }
-      }
+      },
+      "wheat_seed": 50,
+      "rice_seed": 60
     }
   },
   "legendary_scratch_card": {
