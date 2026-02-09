@@ -92,7 +92,8 @@ authedApp.post("/pausestreak", async (c) => {
   return c.body("streaks will be paused for the next 24 hours", 200);
 });
 
-authedApp.route("/vote", voteController);
+app.route("/vote", voteController);
+
 authedApp.route("/kofi", kofiController);
 authedApp.route("/items", itemController);
 
