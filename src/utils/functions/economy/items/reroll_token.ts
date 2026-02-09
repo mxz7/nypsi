@@ -34,7 +34,9 @@ module.exports = new ItemUse(
         ],
       });
 
-    if (upgrades.length >= maxPrestige) {
+    const upgradesCount = upgrades.reduce((total, upgrade) => total + upgrade.amount, 0);
+
+    if (upgradesCount >= maxPrestige) {
       return ItemUse.send(message, { embeds: [new ErrorEmbed("you already have all upgrades")] });
     }
 
