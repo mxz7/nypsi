@@ -396,6 +396,9 @@ export default async function messageCreate(message: Message) {
   if (message.channel.isVoiceBased()) return;
   if (!message.member) return;
 
+  message.content = message.content.replace(removeExtraSpacesRegex, ""); // remove any additional spaces
+  const lowercaseContent = message.content.toLowerCase();
+
   const checkTask = async () => {
     await sleep(500);
 
@@ -429,7 +432,7 @@ export default async function messageCreate(message: Message) {
 
     if (!lastContents) {
       lastContent.set(message.author.id, {
-        history: [message.content.toLowerCase()],
+        history: [lowercaseContent],
         last: Date.now(),
       });
     } else {
@@ -439,7 +442,7 @@ export default async function messageCreate(message: Message) {
         fail = true;
       } else {
         for (const content of lastContents.history) {
-          const similarity = compareTwoStrings(content, message.content.toLowerCase());
+          const similarity = compareTwoStrings(content, lowercaseContent);
 
           if (similarity > 80) {
             fail = true;
@@ -448,7 +451,7 @@ export default async function messageCreate(message: Message) {
         }
       }
 
-      lastContents.history.push(message.content.toLowerCase());
+      lastContents.history.push(lowercaseContent);
       lastContents.last = Date.now();
       if (lastContents.history.length >= 3) lastContents.history.shift();
 
@@ -474,7 +477,7 @@ export default async function messageCreate(message: Message) {
       (await getLastCommand(message.member)).getTime() > Date.now() - ms("1 day")
     ) {
       for (const brainrot of brainrotFilter) {
-        if (message.content.toLowerCase().includes(brainrot)) {
+        if (lowercaseContent.includes(brainrot)) {
           const amounts = [5, 10, 25, 50, 75];
           const chosen = amounts[Math.floor(Math.random() * amounts.length)];
 
@@ -516,8 +519,6 @@ export default async function messageCreate(message: Message) {
       });
   }
 
-  message.content = message.content.replace(removeExtraSpacesRegex, ""); // remove any additional spaces
-
   if (
     (await hasGuild(message.guild)) &&
     !message.member.permissions.has(PermissionsBitField.Flags.ManageMessages)
@@ -534,14 +535,16 @@ export default async function messageCreate(message: Message) {
 
   if (message.client.user.id == "685193083570094101") prefixes.push("£");
 
-  for (const prefix of prefixes) {
-    if (message.content.startsWith(prefix) && !(await isSlashOnly(message.guild))) {
-      const args = message.content.substring(prefix.length).split(" ");
+  if (!(await isSlashOnly(message.guild))) {
+    for (const prefix of prefixes) {
+      if (message.content.startsWith(prefix)) {
+        const args = message.content.substring(prefix.length).split(" ");
 
-      const cmd = args[0].toLowerCase();
+        const cmd = args[0].toLowerCase();
 
-      runCommand(cmd, message as NypsiMessage, args);
-      break;
+        runCommand(cmd, message as NypsiMessage, args);
+        break;
+      }
     }
   }
 
@@ -552,7 +555,7 @@ export default async function messageCreate(message: Message) {
       (await getKarma(message.guild.ownerId)) >= 10 ||
       (await getLastCommand(message.guild.ownerId)).getTime() >= Date.now() - ms("30 days"))
   ) {
-    let mentionMembers: string[] = [];
+    const mentionMembers = new Set<string>();
 
     if (message.mentions.everyone) {
       if (message.guild.members.cache.size != message.guild.memberCount) {
@@ -566,34 +569,26 @@ export default async function messageCreate(message: Message) {
         members = members.cache;
       }
 
-      mentionMembers = Array.from(members.mapValues((m) => m.user.id).values());
+      members.forEach((m) => mentionMembers.add(m.user.id));
     } else if (message.mentions.roles.first()) {
       if (message.guild.members.cache.size != message.guild.memberCount) {
         await getAllMembers(message.guild, true);
       }
 
       message.mentions.roles.forEach((r) => {
-        r.members.forEach((m) => {
-          if (!mentionMembers.includes(m.user.id)) {
-            mentionMembers.push(m.user.id);
-          }
-        });
+        r.members.forEach((m) => mentionMembers.add(m.user.id));
       });
     }
 
     if (message.mentions?.members?.size > 0) {
       if (mentionMembers) {
-        message.mentions.members.forEach((m) => {
-          if (!mentionMembers.includes(m.user.id)) {
-            mentionMembers.push(m.user.id);
-          }
-        });
+        message.mentions.members.forEach((m) => mentionMembers.add(m.user.id));
       } else {
-        mentionMembers = Array.from(message.mentions.members.mapValues((m) => m.user.id).values());
+        message.mentions.members.forEach((m) => mentionMembers.add(m.user.id));
       }
     }
 
-    if (mentionMembers.length > 0) {
+    if (mentionMembers.size > 0) {
       let channelMembers: Collection<string, GuildMember | ThreadMember> | ThreadMemberManager =
         message.channel.members;
 
@@ -604,7 +599,7 @@ export default async function messageCreate(message: Message) {
       await redis.rpush(
         Constants.redis.nypsi.MENTION_QUEUE,
         JSON.stringify({
-          members: mentionMembers,
+          members: [...mentionMembers],
           channelMembers: Array.from(channelMembers.mapValues((m) => m.user.id).values()),
           content:
             message.content.length > 100
