@@ -93,8 +93,8 @@ authedApp.post("/pausestreak", async (c) => {
 });
 
 app.route("/vote", voteController);
+app.route("/kofi", kofiController);
 
-authedApp.route("/kofi", kofiController);
 authedApp.route("/items", itemController);
 
 app.route("/", authedApp);
