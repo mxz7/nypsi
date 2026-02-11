@@ -46,9 +46,9 @@ async function run(
 
   const desc = [
     `- $**${amount.toLocaleString()}**`,
-    `- \`${pickaxes}\` ${items["wooden_pickaxe"].emoji} ${items["wooden_pickaxe"].name}`,
-    `- \`${fishingRods}\` ${items["terrible_fishing_rod"].emoji} ${items["terrible_fishing_rod"].name}`,
-    `- \`${guns}\` ${items["terrible_gun"].emoji} ${items["terrible_gun"].name}`,
+    `- \`${pickaxes}x\` ${items["wooden_pickaxe"].emoji} ${items["wooden_pickaxe"].name}`,
+    `- \`${fishingRods}x\` ${items["terrible_fishing_rod"].emoji} ${items["terrible_fishing_rod"].name}`,
+    `- \`${guns}x\` ${items["terrible_gun"].emoji} ${items["terrible_gun"].name}`,
   ];
 
   const embed = new CustomEmbed(message.member, desc.join("\n")).setHeader(
