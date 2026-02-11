@@ -134,7 +134,15 @@ export async function calcEarnedGambleXp(
 
   let maxBetAdjusted = maxBet;
 
-  if (rawLevel < 500) {
+  if (rawLevel < 100) {
+    maxBetAdjusted = maxBetAdjusted * 0.05;
+  } else if (rawLevel < 200) {
+    maxBetAdjusted = maxBetAdjusted * 0.1;
+  } else if (rawLevel < 300) {
+    maxBetAdjusted = maxBetAdjusted * 0.15;
+  } else if (rawLevel < 400) {
+    maxBetAdjusted = maxBetAdjusted * 0.2;
+  } else if (rawLevel < 500) {
     maxBetAdjusted = maxBetAdjusted * 0.25;
   } else if (rawLevel < 750) {
     maxBetAdjusted = maxBetAdjusted * 0.5;

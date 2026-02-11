@@ -670,7 +670,7 @@ export async function calcMaxBet(member: MemberResolvable): Promise<number> {
 }
 
 export async function getRequiredBetForXp(member: MemberResolvable): Promise<number> {
-  let requiredBet = 1000;
+  let requiredBet = 500;
 
   const level = await getRawLevel(member);
 
