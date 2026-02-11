@@ -4,7 +4,17 @@ import redis from "../../../init/redis";
 import Constants from "../../Constants";
 import ms = require("ms");
 
+const slashOnlyCache = new Map<string, boolean>();
+
+setInterval(() => {
+  slashOnlyCache.clear();
+}, 300000);
+
 export async function isSlashOnly(guild: Guild) {
+  if (slashOnlyCache.has(guild.id)) {
+    return slashOnlyCache.get(guild.id);
+  }
+
   if (await redis.exists(`${Constants.redis.cache.guild.SLASH_ONLY}:${guild.id}`)) {
     return (await redis.get(`${Constants.redis.cache.guild.SLASH_ONLY}:${guild.id}`)) === "t";
   }
@@ -36,6 +46,8 @@ export async function isSlashOnly(guild: Guild) {
     );
   }
 
+  slashOnlyCache.set(guild.id, res);
+
   return res;
 }
 
@@ -50,4 +62,5 @@ export async function setSlashOnly(guild: Guild, bool: boolean) {
   });
 
   await redis.del(`${Constants.redis.cache.guild.SLASH_ONLY}:${guild.id}`);
+  slashOnlyCache.delete(guild.id);
 }

@@ -23,6 +23,14 @@ import { isAltPunish } from "./altpunish";
 import ms = require("ms");
 
 const snipeFilterCache = new Map<string, string[]>();
+const chatFilterCache = new Map<
+  string,
+  { content: string; percentMatch: number; guildId: string }[]
+>();
+
+setInterval(() => {
+  chatFilterCache.clear();
+}, 10000);
 
 export async function getSnipeFilter(guild: Guild): Promise<string[]> {
   if (snipeFilterCache.has(guild.id)) {
@@ -70,6 +78,10 @@ export async function getChatFilter(guild: Guild | string): Promise<
 > {
   const guildId = typeof guild === "string" ? guild : guild.id;
 
+  if (chatFilterCache.has(guildId)) {
+    return chatFilterCache.get(guildId);
+  }
+
   const cache = await redis.get(`${Constants.redis.cache.guild.CHATFILTER}:${guildId}`);
 
   if (cache) return JSON.parse(cache);
@@ -87,6 +99,8 @@ export async function getChatFilter(guild: Guild | string): Promise<
     3600,
   );
 
+  chatFilterCache.set(guildId, query);
+
   return query;
 }
 
@@ -101,6 +115,7 @@ export async function deleteChatFilterWord(guildId: string, content: string) {
   });
 
   await redis.del(`${Constants.redis.cache.guild.CHATFILTER}:${guildId}`);
+  chatFilterCache.delete(guildId);
 }
 
 export async function addChatFilterWord(guildId: string, content: string, percentMatch?: number) {
@@ -113,6 +128,7 @@ export async function addChatFilterWord(guildId: string, content: string, percen
   });
 
   await redis.del(`${Constants.redis.cache.guild.CHATFILTER}:${guildId}`);
+  chatFilterCache.delete(guildId);
 }
 
 export async function checkMessageContent(
@@ -143,96 +159,98 @@ export async function checkMessageContent(
   modlog: boolean,
   message?: Message,
 ): Promise<boolean> {
-  {
-    const filter = await getChatFilter(guild);
+  const filter = await getChatFilter(guild);
 
-    content = content.toLowerCase().normalize("NFD");
+  if (filter.length === 0) {
+    return true;
+  }
 
-    if (content.length >= 69) {
-      for (const word of filter) {
-        if (word.content.includes(" ")) {
-          if (content.includes(word.content)) {
-            const contentModified = content.replace(word.content, `**${word.content}**`);
-            if (modlog && guild instanceof Guild) {
-              addModLog(
-                guild,
-                "filter violation",
-                message.author.id,
-                guild.client.user,
-                contentModified,
-                -1,
-                message.channelId,
-              );
-              await message.delete().catch(() => {});
-            }
-            return false;
+  content = content.toLowerCase().normalize("NFD");
+
+  if (content.length >= 69) {
+    for (const word of filter) {
+      if (word.content.includes(" ")) {
+        if (content.includes(word.content)) {
+          const contentModified = content.replace(word.content, `**${word.content}**`);
+          if (modlog && guild instanceof Guild) {
+            addModLog(
+              guild,
+              "filter violation",
+              message.author.id,
+              guild.client.user,
+              contentModified,
+              -1,
+              message.channelId,
+            );
+            await message.delete().catch(() => {});
           }
-        } else {
-          if (content.split(" ").indexOf(word.content) != -1) {
-            const contentModified = content.replace(word.content, `**${word.content}**`);
-            if (modlog && guild instanceof Guild) {
-              addModLog(
-                guild,
-                "filter violation",
-                message.author.id,
-                guild.client.user,
-                contentModified,
-                -1,
-                message.channelId,
-              );
-              await message.delete().catch(() => {});
-            }
-            return false;
+          return false;
+        }
+      } else {
+        if (content.split(" ").indexOf(word.content) != -1) {
+          const contentModified = content.replace(word.content, `**${word.content}**`);
+          if (modlog && guild instanceof Guild) {
+            addModLog(
+              guild,
+              "filter violation",
+              message.author.id,
+              guild.client.user,
+              contentModified,
+              -1,
+              message.channelId,
+            );
+            await message.delete().catch(() => {});
           }
+          return false;
         }
       }
-    } else {
-      for (const word of filter) {
-        if (word.content.includes(" ")) {
-          if (content.includes(word.content)) {
-            const contentModified = content.replace(word.content, `**${word.content}**`);
+    }
+  } else {
+    for (const word of filter) {
+      if (word.content.includes(" ")) {
+        if (content.includes(word.content)) {
+          const contentModified = content.replace(word.content, `**${word.content}**`);
+          if (modlog && guild instanceof Guild) {
+            addModLog(
+              guild,
+              "filter violation",
+              message.author.id,
+              guild.client.user,
+              contentModified,
+              -1,
+              message.channelId,
+            );
+            await message.delete().catch(() => {});
+          }
+          return false;
+        }
+      } else {
+        for (const contentWord of content.split(" ")) {
+          const similarity = stringSimilarity.compareTwoStrings(word.content, contentWord);
+
+          if (similarity >= (word.percentMatch || 100) / 100) {
+            const contentModified = content.replace(contentWord, `**${contentWord}**`);
+
             if (modlog && guild instanceof Guild) {
               addModLog(
-                guild,
+                message.guild,
                 "filter violation",
                 message.author.id,
-                guild.client.user,
+                message.client.user,
                 contentModified,
                 -1,
-                message.channelId,
+                message.channel.id,
+                (similarity * 100).toFixed(2),
               );
               await message.delete().catch(() => {});
             }
             return false;
-          }
-        } else {
-          for (const contentWord of content.split(" ")) {
-            const similarity = stringSimilarity.compareTwoStrings(word.content, contentWord);
-
-            if (similarity >= (word.percentMatch || 100) / 100) {
-              const contentModified = content.replace(contentWord, `**${contentWord}**`);
-
-              if (modlog && guild instanceof Guild) {
-                addModLog(
-                  message.guild,
-                  "filter violation",
-                  message.author.id,
-                  message.client.user,
-                  contentModified,
-                  -1,
-                  message.channel.id,
-                  (similarity * 100).toFixed(2),
-                );
-                await message.delete().catch(() => {});
-              }
-              return false;
-            }
           }
         }
       }
     }
-    return true;
   }
+  return true;
 }
 
 export async function checkAutoMute(message: Message) {

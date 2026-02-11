@@ -12,6 +12,15 @@ const peaks = new Map<string, number>();
 const names = new Map<string, string>();
 const icons = new Map<string, string>();
 
+// guildid => value
+const prefixCache = new Map<string, string[]>();
+const guildExistsCache = new Map<string, boolean>();
+
+setInterval(() => {
+  prefixCache.clear();
+  guildExistsCache.clear();
+}, 300000);
+
 export { eSnipe, snipe };
 
 export function runSnipeClearIntervals() {
@@ -104,6 +113,10 @@ export async function hasGuild(guild: Guild | string): Promise<boolean> {
     guildId = guild;
   }
 
+  if (guildExistsCache.has(guildId)) {
+    return guildExistsCache.get(guildId);
+  }
+
   if (await redis.exists(`${Constants.redis.cache.guild.EXISTS}:${guildId}`)) return true;
   const query = await prisma.guild.findUnique({
     where: {
@@ -113,6 +126,8 @@ export async function hasGuild(guild: Guild | string): Promise<boolean> {
       id: true,
     },
   });
+
+  guildExistsCache.set(guildId, Boolean(query));
 
   if (query) {
     await redis.set(
@@ -186,6 +201,10 @@ export async function getPrefix(guild: Guild | string): Promise<string[]> {
   }
 
   try {
+    if (prefixCache.has(guildId)) {
+      return prefixCache.get(guildId);
+    }
+
     if (await redis.exists(`${Constants.redis.cache.guild.PREFIX}:${guildId}`)) {
       return (await redis.get(`${Constants.redis.cache.guild.PREFIX}:${guildId}`)).split(" ");
     }
@@ -218,6 +237,8 @@ export async function getPrefix(guild: Guild | string): Promise<string[]> {
       ms("24 hour") / 1000,
     );
 
+    prefixCache.set(guildId, query.prefixes);
+
     return query.prefixes;
   } catch {
     if (!(await hasGuild(guild))) await createGuild(guild);
@@ -237,6 +258,7 @@ export async function setPrefix(guild: Guild, prefix: string[]) {
   });
 
   await redis.del(`${Constants.redis.cache.guild.PREFIX}:${guild.id}`);
+  prefixCache.delete(guild.id);
 }
 
 export async function getGuildName(id: string) {
