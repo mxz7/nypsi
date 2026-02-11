@@ -12,17 +12,23 @@ import {
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { daysAgo, formatDate } from "../utils/functions/date";
 import {
   addInventoryItem,
   getInventory,
   removeInventoryItem,
 } from "../utils/functions/economy/inventory";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
-import { escapeFormattingCharacters } from "../utils/functions/string";
+import { escapeFormattingCharacters, pluralize } from "../utils/functions/string";
 import { addMarriage, isMarried } from "../utils/functions/users/marriage";
+import { getLastKnownUsername } from "../utils/functions/users/username";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("marry", "marry your ekitten", "fun").setAliases(["propose"]);
+const cmd = new Command("marry", "marry your ekitten", "fun").setAliases([
+  "propose",
+  "wife",
+  "husband",
+]);
 
 cmd.slashEnabled = true;
 
@@ -56,25 +62,31 @@ async function run(
 
   if (!(await userExists(message.member))) await createUser(message.member);
 
-  if (args.length != 1) {
-    return send({ embeds: [new ErrorEmbed("/marry <user>")] });
-  }
+  const currentMarriage = await isMarried(message.member);
 
-  if (await isMarried(message.member))
-    return send({
-      embeds: [
-        new ErrorEmbed("you are already married").setFooter({
-          text: "divorce your current partner with /divorce",
-        }),
-      ],
-      flags: MessageFlags.Ephemeral,
-    });
+  if (currentMarriage) {
+    const embed = new CustomEmbed(message.member).setHeader("marriage", message.author.avatarURL());
+
+    const username = await getLastKnownUsername(currentMarriage.partnerId);
+    const days = daysAgo(currentMarriage.marriageStart);
+
+    embed.setDescription(
+      `${getItems()["ring"].emoji} you have been married to **${username}** since ${formatDate(currentMarriage.marriageStart)}` +
+        `\n> **${days}** ${pluralize("day", days)} ago`,
+    );
+
+    return send({ embeds: [embed] });
+  }
 
   if (!(await getInventory(message.member)).has("ring")) {
     return send({
       embeds: [new ErrorEmbed("you must have a ring to propose to someone")],
       flags: MessageFlags.Ephemeral,
     });
+  }
+
+  if (args.length < 1) {
+    return send({ embeds: [new ErrorEmbed("/marry <user>")] });
   }
 
   if (requesting.has(message.member.id)) {
