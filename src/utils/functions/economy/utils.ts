@@ -783,9 +783,17 @@ export async function doDaily(
 
   promises.push(async () => {
     await addBalance(member, totalMoney);
-    if (!rerun) await updateLastDaily(member, updateLast, amount);
+  });
+
+  promises.push(async () => {
     await addInventoryItem(member, "daily_scratch_card", amount);
   });
+
+  if (!rerun) {
+    promises.push(async () => {
+      await updateLastDaily(member, updateLast, amount);
+    });
+  }
 
   await pAll(promises, { concurrency: 3 });
 
