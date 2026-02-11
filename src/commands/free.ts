@@ -35,7 +35,9 @@ async function run(
 
   const level = await getRawLevel(message.member);
 
-  const cooldown = baseCooldown + cooldownPerPrestige * (level / 100);
+  let cooldown = baseCooldown + cooldownPerPrestige * (level / 100);
+
+  if (cooldown > ms("2 hours")) cooldown = ms("2 hours");
 
   await addCooldown(cmd.name, message.member, Math.floor(cooldown / 1000));
 
