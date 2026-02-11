@@ -720,6 +720,7 @@ export async function doDaily(
   let totalXp = 0;
   let totalCards = amount;
   let marriageBonus = false;
+  let valentinesBonus = false;
 
   const totalRewards = new Map<string, number>();
 
@@ -769,6 +770,14 @@ export async function doDaily(
     const lastDaily = await getLastDaily(marriage.partnerId);
 
     const today = dayjs().set("hour", 0).set("minute", 0).set("second", 0).set("millisecond", 0);
+
+    if (today.date() === 14 && today.month() === 2) {
+      valentinesBonus = true;
+
+      totalCards += 2;
+      totalMoney *= 5;
+      totalXp *= 5;
+    }
 
     if (lastDaily && dayjs(lastDaily).isAfter(today)) {
       marriageBonus = true;
@@ -846,6 +855,10 @@ export async function doDaily(
 
   if (marriageBonus && marriage) {
     desc += `\n💍 **${await getLastKnownUsername(marriage.partnerId)}** marriage bonus`;
+  }
+
+  if (valentinesBonus && marriage) {
+    desc += `\n❤️ **valentine's day** bonus! tell ${await getLastKnownUsername(marriage.partnerId)} you love them`;
   }
 
   const embed = new CustomEmbed(member);

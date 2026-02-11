@@ -3,6 +3,7 @@
 - add rick roll achievement (with rick astley tag)
 - improve event rewards
 - add wheat & rice plants
+- add daily bonus for married players, and special bonus for valentines day
 
 # january 2026
 
