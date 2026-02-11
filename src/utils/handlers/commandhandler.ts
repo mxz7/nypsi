@@ -661,11 +661,24 @@ export async function runCommand(
         if (!cmd) return;
         const owner = recentlyUsedUserAliases.get(message.channel.id).get(cmd);
 
+        const premium = await isPremium(message.member);
+        const command = await getUserAliases(message.author.id).then((r) =>
+          r.find((a) => a.alias === cmd),
+        );
+
+        let commandString = cmd;
+
+        const prefixes = await getPrefix(message.guild);
+
+        if (command) {
+          const prefix = prefixes[0];
+          commandString = `'${prefix}${cmd}' -> ${prefix}${command.command}`;
+        }
+
         return message.channel.send({
           embeds: [
             new ErrorEmbed(
-              `\`${cmd}\` is a custom alias owned by **${owner.replaceAll("_", "\\_")}**. to create your own custom aliases you need a premium membership\n` +
-                "/premium",
+              `\`${commandString}\` is a custom alias owned by **${owner.replaceAll("_", "\\_")}**${!premium ? "\n\nto create your own custom aliases you need a premium membership: /premium" : ""}`,
             ),
           ],
         });
