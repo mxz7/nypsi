@@ -406,8 +406,8 @@
     "aliases": ["wpickaxe", "wpick"],
     "role": "tool",
     "rarity": 0,
-    "buy": 30000,
-    "sell": 5000,
+    "buy": 15000,
+    "sell": 2000,
     "in_crates": true
   },
   "iron_pickaxe": {
@@ -451,8 +451,8 @@
     "aliases": ["tfishing", "tfish"],
     "role": "tool",
     "rarity": 0,
-    "buy": 30000,
-    "sell": 5000,
+    "buy": 15000,
+    "sell": 2000,
     "in_crates": true
   },
   "fishing_rod": {
@@ -520,8 +520,8 @@
     "aliases": ["tgun"],
     "role": "tool",
     "rarity": 0,
-    "buy": 30000,
-    "sell": 5000,
+    "buy": 15000,
+    "sell": 2000,
     "in_crates": true
   },
   "gun": {
