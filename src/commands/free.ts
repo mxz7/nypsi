@@ -3,6 +3,7 @@ import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../
 import { CustomEmbed } from "../models/EmbedBuilders.js";
 import { addBalance } from "../utils/functions/economy/balance";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
+import { getRawLevel } from "../utils/functions/economy/levelling";
 import { addStat } from "../utils/functions/economy/stats";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
@@ -29,7 +30,14 @@ async function run(
 
   if (!(await userExists(message.member))) await createUser(message.member);
 
-  await addCooldown(cmd.name, message.member, ms("30 minutes") / 1000);
+  const baseCooldown = ms("20 minutes");
+  const cooldownPerPrestige = ms("10 minutes");
+
+  const level = await getRawLevel(message.member);
+
+  const cooldown = baseCooldown + cooldownPerPrestige * (level / 100);
+
+  await addCooldown(cmd.name, message.member, Math.floor(cooldown));
 
   const amount = 10_000;
   const pickaxes = Math.floor(Math.random() * 9) + 1;
