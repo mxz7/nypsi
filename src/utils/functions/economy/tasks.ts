@@ -5,6 +5,7 @@ import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { Item } from "../../../types/Economy";
 import { Task } from "../../../types/Tasks";
 import Constants from "../../Constants";
+import { logger } from "../../logger";
 import { addKarma } from "../karma/karma";
 import { getUserId, MemberResolvable } from "../member";
 import sleep from "../sleep";
@@ -267,6 +268,7 @@ export async function addTaskProgress(member: MemberResolvable, taskId: string, 
   await redis.del(`${Constants.redis.cache.economy.TASKS}:${userId}`);
 
   if (Number(task.progress) + amount >= Number(task.target)) {
+    logger.info(`task: ${userId} completed ${taskId}`, { task });
     await prisma.task.update({
       where: {
         user_id_task_id: {
