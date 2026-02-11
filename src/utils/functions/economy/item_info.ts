@@ -253,7 +253,11 @@ export async function runItemInfo(
         .catch(() => {});
 
       if (!res) {
-        msg.edit({ components: [] });
+        if (msg.components.length > 1 && tabName === "general") {
+          msg.edit({ components: msg.components.slice(1) });
+        } else {
+          msg.edit({ components: [] });
+        }
         return;
       }
 
