@@ -37,7 +37,7 @@ async function run(
 
   let cooldown = baseCooldown + cooldownPerPrestige * (level / 100);
 
-  if (cooldown > ms("2 hours")) cooldown = ms("2 hours");
+  if (cooldown > ms("3 hours")) cooldown = ms("3 hours");
 
   await addCooldown(cmd.name, message.member, Math.floor(cooldown / 1000));
 
