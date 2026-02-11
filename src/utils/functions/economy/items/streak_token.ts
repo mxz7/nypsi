@@ -48,7 +48,7 @@ module.exports = new ItemUse(
     await removeInventoryItem(message.member, "streak_token", amount);
     await addStat(message.member, "streak_token", amount);
 
-    const embed = await doDaily(message.member, false, amount, true);
+    const embed = await doDaily(message.member, false, amount, false, true);
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
