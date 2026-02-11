@@ -37,7 +37,7 @@ async function run(
 
   const cooldown = baseCooldown + cooldownPerPrestige * (level / 100);
 
-  await addCooldown(cmd.name, message.member, Math.floor(cooldown));
+  await addCooldown(cmd.name, message.member, Math.floor(cooldown / 1000));
 
   const amount = 10_000;
   const pickaxes = Math.floor(Math.random() * 9) + 1;
