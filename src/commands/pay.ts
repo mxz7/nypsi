@@ -21,7 +21,11 @@ import { getMember } from "../utils/functions/member";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { escapeFormattingCharacters } from "../utils/functions/string";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
-import { getDmSettings } from "../utils/functions/users/notifications";
+import {
+  addInlineNotification,
+  addNotificationToQueue,
+  getDmSettings,
+} from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { transaction } from "../utils/logger";
 import dayjs = require("dayjs");
@@ -153,22 +157,19 @@ async function run(
     addStat(target, "earned-pay", amount);
   }
 
-  if ((await getDmSettings(target)).payment) {
-    const embed = new CustomEmbed(
-      target,
-      `**${escapeFormattingCharacters(message.author.username)}** has sent you $**${Math.floor(
-        amount - taxedAmount,
-      ).toLocaleString()}**`,
-    )
-      .setHeader("you have received a payment")
-      .setFooter({ text: "/settings me notifications" });
+  const notificationEmbed = new CustomEmbed(
+    target,
+    `**${escapeFormattingCharacters(message.author.username)}** has sent you $**${Math.floor(
+      amount - taxedAmount,
+    ).toLocaleString()}**`,
+  )
+    .setHeader("you have received a payment")
+    .setFooter({ text: "/settings me notifications" });
 
-    await target
-      .send({
-        embeds: [embed],
-        content: `you have received $${Math.floor(amount - taxedAmount).toLocaleString()}`,
-      })
-      .catch(() => {});
+  if ((await getDmSettings(target)).payment) {
+    addNotificationToQueue({ memberId: target.user.id, payload: { embed: notificationEmbed } });
+  } else {
+    addInlineNotification({ memberId: target.user.id, embed: notificationEmbed });
   }
 
   const embed = new CustomEmbed(message.member)

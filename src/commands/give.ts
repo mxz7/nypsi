@@ -14,7 +14,11 @@ import { createUser, isEcoBanned, userExists } from "../utils/functions/economy/
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
 import { escapeFormattingCharacters, pluralize } from "../utils/functions/string";
-import { getDmSettings } from "../utils/functions/users/notifications";
+import {
+  addInlineNotification,
+  addNotificationToQueue,
+  getDmSettings,
+} from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { transaction } from "../utils/logger";
 
@@ -153,24 +157,21 @@ async function run(
     removeInventoryItem(message.member, selected.id, amount),
   ]);
 
-  if ((await getDmSettings(target)).payment) {
-    const embed = new CustomEmbed(
-      target,
-      `**${escapeFormattingCharacters(message.author.username)}** has given you ${amount.toLocaleString()} ${selected.emoji} ${
-        selected.name
-      }`,
+  const notificationEmbed = new CustomEmbed(
+    target,
+    `**${escapeFormattingCharacters(message.author.username)}** has given you ${amount.toLocaleString()} ${selected.emoji} ${
+      selected.name
+    }`,
+  )
+    .setHeader(
+      `you have received ${pluralize(`${selected.article} ${selected.name}`, amount, `${amount.toLocaleString()} ${selected.plural}`)}`,
     )
-      .setHeader(
-        `you have received ${pluralize(`${selected.article} ${selected.name}`, amount, `${amount.toLocaleString()} ${selected.plural}`)}`,
-      )
-      .setFooter({ text: "/settings me notifications" });
+    .setFooter({ text: "/settings me notifications" });
 
-    await target
-      .send({
-        embeds: [embed],
-        content: `you have received ${pluralize("an item", amount, `${amount.toLocaleString()} items`)}`,
-      })
-      .catch(() => {});
+  if ((await getDmSettings(target)).payment) {
+    addNotificationToQueue({ memberId: target.user.id, payload: { embed: notificationEmbed } });
+  } else {
+    addInlineNotification({ memberId: target.user.id, embed: notificationEmbed });
   }
 
   transaction(message.author, target.user, "item", amount, selected.id);
