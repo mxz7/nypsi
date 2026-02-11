@@ -986,7 +986,10 @@ export async function runCommand(
         const levelRequirements = getLevelRequirements(rawLevel);
         const preferences = await getPreferences(message.author.id);
 
-        if (percentChance(0.77777) && rawLevel < 250 && preferences.tips) {
+        if (
+          (percentChance(1.5) && rawLevel < 50 && preferences.tips) ||
+          (percentChance(0.77777) && rawLevel < 250 && preferences.tips)
+        ) {
           const tip = tips[Math.floor(Math.random() * tips.length)];
 
           await addInlineNotification({
