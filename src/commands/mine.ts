@@ -98,7 +98,7 @@ async function run(
     return send({
       embeds: [
         new ErrorEmbed(
-          "you need a pickaxe to mine\n[how do i get a pickaxe?](https://nypsi.xyz/docs/economy/fish-hunt-mine?ref=bot-help)",
+          "you need a pickaxe to mine\n[how do i get a pickaxe?](https://nypsi.xyz/docs/economy/fish-hunt-mine?ref=bot-help)\n\nyou can use **/free** to get some basic tools",
         ),
       ],
       flags: MessageFlags.Ephemeral,
