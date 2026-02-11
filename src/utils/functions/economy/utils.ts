@@ -29,7 +29,11 @@ import { getAllGroupAccountIds } from "../moderation/alts";
 import { pluralize } from "../string";
 import { isUserBlacklisted } from "../users/blacklist";
 import { isMarried } from "../users/marriage";
-import { addNotificationToQueue, getDmSettings } from "../users/notifications";
+import {
+  addInlineNotification,
+  addNotificationToQueue,
+  getDmSettings,
+} from "../users/notifications";
 import { getLastKnownAvatar, getLastKnownUsername } from "../users/username";
 import { createProfile, hasProfile } from "../users/utils";
 import { setProgress } from "./achievements";
@@ -792,22 +796,27 @@ export async function doDaily(
       promises.push(() => addXp(marriage.partnerId, marriageXp));
       promises.push(() => addInventoryItem(marriage.partnerId, "daily_scratch_card", 1));
 
+      const embed = new CustomEmbed(marriage.partnerId);
+
+      embed.setHeader("daily", await getLastKnownAvatar(marriage.partnerId));
+      embed.setDescription(
+        `💍 **${await getLastKnownUsername(member.id)}** has done their daily streak!`,
+      );
+      embed.addField(
+        "rewards",
+        `+$**${marriageMoney.toLocaleString()}**` +
+          `\n+ **1** ${items["daily_scratch_card"].emoji} ${pluralize(items["daily_scratch_card"], amount)}`,
+      );
+
       if (marriageDmSettings.other) {
-        const embed = new CustomEmbed(marriage.partnerId);
-
-        embed.setHeader("daily", await getLastKnownAvatar(marriage.partnerId));
-        embed.setDescription(
-          `💍 **${await getLastKnownUsername(member.id)}** has done their daily streak!`,
-        );
-        embed.addField(
-          "rewards",
-          `+$**${marriageMoney.toLocaleString()}**` +
-            `\n+ **1** ${items["daily_scratch_card"].emoji} ${pluralize(items["daily_scratch_card"], amount)}`,
-        );
-
         addNotificationToQueue({
           memberId: marriage.partnerId,
           payload: { embed },
+        });
+      } else {
+        addInlineNotification({
+          memberId: marriage.partnerId,
+          embed,
         });
       }
 
