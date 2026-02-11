@@ -245,7 +245,7 @@ async function fastClickGame(
             time: 30000,
           })
           .catch((err) => {
-            logger.error("lootdrop: awaitInteraction failed in fastClick", { err });
+            logger.error("lootdrop: awaitInteraction failed in fastClick", { err, buttonId });
           });
 
         row.components.forEach((b) => (b.disabled = true));
@@ -622,7 +622,7 @@ async function clickSpecificGame(
             time: 30000,
           })
           .catch((err) =>
-            logger.error("lootdrop: awaitInteraction failed in clickSpecific", { err }),
+            logger.error("lootdrop: awaitInteraction failed in clickSpecific", { err, winningId }),
           );
 
         row.components.forEach((b) => (b.disabled = true));
