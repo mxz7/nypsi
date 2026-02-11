@@ -28,6 +28,9 @@ import { getUserId, MemberResolvable } from "../member";
 import { getAllGroupAccountIds } from "../moderation/alts";
 import { pluralize } from "../string";
 import { isUserBlacklisted } from "../users/blacklist";
+import { isMarried } from "../users/marriage";
+import { addNotificationToQueue, getDmSettings } from "../users/notifications";
+import { getLastKnownAvatar, getLastKnownUsername } from "../users/username";
 import { createProfile, hasProfile } from "../users/utils";
 import { setProgress } from "./achievements";
 import { addBalance, calcMaxBet, getBalance } from "./balance";
@@ -41,6 +44,7 @@ import { addXp } from "./xp";
 import ms = require("ms");
 import math = require("mathjs");
 import pAll = require("p-all");
+import dayjs = require("dayjs");
 
 let items: { [key: string]: Item };
 let achievements: { [key: string]: AchievementData };
@@ -708,28 +712,22 @@ export async function doDaily(
   updateLast = true,
   amount = 1,
   rerun = false,
+  streakToken = false,
 ) {
-  const currentStreak = await getDailyStreak(member);
+  const [currentStreak, marriage] = await Promise.all([getDailyStreak(member), isMarried(member)]);
 
   let totalMoney = 0;
   let totalXp = 0;
+  let totalCards = amount;
+  let marriageBonus = false;
 
   const totalRewards = new Map<string, number>();
 
   const addRewards = (i: number) => {
     const streak = currentStreak + i;
 
-    let money = Math.floor(math.square(streak * 7) + 25_000);
-
-    if (money > 1_000_000) money = 1_000_000;
-
-    let xp = 1;
-
-    if (streak > 5) {
-      xp = Math.floor((streak - 5) / 10);
-    }
-
-    if (xp > 69) xp = 69;
+    const money = getDailyMoney(streak);
+    const xp = getDailyXp(streak);
 
     totalMoney += money;
     totalXp += xp;
@@ -757,18 +755,65 @@ export async function doDaily(
     }
   };
 
-  if (!rerun)
+  if (rerun) {
+    addRewards(0);
+  } else {
     for (let i = 1; i <= amount; i++) {
       addRewards(i);
     }
-  else {
-    addRewards(0);
   }
 
-  const promises = [];
+  const promises: (() => Promise<any>)[] = [];
+
+  if (marriage && !streakToken) {
+    const lastDaily = await getLastDaily(marriage.partnerId);
+
+    const today = dayjs().set("hour", 0).set("minute", 0).set("second", 0).set("millisecond", 0);
+
+    if (lastDaily && dayjs(lastDaily).isAfter(today)) {
+      marriageBonus = true;
+
+      const [marriageStreak, marriageDmSettings] = await Promise.all([
+        getDailyStreak(marriage.partnerId),
+        getDmSettings(marriage.partnerId),
+      ]);
+
+      const marriageMoney = getDailyMoney(marriageStreak);
+      const marriageXp = getDailyXp(marriageStreak);
+
+      promises.push(() => addBalance(marriage.partnerId, marriageMoney));
+      promises.push(() => addXp(marriage.partnerId, marriageXp));
+      promises.push(() => addInventoryItem(marriage.partnerId, "daily_scratch_card", 1));
+
+      if (marriageDmSettings.other) {
+        const embed = new CustomEmbed(marriage.partnerId);
+
+        embed.setHeader("daily", await getLastKnownAvatar(marriage.partnerId));
+        embed.setDescription(
+          `💍 **${await getLastKnownUsername(member.id)}** has done their daily streak!`,
+        );
+        embed.addField(
+          "rewards",
+          `+$**${marriageMoney.toLocaleString()}**` +
+            `\n+ **1** ${items["daily_scratch_card"].emoji} ${pluralize(items["daily_scratch_card"], amount)}`,
+        );
+
+        addNotificationToQueue({
+          memberId: marriage.partnerId,
+          payload: { embed },
+        });
+      }
+
+      // should only get 1 from /daily
+      totalCards = 2;
+      totalMoney *= 2;
+      totalXp *= 2;
+    }
+  }
+
   const rewards: string[] = [
     `+$**${totalMoney.toLocaleString()}**`,
-    `+ ${amount > 1 ? `**${amount.toLocaleString()}** ` : ""}${items["daily_scratch_card"].emoji} ${pluralize(items["daily_scratch_card"], amount)}`,
+    `+ ${totalCards > 1 ? `**${amount.toLocaleString()}** ` : ""}${items["daily_scratch_card"].emoji} ${pluralize(items["daily_scratch_card"], amount)}`,
   ];
 
   for (const [itemId, amount] of totalRewards) {
@@ -786,7 +831,7 @@ export async function doDaily(
   });
 
   promises.push(async () => {
-    await addInventoryItem(member, "daily_scratch_card", amount);
+    await addInventoryItem(member, "daily_scratch_card", totalCards);
   });
 
   if (!rerun) {
@@ -797,11 +842,15 @@ export async function doDaily(
 
   await pAll(promises, { concurrency: 3 });
 
+  let desc = `daily streak: \`${currentStreak}\`${rerun ? "" : ` -> \`${currentStreak + amount}\``}`;
+
+  if (marriageBonus && marriage) {
+    desc += `\n💍 **${await getLastKnownUsername(marriage.partnerId)}** marriage bonus`;
+  }
+
   const embed = new CustomEmbed(member);
   embed.setHeader("daily", member instanceof GuildMember ? member.user.avatarURL() : undefined);
-  embed.setDescription(
-    `daily streak: \`${currentStreak}\`${rerun ? "" : ` -> \`${currentStreak + amount}\``}`,
-  );
+  embed.setDescription(desc);
 
   embed.addField("rewards", rewards.join("\n"));
 
@@ -821,6 +870,26 @@ export async function doDaily(
   addTaskProgress(member, "daily_streaks", amount);
 
   return embed;
+}
+
+function getDailyMoney(currentStreak: number) {
+  let money = Math.floor(math.square(currentStreak * 7) + 25_000);
+
+  if (money > 1_000_000) money = 1_000_000;
+
+  return money;
+}
+
+function getDailyXp(currentStreak: number) {
+  let xp = 1;
+
+  if (currentStreak > 5) {
+    xp = Math.floor((currentStreak - 5) / 10);
+  }
+
+  if (xp > 69) xp = 69;
+
+  return xp;
 }
 
 export async function setDaily(member: MemberResolvable, amount: number) {
