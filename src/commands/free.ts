@@ -45,7 +45,7 @@ async function run(
   const items = getItems();
 
   const desc = [
-    `- $**${amount.toLocaleString()}**`,
+    `- +$**${amount.toLocaleString()}**`,
     `- \`${pickaxes}x\` ${items["wooden_pickaxe"].emoji} ${items["wooden_pickaxe"].name}`,
     `- \`${fishingRods}x\` ${items["terrible_fishing_rod"].emoji} ${items["terrible_fishing_rod"].name}`,
     `- \`${guns}x\` ${items["terrible_gun"].emoji} ${items["terrible_gun"].name}`,
