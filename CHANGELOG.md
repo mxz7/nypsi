@@ -4,6 +4,8 @@
 - improve event rewards
 - add wheat & rice plants
 - add daily bonus for married players, and special bonus for valentines day
+- $freemoney -> /free, gives some free tools, longer cooldown for higher levels
+- with give/pay notifications off, will be received as inline
 
 # january 2026
 
