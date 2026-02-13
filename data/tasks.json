@@ -9,7 +9,7 @@
       "id:legendary_scratch_card:1",
       "karma:750",
       "xp:25000",
-      "id:dabloon:250"
+      "id:dabloon:200"
     ],
     "type": "weekly"
   },
@@ -30,7 +30,7 @@
       "id:basic_crate:2",
       "id:69420_crate:2",
       "xp:1000",
-      "id:dabloon:20",
+      "id:dabloon:10",
       "id:basic_crate:3"
     ],
     "type": "weekly"
@@ -44,7 +44,7 @@
       "id:lucky_scratch_card:2",
       "xp:1500",
       "karma:250",
-      "id:dabloon:50",
+      "id:dabloon:35",
       "id:basic_crate:5"
     ],
     "type": "weekly"
@@ -73,7 +73,6 @@
       "id:69420_crate:1",
       "xp:500",
       "id:lucky_scratch_card:1",
-      "id:dabloon:10",
       "id:basic_crate:2"
     ],
     "type": "daily"
@@ -88,7 +87,7 @@
       "id:69420_crate:5",
       "id:lucky_scratch_card:2",
       "xp:2000",
-      "id:dabloon:50"
+      "id:dabloon:35"
     ],
     "type": "weekly"
   },
@@ -175,7 +174,7 @@
       "xp:2000",
       "karma:300",
       "id:basic_crate:5",
-      "id:dabloon:50"
+      "id:dabloon:35"
     ],
     "type": "weekly"
   },
@@ -196,7 +195,7 @@
       "id:lucky_scratch_card:3",
       "xp:5000",
       "id:basic_crate:5",
-      "id:dabloon:75",
+      "id:dabloon:50",
       "id:basic_crate:7"
     ],
     "type": "weekly"
@@ -340,7 +339,7 @@
     "name": "loot drop professional",
     "description": "win loot drops",
     "target": [1, 2, 3],
-    "prizes": ["id:lucky_scratch_card:2", "id:69420_crate:3", "id:dabloon:50"],
+    "prizes": ["id:lucky_scratch_card:2", "id:69420_crate:3", "id:dabloon:35"],
     "type": "weekly"
   },
   "wordles_daily": {
