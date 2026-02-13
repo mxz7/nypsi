@@ -208,7 +208,9 @@ export async function calcEarnedHFMXp(member: GuildMember, items: number) {
     getUpgrades(member),
   ]);
 
-  const max = min + level / 50 > 30 ? 30 : level / 50;
+  let max = min + level / 50 > 30 ? 30 : level / 50;
+
+  if (max < 15) max = 15;
 
   let earned = Math.random() * (max - min) + min;
 
@@ -222,9 +224,10 @@ export async function calcEarnedHFMXp(member: GuildMember, items: number) {
     }
   }
 
-  if (upgrades.find((i) => i.upgradeId === "xp"))
+  if (upgrades.find((i) => i.upgradeId === "xp")) {
     boosterEffect +=
       upgrades.find((i) => i.upgradeId === "xp").amount * getUpgradesData()["xp"].effect;
+  }
 
   earned += boosterEffect * earned;
 
