@@ -96,6 +96,7 @@ let processedCount = 0;
 
 setInterval(() => {
   logger.info(`processed messages: ${processedCount.toLocaleString()} last minute`);
+  processedCount = 0;
 }, 60000);
 
 const removeExtraSpacesRegex = / +(?= )/g;
