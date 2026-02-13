@@ -90,7 +90,26 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient | Cl
   for (const r of res) {
     if (r) {
       if (r === "failed") {
-        logger.warn("counters: failed to update counter", data);
+        const errorCount = await redis.incr(
+          `${Constants.redis.nypsi.COUNTER_ERROR}:${data.guildId}:${data.channel}`,
+        );
+        await redis.expire(
+          `${Constants.redis.nypsi.COUNTER_ERROR}:${data.guildId}:${data.channel}`,
+          ms("30 days") / 1000,
+        );
+
+        logger.warn(
+          `counters: failed to update counter (${errorCount}/50)${errorCount < 50 ? "" : ", deleting counter"}`,
+          data,
+        );
+
+        if (errorCount == 50)
+          await prisma.guildCounter.delete({
+            where: {
+              channel: data.channel,
+            },
+          });
+        return;
       } else if (r === "updated") {
         logger.info(`::success updated counter for ${data.guildId} type: ${data.tracks}`);
       }
