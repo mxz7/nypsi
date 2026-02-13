@@ -1011,19 +1011,17 @@ export async function runCommand(
           });
         }
 
-        if (
-          percentChance(1) &&
-          rawLevel < 101 &&
-          levelRequirements.xp < (await getXp(message.author.id))
-        ) {
-          const bankBalance = await getBankBalance(message.author.id);
-          await addInlineNotification({
-            memberId: message.author.id,
-            embed: new CustomEmbed(
-              message.member,
-              `you have enough xp for a **level up**!!! you only need to deposit $${(levelRequirements.money - bankBalance).toLocaleString()} more into your bank to level up!\n\n[more information about levelling](https://nypsi.xyz/docs/economy/level?ref=bot-level-tip)`,
-            ),
-          });
+        if (rawLevel < 101 && levelRequirements.xp < (await getXp(message.author.id))) {
+          if ((rawLevel <= 10 && percentChance(25)) || percentChance(1)) {
+            const bankBalance = await getBankBalance(message.author.id);
+            await addInlineNotification({
+              memberId: message.author.id,
+              embed: new CustomEmbed(
+                message.member,
+                `you have enough xp for a **level up**!!! you only need to deposit $${(levelRequirements.money - bankBalance).toLocaleString()} more into your bank to level up!\n\n[more information about levelling](https://nypsi.xyz/docs/economy/level?ref=bot-level-tip)`,
+              ),
+            });
+          }
         }
 
         if (!(await redis.exists(`nypsi:inactiveuserthing:${message.author.id}`))) {
