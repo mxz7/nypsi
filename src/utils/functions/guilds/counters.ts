@@ -277,6 +277,10 @@ export async function createGuildCounter(
           id: everyone.id,
           deny: [PermissionFlagsBits.Connect, PermissionFlagsBits.SendMessages],
         },
+        {
+          id: guild.client.user.id,
+          allow: [PermissionFlagsBits.ManageChannels, PermissionFlagsBits.Connect],
+        },
       ],
       reason: `creating counter with type: ${TrackingType}`,
     })
