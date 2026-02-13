@@ -1011,7 +1011,7 @@ export async function runCommand(
           });
         } else if (
           percentChance(1) &&
-          rawLevel < 75 &&
+          rawLevel < 101 &&
           levelRequirements.xp < (await getXp(message.author.id))
         ) {
           const bankBalance = await getBankBalance(message.author.id);
