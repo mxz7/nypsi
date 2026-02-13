@@ -1009,7 +1009,9 @@ export async function runCommand(
             memberId: message.author.id,
             embed: new CustomEmbed(message.member, tip),
           });
-        } else if (
+        }
+
+        if (
           percentChance(1) &&
           rawLevel < 101 &&
           levelRequirements.xp < (await getXp(message.author.id))
