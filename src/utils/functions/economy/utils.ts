@@ -893,7 +893,7 @@ export async function doDaily(
 }
 
 function getDailyMoney(currentStreak: number) {
-  let money = Math.floor(math.square(currentStreak * 7) + 25_000);
+  let money = Math.floor(math.square((currentStreak - 1) * 7) + 25_000);
 
   if (money > 1_000_000) money = 1_000_000;
 
