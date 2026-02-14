@@ -48,14 +48,18 @@ export default class PageManager<T> {
     return map;
   }
 
-  static defaultRow() {
+  static defaultRow(disabled = false) {
     return new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
         .setCustomId("⬅")
         .setLabel("back")
         .setStyle(ButtonStyle.Primary)
         .setDisabled(true),
-      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+      new ButtonBuilder()
+        .setCustomId("➡")
+        .setLabel("next")
+        .setStyle(ButtonStyle.Primary)
+        .setDisabled(disabled),
     );
   }
 
@@ -215,7 +219,15 @@ export default class PageManager<T> {
       .catch(() => {});
 
     if (!res) {
-      await this.message.edit({ components: [] }).catch(() => {});
+      if (
+        this.message.components[0].type === ComponentType.ActionRow &&
+        this.message.components[0].components.length === 2
+      ) {
+        const components = PageManager.defaultRow(true);
+        await this.message.edit({ components: [components] }).catch(() => {});
+      } else {
+        await this.message.edit({ components: [] }).catch(() => {});
+      }
       return;
     }
 
