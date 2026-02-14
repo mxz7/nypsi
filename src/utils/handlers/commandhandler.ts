@@ -1007,7 +1007,9 @@ export async function runCommand(
 
           await addInlineNotification({
             memberId: message.author.id,
-            embed: new CustomEmbed(message.member, tip),
+            embed: new CustomEmbed(message.member, tip).setFooter({
+              text: `you can disable tips with /settings me preferences`,
+            }),
           });
         }
 
