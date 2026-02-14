@@ -108,7 +108,7 @@ async function run(
     });
   }
 
-  await addCooldown(cmd.name, message.member, 60);
+  await addCooldown(cmd.name, message.member, 30);
 
   waiting.add(message.author.id);
 

@@ -66,7 +66,7 @@ async function run(
     return send({ embeds: [new ErrorEmbed("invalid user(s)")] });
   }
 
-  await addCooldown(cmd.name, message.member, 10);
+  await addCooldown(cmd.name, message.member, 3);
 
   const combo = (parseInt(target1.user.id) + parseInt(target2.user.id)).toString();
 

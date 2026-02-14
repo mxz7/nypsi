@@ -42,7 +42,7 @@ async function run(
     return;
   }
 
-  await addCooldown(cmd.name, message.member, 30);
+  await addCooldown(cmd.name, message.member, 10);
 
   if (!(await userExists(message.member))) await createUser(message.member);
 

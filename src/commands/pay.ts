@@ -124,7 +124,7 @@ async function run(
   }
 
   if (target.user.id == message.client.user.id) {
-    await addCooldown(cmd.name, message.member, 10);
+    await addCooldown(cmd.name, message.member, 3);
     await removeBalance(message.member, amount);
     await addToNypsiBank(amount);
     addStat(message.member, "spent-bank", amount);
@@ -140,7 +140,7 @@ async function run(
     });
   }
 
-  await addCooldown(cmd.name, message.member, 10);
+  await addCooldown(cmd.name, message.member, 3);
 
   await removeBalance(message.member, amount);
   addStat(message.member, "spent-pay", amount);

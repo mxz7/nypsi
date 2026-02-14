@@ -18,7 +18,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
     return;
   }
 
-  await addCooldown(cmd.name, message.member, 10);
+  await addCooldown(cmd.name, message.member, 5);
 
   const res = await fetch("https://inspirobot.me/api?generate=true").then((res) => res.text());
 

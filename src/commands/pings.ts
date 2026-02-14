@@ -40,7 +40,7 @@ async function run(
     return;
   }
 
-  await addCooldown(cmd.name, message.member, 20);
+  await addCooldown(cmd.name, message.member, 7);
 
   let qualified = false;
 

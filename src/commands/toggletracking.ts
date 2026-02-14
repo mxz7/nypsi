@@ -19,7 +19,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
     return;
   }
 
-  await addCooldown(cmd.name, message.member, 90);
+  await addCooldown(cmd.name, message.member, 30);
 
   if (await isTracking(message.member)) {
     await disableTracking(message.member);

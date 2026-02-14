@@ -30,7 +30,7 @@ async function run(
   if (items.length === 0)
     return send({ embeds: [new ErrorEmbed("no items with that role exist")] });
 
-  await addCooldown(cmd.name, message.member, 5);
+  await addCooldown(cmd.name, message.member, 3);
 
   const inventory = await getInventory(message.member);
 

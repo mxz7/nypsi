@@ -36,7 +36,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
     });
   }
 
-  await addCooldown(cmd.name, message.member, 10);
+  await addCooldown(cmd.name, message.member, 5);
 
   const pageItems: string[] = [];
 

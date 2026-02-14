@@ -79,7 +79,7 @@ async function run(
     return send({ embeds: [new ErrorEmbed("invalid payment")] });
   }
 
-  await addCooldown(cmd.name, message.member, 5);
+  await addCooldown(cmd.name, message.member, 3);
 
   const embed = new CustomEmbed(message.member)
     .setHeader("bank withdrawal", message.author.avatarURL())

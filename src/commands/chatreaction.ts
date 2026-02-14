@@ -247,7 +247,7 @@ async function run(
   };
 
   const showStats = async () => {
-    await addCooldown(cmd.name, message.member, 10);
+    await addCooldown(cmd.name, message.member, 5);
 
     const embed = new CustomEmbed(message.member).setHeader(
       `${message.author.username}'s stats`,
@@ -274,7 +274,7 @@ async function run(
   };
 
   const showLeaderboard = async () => {
-    await addCooldown(cmd.name, message.member, 10);
+    await addCooldown(cmd.name, message.member, 5);
 
     const embed = new CustomEmbed(message.member).setHeader(
       "chat reactions leaderboard",
@@ -405,7 +405,7 @@ async function run(
         return;
       }
 
-      await addCooldown(cmd.name, message.member, 10);
+      await addCooldown(cmd.name, message.member, 5);
 
       const blacklisted = await getBlacklisted(message.guild);
 

@@ -67,7 +67,7 @@ async function run(
     return;
   }
 
-  await addCooldown(cmd.name, message.member, 3);
+  await addCooldown(cmd.name, message.member, 2);
 
   let inventory = (await getInventory(message.member)).entries;
 

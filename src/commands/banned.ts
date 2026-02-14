@@ -39,7 +39,7 @@ async function run(
     });
   }
 
-  await addCooldown(cmd.name, message.member, 10);
+  await addCooldown(cmd.name, message.member, 5);
 
   const pageItems: string[] = [];
 

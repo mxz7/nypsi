@@ -41,7 +41,7 @@ async function run(
     return send({ embeds: [new ErrorEmbed(`couldnt find \`${args.join(" ")}\``)] });
   }
 
-  await addCooldown(cmd.name, message.member, 4);
+  await addCooldown(cmd.name, message.member, 3);
 
   if (!(await runItemInfo(message, args, selected, "general", send))) {
     // this should never happen

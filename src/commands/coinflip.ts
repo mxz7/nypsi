@@ -475,7 +475,7 @@ async function run(
       );
     }
 
-    await addCooldown(cmd.name, message.member, 10);
+    await addCooldown(cmd.name, message.member, 7);
     playing.add(message.author.id);
     setTimeout(() => {
       if (playing.has(message.author.id)) playing.delete(message.author.id);
@@ -730,7 +730,7 @@ async function run(
       );
     }
 
-    await addCooldown(cmd.name, message.member, 10);
+    await addCooldown(cmd.name, message.member, 7);
     playing.add(message.author.id);
     setTimeout(() => {
       if (playing.has(message.author.id)) playing.delete(message.author.id);

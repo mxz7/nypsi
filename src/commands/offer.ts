@@ -94,7 +94,7 @@ async function run(
     return;
   }
 
-  await addCooldown(cmd.name, message.member, 5);
+  await addCooldown(cmd.name, message.member, 3);
 
   if (message.author.createdTimestamp > dayjs().subtract(1, "day").valueOf()) {
     return send({

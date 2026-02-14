@@ -1,7 +1,6 @@
 import { CommandInteraction } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const answers = [
   "as i see it, yes",
@@ -33,18 +32,9 @@ async function run(
   send: SendMessage,
   args: string[],
 ) {
-  if (await onCooldown(cmd.name, message.member)) {
-    const res = await getResponse(cmd.name, message.member);
-
-    if (res.respond) send({ embeds: [res.embed] });
-    return;
-  }
-
   if (args.length == 0) {
     return send({ embeds: [new ErrorEmbed("you must ask the 8ball something")] });
   }
-
-  await addCooldown(cmd.name, message.member, 5);
 
   const question = args.join(" ");
 

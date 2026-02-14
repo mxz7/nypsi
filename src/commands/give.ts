@@ -150,7 +150,7 @@ async function run(
     return send({ embeds: [new ErrorEmbed("this item is locked to your account")] });
   }
 
-  await addCooldown(cmd.name, message.member, 5);
+  await addCooldown(cmd.name, message.member, 3);
 
   await Promise.all([
     addInventoryItem(target, selected.id, amount),

@@ -33,7 +33,7 @@ async function run(
     return;
   }
 
-  await addCooldown(cmd.name, message.member, 5);
+  await addCooldown(cmd.name, message.member, 3);
 
   const tasks = await getTasks(message.member);
   const streaks = await getTaskStreaks(message.member);

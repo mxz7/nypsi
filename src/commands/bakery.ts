@@ -4,7 +4,6 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getBakeryUpgrades } from "../utils/functions/economy/bakery";
 import { getBakeryUpgradesData } from "../utils/functions/economy/utils";
 import { getMember } from "../utils/functions/member";
-import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("bakery", "view your current bakery upgrades", "money");
 
@@ -13,15 +12,6 @@ async function run(
   send: SendMessage,
   args: string[],
 ) {
-  if (await onCooldown(cmd.name, message.member)) {
-    const res = await getResponse(cmd.name, message.member);
-
-    if (res.respond) send({ embeds: [res.embed] });
-    return;
-  }
-
-  await addCooldown(cmd.name, message.member, 5);
-
   let target = message.member;
 
   if (args.length > 0) {
