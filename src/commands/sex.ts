@@ -143,191 +143,156 @@ async function run(
         ).setHeader("milf finder"),
       ],
     });
-  } else {
-    if (
-      (await redis.lrange(Constants.redis.nypsi.MILF_QUEUE, 0, -1)).find(
-        (i) => (JSON.parse(i) as MilfSearchData).userId === message.author.id,
-      )
-    ) {
-      return send({
-        embeds: [new ErrorEmbed("we're already searching for a match.. calm down you horny shit")],
-      });
+  }
+
+  if (
+    (await redis.lrange(Constants.redis.nypsi.MILF_QUEUE, 0, -1)).find(
+      (i) => (JSON.parse(i) as MilfSearchData).userId === message.author.id,
+    )
+  ) {
+    return send({
+      embeds: [new ErrorEmbed("we're already searching for a match.. calm down you horny shit")],
+    });
+  }
+
+  for (const milf of (await redis.lrange(Constants.redis.nypsi.MILF_QUEUE, 0, -1)).map(
+    (i) => JSON.parse(i) as MilfSearchData,
+  )) {
+    if (message.guild.id == milf.guildId) continue;
+
+    await redis.lrem(Constants.redis.nypsi.MILF_QUEUE, 1, JSON.stringify(milf));
+
+    if (milf.description && milf.description !== "") {
+      if (
+        (await isMuted(message.guild, milf.userId)) ||
+        !(await checkMessageContent(message.guild, milf.description, false))
+      ) {
+        milf.description = null;
+      }
     }
 
-    for (const milf of (await redis.lrange(Constants.redis.nypsi.MILF_QUEUE, 0, -1)).map(
-      (i) => JSON.parse(i) as MilfSearchData,
-    )) {
-      if (message.guild.id == milf.guildId) continue;
+    const embed = new CustomEmbed(
+      message.member,
+      await buildDescription(milf.guildId, milf.guildName, milf.userId, milf.description),
+    ).setHeader("milf finder");
 
-      await redis.lrem(Constants.redis.nypsi.MILF_QUEUE, 1, JSON.stringify(milf));
+    const promises = await Promise.all([
+      send({ embeds: [embed] }),
+      addProgress(message.member, "whore", 1),
+      addProgress(milf.userId, "whore", 1),
+      addTaskProgress(message.member, "horny"),
+      addTaskProgress(milf.userId, "horny"),
+      addEventProgress(message.client as NypsiClient, message.member, "milfs", 1),
+      addEventProgress(message.client as NypsiClient, milf.userId, "milfs", 1),
+    ]);
 
-      const tag = await getActiveTag(milf.userId);
+    const eventProgress = promises.slice(-2, -1).toSorted()[1] as number;
 
-      const embed = new CustomEmbed(
-        message.member,
-        `a match has been made from **${
-          milf.guildId == Constants.NYPSI_SERVER_ID
-            ? `[nypsi](${Constants.NYPSI_SERVER_INVITE_LINK})`
-            : milf.guildName
-        }**\n\n` +
-          `go ahead and send [**${
-            tag ? `[${getTagsData()[tag.tagId].emoji}] ` : ""
-          }${await getLastKnownUsername(milf.userId, false)}**](https://nypsi.xyz/users/${
-            milf.userId
-          }?ref=bot-milf) a *private* message 😉😏`,
-      ).setHeader("milf finder");
+    let eventData: EventData;
 
-      if (
-        milf.description != "" &&
-        (await checkMessageContent(message.guild, milf.description, false)) &&
-        !(await isMuted(message.guild, milf.userId))
-      ) {
-        embed.setDescription(
-          `a match has been made from **${
-            milf.guildId == Constants.NYPSI_SERVER_ID
-              ? `[nypsi](${Constants.NYPSI_SERVER_INVITE_LINK})`
-              : milf.guildName
-          }**\n\n` +
-            `[**${tag ? `[${getTagsData()[tag.tagId].emoji}] ` : ""}${await getLastKnownUsername(
-              milf.userId,
-              false,
-            )}**](https://nypsi.xyz/users/${milf.userId}?ref=bot-milf) - ${milf.description}\n\n` +
-            "go ahead and send them a *private* message 😉😏",
-        );
-      }
+    if (eventProgress) {
+      eventData = await getCurrentEvent();
+    }
 
-      const promises = await Promise.all([
-        send({ embeds: [embed] }),
-        addProgress(message.member, "whore", 1),
-        addProgress(milf.userId, "whore", 1),
-        addTaskProgress(message.member, "horny"),
-        addTaskProgress(milf.userId, "horny"),
-        addEventProgress(message.client as NypsiClient, message.member, "milfs", 1),
-        addEventProgress(message.client as NypsiClient, milf.userId, "milfs", 1),
-      ]);
+    let description = "";
 
-      const eventProgress = promises.slice(-2, -1).toSorted()[1] as number;
+    if (args.length > 0) {
+      description = args.join(" ");
+      const descriptionCheck = cleanString(description);
 
-      const authorTag = await getActiveTag(message.member);
-
-      let eventData: EventData;
-
-      if (eventProgress) {
-        eventData = await getCurrentEvent();
-      }
-
-      const embed2 = new CustomEmbed(
-        undefined,
-        `a match has been made from **${
-          message.guild.id == Constants.NYPSI_SERVER_ID
-            ? `[nypsi](${Constants.NYPSI_SERVER_INVITE_LINK})`
-            : message.guild.name
-        }**\n\ngo ahead and send [${
-          authorTag ? `[${getTagsData()[authorTag.tagId].emoji}] ` : ""
-        }**${message.author.username}**](https://nypsi.xyz/users/${
-          message.author.id
-        }?ref=bot-milf) a *private* message 😉😏` +
-          (eventProgress ? `\n\n${formatEventProgress(eventData, eventProgress)}` : ""),
-      )
-        .setHeader("milf finder")
-        .setColor(Constants.EMBED_SUCCESS_COLOR);
-
-      let description = "";
-
-      if (args.length > 0) {
-        description = args.join(" ");
-        const descriptionCheck = cleanString(description);
-
-        for (const word of descFilter) {
-          if (descriptionCheck.includes(word)) {
-            description = "";
-            break;
-          }
-        }
-        if (description.length > 50) {
-          description = description.substring(0, 50) + "...";
-        }
-      }
-
-      if (
-        description != "" &&
-        (await checkMessageContent(milf.guildId, description, false)) &&
-        !(await isMuted(milf.guildId, message.author.id))
-      ) {
-        embed2.setDescription(
-          `a match has been made from **${
-            message.guild.id == Constants.NYPSI_SERVER_ID
-              ? `[nypsi](${Constants.NYPSI_SERVER_INVITE_LINK})`
-              : message.guild.name
-          }**\n\n` +
-            `[${authorTag ? `[${getTagsData()[authorTag.tagId].emoji}] ` : ""}**${
-              message.author.username
-            }**](https://nypsi.xyz/users/${message.author.id}?ref=bot-milf) - ${description}\n\n` +
-            "go ahead and send them a *private* message 😉😏",
-        );
-      }
-
-      const clusters = await (message.client as NypsiClient).cluster.broadcastEval(
-        async (client, { guildId }) => {
-          const guild = client.guilds.cache.get(guildId);
-
-          if (guild) return (client as unknown as NypsiClient).cluster.id;
-          return "not-found";
-        },
-        { context: { guildId: milf.guildId } },
-      );
-
-      let cluster: number;
-
-      for (const i of clusters) {
-        if (i != "not-found") {
-          cluster = i;
+      for (const word of descFilter) {
+        if (descriptionCheck.includes(word)) {
+          description = "";
           break;
         }
       }
-
-      return await (message.client as NypsiClient).cluster.broadcastEval(
-        async (client, { embed, cluster, userId, channelId, guildId }) => {
-          if ((client as unknown as NypsiClient).cluster.id != cluster) return;
-          const guild = client.guilds.cache.get(guildId);
-
-          if (!guild) return;
-
-          const channel = guild.channels.cache.get(channelId);
-
-          if (!channel) return;
-
-          if (channel.isTextBased()) {
-            const member = await guild.members.fetch(userId);
-            if (!member) return;
-
-            await channel.send({ content: member.toString(), embeds: [embed] });
-
-            return;
-          }
-        },
-        {
-          context: {
-            embed: embed2.toJSON(),
-            cluster: cluster,
-            userId: milf.userId,
-            channelId: milf.channelId,
-            guildId: milf.guildId,
-          },
-        },
-      );
+      if (description.length > 50) {
+        description = description.substring(0, 50) + "...";
+      }
     }
 
-    addToLooking(description);
-    return send({
-      embeds: [
-        new CustomEmbed(
-          message.member,
-          "you're now on the milf waiting list 😏\n\nyou'll be notified when a match is found",
-        ).setHeader("milf finder"),
-      ],
-    });
+    if (description && description !== "") {
+      if (
+        (await isMuted(message.guild, message.author.id)) ||
+        !(await checkMessageContent(message.guild, description, false))
+      ) {
+        description = null;
+      }
+    }
+
+    const embed2 = new CustomEmbed(
+      undefined,
+      await buildDescription(
+        message.guild.id,
+        message.guild.name,
+        message.author.id,
+        description,
+        eventProgress ? { data: eventData, progress: eventProgress } : undefined,
+      ),
+    )
+      .setHeader("milf finder")
+      .setColor(Constants.EMBED_SUCCESS_COLOR);
+
+    const clusters = await (message.client as NypsiClient).cluster.broadcastEval(
+      async (client, { guildId }) => {
+        const guild = client.guilds.cache.get(guildId);
+
+        if (guild) return (client as unknown as NypsiClient).cluster.id;
+        return "not-found";
+      },
+      { context: { guildId: milf.guildId } },
+    );
+
+    let cluster: number;
+
+    for (const i of clusters) {
+      if (i != "not-found") {
+        cluster = i;
+        break;
+      }
+    }
+
+    return await (message.client as NypsiClient).cluster.broadcastEval(
+      async (client, { embed, cluster, userId, channelId, guildId }) => {
+        if ((client as unknown as NypsiClient).cluster.id != cluster) return;
+        const guild = client.guilds.cache.get(guildId);
+
+        if (!guild) return;
+
+        const channel = guild.channels.cache.get(channelId);
+
+        if (!channel) return;
+
+        if (channel.isTextBased()) {
+          const member = await guild.members.fetch(userId);
+          if (!member) return;
+
+          await channel.send({ content: member.toString(), embeds: [embed] });
+
+          return;
+        }
+      },
+      {
+        context: {
+          embed: embed2.toJSON(),
+          cluster: cluster,
+          userId: milf.userId,
+          channelId: milf.channelId,
+          guildId: milf.guildId,
+        },
+      },
+    );
   }
+
+  addToLooking(description);
+  return send({
+    embeds: [
+      new CustomEmbed(
+        message.member,
+        "you're now on the milf waiting list 😏\n\nyou'll be notified when a match is found",
+      ).setHeader("milf finder"),
+    ],
+  });
 }
 
 cmd.setRun(run);
@@ -354,3 +319,47 @@ setInterval(async () => {
     }
   });
 }, 600000);
+
+async function buildDescription(
+  guildId: string,
+  guildName: string,
+  userId: string,
+  description?: string,
+  event?: { data: EventData; progress: number },
+) {
+  const tag = await getActiveTag(userId);
+
+  let desc: string;
+
+  if (!description) {
+    desc =
+      `a match has been made from **${
+        guildId == Constants.NYPSI_SERVER_ID
+          ? `[nypsi](${Constants.NYPSI_SERVER_INVITE_LINK})`
+          : guildName
+      }**\n\n` +
+      `go ahead and send [**${
+        tag ? `[${getTagsData()[tag.tagId].emoji}] ` : ""
+      }${await getLastKnownUsername(userId, false)}**](https://nypsi.xyz/users/${
+        userId
+      }?ref=bot-milf) a *private* message 😉😏`;
+  } else {
+    desc =
+      `a match has been made from **${
+        guildId == Constants.NYPSI_SERVER_ID
+          ? `[nypsi](${Constants.NYPSI_SERVER_INVITE_LINK})`
+          : guildName
+      }**\n\n` +
+      `[${tag ? `[${getTagsData()[tag.tagId].emoji}] ` : ""}**${await getLastKnownUsername(
+        userId,
+        false,
+      )}**](https://nypsi.xyz/users/${userId}?ref=bot-milf) - ${description}\n\n` +
+      "go ahead and send them a *private* message 😉😏";
+  }
+
+  if (event) {
+    desc += `\n\n${formatEventProgress(event.data, event.progress)}`;
+  }
+
+  return desc;
+}
