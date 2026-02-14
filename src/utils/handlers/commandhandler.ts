@@ -29,8 +29,6 @@ import { getNews, hasSeenNews } from "../functions/news";
 import { getTimestamp, logger } from "../logger";
 // @ts-expect-error doesnt like getting from json file
 import { tips } from "../../../data/lists.json";
-// @ts-expect-error typescript doesnt like opening package.json
-import { version } from "../../../package.json";
 import prisma from "../../init/database";
 import { Item } from "../../types/Economy";
 import Constants from "../Constants";
@@ -263,7 +261,7 @@ async function helpCmd(message: NypsiMessage, args: string[]) {
     }
   }
 
-  const embed = new CustomEmbed(message.member).setFooter({ text: `v${version}` });
+  const embed = new CustomEmbed(message.member);
 
   /**
    * FINDING WHAT THE USER REQUESTED
@@ -334,7 +332,7 @@ async function helpCmd(message: NypsiMessage, args: string[]) {
 
       embed.setTitle(`${args[0].toLowerCase()} commands`);
       embed.setDescription(pages.get(1).join("\n"));
-      embed.setFooter({ text: `page 1/${pages.size} | v${version}` });
+      embed.setFooter({ text: `page 1/${pages.size}` });
     } else if (commands.has(args[0].toLowerCase()) || aliases.has(args[0].toLowerCase())) {
       let cmd: Command;
 
@@ -430,7 +428,7 @@ async function helpCmd(message: NypsiMessage, args: string[]) {
       } else {
         currentPage--;
         embed.setDescription(pages.get(currentPage).join("\n"));
-        embed.setFooter({ text: `page ${currentPage}/${lastPage} | v${version}` });
+        embed.setFooter({ text: `page ${currentPage}/${lastPage}` });
         if (currentPage == 1) {
           row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
             new ButtonBuilder()
@@ -467,7 +465,7 @@ async function helpCmd(message: NypsiMessage, args: string[]) {
       } else {
         currentPage++;
         embed.setDescription(pages.get(currentPage).join("\n"));
-        embed.setFooter({ text: `page ${currentPage}/${lastPage} | v${version}` });
+        embed.setFooter({ text: `page ${currentPage}/${lastPage}` });
         if (currentPage == lastPage) {
           row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
             new ButtonBuilder()
