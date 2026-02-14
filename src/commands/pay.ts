@@ -162,11 +162,12 @@ async function run(
     `**${escapeFormattingCharacters(message.author.username)}** has sent you $**${Math.floor(
       amount - taxedAmount,
     ).toLocaleString()}**`,
-  )
-    .setHeader("you have received a payment")
-    .setFooter({ text: "/settings me notifications" });
+  );
 
   if ((await getDmSettings(target)).payment) {
+    notificationEmbed
+      .setHeader("you have received a payment")
+      .setFooter({ text: "/settings me notifications" });
     addNotificationToQueue({ memberId: target.user.id, payload: { embed: notificationEmbed } });
   } else {
     addInlineNotification({ memberId: target.user.id, embed: notificationEmbed });

@@ -162,13 +162,14 @@ async function run(
     `**${escapeFormattingCharacters(message.author.username)}** has given you ${amount.toLocaleString()} ${selected.emoji} ${
       selected.name
     }`,
-  )
-    .setHeader(
-      `you have received ${pluralize(`${selected.article} ${selected.name}`, amount, `${amount.toLocaleString()} ${selected.plural}`)}`,
-    )
-    .setFooter({ text: "/settings me notifications" });
+  );
 
   if ((await getDmSettings(target)).payment) {
+    notificationEmbed
+      .setHeader(
+        `you have received ${pluralize(`${selected.article} ${selected.name}`, amount, `${amount.toLocaleString()} ${selected.plural}`)}`,
+      )
+      .setFooter({ text: "/settings me notifications" });
     addNotificationToQueue({ memberId: target.user.id, payload: { embed: notificationEmbed } });
   } else {
     addInlineNotification({ memberId: target.user.id, embed: notificationEmbed });
