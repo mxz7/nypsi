@@ -455,8 +455,13 @@ async function run(
 
     let tax = true;
 
+    const embed = new CustomEmbed(message.member);
+
     if ((await isPremium(message.member)) && (await getTier(message.member)) == 4) tax = false;
-    if (["bitcoin", "ethereum"].includes(selected.id)) tax = false;
+    if (["bitcoin", "ethereum"].includes(selected.id)) {
+      tax = false;
+      embed.setFooter({ text: `${selected.name} has a 1% sell fee` });
+    }
 
     if (tax) {
       const taxedAmount = Math.floor(sellWorth * (await getTax()));
@@ -467,8 +472,6 @@ async function run(
     await addBalance(message.member, sellWorth);
 
     addStat(message.member, "earned-sold", sellWorth);
-
-    const embed = new CustomEmbed(message.member);
 
     embed.setDescription(
       `you sold **${amount.toLocaleString()}** ${selected.emoji} ${
