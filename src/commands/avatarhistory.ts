@@ -57,7 +57,7 @@ async function run(
   await addCooldown(cmd.name, message.member, 5);
 
   if (
-    (await getRawLevel(message.member).catch(() => 0)) < 500 ||
+    (await getRawLevel(message.member).catch(() => 0)) < 300 ||
     message.client.user.id !== Constants.BOT_USER_ID
   )
     return send({

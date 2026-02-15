@@ -98,7 +98,7 @@ levellingRewards.set(100, {
 levellingRewards.set(250, {
   text: ["you have unlocked:\n" + "- +1% gamble multi"],
 });
-levellingRewards.set(500, {
+levellingRewards.set(300, {
   text: ["you have unlocked:\n" + "- avatar history tracking (disabled with $toggletracking)"],
 });
 levellingRewards.set(1000, {
