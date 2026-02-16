@@ -522,7 +522,7 @@ export default async function messageCreate(message: Message) {
 
   if (
     (await hasGuild(message.guild)) &&
-    !message.member.permissions.has(PermissionsBitField.Flags.ManageMessages)
+    !message.member?.permissions.has(PermissionsBitField.Flags.ManageMessages)
   ) {
     const res = await checkMessageContent(message.guild, message.content, true, message);
 
