@@ -64,6 +64,7 @@ export async function getAllMembers(
 
   const mutexKey = `member_fetch_${guildId}`;
   await mutex.acquire(mutexKey);
+
   try {
     const lastFetched = await redis
       .get(`${Constants.redis.cache.guild.MEMBERS_LAST_FETCHED}:${guildId}`)
@@ -87,6 +88,7 @@ export async function getAllMembers(
         "EX",
         ms("10 minute") / 1000,
       );
+      console.trace();
       discordMembers = await guild.members.fetch();
     }
 
