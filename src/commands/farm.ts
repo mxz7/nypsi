@@ -70,14 +70,23 @@ async function run(
   if (args.length === 0 || args[0].toLowerCase() === "view") {
     const options = new StringSelectMenuBuilder().setCustomId("farm");
 
-    for (const farm of farms) {
-      if (options.options.find((i) => i.data.value === farm.plantId)) continue;
+    const plants = new Map<string, number>();
 
+    for (const farm of farms) {
+      if (plants.has(farm.plantId)) {
+        plants.set(farm.plantId, plants.get(farm.plantId) + 1);
+      } else {
+        plants.set(farm.plantId, 1);
+      }
+    }
+
+    for (const [id, count] of plants.entries()) {
       options.addOptions(
         new StringSelectMenuOptionBuilder()
-          .setLabel(getPlantsData()[farm.plantId].name)
-          .setValue(farm.plantId)
-          .setEmoji(getItems()[getPlantsData()[farm.plantId].item].emoji),
+          .setLabel(getPlantsData()[id].name)
+          .setValue(id)
+          .setDescription(`${count.toLocaleString()} ${pluralize(getPlantsData()[id], count)}`)
+          .setEmoji(getItems()[getPlantsData()[id].item].emoji),
       );
     }
 
