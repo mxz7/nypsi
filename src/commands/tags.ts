@@ -61,7 +61,7 @@ cmd.setRun((message, send, args) => {
     if (!selected && search !== "none") return send({ embeds: [new ErrorEmbed("unknown tag")] });
 
     if (search !== "none" && !tags.find((i) => i.tagId === selected.id)) {
-      return send({ embeds: [new ErrorEmbed("you dont have this tag")] });
+      return send({ embeds: [new ErrorEmbed("you don't have this tag")] });
     }
 
     if (search === "none") {

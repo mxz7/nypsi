@@ -499,7 +499,7 @@ async function run(
           if (type == "buy") {
             if ((await getBalance(message.member)) < parseInt(amount) * cost) {
               await res.reply({
-                embeds: [new ErrorEmbed("you dont have enough money")],
+                embeds: [new ErrorEmbed("you don't have enough money")],
                 options: { flags: MessageFlags.Ephemeral },
               });
               await updateEmbed();
@@ -579,7 +579,7 @@ async function run(
 
             if (inventory.count(selected.id) < parseInt(amount)) {
               await res.editReply({
-                embeds: [new ErrorEmbed(`you dont have enough ${selected.plural}`)],
+                embeds: [new ErrorEmbed(`you don't have enough ${selected.plural}`)],
                 options: { flags: MessageFlags.Ephemeral },
               });
               await updateEmbed();
@@ -1230,7 +1230,7 @@ async function run(
 
     if (type == "buy") {
       if ((await getBalance(message.member)) < parseInt(amount) * cost) {
-        return send({ embeds: [new ErrorEmbed("you dont have enough money")] });
+        return send({ embeds: [new ErrorEmbed("you don't have enough money")] });
       }
 
       let msg: NypsiMessage;
@@ -1300,7 +1300,7 @@ async function run(
 
       if (inventory.count(selected.id) < parseInt(amount)) {
         return send({
-          embeds: [new ErrorEmbed(`you dont have enough ${selected.plural}`)],
+          embeds: [new ErrorEmbed(`you don't have enough ${selected.plural}`)],
         });
       }
 

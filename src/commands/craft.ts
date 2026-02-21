@@ -421,7 +421,7 @@ async function run(
     }
 
     if (craftable == 0) {
-      return send({ embeds: [new ErrorEmbed("you cant craft any of this item")] });
+      return send({ embeds: [new ErrorEmbed("you can't craft any of this item")] });
     }
 
     let amount = 1;

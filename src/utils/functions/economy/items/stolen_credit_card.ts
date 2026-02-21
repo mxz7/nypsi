@@ -32,7 +32,7 @@ module.exports = new ItemUse(
 
     if (inventory.count("stolen_credit_card") < amount)
       return ItemUse.send(message, {
-        embeds: [new ErrorEmbed("you dont have this many stolen credit cards")],
+        embeds: [new ErrorEmbed("you don't have this many stolen credit cards")],
       });
 
     const addedAmount = randomInt(10_000 * amount, 250_000 * amount);

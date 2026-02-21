@@ -102,7 +102,9 @@ async function run(
   }
 
   if (!inventory.has(selected.id)) {
-    return send({ embeds: [new ErrorEmbed(`you dont have ${selected.article} ${selected.name}`)] });
+    return send({
+      embeds: [new ErrorEmbed(`you don't have ${selected.article} ${selected.name}`)],
+    });
   }
 
   if (selected.role == "car") {
@@ -122,7 +124,7 @@ async function run(
       embeds: [new ErrorEmbed(`this item is used with ${prefix}fish`)],
     });
   } else if (selected.id.includes("coin")) {
-    return send({ embeds: [new ErrorEmbed("you cant use a coin 🙄")] });
+    return send({ embeds: [new ErrorEmbed("you can't use a coin 🙄")] });
   } else if (selected.id.includes("pickaxe")) {
     return send({ embeds: [new ErrorEmbed(`this item is used with ${prefix}mine`)] });
   } else if (selected.id.includes("furnace")) {

@@ -122,7 +122,7 @@ async function run(
 
   if (!inventory.has(selected.id)) {
     return send({
-      embeds: [new ErrorEmbed("you dont have any " + selected.plural)],
+      embeds: [new ErrorEmbed("you don't have any " + selected.plural)],
     });
   }
 

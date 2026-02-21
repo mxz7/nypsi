@@ -63,7 +63,7 @@ async function run(
 
   if (searchTag == "clear") {
     if (current.length == 0)
-      return send({ embeds: [new ErrorEmbed(`you dont have anything being automatically sold`)] });
+      return send({ embeds: [new ErrorEmbed(`you don't have anything being automatically sold`)] });
 
     await setAutosellItems(message.member, []);
     return send({

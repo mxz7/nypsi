@@ -422,11 +422,11 @@ async function run(
     }
 
     if (target.user.id == message.author.id) {
-      return send({ embeds: [new ErrorEmbed("lol xd cant offer yourself something")] });
+      return send({ embeds: [new ErrorEmbed("lol xd can't offer yourself something")] });
     }
 
     if ((await isEcoBanned(target)).banned)
-      return send({ embeds: [new ErrorEmbed("theyre banned lol xd be mean to them for me ty")] });
+      return send({ embeds: [new ErrorEmbed("they're banned lol xd be mean to them for me ty")] });
 
     if ((await getPreferences(target)).offers <= (await getTargetedOffers(target)).length) {
       if ((await getPreferences(target)).offers === 0)
@@ -453,7 +453,7 @@ async function run(
     if (!selected) return send({ embeds: [new ErrorEmbed("invalid item")] });
 
     if (selected.account_locked)
-      return send({ embeds: [new ErrorEmbed("this item cant be traded")] });
+      return send({ embeds: [new ErrorEmbed("this item can't be traded")] });
 
     const blocked = await getBlockedList(target);
 
@@ -512,7 +512,7 @@ async function run(
 
     const balance = await getBalance(message.member);
 
-    if (balance < money) return send({ embeds: [new ErrorEmbed("you cant afford this")] });
+    if (balance < money) return send({ embeds: [new ErrorEmbed("you can't afford this")] });
     await removeBalance(message.member, money);
     const res = await createOffer(target.user, selected.id, amount, money, message.member);
 

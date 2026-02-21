@@ -103,7 +103,7 @@ export default class PageManager<T> {
       /*
       
       broken in recent discord.js update. 
-      cant await interactions on ephemeral message
+      can't await interactions on ephemeral message
 
       */
 

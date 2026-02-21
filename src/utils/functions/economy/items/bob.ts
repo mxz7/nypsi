@@ -49,7 +49,7 @@ module.exports = new ItemUse(
       return ItemUse.send(message, { embeds: [new ErrorEmbed("invalid amount")] });
 
     if (inventory.count("bob") < amount)
-      return ItemUse.send(message, { embeds: [new ErrorEmbed("you dont have this many bobs")] });
+      return ItemUse.send(message, { embeds: [new ErrorEmbed("you don't have this many bobs")] });
 
     const breakdown: string[] = [];
 

@@ -131,7 +131,7 @@ async function run(
   }
 
   if (message.member == target) {
-    return send({ embeds: [new ErrorEmbed("you cant rob yourself")] });
+    return send({ embeds: [new ErrorEmbed("you can't rob yourself")] });
   }
 
   if (!(await userExists(target)) || (await getBalance(target)) <= 500) {

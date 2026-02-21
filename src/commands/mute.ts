@@ -69,7 +69,7 @@ async function run(
     const embed = new CustomEmbed(message.member)
       .setHeader("mute help")
       .addField("usage", "/mute <user> (time) (reason) [-s]")
-      .addField("help", "if the mute role isnt setup correctly this wont work")
+      .addField("help", "if the mute role isnt setup correctly this won't work")
       .addField(
         "time format examples",
         "**1d** *1 day*\n**10h** *10 hours*\n**15m** *15 minutes*\n**30s** *30 seconds*",

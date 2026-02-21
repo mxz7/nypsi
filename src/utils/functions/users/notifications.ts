@@ -84,7 +84,7 @@ export async function getPreferences(member: MemberResolvable): Promise<Preferen
   if (await redis.exists(`${Constants.redis.cache.user.PREFERENCES}:${userId}`)) {
     return JSON.parse(
       await redis.get(`${Constants.redis.cache.user.PREFERENCES}:${userId}`),
-      // json cant parse bigints on its own so we have to do it manually
+      // json can't parse bigints on its own so we have to do it manually
       (key, value) => {
         return key !== "userId" && typeof value === "string" && !isNaN(Number(value))
           ? BigInt(value)

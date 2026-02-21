@@ -129,7 +129,7 @@ async function run(
       .addField(
         "game rules",
         "a 5x5 grid of white squares will be created\n" +
-          "once youve chosen your square, it will become green if there was no mine, if there was, you will lose your bet\n" +
+          "once you've chosen your square, it will become green if there was no mine, if there was, you will lose your bet\n" +
           "if you don't choose an amount of mines, you will be given 3-6 mines, giving you 0.6x per square",
       );
 

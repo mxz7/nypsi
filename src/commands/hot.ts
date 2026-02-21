@@ -63,7 +63,7 @@ async function run(
   if (hotAmount >= 95) {
     hotEmoji = "💰🍆💪😍😘";
     hotText =
-      "HEY THERE what does it take to marry you. look. ill give you money. here. ive got big muscles too. im 6'2. please.";
+      "HEY THERE what does it take to marry you. look. ill give you money. here. ive got big muscles too. i'm 6'2. please.";
 
     if (cache.has(member.user.id)) {
       cache.delete(member.user.id);

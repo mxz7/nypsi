@@ -73,7 +73,9 @@ async function prepare(
   }
 
   if (!inventory.has(selected.id)) {
-    return send({ embeds: [new ErrorEmbed(`you dont have ${selected.article} ${selected.name}`)] });
+    return send({
+      embeds: [new ErrorEmbed(`you don't have ${selected.article} ${selected.name}`)],
+    });
   }
 
   if (selected.role !== "scratch-card")
@@ -258,7 +260,7 @@ async function prepare(
     });
 
     // if (fail) return play(response);
-    if (fail) return; // in case it causes problems cause i cant recreate
+    if (fail) return; // in case it causes problems cause i can't recreate
 
     if (card.remainingClicks !== 0) {
       embed.setDescription(

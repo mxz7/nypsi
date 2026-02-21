@@ -56,9 +56,9 @@ async function run(
   if (!time) {
     return send({ embeds: [new ErrorEmbed("invalid time length")] });
   } else if (time < Date.now() - 604800000 && message.author.id != message.guild.ownerId) {
-    return send({ embeds: [new ErrorEmbed("lol dont even try")] });
+    return send({ embeds: [new ErrorEmbed("lol don't even try")] });
   } else if (time < Date.now() - 604800000 * 2) {
-    return send({ embeds: [new ErrorEmbed("lol dont even try")] });
+    return send({ embeds: [new ErrorEmbed("lol don't even try")] });
   }
 
   let members = await getAllMembers(message.guild, true);

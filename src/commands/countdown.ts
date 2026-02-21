@@ -109,7 +109,7 @@ async function run(
 
     if (date.getTime() < now) {
       return send({
-        embeds: [new ErrorEmbed("unfortunately i cant go back in time")],
+        embeds: [new ErrorEmbed("unfortunately i can't go back in time")],
       });
     }
 

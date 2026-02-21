@@ -388,7 +388,7 @@ function getGeneralMessage(
 
       if (["collectable", "flower", "cat"].includes(selected.role)) {
         roleDescription =
-          "collectables don't do anything, they're just *collectables*. if you dont want them, you can get rid of them by selling them";
+          "collectables don't do anything, they're just *collectables*. if you don't want them, you can get rid of them by selling them";
       }
 
       if (["sellable", "prey", "fish"].includes(selected.role)) {

@@ -267,7 +267,7 @@ async function run(
     if (searchTag == "clear") {
       if (current.length == 0)
         return send({
-          embeds: [new ErrorEmbed(`you dont have anything being automatically sold`)],
+          embeds: [new ErrorEmbed(`you don't have anything being automatically sold`)],
         });
 
       await setSellFilter(message.member, []);
@@ -365,7 +365,7 @@ async function run(
     }
 
     if (!inventory.has(selected.id)) {
-      return send({ embeds: [new ErrorEmbed("you dont have any " + selected.name)] });
+      return send({ embeds: [new ErrorEmbed("you don't have any " + selected.name)] });
     }
 
     if (inventory.count(selected.id) < amount) {

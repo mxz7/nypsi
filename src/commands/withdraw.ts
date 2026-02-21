@@ -52,7 +52,7 @@ async function run(
   }
 
   if ((await getBankBalance(message.member)) == 0) {
-    return send({ embeds: [new ErrorEmbed("you dont have any money in your bank account")] });
+    return send({ embeds: [new ErrorEmbed("you don't have any money in your bank account")] });
   }
 
   if (args[0].toLowerCase() == "all") {
@@ -67,7 +67,7 @@ async function run(
 
   if (amount > (await getBankBalance(message.member))) {
     return send({
-      embeds: [new ErrorEmbed("you dont have enough money in your bank account")],
+      embeds: [new ErrorEmbed("you don't have enough money in your bank account")],
     });
   }
 

@@ -38,7 +38,7 @@ module.exports = new ItemUse(
 
     if (!inventory.has(selected.id)) {
       return ItemUse.send(message, {
-        embeds: [new ErrorEmbed(`you dont have ${selected.article} ${selected.name}`)],
+        embeds: [new ErrorEmbed(`you don't have ${selected.article} ${selected.name}`)],
       });
     }
 
