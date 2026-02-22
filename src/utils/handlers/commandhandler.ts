@@ -644,7 +644,7 @@ export async function runCommand(
         if (!recentlyUsedUserAliases.has(message.channel.id))
           recentlyUsedUserAliases.set(message.channel.id, new Map());
         if (!recentlyUsedUserAliases.get(message.channel.id).has(cmd))
-          recentlyUsedUserAliases.get(message.channel.id).set(cmd, message.author.username);
+          recentlyUsedUserAliases.get(message.channel.id).set(cmd, message.author.id);
 
         cmd = foundAlias.command.split(" ")[0];
         command = commands.get(cmd);
@@ -658,11 +658,10 @@ export async function runCommand(
       } else if (recentlyUsedUserAliases.get(message.channel.id)?.has(cmd)) {
         if (!cmd) return;
         const owner = recentlyUsedUserAliases.get(message.channel.id).get(cmd);
+        const ownerUsername = await getLastKnownUsername(owner, true);
 
         const premium = await isPremium(message.member);
-        const command = await getUserAliases(message.author.id).then((r) =>
-          r.find((a) => a.alias === cmd),
-        );
+        const command = await getUserAliases(owner).then((r) => r.find((a) => a.alias === cmd));
 
         let commandString = cmd;
 
@@ -676,7 +675,7 @@ export async function runCommand(
         return message.channel.send({
           embeds: [
             new ErrorEmbed(
-              `\`${commandString}\` is a custom alias owned by **${owner.replaceAll("_", "\\_")}**${!premium ? "\n\nto create your own custom aliases you need a premium membership: /premium" : ""}`,
+              `\`${commandString}\` is a custom alias owned by **${ownerUsername}**${!premium ? "\n\nto create your own custom aliases you need a premium membership: /premium" : ""}`,
             ),
           ],
         });
