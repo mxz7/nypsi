@@ -21,7 +21,7 @@ import { MStoTime } from "./date";
 import { isEcoBanned, setEcoBan } from "./economy/utils";
 import { getUserId, MemberResolvable } from "./member";
 import { getAllGroupAccountIds } from "./moderation/alts";
-import { addNotificationToQueue } from "./users/notifications";
+import { addInlineNotification, addNotificationToQueue } from "./users/notifications";
 import ms = require("ms");
 import dayjs = require("dayjs");
 
@@ -178,6 +178,25 @@ export async function failedCaptcha(member: GuildMember, content: string) {
       "EX",
       Math.floor(ms("1 day") / 1000),
     );
+  }
+
+  if (
+    parseInt(await redis.get(`${Constants.redis.cache.user.captcha_fail}:${member.user.id}`)) ===
+      35 &&
+    !(await isEcoBanned(member.user.id)).banned
+  ) {
+    const embed = new CustomEmbed(
+      member,
+      "you have missed a lot of captchas, if this continues you may be automatically banned",
+    ).setTitle("⚠️ warning");
+
+    addNotificationToQueue({
+      memberId: member.user.id,
+      payload: {
+        embed,
+      },
+    });
+    addInlineNotification({ memberId: member.user.id, embed });
   }
 
   if (
