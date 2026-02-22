@@ -773,7 +773,7 @@ async function run(
 
     const user = await message.client.users.fetch(args[1]);
 
-    if (!user) return send({ embeds: [new ErrorEmbed("user doesnt exist")] });
+    if (!user) return send({ embeds: [new ErrorEmbed("user doesn't exist")] });
 
     if (await isPremium(user)) {
       const embed = new CustomEmbed(message.member);

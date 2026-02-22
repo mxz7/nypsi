@@ -37,7 +37,7 @@ cmd.slashData
     view.setName("request").setDescription("view all of the data held on you by nypsi's database"),
   );
 
-// @ts-expect-error ts doesnt like that
+// @ts-expect-error ts doesn't like that
 BigInt.prototype.toJSON = function () {
   return this.toString();
 };

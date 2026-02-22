@@ -27,7 +27,7 @@ import { giveCaptcha, isLockedOut, verifyUser } from "../functions/captcha";
 import { formatDate } from "../functions/date";
 import { getNews, hasSeenNews } from "../functions/news";
 import { getTimestamp, logger } from "../logger";
-// @ts-expect-error doesnt like getting from json file
+// @ts-expect-error doesn't like getting from json file
 import { tips } from "../../../data/lists.json";
 import prisma from "../../init/database";
 import { Item } from "../../types/Economy";

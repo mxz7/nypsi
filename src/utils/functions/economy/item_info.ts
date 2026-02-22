@@ -693,7 +693,7 @@ export function poolBreakdownData(pool: LootPool): {
   for (const key in pool.items ?? {}) {
     const countObj = typeof pool.items[key] === "object" ? pool.items[key].count : {};
     const countString = Object.hasOwn(countObj, "min")
-      ? // @ts-expect-error ts doesnt realize min has to be present
+      ? // @ts-expect-error ts doesn't realize min has to be present
         `${countObj.min}-${countObj.max}`
       : `${getItemCount(pool.items[key], key)}`;
 

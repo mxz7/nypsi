@@ -135,7 +135,7 @@ async function run(
   }
 
   if (!(await userExists(target)) || (await getBalance(target)) <= 500) {
-    return send({ embeds: [new ErrorEmbed("this user doesnt have sufficient funds")] });
+    return send({ embeds: [new ErrorEmbed("this user doesn't have sufficient funds")] });
   }
 
   if (

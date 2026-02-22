@@ -17,7 +17,7 @@ import { nanoid } from "nanoid";
 import { compareTwoStrings } from "string-similarity";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../models/Command";
 import { CustomEmbed, ErrorEmbed, getColor } from "../../../models/EmbedBuilders";
-// @ts-expect-error doesnt like getting from json file
+// @ts-expect-error doesn't like getting from json file
 import { countries } from "../../../../data/lists.json";
 import prisma from "../../../init/database";
 import Constants from "../../Constants";

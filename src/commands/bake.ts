@@ -16,7 +16,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 
 const cmd = new Command(
   "bake",
-  "use your furnace to bake cookies and cakes! (doesnt remove your furnace because cookies are cool)",
+  "use your furnace to bake cookies and cakes! (doesn't remove your furnace because cookies are cool)",
   "money",
 );
 

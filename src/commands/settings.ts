@@ -385,7 +385,7 @@ async function run(
             await modalResponse.deferUpdate();
           }
         } else {
-          // @ts-expect-error doesnt like doing this!
+          // @ts-expect-error doesn't like doing this!
           settings[selected] = true;
           await res.deferUpdate();
         }
@@ -399,12 +399,12 @@ async function run(
 
         await res.deferUpdate();
 
-        // @ts-expect-error doesnt like doing this!
+        // @ts-expect-error doesn't like doing this!
         if (typeof settings[selected] === "number" || typeof settings[selected] === "bigint") {
-          // @ts-expect-error doesnt like doing this!
+          // @ts-expect-error doesn't like doing this!
           settings[selected] = 0;
         } else {
-          // @ts-expect-error doesnt like doing this!
+          // @ts-expect-error doesn't like doing this!
           settings[selected] = false;
         }
 
@@ -627,7 +627,7 @@ async function run(
             await modalResponse.deferUpdate();
           }
         } else {
-          // @ts-expect-error doesnt like doing this!
+          // @ts-expect-error doesn't like doing this!
           settings[selected] = true;
           await res.deferUpdate();
         }
@@ -644,15 +644,15 @@ async function run(
         if (selected === "marketDelay") {
           settings[selected] = 300;
         } else if (
-          // @ts-expect-error doesnt like doing this!
+          // @ts-expect-error doesn't like doing this!
           typeof settings[selected] === "number" ||
-          // @ts-expect-error doesnt like doing this!
+          // @ts-expect-error doesn't like doing this!
           typeof settings[selected] === "bigint"
         ) {
-          // @ts-expect-error doesnt like doing this!
+          // @ts-expect-error doesn't like doing this!
           settings[selected] = 0;
         } else {
-          // @ts-expect-error doesnt like doing this!
+          // @ts-expect-error doesn't like doing this!
           settings[selected] = false;
         }
 

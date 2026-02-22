@@ -43,7 +43,7 @@ async function doVote(user: string) {
   await redis.srem(Constants.redis.nypsi.VOTE_REMINDER_RECEIVED, user);
 
   if (!(await userExists(user))) {
-    logger.warn(`vote: ${user} doesnt exist`);
+    logger.warn(`vote: ${user} doesn't exist`);
     return;
   }
 

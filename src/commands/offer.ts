@@ -488,7 +488,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            `**${escapeFormattingCharacters(target.user.username)}** doesnt have ${amount}x ${selected.emoji} ${selected.name}`,
+            `**${escapeFormattingCharacters(target.user.username)}** doesn't have ${amount}x ${selected.emoji} ${selected.name}`,
           ),
         ],
       });
