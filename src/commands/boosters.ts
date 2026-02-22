@@ -33,7 +33,7 @@ async function run(
 
   embed.setHeader("boosters", message.author.avatarURL());
 
-  const pages = await getBoostersDisplay(await getBoosters(message.member), embed);
+  const pages = await getBoostersDisplay(await getBoosters(message.member), embed, true);
 
   if (!pages) {
     embed.setDescription("you have no active boosters");

@@ -193,10 +193,6 @@ async function run(
 
     const pages = await getBoostersDisplay(boosters, embed);
 
-    if (pages.get(1)) {
-      embed.addField("current boosters", pages.get(1).join("\n"));
-    }
-
     if (pages.size <= 1) return send({ embeds: [embed] });
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(

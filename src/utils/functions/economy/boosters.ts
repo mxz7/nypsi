@@ -241,6 +241,7 @@ export async function addBooster(
 export async function getBoostersDisplay(
   boosters: Map<string, Booster[]>,
   embed: CustomEmbed,
+  useDescription = false,
 ): Promise<null | Map<number, string[]>> {
   const desc: string[] = [];
 
@@ -302,7 +303,11 @@ export async function getBoostersDisplay(
   const firstPage = pages.get(1);
 
   if (firstPage) {
-    embed.setDescription(firstPage.join("\n"));
+    if (useDescription) {
+      embed.setDescription(firstPage.join("\n"));
+    } else {
+      embed.addField("current boosters", firstPage.join("\n"));
+    }
   }
 
   if (globalBoosters.length > 0) {
