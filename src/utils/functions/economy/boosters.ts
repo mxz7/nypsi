@@ -1,6 +1,7 @@
 import { BoosterScope } from "#generated/prisma";
 import { GuildMember } from "discord.js";
 import { sort } from "fast-sort";
+import { exec } from "node:child_process";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
@@ -231,6 +232,10 @@ export async function addBooster(
   });
 
   await redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${userId}`);
+
+  if (scope === "global") {
+    exec(`redis-cli KEYS "*cache:economy:boosters*" | xargs redis-cli DEL`);
+  }
 }
 
 export async function getBoostersDisplay(
