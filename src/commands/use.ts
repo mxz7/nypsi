@@ -177,13 +177,11 @@ async function run(
 
     const embed = new CustomEmbed(message.member).setHeader("boosters", message.author.avatarURL());
 
-    let desc = `activating ${amount > 1 ? `${amount}x ` : ""}**${selected.name}** booster...`;
-    let desc2 = `you have activated ${amount > 1 ? `${amount}x ` : ""}**${selected.name}**${global ? " (global)" : ""}`;
+    let desc = `you have activated ${amount > 1 ? `${amount}x ` : ""}**${selected.name}**${global ? " (global)" : ""}`;
 
     if (["cake", "cookie", "lucky_cheese"].includes(selected.id)) {
       addTaskProgress(message.author.id, "eat_cookies", amount);
-      desc = `eating ${amount > 1 ? `${amount} ` : ""}**${pluralize(selected, amount)}**...`;
-      desc2 = `you have eaten ${amount > 1 ? `${amount} ` : "a "}**${pluralize(
+      desc = `you have eaten ${amount > 1 ? `${amount} ` : "a "}**${pluralize(
         selected,
         amount,
       )}** 😋`;
@@ -191,49 +189,43 @@ async function run(
 
     embed.setDescription(desc);
 
-    const msg = await send({ embeds: [embed] });
-
     const pages = await getBoostersDisplay(boosters, embed);
 
-    embed.setDescription(desc2);
     if (pages.get(1)) {
       embed.addField("current boosters", pages.get(1).join("\n"));
     }
 
-    setTimeout(async () => {
-      if (pages.size <= 1) return msg.edit({ embeds: [embed] });
+    if (pages.size <= 1) return send({ embeds: [embed] });
 
-      const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder()
-          .setCustomId("⬅")
-          .setLabel("back")
-          .setStyle(ButtonStyle.Primary)
-          .setDisabled(true),
-        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
-      );
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId("⬅")
+        .setLabel("back")
+        .setStyle(ButtonStyle.Primary)
+        .setDisabled(true),
+      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+    );
 
-      await msg.edit({ embeds: [embed], components: [row] });
+    const msg = await send({ embeds: [embed], components: [row] });
 
-      const manager = new PageManager({
-        embed,
-        message: msg,
-        row,
-        userId: message.author.id,
-        pages,
-        updateEmbed(page: string[], embed: CustomEmbed) {
-          embed.data.fields.length = 0;
-          embed.addField("current boosters", page.join("\n"));
-          return embed;
-        },
-        onPageUpdate(manager) {
-          manager.embed.setFooter({ text: `page ${manager.currentPage}/${manager.lastPage}` });
-          return manager.embed;
-        },
-      });
+    const manager = new PageManager({
+      embed,
+      message: msg,
+      row,
+      userId: message.author.id,
+      pages,
+      updateEmbed(page: string[], embed: CustomEmbed) {
+        embed.data.fields.length = 0;
+        embed.addField("current boosters", page.join("\n"));
+        return embed;
+      },
+      onPageUpdate(manager) {
+        manager.embed.setFooter({ text: `page ${manager.currentPage}/${manager.lastPage}` });
+        return manager.embed;
+      },
+    });
 
-      return manager.listen();
-    }, 1000);
-    return;
+    return manager.listen();
   } else if (selected.role == "worker-upgrade") {
     const baseUpgrades = getBaseUpgrades();
 
