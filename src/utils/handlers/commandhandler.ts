@@ -663,19 +663,19 @@ export async function runCommand(
         const premium = await isPremium(message.member);
         const command = await getUserAliases(owner).then((r) => r.find((a) => a.alias === cmd));
 
-        let commandString = cmd;
+        let commandString = `\`${cmd}\``;
 
         const prefixes = await getPrefix(message.guild);
 
         if (command) {
           const prefix = prefixes[0];
-          commandString = `'${prefix}${cmd}' -> ${prefix}${command.command}`;
+          commandString = `\`${prefix}${cmd}\` -> \`${prefix}${command.command}\``;
         }
 
         return message.channel.send({
           embeds: [
             new ErrorEmbed(
-              `\`${commandString}\` is a custom alias owned by **${ownerUsername}**${!premium ? "\n\nto create your own custom aliases you need a premium membership: /premium" : ""}`,
+              `${commandString} is a custom alias owned by **${ownerUsername}**${!premium ? "\n\nto create your own custom aliases you need a premium membership: /premium" : ""}`,
             ),
           ],
         });
