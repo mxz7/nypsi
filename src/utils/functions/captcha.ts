@@ -95,19 +95,27 @@ export async function passedCaptcha(member: GuildMember | User, check: Captcha, 
     );
   } else {
     const timeTakenToSolve = check.solvedAt.getTime() - check.createdAt.getTime();
+    const failedCaptchas = parseInt(
+      await redis.get(`${Constants.redis.cache.user.captcha_fail}:${member.id}`),
+    );
 
-    await hook.send(
+    let msg =
       `[${getTimestamp()}] **${username}** (${member.id}) has passed a captcha [${await redis.get(
         `${Constants.redis.cache.user.captcha_pass}:${member.id}`,
       )}]\n` +
-        "```" +
-        `received: ${check.received}\n` +
-        `received at: ${dayjs(check.createdAt).format("HH:mm:ss")}\n` +
-        `visits (${check.visits.length}): ${check.visits.map((i) => dayjs(i).format("HH:mm:ss")).join(" ")}\n` +
-        `solved at: ${dayjs(check.solvedAt).format("HH:mm:ss")}\n` +
-        `time taken: ${MStoTime(timeTakenToSolve)}\n` +
-        "```",
-    );
+      "```" +
+      `received: ${check.received}\n` +
+      `received at: ${dayjs(check.createdAt).format("HH:mm:ss")}\n` +
+      `visits (${check.visits.length}): ${check.visits.map((i) => dayjs(i).format("HH:mm:ss")).join(" ")}\n` +
+      `solved at: ${dayjs(check.solvedAt).format("HH:mm:ss")}\n` +
+      `time taken: ${MStoTime(timeTakenToSolve)}\n` +
+      "```";
+
+    if (timeTakenToSolve > ms("2 minutes") && failedCaptchas > 3) {
+      msg += `\n\n⚠️ taken longer than 2 minutes to solve with captcha experience`;
+    }
+
+    await hook.send(msg);
   }
 
   let ttl = Math.floor(ms("30 minutes") / 1000);
