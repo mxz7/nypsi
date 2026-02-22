@@ -180,7 +180,9 @@ async function run(
     let desc = `you have activated ${amount > 1 ? `${amount}x ` : ""}**${selected.name}**${global ? " (global)" : ""}`;
 
     if (["cake", "cookie", "lucky_cheese"].includes(selected.id)) {
-      addTaskProgress(message.author.id, "eat_cookies", amount);
+      if (selected.id === "cookie") {
+        addTaskProgress(message.author.id, "eat_cookies", amount);
+      }
       desc = `you have eaten ${amount > 1 ? `${amount} ` : "a "}**${pluralize(
         selected,
         amount,
