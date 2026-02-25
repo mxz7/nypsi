@@ -30,6 +30,7 @@ import {
 } from "../utils/functions/economy/inventory";
 import { addStat } from "../utils/functions/economy/stats";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
+import { getToolPreferences } from "../utils/functions/economy/tool_preferences";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { addXp, calcEarnedHFMXp } from "../utils/functions/economy/xp";
 import { percentChance } from "../utils/functions/random";
@@ -54,28 +55,82 @@ async function run(
     return;
   }
 
-  const inventory = await getInventory(member);
   const items = getItems();
+  const [inventory, toolPreferences, boosters] = await Promise.all([
+    getInventory(member),
+    getToolPreferences(member),
+    getBoosters(member),
+  ]);
 
   let fishingRod: string;
 
-  if (inventory.has("incredible_fishing_rod")) {
-    fishingRod = "incredible_fishing_rod";
-  } else if (inventory.has("fishing_rod")) {
-    fishingRod = "fishing_rod";
-  } else if (inventory.has("terrible_fishing_rod")) {
-    fishingRod = "terrible_fishing_rod";
+  let times = 1;
+  let unbreaking = false;
+
+  for (const boosterId of boosters.keys()) {
+    if (items[boosterId].boosterEffect.boosts.includes("fish")) {
+      if (items[boosterId].id == "unbreaking") {
+        unbreaking = true;
+      } else {
+        times++;
+      }
+    }
   }
 
-  if (!fishingRod) {
-    return send({
-      embeds: [
-        new ErrorEmbed(
-          "you need a fishing rod to fish\n[how do i get a fishing rod?](https://nypsi.xyz/docs/economy/fish-hunt-mine?ref=bot-help)\n\nyou can use **/free** to get some basic tools",
-        ),
-      ],
-      flags: MessageFlags.Ephemeral,
-    });
+  if (
+    (unbreaking && toolPreferences.bestToolOnUnbreaking) ||
+    toolPreferences.rodType == "highest"
+  ) {
+    if (inventory.has("incredible_fishing_rod")) {
+      fishingRod = "incredible_fishing_rod";
+    } else if (inventory.has("fishing_rod")) {
+      fishingRod = "fishing_rod";
+    } else if (inventory.has("terrible_fishing_rod")) {
+      fishingRod = "terrible_fishing_rod";
+    }
+
+    if (!fishingRod) {
+      return send({
+        embeds: [
+          new ErrorEmbed(
+            "you need a fishing rod to fish\n[how do i get a fishing rod?](https://nypsi.xyz/docs/economy/fish-hunt-mine?ref=bot-help)\n\nyou can use **/free** to get some basic tools",
+          ),
+        ],
+        flags: MessageFlags.Ephemeral,
+      });
+    }
+  } else {
+    if (toolPreferences.rodType == "incredible" && inventory.has("incredible_fishing_rod")) {
+      fishingRod = "incredible_fishing_rod";
+    } else if (
+      (toolPreferences.rodType == "normal" ||
+        (toolPreferences.rodType == "incredible" && toolPreferences.useLowerToolOnEmpty)) &&
+      inventory.has("fishing_rod")
+    ) {
+      fishingRod = "fishing_rod";
+    } else if (
+      (toolPreferences.rodType == "terrible" || toolPreferences.useLowerToolOnEmpty) &&
+      inventory.has("terrible_fishing_rod")
+    ) {
+      fishingRod = "terrible_fishing_rod";
+    }
+
+    if (!fishingRod) {
+      return send({
+        embeds: [
+          new ErrorEmbed("you do not have any more of your preferred fishing rod").setFooter({
+            text: "$tools",
+          }),
+        ],
+        flags: MessageFlags.Ephemeral,
+      });
+    }
+  }
+
+  if (fishingRod == "fishing_rod") {
+    times++;
+  } else if (fishingRod == "incredible_fishing_rod") {
+    times += 2;
   }
 
   await addCooldown(cmd.name, member, 60);
@@ -134,28 +189,6 @@ async function run(
   }
 
   await addStat(member, fishingRod);
-
-  let times = 1;
-
-  if (fishingRod == "fishing_rod") {
-    times = 2;
-  } else if (fishingRod == "incredible_fishing_rod") {
-    times = 3;
-  }
-
-  const boosters = await getBoosters(member);
-
-  let unbreaking = false;
-
-  for (const boosterId of boosters.keys()) {
-    if (items[boosterId].boosterEffect.boosts.includes("fish")) {
-      if (items[boosterId].id == "unbreaking") {
-        unbreaking = true;
-      } else {
-        times++;
-      }
-    }
-  }
 
   if ((await inventory.hasGem("purple_gem")).any) {
     if (percentChance(0.2)) {

@@ -27,6 +27,7 @@ import {
 } from "../utils/functions/economy/inventory";
 import { addStat } from "../utils/functions/economy/stats";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
+import { getToolPreferences } from "../utils/functions/economy/tool_preferences";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { addXp, calcEarnedHFMXp } from "../utils/functions/economy/xp";
 import { percentChance } from "../utils/functions/random";
@@ -66,46 +67,18 @@ async function run(
     return;
   }
 
-  const inventory = await getInventory(member);
   const items = getItems();
+  const [inventory, toolPreferences, boosters] = await Promise.all([
+    getInventory(member),
+    getToolPreferences(member),
+    getBoosters(member),
+  ]);
 
   let gun: string;
-
-  if (inventory.has("incredible_gun")) {
-    gun = "incredible_gun";
-  } else if (inventory.has("gun")) {
-    gun = "gun";
-  } else if (inventory.has("terrible_gun")) {
-    gun = "terrible_gun";
-  }
-
-  if (!gun) {
-    return send({
-      embeds: [
-        new ErrorEmbed(
-          "you need a gun to hunt\n[how do i get a gun?](https://nypsi.xyz/docs/economy/fish-hunt-mine?ref=bot-help)\n\nyou can use **/free** to get some basic tools",
-        ),
-      ],
-      flags: MessageFlags.Ephemeral,
-    });
-  }
-
-  await addCooldown(cmd.name, member, 60);
-
-  await addStat(member, gun);
-
-  const huntItems = Array.from(Object.keys(items));
 
   let times = 1;
   let multi = 0;
 
-  if (gun == "gun") {
-    times = 2;
-  } else if (gun == "incredible_gun") {
-    times = 3;
-  }
-
-  const boosters = await getBoosters(member);
   let unbreaking = false;
 
   for (const boosterId of boosters.keys()) {
@@ -124,6 +97,68 @@ async function run(
       }
     }
   }
+
+  if (
+    (unbreaking && toolPreferences.bestToolOnUnbreaking) ||
+    toolPreferences.gunType == "highest"
+  ) {
+    if (inventory.has("incredible_gun")) {
+      gun = "incredible_gun";
+    } else if (inventory.has("gun")) {
+      gun = "gun";
+    } else if (inventory.has("terrible_gun")) {
+      gun = "terrible_gun";
+    }
+
+    if (!gun) {
+      return send({
+        embeds: [
+          new ErrorEmbed(
+            "you need a gun to hunt\n[how do i get a gun?](https://nypsi.xyz/docs/economy/fish-hunt-mine?ref=bot-help)\n\nyou can use **/free** to get some basic tools",
+          ),
+        ],
+        flags: MessageFlags.Ephemeral,
+      });
+    }
+  } else {
+    if (toolPreferences.gunType == "incredible" && inventory.has("incredible_gun")) {
+      gun = "incredible_gun";
+    } else if (
+      (toolPreferences.gunType == "normal" ||
+        (toolPreferences.gunType == "incredible" && toolPreferences.useLowerToolOnEmpty)) &&
+      inventory.has("gun")
+    ) {
+      gun = "gun";
+    } else if (
+      (toolPreferences.gunType == "terrible" || toolPreferences.useLowerToolOnEmpty) &&
+      inventory.has("terrible_gun")
+    ) {
+      gun = "terrible_gun";
+    }
+
+    if (!gun) {
+      return send({
+        embeds: [
+          new ErrorEmbed("you do not have any more of your preferred gun").setFooter({
+            text: "$tools",
+          }),
+        ],
+        flags: MessageFlags.Ephemeral,
+      });
+    }
+  }
+
+  if (gun == "gun") {
+    times++;
+  } else if (gun == "incredible_gun") {
+    times += 2;
+  }
+
+  await addCooldown(cmd.name, member, 60);
+
+  await addStat(member, gun);
+
+  const huntItems = Array.from(Object.keys(items));
 
   if ((await inventory.hasGem("purple_gem")).any) {
     if (percentChance(0.2)) {

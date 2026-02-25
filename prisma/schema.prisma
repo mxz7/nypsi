@@ -214,6 +214,7 @@ model Economy {
 
   MarketWatch        MarketWatch[]
   Boosters           Booster[]
+  ToolPreferences    ToolPreferences?
   EconomyWorker      EconomyWorker[]
   Inventory          Inventory[]
   Crafting           Crafting[]
@@ -231,6 +232,28 @@ model Economy {
   CustomCar          CustomCar[]
   Farm               Farm[]
   FarmUpgrades       FarmUpgrades[]
+}
+
+enum ToolPreferenceSelection {
+  terrible
+  normal
+  incredible
+  highest
+}
+
+model ToolPreferences {
+  userId String
+
+  pickaxeType ToolPreferenceSelection @default(highest)
+  rodType     ToolPreferenceSelection @default(highest)
+  gunType     ToolPreferenceSelection @default(highest)
+
+  bestToolOnUnbreaking Boolean @default(true)
+  useLowerToolOnEmpty Boolean @default(true)
+  
+  economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@id(userId)
 }
 
 model Farm {

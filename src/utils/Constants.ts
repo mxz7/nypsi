@@ -266,6 +266,7 @@ export default {
         COMPLETION_LB: "cache:economy:lb:completion",
         ITEM_EXISTS: "cache:economy:item:exists",
         HAS_GEM: "cache:economy:item:hasgem",
+        TOOL_PREFERENCES: "cache:economy:item:toolpreferences",
       },
       z: {
         profile: "cache:z:profile",
