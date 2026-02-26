@@ -34,6 +34,7 @@ model User {
   Achievements             Achievements[]
   DMSettings               DMSettings?
   Preferences              Preferences?
+  ToolPreferences          ToolPreferences?
   Leaderboards             Leaderboards[]
   ActiveChannels           ActiveChannels[]
   Tags                     Tags[]
@@ -214,7 +215,6 @@ model Economy {
 
   MarketWatch        MarketWatch[]
   Boosters           Booster[]
-  ToolPreferences    ToolPreferences?
   EconomyWorker      EconomyWorker[]
   Inventory          Inventory[]
   Crafting           Crafting[]
@@ -242,7 +242,7 @@ enum ToolPreferenceSelection {
 }
 
 model ToolPreferences {
-  userId String
+  userId String @id
 
   pickaxeType ToolPreferenceSelection @default(highest)
   rodType     ToolPreferenceSelection @default(highest)
@@ -251,9 +251,7 @@ model ToolPreferences {
   bestToolOnUnbreaking Boolean @default(true)
   useLowerToolOnEmpty Boolean @default(true)
   
-  economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
-
-  @@id(userId)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Farm {

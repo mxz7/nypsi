@@ -14,4 +14,4 @@ CREATE TABLE "ToolPreferences" (
 );
 
 -- AddForeignKey
-ALTER TABLE "ToolPreferences" ADD CONSTRAINT "ToolPreferences_userId_fkey" FOREIGN KEY ("userId") REFERENCES "Economy"("userId") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "ToolPreferences" ADD CONSTRAINT "ToolPreferences_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
