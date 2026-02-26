@@ -1,17 +1,9 @@
 -- CreateEnum
 CREATE TYPE "ToolPreferenceSelection" AS ENUM ('terrible', 'normal', 'incredible', 'highest');
 
--- CreateTable
-CREATE TABLE "ToolPreferences" (
-    "userId" TEXT NOT NULL,
-    "pickaxeType" "ToolPreferenceSelection" NOT NULL DEFAULT 'highest',
-    "rodType" "ToolPreferenceSelection" NOT NULL DEFAULT 'highest',
-    "gunType" "ToolPreferenceSelection" NOT NULL DEFAULT 'highest',
-    "bestToolOnUnbreaking" BOOLEAN NOT NULL DEFAULT true,
-    "useLowerToolOnEmpty" BOOLEAN NOT NULL DEFAULT true,
-
-    CONSTRAINT "ToolPreferences_pkey" PRIMARY KEY ("userId")
-);
-
--- AddForeignKey
-ALTER TABLE "ToolPreferences" ADD CONSTRAINT "ToolPreferences_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+-- AlterTable
+ALTER TABLE "Economy" ADD COLUMN     "preferredGun" "ToolPreferenceSelection" NOT NULL DEFAULT 'highest',
+ADD COLUMN     "preferredPickaxe" "ToolPreferenceSelection" NOT NULL DEFAULT 'highest',
+ADD COLUMN     "preferredRod" "ToolPreferenceSelection" NOT NULL DEFAULT 'highest',
+ADD COLUMN     "useBestToolOnUnbreaking" BOOLEAN NOT NULL DEFAULT true,
+ADD COLUMN     "useLowerToolOnEmpty" BOOLEAN NOT NULL DEFAULT true;

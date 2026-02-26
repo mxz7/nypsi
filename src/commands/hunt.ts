@@ -30,6 +30,7 @@ import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { getToolPreferences } from "../utils/functions/economy/tool_preferences";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { addXp, calcEarnedHFMXp } from "../utils/functions/economy/xp";
+import { getPrefix } from "../utils/functions/guilds/utils";
 import { percentChance } from "../utils/functions/random";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
@@ -99,8 +100,8 @@ async function run(
   }
 
   if (
-    (unbreaking && toolPreferences.bestToolOnUnbreaking) ||
-    toolPreferences.gunType == "highest"
+    (unbreaking && toolPreferences.useBestToolOnUnbreaking) ||
+    toolPreferences.preferredGun == "highest"
   ) {
     if (inventory.has("incredible_gun")) {
       gun = "incredible_gun";
@@ -121,16 +122,16 @@ async function run(
       });
     }
   } else {
-    if (toolPreferences.gunType == "incredible" && inventory.has("incredible_gun")) {
+    if (toolPreferences.preferredGun == "incredible" && inventory.has("incredible_gun")) {
       gun = "incredible_gun";
     } else if (
-      (toolPreferences.gunType == "normal" ||
-        (toolPreferences.gunType == "incredible" && toolPreferences.useLowerToolOnEmpty)) &&
+      (toolPreferences.preferredGun == "normal" ||
+        (toolPreferences.preferredGun == "incredible" && toolPreferences.useLowerToolOnEmpty)) &&
       inventory.has("gun")
     ) {
       gun = "gun";
     } else if (
-      (toolPreferences.gunType == "terrible" || toolPreferences.useLowerToolOnEmpty) &&
+      (toolPreferences.preferredGun == "terrible" || toolPreferences.useLowerToolOnEmpty) &&
       inventory.has("terrible_gun")
     ) {
       gun = "terrible_gun";
@@ -140,7 +141,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed("you do not have any more of your preferred gun").setFooter({
-            text: "$tools",
+            text: `${(await getPrefix(message.guild))[0]}tools`,
           }),
         ],
         flags: MessageFlags.Ephemeral,

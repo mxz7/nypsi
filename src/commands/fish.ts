@@ -33,6 +33,7 @@ import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { getToolPreferences } from "../utils/functions/economy/tool_preferences";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { addXp, calcEarnedHFMXp } from "../utils/functions/economy/xp";
+import { getPrefix } from "../utils/functions/guilds/utils";
 import { percentChance } from "../utils/functions/random";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -78,8 +79,8 @@ async function run(
   }
 
   if (
-    (unbreaking && toolPreferences.bestToolOnUnbreaking) ||
-    toolPreferences.rodType == "highest"
+    (unbreaking && toolPreferences.useBestToolOnUnbreaking) ||
+    toolPreferences.preferredRod == "highest"
   ) {
     if (inventory.has("incredible_fishing_rod")) {
       fishingRod = "incredible_fishing_rod";
@@ -100,16 +101,16 @@ async function run(
       });
     }
   } else {
-    if (toolPreferences.rodType == "incredible" && inventory.has("incredible_fishing_rod")) {
+    if (toolPreferences.preferredRod == "incredible" && inventory.has("incredible_fishing_rod")) {
       fishingRod = "incredible_fishing_rod";
     } else if (
-      (toolPreferences.rodType == "normal" ||
-        (toolPreferences.rodType == "incredible" && toolPreferences.useLowerToolOnEmpty)) &&
+      (toolPreferences.preferredRod == "normal" ||
+        (toolPreferences.preferredRod == "incredible" && toolPreferences.useLowerToolOnEmpty)) &&
       inventory.has("fishing_rod")
     ) {
       fishingRod = "fishing_rod";
     } else if (
-      (toolPreferences.rodType == "terrible" || toolPreferences.useLowerToolOnEmpty) &&
+      (toolPreferences.preferredRod == "terrible" || toolPreferences.useLowerToolOnEmpty) &&
       inventory.has("terrible_fishing_rod")
     ) {
       fishingRod = "terrible_fishing_rod";
@@ -119,7 +120,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed("you do not have any more of your preferred fishing rod").setFooter({
-            text: "$tools",
+            text: `${(await getPrefix(message.guild))[0]}tools`,
           }),
         ],
         flags: MessageFlags.Ephemeral,

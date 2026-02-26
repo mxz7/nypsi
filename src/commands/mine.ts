@@ -30,6 +30,7 @@ import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { getToolPreferences } from "../utils/functions/economy/tool_preferences";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { addXp, calcEarnedHFMXp } from "../utils/functions/economy/xp";
+import { getPrefix } from "../utils/functions/guilds/utils";
 import { percentChance } from "../utils/functions/random";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -125,8 +126,8 @@ async function run(
   }
 
   if (
-    (unbreakable && toolPreferences.bestToolOnUnbreaking) ||
-    toolPreferences.pickaxeType == "highest"
+    (unbreakable && toolPreferences.useBestToolOnUnbreaking) ||
+    toolPreferences.preferredPickaxe == "highest"
   ) {
     if (inventory.has("diamond_pickaxe")) {
       pickaxe = "diamond_pickaxe";
@@ -147,16 +148,17 @@ async function run(
       });
     }
   } else {
-    if (toolPreferences.pickaxeType == "incredible" && inventory.has("diamond_pickaxe")) {
+    if (toolPreferences.preferredPickaxe == "incredible" && inventory.has("diamond_pickaxe")) {
       pickaxe = "diamond_pickaxe";
     } else if (
-      (toolPreferences.pickaxeType == "normal" ||
-        (toolPreferences.pickaxeType == "incredible" && toolPreferences.useLowerToolOnEmpty)) &&
+      (toolPreferences.preferredPickaxe == "normal" ||
+        (toolPreferences.preferredPickaxe == "incredible" &&
+          toolPreferences.useLowerToolOnEmpty)) &&
       inventory.has("iron_pickaxe")
     ) {
       pickaxe = "iron_pickaxe";
     } else if (
-      (toolPreferences.pickaxeType == "terrible" || toolPreferences.useLowerToolOnEmpty) &&
+      (toolPreferences.preferredPickaxe == "terrible" || toolPreferences.useLowerToolOnEmpty) &&
       inventory.has("wooden_pickaxe")
     ) {
       pickaxe = "wooden_pickaxe";
@@ -166,7 +168,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed("you do not have any more of your preferred pickaxe").setFooter({
-            text: "$tools",
+            text: `${(await getPrefix(message.guild))[0]}tools`,
           }),
         ],
         flags: MessageFlags.Ephemeral,

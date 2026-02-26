@@ -34,7 +34,6 @@ model User {
   Achievements             Achievements[]
   DMSettings               DMSettings?
   Preferences              Preferences?
-  ToolPreferences          ToolPreferences?
   Leaderboards             Leaderboards[]
   ActiveChannels           ActiveChannels[]
   Tags                     Tags[]
@@ -210,6 +209,12 @@ model Economy {
 
   dailyLottery Int?
 
+  preferredPickaxe         ToolPreferenceSelection @default(highest)
+  preferredRod             ToolPreferenceSelection @default(highest)
+  preferredGun             ToolPreferenceSelection @default(highest)
+  useBestToolOnUnbreaking  Boolean @default(true)
+  useLowerToolOnEmpty      Boolean @default(true)
+
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @id
 
@@ -239,19 +244,6 @@ enum ToolPreferenceSelection {
   normal
   incredible
   highest
-}
-
-model ToolPreferences {
-  userId String @id
-
-  pickaxeType ToolPreferenceSelection @default(highest)
-  rodType     ToolPreferenceSelection @default(highest)
-  gunType     ToolPreferenceSelection @default(highest)
-
-  bestToolOnUnbreaking Boolean @default(true)
-  useLowerToolOnEmpty Boolean @default(true)
-  
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Farm {

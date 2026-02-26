@@ -40,7 +40,7 @@ async function run(
     return;
   }
 
-  await addCooldown(cmd.name, message.member, 5); //30
+  await addCooldown(cmd.name, message.member, 15);
 
   const items = getItems();
   let inventory = await getInventory(message.member);
@@ -108,7 +108,7 @@ async function run(
     new SectionBuilder()
       .addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
-          `use the best tool with unbreaking active:  ${preferences.bestToolOnUnbreaking ? "✅" : "❌"}`,
+          `use the best tool with unbreaking active:  ${preferences.useBestToolOnUnbreaking ? "✅" : "❌"}`,
         ),
       )
       .setButtonAccessory(
@@ -144,13 +144,13 @@ async function run(
         ),
       )
       .addActionRowComponents((row) =>
-        row.addComponents(selectRow("rod", preferences.rodType, disabled)),
+        row.addComponents(selectRow("rod", preferences.preferredRod, disabled)),
       )
       .addActionRowComponents((row) =>
-        row.addComponents(selectRow("gun", preferences.gunType, disabled)),
+        row.addComponents(selectRow("gun", preferences.preferredGun, disabled)),
       )
       .addActionRowComponents((row) =>
-        row.addComponents(selectRow("pickaxe", preferences.pickaxeType, disabled)),
+        row.addComponents(selectRow("pickaxe", preferences.preferredPickaxe, disabled)),
       );
 
   const msg = await send({
@@ -191,7 +191,11 @@ async function run(
         value,
       );
     } else if (res == "toggle-unbreaking") {
-      await toggleToolPreference(message.member, "unbreaking", !preferences.bestToolOnUnbreaking);
+      await toggleToolPreference(
+        message.member,
+        "unbreaking",
+        !preferences.useBestToolOnUnbreaking,
+      );
     } else if (res == "toggle-lower") {
       await toggleToolPreference(message.member, "lower", !preferences.useLowerToolOnEmpty);
     }

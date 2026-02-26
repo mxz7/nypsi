@@ -1,6 +1,7 @@
-import { ToolPreferences, ToolPreferenceSelection } from "#generated/prisma";
+import { ToolPreferenceSelection } from "#generated/prisma";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
+import { ToolPreferences } from "../../../types/Economy";
 import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
 import ms = require("ms");
@@ -14,10 +15,15 @@ export async function getToolPreferences(member: MemberResolvable): Promise<Tool
     return JSON.parse(cache);
   }
 
-  const query = await prisma.toolPreferences.upsert({
+  const query = await prisma.economy.findUnique({
     where: { userId },
-    update: {},
-    create: { userId },
+    select: {
+      preferredGun: true,
+      preferredPickaxe: true,
+      preferredRod: true,
+      useBestToolOnUnbreaking: true,
+      useLowerToolOnEmpty: true,
+    },
   });
 
   await redis.set(
@@ -37,9 +43,9 @@ export async function toggleToolPreference(
 ) {
   const userId = getUserId(member);
 
-  const type = toggle == "unbreaking" ? "bestToolOnUnbreaking" : "useLowerToolOnEmpty";
+  const type = toggle == "unbreaking" ? "useBestToolOnUnbreaking" : "useLowerToolOnEmpty";
 
-  await prisma.toolPreferences.update({
+  await prisma.economy.update({
     where: {
       userId,
     },
@@ -58,9 +64,9 @@ export async function setToolPreference(
 ): Promise<void> {
   const userId = getUserId(member);
 
-  const type = tool == "gun" ? "gunType" : tool == "rod" ? "rodType" : "pickaxeType";
+  const type = tool == "gun" ? "preferredGun" : tool == "rod" ? "preferredRod" : "preferredPickaxe";
 
-  await prisma.toolPreferences.update({
+  await prisma.economy.update({
     where: { userId },
     data: {
       [type]: preference,
