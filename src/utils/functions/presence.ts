@@ -1,5 +1,6 @@
 import { ActivitiesOptions, ActivityType } from "discord.js";
 import redis from "../../init/redis";
+import { Item } from "../../types/Economy";
 import Constants from "../Constants";
 import { daysUntilChristmas } from "./date";
 import { getTotalAmountOfItem } from "./economy/inventory";
@@ -44,8 +45,16 @@ export async function randomPresence(): Promise<ActivitiesOptions> {
     }
   } else if (chosen.name === "item") {
     const items = Object.values(getItems());
-    const item = items[Math.floor(Math.random() * items.length)];
-    const count = await getTotalAmountOfItem(item.id);
+    let item: Item;
+    let count = 0;
+    let repeats = 0;
+
+    while (count === 0 && repeats < 10) {
+      item = items[Math.floor(Math.random() * items.length)];
+      count = await getTotalAmountOfItem(item.id);
+      repeats++;
+    }
+
     chosen.name = `${count.toLocaleString()} ${!item.emoji.includes("<") ? `${item.emoji} ` : ""}${pluralize(item, count)}`;
   }
 
