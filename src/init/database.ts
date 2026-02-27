@@ -20,6 +20,8 @@ const prisma = new PrismaClient({ adapter }).$extends({
         if (["Mention", "GraphMetrics"].includes(model)) return result;
 
         redis.lpush(Constants.redis.nypsi.HOURLY_DB_REPORT, timeTaken);
+        redis.hincrby(Constants.redis.nypsi.HOURLY_DB_REPORT_COUNT, `${model}.${operation}`, 1);
+
         if (timeTaken > 1000 && !parentPort) {
           let loggerArgs: typeof args;
           if (

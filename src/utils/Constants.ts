@@ -284,6 +284,7 @@ export default {
       GEM_GIVEN: "nypsi:gemgiven",
       GUILD_LOG_QUEUE: "nypsi:guild:logs:queue",
       HOURLY_DB_REPORT: "nypsi:hourlydbreport",
+      HOURLY_DB_REPORT_COUNT: "nypsi:hourlydbreport_count",
       LOCKED_OUT: "nypsi:requirescaptcha",
       MILF_QUEUE: "nypsi:milf:queue",
       NEWS_SEEN: "nypsi:news:seen",

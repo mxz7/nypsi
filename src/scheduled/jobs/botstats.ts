@@ -8,12 +8,18 @@ export default {
   cron: "0 * * * *",
   async run(log) {
     const queries = await redis.lrange(Constants.redis.nypsi.HOURLY_DB_REPORT, 0, -1);
-    await redis.del(Constants.redis.nypsi.HOURLY_DB_REPORT);
+    const queryCounts = await redis.hgetall(Constants.redis.nypsi.HOURLY_DB_REPORT_COUNT);
+    await redis.del(
+      Constants.redis.nypsi.HOURLY_DB_REPORT,
+      Constants.redis.nypsi.HOURLY_DB_REPORT_COUNT,
+    );
 
     let total = parseInt(queries.reduce((a, b) => (parseInt(a) + parseInt(b)).toString()));
     let avg = (total / queries.length).toFixed(2);
 
-    log(`average query takes ${avg}ms (${total.toLocaleString()} queries in the last hour)`);
+    log(`average query takes ${avg}ms (${total.toLocaleString()} queries in the last hour)`, {
+      queryCounts,
+    });
 
     await prisma.botMetrics.createMany({
       data: [

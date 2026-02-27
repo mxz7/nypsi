@@ -1,8 +1,8 @@
 import { CronJob } from "cron";
+import { ClusterManager } from "discord-hybrid-sharding";
 import { readdir } from "fs/promises";
 import { Job } from "../types/Jobs";
 import { logger } from "../utils/logger";
-import { ClusterManager } from "discord-hybrid-sharding";
 
 const jobs = new Map<string, { job: CronJob; name: string; run: () => void }>();
 
@@ -22,7 +22,8 @@ export async function loadJobs(manager: ClusterManager) {
     const run = async () => {
       logger.info(`[${imported.name}] job started`);
       await imported.run(
-        (message: string) => logger.info(`[${imported.name}] ${message}`),
+        (message: string, data?: Record<any, any>) =>
+          logger.info(`[${imported.name}] ${message}`, data),
         manager,
       );
       logger.info(`[${imported.name}] job finished`);
