@@ -235,7 +235,7 @@ export async function failedCaptcha(member: GuildMember, content: string) {
       parseInt(await redis.get(`${Constants.redis.cache.user.captcha_fail}:${member.user.id}`)) %
         15 ===
         0 && !(await isEcoBanned(member.user.id)).banned
-        ? " <@&1091314758986256424>"
+        ? ` <@&${Constants.STAFF_ROLE_ID}>`
         : ""
     }`,
   );

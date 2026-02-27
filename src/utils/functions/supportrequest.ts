@@ -137,7 +137,7 @@ export async function createSupportRequest(id: string, client: NypsiClient, user
         shard: shard,
         username: username,
         channelId: Constants.SUPPORT_CHANNEL_ID,
-        roleId: Constants.SUPPORT_ROLE_ID,
+        roleId: Constants.STAFF_ROLE_ID,
       },
     },
   );
