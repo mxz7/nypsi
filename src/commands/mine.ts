@@ -27,8 +27,10 @@ import {
 } from "../utils/functions/economy/inventory";
 import { addStat } from "../utils/functions/economy/stats";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
+import { getToolPreferences } from "../utils/functions/economy/tool_preferences";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { addXp, calcEarnedHFMXp } from "../utils/functions/economy/xp";
+import { getPrefix } from "../utils/functions/guilds/utils";
 import { percentChance } from "../utils/functions/random";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -81,51 +83,18 @@ async function run(
     return;
   }
 
-  const inventory = await getInventory(member);
   const items = getItems();
+  const [inventory, toolPreferences, boosters] = await Promise.all([
+    getInventory(member),
+    getToolPreferences(member),
+    getBoosters(member),
+  ]);
 
   let pickaxe: string;
-
-  if (inventory.has("diamond_pickaxe")) {
-    pickaxe = "diamond_pickaxe";
-  } else if (inventory.has("iron_pickaxe")) {
-    pickaxe = "iron_pickaxe";
-  } else if (inventory.has("wooden_pickaxe")) {
-    pickaxe = "wooden_pickaxe";
-  }
-
-  if (!pickaxe) {
-    return send({
-      embeds: [
-        new ErrorEmbed(
-          "you need a pickaxe to mine\n[how do i get a pickaxe?](https://nypsi.xyz/docs/economy/fish-hunt-mine?ref=bot-help)\n\nyou can use **/free** to get some basic tools",
-        ),
-      ],
-      flags: MessageFlags.Ephemeral,
-    });
-  }
-
-  await addCooldown(cmd.name, member, 60);
-
-  await addStat(member, pickaxe);
-
-  const mineItems = Array.from(Object.keys(items));
-
-  const boosters = await getBoosters(member);
 
   let times = 1;
   let multi = 0;
   let unbreakable = false;
-
-  if (pickaxe == "iron_pickaxe") {
-    times = 2;
-  } else if (pickaxe == "diamond_pickaxe") {
-    times = 3;
-  }
-
-  for (let i = 0; i < 20; i++) {
-    mineItems.push("nothing");
-  }
 
   for (const boosterId of boosters.keys()) {
     if (items[boosterId].role == "booster") {
@@ -154,6 +123,73 @@ async function run(
         }
       }
     }
+  }
+
+  if (
+    (unbreakable && toolPreferences.useBestToolOnUnbreaking) ||
+    toolPreferences.preferredPickaxe == "highest"
+  ) {
+    if (inventory.has("diamond_pickaxe")) {
+      pickaxe = "diamond_pickaxe";
+    } else if (inventory.has("iron_pickaxe")) {
+      pickaxe = "iron_pickaxe";
+    } else if (inventory.has("wooden_pickaxe")) {
+      pickaxe = "wooden_pickaxe";
+    }
+
+    if (!pickaxe) {
+      return send({
+        embeds: [
+          new ErrorEmbed(
+            "you need a pickaxe to mine\n[how do i get a pickaxe?](https://nypsi.xyz/docs/economy/fish-hunt-mine?ref=bot-help)\n\nyou can use **/free** to get some basic tools",
+          ),
+        ],
+        flags: MessageFlags.Ephemeral,
+      });
+    }
+  } else {
+    if (toolPreferences.preferredPickaxe == "incredible" && inventory.has("diamond_pickaxe")) {
+      pickaxe = "diamond_pickaxe";
+    } else if (
+      (toolPreferences.preferredPickaxe == "normal" ||
+        (toolPreferences.preferredPickaxe == "incredible" &&
+          toolPreferences.useLowerToolOnEmpty)) &&
+      inventory.has("iron_pickaxe")
+    ) {
+      pickaxe = "iron_pickaxe";
+    } else if (
+      (toolPreferences.preferredPickaxe == "terrible" || toolPreferences.useLowerToolOnEmpty) &&
+      inventory.has("wooden_pickaxe")
+    ) {
+      pickaxe = "wooden_pickaxe";
+    }
+
+    if (!pickaxe) {
+      return send({
+        embeds: [
+          new ErrorEmbed("you do not have any more of your preferred pickaxe").setFooter({
+            text: `${(await getPrefix(message.guild))[0]}tools`,
+          }),
+        ],
+        flags: MessageFlags.Ephemeral,
+      });
+    }
+  }
+
+  if (pickaxe == "iron_pickaxe") {
+    times++;
+  } else if (pickaxe == "diamond_pickaxe") {
+    times += 2;
+  }
+
+  await addCooldown(cmd.name, member, 2);
+
+  await addStat(member, pickaxe);
+
+  const mineItems = Array.from(Object.keys(items));
+
+  for (let i = 0; i < 20; i++) {
+    mineItems.push("nothing");
   }
 
   if ((await inventory.hasGem("purple_gem")).any) {

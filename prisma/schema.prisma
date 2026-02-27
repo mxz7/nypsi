@@ -209,6 +209,12 @@ model Economy {
 
   dailyLottery Int?
 
+  preferredPickaxe         ToolPreferenceSelection @default(highest)
+  preferredRod             ToolPreferenceSelection @default(highest)
+  preferredGun             ToolPreferenceSelection @default(highest)
+  useBestToolOnUnbreaking  Boolean @default(true)
+  useLowerToolOnEmpty      Boolean @default(true)
+
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @id
 
@@ -231,6 +237,13 @@ model Economy {
   CustomCar          CustomCar[]
   Farm               Farm[]
   FarmUpgrades       FarmUpgrades[]
+}
+
+enum ToolPreferenceSelection {
+  terrible
+  normal
+  incredible
+  highest
 }
 
 model Farm {

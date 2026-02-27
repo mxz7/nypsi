@@ -1,4 +1,4 @@
-import { BoosterScope, CarUpgradeType } from "#generated/prisma";
+import { BoosterScope, CarUpgradeType, ToolPreferenceSelection } from "#generated/prisma";
 
 export interface Item {
   id: string;
@@ -154,4 +154,12 @@ export interface Event {
 export type DabloonShopItem = {
   itemId: string;
   cost: number;
+};
+
+export type ToolPreferences = {
+  preferredPickaxe: ToolPreferenceSelection;
+  preferredRod: ToolPreferenceSelection;
+  preferredGun: ToolPreferenceSelection;
+  useBestToolOnUnbreaking: boolean;
+  useLowerToolOnEmpty: boolean;
 };
