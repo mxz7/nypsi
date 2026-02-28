@@ -155,10 +155,10 @@ export default async function guildMemberAdd(member: GuildMember) {
   }
 
   if ((await isMuted(member.guild, member)) || altPunish) {
-    let muteRole = await member.guild.roles.cache.get(await getMuteRole(member.guild));
+    let muteRole = member.guild.roles.cache.get(await getMuteRole(member.guild));
 
     if (!(await getMuteRole(member.guild))) {
-      muteRole = await member.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted");
+      muteRole = member.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted");
     }
 
     if (!muteRole) return await deleteMute(member.guild, member);

@@ -184,7 +184,7 @@ export async function runInteraction(interaction: Interaction) {
         }
       }
 
-      const role = await interaction.guild.roles.cache.get(roleId);
+      const role = interaction.guild.roles.cache.get(roleId);
 
       if (!role) {
         return interaction

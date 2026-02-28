@@ -80,7 +80,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
       const client = c as unknown as NypsiClient;
       if (client.cluster.id != shard) return false;
 
-      const channel = await client.channels.cache.get(channelId);
+      const channel = client.channels.cache.get(channelId);
 
       if (!channel) return false;
 

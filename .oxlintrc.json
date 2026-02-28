@@ -3,12 +3,20 @@
   "plugins": ["typescript", "node"],
   "categories": {},
   "rules": {
-    "no-unreachable": "error",
+    "typescript/restrict-template-expressions": "off",
+    "typescript/require-array-sort-compare": "off",
+    "typescript/no-floating-promises": "off",
+    "typescript/no-require-imports": "off",
+    "typescript/no-base-to-string": "off",
+    "typescript/no-empty-function": "off",
+    "typescript/no-explicit-any": "off",
+    "typescript/unbound-method": "off",
     "no-case-declarations": "off",
-    "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/no-empty-function": "off",
-    "@typescript-eslint/ban-ts-comment": "warn",
-    "@typescript-eslint/no-require-imports": "off"
+
+    "typescript/ban-ts-comment": "warn",
+    "typescript/no-deprecated": "warn",
+    
+    "no-unreachable": "error"
   },
   "env": {
     "builtin": true,

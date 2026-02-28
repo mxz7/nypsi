@@ -310,7 +310,7 @@ export async function checkAutoMute(message: Message) {
     } else if (guildMuteRole == "timeout") {
       mode = "timeout";
     } else {
-      muteRole = await message.guild.roles.cache.get(guildMuteRole);
+      muteRole = message.guild.roles.cache.get(guildMuteRole);
 
       if (!muteRole) {
         logger.warn(`failed to find muterole ${message.guild.id} ${guildMuteRole}`);

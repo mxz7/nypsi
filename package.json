@@ -9,7 +9,7 @@
     "clean": "rm -rf dist node_modules",
     "build": "tsc --incremental",
     "watch": "tsc --build --watch",
-    "lint": "oxlint",
+    "lint": "oxlint --type-aware",
     "validate": "npm run format:check && npm run lint"
   },
   "prisma": {
@@ -65,6 +65,7 @@
     "@types/urban-dictionary": "3.0.2",
     "jest": "^30.2.0",
     "oxlint": "^1.50.0",
+    "oxlint-tsgolint": "^0.15.0",
     "prettier": "3.8.1",
     "prisma": "7.4.2",
     "ts-node": "^10.9.2",

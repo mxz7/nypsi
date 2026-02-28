@@ -1948,7 +1948,7 @@ async function run(
 
         if (!res) return;
 
-        const month = res.fields.getStringSelectValues("month");
+        const month = res.fields.getStringSelectValues("month")[0];
         const day = res.fields.getTextInputValue("day").padStart(2, "0");
         const year = res.fields.getTextInputValue("year") || "0069";
 
@@ -2133,7 +2133,7 @@ async function run(
         }
 
         logger.info(
-          `admin: ${message.author.id} (${message.author.username}) gave ${user} captcha`,
+          `admin: ${message.author.id} (${message.author.username}) gave ${user.id} captcha`,
         );
 
         await giveCaptcha(user, 2, true);
@@ -2724,7 +2724,7 @@ async function run(
       await setEcoBan(target, time);
 
       logger.info(
-        `admin: ${message.author.id} (${message.author.username}) set ${target.id} ecoban to ${time}`,
+        `admin: ${message.author.id} (${message.author.username}) set ${target.id} ecoban to ${time.toString()}`,
       );
     }
 

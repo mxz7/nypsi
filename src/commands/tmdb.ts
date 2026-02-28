@@ -1131,7 +1131,7 @@ async function getCountryCode(name: string): Promise<string | undefined> {
 }
 
 function getFlagEmoji(countryCode: string) {
-  const codePoints = [...countryCode.toUpperCase()].map(
+  const codePoints = Array.from(countryCode.toUpperCase()).map(
     (char) => 0x1f1e6 + char.charCodeAt(0) - "A".charCodeAt(0),
   );
 
