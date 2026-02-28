@@ -79,7 +79,10 @@ export async function getAllMembers(
 
     let discordMembers: Collection<string, GuildMember>;
 
-    if (guild.memberCount === guild.members.cache.size) {
+    if (
+      guild.memberCount === guild.members.cache.size ||
+      (lastFetched > Date.now() - ms("3 minute") && getCollection)
+    ) {
       discordMembers = guild.members.cache;
     } else {
       await redis.set(
