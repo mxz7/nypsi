@@ -9,7 +9,7 @@
     "clean": "rm -rf dist node_modules",
     "build": "tsc --incremental",
     "watch": "tsc --build --watch",
-    "lint": "eslint --cache ./src/",
+    "lint": "oxlint",
     "validate": "npm run format:check && npm run lint"
   },
   "prisma": {
