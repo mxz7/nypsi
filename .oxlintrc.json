@@ -1,0 +1,19 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "node"],
+  "categories": {},
+  "rules": {
+    "no-unreachable": "error",
+    "no-case-declarations": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/ban-ts-comment": "warn",
+    "@typescript-eslint/no-require-imports": "off"
+  },
+  "env": {
+    "builtin": true,
+    "commonjs": true,
+    "es2021": true,
+    "node": true
+  }
+}
