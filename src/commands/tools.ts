@@ -104,40 +104,47 @@ async function run(
       );
   };
 
-  const toggleButtons = (disabled = false) => [
+  const toggleButton = (button: "unbreaking" | "lower", disabled = false) =>
     new SectionBuilder()
       .addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
-          `use the best tool with unbreaking active:  ${preferences.useBestToolOnUnbreaking ? "✅" : "❌"}`,
+          button == "unbreaking"
+            ? `use the best tool with unbreaking active`
+            : `automatically use a lower tool if you run out\nof the currently selected tool`,
         ),
       )
       .setButtonAccessory(
         new ButtonBuilder()
-          .setCustomId("toggle-unbreaking")
-          .setLabel("toggle")
-          .setStyle(ButtonStyle.Secondary)
+          .setCustomId(`toggle-${button}`)
+          .setLabel(
+            button == "unbreaking"
+              ? preferences.useBestToolOnUnbreaking
+                ? "on"
+                : "off"
+              : preferences.useLowerToolOnEmpty
+                ? "on"
+                : "off",
+          )
+          .setStyle(
+            button == "unbreaking"
+              ? preferences.useBestToolOnUnbreaking
+                ? ButtonStyle.Success
+                : ButtonStyle.Danger
+              : preferences.useLowerToolOnEmpty
+                ? ButtonStyle.Success
+                : ButtonStyle.Danger,
+          )
           .setDisabled(disabled),
-      ),
-    new SectionBuilder()
-      .addTextDisplayComponents(
-        new TextDisplayBuilder().setContent(
-          `automatically use a lower tool if you run out\nof the currently selected tool:  ${preferences.useLowerToolOnEmpty ? "✅" : "❌"}`,
-        ),
-      )
-      .setButtonAccessory(
-        new ButtonBuilder()
-          .setCustomId("toggle-lower")
-          .setLabel("toggle")
-          .setStyle(ButtonStyle.Secondary)
-          .setDisabled(disabled),
-      ),
-  ];
+      );
 
   const container = (disabled = false) =>
     new ContainerBuilder()
       .setAccentColor(resolveColor(getColor(message.member)))
       .addTextDisplayComponents(new TextDisplayBuilder().setContent("## tool preferences"))
-      .addSectionComponents(...toggleButtons(disabled))
+      .addSectionComponents(toggleButton("unbreaking", disabled))
+      .addSeparatorComponents((separator) => separator.setDivider(false))
+      .addSectionComponents(toggleButton("lower", disabled))
+      .addSeparatorComponents((separator) => separator)
       .addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
           "what level of tool you want to use when fishing/hunting/mining?",
