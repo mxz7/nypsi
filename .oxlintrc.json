@@ -15,5 +15,6 @@
     "commonjs": true,
     "es2021": true,
     "node": true
-  }
+  },
+  "ignorePatterns": ["generated/prisma**", "dist/", "*.js"]
 }
