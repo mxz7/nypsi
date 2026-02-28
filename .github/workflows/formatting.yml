@@ -1,67 +1,13 @@
 name: formatting
 
-on:
-  pull_request:
-    branches: [main]
+on: push
 
 jobs:
   format:
     runs-on: ubuntu-latest
     steps:
-      - name: checkout repository
-        uses: actions/checkout@v6
-
-      - name: setup node
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-
-      - uses: pnpm/action-setup@v4
-        name: install pnpm
-        id: pnpm-install
-        with:
-          version: latest
-          run_install: false
-
-      - name: get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      - uses: actions/cache@v5
-        name: setup pnpm cache
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: restore prettiercache
-        uses: actions/cache/restore@v5
-        id: cache
-        with:
-          path: .prettiercache
-          key: prettiercache-${{ runner.os }}-${{ hashFiles('pnpm-lock.json') }}
-          restore-keys: |
-            prettiercache-${{ runner.os }}
+      - name: setup
+        uses: ./.github/actions/setup
 
       - name: check formatting
         run: pnpm run format:check
-
-      - name: clear prettiercache
-        continue-on-error: true
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push' && steps.cache.outputs.cache-hit
-        run: gh cache delete --repo ${{ github.repository }} ${{ steps.cache.outputs.cache-primary-key }}
-
-      - name: save prettiercache
-        uses: actions/cache/save@v5
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        with:
-          path: .prettiercache
-          key: prettiercache-${{ runner.os }}-${{ hashFiles('pnpm-lock.json') }}

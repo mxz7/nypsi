@@ -7,142 +7,49 @@ on:
     branches: [main]
 
 jobs:
-  test:
-    name: tests
+  build:
+    name: build
 
     runs-on: ubuntu-latest
     steps:
-      - name: checkout repository
-        uses: actions/checkout@v6
-
-      - name: setup node
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-
-      - uses: pnpm/action-setup@v4
-        name: install pnpm
-        id: pnpm-install
-        with:
-          version: latest
-          run_install: false
-
-      - name: get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      - uses: actions/cache@v5
-        name: setup pnpm cache
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: run setup.sh
-        run: bash ${GITHUB_WORKSPACE}/setup.sh
-
-      - name: setup prisma
-        run: npx prisma generate
-
-      - name: restore tsbuildinfo
-        uses: actions/cache/restore@v5
-        with:
-          path: tsconfig.tsbuildinfo
-          key: tsbuildinfo-${{ runner.os }}-${{ hashFiles('tsconfig.json', 'pnpm-lock.json') }}
-          restore-keys: |
-            tsbuildinfo-${{ runner.os }}
+      - name: setup
+        uses: ./.github/actions/setup
 
       - name: build
-        run: npx tsc --incremental --noEmit
+        run: npx tsc --build
 
-      - name: run tests
-        run: npx jest
+      - name: save build artifacts
+        uses: actions/cache/save@v5
+        with:
+          path: dist/
+          key: build-${{ runner.os }}-${{ github.sha }}
 
   lint:
     name: linting
-
     runs-on: ubuntu-latest
     steps:
-      - name: checkout repository
-        uses: actions/checkout@v6
-
-      - name: setup node
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-
-      - uses: pnpm/action-setup@v4
-        name: install pnpm
-        id: pnpm-install
-        with:
-          version: latest
-          run_install: false
-
-      - name: get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      - uses: actions/cache@v5
-        name: setup pnpm cache
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: run setup.sh
-        run: bash ${GITHUB_WORKSPACE}/setup.sh
-
-      - name: setup prisma
-        run: npx prisma generate
-
-      - name: restore tsbuildinfo
-        uses: actions/cache/restore@v5
-        with:
-          path: tsconfig.tsbuildinfo
-          key: tsbuildinfo-${{ runner.os }}-${{ hashFiles('tsconfig.json', 'pnpm-lock.json') }}
-          restore-keys: |
-            tsbuildinfo-${{ runner.os }}
-
-      - name: build
-        run: npx tsc --incremental --noEmit
-
-      - name: restore eslintcache
-        uses: actions/cache/restore@v5
-        id: cache
-        with:
-          path: .eslintcache
-          key: eslintcache-${{ runner.os }}-${{ hashFiles('pnpm-lock.json') }}
-          restore-keys: |
-            eslintcache-${{ runner.os }}
+      - name: setup
+        uses: ./.github/actions/setup
 
       - name: linting
         run: pnpm run lint
 
-      - name: clear eslintcache
-        continue-on-error: true
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push' && steps.cache.outputs.cache-hit
-        run: gh cache delete --repo ${{ github.repository }} ${{ steps.cache.outputs.cache-primary-key }}
+  test:
+    name: tests
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: setup
+        uses: ./.github/actions/setup
 
-      - name: save eslintcache
-        uses: actions/cache/save@v5
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      - name: restore build artifacts
+        uses: actions/cache/restore@v5
         with:
-          path: .eslintcache
-          key: eslintcache-${{ runner.os }}-${{ hashFiles('pnpm-lock.json') }}
+          path: dist/
+          key: build-${{ runner.os }}-${{ github.sha }}
+
+      - name: run tests
+        run: npx jest
 
   deploy:
     if: github.ref == 'refs/heads/main'
@@ -159,68 +66,14 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           env: prod
 
-      - name: checkout repository
-        uses: actions/checkout@v6
+      - name: setup
+        uses: ./.github/actions/setup
 
-      - name: setup node
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-
-      - uses: pnpm/action-setup@v4
-        name: install pnpm
-        id: pnpm-install
-        with:
-          version: latest
-          run_install: false
-
-      - name: get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      - uses: actions/cache@v5
-        name: setup pnpm cache
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: run setup.sh
-        run: bash ${GITHUB_WORKSPACE}/setup.sh
-
-      - name: setup prisma
-        run: npx prisma generate
-
-      - name: restore tsbuildinfo
+      - name: restore build artifacts
         uses: actions/cache/restore@v5
-        id: cache
         with:
-          path: tsconfig.tsbuildinfo
-          key: tsbuildinfo-${{ runner.os }}-${{ hashFiles('tsconfig.json', 'pnpm-lock.json') }}
-          restore-keys: |
-            tsbuildinfo-${{ runner.os }}
-
-      - name: build
-        run: npx tsc --build --incremental --force
-
-      - name: clear tsbuildinfo cache
-        continue-on-error: true
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: steps.cache.outputs.cache-hit
-        run: gh cache delete --repo ${{ github.repository }} ${{ steps.cache.outputs.cache-primary-key }}
-
-      - name: save tsbuildinfo
-        uses: actions/cache/save@v5
-        with:
-          path: tsconfig.tsbuildinfo
-          key: tsbuildinfo-${{ runner.os }}-${{ hashFiles('tsconfig.json', 'pnpm-lock.json') }}
+          path: dist/
+          key: build-${{ runner.os }}-${{ github.sha }}
 
       - name: prepare files for deploy
         run: |

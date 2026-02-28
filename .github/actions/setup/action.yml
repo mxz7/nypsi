@@ -1,0 +1,32 @@
+name: setup node and dependencies
+description: setups up node, dependencies, file structure and prisma
+
+runs:
+  using: composite
+
+  steps:
+    - name: checkout repository
+      uses: actions/checkout@v6
+
+    - name: install pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: latest
+
+    - name: use node.js 24
+      uses: actions/setup-node@v4
+      with:
+        node-version: 24
+        cache: "pnpm"
+
+    - name: install dependencies
+      shell: bash
+      run: pnpm install --frozen-lockfile
+
+    - name: run setup.sh
+      shell: bash
+      run: bash setup.sh
+
+    - name: setup prisma
+      shell: bash
+      run: npx prisma generate
