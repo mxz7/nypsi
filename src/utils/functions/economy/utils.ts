@@ -858,7 +858,7 @@ export async function doDaily(
 
   await pAll(promises, { concurrency: 3 });
 
-  let desc = `daily streak: \`${currentStreak}\`${rerun ? "" : ` -> \`${currentStreak + amount}\``}`;
+  let desc = `daily streak: \`${currentStreak.toLocaleString()}\`${rerun ? "" : ` -> \`${(currentStreak + amount).toLocaleString()}\``}`;
 
   if (marriageBonus && marriage) {
     desc += `\n💍 **${await getLastKnownUsername(marriage.partnerId)}** marriage bonus`;
