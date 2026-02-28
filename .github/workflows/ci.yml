@@ -12,6 +12,9 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
+      - name: checkout repository
+        uses: actions/checkout@v6
+
       - name: setup
         uses: ./.github/actions/setup
 
@@ -28,6 +31,9 @@ jobs:
     name: linting
     runs-on: ubuntu-latest
     steps:
+      - name: checkout repository
+        uses: actions/checkout@v6
+
       - name: setup
         uses: ./.github/actions/setup
 
@@ -39,6 +45,9 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: checkout repository
+        uses: actions/checkout@v6
+
       - name: setup
         uses: ./.github/actions/setup
 
@@ -65,6 +74,9 @@ jobs:
           step: start
           token: ${{ secrets.GITHUB_TOKEN }}
           env: prod
+
+      - name: checkout repository
+        uses: actions/checkout@v6
 
       - name: setup
         uses: ./.github/actions/setup
