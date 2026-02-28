@@ -1,12 +1,13 @@
 import prisma from "../../init/database";
 import redis from "../../init/redis";
+import { NypsiClient } from "../../models/Client";
 import { Job } from "../../types/Jobs";
 import Constants from "../../utils/Constants";
 
 export default {
   name: "hourly bot stats",
   cron: "0 * * * *",
-  async run(log) {
+  async run(log, manager) {
     const queries = await redis.lrange(Constants.redis.nypsi.HOURLY_DB_REPORT, 0, -1);
     const queryCounts = await redis.hgetall(Constants.redis.nypsi.HOURLY_DB_REPORT_COUNT);
     await redis.del(
@@ -53,6 +54,26 @@ export default {
           value: total / commands.length,
         },
       ],
+    });
+
+    const rawResults = await manager.broadcastEval((c) => {
+      const client = c as unknown as NypsiClient;
+
+      return {
+        cluster: client.cluster.id,
+        rss: process.memoryUsage().rss,
+      };
+    });
+
+    const bytesToMb = (b: number) => +(b / 1024 / 1024).toFixed(2);
+
+    const results = Object.fromEntries(
+      rawResults.map((r: { cluster: number; rss: number }) => [r.cluster, `${bytesToMb(r.rss)}mb`]),
+    );
+
+    log("cluster memory usage", {
+      clusters: results,
+      main: `${bytesToMb(process.memoryUsage().rss)}mb`,
     });
   },
 } satisfies Job;
