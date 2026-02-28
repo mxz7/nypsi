@@ -414,7 +414,6 @@ async function run(
       const embed = new CustomEmbed(
         message.member,
         "click the button below to vote start a chat reaction\n\n1/4",
-        true,
       ).setHeader(`${message.author.username}'s chat reaction`, message.author.avatarURL());
 
       const components = [

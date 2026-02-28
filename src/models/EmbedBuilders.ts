@@ -38,7 +38,7 @@ export class CustomContainer extends ContainerBuilder {
 }
 
 export class CustomEmbed extends EmbedBuilder {
-  constructor(member?: MemberResolvable, text?: string, disableFooter = false) {
+  constructor(member?: MemberResolvable, text?: string) {
     super();
 
     super.setColor(Constants.PURPLE);
@@ -54,13 +54,6 @@ export class CustomEmbed extends EmbedBuilder {
 
       super.setDescription(text);
     }
-
-    const chance = Math.floor(Math.random() * 50);
-
-    if (chance == 7 && !disableFooter)
-      super.setFooter({
-        text: "nypsi.xyz",
-      });
 
     return this;
   }
