@@ -27,10 +27,13 @@ export const dmQueueWorker = new Worker<NotificationPayload, boolean>(
       client: manager,
     });
 
-    if (res) {
-      return true;
-    } else {
-      throw new Error(`failed to dm ${job.data.memberId}`);
+    switch (res) {
+      case "success":
+        return true;
+      case "failed":
+        return false;
+      case "error":
+        throw new Error(`failed to dm ${job.data.memberId} after 3 attempts`);
     }
   },
   {
@@ -57,6 +60,14 @@ dmQueueWorker.on("stalled", (jobId) => {
   logger.debug(`dm: job stalled: ${jobId}`);
 });
 
+dmQueueWorker.on("completed", (job) => {
+  logger.debug(`dm: job completed: ${job.id} ${job.data.memberId}`);
+});
+
+dmQueueWorker.on("failed", (job, err) => {
+  logger.error(`dm: job failed: ${job.id} ${job.data.memberId}`, err);
+});
+
 dmQueueWorker.pause();
 
 interface RequestDMOptions {
@@ -67,7 +78,7 @@ interface RequestDMOptions {
   components?: ActionRowBuilder<MessageActionRowComponentBuilder>;
 }
 
-async function requestDM(options: RequestDMOptions): Promise<boolean> {
+async function requestDM(options: RequestDMOptions): Promise<"success" | "failed" | "error"> {
   logger.info(`dm: requested ${options.memberId}`);
 
   if (options.client instanceof NypsiClient) {
@@ -99,11 +110,12 @@ async function requestDM(options: RequestDMOptions): Promise<boolean> {
       }
     } catch {
       logger.error(`dm: failed finding member/shard: ${options.memberId}`);
+      return "error";
     }
 
     if (isNaN(shard)) {
       logger.warn(`dm: user not found: ${options.memberId}`);
-      return false;
+      return "failed";
     }
 
     const payload: BaseMessageOptions = {
@@ -161,13 +173,14 @@ async function requestDM(options: RequestDMOptions): Promise<boolean> {
 
       if (res.filter((i) => i.success).length > 0) {
         logger.info(`::success dm: sent ${options.memberId} (${shard})`);
-        return true;
+        return "success";
       } else {
         logger.warn(`dm: failed to send: ${options.memberId}`, { results: res });
-        return false;
+        return "failed";
       }
     } catch {
       logger.error(`dm: failed to send: ${options.memberId} (caught)`);
+      return "error";
     }
   } else {
     let clusterHas: (number | "not-found")[];
@@ -199,10 +212,11 @@ async function requestDM(options: RequestDMOptions): Promise<boolean> {
 
       if (isNaN(shard)) {
         logger.warn(`dm: user not found: ${options.memberId}`);
-        return false;
+        return "failed";
       }
     } catch {
       logger.error(`dm: failed finding user/shard: ${options.memberId}`);
+      return "error";
     }
 
     const payload: BaseMessageOptions = {
@@ -260,15 +274,14 @@ async function requestDM(options: RequestDMOptions): Promise<boolean> {
 
       if (res.filter((i) => i.success).length > 0) {
         logger.info(`::success dm: sent ${options.memberId} (${shard})`);
-        return true;
+        return "success";
       } else {
         logger.warn(`dm: failed to send: ${options.memberId}`, { results: res });
-        return false;
+        return "failed";
       }
     } catch {
       logger.error(`dm: failed to send: ${options.memberId} (caught)`);
+      return "error";
     }
   }
-
-  return false;
 }

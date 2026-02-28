@@ -139,6 +139,7 @@ export function addNotificationToQueue(...payload: NotificationPayload[]) {
     payload.map((data) => ({
       data,
       name: data.memberId,
+      opts: { attempts: 5, backoff: { type: "exponential", delay: 300000 } },
     })),
   );
 }
