@@ -2,6 +2,9 @@ name: formatting
 
 on: push
 
+permissions:
+  contents: read
+
 jobs:
   format:
     runs-on: ubuntu-latest
