@@ -330,7 +330,7 @@
         "weight": 1,
         "count": {
           "min": 5,
-          "max": 75
+          "max": 50
         }
       }
     }
@@ -385,7 +385,7 @@
         "weight": 5,
         "count": {
           "min": 5,
-          "max": 150
+          "max": 125
         }
       },
       "wheat_seed": 50,
@@ -440,7 +440,7 @@
         "weight": 10,
         "count": {
           "min": 50,
-          "max": 250
+          "max": 300
         }
       }
     }
@@ -523,8 +523,8 @@
       "dabloon": {
         "weight": 3,
         "count": {
-          "min": 25,
-          "max": 125
+          "min": 5,
+          "max": 100
         }
       }
     }
