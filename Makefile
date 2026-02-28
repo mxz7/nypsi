@@ -16,5 +16,6 @@ clean:
 	rm .prettiercache
 
 dev: build
+	trap 'kill 0' EXIT; \
 	$(MAKE) watch & \
-		$(MAKE) run
+	$(MAKE) run
