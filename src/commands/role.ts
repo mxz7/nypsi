@@ -346,7 +346,7 @@ async function run(
     let role: Role;
 
     if (!(message instanceof Message) && message.isChatInputCommand()) {
-      role = await message.guild.roles.cache.get(message.options.getRole("role").id);
+      role = message.guild.roles.cache.get(message.options.getRole("role").id);
     } else if (message.mentions?.roles?.first()) {
       role = message.mentions.roles.first();
     } else {

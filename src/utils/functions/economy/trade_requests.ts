@@ -160,7 +160,7 @@ export async function createTradeRequest(
 
   const clusters = await (member.client as NypsiClient).cluster.broadcastEval(
     async (client, { guildId }) => {
-      const guild = await client.guilds.cache.get(guildId);
+      const guild = client.guilds.cache.get(guildId);
 
       if (guild) return (client as unknown as NypsiClient).cluster.id;
       return "not-found";
@@ -288,7 +288,7 @@ export async function bumpTradeRequest(id: number, client: NypsiClient) {
 
   const clusters = await client.cluster.broadcastEval(
     async (client, { serverId }) => {
-      const guild = await client.guilds.cache.get(serverId);
+      const guild = client.guilds.cache.get(serverId);
 
       if (guild) return (client as unknown as NypsiClient).cluster.id;
       return "not-found";
@@ -309,11 +309,11 @@ export async function bumpTradeRequest(id: number, client: NypsiClient) {
     .broadcastEval(
       async (client, { guildId, channelId, row, messageId, embed, cluster }) => {
         if ((client as unknown as NypsiClient).cluster.id != cluster) return null;
-        const guild = await client.guilds.cache.get(guildId);
+        const guild = client.guilds.cache.get(guildId);
 
         if (!guild) return;
 
-        const channel = await guild.channels.cache.get(channelId);
+        const channel = guild.channels.cache.get(channelId);
 
         if (!channel) return;
 

@@ -18,14 +18,14 @@ export default async function guildMemberUpdate(oldMember: GuildMember, newMembe
     const roles: Role[] = [];
 
     for (const newRole of newDiff) {
-      roles.push(await newMember.guild.roles.cache.get(newRole));
+      roles.push(newMember.guild.roles.cache.get(newRole));
     }
 
     if (roles.length != 0) await createLog(newMember, roles, true);
     roles.length = 0;
 
     for (const oldRole of oldDiff) {
-      roles.push(await newMember.guild.roles.cache.get(oldRole));
+      roles.push(newMember.guild.roles.cache.get(oldRole));
     }
 
     if (roles.length != 0) await createLog(oldMember, roles, false);

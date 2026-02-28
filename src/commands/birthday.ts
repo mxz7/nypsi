@@ -328,7 +328,7 @@ async function run(
 
     if (!res) return;
 
-    const month = res.fields.getStringSelectValues("month");
+    const month = res.fields.getStringSelectValues("month")[0];
     const day = res.fields.getTextInputValue("day").padStart(2, "0");
     const year = res.fields.getTextInputValue("year") || "0069";
 

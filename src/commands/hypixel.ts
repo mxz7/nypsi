@@ -147,7 +147,7 @@ async function run(
       challenges = hypixelData.player.challenges.all_time;
     }
 
-    await Object.entries(challenges).forEach((c) => {
+    Object.entries(challenges).forEach((c) => {
       if (!parseInt(challenges)) {
         challenges = 0;
       }
