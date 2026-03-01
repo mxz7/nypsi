@@ -19,6 +19,9 @@ export default {
     let avg = (total / queries.length).toFixed(2);
 
     log(`average query takes ${avg}ms (${total.toLocaleString()} queries in the last hour)`, {
+      queryCountsTotal: Object.values(queryCounts).reduce((a, b) =>
+        (parseInt(a) + parseInt(b)).toString(),
+      ),
       queryCounts,
     });
 
