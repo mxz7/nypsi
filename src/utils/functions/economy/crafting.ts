@@ -2,7 +2,7 @@ import dayjs = require("dayjs");
 import prisma from "../../../init/database";
 import { getUserId, MemberResolvable } from "../member";
 import { addProgress } from "./achievements";
-import { addInventoryItem, isGem } from "./inventory";
+import { addInventoryItem } from "./inventory";
 import { getItems } from "./utils";
 
 export async function getCraftingItems(member: MemberResolvable, deleteOld = true) {
@@ -39,7 +39,6 @@ export async function getCraftingItems(member: MemberResolvable, deleteOld = tru
         });
 
         await addInventoryItem(userId, item.itemId, item.amount);
-        if (isGem(item.itemId)) await addProgress(userId, "gem_hunter", item.amount);
       }
     }
   }
