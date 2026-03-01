@@ -1060,11 +1060,7 @@ async function run(
     }
 
     return send({ embeds: [embed] });
-  } else if (
-    args[0].toLowerCase().includes("search") ||
-    args[0].toLowerCase().includes("find") ||
-    args[0].toLowerCase().includes("view")
-  ) {
+  } else if (["search", "find", "view", "v", "f"].includes(args[0].toLowerCase())) {
     if (args.length === 1) return send({ embeds: [new ErrorEmbed("/market search <item>")] });
 
     const item = selectItem(args.slice(1).join(" "));
