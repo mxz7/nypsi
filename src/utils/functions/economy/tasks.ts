@@ -8,6 +8,7 @@ import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { addKarma } from "../karma/karma";
 import { getUserId, MemberResolvable } from "../member";
+import { Mutex } from "../mutex";
 import sleep from "../sleep";
 import { addInlineNotification } from "../users/notifications";
 import { getLastKnownAvatar } from "../users/username";
@@ -20,6 +21,8 @@ import { getItems, getTasksData, isEcoBanned, maxPrestige, userExists } from "./
 import { addXp } from "./xp";
 
 const taskGeneration = new Map<string, number>();
+
+const mutex = new Mutex(false);
 
 async function generateDailyTasks(member: MemberResolvable, count: number) {
   const tasks = Object.values(getTasksData()).filter((i) => i.type === "daily");
@@ -165,9 +168,11 @@ export async function getTasks(member: MemberResolvable): Promise<PrismaTask[]> 
       taskGeneration.delete(userId);
       return getTasks(userId);
     }
-  } catch {
+  } catch (error) {
     await redis.del(`${Constants.redis.cache.economy.TASKS}:${userId}`);
     taskGeneration.delete(userId);
+
+    logger.debug(`task: weird error when handling odd tasks for ${userId}, retrying`, { error });
     return getTasks(userId);
   }
 
@@ -254,80 +259,87 @@ export function parseReward(reward: string) {
 
 export async function addTaskProgress(member: MemberResolvable, taskId: string, amount = 1) {
   const userId = getUserId(member);
+  const mutexKey = `${userId}_${taskId}`;
 
-  if (!(await userExists(userId))) return;
-  if ((await isEcoBanned(userId)).banned) return;
+  await mutex.acquire(mutexKey);
 
-  const tasks = await getTasks(userId);
+  try {
+    if (!(await userExists(userId))) return;
+    if ((await isEcoBanned(userId)).banned) return;
 
-  const task = tasks.find((i) => i.task_id === taskId);
+    const tasks = await getTasks(userId);
 
-  if (!task) return;
-  if (task.completed) return;
+    const task = tasks.find((i) => i.task_id === taskId);
 
-  await redis.del(`${Constants.redis.cache.economy.TASKS}:${userId}`);
+    if (!task) return;
+    if (task.completed) return;
 
-  if (Number(task.progress) + amount >= Number(task.target)) {
-    logger.info(`task: ${userId} completed ${taskId}`, { task });
-    await prisma.task.update({
-      where: {
-        user_id_task_id: {
-          task_id: taskId,
-          user_id: userId,
+    await redis.del(`${Constants.redis.cache.economy.TASKS}:${userId}`);
+
+    if (Number(task.progress) + amount >= Number(task.target)) {
+      logger.info(`task: ${userId} completed ${taskId}`, { task });
+      await prisma.task.update({
+        where: {
+          user_id_task_id: {
+            task_id: taskId,
+            user_id: userId,
+          },
         },
-      },
-      data: {
-        progress: task.target,
-        completed: true,
-      },
-    });
+        data: {
+          progress: task.target,
+          completed: true,
+        },
+      });
 
-    const reward = parseReward(task.prize);
+      const reward = parseReward(task.prize);
 
-    const embed = new CustomEmbed()
-      .setHeader("task completed", await getLastKnownAvatar(userId))
-      .setColor(Constants.EMBED_SUCCESS_COLOR);
+      const embed = new CustomEmbed()
+        .setHeader("task completed", await getLastKnownAvatar(userId))
+        .setColor(Constants.EMBED_SUCCESS_COLOR);
 
-    let desc = `you have completed the **${getTasksData()[task.task_id].name}** task`;
+      let desc = `you have completed the **${getTasksData()[task.task_id].name}** task`;
 
-    switch (reward.type) {
-      case "item":
-        desc += `\n\nyou have received ${reward.value}x ${reward.item.emoji} ${reward.item.name}`;
-        await addInventoryItem(task.user_id, reward.item.id, reward.value);
-        break;
-      case "karma":
-        desc += `\n\nyou have received 🔮 ${reward.value} karma`;
-        await addKarma(task.user_id, reward.value);
-        break;
-      case "money":
-        desc += `\n\nyou have received $${reward.value.toLocaleString()}`;
-        await addBalance(task.user_id, reward.value);
-        break;
-      case "xp":
-        desc += `\n\nyou have received ${reward.value.toLocaleString()}xp`;
-        await addXp(task.user_id, reward.value);
+      switch (reward.type) {
+        case "item":
+          desc += `\n\nyou have received ${reward.value}x ${reward.item.emoji} ${reward.item.name}`;
+          await addInventoryItem(task.user_id, reward.item.id, reward.value);
+          break;
+        case "karma":
+          desc += `\n\nyou have received 🔮 ${reward.value} karma`;
+          await addKarma(task.user_id, reward.value);
+          break;
+        case "money":
+          desc += `\n\nyou have received $${reward.value.toLocaleString()}`;
+          await addBalance(task.user_id, reward.value);
+          break;
+        case "xp":
+          desc += `\n\nyou have received ${reward.value.toLocaleString()}xp`;
+          await addXp(task.user_id, reward.value);
 
-        const guild = await getGuildName(task.user_id);
+          const guild = await getGuildName(task.user_id);
 
-        if (guild) {
-          await addToGuildXP(guild, reward.value, task.user_id);
-        }
-        break;
+          if (guild) {
+            await addToGuildXP(guild, reward.value, task.user_id);
+          }
+          break;
+      }
+
+      embed.setDescription(desc);
+      if (getTasksData()[task.task_id].complete_gif)
+        embed.setImage(getTasksData()[task.task_id].complete_gif);
+
+      addInlineNotification({ embed, memberId: task.user_id });
+      addProgress(task.user_id, "taskmaster", 1);
+
+      if (task.type === "daily") addTaskProgress(task.user_id, "all_dailies");
+    } else {
+      await prisma.task.update({
+        where: { user_id_task_id: { user_id: userId, task_id: taskId } },
+        data: { progress: { increment: amount } },
+      });
     }
-
-    embed.setDescription(desc);
-    if (getTasksData()[task.task_id].complete_gif)
-      embed.setImage(getTasksData()[task.task_id].complete_gif);
-
-    addInlineNotification({ embed, memberId: task.user_id });
-    addProgress(task.user_id, "taskmaster", 1);
-
-    if (task.type === "daily") addTaskProgress(task.user_id, "all_dailies");
-  } else {
-    await prisma.task.update({
-      where: { user_id_task_id: { user_id: userId, task_id: taskId } },
-      data: { progress: { increment: amount } },
-    });
+  } finally {
+    mutex.release(mutexKey);
   }
 }
 
