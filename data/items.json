@@ -3652,7 +3652,7 @@
     "rarity": 69,
     "role": "sellable",
     "buy": 0,
-    "sell": 3000,
+    "sell": 5000,
     "in_crates": false
   },
   "rice_seed": {
@@ -3680,7 +3680,7 @@
     "rarity": 69,
     "role": "sellable",
     "buy": 0,
-    "sell": 2000,
+    "sell": 3000,
     "in_crates": false
   }
 }
