@@ -442,7 +442,7 @@ export async function isRequestSuitable(
 
   try {
     const response = await openai.responses.parse({
-      model: "gpt-5-mini",
+      model: "gpt-5.1-mini",
       instructions: sysPrompt.join("\n"),
       input: [{ role: "user", content }],
       text: { format: zodTextFormat(isRequestSuitableFormat, "supportrequest_suitable") },
