@@ -92,7 +92,7 @@ async function run(
     lovePercent = 0;
   }
 
-  if (lovePercent === 100 && percentChance(50)) {
+  if (lovePercent === 100 && percentChance(25)) {
     lovePercent = 99;
   }
 

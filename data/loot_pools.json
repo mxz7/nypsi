@@ -58,7 +58,8 @@
       "orange_seed": 15,
       "pineapple_seed": 5,
       "rain": 2,
-      "magic_potato": 1.5
+      "magic_potato": 1.5,
+      "ring": 5
     }
   },
   "mineshaft_chest": {
@@ -149,7 +150,8 @@
           "min": 100,
           "max": 750
         }
-      }
+      },
+      "ring": 25
     }
   },
   "corner_shop_scratchie": {
@@ -266,7 +268,8 @@
       "pumpkin": 100,
       "christmas_tree": 100,
       "wheat_seed": 30,
-      "redbull": 10
+      "redbull": 10,
+      "ring": 0.75
     }
   },
   "lucky_scratch_card": {
@@ -332,7 +335,8 @@
           "min": 5,
           "max": 50
         }
-      }
+      },
+      "ring": 2
     }
   },
   "karma_scratch_card": {
@@ -442,7 +446,8 @@
           "min": 50,
           "max": 300
         }
-      }
+      },
+      "ring": 10
     }
   },
   "random_drop": {
