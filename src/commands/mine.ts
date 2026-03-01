@@ -182,7 +182,7 @@ async function run(
     times += 2;
   }
 
-  await addCooldown(cmd.name, member, 2);
+  await addCooldown(cmd.name, member, 60);
 
   await addStat(member, pickaxe);
 
