@@ -51,7 +51,7 @@ async function run(
             .setStyle(ButtonStyle.Link)
             .setLabel("what's this?")
             .setEmoji("❓")
-            .setURL("https://nypsi.xyz/docs/economy/events?ref=bot-event-command"),
+            .setURL("https://nypsi.xyz/wiki/economy/events?ref=bot-event-command"),
         ),
       ],
     });
@@ -102,7 +102,7 @@ async function run(
           .setStyle(ButtonStyle.Link)
           .setLabel("what's this?")
           .setEmoji("❓")
-          .setURL("https://nypsi.xyz/docs/economy/events?ref=bot-event-command"),
+          .setURL("https://nypsi.xyz/wiki/economy/events?ref=bot-event-command"),
       ),
     ],
   });

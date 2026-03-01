@@ -352,7 +352,7 @@ function getGeneralMessage(
     description.push("**account locked**");
   } else {
     description.push(
-      `**worth** ${value ? `$${Math.floor(value).toLocaleString()}` : "[unvalued](https://nypsi.xyz/docs/economy/items/worth?ref=bot-item#unvalued)"}`,
+      `**worth** ${value ? `$${Math.floor(value).toLocaleString()}` : "[unvalued](https://nypsi.xyz/wiki/economy/items/worth?ref=bot-item#unvalued)"}`,
     );
 
     if (total && selected.id !== "lottery_ticket") {
@@ -577,7 +577,7 @@ export function getObtainingData(selected: Item): ObtainingData {
 
   if (isGem(selected.id) || selected.id === "gem_shard") {
     description.push(
-      `${selected.emoji} [mysterious activities](https://nypsi.xyz/docs/economy/items/gems)`,
+      `${selected.emoji} [mysterious activities](https://nypsi.xyz/wiki/economy/items/gems)`,
     );
   }
 
@@ -590,7 +590,7 @@ export function getObtainingData(selected: Item): ObtainingData {
   }
 
   if (selected.id === "pandora_box") {
-    description.push("[events](https://nypsi.xyz/docs/economy/events?ref=bot-item-pandora)");
+    description.push("[events](https://nypsi.xyz/wiki/economy/events?ref=bot-item-pandora)");
   }
 
   const randomDropPool = lootPools["random_drop"];

@@ -2050,7 +2050,7 @@ export async function topVoteStreakGlobal(member?: MemberResolvable, amount = 10
 
 export async function formatUsername(id: string, username: string, privacy: boolean) {
   if (!privacy)
-    return "[**[hidden]**](https://nypsi.xyz/docs/economy/user-settings/hidden?ref=bot-lb)";
+    return "[**[hidden]**](https://nypsi.xyz/wiki/economy/user-settings/hidden?ref=bot-lb)";
 
   let out = `[**${username}**](https://nypsi.xyz/users/${encodeURIComponent(id)}?ref=bot-lb)`;
 

@@ -1389,7 +1389,7 @@ async function run(
       },
       {
         name: "need more help?",
-        value: `visit the [**docs**](${"https://nypsi.xyz/docs/economy/market/?ref=bot-market"}) or ask a community or staff member in the [**official nypsi server**](${Constants.NYPSI_SERVER_INVITE_LINK})`,
+        value: `visit the [**docs**](${"https://nypsi.xyz/wiki/economy/market/?ref=bot-market"}) or ask a community or staff member in the [**official nypsi server**](${Constants.NYPSI_SERVER_INVITE_LINK})`,
       },
     );
 

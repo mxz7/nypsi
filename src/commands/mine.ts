@@ -63,7 +63,7 @@ const areas = [
 ];
 
 const cmd = new Command("mine", "go to a cave and mine", "money").setDocs(
-  "https://nypsi.xyz/docs/economy/fish-hunt-mine?ref=bot-help",
+  "https://nypsi.xyz/wiki/economy/fish-hunt-mine?ref=bot-help",
 );
 
 cmd.slashEnabled = true;
@@ -141,7 +141,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            "you need a pickaxe to mine\n[how do i get a pickaxe?](https://nypsi.xyz/docs/economy/fish-hunt-mine?ref=bot-help)\n\nyou can use **/free** to get some basic tools",
+            "you need a pickaxe to mine\n[how do i get a pickaxe?](https://nypsi.xyz/wiki/economy/fish-hunt-mine?ref=bot-help)\n\nyou can use **/free** to get some basic tools",
           ),
         ],
         flags: MessageFlags.Ephemeral,

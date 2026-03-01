@@ -68,7 +68,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 
 const cmd = new Command("chatreaction", "see who can type the fastest", "fun")
   .setAliases(["cr", "reaction"])
-  .setDocs("https://nypsi.xyz/docs/chat-reactions/setup?ref=bot-help");
+  .setDocs("https://nypsi.xyz/wiki/chat-reactions/setup?ref=bot-help");
 
 cmd.slashEnabled = true;
 cmd.slashData

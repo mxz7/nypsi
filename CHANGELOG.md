@@ -81,7 +81,7 @@
 - after maintenance or reboots, boosters will be given their lost time back
 - revised `$help <item>` and `$recipe` to be aliases for `$item` (@fedpol1)
 - added more info to `$item`, accessible through pages (@fedpol1, @growling_grizzly)
-- added events (https://nypsi.xyz/docs/economy/events)
+- added events (https://nypsi.xyz/wiki/economy/events)
 - maxbet & mines balancing
 - daily guild contribution stats (@growling_grizzly)
 - more complex times (such as 1h30m) can now be used in mute/ban/etc (@growling_grizzly)

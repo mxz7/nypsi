@@ -361,7 +361,7 @@ async function helpCmd(message: NypsiMessage, args: string[]) {
       }
 
       if (cmd.docs) {
-        desc += `\n**docs** ${cmd.docs}`;
+        desc += `\n**wiki** ${cmd.docs}`;
       }
 
       embed.setTitle(`${cmd.name} command`);
@@ -1017,7 +1017,7 @@ export async function runCommand(
               memberId: message.author.id,
               embed: new CustomEmbed(
                 message.member,
-                `you have enough xp for a **level up**!!! you only need to deposit $${(levelRequirements.money - bankBalance).toLocaleString()} more into your bank to level up!\n\n[more information about levelling](https://nypsi.xyz/docs/economy/level?ref=bot-level-tip)`,
+                `you have enough xp for a **level up**!!! you only need to deposit $${(levelRequirements.money - bankBalance).toLocaleString()} more into your bank to level up!\n\n[more information about levelling](https://nypsi.xyz/wiki/economy/level?ref=bot-level-tip)`,
               ),
             });
           }

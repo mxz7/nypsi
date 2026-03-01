@@ -22,11 +22,11 @@ invite link can be found at: [`nypsi.xyz/invite`](https://nypsi.xyz/invite?ref=n
 
 ## documentation
 
-the documentation can be found at [`nypsi.xyz/docs`](https://nypsi.xyz/docs?ref=nypsi-git)
+the documentation can be found at [`nypsi.xyz/wiki`](https://nypsi.xyz/wiki?ref=nypsi-git)
 
 ## self host
 
-[setup tutorial](https://nypsi.xyz/docs/self-host?ref=nypsi-git)
+[setup tutorial](https://nypsi.xyz/wiki/self-host?ref=nypsi-git)
 
 ## top.gg
 

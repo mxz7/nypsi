@@ -51,7 +51,7 @@ let startTimeout: NodeJS.Timeout;
 const waitingButtons = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
   new ButtonBuilder().setCustomId("crash-join").setLabel("join").setStyle(ButtonStyle.Success),
   new ButtonBuilder()
-    .setURL("https://nypsi.xyz/docs/economy/crash?ref=bot-crash")
+    .setURL("https://nypsi.xyz/wiki/economy/crash?ref=bot-crash")
     .setStyle(ButtonStyle.Link)
     .setLabel("help"),
 );

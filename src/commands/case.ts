@@ -29,7 +29,7 @@ import { getLastKnownUsername } from "../utils/functions/users/username";
 
 const cmd = new Command("case", "get information about a given case", "moderation")
   .setPermissions(["MANAGE_MESSAGES", "MANAGE_SERVER", "MODERATE_MEMBERS"])
-  .setDocs("https://nypsi.xyz/docs/moderation/cases?ref=bot-help");
+  .setDocs("https://nypsi.xyz/wiki/moderation/cases?ref=bot-help");
 
 cmd.slashEnabled = true;
 cmd.slashData.addIntegerOption((option) =>

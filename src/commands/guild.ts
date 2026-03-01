@@ -59,7 +59,7 @@ import sharp = require("sharp");
 
 const cmd = new Command("guild", "create and manage your guild/clan", "money")
   .setAliases(["g", "clan"])
-  .setDocs("https://nypsi.xyz/docs/economy/guilds?ref=bot-help");
+  .setDocs("https://nypsi.xyz/wiki/economy/guilds?ref=bot-help");
 
 cmd.slashEnabled = true;
 

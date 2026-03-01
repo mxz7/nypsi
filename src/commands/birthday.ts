@@ -217,7 +217,7 @@ async function run(
     const embed = new CustomEmbed(
       message.member,
       (birthday
-        ? `your birthday is **${await getFormattedBirthday(birthday)}**\n-# incorrect? [make a support ticket](https://nypsi.xyz/docs/faq#how-do-i-make-a-support-ticket)\n\n`
+        ? `your birthday is **${await getFormattedBirthday(birthday)}**\n-# incorrect? [make a support ticket](https://nypsi.xyz/wiki/faq#how-do-i-make-a-support-ticket)\n\n`
         : "") +
         "/**birthday toggle** *enable/disable your birthday from being announced in servers*\n" +
         "/**birthday channel <channel>** *set a channel to be used as the birthday announcement channel*\n" +

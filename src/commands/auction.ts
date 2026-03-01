@@ -14,7 +14,7 @@ async function run(
     embeds: [
       new CustomEmbed(
         message.member,
-        "auctions have been moved to be part of /market\nmore info: https://nypsi.xyz/docs/economy/market",
+        "auctions have been moved to be part of /market\nmore info: https://nypsi.xyz/wiki/economy/market",
       ),
     ],
   });

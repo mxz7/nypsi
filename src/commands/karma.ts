@@ -7,7 +7,7 @@ import { getMember } from "../utils/functions/member";
 import { escapeFormattingCharacters } from "../utils/functions/string";
 
 const cmd = new Command("karma", "check how much karma you have", "money").setDocs(
-  "https://nypsi.xyz/docs/economy/karma?ref=bot-help",
+  "https://nypsi.xyz/wiki/economy/karma?ref=bot-help",
 );
 
 cmd.slashEnabled = true;

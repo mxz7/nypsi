@@ -115,7 +115,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            "you need a gun to hunt\n[how do i get a gun?](https://nypsi.xyz/docs/economy/fish-hunt-mine?ref=bot-help)\n\nyou can use **/free** to get some basic tools",
+            "you need a gun to hunt\n[how do i get a gun?](https://nypsi.xyz/wiki/economy/fish-hunt-mine?ref=bot-help)\n\nyou can use **/free** to get some basic tools",
           ),
         ],
         flags: MessageFlags.Ephemeral,

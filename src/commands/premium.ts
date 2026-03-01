@@ -66,7 +66,7 @@ const commandFilter = [
 
 const cmd = new Command("premium", "view your premium status", "info")
   .setAliases(["patreon", "donate", "prem", "kofi"])
-  .setDocs("https://nypsi.xyz/docs/premium?ref=bot-help");
+  .setDocs("https://nypsi.xyz/wiki/premium?ref=bot-help");
 
 cmd.slashEnabled = true;
 cmd.slashData

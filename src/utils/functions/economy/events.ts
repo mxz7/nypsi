@@ -138,7 +138,7 @@ export async function createEvent(
               .setStyle(ButtonStyle.Link)
               .setLabel("what's this?")
               .setEmoji("❓")
-              .setURL("https://nypsi.xyz/docs/economy/events?ref=bot-event-announcement"),
+              .setURL("https://nypsi.xyz/wiki/economy/events?ref=bot-event-announcement"),
           ),
           channelId: targetChannel,
           cluster: cluster,

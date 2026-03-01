@@ -401,8 +401,8 @@ async function run(
           new CustomEmbed(
             message.member,
             `are you sure you want to sell **${amount}** ${selected.emoji} **${selected.name}**?\n` +
-              "you may get more money from selling this item on the [**/market**](https://nypsi.xyz/docs/economy/market?ref=bot-sell)" +
-              `, its [*worth*](https://nypsi.xyz/docs/economy/items/worth?ref=bot-sell) is $**${marketWorth.toLocaleString()}**`,
+              "you may get more money from selling this item on the [**/market**](https://nypsi.xyz/wiki/economy/market?ref=bot-sell)" +
+              `, its [*worth*](https://nypsi.xyz/wiki/economy/items/worth?ref=bot-sell) is $**${marketWorth.toLocaleString()}**`,
           ),
         ],
         components: [row],
