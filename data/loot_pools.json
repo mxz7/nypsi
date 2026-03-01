@@ -167,15 +167,15 @@
       "diamond": 100,
       "cookie": 100,
       "worm": 100,
-      "galvanised_square_steel": 100,
+      "galvanised_square_steel": 75,
       "blue_rocks": 65,
-      "ancient_debris": 60,
-      "stolen_credit_card": 90,
+      "ancient_debris": 40,
+      "stolen_credit_card": 80,
       "grandma": 20,
       "grandpa": 10,
       "super_cursor": 5,
       "lightning_mcqueen": 40,
-      "redbull": 10,
+      "redbull": 8,
       "rick_astley": 40,
       "xp_potion": 10,
       "wooden_pickaxe": {
@@ -206,7 +206,7 @@
       "toe": 50,
       "pumpkin": 10,
       "christmas_tree": 15,
-      "wheat_seed": 1
+      "rice_seed": 1
     }
   },
   "daily_scratch_card": {
@@ -249,24 +249,24 @@
       "69420_crate": 65,
       "bronze_credit": 0.5,
       "quarry_scrap": 4,
-      "gem_shard": 0.5,
+      "gem_shard": 0.75,
       "blue_gem": 0.5,
       "lucky_cheese": 5,
       "reroll_token": 0.05,
-      "banana_seed": 1,
       "fertiliser": {
-        "weight": 30,
+        "weight": 40,
         "count": {
           "min": 1,
           "max": 5
         }
       },
-      "toe": 10,
+      "toe": 40,
       "unbreaking": 2,
-      "mango_seed": 4,
-      "pumpkin": 80,
+      "mango_seed": 7,
+      "pumpkin": 100,
       "christmas_tree": 100,
-      "wheat_seed": 25
+      "wheat_seed": 30,
+      "redbull": 10
     }
   },
   "lucky_scratch_card": {
