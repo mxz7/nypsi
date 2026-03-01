@@ -364,13 +364,12 @@ export async function waterFarm(member: MemberResolvable) {
   const dead = await checkDead(member);
   const farm = await getFarm(member);
 
+  const now = Date.now();
+
   const toWater: number[] = [];
 
   for (const plant of farm) {
-    if (
-      plant.wateredAt.valueOf() <
-      Date.now() - getPlantsData()[plant.plantId].water.every * 1000
-    ) {
+    if (plant.wateredAt.valueOf() < now - getPlantsData()[plant.plantId].water.every * 1000) {
       toWater.push(plant.id);
     }
   }
@@ -399,17 +398,16 @@ export async function fertiliseFarm(member: MemberResolvable): Promise<{
 
   if (!inventory.has("fertiliser")) return { dead, msg: "no fertiliser" };
 
+  const now = Date.now();
+
   let possible = sort(
     farm.filter(
       (i) =>
-        i.fertilisedAt.valueOf() <
-        dayjs().subtract(getPlantsData()[i.plantId].fertilise.every, "seconds").valueOf(),
+        i.fertilisedAt.valueOf() < now - getPlantsData()[i.plantId].fertilise.every * 0.8 * 1000,
     ),
   ).asc((i) => {
     const timeTillDead =
-      new Date(i.fertilisedAt).getTime() +
-      getPlantsData()[i.plantId].fertilise.dead * 1000 -
-      Date.now();
+      new Date(i.fertilisedAt).getTime() + getPlantsData()[i.plantId].fertilise.dead * 1000 - now;
 
     return timeTillDead;
   });
