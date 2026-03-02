@@ -381,14 +381,13 @@ model Inventory {
 model Museum {
   userId String
 
-  item          String
-  amount        BigInt    @default(1)
-  completed     Boolean   @default(false)
+  itemId        String
+  amount        BigInt
   completedAt   DateTime?
 
   economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
-  @@id([userId, item])
+  @@id([userId, itemId])
 }
 
 model EconomyWorker {

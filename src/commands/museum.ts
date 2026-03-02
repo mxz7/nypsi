@@ -1,4 +1,14 @@
-import { CommandInteraction, ContainerBuilder, Interaction, Message, MessageFlags, resolveColor, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, TextDisplayBuilder } from "discord.js";
+import {
+  CommandInteraction,
+  ContainerBuilder,
+  Interaction,
+  Message,
+  MessageFlags,
+  resolveColor,
+  StringSelectMenuBuilder,
+  StringSelectMenuOptionBuilder,
+  TextDisplayBuilder,
+} from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { getColor } from "../models/EmbedBuilders";
 import { getInventory } from "../utils/functions/economy/inventory";
@@ -29,31 +39,24 @@ async function run(
   const itemRoles = [
     ...new Set(
       Object.values(items)
-        .map(item => item.museum?.category)
-        .filter(Boolean)
-    )
+        .map((item) => item.museum?.category)
+        .filter(Boolean),
+    ),
   ].sort();
 
-  console.log({itemRoles})
-  
   let inventory = await getInventory(message.member);
 
-  const roleSelectMenu = (
-    disabled = false,
-    selected = "none"
-  ) => {
+  const roleSelectMenu = (disabled = false, selected = "none") => {
     return new StringSelectMenuBuilder()
       .setCustomId(`select-role`)
       .setDisabled(disabled)
       .addOptions(
-        itemRoles.map(
-          (role) => {
-            return new StringSelectMenuOptionBuilder()
-              .setLabel(role)
-              .setValue(role)
-              .setDefault(role == selected);
-          },
-        ),
+        itemRoles.map((role) => {
+          return new StringSelectMenuOptionBuilder()
+            .setLabel(role)
+            .setValue(role)
+            .setDefault(role == selected);
+        }),
       );
   };
 
@@ -62,28 +65,22 @@ async function run(
       .setAccentColor(resolveColor(getColor(message.member)))
       .addTextDisplayComponents(new TextDisplayBuilder().setContent("## museum"))
       .addSeparatorComponents((separator) => separator)
-      .addTextDisplayComponents(
-        new TextDisplayBuilder().setContent(
-          "select a category of item",
-        ),
-      )
-      .addActionRowComponents((row) =>
-        row.addComponents(roleSelectMenu(disabled)),
-      )
+      .addTextDisplayComponents(new TextDisplayBuilder().setContent("select a category of item"))
+      .addActionRowComponents((row) => row.addComponents(roleSelectMenu(disabled)));
 
   let msg: Message;
 
   const homeView = async () => {
     if (msg) {
       await msg.edit({
-      flags: MessageFlags.IsComponentsV2,
-      components: [container()],
-    });
+        flags: MessageFlags.IsComponentsV2,
+        components: [container()],
+      });
     } else {
       msg = await send({
-      flags: MessageFlags.IsComponentsV2,
-      components: [container()],
-    });
+        flags: MessageFlags.IsComponentsV2,
+        components: [container()],
+      });
     }
 
     const filter = (i: Interaction) => i.user.id == message.author.id;
@@ -111,23 +108,18 @@ async function run(
       const { res, interaction } = response;
 
       if (interaction.isStringSelectMenu()) {
-        
       }
 
       inventory = await getInventory(message.member);
       await msg.edit({ flags: MessageFlags.IsComponentsV2, components: [container()] });
       return pageManager();
     };
-  }
+  };
 
-  const categoryView = () => {
-
-  }
+  const categoryView = () => {};
 
   if (args[0]?.toLowerCase() == "donate") {
-
   } else if (args.length >= 2 && args[0].toLowerCase() == "view") {
-
   } else return homeView();
 }
 

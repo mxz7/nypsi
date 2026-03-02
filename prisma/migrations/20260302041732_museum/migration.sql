@@ -1,12 +1,11 @@
 -- CreateTable
 CREATE TABLE "Museum" (
     "userId" TEXT NOT NULL,
-    "item" TEXT NOT NULL,
-    "amount" BIGINT NOT NULL DEFAULT 1,
-    "completed" BOOLEAN NOT NULL DEFAULT false,
+    "itemId" TEXT NOT NULL,
+    "amount" BIGINT NOT NULL,
     "completedAt" TIMESTAMP(3),
 
-    CONSTRAINT "Museum_pkey" PRIMARY KEY ("userId","item")
+    CONSTRAINT "Museum_pkey" PRIMARY KEY ("userId","itemId")
 );
 
 -- AddForeignKey

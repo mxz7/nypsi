@@ -13,7 +13,7 @@ export interface Item {
     category: string;
     threshold: number;
     no_overflow?: boolean;
-  }
+  };
   default_count?: number;
   booster_desc?: string;
   aliases?: string[];

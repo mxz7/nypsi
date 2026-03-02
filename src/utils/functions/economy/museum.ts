@@ -7,33 +7,32 @@ import { getUserId, MemberResolvable } from "../member";
 import { createUser, getItems, userExists } from "./utils";
 
 export class Museum {
-  private items: { [itemId: string]: {amount: number; completed: boolean; completedAt: Date} };
-  private userId: string;
+  private items: { [itemId: string]: { amount: number; completedAt: Date } };
 
   constructor(
-    member: MemberResolvable,
-    data?: { item: string; amount: number; completed: boolean; completedAt: Date }[],
+    data?:
+      | { [itemId: string]: { amount: number; completedAt: Date } }
+      | { item: string; amount: number; completedAt: Date }[],
   ) {
-    this.userId = getUserId(member);
     this.items = {};
 
     if (Array.isArray(data)) {
       for (const i of data) {
         this.items[i.item] = {
-            amount: i.amount,
-            completed: i.completed,
-            completedAt: i.completedAt
+          amount: i.amount,
+          completedAt: i.completedAt,
         };
       }
+    } else if (data) {
+      this.items = data;
     }
   }
 
-  get entries(): { item: string; amount: number; completed: boolean; completedAt: Date }[] {
+  entries(): { item: string; amount: number; completedAt: Date }[] {
     return Object.entries(this.items).map(([item, data]) => ({
       item,
       amount: data.amount,
-      completed: data.completed,
-      completedAt: data.completedAt
+      completedAt: data.completedAt,
     }));
   }
 
@@ -41,34 +40,31 @@ export class Museum {
   count(itemId: string): number;
   count(item: Item | string): number {
     const itemId = typeof item === "string" ? item : item.id;
-    return this.items[itemId].amount ?? 0;
+    return this.items[itemId]?.amount ?? 0;
   }
 
   has(item: Item): boolean;
   has(itemId: string): boolean;
   has(item: Item | string): boolean {
     const itemId = typeof item === "string" ? item : item.id;
-    return (this.items[itemId].amount ?? 0) > 0;
+    return (this.items[itemId]?.amount ?? 0) > 0;
   }
 
   completed(item: Item): boolean;
   completed(itemId: string): boolean;
   completed(item: Item | string): boolean {
     const itemId = typeof item === "string" ? item : item.id;
-    if (!getItems()[itemId]?.museum) return false;
-    return this.count(itemId) >= getItems()[itemId].museum.threshold;
+    return Boolean(this.completedAt(itemId));
   }
-  
-  completedAt(item: Item): boolean;
-  completedAt(itemId: string): boolean;
-  completedAt(item: Item | string): boolean {
+
+  completedAt(item: Item): Date;
+  completedAt(itemId: string): Date;
+  completedAt(item: Item | string): Date {
     const itemId = typeof item === "string" ? item : item.id;
-    if (!getItems()[itemId]?.museum) return false;
-    return this.count(itemId) >= getItems()[itemId].museum.threshold;
+    return this.items[itemId]?.completedAt;
   }
-  
-  // check if this is the actual format it needs to be saved as i cba rn
-  toJSON(): { [itemId: string]: {amount: number; completed: boolean; completedAt: Date} } {
+
+  toJSON(): { [itemId: string]: { amount: number; completedAt: Date } } {
     return this.items;
   }
 }
@@ -81,11 +77,11 @@ export async function getMuseum(member: MemberResolvable): Promise<Museum> {
   if (cache) {
     try {
       const parsed = JSON.parse(cache);
-      return new Museum(userId, parsed);
+      return new Museum(parsed);
     } catch (e) {
       console.error(e);
       logger.error("weird museum cache error", { error: e });
-      return new Museum(userId);
+      return new Museum();
     }
   }
 
@@ -95,15 +91,14 @@ export async function getMuseum(member: MemberResolvable): Promise<Museum> {
         userId,
       },
       select: {
-        item: true,
+        itemId: true,
         amount: true,
-        completed: true,
-        completedAt: true
+        completedAt: true,
       },
     })
     .then((q) =>
       q.map((i) => {
-        return { item: i.item, amount: Number(i.amount), completed: i.completed, completedAt: i.completedAt };
+        return { item: i.itemId, amount: Number(i.amount), completedAt: i.completedAt };
       }),
     )
     .catch(() => {});
@@ -116,10 +111,10 @@ export async function getMuseum(member: MemberResolvable): Promise<Museum> {
       "EX",
       180,
     );
-    return new Museum(userId);
+    return new Museum();
   }
 
-  const museum = new Museum(userId, query);
+  const museum = new Museum(query);
 
   await redis.set(
     `${Constants.redis.cache.economy.MUSEUM}:${userId}`,
@@ -145,9 +140,9 @@ export async function addToMuseum(member: MemberResolvable, itemId: string, amou
 
   await prisma.museum.upsert({
     where: {
-      userId_item: {
+      userId_itemId: {
         userId,
-        item: itemId,
+        itemId,
       },
     },
     update: {
@@ -155,12 +150,10 @@ export async function addToMuseum(member: MemberResolvable, itemId: string, amou
     },
     create: {
       userId,
-      item: itemId,
+      itemId,
       amount: amount,
     },
   });
 
-  await redis.del(
-    `${Constants.redis.cache.economy.MUSEUM}:${userId}`,
-  );
+  await redis.del(`${Constants.redis.cache.economy.MUSEUM}:${userId}`);
 }
