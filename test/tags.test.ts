@@ -14,6 +14,11 @@ for (const t of Object.values(data)) {
     expect
       .soft(Constants.EMOJI_REGEX.test(t.emoji) || Constants.UNICODE_EMOJI_REGEX.test(t.emoji))
       .toBe(true);
+
+    if (Constants.EMOJI_REGEX.test(t.emoji)) {
+      expect.soft(t.image).toBeDefined();
+    }
+
     if (t.image) expect.soft(typeof t.image).toBe("string");
   });
 }
