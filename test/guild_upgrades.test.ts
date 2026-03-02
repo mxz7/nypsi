@@ -12,6 +12,8 @@ for (const g of Object.values(data)) {
     expect.soft(typeof g.name).toBe("string");
     expect.soft(typeof g.description).toBe("string");
     expect.soft(typeof g.cost).toBe("number");
+    expect.soft(g.cost).toBeGreaterThan(0);
     expect.soft(typeof g.increment_per_level).toBe("number");
+    expect.soft(g.increment_per_level).toBeGreaterThanOrEqual(0);
   });
 }
