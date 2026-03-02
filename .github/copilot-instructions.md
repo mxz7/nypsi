@@ -31,7 +31,7 @@
 - **Build:** `pnpm run build` (TypeScript incremental build to `dist/`).
 - **Lint:** `pnpm run lint` (uses ESLint with caching).
 - **Format:** `pnpm run format` (Prettier with cache).
-- **Test:** `npx jest` (see `test/` directory for test files).
+- **Test:** `pnpm run test` (see `test/` directory for test files).
 - **Prisma:**
   - Generate client: `npx prisma generate`
   - Migrate: `npx prisma migrate dev`
@@ -46,7 +46,7 @@
 - **Logging:** Use the custom logger in `src/utils/logger.ts` for all logs (supports Discord/webhook transports).
 - **API Auth:** All API endpoints require bearer token auth (`API_AUTH` env var).
 - **Economy/Items:** Extend or update economy logic via `src/utils/functions/economy/` and `data/items.json`.
-- **Testing:** Place tests in `test/` and use Jest. Mocks may be needed for Discord/Redis/Prisma.
+- **Testing:** Place tests in `test/` and use Vitest. Mocks may be needed for Discord/Redis/Prisma.
 
 ## Integration Points
 
