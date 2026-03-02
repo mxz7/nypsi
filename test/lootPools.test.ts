@@ -1,7 +1,12 @@
-const { readFileSync } = require("fs");
+import { readFileSync } from "node:fs";
+import { expect, test } from "vitest";
+import { Item } from "../src/types/Economy";
+import { LootPool } from "../src/types/LootPool";
 
-const items = JSON.parse(readFileSync("data/items.json"));
-const lootPools = JSON.parse(readFileSync("data/loot_pools.json"));
+const items: Record<string, Item> = JSON.parse(readFileSync("data/items.json").toString());
+const lootPools: Record<string, LootPool> = JSON.parse(
+  readFileSync("data/loot_pools.json").toString(),
+);
 
 for (const poolId in lootPools) {
   test(poolId, () => {

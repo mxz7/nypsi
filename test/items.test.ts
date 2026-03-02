@@ -1,8 +1,12 @@
-const { readFileSync } = require("fs");
-const { exp } = require("mathjs");
+import { readFileSync } from "node:fs";
+import { expect, test } from "vitest";
+import { Item } from "../src/types/Economy";
+import { LootPool } from "../src/types/LootPool";
 
-const items = JSON.parse(readFileSync("data/items.json"));
-const lootPools = JSON.parse(readFileSync("data/loot_pools.json"));
+const items: Record<string, Item> = JSON.parse(readFileSync("data/items.json").toString());
+const lootPools: Record<string, LootPool> = JSON.parse(
+  readFileSync("data/loot_pools.json").toString(),
+);
 
 for (const item of Object.values(items)) {
   test(item.id, () => {
@@ -26,11 +30,12 @@ for (const item of Object.values(items)) {
       for (const effect of item.boosterEffect.boosts) {
         expect(typeof effect).toBe("string");
       }
-    }
-
-    if (item.role === "scratch-card") {
+    } else if (item.role === "scratch-card") {
       expect(typeof item.clicks).toBe("number");
-    }
+    } else if (item.role === "car") expect(typeof item.speed).toBe("number");
+    else if (item.role === "ore") expect(typeof item.ingot).toBe("string");
+    else if (item.role === "worker-upgrade") expect(typeof item.worker_upgrade_id).toBe("string");
+    else if (item.role === "tag") expect(typeof item.tagId).toBe("string");
 
     if (item.role === "scratch-card" || item.role === "crate") {
       for (const poolKey in item.loot_pools) {
@@ -39,11 +44,6 @@ for (const item of Object.values(items)) {
         expect(Number(item.loot_pools[poolKey])).toBeGreaterThan(0);
       }
     }
-
-    if (item.role === "car") expect(typeof item.speed).toBe("number");
-    if (item.role === "ore") expect(typeof item.ingot).toBe("string");
-    if (item.role === "worker-upgrade") expect(typeof item.worker_upgrade_id).toBe("string");
-    if (item.role === "tag") expect(typeof item.tagId).toBe("string");
 
     if (item.rarity) expect(typeof item.rarity).toBe("number");
     if (item.booster_desc) expect(typeof item.booster_desc).toBe("string");
