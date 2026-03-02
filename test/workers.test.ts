@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { expect, test } from "vitest";
 import { Worker, WorkerUpgrades } from "../src/types/Workers";
+import Constants from "../src/utils/Constants";
 
 const data = JSON.parse(readFileSync("data/workers.json").toString());
 
@@ -27,6 +28,12 @@ for (const w of Object.values(workers)) {
     expect.soft(typeof w.id).toBe("string");
     expect.soft(typeof w.name).toBe("string");
     expect.soft(typeof w.item_emoji).toBe("string");
+    expect
+      .soft(
+        Constants.EMOJI_REGEX.test(w.item_emoji) ||
+          Constants.UNICODE_EMOJI_REGEX.test(w.item_emoji),
+      )
+      .toBe(true);
     expect.soft(typeof w.prestige_requirement).toBe("number");
     expect.soft(typeof w.cost).toBe("number");
     expect.soft(typeof w.base.per_item).toBe("number");

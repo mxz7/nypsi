@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { expect, test } from "vitest";
 import { AchievementData } from "../src/types/Economy";
+import Constants from "../src/utils/Constants";
 
 const data: Record<string, AchievementData> = JSON.parse(
   readFileSync("data/achievements.json").toString(),
@@ -15,6 +16,9 @@ for (const ach of Object.values(data)) {
     expect.soft(typeof ach.id).toBe("string");
     expect.soft(typeof ach.name).toBe("string");
     expect.soft(typeof ach.emoji).toBe("string");
+    expect
+      .soft(Constants.EMOJI_REGEX.test(ach.emoji) || Constants.UNICODE_EMOJI_REGEX.test(ach.emoji))
+      .toBe(true);
     expect.soft(typeof ach.target).toBe("number");
     expect.soft(typeof ach.description).toBe("string");
 

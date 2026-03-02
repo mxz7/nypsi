@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { expect, test } from "vitest";
 import { Item } from "../src/types/Economy";
 import { LootPool } from "../src/types/LootPool";
+import Constants from "../src/utils/Constants";
 
 const items: Record<string, Item> = JSON.parse(readFileSync("data/items.json").toString());
 const lootPools: Record<string, LootPool> = JSON.parse(
@@ -13,6 +14,11 @@ for (const item of Object.values(items)) {
     expect.soft(typeof item.id).toBe("string");
     expect.soft(typeof item.name).toBe("string");
     expect.soft(typeof item.emoji).toBe("string");
+    expect
+      .soft(
+        Constants.EMOJI_REGEX.test(item.emoji) || Constants.UNICODE_EMOJI_REGEX.test(item.emoji),
+      )
+      .toBe(true);
     expect.soft(typeof item.longDesc).toBe("string");
     expect.soft(typeof item.article).toBe("string");
     expect.soft(typeof item.in_crates).toBe("boolean");

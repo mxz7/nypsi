@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { expect, test } from "vitest";
 import { KarmaShopItem } from "../src/types/Karmashop";
+import Constants from "../src/utils/Constants";
 
 const data: Record<string, KarmaShopItem> = JSON.parse(
   readFileSync("data/karmashop.json").toString(),
@@ -11,6 +12,9 @@ for (const k of Object.values(data)) {
     expect.soft(typeof k.id).toBe("string");
     expect.soft(typeof k.name).toBe("string");
     expect.soft(typeof k.emoji).toBe("string");
+    expect
+      .soft(Constants.EMOJI_REGEX.test(k.emoji) || Constants.UNICODE_EMOJI_REGEX.test(k.emoji))
+      .toBe(true);
     expect.soft(typeof k.cost).toBe("number");
     expect.soft(typeof k.items_left).toBe("number");
     if (k.aliases) expect.soft(Array.isArray(k.aliases)).toBe(true);
