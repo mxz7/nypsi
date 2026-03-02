@@ -222,6 +222,7 @@ model Economy {
   Boosters           Booster[]
   EconomyWorker      EconomyWorker[]
   Inventory          Inventory[]
+  Museum             Museum[]
   Crafting           Crafting[]
   Game               Game[]
   Stats              Stats[]
@@ -371,6 +372,19 @@ model Inventory {
 
   item   String
   amount BigInt @default(1)
+
+  economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@id([userId, item])
+}
+
+model Museum {
+  userId String
+
+  item          String
+  amount        BigInt    @default(1)
+  completed     Boolean   @default(false)
+  completedAt   DateTime?
 
   economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
 

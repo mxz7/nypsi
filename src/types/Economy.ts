@@ -9,6 +9,11 @@ export interface Item {
   buy?: number;
   sell?: number;
   role: string;
+  museum?: {
+    category: string;
+    threshold: number;
+    no_overflow?: boolean;
+  }
   default_count?: number;
   booster_desc?: string;
   aliases?: string[];
