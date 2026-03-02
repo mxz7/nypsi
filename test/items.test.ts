@@ -63,5 +63,17 @@ for (const item of Object.values(items)) {
         expect(Number(ingredient.split(":")[1])).toBeGreaterThan(0);
       }
     }
+
+    if (item.plantId !== undefined) expect(typeof item.plantId).toBe("string");
+    if (item.unique !== undefined) expect(item.unique).toBe(true);
+
+    if (item.default_count !== undefined) expect(typeof item.default_count).toBe("number");
+    if (item.account_locked !== undefined) expect(item.account_locked).toBe(true);
+    if (item.hidden !== undefined) expect(item.hidden).toBe(true);
+    if (item.upgrades) expect(typeof item.upgrades).toBe("string");
+
+    if (item.boosterEffect && item.boosterEffect.global !== undefined) {
+      expect(typeof item.boosterEffect.global).toBe("boolean");
+    }
   });
 }
