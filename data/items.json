@@ -2113,7 +2113,7 @@
     "sell": 100000,
     "role": "item",
     "museum": {
-      "category": "item",
+      "category": "general",
       "threshold": 10
     },
     "in_crates": true
@@ -2341,7 +2341,7 @@
     "longDesc": "used to enter the nether when mining",
     "role": "item",
     "museum": {
-      "category": "tool",
+      "category": "tools",
       "threshold": 1,
       "no_overflow": true
     },
@@ -3662,7 +3662,7 @@
     "rarity": 0,
     "role": "item",
     "museum": {
-      "category": "tool",
+      "category": "tools",
       "threshold": 5
     },
     "buy": 0,
@@ -3731,7 +3731,7 @@
     "rarity": 4,
     "role": "item",
     "museum": {
-      "category": "tool",
+      "category": "tools",
       "threshold": 1
     },
     "buy": 0,
