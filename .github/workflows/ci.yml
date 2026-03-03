@@ -61,7 +61,7 @@ jobs:
           key: build-${{ runner.os }}-${{ github.sha }}
 
       - name: run tests
-        run: npx jest
+        run: pnpm run test
 
   deploy:
     if: github.ref == 'refs/heads/main'

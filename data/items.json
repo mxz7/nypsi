@@ -1123,7 +1123,7 @@
     "name": "broken ring",
     "article": "a",
     "plural": "broken rings",
-    "emoji": " <:nypsi_broken_ring:1384749748803600405>",
+    "emoji": "<:nypsi_broken_ring:1384749748803600405>",
     "longDesc": "ouch...",
     "rarity": 4,
     "role": "collectable",
@@ -1175,8 +1175,8 @@
   },
   "subaru_wrx": {
     "id": "subaru_wrx",
-    "name": "subuwu",
-    "plural": "subuwus",
+    "name": "subaru",
+    "plural": "subarus",
     "article": "a",
     "emoji": "<:subuwu:1354809872222257324>",
     "longDesc": "uwu",
@@ -2098,7 +2098,6 @@
     "role": "item",
     "shortDesc": "7 days of gold credit",
     "longDesc": "use to receive 7 days of gold (as long as you don't have a better tier currently)",
-    "aliases": ["gold"],
     "rarity": 69,
     "in_crates": false,
     "craft": {
