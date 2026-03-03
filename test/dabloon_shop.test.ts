@@ -11,6 +11,7 @@ for (const it of Object.values(data)) {
   test(it.itemId, () => {
     expect.soft(typeof it.itemId).toBe("string");
     expect.soft(typeof it.cost).toBe("number");
+    expect.soft(it.cost).toBeGreaterThan(50);
     expect.soft(items[it.itemId]).toBeDefined();
   });
 }

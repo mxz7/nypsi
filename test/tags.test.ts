@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { expect, test } from "vitest";
 import { Tag } from "../src/types/Tags";
 import Constants from "../src/utils/Constants";
@@ -19,6 +19,10 @@ for (const t of Object.values(data)) {
       expect.soft(t.image).toBeDefined();
     }
 
-    if (t.image) expect.soft(typeof t.image).toBe("string");
+    if (t.image) {
+      expect.soft(typeof t.image).toBe("string");
+      const exists = existsSync(`data/emojis/${t.image}`);
+      expect.soft(exists).toBe(true);
+    }
   });
 }

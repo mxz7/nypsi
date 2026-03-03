@@ -17,6 +17,7 @@ for (const u of Object.values(data)) {
       .toBe(true);
     expect.soft(typeof u.upgrades).toBe("string");
     expect.soft(typeof u.value).toBe("number");
+    expect.soft(u.value).toBeGreaterThan(0);
     if (u.max !== undefined) {
       expect.soft(typeof u.max).toBe("number");
       expect.soft(u.max).toBeGreaterThan(0);

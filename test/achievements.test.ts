@@ -20,6 +20,7 @@ for (const ach of Object.values(data)) {
       .soft(Constants.EMOJI_REGEX.test(ach.emoji) || Constants.UNICODE_EMOJI_REGEX.test(ach.emoji))
       .toBe(true);
     expect.soft(typeof ach.target).toBe("number");
+    expect.soft(ach.target).toBeGreaterThan(0);
     expect.soft(typeof ach.description).toBe("string");
 
     if (ach.prize) {

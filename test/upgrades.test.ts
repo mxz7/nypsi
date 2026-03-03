@@ -10,7 +10,13 @@ for (const u of Object.values(data)) {
     expect.soft(typeof u.name).toBe("string");
     expect.soft(typeof u.effect).toBe("number");
     if (u.description) expect.soft(typeof u.description).toBe("string");
-    if (u.max !== undefined) expect.soft(typeof u.max).toBe("number");
-    if (u.chance !== undefined) expect.soft(typeof u.chance).toBe("number");
+    if (u.max !== undefined) {
+      expect.soft(typeof u.max).toBe("number");
+      expect.soft(u.max).toBeGreaterThan(0);
+    }
+    if (u.chance !== undefined) {
+      expect.soft(typeof u.chance).toBe("number");
+      expect.soft(u.chance).toBeGreaterThan(0);
+    }
   });
 }

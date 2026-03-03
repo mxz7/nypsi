@@ -19,7 +19,9 @@ for (const u of Object.values(upgrades)) {
     expect.soft(typeof u.name).toBe("string");
     expect.soft(typeof u.upgrades).toBe("string");
     expect.soft(typeof u.effect).toBe("number");
+    expect.soft(u.effect).toBeGreaterThan(0);
     expect.soft(typeof u.stack_limit).toBe("number");
+    expect.soft(u.stack_limit).toBeGreaterThan(0);
   });
 }
 
@@ -35,14 +37,21 @@ for (const w of Object.values(workers)) {
       )
       .toBe(true);
     expect.soft(typeof w.prestige_requirement).toBe("number");
+    expect.soft(w.prestige_requirement).toBeGreaterThan(0);
     expect.soft(typeof w.cost).toBe("number");
+    expect.soft(w.cost).toBeGreaterThan(0);
     expect.soft(typeof w.base.per_item).toBe("number");
+    expect.soft(w.base.per_item).toBeGreaterThan(0);
     expect.soft(typeof w.base.max_storage).toBe("number");
+    expect.soft(w.base.max_storage).toBeGreaterThan(0);
     expect.soft(typeof w.base.per_interval).toBe("number");
+    expect.soft(w.base.per_interval).toBeGreaterThan(0);
     if (w.base.byproducts) {
       for (const bp of Object.values(w.base.byproducts)) {
         expect.soft(typeof bp.chance).toBe("number");
+        expect.soft(bp.chance).toBeGreaterThan(0);
         expect.soft(typeof bp.rolls).toBe("number");
+        expect.soft(bp.rolls).toBeGreaterThan(0);
         expect.soft(typeof bp.multiply_chance).toBe("boolean");
         expect.soft(typeof bp.multiply_rolls).toBe("boolean");
       }

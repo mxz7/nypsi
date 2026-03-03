@@ -35,20 +35,21 @@ for (const item of Object.values(items)) {
         expect.soft(typeof item.max).toBe("number");
         expect.soft(item.max).toBeGreaterThan(0);
       }
-      expect.soft(typeof item.boosterEffect).toBe("object");
-      expect.soft(typeof item.boosterEffect.effect).toBe("number");
-      expect.soft(item.boosterEffect.effect).toBeGreaterThanOrEqual(0);
-      expect.soft(typeof item.boosterEffect.time).toBe("number");
-      expect.soft(item.boosterEffect.time).toBeGreaterThan(0);
+      expect(typeof item.boosterEffect).toBe("object");
+      if (item.boosterEffect) {
+        expect.soft(typeof item.boosterEffect.effect).toBe("number");
+        expect.soft(item.boosterEffect.effect).toBeGreaterThanOrEqual(0);
+        expect.soft(typeof item.boosterEffect.time).toBe("number");
+        expect.soft(item.boosterEffect.time).toBeGreaterThan(0);
+        expect.soft(Array.isArray(item.boosterEffect.boosts)).toBe(true);
 
-      expect.soft(Array.isArray(item.boosterEffect.boosts)).toBe(true);
+        for (const effect of item.boosterEffect.boosts) {
+          expect.soft(typeof effect).toBe("string");
+        }
 
-      for (const effect of item.boosterEffect.boosts) {
-        expect.soft(typeof effect).toBe("string");
-      }
-
-      if (item.boosterEffect.global !== undefined) {
-        expect.soft(item.boosterEffect.global).toBe(true);
+        if (item.boosterEffect.global !== undefined) {
+          expect.soft(item.boosterEffect.global).toBe(true);
+        }
       }
     } else if (item.role === "scratch-card") {
       expect.soft(typeof item.clicks).toBe("number");
@@ -58,10 +59,10 @@ for (const item of Object.values(items)) {
       expect.soft(item.speed).toBeGreaterThanOrEqual(0);
     } else if (item.role === "ore") {
       expect.soft(typeof item.ingot).toBe("string");
-      expect.soft(items[item.ingot]).toBeDefined();
+      expect(items[item.ingot!]).toBeDefined();
     } else if (item.role === "worker-upgrade") {
-      expect.soft(typeof item.worker_upgrade_id).toBe("string");
-      expect.soft(upgrades[item.worker_upgrade_id]).toBeDefined();
+      expect(typeof item.worker_upgrade_id).toBe("string");
+      expect.soft(upgrades[item.worker_upgrade_id!]).toBeDefined();
     } else if (item.role === "tag") expect.soft(typeof item.tagId).toBe("string");
 
     if (item.role === "scratch-card" || item.role === "crate") {
@@ -129,7 +130,10 @@ for (const item of Object.values(items)) {
     if (item.plantId !== undefined) expect.soft(typeof item.plantId).toBe("string");
     if (item.unique !== undefined) expect.soft(item.unique).toBe(true);
 
-    if (item.default_count !== undefined) expect.soft(typeof item.default_count).toBe("number");
+    if (item.default_count !== undefined) {
+      expect.soft(typeof item.default_count).toBe("number");
+      expect.soft(item.default_count).toBeGreaterThan(1);
+    }
     if (item.account_locked !== undefined) expect.soft(item.account_locked).toBe(true);
     if (item.hidden !== undefined) expect.soft(item.hidden).toBe(true);
     if (item.upgrades) expect.soft(typeof item.upgrades).toBe("string");
