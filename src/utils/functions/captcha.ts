@@ -21,7 +21,11 @@ import { MStoTime } from "./date";
 import { isEcoBanned, setEcoBan } from "./economy/utils";
 import { getUserId, MemberResolvable } from "./member";
 import { getAllGroupAccountIds } from "./moderation/alts";
-import { addInlineNotification, addNotificationToQueue } from "./users/notifications";
+import {
+  addInlineNotification,
+  addNotificationToQueue,
+  getDmSettings,
+} from "./users/notifications";
 import ms = require("ms");
 import dayjs = require("dayjs");
 
@@ -115,6 +119,26 @@ export async function passedCaptcha(member: GuildMember | User, check: Captcha, 
       msg += `\n\n⚠️ taken longer than 2 minutes to solve with captcha experience`;
     }
 
+    if (
+      parseInt(await redis.get(`${Constants.redis.cache.user.captcha_fail}:${member.id}`)) >= 35 &&
+      !(await isEcoBanned(member.id)).banned
+    ) {
+      const embed = new CustomEmbed(
+        member,
+        "you have missed a lot of captchas, if this continues you may be automatically banned",
+      ).setTitle("⚠️ warning");
+
+      if ((await getDmSettings(member.id)).other) {
+        addNotificationToQueue({
+          memberId: member.id,
+          payload: {
+            embed,
+          },
+        });
+      }
+      addInlineNotification({ memberId: member.id, embed });
+    }
+
     await hook.send(msg);
   }
 
@@ -186,25 +210,6 @@ export async function failedCaptcha(member: GuildMember, content: string) {
       "EX",
       Math.floor(ms("1 day") / 1000),
     );
-  }
-
-  if (
-    parseInt(await redis.get(`${Constants.redis.cache.user.captcha_fail}:${member.user.id}`)) ===
-      35 &&
-    !(await isEcoBanned(member.user.id)).banned
-  ) {
-    const embed = new CustomEmbed(
-      member,
-      "you have missed a lot of captchas, if this continues you may be automatically banned",
-    ).setTitle("⚠️ warning");
-
-    addNotificationToQueue({
-      memberId: member.user.id,
-      payload: {
-        embed,
-      },
-    });
-    addInlineNotification({ memberId: member.user.id, embed });
   }
 
   if (
