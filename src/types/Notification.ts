@@ -14,3 +14,10 @@ export interface InlineNotificationPayload {
   memberId: string;
   embed: CustomEmbed;
 }
+
+export interface NotificationData {
+  id: string;
+  name: string;
+  description: string;
+  types?: { name: string; description: string; value: string }[];
+}

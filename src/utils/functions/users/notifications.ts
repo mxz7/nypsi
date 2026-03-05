@@ -1,7 +1,11 @@
 import { DMSettings, Preferences } from "#generated/prisma";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
-import { InlineNotificationPayload, NotificationPayload } from "../../../types/Notification";
+import {
+  InlineNotificationPayload,
+  NotificationData,
+  NotificationPayload,
+} from "../../../types/Notification";
 import Constants from "../../Constants";
 import { dmQueue } from "../../queues/queues";
 import { createUser, userExists } from "../economy/utils";
@@ -9,13 +13,6 @@ import { getUserId, MemberResolvable } from "../member";
 import ms = require("ms");
 
 declare function require(name: string): any;
-
-interface NotificationData {
-  id: string;
-  name: string;
-  description: string;
-  types?: { name: string; description: string; value: string }[];
-}
 
 const notificationsData: { [key: string]: NotificationData } =
   require("../../../../data/notifications.json").notifications;
