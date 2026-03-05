@@ -143,7 +143,16 @@ for (const item of Object.values(items)) {
       expect.soft(typeof item.museum.category).toBe("string");
       expect
         .soft(item.museum.category)
-        .toBeOneOf(["boosters", "cars", "collectables", "general", "sellables", "tools"]);
+        .toBeOneOf([
+          "boosters",
+          "cars",
+          "collectables",
+          "general",
+          "sellables",
+          "tools",
+          "gems",
+          "cats",
+        ]);
       if (item.museum.no_overflow !== undefined) expect.soft(item.museum.no_overflow).toBe(true);
       expect.soft(typeof item.museum.threshold).toBe("number");
       expect.soft(item.museum.threshold).toBeGreaterThan(0);
