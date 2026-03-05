@@ -287,6 +287,7 @@ export async function invite(userId: string, targetId: string, guild: Guild) {
 
     await channel.permissionOverwrites.create(discordTarget, {
       ViewChannel: true,
+      Connect: true,
     });
 
     if (Constants.Z_CHANNELS.indexOf(channelId) !== 0 || !channel.isSendable()) {
