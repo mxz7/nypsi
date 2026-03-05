@@ -137,5 +137,16 @@ for (const item of Object.values(items)) {
     if (item.account_locked !== undefined) expect.soft(item.account_locked).toBe(true);
     if (item.hidden !== undefined) expect.soft(item.hidden).toBe(true);
     if (item.upgrades) expect.soft(typeof item.upgrades).toBe("string");
+
+    if (item.museum) {
+      expect(typeof item.museum).toBe("object");
+      expect.soft(typeof item.museum.category).toBe("string");
+      expect
+        .soft(item.museum.category)
+        .toBeOneOf(["boosters", "cars", "collectables", "general", "sellables", "tools"]);
+      if (item.museum.no_overflow !== undefined) expect.soft(item.museum.no_overflow).toBe(true);
+      expect.soft(typeof item.museum.threshold).toBe("number");
+      expect.soft(item.museum.threshold).toBeGreaterThan(0);
+    }
   });
 }
