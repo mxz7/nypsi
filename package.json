@@ -10,7 +10,7 @@
     "build": "tsc --incremental",
     "watch": "tsc --build --watch",
     "lint": "oxlint --type-aware",
-    "validate": "npm run format:check && npm run lint",
+    "validate": "npm run format:check && npm run test && npm run lint",
     "seed": "NODE_ENV=development tsx src/scripts/seed.ts",
     "test": "vitest run"
   },
