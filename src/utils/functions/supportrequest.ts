@@ -283,7 +283,7 @@ export async function handleAttachments(attachments: Collection<string, Attachme
 
       if (!uploadRes) return false;
 
-      urls.push(`https://cdn.nypsi.xyz/${key}`);
+      urls.push(`${Constants.CDN_DOMAIN}/${key}`);
     });
   }
 

@@ -143,7 +143,7 @@ async function run(
           embeds: [
             new EmbedBuilder()
               .setColor(color as ColorResolvable)
-              .setImage(`https://cdn.nypsi.xyz/${circleId}`),
+              .setImage(`${Constants.CDN_DOMAIN}/${circleId}`),
           ],
         })
         .catch(() =>
@@ -151,7 +151,7 @@ async function run(
             embeds: [
               new EmbedBuilder()
                 .setColor(color as ColorResolvable)
-                .setImage(`https://cdn.nypsi.xyz/${circleId}`),
+                .setImage(`${Constants.CDN_DOMAIN}/${circleId}`),
             ],
           }),
         );

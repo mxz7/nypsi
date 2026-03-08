@@ -146,7 +146,7 @@ export async function updateUser(user: User, command: string) {
 
         if (!res) return;
 
-        await addNewAvatar(user.id, `https://cdn.nypsi.xyz/${key}`);
+        await addNewAvatar(user.id, `${Constants.CDN_DOMAIN}/${key}`);
         logger.debug(`uploaded new avatar for ${user.id}`);
       })();
     }

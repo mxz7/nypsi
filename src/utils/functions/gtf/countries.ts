@@ -34,6 +34,8 @@ export async function fetchCountryData(country: string): Promise<CountryData | "
     });
 
     if (res) {
+      res.flags.png = `https://nypsi.xyz/flag/${Buffer.from(res.cca2).toString("hex")}`;
+
       await redis.set(
         `${Constants.redis.cache.COUNTRY_DATA}:${res.name.official.toLowerCase().replaceAll('"', "")}`,
         JSON.stringify(res),
@@ -56,6 +58,8 @@ export async function fetchCountryData(country: string): Promise<CountryData | "
       });
 
       if (res?.length) {
+        res[0].flags.png = `https://nypsi.xyz/flag/${Buffer.from(res[0].cca2).toString("hex")}`;
+
         await redis.set(
           `${Constants.redis.cache.COUNTRY_DATA}:${res[0].name.official.toLowerCase().replaceAll('"', "")}`,
           JSON.stringify(res[0]),

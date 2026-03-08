@@ -205,7 +205,7 @@ async function run(
         const lastKnownUsername = await getLastKnownUsername(caseData.evidence.userId);
 
         embed
-          .setImage(`https://cdn.nypsi.xyz/evidence/${caseData.guildId}/${caseData.evidence.id}`)
+          .setImage(`${Constants.CDN_DOMAIN}/evidence/${caseData.guildId}/${caseData.evidence.id}`)
           .setDescription(
             `uploaded by: ${lastKnownUsername ? `${lastKnownUsername} ` : ""}\`${caseData.evidence.userId}\`\n` +
               `uploaded at: <t:${Math.floor(caseData.evidence.createdAt.getTime() / 1000)}>\n` +

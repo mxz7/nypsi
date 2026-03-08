@@ -418,4 +418,5 @@ export default {
     "1247278184165277829",
     "1247278987617505351",
   ] as string[],
+  CDN_DOMAIN: process.env.CDN_DOMAIN || "https://cdn.nypsi.xyz",
 } as const;

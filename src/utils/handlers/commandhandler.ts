@@ -1104,7 +1104,7 @@ export async function runCommand(
         await message.channel.send({
           content: `${message.author.toString()} you have been **RICK ROLLED** by ${await getLastKnownUsername(
             userId,
-          )}\n\nhttps://cdn.nypsi.xyz/rickroll.gif`,
+          )}\n\n${Constants.CDN_DOMAIN}/rickroll.gif`,
         });
       }
 

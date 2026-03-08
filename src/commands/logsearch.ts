@@ -4,6 +4,7 @@ import { readFile } from "fs/promises";
 import { nanoid } from "nanoid";
 import { promisify } from "util";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
+import Constants from "../utils/Constants";
 import { uploadImage } from "../utils/functions/image";
 import { hasAdminPermission } from "../utils/functions/users/admin";
 import { logger } from "../utils/logger";
@@ -73,7 +74,7 @@ async function run(
     return (await msg).edit({
       content:
         `results for \`${args.join(" ")}\` in ${((after - before) / 1000).toFixed(2)}s\n\n` +
-        `https://cdn.nypsi.xyz/${id}`,
+        `${Constants.CDN_DOMAIN}/${id}`,
     });
   } else {
     return (await msg).edit({
