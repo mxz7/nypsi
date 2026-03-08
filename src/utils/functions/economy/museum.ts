@@ -12,13 +12,13 @@ export class Museum {
   constructor(
     data?:
       | { [itemId: string]: { amount: number; completedAt: Date } }
-      | { item: string; amount: number; completedAt: Date }[],
+      | { itemId: string; amount: number; completedAt: Date }[],
   ) {
     this.items = {};
 
     if (Array.isArray(data)) {
       for (const i of data) {
-        this.items[i.item] = {
+        this.items[i.itemId] = {
           amount: i.amount,
           completedAt: i.completedAt,
         };
@@ -28,12 +28,18 @@ export class Museum {
     }
   }
 
-  entries(): { item: string; amount: number; completedAt: Date }[] {
+  entries(): { itemId: string; amount: number; completedAt: Date }[] {
     return Object.entries(this.items).map(([item, data]) => ({
-      item,
+      itemId: item,
       amount: data.amount,
       completedAt: data.completedAt,
     }));
+  }
+
+  getItemsInCategory(category: string) {
+    const items = getItems();
+
+    return this.entries().filter((item) => items[item.itemId].museum?.category == category);
   }
 
   count(item: Item): number;
@@ -54,7 +60,7 @@ export class Museum {
   completed(itemId: string): boolean;
   completed(item: Item | string): boolean {
     const itemId = typeof item === "string" ? item : item.id;
-    return Boolean(this.completedAt(itemId));
+    return this.completedAt(itemId) != undefined;
   }
 
   completedAt(item: Item): Date;
@@ -62,6 +68,24 @@ export class Museum {
   completedAt(item: Item | string): Date {
     const itemId = typeof item === "string" ? item : item.id;
     return this.items[itemId]?.completedAt;
+  }
+
+  async completedPlacement(item: Item): Promise<number>;
+  async completedPlacement(itemId: string): Promise<number>;
+  async completedPlacement(item: Item | string): Promise<number> {
+    const itemId = typeof item === "string" ? item : item.id;
+    if (!this.completed(itemId)) return undefined;
+
+    const placement = await prisma.museum.count({
+      where: {
+        itemId,
+        completedAt: {
+          lte: this.completedAt(itemId),
+        },
+      },
+    });
+
+    return placement;
   }
 
   toJSON(): { [itemId: string]: { amount: number; completedAt: Date } } {
@@ -98,7 +122,7 @@ export async function getMuseum(member: MemberResolvable): Promise<Museum> {
     })
     .then((q) =>
       q.map((i) => {
-        return { item: i.itemId, amount: Number(i.amount), completedAt: i.completedAt };
+        return { itemId: i.itemId, amount: Number(i.amount), completedAt: i.completedAt };
       }),
     )
     .catch(() => {});
@@ -133,12 +157,14 @@ export async function addToMuseum(member: MemberResolvable, itemId: string, amou
 
   if (!(await userExists(userId))) await createUser(userId);
 
-  if (!getItems()[itemId] || !getItems()[itemId].museum) {
+  const item = getItems()[itemId];
+
+  if (!item || !item.museum) {
     console.trace();
     return logger.error(`invalid item for museum: ${itemId}`);
   }
 
-  await prisma.museum.upsert({
+  const res = await prisma.museum.upsert({
     where: {
       userId_itemId: {
         userId,
@@ -153,7 +179,25 @@ export async function addToMuseum(member: MemberResolvable, itemId: string, amou
       itemId,
       amount: amount,
     },
+    select: {
+      amount: true,
+      completedAt: true,
+    },
   });
+
+  if (!res.completedAt && res.amount >= item.museum.threshold) {
+    await prisma.museum.update({
+      where: {
+        userId_itemId: {
+          userId,
+          itemId,
+        },
+      },
+      data: {
+        completedAt: new Date(),
+      },
+    });
+  }
 
   await redis.del(`${Constants.redis.cache.economy.MUSEUM}:${userId}`);
 }

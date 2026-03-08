@@ -1,4 +1,6 @@
 import {
+  ButtonBuilder,
+  ButtonStyle,
   CommandInteraction,
   ContainerBuilder,
   Interaction,
@@ -9,10 +11,13 @@ import {
   StringSelectMenuOptionBuilder,
   TextDisplayBuilder,
 } from "discord.js";
+import { inPlaceSort } from "fast-sort";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { ErrorEmbed, getColor } from "../models/EmbedBuilders";
 import { getInventory } from "../utils/functions/economy/inventory";
+import { addToMuseum, getMuseum } from "../utils/functions/economy/museum";
 import { getItems } from "../utils/functions/economy/utils";
+import PageManager from "../utils/functions/page";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("museum", "view your museum progress", "money");
@@ -146,13 +151,63 @@ async function run(
   };
 
   const categoryView = async (category: string) => {
-    const container = (disabled = false) =>
-      new ContainerBuilder()
+    const itemsInCategory = Object.values(items).filter((i) => i.museum?.category == category);
+    const museum = await getMuseum(message.member);
+
+    const desc: string[] = [];
+
+    inPlaceSort(itemsInCategory).asc((item) => item.id);
+
+    for (const item of itemsInCategory) {
+      desc.push(
+        `### ${item.emoji} ${item.name}\n` +
+          `donated **${museum.count(item)}/${item.museum.threshold}**${museum.completed(item) ? ` - completed <t:${Math.floor(new Date(museum.completedAt(item)).getTime() / 1000)}:R> (#**${await museum.completedPlacement(item)}**)` : ""}` +
+          ``,
+      );
+    }
+
+    const pages = PageManager.createPages(desc, 8);
+    let currentPage = 1;
+
+    const container = (disabled = false) => {
+      const builder = new ContainerBuilder()
         .setAccentColor(resolveColor(getColor(message.member)))
-        .addTextDisplayComponents(new TextDisplayBuilder().setContent(`## museum - ${category}`))
+        .addTextDisplayComponents(
+          new TextDisplayBuilder().setContent(
+            `## ${message.member.user.username}'s museum - ${category}`,
+          ),
+        )
+        .addSeparatorComponents((separator) => separator)
+        .addTextDisplayComponents(
+          new TextDisplayBuilder().setContent(pages.get(currentPage).join("\n")),
+        );
+
+      if (pages.size > 1) {
+        builder
+          .addTextDisplayComponents(
+            new TextDisplayBuilder().setContent(`-# page ${currentPage}/${pages.size}`),
+          )
+          .addActionRowComponents((row) =>
+            row.addComponents(
+              new ButtonBuilder()
+                .setCustomId("⬅")
+                .setLabel("back")
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled(disabled || currentPage == 1),
+              new ButtonBuilder()
+                .setCustomId("➡")
+                .setLabel("next")
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled(disabled || currentPage == pages.size),
+            ),
+          );
+      }
+
+      return builder
         .addSeparatorComponents((separator) => separator)
         .addTextDisplayComponents(new TextDisplayBuilder().setContent("select a category of item"))
         .addActionRowComponents((row) => row.addComponents(categorySelectMenu(disabled, category)));
+    };
 
     if (msg) {
       await msg.edit({
@@ -195,6 +250,10 @@ async function run(
       if (categorySelect) {
         inventory = await getInventory(message.member);
         return categorySelect == "home" ? homeView() : categoryView(categorySelect);
+      } else if (res == "➡") {
+        if (currentPage < pages.size) currentPage++;
+      } else if (res == "⬅") {
+        if (currentPage > 1) currentPage--;
       }
 
       inventory = await getInventory(message.member);
@@ -206,9 +265,27 @@ async function run(
   };
 
   if (args[0]?.toLowerCase() == "donate") {
+    if (args.length < 2) {
+      return send({ embeds: [new ErrorEmbed("/museum donate <item> <amount>")] });
+    }
+
+    let itemId = args[1].toLowerCase();
+
+    if (!items[itemId]) {
+      return send({ embeds: [new ErrorEmbed("invalid item")] });
+    }
+
+    let amount = args.length == 2 ? 1 : parseInt(args[2]);
+
+    if (amount <= 0 || isNaN(amount) || !amount) {
+      return send({ embeds: [new ErrorEmbed("invalid amount")] });
+    }
+
+    // TEMP - always add
+    await addToMuseum(message.member, itemId, amount);
   } else if (args.length) {
     if (args[0]?.toLowerCase() == "view") args.shift();
-    if (args.length == 0) return homeView();
+    if (args.length == 0 || args[0].toLowerCase() == "home") return homeView();
     let category = args[0]?.toLowerCase();
     if (itemCategories.includes(category)) {
       return categoryView(category);
