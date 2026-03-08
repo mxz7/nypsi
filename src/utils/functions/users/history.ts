@@ -144,7 +144,7 @@ export async function deleteAvatar(id: number) {
       res = false;
     });
 
-  if (query && query.value.startsWith("https://cdn.nypsi.xyz")) {
+  if (query && query.value.startsWith("${Constants.CDN_DOMAIN}")) {
     const key = query.value.substring(22);
 
     s3.send(new DeleteObjectCommand({ Bucket: process.env.S3_BUCKET, Key: key }));
@@ -168,7 +168,7 @@ export async function deleteAllAvatars(member: MemberResolvable) {
   const commands: { Key: string }[] = [];
 
   for (const { value } of avatars) {
-    if (value.startsWith("https://cdn.nypsi.xyz")) {
+    if (value.startsWith("${Constants.CDN_DOMAIN}")) {
       const key = value.substring(22);
       commands.push({ Key: key });
     }

@@ -77,7 +77,7 @@ module.exports = new ItemUse(
         return res.reply({
           embeds: [
             new ErrorEmbed("what happened to your rain buddy. YEAH. I SAW THAT").setImage(
-              "https://cdn.nypsi.xyz/static/i_saw_that.jpeg",
+              "${Constants.CDN_DOMAIN}/static/i_saw_that.jpeg",
             ),
           ],
           flags: MessageFlags.Ephemeral,

@@ -218,7 +218,7 @@ async function run(
         `you are not in a guild. you can create one with ${prefix}guild create or join one if you have been invited`,
       );
     } else {
-      if (guild.avatarId) embed.setThumbnail(`https://cdn.nypsi.xyz/${guild.avatarId}`);
+      if (guild.avatarId) embed.setThumbnail(`${Constants.CDN_DOMAIN}/${guild.avatarId}`);
       embed.setHeader(
         guild.guildName,
         guild.avatarId ? undefined : await getLastKnownAvatar(guild.ownerId),
@@ -420,7 +420,7 @@ async function run(
 
     embed.setHeader(
       "guild invitation",
-      guild.avatarId ? `https://cdn.nypsi.xyz/${guild.avatarId}` : undefined,
+      guild.avatarId ? `${Constants.CDN_DOMAIN}/${guild.avatarId}` : undefined,
     );
     embed.setDescription(`you have been invited to join **${guild.guildName}**\n\ndo you accept?`);
 
@@ -814,7 +814,7 @@ async function run(
 
       const embed = new CustomEmbed(message.member).setHeader(
         "guild deposit",
-        guild.avatarId ? `https://cdn.nypsi.xyz/${guild.avatarId}` : undefined,
+        guild.avatarId ? `${Constants.CDN_DOMAIN}/${guild.avatarId}` : undefined,
         `https://nypsi.xyz/guilds/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}?ref=bot-guild`,
       );
 
@@ -843,7 +843,7 @@ async function run(
 
     const embed = new CustomEmbed(message.member).setHeader(
       `${guild.guildName} stats`,
-      guild.avatarId ? `https://cdn.nypsi.xyz/${guild.avatarId}` : undefined,
+      guild.avatarId ? `${Constants.CDN_DOMAIN}/${guild.avatarId}` : undefined,
       `https://nypsi.xyz/guilds/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}?ref=bot-guild`,
     );
 
@@ -968,7 +968,7 @@ async function run(
 
     embed.setHeader(
       guild.guildName,
-      guild.avatarId ? `https://cdn.nypsi.xyz/${guild.avatarId}` : undefined,
+      guild.avatarId ? `${Constants.CDN_DOMAIN}/${guild.avatarId}` : undefined,
       `https://nypsi.xyz/guilds/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}?ref=bot-guild`,
     );
     embed.setDescription(
@@ -1016,7 +1016,7 @@ async function run(
             "please note that inappropriate images may result in your guild being deleted",
         ).setHeader(
           "guild avatar",
-          guild.avatarId ? `https://cdn.nypsi.xyz/${guild.avatarId}` : undefined,
+          guild.avatarId ? `${Constants.CDN_DOMAIN}/${guild.avatarId}` : undefined,
         ),
       ],
     });
@@ -1322,7 +1322,7 @@ async function run(
     const embed = new CustomEmbed(message.member)
       .setHeader(
         `${guild.guildName} upgrades`,
-        guild.avatarId ? `https://cdn.nypsi.xyz/${guild.avatarId}` : undefined,
+        guild.avatarId ? `${Constants.CDN_DOMAIN}/${guild.avatarId}` : undefined,
         `https://nypsi.xyz/guilds/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}?ref=bot-guild`,
       )
       .setFields(...pages.get(1))

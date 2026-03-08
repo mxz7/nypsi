@@ -146,13 +146,13 @@ async function run(
       if (item.deleted) {
         embed.addField(
           item.caseId.toString(),
-          `${item.evidence?.id ? `[\`[deleted]\`](https://cdn.nypsi.xyz/evidence/${item.guildId}/${item.evidence.id})` : "`[deleted]`"}`,
+          `${item.evidence?.id ? `[\`[deleted]\`](${Constants.CDN_DOMAIN}/evidence/${item.guildId}/${item.evidence.id})` : "`[deleted]`"}`,
         );
       } else {
         embed.addField(
           `case ${item.caseId}`,
           (item.evidence?.id
-            ? `[\`${item.type}\`](https://cdn.nypsi.xyz/evidence/${item.guildId}/${item.evidence.id})`
+            ? `[\`${item.type}\`](${Constants.CDN_DOMAIN}/evidence/${item.guildId}/${item.evidence.id})`
             : `\`${item.type}\``) +
             " - " +
             item.command +

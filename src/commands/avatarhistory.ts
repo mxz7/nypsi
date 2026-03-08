@@ -99,7 +99,7 @@ async function run(
           );
         });
 
-      await addNewAvatar(message.member, `https://cdn.nypsi.xyz/${key}`);
+      await addNewAvatar(message.member, `${Constants.CDN_DOMAIN}/${key}`);
       logger.debug(`uploaded new avatar for ${message.author.id}`);
 
       history = await fetchAvatarHistory(message.member);
