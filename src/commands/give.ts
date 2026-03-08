@@ -159,9 +159,10 @@ async function run(
 
   const notificationEmbed = new CustomEmbed(
     target,
-    `**${escapeFormattingCharacters(message.author.username)}** has given you ${amount.toLocaleString()} ${selected.emoji} ${
-      selected.name
-    }`,
+    `**${escapeFormattingCharacters(message.author.username)}** has given you ${amount.toLocaleString()} ${selected.emoji} ${pluralize(
+      selected,
+      amount,
+    )}`,
   );
 
   if ((await getDmSettings(target)).payment) {
@@ -181,9 +182,10 @@ async function run(
     embeds: [
       new CustomEmbed(
         message.member,
-        `you have given **${amount}** ${selected.emoji} ${
-          selected.name
-        } to **${target.toString()}**`,
+        `you have given **${amount.toLocaleString()}** ${selected.emoji} ${pluralize(
+          selected,
+          amount,
+        )} to **${target.toString()}**`,
       ),
     ],
   });
