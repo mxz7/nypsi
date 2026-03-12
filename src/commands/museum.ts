@@ -16,7 +16,7 @@ import {
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
-import { CustomEmbed, ErrorEmbed, getColor } from "../models/EmbedBuilders";
+import { CustomContainer, CustomEmbed, ErrorEmbed, getColor } from "../models/EmbedBuilders";
 import { getInventory } from "../utils/functions/economy/inventory";
 import { addToMuseum, getMuseum } from "../utils/functions/economy/museum";
 import { getItems } from "../utils/functions/economy/utils";
@@ -186,8 +186,7 @@ async function run(
     let currentPage = 1;
 
     const container = (disabled = false) => {
-      const builder = new ContainerBuilder()
-        .setAccentColor(resolveColor(getColor(message.member)))
+      const builder = new CustomContainer()
         .addTextDisplayComponents(
           new TextDisplayBuilder().setContent(
             `## ${message.member.user.username}'s museum - ${category}`,
