@@ -1,10 +1,13 @@
 import {
+  ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
+  ComponentType,
   ContainerBuilder,
   Interaction,
   Message,
+  MessageActionRowComponentBuilder,
   MessageFlags,
   resolveColor,
   StringSelectMenuBuilder,
@@ -13,11 +16,12 @@ import {
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
-import { ErrorEmbed, getColor } from "../models/EmbedBuilders";
+import { CustomEmbed, ErrorEmbed, getColor } from "../models/EmbedBuilders";
 import { getInventory } from "../utils/functions/economy/inventory";
 import { addToMuseum, getMuseum } from "../utils/functions/economy/museum";
 import { getItems } from "../utils/functions/economy/utils";
 import PageManager from "../utils/functions/page";
+import { pluralize } from "../utils/functions/string";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("museum", "view your museum progress", "money");
@@ -25,7 +29,19 @@ const cmd = new Command("museum", "view your museum progress", "money");
 cmd.slashEnabled = true;
 cmd.slashData
   .addSubcommand((progress) =>
-    progress.setName("donate").setDescription("donate an item to the museum"),
+    progress
+      .setName("donate")
+      .setDescription("donate an item to the museum")
+      .addStringOption((option) =>
+        option
+          .setName("museum-item")
+          .setDescription("the item you want to donate")
+          .setAutocomplete(true)
+          .setRequired(true),
+      )
+      .addStringOption((option) =>
+        option.setName("amount").setDescription("the amount you want to donate"),
+      ),
   )
   .addSubcommand((view) =>
     view
@@ -133,7 +149,7 @@ async function run(
       if (fail) return;
       if (!response) return;
 
-      const { res, interaction } = response;
+      const { interaction } = response;
 
       const categorySelect = await doCategorySelect(interaction);
 
@@ -161,8 +177,8 @@ async function run(
     for (const item of itemsInCategory) {
       desc.push(
         `### ${item.emoji} ${item.name}\n` +
-          `donated **${museum.count(item)}/${item.museum.threshold}**${museum.completed(item) ? ` - completed <t:${Math.floor(new Date(museum.completedAt(item)).getTime() / 1000)}:R> (#**${await museum.completedPlacement(item)}**)` : ""}` +
-          ``,
+          `donated **${museum.count(item).toLocaleString()}**${museum.completed(item) ? ` - first donated <t:${Math.floor(new Date(museum.completedAt(item)).getTime() / 1000)}:R> (#**${(await museum.completedPlacement(item)).toLocaleString()}**)` : ""}\n` +
+          `${!museum.completed(item) ? `donate **${(item.museum.threshold - museum.count(item)).toLocaleString()}** more to save permanently` : item.museum.no_overflow ? `quantity maxed!` : `#**${(await museum.leaderboardPlacement(item)).toLocaleString()}** on leaderboard`}`,
       );
     }
 
@@ -275,14 +291,69 @@ async function run(
       return send({ embeds: [new ErrorEmbed("invalid item")] });
     }
 
+    const item = items[itemId];
+
+    if (!item.museum) {
+      return send({ embeds: [new ErrorEmbed("that item cannot be donated to the museum")] });
+    }
+
     let amount = args.length == 2 ? 1 : parseInt(args[2]);
+
+    if (args[2]?.toLowerCase() == "all") amount = inventory.count(itemId);
 
     if (amount <= 0 || isNaN(amount) || !amount) {
       return send({ embeds: [new ErrorEmbed("invalid amount")] });
     }
 
-    // TEMP - always add
-    await addToMuseum(message.member, itemId, amount);
+    const museum = await getMuseum(message.member);
+
+    if (item.museum.no_overflow && amount > item.museum.threshold - museum.count(item))
+      amount = item.museum.threshold - museum.count(item);
+
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder().setCustomId("confirm").setLabel("confirm").setStyle(ButtonStyle.Success),
+      new ButtonBuilder().setCustomId("cancel").setLabel("cancel").setStyle(ButtonStyle.Danger),
+    );
+
+    const msg = await send({
+      embeds: [
+        new CustomEmbed(
+          message.member,
+          `confirm that you want to donate **${amount.toLocaleString()}** ${item.emoji} ${pluralize(item, amount)} to your museum`,
+        ),
+      ],
+      components: [row],
+    });
+
+    const interaction = await msg
+      .awaitMessageComponent({
+        filter: (i) => i.user.id === message.author.id,
+        time: 30000,
+        componentType: ComponentType.Button,
+      })
+      .catch(() => {
+        row.components.forEach((b) => b.setDisabled(true));
+        msg.edit({ components: [row] });
+      });
+
+    if (!interaction) return;
+
+    if (interaction.customId === "confirm") {
+      await addToMuseum(message.member, itemId, amount);
+
+      interaction.update({
+        embeds: [
+          new CustomEmbed(
+            message.member,
+            `you have donated **${amount.toLocaleString()}** ${item.emoji} ${pluralize(item, amount)} to your museum`,
+          ),
+        ],
+        components: [],
+      });
+    } else {
+      row.components.forEach((b) => b.setDisabled(true));
+      interaction.update({ components: [row] });
+    }
   } else if (args.length) {
     if (args[0]?.toLowerCase() == "view") args.shift();
     if (args.length == 0 || args[0].toLowerCase() == "home") return homeView();

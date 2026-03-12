@@ -5,12 +5,15 @@ export default {
   name: "museum-category",
   type: "autocomplete",
   async run(interaction) {
+    const focused = interaction.options.getFocused(true);
+    focused.value = focused.value.toLowerCase();
+
     return await interaction.respond(
       [
         ...new Set(
           Object.values(getItems())
             .map((item) => item.museum?.category)
-            .filter(Boolean),
+            .filter((i) => i && i.includes(focused.value)),
         ),
       ]
         .sort()
