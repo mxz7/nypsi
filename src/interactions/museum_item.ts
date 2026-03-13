@@ -18,14 +18,17 @@ export default {
     ]);
 
     let options = Object.values(inventory.entries)
-      .filter(
-        (i) =>
-          items[i.item].museum &&
-          !(museum.completed(i.item) && items[i.item].museum.no_overflow) &&
-          (i.item.includes(focused.value) ||
-            items[i.item].name.includes(focused.value) ||
-            items[i.item].aliases?.includes(focused.value)),
-      )
+      .filter((i) => {
+        const item = items[i.item];
+
+        if (!item.museum || (museum.completed(item) && item.museum.no_overflow)) return false;
+
+        return (
+          item.id.includes(focused.value) ||
+          item.name.includes(focused.value) ||
+          item.aliases?.includes(focused.value)
+        );
+      })
       .map((i) => i.item);
 
     if (options.length > 25) options = options.splice(0, 24);

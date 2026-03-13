@@ -6,19 +6,28 @@ import {
   ComponentType,
   ContainerBuilder,
   Interaction,
+  LabelBuilder,
   Message,
   MessageActionRowComponentBuilder,
   MessageFlags,
+  ModalBuilder,
   resolveColor,
   StringSelectMenuBuilder,
   StringSelectMenuOptionBuilder,
   TextDisplayBuilder,
+  TextInputBuilder,
+  TextInputStyle,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomContainer, CustomEmbed, ErrorEmbed, getColor } from "../models/EmbedBuilders";
 import { getInventory, selectItem } from "../utils/functions/economy/inventory";
-import { addToMuseum, getMuseum, showMuseumLeaderboard } from "../utils/functions/economy/museum";
+import {
+  addToMuseum,
+  getMuseum,
+  getMuseumCategories,
+  showMuseumLeaderboard,
+} from "../utils/functions/economy/museum";
 import { getItems } from "../utils/functions/economy/utils";
 import { default as PageManager } from "../utils/functions/page";
 import { pluralize } from "../utils/functions/string";
@@ -91,14 +100,7 @@ async function run(
 
   const items = getItems();
 
-  const itemCategories = [
-    "home",
-    ...new Set(
-      Object.values(items)
-        .map((item) => item.museum?.category)
-        .filter(Boolean),
-    ),
-  ].sort();
+  const itemCategories = getMuseumCategories();
 
   let inventory = await getInventory(message.member);
 
@@ -233,6 +235,11 @@ async function run(
                 .setLabel("next")
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(disabled || currentPage == pages.size),
+              new ButtonBuilder()
+                .setCustomId("find")
+                .setLabel("find")
+                .setStyle(ButtonStyle.Secondary)
+                .setDisabled(disabled),
             ),
           );
       }
@@ -262,10 +269,11 @@ async function run(
       const response = await msg
         .awaitMessageComponent({ filter, time: 60000 })
         .then(async (collected) => {
-          await collected.deferUpdate().catch(() => {
-            fail = true;
-            return pageManager();
-          });
+          if (collected.customId != "find")
+            await collected.deferUpdate().catch(() => {
+              fail = true;
+              return pageManager();
+            });
           return { res: collected.customId, interaction: collected };
         })
         .catch(async () => {
@@ -287,6 +295,74 @@ async function run(
         if (currentPage < pages.size) currentPage++;
       } else if (res == "⬅") {
         if (currentPage > 1) currentPage--;
+      } else if (res == "find") {
+        const modal = new ModalBuilder()
+          .setCustomId("museum-find")
+          .setTitle("find an item")
+          .addLabelComponents(
+            new LabelBuilder()
+              .setLabel("enter item name/id")
+              .setTextInputComponent(
+                new TextInputBuilder()
+                  .setCustomId("item")
+                  .setPlaceholder("enter item")
+                  .setRequired(true)
+                  .setStyle(TextInputStyle.Short),
+              ),
+          );
+
+        await interaction.showModal(modal);
+
+        const filter = (i: Interaction) => i.user.id == interaction.user.id;
+
+        const res = await interaction.awaitModalSubmit({ filter, time: 120000 }).catch(() => {});
+
+        if (!res) return;
+
+        if (!res.isModalSubmit()) return;
+
+        const item = selectItem(res.fields.getTextInputValue("item").toLowerCase());
+
+        if (!item) {
+          await res.reply({
+            embeds: [new ErrorEmbed(`invalid item`)],
+            flags: MessageFlags.Ephemeral,
+          });
+          return pageManager();
+        }
+
+        if (!item.museum) {
+          await res.reply({
+            embeds: [new ErrorEmbed(`that item is not in the museum`)],
+            flags: MessageFlags.Ephemeral,
+          });
+          return pageManager();
+        }
+
+        if (item.museum.category !== category) {
+          await res.reply({
+            embeds: [
+              new ErrorEmbed(
+                `that item is located in **${item.museum.category}**, not in **${category}**`,
+              ),
+            ],
+            flags: MessageFlags.Ephemeral,
+          });
+          return pageManager();
+        }
+
+        let page = 1;
+
+        for (const [key, arr] of pages) {
+          if (arr.some((s) => s.startsWith(`**${item.emoji} ${item.name}**`))) {
+            page = key;
+            break;
+          }
+        }
+
+        res.deferUpdate();
+
+        currentPage = page;
       }
 
       inventory = await getInventory(message.member);

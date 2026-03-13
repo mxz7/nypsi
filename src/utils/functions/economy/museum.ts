@@ -317,6 +317,18 @@ export async function addToMuseum(member: MemberResolvable, itemId: string, amou
   );
 }
 
+export function getMuseumCategories() {
+  return [
+    "home",
+    ...new Set(
+      Object.values(getItems())
+        .map((item) => item.museum?.category)
+        .filter(Boolean)
+        .sort(),
+    ),
+  ];
+}
+
 export async function showMuseumLeaderboard(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   send: SendMessage,

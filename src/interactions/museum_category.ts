@@ -1,5 +1,5 @@
 import { AutocompleteHandler } from "../types/InteractionHandler";
-import { getItems } from "../utils/functions/economy/utils";
+import { getMuseumCategories } from "../utils/functions/economy/museum";
 
 export default {
   name: "museum-category",
@@ -9,16 +9,12 @@ export default {
     focused.value = focused.value.toLowerCase();
 
     return await interaction.respond(
-      [
-        "home",
-        ...new Set(
-          Object.values(getItems())
-            .map((item) => item.museum?.category)
-            .filter((i) => i && i.includes(focused.value)),
-        ),
-      ]
-        .sort()
-        .map((category) => ({ name: category, value: category })),
+      getMuseumCategories()
+        .filter((i) => i && i.includes(focused.value))
+        .map((category) => ({
+          name: category,
+          value: category,
+        })),
     );
   },
 } as AutocompleteHandler;
