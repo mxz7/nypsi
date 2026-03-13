@@ -104,7 +104,7 @@ export class Museum {
     );
     if (cache) {
       const parsed: Record<string, number> = JSON.parse(cache);
-      return parsed[itemId];
+      return parsed[itemId] || -1;
     }
 
     const completedItems = Object.entries(this.items)
@@ -272,7 +272,7 @@ export async function addToMuseum(member: MemberResolvable, itemId: string, amou
 
   if (!item || !item.museum) {
     console.trace();
-    return logger.error(`invalid item for museum: ${itemId}`);
+    return logger.error(`museum: invalid item ${itemId}`);
   }
 
   const res = await prisma.museum.upsert({

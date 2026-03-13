@@ -10,6 +10,7 @@ export default {
 
     return await interaction.respond(
       [
+        "home",
         ...new Set(
           Object.values(getItems())
             .map((item) => item.museum?.category)

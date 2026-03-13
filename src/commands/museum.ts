@@ -24,7 +24,7 @@ import { default as PageManager } from "../utils/functions/page";
 import { pluralize } from "../utils/functions/string";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("museum", "view your museum progress", "money");
+const cmd = new Command("museum", "view your museum progress", "money").setAliases(["collect"]);
 
 cmd.slashEnabled = true;
 cmd.slashData
@@ -89,20 +89,16 @@ async function run(
     return;
   }
 
-  //TODO: change where this is + duration
-  await addCooldown(cmd.name, message.member, 1);
-
   const items = getItems();
 
   const itemCategories = [
+    "home",
     ...new Set(
       Object.values(items)
         .map((item) => item.museum?.category)
         .filter(Boolean),
     ),
   ].sort();
-
-  itemCategories.unshift("home");
 
   let inventory = await getInventory(message.member);
 
@@ -121,8 +117,9 @@ async function run(
   };
 
   const doCategorySelect = async (interaction: Interaction) => {
-    if (!interaction.isStringSelectMenu() || interaction.customId != "select-category")
+    if (!interaction.isStringSelectMenu() || interaction.customId != "select-category") {
       return false;
+    }
     return interaction.values[0];
   };
 
@@ -299,6 +296,8 @@ async function run(
 
     return pageManager();
   };
+
+  await addCooldown(cmd.name, message.member, 3);
 
   if (args[0]?.toLowerCase() == "donate") {
     //todo: check for inventory and remove from it

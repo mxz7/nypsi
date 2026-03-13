@@ -11,8 +11,11 @@ export default {
     focused.value = focused.value.toLowerCase();
 
     const items = getItems();
-    const inventory = await getInventory(interaction.member);
-    const museum = await getMuseum(interaction.member);
+
+    const [inventory, museum] = await Promise.all([
+      getInventory(interaction.member),
+      getMuseum(interaction.member),
+    ]);
 
     let options = Object.values(inventory.entries)
       .filter(
