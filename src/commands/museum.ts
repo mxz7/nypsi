@@ -17,10 +17,10 @@ import {
 import { inPlaceSort } from "fast-sort";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomContainer, CustomEmbed, ErrorEmbed, getColor } from "../models/EmbedBuilders";
-import { getInventory } from "../utils/functions/economy/inventory";
-import { addToMuseum, getMuseum } from "../utils/functions/economy/museum";
+import { getInventory, selectItem } from "../utils/functions/economy/inventory";
+import { addToMuseum, getMuseum, showMuseumLeaderboard } from "../utils/functions/economy/museum";
 import { getItems } from "../utils/functions/economy/utils";
-import PageManager from "../utils/functions/page";
+import { default as PageManager } from "../utils/functions/page";
 import { pluralize } from "../utils/functions/string";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -41,6 +41,28 @@ cmd.slashData
       )
       .addStringOption((option) =>
         option.setName("amount").setDescription("the amount you want to donate"),
+      ),
+  )
+  .addSubcommand((top) =>
+    top
+      .setName("top")
+      .setDescription("view the leaderboard(s) for an item")
+      .addStringOption((option) =>
+        option
+          .setName("museum-lb-item")
+          .setDescription("the item you want to view")
+          .setAutocomplete(true)
+          .setRequired(true),
+      )
+      .addStringOption((option) =>
+        option
+          .setName("scope")
+          .setDescription("show global/server")
+          .setChoices([
+            { name: "global", value: "global" },
+            { name: "server", value: "server" },
+          ])
+          .setRequired(false),
       ),
   )
   .addSubcommand((view) =>
@@ -176,9 +198,9 @@ async function run(
 
     for (const item of itemsInCategory) {
       desc.push(
-        `### ${item.emoji} ${item.name}\n` +
+        `**${item.emoji} ${item.name}**\n` +
           `donated **${museum.count(item).toLocaleString()}**${museum.completed(item) ? ` - first donated <t:${Math.floor(new Date(museum.completedAt(item)).getTime() / 1000)}:R> (#**${(await museum.completedPlacement(item)).toLocaleString()}**)` : ""}\n` +
-          `${!museum.completed(item) ? `donate **${(item.museum.threshold - museum.count(item)).toLocaleString()}** more to save permanently` : item.museum.no_overflow ? `quantity maxed!` : `#**${(await museum.leaderboardPlacement(item)).toLocaleString()}** on leaderboard`}`,
+          `${!museum.completed(item) ? `donate **${(item.museum.threshold - museum.count(item)).toLocaleString()}** more to complete` : item.museum.no_overflow ? `quantity maxed!` : `#**${(await museum.leaderboardPlacement(item)).toLocaleString()}** on leaderboard`}`,
       );
     }
 
@@ -189,12 +211,12 @@ async function run(
       const builder = new CustomContainer()
         .addTextDisplayComponents(
           new TextDisplayBuilder().setContent(
-            `## ${message.member.user.username}'s museum - ${category}`,
+            `### ${message.member.user.username}'s museum - ${category}`,
           ),
         )
         .addSeparatorComponents((separator) => separator)
         .addTextDisplayComponents(
-          new TextDisplayBuilder().setContent(pages.get(currentPage).join("\n")),
+          new TextDisplayBuilder().setContent(pages.get(currentPage).join("\n\n")),
         );
 
       if (pages.size > 1) {
@@ -220,7 +242,6 @@ async function run(
 
       return builder
         .addSeparatorComponents((separator) => separator)
-        .addTextDisplayComponents(new TextDisplayBuilder().setContent("select a category of item"))
         .addActionRowComponents((row) => row.addComponents(categorySelectMenu(disabled, category)));
     };
 
@@ -280,17 +301,16 @@ async function run(
   };
 
   if (args[0]?.toLowerCase() == "donate") {
+    //todo: check for inventory and remove from it
     if (args.length < 2) {
       return send({ embeds: [new ErrorEmbed("/museum donate <item> <amount>")] });
     }
 
-    let itemId = args[1].toLowerCase();
+    let item = selectItem(args[1]);
 
-    if (!items[itemId]) {
+    if (!item) {
       return send({ embeds: [new ErrorEmbed("invalid item")] });
     }
-
-    const item = items[itemId];
 
     if (!item.museum) {
       return send({ embeds: [new ErrorEmbed("that item cannot be donated to the museum")] });
@@ -298,7 +318,7 @@ async function run(
 
     let amount = args.length == 2 ? 1 : parseInt(args[2]);
 
-    if (args[2]?.toLowerCase() == "all") amount = inventory.count(itemId);
+    if (args[2]?.toLowerCase() == "all") amount = inventory.count(item);
 
     if (amount <= 0 || isNaN(amount) || !amount) {
       return send({ embeds: [new ErrorEmbed("invalid amount")] });
@@ -338,7 +358,7 @@ async function run(
     if (!interaction) return;
 
     if (interaction.customId === "confirm") {
-      await addToMuseum(message.member, itemId, amount);
+      await addToMuseum(message.member, item.id, amount);
 
       interaction.update({
         embeds: [
@@ -353,6 +373,9 @@ async function run(
       row.components.forEach((b) => b.setDisabled(true));
       interaction.update({ components: [row] });
     }
+  } else if (args[0]?.toLowerCase() == "top") {
+    if (args.length == 1) return send({ embeds: [new ErrorEmbed(`/museum top <item>`)] });
+    return showMuseumLeaderboard(message, send, args);
   } else if (args.length) {
     if (args[0]?.toLowerCase() == "view") args.shift();
     if (args.length == 0 || args[0].toLowerCase() == "home") return homeView();

@@ -14,6 +14,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { Item } from "../types/Economy.js";
 import { getGuildByUser } from "../utils/functions/economy/guilds";
 import { selectItem } from "../utils/functions/economy/inventory";
+import { showMuseumLeaderboard } from "../utils/functions/economy/museum";
 import {
   topBalance,
   topChatReaction,
@@ -207,6 +208,25 @@ cmd.slashData
     cmd
       .setName("votestreak")
       .setDescription("view highest vote streaks")
+      .addStringOption((option) =>
+        option
+          .setName("scope")
+          .setDescription("show global/server")
+          .setChoices(...scopeChoices)
+          .setRequired(false),
+      ),
+  )
+  .addSubcommand((museum) =>
+    museum
+      .setName("museum")
+      .setDescription("view the leaderboard(s) for an item in the museum")
+      .addStringOption((option) =>
+        option
+          .setName("museum-lb-item")
+          .setDescription("the item you want to view")
+          .setAutocomplete(true)
+          .setRequired(true),
+      )
       .addStringOption((option) =>
         option
           .setName("scope")
@@ -602,6 +622,9 @@ async function run(
     }
 
     return show(data.pages, data.pos, title, url);
+  } else if (args[0].toLowerCase() == "museum") {
+    if (args.length == 1) return send({ embeds: [new ErrorEmbed(`/top museum <item>`)] });
+    return showMuseumLeaderboard(message, send, args);
   } else {
     const selected =
       selectItem(args.join(" ").toLowerCase()) ||
