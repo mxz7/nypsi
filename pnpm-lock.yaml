@@ -19,7 +19,7 @@ importers:
         version: 2.6.0
       '@hono/node-server':
         specifier: ^1.19.11
-        version: 1.19.11(hono@4.12.5)
+        version: 1.19.11(hono@4.12.7)
       '@prisma/adapter-pg':
         specifier: ^7.4.2
         version: 7.4.2
@@ -51,8 +51,8 @@ importers:
         specifier: 4.2.0
         version: 4.2.0
       dayjs:
-        specifier: 1.11.19
-        version: 1.11.19
+        specifier: 1.11.20
+        version: 1.11.20
       discord-hybrid-sharding:
         specifier: 3.0.1
         version: 3.0.1
@@ -66,8 +66,8 @@ importers:
         specifier: 3.4.1
         version: 3.4.1
       hono:
-        specifier: ^4.12.5
-        version: 4.12.5
+        specifier: ^4.12.7
+        version: 4.12.7
       ioredis:
         specifier: 5.9.2
         version: 5.9.2
@@ -1477,8 +1477,8 @@ packages:
   csstype@3.2.3:
     resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
 
-  dayjs@1.11.19:
-    resolution: {integrity: sha512-t5EcLVS6QPBNqM2z8fakk/NKel+Xzshgt8FFKAn+qwlD1pzZWxh0nVCrvFK7ZDb6XucZeF9z8C7CBWTRIVApAw==}
+  dayjs@1.11.20:
+    resolution: {integrity: sha512-YbwwqR/uYpeoP4pu043q+LTDLFBLApUP6VxRihdfNTqu4ubqMlGDLd6ErXhEgsyvY0K6nCs7nggYumAN+9uEuQ==}
 
   debug@4.4.3:
     resolution: {integrity: sha512-RGwwWnwQvkVfavKVt22FGLw+xYSdzARwm0ru6DhTVA3umU5hZc28V3kO4stgYryrTlLpuvgI9GiijltAjNbcqA==}
@@ -1624,8 +1624,8 @@ packages:
     resolution: {integrity: sha512-U7tt8JsyrxSRKspfhtLET79pU8K+tInj5QZXs1jSugO1Vq5dFj3kmZsRldo29mTBfcjDRVRXrEZ6LS63Cog9ZA==}
     engines: {node: '>=16.9.0'}
 
-  hono@4.12.5:
-    resolution: {integrity: sha512-3qq+FUBtlTHhtYxbxheZgY8NIFnkkC/MR8u5TTsr7YZ3wixryQ3cCwn3iZbg8p8B88iDBBAYSfZDS75t8MN7Vg==}
+  hono@4.12.7:
+    resolution: {integrity: sha512-jq9l1DM0zVIvsm3lv9Nw9nlJnMNPOcAtsbsgiUhWcFzPE99Gvo6yRTlszSLLYacMeQ6quHD6hMfId8crVHvexw==}
     engines: {node: '>=16.9.0'}
 
   http-status-codes@2.3.0:
@@ -2792,9 +2792,9 @@ snapshots:
   '@esbuild/win32-x64@0.27.3':
     optional: true
 
-  '@hono/node-server@1.19.11(hono@4.12.5)':
+  '@hono/node-server@1.19.11(hono@4.12.7)':
     dependencies:
-      hono: 4.12.5
+      hono: 4.12.7
 
   '@hono/node-server@1.19.9(hono@4.11.4)':
     dependencies:
@@ -3721,7 +3721,7 @@ snapshots:
 
   csstype@3.2.3: {}
 
-  dayjs@1.11.19: {}
+  dayjs@1.11.20: {}
 
   debug@4.4.3:
     dependencies:
@@ -3871,7 +3871,7 @@ snapshots:
 
   hono@4.11.4: {}
 
-  hono@4.12.5: {}
+  hono@4.12.7: {}
 
   http-status-codes@2.3.0: {}
 
