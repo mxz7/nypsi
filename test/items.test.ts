@@ -152,6 +152,7 @@ for (const item of Object.values(items)) {
           "tools",
           "gems",
           "cats",
+          "flowers",
         ]);
       if (item.museum.no_overflow !== undefined) expect.soft(item.museum.no_overflow).toBe(true);
       expect.soft(typeof item.museum.threshold).toBe("number");
