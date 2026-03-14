@@ -42,7 +42,7 @@ export default {
         items[i].emoji.startsWith(":")
           ? ""
           : `${items[i].emoji} `
-      }${items[i].name} [${items[i].museum.no_overflow ? Math.min(inventory.count(i), items[i].museum.threshold - museum.count(i)).toLocaleString() : inventory.count(i).toLocaleString()} available]`,
+      }${items[i].name} (${items[i].museum.no_overflow ? Math.min(inventory.count(i), items[i].museum.threshold - museum.count(i)).toLocaleString() : inventory.count(i).toLocaleString()} available)`,
       value: i,
     }));
 

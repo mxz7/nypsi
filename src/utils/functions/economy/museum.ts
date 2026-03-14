@@ -337,7 +337,7 @@ export async function showMuseumLeaderboard(
   const selected = selectItem(args[1].toLowerCase());
 
   if (!selected) {
-    return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] });
+    return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[1]}\``)] });
   }
 
   if (!selected.museum) {
