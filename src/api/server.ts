@@ -1,101 +1,40 @@
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { bearerAuth } from "hono/bearer-auth";
-import { checkStatus, manager } from "..";
-import redis from "../init/redis";
-import { setProgress } from "../utils/functions/economy/achievements";
-import { calcItemValue } from "../utils/functions/economy/inventory";
-import sleep from "../utils/functions/sleep";
 import { logger } from "../utils/logger";
+import achievementController from "./controllers/achievements";
 import itemController from "./controllers/item";
 import kofiController from "./controllers/kofi";
+import redisController from "./controllers/redis";
+import statusController from "./controllers/status";
+import systemController from "./controllers/system";
 import voteController from "./controllers/vote";
 import loggerMiddleware from "./middleware/logger";
-import ms = require("ms");
 
 const app = new Hono();
 
 app.use(loggerMiddleware);
 
-// routes
 app.get("/", (c) => {
   return c.json({ meow: "meow" });
+});
+
+app.get("/health", (c) => {
+  return c.json({ status: "ok" });
 });
 
 const authedApp = new Hono();
 
 authedApp.use(bearerAuth({ token: process.env.API_AUTH }));
 
-authedApp.get("/status", async (c) => {
-  const status = await checkStatus();
-
-  return c.json(status);
-});
-
-authedApp.post(
-  "/achievement/animal_lover/progress/:userid",
-  bearerAuth({ token: process.env.API_AUTH }),
-  async (c) => {
-    let body: { progress: number };
-
-    try {
-      body = await c.req.json();
-    } catch {
-      c.status(400);
-      return c.json({ error: "invalid body" });
-    }
-
-    if (!body.progress) {
-      c.status(400);
-      return c.json({ error: "invalid body" });
-    }
-
-    const userId = c.req.param("userid");
-    await setProgress(userId, "animal_lover", body.progress);
-    return c.body(null, 200);
-  },
-);
-
-authedApp.delete("/redis", async (c) => {
-  const keys = await c.req.text().then((r) => r.split("\n"));
-
-  logger.info(`api: deleting redis keys (${keys.join(", ")})`);
-
-  await redis.del(...keys);
-
-  return c.body(null, 200);
-});
-
-authedApp.get("/item/value/:itemId", async (c) => {
-  const itemId = c.req.param("itemId");
-  const value = await calcItemValue(itemId);
-  return c.json({ value });
-});
-
-authedApp.post("/reboot", async (c) => {
-  logger.info(`api: forced reboot triggered`);
-
-  setTimeout(async () => {
-    logger.info(`api: killing clusters...`);
-    manager.clusters.forEach((c) => c.kill({ force: true, reason: "triggered by API" }));
-
-    logger.info(`api: killing process in 5 seconds...`);
-    await sleep(5000);
-    process.exit(0);
-  }, 3000);
-
-  return c.body(null, 200);
-});
-
-authedApp.post("/pausestreak", async (c) => {
-  await redis.set("nypsi:streakpause", 69, "EX", ms("1 day") / 1000);
-  return c.body("streaks will be paused for the next 24 hours", 200);
-});
-
-app.route("/vote", voteController);
 app.route("/kofi", kofiController);
+app.route("/vote", voteController);
 
+authedApp.route("/", statusController);
+authedApp.route("/", systemController);
+authedApp.route("/achievement", achievementController);
 authedApp.route("/items", itemController);
+authedApp.route("/redis", redisController);
 
 app.route("/", authedApp);
 
