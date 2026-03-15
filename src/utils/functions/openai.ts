@@ -1,8 +1,13 @@
+import { readFileSync } from "node:fs";
 import OpenAI from "openai";
 import redis from "../../init/redis";
 import Constants from "../Constants";
 import { logger } from "../logger";
 import ms = require("ms");
+
+const prompts: Record<Prompts, string> = {
+  support_request: readFileSync("data/prompts/support_request.txt").toString(),
+};
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_KEY });
 
@@ -41,5 +46,17 @@ export async function getDocsRaw() {
     console.error(e);
     logger.error(`openai: failed to get llms docs`);
     return "";
+  }
+}
+
+type Prompts = "support_request";
+
+export async function buildPrompt(prompt: Prompts) {
+  if (prompt === "support_request") {
+    const text = prompts.support_request;
+
+    text.replace("{documentation}", await getDocsRaw());
+
+    return text;
   }
 }
