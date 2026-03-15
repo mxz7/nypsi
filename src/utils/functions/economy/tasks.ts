@@ -274,8 +274,6 @@ export async function addTaskProgress(member: MemberResolvable, taskId: string, 
     if (!task) return;
     if (task.completed) return;
 
-    await redis.del(`${Constants.redis.cache.economy.TASKS}:${userId}`);
-
     if (Number(task.progress) + amount >= Number(task.target)) {
       logger.info(`task: ${userId} completed ${taskId}`, { task });
       await prisma.task.update({
@@ -302,24 +300,24 @@ export async function addTaskProgress(member: MemberResolvable, taskId: string, 
       switch (reward.type) {
         case "item":
           desc += `\n\nyou have received ${reward.value}x ${reward.item.emoji} ${reward.item.name}`;
-          await addInventoryItem(task.user_id, reward.item.id, reward.value);
+          addInventoryItem(task.user_id, reward.item.id, reward.value);
           break;
         case "karma":
           desc += `\n\nyou have received 🔮 ${reward.value} karma`;
-          await addKarma(task.user_id, reward.value);
+          addKarma(task.user_id, reward.value);
           break;
         case "money":
           desc += `\n\nyou have received $${reward.value.toLocaleString()}`;
-          await addBalance(task.user_id, reward.value);
+          addBalance(task.user_id, reward.value);
           break;
         case "xp":
           desc += `\n\nyou have received ${reward.value.toLocaleString()}xp`;
-          await addXp(task.user_id, reward.value);
+          addXp(task.user_id, reward.value);
 
           const guild = await getGuildName(task.user_id);
 
           if (guild) {
-            await addToGuildXP(guild, reward.value, task.user_id);
+            addToGuildXP(guild, reward.value, task.user_id);
           }
           break;
       }
@@ -339,6 +337,7 @@ export async function addTaskProgress(member: MemberResolvable, taskId: string, 
       });
     }
   } finally {
+    redis.del(`${Constants.redis.cache.economy.TASKS}:${userId}`);
     mutex.release(mutexKey);
   }
 }
