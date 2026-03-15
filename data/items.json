@@ -7,6 +7,10 @@
     "emoji": "🐟",
     "longDesc": "commonly found while fishing",
     "role": "fish",
+    "museum": {
+      "category": "sellables",
+      "threshold": 3000
+    },
     "rarity": 0,
     "buy": 0,
     "sell": 3500,
@@ -20,6 +24,10 @@
     "emoji": "🐠",
     "longDesc": "not as common as the small fish",
     "role": "fish",
+    "museum": {
+      "category": "sellables",
+      "threshold": 7500
+    },
     "rarity": 1,
     "buy": 0,
     "sell": 10000,
@@ -33,6 +41,10 @@
     "emoji": "<:nypsi_salmon:1032766920476336148>",
     "longDesc": "😋",
     "role": "fish",
+    "museum": {
+      "category": "sellables",
+      "threshold": 5000
+    },
     "rarity": 1,
     "buy": 0,
     "sell": 12500,
@@ -46,6 +58,10 @@
     "emoji": "<:nypsi_pufferfish:1032767867625668708>",
     "longDesc": "be very careful !!",
     "role": "fish",
+    "museum": {
+      "category": "sellables",
+      "threshold": 5000
+    },
     "rarity": 1,
     "buy": 0,
     "sell": 12500,
@@ -59,6 +75,10 @@
     "emoji": "🦈",
     "longDesc": "maybe it'll give you a hug",
     "role": "fish",
+    "museum": {
+      "category": "sellables",
+      "threshold": 3500
+    },
     "rarity": 2,
     "buy": 0,
     "sell": 17500,
@@ -72,6 +92,10 @@
     "emoji": "<:nypsi_nemo:1032768399928987668>",
     "longDesc": "just keep swimming.. just keep swimming..",
     "role": "fish",
+    "museum": {
+      "category": "sellables",
+      "threshold": 1500
+    },
     "rarity": 3,
     "buy": 0,
     "sell": 23500,
@@ -85,6 +109,10 @@
     "emoji": "<:cobblestone:1354807278951334054>",
     "longDesc": "found when mining",
     "role": "sellable",
+    "museum": {
+      "category": "sellables",
+      "threshold": 30000
+    },
     "rarity": 0,
     "aliases": ["cobble"],
     "buy": 0,
@@ -99,6 +127,10 @@
     "emoji": "<:nypsi_netherrack:1034510405101432963>",
     "longDesc": "found when mining in the nether",
     "role": "sellable",
+    "museum": {
+      "category": "sellables",
+      "threshold": 75000
+    },
     "rarity": 0,
     "buy": 0,
     "sell": 750,
@@ -112,6 +144,10 @@
     "emoji": "<:nypsi_endstone:1158022795083665588>",
     "longDesc": "found when mining in the end",
     "role": "sellable",
+    "museum": {
+      "category": "sellables",
+      "threshold": 7500
+    },
     "rarity": 0,
     "buy": 0,
     "sell": 3000,
@@ -125,6 +161,10 @@
     "emoji": "<:nypsi_purpur:1158024429373227098>",
     "longDesc": "found when mining in the end",
     "role": "sellable",
+    "museum": {
+      "category": "sellables",
+      "threshold": 7500
+    },
     "rarity": 1,
     "buy": 0,
     "sell": 15000,
@@ -138,6 +178,10 @@
     "emoji": "<:nypsi_chorus:1162013496783941713>",
     "longDesc": "found when mining in the end",
     "role": "sellable",
+    "museum": {
+      "category": "sellables",
+      "threshold": 7500
+    },
     "rarity": 2,
     "buy": 0,
     "sell": 35000,
@@ -151,6 +195,10 @@
     "emoji": "<:nypsi_dragon_egg:1158024899470839898>",
     "longDesc": "found when mining in the end",
     "role": "sellable",
+    "museum": {
+      "category": "sellables",
+      "threshold": 750
+    },
     "rarity": 3,
     "buy": 0,
     "sell": 250000,
@@ -164,6 +212,11 @@
     "emoji": "<:coal:1354807066983665735>",
     "longDesc": "can be used to smelt 1 ore in a furnace",
     "role": "fuel",
+    "museum": {
+      "category": "tools",
+      "threshold": 1,
+      "no_overflow": true
+    },
     "rarity": 0,
     "buy": 3000,
     "sell": 1500,
@@ -177,6 +230,10 @@
     "emoji": "<:iron_ingot:1354808965971710144>",
     "longDesc": "product of smelting iron ore",
     "role": "sellable",
+    "museum": {
+      "category": "sellables",
+      "threshold": 10000
+    },
     "rarity": 69,
     "aliases": ["iron"],
     "buy": 0,
@@ -191,6 +248,10 @@
     "emoji": "<:copper_ingot:1462062346540154963>",
     "longDesc": "product of smelting copper ore",
     "role": "sellable",
+    "museum": {
+      "category": "sellables",
+      "threshold": 10000
+    },
     "rarity": 69,
     "aliases": ["copper"],
     "buy": 0,
@@ -205,6 +266,10 @@
     "emoji": "<:gold_ingot:1354808635015823401>",
     "longDesc": "product of smelting gold ore",
     "role": "sellable",
+    "museum": {
+      "category": "sellables",
+      "threshold": 7500
+    },
     "rarity": 69,
     "aliases": ["gold"],
     "buy": 0,
@@ -223,6 +288,10 @@
     "emoji": "<:diamond:1354807582908223759>",
     "longDesc": "found when mining",
     "role": "sellable",
+    "museum": {
+      "category": "sellables",
+      "threshold": 3000
+    },
     "rarity": 3,
     "buy": 0,
     "sell": 60000,
@@ -236,6 +305,10 @@
     "emoji": "<:nypsi_obsidian:1034510054008823849>",
     "longDesc": "found when mining and used to craft a nether portal",
     "role": "resource",
+    "museum": {
+      "category": "general",
+      "threshold": 250
+    },
     "rarity": 4,
     "buy": 0,
     "sell": 75000,
@@ -249,6 +322,10 @@
     "emoji": "<:nypsi_emerald:1017420625880551434>",
     "longDesc": "found when mining",
     "role": "sellable",
+    "museum": {
+      "category": "sellables",
+      "threshold": 1000
+    },
     "rarity": 3,
     "buy": 0,
     "sell": 70000,
@@ -262,6 +339,10 @@
     "emoji": "<:nypsi_amethyst:1032257888699297872>",
     "longDesc": "found when mining",
     "role": "sellable",
+    "museum": {
+      "category": "sellables",
+      "threshold": 4000
+    },
     "rarity": 3,
     "buy": 0,
     "sell": 50000,
@@ -275,6 +356,11 @@
     "emoji": "<:furnace:1354808306698293379>",
     "longDesc": "used to smelt ore",
     "role": "tool",
+    "museum": {
+      "category": "tools",
+      "threshold": 1,
+      "no_overflow": true
+    },
     "rarity": 0,
     "buy": 50000,
     "sell": 15000,
@@ -288,6 +374,10 @@
     "emoji": "<:iron_ore:1354809068824428754>",
     "longDesc": "can be smelted into an iron ingot with a furnace and coal",
     "role": "ore",
+    "museum": {
+      "category": "sellables",
+      "threshold": 1000
+    },
     "rarity": 1,
     "ingot": "iron_ingot",
     "buy": 0,
@@ -302,6 +392,10 @@
     "emoji": "<:copper_ore:1462062343977439350>",
     "longDesc": "can be smelted into a copper ingot with a furnace and coal",
     "role": "ore",
+    "museum": {
+      "category": "sellables",
+      "threshold": 1000
+    },
     "rarity": 1,
     "ingot": "copper_ingot",
     "buy": 0,
@@ -317,6 +411,10 @@
     "emoji": "<:nypsi_goldn:1034512597153742898>",
     "longDesc": "can be crafted into a gold ingot or sold as is",
     "role": "sellable",
+    "museum": {
+      "category": "sellables",
+      "threshold": 2000
+    },
     "rarity": 1,
     "buy": 0,
     "sell": 2000,
@@ -330,6 +428,10 @@
     "emoji": "<:nypsi_quartz:1034514057455222875>",
     "longDesc": "found when mining in the nether",
     "role": "sellable",
+    "museum": {
+      "category": "sellables",
+      "threshold": 10000
+    },
     "rarity": 1,
     "buy": 0,
     "sell": 11500,
@@ -343,6 +445,10 @@
     "emoji": "<:gold_ore:1354808770043318436>",
     "longDesc": "can be smelted into a gold ingot with a furnace and coal",
     "role": "ore",
+    "museum": {
+      "category": "sellables",
+      "threshold": 750
+    },
     "rarity": 2,
     "ingot": "gold_ingot",
     "buy": 0,
@@ -358,6 +464,10 @@
     "emoji": "<:nypsi_ancient_debris:1032256372068335647>",
     "longDesc": "can be smelted into a netherite scrap with a furnace and coal",
     "role": "ore",
+    "museum": {
+      "category": "sellables",
+      "threshold": 100
+    },
     "rarity": 3,
     "ingot": "netherite_scrap",
     "buy": 0,
@@ -372,6 +482,10 @@
     "emoji": "<:nypsi_nscrap:1034591769662341170>",
     "longDesc": "can be crafted into a netherite ingot",
     "role": "resource",
+    "museum": {
+      "category": "sellables",
+      "threshold": 100
+    },
     "rarity": 3,
     "buy": 0,
     "sell": 75000,
@@ -386,6 +500,10 @@
     "emoji": "<:nypsi_ningot:1034591922473418792>",
     "longDesc": "crafted from netherite scraps and gold ingots",
     "role": "sellable",
+    "museum": {
+      "category": "sellables",
+      "threshold": 100
+    },
     "rarity": 69,
     "buy": 0,
     "sell": 3000000,
@@ -405,6 +523,11 @@
     "default_count": 5,
     "aliases": ["wpickaxe", "wpick"],
     "role": "tool",
+    "museum": {
+      "category": "tools",
+      "threshold": 1,
+      "no_overflow": true
+    },
     "rarity": 0,
     "buy": 15000,
     "sell": 2000,
@@ -420,6 +543,10 @@
     "default_count": 10,
     "aliases": ["ironpick", "ipick"],
     "role": "tool",
+    "museum": {
+      "category": "tools",
+      "threshold": 500
+    },
     "rarity": 1,
     "buy": 0,
     "sell": 5000,
@@ -435,6 +562,10 @@
     "default_count": 10,
     "aliases": ["diamondpick", "dpick"],
     "role": "tool",
+    "museum": {
+      "category": "tools",
+      "threshold": 250
+    },
     "rarity": 3,
     "buy": 0,
     "sell": 10000,
@@ -450,6 +581,11 @@
     "default_count": 5,
     "aliases": ["tfishing", "tfish"],
     "role": "tool",
+    "museum": {
+      "category": "tools",
+      "threshold": 1,
+      "no_overflow": true
+    },
     "rarity": 0,
     "buy": 15000,
     "sell": 2000,
@@ -465,6 +601,10 @@
     "default_count": 10,
     "aliases": ["fishing"],
     "role": "tool",
+    "museum": {
+      "category": "tools",
+      "threshold": 500
+    },
     "rarity": 1,
     "buy": 0,
     "sell": 5000,
@@ -480,6 +620,10 @@
     "default_count": 10,
     "aliases": ["ifishing", "ifish"],
     "role": "tool",
+    "museum": {
+      "category": "tools",
+      "threshold": 250
+    },
     "rarity": 3,
     "buy": 0,
     "sell": 10000,
@@ -495,7 +639,12 @@
     "rarity": 0,
     "role": "item",
     "aliases": ["btc"],
-    "in_crates": true
+    "in_crates": true,
+    "museum": {
+      "category": "general",
+      "threshold": 1,
+      "no_overflow": true
+    }
   },
   "ethereum": {
     "id": "ethereum",
@@ -507,7 +656,12 @@
     "rarity": 0,
     "role": "item",
     "aliases": ["eth"],
-    "in_crates": true
+    "in_crates": true,
+    "museum": {
+      "category": "general",
+      "threshold": 1,
+      "no_overflow": true
+    }
   },
   "terrible_gun": {
     "id": "terrible_gun",
@@ -519,6 +673,11 @@
     "default_count": 10,
     "aliases": ["tgun"],
     "role": "tool",
+    "museum": {
+      "category": "tools",
+      "threshold": 1,
+      "no_overflow": true
+    },
     "rarity": 0,
     "buy": 15000,
     "sell": 2000,
@@ -533,6 +692,10 @@
     "longDesc": "allows you to hunt with better luck",
     "default_count": 10,
     "role": "tool",
+    "museum": {
+      "category": "tools",
+      "threshold": 500
+    },
     "rarity": 1,
     "buy": 0,
     "sell": 5000,
@@ -548,6 +711,10 @@
     "default_count": 10,
     "aliases": ["igun", "ak47"],
     "role": "tool",
+    "museum": {
+      "category": "tools",
+      "threshold": 250
+    },
     "rarity": 3,
     "buy": 0,
     "sell": 10000,
@@ -561,6 +728,10 @@
     "emoji": "🐰",
     "longDesc": "tiny small baby rabbit, ur cat could kill this",
     "role": "prey",
+    "museum": {
+      "category": "sellables",
+      "threshold": 5000
+    },
     "rarity": 0,
     "buy": 0,
     "sell": 3000,
@@ -574,6 +745,10 @@
     "emoji": "🐰",
     "longDesc": "jumps around in ur garden",
     "role": "prey",
+    "museum": {
+      "category": "sellables",
+      "threshold": 5000
+    },
     "rarity": 1,
     "buy": 0,
     "sell": 6000,
@@ -587,6 +762,10 @@
     "emoji": "🐰",
     "longDesc": "massive fuck off rabbit like a bear",
     "role": "prey",
+    "museum": {
+      "category": "sellables",
+      "threshold": 2000
+    },
     "rarity": 2,
     "buy": 0,
     "sell": 8000,
@@ -600,6 +779,10 @@
     "emoji": "🦌",
     "longDesc": "not one of santa's.. anymore at least",
     "role": "prey",
+    "museum": {
+      "category": "sellables",
+      "threshold": 2500
+    },
     "rarity": 2,
     "buy": 0,
     "sell": 12000,
@@ -613,6 +796,10 @@
     "emoji": "🦙",
     "longDesc": "can't spit anymore can it. how could you.",
     "role": "prey",
+    "museum": {
+      "category": "sellables",
+      "threshold": 2500
+    },
     "rarity": 2,
     "buy": 0,
     "sell": 13000,
@@ -627,6 +814,10 @@
     "emoji": "🦧",
     "longDesc": "meeeee and my monkey... monkey doesn't wear any pants",
     "role": "prey",
+    "museum": {
+      "category": "sellables",
+      "threshold": 2000
+    },
     "rarity": 2,
     "buy": 0,
     "sell": 13000,
@@ -640,6 +831,10 @@
     "emoji": "🦍",
     "longDesc": "he was innocent ):",
     "role": "prey",
+    "museum": {
+      "category": "sellables",
+      "threshold": 500
+    },
     "rarity": 3,
     "buy": 0,
     "sell": 22500,
@@ -653,6 +848,10 @@
     "emoji": "🦒",
     "longDesc": "it's just a giraffe lol",
     "role": "prey",
+    "museum": {
+      "category": "sellables",
+      "threshold": 500
+    },
     "rarity": 3,
     "buy": 0,
     "sell": 27500,
@@ -666,6 +865,10 @@
     "emoji": "🦁",
     "longDesc": "rawr",
     "role": "prey",
+    "museum": {
+      "category": "sellables",
+      "threshold": 200
+    },
     "rarity": 4,
     "buy": 0,
     "sell": 200000,
@@ -679,6 +882,10 @@
     "emoji": "🐼",
     "longDesc": "useless and stupid but adorable",
     "role": "prey",
+    "museum": {
+      "category": "sellables",
+      "threshold": 500
+    },
     "rarity": 3,
     "buy": 0,
     "sell": 30000,
@@ -692,6 +899,10 @@
     "emoji": "🐀",
     "longDesc": "https://youtu.be/1hhl9kFTuQ8?t=19",
     "role": "prey",
+    "museum": {
+      "category": "sellables",
+      "threshold": 3000
+    },
     "rarity": 0,
     "buy": 0,
     "sell": 2000,
@@ -705,6 +916,10 @@
     "emoji": "🐁",
     "longDesc": "squeak squeak",
     "role": "prey",
+    "museum": {
+      "category": "sellables",
+      "threshold": 3000
+    },
     "rarity": 0,
     "buy": 0,
     "sell": 1500,
@@ -718,6 +933,10 @@
     "emoji": "🦘",
     "longDesc": "australia",
     "role": "prey",
+    "museum": {
+      "category": "sellables",
+      "threshold": 350
+    },
     "rarity": 3,
     "buy": 0,
     "sell": 25000,
@@ -731,6 +950,10 @@
     "emoji": "🐺",
     "longDesc": "bark.",
     "role": "prey",
+    "museum": {
+      "category": "sellables",
+      "threshold": 300
+    },
     "rarity": 3,
     "buy": 0,
     "sell": 30000,
@@ -744,6 +967,10 @@
     "emoji": "<:nypsi_blaze:1157801702376886372>",
     "longDesc": "found while hunting in the nether",
     "role": "prey",
+    "museum": {
+      "category": "sellables",
+      "threshold": 500
+    },
     "rarity": 2,
     "buy": 0,
     "sell": 20000,
@@ -757,6 +984,10 @@
     "emoji": "<:nypsi_wither_skel:1157805627788234913>",
     "longDesc": "found while hunting in the nether",
     "role": "prey",
+    "museum": {
+      "category": "sellables",
+      "threshold": 50
+    },
     "rarity": 2,
     "buy": 0,
     "sell": 20000,
@@ -770,6 +1001,10 @@
     "emoji": "<:nypsi_piglin:1157806701655900242>",
     "longDesc": "found while hunting in the nether",
     "role": "prey",
+    "museum": {
+      "category": "sellables",
+      "threshold": 75
+    },
     "rarity": 3,
     "buy": 0,
     "sell": 80000,
@@ -783,6 +1018,10 @@
     "emoji": "<:nypsi_ghast:1157808196023488532>",
     "longDesc": "found while hunting in the nether",
     "role": "prey",
+    "museum": {
+      "category": "sellables",
+      "threshold": 100
+    },
     "rarity": 3,
     "buy": 0,
     "sell": 80000,
@@ -796,6 +1035,10 @@
     "emoji": "<:nypsi_enderman:1158003251124375643>",
     "longDesc": "found while hunting",
     "role": "prey",
+    "museum": {
+      "category": "sellables",
+      "threshold": 10
+    },
     "rarity": 5,
     "buy": 0,
     "sell": 125000,
@@ -885,6 +1128,10 @@
     "emoji": "📅",
     "longDesc": "protects your daily streak",
     "role": "item",
+    "museum": {
+      "category": "general",
+      "threshold": 10
+    },
     "rarity": 4,
     "buy": 0,
     "sell": 100000,
@@ -898,6 +1145,11 @@
     "emoji": "🔒",
     "longDesc": "protect your balance",
     "role": "item",
+    "museum": {
+      "category": "general",
+      "threshold": 1,
+      "no_overflow": true
+    },
     "rarity": 0,
     "buy": 50000,
     "sell": 25000,
@@ -912,6 +1164,11 @@
     "longDesc": "destroy someone's padlock",
     "rarity": 0,
     "role": "item",
+    "museum": {
+      "category": "general",
+      "threshold": 1,
+      "no_overflow": true
+    },
     "buy": 150000,
     "sell": 50000,
     "in_crates": true
@@ -925,6 +1182,11 @@
     "longDesc": "bypass rob cooldown",
     "rarity": 0,
     "role": "item",
+    "museum": {
+      "category": "general",
+      "threshold": 1,
+      "no_overflow": true
+    },
     "buy": 300000,
     "sell": 100000,
     "in_crates": true
@@ -938,6 +1200,10 @@
     "longDesc": "yum yum",
     "rarity": 0,
     "role": "booster",
+    "museum": {
+      "category": "boosters",
+      "threshold": 1000000
+    },
     "booster_desc": "eat a cookie to get +**1**% multi for 30 seconds (stacks up to 3)",
     "buy": 0,
     "sell": 300,
@@ -959,6 +1225,10 @@
     "longDesc": "yum yum 😋",
     "rarity": 69,
     "role": "booster",
+    "museum": {
+      "category": "boosters",
+      "threshold": 1000
+    },
     "booster_desc": "eat a cake to get +**50**% xp",
     "buy": 0,
     "sell": 50000,
@@ -980,6 +1250,10 @@
     "longDesc": "it's a molar i think",
     "rarity": 1,
     "role": "collectable",
+    "museum": {
+      "category": "collectables",
+      "threshold": 100
+    },
     "in_crates": true
   },
   "galvanised_square_steel": {
@@ -992,6 +1266,10 @@
     "longDesc": "eco friendly wood veneer and screws from your aunt",
     "rarity": 1,
     "role": "item",
+    "museum": {
+      "category": "collectables",
+      "threshold": 50
+    },
     "in_crates": true
   },
   "bitch": {
@@ -1003,6 +1281,10 @@
     "longDesc": "i coded some bitches",
     "rarity": 2,
     "role": "collectable",
+    "museum": {
+      "category": "collectables",
+      "threshold": 30
+    },
     "in_crates": true
   },
   "clover": {
@@ -1014,6 +1296,10 @@
     "longDesc": "ur pretty lucky",
     "rarity": 2,
     "role": "collectable",
+    "museum": {
+      "category": "collectables",
+      "threshold": 30
+    },
     "aliases": ["leaf"],
     "in_crates": true
   },
@@ -1027,6 +1313,10 @@
     "longDesc": "[i love you](https://64.media.tumblr.com/3020949b864ff6fdeecdd80fe5b5859c/tumblr_mg5tw61IIQ1r5rz5so1_500.gif)",
     "rarity": 2,
     "role": "collectable",
+    "museum": {
+      "category": "collectables",
+      "threshold": 50
+    },
     "aliases": ["teddybear"],
     "in_crates": true
   },
@@ -1039,6 +1329,10 @@
     "longDesc": "we're getting old now",
     "rarity": 2,
     "role": "collectable",
+    "museum": {
+      "category": "collectables",
+      "threshold": 30
+    },
     "aliases": ["save", "icon", "floppy", "disk"],
     "in_crates": true
   },
@@ -1051,6 +1345,10 @@
     "longDesc": "no comment",
     "rarity": 1,
     "role": "collectable",
+    "museum": {
+      "category": "collectables",
+      "threshold": 75
+    },
     "aliases": ["child", "children", "somebodys"],
     "in_crates": true
   },
@@ -1063,6 +1361,10 @@
     "longDesc": "#rippaulwalker",
     "rarity": 4,
     "role": "car",
+    "museum": {
+      "category": "cars",
+      "threshold": 5
+    },
     "speed": 6,
     "aliases": ["r34", "gtr"],
     "in_crates": true
@@ -1076,6 +1378,10 @@
     "longDesc": "[is that a supra?!](https://www.youtube.com/watch?v=ybZmYvaqwEg)",
     "rarity": 3,
     "role": "car",
+    "museum": {
+      "category": "cars",
+      "threshold": 5
+    },
     "speed": 5,
     "aliases": ["supra", "toyota"],
     "in_crates": true
@@ -1089,6 +1395,11 @@
     "longDesc": "[if you're caught by the police on a robbery, you won't lose money](https://file.maxz.dev/xruR11Ii34.webp)",
     "rarity": 0,
     "role": "item",
+    "museum": {
+      "category": "general",
+      "threshold": 1,
+      "no_overflow": true
+    },
     "boobies": "i got this idea while watching better call saul on netflix lol. if you haven't seen it i would recommend that u go watch it. you're not seeing this file though so i'm talking to myself. it's a prequel to breaking bad. i'm so weird.",
     "aliases": ["saulgoodman", "saul"],
     "buy": 200000,
@@ -1104,6 +1415,10 @@
     "longDesc": "[mining away... i don't know what to mine ill mine this anyway](https://www.youtube.com/watch?v=dgha9S39Y6M)",
     "rarity": 2,
     "role": "collectable",
+    "museum": {
+      "category": "collectables",
+      "threshold": 50
+    },
     "aliases": ["mc", "minecraft"],
     "in_crates": true
   },
@@ -1115,7 +1430,12 @@
     "emoji": "<:nypsi_ring:1384728690986061844>",
     "longDesc": "maybe get married?",
     "rarity": 4,
-    "role": "collectable",
+    "role": "item",
+    "museum": {
+      "category": "collectables",
+      "threshold": 3,
+      "no_overflow": true
+    },
     "in_crates": true
   },
   "broken_ring": {
@@ -1127,6 +1447,10 @@
     "longDesc": "ouch...",
     "rarity": 4,
     "role": "collectable",
+    "museum": {
+      "category": "collectables",
+      "threshold": 5
+    },
     "in_crates": false
   },
   "radio": {
@@ -1138,6 +1462,11 @@
     "longDesc": "prevent someone from robbing people",
     "rarity": 0,
     "role": "item",
+    "museum": {
+      "category": "general",
+      "threshold": 1,
+      "no_overflow": true
+    },
     "aliases": ["policescanner, policeradio, police"],
     "buy": 150000,
     "sell": 25000,
@@ -1152,6 +1481,10 @@
     "longDesc": "mitsubishi > subuwu",
     "rarity": 0,
     "role": "car",
+    "museum": {
+      "category": "cars",
+      "threshold": 300
+    },
     "speed": 3,
     "aliases": ["evox", "evo", "lancer"],
     "buy": 50000,
@@ -1167,6 +1500,10 @@
     "longDesc": "wait for the vtec to kick in",
     "rarity": 3,
     "role": "car",
+    "museum": {
+      "category": "cars",
+      "threshold": 30
+    },
     "speed": 4,
     "aliases": ["civic", "honda"],
     "buy": 0,
@@ -1182,6 +1519,10 @@
     "longDesc": "uwu",
     "rarity": 2,
     "role": "car",
+    "museum": {
+      "category": "cars",
+      "threshold": 40
+    },
     "speed": 3,
     "aliases": ["subuwu"],
     "buy": 0,
@@ -1197,6 +1538,10 @@
     "longDesc": "flap flap",
     "rarity": 3,
     "role": "prey",
+    "museum": {
+      "category": "sellables",
+      "threshold": 500
+    },
     "buy": 0,
     "sell": 25000,
     "in_crates": true
@@ -1210,6 +1555,11 @@
     "longDesc": "stop someone finding milfs",
     "rarity": 0,
     "role": "item",
+    "museum": {
+      "category": "general",
+      "threshold": 1,
+      "no_overflow": true
+    },
     "aliases": ["chastity"],
     "buy": 75000,
     "sell": 40000,
@@ -1224,6 +1574,10 @@
     "longDesc": "electric car go nyowm",
     "rarity": 2,
     "role": "car",
+    "museum": {
+      "category": "cars",
+      "threshold": 50
+    },
     "speed": 3,
     "aliases": ["tesla"],
     "buy": 0,
@@ -1239,6 +1593,11 @@
     "longDesc": "simply handcuff someone",
     "rarity": 1,
     "role": "item",
+    "museum": {
+      "category": "general",
+      "threshold": 1,
+      "no_overflow": true
+    },
     "aliases": ["handcuff"],
     "buy": 400000,
     "sell": 150000,
@@ -1257,7 +1616,11 @@
     "aliases": ["bike", "bicycle"],
     "buy": 0,
     "sell": 0,
-    "in_crates": false
+    "in_crates": false,
+    "museum": {
+      "category": "collectables",
+      "threshold": 1
+    }
   },
   "smart_car": {
     "id": "smart_car",
@@ -1268,6 +1631,10 @@
     "longDesc": "you should be embarrassed of yourself",
     "rarity": 1,
     "role": "car",
+    "museum": {
+      "category": "cars",
+      "threshold": 100
+    },
     "speed": 1,
     "aliases": ["smart"],
     "buy": 0,
@@ -1283,6 +1650,10 @@
     "longDesc": "it's lightning mcqueen!",
     "rarity": 2,
     "role": "car",
+    "museum": {
+      "category": "cars",
+      "threshold": 100
+    },
     "speed": 4,
     "aliases": ["mcqueen", "lightning"],
     "buy": 0,
@@ -1298,6 +1669,10 @@
     "longDesc": "spread em. ill be there in half an hour",
     "rarity": 1,
     "role": "car",
+    "museum": {
+      "category": "cars",
+      "threshold": 75
+    },
     "speed": 1,
     "aliases": ["inbetweeners"],
     "buy": 0,
@@ -1313,6 +1688,10 @@
     "longDesc": "skrt skrt",
     "rarity": 1,
     "role": "car",
+    "museum": {
+      "category": "cars",
+      "threshold": 100
+    },
     "speed": 2,
     "aliases": ["fiesta"],
     "buy": 0,
@@ -1328,6 +1707,10 @@
     "longDesc": "ayo chav check",
     "rarity": 1,
     "role": "car",
+    "museum": {
+      "category": "cars",
+      "threshold": 100
+    },
     "speed": 1,
     "aliases": ["chav", "corsa"],
     "buy": 0,
@@ -1343,6 +1726,11 @@
     "longDesc": "50% shorter cooldowns for 15 minutes",
     "rarity": 2,
     "role": "booster",
+    "museum": {
+      "category": "boosters",
+      "threshold": 1,
+      "no_overflow": true
+    },
     "buy": 0,
     "sell": 100000,
     "stackable": false,
@@ -1362,6 +1750,11 @@
     "longDesc": "increased luck when fishing",
     "rarity": 0,
     "role": "booster",
+    "museum": {
+      "category": "boosters",
+      "threshold": 1,
+      "no_overflow": true
+    },
     "buy": 45000,
     "sell": 25000,
     "stackable": false,
@@ -1382,6 +1775,11 @@
     "aliases": ["mag"],
     "rarity": 0,
     "role": "booster",
+    "museum": {
+      "category": "boosters",
+      "threshold": 1,
+      "no_overflow": true
+    },
     "buy": 45000,
     "sell": 25000,
     "stackable": false,
@@ -1404,6 +1802,11 @@
     "buy": 0,
     "sell": 100000,
     "role": "booster",
+    "museum": {
+      "category": "boosters",
+      "threshold": 1,
+      "no_overflow": true
+    },
     "stackable": true,
     "max": 3,
     "boosterEffect": {
@@ -1424,6 +1827,11 @@
     "buy": 0,
     "sell": 75000,
     "role": "booster",
+    "museum": {
+      "category": "boosters",
+      "threshold": 1,
+      "no_overflow": true
+    },
     "stackable": true,
     "max": 3,
     "boosterEffect": {
@@ -1444,6 +1852,11 @@
     "buy": 0,
     "sell": 75000,
     "role": "booster",
+    "museum": {
+      "category": "boosters",
+      "threshold": 1,
+      "no_overflow": true
+    },
     "stackable": true,
     "max": 2,
     "boosterEffect": {
@@ -1464,6 +1877,11 @@
     "buy": 0,
     "sell": 150000,
     "role": "booster",
+    "museum": {
+      "category": "boosters",
+      "threshold": 1,
+      "no_overflow": true
+    },
     "stackable": false,
     "max": 3,
     "boosterEffect": {
@@ -1485,6 +1903,11 @@
     "buy": 0,
     "sell": 75000,
     "role": "booster",
+    "museum": {
+      "category": "boosters",
+      "threshold": 1,
+      "no_overflow": true
+    },
     "stackable": true,
     "max": 3,
     "boosterEffect": {
@@ -1506,6 +1929,11 @@
     "sell": 75000,
     "aliases": ["xp"],
     "role": "booster",
+    "museum": {
+      "category": "boosters",
+      "threshold": 1,
+      "no_overflow": true
+    },
     "stackable": true,
     "max": 3,
     "boosterEffect": {
@@ -1527,6 +1955,11 @@
     "buy": 0,
     "sell": 500000,
     "role": "booster",
+    "museum": {
+      "category": "boosters",
+      "threshold": 1,
+      "no_overflow": true
+    },
     "stackable": false,
     "boosterEffect": {
       "boosts": ["slots"],
@@ -1547,6 +1980,11 @@
     "buy": 0,
     "sell": 75000,
     "role": "tool",
+    "museum": {
+      "category": "tools",
+      "threshold": 1,
+      "no_overflow": true
+    },
     "in_crates": true
   },
   "streak_token": {
@@ -1561,6 +1999,11 @@
     "buy": 0,
     "sell": 100000,
     "role": "tool",
+    "museum": {
+      "category": "tools",
+      "threshold": 1,
+      "no_overflow": true
+    },
     "in_crates": true
   },
   "blue_rocks": {
@@ -1576,6 +2019,10 @@
     "buy": 0,
     "sell": 25000,
     "role": "booster",
+    "museum": {
+      "category": "boosters",
+      "threshold": 350
+    },
     "stackable": false,
     "boosterEffect": {
       "boosts": ["fight"],
@@ -1597,6 +2044,11 @@
     "buy": 100000,
     "sell": 75000,
     "role": "booster",
+    "museum": {
+      "category": "boosters",
+      "threshold": 1,
+      "no_overflow": true
+    },
     "stackable": false,
     "boosterEffect": {
       "boosts": ["fight"],
@@ -1634,6 +2086,11 @@
     "rarity": 2,
     "sell": 100000,
     "role": "booster",
+    "museum": {
+      "category": "boosters",
+      "threshold": 1,
+      "no_overflow": true
+    },
     "stackable": true,
     "max": 3,
     "boosterEffect": {
@@ -1653,6 +2110,10 @@
     "rarity": 2,
     "sell": 100000,
     "role": "item",
+    "museum": {
+      "category": "general",
+      "threshold": 10
+    },
     "in_crates": true
   },
   "claw_crane": {
@@ -1671,6 +2132,10 @@
     "craft": {
       "time": 43200,
       "ingredients": ["hook:8"]
+    },
+    "museum": {
+      "category": "general",
+      "threshold": 1
     }
   },
   "magnet": {
@@ -1684,7 +2149,11 @@
     "sell": 1000000,
     "role": "worker-upgrade",
     "worker_upgrade_id": "magnet",
-    "in_crates": true
+    "in_crates": true,
+    "museum": {
+      "category": "general",
+      "threshold": 1
+    }
   },
   "stolen_nasa_computer": {
     "id": "stolen_nasa_computer",
@@ -1698,7 +2167,11 @@
     "sell": 100000,
     "role": "worker-upgrade",
     "worker_upgrade_id": "nasa_computers",
-    "in_crates": true
+    "in_crates": true,
+    "museum": {
+      "category": "general",
+      "threshold": 1
+    }
   },
   "launchpad": {
     "id": "launchpad",
@@ -1712,7 +2185,11 @@
     "sell": 75000,
     "role": "worker-upgrade",
     "worker_upgrade_id": "launchpad",
-    "in_crates": true
+    "in_crates": true,
+    "museum": {
+      "category": "general",
+      "threshold": 1
+    }
   },
   "warehouse_permit": {
     "id": "warehouse_permit",
@@ -1726,7 +2203,11 @@
     "sell": 100000,
     "role": "worker-upgrade",
     "worker_upgrade_id": "warehouse_expansion",
-    "in_crates": true
+    "in_crates": true,
+    "museum": {
+      "category": "general",
+      "threshold": 1
+    }
   },
   "orphan": {
     "id": "orphan",
@@ -1739,7 +2220,11 @@
     "sell": 100000,
     "role": "worker-upgrade",
     "worker_upgrade_id": "underage_workers",
-    "in_crates": true
+    "in_crates": true,
+    "museum": {
+      "category": "general",
+      "threshold": 1
+    }
   },
   "grandma": {
     "id": "grandma",
@@ -1752,7 +2237,11 @@
     "rarity": 2,
     "sell": 100000,
     "role": "bakery-upgrade",
-    "in_crates": true
+    "in_crates": true,
+    "museum": {
+      "category": "general",
+      "threshold": 1
+    }
   },
   "grandpa": {
     "id": "grandpa",
@@ -1765,7 +2254,11 @@
     "rarity": 2,
     "sell": 100000,
     "role": "bakery-upgrade",
-    "in_crates": true
+    "in_crates": true,
+    "museum": {
+      "category": "general",
+      "threshold": 1
+    }
   },
   "oven": {
     "id": "oven",
@@ -1778,7 +2271,11 @@
     "rarity": 3,
     "sell": 1000000,
     "role": "bakery-upgrade",
-    "in_crates": true
+    "in_crates": true,
+    "museum": {
+      "category": "general",
+      "threshold": 1
+    }
   },
   "highroller": {
     "id": "highroller",
@@ -1791,6 +2288,11 @@
     "rarity": 4,
     "sell": 100000,
     "role": "booster",
+    "museum": {
+      "category": "boosters",
+      "threshold": 1,
+      "no_overflow": true
+    },
     "stackable": false,
     "boosterEffect": {
       "boosts": ["maxbet"],
@@ -1810,6 +2312,11 @@
     "rarity": 3,
     "sell": 1000000,
     "role": "booster",
+    "museum": {
+      "category": "boosters",
+      "threshold": 1,
+      "no_overflow": true
+    },
     "stackable": false,
     "boosterEffect": {
       "boosts": ["worker_claim"],
@@ -1827,6 +2334,10 @@
     "longDesc": "it's the bot owner's actual necklace!!",
     "rarity": 5,
     "role": "collectable",
+    "museum": {
+      "category": "collectables",
+      "threshold": 1
+    },
     "sell": 50000000,
     "aliases": ["palm", "tree", "necklace"],
     "in_crates": true
@@ -1842,6 +2353,11 @@
     "buy": 0,
     "sell": 1000000,
     "role": "booster",
+    "museum": {
+      "category": "boosters",
+      "threshold": 1,
+      "no_overflow": true
+    },
     "stackable": false,
     "boosterEffect": {
       "boosts": ["xp"],
@@ -1858,6 +2374,11 @@
     "emoji": "<:nypsi_portal:1034509723749322843>",
     "longDesc": "used to enter the nether when mining",
     "role": "item",
+    "museum": {
+      "category": "tools",
+      "threshold": 1,
+      "no_overflow": true
+    },
     "rarity": 69,
     "buy": 0,
     "sell": 1000000,
@@ -1876,6 +2397,10 @@
     "emoji": "<:nypsi_gem_green:1046866209326514206>",
     "longDesc": "a mysterious green, shiny gem. only found during a specific activity. it is widely known that the green gem is harmless... mostly. the most noble of all gems",
     "role": "item",
+    "museum": {
+      "category": "gems",
+      "threshold": 1
+    },
     "sell": 5000000,
     "rarity": 2,
     "in_crates": false,
@@ -1893,6 +2418,10 @@
     "emoji": "<:nypsi_gem_purple:1046932495184187452>",
     "longDesc": "a mysterious purple, shiny gem. only found during a specific activity. some say gems are magical, made by witches. and are dangerous...",
     "role": "item",
+    "museum": {
+      "category": "gems",
+      "threshold": 1
+    },
     "sell": 7500000,
     "rarity": 2,
     "in_crates": false,
@@ -1910,6 +2439,10 @@
     "emoji": "<:nypsi_gem_pink:1046932847069499472>",
     "longDesc": "a mysterious pink, shiny gem. only found during a specific activity. some say gems were planted by aliens in the early stages of earth's creation",
     "role": "item",
+    "museum": {
+      "category": "gems",
+      "threshold": 1
+    },
     "sell": 10000000,
     "rarity": 2,
     "in_crates": false,
@@ -1927,6 +2460,10 @@
     "emoji": "<:nypsi_gem_blue:1046933487770423406>",
     "longDesc": "a mysterious blue, shiny gem. only found during a specific activity. some say gems are ancient relics of a long past civilization",
     "role": "item",
+    "museum": {
+      "category": "gems",
+      "threshold": 1
+    },
     "sell": 2500000,
     "rarity": 2,
     "in_crates": false,
@@ -1944,6 +2481,10 @@
     "emoji": "<:nypsi_gem_white:1046933670436552725>",
     "longDesc": "a mysterious white, shiny gem. the most ancient and most powerful of them all. ancient tablets claim that the holder of this gem has the power to create worlds. be careful.",
     "role": "item",
+    "museum": {
+      "category": "gems",
+      "threshold": 1
+    },
     "rarity": 3,
     "in_crates": false,
     "sell": 32500000,
@@ -1961,6 +2502,10 @@
     "emoji": "<:nypsi_crystal_heart:1051624572694319124>",
     "longDesc": "it's widely understood throughout history, that nobody truly understands the origin of any gem, including the crystal heart. ancient hieroglyphs depict the crystal heart forming when all gem colours fuse together. quite a sight to behold.",
     "role": "item",
+    "museum": {
+      "category": "gems",
+      "threshold": 1
+    },
     "rarity": 4,
     "sell": 1000000000,
     "in_crates": false,
@@ -1995,7 +2540,11 @@
     "rarity": 2,
     "sell": 100000,
     "role": "bakery-upgrade",
-    "in_crates": true
+    "in_crates": true,
+    "museum": {
+      "category": "general",
+      "threshold": 1
+    }
   },
   "super_cursor": {
     "id": "super_cursor",
@@ -2012,7 +2561,11 @@
       "time": 21600,
       "ingredients": ["cursor:3"]
     },
-    "in_crates": true
+    "in_crates": true,
+    "museum": {
+      "category": "general",
+      "threshold": 1
+    }
   },
   "workers_crate": {
     "id": "workers_crate",
@@ -2216,6 +2769,10 @@
     "emoji": "<:nypsi_bob:1078776552067694672>",
     "longDesc": "remove an hour of time from all your items being crafted",
     "role": "item",
+    "museum": {
+      "category": "tools",
+      "threshold": 15
+    },
     "rarity": 1,
     "buy": 0,
     "sell": 100000,
@@ -2229,6 +2786,10 @@
     "emoji": "<:nypsi_gem_shard:1088524343367188510>",
     "longDesc": "gem shards have no known powers unlike intact shards, however, it is known that when you put enough gem shards together they will reliably form into full shards, if you're lucky...",
     "role": "item",
+    "museum": {
+      "category": "gems",
+      "threshold": 15
+    },
     "aliases": ["shard", "shards"],
     "rarity": 3,
     "buy": 0,
@@ -2244,6 +2805,10 @@
     "emoji": "🪨",
     "longDesc": "rarely found from your quarry, can be crafted into quarry upgrades",
     "role": "item",
+    "museum": {
+      "category": "general",
+      "threshold": 5
+    },
     "rarity": 69,
     "buy": 0,
     "sell": 1000000,
@@ -2266,6 +2831,10 @@
     "craft": {
       "time": 43200,
       "ingredients": ["quarry_scrap:12"]
+    },
+    "museum": {
+      "category": "general",
+      "threshold": 1
     }
   },
   "earth_scanner": {
@@ -2285,6 +2854,10 @@
     "craft": {
       "time": 43200,
       "ingredients": ["quarry_scrap:5"]
+    },
+    "museum": {
+      "category": "general",
+      "threshold": 1
     }
   },
   "manager": {
@@ -2299,7 +2872,11 @@
     "buy": 0,
     "sell": 100000,
     "in_crates": true,
-    "worker_upgrade_id": "manager"
+    "worker_upgrade_id": "manager",
+    "museum": {
+      "category": "general",
+      "threshold": 1
+    }
   },
   "shipping_container": {
     "id": "shipping_container",
@@ -2314,7 +2891,11 @@
     "buy": 0,
     "sell": 150000,
     "in_crates": true,
-    "worker_upgrade_id": "shipping_containers"
+    "worker_upgrade_id": "shipping_containers",
+    "museum": {
+      "category": "general",
+      "threshold": 1
+    }
   },
   "viagra": {
     "id": "viagra",
@@ -2325,6 +2906,10 @@
     "longDesc": "if you can't get it up...",
     "rarity": 2,
     "role": "booster",
+    "museum": {
+      "category": "boosters",
+      "threshold": 50
+    },
     "booster_desc": "gets it up",
     "buy": 0,
     "sell": 50000,
@@ -2345,6 +2930,10 @@
     "longDesc": "rick roll someone",
     "rarity": 2,
     "role": "item",
+    "museum": {
+      "category": "general",
+      "threshold": 10
+    },
     "aliases": ["rick", "rickroll"],
     "sell": 1000000,
     "in_crates": true
@@ -2361,6 +2950,11 @@
     "buy": 0,
     "sell": 100000,
     "role": "booster",
+    "museum": {
+      "category": "boosters",
+      "threshold": 1,
+      "no_overflow": true
+    },
     "stackable": true,
     "max": 10,
     "boosterEffect": {
@@ -2381,7 +2975,11 @@
     "role": "tag",
     "sell": 50000000,
     "in_crates": true,
-    "tagId": "goat"
+    "tagId": "goat",
+    "museum": {
+      "category": "general",
+      "threshold": 1
+    }
   },
   "cat_tag": {
     "id": "cat_tag",
@@ -2394,7 +2992,11 @@
     "role": "tag",
     "sell": 50000000,
     "in_crates": true,
-    "tagId": "cat"
+    "tagId": "cat",
+    "museum": {
+      "category": "general",
+      "threshold": 1
+    }
   },
   "clown_tag": {
     "id": "clown_tag",
@@ -2407,7 +3009,11 @@
     "role": "tag",
     "sell": 50000000,
     "in_crates": true,
-    "tagId": "clown"
+    "tagId": "clown",
+    "museum": {
+      "category": "general",
+      "threshold": 1
+    }
   },
   "omega_crate": {
     "id": "omega_crate",
@@ -2436,7 +3042,11 @@
     "role": "tag",
     "sell": 5000000,
     "in_crates": false,
-    "tagId": "infinity"
+    "tagId": "infinity",
+    "museum": {
+      "category": "general",
+      "threshold": 1
+    }
   },
   "karma_tag": {
     "id": "karma_tag",
@@ -2449,7 +3059,11 @@
     "role": "tag",
     "sell": 5000000,
     "in_crates": false,
-    "tagId": "karma"
+    "tagId": "karma",
+    "museum": {
+      "category": "general",
+      "threshold": 1
+    }
   },
   "hanafuda_tag": {
     "id": "hanafuda_tag",
@@ -2462,7 +3076,11 @@
     "role": "tag",
     "sell": 5000000,
     "in_crates": false,
-    "tagId": "hanafuda"
+    "tagId": "hanafuda",
+    "museum": {
+      "category": "general",
+      "threshold": 1
+    }
   },
   "xp_booster": {
     "id": "xp_booster",
@@ -2493,6 +3111,10 @@
     "longDesc": "reroll a permanent upgrade into a different one",
     "sell": 25000000,
     "role": "item",
+    "museum": {
+      "category": "tools",
+      "threshold": 1
+    },
     "aliases": ["reroll"],
     "rarity": 7,
     "article": "a",
@@ -2507,6 +3129,10 @@
     "longDesc": "uwu",
     "rarity": 3,
     "role": "collectable",
+    "museum": {
+      "category": "collectables",
+      "threshold": 100
+    },
     "aliases": ["tiddy", "goth", "gf"],
     "in_crates": true
   },
@@ -2519,6 +3145,10 @@
     "longDesc": "used to create eyes of ender",
     "rarity": 69,
     "role": "resource",
+    "museum": {
+      "category": "sellables",
+      "threshold": 25
+    },
     "in_crates": false,
     "craft": {
       "time": 3600,
@@ -2534,6 +3164,10 @@
     "longDesc": "used to create eyes of ender",
     "rarity": 69,
     "role": "resource",
+    "museum": {
+      "category": "sellables",
+      "threshold": 5
+    },
     "aliases": ["pearl", "epearl"],
     "in_crates": false,
     "craft": {
@@ -2550,6 +3184,10 @@
     "longDesc": "crafted from wither skeletons",
     "rarity": 69,
     "role": "sellable",
+    "museum": {
+      "category": "sellables",
+      "threshold": 500
+    },
     "sell": 200000,
     "in_crates": false,
     "craft": {
@@ -2566,6 +3204,10 @@
     "longDesc": "used to create an end portal",
     "rarity": 69,
     "role": "resource",
+    "museum": {
+      "category": "sellables",
+      "threshold": 5
+    },
     "aliases": ["eye", "ender", "endereye", "ender_eye"],
     "in_crates": false,
     "sell": 100000,
@@ -2583,6 +3225,11 @@
     "longDesc": "used to mine in the end",
     "rarity": 69,
     "role": "item",
+    "museum": {
+      "category": "tools",
+      "threshold": 1,
+      "no_overflow": true
+    },
     "in_crates": false,
     "sell": 1000000,
     "craft": {
@@ -2599,6 +3246,10 @@
     "longDesc": "mr bean",
     "rarity": 1,
     "role": "car",
+    "museum": {
+      "category": "cars",
+      "threshold": 75
+    },
     "speed": 2,
     "aliases": ["mini"],
     "buy": 0,
@@ -2614,6 +3265,10 @@
     "longDesc": "NYYOOWWMMMMM",
     "rarity": 5,
     "role": "car",
+    "museum": {
+      "category": "cars",
+      "threshold": 15
+    },
     "speed": 7,
     "aliases": ["lambo", "aventador"],
     "buy": 0,
@@ -2629,6 +3284,10 @@
     "longDesc": "meow meow meow meow meow meow meow",
     "rarity": 6,
     "role": "cat",
+    "museum": {
+      "category": "cats",
+      "threshold": 1
+    },
     "sell": 50000000,
     "in_crates": true
   },
@@ -2641,6 +3300,10 @@
     "longDesc": "ITS FOOTBALL. NOT SOCCER. FLIP YOU SMELLY FAT AMERICANS",
     "rarity": 0,
     "role": "collectable",
+    "museum": {
+      "category": "collectables",
+      "threshold": 175
+    },
     "sell": 25000,
     "in_crates": true
   },
@@ -2653,6 +3316,10 @@
     "longDesc": "obviously the worse one",
     "rarity": 0,
     "role": "collectable",
+    "museum": {
+      "category": "collectables",
+      "threshold": 175
+    },
     "sell": 1,
     "in_crates": true
   },
@@ -2666,6 +3333,11 @@
     "longDesc": "greggs obviously do the best ones",
     "rarity": 1,
     "role": "booster",
+    "museum": {
+      "category": "boosters",
+      "threshold": 15,
+      "no_overflow": true
+    },
     "sell": 25000,
     "in_crates": true,
     "boosterEffect": {
@@ -2685,6 +3357,11 @@
     "longDesc": "this is what you're missing out on if you're not from the uk",
     "rarity": 1,
     "role": "booster",
+    "museum": {
+      "category": "boosters",
+      "threshold": 15,
+      "no_overflow": true
+    },
     "sell": 25000,
     "in_crates": true,
     "boosterEffect": {
@@ -2704,6 +3381,11 @@
     "longDesc": "if you drink orange juice you're a massive loser",
     "rarity": 2,
     "role": "booster",
+    "museum": {
+      "category": "boosters",
+      "threshold": 15,
+      "no_overflow": true
+    },
     "sell": 50000,
     "in_crates": false,
     "boosterEffect": {
@@ -2728,7 +3410,11 @@
     "rarity": 1,
     "role": "car_part",
     "sell": 10000,
-    "in_crates": true
+    "in_crates": true,
+    "museum": {
+      "category": "general",
+      "threshold": 1
+    }
   },
   "engine_upgrade": {
     "id": "engine_upgrade",
@@ -2745,7 +3431,11 @@
       "ingredients": ["engine_upgrade_part:15"],
       "time": 172800
     },
-    "in_crates": false
+    "in_crates": false,
+    "museum": {
+      "category": "general",
+      "threshold": 1
+    }
   },
   "turbo_upgrade_part": {
     "id": "turbo_upgrade_part",
@@ -2758,7 +3448,11 @@
     "rarity": 5,
     "role": "car_part",
     "sell": 10000,
-    "in_crates": true
+    "in_crates": true,
+    "museum": {
+      "category": "general",
+      "threshold": 1
+    }
   },
   "turbo_upgrade": {
     "id": "turbo_upgrade",
@@ -2775,7 +3469,11 @@
       "ingredients": ["turbo_upgrade_part:6"],
       "time": 604800
     },
-    "in_crates": false
+    "in_crates": false,
+    "museum": {
+      "category": "general",
+      "threshold": 1
+    }
   },
   "wheel_upgrade_part": {
     "id": "wheel_upgrade_part",
@@ -2788,7 +3486,11 @@
     "rarity": 5,
     "role": "car_part",
     "sell": 10000,
-    "in_crates": true
+    "in_crates": true,
+    "museum": {
+      "category": "general",
+      "threshold": 1
+    }
   },
   "wheel_upgrade": {
     "id": "wheel_upgrade",
@@ -2805,7 +3507,11 @@
       "ingredients": ["wheel_upgrade_part:4"],
       "time": 604800
     },
-    "in_crates": false
+    "in_crates": false,
+    "museum": {
+      "category": "general",
+      "threshold": 1
+    }
   },
   "range_rover_skin": {
     "id": "range_rover_skin",
@@ -2816,6 +3522,10 @@
     "emoji": "<:nypsi_rangerover:1229070562131841107>",
     "longDesc": "range rover skin for custom cars",
     "role": "car_skin",
+    "museum": {
+      "category": "cars",
+      "threshold": 3
+    },
     "sell": 100000,
     "in_crates": true,
     "rarity": 5
@@ -2829,6 +3539,10 @@
     "emoji": "<:nypsi_pontiac:1229082173374730311>",
     "longDesc": "pontiac car skin for custom cars",
     "role": "car_skin",
+    "museum": {
+      "category": "cars",
+      "threshold": 10
+    },
     "sell": 100000,
     "in_crates": true,
     "rarity": 5
@@ -2842,6 +3556,10 @@
     "emoji": "<:nypsi_ferrari:1229083946017624166>",
     "longDesc": "ferrari car skin for custom cars",
     "role": "car_skin",
+    "museum": {
+      "category": "cars",
+      "threshold": 10
+    },
     "sell": 100000,
     "in_crates": true,
     "rarity": 5
@@ -2855,6 +3573,10 @@
     "emoji": "<:nypsi_bugatti:1229084570763264090>",
     "longDesc": "bugatti car skin for custom cars",
     "role": "car_skin",
+    "museum": {
+      "category": "cars",
+      "threshold": 2
+    },
     "sell": 100000,
     "in_crates": true,
     "rarity": 5
@@ -2868,6 +3590,10 @@
     "emoji": "<:nypsi_rx7:1229104303738851518>",
     "longDesc": "rx7 car skin for custom cars",
     "role": "car_skin",
+    "museum": {
+      "category": "cars",
+      "threshold": 5
+    },
     "sell": 100000,
     "in_crates": true,
     "rarity": 5
@@ -2881,6 +3607,10 @@
     "emoji": "<:nypsi_veilside_rx7:1253785772331372624>",
     "longDesc": "veilside rx7 car skin for custom cars",
     "role": "car_skin",
+    "museum": {
+      "category": "cars",
+      "threshold": 5
+    },
     "sell": 100000,
     "in_crates": false,
     "rarity": 10
@@ -2894,6 +3624,10 @@
     "emoji": "<:nypsi_ford_transit:1255516012242014259>",
     "longDesc": "ford transit car skin for custom cars 😜",
     "role": "car_skin",
+    "museum": {
+      "category": "cars",
+      "threshold": 7
+    },
     "sell": 100000,
     "in_crates": false,
     "rarity": 10
@@ -2907,6 +3641,10 @@
     "longDesc": "delicious treat",
     "rarity": 69,
     "role": "sellable",
+    "museum": {
+      "category": "sellables",
+      "threshold": 15000
+    },
     "buy": 0,
     "sell": 17500,
     "in_crates": false
@@ -2936,6 +3674,10 @@
     "aliases": ["appy"],
     "rarity": 69,
     "role": "sellable",
+    "museum": {
+      "category": "sellables",
+      "threshold": 10000
+    },
     "buy": 0,
     "sell": 35000,
     "in_crates": false
@@ -2950,6 +3692,10 @@
     "rarity": 4,
     "role": "seed",
     "plantId": "apple_tree",
+    "museum": {
+      "category": "sellables",
+      "threshold": 100
+    },
     "buy": 0,
     "sell": 50000,
     "in_crates": true,
@@ -2978,6 +3724,10 @@
     "longDesc": "apples are better",
     "rarity": 69,
     "role": "sellable",
+    "museum": {
+      "category": "sellables",
+      "threshold": 25000
+    },
     "buy": 0,
     "sell": 20000,
     "in_crates": false
@@ -3006,6 +3756,10 @@
     "longDesc": "used to grow plants and keep them healthy",
     "rarity": 0,
     "role": "item",
+    "museum": {
+      "category": "tools",
+      "threshold": 5
+    },
     "buy": 0,
     "sell": 10000,
     "in_crates": true,
@@ -3021,6 +3775,10 @@
     "aliases": ["berry"],
     "rarity": 69,
     "role": "sellable",
+    "museum": {
+      "category": "sellables",
+      "threshold": 35000
+    },
     "buy": 0,
     "sell": 12500,
     "in_crates": false
@@ -3067,6 +3825,10 @@
     "longDesc": "used to make hoes for farms",
     "rarity": 4,
     "role": "item",
+    "museum": {
+      "category": "tools",
+      "threshold": 3
+    },
     "buy": 0,
     "sell": 10000,
     "in_crates": false
@@ -3164,6 +3926,11 @@
     "emoji": "<a:super_furnace:1314953706609049671>",
     "longDesc": "used to smelt 10x more ore",
     "role": "tool",
+    "museum": {
+      "category": "tools",
+      "threshold": 1,
+      "no_overflow": true
+    },
     "rarity": 69,
     "sell": 150000,
     "in_crates": false,
@@ -3180,6 +3947,10 @@
     "emoji": "<:nypsi_toe:1320517027936337991>",
     "longDesc": "ewwwww smelly",
     "role": "collectable",
+    "museum": {
+      "category": "collectables",
+      "threshold": 75
+    },
     "rarity": 1,
     "in_crates": true
   },
@@ -3191,6 +3962,10 @@
     "emoji": "🦶",
     "longDesc": "ewwwww smelly",
     "role": "collectable",
+    "museum": {
+      "category": "collectables",
+      "threshold": 50
+    },
     "rarity": 1,
     "in_crates": false,
     "craft": {
@@ -3207,6 +3982,10 @@
     "longDesc": "rock",
     "rarity": 6,
     "role": "collectable",
+    "museum": {
+      "category": "collectables",
+      "threshold": 1
+    },
     "sell": 1000000000,
     "in_crates": true,
     "unique": true
@@ -3220,6 +3999,10 @@
     "longDesc": "famous painting for real",
     "rarity": 6,
     "role": "collectable",
+    "museum": {
+      "category": "collectables",
+      "threshold": 1
+    },
     "sell": 50000000,
     "in_crates": false,
     "unique": true
@@ -3233,6 +4016,10 @@
     "longDesc": "a beautiful romantic flower",
     "rarity": 5,
     "role": "flower",
+    "museum": {
+      "category": "flowers",
+      "threshold": 1
+    },
     "sell": 1000000,
     "in_crates": true
   },
@@ -3245,6 +4032,10 @@
     "longDesc": "a pink flower",
     "rarity": 5,
     "role": "flower",
+    "museum": {
+      "category": "flowers",
+      "threshold": 1
+    },
     "sell": 1000000,
     "in_crates": true
   },
@@ -3257,6 +4048,10 @@
     "longDesc": "they're pretty cute i suppose",
     "rarity": 3,
     "role": "flower",
+    "museum": {
+      "category": "flowers",
+      "threshold": 1
+    },
     "sell": 100000,
     "in_crates": true
   },
@@ -3269,6 +4064,10 @@
     "longDesc": "beautiful little flower wow i love it",
     "rarity": 5,
     "role": "flower",
+    "museum": {
+      "category": "flowers",
+      "threshold": 1
+    },
     "sell": 100000,
     "in_crates": true
   },
@@ -3281,6 +4080,10 @@
     "longDesc": "cherry is better",
     "rarity": 4,
     "role": "flower",
+    "museum": {
+      "category": "flowers",
+      "threshold": 1
+    },
     "sell": 100000,
     "in_crates": true
   },
@@ -3293,6 +4096,10 @@
     "longDesc": "pretty pink",
     "rarity": 5,
     "role": "flower",
+    "museum": {
+      "category": "flowers",
+      "threshold": 1
+    },
     "sell": 100000,
     "in_crates": true
   },
@@ -3305,6 +4112,10 @@
     "longDesc": "so cute",
     "rarity": 6,
     "role": "flower",
+    "museum": {
+      "category": "flowers",
+      "threshold": 1
+    },
     "sell": 100000,
     "in_crates": true
   },
@@ -3317,6 +4128,10 @@
     "longDesc": "the owner used to call himself a mango",
     "rarity": 69,
     "role": "sellable",
+    "museum": {
+      "category": "sellables",
+      "threshold": 5000
+    },
     "buy": 0,
     "sell": 40000,
     "in_crates": false
@@ -3345,6 +4160,10 @@
     "longDesc": "[i'd like to thank tori for her generous gift of $2](https://youtu.be/eRRXEWNuYy4?t=19)",
     "rarity": 69,
     "role": "sellable",
+    "museum": {
+      "category": "sellables",
+      "threshold": 5000
+    },
     "buy": 0,
     "sell": 30000,
     "in_crates": false
@@ -3373,6 +4192,10 @@
     "longDesc": "who lives in a pineapple under the seaaa... SPONGE BOB SQUARE PANTS",
     "rarity": 69,
     "role": "sellable",
+    "museum": {
+      "category": "sellables",
+      "threshold": 5000
+    },
     "buy": 0,
     "sell": 30000,
     "in_crates": false
@@ -3401,6 +4224,10 @@
     "longDesc": "please do not bend",
     "rarity": 5,
     "role": "cat",
+    "museum": {
+      "category": "cats",
+      "threshold": 1
+    },
     "sell": 25000000,
     "in_crates": true
   },
@@ -3413,6 +4240,10 @@
     "longDesc": "zaza",
     "rarity": 5,
     "role": "cat",
+    "museum": {
+      "category": "cats",
+      "threshold": 1
+    },
     "sell": 25000000,
     "in_crates": true
   },
@@ -3425,6 +4256,10 @@
     "longDesc": "he judges",
     "rarity": 5,
     "role": "cat",
+    "museum": {
+      "category": "cats",
+      "threshold": 1
+    },
     "sell": 25000000,
     "in_crates": true
   },
@@ -3437,6 +4272,10 @@
     "longDesc": "o ii a e oia ee ia ai",
     "rarity": 5,
     "role": "cat",
+    "museum": {
+      "category": "cats",
+      "threshold": 1
+    },
     "sell": 25000000,
     "in_crates": true
   },
@@ -3461,6 +4300,10 @@
     "emoji": "<:dodge_charger:1355262888675377383>",
     "longDesc": "dodge charger skin for custom cars",
     "role": "car_skin",
+    "museum": {
+      "category": "cars",
+      "threshold": 5
+    },
     "sell": 100000,
     "in_crates": false,
     "rarity": 69
@@ -3474,6 +4317,10 @@
     "longDesc": "bleh",
     "rarity": 5,
     "role": "cat",
+    "museum": {
+      "category": "cats",
+      "threshold": 1
+    },
     "sell": 25000000,
     "in_crates": true
   },
@@ -3487,6 +4334,10 @@
     "longDesc": "good job little buddy, you found a bug! heres a gold star!",
     "rarity": 69,
     "role": "trophy",
+    "museum": {
+      "category": "collectables",
+      "threshold": 10
+    },
     "in_crates": false,
     "account_locked": true
   },
@@ -3531,6 +4382,10 @@
     "longDesc": "[PUMPKIN](https://www.youtube.com/shorts/QlKRD2bqTiQ)",
     "rarity": 0,
     "role": "item",
+    "museum": {
+      "category": "sellables",
+      "threshold": 100
+    },
     "in_crates": true,
     "unique": true
   },
@@ -3543,6 +4398,10 @@
     "longDesc": "wow majestic",
     "rarity": 6,
     "role": "flower",
+    "museum": {
+      "category": "flowers",
+      "threshold": 1
+    },
     "sell": 100000,
     "in_crates": true
   },
@@ -3556,6 +4415,10 @@
     "aliases": ["ctree"],
     "rarity": 0,
     "role": "item",
+    "museum": {
+      "category": "collectables",
+      "threshold": 100
+    },
     "in_crates": true,
     "unique": true
   },
@@ -3590,6 +4453,11 @@
     "buy": 0,
     "sell": 10000000,
     "role": "booster",
+    "museum": {
+      "category": "boosters",
+      "threshold": 1,
+      "no_overflow": true
+    },
     "stackable": false,
     "rarity": 5,
     "aliases": ["mpotato", "potato"],
@@ -3611,6 +4479,10 @@
     "longDesc": "nom nom nom nom",
     "rarity": 1,
     "role": "collectable",
+    "museum": {
+      "category": "collectables",
+      "threshold": 50
+    },
     "in_crates": true
   },
   "dabloon": {
@@ -3624,7 +4496,11 @@
     "rarity": 3,
     "in_crates": true,
     "role": "currency",
-    "sell": 100000
+    "sell": 100000,
+    "museum": {
+      "category": "general",
+      "threshold": 100
+    }
   },
   "wheat_seed": {
     "id": "wheat_seed",
@@ -3650,6 +4526,10 @@
     "longDesc": "maybe make some bread",
     "rarity": 69,
     "role": "sellable",
+    "museum": {
+      "category": "sellables",
+      "threshold": 40000
+    },
     "buy": 0,
     "sell": 5000,
     "in_crates": false
@@ -3678,6 +4558,10 @@
     "longDesc": "delicious with chicken",
     "rarity": 69,
     "role": "sellable",
+    "museum": {
+      "category": "sellables",
+      "threshold": 40000
+    },
     "buy": 0,
     "sell": 3000,
     "in_crates": false
