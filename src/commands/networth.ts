@@ -1,9 +1,11 @@
 import {
   ActionRowBuilder,
   ButtonBuilder,
+  ButtonInteraction,
   ButtonStyle,
   CommandInteraction,
   MessageActionRowComponentBuilder,
+  MessageFlags,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { NypsiClient } from "../models/Client";
@@ -82,34 +84,20 @@ async function run(
   let mainValues = `🌍 $**${net.amount.toLocaleString()}**\n`;
   const itemValues: { itemId: string; value: number }[] = [];
 
+  const netLines: Record<string, { symbol: string; desc: string }> = {
+    balance: { symbol: "💰", desc: "balance, bank, offers, and market offers" },
+    guild: { symbol: "👥", desc: "guild worth" },
+    workers: { symbol: "👷🏻‍♂️", desc: "worker cost, upgrades, and stored items" },
+    bakery: { symbol: getItems()["furnace"].emoji, desc: "bakery upgrades" },
+    garage: { symbol: "🔧", desc: "cars and car upgrades" },
+    farm: { symbol: "🌱", desc: "seeds, upgrades, and harvest value" },
+  };
+
   for (const [key, value] of net.breakdown.entries()) {
     if (value <= 0) continue;
 
-    if (key === "balance") {
-      mainValues += `\n💰 $**${value.toLocaleString()}** (${((value / net.amount) * 100).toFixed(
-        2,
-      )}%)`;
-    } else if (key === "guild") {
-      mainValues += `\n👥 $**${value.toLocaleString()}** (${((value / net.amount) * 100).toFixed(
-        2,
-      )}%)`;
-    } else if (key === "workers") {
-      mainValues += `\n👷🏻‍♂️ $**${value.toLocaleString()}** (${((value / net.amount) * 100).toFixed(
-        2,
-      )}%)`;
-    } else if (key === "bakery") {
-      mainValues += `\n${getItems()["furnace"].emoji} $**${value.toLocaleString()}** (${(
-        (value / net.amount) *
-        100
-      ).toFixed(2)}%)`;
-    } else if (key === "garage") {
-      mainValues += `\n🔧 $**${value.toLocaleString()}** (${((value / net.amount) * 100).toFixed(
-        2,
-      )}%)`;
-    } else if (key === "farm") {
-      mainValues += `\n🌱 $**${value.toLocaleString()}** (${((value / net.amount) * 100).toFixed(
-        2,
-      )}%)`;
+    if (netLines[key]) {
+      mainValues += `\n${netLines[key].symbol} $**${value.toLocaleString()}** (${((value / net.amount) * 100).toFixed(2)}%)`;
     } else {
       itemValues.push({ itemId: key, value });
     }
@@ -149,6 +137,10 @@ async function run(
       .setStyle(ButtonStyle.Primary)
       .setDisabled(true),
     new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+    new ButtonBuilder()
+      .setCustomId("breakdown")
+      .setLabel("breakdown info")
+      .setStyle(ButtonStyle.Secondary),
   );
   if (pages.size <= 1) return send({ embeds: [embed] });
   const msg = await send({ embeds: [embed], components: [row] });
@@ -174,6 +166,24 @@ async function run(
 
       return embed;
     },
+    handleResponses: new Map().set(
+      "breakdown",
+      async (manager: PageManager<string>, interaction: ButtonInteraction) => {
+        await interaction.reply({
+          embeds: [
+            new CustomEmbed(message.member)
+              .setHeader("networth breakdown information")
+              .setDescription(
+                Object.values(netLines)
+                  .map((i) => `${i.symbol} ${i.desc}`)
+                  .join("\n\n"),
+              ),
+          ],
+          flags: MessageFlags.Ephemeral,
+        });
+        return manager.listen();
+      },
+    ),
   });
 
   return manager.listen();
