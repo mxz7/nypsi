@@ -4336,7 +4336,7 @@
     "role": "trophy",
     "museum": {
       "category": "collectables",
-      "threshold": 10
+      "threshold": 1
     },
     "in_crates": false,
     "account_locked": true

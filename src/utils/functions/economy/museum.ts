@@ -435,7 +435,7 @@ export async function showMuseumLeaderboard(
   };
 
   const rows = (disabled = false) => [
-    ...(selected.museum.no_overflow
+    ...(selected.museum.no_overflow || selected.account_locked
       ? []
       : [
           new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(

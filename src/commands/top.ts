@@ -222,7 +222,7 @@ cmd.slashData
       .setDescription("view the leaderboard(s) for an item in the museum")
       .addStringOption((option) =>
         option
-          .setName("museum-lb-item")
+          .setName("museum-item")
           .setDescription("the item you want to view")
           .setAutocomplete(true)
           .setRequired(true),
@@ -374,6 +374,8 @@ async function run(
 
     if (item.id === "lottery_ticket")
       return send({ embeds: [new ErrorEmbed("leaderboards for this item are unavailable")] });
+
+    if (item.id == "gold_star") return showMuseumLeaderboard(message, send, args);
 
     let global = false;
 
@@ -640,6 +642,9 @@ async function run(
 
     if (selected.id === "lottery_ticket")
       return send({ embeds: [new ErrorEmbed("leaderboards for this item are unavailable")] });
+
+    if (selected.id == "gold_star")
+      return showMuseumLeaderboard(message, send, ["museum", ...args]);
 
     let global = false;
 

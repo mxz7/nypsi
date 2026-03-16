@@ -467,7 +467,7 @@ async function run(
     for (const item of itemsInCategory) {
       desc.push(
         `**${item.emoji} ${item.name}**\n` +
-          `donated **${museum.count(item).toLocaleString()}**${museum.completed(item) ? ` - first donated <t:${Math.floor(new Date(museum.completedAt(item)).getTime() / 1000)}:R> (#**${(await museum.completedPlacement(item)).toLocaleString()}**)` : ""}\n` +
+          `donated **${museum.count(item).toLocaleString()}**${museum.completed(item) && !item.account_locked ? ` - first donated <t:${Math.floor(new Date(museum.completedAt(item)).getTime() / 1000)}:R> (#**${(await museum.completedPlacement(item)).toLocaleString()}**)` : ""}\n` +
           `${!museum.completed(item) ? `donate **${(item.museum.threshold - museum.count(item)).toLocaleString()}** more to complete` : item.museum.no_overflow ? `quantity maxed!` : `#**${(await museum.leaderboardPlacement(item)).toLocaleString()}** on leaderboard`}`,
       );
     }

@@ -67,6 +67,7 @@ import {
 import { getPrestige, setLevel, setPrestige } from "../utils/functions/economy/levelling";
 import { giveLootPoolResult, rollLootPool } from "../utils/functions/economy/loot_pools";
 import { deleteMarketOrder } from "../utils/functions/economy/market";
+import { addToMuseum } from "../utils/functions/economy/museum";
 import { getTaskStreaks, setTaskStreak } from "../utils/functions/economy/tasks";
 import { topBalanceGlobal } from "../utils/functions/economy/top";
 import {
@@ -903,6 +904,11 @@ async function run(
 
         if (isNaN(amount) || amount < 0) {
           await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid amount")] });
+          return waitForButton();
+        }
+
+        if (msg.content.split(" ")[0] == "gold_star") {
+          await res.editReply({ embeds: [new CustomEmbed(message.member, "use $x givestar")] });
           return waitForButton();
         }
 
@@ -2811,6 +2817,18 @@ async function run(
     return message.react("✅");
   };
 
+  const giveStar = async (id: string, amount = 1) => {
+    const user = await getUserFromId(id);
+
+    if (!user) {
+      return send({ embeds: [new ErrorEmbed("invalid id")] });
+    }
+
+    await addToMuseum(user, "gold_star", amount);
+
+    return message.react("✅");
+  };
+
   const requestProfileTransfer = async (from: User, to: User) => {
     if (await hasProfile(to))
       return send({
@@ -3161,6 +3179,24 @@ async function run(
     }
 
     return message.react("✅");
+  } else if (args[0].toLowerCase() == "givestar") {
+    if (!(await hasAdminPermission(message.member, "set-inv"))) {
+      return send({
+        embeds: [requiredLevelEmbed("set-inv")],
+      });
+    }
+
+    if (args.length == 1) {
+      return send({ embeds: [new ErrorEmbed("$x givestar <id> [amount]")] });
+    }
+
+    let amount = args.length > 2 ? parseInt(args[2]) : 1;
+
+    if (amount <= 0 || isNaN(amount)) {
+      return send({ embeds: [new ErrorEmbed("invalid amount")] });
+    }
+
+    return giveStar(args[1], amount);
   } else if (["transaction", "tx"].includes(args[0].toLowerCase())) {
     if (!(await hasAdminPermission(message.member, "view-transactions"))) {
       return send({
@@ -3596,6 +3632,38 @@ async function run(
     await addInventoryItem(randomUser.userId, "christmas_tree", 1);
 
     logger.debug(`tree: random christmas_tree given to ${randomUser.userId}`);
+
+    // remove after migrating
+  } else if (args[0].toLowerCase() == "migratestars") {
+    if (!(await hasAdminPermission(message.member, "set-inv"))) {
+      return send({
+        embeds: [requiredLevelEmbed("set-inv")],
+      });
+    }
+
+    const res = await prisma.inventory.findMany({
+      where: {
+        item: "gold_star",
+      },
+      select: {
+        userId: true,
+        amount: true,
+      },
+    });
+
+    let stars = 0;
+
+    for (const user of res) {
+      await addToMuseum(user.userId, "gold_star", Number(user.amount));
+      await redis.del(`${Constants.redis.cache.economy.INVENTORY}:${user.userId}`);
+      stars += Number(user.amount);
+    }
+
+    await redis.del(`${Constants.redis.cache.economy.ITEM_EXISTS}:${"gold_star"}`);
+
+    return send({
+      embeds: [new CustomEmbed(`migrated ${stars.toLocaleString()} gold stars to the museum`)],
+    });
   } else {
     return send({
       embeds: [new CustomEmbed(message.member, await getUsableCommands(message.member))],
@@ -3633,6 +3701,11 @@ async function getUsableCommands(member: MemberResolvable) {
       command: "$x cmdwatch <id> <cmd>",
       description: "watch a players usage of a command",
       permission: "cmdwatch",
+    },
+    {
+      command: "$x givestar <id> [amount]",
+      description: "give a user a gold star",
+      permission: "set-inv",
     },
     {
       command: "$x tx",
