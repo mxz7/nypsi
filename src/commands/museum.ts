@@ -21,14 +21,19 @@ import {
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomContainer, CustomEmbed, ErrorEmbed, getColor } from "../models/EmbedBuilders";
-import { getInventory, selectItem } from "../utils/functions/economy/inventory";
+import {
+  getInventory,
+  removeInventoryItem,
+  selectItem,
+} from "../utils/functions/economy/inventory";
 import {
   addToMuseum,
   getMuseum,
   getMuseumCategories,
   showMuseumLeaderboard,
 } from "../utils/functions/economy/museum";
-import { getItems } from "../utils/functions/economy/utils";
+import { createUser, formatNumber, getItems, userExists } from "../utils/functions/economy/utils";
+import { getMember } from "../utils/functions/member";
 import { default as PageManager } from "../utils/functions/page";
 import { pluralize } from "../utils/functions/string";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -43,7 +48,7 @@ cmd.slashData
       .setDescription("donate an item to the museum")
       .addStringOption((option) =>
         option
-          .setName("museum-item")
+          .setName("museum-donate-item")
           .setDescription("the item you want to donate")
           .setAutocomplete(true)
           .setRequired(true),
@@ -58,7 +63,7 @@ cmd.slashData
       .setDescription("view the leaderboard(s) for an item")
       .addStringOption((option) =>
         option
-          .setName("museum-lb-item")
+          .setName("museum-item")
           .setDescription("the item you want to view")
           .setAutocomplete(true)
           .setRequired(true),
@@ -77,12 +82,26 @@ cmd.slashData
   .addSubcommand((view) =>
     view
       .setName("view")
-      .setDescription("view your museum")
+      .setDescription("view your museum by either category or item")
       .addStringOption((option) =>
         option
           .setName("museum-category")
           .setDescription("the category you want to view")
           .setAutocomplete(true),
+      )
+      .addStringOption((option) =>
+        option
+          .setName("museum-item")
+          .setDescription("the item you want to view")
+          .setAutocomplete(true),
+      ),
+  )
+  .addSubcommand((lookup) =>
+    lookup
+      .setName("lookup")
+      .setDescription("lookup a player's museum")
+      .addUserOption((option) =>
+        option.setName("user").setDescription("view the museum of this user").setRequired(true),
       ),
   );
 
@@ -101,8 +120,6 @@ async function run(
   const items = getItems();
   const sortedItems = Object.values(items).toSorted((a, b) => a.id.localeCompare(b.id));
   const itemCategories = getMuseumCategories();
-
-  let inventory = await getInventory(message.member);
 
   const categorySelectMenu = (disabled = false, selected = "home") => {
     return new StringSelectMenuBuilder()
@@ -177,28 +194,60 @@ async function run(
 
     await res.deferUpdate();
 
-    return { page: page, category: item.museum.category };
+    return { item, page: page, category: item.museum.category };
   };
 
   let msg: Message;
 
-  const homeView = async () => {
-    const container = (disabled = false) =>
-      new ContainerBuilder()
-        .setAccentColor(resolveColor(getColor(message.member)))
-        .addTextDisplayComponents(new TextDisplayBuilder().setContent("## museum"))
-        .addActionRowComponents((row) =>
-          row.addComponents(
-            new ButtonBuilder()
-              .setCustomId("find")
-              .setLabel("find item")
-              .setStyle(ButtonStyle.Secondary)
-              .setDisabled(disabled),
+  const homeView = async (member = message.member) => {
+    const museum = await getMuseum(member);
+
+    const desc: string[] = [];
+
+    for (const item of await museum.getFavoritedItems()) {
+      desc.push(
+        `**${item.emoji} ${item.name}\n**` +
+          `donated **${museum.count(item).toLocaleString()}** (#**${(await museum.leaderboardPlacement(item)).toLocaleString()}**)`,
+      );
+    }
+
+    const container = (disabled = false) => {
+      const container = new ContainerBuilder()
+        .setAccentColor(resolveColor(getColor(member)))
+        .addTextDisplayComponents(
+          new TextDisplayBuilder().setContent(
+            `### ${member.user.username}'s museum\n**featured items**`,
           ),
         )
         .addSeparatorComponents((separator) => separator)
-        .addTextDisplayComponents(new TextDisplayBuilder().setContent("select a category of item"))
-        .addActionRowComponents((row) => row.addComponents(categorySelectMenu(disabled)));
+        .addTextDisplayComponents(
+          new TextDisplayBuilder().setContent(
+            desc.length ? desc.join("\n\n") : "no featured items ):",
+          ),
+        );
+
+      if (member.id == message.member.id) {
+        container
+          .addActionRowComponents((row) =>
+            row.addComponents(
+              new ButtonBuilder()
+                .setCustomId("edit")
+                .setLabel("edit")
+                .setStyle(ButtonStyle.Secondary)
+                .setDisabled(disabled),
+              new ButtonBuilder()
+                .setCustomId("find")
+                .setLabel("find item")
+                .setStyle(ButtonStyle.Secondary)
+                .setDisabled(disabled),
+            ),
+          )
+          .addSeparatorComponents((separator) => separator)
+          .addActionRowComponents((row) => row.addComponents(categorySelectMenu(disabled)));
+      }
+
+      return container;
+    };
 
     if (msg) {
       await msg.edit({
@@ -211,6 +260,8 @@ async function run(
         components: [container()],
       });
     }
+
+    if (member.id != message.member.id) return;
 
     const filter = (i: Interaction) => i.user.id == message.author.id;
 
@@ -240,7 +291,6 @@ async function run(
       const categorySelect = await doCategorySelect(interaction);
 
       if (categorySelect) {
-        inventory = await getInventory(message.member);
         return categoryView(categorySelect);
       } else if (res == "find") {
         const res = await doFindItem(interaction as ButtonInteraction);
@@ -248,10 +298,158 @@ async function run(
         if (!res) return pageManager();
 
         return categoryView(res.category, res.page);
+      } else if (res == "edit") {
+        return editView();
       }
 
-      inventory = await getInventory(message.member);
       await msg.edit({ flags: MessageFlags.IsComponentsV2, components: [container()] });
+      return pageManager();
+    };
+
+    return pageManager();
+  };
+
+  const editView = async () => {
+    const museum = await getMuseum(message.member);
+
+    let featuredItems = (await museum.getFavoritedItems())
+      .concat(Array(5).fill(undefined))
+      .slice(0, 5);
+
+    const container = async (disabled = false) => {
+      const container = new ContainerBuilder()
+        .setAccentColor(resolveColor(getColor(message.member)))
+        .addTextDisplayComponents(
+          new TextDisplayBuilder().setContent(
+            `### ${message.member.user.username}'s museum\n**featured items**`,
+          ),
+        )
+        .addSeparatorComponents((separator) => separator);
+
+      for (let i = 0; i < featuredItems.length; i++) {
+        container
+          .addTextDisplayComponents(
+            new TextDisplayBuilder().setContent(
+              featuredItems[i]
+                ? `**${featuredItems[i].emoji} ${featuredItems[i].name}\n**` +
+                    `donated **${museum.count(featuredItems[i]).toLocaleString()}** (#**${(await museum.leaderboardPlacement(featuredItems[i])).toLocaleString()}**)`
+                : `no item selected`,
+            ),
+          )
+
+          .addActionRowComponents((row) =>
+            row.addComponents(
+              new ButtonBuilder()
+                .setCustomId(`alter-${i}`)
+                .setLabel(featuredItems[i] ? "delete" : "add")
+                .setStyle(featuredItems[i] ? ButtonStyle.Danger : ButtonStyle.Success)
+                .setDisabled(disabled),
+              new ButtonBuilder()
+                .setCustomId(`up-${i}`)
+                .setEmoji("⬆️")
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled(disabled || i == 0),
+              new ButtonBuilder()
+                .setCustomId(`down-${i}`)
+                .setEmoji("⬇️")
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled(disabled || i == featuredItems.length - 1),
+            ),
+          );
+      }
+
+      return container
+        .addSeparatorComponents((separator) => separator)
+        .addActionRowComponents((row) =>
+          row.addComponents(
+            new ButtonBuilder()
+              .setCustomId("save")
+              .setLabel("save")
+              .setStyle(ButtonStyle.Success)
+              .setDisabled(disabled),
+          ),
+        );
+    };
+
+    if (msg) {
+      await msg.edit({
+        flags: MessageFlags.IsComponentsV2,
+        components: [await container()],
+      });
+    } else {
+      msg = await send({
+        flags: MessageFlags.IsComponentsV2,
+        components: [await container()],
+      });
+    }
+
+    const filter = (i: Interaction) => i.user.id == message.author.id;
+
+    const pageManager: any = async () => {
+      let fail = false;
+
+      const response = await msg
+        .awaitMessageComponent({ filter, time: 60000 })
+        .then(async (collected) => {
+          if (!collected.customId.startsWith("alter-"))
+            await collected.deferUpdate().catch(() => {
+              fail = true;
+              return pageManager();
+            });
+          return { res: collected.customId, interaction: collected };
+        })
+        .catch(async () => {
+          fail = true;
+          await msg.edit({
+            flags: MessageFlags.IsComponentsV2,
+            components: [await container(true)],
+          });
+        });
+
+      if (fail) return;
+      if (!response) return;
+
+      const { res, interaction } = response;
+
+      if (res == "save") {
+        if (
+          JSON.stringify(featuredItems.filter(Boolean)) !=
+          JSON.stringify(await museum.getFavoritedItems())
+        ) {
+          await museum.setFavoritedItems(featuredItems);
+        }
+
+        return homeView();
+      } else if (res.startsWith("alter-")) {
+        const slot = parseInt(res.split("-")[1]);
+
+        if (featuredItems[slot]) {
+          featuredItems[slot] = undefined;
+          await interaction.deferUpdate();
+        } else {
+          const res = await doFindItem(interaction as ButtonInteraction);
+          if (!res) return pageManager();
+          featuredItems[slot] = res.item;
+        }
+      } else if (res.startsWith("up-")) {
+        const slot = parseInt(res.split("-")[1]);
+
+        if (slot > 0) {
+          const temp = featuredItems[slot];
+          featuredItems[slot] = featuredItems[slot - 1];
+          featuredItems[slot - 1] = temp;
+        }
+      } else if (res.startsWith("down-")) {
+        const slot = parseInt(res.split("-")[1]);
+
+        if (slot < featuredItems.length - 1) {
+          const temp = featuredItems[slot];
+          featuredItems[slot] = featuredItems[slot + 1];
+          featuredItems[slot + 1] = temp;
+        }
+      }
+
+      await msg.edit({ flags: MessageFlags.IsComponentsV2, components: [await container()] });
       return pageManager();
     };
 
@@ -280,7 +478,7 @@ async function run(
       const builder = new CustomContainer()
         .addTextDisplayComponents(
           new TextDisplayBuilder().setContent(
-            `### ${message.member.user.username}'s museum - ${category}`,
+            `### ${message.member.user.username}'s museum\n**${category}**`,
           ),
         )
         .addSeparatorComponents((separator) => separator)
@@ -369,7 +567,6 @@ async function run(
       const categorySelect = await doCategorySelect(interaction);
 
       if (categorySelect) {
-        inventory = await getInventory(message.member);
         return categorySelect == "home" ? homeView() : categoryView(categorySelect);
       } else if (res == "➡") {
         if (currentPage < pages.size) currentPage++;
@@ -383,7 +580,6 @@ async function run(
         return categoryView(res.category, res.page);
       }
 
-      inventory = await getInventory(message.member);
       await msg.edit({ flags: MessageFlags.IsComponentsV2, components: [container()] });
       return pageManager();
     };
@@ -394,33 +590,57 @@ async function run(
   await addCooldown(cmd.name, message.member, 3);
 
   if (args[0]?.toLowerCase() == "donate") {
-    //todo: check for inventory and remove from it
     if (args.length < 2) {
-      return send({ embeds: [new ErrorEmbed("/museum donate <item> <amount>")] });
+      return send({
+        embeds: [new ErrorEmbed("/museum donate <item> <amount>")],
+        flags: MessageFlags.Ephemeral,
+      });
     }
 
     let item = selectItem(args[1]);
 
     if (!item) {
-      return send({ embeds: [new ErrorEmbed("invalid item")] });
+      return send({ embeds: [new ErrorEmbed("invalid item")], flags: MessageFlags.Ephemeral });
     }
 
     if (!item.museum) {
-      return send({ embeds: [new ErrorEmbed("that item cannot be donated to the museum")] });
+      return send({
+        embeds: [new ErrorEmbed("that item cannot be donated to the museum")],
+        flags: MessageFlags.Ephemeral,
+      });
     }
 
-    let amount = args.length == 2 ? 1 : parseInt(args[2]);
+    let inventory = await getInventory(message.member);
+
+    let amount = args.length == 2 ? 1 : formatNumber(args[2]);
 
     if (args[2]?.toLowerCase() == "all") amount = inventory.count(item);
 
     if (amount <= 0 || isNaN(amount) || !amount) {
-      return send({ embeds: [new ErrorEmbed("invalid amount")] });
+      return send({ embeds: [new ErrorEmbed("invalid amount")], flags: MessageFlags.Ephemeral });
     }
 
     const museum = await getMuseum(message.member);
 
-    if (item.museum.no_overflow && amount > item.museum.threshold - museum.count(item))
+    let overflow = false;
+
+    if (item.museum.no_overflow && amount > item.museum.threshold - museum.count(item)) {
       amount = item.museum.threshold - museum.count(item);
+      overflow = true;
+
+      if (amount <= 0) {
+        return send({
+          embeds: [new ErrorEmbed("you have reached the donation cap for this item")],
+          flags: MessageFlags.Ephemeral,
+        });
+      }
+    }
+
+    if (inventory.count(item) < amount)
+      return send({
+        embeds: [new ErrorEmbed(`you don't have enough ${item.plural}`)],
+        flags: MessageFlags.Ephemeral,
+      });
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder().setCustomId("confirm").setLabel("confirm").setStyle(ButtonStyle.Success),
@@ -431,7 +651,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          `confirm that you want to donate **${amount.toLocaleString()}** ${item.emoji} ${pluralize(item, amount)} to your museum\n\n**you cannot get this back!**`,
+          `confirm that you want to donate **${amount.toLocaleString()}** ${item.emoji} ${pluralize(item, amount)} to your museum\n${overflow ? "-# amount limited due to this item's donation cap" : ""}\n**you cannot get this back!**`,
         ),
       ],
       components: [row],
@@ -451,7 +671,12 @@ async function run(
     if (!interaction) return;
 
     if (interaction.customId === "confirm") {
+      inventory = await getInventory(message.member);
+      if (inventory.count(item) < amount)
+        return interaction.update({ embeds: [new ErrorEmbed(`sneaky bitch`)], components: [] });
+
       await addToMuseum(message.member, item.id, amount);
+      await removeInventoryItem(message.member, item.id, amount);
 
       interaction.update({
         embeds: [
@@ -467,15 +692,52 @@ async function run(
       interaction.update({ components: [row] });
     }
   } else if (args[0]?.toLowerCase() == "top") {
-    if (args.length == 1) return send({ embeds: [new ErrorEmbed(`/museum top <item>`)] });
+    if (args.length == 1)
+      return send({
+        embeds: [new ErrorEmbed(`/museum top <item>`)],
+        flags: MessageFlags.Ephemeral,
+      });
     return showMuseumLeaderboard(message, send, args);
+  } else if (args[0]?.toLowerCase() == "lookup") {
+    if (args.length == 1)
+      return send({
+        embeds: [new ErrorEmbed(`/museum lookup <user>`)],
+        flags: MessageFlags.Ephemeral,
+      });
+    args.shift();
+
+    let target = await getMember(message.guild, args.join(" "));
+    if (!target) {
+      return send({ embeds: [new ErrorEmbed("invalid user")], flags: MessageFlags.Ephemeral });
+    }
+
+    if (!(await userExists(target))) await createUser(target);
+
+    return homeView(target);
   } else if (args.length) {
     if (args[0]?.toLowerCase() == "view") args.shift();
     if (args.length == 0 || args[0].toLowerCase() == "home") return homeView();
-    let category = args[0]?.toLowerCase();
+    let category = args[0].toLowerCase();
     if (itemCategories.includes(category)) {
       return categoryView(category);
-    } else return send({ embeds: [new ErrorEmbed(`could not find category \`${category}\``)] });
+    }
+
+    const item = selectItem(args[0]);
+
+    if (item && item.museum) {
+      const index = sortedItems
+        .filter((i) => i.museum?.category == item.museum.category)
+        .findIndex((i) => i.id == item.id);
+
+      const page = Math.floor(index / itemsPerPage) + 1;
+
+      return categoryView(item.museum.category, page);
+    }
+
+    return send({
+      embeds: [new ErrorEmbed(`could not find \`${category}\``)],
+      flags: MessageFlags.Ephemeral,
+    });
   } else return homeView();
 }
 

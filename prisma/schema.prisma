@@ -384,10 +384,26 @@ model Museum {
   itemId        String
   amount        BigInt
   completedAt   DateTime?
+  favorited     Int?
+
+  breakdown     MuseumDonation[]
 
   economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
   @@id([userId, itemId])
+}
+
+model MuseumDonation {
+  id          Int      @id @default(autoincrement())
+  userId      String
+  itemId      String
+  amount      BigInt
+  createdAt   DateTime @default(now())
+
+  museum Museum @relation(fields: [userId, itemId], references: [userId, itemId], onDelete: Cascade)
+
+  @@index([itemId, userId, amount])
+  @@index([createdAt, itemId, amount])
 }
 
 model EconomyWorker {

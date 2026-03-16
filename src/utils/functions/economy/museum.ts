@@ -69,7 +69,7 @@ export class Museum {
   count(itemId: string): number;
   count(item: Item | string): number {
     const itemId = typeof item === "string" ? item : item.id;
-    return this.items[itemId]?.amount ?? 0;
+    return Number(this.items[itemId]?.amount ?? 0);
   }
 
   has(item: Item): boolean;
@@ -114,20 +114,20 @@ export class Museum {
     if (completedItems.length === 0) return null;
 
     const results = await prisma.$queryRaw<{ itemId: string; placement: number }[]>`
-    SELECT "itemId", placement
-    FROM (
-      SELECT
-        "itemId",
-        "userId",
-        ROW_NUMBER() OVER (
-          PARTITION BY "itemId"
-          ORDER BY "completedAt" ASC
-        ) as placement
-      FROM "Museum"
-      WHERE "itemId" IN (${Prisma.join(completedItems)})
-      AND "completedAt" IS NOT NULL
-    ) ranked
-    WHERE "userId" = ${this.userId};
+      SELECT "itemId", placement
+      FROM (
+        SELECT
+          "itemId",
+          "userId",
+          ROW_NUMBER() OVER (
+            PARTITION BY "itemId"
+            ORDER BY "completedAt" ASC
+          ) as placement
+        FROM "Museum"
+        WHERE "itemId" IN (${Prisma.join(completedItems)})
+          AND "completedAt" IS NOT NULL
+      ) ranked
+      WHERE "userId" = ${this.userId};
     `;
 
     const placements: Record<string, number> = {};
@@ -143,60 +143,100 @@ export class Museum {
       ms("3 days") / 1000,
     );
 
-    return placements[itemId];
+    return placements[itemId] || -1;
   }
 
   async leaderboardPlacement(item: Item): Promise<number>;
   async leaderboardPlacement(itemId: string): Promise<number>;
   async leaderboardPlacement(item: Item | string): Promise<number> {
     const itemId = typeof item === "string" ? item : item.id;
-    if (!this.completed(itemId)) return undefined;
 
     const cache = await redis.get(
-      `${Constants.redis.cache.economy.MUSEUM_LEADERBOARD_PLACEMENTS}:${this.userId}`,
+      `${Constants.redis.cache.economy.MUSEUM_LEADERBOARD_PLACEMENTS}:${itemId}`,
     );
     if (cache) {
       const parsed: Record<string, number> = JSON.parse(cache);
-      return parsed[itemId];
+      return parsed[this.userId];
     }
 
-    const completedItems = Object.entries(this.items)
-      .filter(([_, item]) => item.completedAt)
-      .map(([id]) => id);
-
-    if (completedItems.length === 0) return null;
-
-    const results = await prisma.$queryRaw<{ itemId: string; placement: number }[]>`
-    SELECT "itemId", placement
-    FROM (
-      SELECT
-        "itemId",
-        "userId",
-        RANK() OVER (
-          PARTITION BY "itemId"
-          ORDER BY "amount" DESC
-        ) as placement
-      FROM "Museum"
-      WHERE "itemId" IN (${Prisma.join(completedItems)})
-      AND "completedAt" IS NOT NULL
-    ) ranked
-    WHERE "userId" = ${this.userId};
+    const results = await prisma.$queryRaw<{ userId: string; placement: number }[]>`
+      SELECT "userId", placement
+      FROM (
+          SELECT
+            "userId",
+            RANK() OVER (
+              PARTITION BY "itemId"
+              ORDER BY "amount" DESC
+            ) AS placement
+          FROM "Museum"
+          WHERE "itemId" = ${itemId}
+        ) ranked;
     `;
 
     const placements: Record<string, number> = {};
 
     for (const row of results) {
-      placements[row.itemId] = Number(row.placement);
+      placements[row.userId] = Number(row.placement);
     }
 
     await redis.set(
-      `${Constants.redis.cache.economy.MUSEUM_LEADERBOARD_PLACEMENTS}:${this.userId}`,
+      `${Constants.redis.cache.economy.MUSEUM_LEADERBOARD_PLACEMENTS}:${itemId}`,
       JSON.stringify(placements),
       "EX",
       ms("1 day") / 1000,
     );
 
-    return placements[itemId];
+    return placements[this.userId];
+  }
+
+  async getFavoritedItems() {
+    const items = getItems();
+
+    const res = await prisma.museum
+      .findMany({
+        where: {
+          userId: this.userId,
+          favorited: { not: null },
+        },
+        select: {
+          itemId: true,
+        },
+        orderBy: {
+          favorited: "asc",
+        },
+      })
+      .then((i) => i.map((i) => items[i.itemId]));
+
+    return res;
+  }
+
+  async setFavoritedItems(items: Item[]) {
+    const filtered = items.filter(Boolean);
+
+    await prisma.$transaction([
+      prisma.museum.updateMany({
+        where: {
+          userId: this.userId,
+          favorited: { not: null },
+        },
+        data: {
+          favorited: null,
+        },
+      }),
+      ...filtered.map((item, i) =>
+        prisma.museum.update({
+          where: {
+            userId_itemId: {
+              userId: this.userId,
+              itemId: item.id,
+            },
+          },
+          data: {
+            favorited: i,
+          },
+        }),
+      ),
+    ]);
   }
 
   toJSON(): { [itemId: string]: { amount: number; completedAt: Date } } {
@@ -275,6 +315,8 @@ export async function addToMuseum(member: MemberResolvable, itemId: string, amou
     return logger.error(`museum: invalid item ${itemId}`);
   }
 
+  const now = new Date();
+
   const res = await prisma.museum.upsert({
     where: {
       userId_itemId: {
@@ -284,11 +326,23 @@ export async function addToMuseum(member: MemberResolvable, itemId: string, amou
     },
     update: {
       amount: { increment: amount },
+      breakdown: {
+        create: {
+          amount,
+          createdAt: now,
+        },
+      },
     },
     create: {
       userId,
       itemId,
       amount: amount,
+      breakdown: {
+        create: {
+          amount,
+          createdAt: now,
+        },
+      },
     },
     select: {
       amount: true,
@@ -305,16 +359,15 @@ export async function addToMuseum(member: MemberResolvable, itemId: string, amou
         },
       },
       data: {
-        completedAt: new Date(),
+        completedAt: now,
       },
     });
     await redis.del(`${Constants.redis.cache.economy.MUSEUM_COMPLETION_PLACEMENTS}:${userId}`);
+  } else if (res.completedAt) {
+    await redis.del(`${Constants.redis.cache.economy.MUSEUM_LEADERBOARD_PLACEMENTS}:${itemId}`);
   }
 
-  await redis.del(
-    `${Constants.redis.cache.economy.MUSEUM}:${userId}`,
-    `${Constants.redis.cache.economy.MUSEUM_LEADERBOARD_PLACEMENTS}:${userId}`,
-  );
+  await redis.del(`${Constants.redis.cache.economy.MUSEUM}:${userId}`);
 }
 
 export function getMuseumCategories() {
@@ -429,6 +482,8 @@ export async function showMuseumLeaderboard(
     embeds: [embed()],
     components: rows(),
   });
+
+  if (data.pages.size == 1 && selected.museum.no_overflow) return;
 
   const filter = (i: Interaction) => i.user.id == message.author.id;
 
