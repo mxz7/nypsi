@@ -144,7 +144,7 @@ async function run(
 
   const itemsPerPage = 8;
 
-  const doFindItem = async (interaction: ButtonInteraction) => {
+  const doFindItem = async (interaction: ButtonInteraction, defer = true) => {
     const modal = new ModalBuilder()
       .setCustomId("museum-find")
       .setTitle("find an item")
@@ -192,9 +192,9 @@ async function run(
 
     const page = Math.floor(index / itemsPerPage) + 1;
 
-    await res.deferUpdate();
+    if (defer) await res.deferUpdate();
 
-    return { item, page: page, category: item.museum.category };
+    return { item, interaction: res, page: page, category: item.museum.category };
   };
 
   let msg: Message;
@@ -367,6 +367,11 @@ async function run(
               .setLabel("save")
               .setStyle(ButtonStyle.Success)
               .setDisabled(disabled),
+            new ButtonBuilder()
+              .setCustomId("clear")
+              .setLabel("clear")
+              .setStyle(ButtonStyle.Danger)
+              .setDisabled(disabled || featuredItems.every((i) => i === undefined)),
           ),
         );
     };
@@ -420,6 +425,8 @@ async function run(
         }
 
         return homeView();
+      } else if (res == "clear") {
+        featuredItems = Array(5).fill(undefined);
       } else if (res.startsWith("alter-")) {
         const slot = parseInt(res.split("-")[1]);
 
@@ -427,8 +434,27 @@ async function run(
           featuredItems[slot] = undefined;
           await interaction.deferUpdate();
         } else {
-          const res = await doFindItem(interaction as ButtonInteraction);
+          const res = await doFindItem(interaction as ButtonInteraction, false);
           if (!res) return pageManager();
+
+          if (!museum.has(res.item)) {
+            await res.interaction.reply({
+              embeds: [new ErrorEmbed("you have not donated that item yet")],
+              flags: MessageFlags.Ephemeral,
+            });
+            return pageManager();
+          }
+
+          if (featuredItems.findIndex((i) => i?.id == res.item.id) != -1) {
+            await res.interaction.reply({
+              embeds: [new ErrorEmbed("you already have that item featured")],
+              flags: MessageFlags.Ephemeral,
+            });
+            return pageManager();
+          }
+
+          await res.interaction.deferUpdate();
+
           featuredItems[slot] = res.item;
         }
       } else if (res.startsWith("up-")) {
