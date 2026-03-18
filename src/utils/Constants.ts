@@ -124,6 +124,7 @@ const adminPermissionLevels = {
     "add-purchase",
     "set-streak",
     "run-streak",
+    "update-museum",
   ] as const,
   "5": ["set-premium", "streakpause", "spawn-lootdrop"] as const,
   "69": [

@@ -3197,6 +3197,74 @@ async function run(
     }
 
     return giveStar(args[1], amount);
+  } else if (args[0].toLowerCase() == "updatemuseum") {
+    if (!(await hasAdminPermission(message.member, "update-museum"))) {
+      return send({
+        embeds: [requiredLevelEmbed("update-museum")],
+      });
+    }
+
+    const results = await prisma.$queryRawUnsafe<
+      {
+        userId: string;
+        itemId: string;
+        completedAt: Date;
+      }[]
+    >(`
+      WITH item_thresholds("itemId", threshold) AS (
+        VALUES ${Object.values(getItems())
+          .filter((i) => i.museum)
+          .map((i) => `('${i.id}', ${i.museum.threshold})`)
+          .join(",")}
+      ),
+      agg AS (
+        SELECT
+          "userId",
+          "itemId",
+          SUM("amount") AS total_amount,
+          MIN("createdAt") AS "completedAt"
+        FROM "MuseumDonation"
+        GROUP BY "userId", "itemId"
+      ),
+      completed AS (
+        SELECT
+          a."userId",
+          a."itemId",
+          CASE
+            WHEN a.total_amount >= t.threshold THEN a."completedAt"
+            ELSE NULL
+          END AS "completedAt"
+        FROM agg a
+        JOIN item_thresholds t ON t."itemId" = a."itemId"
+        JOIN "Economy" e ON e."userId" = a."userId"
+        JOIN "User" u ON u.id = a."userId"
+      )
+      UPDATE "Museum" m
+      SET "completedAt" = c."completedAt"
+      FROM completed c
+      WHERE m."userId" = c."userId"
+        AND m."itemId" = c."itemId";
+    `);
+
+    for (const result of results) {
+      await prisma.museum.update({
+        where: {
+          userId_itemId: {
+            userId: result.userId,
+            itemId: result.itemId,
+          },
+        },
+        data: {
+          completedAt: result.completedAt,
+        },
+      });
+    }
+
+    const keys = await redis.keys(`${Constants.redis.cache.economy.MUSEUM}:*`);
+
+    if (keys.length) await redis.del(keys);
+
+    return message.react("✅");
   } else if (["transaction", "tx"].includes(args[0].toLowerCase())) {
     if (!(await hasAdminPermission(message.member, "view-transactions"))) {
       return send({
@@ -3706,6 +3774,11 @@ async function getUsableCommands(member: MemberResolvable) {
       command: "$x givestar <id> [amount]",
       description: "give a user a gold star",
       permission: "set-inv",
+    },
+    {
+      command: "$x updatemuseum",
+      description: "redo completion values after threshold update",
+      permission: "update-museum",
     },
     {
       command: "$x tx",
