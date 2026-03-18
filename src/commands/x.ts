@@ -3204,7 +3204,7 @@ async function run(
       });
     }
 
-    const results = await prisma.$queryRawUnsafe<
+    await prisma.$queryRawUnsafe<
       {
         userId: string;
         itemId: string;
@@ -3245,20 +3245,6 @@ async function run(
       WHERE m."userId" = c."userId"
         AND m."itemId" = c."itemId";
     `);
-
-    for (const result of results) {
-      await prisma.museum.update({
-        where: {
-          userId_itemId: {
-            userId: result.userId,
-            itemId: result.itemId,
-          },
-        },
-        data: {
-          completedAt: result.completedAt,
-        },
-      });
-    }
 
     const keys = await redis.keys(`${Constants.redis.cache.economy.MUSEUM}:*`);
 
