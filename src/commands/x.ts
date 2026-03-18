@@ -107,7 +107,7 @@ import {
   setExpireDate,
   setTier,
 } from "../utils/functions/premium/premium";
-import { getDuration } from "../utils/functions/string";
+import { getDuration, pluralize } from "../utils/functions/string";
 import { createSupportRequest } from "../utils/functions/supportrequest";
 import { exportTransactions } from "../utils/functions/transactions";
 import { getAdminLevel, hasAdminPermission, setAdminLevel } from "../utils/functions/users/admin";
@@ -3204,53 +3204,71 @@ async function run(
       });
     }
 
-    await prisma.$queryRawUnsafe<
-      {
-        userId: string;
-        itemId: string;
-        completedAt: Date;
-      }[]
-    >(`
+    const res = await prisma.$executeRaw`
       WITH item_thresholds("itemId", threshold) AS (
-        VALUES ${Object.values(getItems())
-          .filter((i) => i.museum)
-          .map((i) => `('${i.id}', ${i.museum.threshold})`)
-          .join(",")}
+          VALUES ${Prisma.raw(
+            Object.values(getItems())
+              .filter((i) => i.museum)
+              .map((i) => `('${i.id}', ${i.museum.threshold})`)
+              .join(","),
+          )}
       ),
       agg AS (
         SELECT
-          "userId",
-          "itemId",
-          SUM("amount") AS total_amount,
-          MIN("createdAt") AS "completedAt"
-        FROM "MuseumDonation"
-        GROUP BY "userId", "itemId"
+            md."userId",
+            md."itemId",
+            md."createdAt",
+            SUM(md."amount") OVER (
+                PARTITION BY md."userId", md."itemId"
+                ORDER BY md."createdAt"
+                ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+            ) AS running_total,
+            it.threshold
+        FROM "MuseumDonation" md
+        JOIN item_thresholds it
+          ON md."itemId" = it."itemId"
       ),
-      completed AS (
-        SELECT
-          a."userId",
-          a."itemId",
-          CASE
-            WHEN a.total_amount >= t.threshold THEN a."completedAt"
-            ELSE NULL
-          END AS "completedAt"
-        FROM agg a
-        JOIN item_thresholds t ON t."itemId" = a."itemId"
-        JOIN "Economy" e ON e."userId" = a."userId"
-        JOIN "User" u ON u.id = a."userId"
+      first_completion AS (
+        SELECT DISTINCT ON ("userId", "itemId")
+            "userId",
+            "itemId",
+            "createdAt" AS "completedAt"
+        FROM agg
+        WHERE running_total >= threshold
+        ORDER BY "userId", "itemId", "createdAt" ASC
+      ),
+      all_user_items AS (
+        SELECT u."userId", i."itemId", fc."completedAt"
+        FROM (
+            SELECT DISTINCT "userId" FROM "MuseumDonation"
+        ) u
+        CROSS JOIN (
+            SELECT "itemId" FROM item_thresholds
+        ) i
+        LEFT JOIN first_completion fc
+          ON fc."userId" = u."userId" AND fc."itemId" = i."itemId"
       )
       UPDATE "Museum" m
-      SET "completedAt" = c."completedAt"
-      FROM completed c
-      WHERE m."userId" = c."userId"
-        AND m."itemId" = c."itemId";
-    `);
+      SET "completedAt" = aui."completedAt"
+      FROM all_user_items aui
+      WHERE m."userId" = aui."userId"
+        AND m."itemId" = aui."itemId"
+        AND (m."completedAt" IS DISTINCT FROM aui."completedAt");
+      `;
 
-    const keys = await redis.keys(`${Constants.redis.cache.economy.MUSEUM}:*`);
+    if (res) {
+      const keys = await redis.keys(`${Constants.redis.cache.economy.MUSEUM}:*`);
+      if (keys.length) await redis.del(keys);
+    }
 
-    if (keys.length) await redis.del(keys);
-
-    return message.react("✅");
+    return send({
+      embeds: [
+        new CustomEmbed(
+          message.member,
+          `${res.toLocaleString()} ${pluralize("entry", res, "entries")} updated`,
+        ),
+      ],
+    });
   } else if (["transaction", "tx"].includes(args[0].toLowerCase())) {
     if (!(await hasAdminPermission(message.member, "view-transactions"))) {
       return send({
