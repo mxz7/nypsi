@@ -18,18 +18,21 @@ export default {
     let total = parseInt(queries.reduce((a, b) => (parseInt(a) + parseInt(b)).toString()));
     let avg = (total / queries.length).toFixed(2);
 
-    log(`average query takes ${avg}ms (${total.toLocaleString()} queries in the last hour)`, {
-      queryCountsTotal: Object.values(queryCounts).reduce((a, b) =>
-        (parseInt(a) + parseInt(b)).toString(),
-      ),
-      queryCounts,
-    });
+    log(
+      `average query takes ${avg}ms (${queries.length.toLocaleString()} queries in the last hour)`,
+      {
+        queryCountsTotal: Object.values(queryCounts).reduce((a, b) =>
+          (parseInt(a) + parseInt(b)).toString(),
+        ),
+        queryCounts,
+      },
+    );
 
     await prisma.botMetrics.createMany({
       data: [
         {
           category: "hourly_query",
-          value: total,
+          value: queries.length,
         },
         {
           category: "hourly_query_time",
