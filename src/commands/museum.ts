@@ -19,6 +19,7 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
+import { sort } from "fast-sort";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomContainer, CustomEmbed, ErrorEmbed, getColor } from "../models/EmbedBuilders";
 import {
@@ -118,7 +119,7 @@ async function run(
   }
 
   const items = getItems();
-  const sortedItems = Object.values(items).toSorted((a, b) => a.id.localeCompare(b.id));
+  const sortedItems = sort(Object.values(items)).asc((i) => i.id);
   const itemCategories = getMuseumCategories();
 
   const categorySelectMenu = (disabled = false, selected = "home") => {
@@ -493,8 +494,18 @@ async function run(
     for (const item of itemsInCategory) {
       desc.push(
         `**${item.emoji} ${item.name}**\n` +
-          `donated **${museum.count(item).toLocaleString()}**${museum.completed(item) && !item.account_locked ? ` - first donated <t:${Math.floor(new Date(museum.completedAt(item)).getTime() / 1000)}:R> (#**${(await museum.completedPlacement(item)).toLocaleString()}**)` : ""}\n` +
-          `${!museum.completed(item) ? `donate **${(item.museum.threshold - museum.count(item)).toLocaleString()}** more to complete` : item.museum.no_overflow ? `quantity maxed!` : `#**${(await museum.leaderboardPlacement(item)).toLocaleString()}** on leaderboard`}`,
+          `donated **${museum.count(item).toLocaleString()}**${
+            museum.completed(item) && !item.account_locked
+              ? ` - first donated <t:${Math.floor(museum.completedAt(item).getTime() / 1000)}:R> (#**${(await museum.completedPlacement(item)).toLocaleString()}**)`
+              : ""
+          }\n` +
+          `${
+            !museum.completed(item)
+              ? `donate **${(item.museum.threshold - museum.count(item)).toLocaleString()}** more to complete`
+              : item.museum.no_overflow
+                ? `quantity maxed!`
+                : `#**${(await museum.leaderboardPlacement(item)).toLocaleString()}** on leaderboard`
+          }`,
       );
     }
 

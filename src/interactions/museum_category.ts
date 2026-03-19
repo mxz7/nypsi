@@ -10,7 +10,7 @@ export default {
 
     return await interaction.respond(
       getMuseumCategories()
-        .filter((i) => i && i.includes(focused.value))
+        .filter((i) => i.includes(focused.value))
         .map((category) => ({
           name: category,
           value: category,

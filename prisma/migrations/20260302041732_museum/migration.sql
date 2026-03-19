@@ -21,10 +21,7 @@ CREATE TABLE "MuseumDonation" (
 );
 
 -- CreateIndex
-CREATE INDEX "MuseumDonation_itemId_userId_amount_idx" ON "MuseumDonation"("itemId", "userId", "amount");
-
--- CreateIndex
-CREATE INDEX "MuseumDonation_createdAt_itemId_amount_idx" ON "MuseumDonation"("createdAt", "itemId", "amount");
+CREATE INDEX "MuseumDonation_userId_itemId_idx" ON "MuseumDonation"("userId", "itemId");
 
 -- AddForeignKey
 ALTER TABLE "Museum" ADD CONSTRAINT "Museum_userId_fkey" FOREIGN KEY ("userId") REFERENCES "Economy"("userId") ON DELETE CASCADE ON UPDATE CASCADE;

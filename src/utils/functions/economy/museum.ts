@@ -26,23 +26,31 @@ import {
 import { createUser, getItems, userExists } from "./utils";
 import ms = require("ms");
 
+type MuseumItem = {
+  [itemId: string]: {
+    amount: number;
+    completedAt: Date | string;
+  };
+};
+
+type MuseumEntry = {
+  itemId: string;
+  amount: bigint | number;
+  completedAt: Date | string;
+};
+
 export class Museum {
-  private items: { [itemId: string]: { amount: number; completedAt: Date } };
+  private items: MuseumItem;
   private userId: string;
 
-  constructor(
-    member: MemberResolvable,
-    data?:
-      | { [itemId: string]: { amount: number; completedAt: Date } }
-      | { itemId: string; amount: number; completedAt: Date }[],
-  ) {
+  constructor(member: MemberResolvable, data?: MuseumItem | MuseumEntry[]) {
     this.userId = getUserId(member);
     this.items = {};
 
     if (Array.isArray(data)) {
       for (const i of data) {
         this.items[i.itemId] = {
-          amount: i.amount,
+          amount: Number(i.amount),
           completedAt: i.completedAt,
         };
       }
@@ -51,7 +59,7 @@ export class Museum {
     }
   }
 
-  entries(): { itemId: string; amount: number; completedAt: Date }[] {
+  entries(): MuseumEntry[] {
     return Object.entries(this.items).map(([item, data]) => ({
       itemId: item,
       amount: data.amount,
@@ -90,7 +98,7 @@ export class Museum {
   completedAt(itemId: string): Date;
   completedAt(item: Item | string): Date {
     const itemId = typeof item === "string" ? item : item.id;
-    return this.items[itemId]?.completedAt;
+    return this.items[itemId]?.completedAt ? new Date(this.items[itemId]?.completedAt) : undefined;
   }
 
   async completedPlacement(item: Item): Promise<number>;
@@ -239,7 +247,7 @@ export class Museum {
     ]);
   }
 
-  toJSON(): { [itemId: string]: { amount: number; completedAt: Date } } {
+  toJSON(): MuseumItem {
     return this.items;
   }
 }
@@ -251,7 +259,7 @@ export async function getMuseum(member: MemberResolvable): Promise<Museum> {
 
   if (cache) {
     try {
-      const parsed = JSON.parse(cache);
+      const parsed: MuseumEntry[] = JSON.parse(cache);
       return new Museum(member, parsed);
     } catch (e) {
       console.error(e);
@@ -271,11 +279,6 @@ export async function getMuseum(member: MemberResolvable): Promise<Museum> {
         completedAt: true,
       },
     })
-    .then((q) =>
-      q.map((i) => {
-        return { itemId: i.itemId, amount: Number(i.amount), completedAt: i.completedAt };
-      }),
-    )
     .catch(() => {});
 
   if (!query || query.length == 0) {

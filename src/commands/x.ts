@@ -3726,15 +3726,24 @@ async function run(
     let stars = 0;
 
     for (const user of res) {
-      await addToMuseum(user.userId, "gold_star", Number(user.amount));
-      await redis.del(`${Constants.redis.cache.economy.INVENTORY}:${user.userId}`);
-      stars += Number(user.amount);
+      const amount = Number(user.amount);
+
+      await Promise.all([
+        addToMuseum(user.userId, "gold_star", amount),
+        removeInventoryItem(user.userId, "gold_star", amount),
+        redis.del(`${Constants.redis.cache.economy.INVENTORY}:${user.userId}`),
+      ]);
+
+      stars += amount;
     }
 
-    await redis.del(`${Constants.redis.cache.economy.ITEM_EXISTS}:${"gold_star"}`);
-
     return send({
-      embeds: [new CustomEmbed(`migrated ${stars.toLocaleString()} gold stars to the museum`)],
+      embeds: [
+        new CustomEmbed(
+          message.member,
+          `migrated ${stars.toLocaleString()} gold stars to the museum`,
+        ),
+      ],
     });
   } else {
     return send({

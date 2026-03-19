@@ -402,8 +402,7 @@ model MuseumDonation {
 
   museum Museum @relation(fields: [userId, itemId], references: [userId, itemId], onDelete: Cascade)
 
-  @@index([itemId, userId, amount])
-  @@index([createdAt, itemId, amount])
+  @@index([userId, itemId])
 }
 
 model EconomyWorker {
