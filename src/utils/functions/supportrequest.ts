@@ -359,7 +359,7 @@ export async function isRequestSuitable(
 ): Promise<{ decision: boolean; reason: string; answer?: string }> {
   try {
     const response = await openai.responses.parse({
-      model: "gpt-5.1-mini",
+      model: "gpt-5.4-mini",
       instructions: await buildPrompt("support_request"),
       input: [{ role: "user", content }],
       text: { format: zodTextFormat(isRequestSuitableFormat, "supportrequest_suitable") },
