@@ -19,8 +19,15 @@ const prisma = new PrismaClient({ adapter }).$extends({
 
         if (["Mention", "GraphMetrics"].includes(model)) return result;
 
-        redis.lpush(Constants.redis.nypsi.HOURLY_DB_REPORT, timeTaken);
-        redis.hincrby(Constants.redis.nypsi.HOURLY_DB_REPORT_COUNT, `${model}.${operation}`, 1);
+        redis
+          .multi()
+          .lpush(Constants.redis.nypsi.HOURLY_DB_REPORT, timeTaken)
+          .hincrby(Constants.redis.nypsi.HOURLY_DB_REPORT_COUNT, `${model}.${operation}`, 1)
+          .exec((error) => {
+            if (error) {
+              logger.error(`query stats: error updating redis query stats`, error);
+            }
+          });
 
         if (timeTaken > 1000 && !parentPort) {
           let loggerArgs: typeof args;
