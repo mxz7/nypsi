@@ -10,7 +10,7 @@
       "id:legendary_scratch_card:1",
       "karma:750",
       "xp:25000",
-      "id:dabloon:200"
+      "id:dabloon:100"
     ],
     "type": "weekly"
   },
@@ -139,14 +139,7 @@
     "name": "progression",
     "description": "increase your nypsi level",
     "target": [10, 15, 50, 100],
-    "prizes": [
-      "id:basic_crate:5",
-      "id:69420_crate:5",
-      "xp:5000",
-      "id:nypsi_crate:1",
-      "id:nypsi_crate:1",
-      "id:dabloon:50"
-    ],
+    "prizes": ["id:basic_crate:5", "id:69420_crate:5", "xp:5000", "id:nypsi_crate:1"],
     "exclude": ["max_prestige"],
     "type": "weekly"
   },
@@ -181,7 +174,7 @@
       "id:lucky_scratch_card:3",
       "xp:5000",
       "id:basic_crate:5",
-      "id:dabloon:50",
+      "id:dabloon:30",
       "id:basic_crate:7",
       "id:basic_crate:7"
     ],
@@ -398,13 +391,7 @@
     "name": "couch potato",
     "description": "rate a movie or tv show (/tmdb)",
     "target": [1],
-    "prizes": [
-      "id:basic_crate:1",
-      "xp:1000",
-      "id:dabloon:5",
-      "id:basic_crate:2",
-      "id:basic_crate:2"
-    ],
+    "prizes": ["id:basic_crate:1", "xp:1000", "id:basic_crate:2"],
     "type": "daily"
   }
 }
