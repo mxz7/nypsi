@@ -1615,5 +1615,50 @@
       "nypsi_crate:2",
       "tag:rick_astley"
     ]
+  },
+  "artifact_discoverer_i": {
+    "id": "artifact_discoverer_i",
+    "name": "artifact discoverer **I**",
+    "emoji": "🏛",
+    "target": 10,
+    "description": "complete 10 donations in the museum",
+    "prize": ["lucky_scratch_card:1"]
+  },
+  "artifact_discoverer_ii": {
+    "id": "artifact_discoverer_ii",
+    "name": "artifact discoverer **II**",
+    "emoji": "🏛",
+    "target": 25,
+    "description": "complete 25 donations in the museum",
+    "prize": ["lucky_scratch_card:3"]
+  },
+  "artifact_discoverer_iii": {
+    "id": "artifact_discoverer_iii",
+    "name": "artifact discoverer **III**",
+    "emoji": "🏛",
+    "target": 50,
+    "description": "complete 50 donations in the museum",
+    "prize": ["lucky_scratch_card:4", "nypsi_crate:1"]
+  },
+  "artifact_discoverer_iv": {
+    "id": "artifact_discoverer_iv",
+    "name": "artifact discoverer **IV**",
+    "emoji": "🏛",
+    "target": 75,
+    "description": "complete 75 donations in the museum",
+    "prize": ["legendary_scratch_card:1", "lucky_scratch_card:5", "nypsi_crate:1"]
+  },
+  "artifact_discoverer_v": {
+    "id": "artifact_discoverer_v",
+    "name": "artifact discoverer **V**",
+    "emoji": "🏛",
+    "target": 125,
+    "description": "complete 125 donations in the museum",
+    "prize": [
+      "legendary_scratch_card:2",
+      "lucky_scratch_card:5",
+      "nypsi_crate:2",
+      "tag:artifact_discoverer"
+    ]
   }
 }

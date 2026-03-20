@@ -252,6 +252,12 @@
     "emoji": "<a:rick_astley:1100529748796506203>",
     "image": "rick_astley.png"
   },
+  "artifact_discoverer": {
+    "id": "artifact_discoverer",
+    "name": "artifact discoverer",
+    "description": "found in the artifact discoverer v achievement",
+    "emoji": "🏛"
+  },
   "ring": {
     "id": "ring",
     "name": "ring",

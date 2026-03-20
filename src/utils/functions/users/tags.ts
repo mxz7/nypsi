@@ -144,10 +144,10 @@ export async function showTags(target: GuildMember) {
     );
   }
 
-  const embed = new CustomEmbed(target, pages.get(1).join("\n")).setHeader(
-    `${target.user.username}'s tags`,
-    target.user.displayAvatarURL(),
-  );
+  const embed = new CustomEmbed(
+    target,
+    pages.size ? pages.get(1).join("\n") : "no tags to display",
+  ).setHeader(`${target.user.username}'s tags`, target.user.displayAvatarURL());
 
   return { pages, embed };
 }

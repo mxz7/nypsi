@@ -16,6 +16,7 @@ import { Item } from "../../../types/Economy";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { getUserId, MemberResolvable } from "../member";
+import { addProgress } from "./achievements";
 import { selectItem } from "./inventory";
 import {
   topMuseumAmount,
@@ -366,6 +367,7 @@ export async function addToMuseum(member: MemberResolvable, itemId: string, amou
       },
     });
     await redis.del(`${Constants.redis.cache.economy.MUSEUM_COMPLETION_PLACEMENTS}:${userId}`);
+    addProgress(member, "artifact_discoverer", 1);
   } else if (res.completedAt) {
     await redis.del(`${Constants.redis.cache.economy.MUSEUM_LEADERBOARD_PLACEMENTS}:${itemId}`);
   }

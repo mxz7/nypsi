@@ -47,6 +47,12 @@ import {
 } from "../utils/functions/captcha";
 import { formatDate, MStoTime } from "../utils/functions/date";
 import {
+  addProgress,
+  getUncompletedAchievements,
+  getUserAchievement,
+  setProgress,
+} from "../utils/functions/economy/achievements";
+import {
   calcNetWorth,
   getBalance,
   getBankBalance,
@@ -2829,6 +2835,121 @@ async function run(
     return message.react("✅");
   };
 
+  const updateMuseum = async () => {
+    const res = await prisma.$queryRaw<
+      { userId: string; completedAt: Date | null; originalCompletedAt: Date | null }[]
+    >`
+      WITH item_thresholds("itemId", threshold) AS (
+          VALUES ${Prisma.raw(
+            Object.values(getItems())
+              .filter((i) => i.museum)
+              .map((i) => `('${i.id}', ${i.museum.threshold})`)
+              .join(","),
+          )}
+      ),
+      agg AS (
+        SELECT
+            md."userId",
+            md."itemId",
+            md."createdAt",
+            SUM(md."amount") OVER (
+                PARTITION BY md."userId", md."itemId"
+                ORDER BY md."createdAt"
+                ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+            ) AS running_total,
+            it.threshold
+        FROM "MuseumDonation" md
+        JOIN item_thresholds it
+          ON md."itemId" = it."itemId"
+      ),
+      first_completion AS (
+        SELECT DISTINCT ON ("userId", "itemId")
+            "userId",
+            "itemId",
+            "createdAt" AS "completedAt"
+        FROM agg
+        WHERE running_total >= threshold
+        ORDER BY "userId", "itemId", "createdAt" ASC
+      ),
+      all_user_items AS (
+        SELECT u."userId", i."itemId", fc."completedAt"
+        FROM (
+            SELECT DISTINCT "userId" FROM "MuseumDonation"
+        ) u
+        CROSS JOIN (
+            SELECT "itemId" FROM item_thresholds
+        ) i
+        LEFT JOIN first_completion fc
+          ON fc."userId" = u."userId" AND fc."itemId" = i."itemId"
+      ),
+      to_update AS (
+        SELECT
+          m."userId",
+          m."itemId",
+          m."completedAt" AS "originalCompletedAt",
+          aui."completedAt" AS "newCompletedAt"
+        FROM "Museum" m
+        JOIN all_user_items aui
+          ON m."userId" = aui."userId"
+        AND m."itemId" = aui."itemId"
+        WHERE m."completedAt" IS DISTINCT FROM aui."completedAt"
+      )
+      UPDATE "Museum" m
+      SET "completedAt" = tu."newCompletedAt"
+      FROM to_update tu
+      WHERE m."userId" = tu."userId"
+        AND m."itemId" = tu."itemId"
+      RETURNING
+        m."userId",
+        m."completedAt",
+        tu."originalCompletedAt";
+      `;
+
+    const changes: Record<string, number> = {};
+
+    for (const update of res) {
+      if (update.completedAt && update.originalCompletedAt) continue;
+
+      if (!update.completedAt) {
+        changes[update.userId] = (changes[update.userId] || 0) - 1;
+      } else {
+        changes[update.userId] = (changes[update.userId] || 0) + 1;
+      }
+    }
+
+    for (const [id, amount] of Object.entries(changes)) {
+      if (amount > 0) {
+        addProgress(id, "artifact_discoverer", amount);
+      } else if (amount < 0) {
+        const selected =
+          (await getUncompletedAchievements(id)).find((i) =>
+            i.achievementId.includes("artifact_discoverer"),
+          )?.achievementId ?? undefined;
+
+        if (selected)
+          setProgress(
+            id,
+            "artifact_discoverer",
+            Number((await getUserAchievement(id, selected)).progress) + amount,
+          );
+      }
+    }
+
+    if (res) {
+      const keys = await redis.keys(`${Constants.redis.cache.economy.MUSEUM}:*`);
+      if (keys.length) await redis.del(keys);
+    }
+
+    return send({
+      embeds: [
+        new CustomEmbed(
+          message.member,
+          `${res.length.toLocaleString()} ${pluralize("entry", res.length, "entries")} updated`,
+        ),
+      ],
+    });
+  };
+
   const requestProfileTransfer = async (from: User, to: User) => {
     if (await hasProfile(to))
       return send({
@@ -3204,71 +3325,7 @@ async function run(
       });
     }
 
-    const res = await prisma.$executeRaw`
-      WITH item_thresholds("itemId", threshold) AS (
-          VALUES ${Prisma.raw(
-            Object.values(getItems())
-              .filter((i) => i.museum)
-              .map((i) => `('${i.id}', ${i.museum.threshold})`)
-              .join(","),
-          )}
-      ),
-      agg AS (
-        SELECT
-            md."userId",
-            md."itemId",
-            md."createdAt",
-            SUM(md."amount") OVER (
-                PARTITION BY md."userId", md."itemId"
-                ORDER BY md."createdAt"
-                ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
-            ) AS running_total,
-            it.threshold
-        FROM "MuseumDonation" md
-        JOIN item_thresholds it
-          ON md."itemId" = it."itemId"
-      ),
-      first_completion AS (
-        SELECT DISTINCT ON ("userId", "itemId")
-            "userId",
-            "itemId",
-            "createdAt" AS "completedAt"
-        FROM agg
-        WHERE running_total >= threshold
-        ORDER BY "userId", "itemId", "createdAt" ASC
-      ),
-      all_user_items AS (
-        SELECT u."userId", i."itemId", fc."completedAt"
-        FROM (
-            SELECT DISTINCT "userId" FROM "MuseumDonation"
-        ) u
-        CROSS JOIN (
-            SELECT "itemId" FROM item_thresholds
-        ) i
-        LEFT JOIN first_completion fc
-          ON fc."userId" = u."userId" AND fc."itemId" = i."itemId"
-      )
-      UPDATE "Museum" m
-      SET "completedAt" = aui."completedAt"
-      FROM all_user_items aui
-      WHERE m."userId" = aui."userId"
-        AND m."itemId" = aui."itemId"
-        AND (m."completedAt" IS DISTINCT FROM aui."completedAt");
-      `;
-
-    if (res) {
-      const keys = await redis.keys(`${Constants.redis.cache.economy.MUSEUM}:*`);
-      if (keys.length) await redis.del(keys);
-    }
-
-    return send({
-      embeds: [
-        new CustomEmbed(
-          message.member,
-          `${res.toLocaleString()} ${pluralize("entry", res, "entries")} updated`,
-        ),
-      ],
-    });
+    return updateMuseum();
   } else if (["transaction", "tx"].includes(args[0].toLowerCase())) {
     if (!(await hasAdminPermission(message.member, "view-transactions"))) {
       return send({
@@ -3731,7 +3788,6 @@ async function run(
       await Promise.all([
         addToMuseum(user.userId, "gold_star", amount),
         removeInventoryItem(user.userId, "gold_star", amount),
-        redis.del(`${Constants.redis.cache.economy.INVENTORY}:${user.userId}`),
       ]);
 
       stars += amount;
