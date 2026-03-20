@@ -780,6 +780,16 @@ async function run(
       embeds: [new ErrorEmbed(`could not find \`${category}\``)],
       flags: MessageFlags.Ephemeral,
     });
+  } else if (args[0]?.toLowerCase() === "help") {
+    const embed = new CustomEmbed(
+      message.member,
+      "**/museum view** - view your museum\n" +
+        "**/museum donate** - donate items to your museum\n" +
+        "**/museum top** - view museum leaderboards\n" +
+        "**/museum lookup** - view a player's featured items",
+    ).setHeader("museum help");
+
+    return send({ embeds: [embed] });
   } else return homeView();
 }
 
