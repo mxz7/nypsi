@@ -3763,47 +3763,6 @@ async function run(
     logger.debug(`tree: random christmas_tree given to ${randomUser.userId}`);
 
     // remove after migrating
-  } else if (args[0].toLowerCase() == "migratestars") {
-    if (!(await hasAdminPermission(message.member, "set-inv"))) {
-      return send({
-        embeds: [requiredLevelEmbed("set-inv")],
-      });
-    }
-
-    const res = await prisma.inventory.findMany({
-      where: {
-        item: "gold_star",
-      },
-      select: {
-        userId: true,
-        amount: true,
-      },
-      orderBy: {
-        amount: "desc",
-      },
-    });
-
-    let stars = 0;
-
-    for (const user of res) {
-      const amount = Number(user.amount);
-
-      await Promise.all([
-        addToMuseum(user.userId, "gold_star", amount),
-        removeInventoryItem(user.userId, "gold_star", amount),
-      ]);
-
-      stars += amount;
-    }
-
-    return send({
-      embeds: [
-        new CustomEmbed(
-          message.member,
-          `migrated ${stars.toLocaleString()} gold stars to the museum`,
-        ),
-      ],
-    });
   } else {
     return send({
       embeds: [new CustomEmbed(message.member, await getUsableCommands(message.member))],
