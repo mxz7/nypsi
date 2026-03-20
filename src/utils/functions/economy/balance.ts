@@ -31,6 +31,7 @@ import { hasVoted } from "./vote";
 import { calcWorkerValues } from "./workers";
 import ms = require("ms");
 import _ = require("lodash");
+import pAll = require("p-all");
 
 export async function getBalance(member: MemberResolvable) {
   const userId = getUserId(member);
@@ -794,9 +795,16 @@ export async function calcNetWorth(
       : 0,
   );
 
+  const promises: Array<() => Promise<void>> = [];
+
   for (const sellOrder of query.Market.filter((i) => i.orderType == "sell")) {
-    worth += ((await calcItemValue(sellOrder.itemId)) || 0) * sellOrder.itemAmount;
+    promises.push(async () => {
+      worth += ((await calcItemValue(sellOrder.itemId)) || 0) * sellOrder.itemAmount;
+    });
   }
+
+  await pAll(promises, { concurrency: 5 });
+  promises.length = 0;
 
   for (const buyOrder of query.Market.filter((i) => i.orderType == "buy")) {
     worth += Number(buyOrder.price) * buyOrder.itemAmount;
@@ -816,26 +824,43 @@ export async function calcNetWorth(
   }
 
   for (const upgrade of query.BakeryUpgrade) {
-    const item = getItems()[upgrade.upgradeId];
+    promises.push(async () => {
+      const item = getItems()[upgrade.upgradeId];
 
-    const value = (await calcItemValue(item.id)) || 0;
+      const value = (await calcItemValue(item.id)) || 0;
 
-    worth += Math.floor(value * upgrade.amount);
+      worth += Math.floor(value * upgrade.amount);
 
-    if (breakdown) {
-      breakdownItems.set(
-        "bakery",
-        Math.floor(value * upgrade.amount) + (breakdownItems.get("bakery") ?? 0),
-      );
-    }
+      if (breakdown) {
+        if (breakdownItems.has("bakery")) {
+          breakdownItems.set(
+            "bakery",
+            breakdownItems.get("bakery") + Math.floor(value * upgrade.amount),
+          );
+        } else {
+          breakdownItems.set(
+            "bakery",
+            Math.floor(value * upgrade.amount) + (breakdownItems.get("bakery") ?? 0),
+          );
+        }
+      }
+    });
   }
+
+  await pAll(promises, { concurrency: 5 });
+  promises.length = 0;
 
   for (const item of query.Inventory) {
-    const value = (await calcItemValue(item.item)) || 1000;
+    promises.push(async () => {
+      const value = (await calcItemValue(item.item)) || 1000;
 
-    worth += Math.floor(value * Number(item.amount));
-    if (breakdown) breakdownItems.set(item.item, value * Number(item.amount));
+      worth += Math.floor(value * Number(item.amount));
+      if (breakdown) breakdownItems.set(item.item, value * Number(item.amount));
+    });
   }
+
+  await pAll(promises, { concurrency: 5 });
+  promises.length = 0;
 
   const museumItems = await prisma.museumDonation.groupBy({
     by: ["itemId"],
@@ -853,10 +878,15 @@ export async function calcNetWorth(
   let museumBreakdown = 0;
 
   for (const donation of museumItems) {
-    const value = (await calcItemValue(donation.itemId)) || 0;
+    promises.push(async () => {
+      const value = (await calcItemValue(donation.itemId)) || 0;
 
-    museumBreakdown += Math.floor(value * Number(donation._sum.amount));
+      museumBreakdown += Math.floor(value * Number(donation._sum.amount));
+    });
   }
+
+  await pAll(promises, { concurrency: 5 });
+  promises.length = 0;
 
   // museum net is only 25% of items donated this season
   museumBreakdown *= 0.25;
@@ -867,17 +897,22 @@ export async function calcNetWorth(
   let garageBreakdown = 0;
 
   for (let i = 0; i < query.CustomCar.length; i++) {
-    garageBreakdown += calcCarCost(i);
+    promises.push(async () => {
+      garageBreakdown += calcCarCost(i);
 
-    const car = query.CustomCar[i];
+      const car = query.CustomCar[i];
 
-    for (const upgrade of car.upgrades) {
-      garageBreakdown +=
-        ((await calcItemValue(
-          Object.values(getItems()).find((i) => i.upgrades === upgrade.type).id,
-        )) || 0) * upgrade.amount;
-    }
+      for (const upgrade of car.upgrades) {
+        garageBreakdown +=
+          ((await calcItemValue(
+            Object.values(getItems()).find((i) => i.upgrades === upgrade.type).id,
+          )) || 0) * upgrade.amount;
+      }
+    });
   }
+
+  await pAll(promises, { concurrency: 5 });
+  promises.length = 0;
 
   breakdownItems.set("garage", garageBreakdown);
   worth += garageBreakdown;
@@ -885,49 +920,54 @@ export async function calcNetWorth(
   let workersBreakdown = 0;
 
   for (const worker of query.EconomyWorker) {
-    const baseUpgrades = getBaseUpgrades();
-    const baseWorkers = getBaseWorkers();
+    promises.push(async () => {
+      const baseUpgrades = getBaseUpgrades();
+      const baseWorkers = getBaseWorkers();
 
-    for (const upgrade of worker.upgrades) {
-      if (!baseUpgrades[upgrade.upgradeId].base_cost) {
-        const itemId = Array.from(Object.keys(getItems())).find(
-          (i) => getItems()[i].worker_upgrade_id === upgrade.upgradeId,
-        );
-        if (!itemId) continue;
+      for (const upgrade of worker.upgrades) {
+        if (!baseUpgrades[upgrade.upgradeId].base_cost) {
+          const itemId = Array.from(Object.keys(getItems())).find(
+            (i) => getItems()[i].worker_upgrade_id === upgrade.upgradeId,
+          );
+          if (!itemId) continue;
 
-        const value = Math.floor(((await calcItemValue(itemId)) || 0) * upgrade.amount);
+          const value = Math.floor(((await calcItemValue(itemId)) || 0) * upgrade.amount);
 
-        worth += value;
-        workersBreakdown += value;
-      } else {
-        let totalCost = 0;
+          worth += value;
+          workersBreakdown += value;
+        } else {
+          let totalCost = 0;
 
-        let baseCost = _.clone(baseUpgrades[upgrade.upgradeId]).base_cost;
+          let baseCost = _.clone(baseUpgrades[upgrade.upgradeId]).base_cost;
 
-        baseCost =
-          baseCost *
-          (baseWorkers[worker.workerId].prestige_requirement >= 40
-            ? baseWorkers[worker.workerId].prestige_requirement / 40
-            : 1);
+          baseCost =
+            baseCost *
+            (baseWorkers[worker.workerId].prestige_requirement >= 40
+              ? baseWorkers[worker.workerId].prestige_requirement / 40
+              : 1);
 
-        for (let i = 0; i < upgrade.amount; i++) {
-          const cost = baseCost + baseCost * i;
+          for (let i = 0; i < upgrade.amount; i++) {
+            const cost = baseCost + baseCost * i;
 
-          totalCost += cost;
+            totalCost += cost;
+          }
+
+          worth += totalCost;
+          workersBreakdown += totalCost;
         }
-
-        worth += totalCost;
-        workersBreakdown += totalCost;
       }
-    }
 
-    const { perItem } = await calcWorkerValues(worker, client);
+      const { perItem } = await calcWorkerValues(worker, client);
 
-    worth += baseWorkers[worker.workerId].cost;
-    worth += worker.stored * perItem;
-    workersBreakdown += worker.stored * perItem;
-    workersBreakdown += baseWorkers[worker.workerId].cost;
+      worth += baseWorkers[worker.workerId].cost;
+      worth += worker.stored * perItem;
+      workersBreakdown += worker.stored * perItem;
+      workersBreakdown += baseWorkers[worker.workerId].cost;
+    });
   }
+
+  await pAll(promises, { concurrency: 5 });
+  promises.length = 0;
 
   breakdownItems.set("workers", workersBreakdown);
 
@@ -937,39 +977,42 @@ export async function calcNetWorth(
 
   for (const farm of query.Farm) {
     if (typesChecked.includes(farm.plantId)) continue;
+    typesChecked.push(farm.plantId);
+    promises.push(async () => {
+      const seed = Object.keys(getItems()).find((i) => getItems()[i].plantId === farm.plantId);
 
-    const seed = Object.keys(getItems()).find((i) => getItems()[i].plantId === farm.plantId);
+      const seedValue =
+        query.Farm.filter((i) => i.plantId === farm.plantId).length *
+        ((await calcItemValue(seed)) || 0);
+      const harvestValue =
+        (await getClaimable(userId, farm.plantId, false)).items *
+        ((await calcItemValue(getPlantsData()[farm.plantId].item)) || 0);
 
-    const seedValue =
-      query.Farm.filter((i) => i.plantId === farm.plantId).length *
-      ((await calcItemValue(seed)) || 0);
-    const harvestValue =
-      (await getClaimable(userId, farm.plantId, false)).items *
-      ((await calcItemValue(getPlantsData()[farm.plantId].item)) || 0);
+      let upgradesValue = 0;
 
-    let upgradesValue = 0;
+      const upgrades = getPlantUpgrades();
 
-    const upgrades = getPlantUpgrades();
+      for (const userUpgrade of query.FarmUpgrades.filter((u) => u.plantId == farm.plantId)) {
+        const upgrade =
+          upgrades[Object.keys(upgrades).find((u) => upgrades[u].id == userUpgrade.upgradeId)];
 
-    for (const userUpgrade of query.FarmUpgrades.filter((u) => u.plantId == farm.plantId)) {
-      const upgrade =
-        upgrades[Object.keys(upgrades).find((u) => upgrades[u].id == userUpgrade.upgradeId)];
-
-      if (upgrade.type_single) {
-        upgradesValue +=
-          userUpgrade.amount * ((await calcItemValue(upgrade.type_single.item)) || 0);
-      } else if (upgrade.type_upgradable) {
-        for (let i = 0; i < userUpgrade.amount; i++) {
-          upgradesValue += (await calcItemValue(upgrade.type_upgradable.items[i])) || 0;
+        if (upgrade.type_single) {
+          upgradesValue +=
+            userUpgrade.amount * ((await calcItemValue(upgrade.type_single.item)) || 0);
+        } else if (upgrade.type_upgradable) {
+          for (let i = 0; i < userUpgrade.amount; i++) {
+            upgradesValue += (await calcItemValue(upgrade.type_upgradable.items[i])) || 0;
+          }
         }
       }
-    }
 
-    worth += seedValue + harvestValue + upgradesValue;
-    farmBreakdown += seedValue + harvestValue + upgradesValue;
-
-    typesChecked.push(farm.plantId);
+      worth += seedValue + harvestValue + upgradesValue;
+      farmBreakdown += seedValue + harvestValue + upgradesValue;
+    });
   }
+
+  await pAll(promises, { concurrency: 2 });
+  promises.length = 0;
 
   breakdownItems.set("farm", farmBreakdown);
 
