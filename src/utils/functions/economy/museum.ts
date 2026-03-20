@@ -368,11 +368,12 @@ export async function addToMuseum(member: MemberResolvable, itemId: string, amou
     });
     await redis.del(`${Constants.redis.cache.economy.MUSEUM_COMPLETION_PLACEMENTS}:${userId}`);
     addProgress(member, "artifact_discoverer", 1);
-  } else if (res.completedAt) {
-    await redis.del(`${Constants.redis.cache.economy.MUSEUM_LEADERBOARD_PLACEMENTS}:${itemId}`);
   }
 
-  await redis.del(`${Constants.redis.cache.economy.MUSEUM}:${userId}`);
+  await redis.del(
+    `${Constants.redis.cache.economy.MUSEUM_LEADERBOARD_PLACEMENTS}:${itemId}`,
+    `${Constants.redis.cache.economy.MUSEUM}:${userId}`,
+  );
 }
 
 export function getMuseumCategories() {
