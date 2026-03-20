@@ -60,26 +60,46 @@ cmd.slashData
         option.setName("amount").setDescription("the amount you want to donate"),
       ),
   )
-  .addSubcommand((top) =>
+  .addSubcommandGroup((top) =>
     top
       .setName("top")
-      .setDescription("view the leaderboard(s) for an item")
-      .addStringOption((option) =>
-        option
-          .setName("museum-item")
-          .setDescription("the item you want to view")
-          .setAutocomplete(true)
-          .setRequired(true),
+      .setDescription("view museum leaderboards")
+      .addSubcommand((item) =>
+        item
+          .setName("item")
+          .setDescription("view the leaderboard(s) for an item")
+          .addStringOption((option) =>
+            option
+              .setName("museum-item")
+              .setDescription("the item you want to view")
+              .setAutocomplete(true)
+              .setRequired(true),
+          )
+          .addStringOption((option) =>
+            option
+              .setName("scope")
+              .setDescription("show global/server")
+              .setChoices([
+                { name: "global", value: "global" },
+                { name: "server", value: "server" },
+              ])
+              .setRequired(false),
+          ),
       )
-      .addStringOption((option) =>
-        option
-          .setName("scope")
-          .setDescription("show global/server")
-          .setChoices([
-            { name: "global", value: "global" },
-            { name: "server", value: "server" },
-          ])
-          .setRequired(false),
+      .addSubcommand((completion) =>
+        completion
+          .setName("completion")
+          .setDescription("view the museum completion leaderboard")
+          .addStringOption((option) =>
+            option
+              .setName("scope")
+              .setDescription("show global/server")
+              .setChoices([
+                { name: "global", value: "global" },
+                { name: "server", value: "server" },
+              ])
+              .setRequired(false),
+          ),
       ),
   )
   .addSubcommand((view) =>
@@ -649,7 +669,7 @@ async function run(
   if (args[0]?.toLowerCase() == "donate") {
     if (args.length < 2) {
       return send({
-        embeds: [new ErrorEmbed("/museum donate <item> <amount>")],
+        embeds: [new ErrorEmbed("/museum donate <item> [amount]")],
         flags: MessageFlags.Ephemeral,
       });
     }
@@ -751,7 +771,7 @@ async function run(
   } else if (args[0]?.toLowerCase() == "top") {
     if (args.length == 1)
       return send({
-        embeds: [new ErrorEmbed(`/museum top <item>`)],
+        embeds: [new ErrorEmbed(`/museum top <completion|item>`)],
         flags: MessageFlags.Ephemeral,
       });
     return showMuseumLeaderboard(message, send, args);

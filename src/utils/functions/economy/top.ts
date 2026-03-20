@@ -2211,6 +2211,163 @@ export async function topMuseumCompletionGlobal(
   return { pages, pos };
 }
 
+export async function topMuseumCompletions(guild: Guild, member: MemberResolvable) {
+  const members = await getAllMembers(guild);
+
+  const query = await prisma.$queryRaw<
+    {
+      userId: string;
+      totalCompleted: number;
+      banned: Date;
+      lastKnownUsername: string;
+      usernameUpdatedAt: Date;
+    }[]
+  >`
+      SELECT
+        m."userId",
+        COUNT(m."completedAt") AS "totalCompleted",
+        e."banned",
+        u."lastKnownUsername",
+        u."usernameUpdatedAt"
+      FROM "Museum" m
+      JOIN "Economy" e ON m."userId" = e."userId"
+      JOIN "User" u ON e."userId" = u."id"
+      WHERE m."completedAt" IS NOT NULL
+        AND m."userId" = ANY(${members})
+        AND u."blacklisted" = false
+      GROUP BY m."userId", e."banned", u."lastKnownUsername", u."usernameUpdatedAt"
+      ORDER BY "totalCompleted" DESC, "lastKnownUsername" ASC;
+    `;
+
+  const out: string[] = [];
+  let count = 0;
+  const userIds = query.map((i) => i.userId);
+  const promises: (() => Promise<void>)[] = [];
+  const date = dayjs();
+
+  for (const user of query) {
+    if (user.banned && date.isBefore(user.banned)) {
+      userIds.splice(userIds.indexOf(user.userId), 1);
+      continue;
+    }
+
+    const currentCount = count;
+    let pos = (count + 1).toString();
+
+    if (pos == "1") {
+      pos = "🥇";
+    } else if (pos == "2") {
+      pos = "🥈";
+    } else if (pos == "3") {
+      pos = "🥉";
+    } else {
+      pos += ".";
+    }
+
+    count++;
+
+    promises.push(async () => {
+      let username = user.lastKnownUsername;
+
+      if (user.usernameUpdatedAt.getTime() < date.valueOf() - WEEK_MS) {
+        const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
+
+        if (discordUser) {
+          username = discordUser.username;
+          await updateLastKnownUsername(user.userId, username);
+        }
+      }
+
+      out[currentCount] = `${pos} ${await formatUsername(
+        user.userId,
+        username,
+        true,
+      )} ${user.totalCompleted.toLocaleString()}`;
+    });
+  }
+
+  await pAll(promises, { concurrency: 10 });
+
+  const pages = PageManager.createPages(out);
+
+  let pos = 0;
+
+  if (member) {
+    pos = userIds.indexOf(getUserId(member)) + 1;
+  }
+
+  return { pages, pos };
+}
+
+export async function topMuseumCompletionsGlobal(member?: MemberResolvable, amount = 100) {
+  const query = await prisma.$queryRaw<
+    {
+      userId: string;
+      totalCompleted: number;
+      banned: Date;
+      lastKnownUsername: string;
+    }[]
+  >`
+    SELECT
+      m."userId",
+      COUNT(m."completedAt") AS "totalCompleted",
+      e."banned",
+      u."lastKnownUsername"
+    FROM "Museum" m
+    JOIN "Economy" e ON m."userId" = e."userId"
+    JOIN "User" u ON e."userId" = u."id"
+    WHERE m."completedAt" IS NOT NULL
+    GROUP BY m."userId", e."banned", u."lastKnownUsername"
+    ORDER BY "totalCompleted" DESC, "lastKnownUsername" ASC
+    LIMIT ${amount};
+    `;
+
+  const out = [];
+
+  let count = 0;
+
+  const userIds = query.map((i) => i.userId);
+
+  for (const user of query) {
+    if (user.banned && dayjs().isBefore(user.banned)) {
+      userIds.splice(userIds.indexOf(user.userId), 1);
+      continue;
+    }
+
+    let pos = (count + 1).toString();
+
+    if (pos == "1") {
+      pos = "🥇";
+    } else if (pos == "2") {
+      pos = "🥈";
+    } else if (pos == "3") {
+      pos = "🥉";
+    } else {
+      pos += ".";
+    }
+
+    out[count] = `${pos} ${await formatUsername(
+      user.userId,
+      user.lastKnownUsername,
+      (await getPreferences(user.userId)).leaderboards,
+    )} ${user.totalCompleted.toLocaleString()}`;
+
+    count++;
+  }
+
+  const pages = PageManager.createPages(out);
+
+  let pos = 0;
+
+  if (member) {
+    pos = userIds.indexOf(getUserId(member)) + 1;
+  }
+
+  checkLeaderboardPositions(userIds, `museum-completions`);
+
+  return { pages, pos };
+}
+
 export async function topMuseumAmount(guild: Guild, item: string, member: MemberResolvable) {
   const members = await getAllMembers(guild);
 

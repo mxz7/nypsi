@@ -16,6 +16,7 @@ import { Item } from "../../../types/Economy";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { getUserId, MemberResolvable } from "../member";
+import PageManager from "../page";
 import { addInlineNotification } from "../users/notifications";
 import { addProgress } from "./achievements";
 import { selectItem } from "./inventory";
@@ -24,6 +25,8 @@ import {
   topMuseumAmountGlobal,
   topMuseumCompletion,
   topMuseumCompletionGlobal,
+  topMuseumCompletions,
+  topMuseumCompletionsGlobal,
 } from "./top";
 import { createUser, getItems, userExists } from "./utils";
 import ms = require("ms");
@@ -401,6 +404,63 @@ export async function showMuseumLeaderboard(
   send: SendMessage,
   args: string[],
 ) {
+  const global = args[2]?.toLowerCase() === "global";
+
+  let data: { pages: Map<number, string[]>; pos: number };
+
+  if (args[1].toLowerCase().startsWith("completion")) {
+    data = global
+      ? await topMuseumCompletionsGlobal(message.member)
+      : await topMuseumCompletions(message.guild, message.member);
+
+    const embed = new CustomEmbed(message.member).setHeader(
+      `top museum completions ${global ? "[global]" : `for ${message.guild.name}`}`,
+      global ? message.client.user.avatarURL() : message.guild.iconURL(),
+    );
+
+    if (data.pages.size == 0) {
+      embed.setDescription("no data to show");
+    } else {
+      embed.setDescription(data.pages.get(1).join("\n"));
+    }
+
+    if (data.pos != 0) {
+      embed.setFooter({
+        text: `you are #${data.pos} | ${Object.values(getItems())
+          .filter((i) => i.museum)
+          .length.toLocaleString()} possible`,
+      });
+    }
+
+    if (
+      data.pos === 1 &&
+      message instanceof Message &&
+      !(await redis.exists(`nypsi:cd:topemoji:${message.channelId}`))
+    ) {
+      await redis.set(`nypsi:cd:topemoji:${message.channelId}`, "boobies", "EX", 3);
+      message.react("👑");
+    }
+
+    if (data.pages.size <= 1) {
+      return send({ embeds: [embed] });
+    }
+
+    const msg = await send({ embeds: [embed], components: [PageManager.defaultRow()] });
+
+    const manager = new PageManager({
+      embed: embed,
+      message: msg,
+      row: PageManager.defaultRow(),
+      userId: message.author.id,
+      pages: data.pages,
+      allowMessageDupe: true,
+    });
+
+    return manager.listen();
+  }
+
+  if (args[1].toLowerCase() == "item") args.shift();
+
   const selected = selectItem(args[1].toLowerCase());
 
   if (!selected) {
@@ -410,12 +470,6 @@ export async function showMuseumLeaderboard(
   if (!selected.museum) {
     return send({ embeds: [new ErrorEmbed(`that item is not in the museum`)] });
   }
-
-  let global = false;
-
-  if (args[2]?.toLowerCase() == "global") global = true;
-
-  let data: { pages: Map<number, string[]>; pos: number };
 
   if (global) {
     data = !selected.museum.no_overflow
@@ -449,18 +503,22 @@ export async function showMuseumLeaderboard(
   };
 
   const rows = (disabled = false) => [
-    new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder()
-        .setCustomId("amount")
-        .setLabel("amount")
-        .setStyle(ButtonStyle.Secondary)
-        .setDisabled(disabled || amountLeaderboardShown),
-      new ButtonBuilder()
-        .setCustomId("comp")
-        .setLabel("completion time")
-        .setStyle(ButtonStyle.Secondary)
-        .setDisabled(disabled || !amountLeaderboardShown),
-    ),
+    ...(selected.museum.no_overflow || selected.account_locked
+      ? []
+      : [
+          new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+            new ButtonBuilder()
+              .setCustomId("amount")
+              .setLabel("amount")
+              .setStyle(ButtonStyle.Secondary)
+              .setDisabled(disabled || amountLeaderboardShown),
+            new ButtonBuilder()
+              .setCustomId("comp")
+              .setLabel("completion time")
+              .setStyle(ButtonStyle.Secondary)
+              .setDisabled(disabled || !amountLeaderboardShown),
+          ),
+        ]),
 
     ...(data.pages.size <= 1
       ? []

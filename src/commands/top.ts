@@ -216,23 +216,40 @@ cmd.slashData
           .setRequired(false),
       ),
   )
-  .addSubcommand((museum) =>
+  .addSubcommandGroup((museum) =>
     museum
       .setName("museum")
-      .setDescription("view the leaderboard(s) for an item in the museum")
-      .addStringOption((option) =>
-        option
-          .setName("museum-item")
-          .setDescription("the item you want to view")
-          .setAutocomplete(true)
-          .setRequired(true),
+      .setDescription("view museum leaderboards")
+      .addSubcommand((item) =>
+        item
+          .setName("item")
+          .setDescription("view the museum leaderboard(s) for an item")
+          .addStringOption((option) =>
+            option
+              .setName("museum-item")
+              .setDescription("the item you want to view")
+              .setAutocomplete(true)
+              .setRequired(true),
+          )
+          .addStringOption((option) =>
+            option
+              .setName("scope")
+              .setDescription("show global/server")
+              .setChoices(...scopeChoices)
+              .setRequired(false),
+          ),
       )
-      .addStringOption((option) =>
-        option
-          .setName("scope")
-          .setDescription("show global/server")
-          .setChoices(...scopeChoices)
-          .setRequired(false),
+      .addSubcommand((completion) =>
+        completion
+          .setName("completion")
+          .setDescription("view the museum completion leaderboard")
+          .addStringOption((option) =>
+            option
+              .setName("scope")
+              .setDescription("show global/server")
+              .setChoices(...scopeChoices)
+              .setRequired(false),
+          ),
       ),
   );
 
@@ -625,7 +642,8 @@ async function run(
 
     return show(data.pages, data.pos, title, url);
   } else if (args[0].toLowerCase() == "museum") {
-    if (args.length == 1) return send({ embeds: [new ErrorEmbed(`/top museum <item>`)] });
+    if (args.length == 1)
+      return send({ embeds: [new ErrorEmbed(`/top museum <completion|item>`)] });
     return showMuseumLeaderboard(message, send, args);
   } else {
     const selected =
