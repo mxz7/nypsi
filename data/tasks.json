@@ -393,5 +393,19 @@
     "target": [1],
     "prizes": ["id:basic_crate:1", "xp:1000", "id:basic_crate:2"],
     "type": "daily"
+  },
+  "museum_weekly": {
+    "id": "museum_weekly",
+    "name": "artifact discoverer",
+    "description": "donate items to your museum",
+    "target": [75, 100, 150],
+    "prizes": [
+      "id:lucky_scratch_card:2",
+      "xp:1500",
+      "karma:250",
+      "id:basic_crate:5",
+      "id:basic_crate:5"
+    ],
+    "type": "weekly"
   }
 }
