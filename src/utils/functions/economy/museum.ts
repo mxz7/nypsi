@@ -16,6 +16,7 @@ import { Item } from "../../../types/Economy";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { getUserId, MemberResolvable } from "../member";
+import { addInlineNotification } from "../users/notifications";
 import { addProgress } from "./achievements";
 import { selectItem } from "./inventory";
 import {
@@ -368,6 +369,13 @@ export async function addToMuseum(member: MemberResolvable, itemId: string, amou
     });
     await redis.del(`${Constants.redis.cache.economy.MUSEUM_COMPLETION_PLACEMENTS}:${userId}`);
     addProgress(member, "artifact_discoverer", 1);
+    addInlineNotification({
+      memberId: userId,
+      embed: new CustomEmbed(
+        userId,
+        `you have completed the ${item.emoji} **${item.name}** museum item!!`,
+      ),
+    });
   }
 
   await redis.del(
