@@ -16,6 +16,7 @@ import {
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { min } from "mathjs";
+import prisma from "../../../init/database";
 import { NypsiClient } from "../../../models/Client";
 import { NypsiCommandInteraction, NypsiMessage, SendMessage } from "../../../models/Command";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
@@ -67,12 +68,18 @@ export async function runItemInfo(
   const tabs: { [tab: string]: ItemMessageData } = {};
   const metaTabs: StringSelectMenuOptionBuilder[] = [];
 
-  const [total, inMarket, value, sellMulti, inventory] = await Promise.all([
+  const [total, inMarket, value, sellMulti, inventory, inMuseum] = await Promise.all([
     getTotalAmountOfItem(selected.id),
     countItemOnMarket(selected.id, "sell"),
     calcItemValue(selected.id),
     getSellMulti(message.author, message.client as NypsiClient),
     getInventory(message.member),
+    prisma.museumDonation
+      .aggregate({
+        where: { itemId: selected.id },
+        _sum: { amount: true },
+      })
+      .then((i) => Number(i._sum.amount)),
   ]);
 
   // =====vvvvv===== MESSAGE DATA =====vvvvv=====
@@ -83,6 +90,7 @@ export async function runItemInfo(
     message.member,
     total,
     inMarket,
+    inMuseum,
     value,
     sellMulti.multi,
   );
@@ -312,6 +320,7 @@ function getGeneralMessage(
   member: ItemMessageMember,
   total: number,
   inMarket: number,
+  inMuseum: number,
   value: number,
   sellMulti: number,
 ): ItemMessageData {
@@ -349,6 +358,10 @@ function getGeneralMessage(
   }
 
   if (selected.account_locked) {
+    if (inMuseum) {
+      description.push(`**in museum** ${inMuseum.toLocaleString()}\n`);
+    }
+
     description.push("**account locked**");
   } else {
     description.push(
@@ -361,6 +374,10 @@ function getGeneralMessage(
 
     if (inMarket) {
       description.push(`**in market** ${inMarket.toLocaleString()}`);
+    }
+
+    if (inMuseum) {
+      description.push(`**in museum** ${inMuseum.toLocaleString()}`);
     }
 
     if (

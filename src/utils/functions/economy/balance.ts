@@ -867,6 +867,55 @@ export async function calcNetWorth(
     }
   }
 
+  const museumItems = await prisma.museumDonation.groupBy({
+    by: ["itemId"],
+    where: {
+      userId,
+      createdAt: {
+        gte: Constants.SEASON_START,
+      },
+    },
+    _sum: {
+      amount: true,
+    },
+  });
+
+  let museumBreakdown = 0;
+
+  for (const donation of museumItems) {
+    if (
+      donation.itemId === "cookie" ||
+      ["prey", "fish", "sellable", "ore"].includes(getItems()[donation.itemId].role)
+    ) {
+      museumBreakdown += getItems()[donation.itemId].sell * Number(donation._sum.amount);
+    } else if (getItems()[donation.itemId].buy && getItems()[donation.itemId].sell) {
+      museumBreakdown += getItems()[donation.itemId].sell * Number(donation._sum.amount);
+    } else {
+      const [marketAvg, offerAvg] = await Promise.all([
+        getMarketAverage(donation.itemId),
+        getOffersAverage(donation.itemId),
+      ]);
+
+      if (marketAvg && offerAvg) {
+        const value = (await calcItemValue(donation.itemId)) || 0;
+        museumBreakdown += Math.floor(value * Number(donation._sum.amount));
+      } else if (offerAvg) {
+        museumBreakdown += offerAvg * Number(donation._sum.amount);
+      } else if (marketAvg) {
+        museumBreakdown += marketAvg * Number(donation._sum.amount);
+      } else if (getItems()[donation.itemId].sell) {
+        museumBreakdown += getItems()[donation.itemId].sell * Number(donation._sum.amount);
+      } else {
+        museumBreakdown += 1000 * Number(donation._sum.amount);
+      }
+    }
+  }
+
+  museumBreakdown *= 0.25;
+
+  if (breakdown) breakdownItems.set("museum", museumBreakdown);
+  worth += museumBreakdown;
+
   let garageBreakdown = 0;
 
   for (let i = 0; i < query.CustomCar.length; i++) {

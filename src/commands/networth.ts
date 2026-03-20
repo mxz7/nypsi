@@ -87,6 +87,7 @@ async function run(
   const netLines: Record<string, { symbol: string; desc: string }> = {
     balance: { symbol: "💰", desc: "balance, bank, offers, and market offers" },
     guild: { symbol: "👥", desc: "guild worth" },
+    museum: { symbol: "🏛️", desc: "**25%** of the value of museum donations made this season" },
     workers: { symbol: "👷🏻‍♂️", desc: "worker cost, upgrades, and stored items" },
     bakery: { symbol: getItems()["furnace"].emoji, desc: "bakery upgrades" },
     garage: { symbol: "🔧", desc: "cars and car upgrades" },

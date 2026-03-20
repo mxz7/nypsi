@@ -14,6 +14,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { Item } from "../types/Economy.js";
 import { getGuildByUser } from "../utils/functions/economy/guilds";
 import { selectItem } from "../utils/functions/economy/inventory";
+import { showMuseumLeaderboard } from "../utils/functions/economy/museum";
 import {
   topBalance,
   topChatReaction,
@@ -214,6 +215,25 @@ cmd.slashData
           .setChoices(...scopeChoices)
           .setRequired(false),
       ),
+  )
+  .addSubcommand((museum) =>
+    museum
+      .setName("museum")
+      .setDescription("view the leaderboard(s) for an item in the museum")
+      .addStringOption((option) =>
+        option
+          .setName("museum-item")
+          .setDescription("the item you want to view")
+          .setAutocomplete(true)
+          .setRequired(true),
+      )
+      .addStringOption((option) =>
+        option
+          .setName("scope")
+          .setDescription("show global/server")
+          .setChoices(...scopeChoices)
+          .setRequired(false),
+      ),
   );
 
 async function run(
@@ -354,6 +374,8 @@ async function run(
 
     if (item.id === "lottery_ticket")
       return send({ embeds: [new ErrorEmbed("leaderboards for this item are unavailable")] });
+
+    if (item.id == "gold_star") return showMuseumLeaderboard(message, send, args);
 
     let global = false;
 
@@ -602,6 +624,9 @@ async function run(
     }
 
     return show(data.pages, data.pos, title, url);
+  } else if (args[0].toLowerCase() == "museum") {
+    if (args.length == 1) return send({ embeds: [new ErrorEmbed(`/top museum <item>`)] });
+    return showMuseumLeaderboard(message, send, args);
   } else {
     const selected =
       selectItem(args.join(" ").toLowerCase()) ||
@@ -617,6 +642,9 @@ async function run(
 
     if (selected.id === "lottery_ticket")
       return send({ embeds: [new ErrorEmbed("leaderboards for this item are unavailable")] });
+
+    if (selected.id == "gold_star")
+      return showMuseumLeaderboard(message, send, ["museum", ...args]);
 
     let global = false;
 

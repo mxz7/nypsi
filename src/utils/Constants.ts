@@ -124,6 +124,7 @@ const adminPermissionLevels = {
     "add-purchase",
     "set-streak",
     "run-streak",
+    "update-museum",
   ] as const,
   "5": ["set-premium", "streakpause", "spawn-lootdrop"] as const,
   "69": [
@@ -253,6 +254,9 @@ export default {
         GUILD_USER: "cache:economy:guild:user",
         GUILD_UPGRADES: "cache:economy:guild:upgrades",
         INVENTORY: "cache:economy:inventory",
+        MUSEUM: "cache:economy:museum",
+        MUSEUM_COMPLETION_PLACEMENTS: "cache:economy:museum:placement:completion",
+        MUSEUM_LEADERBOARD_PLACEMENTS: "cache:economy:museum:placement:leaderboard",
         NETWORTH: "cache:economy:networth",
         PADLOCK: "cache:economy:padlock",
         PASSIVE: "cache:economy:passive",

@@ -2048,6 +2048,327 @@ export async function topVoteStreakGlobal(member?: MemberResolvable, amount = 10
   return { pages, pos };
 }
 
+export async function topMuseumCompletion(guild: Guild, item: string, member: MemberResolvable) {
+  const members = await getAllMembers(guild);
+
+  const query = await prisma.museum.findMany({
+    where: {
+      AND: [
+        { userId: { in: members } },
+        { itemId: item },
+        { completedAt: { not: null } },
+        { economy: { user: { blacklisted: false } } },
+      ],
+    },
+    select: {
+      userId: true,
+      completedAt: true,
+      economy: {
+        select: {
+          banned: true,
+          user: {
+            select: {
+              lastKnownUsername: true,
+              usernameUpdatedAt: true,
+            },
+          },
+        },
+      },
+    },
+    orderBy: [{ completedAt: "asc" }, { economy: { user: { lastKnownUsername: "asc" } } }],
+  });
+
+  const out: string[] = [];
+  let count = 0;
+  const userIds = query.map((i) => i.userId);
+  const promises: (() => Promise<void>)[] = [];
+  const date = dayjs();
+
+  for (const user of query) {
+    if (user.economy.banned && date.isBefore(user.economy.banned)) {
+      userIds.splice(userIds.indexOf(user.userId), 1);
+      continue;
+    }
+
+    const currentCount = count;
+    let pos = (count + 1).toString();
+
+    if (pos == "1") {
+      pos = "🥇";
+    } else if (pos == "2") {
+      pos = "🥈";
+    } else if (pos == "3") {
+      pos = "🥉";
+    } else {
+      pos += ".";
+    }
+
+    count++;
+
+    promises.push(async () => {
+      let username = user.economy.user.lastKnownUsername;
+
+      if (user.economy.user.usernameUpdatedAt.getTime() < date.valueOf() - WEEK_MS) {
+        const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
+
+        if (discordUser) {
+          username = discordUser.username;
+          await updateLastKnownUsername(user.userId, username);
+        }
+      }
+
+      out[currentCount] = `${pos} ${await formatUsername(
+        user.userId,
+        username,
+        true,
+      )} <t:${Math.floor(new Date(user.completedAt).getTime() / 1000)}:f>`;
+    });
+  }
+
+  await pAll(promises, { concurrency: 10 });
+
+  const pages = PageManager.createPages(out);
+
+  let pos = 0;
+
+  if (member) {
+    pos = userIds.indexOf(getUserId(member)) + 1;
+  }
+
+  return { pages, pos };
+}
+
+export async function topMuseumCompletionGlobal(
+  item: string,
+  member?: MemberResolvable,
+  amount = 100,
+) {
+  const query = await prisma.museum.findMany({
+    where: {
+      AND: [{ itemId: item }, { completedAt: { not: null } }],
+    },
+    select: {
+      userId: true,
+      completedAt: true,
+      economy: {
+        select: {
+          user: {
+            select: {
+              lastKnownUsername: true,
+            },
+          },
+          banned: true,
+        },
+      },
+    },
+    orderBy: [{ completedAt: "asc" }, { economy: { user: { lastKnownUsername: "asc" } } }],
+    take: amount,
+  });
+
+  const out = [];
+
+  let count = 0;
+
+  const userIds = query.map((i) => i.userId);
+
+  for (const user of query) {
+    if (user.economy.banned && dayjs().isBefore(user.economy.banned)) {
+      userIds.splice(userIds.indexOf(user.userId), 1);
+      continue;
+    }
+
+    let pos = (count + 1).toString();
+
+    if (pos == "1") {
+      pos = "🥇";
+    } else if (pos == "2") {
+      pos = "🥈";
+    } else if (pos == "3") {
+      pos = "🥉";
+    } else {
+      pos += ".";
+    }
+
+    out[count] = `${pos} ${await formatUsername(
+      user.userId,
+      user.economy.user.lastKnownUsername,
+      (await getPreferences(user.userId)).leaderboards,
+    )} <t:${Math.floor(new Date(user.completedAt).getTime() / 1000)}:f>`;
+
+    count++;
+  }
+
+  const pages = PageManager.createPages(out);
+
+  let pos = 0;
+
+  if (member) {
+    pos = userIds.indexOf(getUserId(member)) + 1;
+  }
+
+  checkLeaderboardPositions(userIds, `museum-completion-item-${item}`);
+
+  return { pages, pos };
+}
+
+export async function topMuseumAmount(guild: Guild, item: string, member: MemberResolvable) {
+  const members = await getAllMembers(guild);
+
+  const query = await prisma.museum.findMany({
+    where: {
+      AND: [
+        { userId: { in: members } },
+        { itemId: item },
+        { economy: { user: { blacklisted: false } } },
+      ],
+    },
+    select: {
+      userId: true,
+      amount: true,
+      economy: {
+        select: {
+          banned: true,
+          user: {
+            select: {
+              lastKnownUsername: true,
+              usernameUpdatedAt: true,
+            },
+          },
+        },
+      },
+    },
+    orderBy: [{ amount: "desc" }, { economy: { user: { lastKnownUsername: "asc" } } }],
+  });
+
+  const out: string[] = [];
+  let count = 0;
+  const userIds = query.map((i) => i.userId);
+  const promises: (() => Promise<void>)[] = [];
+  const date = dayjs();
+
+  for (const user of query) {
+    if (user.economy.banned && date.isBefore(user.economy.banned)) {
+      userIds.splice(userIds.indexOf(user.userId), 1);
+      continue;
+    }
+
+    const currentCount = count;
+    let pos = (count + 1).toString();
+
+    if (pos == "1") {
+      pos = "🥇";
+    } else if (pos == "2") {
+      pos = "🥈";
+    } else if (pos == "3") {
+      pos = "🥉";
+    } else {
+      pos += ".";
+    }
+
+    count++;
+
+    promises.push(async () => {
+      let username = user.economy.user.lastKnownUsername;
+
+      if (user.economy.user.usernameUpdatedAt.getTime() < date.valueOf() - WEEK_MS) {
+        const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
+
+        if (discordUser) {
+          username = discordUser.username;
+          await updateLastKnownUsername(user.userId, username);
+        }
+      }
+
+      out[currentCount] = `${pos} ${await formatUsername(
+        user.userId,
+        username,
+        true,
+      )} ${user.amount.toLocaleString()} ${pluralize(getItems()[item], user.amount)}`;
+    });
+  }
+
+  await pAll(promises, { concurrency: 10 });
+
+  const pages = PageManager.createPages(out);
+
+  let pos = 0;
+
+  if (member) {
+    pos = userIds.indexOf(getUserId(member)) + 1;
+  }
+
+  return { pages, pos };
+}
+
+export async function topMuseumAmountGlobal(item: string, member?: MemberResolvable, amount = 100) {
+  const query = await prisma.museum.findMany({
+    where: {
+      itemId: item,
+    },
+    select: {
+      userId: true,
+      amount: true,
+      economy: {
+        select: {
+          user: {
+            select: {
+              lastKnownUsername: true,
+            },
+          },
+          banned: true,
+        },
+      },
+    },
+    orderBy: [{ amount: "desc" }, { economy: { user: { lastKnownUsername: "asc" } } }],
+    take: amount,
+  });
+
+  const out = [];
+
+  let count = 0;
+
+  const userIds = query.map((i) => i.userId);
+
+  for (const user of query) {
+    if (user.economy.banned && dayjs().isBefore(user.economy.banned)) {
+      userIds.splice(userIds.indexOf(user.userId), 1);
+      continue;
+    }
+
+    let pos = (count + 1).toString();
+
+    if (pos == "1") {
+      pos = "🥇";
+    } else if (pos == "2") {
+      pos = "🥈";
+    } else if (pos == "3") {
+      pos = "🥉";
+    } else {
+      pos += ".";
+    }
+
+    out[count] = `${pos} ${await formatUsername(
+      user.userId,
+      user.economy.user.lastKnownUsername,
+      (await getPreferences(user.userId)).leaderboards,
+    )} ${user.amount.toLocaleString()} ${pluralize(getItems()[item], user.amount)}`;
+
+    count++;
+  }
+
+  const pages = PageManager.createPages(out);
+
+  let pos = 0;
+
+  if (member) {
+    pos = userIds.indexOf(getUserId(member)) + 1;
+  }
+
+  checkLeaderboardPositions(userIds, `museum-amount-item-${item}`);
+
+  return { pages, pos };
+}
+
 export async function formatUsername(id: string, username: string, privacy: boolean) {
   if (!privacy)
     return "[**[hidden]**](https://nypsi.xyz/wiki/economy/user-settings/hidden?ref=bot-lb)";
