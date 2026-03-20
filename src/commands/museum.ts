@@ -209,8 +209,13 @@ async function run(
 
     for (const item of await museum.getFavoritedItems()) {
       desc.push(
-        `**${item.emoji} ${item.name}\n**` +
-          `donated **${museum.count(item).toLocaleString()}** (#**${(await museum.leaderboardPlacement(item)).toLocaleString()}**)`,
+        `**${item.emoji} ${item.name}**` +
+          (!item.museum.no_overflow || !museum.completed(item)
+            ? `\ndonated **${museum.count(item).toLocaleString()}** (#**${(await museum.leaderboardPlacement(item)).toLocaleString()}**)`
+            : "") +
+          (museum.completed(item)
+            ? `\ncompleted <t:${Math.floor(museum.completedAt(item).getTime() / 1000)}:f> (#**${(await museum.completedPlacement(item)).toLocaleString()}**)`
+            : ""),
       );
     }
 
@@ -334,8 +339,13 @@ async function run(
           .addTextDisplayComponents(
             new TextDisplayBuilder().setContent(
               featuredItems[i]
-                ? `**${featuredItems[i].emoji} ${featuredItems[i].name}\n**` +
-                    `donated **${museum.count(featuredItems[i]).toLocaleString()}** (#**${(await museum.leaderboardPlacement(featuredItems[i])).toLocaleString()}**)`
+                ? `**${featuredItems[i].emoji} ${featuredItems[i].name}**` +
+                    (!featuredItems[i].museum.no_overflow || !museum.completed(featuredItems[i])
+                      ? `\ndonated **${museum.count(featuredItems[i]).toLocaleString()}** (#**${(await museum.leaderboardPlacement(featuredItems[i])).toLocaleString()}**)`
+                      : "") +
+                    (museum.completed(featuredItems[i])
+                      ? `\ncompleted <t:${Math.floor(museum.completedAt(featuredItems[i]).getTime() / 1000)}:f> (#**${(await museum.completedPlacement(featuredItems[i])).toLocaleString()}**)`
+                      : "")
                 : `no item selected`,
             ),
           )
