@@ -3692,10 +3692,6 @@
     "rarity": 4,
     "role": "seed",
     "plantId": "apple_tree",
-    "museum": {
-      "category": "sellables",
-      "threshold": 100
-    },
     "buy": 0,
     "sell": 50000,
     "in_crates": true,
