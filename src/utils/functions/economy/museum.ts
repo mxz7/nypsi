@@ -503,7 +503,7 @@ export async function showMuseumLeaderboard(
   };
 
   const rows = (disabled = false) => [
-    ...(selected.museum.no_overflow || selected.account_locked
+    ...(selected.museum.no_overflow
       ? []
       : [
           new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
