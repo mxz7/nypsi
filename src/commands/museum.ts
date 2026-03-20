@@ -760,7 +760,6 @@ async function run(
     }
 
     const item = selectItem(args[0]);
-
     if (item && item.museum) {
       const index = sortedItems
         .filter((i) => i.museum?.category == item.museum.category)
@@ -769,6 +768,12 @@ async function run(
       const page = Math.floor(index / itemsPerPage) + 1;
 
       return categoryView(item.museum.category, page);
+    }
+
+    const target = await getMember(message.guild, args.join(" "));
+    if (target) {
+      if (!(await userExists(target))) await createUser(target);
+      return homeView(target);
     }
 
     return send({
