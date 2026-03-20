@@ -1652,8 +1652,8 @@
     "id": "artifact_discoverer_v",
     "name": "artifact discoverer **V**",
     "emoji": "🏛",
-    "target": 125,
-    "description": "complete 125 donations in the museum",
+    "target": 150,
+    "description": "complete 150 donations in the museum",
     "prize": [
       "legendary_scratch_card:2",
       "lucky_scratch_card:5",
