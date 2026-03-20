@@ -441,22 +441,19 @@ export async function showMuseumLeaderboard(
   };
 
   const rows = (disabled = false) => [
-    ...(selected.museum.no_overflow || selected.account_locked
-      ? []
-      : [
-          new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-            new ButtonBuilder()
-              .setCustomId("amount")
-              .setLabel("amount")
-              .setStyle(ButtonStyle.Secondary)
-              .setDisabled(disabled || amountLeaderboardShown),
-            new ButtonBuilder()
-              .setCustomId("comp")
-              .setLabel("completion time")
-              .setStyle(ButtonStyle.Secondary)
-              .setDisabled(disabled || !amountLeaderboardShown),
-          ),
-        ]),
+    new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId("amount")
+        .setLabel("amount")
+        .setStyle(ButtonStyle.Secondary)
+        .setDisabled(disabled || amountLeaderboardShown),
+      new ButtonBuilder()
+        .setCustomId("comp")
+        .setLabel("completion time")
+        .setStyle(ButtonStyle.Secondary)
+        .setDisabled(disabled || !amountLeaderboardShown),
+    ),
+
     ...(data.pages.size <= 1
       ? []
       : [
