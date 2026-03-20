@@ -39,7 +39,9 @@ import { default as PageManager } from "../utils/functions/page";
 import { pluralize } from "../utils/functions/string";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("museum", "view your museum progress", "money").setAliases(["collect"]);
+const cmd = new Command("museum", "view your museum progress", "money")
+  .setAliases(["collect"])
+  .setDocs("https://nypsi.xyz/wiki/economy/items/museum");
 
 cmd.slashEnabled = true;
 cmd.slashData
