@@ -14,12 +14,10 @@ import { getTier } from "../premium/premium";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getBoosters } from "./boosters";
 import { calcCarCost } from "./cars";
-import { getClaimable, getFarm, getFarmUpgrades } from "./farm";
+import { getClaimable } from "./farm";
 import { getGuildUpgradesByUser } from "./guilds";
 import { calcItemValue, gemBreak, getInventory } from "./inventory";
 import { doLevelUp, getRawLevel, getUpgrades } from "./levelling";
-import { getMarketAverage } from "./market";
-import { getOffersAverage } from "./offers";
 import { isPassive } from "./passive";
 import {
   getBaseUpgrades,
@@ -759,6 +757,18 @@ export async function calcNetWorth(
           },
         },
       },
+      Farm: {
+        select: {
+          plantId: true,
+        },
+      },
+      FarmUpgrades: {
+        select: {
+          amount: true,
+          plantId: true,
+          upgradeId: true,
+        },
+      },
     },
   });
 
@@ -784,11 +794,13 @@ export async function calcNetWorth(
       : 0,
   );
 
-  for (const sellOrder of query.Market.filter((i) => i.orderType == "sell"))
+  for (const sellOrder of query.Market.filter((i) => i.orderType == "sell")) {
     worth += ((await calcItemValue(sellOrder.itemId)) || 0) * sellOrder.itemAmount;
+  }
 
-  for (const buyOrder of query.Market.filter((i) => i.orderType == "buy"))
+  for (const buyOrder of query.Market.filter((i) => i.orderType == "buy")) {
     worth += Number(buyOrder.price) * buyOrder.itemAmount;
+  }
 
   if (breakdown) breakdownItems.set("balance", worth);
 
@@ -806,65 +818,23 @@ export async function calcNetWorth(
   for (const upgrade of query.BakeryUpgrade) {
     const item = getItems()[upgrade.upgradeId];
 
-    let value = 0;
+    const value = (await calcItemValue(item.id)) || 0;
 
-    const marketAvg = await getMarketAverage(item.id);
-    const offersAvg = await getOffersAverage(item.id);
+    worth += Math.floor(value * upgrade.amount);
 
-    if (marketAvg && offersAvg) {
-      value += Math.floor(((await calcItemValue(item.id)) || 0) * upgrade.amount);
-    } else if (marketAvg) {
-      value += upgrade.amount * marketAvg;
-    } else if (offersAvg) {
-      value += upgrade.amount * offersAvg;
-    } else {
-      value = upgrade.amount * (item.sell || 1000);
-    }
-
-    worth += value;
     if (breakdown) {
-      breakdownItems.set("bakery", value + (breakdownItems.get("bakery") ?? 0));
+      breakdownItems.set(
+        "bakery",
+        Math.floor(value * upgrade.amount) + (breakdownItems.get("bakery") ?? 0),
+      );
     }
   }
 
   for (const item of query.Inventory) {
-    if (
-      item.item === "cookie" ||
-      ["prey", "fish", "sellable", "ore"].includes(getItems()[item.item].role)
-    ) {
-      worth += getItems()[item.item].sell * Number(item.amount);
-      if (breakdown)
-        breakdownItems.set(item.item, getItems()[item.item].sell * Number(item.amount));
-    } else if (getItems()[item.item].buy && getItems()[item.item].sell) {
-      worth += getItems()[item.item].sell * Number(item.amount);
-      if (breakdown)
-        breakdownItems.set(item.item, getItems()[item.item].sell * Number(item.amount));
-    } else {
-      const [marketAvg, offerAvg] = await Promise.all([
-        getMarketAverage(item.item),
-        getOffersAverage(item.item),
-      ]);
+    const value = (await calcItemValue(item.item)) || 1000;
 
-      if (marketAvg && offerAvg) {
-        const value = (await calcItemValue(item.item)) || 0;
-
-        worth += Math.floor(value * Number(item.amount));
-        if (breakdown) breakdownItems.set(item.item, value * Number(item.amount));
-      } else if (offerAvg) {
-        worth += offerAvg * Number(item.amount);
-        if (breakdown) breakdownItems.set(item.item, offerAvg * Number(item.amount));
-      } else if (marketAvg) {
-        worth += marketAvg * Number(item.amount);
-        if (breakdown) breakdownItems.set(item.item, marketAvg * Number(item.amount));
-      } else if (getItems()[item.item].sell) {
-        worth += getItems()[item.item].sell * Number(item.amount);
-        if (breakdown)
-          breakdownItems.set(item.item, getItems()[item.item].sell * Number(item.amount));
-      } else {
-        worth += 1000 * Number(item.amount);
-        if (breakdown) breakdownItems.set(item.item, 1000 * Number(item.amount));
-      }
-    }
+    worth += Math.floor(value * Number(item.amount));
+    if (breakdown) breakdownItems.set(item.item, value * Number(item.amount));
   }
 
   const museumItems = await prisma.museumDonation.groupBy({
@@ -883,34 +853,12 @@ export async function calcNetWorth(
   let museumBreakdown = 0;
 
   for (const donation of museumItems) {
-    if (
-      donation.itemId === "cookie" ||
-      ["prey", "fish", "sellable", "ore"].includes(getItems()[donation.itemId].role)
-    ) {
-      museumBreakdown += getItems()[donation.itemId].sell * Number(donation._sum.amount);
-    } else if (getItems()[donation.itemId].buy && getItems()[donation.itemId].sell) {
-      museumBreakdown += getItems()[donation.itemId].sell * Number(donation._sum.amount);
-    } else {
-      const [marketAvg, offerAvg] = await Promise.all([
-        getMarketAverage(donation.itemId),
-        getOffersAverage(donation.itemId),
-      ]);
+    const value = (await calcItemValue(donation.itemId)) || 0;
 
-      if (marketAvg && offerAvg) {
-        const value = (await calcItemValue(donation.itemId)) || 0;
-        museumBreakdown += Math.floor(value * Number(donation._sum.amount));
-      } else if (offerAvg) {
-        museumBreakdown += offerAvg * Number(donation._sum.amount);
-      } else if (marketAvg) {
-        museumBreakdown += marketAvg * Number(donation._sum.amount);
-      } else if (getItems()[donation.itemId].sell) {
-        museumBreakdown += getItems()[donation.itemId].sell * Number(donation._sum.amount);
-      } else {
-        museumBreakdown += 1000 * Number(donation._sum.amount);
-      }
-    }
+    museumBreakdown += Math.floor(value * Number(donation._sum.amount));
   }
 
+  // museum net is only 25% of items donated this season
   museumBreakdown *= 0.25;
 
   if (breakdown) breakdownItems.set("museum", museumBreakdown);
@@ -947,23 +895,10 @@ export async function calcNetWorth(
         );
         if (!itemId) continue;
 
-        const [marketAvg, offersAvg] = await Promise.all([
-          getMarketAverage(itemId),
-          getOffersAverage(itemId),
-        ]);
+        const value = Math.floor(((await calcItemValue(itemId)) || 0) * upgrade.amount);
 
-        if (marketAvg && offersAvg) {
-          worth += Math.floor(((await calcItemValue(itemId)) || 0) * upgrade.amount);
-          workersBreakdown += Math.floor(((await calcItemValue(itemId)) || 0) * upgrade.amount);
-        } else if (marketAvg) {
-          worth += upgrade.amount * marketAvg;
-          workersBreakdown += upgrade.amount * marketAvg;
-        } else if (offersAvg) {
-          worth += upgrade.amount * offersAvg;
-          workersBreakdown += upgrade.amount * offersAvg;
-        } else {
-          worth += 100_000;
-        }
+        worth += value;
+        workersBreakdown += value;
       } else {
         let totalCost = 0;
 
@@ -998,17 +933,16 @@ export async function calcNetWorth(
 
   let farmBreakdown = 0;
 
-  const farms = await getFarm(userId);
-
   const typesChecked: string[] = [];
 
-  for (const farm of farms) {
+  for (const farm of query.Farm) {
     if (typesChecked.includes(farm.plantId)) continue;
 
     const seed = Object.keys(getItems()).find((i) => getItems()[i].plantId === farm.plantId);
 
     const seedValue =
-      farms.filter((i) => i.plantId === farm.plantId).length * ((await calcItemValue(seed)) || 0);
+      query.Farm.filter((i) => i.plantId === farm.plantId).length *
+      ((await calcItemValue(seed)) || 0);
     const harvestValue =
       (await getClaimable(userId, farm.plantId, false)).items *
       ((await calcItemValue(getPlantsData()[farm.plantId].item)) || 0);
@@ -1017,9 +951,7 @@ export async function calcNetWorth(
 
     const upgrades = getPlantUpgrades();
 
-    for (const userUpgrade of (await getFarmUpgrades(userId)).filter(
-      (u) => u.plantId == farm.plantId,
-    )) {
+    for (const userUpgrade of query.FarmUpgrades.filter((u) => u.plantId == farm.plantId)) {
       const upgrade =
         upgrades[Object.keys(upgrades).find((u) => upgrades[u].id == userUpgrade.upgradeId)];
 
@@ -1061,11 +993,12 @@ export async function calcNetWorth(
   });
 
   setImmediate(async () => {
-    if (query.netWorth && (await getDmSettings(userId)).netWorth > 0) {
+    const dmSettings = await getDmSettings(userId);
+
+    if (query.netWorth && dmSettings.netWorth > 0) {
       const payload: NotificationPayload = {
         memberId: userId,
         payload: {
-          content: "",
           embed: new CustomEmbed(
             userId,
             `$${Number(query.netWorth).toLocaleString()} ➔ $${Math.floor(worth).toLocaleString()}`,
@@ -1073,14 +1006,11 @@ export async function calcNetWorth(
         },
       };
 
-      if (Number(query.netWorth) < Math.floor(worth) - (await getDmSettings(userId)).netWorth) {
+      if (Number(query.netWorth) < Math.floor(worth) - dmSettings.netWorth) {
         payload.payload.content = `your net worth has increased by $${(
           Math.floor(worth) - Number(query.netWorth)
         ).toLocaleString()}`;
-      } else if (
-        Number(query.netWorth) >
-        Math.floor(worth) + (await getDmSettings(userId)).netWorth
-      ) {
+      } else if (Number(query.netWorth) > Math.floor(worth) + dmSettings.netWorth) {
         payload.payload.content = `your net worth has decreased by $${(
           Number(query.netWorth) - Math.floor(worth)
         ).toLocaleString()}`;
