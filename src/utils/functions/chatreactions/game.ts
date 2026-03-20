@@ -1,5 +1,6 @@
 import { Guild, GuildMember, Message, TextChannel, User } from "discord.js";
 import { inPlaceSort } from "fast-sort";
+import prisma from "../../../init/database";
 import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed, getColor } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
@@ -15,7 +16,6 @@ import {
 } from "../economy/events";
 import { createGame } from "../economy/stats";
 import { addTaskProgress } from "../economy/tasks";
-import { topChatReactionGlobal } from "../economy/top";
 import { isPremium } from "../premium/premium";
 import sleep from "../sleep";
 import { getZeroWidth, pluralize } from "../string";
@@ -173,11 +173,11 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel, 
       }));
 
       if (update.global) {
-        const pos = await topChatReactionGlobal(message.author.id, false, 5000, true);
+        const pos = await getLeaderboardPosition(message.author.id).catch(() => -1);
 
         const embed = new CustomEmbed(message.member);
         embed.setDescription(
-          `you've set a new **personal best** ${pos > -1 ? ` (#${(pos + 1).toLocaleString()})` : ""}`,
+          `you've set a new **personal best** ${pos > -1 ? ` (#${pos.toLocaleString()})` : ""}`,
         );
 
         setTimeout(() => {
@@ -452,4 +452,19 @@ export async function startChatReactionDuel(
       }, 750);
     });
   });
+}
+
+async function getLeaderboardPosition(userId: string) {
+  const position = await prisma.$queryRaw<{ position: bigint }[]>`
+  SELECT position FROM (
+    SELECT 
+      "userId",
+      ROW_NUMBER() OVER (ORDER BY time ASC) AS position
+    FROM "ChatReactionLeaderboards"
+    WHERE daily = ${false}
+  ) ranked
+  WHERE "userId" = ${userId}
+`;
+
+  return position[0]?.position ? Number(position[0].position) : null;
 }
