@@ -498,21 +498,25 @@ async function run(
     for (const item of itemsInCategory) {
       if (museum.completed(item)) completed++;
 
-      desc.push(
-        `- **${item.emoji} ${item.name}**\n` +
-          `  - donated **${museum.count(item).toLocaleString()}**${
-            museum.completed(item) && !item.account_locked
-              ? ` - first donated <t:${Math.floor(museum.completedAt(item).getTime() / 1000)}:R> (#**${(await museum.completedPlacement(item)).toLocaleString()}**)`
-              : ""
-          }\n` +
-          `${
-            !museum.completed(item)
-              ? `  - **${(item.museum.threshold - museum.count(item)).toLocaleString()}** more to complete`
-              : item.museum.no_overflow
-                ? `  - quantity maxed!`
-                : `  - #**${(await museum.leaderboardPlacement(item)).toLocaleString()}** on leaderboard`
-          }`,
-      );
+      const lines = [
+        `- **${item.emoji} ${item.name}**`,
+
+        `  - donated **${museum.count(item).toLocaleString()}${item.museum.no_overflow ? `/${item.museum.threshold}` : ""}**${
+          museum.completed(item) && !item.account_locked
+            ? ` - first donated <t:${Math.floor(museum.completedAt(item).getTime() / 1000)}:R> (#**${(await museum.completedPlacement(item)).toLocaleString()}**)`
+            : ""
+        }`,
+
+        `${
+          !museum.completed(item)
+            ? `  - **${(item.museum.threshold - museum.count(item)).toLocaleString()}** more to complete`
+            : item.museum.no_overflow
+              ? `  - completed!`
+              : `  - #**${(await museum.leaderboardPlacement(item)).toLocaleString()}** on leaderboard`
+        }`,
+      ];
+
+      desc.push(lines.join("\n"));
     }
 
     const pages = PageManager.createPages(desc, itemsPerPage);
