@@ -491,7 +491,11 @@ async function run(
 
     const desc: string[] = [];
 
+    let completed = 0;
+
     for (const item of itemsInCategory) {
+      if (museum.completed(item)) completed++;
+
       desc.push(
         `- **${item.emoji} ${item.name}**\n` +
           `  - donated **${museum.count(item).toLocaleString()}**${
@@ -515,7 +519,7 @@ async function run(
       const builder = new CustomContainer()
         .addTextDisplayComponents(
           new TextDisplayBuilder().setContent(
-            `### ${message.member.user.username}'s museum\n**${category}**`,
+            `### ${message.member.user.username}'s museum\n**${category}${completed === itemsInCategory.length ? "(completed)" : ""}**`,
           ),
         )
         .addSeparatorComponents((separator) => separator)
