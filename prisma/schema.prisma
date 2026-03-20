@@ -381,12 +381,12 @@ model Inventory {
 model Museum {
   userId String
 
-  itemId        String
-  amount        BigInt
-  completedAt   DateTime?
-  favorited     Int?
+  itemId      String
+  amount      BigInt
+  completedAt DateTime?
+  favorited   Int?      @db.SmallInt
 
-  breakdown     MuseumDonation[]
+  breakdown MuseumDonation[]
 
   economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
@@ -394,11 +394,11 @@ model Museum {
 }
 
 model MuseumDonation {
-  id          Int      @id @default(autoincrement())
-  userId      String
-  itemId      String
-  amount      BigInt
-  createdAt   DateTime @default(now())
+  id        Int      @id @default(autoincrement())
+  userId    String
+  itemId    String
+  amount    BigInt
+  createdAt DateTime @default(now())
 
   museum Museum @relation(fields: [userId, itemId], references: [userId, itemId], onDelete: Cascade)
 

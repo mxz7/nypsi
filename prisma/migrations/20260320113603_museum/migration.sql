@@ -4,7 +4,7 @@ CREATE TABLE "Museum" (
     "itemId" TEXT NOT NULL,
     "amount" BIGINT NOT NULL,
     "completedAt" TIMESTAMP(3),
-    "favorited" INTEGER,
+    "favorited" SMALLINT,
 
     CONSTRAINT "Museum_pkey" PRIMARY KEY ("userId","itemId")
 );
