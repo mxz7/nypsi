@@ -3778,6 +3778,9 @@ async function run(
         userId: true,
         amount: true,
       },
+      orderBy: {
+        amount: "desc",
+      },
     });
 
     let stars = 0;
