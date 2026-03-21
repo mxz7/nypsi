@@ -15,7 +15,7 @@ import { getAchievements, getItems, getTagsData } from "./utils";
 import pAll = require("p-all");
 import ms = require("ms");
 
-const WEEK_MS = ms("1 week");
+const UPDATE_USERNAME_MS = ms("3 weeks");
 
 export async function topBalance(guild: Guild, member?: MemberResolvable) {
   const members = await getAllMembers(guild);
@@ -68,7 +68,7 @@ export async function topBalance(guild: Guild, member?: MemberResolvable) {
     promises.push(async () => {
       let username = user.user.lastKnownUsername;
 
-      if (user.user.usernameUpdatedAt.getTime() < date.valueOf() - WEEK_MS) {
+      if (user.user.usernameUpdatedAt.getTime() < date.valueOf() - UPDATE_USERNAME_MS) {
         const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
 
         if (discordUser) {
@@ -281,7 +281,7 @@ export async function topNetWorth(guild: Guild, member?: MemberResolvable) {
       promises.push(async () => {
         let username = user.user.lastKnownUsername;
 
-        if (user.user.usernameUpdatedAt.getTime() < date.valueOf() - WEEK_MS) {
+        if (user.user.usernameUpdatedAt.getTime() < date.valueOf() - UPDATE_USERNAME_MS) {
           const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
 
           if (discordUser) {
@@ -370,7 +370,7 @@ export async function topPrestige(guild: Guild, member?: MemberResolvable) {
     promises.push(async () => {
       let username = user.user.lastKnownUsername;
 
-      if (user.user.usernameUpdatedAt.getTime() < date.valueOf() - WEEK_MS) {
+      if (user.user.usernameUpdatedAt.getTime() < date.valueOf() - UPDATE_USERNAME_MS) {
         const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
 
         if (discordUser) {
@@ -528,7 +528,7 @@ export async function topItem(guild: Guild, item: string, member: MemberResolvab
     promises.push(async () => {
       let username = user.economy.user.lastKnownUsername;
 
-      if (user.economy.user.usernameUpdatedAt.getTime() < date.valueOf() - WEEK_MS) {
+      if (user.economy.user.usernameUpdatedAt.getTime() < date.valueOf() - UPDATE_USERNAME_MS) {
         const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
 
         if (discordUser) {
@@ -679,7 +679,7 @@ export async function topCompletion(guild: Guild, member: MemberResolvable) {
 
       let username = usernameData.lastKnownUsername;
 
-      if (usernameData.usernameUpdatedAt.getTime() < date.valueOf() - WEEK_MS) {
+      if (usernameData.usernameUpdatedAt.getTime() < date.valueOf() - UPDATE_USERNAME_MS) {
         const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
 
         if (discordUser) {
@@ -797,7 +797,7 @@ export async function topDailyStreak(guild: Guild, member?: MemberResolvable) {
     promises.push(async () => {
       let username = user.user.lastKnownUsername;
 
-      if (user.user.usernameUpdatedAt.getTime() < date.valueOf() - WEEK_MS) {
+      if (user.user.usernameUpdatedAt.getTime() < date.valueOf() - UPDATE_USERNAME_MS) {
         const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
 
         if (discordUser) {
@@ -947,7 +947,7 @@ export async function topLottoWins(guild: Guild, member?: MemberResolvable) {
     promises.push(async () => {
       let username = user.user.lastKnownUsername;
 
-      if (user.user.usernameUpdatedAt.getTime() < date.valueOf() - WEEK_MS) {
+      if (user.user.usernameUpdatedAt.getTime() < date.valueOf() - UPDATE_USERNAME_MS) {
         const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
 
         if (discordUser) {
@@ -1085,7 +1085,7 @@ export async function topWordle(guild: Guild, member: MemberResolvable) {
 
       let username = usernameData.lastKnownUsername;
 
-      if (usernameData.usernameUpdatedAt.getTime() < date.valueOf() - WEEK_MS) {
+      if (usernameData.usernameUpdatedAt.getTime() < date.valueOf() - UPDATE_USERNAME_MS) {
         const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
 
         if (discordUser) {
@@ -1217,7 +1217,7 @@ export async function topWordleTime(guild: Guild, member: MemberResolvable) {
 
       let username = usernameData.lastKnownUsername;
 
-      if (usernameData.usernameUpdatedAt.getTime() < date.valueOf() - WEEK_MS) {
+      if (usernameData.usernameUpdatedAt.getTime() < date.valueOf() - UPDATE_USERNAME_MS) {
         const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
 
         if (discordUser) {
@@ -1348,7 +1348,7 @@ export async function topCommand(guild: Guild, command: string, member: MemberRe
     promises.push(async () => {
       let username = user.user.lastKnownUsername;
 
-      if (user.user.usernameUpdatedAt.getTime() < date.valueOf() - WEEK_MS) {
+      if (user.user.usernameUpdatedAt.getTime() < date.valueOf() - UPDATE_USERNAME_MS) {
         const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
 
         if (discordUser) {
@@ -1482,7 +1482,7 @@ export async function topCommandUses(guild: Guild, member: MemberResolvable) {
 
       let username = usernameData.lastKnownUsername;
 
-      if (usernameData.usernameUpdatedAt.getTime() < date.valueOf() - WEEK_MS) {
+      if (usernameData.usernameUpdatedAt.getTime() < date.valueOf() - UPDATE_USERNAME_MS) {
         const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
 
         if (discordUser) {
@@ -1623,7 +1623,7 @@ export async function topVote(guild: Guild, member?: MemberResolvable) {
     promises.push(async () => {
       let username = user.user.lastKnownUsername;
 
-      if (user.user.usernameUpdatedAt.getTime() < date.valueOf() - WEEK_MS) {
+      if (user.user.usernameUpdatedAt.getTime() < date.valueOf() - UPDATE_USERNAME_MS) {
         const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
 
         if (discordUser) {
@@ -1777,7 +1777,7 @@ export async function topChatReaction(guild: Guild, daily: boolean, member?: Mem
     promises.push(async () => {
       let username = user.user.lastKnownUsername;
 
-      if (user.user.usernameUpdatedAt.getTime() < date.valueOf() - WEEK_MS) {
+      if (user.user.usernameUpdatedAt.getTime() < date.valueOf() - UPDATE_USERNAME_MS) {
         const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
 
         if (discordUser) {
@@ -1953,7 +1953,7 @@ export async function topVoteStreak(guild: Guild, member?: MemberResolvable) {
     promises.push(async () => {
       let username = user.user.lastKnownUsername;
 
-      if (user.user.usernameUpdatedAt.getTime() < date.valueOf() - WEEK_MS) {
+      if (user.user.usernameUpdatedAt.getTime() < date.valueOf() - UPDATE_USERNAME_MS) {
         const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
 
         if (discordUser) {
@@ -2108,7 +2108,7 @@ export async function topMuseumCompletion(guild: Guild, item: string, member: Me
     promises.push(async () => {
       let username = user.economy.user.lastKnownUsername;
 
-      if (user.economy.user.usernameUpdatedAt.getTime() < date.valueOf() - WEEK_MS) {
+      if (user.economy.user.usernameUpdatedAt.getTime() < date.valueOf() - UPDATE_USERNAME_MS) {
         const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
 
         if (discordUser) {
@@ -2271,7 +2271,7 @@ export async function topMuseumCompletions(guild: Guild, member: MemberResolvabl
     promises.push(async () => {
       let username = user.lastKnownUsername;
 
-      if (user.usernameUpdatedAt.getTime() < date.valueOf() - WEEK_MS) {
+      if (user.usernameUpdatedAt.getTime() < date.valueOf() - UPDATE_USERNAME_MS) {
         const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
 
         if (discordUser) {
@@ -2437,7 +2437,7 @@ export async function topMuseumAmount(guild: Guild, item: string, member: Member
     promises.push(async () => {
       let username = user.economy.user.lastKnownUsername;
 
-      if (user.economy.user.usernameUpdatedAt.getTime() < date.valueOf() - WEEK_MS) {
+      if (user.economy.user.usernameUpdatedAt.getTime() < date.valueOf() - UPDATE_USERNAME_MS) {
         const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
 
         if (discordUser) {
