@@ -257,8 +257,24 @@ export async function checkAutoMute(message: Message) {
   const muteLevels = await getAutoMuteLevels(message.guild);
   if (muteLevels.length == 0) return;
 
-  await addMuteViolation(message.guild, message.member);
-  const vl = (await getMuteViolations(message.guild, message.member)) - 1;
+  const groupAccounts = await getAllGroupAccountIds(message.guild, message.member);
+
+  let highestViolation: { userId: string; vl: number };
+
+  for (const userId of groupAccounts) {
+    const vl = await getMuteViolations(message.guild, userId);
+
+    if (!highestViolation || highestViolation.vl < vl) {
+      highestViolation = { userId, vl };
+    }
+  }
+
+  if (!highestViolation) {
+    highestViolation = { userId: message.member.user.id, vl: 0 };
+  }
+
+  await addMuteViolation(message.guild, highestViolation.userId);
+  const vl = (await getMuteViolations(message.guild, highestViolation.userId)) - 1;
 
   const muteUser = async (member: GuildMember, length: number, isAlt?: boolean) => {
     const guildMuteRole = await getMuteRole(message.guild);
@@ -398,7 +414,7 @@ export async function checkAutoMute(message: Message) {
   await muteUser(message.member, level);
 
   if (punishAlts)
-    for (const id of await getAllGroupAccountIds(message.guild, message.member.user.id)) {
+    for (const id of groupAccounts) {
       if (id == message.member.user.id) continue;
       const member = await getExactMember(message.guild, id);
       if (member) await muteUser(member, level, true);
