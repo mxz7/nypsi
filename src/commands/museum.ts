@@ -535,7 +535,7 @@ async function run(
       const builder = new CustomContainer()
         .addTextDisplayComponents(
           new TextDisplayBuilder().setContent(
-            `### ${message.member.user.username}'s museum\n**${category}${completed === itemsInCategory.length ? "(completed)" : ""}**`,
+            `### ${message.member.user.username}'s museum\n**${category}${completed === itemsInCategory.length ? " (completed)" : ""}**`,
           ),
         )
         .addSeparatorComponents((separator) => separator)
