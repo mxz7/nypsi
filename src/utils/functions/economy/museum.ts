@@ -580,15 +580,17 @@ async function showMuseumCompletionLeaderboard(
       embed.setDescription(getPages().get(currentPage).join("\n"));
     }
 
+    const totalItems = Object.values(getItems()).filter((i) => i.museum).length;
+
     if (data.pos != 0) {
       embed.setFooter({
         text: `you are #${data.pos}${
-          !viewPercent
-            ? ` | ${Object.values(getItems())
-                .filter((i) => i.museum)
-                .length.toLocaleString()} possible`
-            : ""
+          !viewPercent ? ` | ${totalItems.toLocaleString()} possible` : ""
         }`,
+      });
+    } else if (!viewPercent) {
+      embed.setFooter({
+        text: `${totalItems.toLocaleString()} possible`,
       });
     }
 
