@@ -2239,11 +2239,13 @@ export async function topMuseumCompletions(guild: Guild, member: MemberResolvabl
       ORDER BY "totalCompleted" DESC, "lastKnownUsername" ASC;
     `;
 
-  const out: string[] = [];
+  const percentOut: string[] = [];
+  const amountOut: string[] = [];
   let count = 0;
   const userIds = query.map((i) => i.userId);
   const promises: (() => Promise<void>)[] = [];
   const date = dayjs();
+  const museumItemCount = Object.values(getItems()).filter((i) => i.museum).length;
 
   for (const user of query) {
     if (user.banned && date.isBefore(user.banned)) {
@@ -2278,17 +2280,18 @@ export async function topMuseumCompletions(guild: Guild, member: MemberResolvabl
         }
       }
 
-      out[currentCount] = `${pos} ${await formatUsername(
-        user.userId,
-        username,
-        true,
-      )} ${user.totalCompleted.toLocaleString()}`;
+      const formattedName = await formatUsername(user.userId, username, true);
+
+      amountOut[currentCount] = `${pos} ${formattedName} ${user.totalCompleted.toLocaleString()}`;
+      percentOut[currentCount] =
+        `${pos} ${formattedName} ${((Number(user.totalCompleted) / museumItemCount) * 100).toFixed(1)}%`;
     });
   }
 
   await pAll(promises, { concurrency: 10 });
 
-  const pages = PageManager.createPages(out);
+  const percentPages = PageManager.createPages(percentOut);
+  const amountPages = PageManager.createPages(amountOut);
 
   let pos = 0;
 
@@ -2296,7 +2299,7 @@ export async function topMuseumCompletions(guild: Guild, member: MemberResolvabl
     pos = userIds.indexOf(getUserId(member)) + 1;
   }
 
-  return { pages, pos };
+  return { percentPages, amountPages, pos };
 }
 
 export async function topMuseumCompletionsGlobal(member?: MemberResolvable, amount = 100) {
@@ -2322,11 +2325,13 @@ export async function topMuseumCompletionsGlobal(member?: MemberResolvable, amou
     LIMIT ${amount};
     `;
 
-  const out = [];
+  const percentOut: string[] = [];
+  const amountOut: string[] = [];
 
   let count = 0;
 
   const userIds = query.map((i) => i.userId);
+  const museumItemCount = Object.values(getItems()).filter((i) => i.museum).length;
 
   for (const user of query) {
     if (user.banned && dayjs().isBefore(user.banned)) {
@@ -2346,16 +2351,21 @@ export async function topMuseumCompletionsGlobal(member?: MemberResolvable, amou
       pos += ".";
     }
 
-    out[count] = `${pos} ${await formatUsername(
+    const formattedName = await formatUsername(
       user.userId,
       user.lastKnownUsername,
       (await getPreferences(user.userId)).leaderboards,
-    )} ${user.totalCompleted.toLocaleString()}`;
+    );
+
+    amountOut[count] = `${pos} ${formattedName} ${user.totalCompleted.toLocaleString()}`;
+    percentOut[count] =
+      `${pos} ${formattedName} ${((Number(user.totalCompleted) / museumItemCount) * 100).toFixed(1)}%`;
 
     count++;
   }
 
-  const pages = PageManager.createPages(out);
+  const percentPages = PageManager.createPages(percentOut);
+  const amountPages = PageManager.createPages(amountOut);
 
   let pos = 0;
 
@@ -2363,9 +2373,9 @@ export async function topMuseumCompletionsGlobal(member?: MemberResolvable, amou
     pos = userIds.indexOf(getUserId(member)) + 1;
   }
 
-  checkLeaderboardPositions(userIds, `museum-completions`);
+  checkLeaderboardPositions(userIds, `museum-completion-percent`);
 
-  return { pages, pos };
+  return { percentPages, amountPages, pos };
 }
 
 export async function topMuseumAmount(guild: Guild, item: string, member: MemberResolvable) {

@@ -16,7 +16,6 @@ import { Item } from "../../../types/Economy";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { getUserId, MemberResolvable } from "../member";
-import PageManager from "../page";
 import { addInlineNotification } from "../users/notifications";
 import { addProgress } from "./achievements";
 import { selectItem } from "./inventory";
@@ -406,57 +405,8 @@ export async function showMuseumLeaderboard(
 ) {
   const global = args[2]?.toLowerCase() === "global";
 
-  let data: { pages: Map<number, string[]>; pos: number };
-
   if (args[1].toLowerCase().startsWith("completion")) {
-    data = global
-      ? await topMuseumCompletionsGlobal(message.member)
-      : await topMuseumCompletions(message.guild, message.member);
-
-    const embed = new CustomEmbed(message.member).setHeader(
-      `top museum completions ${global ? "[global]" : `for ${message.guild.name}`}`,
-      global ? message.client.user.avatarURL() : message.guild.iconURL(),
-    );
-
-    if (data.pages.size == 0) {
-      embed.setDescription("no data to show");
-    } else {
-      embed.setDescription(data.pages.get(1).join("\n"));
-    }
-
-    if (data.pos != 0) {
-      embed.setFooter({
-        text: `you are #${data.pos} | ${Object.values(getItems())
-          .filter((i) => i.museum)
-          .length.toLocaleString()} possible`,
-      });
-    }
-
-    if (
-      data.pos === 1 &&
-      message instanceof Message &&
-      !(await redis.exists(`nypsi:cd:topemoji:${message.channelId}`))
-    ) {
-      await redis.set(`nypsi:cd:topemoji:${message.channelId}`, "boobies", "EX", 3);
-      message.react("👑");
-    }
-
-    if (data.pages.size <= 1) {
-      return send({ embeds: [embed] });
-    }
-
-    const msg = await send({ embeds: [embed], components: [PageManager.defaultRow()] });
-
-    const manager = new PageManager({
-      embed: embed,
-      message: msg,
-      row: PageManager.defaultRow(),
-      userId: message.author.id,
-      pages: data.pages,
-      allowMessageDupe: true,
-    });
-
-    return manager.listen();
+    return showMuseumCompletionLeaderboard(message, send, global);
   }
 
   if (args[1].toLowerCase() == "item") args.shift();
@@ -470,6 +420,8 @@ export async function showMuseumLeaderboard(
   if (!selected.museum) {
     return send({ embeds: [new ErrorEmbed(`that item is not in the museum`)] });
   }
+
+  let data: { pages: Map<number, string[]>; pos: number };
 
   if (global) {
     data = !selected.museum.no_overflow
@@ -595,6 +547,133 @@ export async function showMuseumLeaderboard(
       }
 
       amountLeaderboardShown = res == "amount";
+      currentPage = 1;
+    }
+
+    await msg.edit({ embeds: [embed()], components: rows() });
+    return pageManager();
+  };
+
+  return pageManager();
+}
+
+async function showMuseumCompletionLeaderboard(
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
+  global: boolean,
+) {
+  const data = global
+    ? await topMuseumCompletionsGlobal(message.member)
+    : await topMuseumCompletions(message.guild, message.member);
+
+  let viewPercent = true;
+  let currentPage = 1;
+
+  const embed = () => {
+    const embed = new CustomEmbed(message.member).setHeader(
+      `top museum completion ${global ? "[global]" : `for ${message.guild.name}`}`,
+    );
+
+    if (getPages().size == 0) {
+      embed.setDescription("no data to show");
+    } else {
+      embed.setDescription(getPages().get(currentPage).join("\n"));
+    }
+
+    if (data.pos != 0) {
+      embed.setFooter({
+        text: `you are #${data.pos}${
+          !viewPercent
+            ? ` | ${Object.values(getItems())
+                .filter((i) => i.museum)
+                .length.toLocaleString()} possible`
+            : ""
+        }`,
+      });
+    }
+
+    return embed;
+  };
+
+  const getPages = () => {
+    return viewPercent ? data.percentPages : data.amountPages;
+  };
+
+  const rows = (disabled = false) => [
+    new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId("percent")
+        .setLabel("percent")
+        .setStyle(ButtonStyle.Secondary)
+        .setDisabled(disabled || viewPercent),
+      new ButtonBuilder()
+        .setCustomId("amount")
+        .setLabel("amount")
+        .setStyle(ButtonStyle.Secondary)
+        .setDisabled(disabled || !viewPercent),
+    ),
+
+    ...(getPages().size <= 1
+      ? []
+      : [
+          new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+            new ButtonBuilder()
+              .setCustomId("⬅")
+              .setLabel("back")
+              .setStyle(ButtonStyle.Primary)
+              .setDisabled(disabled || currentPage <= 1),
+            new ButtonBuilder()
+              .setCustomId("➡")
+              .setLabel("next")
+              .setStyle(ButtonStyle.Primary)
+              .setDisabled(disabled || currentPage >= getPages().size),
+          ),
+        ]),
+  ];
+
+  if (
+    data.pos === 1 &&
+    message instanceof Message &&
+    !(await redis.exists(`nypsi:cd:topemoji:${message.channelId}`))
+  ) {
+    await redis.set(`nypsi:cd:topemoji:${message.channelId}`, "boobies", "EX", 3);
+    message.react("👑");
+  }
+
+  const msg = await send({
+    embeds: [embed()],
+    components: rows(),
+  });
+
+  const filter = (i: Interaction) => i.user.id == message.author.id;
+
+  const pageManager: any = async () => {
+    let fail = false;
+
+    const response = await msg
+      .awaitMessageComponent({ filter, time: 30000 })
+      .then(async (collected) => {
+        await collected.deferUpdate().catch(() => {
+          fail = true;
+          return pageManager();
+        });
+        return { res: collected.customId };
+      })
+      .catch(async () => {
+        fail = true;
+        await msg.edit({ components: rows(true) });
+      });
+
+    if (fail) return;
+    if (!response) return;
+
+    const { res } = response;
+    if (res == "⬅") {
+      if (currentPage > 1) currentPage--;
+    } else if (res == "➡") {
+      if (currentPage < getPages().size) currentPage++;
+    } else if (res == "percent" || res == "amount") {
+      viewPercent = res == "percent";
       currentPage = 1;
     }
 
