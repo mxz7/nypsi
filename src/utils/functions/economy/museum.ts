@@ -24,6 +24,8 @@ import {
   topMuseumAmountGlobal,
   topMuseumCompletion,
   topMuseumCompletionGlobal,
+  topMuseumCompletions,
+  topMuseumCompletionsGlobal,
 } from "./top";
 import { createUser, getItems, userExists } from "./utils";
 import ms = require("ms");
@@ -401,6 +403,14 @@ export async function showMuseumLeaderboard(
   send: SendMessage,
   args: string[],
 ) {
+  const global = args[2]?.toLowerCase() === "global";
+
+  if (args[1].toLowerCase().startsWith("completion")) {
+    return showMuseumCompletionLeaderboard(message, send, global);
+  }
+
+  if (args[1].toLowerCase() == "item") args.shift();
+
   const selected = selectItem(args[1].toLowerCase());
 
   if (!selected) {
@@ -410,10 +420,6 @@ export async function showMuseumLeaderboard(
   if (!selected.museum) {
     return send({ embeds: [new ErrorEmbed(`that item is not in the museum`)] });
   }
-
-  let global = false;
-
-  if (args[2]?.toLowerCase() == "global") global = true;
 
   let data: { pages: Map<number, string[]>; pos: number };
 
@@ -449,18 +455,22 @@ export async function showMuseumLeaderboard(
   };
 
   const rows = (disabled = false) => [
-    new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder()
-        .setCustomId("amount")
-        .setLabel("amount")
-        .setStyle(ButtonStyle.Secondary)
-        .setDisabled(disabled || amountLeaderboardShown),
-      new ButtonBuilder()
-        .setCustomId("comp")
-        .setLabel("completion time")
-        .setStyle(ButtonStyle.Secondary)
-        .setDisabled(disabled || !amountLeaderboardShown),
-    ),
+    ...(selected.museum.no_overflow
+      ? []
+      : [
+          new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+            new ButtonBuilder()
+              .setCustomId("amount")
+              .setLabel("amount")
+              .setStyle(ButtonStyle.Secondary)
+              .setDisabled(disabled || amountLeaderboardShown),
+            new ButtonBuilder()
+              .setCustomId("comp")
+              .setLabel("completion time")
+              .setStyle(ButtonStyle.Secondary)
+              .setDisabled(disabled || !amountLeaderboardShown),
+          ),
+        ]),
 
     ...(data.pages.size <= 1
       ? []
@@ -537,6 +547,135 @@ export async function showMuseumLeaderboard(
       }
 
       amountLeaderboardShown = res == "amount";
+      currentPage = 1;
+    }
+
+    await msg.edit({ embeds: [embed()], components: rows() });
+    return pageManager();
+  };
+
+  return pageManager();
+}
+
+async function showMuseumCompletionLeaderboard(
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
+  global: boolean,
+) {
+  const data = global
+    ? await topMuseumCompletionsGlobal(message.member)
+    : await topMuseumCompletions(message.guild, message.member);
+
+  let viewPercent = true;
+  let currentPage = 1;
+
+  const embed = () => {
+    const embed = new CustomEmbed(message.member).setHeader(
+      `top museum completion ${global ? "[global]" : `for ${message.guild.name}`}`,
+    );
+
+    if (getPages().size == 0) {
+      embed.setDescription("no data to show");
+    } else {
+      embed.setDescription(getPages().get(currentPage).join("\n"));
+    }
+
+    const totalItems = Object.values(getItems()).filter((i) => i.museum).length;
+
+    if (data.pos != 0) {
+      embed.setFooter({
+        text: `you are #${data.pos}${
+          !viewPercent ? ` | ${totalItems.toLocaleString()} possible` : ""
+        }`,
+      });
+    } else if (!viewPercent) {
+      embed.setFooter({
+        text: `${totalItems.toLocaleString()} possible`,
+      });
+    }
+
+    return embed;
+  };
+
+  const getPages = () => {
+    return viewPercent ? data.percentPages : data.amountPages;
+  };
+
+  const rows = (disabled = false) => [
+    new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId("percent")
+        .setLabel("percent")
+        .setStyle(ButtonStyle.Secondary)
+        .setDisabled(disabled || viewPercent),
+      new ButtonBuilder()
+        .setCustomId("amount")
+        .setLabel("amount")
+        .setStyle(ButtonStyle.Secondary)
+        .setDisabled(disabled || !viewPercent),
+    ),
+
+    ...(getPages().size <= 1
+      ? []
+      : [
+          new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+            new ButtonBuilder()
+              .setCustomId("⬅")
+              .setLabel("back")
+              .setStyle(ButtonStyle.Primary)
+              .setDisabled(disabled || currentPage <= 1),
+            new ButtonBuilder()
+              .setCustomId("➡")
+              .setLabel("next")
+              .setStyle(ButtonStyle.Primary)
+              .setDisabled(disabled || currentPage >= getPages().size),
+          ),
+        ]),
+  ];
+
+  if (
+    data.pos === 1 &&
+    message instanceof Message &&
+    !(await redis.exists(`nypsi:cd:topemoji:${message.channelId}`))
+  ) {
+    await redis.set(`nypsi:cd:topemoji:${message.channelId}`, "boobies", "EX", 3);
+    message.react("👑");
+  }
+
+  const msg = await send({
+    embeds: [embed()],
+    components: rows(),
+  });
+
+  const filter = (i: Interaction) => i.user.id == message.author.id;
+
+  const pageManager: any = async () => {
+    let fail = false;
+
+    const response = await msg
+      .awaitMessageComponent({ filter, time: 30000 })
+      .then(async (collected) => {
+        await collected.deferUpdate().catch(() => {
+          fail = true;
+          return pageManager();
+        });
+        return { res: collected.customId };
+      })
+      .catch(async () => {
+        fail = true;
+        await msg.edit({ components: rows(true) });
+      });
+
+    if (fail) return;
+    if (!response) return;
+
+    const { res } = response;
+    if (res == "⬅") {
+      if (currentPage > 1) currentPage--;
+    } else if (res == "➡") {
+      if (currentPage < getPages().size) currentPage++;
+    } else if (res == "percent" || res == "amount") {
+      viewPercent = res == "percent";
       currentPage = 1;
     }
 
