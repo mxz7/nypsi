@@ -67,10 +67,10 @@ import { getGuildByUser } from "../utils/functions/economy/guilds";
 import {
   addInventoryItem,
   calcItemValue,
-  removeInventoryItem,
+  getInventory,
   setInventoryItem,
 } from "../utils/functions/economy/inventory";
-import { getPrestige, setLevel, setPrestige } from "../utils/functions/economy/levelling";
+import { getLevel, getPrestige, setLevel, setPrestige } from "../utils/functions/economy/levelling";
 import { giveLootPoolResult, rollLootPool } from "../utils/functions/economy/loot_pools";
 import { deleteMarketOrder } from "../utils/functions/economy/market";
 import { addToMuseum } from "../utils/functions/economy/museum";
@@ -83,7 +83,9 @@ import {
   getEventsData,
   getItems,
   getLastDaily,
+  getTagsData,
   isEcoBanned,
+  maxPrestige,
   reset,
   setDaily,
   setEcoBan,
@@ -678,7 +680,7 @@ async function run(
           embeds: [
             new CustomEmbed(
               message.member,
-              "enter a non stupid number pls remember if you do this for a joke this money could very easily be distributed between members & put into items",
+              "enter a non stupid number pls remember if you do this for a joke this money could very easily be distributed between members & put into items\n\nprefix amount with `+` or `-` to increment/decrement",
             ),
           ],
         });
@@ -695,15 +697,18 @@ async function run(
           });
 
         if (!msg) return;
-        if (!parseInt(msg.content) && parseInt(msg.content) != 0) {
-          await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid value")] });
+
+        const value = getIncrementalValue(await getBalance(user), msg.content);
+
+        if (typeof value !== "number") {
+          await res.editReply({ embeds: [value] });
           return waitForButton();
         }
 
         logger.info(
-          `admin: ${message.author.id} (${message.author.username}) set ${user.id} balance to ${msg.content}`,
+          `admin: ${message.author.id} (${message.author.username}) set ${user.id} balance to ${value}`,
         );
-        await updateBalance(user, parseInt(msg.content));
+        await updateBalance(user, value);
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-bank") {
@@ -718,7 +723,7 @@ async function run(
           embeds: [
             new CustomEmbed(
               message.member,
-              "enter a non stupid number pls remember if you do this for a joke this money could very easily be distributed between members & put into items",
+              "enter a non stupid number pls remember if you do this for a joke this money could very easily be distributed between members & put into items\n\nprefix amount with `+` or `-` to increment/decrement",
             ),
           ],
         });
@@ -735,15 +740,18 @@ async function run(
           });
 
         if (!msg) return;
-        if (!parseInt(msg.content) && parseInt(msg.content) != 0) {
-          await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid value")] });
+
+        const value = getIncrementalValue(await getBankBalance(user), msg.content);
+
+        if (typeof value !== "number") {
+          await res.editReply({ embeds: [value] });
           return waitForButton();
         }
 
         logger.info(
-          `admin: ${message.author.id} (${message.author.username}) set ${user.id} bank balance to ${msg.content}`,
+          `admin: ${message.author.id} (${message.author.username}) set ${user.id} bank balance to ${value}`,
         );
-        await updateBankBalance(user, parseInt(msg.content));
+        await updateBankBalance(user, value);
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-prestige") {
@@ -755,7 +763,12 @@ async function run(
         }
 
         await res.editReply({
-          embeds: [new CustomEmbed(message.member, "enter new prestige")],
+          embeds: [
+            new CustomEmbed(
+              message.member,
+              "enter new prestige\n\nprefix amount with `+` or `-` to increment/decrement",
+            ),
+          ],
         });
 
         const msg = await message.channel
@@ -770,15 +783,18 @@ async function run(
           });
 
         if (!msg) return;
-        if (!parseInt(msg.content) && parseInt(msg.content) != 0) {
-          await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid value")] });
+
+        const value = getIncrementalValue(await getPrestige(user), msg.content);
+
+        if (typeof value !== "number") {
+          await res.editReply({ embeds: [value] });
           return waitForButton();
         }
 
         logger.info(
-          `admin: ${message.author.id} (${message.author.username}) set ${user.id} prestige to ${msg.content}`,
+          `admin: ${message.author.id} (${message.author.username}) set ${user.id} prestige to ${Math.min(maxPrestige, value)}`,
         );
-        await setPrestige(user, parseInt(msg.content));
+        await setPrestige(user, Math.min(maxPrestige, value));
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-level") {
@@ -790,7 +806,12 @@ async function run(
         }
 
         await res.editReply({
-          embeds: [new CustomEmbed(message.member, "enter new level")],
+          embeds: [
+            new CustomEmbed(
+              message.member,
+              "enter new level\n\nprefix amount with `+` or `-` to increment/decrement",
+            ),
+          ],
         });
 
         const msg = await message.channel
@@ -805,15 +826,18 @@ async function run(
           });
 
         if (!msg) return;
-        if (!parseInt(msg.content) && parseInt(msg.content) != 0) {
-          await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid value")] });
+
+        const value = getIncrementalValue(await getLevel(user), msg.content);
+
+        if (typeof value !== "number") {
+          await res.editReply({ embeds: [value] });
           return waitForButton();
         }
 
         logger.info(
-          `admin: ${message.author.id} (${message.author.username}) set ${user.id} level to ${msg.content}`,
+          `admin: ${message.author.id} (${message.author.username}) set ${user.id} level to ${value}`,
         );
-        await setLevel(user, parseInt(msg.content));
+        await setLevel(user, value);
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-xp") {
@@ -825,7 +849,12 @@ async function run(
         }
 
         await res.editReply({
-          embeds: [new CustomEmbed(message.member, "enter new xp value")],
+          embeds: [
+            new CustomEmbed(
+              message.member,
+              "enter new xp value\n\nprefix amount with `+` or `-` to increment/decrement",
+            ),
+          ],
         });
 
         const msg = await message.channel
@@ -840,15 +869,18 @@ async function run(
           });
 
         if (!msg) return;
-        if (!parseInt(msg.content) && parseInt(msg.content) != 0) {
-          await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid value")] });
+
+        const value = getIncrementalValue(await getXp(user), msg.content);
+
+        if (typeof value !== "number") {
+          await res.editReply({ embeds: [value] });
           return waitForButton();
         }
 
         logger.info(
-          `admin: ${message.author.id} (${message.author.username}) set ${user.id} xp to ${msg.content}`,
+          `admin: ${message.author.id} (${message.author.username}) set ${user.id} xp to ${value}`,
         );
-        await updateXp(user, parseInt(msg.content));
+        await updateXp(user, value);
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-inv") {
@@ -881,55 +913,27 @@ async function run(
 
         if (!msg) return;
 
-        logger.info(
-          `admin: ${message.author.id} (${message.author.username}) set ${user.id} inventory item to ${msg.content}`,
-        );
+        const item = getItems()[msg.content.split(" ")[0]];
 
-        if (!getItems()[msg.content.split(" ")[0]]) {
+        if (!item) {
           await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid item")] });
           return waitForButton();
         }
 
-        let mode: "increment" | "decrement" | "set" = "set";
+        const value = getIncrementalValue(
+          (await getInventory(user)).count(item),
+          msg.content.split(" ")[1],
+        );
 
-        if (msg.content.split(" ")[1].startsWith("-")) {
-          mode = "decrement";
-        } else if (msg.content.split(" ")[1].startsWith("+")) {
-          mode = "increment";
-        }
-
-        let amount: number;
-
-        if (mode !== "set") {
-          amount = parseInt(
-            msg.content.split(" ")[1].substring(1, msg.content.split(" ")[1].length),
-          );
-        } else {
-          amount = parseInt(msg.content.split(" ")[1]);
-        }
-
-        if (isNaN(amount) || amount < 0) {
-          await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid amount")] });
+        if (typeof value !== "number") {
+          await res.editReply({ embeds: [value] });
           return waitForButton();
         }
 
-        if (msg.content.split(" ")[0] == "gold_star") {
-          await res.editReply({ embeds: [new CustomEmbed(message.member, "use $x givestar")] });
-          return waitForButton();
-        }
-
-        if (mode === "set") {
-          await setInventoryItem(
-            user,
-            msg.content.split(" ")[0],
-            parseInt(msg.content.split(" ")[1]),
-          );
-        } else if (mode === "increment") {
-          await addInventoryItem(user, msg.content.split(" ")[0], amount);
-        } else if (mode === "decrement") {
-          await removeInventoryItem(user, msg.content.split(" ")[0], amount);
-        }
-
+        logger.info(
+          `admin: ${message.author.id} (${message.author.username}) set ${user.id} ${item.id} quantity to ${value}`,
+        );
+        await setInventoryItem(user, item.id, value);
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-karma") {
@@ -941,7 +945,12 @@ async function run(
         }
 
         await res.editReply({
-          embeds: [new CustomEmbed(message.member, "enter new karma value")],
+          embeds: [
+            new CustomEmbed(
+              message.member,
+              "enter new karma value\n\nprefix amount with `+` or `-` to increment/decrement",
+            ),
+          ],
         });
 
         const msg = await message.channel
@@ -956,29 +965,21 @@ async function run(
           });
 
         if (!msg) return;
-        if (!parseInt(msg.content) && parseInt(msg.content) != 0) {
-          await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid value")] });
+
+        const karma = await getKarma(user);
+        const value = getIncrementalValue(karma, msg.content);
+
+        if (typeof value !== "number") {
+          await res.editReply({ embeds: [value] });
           return waitForButton();
         }
 
-        const karma = await getKarma(user);
-
-        let amount = 0;
-        let remove = false;
-
-        if (parseInt(msg.content) < karma) {
-          remove = true;
-          amount = karma - parseInt(msg.content);
-        } else {
-          amount = parseInt(msg.content) - karma;
-        }
-
         logger.info(
-          `admin: ${message.author.id} (${message.author.username}) set ${user.id} karma to ${msg.content}`,
+          `admin: ${message.author.id} (${message.author.username}) set ${user.id} karma to ${value}`,
         );
 
-        if (remove) await removeKarma(user, amount);
-        else await addKarma(user, amount);
+        if (value < karma) await removeKarma(user, karma - value);
+        else await addKarma(user, value - karma);
 
         msg.react("✅");
         return waitForButton();
@@ -1848,6 +1849,40 @@ async function run(
     return waitForButton();
   };
 
+  const getIncrementalValue = (initialValue: number, input: string, noNegative = true) => {
+    let mode: "increment" | "decrement" | "set" = "set";
+
+    if (input.startsWith("-")) {
+      mode = "decrement";
+    } else if (input.startsWith("+")) {
+      mode = "increment";
+    }
+
+    let amount: number;
+
+    if (mode !== "set") {
+      amount = parseInt(input.substring(1, input.length));
+    } else {
+      amount = parseInt(input);
+    }
+
+    if (isNaN(amount) || (noNegative && amount < 0)) {
+      return new CustomEmbed(message.member, "invalid amount");
+    }
+
+    let newValue = 0;
+
+    if (mode === "set") {
+      newValue = amount;
+    } else if (mode === "increment") {
+      newValue = initialValue + amount;
+    } else if (mode === "decrement") {
+      newValue = noNegative ? Math.max(0, initialValue - amount) : initialValue - amount;
+    }
+
+    return newValue;
+  };
+
   const doBirthday = async (user: User, response: ButtonInteraction) => {
     const render = async () => {
       const birthday = await getBirthday(user);
@@ -2268,6 +2303,11 @@ async function run(
 
         if (!msgResponse) return;
 
+        if (!getTagsData()[msgResponse.content]) {
+          await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid tag")] });
+          return waitForButton();
+        }
+
         logger.info(
           `admin: ${message.author.id} (${message.author.username}) added ${msgResponse.content} tag to ${user.id}`,
         );
@@ -2306,6 +2346,18 @@ async function run(
           });
 
         if (!msgResponse) return;
+
+        if (!getTagsData()[msgResponse.content]) {
+          await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid tag")] });
+          return waitForButton();
+        }
+
+        if ((await getTags(user)).findIndex((i) => i.tagId == msgResponse.content) < 0) {
+          await res.editReply({
+            embeds: [new CustomEmbed(message.member, "user does not have that tag")],
+          });
+          return waitForButton();
+        }
 
         logger.info(
           `admin: ${message.author.id} (${message.author.username}) removed ${msgResponse.content} tag from ${user.id}`,
