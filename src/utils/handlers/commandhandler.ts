@@ -961,13 +961,13 @@ export async function runCommand(
         res = await message
           .reply(data as InteractionReplyOptions)
           .then((r) => r.fetch())
-          .catch(async () => {
-            logger.warn("send: failed to reply to non deferred reply");
+          .catch(async (e) => {
+            logger.warn("send: failed to reply to non deferred reply", e);
             return message
               .editReply(data as InteractionEditReplyOptions)
               .then((r) => r.fetch())
-              .catch(() => {
-                logger.warn("send: failed to edit errored non deferred reply");
+              .catch((e) => {
+                logger.warn("send: failed to edit errored non deferred reply", e);
                 return message.channel.send(data as BaseMessageOptions);
               });
           });
