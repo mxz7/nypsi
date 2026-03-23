@@ -400,11 +400,11 @@
     "description": "donate items to your museum",
     "target": [75, 100, 150],
     "prizes": [
-      "id:lucky_scratch_card:2",
+      "id:lucky_scratch_card:1",
       "xp:1500",
       "karma:250",
-      "id:basic_crate:5",
-      "id:basic_crate:5"
+      "id:basic_crate:3",
+      "id:basic_crate:3"
     ],
     "type": "weekly"
   }

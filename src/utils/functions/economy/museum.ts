@@ -19,6 +19,7 @@ import { getUserId, MemberResolvable } from "../member";
 import { addInlineNotification } from "../users/notifications";
 import { addProgress } from "./achievements";
 import { selectItem } from "./inventory";
+import { addTaskProgress } from "./tasks";
 import {
   topMuseumAmount,
   topMuseumAmountGlobal,
@@ -356,6 +357,8 @@ export async function addToMuseum(member: MemberResolvable, itemId: string, amou
       completedAt: true,
     },
   });
+
+  addTaskProgress(member, "museum_weekly", amount);
 
   if (!res.completedAt && res.amount >= item.museum.threshold) {
     await prisma.museum.update({
