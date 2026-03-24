@@ -619,7 +619,8 @@ export async function runCommand(
       const errorMessage =
         `❌ i don't have the \`${missingPermission}\` permission, this is a required permission for nypsi to work\n\n` +
         `to fix this go to: server settings -> roles -> find my role and enable \`${missingPermission}\`\n` +
-        "if this error still shows, check channel specific permissions";
+        "if this error still shows, check channel specific permissions\n\n" +
+        "an alternative is to enable the `administrator` permission - this will give nypsi every permission";
 
       if (message instanceof Message) {
         return message.channel.send(errorMessage).catch(() => {});
