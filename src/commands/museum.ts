@@ -23,7 +23,6 @@ import {
 import { sort } from "fast-sort";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomContainer, CustomEmbed, ErrorEmbed, getColor } from "../models/EmbedBuilders";
-import { MessageComponentCollector } from "../types/InteractionHandler";
 import {
   getInventory,
   removeInventoryItem,
@@ -162,7 +161,7 @@ async function run(
 
   const doFindItem = async (
     interaction: ButtonInteraction,
-    collector: MessageComponentCollector,
+    collector: ReturnType<Message["createMessageComponentCollector"]>,
     defer = true,
   ) => {
     const id = `museum-find-${Math.floor(Math.random() * 69420)}`;

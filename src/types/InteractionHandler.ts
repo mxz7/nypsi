@@ -1,15 +1,4 @@
-import {
-  AutocompleteInteraction,
-  ButtonInteraction,
-  CacheType,
-  ChannelSelectMenuInteraction,
-  InteractionCollector,
-  MentionableSelectMenuInteraction,
-  MessageComponentInteraction,
-  RoleSelectMenuInteraction,
-  StringSelectMenuInteraction,
-  UserSelectMenuInteraction,
-} from "discord.js";
+import { AutocompleteInteraction, MessageComponentInteraction } from "discord.js";
 
 export type InteractionHandler = {
   name: string;
@@ -22,12 +11,3 @@ export type AutocompleteHandler = {
   type: "autocomplete";
   run: (interaction: AutocompleteInteraction) => Promise<any>;
 };
-
-export type MessageComponentCollector = InteractionCollector<
-  | ButtonInteraction<CacheType>
-  | StringSelectMenuInteraction<CacheType>
-  | UserSelectMenuInteraction<CacheType>
-  | RoleSelectMenuInteraction<CacheType>
-  | MentionableSelectMenuInteraction<CacheType>
-  | ChannelSelectMenuInteraction<CacheType>
->;
