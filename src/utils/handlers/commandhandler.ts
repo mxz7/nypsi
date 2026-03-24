@@ -586,41 +586,46 @@ export async function runCommand(
         .catch(() => {});
     }
 
+    let missingPermission = "";
+
     if (
       !message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.EmbedLinks) ||
       !message.guild.members.me.permissions.has(PermissionFlagsBits.EmbedLinks)
     ) {
-      return message.channel.send({
-        content:
-          "❌ i don't have the `embed links` permission\n\nto fix this go to: server settings -> roles -> find my role and enable `embed links`\n" +
-          "if this error still shows, check channel specific permissions",
-      });
-    }
-
-    if (
+      missingPermission = "embed links";
+    } else if (
       !message.channel
         .permissionsFor(message.client.user)
         .has(PermissionFlagsBits.ManageMessages) ||
       !message.guild.members.me.permissions.has(PermissionFlagsBits.ManageMessages)
     ) {
-      return message.channel.send(
-        "❌ i don't have the `manage messages` permission, this is a required permission for nypsi to work\n\n" +
-          "to fix this go to: server settings -> roles -> find my role and enable `manage messages`\n" +
-          "if this error still shows, check channel specific permissions",
-      );
-    }
-
-    if (
+      missingPermission = "manage messages";
+    } else if (
       !message.channel
         .permissionsFor(message.client.user)
         .has(PermissionFlagsBits.UseExternalEmojis)
     ) {
-      return message.channel.send({
-        content:
-          "❌ i don't have the `use external emojis` permission, this is a required permission for nypsi to work\n\n" +
-          "to fix this go to: server settings -> roles -> find my role and enable `use external emojis`\n" +
-          "if this error still shows, check channel specific permissions",
-      });
+      missingPermission = "use external emojis";
+    } else if (
+      !message.channel
+        .permissionsFor(message.client.user)
+        .has(PermissionFlagsBits.ReadMessageHistory) ||
+      !message.guild.members.me.permissions.has(PermissionFlagsBits.ReadMessageHistory)
+    ) {
+      missingPermission = "read message history";
+    }
+
+    if (missingPermission) {
+      const errorMessage =
+        `❌ i don't have the \`${missingPermission}\` permission, this is a required permission for nypsi to work\n\n` +
+        `to fix this go to: server settings -> roles -> find my role and enable \`${missingPermission}\`\n` +
+        "if this error still shows, check channel specific permissions";
+
+      if (message instanceof Message) {
+        return message.channel.send(errorMessage).catch(() => {});
+      } else {
+        return message.reply(errorMessage).catch(() => {});
+      }
     }
   }
 
