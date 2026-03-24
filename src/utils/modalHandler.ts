@@ -1,34 +1,45 @@
-import { ModalSubmitInteraction } from "discord.js";
+import {
+  Message,
+  MessageCollectorOptionsParams,
+  MessageComponentType,
+  ModalSubmitInteraction,
+} from "discord.js";
+import { MessageComponentCollector } from "../types/InteractionHandler";
 
-type ModalCollector = (interaction: ModalSubmitInteraction) => Promise<any>;
+const modalCollectors = new Map<string, MessageComponentCollector>();
 
-const modalCollectors = new Map<string, ModalCollector>();
-
-export function createModalId(
-  baseId: string,
+export function createMessageComponentAndModalCollector(
+  msg: Message,
   userId: string,
-  interactionId: string,
-  messageId: string,
-): `${string}:${string}:${string}:${string}` {
-  return `${baseId}:${userId}:${interactionId}:${messageId}`;
+  options: MessageCollectorOptionsParams<MessageComponentType, boolean>,
+  ...modalIds: string[]
+) {
+  const res = msg.createMessageComponentCollector(options) as MessageComponentCollector;
+  const id = `${userId}:${msg.id}${modalIds.map((i) => `:${i}`)}`;
+
+  modalCollectors.set(id, res);
+
+  res.on("end", () => {
+    modalCollectors.delete(id);
+  });
+
+  return res;
 }
 
-export function registerModalCollector(id: string, fn: ModalCollector) {
-  modalCollectors.set(id, fn);
-}
+export function handleModal(interaction: ModalSubmitInteraction) {
+  let res: MessageComponentCollector = undefined;
 
-export function deleteModalCollectors(messageId: string): void;
-export function deleteModalCollectors(baseId: string, userId: string): void;
-export function deleteModalCollectors(baseId: string, userId?: string) {
-  for (const [key] of modalCollectors) {
-    if ((userId && key.startsWith(`${baseId}:${userId}`)) || (!userId && key.endsWith(baseId))) {
-      modalCollectors.delete(key);
+  for (const [key, value] of modalCollectors) {
+    if (
+      key.startsWith(interaction.user.id) &&
+      key.split(":").indexOf(interaction.customId.split(":")[0]) != -1
+    ) {
+      res = value;
+      break;
     }
   }
-}
 
-export function consumeModalCollector(id: string) {
-  const fn = modalCollectors.get(id);
-  modalCollectors.delete(id);
-  return fn;
+  if (!res) return;
+
+  res.emit("collect", interaction);
 }

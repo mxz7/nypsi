@@ -22,8 +22,6 @@ import {
 import { sort } from "fast-sort";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomContainer, CustomEmbed, ErrorEmbed, getColor } from "../models/EmbedBuilders";
-import { Item } from "../types/Economy";
-import { MessageComponentCollector } from "../types/InteractionHandler";
 import {
   getInventory,
   removeInventoryItem,
@@ -33,7 +31,6 @@ import {
   addToMuseum,
   getMuseum,
   getMuseumCategories,
-  Museum,
   showMuseumLeaderboard,
 } from "../utils/functions/economy/museum";
 import { createUser, formatNumber, getItems, userExists } from "../utils/functions/economy/utils";
@@ -41,11 +38,7 @@ import { getMember } from "../utils/functions/member";
 import { default as PageManager } from "../utils/functions/page";
 import { pluralize } from "../utils/functions/string";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import {
-  createModalId,
-  deleteModalCollectors,
-  registerModalCollector,
-} from "../utils/modalHandler";
+import { createMessageComponentAndModalCollector } from "../utils/modalHandler";
 
 const cmd = new Command("museum", "view your museum progress", "money")
   .setAliases(["collect"])
@@ -148,8 +141,6 @@ async function run(
     return;
   }
 
-  let collector: MessageComponentCollector = undefined;
-
   const items = getItems();
   const sortedItems = sort(Object.values(items)).asc((i) => i.id);
   const itemCategories = getMuseumCategories();
@@ -168,6 +159,38 @@ async function run(
       );
   };
 
+  const doFindItem = async (interaction: Interaction, defer = true) => {
+    if (interaction.isModalSubmit() && interaction.customId.startsWith("museum-find")) {
+      const item = selectItem(interaction.fields.getTextInputValue("item").toLowerCase());
+
+      if (!item) {
+        interaction.reply({
+          embeds: [new ErrorEmbed("invalid item")],
+          flags: MessageFlags.Ephemeral,
+        });
+        return;
+      }
+
+      if (!item.museum) {
+        interaction.reply({
+          embeds: [new ErrorEmbed("that item is not in the museum")],
+          flags: MessageFlags.Ephemeral,
+        });
+        return;
+      }
+
+      const index = sortedItems
+        .filter((i) => i.museum?.category == item.museum.category)
+        .findIndex((i) => i.id == item.id);
+
+      const page = Math.floor(index / itemsPerPage) + 1;
+
+      if (defer) await interaction.deferUpdate();
+
+      return { interaction, item, page, category: item.museum.category };
+    }
+  };
+
   const doCategorySelect = async (interaction: Interaction) => {
     if (!interaction.isStringSelectMenu() || interaction.customId != "select-category") {
       return false;
@@ -177,78 +200,9 @@ async function run(
 
   const itemsPerPage = 8;
 
-  const doFindItem = async (
-    interaction: ButtonInteraction,
-    mode: "search" | "featured",
-    museum?: Museum,
-    featuredItems?: Item[],
-    slot?: number,
-  ) => {
-    const modalId = createModalId("museum-find", message.member.id, interaction.id, message.id);
-
-    registerModalCollector(modalId, async (res) => {
-      if (collector.ended) {
-        return res.reply({
-          embeds: [new ErrorEmbed("interaction expired")],
-          flags: MessageFlags.Ephemeral,
-        });
-      }
-
-      const item = selectItem(res.fields.getTextInputValue("item").toLowerCase());
-
-      if (!item) {
-        return res.reply({
-          embeds: [new ErrorEmbed("invalid item")],
-          flags: MessageFlags.Ephemeral,
-        });
-      }
-
-      if (!item.museum) {
-        return res.reply({
-          embeds: [new ErrorEmbed("that item is not in the museum")],
-          flags: MessageFlags.Ephemeral,
-        });
-      }
-
-      if (mode == "search") {
-        const index = sortedItems
-          .filter((i) => i.museum?.category == item.museum.category)
-          .findIndex((i) => i.id == item.id);
-
-        const page = Math.floor(index / itemsPerPage) + 1;
-
-        await res.deferUpdate();
-        deleteModalCollectors(`museum-find`, message.member.id);
-
-        collector.stop("swap");
-
-        return categoryView(item.museum.category, page);
-      } else {
-        if (!museum.has(item)) {
-          return res.reply({
-            embeds: [new ErrorEmbed("you have not donated that item yet")],
-            flags: MessageFlags.Ephemeral,
-          });
-        }
-        if (featuredItems.findIndex((i) => i?.id == item.id) != -1) {
-          return res.reply({
-            embeds: [new ErrorEmbed("you already have that item featured")],
-            flags: MessageFlags.Ephemeral,
-          });
-        }
-
-        featuredItems[slot] = item;
-
-        await res.deferUpdate();
-        deleteModalCollectors(`museum-find`, message.member.id);
-
-        collector.stop("swap");
-        return editView(featuredItems);
-      }
-    });
-
+  const showFindItemModal = async (interaction: ButtonInteraction) => {
     const modal = new ModalBuilder()
-      .setCustomId(modalId)
+      .setCustomId(`museum-find:${interaction.id}`)
       .setTitle("find an item")
       .addLabelComponents(
         new LabelBuilder()
@@ -338,13 +292,18 @@ async function run(
 
     const filter = (i: Interaction) => i.user.id == message.author.id;
 
-    collector = msg.createMessageComponentCollector({ filter, time: 60000 });
+    const collector = createMessageComponentAndModalCollector(
+      msg,
+      message.member.id,
+      { filter, time: 60000 },
+      "museum-find",
+    );
 
     collector.on("collect", async (interaction) => {
       const res = interaction.customId;
       let fail = false;
 
-      if (res !== "find") {
+      if (!interaction.isModalSubmit() && res !== "find") {
         await interaction.deferUpdate().catch(() => {
           fail = true;
         });
@@ -352,13 +311,17 @@ async function run(
 
       if (fail) return;
 
+      const foundItem = await doFindItem(interaction);
       const categorySelect = await doCategorySelect(interaction);
 
-      if (categorySelect) {
+      if (foundItem) {
+        collector.stop("swap");
+        return categoryView(foundItem.category, foundItem.page);
+      } else if (categorySelect) {
         collector.stop("swap");
         return categoryView(categorySelect);
       } else if (res == "find") {
-        await doFindItem(interaction as ButtonInteraction, "search");
+        await showFindItemModal(interaction as ButtonInteraction);
       } else if (res == "edit") {
         collector.stop("swap");
         return editView();
@@ -366,18 +329,17 @@ async function run(
     });
 
     collector.on("end", async (_, reason) => {
-      deleteModalCollectors(message.id);
       if (reason != "swap")
         await msg.edit({ flags: MessageFlags.IsComponentsV2, components: [container(true)] });
     });
   };
 
-  const editView = async (itemList?: Item[]) => {
+  const editView = async () => {
     const museum = await getMuseum(message.member);
 
-    let featuredItems = itemList
-      ? itemList
-      : (await museum.getFavoritedItems()).concat(Array(5).fill(undefined)).slice(0, 5);
+    let featuredItems = (await museum.getFavoritedItems())
+      .concat(Array(5).fill(undefined))
+      .slice(0, 5);
 
     const container = async (disabled = false) => {
       const container = new ContainerBuilder()
@@ -458,13 +420,20 @@ async function run(
 
     const filter = (i: Interaction) => i.user.id == message.author.id;
 
-    collector = msg.createMessageComponentCollector({ filter, time: 60000 });
+    const collector = createMessageComponentAndModalCollector(
+      msg,
+      message.member.id,
+      { filter, time: 60000 },
+      "museum-find",
+    );
+
+    let updatingSlot = -1;
 
     collector.on("collect", async (interaction) => {
       const res = interaction.customId;
       let fail = false;
 
-      if (!res.startsWith("alter-")) {
+      if (!interaction.isModalSubmit() && !res.startsWith("alter-")) {
         await interaction.deferUpdate().catch(() => {
           fail = true;
         });
@@ -472,7 +441,29 @@ async function run(
 
       if (fail) return;
 
-      if (res == "save") {
+      const foundItem = await doFindItem(interaction, false);
+
+      if (foundItem) {
+        if (!museum.has(foundItem.item)) {
+          await foundItem.interaction.reply({
+            embeds: [new ErrorEmbed("you have not donated that item yet")],
+            flags: MessageFlags.Ephemeral,
+          });
+          return;
+        }
+
+        if (featuredItems.findIndex((i) => i?.id == foundItem.item.id) != -1) {
+          await foundItem.interaction.reply({
+            embeds: [new ErrorEmbed("you already have that item featured")],
+            flags: MessageFlags.Ephemeral,
+          });
+          return;
+        }
+
+        await foundItem.interaction.deferUpdate();
+
+        featuredItems[updatingSlot] = foundItem.item;
+      } else if (res == "save") {
         if (
           JSON.stringify(featuredItems.filter(Boolean)) !=
           JSON.stringify(await museum.getFavoritedItems())
@@ -485,18 +476,12 @@ async function run(
       } else if (res == "clear") {
         featuredItems = Array(5).fill(undefined);
       } else if (res.startsWith("alter-")) {
-        const slot = parseInt(res.split("-")[1]);
-        if (featuredItems[slot]) {
-          featuredItems[slot] = undefined;
+        updatingSlot = parseInt(res.split("-")[1]);
+        if (featuredItems[updatingSlot]) {
+          featuredItems[updatingSlot] = undefined;
           await interaction.deferUpdate();
         } else {
-          await doFindItem(
-            interaction as ButtonInteraction,
-            "featured",
-            museum,
-            featuredItems,
-            slot,
-          );
+          await showFindItemModal(interaction as ButtonInteraction);
         }
       } else if (res.startsWith("up-")) {
         const slot = parseInt(res.split("-")[1]);
@@ -520,7 +505,6 @@ async function run(
     });
 
     collector.on("end", async (_, reason) => {
-      deleteModalCollectors(message.id);
       if (reason != "swap")
         await msg.edit({ flags: MessageFlags.IsComponentsV2, components: [await container(true)] });
     });
@@ -629,13 +613,18 @@ async function run(
 
     const filter = (i: Interaction) => i.user.id == message.author.id;
 
-    collector = msg.createMessageComponentCollector({ filter, time: 60000 });
+    const collector = createMessageComponentAndModalCollector(
+      msg,
+      message.member.id,
+      { filter, time: 60000 },
+      "museum-find",
+    );
 
     collector.on("collect", async (interaction) => {
       const res = interaction.customId;
       let fail = false;
 
-      if (res !== "find") {
+      if (!interaction.isModalSubmit() && res !== "find") {
         await interaction.deferUpdate().catch(() => {
           fail = true;
         });
@@ -643,9 +632,13 @@ async function run(
 
       if (fail) return;
 
+      const foundItem = await doFindItem(interaction);
       const categorySelect = await doCategorySelect(interaction);
 
-      if (categorySelect) {
+      if (foundItem) {
+        collector.stop("swap");
+        return categoryView(foundItem.category, foundItem.page);
+      } else if (categorySelect) {
         collector.stop("swap");
         return categorySelect == "home" ? homeView() : categoryView(categorySelect);
       } else if (res == "➡") {
@@ -653,14 +646,13 @@ async function run(
       } else if (res == "⬅") {
         if (currentPage > 1) currentPage--;
       } else if (res == "find") {
-        await doFindItem(interaction as ButtonInteraction, "search");
+        await showFindItemModal(interaction as ButtonInteraction);
       }
 
       await msg.edit({ flags: MessageFlags.IsComponentsV2, components: [container()] });
     });
 
     collector.on("end", async (_, reason) => {
-      deleteModalCollectors(message.id);
       if (reason != "swap")
         await msg.edit({ flags: MessageFlags.IsComponentsV2, components: [container(true)] });
     });
