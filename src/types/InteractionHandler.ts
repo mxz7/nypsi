@@ -6,7 +6,6 @@ import {
   InteractionCollector,
   MentionableSelectMenuInteraction,
   MessageComponentInteraction,
-  ModalSubmitInteraction,
   RoleSelectMenuInteraction,
   StringSelectMenuInteraction,
   UserSelectMenuInteraction,
@@ -31,5 +30,4 @@ export type MessageComponentCollector = InteractionCollector<
   | RoleSelectMenuInteraction<CacheType>
   | MentionableSelectMenuInteraction<CacheType>
   | ChannelSelectMenuInteraction<CacheType>
-  | ModalSubmitInteraction<CacheType>
 >;

@@ -16,7 +16,6 @@ import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { runCommand } from "../utils/handlers/commandhandler";
 import { runInteraction } from "../utils/handlers/interactions";
 import { logger } from "../utils/logger";
-import { handleModal } from "../utils/modalHandler";
 
 export default async function interactionCreate(interaction: Interaction) {
   if (interaction.isButton()) {
@@ -31,10 +30,6 @@ export default async function interactionCreate(interaction: Interaction) {
     )
   ) {
     return runInteraction(interaction);
-  }
-
-  if (interaction.isModalSubmit()) {
-    return handleModal(interaction);
   }
 
   if (!interaction.isChatInputCommand()) return;

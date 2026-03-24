@@ -4,6 +4,7 @@ import {
   ButtonInteraction,
   ButtonStyle,
   ComponentType,
+  Interaction,
   Message,
   MessageActionRowComponentBuilder,
   MessageFlags,
@@ -243,4 +244,20 @@ export default class PageManager<T> {
 
     return embed;
   }
+}
+
+export function createMessageCollector(
+  msg: Message,
+  filter: (i: Interaction) => boolean,
+  timeout: number,
+) {
+  const collector = msg.createMessageComponentCollector({ filter });
+  let timer: NodeJS.Timeout = setTimeout(() => collector.stop("time"), timeout);
+
+  collector.on("collect", () => {
+    clearTimeout(timer);
+    timer = setTimeout(() => collector.stop("time"), timeout);
+  });
+
+  return collector;
 }
