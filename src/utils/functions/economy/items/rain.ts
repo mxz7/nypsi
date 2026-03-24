@@ -14,6 +14,7 @@ import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import { startLootRain } from "../../../../scheduled/clusterjobs/random-drops";
 import Constants from "../../../Constants";
+import { pluralize } from "../../string";
 import { getInventory, removeInventoryItem } from "../inventory";
 import { addStat } from "../stats";
 
@@ -37,7 +38,7 @@ module.exports = new ItemUse(
       embeds: [
         new CustomEmbed(
           message.member,
-          `💦 confirm to start a loot rain for **${length} minutes**` +
+          `💦 confirm to start a loot rain for **${length} ${pluralize("minute", length)}**` +
             (message.guildId !== Constants.NYPSI_SERVER_ID
               ? "\n\nyou can **double** the length of your loot rain by using it in a **public commands channel** in the **[official nypsi server](https://nypsi.xyz/discord)**"
               : ""),
