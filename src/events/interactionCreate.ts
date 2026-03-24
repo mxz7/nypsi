@@ -16,6 +16,7 @@ import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { runCommand } from "../utils/handlers/commandhandler";
 import { runInteraction } from "../utils/handlers/interactions";
 import { logger } from "../utils/logger";
+import { consumeModalCollector } from "../utils/modalHandler";
 
 export default async function interactionCreate(interaction: Interaction) {
   if (interaction.isButton()) {
@@ -30,6 +31,23 @@ export default async function interactionCreate(interaction: Interaction) {
     )
   ) {
     return runInteraction(interaction);
+  }
+
+  if (interaction.isModalSubmit()) {
+    const collector = consumeModalCollector(interaction.customId);
+    if (!collector) return;
+
+    try {
+      await collector(interaction);
+    } catch (err) {
+      logger.error(`modals: collector failed`, { err });
+      if (!interaction.replied) {
+        await interaction.reply({
+          content: "something went wrong, please make a support ticket",
+          ephemeral: true,
+        });
+      }
+    }
   }
 
   if (!interaction.isChatInputCommand()) return;

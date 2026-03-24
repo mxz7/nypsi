@@ -22,6 +22,8 @@ import {
 import { sort } from "fast-sort";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomContainer, CustomEmbed, ErrorEmbed, getColor } from "../models/EmbedBuilders";
+import { Item } from "../types/Economy";
+import { MessageComponentCollector } from "../types/InteractionHandler";
 import {
   getInventory,
   removeInventoryItem,
@@ -31,6 +33,7 @@ import {
   addToMuseum,
   getMuseum,
   getMuseumCategories,
+  Museum,
   showMuseumLeaderboard,
 } from "../utils/functions/economy/museum";
 import { createUser, formatNumber, getItems, userExists } from "../utils/functions/economy/utils";
@@ -38,6 +41,7 @@ import { getMember } from "../utils/functions/member";
 import { default as PageManager } from "../utils/functions/page";
 import { pluralize } from "../utils/functions/string";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { deleteModalCollectors, registerModalCollector } from "../utils/modalHandler";
 
 const cmd = new Command("museum", "view your museum progress", "money")
   .setAliases(["collect"])
@@ -140,6 +144,8 @@ async function run(
     return;
   }
 
+  let collector: MessageComponentCollector = undefined;
+
   const items = getItems();
   const sortedItems = sort(Object.values(items)).asc((i) => i.id);
   const itemCategories = getMuseumCategories();
@@ -167,9 +173,78 @@ async function run(
 
   const itemsPerPage = 8;
 
-  const doFindItem = async (interaction: ButtonInteraction, defer = true) => {
+  const doFindItem = async (
+    interaction: ButtonInteraction,
+    mode: "search" | "featured",
+    museum?: Museum,
+    featuredItems?: Item[],
+    slot?: number,
+  ) => {
+    const modalId = `museum-find:${message.member.id}:${interaction.id}`;
+
+    registerModalCollector(modalId, async (res) => {
+      if (collector.ended) {
+        return res.reply({
+          embeds: [new ErrorEmbed("interaction expired")],
+          flags: MessageFlags.Ephemeral,
+        });
+      }
+
+      const item = selectItem(res.fields.getTextInputValue("item").toLowerCase());
+
+      if (!item) {
+        return res.reply({
+          embeds: [new ErrorEmbed("invalid item")],
+          flags: MessageFlags.Ephemeral,
+        });
+      }
+
+      if (!item.museum) {
+        return res.reply({
+          embeds: [new ErrorEmbed("that item is not in the museum")],
+          flags: MessageFlags.Ephemeral,
+        });
+      }
+
+      if (mode == "search") {
+        const index = sortedItems
+          .filter((i) => i.museum?.category == item.museum.category)
+          .findIndex((i) => i.id == item.id);
+
+        const page = Math.floor(index / itemsPerPage) + 1;
+
+        await res.deferUpdate();
+        deleteModalCollectors(`museum-find`, message.member.id);
+
+        collector.stop("swap");
+
+        return categoryView(item.museum.category, page);
+      } else {
+        if (!museum.has(item)) {
+          return res.reply({
+            embeds: [new ErrorEmbed("you have not donated that item yet")],
+            flags: MessageFlags.Ephemeral,
+          });
+        }
+        if (featuredItems.findIndex((i) => i?.id == item.id) != -1) {
+          return res.reply({
+            embeds: [new ErrorEmbed("you already have that item featured")],
+            flags: MessageFlags.Ephemeral,
+          });
+        }
+
+        featuredItems[slot] = item;
+
+        await res.deferUpdate();
+        deleteModalCollectors(`museum-find`, message.member.id);
+
+        collector.stop("swap");
+        return editView(featuredItems);
+      }
+    });
+
     const modal = new ModalBuilder()
-      .setCustomId("museum-find")
+      .setCustomId(modalId)
       .setTitle("find an item")
       .addLabelComponents(
         new LabelBuilder()
@@ -184,40 +259,6 @@ async function run(
       );
 
     await interaction.showModal(modal);
-
-    const filter = (i: Interaction) => i.user.id == interaction.user.id;
-
-    const res = await interaction.awaitModalSubmit({ filter, time: 120000 }).catch(() => {});
-
-    if (!res || !res.isModalSubmit()) return;
-
-    const item = selectItem(res.fields.getTextInputValue("item").toLowerCase());
-
-    if (!item) {
-      await res.reply({
-        embeds: [new ErrorEmbed("invalid item")],
-        flags: MessageFlags.Ephemeral,
-      });
-      return false;
-    }
-
-    if (!item.museum) {
-      await res.reply({
-        embeds: [new ErrorEmbed("that item is not in the museum")],
-        flags: MessageFlags.Ephemeral,
-      });
-      return false;
-    }
-
-    const index = sortedItems
-      .filter((i) => i.museum?.category == item.museum.category)
-      .findIndex((i) => i.id == item.id);
-
-    const page = Math.floor(index / itemsPerPage) + 1;
-
-    if (defer) await res.deferUpdate();
-
-    return { item, interaction: res, page: page, category: item.museum.category };
   };
 
   let msg: Message;
@@ -293,56 +334,45 @@ async function run(
 
     const filter = (i: Interaction) => i.user.id == message.author.id;
 
-    const pageManager: any = async () => {
+    collector = msg.createMessageComponentCollector({ filter, time: 60000 });
+
+    collector.on("collect", async (interaction) => {
+      const res = interaction.customId;
       let fail = false;
 
-      const response = await msg
-        .awaitMessageComponent({ filter, time: 60000 })
-        .then(async (collected) => {
-          if (collected.customId != "find")
-            await collected.deferUpdate().catch(() => {
-              fail = true;
-              return pageManager();
-            });
-          return { res: collected.customId, interaction: collected };
-        })
-        .catch(async () => {
+      if (res !== "find") {
+        await interaction.deferUpdate().catch(() => {
           fail = true;
-          await msg.edit({ flags: MessageFlags.IsComponentsV2, components: [container(true)] });
         });
+      }
 
       if (fail) return;
-      if (!response) return;
-
-      const { res, interaction } = response;
 
       const categorySelect = await doCategorySelect(interaction);
 
       if (categorySelect) {
+        collector.stop("swap");
         return categoryView(categorySelect);
       } else if (res == "find") {
-        const res = await doFindItem(interaction as ButtonInteraction);
-
-        if (!res) return pageManager();
-
-        return categoryView(res.category, res.page);
+        await doFindItem(interaction as ButtonInteraction, "search");
       } else if (res == "edit") {
+        collector.stop("swap");
         return editView();
       }
+    });
 
-      await msg.edit({ flags: MessageFlags.IsComponentsV2, components: [container()] });
-      return pageManager();
-    };
-
-    return pageManager();
+    collector.on("end", async (_, message) => {
+      if (message != "swap")
+        await msg.edit({ flags: MessageFlags.IsComponentsV2, components: [container(true)] });
+    });
   };
 
-  const editView = async () => {
+  const editView = async (itemList?: Item[]) => {
     const museum = await getMuseum(message.member);
 
-    let featuredItems = (await museum.getFavoritedItems())
-      .concat(Array(5).fill(undefined))
-      .slice(0, 5);
+    let featuredItems = itemList
+      ? itemList
+      : (await museum.getFavoritedItems()).concat(Array(5).fill(undefined)).slice(0, 5);
 
     const container = async (disabled = false) => {
       const container = new ContainerBuilder()
@@ -423,31 +453,19 @@ async function run(
 
     const filter = (i: Interaction) => i.user.id == message.author.id;
 
-    const pageManager: any = async () => {
+    collector = msg.createMessageComponentCollector({ filter, time: 60000 });
+
+    collector.on("collect", async (interaction) => {
+      const res = interaction.customId;
       let fail = false;
 
-      const response = await msg
-        .awaitMessageComponent({ filter, time: 60000 })
-        .then(async (collected) => {
-          if (!collected.customId.startsWith("alter-"))
-            await collected.deferUpdate().catch(() => {
-              fail = true;
-              return pageManager();
-            });
-          return { res: collected.customId, interaction: collected };
-        })
-        .catch(async () => {
+      if (!res.startsWith("alter-")) {
+        await interaction.deferUpdate().catch(() => {
           fail = true;
-          await msg.edit({
-            flags: MessageFlags.IsComponentsV2,
-            components: [await container(true)],
-          });
         });
+      }
 
       if (fail) return;
-      if (!response) return;
-
-      const { res, interaction } = response;
 
       if (res == "save") {
         if (
@@ -457,38 +475,23 @@ async function run(
           await museum.setFavoritedItems(featuredItems);
         }
 
+        collector.stop("swap");
         return homeView();
       } else if (res == "clear") {
         featuredItems = Array(5).fill(undefined);
       } else if (res.startsWith("alter-")) {
         const slot = parseInt(res.split("-")[1]);
-
         if (featuredItems[slot]) {
           featuredItems[slot] = undefined;
           await interaction.deferUpdate();
         } else {
-          const res = await doFindItem(interaction as ButtonInteraction, false);
-          if (!res) return pageManager();
-
-          if (!museum.has(res.item)) {
-            await res.interaction.reply({
-              embeds: [new ErrorEmbed("you have not donated that item yet")],
-              flags: MessageFlags.Ephemeral,
-            });
-            return pageManager();
-          }
-
-          if (featuredItems.findIndex((i) => i?.id == res.item.id) != -1) {
-            await res.interaction.reply({
-              embeds: [new ErrorEmbed("you already have that item featured")],
-              flags: MessageFlags.Ephemeral,
-            });
-            return pageManager();
-          }
-
-          await res.interaction.deferUpdate();
-
-          featuredItems[slot] = res.item;
+          await doFindItem(
+            interaction as ButtonInteraction,
+            "featured",
+            museum,
+            featuredItems,
+            slot,
+          );
         }
       } else if (res.startsWith("up-")) {
         const slot = parseInt(res.split("-")[1]);
@@ -509,10 +512,12 @@ async function run(
       }
 
       await msg.edit({ flags: MessageFlags.IsComponentsV2, components: [await container()] });
-      return pageManager();
-    };
+    });
 
-    return pageManager();
+    collector.on("end", async (_, message) => {
+      if (message != "swap")
+        await msg.edit({ flags: MessageFlags.IsComponentsV2, components: [await container(true)] });
+    });
   };
 
   const categoryView = async (category: string, currentPage = 1) => {
@@ -618,50 +623,40 @@ async function run(
 
     const filter = (i: Interaction) => i.user.id == message.author.id;
 
-    const pageManager: any = async () => {
+    collector = msg.createMessageComponentCollector({ filter, time: 60000 });
+
+    collector.on("collect", async (interaction) => {
+      const res = interaction.customId;
       let fail = false;
 
-      const response = await msg
-        .awaitMessageComponent({ filter, time: 60000 })
-        .then(async (collected) => {
-          if (collected.customId != "find")
-            await collected.deferUpdate().catch(() => {
-              fail = true;
-              return pageManager();
-            });
-          return { res: collected.customId, interaction: collected };
-        })
-        .catch(async () => {
+      if (res !== "find") {
+        await interaction.deferUpdate().catch(() => {
           fail = true;
-          await msg.edit({ flags: MessageFlags.IsComponentsV2, components: [container(true)] });
         });
+      }
 
       if (fail) return;
-      if (!response) return;
-
-      const { res, interaction } = response;
 
       const categorySelect = await doCategorySelect(interaction);
 
       if (categorySelect) {
+        collector.stop("swap");
         return categorySelect == "home" ? homeView() : categoryView(categorySelect);
       } else if (res == "➡") {
         if (currentPage < pages.size) currentPage++;
       } else if (res == "⬅") {
         if (currentPage > 1) currentPage--;
       } else if (res == "find") {
-        const res = await doFindItem(interaction as ButtonInteraction);
-
-        if (!res) return pageManager();
-
-        return categoryView(res.category, res.page);
+        await doFindItem(interaction as ButtonInteraction, "search");
       }
 
       await msg.edit({ flags: MessageFlags.IsComponentsV2, components: [container()] });
-      return pageManager();
-    };
+    });
 
-    return pageManager();
+    collector.on("end", async (_, message) => {
+      if (message != "swap")
+        await msg.edit({ flags: MessageFlags.IsComponentsV2, components: [container(true)] });
+    });
   };
 
   await addCooldown(cmd.name, message.member, 3);
