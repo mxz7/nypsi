@@ -44,8 +44,8 @@ importers:
         specifier: ^17.0.1
         version: 17.0.1
       '@yusifaliyevpro/countries':
-        specifier: ^2.2.2
-        version: 2.2.2
+        specifier: ^2.3.0
+        version: 2.3.0
       '@zeyrbot/urbandictionary':
         specifier: ^1.0.3
         version: 1.0.3
@@ -1530,8 +1530,8 @@ packages:
     resolution: {integrity: sha512-Xfe6rpCTxSxfbswi/W/Pz7zp1WWSNn4A0eW4mLkQUewCrXXtMj31lCg+iQyTkh/CkusZSq9eDflu7tjEDXUY6g==}
     engines: {node: '>=v14.0.0', npm: '>=7.0.0'}
 
-  '@yusifaliyevpro/countries@2.2.2':
-    resolution: {integrity: sha512-2chsv5XtnBFFz3dG25xWHx+E0lKRZuyP+T/3aICBHXCWvcsCO4OUhIibRKrJcmZQyD4cMiwkG/kFoXBkb8vMEw==}
+  '@yusifaliyevpro/countries@2.3.0':
+    resolution: {integrity: sha512-aL/ldX01jRWTwDec1nkgUYIFcsprkNZXPT/iTu1opVFpXHty1ul5Xs4LDnTLEybmsk+O0N9EP35zjz4Vzzh8VA==}
 
   '@zeyrbot/urbandictionary@1.0.3':
     resolution: {integrity: sha512-w4Nc88ikL4DakWTXwvKfCztDVmKNhcP3tLwmGWH7BwJcyDpvL5eJp+duumVyh6wrqhbRzlE7fLuDJPnl7jHkBw==}
@@ -3883,7 +3883,7 @@ snapshots:
 
   '@vladfrangu/async_event_emitter@2.4.7': {}
 
-  '@yusifaliyevpro/countries@2.2.2': {}
+  '@yusifaliyevpro/countries@2.3.0': {}
 
   '@zeyrbot/urbandictionary@1.0.3':
     dependencies:

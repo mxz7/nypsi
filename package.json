@@ -27,7 +27,7 @@
     "@prisma/adapter-pg": "^7.5.0",
     "@prisma/client": "7.5.0",
     "@twemoji/parser": "^17.0.1",
-    "@yusifaliyevpro/countries": "^2.2.2",
+    "@yusifaliyevpro/countries": "^2.3.0",
     "@zeyrbot/urbandictionary": "^1.0.3",
     "bufferutil": "4.1.0",
     "bullmq": "^5.67.3",
