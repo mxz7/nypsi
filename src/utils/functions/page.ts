@@ -246,18 +246,27 @@ export default class PageManager<T> {
   }
 }
 
-export function createMessageCollector(
-  msg: Message,
-  filter: (i: Interaction) => boolean,
-  timeout: number,
-) {
-  const collector = msg.createMessageComponentCollector({ filter });
-  let timer: NodeJS.Timeout = setTimeout(() => collector.stop("time"), timeout);
+export class CustomMessageComponentCollector {
+  private collector: ReturnType<Message["createMessageComponentCollector"]>;
+  private timer: NodeJS.Timeout;
+  private timeout: number;
 
-  collector.on("collect", () => {
-    clearTimeout(timer);
-    timer = setTimeout(() => collector.stop("time"), timeout);
-  });
+  constructor(msg: Message, filter: (i: Interaction) => boolean, timeout: number) {
+    this.timeout = timeout;
+    this.collector = msg.createMessageComponentCollector({ filter });
+    this.timer = setTimeout(() => this.collector.stop("time"), timeout);
 
-  return collector;
+    this.collector.on("collect", () => {
+      this.refreshTimer();
+    });
+  }
+
+  refreshTimer(ms = this.timeout) {
+    clearTimeout(this.timer);
+    this.timer = setTimeout(() => this.collector.stop("time"), ms);
+  }
+
+  get instance() {
+    return this.collector;
+  }
 }

@@ -37,7 +37,7 @@ import {
 } from "../utils/functions/economy/museum";
 import { createUser, formatNumber, getItems, userExists } from "../utils/functions/economy/utils";
 import { getMember } from "../utils/functions/member";
-import PageManager, { createMessageCollector } from "../utils/functions/page";
+import PageManager, { CustomMessageComponentCollector } from "../utils/functions/page";
 import { pluralize } from "../utils/functions/string";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -310,9 +310,10 @@ async function run(
 
     const filter = (i: Interaction) => i.user.id === message.author.id;
 
-    const collector = createMessageCollector(msg, filter, 5000);
+    const collector = new CustomMessageComponentCollector(msg, filter, 5000);
+    const collectorInstance = collector.instance;
 
-    collector.on("collect", async (interaction) => {
+    collectorInstance.on("collect", async (interaction) => {
       const res = interaction.customId;
       let fail = false;
 
@@ -327,20 +328,22 @@ async function run(
       const categorySelect = await doCategorySelect(interaction);
 
       if (categorySelect) {
-        collector.stop("swap");
+        collectorInstance.stop("swap");
         return categoryView(categorySelect);
       } else if (res === "find") {
-        const findRes = await doFindItem(interaction as ButtonInteraction, collector);
+        collector.refreshTimer(120000);
+        const findRes = await doFindItem(interaction as ButtonInteraction, collectorInstance);
+        collector.refreshTimer();
         if (!findRes) return;
-        collector.stop("swap");
+        collectorInstance.stop("swap");
         return categoryView(findRes.category, findRes.page);
       } else if (res === "edit") {
-        collector.stop("swap");
+        collectorInstance.stop("swap");
         return editView();
       }
     });
 
-    collector.on("end", async (_, reason) => {
+    collectorInstance.on("end", async (_, reason) => {
       if (reason == "time")
         await msg.edit({ flags: MessageFlags.IsComponentsV2, components: [container(true)] });
     });
@@ -432,9 +435,10 @@ async function run(
 
     const filter = (i: Interaction) => i.user.id === message.author.id;
 
-    const collector = createMessageCollector(msg, filter, 15000);
+    const collector = new CustomMessageComponentCollector(msg, filter, 5000);
+    const collectorInstance = collector.instance;
 
-    collector.on("collect", async (interaction) => {
+    collectorInstance.on("collect", async (interaction) => {
       const res = interaction.customId;
       let fail = false;
 
@@ -454,7 +458,7 @@ async function run(
           await museum.setFavoritedItems(featuredItems);
         }
 
-        collector.stop("swap");
+        collectorInstance.stop("swap");
         return homeView();
       } else if (res == "clear") {
         featuredItems = Array(5).fill(undefined);
@@ -465,7 +469,9 @@ async function run(
           featuredItems[slot] = undefined;
           await interaction.deferUpdate();
         } else {
-          const res = await doFindItem(interaction as ButtonInteraction, collector, false);
+          collector.refreshTimer(120000);
+          const res = await doFindItem(interaction as ButtonInteraction, collectorInstance);
+          collector.refreshTimer();
           if (!res) return;
 
           if (!museum.has(res.item)) {
@@ -509,7 +515,7 @@ async function run(
       await msg.edit({ flags: MessageFlags.IsComponentsV2, components: [await container()] });
     });
 
-    collector.on("end", async (_, reason) => {
+    collectorInstance.on("end", async (_, reason) => {
       if (reason == "time")
         await msg.edit({ flags: MessageFlags.IsComponentsV2, components: [await container(true)] });
     });
@@ -618,9 +624,10 @@ async function run(
 
     const filter = (i: Interaction) => i.user.id == message.author.id;
 
-    const collector = createMessageCollector(msg, filter, 5000);
+    const collector = new CustomMessageComponentCollector(msg, filter, 5000);
+    const collectorInstance = collector.instance;
 
-    collector.on("collect", async (interaction) => {
+    collectorInstance.on("collect", async (interaction) => {
       const res = interaction.customId;
       let fail = false;
 
@@ -635,25 +642,27 @@ async function run(
       const categorySelect = await doCategorySelect(interaction);
 
       if (categorySelect) {
-        collector.stop("swap");
+        collectorInstance.stop("swap");
         return categorySelect == "home" ? homeView() : categoryView(categorySelect);
       } else if (res == "➡") {
         if (currentPage < pages.size) currentPage++;
       } else if (res == "⬅") {
         if (currentPage > 1) currentPage--;
       } else if (res == "find") {
-        const res = await doFindItem(interaction as ButtonInteraction, collector);
+        collector.refreshTimer(120000);
+        const res = await doFindItem(interaction as ButtonInteraction, collectorInstance);
+        collector.refreshTimer();
 
         if (!res) return;
 
-        collector.stop("swap");
+        collectorInstance.stop("swap");
         return categoryView(res.category, res.page);
       }
 
       await msg.edit({ flags: MessageFlags.IsComponentsV2, components: [container()] });
     });
 
-    collector.on("end", async (_, reason) => {
+    collectorInstance.on("end", async (_, reason) => {
       if (reason == "time")
         await msg.edit({ flags: MessageFlags.IsComponentsV2, components: [container(true)] });
     });
