@@ -26,8 +26,8 @@ importers:
         specifier: 3.1000.0
         version: 3.1000.0
       '@catppuccin/palette':
-        specifier: 1.7.1
-        version: 1.7.1
+        specifier: 1.8.0
+        version: 1.8.0
       '@discordjs/rest':
         specifier: 2.6.1
         version: 2.6.1
@@ -327,8 +327,8 @@ packages:
     resolution: {integrity: sha512-05WQkdpL9COIMz4LjTxGpPNCdlpyimKppYNoJ5Di5EUObifl8t4tuLuUBBZEpoLYOmfvIWrsp9fCl0HoPRVTdA==}
     engines: {node: '>=6.9.0'}
 
-  '@catppuccin/palette@1.7.1':
-    resolution: {integrity: sha512-aRc1tbzrevOTV7nFTT9SRdF26w/MIwT4Jwt4fDMc9itRZUDXCuEDBLyz4TQMlqO9ZP8mf5Hu4Jr6D03NLFc6Gw==}
+  '@catppuccin/palette@1.8.0':
+    resolution: {integrity: sha512-qXhwKiLzQomUygUJYB36YAFgs+dET5bIocfkiaFIatQF5Pwc7L112TlF9P8J5Oqs3x3XTjYSucG0ncHXSCuk7Q==}
 
   '@chevrotain/cst-dts-gen@10.5.0':
     resolution: {integrity: sha512-lhmC/FyqQ2o7pGK4Om+hzuDrm9rhFYIJ/AXoQBeongmn870Xeb0L6oGEiuR8nohFNL5sMaQEJWCxr1oIVIVXrw==}
@@ -2836,7 +2836,7 @@ snapshots:
 
   '@babel/runtime@7.28.6': {}
 
-  '@catppuccin/palette@1.7.1': {}
+  '@catppuccin/palette@1.8.0': {}
 
   '@chevrotain/cst-dts-gen@10.5.0':
     dependencies:
