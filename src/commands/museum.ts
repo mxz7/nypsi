@@ -41,7 +41,11 @@ import { getMember } from "../utils/functions/member";
 import { default as PageManager } from "../utils/functions/page";
 import { pluralize } from "../utils/functions/string";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { deleteModalCollectors, registerModalCollector } from "../utils/modalHandler";
+import {
+  createModalId,
+  deleteModalCollectors,
+  registerModalCollector,
+} from "../utils/modalHandler";
 
 const cmd = new Command("museum", "view your museum progress", "money")
   .setAliases(["collect"])
@@ -180,7 +184,7 @@ async function run(
     featuredItems?: Item[],
     slot?: number,
   ) => {
-    const modalId = `museum-find:${message.member.id}:${interaction.id}`;
+    const modalId = createModalId("museum-find", message.member.id, interaction.id, message.id);
 
     registerModalCollector(modalId, async (res) => {
       if (collector.ended) {
@@ -361,8 +365,9 @@ async function run(
       }
     });
 
-    collector.on("end", async (_, message) => {
-      if (message != "swap")
+    collector.on("end", async (_, reason) => {
+      deleteModalCollectors(message.id);
+      if (reason != "swap")
         await msg.edit({ flags: MessageFlags.IsComponentsV2, components: [container(true)] });
     });
   };
@@ -514,8 +519,9 @@ async function run(
       await msg.edit({ flags: MessageFlags.IsComponentsV2, components: [await container()] });
     });
 
-    collector.on("end", async (_, message) => {
-      if (message != "swap")
+    collector.on("end", async (_, reason) => {
+      deleteModalCollectors(message.id);
+      if (reason != "swap")
         await msg.edit({ flags: MessageFlags.IsComponentsV2, components: [await container(true)] });
     });
   };
@@ -653,8 +659,9 @@ async function run(
       await msg.edit({ flags: MessageFlags.IsComponentsV2, components: [container()] });
     });
 
-    collector.on("end", async (_, message) => {
-      if (message != "swap")
+    collector.on("end", async (_, reason) => {
+      deleteModalCollectors(message.id);
+      if (reason != "swap")
         await msg.edit({ flags: MessageFlags.IsComponentsV2, components: [container(true)] });
     });
   };
