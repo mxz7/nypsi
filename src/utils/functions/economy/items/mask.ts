@@ -6,7 +6,7 @@ import { ItemUse } from "../../../../models/ItemUse";
 import { removeInventoryItem } from "../inventory";
 import { addStat } from "../stats";
 
-module.exports = new ItemUse(
+export default new ItemUse(
   "mask",
   async (message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) => {
     const robCooldown = (await redis.exists(`cd:rob:${message.author.id}`)) == 1;

@@ -76,6 +76,7 @@ export default {
 
                     if (!birthday) continue;
 
+                    // @ts-expect-error - dayjs is imported wrong apparently but it works fine
                     const years = dayjs().diff(birthday.birthday, "years");
 
                     const msg = `it's ${member.toString()}'s ${parseInt(birthday.birthday.split("-")[0]) == 69 ? "" : `**${years}${getOrdinalSuffix(years)}** `}birthday today!`;

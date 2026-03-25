@@ -1,12 +1,18 @@
-import { Collection, Message, Snowflake, TextBasedChannel } from "discord.js";
+import {
+  GuildTextBasedChannel,
+  Message,
+  PartialMessage,
+  ReadonlyCollection,
+  Snowflake,
+} from "discord.js";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
 import { logger } from "../utils/logger";
 import dayjs = require("dayjs");
 
 export default async function messageDeleteBulk(
-  messages: Collection<Snowflake, Message>,
-  channel: TextBasedChannel,
+  messages: ReadonlyCollection<Snowflake, Message<true> | PartialMessage<true>>,
+  channel: GuildTextBasedChannel,
 ) {
   if (channel.isDMBased()) return;
 

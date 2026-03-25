@@ -14,7 +14,7 @@ import sleep from "../../sleep";
 import { removeInventoryItem } from "../inventory";
 import { addStat } from "../stats";
 
-module.exports = new ItemUse(
+export default new ItemUse(
   "chastity_cage",
   async (
     message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),

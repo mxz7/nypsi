@@ -18,7 +18,7 @@ import { pluralize } from "../../string";
 import { getInventory, removeInventoryItem } from "../inventory";
 import { addStat } from "../stats";
 
-module.exports = new ItemUse(
+export default new ItemUse(
   "rain",
   async (message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) => {
     let length = 1;

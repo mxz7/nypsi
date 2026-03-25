@@ -15,7 +15,7 @@ import { removeInventoryItem } from "../inventory";
 import { isPassive } from "../passive";
 import { addStat } from "../stats";
 
-module.exports = new ItemUse(
+export default new ItemUse(
   "radio",
   async (
     message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),

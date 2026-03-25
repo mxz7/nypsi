@@ -15,11 +15,10 @@ import {
 } from "discord.js";
 import { nanoid } from "nanoid";
 import { compareTwoStrings } from "string-similarity";
-import { NypsiCommandInteraction, NypsiMessage } from "../../../models/Command";
-import { CustomEmbed, ErrorEmbed, getColor } from "../../../models/EmbedBuilders";
-// @ts-expect-error doesn't like getting from json file
 import { countries } from "../../../../data/lists.json";
 import prisma from "../../../init/database";
+import { NypsiCommandInteraction, NypsiMessage } from "../../../models/Command";
+import { CustomEmbed, ErrorEmbed, getColor } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { MStoTime } from "../date";
 import { addProgress } from "../economy/achievements";

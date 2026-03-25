@@ -14,7 +14,7 @@ import { isPassive } from "../passive";
 import { addStat } from "../stats";
 import { addHandcuffs, createUser, isHandcuffed, userExists } from "../utils";
 
-module.exports = new ItemUse(
+export default new ItemUse(
   "handcuffs",
   async (
     message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),

@@ -1,5 +1,4 @@
 import { CommandInteraction } from "discord.js";
-// @ts-expect-error doesn't like getting from json file
 import { workMessages } from "../../data/lists.json";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";

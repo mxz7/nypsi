@@ -1,9 +1,9 @@
-import { GuildChannel } from "discord.js";
+import { DMChannel, NonThreadGuildBasedChannel } from "discord.js";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
 
-export default async function channelDelete(channel: GuildChannel) {
-  if (!channel.guild) return;
+export default async function channelDelete(channel: DMChannel | NonThreadGuildBasedChannel) {
+  if (channel.isDMBased()) return;
 
   if (await isLogsEnabled(channel.guild)) {
     const embed = new CustomEmbed().disableFooter().setTimestamp();

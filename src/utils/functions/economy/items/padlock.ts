@@ -6,7 +6,7 @@ import { hasPadlock, setPadlock } from "../balance";
 import { removeInventoryItem } from "../inventory";
 import { addStat } from "../stats";
 
-module.exports = new ItemUse(
+export default new ItemUse(
   "padlock",
   async (message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) => {
     if (await hasPadlock(message.member)) {

@@ -30,7 +30,7 @@ export default {
       return interaction.reply({
         embeds: [
           new CustomEmbed(
-            this.member,
+            interaction.user.id,
             "fun & moderation commands are still available to you. maintenance mode only prevents certain commands to prevent loss of progress",
           ).setTitle("⚠️ nypsi is under maintenance"),
         ],

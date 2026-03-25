@@ -7,6 +7,7 @@
     "strictFunctionTypes": true,
     "skipLibCheck": true,
     "noImplicitAny": true,
+    "strictNullChecks": false,
     "paths": {
       "#generated/prisma": ["./src/generated/prisma/client"]
     }

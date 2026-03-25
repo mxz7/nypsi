@@ -19,20 +19,17 @@ import {
   WebhookClient,
 } from "discord.js";
 import * as fs from "fs";
+import { tips } from "../../../data/lists.json";
+import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { NypsiClient } from "../../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../models/EmbedBuilders";
-import { giveCaptcha, isLockedOut, verifyUser } from "../functions/captcha";
-import { formatDate } from "../functions/date";
-import { getNews, hasSeenNews } from "../functions/news";
-import { getTimestamp, logger } from "../logger";
-// @ts-expect-error doesn't like getting from json file
-import { tips } from "../../../data/lists.json";
-import prisma from "../../init/database";
 import { Item } from "../../types/Economy";
 import Constants from "../Constants";
 import { a } from "../functions/anticheat";
+import { giveCaptcha, isLockedOut, verifyUser } from "../functions/captcha";
+import { formatDate } from "../functions/date";
 import { addProgress, setProgress } from "../functions/economy/achievements";
 import { getBankBalance } from "../functions/economy/balance";
 import { addBooster } from "../functions/economy/boosters";
@@ -66,6 +63,7 @@ import { getChatFilter } from "../functions/guilds/filters";
 import { getPrefix } from "../functions/guilds/utils";
 import { addKarma, getKarma } from "../functions/karma/karma";
 import { getAllGroupAccountIds } from "../functions/moderation/alts";
+import { getNews, hasSeenNews } from "../functions/news";
 import { getUserAliases } from "../functions/premium/aliases";
 import { addUse, getCommand } from "../functions/premium/command";
 import { isPremium } from "../functions/premium/premium";
@@ -83,6 +81,7 @@ import {
 } from "../functions/users/notifications";
 import { getLastKnownUsername } from "../functions/users/username";
 import { createProfile, hasProfile } from "../functions/users/utils";
+import { getTimestamp, logger } from "../logger";
 import dayjs = require("dayjs");
 import ms = require("ms");
 
@@ -215,7 +214,7 @@ export function reloadCommand(commandsArray: string[]) {
         commandsSize = commands.size;
       }
     } catch (e) {
-      logger.error(e);
+      logger.error("commandhandler: failed to reload command", { error: e });
     }
   }
   aliasesSize = aliases.size;
@@ -1528,23 +1527,21 @@ export async function deleteSlashCommandsFromGuild(guildID: string, clientID: st
   try {
     await rest.put(Routes.applicationGuildCommands(clientID, guildID), { body: [] });
 
-    logger.info("finished deletion of [/] commands");
+    logger.info("slash commands: finished deletion of [/] commands");
   } catch (error) {
-    logger.error("failed deletion of [/] commands");
-    logger.error(error);
+    logger.error("slash commands: failed deletion of [/] commands", { error });
   }
 }
 
 export async function deleteSlashCommands(clientID: string) {
-  logger.info("started refresh of global [/] commands...");
+  logger.info("started deletion of global [/] commands...");
   const rest = new REST({ version: "9" }).setToken(process.env.BOT_TOKEN);
 
   try {
     await rest.put(Routes.applicationCommands(clientID), { body: [] });
 
-    logger.info("finished deletion of global [/] commands");
+    logger.info("slash commands: finished deletion of global [/] commands");
   } catch (error) {
-    logger.error("failed deletion of global [/] commands");
-    logger.error(error);
+    logger.error("slash commands: failed deletion of global [/] commands", { error });
   }
 }

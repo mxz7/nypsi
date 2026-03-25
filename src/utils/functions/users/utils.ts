@@ -1,5 +1,5 @@
 import { exec } from "child_process";
-import { User, WebhookClient } from "discord.js";
+import { GuildMember, User, WebhookClient } from "discord.js";
 import { promisify } from "util";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
@@ -51,8 +51,11 @@ export async function hasProfile(member: MemberResolvable) {
 export async function createProfile(member: MemberResolvable) {
   const userId = getUserId(member);
   let username = "";
-  if (typeof member !== "string") {
-    username = member instanceof User ? member.username : member.user.username;
+
+  if (member instanceof User) {
+    username = member.username;
+  } else if (member instanceof GuildMember) {
+    username = member.user.username;
   }
 
   if (await redis.exists(`${Constants.redis.nypsi.PROFILE_TRANSFER}:${userId}`)) return;

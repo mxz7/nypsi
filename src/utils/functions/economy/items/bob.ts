@@ -12,7 +12,7 @@ import { addStat } from "../stats";
 import { formatNumber, getItems } from "../utils";
 import dayjs = require("dayjs");
 
-module.exports = new ItemUse(
+export default new ItemUse(
   "bob",
   async (
     message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),

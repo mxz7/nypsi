@@ -429,10 +429,10 @@ module.exports = cmd;
   );
 
   for (const file of files) {
-    const x = await import(`../utils/functions/economy/items/${file}`);
+    const x = await import(`../utils/functions/economy/items/${file}`).then((f) => f.default);
 
     if (!(x instanceof ItemUse)) {
-      logger.error(`failed to load ${file}`);
+      logger.error(`failed to load ${file}`, { x });
     } else {
       itemFunctions.set(x.itemId, x);
     }

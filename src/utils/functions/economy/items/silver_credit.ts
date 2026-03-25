@@ -24,7 +24,7 @@ import dayjs = require("dayjs");
 
 const SILVER_TIER = 2;
 
-module.exports = new ItemUse(
+export default new ItemUse(
   "silver_credit",
   async (message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) => {
     const currentTier = await getTier(message.author.id);

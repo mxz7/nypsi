@@ -10,7 +10,7 @@ const responses = [
   "img:https://c.tenor.com/ePP-BHO96PQAAAAC/tenor.gif",
 ];
 
-module.exports = new ItemUse(
+export default new ItemUse(
   "football",
   async (message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) => {
     const chosen = responses[Math.floor(Math.random() * responses.length)];

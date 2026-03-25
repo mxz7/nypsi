@@ -1,4 +1,4 @@
-import { Message, PermissionFlagsBits } from "discord.js";
+import { Message, PartialMessage, PermissionFlagsBits } from "discord.js";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import {
   checkAutoMute,
@@ -10,9 +10,35 @@ import { createGuild, eSnipe, hasGuild } from "../utils/functions/guilds/utils";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
 import { addMuteViolation } from "../utils/functions/moderation/mute";
 import { cleanString } from "../utils/functions/string";
+import { logger } from "../utils/logger";
 
-export default async function messageUpdate(message: Message, newMessage: Message) {
+export default async function messageUpdate(
+  message: Message | PartialMessage,
+  newMessage: Message | PartialMessage,
+) {
   if (!message) return;
+
+  if (message.partial) {
+    const fetched: false | Message = await message.fetch().catch(() => false);
+
+    if (!fetched) {
+      logger.error("message update: failed to fetch partial message");
+      return;
+    }
+
+    message = fetched;
+  }
+
+  if (newMessage.partial) {
+    const fetched: false | Message = await newMessage.fetch().catch(() => false);
+
+    if (!fetched) {
+      logger.error("message update: failed to fetch partial new message");
+      return;
+    }
+
+    newMessage = fetched;
+  }
 
   if (!message.member) return;
 
@@ -35,11 +61,16 @@ export default async function messageUpdate(message: Message, newMessage: Messag
   }
 
   if (!newMessage.member.permissions.has(PermissionFlagsBits.Administrator)) {
-    const res = await checkMessageContent(message.guild, newMessage.content, true, newMessage);
+    const res = await checkMessageContent(
+      message.guild,
+      newMessage.content,
+      true,
+      newMessage as Message,
+    );
 
     if (!res) {
       addMuteViolation(newMessage.guild, newMessage.member);
-      await checkAutoMute(newMessage);
+      await checkAutoMute(newMessage as Message);
       return;
     }
   }
