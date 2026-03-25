@@ -105,7 +105,7 @@ jobs:
           remote_key: ${{ secrets.SSH_KEY }}
 
       - name: connect to server & update packages
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1.2.5
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
