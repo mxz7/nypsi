@@ -161,10 +161,10 @@ async function run(
 
   const doFindItem = async (
     interaction: ButtonInteraction,
-    collector: ReturnType<Message["createMessageComponentCollector"]>,
+    collector: CustomMessageComponentCollector,
     defer = true,
   ) => {
-    const id = `museum-find-${Math.floor(Math.random() * 69420)}`;
+    const id = `museum-find-${interaction.id}`;
 
     const modal = new ModalBuilder()
       .setCustomId(id)
@@ -186,11 +186,12 @@ async function run(
     const filter = (i: ModalSubmitInteraction) =>
       i.user.id == (interaction as ButtonInteraction).user.id && i.customId === id;
 
+    collector.refreshTimer(120000);
     const res = await interaction.awaitModalSubmit({ filter, time: 120000 }).catch(() => {});
 
     if (!res || !res.isModalSubmit()) return;
 
-    if (collector.ended) {
+    if (collector.instance.ended) {
       await res.reply({
         embeds: [new ErrorEmbed("action expired")],
         flags: MessageFlags.Ephemeral,
@@ -223,6 +224,7 @@ async function run(
     const page = Math.floor(index / itemsPerPage) + 1;
 
     if (defer) await res.deferUpdate();
+    collector.refreshTimer();
 
     return { item, interaction: res, page: page, category: item.museum.category };
   };
@@ -309,7 +311,7 @@ async function run(
 
     const filter = (i: Interaction) => i.user.id === message.author.id;
 
-    const collector = new CustomMessageComponentCollector(msg, filter, 5000);
+    const collector = new CustomMessageComponentCollector(msg, filter, 60000);
     const collectorInstance = collector.instance;
 
     collectorInstance.on("collect", async (interaction) => {
@@ -330,9 +332,7 @@ async function run(
         collectorInstance.stop("swap");
         return categoryView(categorySelect);
       } else if (res === "find") {
-        collector.refreshTimer(120000);
-        const findRes = await doFindItem(interaction as ButtonInteraction, collectorInstance);
-        collector.refreshTimer();
+        const findRes = await doFindItem(interaction as ButtonInteraction, collector);
         if (!findRes) return;
         collectorInstance.stop("swap");
         return categoryView(findRes.category, findRes.page);
@@ -434,7 +434,7 @@ async function run(
 
     const filter = (i: Interaction) => i.user.id === message.author.id;
 
-    const collector = new CustomMessageComponentCollector(msg, filter, 5000);
+    const collector = new CustomMessageComponentCollector(msg, filter, 60000);
     const collectorInstance = collector.instance;
 
     collectorInstance.on("collect", async (interaction) => {
@@ -468,9 +468,7 @@ async function run(
           featuredItems[slot] = undefined;
           await interaction.deferUpdate();
         } else {
-          collector.refreshTimer(120000);
-          const res = await doFindItem(interaction as ButtonInteraction, collectorInstance);
-          collector.refreshTimer();
+          const res = await doFindItem(interaction as ButtonInteraction, collector, false);
           if (!res) return;
 
           if (!museum.has(res.item)) {
@@ -623,7 +621,7 @@ async function run(
 
     const filter = (i: Interaction) => i.user.id == message.author.id;
 
-    const collector = new CustomMessageComponentCollector(msg, filter, 5000);
+    const collector = new CustomMessageComponentCollector(msg, filter, 60000);
     const collectorInstance = collector.instance;
 
     collectorInstance.on("collect", async (interaction) => {
@@ -648,9 +646,7 @@ async function run(
       } else if (res == "⬅") {
         if (currentPage > 1) currentPage--;
       } else if (res == "find") {
-        collector.refreshTimer(120000);
-        const res = await doFindItem(interaction as ButtonInteraction, collectorInstance);
-        collector.refreshTimer();
+        const res = await doFindItem(interaction as ButtonInteraction, collector);
 
         if (!res) return;
 

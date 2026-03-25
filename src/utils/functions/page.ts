@@ -259,6 +259,10 @@ export class CustomMessageComponentCollector {
     this.collector.on("collect", () => {
       this.refreshTimer();
     });
+
+    this.collector.on("end", () => {
+      clearTimeout(this.timer);
+    });
   }
 
   refreshTimer(ms = this.timeout) {
