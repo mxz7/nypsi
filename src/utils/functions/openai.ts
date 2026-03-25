@@ -53,9 +53,9 @@ type Prompts = "support_request";
 
 export async function buildPrompt(prompt: Prompts) {
   if (prompt === "support_request") {
-    const text = prompts.support_request;
+    let text = prompts.support_request;
 
-    text.replace("{documentation}", await getDocsRaw());
+    text = text.replace("{documentation}", await getDocsRaw());
 
     return text;
   }
