@@ -1,11 +1,23 @@
-import { User } from "discord.js";
+import { PartialUser, User } from "discord.js";
 import { NypsiClient } from "../models/Client";
 import { clearMemberCache } from "../utils/functions/member";
 import { addNewUsername, fetchUsernameHistory, isTracking } from "../utils/functions/users/history";
 import { updateLastKnownUsername } from "../utils/functions/users/username";
 import { hasProfile } from "../utils/functions/users/utils";
+import { logger } from "../utils/logger";
 
-export default async function userUpdate(oldUser: User, newUser: User) {
+export default async function userUpdate(oldUser: User | PartialUser, newUser: User) {
+  if (oldUser.partial) {
+    const fetched: false | User = await oldUser.fetch().catch(() => false);
+
+    if (!fetched) {
+      logger.error("user update: failed to fetch partial user");
+      return;
+    }
+
+    oldUser = fetched;
+  }
+
   oldUser.client.guilds.cache
     .filter((g) => g.members.cache.has(oldUser.id))
     .forEach((g) => clearMemberCache(g.id));

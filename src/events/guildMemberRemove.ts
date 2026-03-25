@@ -1,4 +1,4 @@
-import { GuildMember } from "discord.js";
+import { GuildMember, PartialGuildMember } from "discord.js";
 import prisma from "../init/database";
 import redis from "../init/redis";
 import { CustomEmbed } from "../models/EmbedBuilders";
@@ -11,8 +11,20 @@ import { isBooster, setBooster } from "../utils/functions/premium/boosters";
 import { pluralize } from "../utils/functions/string";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
 import { getTags, removeTag } from "../utils/functions/users/tags";
+import { logger } from "../utils/logger";
 
-export default async function guildMemberRemove(member: GuildMember) {
+export default async function guildMemberRemove(member: GuildMember | PartialGuildMember) {
+  if (member.partial) {
+    const fetched: false | GuildMember = await member.fetch().catch(() => false);
+
+    if (!fetched) {
+      logger.error("guild member remove: failed to fetch partial member");
+      return;
+    }
+
+    member = fetched;
+  }
+
   clearMemberCache(member.guild.id);
   await redis.del(`${Constants.redis.cache.guild.JOIN_ORDER}:${member.guild.id}`);
 

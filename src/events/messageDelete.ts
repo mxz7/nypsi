@@ -1,12 +1,24 @@
-import { Message } from "discord.js";
+import { Message, PartialMessage } from "discord.js";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { getChatFilter, getSnipeFilter } from "../utils/functions/guilds/filters";
 import { createGuild, hasGuild, snipe } from "../utils/functions/guilds/utils";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
 import { cleanString } from "../utils/functions/string";
+import { logger } from "../utils/logger";
 
-export default async function messageDelete(message: Message) {
+export default async function messageDelete(message: Message | PartialMessage) {
   if (!message) return;
+
+  if (message.partial) {
+    const fetched: false | Message = await message.fetch().catch(() => false);
+
+    if (!fetched) {
+      logger.error("message delete: failed to fetch partial message");
+      return;
+    }
+
+    message = fetched;
+  }
 
   if (!message.member) return;
 

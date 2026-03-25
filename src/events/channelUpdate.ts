@@ -1,8 +1,13 @@
-import { GuildChannel } from "discord.js";
+import { DMChannel, NonThreadGuildBasedChannel } from "discord.js";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
 
-export default async function channelUpdate(oldChannel: GuildChannel, newChannel: GuildChannel) {
+export default async function channelUpdate(
+  oldChannel: DMChannel | NonThreadGuildBasedChannel,
+  newChannel: DMChannel | NonThreadGuildBasedChannel,
+) {
+  if (oldChannel.isDMBased() || newChannel.isDMBased()) return;
+
   if (oldChannel.name != newChannel.name && (await isLogsEnabled(newChannel.guild))) {
     const embed = new CustomEmbed().disableFooter().setTimestamp();
 

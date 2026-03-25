@@ -1,4 +1,13 @@
-import { APIInteractionGuildMember, Collection, Guild, GuildMember, Role, User } from "discord.js";
+import {
+  APIInteractionGuildMember,
+  Collection,
+  Guild,
+  GuildMember,
+  PartialGuildMember,
+  PartialUser,
+  Role,
+  User,
+} from "discord.js";
 import { inPlaceSort, sort } from "fast-sort";
 import { compareTwoStrings } from "string-similarity";
 import Constants from "../Constants";
@@ -231,7 +240,13 @@ export async function getRole(guild: Guild, roleName: string): Promise<Role> {
   return target;
 }
 
-export type MemberResolvable = GuildMember | APIInteractionGuildMember | User | string;
+export type MemberResolvable =
+  | GuildMember
+  | PartialGuildMember
+  | APIInteractionGuildMember
+  | User
+  | PartialUser
+  | string;
 
 export function getUserId(user: MemberResolvable): string {
   try {

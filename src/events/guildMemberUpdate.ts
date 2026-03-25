@@ -1,11 +1,26 @@
-import { GuildMember, Role } from "discord.js";
+import { GuildMember, PartialGuildMember, Role } from "discord.js";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { clearMemberCache } from "../utils/functions/member";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
 import { isBooster, setBooster } from "../utils/functions/premium/boosters";
+import { logger } from "../utils/logger";
 
-export default async function guildMemberUpdate(oldMember: GuildMember, newMember: GuildMember) {
+export default async function guildMemberUpdate(
+  oldMember: GuildMember | PartialGuildMember,
+  newMember: GuildMember,
+) {
+  if (oldMember.partial) {
+    const fetched: false | GuildMember = await oldMember.fetch().catch(() => false);
+
+    if (!fetched) {
+      logger.error("guild member update: failed to fetch partial member");
+      return;
+    }
+
+    oldMember = fetched;
+  }
+
   clearMemberCache(oldMember.guild.id);
 
   const oldRoleIds = Array.from(oldMember.roles.cache.keys());
@@ -28,7 +43,7 @@ export default async function guildMemberUpdate(oldMember: GuildMember, newMembe
       roles.push(newMember.guild.roles.cache.get(oldRole));
     }
 
-    if (roles.length != 0) await createLog(oldMember, roles, false);
+    if (roles.length != 0) await createLog(oldMember as GuildMember, roles, false);
   }
 
   if (oldMember.displayName !== newMember.displayName && (await isLogsEnabled(newMember.guild))) {
