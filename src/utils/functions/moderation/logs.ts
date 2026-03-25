@@ -5,6 +5,7 @@ import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { LogType, PunishmentType } from "../../../types/Moderation";
 import Constants from "../../Constants";
+import { Mutex } from "../mutex";
 
 const logColors = new Map<LogType, ColorResolvable>();
 const modLogColors = new Map<PunishmentType, ColorResolvable>();
@@ -23,8 +24,6 @@ modLogColors.set("unban", flavors.macchiato.colors.red.hex as ColorResolvable);
 modLogColors.set("warn", flavors.macchiato.colors.flamingo.hex as ColorResolvable);
 modLogColors.set("kick", flavors.macchiato.colors.sky.hex as ColorResolvable);
 modLogColors.set("filter violation", flavors.macchiato.colors.sapphire.hex as ColorResolvable);
-
-let checkingLogsEnabled = false;
 
 export async function addModLog(
   guild: Guild,
@@ -89,47 +88,31 @@ export async function addLog(guild: Guild, type: LogType, embed: CustomEmbed) {
   );
 }
 
-export async function isLogsEnabled(guild: Guild, times = 1) {
+const logsEnabledMutex = new Mutex();
+
+export async function isLogsEnabled(guild: Guild) {
   if (await redis.exists(`${Constants.redis.cache.guild.LOGS}:${guild.id}`)) {
     return (await redis.get(`${Constants.redis.cache.guild.LOGS}:${guild.id}`)) === "t";
   }
 
-  if (checkingLogsEnabled) {
-    if (times < 1000) {
-      times++;
-      return (await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(isLogsEnabled(guild, times));
-        }, 200);
-      })) as boolean;
-    }
-  }
+  await logsEnabledMutex.acquire(guild.id);
 
-  checkingLogsEnabled = true;
-
-  const query = await prisma.guild
-    .findUnique({
-      where: {
-        id: guild.id,
-      },
-      select: {
-        logs: true,
-      },
-    })
-    .catch(() => {
-      checkingLogsEnabled = false;
+  try {
+    const query = await prisma.guild.findUnique({
+      where: { id: guild.id },
+      select: { logs: true },
     });
 
-  checkingLogsEnabled = false;
+    if (!query || !query.logs) {
+      await redis.set(`${Constants.redis.cache.guild.LOGS}:${guild.id}`, "f", "EX", 36000);
+      return false;
+    }
 
-  if (!query || !query.logs) {
-    await redis.set(`${Constants.redis.cache.guild.LOGS}:${guild.id}`, "f", "EX", 36000);
-    return false;
-  } else {
     await redis.set(`${Constants.redis.cache.guild.LOGS}:${guild.id}`, "t", "EX", 36000);
+    return true;
+  } finally {
+    logsEnabledMutex.release(guild.id);
   }
-
-  return true;
 }
 
 export async function setLogsChannelHook(guild: Guild, hook: string) {
