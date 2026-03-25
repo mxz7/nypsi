@@ -24,7 +24,7 @@ import dayjs = require("dayjs");
 
 const GOLD_TIER = 3;
 
-module.exports = new ItemUse(
+export default new ItemUse(
   "gold_credit",
   async (message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) => {
     const currentTier = await getTier(message.author.id);

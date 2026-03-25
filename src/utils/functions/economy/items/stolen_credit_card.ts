@@ -10,7 +10,7 @@ import { getInventory, removeInventoryItem } from "../inventory";
 import { addStat } from "../stats";
 import { formatNumber } from "../utils";
 
-module.exports = new ItemUse(
+export default new ItemUse(
   "stolen_credit_card",
   async (
     message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),

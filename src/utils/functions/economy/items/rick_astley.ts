@@ -9,7 +9,7 @@ import { escapeFormattingCharacters } from "../../string";
 import { removeInventoryItem } from "../inventory";
 import { addStat } from "../stats";
 
-module.exports = new ItemUse(
+export default new ItemUse(
   "rick_astley",
   async (
     message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),

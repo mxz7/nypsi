@@ -25,7 +25,7 @@ const responses = [
   "img:https://file.maxz.dev/FIFtW0Ow9I.jpg",
 ];
 
-module.exports = new ItemUse(
+export default new ItemUse(
   "dave",
   async (message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) => {
     const chosen = responses[Math.floor(Math.random() * responses.length)];

@@ -4,7 +4,7 @@ import { CustomEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import { getPrefix } from "../../guilds/utils";
 
-module.exports = new ItemUse(
+export default new ItemUse(
   "lottery_ticket",
   async (message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) => {
     return ItemUse.send(message, {

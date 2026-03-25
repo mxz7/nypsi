@@ -7,7 +7,7 @@ import { getInventory } from "../inventory";
 import { addStat } from "../stats";
 import { getItems } from "../utils";
 
-module.exports = new ItemUse(
+export default new ItemUse(
   "bitch",
   async (message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) => {
     await addStat(message.member, "bitch");

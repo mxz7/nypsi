@@ -293,7 +293,7 @@ async function prepare(
   return play();
 }
 
-module.exports = new ItemUse(
+export default new ItemUse(
   "scratch_card",
   (message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction), args: string[]) => {
     return prepare(message, args);

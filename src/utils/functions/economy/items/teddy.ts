@@ -4,7 +4,7 @@ import { CustomEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import { addStat } from "../stats";
 
-module.exports = new ItemUse(
+export default new ItemUse(
   "teddy",
   async (message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) => {
     await addStat(message.member, "teddy");

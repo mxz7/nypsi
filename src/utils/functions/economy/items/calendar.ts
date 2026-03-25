@@ -3,7 +3,7 @@ import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Comman
 import { CustomEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 
-module.exports = new ItemUse(
+export default new ItemUse(
   "calendar",
   async (message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) => {
     return ItemUse.send(message, {

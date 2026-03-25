@@ -22,7 +22,7 @@ import { addStat } from "../stats";
 import { addTaskProgress } from "../tasks";
 import { getItems } from "../utils";
 
-module.exports = new ItemUse(
+export default new ItemUse(
   "crates",
   async (
     message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),

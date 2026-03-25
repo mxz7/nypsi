@@ -14,7 +14,7 @@ import { addStat } from "../stats";
 import { doDaily, getLastDaily } from "../utils";
 import dayjs = require("dayjs");
 
-module.exports = new ItemUse(
+export default new ItemUse(
   "streak_token",
   async (
     message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),

@@ -24,7 +24,7 @@ import dayjs = require("dayjs");
 
 const PLAT_TIER = 4;
 
-module.exports = new ItemUse(
+export default new ItemUse(
   "platinum_credit",
   async (message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) => {
     const currentTier = await getTier(message.author.id);

@@ -17,7 +17,7 @@ import { getUpgrades, setUpgrade } from "../levelling";
 import { addStat } from "../stats";
 import { getUpgradesData, maxPrestige } from "../utils";
 
-module.exports = new ItemUse(
+export default new ItemUse(
   "reroll_token",
   async (message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) => {
     let [inventory, upgrades] = await Promise.all([

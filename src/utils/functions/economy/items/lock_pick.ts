@@ -21,7 +21,7 @@ import { isPassive } from "../passive";
 import { addStat } from "../stats";
 import ms = require("ms");
 
-module.exports = new ItemUse(
+export default new ItemUse(
   "lock_pick",
   async (
     message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),

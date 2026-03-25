@@ -4,7 +4,7 @@ import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import { fertiliseFarm, getFarm } from "../farm";
 
-module.exports = new ItemUse(
+export default new ItemUse(
   "fertiliser",
   async (message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) => {
     const farm = await getFarm(message.author.id);
