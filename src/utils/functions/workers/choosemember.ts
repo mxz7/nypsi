@@ -38,9 +38,9 @@ if (!isMainThread) {
     } else {
       let score = 0;
 
-      if (member.user.username.toLowerCase().startsWith(memberName.toLowerCase())) score += 1.25;
+      if (member.user.username.toLowerCase().startsWith(memberName.toLowerCase())) score += 1.5;
       if ((member.user.globalName || "").toLowerCase().startsWith(memberName.toLowerCase()))
-        score += 1;
+        score += 1.1;
       if ((member.nickname || "").toLowerCase().startsWith(memberName.toLowerCase())) score += 0.5;
 
       if (member.user.username.toLowerCase().includes(memberName.toLowerCase())) score += 0.75;

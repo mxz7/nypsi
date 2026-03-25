@@ -111,8 +111,8 @@ export async function getMember(
       } else {
         let score = 0;
 
-        if (member.user.username.toLowerCase().startsWith(memberName)) score += 1.25;
-        if (member.user.displayName.toLowerCase().startsWith(memberName)) score += 1;
+        if (member.user.username.toLowerCase().startsWith(memberName)) score += 1.5;
+        if (member.user.displayName.toLowerCase().startsWith(memberName)) score += 1.1;
         if (member.displayName.toLowerCase().startsWith(memberName)) score += 0.5;
 
         if (member.user.username.toLowerCase().includes(memberName)) score += 0.75;
