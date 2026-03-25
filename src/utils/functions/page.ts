@@ -254,7 +254,7 @@ export class CustomMessageComponentCollector {
   constructor(msg: Message, filter: (i: Interaction) => boolean, timeout: number) {
     this.timeout = timeout;
     this.collector = msg.createMessageComponentCollector({ filter });
-    this.timer = setTimeout(() => this.collector.stop("time"), timeout);
+    this.refreshTimer();
 
     this.collector.on("collect", () => {
       this.refreshTimer();
