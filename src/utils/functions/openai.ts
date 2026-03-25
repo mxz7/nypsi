@@ -5,9 +5,9 @@ import Constants from "../Constants";
 import { logger } from "../logger";
 import ms = require("ms");
 
-const prompts: Record<Prompts, string> = {
+const prompts = {
   support_request: readFileSync("data/prompts/support_request.txt").toString(),
-};
+} as const;
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_KEY });
 
@@ -49,14 +49,12 @@ export async function getDocsRaw() {
   }
 }
 
-type Prompts = "support_request";
+export function buildPrompt(prompt: keyof typeof prompts, data?: Record<string, string>) {
+  let text = prompts[prompt];
 
-export async function buildPrompt(prompt: Prompts) {
-  if (prompt === "support_request") {
-    let text = prompts.support_request;
-
-    text = text.replace("{documentation}", await getDocsRaw());
-
-    return text;
+  for (const [key, value] of Object.entries(data ?? {})) {
+    text = text.replace(`{${key}}`, value);
   }
+
+  return text;
 }

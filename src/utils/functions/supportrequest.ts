@@ -10,7 +10,7 @@ import { CustomEmbed } from "../../models/EmbedBuilders";
 import Constants from "../Constants";
 import { logger } from "../logger";
 import { uploadImage } from "./image";
-import openai, { buildPrompt, prompt } from "./openai";
+import openai, { buildPrompt, getDocsRaw, prompt } from "./openai";
 import { getLastKnownUsername } from "./users/username";
 import pAll = require("p-all");
 
@@ -358,9 +358,10 @@ export async function isRequestSuitable(
   content: string,
 ): Promise<{ decision: boolean; reason: string; answer?: string }> {
   try {
+    const prompt = buildPrompt("support_request", { documentation: await getDocsRaw() });
     const response = await openai.responses.parse({
       model: "gpt-5.4-mini",
-      instructions: await buildPrompt("support_request"),
+      instructions: prompt,
       input: [{ role: "user", content }],
       text: { format: zodTextFormat(isRequestSuitableFormat, "supportrequest_suitable") },
     });
