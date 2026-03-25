@@ -9,7 +9,7 @@ import { getGuildByUser } from "../economy/guilds";
 import { deleteOffer, getTargetedOffers } from "../economy/offers";
 import { deleteImage } from "../image";
 import { getUserId, MemberResolvable } from "../member";
-import { deleteAllAvatars } from "./history";
+import { addNewUsername, deleteAllAvatars } from "./history";
 import { isMarried, removeMarriage } from "./marriage";
 import ms = require("ms");
 
@@ -71,6 +71,10 @@ export async function createProfile(member: MemberResolvable) {
     })
     .catch(() => {});
   await redis.del(`${Constants.redis.cache.user.EXISTS}:${userId}`);
+
+  if (username) {
+    addNewUsername(userId, username);
+  }
 }
 
 export async function doProfileTransfer(fromId: string, toId: string) {
