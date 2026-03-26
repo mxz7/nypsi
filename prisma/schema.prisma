@@ -548,11 +548,12 @@ model FlagGame {
 }
 
 model ChessPuzzleStats {
-  userId     String @id
-  solved     Int    @default(0)
-  failed     Int    @default(0)
-  streak     Int    @default(0)
-  bestStreak Int    @default(0)
+  userId               String @id
+  solved               Int    @default(0)
+  failed               Int    @default(0)
+  streak               Int    @default(0)
+  bestStreak           Int    @default(0)
+  averageWinningRating Float  @default(0)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
