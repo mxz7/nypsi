@@ -148,7 +148,7 @@ async function startChessGame(
 
   const updateEmbedDescription = (opponentTurn: boolean) => {
     embed.setDescription(
-      `**${(opponentTurn ? colorName : colorName === "White" ? "Black" : "White").toLowerCase()} to move**\n\n` +
+      `**${(!opponentTurn ? colorName : colorName === "White" ? "Black" : "White").toLowerCase()} to move**\n\n` +
         `rating: \`${puzzle.puzzle.rating}\`\n` +
         `difficulty: \`${difficulty ?? "normal"}\`\n` +
         `themes: ${puzzle.puzzle.themes
