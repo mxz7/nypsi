@@ -1,0 +1,371 @@
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  CommandInteraction,
+  ComponentType,
+  LabelBuilder,
+  Message,
+  MessageActionRowComponentBuilder,
+  MessageFlags,
+  ModalBuilder,
+  TextInputBuilder,
+  TextInputStyle,
+} from "discord.js";
+import { nanoid } from "nanoid";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import Constants from "../utils/Constants";
+import { renderBoard } from "../utils/functions/chess/board";
+import {
+  buildChessFromPuzzle,
+  getChessStats,
+  getRandomPuzzle,
+  LichessPuzzle,
+  normalizeToUci,
+  recordFail,
+  recordSolve,
+} from "../utils/functions/chess/puzzle";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+
+const cmd = new Command("chess", "play a chess puzzle", "fun").setAliases(["puzzle"]);
+
+cmd.slashEnabled = true;
+cmd.slashData
+  .addSubcommand((option) => option.setName("puzzle").setDescription("solve a random chess puzzle"))
+  .addSubcommand((option) =>
+    option.setName("stats").setDescription("view your chess puzzle stats"),
+  );
+
+async function run(
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
+  args: string[],
+) {
+  if (await onCooldown(cmd.name, message.member)) {
+    const res = await getResponse(cmd.name, message.member);
+    if (res.respond) send({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
+    return;
+  }
+
+  if (args.length === 0 || (args[0] !== "puzzle" && args[0] !== "p" && args[0] !== "stats")) {
+    return send({
+      embeds: [
+        new CustomEmbed(
+          message.member,
+          "**/chess puzzle** *solve a random chess puzzle*\n**/chess stats** *view your stats*",
+        ).setHeader("chess puzzles", message.author.avatarURL()),
+      ],
+    });
+  }
+
+  if (args[0] === "stats") {
+    await addCooldown(cmd.name, message.member, 3);
+    const stats = await getChessStats(message.author.id);
+
+    const embed = new CustomEmbed(message.member);
+    embed.setHeader(`${message.author.username}'s chess stats`, message.author.avatarURL());
+
+    if (!stats || (stats.solved === 0 && stats.failed === 0)) {
+      embed.setDescription(
+        "you haven't played any chess puzzles yet.\n\nuse **/chess puzzle** to start!",
+      );
+    } else {
+      const total = stats.solved + stats.failed;
+      const pct = total > 0 ? ((stats.solved / total) * 100).toFixed(1) : "0.0";
+      embed.setDescription(
+        `puzzles solved: **${stats.solved.toLocaleString()}** / **${total.toLocaleString()}** (${pct}%)\n` +
+          `current streak: **${stats.streak.toLocaleString()}**\n` +
+          `best streak: **${stats.bestStreak.toLocaleString()}**`,
+      );
+    }
+
+    return send({ embeds: [embed] });
+  }
+
+  // /chess puzzle
+  await addCooldown(cmd.name, message.member, 10);
+
+  const puzzle = await getRandomPuzzle();
+
+  console.log(puzzle);
+
+  if (puzzle === "unavailable") {
+    return send({
+      embeds: [new ErrorEmbed("lichess is currently unavailable, please try again shortly")],
+    });
+  }
+
+  return startChessGame(message, puzzle);
+}
+
+async function startChessGame(
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  puzzle: LichessPuzzle,
+) {
+  const chess = buildChessFromPuzzle(puzzle);
+  const solution = puzzle.puzzle.solution;
+  const playerColor = chess.turn() as "w" | "b";
+  const perspective = playerColor === "w" ? "white" : "black";
+  const colorName = playerColor === "w" ? "White" : "Black";
+
+  // moveIndex tracks the next move in the solution array that the player must input.
+  // solution[even] = player move, solution[odd] = opponent auto-reply.
+  let moveIndex = 0;
+
+  console.log(chess.history().slice(-5));
+  const lastUci = chess.history({ verbose: true }).slice(-1)[0];
+  console.log(lastUci);
+
+  const initialBuffer = await renderBoard(chess, {
+    perspective,
+    lastMove: { from: lastUci.from, to: lastUci.to },
+  });
+
+  const embed = new CustomEmbed(message.member)
+    .setHeader(`${message.author.username}'s chess puzzle`, message.author.avatarURL())
+    .setDescription(
+      `**${colorName.toLowerCase()} to move**\n\n` +
+        `rating: \`${puzzle.puzzle.rating}\` · themes: ${puzzle.puzzle.themes
+          .slice(0, 3)
+          .map((t) => `\`${t}\``)
+          .join(", ")}`,
+    )
+    .setImage("attachment://chess.png");
+
+  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+    new ButtonBuilder().setCustomId("chess-guess").setLabel("move").setStyle(ButtonStyle.Primary),
+    new ButtonBuilder().setCustomId("chess-hint").setLabel("hint").setStyle(ButtonStyle.Secondary),
+    new ButtonBuilder().setCustomId("chess-end").setLabel("end").setStyle(ButtonStyle.Danger),
+  );
+
+  let msg: Message;
+
+  const sendOpts = {
+    embeds: [embed],
+    components: [row],
+    files: [{ attachment: initialBuffer, name: "chess.png" }],
+  };
+
+  if (message instanceof Message) {
+    msg = await message.channel.send(sendOpts);
+  } else {
+    msg = await message
+      .reply(sendOpts)
+      .then((m) => m.fetch())
+      .catch(() => message.editReply(sendOpts).then((m) => m.fetch() as Promise<Message>));
+  }
+
+  const collector = msg.createMessageComponentCollector({
+    componentType: ComponentType.Button,
+    filter: (i) => i.user.id === message.author.id,
+    time: 300_000,
+  });
+
+  collector.on("collect", async (interaction) => {
+    if (interaction.customId === "chess-end") {
+      return collector.stop("cancelled");
+    }
+
+    if (interaction.customId === "chess-hint") {
+      // Remove hint button so it can only be used once
+      const hintIdx = row.components.findIndex((c) => {
+        const b = c as ButtonBuilder;
+        return (b.data as { custom_id?: string }).custom_id === "chess-hint";
+      });
+      if (hintIdx !== -1) row.components.splice(hintIdx, 1);
+
+      const expectedFrom = solution[moveIndex].slice(0, 2);
+      await interaction.update({ embeds: [embed], components: [row] });
+      await interaction
+        .followUp({
+          embeds: [new CustomEmbed(message.member, `the piece to move is on **${expectedFrom}**`)],
+          flags: MessageFlags.Ephemeral,
+        })
+        .catch(() => {});
+      return;
+    }
+
+    // chess-guess: show modal
+    const modalId = `chess-guess-${nanoid()}`;
+
+    const modal = new ModalBuilder()
+      .setCustomId(modalId)
+      .setTitle("enter your move")
+      .addLabelComponents(
+        new LabelBuilder()
+          .setLabel("move")
+          .setTextInputComponent(
+            new TextInputBuilder()
+              .setCustomId("move")
+              .setRequired(true)
+              .setPlaceholder("e.g. e2e4  or  Nf3")
+              .setStyle(TextInputStyle.Short),
+          ),
+      );
+
+    await interaction.showModal(modal);
+
+    const res = await interaction
+      .awaitModalSubmit({
+        time: 300_000,
+        filter: (i) => i.user.id === interaction.user.id && i.customId === modalId,
+      })
+      .catch((): null => null);
+
+    if (!res || !res.isModalSubmit()) return;
+
+    if (collector.ended) {
+      res
+        .reply({
+          embeds: [new ErrorEmbed("this game has already ended")],
+          flags: MessageFlags.Ephemeral,
+        })
+        .catch(() => {});
+      return;
+    }
+
+    const input = res.fields.getTextInputValue("move");
+    const uci = normalizeToUci(input, chess);
+
+    if (!uci) {
+      res
+        .reply({
+          embeds: [new ErrorEmbed(`\`${input}\` is not a valid or legal move, try again`)],
+          flags: MessageFlags.Ephemeral,
+        })
+        .catch(() => {});
+      return;
+    }
+
+    const expected = solution[moveIndex];
+    const expectedNormalized = expected.slice(0, 4) + (expected[4] ?? "");
+
+    if (uci !== expectedNormalized) {
+      res
+        .reply({
+          embeds: [new ErrorEmbed("that's not the best move, try again")],
+          flags: MessageFlags.Ephemeral,
+        })
+        .catch(() => {});
+      return;
+    }
+
+    // Correct move — apply it
+    chess.move({ from: uci.slice(0, 2), to: uci.slice(2, 4), promotion: uci[4] || undefined });
+    moveIndex++;
+
+    const playerLastMove = { from: uci.slice(0, 2), to: uci.slice(2, 4) };
+
+    if (moveIndex >= solution.length) {
+      // Puzzle solved!
+      await res.deferUpdate().catch(() => {});
+      collector.stop("win");
+      await recordSolve(message.author.id);
+      const stats = await getChessStats(message.author.id);
+      embed
+        .setDescription(
+          `**puzzle solved!!**\n\nrating: \`${puzzle.puzzle.rating}\`\ncurrent streak: **${stats?.streak ?? 1}**`,
+        )
+        .setColor(Constants.EMBED_SUCCESS_COLOR)
+        .setFooter(null);
+
+      const buffer = await renderBoard(chess, { perspective, lastMove: playerLastMove });
+      row.components.forEach((c) => (c as ButtonBuilder).setDisabled(true));
+      await msg
+        .edit({
+          embeds: [embed.setImage("attachment://chess.png")],
+          components: [row],
+          files: [{ attachment: buffer, name: "chess.png" }],
+        })
+        .catch(() => {});
+      return;
+    }
+
+    // Auto-play opponent reply
+    const opponentUci = solution[moveIndex];
+    chess.move({
+      from: opponentUci.slice(0, 2),
+      to: opponentUci.slice(2, 4),
+      promotion: opponentUci[4] || undefined,
+    });
+    moveIndex++;
+
+    const opponentLastMove = {
+      from: opponentUci.slice(0, 2),
+      to: opponentUci.slice(2, 4),
+    };
+
+    if (moveIndex >= solution.length) {
+      // Puzzle solved after opponent's final auto-move
+      await res.deferUpdate().catch(() => {});
+      collector.stop("win");
+      await recordSolve(message.author.id);
+      const stats = await getChessStats(message.author.id);
+      embed
+        .setDescription(
+          `✓ puzzle solved!\n\nrating: \`${puzzle.puzzle.rating}\`\ncurrent streak: **${stats?.streak ?? 1}**`,
+        )
+        .setColor(Constants.EMBED_SUCCESS_COLOR)
+        .setFooter(null);
+
+      const buffer = await renderBoard(chess, { perspective, lastMove: opponentLastMove });
+      row.components.forEach((c) => (c as ButtonBuilder).setDisabled(true));
+      await msg
+        .edit({
+          embeds: [embed.setImage("attachment://chess.png")],
+          components: [row],
+          files: [{ attachment: buffer, name: "chess.png" }],
+        })
+        .catch(() => {});
+      return;
+    }
+
+    // Continue puzzle — update board showing opponent's last move
+    await res.deferUpdate().catch(() => {});
+    const buffer = await renderBoard(chess, { perspective, lastMove: opponentLastMove });
+    embed.setDescription(
+      `**${colorName} to move** — find the best continuation\n\n` +
+        `rating: \`${puzzle.puzzle.rating}\` · themes: ${puzzle.puzzle.themes
+          .slice(0, 3)
+          .map((t) => `\`${t}\``)
+          .join(", ")}`,
+    );
+    await msg
+      .edit({
+        embeds: [embed.setImage("attachment://chess.png")],
+        components: [row],
+        files: [{ attachment: buffer, name: "chess.png" }],
+      })
+      .catch(() => {});
+  });
+
+  collector.on("end", async (_, reason) => {
+    row.components.forEach((c) => (c as ButtonBuilder).setDisabled(true));
+
+    if (reason === "win") return; // already handled above
+
+    await recordFail(message.author.id);
+
+    const solutionDisplay = solution.join(" → ");
+
+    if (reason === "cancelled") {
+      embed
+        .setDescription(`**game ended**\n\nsolution: \`${solutionDisplay}\``)
+        .setColor(Constants.EMBED_FAIL_COLOR)
+        .setFooter(null);
+    } else {
+      // time
+      embed
+        .setDescription(`**out of time**\n\nsolution: \`${solutionDisplay}\``)
+        .setColor(Constants.EMBED_FAIL_COLOR)
+        .setFooter(null);
+    }
+
+    await msg.edit({ embeds: [embed], components: [row] }).catch(() => {});
+  });
+}
+
+cmd.setRun(run);
+
+module.exports = cmd;
