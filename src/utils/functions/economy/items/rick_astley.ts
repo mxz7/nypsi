@@ -23,7 +23,7 @@ export default new ItemUse(
     if (!target) return ItemUse.send(message, { embeds: [new ErrorEmbed("invalid member")] });
 
     if (target.user.id === message.author.id)
-      return ItemUse.send(message, { embeds: [new ErrorEmbed("you cannot rick roll yourself")] });
+      return ItemUse.send(message, { embeds: [new ErrorEmbed("you cannot rick roll yourself IDIOT")] });
 
     if (await redis.exists(`${Constants.redis.nypsi.RICKROLL}:${target.user.id}`))
       return ItemUse.send(message, {
