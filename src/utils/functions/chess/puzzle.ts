@@ -111,7 +111,7 @@ export async function getChessStats(userId: string) {
   return prisma.chessPuzzleStats.findUnique({ where: { userId } });
 }
 
-export async function recordSolve(userId: string, puzzleRating: number) {
+export async function addChessSolve(userId: string, puzzleRating: number) {
   const existing = await getChessStats(userId);
   const solvedBefore = existing?.solved ?? 0;
   const newSolved = solvedBefore + 1;
@@ -138,7 +138,7 @@ export async function recordSolve(userId: string, puzzleRating: number) {
   });
 }
 
-export async function recordFail(userId: string) {
+export async function addChessFail(userId: string) {
   await prisma.chessPuzzleStats.upsert({
     where: { userId },
     create: { userId, failed: 1, streak: 0 },

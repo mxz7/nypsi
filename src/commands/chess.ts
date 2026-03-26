@@ -18,13 +18,13 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { renderBoard } from "../utils/functions/chess/board";
 import {
+  addChessFail,
+  addChessSolve,
   buildChessFromPuzzle,
   getChessStats,
   getRandomPuzzle,
   LichessPuzzle,
   normalizeToUci,
-  recordFail,
-  recordSolve,
 } from "../utils/functions/chess/puzzle";
 import sleep from "../utils/functions/sleep";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -173,7 +173,7 @@ async function startChessGame(
   ) => {
     await res.deferUpdate().catch(() => {});
     collector.stop("win");
-    await recordSolve(message.author.id, puzzle.puzzle.rating);
+    await addChessSolve(message.author.id, puzzle.puzzle.rating);
     const stats = await getChessStats(message.author.id);
 
     embed
@@ -349,7 +349,7 @@ async function startChessGame(
 
     if (reason === "win") return; // already handled above
 
-    await recordFail(message.author.id);
+    await addChessFail(message.author.id);
 
     const solutionDisplay = solution.join(" → ");
 
