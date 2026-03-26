@@ -31,6 +31,7 @@ import {
 } from "../utils/functions/chess/puzzle";
 import sleep from "../utils/functions/sleep";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { logger } from "../utils/logger";
 
 const cmd = new Command("chess", "play a chess puzzle", "fun").setAliases(["puzzle"]);
 
@@ -124,7 +125,11 @@ async function startChessGame(
   puzzle: LichessPuzzle,
   difficulty?: ChessPuzzleDifficulty,
 ) {
+  const beforeBuild = performance.now();
   const chess = buildChessFromPuzzle(puzzle);
+  const afterBuild = performance.now();
+
+  logger.debug(`chess: built chess instance from puzzle in ${afterBuild - beforeBuild}ms`);
 
   if (chess.history().length < 1) {
     return send({ embeds: [new ErrorEmbed("invalid puzzle data received, please try again")] });
