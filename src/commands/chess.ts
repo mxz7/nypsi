@@ -26,6 +26,7 @@ import {
   recordFail,
   recordSolve,
 } from "../utils/functions/chess/puzzle";
+import sleep from "../utils/functions/sleep";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("chess", "play a chess puzzle", "fun").setAliases(["puzzle"]);
@@ -113,11 +114,9 @@ async function startChessGame(
   // solution[even] = player move, solution[odd] = opponent auto-reply.
   let moveIndex = 0;
 
-  console.log(chess.history().slice(-5));
   const lastUci = chess.history({ verbose: true }).slice(-1)[0];
-  console.log(lastUci);
 
-  const initialBuffer = await renderBoard(chess, {
+  let buffer = await renderBoard(chess, {
     perspective,
     lastMove: { from: lastUci.from, to: lastUci.to },
   });
@@ -133,10 +132,20 @@ async function startChessGame(
     )
     .setImage("attachment://chess.png");
 
+  const updateEmbedDescription = (opponentTurn: boolean) => {
+    embed.setDescription(
+      `**${(opponentTurn ? colorName : colorName === "White" ? "Black" : "White").toLowerCase()} to move**\n\n` +
+        `rating: \`${puzzle.puzzle.rating}\`\nthemes: ${puzzle.puzzle.themes
+          .slice(0, 3)
+          .map((t) => `\`${t}\``)
+          .join(", ")}`,
+    );
+  };
+
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder().setCustomId("chess-guess").setLabel("move").setStyle(ButtonStyle.Primary),
     new ButtonBuilder().setCustomId("chess-hint").setLabel("hint").setStyle(ButtonStyle.Secondary),
-    new ButtonBuilder().setCustomId("chess-end").setLabel("end").setStyle(ButtonStyle.Danger),
+    new ButtonBuilder().setCustomId("chess-end").setLabel("resign").setStyle(ButtonStyle.Danger),
   );
 
   let msg: Message;
@@ -144,7 +153,7 @@ async function startChessGame(
   const sendOpts = {
     embeds: [embed],
     components: [row],
-    files: [{ attachment: initialBuffer, name: "chess.png" }],
+    files: [{ attachment: buffer, name: "chess.png" }],
   };
 
   if (message instanceof Message) {
@@ -161,6 +170,33 @@ async function startChessGame(
     filter: (i) => i.user.id === message.author.id,
     time: 300_000,
   });
+
+  const handleWin = async (
+    lastMove: { from: string; to: string },
+    res: { deferUpdate: () => Promise<unknown> },
+  ) => {
+    await res.deferUpdate().catch(() => {});
+    collector.stop("win");
+    await recordSolve(message.author.id);
+    const stats = await getChessStats(message.author.id);
+
+    embed
+      .setDescription(
+        `**puzzle solved!!**\n\nrating: \`${puzzle.puzzle.rating}\`\ncurrent streak: **${stats?.streak ?? 1}**`,
+      )
+      .setColor(Constants.EMBED_SUCCESS_COLOR)
+      .setFooter(null);
+
+    const buffer = await renderBoard(chess, { perspective, lastMove });
+    row.components.forEach((c) => (c as ButtonBuilder).setDisabled(true));
+    await msg
+      .edit({
+        embeds: [embed.setImage("attachment://chess.png")],
+        components: [row],
+        files: [{ attachment: buffer, name: "chess.png" }],
+      })
+      .catch(() => {});
+  };
 
   collector.on("collect", async (interaction) => {
     if (interaction.customId === "chess-end") {
@@ -251,6 +287,8 @@ async function startChessGame(
       return;
     }
 
+    await res.deferUpdate().catch(() => {});
+
     // Correct move — apply it
     chess.move({ from: uci.slice(0, 2), to: uci.slice(2, 4), promotion: uci[4] || undefined });
     moveIndex++;
@@ -258,29 +296,26 @@ async function startChessGame(
     const playerLastMove = { from: uci.slice(0, 2), to: uci.slice(2, 4) };
 
     if (moveIndex >= solution.length) {
-      // Puzzle solved!
-      await res.deferUpdate().catch(() => {});
-      collector.stop("win");
-      await recordSolve(message.author.id);
-      const stats = await getChessStats(message.author.id);
-      embed
-        .setDescription(
-          `**puzzle solved!!**\n\nrating: \`${puzzle.puzzle.rating}\`\ncurrent streak: **${stats?.streak ?? 1}**`,
-        )
-        .setColor(Constants.EMBED_SUCCESS_COLOR)
-        .setFooter(null);
-
-      const buffer = await renderBoard(chess, { perspective, lastMove: playerLastMove });
-      row.components.forEach((c) => (c as ButtonBuilder).setDisabled(true));
-      await msg
-        .edit({
-          embeds: [embed.setImage("attachment://chess.png")],
-          components: [row],
-          files: [{ attachment: buffer, name: "chess.png" }],
-        })
-        .catch(() => {});
+      await handleWin(playerLastMove, res);
       return;
     }
+
+    buffer = await renderBoard(chess, { perspective, lastMove: playerLastMove });
+
+    updateEmbedDescription(true);
+    embed.setImage("attachment://chess.png");
+
+    row.components.forEach((c) => (c as ButtonBuilder).setDisabled(true));
+
+    await msg.edit({
+      embeds: [embed],
+      components: [row],
+      files: [{ attachment: buffer, name: "chess.png" }],
+    });
+
+    await sleep(3000);
+
+    row.components.forEach((c) => (c as ButtonBuilder).setDisabled(false));
 
     // Auto-play opponent reply
     const opponentUci = solution[moveIndex];
@@ -298,39 +333,12 @@ async function startChessGame(
 
     if (moveIndex >= solution.length) {
       // Puzzle solved after opponent's final auto-move
-      await res.deferUpdate().catch(() => {});
-      collector.stop("win");
-      await recordSolve(message.author.id);
-      const stats = await getChessStats(message.author.id);
-      embed
-        .setDescription(
-          `✓ puzzle solved!\n\nrating: \`${puzzle.puzzle.rating}\`\ncurrent streak: **${stats?.streak ?? 1}**`,
-        )
-        .setColor(Constants.EMBED_SUCCESS_COLOR)
-        .setFooter(null);
-
-      const buffer = await renderBoard(chess, { perspective, lastMove: opponentLastMove });
-      row.components.forEach((c) => (c as ButtonBuilder).setDisabled(true));
-      await msg
-        .edit({
-          embeds: [embed.setImage("attachment://chess.png")],
-          components: [row],
-          files: [{ attachment: buffer, name: "chess.png" }],
-        })
-        .catch(() => {});
+      await handleWin(opponentLastMove, res);
       return;
     }
 
-    // Continue puzzle — update board showing opponent's last move
-    await res.deferUpdate().catch(() => {});
-    const buffer = await renderBoard(chess, { perspective, lastMove: opponentLastMove });
-    embed.setDescription(
-      `**${colorName} to move** — find the best continuation\n\n` +
-        `rating: \`${puzzle.puzzle.rating}\` · themes: ${puzzle.puzzle.themes
-          .slice(0, 3)
-          .map((t) => `\`${t}\``)
-          .join(", ")}`,
-    );
+    buffer = await renderBoard(chess, { perspective, lastMove: opponentLastMove });
+    updateEmbedDescription(false);
     await msg
       .edit({
         embeds: [embed.setImage("attachment://chess.png")],
