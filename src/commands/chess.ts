@@ -13,6 +13,7 @@ import {
   TextInputStyle,
 } from "discord.js";
 import { nanoid } from "nanoid";
+import { send } from "node:process";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
@@ -124,6 +125,11 @@ async function startChessGame(
   difficulty?: ChessPuzzleDifficulty,
 ) {
   const chess = buildChessFromPuzzle(puzzle);
+
+  if (chess.history().length < 1) {
+    return send({ embeds: [new ErrorEmbed("invalid puzzle data received, please try again")] });
+  }
+
   const solution = puzzle.puzzle.solution;
   const playerColor = chess.turn() as "w" | "b";
   const perspective = playerColor === "w" ? "white" : "black";
