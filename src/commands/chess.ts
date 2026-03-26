@@ -227,6 +227,7 @@ async function startChessGame(
 
   collector.on("collect", async (interaction) => {
     if (interaction.customId === "chess-end") {
+      interaction.deferUpdate();
       return collector.stop("cancelled");
     }
 
