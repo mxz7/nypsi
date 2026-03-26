@@ -123,7 +123,7 @@ async function startChessGame(
   });
 
   const embed = new CustomEmbed(message.member)
-    .setHeader(`${message.author.username}'s chess puzzle`, message.author.avatarURL())
+    .setHeader("chess puzzle", message.author.avatarURL())
     .setImage("attachment://chess.png");
 
   const updateEmbedDescription = (opponentTurn: boolean) => {
