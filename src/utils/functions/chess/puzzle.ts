@@ -1,5 +1,6 @@
 import { Chess } from "chess.js";
 import prisma from "../../../init/database";
+import { logger } from "../../logger";
 
 export const CHESS_PUZZLE_DIFFICULTIES = [
   "easiest",
@@ -8,6 +9,7 @@ export const CHESS_PUZZLE_DIFFICULTIES = [
   "harder",
   "hardest",
 ] as const;
+const FILTERED_THEMES = new Set(["promotion", "advancedPawn", "underPromotion"]);
 
 export type ChessPuzzleDifficulty = (typeof CHESS_PUZZLE_DIFFICULTIES)[number];
 
@@ -27,8 +29,6 @@ export interface LichessPuzzle {
   };
 }
 
-const filteredThemes = new Set(["promotion", "advancedPawn", "underPromotion"]);
-
 export async function getRandomPuzzle(options?: {
   difficulty?: ChessPuzzleDifficulty;
 }): Promise<LichessPuzzle | "unavailable"> {
@@ -43,7 +43,14 @@ export async function getRandomPuzzle(options?: {
   });
 
   if (response.ok && response.status === 200) {
-    return response.json() as Promise<LichessPuzzle>;
+    const data = (await response.json()) as LichessPuzzle;
+
+    if (data.puzzle.themes.some((theme) => FILTERED_THEMES.has(theme))) {
+      // Some themes (e.g. promotion) can be very difficult to render properly, so filter them out.
+      // yeah what copilot said ^ FUCK THAT SHIT
+      logger.debug(`chess: skipping puzzle for filtered theme`, { puzzle: data.puzzle });
+      return getRandomPuzzle(options);
+    }
   }
 
   return "unavailable";
