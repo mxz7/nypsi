@@ -198,11 +198,15 @@ export async function renderBoard(chess: Chess, opts: RenderOptions = {}): Promi
     }
   }
 
+  const sharpBefore = performance.now();
   const res = await sharp(Buffer.from(baseSvg)).png().composite(pieces).png().toBuffer();
+  const sharpAfter = performance.now();
 
   const end = performance.now();
 
-  logger.debug(`chess: rendered board in ${(end - start).toFixed(2)}ms`);
+  logger.debug(
+    `chess: rendered board in ${(end - start).toFixed(2)}ms (sharp: ${(sharpAfter - sharpBefore).toFixed(2)}ms)`,
+  );
 
   return res;
 }
