@@ -51,6 +51,8 @@ export async function getRandomPuzzle(options?: {
       logger.debug(`chess: skipping puzzle for filtered theme`, { puzzle: data.puzzle });
       return getRandomPuzzle(options);
     }
+
+    return data;
   }
 
   return "unavailable";
