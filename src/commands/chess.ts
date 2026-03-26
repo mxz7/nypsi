@@ -289,6 +289,9 @@ async function startChessGame(
     }
 
     const input = res.fields.getTextInputValue("move");
+
+    logger.debug(`chess: received move "${res.fields.getTextInputValue("move")}"`);
+
     const uci = normalizeToUci(input, chess);
 
     if (!uci) {
