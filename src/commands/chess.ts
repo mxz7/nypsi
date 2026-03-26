@@ -38,7 +38,7 @@ cmd.slashData
   .addSubcommand((option) =>
     option
       .setName("puzzle")
-      .setDescription("solve a random chess puzzle")
+      .setDescription("play a random chess puzzle")
       .addStringOption((difficulty) =>
         difficulty
           .setName("difficulty")
@@ -73,7 +73,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          "**/chess puzzle [difficulty]** *solve a random chess puzzle*\n" +
+          "**/chess puzzle [difficulty]** *play a random chess puzzle*\n" +
             `- difficulty: ${CHESS_PUZZLE_DIFFICULTIES.map((d) => `\`${d}\``).join(", ")}\n` +
             "**/chess stats** *view your stats*",
         ).setHeader("chess puzzles", message.author.avatarURL()),
