@@ -109,8 +109,6 @@ async function run(
 
   const puzzle = await getRandomPuzzle({ difficulty: difficulty ?? undefined });
 
-  console.log(puzzle);
-
   if (puzzle === "unavailable") {
     return send({
       embeds: [new ErrorEmbed("lichess is currently unavailable, please try again shortly")],
