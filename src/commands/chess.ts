@@ -123,13 +123,6 @@ async function startChessGame(
 
   const embed = new CustomEmbed(message.member)
     .setHeader(`${message.author.username}'s chess puzzle`, message.author.avatarURL())
-    .setDescription(
-      `**${colorName.toLowerCase()} to move**\n\n` +
-        `rating: \`${puzzle.puzzle.rating}\` · themes: ${puzzle.puzzle.themes
-          .slice(0, 3)
-          .map((t) => `\`${t}\``)
-          .join(", ")}`,
-    )
     .setImage("attachment://chess.png");
 
   const updateEmbedDescription = (opponentTurn: boolean) => {
@@ -141,6 +134,8 @@ async function startChessGame(
           .join(", ")}`,
     );
   };
+
+  updateEmbedDescription(false);
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder().setCustomId("chess-guess").setLabel("move").setStyle(ButtonStyle.Primary),
