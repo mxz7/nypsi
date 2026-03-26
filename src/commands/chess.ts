@@ -13,7 +13,6 @@ import {
   TextInputStyle,
 } from "discord.js";
 import { nanoid } from "nanoid";
-import { send } from "node:process";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
@@ -117,12 +116,13 @@ async function run(
     });
   }
 
-  return startChessGame(message, puzzle, difficulty ?? undefined);
+  return startChessGame(message, puzzle, send, difficulty ?? undefined);
 }
 
 async function startChessGame(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   puzzle: LichessPuzzle,
+  send: SendMessage,
   difficulty?: ChessPuzzleDifficulty,
 ) {
   const beforeBuild = performance.now();
