@@ -11,7 +11,7 @@ const CANVAS_SIZE = SQUARE_SIZE * 8 + BORDER * 2;
 const LIGHT_COLOR = "#F0D9B5";
 const DARK_COLOR = "#B58863";
 const HIGHLIGHT_COLOR = "rgba(20, 85, 30, 0.5)";
-const LABEL_COLOR = "#333333";
+const LABEL_COLOR = "#F0D9B5";
 
 const PIECES_DIR = path.join(process.cwd(), "data", "chess_pieces");
 
