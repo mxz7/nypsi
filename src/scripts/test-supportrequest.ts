@@ -1,4 +1,5 @@
 import "dotenv/config";
+import Constants from "../utils/Constants";
 import { isRequestSuitable } from "../utils/functions/supportrequest";
 
 async function main() {
@@ -8,7 +9,7 @@ async function main() {
     throw new Error("provide support request content as a CLI argument");
   }
 
-  const result = await isRequestSuitable(content);
+  const result = await isRequestSuitable(Constants.OWNER_ID, content);
 
   console.log(JSON.stringify(result, null, 2));
 }

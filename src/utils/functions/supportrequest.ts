@@ -9,10 +9,15 @@ import { NypsiClient } from "../../models/Client";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import Constants from "../Constants";
 import { logger } from "../logger";
+import { isLockedOut } from "./captcha";
+import { getLevel, getPrestige } from "./economy/levelling";
+import { isEcoBanned, userExists } from "./economy/utils";
 import { uploadImage } from "./image";
 import openai, { buildPrompt, getDocsRaw, prompt } from "./openai";
+import { getLastCommand } from "./users/commands";
 import { getLastKnownUsername } from "./users/username";
 import pAll = require("p-all");
+import dayjs = require("dayjs");
 
 export const quickResponses = new Map<string, string>();
 
@@ -355,14 +360,75 @@ export async function summariseRequest(id: string) {
 }
 
 export async function isRequestSuitable(
+  userId: string,
   content: string,
 ): Promise<{ decision: boolean; reason: string; answer?: string }> {
   try {
     const prompt = buildPrompt("support_request", { documentation: await getDocsRaw() });
+
+    const context: Record<string, string> = {
+      exists: "false",
+      username: "null",
+      last_command: "null",
+      currently_banned: "null",
+      punishments: "null",
+      needs_captcha: "null",
+      prestige: "null",
+      level: "null",
+    };
+
+    if (await userExists(userId)) {
+      context.exists = "true";
+      context.username = await getLastKnownUsername(userId, false);
+      context.last_command = (await getLastCommand(userId)).toISOString();
+      context.captcha = Boolean(await isLockedOut(userId)).toString();
+      context.prestige = ((await getPrestige(userId)) || 0).toString();
+      context.level = ((await getLevel(userId)) || 0).toString();
+
+      const ecoBan = await isEcoBanned(userId);
+      const punishments = await prisma.moderationCase.findMany({
+        where: {
+          AND: [
+            { user: userId },
+            { time: { gte: dayjs().subtract(1, "month").toDate() } },
+            { guildId: Constants.NYPSI_SERVER_ID },
+          ],
+        },
+        select: {
+          caseId: true,
+          command: true,
+          type: true,
+        },
+      });
+
+      if (ecoBan.banned) {
+        context.currently_banned = "true";
+
+        if (ecoBan.bannedAccount !== userId) {
+          const username = await getLastKnownUsername(ecoBan.bannedAccount, false);
+          context.currently_banned += ", linked to " + username;
+        }
+      } else {
+        context.currently_banned = "false";
+      }
+
+      if (punishments.length) {
+        context.punishments = JSON.stringify(punishments);
+      } else {
+        context.punishments = "none";
+      }
+    }
+
+    const userContext = buildPrompt("user_context", context);
+
     const response = await openai.responses.parse({
       model: "gpt-5.4-mini",
-      instructions: prompt,
-      input: [{ role: "user", content }],
+      input: [
+        { role: "system", content: prompt },
+        { role: "system", content: userContext },
+
+        { role: "user", content },
+      ],
       text: { format: zodTextFormat(isRequestSuitableFormat, "supportrequest_suitable") },
     });
 

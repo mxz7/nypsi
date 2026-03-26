@@ -209,7 +209,7 @@ export default async function messageCreate(message: Message) {
 
         if (a) return;
 
-        const aiResponse = await isRequestSuitable(helpMessage);
+        const aiResponse = await isRequestSuitable(message.author.id, helpMessage);
 
         logger.info(
           `supportrequest: ${message.author.id} (${message.author.username}) ai response`,

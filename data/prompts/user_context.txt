@@ -1,0 +1,10 @@
+<USER_CONTEXT>
+Exists in database?: {exists}
+Username: {username}
+Last command: {last_command}
+Prestige: {prestige}
+Level: {level}
+Currently banned from bot: {currently_banned}
+Recent nypsi server punishments: {punishments}
+Needs to complete captcha: {captcha}
+</USER_CONTEXT>

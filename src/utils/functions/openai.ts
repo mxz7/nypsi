@@ -7,6 +7,7 @@ import ms = require("ms");
 
 const prompts = {
   support_request: readFileSync("data/prompts/support_request.txt").toString(),
+  user_context: readFileSync("data/prompts/user_context.txt").toString(),
 } as const;
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_KEY });
