@@ -21,6 +21,8 @@ import {
   addChessFail,
   addChessSolve,
   buildChessFromPuzzle,
+  CHESS_PUZZLE_DIFFICULTIES,
+  ChessPuzzleDifficulty,
   getChessStats,
   getRandomPuzzle,
   LichessPuzzle,
@@ -33,7 +35,24 @@ const cmd = new Command("chess", "play a chess puzzle", "fun").setAliases(["puzz
 
 cmd.slashEnabled = true;
 cmd.slashData
-  .addSubcommand((option) => option.setName("puzzle").setDescription("solve a random chess puzzle"))
+  .addSubcommand((option) =>
+    option
+      .setName("puzzle")
+      .setDescription("solve a random chess puzzle")
+      .addStringOption((difficulty) =>
+        difficulty
+          .setName("difficulty")
+          .setDescription("select puzzle difficulty")
+          .setRequired(false)
+          .addChoices(
+            { name: "easiest", value: "easiest" },
+            { name: "easier", value: "easier" },
+            { name: "normal", value: "normal" },
+            { name: "harder", value: "harder" },
+            { name: "hardest", value: "hardest" },
+          ),
+      ),
+  )
   .addSubcommand((option) =>
     option.setName("stats").setDescription("view your chess puzzle stats"),
   );
@@ -54,7 +73,9 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          "**/chess puzzle** *solve a random chess puzzle*\n**/chess stats** *view your stats*",
+          "**/chess puzzle [difficulty]** *solve a random chess puzzle*\n" +
+            `- difficulty: ${CHESS_PUZZLE_DIFFICULTIES.map((d) => `\`${d}\``).join(", ")}\n` +
+            "**/chess stats** *view your stats*",
         ).setHeader("chess puzzles", message.author.avatarURL()),
       ],
     });
@@ -86,9 +107,21 @@ async function run(
   }
 
   // /chess puzzle
+  const difficulty = parsePuzzleDifficulty(args[1]);
+
+  if (!difficulty && args[1]) {
+    return send({
+      embeds: [
+        new ErrorEmbed(
+          `invalid difficulty. use one of: ${CHESS_PUZZLE_DIFFICULTIES.map((d) => `\`${d}\``).join(", ")}`,
+        ),
+      ],
+    });
+  }
+
   await addCooldown(cmd.name, message.member, 10);
 
-  const puzzle = await getRandomPuzzle();
+  const puzzle = await getRandomPuzzle({ difficulty: difficulty ?? undefined });
 
   console.log(puzzle);
 
@@ -98,12 +131,13 @@ async function run(
     });
   }
 
-  return startChessGame(message, puzzle);
+  return startChessGame(message, puzzle, difficulty ?? undefined);
 }
 
 async function startChessGame(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   puzzle: LichessPuzzle,
+  difficulty?: ChessPuzzleDifficulty,
 ) {
   const chess = buildChessFromPuzzle(puzzle);
   const solution = puzzle.puzzle.solution;
@@ -129,7 +163,9 @@ async function startChessGame(
   const updateEmbedDescription = (opponentTurn: boolean) => {
     embed.setDescription(
       `**${(opponentTurn ? colorName : colorName === "White" ? "Black" : "White").toLowerCase()} to move**\n\n` +
-        `rating: \`${puzzle.puzzle.rating}\`\nthemes: ${puzzle.puzzle.themes
+        `rating: \`${puzzle.puzzle.rating}\`\n` +
+        `difficulty: \`${difficulty ?? "normal"}\`\n` +
+        `themes: ${puzzle.puzzle.themes
           .slice(0, 3)
           .map((t) => `\`${t}\``)
           .join(", ")}`,
@@ -368,6 +404,17 @@ async function startChessGame(
 
     await msg.edit({ embeds: [embed], components: [row] }).catch(() => {});
   });
+}
+
+function parsePuzzleDifficulty(value?: string): ChessPuzzleDifficulty | null {
+  const requested = value?.toLowerCase();
+  if (!requested) return null;
+
+  if (CHESS_PUZZLE_DIFFICULTIES.includes(requested as ChessPuzzleDifficulty)) {
+    return requested as ChessPuzzleDifficulty;
+  }
+
+  return null;
 }
 
 cmd.setRun(run);

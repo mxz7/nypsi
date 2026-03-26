@@ -1,6 +1,16 @@
 import { Chess } from "chess.js";
 import prisma from "../../../init/database";
 
+export const CHESS_PUZZLE_DIFFICULTIES = [
+  "easiest",
+  "easier",
+  "normal",
+  "harder",
+  "hardest",
+] as const;
+
+export type ChessPuzzleDifficulty = (typeof CHESS_PUZZLE_DIFFICULTIES)[number];
+
 export interface LichessPuzzle {
   game: {
     id: string;
@@ -17,8 +27,18 @@ export interface LichessPuzzle {
   };
 }
 
-export async function getRandomPuzzle(): Promise<LichessPuzzle | "unavailable"> {
-  const response = await fetch("https://lichess.org/api/puzzle/next", {
+const filteredThemes = new Set(["promotion", "advancedPawn", "underPromotion"]);
+
+export async function getRandomPuzzle(options?: {
+  difficulty?: ChessPuzzleDifficulty;
+}): Promise<LichessPuzzle | "unavailable"> {
+  const url = new URL("https://lichess.org/api/puzzle/next");
+
+  if (options?.difficulty) {
+    url.searchParams.set("difficulty", options.difficulty);
+  }
+
+  const response = await fetch(url, {
     headers: { Accept: "application/json" },
   });
 
