@@ -38,23 +38,43 @@ export async function getRandomPuzzle(options?: {
     url.searchParams.set("difficulty", options.difficulty);
   }
 
-  const response = await fetch(url, {
-    headers: { Accept: "application/json" },
-  });
+  const maxAttempts = 5;
 
-  if (response.ok && response.status === 200) {
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    let response: Response;
+
+    try {
+      response = await fetch(url, {
+        headers: { Accept: "application/json" },
+      });
+    } catch (error) {
+      logger.error("chess: failed to fetch puzzle from lichess", { error });
+      return "unavailable";
+    }
+
+    if (!response.ok || response.status !== 200) {
+      logger.warn("chess: received non-ok response from lichess puzzle api", {
+        status: response.status,
+      });
+      return "unavailable";
+    }
+
     const data = (await response.json()) as LichessPuzzle;
 
     if (data.puzzle.themes.some((theme) => FILTERED_THEMES.has(theme))) {
       // Some themes (e.g. promotion) can be very difficult to render properly, so filter them out.
       // yeah what copilot said ^ FUCK THAT SHIT
-      logger.debug(`chess: skipping puzzle for filtered theme`, { puzzle: data.puzzle });
-      return getRandomPuzzle(options);
+      logger.debug("chess: skipping puzzle for filtered theme", {
+        puzzle: data.puzzle,
+        attempt,
+      });
+      continue;
     }
 
     return data;
   }
 
+  logger.warn("chess: exhausted attempts while trying to fetch non-filtered puzzle");
   return "unavailable";
 }
 
