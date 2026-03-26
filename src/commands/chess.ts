@@ -76,6 +76,7 @@ async function run(
       const pct = total > 0 ? ((stats.solved / total) * 100).toFixed(1) : "0.0";
       embed.setDescription(
         `puzzles solved: **${stats.solved.toLocaleString()}** / **${total.toLocaleString()}** (${pct}%)\n` +
+          `avg winning rating: **${Math.round(stats.averageWinningRating).toLocaleString()}**\n` +
           `current streak: **${stats.streak.toLocaleString()}**\n` +
           `best streak: **${stats.bestStreak.toLocaleString()}**`,
       );
@@ -172,7 +173,7 @@ async function startChessGame(
   ) => {
     await res.deferUpdate().catch(() => {});
     collector.stop("win");
-    await recordSolve(message.author.id);
+    await recordSolve(message.author.id, puzzle.puzzle.rating);
     const stats = await getChessStats(message.author.id);
 
     embed

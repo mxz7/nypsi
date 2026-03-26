@@ -111,15 +111,30 @@ export async function getChessStats(userId: string) {
   return prisma.chessPuzzleStats.findUnique({ where: { userId } });
 }
 
-export async function recordSolve(userId: string) {
-  const existing = await prisma.chessPuzzleStats.findUnique({ where: { userId } });
+export async function recordSolve(userId: string, puzzleRating: number) {
+  const existing = await getChessStats(userId);
+  const solvedBefore = existing?.solved ?? 0;
+  const newSolved = solvedBefore + 1;
   const newStreak = (existing?.streak ?? 0) + 1;
   const newBest = Math.max(newStreak, existing?.bestStreak ?? 0);
+  const ratingTotalBefore = (existing?.averageWinningRating ?? 0) * solvedBefore;
+  const newAverageWinningRating = (ratingTotalBefore + puzzleRating) / newSolved;
 
   await prisma.chessPuzzleStats.upsert({
     where: { userId },
-    create: { userId, solved: 1, streak: 1, bestStreak: 1 },
-    update: { solved: { increment: 1 }, streak: newStreak, bestStreak: newBest },
+    create: {
+      userId,
+      solved: 1,
+      streak: 1,
+      bestStreak: 1,
+      averageWinningRating: puzzleRating,
+    },
+    update: {
+      solved: { increment: 1 },
+      streak: newStreak,
+      bestStreak: newBest,
+      averageWinningRating: newAverageWinningRating,
+    },
   });
 }
 
