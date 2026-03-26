@@ -87,21 +87,7 @@ async function run(
 
     const embed = new CustomEmbed(message.member);
     embed.setHeader(`${message.author.username}'s chess stats`, message.author.avatarURL());
-
-    if (!stats || (stats.solved === 0 && stats.failed === 0)) {
-      embed.setDescription(
-        "you haven't played any chess puzzles yet.\n\nuse **/chess puzzle** to start!",
-      );
-    } else {
-      const total = stats.solved + stats.failed;
-      const pct = total > 0 ? ((stats.solved / total) * 100).toFixed(1) : "0.0";
-      embed.setDescription(
-        `puzzles solved: **${stats.solved.toLocaleString()}** / **${total.toLocaleString()}** (${pct}%)\n` +
-          `avg winning rating: **${Math.round(stats.averageWinningRating).toLocaleString()}**\n` +
-          `current streak: **${stats.streak.toLocaleString()}**\n` +
-          `best streak: **${stats.bestStreak.toLocaleString()}**`,
-      );
-    }
+    embed.setDescription(formatChessStatsDisplay(stats));
 
     return send({ embeds: [embed] });
   }
@@ -214,7 +200,7 @@ async function startChessGame(
 
     embed
       .setDescription(
-        `**puzzle solved!!**\n\nrating: \`${puzzle.puzzle.rating}\`\ncurrent streak: **${stats?.streak ?? 1}**`,
+        `**puzzle solved!!**\n\nrating: \`${puzzle.puzzle.rating}\`\n\n${formatChessStatsDisplay(stats)}`,
       )
       .setColor(Constants.EMBED_SUCCESS_COLOR)
       .setFooter(null);
@@ -415,6 +401,22 @@ function parsePuzzleDifficulty(value?: string): ChessPuzzleDifficulty | null {
   }
 
   return null;
+}
+
+function formatChessStatsDisplay(stats: Awaited<ReturnType<typeof getChessStats>> | null): string {
+  if (!stats || (stats.solved === 0 && stats.failed === 0)) {
+    return "you haven't played any chess puzzles yet.\n\nuse **/chess puzzle** to start!";
+  }
+
+  const total = stats.solved + stats.failed;
+  const pct = total > 0 ? ((stats.solved / total) * 100).toFixed(1) : "0.0";
+
+  return (
+    `puzzles solved: **${stats.solved.toLocaleString()}** / **${total.toLocaleString()}** (${pct}%)\n` +
+    `avg winning rating: **${Math.round(stats.averageWinningRating).toLocaleString()}**\n` +
+    `current streak: **${stats.streak.toLocaleString()}**\n` +
+    `best streak: **${stats.bestStreak.toLocaleString()}**`
+  );
 }
 
 cmd.setRun(run);
