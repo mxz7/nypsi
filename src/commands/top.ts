@@ -32,7 +32,6 @@ import {
   topItemGlobal,
   topLottoWins,
   topNetWorth,
-  topNetWorthGlobal,
   topPrestige,
   topVote,
 } from "../utils/functions/leaderboards/economy";
@@ -439,9 +438,9 @@ async function run(
     let data: LeaderboardResult;
 
     if (global) {
-      data = await topNetWorthGlobal(message.member);
+      data = await topNetWorth("global", undefined, message.member);
     } else {
-      data = await topNetWorth(message.guild, message.member);
+      data = await topNetWorth("guild", message.guild, message.member);
     }
 
     return show(

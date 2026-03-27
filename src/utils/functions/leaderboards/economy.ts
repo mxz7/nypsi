@@ -1,15 +1,14 @@
 import dayjs = require("dayjs");
 import { Guild } from "discord.js";
 import prisma from "../../../init/database";
+import { checkLeaderboardPositions } from "../economy/stats";
+import { getAchievements, getItems } from "../economy/utils";
 import { getAllMembers } from "../guilds/members";
 import { getUserId, MemberResolvable } from "../member";
-import { Mutex } from "../mutex";
 import PageManager from "../page";
 import { pluralize } from "../string";
 import { getPreferences } from "../users/notifications";
 import { getLastKnownUsername, updateLastKnownUsername } from "../users/username";
-import { checkLeaderboardPositions } from "../economy/stats";
-import { getAchievements, getItems } from "../economy/utils";
 import {
   createLeaderboardOutput,
   formatUsername,
@@ -163,160 +162,83 @@ export async function topBalanceGlobal(amount: number, allowHidden = true): Prom
   return usersFinal.slice(0, amount);
 }
 
-export async function topNetWorthGlobal(member: MemberResolvable, amount = 100) {
+export async function topNetWorth(
+  scope: "global",
+  guild: undefined,
+  member?: MemberResolvable,
+  amount?: number,
+): Promise<LeaderboardResult>;
+export async function topNetWorth(
+  scope: "guild",
+  guild: Guild,
+  member?: MemberResolvable,
+  amount?: number,
+): Promise<LeaderboardResult>;
+export async function topNetWorth(
+  scope: "guild" | "global",
+  guild?: Guild,
+  member?: MemberResolvable,
+  amount?: number,
+): Promise<LeaderboardResult> {
+  const members = await getMembers(guild);
+
   const query = await prisma.economy.findMany({
     where: {
-      AND: [{ netWorth: { gt: 0 } }, { user: { blacklisted: false } }],
+      AND: [
+        members ? { userId: { in: members } } : undefined,
+        { user: { blacklisted: false } },
+        { netWorth: { gt: 0 } },
+        { OR: [{ banned: null }, { banned: { lt: new Date() } }] },
+      ].filter(Boolean),
     },
     select: {
       userId: true,
       netWorth: true,
-      banned: true,
       user: {
         select: {
           lastKnownUsername: true,
+          usernameUpdatedAt: true,
         },
       },
     },
     orderBy: [{ netWorth: "desc" }, { user: { lastKnownUsername: "asc" } }],
-    take: amount,
+    take: getAmount(guild, amount) || undefined,
   });
 
   const out: string[] = [];
-
+  let count = 1;
   const userIds = query.map((i) => i.userId);
+  const promises: (() => Promise<void>)[] = [];
 
   for (const user of query) {
-    if (user.banned && dayjs().isBefore(user.banned)) {
-      userIds.splice(userIds.indexOf(user.userId), 1);
-      continue;
-    }
+    const currentCount = count;
+    const pos = getPos(count);
 
-    let pos = (out.length + 1).toString();
+    count++;
 
-    if (pos == "1") {
-      pos = "🥇";
-    } else if (pos == "2") {
-      pos = "🥈";
-    } else if (pos == "3") {
-      pos = "🥉";
-    } else {
-      pos += ".";
-    }
-
-    out.push(
-      `${pos} ${await formatUsername(
+    promises.push(async () => {
+      const username = await getUsername(
         user.userId,
         user.user.lastKnownUsername,
-        (await getPreferences(user.userId)).leaderboards,
-      )} $${Number(user.netWorth).toLocaleString()}`,
-    );
-  }
+        user.user.usernameUpdatedAt,
+        guild,
+      );
 
-  const pages = PageManager.createPages(out);
-
-  let pos = 0;
-
-  if (member) {
-    pos = userIds.indexOf(getUserId(member)) + 1;
-  }
-
-  checkLeaderboardPositions(userIds, "networth");
-
-  return { pages, pos };
-}
-
-const topNetMutex = new Mutex();
-
-export async function topNetWorth(guild: Guild, member?: MemberResolvable) {
-  topNetMutex.acquire(guild.id);
-
-  try {
-    const members = await getAllMembers(guild);
-
-    const query = await prisma.economy.findMany({
-      where: {
-        AND: [
-          { userId: { in: members } },
-          { user: { blacklisted: false } },
-          { netWorth: { gt: 0 } },
-        ],
-      },
-      select: {
-        userId: true,
-        netWorth: true,
-        banned: true,
-        user: {
-          select: {
-            lastKnownUsername: true,
-            usernameUpdatedAt: true,
-          },
-        },
-      },
-      orderBy: [{ netWorth: "desc" }, { user: { lastKnownUsername: "asc" } }],
+      out[currentCount] = `${pos} ${await formatUsername(
+        user.userId,
+        username,
+        scope === "global",
+      )} $${Number(user.netWorth).toLocaleString()}`;
     });
-
-    const out: string[] = [];
-    let count = 0;
-    const userIds = query.map((i) => i.userId);
-    const promises: (() => Promise<void>)[] = [];
-    const date = dayjs();
-
-    for (const user of query) {
-      if (user.banned && date.isBefore(user.banned)) {
-        userIds.splice(userIds.indexOf(user.userId), 1);
-        continue;
-      }
-
-      const currentCount = count;
-      let pos = (count + 1).toString();
-
-      if (pos == "1") {
-        pos = "🥇";
-      } else if (pos == "2") {
-        pos = "🥈";
-      } else if (pos == "3") {
-        pos = "🥉";
-      } else {
-        pos += ".";
-      }
-
-      count++;
-
-      promises.push(async () => {
-        let username = user.user.lastKnownUsername;
-
-        if (user.user.usernameUpdatedAt.getTime() < date.valueOf() - UPDATE_USERNAME_MS) {
-          const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
-
-          if (discordUser) {
-            username = discordUser.username;
-            await updateLastKnownUsername(user.userId, username);
-          }
-        }
-
-        out[currentCount] = `${pos} ${await formatUsername(
-          user.userId,
-          username,
-          true,
-        )} $${Number(user.netWorth).toLocaleString()}`;
-      });
-    }
-
-    await pAll(promises, { concurrency: 10 });
-
-    const pages = PageManager.createPages(out);
-
-    let pos = 0;
-
-    if (member) {
-      pos = userIds.indexOf(getUserId(member)) + 1;
-    }
-
-    return { pages, pos };
-  } finally {
-    topNetMutex.release(guild.id);
   }
+
+  await pAll(promises, { concurrency: 10 });
+
+  if (scope === "global") {
+    checkLeaderboardPositions(userIds, "networth");
+  }
+
+  return createLeaderboardOutput(out, userIds, member ? getUserId(member) : undefined);
 }
 
 export async function topPrestige(
@@ -832,4 +754,3 @@ export async function topVote(
 
   return createLeaderboardOutput(out, userIds, member ? getUserId(member) : undefined);
 }
-
