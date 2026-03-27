@@ -13,6 +13,7 @@ import {
   TextInputStyle,
 } from "discord.js";
 import { nanoid } from "nanoid";
+import redis from "../init/redis";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
@@ -107,17 +108,29 @@ async function run(
     });
   }
 
-  await addCooldown(cmd.name, message.member, 10);
-
-  const puzzle = await getRandomPuzzle({ difficulty: difficulty ?? undefined });
-
-  if (puzzle === "unavailable") {
+  if (await redis.sismember(Constants.redis.nypsi.USERS_PLAYING, message.author.id)) {
     return send({
-      embeds: [new ErrorEmbed("lichess is currently unavailable, please try again shortly")],
+      embeds: [new ErrorEmbed("you have an active game")],
     });
   }
 
-  return startChessGame(message, puzzle, send, difficulty ?? undefined);
+  await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+
+  try {
+    await addCooldown(cmd.name, message.member, 10);
+
+    const puzzle = await getRandomPuzzle({ difficulty: difficulty ?? undefined });
+
+    if (puzzle === "unavailable") {
+      return send({
+        embeds: [new ErrorEmbed("lichess is currently unavailable, please try again shortly")],
+      });
+    }
+
+    return startChessGame(message, puzzle, send, difficulty ?? undefined);
+  } finally {
+    await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+  }
 }
 
 async function startChessGame(
