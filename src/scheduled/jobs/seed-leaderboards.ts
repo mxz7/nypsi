@@ -3,7 +3,7 @@ import { MStoTime } from "../../utils/functions/date";
 import { calcItemValue } from "../../utils/functions/economy/inventory";
 import { getItems } from "../../utils/functions/economy/utils";
 import { topChatReaction } from "../../utils/functions/leaderboards/chat-reactions";
-import { topCommandUsesGlobal } from "../../utils/functions/leaderboards/commands";
+import { topCommandUses } from "../../utils/functions/leaderboards/commands";
 import {
   topBalance,
   topItem,
@@ -40,7 +40,7 @@ export default {
     await sleep(1000);
     await topChatReaction("global", undefined, true, "", 100);
     await sleep(1000);
-    await topCommandUsesGlobal("");
+    await topCommandUses("global", undefined, "", 100);
     await sleep(1000);
     await topVoteStreak("global", undefined);
     await sleep(1000);

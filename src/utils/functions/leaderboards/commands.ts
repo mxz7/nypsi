@@ -1,13 +1,10 @@
-import dayjs = require("dayjs");
 import { Guild } from "discord.js";
 import prisma from "../../../init/database";
 import { checkLeaderboardPositions } from "../economy/stats";
 import { getAllMembers } from "../guilds/members";
 import { getUserId, MemberResolvable } from "../member";
-import PageManager from "../page";
 import { pluralize } from "../string";
-import { getPreferences } from "../users/notifications";
-import { getLastKnownUsername, updateLastKnownUsername } from "../users/username";
+import { getLastKnownUsername } from "../users/username";
 import {
   createLeaderboardOutput,
   formatUsername,
@@ -16,7 +13,6 @@ import {
   getPos,
   getUsername,
   LeaderboardResult,
-  UPDATE_USERNAME_MS,
 } from "./helpers";
 import pAll = require("p-all");
 
@@ -97,12 +93,29 @@ export async function topCommand(
   return createLeaderboardOutput(out, userIds, member ? getUserId(member) : undefined);
 }
 
-export async function topCommandUses(guild: Guild, member: MemberResolvable) {
-  const members = await getAllMembers(guild);
+export async function topCommandUses(
+  scope: "global",
+  guild: undefined,
+  member?: MemberResolvable,
+  amount?: number,
+): Promise<LeaderboardResult>;
+export async function topCommandUses(
+  scope: "guild",
+  guild: Guild,
+  member?: MemberResolvable,
+  amount?: number,
+): Promise<LeaderboardResult>;
+export async function topCommandUses(
+  scope: "guild" | "global",
+  guild?: Guild,
+  member?: MemberResolvable,
+  amount?: number,
+): Promise<LeaderboardResult> {
+  const members = guild ? await getAllMembers(guild) : null;
 
   const query = await prisma.commandUse.groupBy({
     where: {
-      AND: [{ userId: { in: members } }],
+      AND: [members ? { userId: { in: members } } : undefined].filter(Boolean),
     },
     by: ["userId"],
     _sum: {
@@ -113,114 +126,39 @@ export async function topCommandUses(guild: Guild, member: MemberResolvable) {
         uses: "desc",
       },
     },
+    take: getAmount(guild, amount) || undefined,
   });
 
   const out: string[] = [];
-  let count = 0;
+  let count = 1;
   const userIds = query.map((i) => i.userId);
   const promises: (() => Promise<void>)[] = [];
-  const date = dayjs();
 
   for (const user of query) {
     const currentCount = count;
-    let pos = (count + 1).toString();
-
-    if (pos == "1") {
-      pos = "🥇";
-    } else if (pos == "2") {
-      pos = "🥈";
-    } else if (pos == "3") {
-      pos = "🥉";
-    } else {
-      pos += ".";
-    }
+    const pos = getPos(count);
 
     count++;
 
     promises.push(async () => {
       const usernameData = await getLastKnownUsername(user.userId, false, true);
 
-      let username = usernameData.lastKnownUsername;
-
-      if (usernameData.usernameUpdatedAt.getTime() < date.valueOf() - UPDATE_USERNAME_MS) {
-        const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
-
-        if (discordUser) {
-          username = discordUser.username;
-          await updateLastKnownUsername(user.userId, username);
-        }
-      }
+      const username = await getUsername(
+        user.userId,
+        usernameData.lastKnownUsername,
+        usernameData.usernameUpdatedAt,
+        guild,
+      );
 
       out[currentCount] = `${pos} ${await formatUsername(
         user.userId,
         username,
-        true,
+        scope === "global",
       )} ${user._sum.uses.toLocaleString()} ${pluralize("command", user._sum.uses)}`;
     });
   }
 
   await pAll(promises, { concurrency: 10 });
 
-  const pages = PageManager.createPages(out);
-
-  let pos = 0;
-
-  if (member) {
-    pos = userIds.indexOf(getUserId(member)) + 1;
-  }
-
-  return { pages, pos };
-}
-
-export async function topCommandUsesGlobal(member?: MemberResolvable) {
-  const query = await prisma.commandUse.groupBy({
-    by: ["userId"],
-    _sum: {
-      uses: true,
-    },
-    orderBy: {
-      _sum: {
-        uses: "desc",
-      },
-    },
-    take: 100,
-  });
-
-  const out = [];
-
-  let count = 0;
-
-  const userIds = query.map((i) => i.userId);
-
-  for (const user of query) {
-    let pos = (count + 1).toString();
-
-    if (pos == "1") {
-      pos = "🥇";
-    } else if (pos == "2") {
-      pos = "🥈";
-    } else if (pos == "3") {
-      pos = "🥉";
-    } else {
-      pos += ".";
-    }
-
-    out[count] = `${pos} ${await formatUsername(
-      user.userId,
-      await getLastKnownUsername(user.userId, false),
-      (await getPreferences(user.userId)).leaderboards,
-    )} ${user._sum.uses.toLocaleString()} ${pluralize("command", user._sum.uses)}`;
-
-    count++;
-  }
-
-  const pages = PageManager.createPages(out);
-
-  let pos = 0;
-
-  if (member) {
-    pos = userIds.indexOf(getUserId(member)) + 1;
-  }
-
-  return { pages, pos };
+  return createLeaderboardOutput(out, userIds, member ? getUserId(member) : undefined);
 }

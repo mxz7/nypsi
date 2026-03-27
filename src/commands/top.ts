@@ -19,11 +19,7 @@ import { showMuseumLeaderboard } from "../utils/functions/economy/museum";
 import { getItems } from "../utils/functions/economy/utils.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { topChatReaction } from "../utils/functions/leaderboards/chat-reactions";
-import {
-  topCommand,
-  topCommandUses,
-  topCommandUsesGlobal,
-} from "../utils/functions/leaderboards/commands";
+import { topCommand, topCommandUses } from "../utils/functions/leaderboards/commands";
 import {
   topBalance,
   topCompletion,
@@ -622,11 +618,11 @@ async function run(
 
     if (args.length === 1 || args[1]?.toLowerCase() === "global") {
       if (args[1]?.toLowerCase() === "global") {
-        data = await topCommandUsesGlobal(message.member);
+        data = await topCommandUses("global", undefined, message.member);
         title = `top command uses [global]`;
         url = "https://nypsi.xyz/leaderboards/commands?ref=bot-lb";
       } else {
-        data = await topCommandUses(message.guild, message.member);
+        data = await topCommandUses("guild", message.guild, message.member);
         title = `top command uses for ${message.guild.name}`;
       }
     } else {
