@@ -65,7 +65,7 @@ async function run(
     return;
   }
 
-  if (args[0].toLowerCase() === "stats") {
+  if (args[0]?.toLowerCase() === "stats") {
     await addCooldown(cmd.name, message.member, 3);
     const stats = await getChessStats(message.author.id);
 
@@ -75,7 +75,7 @@ async function run(
 
     return send({ embeds: [embed] });
   } else if (
-    ["puzzle", "p", "play", ...CHESS_PUZZLE_DIFFICULTIES].includes(args[0].toLowerCase())
+    ["puzzle", "p", "play", ...CHESS_PUZZLE_DIFFICULTIES].includes(args[0]?.toLowerCase())
   ) {
     if (!["puzzle", "p", "play"].includes(args[0].toLowerCase())) {
       args[1] = args[0];
