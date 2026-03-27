@@ -34,7 +34,7 @@ import { formatTime } from "../utils/functions/string";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
 
-const cmd = new Command("chess", "play a chess puzzle", "fun").setAliases(["puzzle"]);
+const cmd = new Command("chess", "play a chess puzzle", "fun").setAliases(["ch"]);
 
 cmd.slashEnabled = true;
 cmd.slashData
