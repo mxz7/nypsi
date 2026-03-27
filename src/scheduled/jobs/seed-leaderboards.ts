@@ -28,7 +28,7 @@ export default {
     await sleep(1000);
     await topDailyStreak("global", undefined, "", 100);
     await sleep(1000);
-    await topPrestige("global", undefined, undefined, 1000);
+    await topPrestige("global", undefined, undefined, 100);
     await sleep(1000);
     await topNetWorth("global", undefined, "", 100);
     await sleep(1000);
