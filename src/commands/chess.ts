@@ -72,19 +72,9 @@ async function run(
   }
 
   if (args.length === 0 || (args[0] !== "puzzle" && args[0] !== "p" && args[0] !== "stats")) {
-    return send({
-      embeds: [
-        new CustomEmbed(
-          message.member,
-          "**/chess puzzle [difficulty]** *play a random chess puzzle*\n" +
-            `- difficulty: ${CHESS_PUZZLE_DIFFICULTIES.map((d) => `\`${d}\``).join(", ")}\n` +
-            "**/chess stats** *view your stats*",
-        ).setHeader("chess puzzles", message.author.avatarURL()),
-      ],
-    });
   }
 
-  if (args[0] === "stats") {
+  if (args[0].toLowerCase() === "stats") {
     await addCooldown(cmd.name, message.member, 3);
     const stats = await getChessStats(message.author.id);
 
@@ -93,43 +83,47 @@ async function run(
     embed.setDescription(formatChessStatsDisplay(stats));
 
     return send({ embeds: [embed] });
-  }
+  } else if (
+    ["puzzle", "p", "play", ...CHESS_PUZZLE_DIFFICULTIES].includes(args[0].toLowerCase())
+  ) {
+    if (!["puzzle", "p", "play"].includes(args[0].toLowerCase())) {
+      args[1] = args[0];
+    }
+    const difficulty = parsePuzzleDifficulty(args[1]);
 
-  // /chess puzzle
-  const difficulty = parsePuzzleDifficulty(args[1]);
-
-  if (!difficulty && args[1]) {
-    return send({
-      embeds: [
-        new ErrorEmbed(
-          `invalid difficulty. use one of: ${CHESS_PUZZLE_DIFFICULTIES.map((d) => `\`${d}\``).join(", ")}`,
-        ),
-      ],
-    });
-  }
-
-  if (await redis.sismember(Constants.redis.nypsi.USERS_PLAYING, message.author.id)) {
-    return send({
-      embeds: [new ErrorEmbed("you have an active game")],
-    });
-  }
-
-  await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
-
-  try {
-    await addCooldown(cmd.name, message.member, 10);
-
-    const puzzle = await getRandomPuzzle({ difficulty: difficulty ?? undefined });
-
-    if (puzzle === "unavailable") {
+    if (!difficulty && args[1]) {
       return send({
-        embeds: [new ErrorEmbed("lichess is currently unavailable, please try again shortly")],
+        embeds: [
+          new ErrorEmbed(
+            `invalid difficulty. use one of: ${CHESS_PUZZLE_DIFFICULTIES.map((d) => `\`${d}\``).join(", ")}`,
+          ),
+        ],
       });
     }
 
-    return startChessGame(message, puzzle, send, difficulty ?? undefined);
-  } finally {
-    await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+    if (await redis.sismember(Constants.redis.nypsi.USERS_PLAYING, message.author.id)) {
+      return send({
+        embeds: [new ErrorEmbed("you have an active game")],
+      });
+    }
+
+    await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+
+    try {
+      await addCooldown(cmd.name, message.member, 10);
+
+      const puzzle = await getRandomPuzzle({ difficulty: difficulty ?? undefined });
+
+      if (puzzle === "unavailable") {
+        return send({
+          embeds: [new ErrorEmbed("lichess is currently unavailable, please try again shortly")],
+        });
+      }
+
+      return startChessGame(message, puzzle, send, difficulty ?? undefined);
+    } finally {
+      await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+    }
   }
 }
 
