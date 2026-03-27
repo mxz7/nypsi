@@ -123,7 +123,7 @@ function renderBaseBoardSvg(opts: RenderOptions, perspective: "white" | "black")
   parts.push(
     `<svg xmlns="http://www.w3.org/2000/svg" width="${CANVAS_SIZE}" height="${CANVAS_SIZE}" viewBox="0 0 ${CANVAS_SIZE} ${CANVAS_SIZE}">`,
   );
-  parts.push(`<rect x="0" y="0" width="${CANVAS_SIZE}" height="${CANVAS_SIZE}" fill="#1a1a1a"/>`);
+  parts.push(`<rect x="0" y="0" width="${CANVAS_SIZE}" height="${CANVAS_SIZE}" fill="#242429"/>`);
 
   for (let row = 0; row < 8; row++) {
     for (let col = 0; col < 8; col++) {
