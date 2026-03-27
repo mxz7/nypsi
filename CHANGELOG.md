@@ -1,6 +1,7 @@
 # march 2026
-- add museum (@growling_grizzly)
 
+- add museum (@growling_grizzly)
+- add chess puzzles
 
 # february 2026
 

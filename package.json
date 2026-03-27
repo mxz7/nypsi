@@ -33,6 +33,7 @@
     "bufferutil": "4.1.0",
     "bullmq": "^5.67.3",
     "chalk": "4.1.2",
+    "chess.js": "^1.4.0",
     "cron": "^4.4.0",
     "crypto-js": "4.2.0",
     "dayjs": "1.11.20",

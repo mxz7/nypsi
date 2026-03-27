@@ -51,6 +51,7 @@ model User {
   Event                    Event[]
   EventContribution        EventContribution[]
   tmdbRatings              tmdbRatings[]
+  ChessPuzzleStats         ChessPuzzleStats?
 }
 
 model ProfileView {
@@ -544,6 +545,19 @@ model FlagGame {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+model ChessPuzzleStats {
+  userId               String @id
+  solved               Int    @default(0)
+  failed               Int    @default(0)
+  streak               Int    @default(0)
+  bestStreak           Int    @default(0)
+  averageWinningRating Float?
+  fastestSolve         Float?
+  averageSolveTime     Float?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum OrderType {
