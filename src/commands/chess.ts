@@ -120,6 +120,8 @@ async function run(
         });
       }
 
+      logger.debug(`chess: ${message.author.id} starting puzzle: ${puzzle.puzzle.id}`);
+
       return startChessGame(message, puzzle, send, difficulty ?? undefined);
     } finally {
       await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
