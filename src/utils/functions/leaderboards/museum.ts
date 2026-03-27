@@ -292,7 +292,7 @@ export async function topMuseumAmount(
 
   const query = await prisma.museum.findMany({
     where: {
-      AND: [members ? { userId: { in: members } } : undefined, { itemId: item }],
+      AND: [members ? { userId: { in: members } } : undefined, { itemId: item }].filter(Boolean),
     },
     select: {
       userId: true,
