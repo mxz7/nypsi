@@ -424,7 +424,7 @@ async function startChessGame(
 
 function parsePuzzleDifficulty(value?: string): ChessPuzzleDifficulty | null {
   const requested = value?.toLowerCase();
-  if (!requested) return null;
+  if (!requested) return "normal";
 
   if (CHESS_PUZZLE_DIFFICULTIES.includes(requested as ChessPuzzleDifficulty)) {
     return requested as ChessPuzzleDifficulty;
