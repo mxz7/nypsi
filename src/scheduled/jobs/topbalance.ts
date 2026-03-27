@@ -2,13 +2,13 @@ import { flavors } from "@catppuccin/palette";
 import { ColorResolvable, WebhookClient } from "discord.js";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import { Job } from "../../types/Jobs";
-import { topBalanceGlobal, topGuilds } from "../../utils/functions/economy/top";
+import { topBalance, topGuilds } from "../../utils/functions/leaderboards/economy";
 
 export default {
   name: "top balance",
   cron: "0 0 * * *",
   async run(log) {
-    const baltop = await topBalanceGlobal(10);
+    const baltop = await topBalance("global", undefined, undefined, 10);
     const guilds = await topGuilds();
 
     const balance = new CustomEmbed();
@@ -28,7 +28,7 @@ export default {
     balance.setColor(flavors.latte.colors.base.hex as ColorResolvable);
     guild.setColor(flavors.latte.colors.base.hex as ColorResolvable);
 
-    balance.setDescription(baltop.join("\n"));
+    balance.setDescription((baltop.pages.get(1) || []).join("\n"));
     guild.setDescription(guilds.pages.get(1).join("\n"));
 
     const hook = new WebhookClient({ url: process.env.TOPGLOBAL_HOOK });

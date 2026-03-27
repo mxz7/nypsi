@@ -15,19 +15,17 @@ import { CustomEmbed, ErrorEmbed } from "../../../models/EmbedBuilders";
 import { Item } from "../../../types/Economy";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
+import {
+  topMuseumAmount,
+  topMuseumCompletion,
+  topMuseumCompletions,
+  topMuseumCompletionsGlobal,
+} from "../leaderboards/museum";
 import { getUserId, MemberResolvable } from "../member";
 import { addInlineNotification } from "../users/notifications";
 import { addProgress } from "./achievements";
 import { selectItem } from "./inventory";
 import { addTaskProgress } from "./tasks";
-import {
-  topMuseumAmount,
-  topMuseumAmountGlobal,
-  topMuseumCompletion,
-  topMuseumCompletionGlobal,
-  topMuseumCompletions,
-  topMuseumCompletionsGlobal,
-} from "./top";
 import { createUser, getItems, userExists } from "./utils";
 import ms = require("ms");
 
@@ -428,12 +426,12 @@ export async function showMuseumLeaderboard(
 
   if (global) {
     data = !selected.museum.no_overflow
-      ? await topMuseumAmountGlobal(selected.id, message.member)
-      : await topMuseumCompletionGlobal(selected.id, message.member);
+      ? await topMuseumAmount("global", undefined, selected.id, message.member)
+      : await topMuseumCompletion("global", undefined, selected.id, message.member);
   } else {
     data = !selected.museum.no_overflow
-      ? await topMuseumAmount(message.guild, selected.id, message.member)
-      : await topMuseumCompletion(message.guild, selected.id, message.member);
+      ? await topMuseumAmount("guild", message.guild, selected.id, message.member)
+      : await topMuseumCompletion("guild", message.guild, selected.id, message.member);
   }
 
   let amountLeaderboardShown = !selected.museum.no_overflow;
@@ -540,13 +538,13 @@ export async function showMuseumLeaderboard(
       if (global) {
         data =
           res == "amount"
-            ? await topMuseumAmountGlobal(selected.id, message.member)
-            : await topMuseumCompletionGlobal(selected.id, message.member);
+            ? await topMuseumAmount("global", undefined, selected.id, message.member)
+            : await topMuseumCompletion("global", undefined, selected.id, message.member);
       } else {
         data =
           res == "amount"
-            ? await topMuseumAmount(message.guild, selected.id, message.member)
-            : await topMuseumCompletion(message.guild, selected.id, message.member);
+            ? await topMuseumAmount("guild", message.guild, selected.id, message.member)
+            : await topMuseumCompletion("guild", message.guild, selected.id, message.member);
       }
 
       amountLeaderboardShown = res == "amount";

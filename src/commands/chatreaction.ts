@@ -30,7 +30,6 @@ import {
   createReactionStatsProfile,
   deleteStats,
   getReactionStats,
-  getServerLeaderboard,
   hasReactionStatsProfile,
 } from "../utils/functions/chatreactions/stats";
 import {
@@ -51,7 +50,6 @@ import {
   getBalance,
   removeBalance,
 } from "../utils/functions/economy/balance";
-import { topChatReaction } from "../utils/functions/economy/top";
 import {
   createUser,
   formatNumber,
@@ -59,6 +57,10 @@ import {
   userExists,
 } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
+import {
+  getServerLeaderboard,
+  topChatReaction,
+} from "../utils/functions/leaderboards/chat-reactions";
 import { getMember } from "../utils/functions/member";
 import PageManager from "../utils/functions/page";
 import { isPremium } from "../utils/functions/premium/premium";
@@ -292,7 +294,7 @@ async function run(
     }
 
     const leaderboards = await getServerLeaderboard(message.guild);
-    const timeLeaderboard = await topChatReaction(message.guild, false)
+    const timeLeaderboard = await topChatReaction("guild", message.guild, false)
       .then((r) => r.pages.get(1).join("\n"))
       .catch(() => "no times recorded");
 

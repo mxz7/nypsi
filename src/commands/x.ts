@@ -75,7 +75,6 @@ import { giveLootPoolResult, rollLootPool } from "../utils/functions/economy/loo
 import { deleteMarketOrder } from "../utils/functions/economy/market";
 import { addToMuseum } from "../utils/functions/economy/museum";
 import { getTaskStreaks, setTaskStreak } from "../utils/functions/economy/tasks";
-import { topBalanceGlobal } from "../utils/functions/economy/top";
 import {
   doDaily,
   getDailyStreak,
@@ -101,6 +100,7 @@ import {
 import { getXp, updateXp } from "../utils/functions/economy/xp";
 import { getPeaks } from "../utils/functions/guilds/utils";
 import { addKarma, getKarma, removeKarma } from "../utils/functions/karma/karma";
+import { topBalance } from "../utils/functions/leaderboards/economy";
 import { getMember, MemberResolvable } from "../utils/functions/member";
 import PageManager from "../utils/functions/page";
 import { getUserAliases } from "../utils/functions/premium/aliases";
@@ -2639,10 +2639,12 @@ async function run(
         ],
       });
     } else if (args[0]?.toLowerCase() == "top") {
-      const balTop = await topBalanceGlobal(15, false);
+      const balTop = await topBalance("guild", message.guild, undefined, 15);
 
-      const embed = new CustomEmbed(message.member, balTop.join("\n")).setTitle(
-        "top " + balTop.length,
+      const lines = balTop.pages.get(1) || [];
+
+      const embed = new CustomEmbed(message.member, lines.join("\n")).setTitle(
+        "top " + lines.length,
       );
 
       return send({ embeds: [embed] });

@@ -1,21 +1,19 @@
 import { Job } from "../../types/Jobs";
 import { MStoTime } from "../../utils/functions/date";
 import { calcItemValue } from "../../utils/functions/economy/inventory";
-import {
-  topBalanceGlobal,
-  topChatReactionGlobal,
-  topCommandUsesGlobal,
-  topDailyStreakGlobal,
-  topItemGlobal,
-  topLottoWinsGlobal,
-  topNetWorthGlobal,
-  topPrestigeGlobal,
-  topVoteGlobal,
-  topVoteStreakGlobal,
-  topWordleGlobal,
-  topWordleTimeGlobal,
-} from "../../utils/functions/economy/top";
 import { getItems } from "../../utils/functions/economy/utils";
+import { topChatReaction } from "../../utils/functions/leaderboards/chat-reactions";
+import { topCommandUses } from "../../utils/functions/leaderboards/commands";
+import {
+  topBalance,
+  topItem,
+  topLottoWins,
+  topNetWorth,
+  topPrestige,
+  topVote,
+} from "../../utils/functions/leaderboards/economy";
+import { topDailyStreak, topVoteStreak } from "../../utils/functions/leaderboards/streaks";
+import { topWordle, topWordleTimeGlobal } from "../../utils/functions/leaderboards/wordle";
 import sleep from "../../utils/functions/sleep";
 import { logger } from "../../utils/logger";
 
@@ -26,33 +24,33 @@ export default {
     const start = Date.now();
     const itemIds = Object.keys(getItems()).filter((i) => i !== "lottery_ticket");
 
-    await topBalanceGlobal(100);
+    await topBalance("global", undefined, undefined, 100);
     await sleep(1000);
-    await topDailyStreakGlobal("", 100);
+    await topDailyStreak("global", undefined, "", 100);
     await sleep(1000);
-    await topPrestigeGlobal("", 100);
+    await topPrestige("global", undefined, undefined, 100);
     await sleep(1000);
-    await topNetWorthGlobal("", 100);
+    await topNetWorth("global", undefined, "", 100);
     await sleep(1000);
-    await topWordleGlobal("");
+    await topWordle("global", undefined, "", 100);
     await sleep(1000);
-    await topVoteGlobal("", 100);
+    await topVote("global", undefined, "", 100);
     await sleep(1000);
-    await topChatReactionGlobal("", false, 100);
+    await topChatReaction("global", undefined, false, "", 100);
     await sleep(1000);
-    await topChatReactionGlobal("", true, 100);
+    await topChatReaction("global", undefined, true, "", 100);
     await sleep(1000);
-    await topCommandUsesGlobal("");
+    await topCommandUses("global", undefined, "", 100);
     await sleep(1000);
-    await topVoteStreakGlobal();
+    await topVoteStreak("global", undefined);
     await sleep(1000);
     await topWordleTimeGlobal();
     await sleep(1000);
-    await topLottoWinsGlobal();
+    await topLottoWins("global", undefined);
 
     for (const item of itemIds) {
       await sleep(1000);
-      await topItemGlobal(item, "", 100);
+      await topItem("global", undefined, item, "", 100);
       await calcItemValue(item);
     }
 

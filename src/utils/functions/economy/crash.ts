@@ -20,12 +20,12 @@ import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { a } from "../anticheat";
 import { giveCaptcha, isLockedOut, verifyUser } from "../captcha";
+import { formatUsername } from "../leaderboards/helpers";
 import { percentChance } from "../random";
 import sleep from "../sleep";
 import { addBalance, calcMaxBet, getBalance, getGambleMulti, removeBalance } from "./balance";
 import { addToGuildXP, getGuildName } from "./guilds";
 import { createGame } from "./stats";
-import { formatUsername } from "./top";
 import { formatBet, formatNumberPretty } from "./utils";
 import { addXp, calcEarnedGambleXp } from "./xp";
 

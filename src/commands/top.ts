@@ -16,37 +16,27 @@ import { showChessLeaderboard } from "../utils/functions/chess/leaderboard";
 import { getGuildByUser } from "../utils/functions/economy/guilds";
 import { selectItem } from "../utils/functions/economy/inventory";
 import { showMuseumLeaderboard } from "../utils/functions/economy/museum";
-import {
-  topBalance,
-  topChatReaction,
-  topChatReactionGlobal,
-  topCommand,
-  topCommandGlobal,
-  topCommandUses,
-  topCommandUsesGlobal,
-  topCompletion,
-  topDailyStreak,
-  topDailyStreakGlobal,
-  topGuilds,
-  topItem,
-  topItemGlobal,
-  topLottoWins,
-  topLottoWinsGlobal,
-  topNetWorth,
-  topNetWorthGlobal,
-  topPrestige,
-  topPrestigeGlobal,
-  topVote,
-  topVoteGlobal,
-  topVoteStreak,
-  topVoteStreakGlobal,
-  topWordle,
-  topWordleGlobal,
-  topWordleTime,
-  topWordleTimeGlobal,
-} from "../utils/functions/economy/top";
 import { getItems } from "../utils/functions/economy/utils.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
+import { topChatReaction } from "../utils/functions/leaderboards/chat-reactions";
+import { topCommand, topCommandUses } from "../utils/functions/leaderboards/commands";
+import {
+  topBalance,
+  topCompletion,
+  topGuilds,
+  topItem,
+  topLottoWins,
+  topNetWorth,
+  topPrestige,
+  topVote,
+} from "../utils/functions/leaderboards/economy";
+import { LeaderboardResult } from "../utils/functions/leaderboards/helpers";
+import { topDailyStreak, topVoteStreak } from "../utils/functions/leaderboards/streaks";
+import {
+  topWordle,
+  topWordleTime,
+  topWordleTimeGlobal,
+} from "../utils/functions/leaderboards/wordle";
 import PageManager from "../utils/functions/page";
 import {
   commandAliasExists,
@@ -349,11 +339,11 @@ async function run(
   };
 
   if (args.length == 0) {
-    const data = await topBalance(message.guild, message.member);
+    const data = await topBalance("guild", message.guild, message.member);
 
     return show(data.pages, data.pos, `top balance for ${message.guild.name}`);
   } else if (args[0].toLowerCase() == "balance") {
-    const data = await topBalance(message.guild, message.member);
+    const data = await topBalance("guild", message.guild, message.member);
 
     return show(data.pages, data.pos, `top balance for ${message.guild.name}`);
   } else if (args[0].toLowerCase() == "prestige" || args[0].toLowerCase() === "level") {
@@ -361,12 +351,12 @@ async function run(
 
     if (args[1]?.toLowerCase() == "global") global = true;
 
-    let data: { pages: Map<number, string[]>; pos: number };
+    let data: LeaderboardResult;
 
     if (global) {
-      data = await topPrestigeGlobal(message.member);
+      data = await topPrestige("global", undefined, message.member, 100);
     } else {
-      data = await topPrestige(message.guild, message.member);
+      data = await topPrestige("guild", message.guild, message.member);
     }
 
     return show(
@@ -416,12 +406,12 @@ async function run(
 
     if (args[2]?.toLowerCase() == "global") global = true;
 
-    let data: { pages: Map<number, string[]>; pos: number };
+    let data: LeaderboardResult;
 
     if (global) {
-      data = await topItemGlobal(item.id, message.member);
+      data = await topItem("global", undefined, item.id, message.member);
     } else {
-      data = await topItem(message.guild, item.id, message.member);
+      data = await topItem("guild", message.guild, item.id, message.member);
     }
 
     return show(
@@ -439,12 +429,12 @@ async function run(
 
     if (args[1]?.toLowerCase() == "global") global = true;
 
-    let data: { pages: Map<number, string[]>; pos: number };
+    let data: LeaderboardResult;
 
     if (global) {
-      data = await topNetWorthGlobal(message.member);
+      data = await topNetWorth("global", undefined, message.member);
     } else {
-      data = await topNetWorth(message.guild, message.member);
+      data = await topNetWorth("guild", message.guild, message.member);
     }
 
     return show(
@@ -469,12 +459,12 @@ async function run(
 
     if (args[1]?.toLowerCase() == "global") global = true;
 
-    let data: { pages: Map<number, string[]>; pos: number };
+    let data: LeaderboardResult;
 
     if (global) {
-      data = await topDailyStreakGlobal(message.member);
+      data = await topDailyStreak("global", undefined, message.member);
     } else {
-      data = await topDailyStreak(message.guild, message.member);
+      data = await topDailyStreak("guild", message.guild, message.member);
     }
 
     return show(
@@ -488,12 +478,12 @@ async function run(
 
     if (args[1]?.toLowerCase() == "global") global = true;
 
-    let data: { pages: Map<number, string[]>; pos: number };
+    let data: LeaderboardResult;
 
     if (global) {
-      data = await topLottoWinsGlobal(message.member);
+      data = await topLottoWins("global", undefined, message.member);
     } else {
-      data = await topLottoWins(message.guild, message.member);
+      data = await topLottoWins("guild", message.guild, message.member);
     }
 
     return show(
@@ -507,7 +497,7 @@ async function run(
 
     if (args[1]?.toLowerCase() == "global") global = true;
 
-    let data: { pages: Map<number, string[]>; pos: number };
+    let data: LeaderboardResult;
 
     if (global) {
       data = await topWordleTimeGlobal(message.member);
@@ -526,12 +516,12 @@ async function run(
 
     if (args[1]?.toLowerCase() == "global") global = true;
 
-    let data: { pages: Map<number, string[]>; pos: number };
+    let data: LeaderboardResult;
 
     if (global) {
-      data = await topWordleGlobal(message.member);
+      data = await topWordle("global", undefined, message.member);
     } else {
-      data = await topWordle(message.guild, message.member);
+      data = await topWordle("guild", message.guild, message.member);
     }
 
     return show(
@@ -545,12 +535,12 @@ async function run(
 
     if (args[1]?.toLowerCase() == "global") global = true;
 
-    let data: { pages: Map<number, string[]>; pos: number };
+    let data: LeaderboardResult;
 
     if (global) {
-      data = await topVoteStreakGlobal(message.member);
+      data = await topVoteStreak("global", undefined, message.member);
     } else {
-      data = await topVoteStreak(message.guild, message.member);
+      data = await topVoteStreak("guild", message.guild, message.member);
     }
 
     return show(
@@ -563,12 +553,12 @@ async function run(
 
     if (args[1]?.toLowerCase() == "global") global = true;
 
-    let data: { pages: Map<number, string[]>; pos: number };
+    let data: LeaderboardResult;
 
     if (global) {
-      data = await topVoteGlobal(message.member);
+      data = await topVote("global", undefined, message.member);
     } else {
-      data = await topVote(message.guild, message.member);
+      data = await topVote("guild", message.guild, message.member);
     }
 
     return show(
@@ -588,12 +578,12 @@ async function run(
     }
     if (args[1]?.toLowerCase() == "global") global = true;
 
-    let data: { pages: Map<number, string[]>; pos: number };
+    let data: LeaderboardResult;
 
     if (global) {
-      data = await topChatReactionGlobal(message.member, false);
+      data = await topChatReaction("global", undefined, false, message.member);
     } else {
-      data = await topChatReaction(message.guild, false, message.member);
+      data = await topChatReaction("guild", message.guild, false, message.member);
     }
 
     return show(
@@ -608,12 +598,12 @@ async function run(
 
     if (args[1]?.toLowerCase() == "global") global = true;
 
-    let data: { pages: Map<number, string[]>; pos: number };
+    let data: LeaderboardResult;
 
     if (global) {
-      data = await topChatReactionGlobal(message.member, true);
+      data = await topChatReaction("global", undefined, true, message.member);
     } else {
-      data = await topChatReaction(message.guild, true, message.member);
+      data = await topChatReaction("guild", message.guild, true, message.member);
     }
 
     return show(
@@ -622,17 +612,17 @@ async function run(
       `top daily chat reaction ${global ? "[global]" : `for ${message.guild.name}`}`,
     );
   } else if (args[0].toLowerCase() === "cmd" || args[0].toLowerCase() === "command") {
-    let data: { pages: Map<number, string[]>; pos: number };
+    let data: LeaderboardResult;
     let title: string;
     let url: string;
 
     if (args.length === 1 || args[1]?.toLowerCase() === "global") {
       if (args[1]?.toLowerCase() === "global") {
-        data = await topCommandUsesGlobal(message.member);
+        data = await topCommandUses("global", undefined, message.member);
         title = `top command uses [global]`;
         url = "https://nypsi.xyz/leaderboards/commands?ref=bot-lb";
       } else {
-        data = await topCommandUses(message.guild, message.member);
+        data = await topCommandUses("guild", message.guild, message.member);
         title = `top command uses for ${message.guild.name}`;
       }
     } else {
@@ -648,9 +638,9 @@ async function run(
       if (args[2]?.toLowerCase() == "global") global = true;
 
       if (global) {
-        data = await topCommandGlobal(cmd, message.member);
+        data = await topCommand("global", undefined, cmd, message.member);
       } else {
-        data = await topCommand(message.guild, cmd, message.member);
+        data = await topCommand("guild", message.guild, cmd, message.member);
       }
 
       title = `top ${(await getPrefix(message.guild))[0]}${cmd} uses ${
@@ -689,12 +679,12 @@ async function run(
 
     if (args[args.length - 1].toLowerCase() == "global") global = true;
 
-    let data: { pages: Map<number, string[]>; pos: number };
+    let data: LeaderboardResult;
 
     if (global) {
-      data = await topItemGlobal(selected.id, message.member);
+      data = await topItem("global", undefined, selected.id, message.member);
     } else {
-      data = await topItem(message.guild, selected.id, message.member);
+      data = await topItem("guild", message.guild, selected.id, message.member);
     }
 
     return show(
