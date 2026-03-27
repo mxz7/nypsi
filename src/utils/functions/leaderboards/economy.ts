@@ -1,13 +1,11 @@
-import dayjs = require("dayjs");
 import { Guild } from "discord.js";
 import prisma from "../../../init/database";
 import { checkLeaderboardPositions } from "../economy/stats";
 import { getAchievements, getItems } from "../economy/utils";
 import { getAllMembers } from "../guilds/members";
 import { getUserId, MemberResolvable } from "../member";
-import PageManager from "../page";
 import { pluralize } from "../string";
-import { getLastKnownUsername, updateLastKnownUsername } from "../users/username";
+import { getLastKnownUsername } from "../users/username";
 import {
   createLeaderboardOutput,
   formatUsername,
@@ -16,7 +14,6 @@ import {
   getPos,
   getUsername,
   LeaderboardResult,
-  UPDATE_USERNAME_MS,
 } from "./helpers";
 import pAll = require("p-all");
 
@@ -372,61 +369,33 @@ export async function topCompletion(guild: Guild, member: MemberResolvable) {
   const allAchievements = Object.keys(getAchievements()).length;
 
   const out: string[] = [];
-  let count = 0;
+  let count = 1;
   const userIds = query.map((i) => i.userId);
   const promises: (() => Promise<void>)[] = [];
-  const date = dayjs();
 
   for (const user of query) {
     const currentCount = count;
     const completion = (user._count.completed / allAchievements) * 100;
-    let pos = (count + 1).toString();
-
-    if (pos == "1") {
-      pos = "🥇";
-    } else if (pos == "2") {
-      pos = "🥈";
-    } else if (pos == "3") {
-      pos = "🥉";
-    } else {
-      pos += ".";
-    }
+    const pos = getPos(count);
 
     count++;
 
     promises.push(async () => {
       const usernameData = await getLastKnownUsername(user.userId, false, true);
-
-      let username = usernameData.lastKnownUsername;
-
-      if (usernameData.usernameUpdatedAt.getTime() < date.valueOf() - UPDATE_USERNAME_MS) {
-        const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
-
-        if (discordUser) {
-          username = discordUser.username;
-          await updateLastKnownUsername(user.userId, username);
-        }
-      }
-
-      out[currentCount] = `${pos} ${await formatUsername(
+      const username = await getUsername(
         user.userId,
-        username,
-        true,
-      )} ${completion.toFixed(1)}%`;
+        usernameData.lastKnownUsername,
+        usernameData.usernameUpdatedAt,
+        guild,
+      );
+
+      out[currentCount] = `${pos} ${await formatUsername(user.userId, username, true)} ${completion.toFixed(1)}%`;
     });
   }
 
   await pAll(promises, { concurrency: 10 });
 
-  const pages = PageManager.createPages(out);
-
-  let pos = 0;
-
-  if (member) {
-    pos = userIds.indexOf(getUserId(member)) + 1;
-  }
-
-  return { pages, pos };
+  return createLeaderboardOutput(out, userIds, member ? getUserId(member) : undefined);
 }
 
 export async function topGuilds(guildName?: string) {
@@ -439,31 +408,17 @@ export async function topGuilds(guildName?: string) {
   });
 
   const out: string[] = [];
+  let count = 1;
 
   for (const guild of query) {
-    let position = (query.indexOf(guild) + 1).toString();
-
-    if (position == "1") position = "🥇";
-    else if (position == "2") position = "🥈";
-    else if (position == "3") position = "🥉";
-    else position += ".";
-
-    out.push(
-      `${position} **[${guild.guildName}](https://nypsi.xyz/guilds/${encodeURIComponent(
-        guild.guildName.replaceAll(" ", "-"),
-      )}?ref=bot-lb)** level ${guild.level}`,
-    );
+    const pos = getPos(count);
+    out[count] = `${pos} **[${guild.guildName}](https://nypsi.xyz/guilds/${encodeURIComponent(
+      guild.guildName.replaceAll(" ", "-"),
+    )}?ref=bot-lb)** level ${guild.level}`;
+    count++;
   }
 
-  const pages = PageManager.createPages(out);
-
-  let pos = 0;
-
-  if (guildName) {
-    pos = query.map((g) => g.guildName).indexOf(guildName) + 1;
-  }
-
-  return { pages, pos };
+  return createLeaderboardOutput(out, query.map((g) => g.guildName), guildName);
 }
 
 export async function topLottoWins(
