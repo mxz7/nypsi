@@ -2,7 +2,7 @@ import { flavors } from "@catppuccin/palette";
 import { ColorResolvable, WebhookClient } from "discord.js";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import { Job } from "../../types/Jobs";
-import { topBalanceGlobal, topGuilds } from "../../utils/functions/economy/top";
+import { topBalanceGlobal, topGuilds } from "../../utils/functions/leaderboards/economy";
 
 export default {
   name: "top balance",

@@ -16,16 +16,20 @@ import { showChessLeaderboard } from "../utils/functions/chess/leaderboard";
 import { getGuildByUser } from "../utils/functions/economy/guilds";
 import { selectItem } from "../utils/functions/economy/inventory";
 import { showMuseumLeaderboard } from "../utils/functions/economy/museum";
+import { getItems } from "../utils/functions/economy/utils.js";
+import { getPrefix } from "../utils/functions/guilds/utils";
 import {
-  LeaderboardResult,
-  topBalance,
   topChatReaction,
   topChatReactionGlobal,
+} from "../utils/functions/leaderboards/chat-reactions";
+import {
   topCommand,
   topCommandUses,
   topCommandUsesGlobal,
+} from "../utils/functions/leaderboards/commands";
+import {
+  topBalance,
   topCompletion,
-  topDailyStreak,
   topGuilds,
   topItem,
   topItemGlobal,
@@ -34,14 +38,15 @@ import {
   topNetWorthGlobal,
   topPrestige,
   topVote,
-  topVoteStreak,
+} from "../utils/functions/leaderboards/economy";
+import { LeaderboardResult } from "../utils/functions/leaderboards/helpers";
+import { topDailyStreak, topVoteStreak } from "../utils/functions/leaderboards/streaks";
+import {
   topWordle,
   topWordleGlobal,
   topWordleTime,
   topWordleTimeGlobal,
-} from "../utils/functions/economy/top";
-import { getItems } from "../utils/functions/economy/utils.js";
-import { getPrefix } from "../utils/functions/guilds/utils";
+} from "../utils/functions/leaderboards/wordle";
 import PageManager from "../utils/functions/page";
 import {
   commandAliasExists,

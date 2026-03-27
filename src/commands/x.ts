@@ -75,7 +75,6 @@ import { giveLootPoolResult, rollLootPool } from "../utils/functions/economy/loo
 import { deleteMarketOrder } from "../utils/functions/economy/market";
 import { addToMuseum } from "../utils/functions/economy/museum";
 import { getTaskStreaks, setTaskStreak } from "../utils/functions/economy/tasks";
-import { topBalanceGlobal } from "../utils/functions/economy/top";
 import {
   doDaily,
   getDailyStreak,
@@ -101,6 +100,7 @@ import {
 import { getXp, updateXp } from "../utils/functions/economy/xp";
 import { getPeaks } from "../utils/functions/guilds/utils";
 import { addKarma, getKarma, removeKarma } from "../utils/functions/karma/karma";
+import { topBalanceGlobal } from "../utils/functions/leaderboards/economy";
 import { getMember, MemberResolvable } from "../utils/functions/member";
 import PageManager from "../utils/functions/page";
 import { getUserAliases } from "../utils/functions/premium/aliases";

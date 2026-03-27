@@ -1,21 +1,19 @@
 import { Job } from "../../types/Jobs";
 import { MStoTime } from "../../utils/functions/date";
 import { calcItemValue } from "../../utils/functions/economy/inventory";
+import { getItems } from "../../utils/functions/economy/utils";
+import { topChatReactionGlobal } from "../../utils/functions/leaderboards/chat-reactions";
+import { topCommandUsesGlobal } from "../../utils/functions/leaderboards/commands";
 import {
   topBalanceGlobal,
-  topChatReactionGlobal,
-  topCommandUsesGlobal,
-  topDailyStreak,
   topItemGlobal,
   topLottoWins,
   topNetWorthGlobal,
   topPrestige,
   topVote,
-  topVoteStreak,
-  topWordleGlobal,
-  topWordleTimeGlobal,
-} from "../../utils/functions/economy/top";
-import { getItems } from "../../utils/functions/economy/utils";
+} from "../../utils/functions/leaderboards/economy";
+import { topDailyStreak, topVoteStreak } from "../../utils/functions/leaderboards/streaks";
+import { topWordleGlobal, topWordleTimeGlobal } from "../../utils/functions/leaderboards/wordle";
 import sleep from "../../utils/functions/sleep";
 import { logger } from "../../utils/logger";
 

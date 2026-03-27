@@ -15,11 +15,6 @@ import { CustomEmbed, ErrorEmbed } from "../../../models/EmbedBuilders";
 import { Item } from "../../../types/Economy";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
-import { getUserId, MemberResolvable } from "../member";
-import { addInlineNotification } from "../users/notifications";
-import { addProgress } from "./achievements";
-import { selectItem } from "./inventory";
-import { addTaskProgress } from "./tasks";
 import {
   topMuseumAmount,
   topMuseumAmountGlobal,
@@ -27,7 +22,12 @@ import {
   topMuseumCompletionGlobal,
   topMuseumCompletions,
   topMuseumCompletionsGlobal,
-} from "./top";
+} from "../leaderboards/museum";
+import { getUserId, MemberResolvable } from "../member";
+import { addInlineNotification } from "../users/notifications";
+import { addProgress } from "./achievements";
+import { selectItem } from "./inventory";
+import { addTaskProgress } from "./tasks";
 import { createUser, getItems, userExists } from "./utils";
 import ms = require("ms");
 
