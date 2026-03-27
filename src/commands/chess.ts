@@ -71,9 +71,6 @@ async function run(
     return;
   }
 
-  if (args.length === 0 || (args[0] !== "puzzle" && args[0] !== "p" && args[0] !== "stats")) {
-  }
-
   if (args[0].toLowerCase() === "stats") {
     await addCooldown(cmd.name, message.member, 3);
     const stats = await getChessStats(message.author.id);
@@ -126,6 +123,17 @@ async function run(
     } finally {
       await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
     }
+  } else {
+    return send({
+      embeds: [
+        new CustomEmbed(
+          message.member,
+          "**/chess puzzle [difficulty]** *play a random chess puzzle*\n" +
+            `- difficulty: ${CHESS_PUZZLE_DIFFICULTIES.map((d) => `\`${d}\``).join(", ")}\n` +
+            "**/chess stats** *view your stats*",
+        ).setHeader("chess puzzles", message.author.avatarURL()),
+      ],
+    });
   }
 }
 
