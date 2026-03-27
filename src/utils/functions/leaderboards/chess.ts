@@ -1,279 +1,225 @@
-import dayjs = require("dayjs");
 import { Guild } from "discord.js";
 import prisma from "../../../init/database";
-import { getAllMembers } from "../guilds/members";
 import { getUserId, MemberResolvable } from "../member";
-import PageManager from "../page";
 import { formatTime, pluralize } from "../string";
-import { getLastKnownUsername, updateLastKnownUsername } from "../users/username";
-import { formatUsername, UPDATE_USERNAME_MS } from "./helpers";
+import {
+  createLeaderboardOutput,
+  formatUsername,
+  getAmount,
+  getMembers,
+  getPos,
+  getUsername,
+  LeaderboardResult,
+} from "./helpers";
 import pAll = require("p-all");
 
-export async function topChessSolved(guild: Guild, member: MemberResolvable) {
-  const members = await getAllMembers(guild);
+export async function topChessSolved(
+  scope: "global",
+  guild: undefined,
+  member?: MemberResolvable,
+  amount?: number,
+): Promise<LeaderboardResult>;
+export async function topChessSolved(
+  scope: "guild",
+  guild: Guild,
+  member?: MemberResolvable,
+  amount?: number,
+): Promise<LeaderboardResult>;
+export async function topChessSolved(
+  scope: "guild" | "global",
+  guild?: Guild,
+  member?: MemberResolvable,
+  amount?: number,
+): Promise<LeaderboardResult> {
+  const members = await getMembers(guild);
 
   const query = await prisma.chessPuzzleStats.findMany({
     where: {
-      AND: [{ userId: { in: members } }, { solved: { gt: 0 } }, { user: { blacklisted: false } }],
+      AND: [
+        members ? { userId: { in: members } } : undefined,
+        { solved: { gt: 0 } },
+        { user: { blacklisted: false } },
+      ].filter(Boolean),
     },
     orderBy: { solved: "desc" },
-    select: { userId: true, solved: true },
+    select: {
+      userId: true,
+      solved: true,
+      user: {
+        select: {
+          lastKnownUsername: true,
+          usernameUpdatedAt: true,
+        },
+      },
+    },
+    take: getAmount(guild, amount) || undefined,
   });
 
   const out: string[] = [];
-  let count = 0;
+  let count = 1;
   const userIds = query.map((i) => i.userId);
   const promises: (() => Promise<void>)[] = [];
-  const date = dayjs();
 
   for (const user of query) {
     const currentCount = count;
-    let pos = (count + 1).toString();
-
-    if (pos == "1") pos = "🥇";
-    else if (pos == "2") pos = "🥈";
-    else if (pos == "3") pos = "🥉";
-    else pos += ".";
+    const pos = getPos(count);
 
     count++;
 
     promises.push(async () => {
-      const usernameData = await getLastKnownUsername(user.userId, false, true);
-      let username = usernameData.lastKnownUsername;
-
-      if (usernameData.usernameUpdatedAt.getTime() < date.valueOf() - UPDATE_USERNAME_MS) {
-        const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
-        if (discordUser) {
-          username = discordUser.username;
-          await updateLastKnownUsername(user.userId, username);
-        }
-      }
+      const username = await getUsername(
+        user.userId,
+        user.user.lastKnownUsername,
+        user.user.usernameUpdatedAt,
+        guild,
+      );
 
       out[currentCount] =
-        `${pos} ${await formatUsername(user.userId, username, true)} ${user.solved.toLocaleString()} ${pluralize("solve", user.solved)}`;
+        `${pos} ${await formatUsername(user.userId, username, scope === "global")} ${user.solved.toLocaleString()} ${pluralize("solve", user.solved)}`;
     });
   }
 
   await pAll(promises, { concurrency: 10 });
-  const pages = PageManager.createPages(out);
-  let pos = 0;
-  if (member) pos = userIds.indexOf(getUserId(member)) + 1;
-  return { pages, pos };
+  return createLeaderboardOutput(out, userIds, member ? getUserId(member) : undefined);
 }
 
-export async function topChessSolvedGlobal(member: MemberResolvable) {
-  const query = await prisma.chessPuzzleStats.findMany({
-    where: { AND: [{ solved: { gt: 0 } }, { user: { blacklisted: false } }] },
-    orderBy: { solved: "desc" },
-    select: { userId: true, solved: true },
-    take: 100,
-  });
-
-  const out: string[] = [];
-
-  for (const user of query) {
-    let pos = (out.length + 1).toString();
-    if (pos == "1") pos = "🥇";
-    else if (pos == "2") pos = "🥈";
-    else if (pos == "3") pos = "🥉";
-    else pos += ".";
-
-    out.push(
-      `${pos} ${await formatUsername(
-        user.userId,
-        await getLastKnownUsername(user.userId, false),
-        true,
-      )} ${user.solved.toLocaleString()} ${pluralize("solve", user.solved)}`,
-    );
-  }
-
-  const pages = PageManager.createPages(out);
-  let pos = 0;
-  if (member) pos = query.findIndex((i) => i.userId === getUserId(member)) + 1;
-  return { pages, pos };
-}
-
-export async function topChessAvgRating(guild: Guild, member: MemberResolvable) {
-  const members = await getAllMembers(guild);
+export async function topChessAvgRating(
+  scope: "global",
+  guild: undefined,
+  member?: MemberResolvable,
+  amount?: number,
+): Promise<LeaderboardResult>;
+export async function topChessAvgRating(
+  scope: "guild",
+  guild: Guild,
+  member?: MemberResolvable,
+  amount?: number,
+): Promise<LeaderboardResult>;
+export async function topChessAvgRating(
+  scope: "guild" | "global",
+  guild?: Guild,
+  member?: MemberResolvable,
+  amount?: number,
+): Promise<LeaderboardResult> {
+  const members = await getMembers(guild);
 
   const query = await prisma.chessPuzzleStats.findMany({
     where: {
       AND: [
-        { userId: { in: members } },
+        members ? { userId: { in: members } } : undefined,
         { solved: { gt: 0 } },
         { averageWinningRating: { gt: 0 } },
         { user: { blacklisted: false } },
-      ],
+      ].filter(Boolean),
     },
     orderBy: { averageWinningRating: "desc" },
-    select: { userId: true, averageWinningRating: true },
+    select: {
+      userId: true,
+      averageWinningRating: true,
+      user: {
+        select: {
+          lastKnownUsername: true,
+          usernameUpdatedAt: true,
+        },
+      },
+    },
+    take: getAmount(guild, amount) || undefined,
   });
 
   const out: string[] = [];
-  let count = 0;
+  let count = 1;
   const userIds = query.map((i) => i.userId);
   const promises: (() => Promise<void>)[] = [];
-  const date = dayjs();
 
   for (const user of query) {
     const currentCount = count;
-    let pos = (count + 1).toString();
-
-    if (pos == "1") pos = "🥇";
-    else if (pos == "2") pos = "🥈";
-    else if (pos == "3") pos = "🥉";
-    else pos += ".";
+    const pos = getPos(count);
 
     count++;
 
     promises.push(async () => {
-      const usernameData = await getLastKnownUsername(user.userId, false, true);
-      let username = usernameData.lastKnownUsername;
-
-      if (usernameData.usernameUpdatedAt.getTime() < date.valueOf() - UPDATE_USERNAME_MS) {
-        const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
-        if (discordUser) {
-          username = discordUser.username;
-          await updateLastKnownUsername(user.userId, username);
-        }
-      }
+      const username = await getUsername(
+        user.userId,
+        user.user.lastKnownUsername,
+        user.user.usernameUpdatedAt,
+        guild,
+      );
 
       out[currentCount] =
-        `${pos} ${await formatUsername(user.userId, username, true)} avg \`${Math.round(user.averageWinningRating).toLocaleString()}\` rating`;
+        `${pos} ${await formatUsername(user.userId, username, scope === "global")} avg \`${Math.round(user.averageWinningRating).toLocaleString()}\` rating`;
     });
   }
 
   await pAll(promises, { concurrency: 10 });
-  const pages = PageManager.createPages(out);
-  let pos = 0;
-  if (member) pos = userIds.indexOf(getUserId(member)) + 1;
-  return { pages, pos };
+  return createLeaderboardOutput(out, userIds, member ? getUserId(member) : undefined);
 }
 
-export async function topChessAvgRatingGlobal(member: MemberResolvable) {
-  const query = await prisma.chessPuzzleStats.findMany({
-    where: {
-      AND: [
-        { solved: { gt: 0 } },
-        { averageWinningRating: { gt: 0 } },
-        { user: { blacklisted: false } },
-      ],
-    },
-    orderBy: { averageWinningRating: "desc" },
-    select: { userId: true, averageWinningRating: true },
-    take: 100,
-  });
-
-  const out: string[] = [];
-
-  for (const user of query) {
-    let pos = (out.length + 1).toString();
-    if (pos == "1") pos = "🥇";
-    else if (pos == "2") pos = "🥈";
-    else if (pos == "3") pos = "🥉";
-    else pos += ".";
-
-    out.push(
-      `${pos} ${await formatUsername(
-        user.userId,
-        await getLastKnownUsername(user.userId, false),
-        true,
-      )} avg \`${Math.round(user.averageWinningRating).toLocaleString()}\` rating`,
-    );
-  }
-
-  const pages = PageManager.createPages(out);
-  let pos = 0;
-  if (member) pos = query.findIndex((i) => i.userId === getUserId(member)) + 1;
-  return { pages, pos };
-}
-
-export async function topChessFastestSolve(guild: Guild, member: MemberResolvable) {
-  const members = await getAllMembers(guild);
+export async function topChessFastestSolve(
+  scope: "global",
+  guild: undefined,
+  member?: MemberResolvable,
+  amount?: number,
+): Promise<LeaderboardResult>;
+export async function topChessFastestSolve(
+  scope: "guild",
+  guild: Guild,
+  member?: MemberResolvable,
+  amount?: number,
+): Promise<LeaderboardResult>;
+export async function topChessFastestSolve(
+  scope: "guild" | "global",
+  guild?: Guild,
+  member?: MemberResolvable,
+  amount?: number,
+): Promise<LeaderboardResult> {
+  const members = await getMembers(guild);
 
   const query = await prisma.chessPuzzleStats.findMany({
     where: {
       AND: [
-        { userId: { in: members } },
+        members ? { userId: { in: members } } : undefined,
         { fastestSolve: { not: null } },
         { user: { blacklisted: false } },
-      ],
+      ].filter(Boolean),
     },
     orderBy: { fastestSolve: "asc" },
-    select: { userId: true, fastestSolve: true },
+    select: {
+      userId: true,
+      fastestSolve: true,
+      user: {
+        select: {
+          lastKnownUsername: true,
+          usernameUpdatedAt: true,
+        },
+      },
+    },
+    take: getAmount(guild, amount) || undefined,
   });
 
   const out: string[] = [];
-  let count = 0;
+  let count = 1;
   const userIds = query.map((i) => i.userId);
   const promises: (() => Promise<void>)[] = [];
-  const date = dayjs();
 
   for (const user of query) {
     const currentCount = count;
-    let pos = (count + 1).toString();
-
-    if (pos == "1") pos = "🥇";
-    else if (pos == "2") pos = "🥈";
-    else if (pos == "3") pos = "🥉";
-    else pos += ".";
+    const pos = getPos(count);
 
     count++;
 
     promises.push(async () => {
-      const usernameData = await getLastKnownUsername(user.userId, false, true);
-      let username = usernameData.lastKnownUsername;
-
-      if (usernameData.usernameUpdatedAt.getTime() < date.valueOf() - UPDATE_USERNAME_MS) {
-        const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
-        if (discordUser) {
-          username = discordUser.username;
-          await updateLastKnownUsername(user.userId, username);
-        }
-      }
+      const username = await getUsername(
+        user.userId,
+        user.user.lastKnownUsername,
+        user.user.usernameUpdatedAt,
+        guild,
+      );
 
       out[currentCount] =
-        `${pos} ${await formatUsername(user.userId, username, true)} \`${formatTime(user.fastestSolve)}\``;
+        `${pos} ${await formatUsername(user.userId, username, scope === "global")} \`${formatTime(user.fastestSolve)}\``;
     });
   }
 
   await pAll(promises, { concurrency: 10 });
-  const pages = PageManager.createPages(out);
-  let pos = 0;
-  if (member) pos = userIds.indexOf(getUserId(member)) + 1;
-  return { pages, pos };
-}
-
-export async function topChessFastestSolveGlobal(member: MemberResolvable) {
-  const query = await prisma.chessPuzzleStats.findMany({
-    where: {
-      AND: [{ fastestSolve: { not: null } }, { user: { blacklisted: false } }],
-    },
-    orderBy: { fastestSolve: "asc" },
-    select: { userId: true, fastestSolve: true },
-    take: 100,
-  });
-
-  const out: string[] = [];
-
-  for (const user of query) {
-    let pos = (out.length + 1).toString();
-    if (pos == "1") pos = "🥇";
-    else if (pos == "2") pos = "🥈";
-    else if (pos == "3") pos = "🥉";
-    else pos += ".";
-
-    out.push(
-      `${pos} ${await formatUsername(
-        user.userId,
-        await getLastKnownUsername(user.userId, false),
-        true,
-      )} \`${formatTime(user.fastestSolve)}\``,
-    );
-  }
-
-  const pages = PageManager.createPages(out);
-  let pos = 0;
-  if (member) pos = query.findIndex((i) => i.userId === getUserId(member)) + 1;
-  return { pages, pos };
+  return createLeaderboardOutput(out, userIds, member ? getUserId(member) : undefined);
 }

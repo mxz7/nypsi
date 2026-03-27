@@ -10,14 +10,7 @@ import {
 import redis from "../../../init/redis";
 import { NypsiCommandInteraction, NypsiMessage, SendMessage } from "../../../models/Command";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
-import {
-  topChessAvgRating,
-  topChessAvgRatingGlobal,
-  topChessFastestSolve,
-  topChessFastestSolveGlobal,
-  topChessSolved,
-  topChessSolvedGlobal,
-} from "../leaderboards/chess";
+import { topChessAvgRating, topChessFastestSolve, topChessSolved } from "../leaderboards/chess";
 import { MemberResolvable } from "../member";
 
 type ChessLeaderboardType = "solved" | "rating" | "fastest";
@@ -41,13 +34,13 @@ export async function showChessLeaderboard(
   ): Promise<{ pages: Map<number, string[]>; pos: number }> => {
     const member = message.member as MemberResolvable;
     if (global) {
-      if (type === "solved") return topChessSolvedGlobal(member);
-      if (type === "rating") return topChessAvgRatingGlobal(member);
-      return topChessFastestSolveGlobal(member);
+      if (type === "solved") return topChessSolved("global", undefined, member);
+      if (type === "rating") return topChessAvgRating("global", undefined, member);
+      return topChessFastestSolve("global", undefined, member);
     } else {
-      if (type === "solved") return topChessSolved(message.guild, member);
-      if (type === "rating") return topChessAvgRating(message.guild, member);
-      return topChessFastestSolve(message.guild, member);
+      if (type === "solved") return topChessSolved("guild", message.guild, member);
+      if (type === "rating") return topChessAvgRating("guild", message.guild, member);
+      return topChessFastestSolve("guild", message.guild, member);
     }
   };
 
