@@ -1,10 +1,11 @@
 import { Guild } from "discord.js";
+import { logger } from "../../logger";
+import { getTagsData } from "../economy/utils";
 import { getAllMembers } from "../guilds/members";
 import PageManager from "../page";
 import { getPreferences } from "../users/notifications";
 import { getActiveTag } from "../users/tags";
 import { updateLastKnownUsername } from "../users/username";
-import { getTagsData } from "../economy/utils";
 import ms = require("ms");
 
 export const UPDATE_USERNAME_MS = ms("3 weeks");
@@ -47,7 +48,9 @@ export async function getUsername(
     const discordUser = await guild.client.users.fetch(userId).catch(() => {});
     if (discordUser) {
       username = discordUser.username;
-      updateLastKnownUsername(userId, username);
+      updateLastKnownUsername(userId, username).catch(() => {
+        logger.warn(`leaderboards: failed to update last known username for ${userId}`);
+      });
     }
   }
 
