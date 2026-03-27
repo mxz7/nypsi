@@ -179,17 +179,20 @@ async function startChessGame(
     .setHeader("chess puzzle", message.author.avatarURL())
     .setImage("attachment://chess.png");
 
-  const updateEmbedDescription = (opponentTurn: boolean) => {
+  const updateEmbed = (opponentTurn: boolean) => {
     const difficultyLine = difficulty ? `difficulty: \`${difficulty}\`\n` : "";
 
+    const colorTurn = !opponentTurn ? colorName : colorName === "White" ? "Black" : "White";
+
     embed.setDescription(
-      `**${(!opponentTurn ? colorName : colorName === "White" ? "Black" : "White").toLowerCase()} to move**\n\n` +
+      `**${colorTurn.toLowerCase()} to move**\n\n` +
         `rating: \`${puzzle.rating}\`\n` +
         difficultyLine,
     );
+    embed.setColor(colorTurn === "White" ? "#ffffff" : "#000001");
   };
 
-  updateEmbedDescription(false);
+  updateEmbed(false);
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder().setCustomId("chess-guess").setLabel("move").setStyle(ButtonStyle.Primary),
@@ -377,7 +380,7 @@ async function startChessGame(
 
     buffer = await renderBoard(chess, { perspective, lastMove: playerLastMove });
 
-    updateEmbedDescription(true);
+    updateEmbed(true);
     embed.setImage("attachment://chess.png");
 
     row.components.forEach((c) => (c as ButtonBuilder).setDisabled(true));
@@ -413,7 +416,7 @@ async function startChessGame(
     }
 
     buffer = await renderBoard(chess, { perspective, lastMove: opponentLastMove });
-    updateEmbedDescription(false);
+    updateEmbed(false);
     await msg
       .edit({
         embeds: [embed.setImage("attachment://chess.png")],
