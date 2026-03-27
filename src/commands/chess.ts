@@ -29,6 +29,7 @@ import {
   getRandomPuzzle,
   normalizeToUci,
 } from "../utils/functions/chess/puzzle";
+import { percentChance } from "../utils/functions/random";
 import sleep from "../utils/functions/sleep";
 import { formatTime } from "../utils/functions/string";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -251,10 +252,11 @@ async function startChessGame(
 
   collector.on("collect", async (interaction) => {
     if (interaction.customId === "chess-end") {
-      if (difficulty) {
+      if (difficulty || percentChance(80)) {
         await interaction.deferUpdate();
       } else {
         await interaction.reply({
+          flags: MessageFlags.Ephemeral,
           embeds: [
             new CustomEmbed(
               message.member,
