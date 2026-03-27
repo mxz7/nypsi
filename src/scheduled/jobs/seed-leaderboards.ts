@@ -13,7 +13,7 @@ import {
   topVote,
 } from "../../utils/functions/leaderboards/economy";
 import { topDailyStreak, topVoteStreak } from "../../utils/functions/leaderboards/streaks";
-import { topWordleGlobal, topWordleTimeGlobal } from "../../utils/functions/leaderboards/wordle";
+import { topWordle, topWordleTimeGlobal } from "../../utils/functions/leaderboards/wordle";
 import sleep from "../../utils/functions/sleep";
 import { logger } from "../../utils/logger";
 
@@ -32,7 +32,7 @@ export default {
     await sleep(1000);
     await topNetWorth("global", undefined, "", 100);
     await sleep(1000);
-    await topWordleGlobal("");
+    await topWordle("global", undefined, "", 100);
     await sleep(1000);
     await topVote("global", undefined, "", 100);
     await sleep(1000);

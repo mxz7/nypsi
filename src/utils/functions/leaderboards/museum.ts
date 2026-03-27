@@ -43,23 +43,20 @@ export async function topMuseumCompletion(
   amount?: number,
 ): Promise<LeaderboardResult> {
   const members = await getMembers(guild);
-  const takeAmount = getAmount(guild, amount) || undefined;
 
   const query = await prisma.museum.findMany({
     where: {
       AND: [
-        ...(members ? [{ userId: { in: members } }] : []),
+        members ? { userId: { in: members } } : undefined,
         { itemId: item },
         { completedAt: { not: null } },
-        ...(members ? [{ economy: { user: { blacklisted: false } } }] : []),
-      ],
+      ].filter(Boolean),
     },
     select: {
       userId: true,
       completedAt: true,
       economy: {
         select: {
-          banned: true,
           user: {
             select: {
               lastKnownUsername: true,
@@ -70,7 +67,7 @@ export async function topMuseumCompletion(
       },
     },
     orderBy: [{ completedAt: "asc" }, { economy: { user: { lastKnownUsername: "asc" } } }],
-    ...(takeAmount ? { take: takeAmount } : {}),
+    take: getAmount(guild, amount) || undefined,
   });
 
   const out: string[] = [];
@@ -79,8 +76,6 @@ export async function topMuseumCompletion(
   let count = 0;
 
   for (const user of query) {
-    if (user.economy.banned && dayjs().isBefore(user.economy.banned)) continue;
-
     const index = count++;
     userIds.push(user.userId);
     const pos = getPos(index + 1);
@@ -294,22 +289,16 @@ export async function topMuseumAmount(
   amount?: number,
 ): Promise<LeaderboardResult> {
   const members = await getMembers(guild);
-  const takeAmount = getAmount(guild, amount) || undefined;
 
   const query = await prisma.museum.findMany({
     where: {
-      AND: [
-        ...(members ? [{ userId: { in: members } }] : []),
-        { itemId: item },
-        ...(members ? [{ economy: { user: { blacklisted: false } } }] : []),
-      ],
+      AND: [members ? { userId: { in: members } } : undefined, { itemId: item }],
     },
     select: {
       userId: true,
       amount: true,
       economy: {
         select: {
-          banned: true,
           user: {
             select: {
               lastKnownUsername: true,
@@ -320,7 +309,7 @@ export async function topMuseumAmount(
       },
     },
     orderBy: [{ amount: "desc" }, { economy: { user: { lastKnownUsername: "asc" } } }],
-    ...(takeAmount ? { take: takeAmount } : {}),
+    take: getAmount(guild, amount) || undefined,
   });
 
   const out: string[] = [];
@@ -329,8 +318,6 @@ export async function topMuseumAmount(
   let count = 0;
 
   for (const user of query) {
-    if (user.economy.banned && dayjs().isBefore(user.economy.banned)) continue;
-
     const index = count++;
     userIds.push(user.userId);
     const pos = getPos(index + 1);

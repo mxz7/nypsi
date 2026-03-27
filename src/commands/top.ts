@@ -38,7 +38,6 @@ import { LeaderboardResult } from "../utils/functions/leaderboards/helpers";
 import { topDailyStreak, topVoteStreak } from "../utils/functions/leaderboards/streaks";
 import {
   topWordle,
-  topWordleGlobal,
   topWordleTime,
   topWordleTimeGlobal,
 } from "../utils/functions/leaderboards/wordle";
@@ -524,9 +523,9 @@ async function run(
     let data: LeaderboardResult;
 
     if (global) {
-      data = await topWordleGlobal(message.member);
+      data = await topWordle("global", undefined, message.member);
     } else {
-      data = await topWordle(message.guild, message.member);
+      data = await topWordle("guild", message.guild, message.member);
     }
 
     return show(
