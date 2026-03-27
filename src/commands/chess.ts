@@ -189,11 +189,7 @@ async function startChessGame(
     embed.setDescription(
       `**${(!opponentTurn ? colorName : colorName === "White" ? "Black" : "White").toLowerCase()} to move**\n\n` +
         `rating: \`${puzzle.rating}\`\n` +
-        difficultyLine +
-        `themes: ${puzzle.themes
-          .slice(0, 3)
-          .map((t) => `\`${t}\``)
-          .join(", ")}`,
+        difficultyLine,
     );
   };
 
