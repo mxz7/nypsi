@@ -38,7 +38,7 @@ export async function getRandomPuzzle(options?: {
   const url = new URL("https://lichess-puzzles.maxz.dev/puzzles/random");
 
   if (options?.difficulty) {
-    url.searchParams.set("difficulty", options.difficulty);
+    url.pathname += `/${options.difficulty}`;
   }
 
   const maxAttempts = 5;
