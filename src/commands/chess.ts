@@ -47,13 +47,7 @@ cmd.slashData
           .setName("difficulty")
           .setDescription("select puzzle difficulty")
           .setRequired(false)
-          .addChoices(
-            { name: "beginner", value: "beginner" },
-            { name: "easy", value: "easy" },
-            { name: "medium", value: "medium" },
-            { name: "hard", value: "hard" },
-            { name: "expert", value: "expert" },
-          ),
+          .addChoices(CHESS_PUZZLE_DIFFICULTIES.map((d) => ({ name: d, value: d }))),
       ),
   )
   .addSubcommand((option) =>

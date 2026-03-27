@@ -3,7 +3,14 @@ import prisma from "../../../init/database";
 import { logger } from "../../logger";
 import { addProgress } from "../economy/achievements";
 
-export const CHESS_PUZZLE_DIFFICULTIES = ["beginner", "easy", "medium", "hard", "expert"] as const;
+export const CHESS_PUZZLE_DIFFICULTIES = [
+  "beginner",
+  "easy",
+  "medium",
+  "hard",
+  "expert",
+  "grandmaster",
+] as const;
 const FILTERED_THEMES = new Set(["promotion", "advancedPawn", "underPromotion"]);
 
 export type ChessPuzzleDifficulty = (typeof CHESS_PUZZLE_DIFFICULTIES)[number];
