@@ -58,13 +58,13 @@ export async function topCommand(
   });
 
   const out: string[] = [];
-  let count = 1;
+  let count = 0;
   const userIds = query.map((i) => i.userId);
   const promises: (() => Promise<void>)[] = [];
 
   for (const user of query) {
     const currentCount = count;
-    const pos = getPos(count);
+    const pos = getPos(count + 1);
 
     count++;
 
@@ -130,13 +130,13 @@ export async function topCommandUses(
   });
 
   const out: string[] = [];
-  let count = 1;
+  let count = 0;
   const userIds = query.map((i) => i.userId);
   const promises: (() => Promise<void>)[] = [];
 
   for (const user of query) {
     const currentCount = count;
-    const pos = getPos(count);
+    const pos = getPos(count + 1);
 
     count++;
 

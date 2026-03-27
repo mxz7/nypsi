@@ -2,10 +2,10 @@ import dayjs = require("dayjs");
 import { Guild } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
+import { getBlacklisted } from "../chatreactions/blacklisted";
 import { checkLeaderboardPositions } from "../economy/stats";
 import { getAllMembers } from "../guilds/members";
 import { getUserId, MemberResolvable } from "../member";
-import { getBlacklisted } from "../chatreactions/blacklisted";
 import {
   createLeaderboardOutput,
   formatUsername,
@@ -225,13 +225,13 @@ export async function topChatReaction(
   });
 
   const out: string[] = [];
-  let count = 1;
+  let count = 0;
   const userIds = query.map((i) => i.userId);
   const promises: (() => Promise<void>)[] = [];
 
   for (const user of query) {
     const currentCount = count;
-    const pos = getPos(count);
+    const pos = getPos(count + 1);
 
     count++;
 

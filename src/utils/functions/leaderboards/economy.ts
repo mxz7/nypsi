@@ -58,13 +58,13 @@ export async function topBalance(
   });
 
   const out: string[] = [];
-  let count = 1;
+  let count = 0;
   const userIds = query.map((i) => i.userId);
   const promises: (() => Promise<void>)[] = [];
 
   for (const user of query) {
     const currentCount = count;
-    const pos = getPos(count);
+    const pos = getPos(count + 1);
 
     count++;
 
@@ -134,13 +134,13 @@ export async function topNetWorth(
   });
 
   const out: string[] = [];
-  let count = 1;
+  let count = 0;
   const userIds = query.map((i) => i.userId);
   const promises: (() => Promise<void>)[] = [];
 
   for (const user of query) {
     const currentCount = count;
-    const pos = getPos(count);
+    const pos = getPos(count + 1);
 
     count++;
 
@@ -212,13 +212,13 @@ export async function topPrestige(
   });
 
   const out: string[] = [];
-  let count = 1;
+  let count = 0;
   const userIds = query.map((i) => i.userId);
   const promises: (() => Promise<void>)[] = [];
 
   for (const user of query) {
     const currentCount = count;
-    const pos = getPos(count);
+    const pos = getPos(count + 1);
 
     count++;
 
@@ -293,13 +293,13 @@ export async function topItem(
   });
 
   const out: string[] = [];
-  let count = 1;
+  let count = 0;
   const userIds = query.map((i) => i.userId);
   const promises: (() => Promise<void>)[] = [];
 
   for (const user of query) {
     const currentCount = count;
-    const pos = getPos(count);
+    const pos = getPos(count + 1);
 
     count++;
 
@@ -353,14 +353,14 @@ export async function topCompletion(guild: Guild, member: MemberResolvable) {
   const allAchievements = Object.keys(getAchievements()).length;
 
   const out: string[] = [];
-  let count = 1;
+  let count = 0;
   const userIds = query.map((i) => i.userId);
   const promises: (() => Promise<void>)[] = [];
 
   for (const user of query) {
     const currentCount = count;
     const completion = (user._count.completed / allAchievements) * 100;
-    const pos = getPos(count);
+    const pos = getPos(count + 1);
 
     count++;
 
@@ -393,10 +393,10 @@ export async function topGuilds(guildName?: string) {
   });
 
   const out: string[] = [];
-  let count = 1;
+  let count = 0;
 
   for (const guild of query) {
-    const pos = getPos(count);
+    const pos = getPos(count + 1);
     out[count] = `${pos} **[${guild.guildName}](https://nypsi.xyz/guilds/${encodeURIComponent(
       guild.guildName.replaceAll(" ", "-"),
     )}?ref=bot-lb)** level ${guild.level}`;
