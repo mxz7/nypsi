@@ -18,10 +18,7 @@ import { selectItem } from "../utils/functions/economy/inventory";
 import { showMuseumLeaderboard } from "../utils/functions/economy/museum";
 import { getItems } from "../utils/functions/economy/utils.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
-import {
-  topChatReaction,
-  topChatReactionGlobal,
-} from "../utils/functions/leaderboards/chat-reactions";
+import { topChatReaction } from "../utils/functions/leaderboards/chat-reactions";
 import {
   topCommand,
   topCommandUses,
@@ -591,9 +588,9 @@ async function run(
     let data: LeaderboardResult;
 
     if (global) {
-      data = await topChatReactionGlobal(message.member, false);
+      data = await topChatReaction("global", undefined, false, message.member);
     } else {
-      data = await topChatReaction(message.guild, false, message.member);
+      data = await topChatReaction("guild", message.guild, false, message.member);
     }
 
     return show(
@@ -611,9 +608,9 @@ async function run(
     let data: LeaderboardResult;
 
     if (global) {
-      data = await topChatReactionGlobal(message.member, true);
+      data = await topChatReaction("global", undefined, true, message.member);
     } else {
-      data = await topChatReaction(message.guild, true, message.member);
+      data = await topChatReaction("guild", message.guild, true, message.member);
     }
 
     return show(

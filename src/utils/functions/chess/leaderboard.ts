@@ -17,7 +17,7 @@ import {
   topChessFastestSolveGlobal,
   topChessSolved,
   topChessSolvedGlobal,
-} from "../economy/top";
+} from "../leaderboards/chess";
 import { MemberResolvable } from "../member";
 
 type ChessLeaderboardType = "solved" | "rating" | "fastest";

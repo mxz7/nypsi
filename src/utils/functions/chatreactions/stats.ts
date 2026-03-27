@@ -1,9 +1,9 @@
 import { Guild, GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
-import { formatUsername } from "../economy/top";
 import { isEcoBanned } from "../economy/utils";
 import { getAllMembers } from "../guilds/members";
+import { formatUsername } from "../leaderboards/helpers";
 import { getBlacklisted } from "./blacklisted";
 
 export async function getReactionStats(guild: Guild, member: GuildMember) {

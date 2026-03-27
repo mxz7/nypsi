@@ -2,7 +2,7 @@ import { Job } from "../../types/Jobs";
 import { MStoTime } from "../../utils/functions/date";
 import { calcItemValue } from "../../utils/functions/economy/inventory";
 import { getItems } from "../../utils/functions/economy/utils";
-import { topChatReactionGlobal } from "../../utils/functions/leaderboards/chat-reactions";
+import { topChatReaction } from "../../utils/functions/leaderboards/chat-reactions";
 import { topCommandUsesGlobal } from "../../utils/functions/leaderboards/commands";
 import {
   topBalanceGlobal,
@@ -36,9 +36,9 @@ export default {
     await sleep(1000);
     await topVote("global", undefined, "", 100);
     await sleep(1000);
-    await topChatReactionGlobal("", false, 100);
+    await topChatReaction("global", undefined, false, "", 100);
     await sleep(1000);
-    await topChatReactionGlobal("", true, 100);
+    await topChatReaction("global", undefined, true, "", 100);
     await sleep(1000);
     await topCommandUsesGlobal("");
     await sleep(1000);

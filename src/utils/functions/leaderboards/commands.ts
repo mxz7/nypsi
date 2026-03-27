@@ -1,12 +1,13 @@
 import dayjs = require("dayjs");
 import { Guild } from "discord.js";
 import prisma from "../../../init/database";
+import { checkLeaderboardPositions } from "../economy/stats";
 import { getAllMembers } from "../guilds/members";
 import { getUserId, MemberResolvable } from "../member";
 import PageManager from "../page";
 import { pluralize } from "../string";
+import { getPreferences } from "../users/notifications";
 import { getLastKnownUsername, updateLastKnownUsername } from "../users/username";
-import { checkLeaderboardPositions } from "../economy/stats";
 import {
   createLeaderboardOutput,
   formatUsername,
@@ -230,4 +231,3 @@ export async function topCommandUsesGlobal(member?: MemberResolvable) {
 
   return { pages, pos };
 }
-
