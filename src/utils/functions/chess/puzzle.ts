@@ -3,37 +3,39 @@ import prisma from "../../../init/database";
 import { logger } from "../../logger";
 import { addProgress } from "../economy/achievements";
 
-export const CHESS_PUZZLE_DIFFICULTIES = [
-  "easiest",
-  "easier",
-  "normal",
-  "harder",
-  "hardest",
-] as const;
+export const CHESS_PUZZLE_DIFFICULTIES = ["beginner", "easy", "medium", "hard", "expert"] as const;
 const FILTERED_THEMES = new Set(["promotion", "advancedPawn", "underPromotion"]);
 
 export type ChessPuzzleDifficulty = (typeof CHESS_PUZZLE_DIFFICULTIES)[number];
 
-export interface LichessPuzzle {
-  game: {
-    id: string;
-    pgn: string;
-    players: { name: string; color: string; rating: number }[];
-  };
-  puzzle: {
-    id: string;
-    rating: number;
-    plays: number;
-    solution: string[];
-    themes: string[];
-    initialPly: number;
-  };
+export interface ChessPuzzle {
+  id: string;
+  fen: string;
+  initialMove: string;
+  gameUrl: string;
+  rating: number;
+  plays: number;
+  solution: string[];
+  themes: string[];
+}
+
+interface RandomPuzzleApiResponse {
+  puzzleId: string;
+  fen: string;
+  moves: string;
+  rating: number;
+  ratingDeviation: number;
+  popularity: number;
+  nbPlays: number;
+  themes: string;
+  gameUrl: string;
+  openingTags: string[] | null;
 }
 
 export async function getRandomPuzzle(options?: {
   difficulty?: ChessPuzzleDifficulty;
-}): Promise<LichessPuzzle | "unavailable"> {
-  const url = new URL("https://lichess.org/api/puzzle/next");
+}): Promise<ChessPuzzle | "unavailable"> {
+  const url = new URL("https://lichess-puzzles.maxz.dev/puzzles/random");
 
   if (options?.difficulty) {
     url.searchParams.set("difficulty", options.difficulty);
@@ -49,79 +51,95 @@ export async function getRandomPuzzle(options?: {
         headers: { Accept: "application/json" },
       });
     } catch (error) {
-      logger.error("chess: failed to fetch puzzle from lichess", { error });
+      logger.error("chess: failed to fetch puzzle from api", { error });
       return "unavailable";
     }
 
     if (!response.ok || response.status !== 200) {
-      logger.warn("chess: received non-ok response from lichess puzzle api", {
+      logger.warn("chess: received non-ok response from api", {
         status: response.status,
       });
       return "unavailable";
     }
 
-    const data = (await response.json()) as LichessPuzzle;
+    const data = (await response.json()) as RandomPuzzleApiResponse;
 
-    if (data.puzzle.themes.some((theme) => FILTERED_THEMES.has(theme))) {
+    const moves = data.moves.trim().split(/\s+/).filter(Boolean);
+
+    if (moves.length < 2) {
+      logger.warn("chess: skipping puzzle with insufficient moves", {
+        puzzleId: data.puzzleId,
+        moves,
+      });
+      continue;
+    }
+
+    const puzzle: ChessPuzzle = {
+      id: data.puzzleId,
+      fen: data.fen,
+      initialMove: moves[0],
+      gameUrl: data.gameUrl,
+      rating: data.rating,
+      plays: data.nbPlays,
+      solution: moves.slice(1),
+      themes: data.themes.trim().split(/\s+/).filter(Boolean),
+    };
+
+    if (puzzle.themes.some((theme) => FILTERED_THEMES.has(theme))) {
       // Some themes (e.g. promotion) can be very difficult to render properly, so filter them out.
       // yeah what copilot said ^ FUCK THAT SHIT
       logger.debug("chess: skipping puzzle for filtered theme", {
-        puzzle: data.puzzle,
+        puzzle,
         attempt,
       });
       continue;
     }
 
-    return data;
+    return puzzle;
   }
 
   logger.warn("chess: exhausted attempts while trying to fetch non-filtered puzzle");
   return "unavailable";
 }
 
-export function buildChessFromPuzzle(puzzle: LichessPuzzle): Chess {
-  const source = new Chess();
-  source.loadPgn(puzzle.game.pgn);
+export function buildChessFromPuzzle(puzzle: ChessPuzzle): Chess {
+  const chess = new Chess();
 
-  const history = source.history({ verbose: true });
-  const firstSolution = puzzle.puzzle.solution[0];
-
-  const buildAtPly = (pliesToReplay: number): Chess => {
-    const chess = new Chess();
-    const capped = Math.max(0, Math.min(pliesToReplay, history.length));
-
-    for (let i = 0; i < capped; i++) {
-      chess.move(history[i]);
-    }
+  try {
+    chess.load(puzzle.fen);
+  } catch (error) {
+    logger.warn("chess: failed to load puzzle fen", {
+      puzzleId: puzzle.id,
+      fen: puzzle.fen,
+      error,
+    });
 
     return chess;
-  };
-
-  const isSolutionMoveLegal = (chess: Chess, uci: string): boolean => {
-    const legal = chess.moves({ verbose: true }).map((m) => m.from + m.to + (m.promotion ?? ""));
-
-    return legal.includes(uci);
-  };
-
-  // Lichess uses 1-based ply indexing for `initialPly`, but in practice some
-  // payloads can be off by one relative to chess.js PGN replay. Prefer nearby
-  // candidates where the first solution move is legal.
-  const candidates = [
-    puzzle.puzzle.initialPly - 1,
-    puzzle.puzzle.initialPly,
-    puzzle.puzzle.initialPly - 2,
-    puzzle.puzzle.initialPly + 1,
-  ];
-
-  for (const candidate of candidates) {
-    const chess = buildAtPly(candidate);
-    if (firstSolution && isSolutionMoveLegal(chess, firstSolution)) {
-      return chess;
-    }
   }
 
-  // Fallback to the standard 1-based interpretation.
-  return buildAtPly(puzzle.puzzle.initialPly - 1);
+  const firstMove = normalizeToUci(puzzle.initialMove, chess);
+
+  if (!firstMove) {
+    logger.warn("chess: failed to apply initial puzzle move", {
+      puzzleId: puzzle.id,
+      initialMove: puzzle.initialMove,
+    });
+    return chess;
+  }
+
+  chess.move({
+    from: firstMove.slice(0, 2),
+    to: firstMove.slice(2, 4),
+    promotion: firstMove[4] || undefined,
+  });
+
+  if (chess.isGameOver()) {
+    logger.warn("chess: puzzle is game over after initial move", {
+      puzzleId: puzzle.id,
+    });
+  }
+
+  return chess;
 }
 
 /**

@@ -23,10 +23,10 @@ import {
   addChessSolve,
   buildChessFromPuzzle,
   CHESS_PUZZLE_DIFFICULTIES,
+  ChessPuzzle,
   ChessPuzzleDifficulty,
   getChessStats,
   getRandomPuzzle,
-  LichessPuzzle,
   normalizeToUci,
 } from "../utils/functions/chess/puzzle";
 import sleep from "../utils/functions/sleep";
@@ -48,11 +48,11 @@ cmd.slashData
           .setDescription("select puzzle difficulty")
           .setRequired(false)
           .addChoices(
-            { name: "easiest", value: "easiest" },
-            { name: "easier", value: "easier" },
-            { name: "normal", value: "normal" },
-            { name: "harder", value: "harder" },
-            { name: "hardest", value: "hardest" },
+            { name: "beginner", value: "beginner" },
+            { name: "easy", value: "easy" },
+            { name: "medium", value: "medium" },
+            { name: "hard", value: "hard" },
+            { name: "expert", value: "expert" },
           ),
       ),
   )
@@ -113,11 +113,15 @@ async function run(
 
       if (puzzle === "unavailable") {
         return send({
-          embeds: [new ErrorEmbed("lichess is currently unavailable, please try again shortly")],
+          embeds: [
+            new ErrorEmbed(
+              "chess puzzle service is currently unavailable, please try again shortly\nsupport: https://nypsi.xyz/discord",
+            ),
+          ],
         });
       }
 
-      logger.debug(`chess: ${message.author.id} starting puzzle: ${puzzle.puzzle.id}`);
+      logger.debug(`chess: ${message.author.id} starting puzzle: ${puzzle.id}`);
 
       return startChessGame(message, puzzle, send, difficulty ?? undefined);
     } finally {
@@ -139,7 +143,7 @@ async function run(
 
 async function startChessGame(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
-  puzzle: LichessPuzzle,
+  puzzle: ChessPuzzle,
   send: SendMessage,
   difficulty?: ChessPuzzleDifficulty,
 ) {
@@ -149,11 +153,16 @@ async function startChessGame(
 
   logger.debug(`chess: built chess instance from puzzle in ${afterBuild - beforeBuild}ms`);
 
-  if (chess.history().length < 1) {
+  if (chess.isGameOver()) {
     return send({ embeds: [new ErrorEmbed("invalid puzzle data received, please try again")] });
   }
 
-  const solution = puzzle.puzzle.solution;
+  const solution = puzzle.solution;
+
+  if (solution.length < 1) {
+    return send({ embeds: [new ErrorEmbed("invalid puzzle data received, please try again")] });
+  }
+
   const playerColor = chess.turn() as "w" | "b";
   const perspective = playerColor === "w" ? "white" : "black";
   const colorName = playerColor === "w" ? "White" : "Black";
@@ -163,10 +172,11 @@ async function startChessGame(
   let moveIndex = 0;
 
   const lastUci = chess.history({ verbose: true }).slice(-1)[0];
+  const lastMove = lastUci ? { from: lastUci.from, to: lastUci.to } : undefined;
 
   let buffer = await renderBoard(chess, {
     perspective,
-    lastMove: { from: lastUci.from, to: lastUci.to },
+    lastMove,
   });
 
   const embed = new CustomEmbed(message.member)
@@ -174,11 +184,13 @@ async function startChessGame(
     .setImage("attachment://chess.png");
 
   const updateEmbedDescription = (opponentTurn: boolean) => {
+    const difficultyLine = difficulty ? `difficulty: \`${difficulty}\`\n` : "";
+
     embed.setDescription(
       `**${(!opponentTurn ? colorName : colorName === "White" ? "Black" : "White").toLowerCase()} to move**\n\n` +
-        `rating: \`${puzzle.puzzle.rating}\`\n` +
-        `difficulty: \`${difficulty ?? "normal"}\`\n` +
-        `themes: ${puzzle.puzzle.themes
+        `rating: \`${puzzle.rating}\`\n` +
+        difficultyLine +
+        `themes: ${puzzle.themes
           .slice(0, 3)
           .map((t) => `\`${t}\``)
           .join(", ")}`,
@@ -225,12 +237,12 @@ async function startChessGame(
     await res.deferUpdate().catch(() => {});
     collector.stop("win");
     const solveTimeMs = Math.round(performance.now() - puzzleStartTime);
-    await addChessSolve(message.author.id, puzzle.puzzle.rating, solveTimeMs);
+    await addChessSolve(message.author.id, puzzle.rating, solveTimeMs);
     const stats = await getChessStats(message.author.id);
 
     embed
       .setDescription(
-        `**puzzle solved!!**\n\nrating: \`${puzzle.puzzle.rating}\`\n\n${formatChessStatsDisplay(stats)}`,
+        `**puzzle solved!!**\n\nrating: \`${puzzle.rating}\`\n\n${formatChessStatsDisplay(stats)}`,
       )
       .setColor(Constants.EMBED_SUCCESS_COLOR)
       .setFooter({ text: `solved in ${formatTime(solveTimeMs)}` });
@@ -428,7 +440,7 @@ async function startChessGame(
 
 function parsePuzzleDifficulty(value?: string): ChessPuzzleDifficulty | null {
   const requested = value?.toLowerCase();
-  if (!requested) return "normal";
+  if (!requested) return null;
 
   if (CHESS_PUZZLE_DIFFICULTIES.includes(requested as ChessPuzzleDifficulty)) {
     return requested as ChessPuzzleDifficulty;
