@@ -1699,6 +1699,6 @@
     "emoji": "<:knight:1487063018188701887>",
     "target": 2500,
     "description": "solve 2,500 chess puzzles",
-    "prize": ["legendary_scratch_card:2", "nypsi_crate:1"]
+    "prize": ["legendary_scratch_card:2", "nypsi_crate:1", "tag:grandmaster"]
   }
 }

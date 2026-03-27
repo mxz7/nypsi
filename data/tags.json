@@ -265,6 +265,13 @@
     "emoji": "<:nypsi_ring:1384728690986061844>",
     "image": "ring.png"
   },
+  "grandmaster": {
+    "id": "grandmaster",
+    "name": "grandmaster",
+    "description": "found in the grandmaster v achievement",
+    "emoji": "<:knight:1487063018188701887>",
+    "image": "knight.png"
+  },
   "year1": {
     "id": "year1",
     "name": "year 1",
