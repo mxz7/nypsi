@@ -256,7 +256,18 @@ async function startChessGame(
 
   collector.on("collect", async (interaction) => {
     if (interaction.customId === "chess-end") {
-      await interaction.deferUpdate().catch(() => {});
+      if (difficulty) {
+        await interaction.deferUpdate();
+      } else {
+        await interaction.reply({
+          embeds: [
+            new CustomEmbed(
+              message.member,
+              "too hard? try setting a difficulty with /chess puzzle <difficulty>",
+            ),
+          ],
+        });
+      }
       return collector.stop("cancelled");
     }
 
