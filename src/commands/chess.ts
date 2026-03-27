@@ -164,6 +164,7 @@ async function startChessGame(
   // moveIndex tracks the next move in the solution array that the player must input.
   // solution[even] = player move, solution[odd] = opponent auto-reply.
   let moveIndex = 0;
+  let wrongMoves = 0;
 
   const lastUci = chess.history({ verbose: true }).slice(-1)[0];
   const lastMove = lastUci ? { from: lastUci.from, to: lastUci.to } : undefined;
@@ -343,12 +344,19 @@ async function startChessGame(
     const expectedNormalized = expected.slice(0, 4) + (expected[4] ?? "");
 
     if (uci !== expectedNormalized) {
-      res
+      wrongMoves++;
+
+      await res
         .reply({
-          embeds: [new ErrorEmbed("that's not the best move, try again")],
+          embeds: [new ErrorEmbed(`that's not the best move, try again (\`${wrongMoves}/3\`)`)],
           flags: MessageFlags.Ephemeral,
         })
         .catch(() => {});
+
+      if (wrongMoves >= 3) {
+        return collector.stop("strikes");
+      }
+
       return;
     }
 
@@ -425,6 +433,11 @@ async function startChessGame(
     if (reason === "cancelled") {
       embed
         .setDescription(`**game ended**\n\nsolution: \`${solutionDisplay}\``)
+        .setColor(Constants.EMBED_FAIL_COLOR)
+        .setFooter(null);
+    } else if (reason === "strikes") {
+      embed
+        .setDescription(`**failed (3 wrong moves)**\n\nsolution: \`${solutionDisplay}\``)
         .setColor(Constants.EMBED_FAIL_COLOR)
         .setFooter(null);
     } else {
