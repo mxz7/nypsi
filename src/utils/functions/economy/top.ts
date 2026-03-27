@@ -17,9 +17,14 @@ import ms = require("ms");
 
 const UPDATE_USERNAME_MS = ms("3 weeks");
 
-export async function formatUsername(id: string, username: string, privacy: boolean) {
-  if (!privacy)
-    return "[**[hidden]**](https://nypsi.xyz/wiki/economy/user-settings/hidden?ref=bot-lb)";
+export async function formatUsername(id: string, username: string, checkPrivacy: boolean) {
+  if (checkPrivacy) {
+    const privacy = (await getPreferences(id)).leaderboards;
+
+    if (!privacy) {
+      return "[**[hidden]**](https://nypsi.xyz/wiki/economy/user-settings/hidden?ref=bot-lb)";
+    }
+  }
 
   let out = `[**${username}**](https://nypsi.xyz/users/${encodeURIComponent(id)}?ref=bot-lb)`;
 
@@ -443,7 +448,7 @@ export async function topPrestige(
       out[currentCount] = `${pos} ${await formatUsername(
         user.userId,
         username,
-        true,
+        scope === "global",
       )} P${user.prestige} | L${user.level}`;
     });
   }
@@ -798,7 +803,7 @@ export async function topDailyStreak(
       out[currentCount] = `${pos} ${await formatUsername(
         user.userId,
         username,
-        (await getPreferences(user.userId)).leaderboards,
+        scope === "global",
       )} ${user.dailyStreak.toLocaleString()}`;
     });
   }
@@ -882,7 +887,7 @@ export async function topLottoWins(
       out[currentCount] = `${pos} ${await formatUsername(
         user.userId,
         username,
-        (await getPreferences(user.userId)).leaderboards,
+        scope === "global",
       )} ${user.progress}`;
     });
   }
@@ -1222,7 +1227,7 @@ export async function topCommand(
       out[currentCount] = `${pos} ${await formatUsername(
         user.userId,
         username,
-        (await getPreferences(user.userId)).leaderboards,
+        scope === "global",
       )} ${user.uses.toLocaleString()} ${pluralize("use", user.uses)}`;
     });
   }
@@ -1432,7 +1437,7 @@ export async function topVote(
       out[currentCount] = `${pos} ${await formatUsername(
         user.userId,
         username,
-        (await getPreferences(user.userId)).leaderboards,
+        scope === "global",
       )} ${user.monthVote.toLocaleString()}`;
     });
   }
@@ -1691,7 +1696,7 @@ export async function topVoteStreak(
       out[currentCount] = `${pos} ${await formatUsername(
         user.userId,
         username,
-        (await getPreferences(user.userId)).leaderboards,
+        scope === "global",
       )} ${user.voteStreak.toLocaleString()}`;
     });
   }
