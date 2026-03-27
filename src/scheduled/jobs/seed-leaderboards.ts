@@ -6,7 +6,7 @@ import { topChatReaction } from "../../utils/functions/leaderboards/chat-reactio
 import { topCommandUsesGlobal } from "../../utils/functions/leaderboards/commands";
 import {
   topBalanceGlobal,
-  topItemGlobal,
+  topItem,
   topLottoWins,
   topNetWorth,
   topPrestige,
@@ -50,7 +50,7 @@ export default {
 
     for (const item of itemIds) {
       await sleep(1000);
-      await topItemGlobal(item, "", 100);
+      await topItem("global", undefined, item, "", 100);
       await calcItemValue(item);
     }
 

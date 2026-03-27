@@ -319,23 +319,48 @@ export async function topPrestige(
   return createLeaderboardOutput(out, userIds, member ? getUserId(member) : undefined);
 }
 
-export async function topItem(guild: Guild, item: string, member: MemberResolvable) {
-  const members = await getAllMembers(guild);
+export async function topItem(
+  scope: "global",
+  guild: undefined,
+  item: string,
+  member?: MemberResolvable,
+  amount?: number,
+): Promise<LeaderboardResult>;
+export async function topItem(
+  scope: "guild",
+  guild: Guild,
+  item: string,
+  member?: MemberResolvable,
+  amount?: number,
+): Promise<LeaderboardResult>;
+export async function topItem(
+  scope: "guild" | "global",
+  guild: Guild | undefined,
+  item: string,
+  member?: MemberResolvable,
+  amount?: number,
+): Promise<LeaderboardResult> {
+  const members = await getMembers(guild);
 
   const query = await prisma.inventory.findMany({
     where: {
       AND: [
-        { userId: { in: members } },
-        { item: item },
+        { item },
+        members ? { userId: { in: members } } : undefined,
         { economy: { user: { blacklisted: false } } },
-      ],
+        {
+          OR: [
+            { economy: { banned: null } },
+            { economy: { banned: { lt: new Date() } } },
+          ],
+        },
+      ].filter(Boolean),
     },
     select: {
       userId: true,
       amount: true,
       economy: {
         select: {
-          banned: true,
           user: {
             select: {
               lastKnownUsername: true,
@@ -346,135 +371,43 @@ export async function topItem(guild: Guild, item: string, member: MemberResolvab
       },
     },
     orderBy: [{ amount: "desc" }, { economy: { user: { lastKnownUsername: "asc" } } }],
+    take: getAmount(guild, amount) || undefined,
   });
 
   const out: string[] = [];
-  let count = 0;
+  let count = 1;
   const userIds = query.map((i) => i.userId);
   const promises: (() => Promise<void>)[] = [];
-  const date = dayjs();
 
   for (const user of query) {
-    if (user.economy.banned && date.isBefore(user.economy.banned)) {
-      userIds.splice(userIds.indexOf(user.userId), 1);
-      continue;
-    }
-
     const currentCount = count;
-    let pos = (count + 1).toString();
-
-    if (pos == "1") {
-      pos = "🥇";
-    } else if (pos == "2") {
-      pos = "🥈";
-    } else if (pos == "3") {
-      pos = "🥉";
-    } else {
-      pos += ".";
-    }
+    const pos = getPos(count);
 
     count++;
 
     promises.push(async () => {
-      let username = user.economy.user.lastKnownUsername;
-
-      if (user.economy.user.usernameUpdatedAt.getTime() < date.valueOf() - UPDATE_USERNAME_MS) {
-        const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
-
-        if (discordUser) {
-          username = discordUser.username;
-          await updateLastKnownUsername(user.userId, username);
-        }
-      }
+      const username = await getUsername(
+        user.userId,
+        user.economy.user.lastKnownUsername,
+        user.economy.user.usernameUpdatedAt,
+        guild,
+      );
 
       out[currentCount] = `${pos} ${await formatUsername(
         user.userId,
         username,
-        true,
+        scope === "global",
       )} ${user.amount.toLocaleString()} ${pluralize(getItems()[item], user.amount)}`;
     });
   }
 
   await pAll(promises, { concurrency: 10 });
 
-  const pages = PageManager.createPages(out);
-
-  let pos = 0;
-
-  if (member) {
-    pos = userIds.indexOf(getUserId(member)) + 1;
+  if (scope === "global") {
+    checkLeaderboardPositions(userIds, `item-${item}`);
   }
 
-  return { pages, pos };
-}
-
-export async function topItemGlobal(item: string, member?: MemberResolvable, amount = 100) {
-  const query = await prisma.inventory.findMany({
-    where: {
-      item,
-    },
-    select: {
-      userId: true,
-      amount: true,
-      economy: {
-        select: {
-          user: {
-            select: {
-              lastKnownUsername: true,
-            },
-          },
-          banned: true,
-        },
-      },
-    },
-    orderBy: [{ amount: "desc" }, { economy: { user: { lastKnownUsername: "asc" } } }],
-    take: amount,
-  });
-
-  const out = [];
-
-  let count = 0;
-
-  const userIds = query.map((i) => i.userId);
-
-  for (const user of query) {
-    if (user.economy.banned && dayjs().isBefore(user.economy.banned)) {
-      userIds.splice(userIds.indexOf(user.userId), 1);
-      continue;
-    }
-
-    let pos = (count + 1).toString();
-
-    if (pos == "1") {
-      pos = "🥇";
-    } else if (pos == "2") {
-      pos = "🥈";
-    } else if (pos == "3") {
-      pos = "🥉";
-    } else {
-      pos += ".";
-    }
-
-    out[count] = `${pos} ${await formatUsername(
-      user.userId,
-      user.economy.user.lastKnownUsername,
-      (await getPreferences(user.userId)).leaderboards,
-    )} ${user.amount.toLocaleString()} ${pluralize(getItems()[item], user.amount)}`;
-
-    count++;
-  }
-
-  const pages = PageManager.createPages(out);
-
-  let pos = 0;
-
-  if (member) {
-    pos = userIds.indexOf(getUserId(member)) + 1;
-  }
-
-  checkLeaderboardPositions(userIds, `item-${item}`);
-
-  return { pages, pos };
+  return createLeaderboardOutput(out, userIds, member ? getUserId(member) : undefined);
 }
 
 export async function topCompletion(guild: Guild, member: MemberResolvable) {

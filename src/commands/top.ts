@@ -29,7 +29,6 @@ import {
   topCompletion,
   topGuilds,
   topItem,
-  topItemGlobal,
   topLottoWins,
   topNetWorth,
   topPrestige,
@@ -415,9 +414,9 @@ async function run(
     let data: LeaderboardResult;
 
     if (global) {
-      data = await topItemGlobal(item.id, message.member);
+      data = await topItem("global", undefined, item.id, message.member);
     } else {
-      data = await topItem(message.guild, item.id, message.member);
+      data = await topItem("guild", message.guild, item.id, message.member);
     }
 
     return show(
@@ -688,9 +687,9 @@ async function run(
     let data: LeaderboardResult;
 
     if (global) {
-      data = await topItemGlobal(selected.id, message.member);
+      data = await topItem("global", undefined, selected.id, message.member);
     } else {
-      data = await topItem(message.guild, selected.id, message.member);
+      data = await topItem("guild", message.guild, selected.id, message.member);
     }
 
     return show(
