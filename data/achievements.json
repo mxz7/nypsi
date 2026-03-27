@@ -1660,5 +1660,45 @@
       "nypsi_crate:2",
       "tag:artifact_discoverer"
     ]
+  },
+  "chess_i": {
+    "id": "chess_i",
+    "name": "grandmaster **I**",
+    "emoji": "<:knight:1487063018188701887>",
+    "target": 15,
+    "description": "solve 15 chess puzzles",
+    "prize": ["lucky_scratch_card:1"]
+  },
+  "chess_ii": {
+    "id": "chess_ii",
+    "name": "grandmaster **II**",
+    "emoji": "<:knight:1487063018188701887>",
+    "target": 75,
+    "description": "solve 75 chess puzzles",
+    "prize": ["lucky_scratch_card:2"]
+  },
+  "chess_iii": {
+    "id": "chess_iii",
+    "name": "grandmaster **III**",
+    "emoji": "<:knight:1487063018188701887>",
+    "target": 250,
+    "description": "solve 250 chess puzzles",
+    "prize": ["lucky_scratch_card:3"]
+  },
+  "chess_iv": {
+    "id": "chess_iv",
+    "name": "grandmaster **IV**",
+    "emoji": "<:knight:1487063018188701887>",
+    "target": 1000,
+    "description": "solve 1,000 chess puzzles",
+    "prize": ["legendary_scratch_card:1"]
+  },
+  "chess_v": {
+    "id": "chess_v",
+    "name": "grandmaster **V**",
+    "emoji": "<:knight:1487063018188701887>",
+    "target": 2500,
+    "description": "solve 2,500 chess puzzles",
+    "prize": ["legendary_scratch_card:2", "nypsi_crate:1"]
   }
 }

@@ -1,6 +1,7 @@
 import { Chess } from "chess.js";
 import prisma from "../../../init/database";
 import { logger } from "../../logger";
+import { addProgress } from "../economy/achievements";
 
 export const CHESS_PUZZLE_DIFFICULTIES = [
   "easiest",
@@ -161,6 +162,7 @@ export async function getChessStats(userId: string) {
 }
 
 export async function addChessSolve(userId: string, puzzleRating: number, solveTimeMs: number) {
+  addProgress(userId, "chess", 1);
   const existing = await getChessStats(userId);
   const solvedBefore = existing?.solved ?? 0;
   const newSolved = solvedBefore + 1;
