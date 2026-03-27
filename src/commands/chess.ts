@@ -29,6 +29,7 @@ import {
   normalizeToUci,
 } from "../utils/functions/chess/puzzle";
 import sleep from "../utils/functions/sleep";
+import { formatTime } from "../utils/functions/string";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
 
@@ -192,6 +193,8 @@ async function startChessGame(
       .catch(() => message.editReply(sendOpts).then((m) => m.fetch() as Promise<Message>));
   }
 
+  const puzzleStartTime = performance.now();
+
   const collector = msg.createMessageComponentCollector({
     componentType: ComponentType.Button,
     filter: (i) => i.user.id === message.author.id,
@@ -204,7 +207,8 @@ async function startChessGame(
   ) => {
     await res.deferUpdate().catch(() => {});
     collector.stop("win");
-    await addChessSolve(message.author.id, puzzle.puzzle.rating);
+    const solveTimeMs = Math.round(performance.now() - puzzleStartTime);
+    await addChessSolve(message.author.id, puzzle.puzzle.rating, solveTimeMs);
     const stats = await getChessStats(message.author.id);
 
     embed
@@ -212,7 +216,7 @@ async function startChessGame(
         `**puzzle solved!!**\n\nrating: \`${puzzle.puzzle.rating}\`\n\n${formatChessStatsDisplay(stats)}`,
       )
       .setColor(Constants.EMBED_SUCCESS_COLOR)
-      .setFooter(null);
+      .setFooter({ text: `solved in ${formatTime(solveTimeMs)}` });
 
     const buffer = await renderBoard(chess, { perspective, lastMove });
     row.components.forEach((c) => (c as ButtonBuilder).setDisabled(true));
@@ -424,12 +428,19 @@ function formatChessStatsDisplay(stats: Awaited<ReturnType<typeof getChessStats>
   const total = stats.solved + stats.failed;
   const pct = total > 0 ? ((stats.solved / total) * 100).toFixed(1) : "0.0";
 
-  return (
+  const lines =
     `puzzles solved: **${stats.solved.toLocaleString()}** / **${total.toLocaleString()}** (${pct}%)\n` +
     `avg winning rating: **${Math.round(stats.averageWinningRating).toLocaleString()}**\n` +
     `current streak: **${stats.streak.toLocaleString()}**\n` +
-    `best streak: **${stats.bestStreak.toLocaleString()}**`
-  );
+    `best streak: **${stats.bestStreak.toLocaleString()}**`;
+
+  const timeLines =
+    (stats.fastestSolve != null ? `\nfastest solve: **${formatTime(stats.fastestSolve)}**` : "") +
+    (stats.averageSolveTime != null
+      ? `\navg solve time: **${formatTime(stats.averageSolveTime)}**`
+      : "");
+
+  return lines + timeLines;
 }
 
 cmd.setRun(run);

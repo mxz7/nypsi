@@ -5,7 +5,9 @@ CREATE TABLE "ChessPuzzleStats" (
     "failed" INTEGER NOT NULL DEFAULT 0,
     "streak" INTEGER NOT NULL DEFAULT 0,
     "bestStreak" INTEGER NOT NULL DEFAULT 0,
-    "averageWinningRating" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "averageWinningRating" DOUBLE PRECISION,
+    "fastestSolve" DOUBLE PRECISION,
+    "averageSolveTime" DOUBLE PRECISION,
 
     CONSTRAINT "ChessPuzzleStats_pkey" PRIMARY KEY ("userId")
 );

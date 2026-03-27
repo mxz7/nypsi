@@ -160,7 +160,7 @@ export async function getChessStats(userId: string) {
   return prisma.chessPuzzleStats.findUnique({ where: { userId } });
 }
 
-export async function addChessSolve(userId: string, puzzleRating: number) {
+export async function addChessSolve(userId: string, puzzleRating: number, solveTimeMs: number) {
   const existing = await getChessStats(userId);
   const solvedBefore = existing?.solved ?? 0;
   const newSolved = solvedBefore + 1;
@@ -168,6 +168,14 @@ export async function addChessSolve(userId: string, puzzleRating: number) {
   const newBest = Math.max(newStreak, existing?.bestStreak ?? 0);
   const ratingTotalBefore = (existing?.averageWinningRating ?? 0) * solvedBefore;
   const newAverageWinningRating = (ratingTotalBefore + puzzleRating) / newSolved;
+
+  const newFastestSolve =
+    existing?.fastestSolve != null ? Math.min(existing.fastestSolve, solveTimeMs) : solveTimeMs;
+
+  const newAverageSolveTime =
+    solveTimeMs !== undefined
+      ? ((existing?.averageSolveTime ?? 0) * solvedBefore + solveTimeMs) / newSolved
+      : undefined;
 
   await prisma.chessPuzzleStats.upsert({
     where: { userId },
@@ -177,12 +185,16 @@ export async function addChessSolve(userId: string, puzzleRating: number) {
       streak: 1,
       bestStreak: 1,
       averageWinningRating: puzzleRating,
+      fastestSolve: solveTimeMs,
+      averageSolveTime: solveTimeMs,
     },
     update: {
       solved: { increment: 1 },
       streak: newStreak,
       bestStreak: newBest,
       averageWinningRating: newAverageWinningRating,
+      ...(newFastestSolve !== undefined && { fastestSolve: newFastestSolve }),
+      ...(newAverageSolveTime !== undefined && { averageSolveTime: newAverageSolveTime }),
     },
   });
 }
@@ -190,7 +202,7 @@ export async function addChessSolve(userId: string, puzzleRating: number) {
 export async function addChessFail(userId: string) {
   await prisma.chessPuzzleStats.upsert({
     where: { userId },
-    create: { userId, failed: 1, streak: 0 },
+    create: { userId, failed: 1 },
     update: { failed: { increment: 1 }, streak: 0 },
   });
 }
