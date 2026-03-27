@@ -17,6 +17,71 @@ import ms = require("ms");
 
 const UPDATE_USERNAME_MS = ms("3 weeks");
 
+export async function formatUsername(id: string, username: string, privacy: boolean) {
+  if (!privacy)
+    return "[**[hidden]**](https://nypsi.xyz/wiki/economy/user-settings/hidden?ref=bot-lb)";
+
+  let out = `[**${username}**](https://nypsi.xyz/users/${encodeURIComponent(id)}?ref=bot-lb)`;
+
+  const tag = await getActiveTag(id);
+
+  if (tag) out = `[${getTagsData()[tag.tagId].emoji}] ${out}`;
+
+  return out;
+}
+
+async function getMembers(guild?: Guild) {
+  if (!guild) return null;
+
+  const members = await getAllMembers(guild);
+
+  return members;
+}
+
+async function getUsername(
+  userId: string,
+  lastKnownUsername: string,
+  lastUpdatedUsername: Date,
+  guild?: Guild,
+) {
+  let username = lastKnownUsername;
+
+  if (guild && lastUpdatedUsername.getTime() < Date.now() - UPDATE_USERNAME_MS) {
+    const discordUser = await guild.client.users.fetch(userId).catch(() => {});
+    if (discordUser) {
+      username = discordUser.username;
+      updateLastKnownUsername(userId, username);
+    }
+  }
+
+  return username;
+}
+
+function getPos(index: number) {
+  switch (index) {
+    case 1:
+      return "🥇";
+    case 2:
+      return "🥈";
+    case 3:
+      return "🥉";
+    default:
+      return `${index}.`;
+  }
+}
+
+function createLeaderboardOutput(out: string[], userIds: string[], userId?: string) {
+  return { pages: PageManager.createPages(out), pos: userId ? userIds.indexOf(userId) + 1 : 0 };
+}
+
+function getAmount(guild?: Guild, amount?: number) {
+  if (amount) return amount;
+  if (!guild) return 100;
+  return undefined;
+}
+
+export type LeaderboardResult = ReturnType<typeof createLeaderboardOutput>;
+
 export async function topBalance(guild: Guild, member?: MemberResolvable) {
   const members = await getAllMembers(guild);
 
@@ -314,22 +379,37 @@ export async function topNetWorth(guild: Guild, member?: MemberResolvable) {
   }
 }
 
-export async function topPrestige(guild: Guild, member?: MemberResolvable) {
-  const members = await getAllMembers(guild);
+export async function topPrestige(
+  scope: "global",
+  guild: undefined,
+  member?: MemberResolvable,
+  amount?: number,
+): Promise<LeaderboardResult>;
+export async function topPrestige(
+  scope: "guild",
+  guild: Guild,
+  member?: MemberResolvable,
+  amount?: number,
+): Promise<LeaderboardResult>;
+export async function topPrestige(
+  scope: "guild" | "global",
+  guild?: Guild,
+  member?: MemberResolvable,
+  amount?: number,
+): Promise<LeaderboardResult> {
+  const members = await getMembers(guild);
 
   const query = await prisma.economy.findMany({
     where: {
       AND: [
-        { userId: { in: members } },
+        members ? { userId: { in: members } } : undefined,
         { OR: [{ prestige: { gt: 0 } }, { level: { gt: 0 } }] },
-        { user: { blacklisted: false } },
-      ],
+      ].filter(Boolean),
     },
     select: {
       userId: true,
       prestige: true,
       level: true,
-      banned: true,
       user: {
         select: {
           lastKnownUsername: true,
@@ -338,46 +418,27 @@ export async function topPrestige(guild: Guild, member?: MemberResolvable) {
       },
     },
     orderBy: [{ prestige: "desc" }, { level: "desc" }, { user: { lastKnownUsername: "asc" } }],
+    take: getAmount(guild, amount) || undefined,
   });
 
   const out: string[] = [];
-  let count = 0;
+  let count = 1;
   const userIds = query.map((i) => i.userId);
   const promises: (() => Promise<void>)[] = [];
-  const date = dayjs();
 
   for (const user of query) {
-    if (user.banned && date.isBefore(user.banned)) {
-      userIds.splice(userIds.indexOf(user.userId), 1);
-      continue;
-    }
-
     const currentCount = count;
-    let pos = (count + 1).toString();
-
-    if (pos == "1") {
-      pos = "🥇";
-    } else if (pos == "2") {
-      pos = "🥈";
-    } else if (pos == "3") {
-      pos = "🥉";
-    } else {
-      pos += ".";
-    }
+    const pos = getPos(count);
 
     count++;
 
     promises.push(async () => {
-      let username = user.user.lastKnownUsername;
-
-      if (user.user.usernameUpdatedAt.getTime() < date.valueOf() - UPDATE_USERNAME_MS) {
-        const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
-
-        if (discordUser) {
-          username = discordUser.username;
-          await updateLastKnownUsername(user.userId, username);
-        }
-      }
+      const username = await getUsername(
+        user.userId,
+        user.user.lastKnownUsername,
+        user.user.usernameUpdatedAt,
+        guild,
+      );
 
       out[currentCount] = `${pos} ${await formatUsername(
         user.userId,
@@ -389,84 +450,11 @@ export async function topPrestige(guild: Guild, member?: MemberResolvable) {
 
   await pAll(promises, { concurrency: 10 });
 
-  const pages = PageManager.createPages(out);
-
-  let pos = 0;
-
-  if (member) {
-    pos = userIds.indexOf(getUserId(member)) + 1;
+  if (scope === "global") {
+    checkLeaderboardPositions(userIds, "prestige");
   }
 
-  return { pages, pos };
-}
-
-export async function topPrestigeGlobal(member: MemberResolvable, amount = 100) {
-  const query = await prisma.economy.findMany({
-    where: {
-      AND: [
-        { OR: [{ prestige: { gt: 0 } }, { level: { gt: 0 } }] },
-        { user: { blacklisted: false } },
-      ],
-    },
-    select: {
-      userId: true,
-      prestige: true,
-      banned: true,
-      level: true,
-      user: {
-        select: {
-          lastKnownUsername: true,
-        },
-      },
-    },
-    orderBy: [{ prestige: "desc" }, { level: "desc" }, { user: { lastKnownUsername: "asc" } }],
-    take: amount,
-  });
-
-  const out = [];
-
-  let count = 0;
-
-  const userIds = query.map((i) => i.userId);
-
-  for (const user of query) {
-    if (user.banned && dayjs().isBefore(user.banned)) {
-      userIds.splice(userIds.indexOf(user.userId), 1);
-      continue;
-    }
-
-    let pos = (count + 1).toString();
-
-    if (pos == "1") {
-      pos = "🥇";
-    } else if (pos == "2") {
-      pos = "🥈";
-    } else if (pos == "3") {
-      pos = "🥉";
-    } else {
-      pos += ".";
-    }
-
-    out[count] = `${pos} ${await formatUsername(
-      user.userId,
-      user.user.lastKnownUsername,
-      (await getPreferences(user.userId)).leaderboards,
-    )} P${user.prestige} | L${user.level}`;
-
-    count++;
-  }
-
-  const pages = PageManager.createPages(out);
-
-  let pos = 0;
-
-  if (member) {
-    pos = userIds.indexOf(getUserId(member)) + 1;
-  }
-
-  checkLeaderboardPositions(userIds, "prestige");
-
-  return { pages, pos };
+  return createLeaderboardOutput(out, userIds, member ? getUserId(member) : undefined);
 }
 
 export async function topItem(guild: Guild, item: string, member: MemberResolvable) {
@@ -2803,17 +2791,4 @@ export async function topChessFastestSolveGlobal(member: MemberResolvable) {
   let pos = 0;
   if (member) pos = query.findIndex((i) => i.userId === getUserId(member)) + 1;
   return { pages, pos };
-}
-
-export async function formatUsername(id: string, username: string, privacy: boolean) {
-  if (!privacy)
-    return "[**[hidden]**](https://nypsi.xyz/wiki/economy/user-settings/hidden?ref=bot-lb)";
-
-  let out = `[**${username}**](https://nypsi.xyz/users/${encodeURIComponent(id)}?ref=bot-lb)`;
-
-  const tag = await getActiveTag(id);
-
-  if (tag) out = `[${getTagsData()[tag.tagId].emoji}] ${out}`;
-
-  return out;
 }

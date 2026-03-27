@@ -9,7 +9,7 @@ import {
   topItemGlobal,
   topLottoWinsGlobal,
   topNetWorthGlobal,
-  topPrestigeGlobal,
+  topPrestige,
   topVoteGlobal,
   topVoteStreakGlobal,
   topWordleGlobal,
@@ -30,7 +30,7 @@ export default {
     await sleep(1000);
     await topDailyStreakGlobal("", 100);
     await sleep(1000);
-    await topPrestigeGlobal("", 100);
+    await topPrestige("global", undefined, undefined, 1000);
     await sleep(1000);
     await topNetWorthGlobal("", 100);
     await sleep(1000);

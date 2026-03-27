@@ -17,6 +17,7 @@ import { getGuildByUser } from "../utils/functions/economy/guilds";
 import { selectItem } from "../utils/functions/economy/inventory";
 import { showMuseumLeaderboard } from "../utils/functions/economy/museum";
 import {
+  LeaderboardResult,
   topBalance,
   topChatReaction,
   topChatReactionGlobal,
@@ -35,7 +36,6 @@ import {
   topNetWorth,
   topNetWorthGlobal,
   topPrestige,
-  topPrestigeGlobal,
   topVote,
   topVoteGlobal,
   topVoteStreak,
@@ -361,12 +361,12 @@ async function run(
 
     if (args[1]?.toLowerCase() == "global") global = true;
 
-    let data: { pages: Map<number, string[]>; pos: number };
+    let data: LeaderboardResult;
 
     if (global) {
-      data = await topPrestigeGlobal(message.member);
+      data = await topPrestige("global", undefined, message.member, 100);
     } else {
-      data = await topPrestige(message.guild, message.member);
+      data = await topPrestige("guild", message.guild, message.member);
     }
 
     return show(
@@ -416,7 +416,7 @@ async function run(
 
     if (args[2]?.toLowerCase() == "global") global = true;
 
-    let data: { pages: Map<number, string[]>; pos: number };
+    let data: LeaderboardResult;
 
     if (global) {
       data = await topItemGlobal(item.id, message.member);
@@ -439,7 +439,7 @@ async function run(
 
     if (args[1]?.toLowerCase() == "global") global = true;
 
-    let data: { pages: Map<number, string[]>; pos: number };
+    let data: LeaderboardResult;
 
     if (global) {
       data = await topNetWorthGlobal(message.member);
@@ -469,7 +469,7 @@ async function run(
 
     if (args[1]?.toLowerCase() == "global") global = true;
 
-    let data: { pages: Map<number, string[]>; pos: number };
+    let data: LeaderboardResult;
 
     if (global) {
       data = await topDailyStreakGlobal(message.member);
@@ -488,7 +488,7 @@ async function run(
 
     if (args[1]?.toLowerCase() == "global") global = true;
 
-    let data: { pages: Map<number, string[]>; pos: number };
+    let data: LeaderboardResult;
 
     if (global) {
       data = await topLottoWinsGlobal(message.member);
@@ -507,7 +507,7 @@ async function run(
 
     if (args[1]?.toLowerCase() == "global") global = true;
 
-    let data: { pages: Map<number, string[]>; pos: number };
+    let data: LeaderboardResult;
 
     if (global) {
       data = await topWordleTimeGlobal(message.member);
@@ -526,7 +526,7 @@ async function run(
 
     if (args[1]?.toLowerCase() == "global") global = true;
 
-    let data: { pages: Map<number, string[]>; pos: number };
+    let data: LeaderboardResult;
 
     if (global) {
       data = await topWordleGlobal(message.member);
@@ -545,7 +545,7 @@ async function run(
 
     if (args[1]?.toLowerCase() == "global") global = true;
 
-    let data: { pages: Map<number, string[]>; pos: number };
+    let data: LeaderboardResult;
 
     if (global) {
       data = await topVoteStreakGlobal(message.member);
@@ -563,7 +563,7 @@ async function run(
 
     if (args[1]?.toLowerCase() == "global") global = true;
 
-    let data: { pages: Map<number, string[]>; pos: number };
+    let data: LeaderboardResult;
 
     if (global) {
       data = await topVoteGlobal(message.member);
@@ -588,7 +588,7 @@ async function run(
     }
     if (args[1]?.toLowerCase() == "global") global = true;
 
-    let data: { pages: Map<number, string[]>; pos: number };
+    let data: LeaderboardResult;
 
     if (global) {
       data = await topChatReactionGlobal(message.member, false);
@@ -608,7 +608,7 @@ async function run(
 
     if (args[1]?.toLowerCase() == "global") global = true;
 
-    let data: { pages: Map<number, string[]>; pos: number };
+    let data: LeaderboardResult;
 
     if (global) {
       data = await topChatReactionGlobal(message.member, true);
@@ -622,7 +622,7 @@ async function run(
       `top daily chat reaction ${global ? "[global]" : `for ${message.guild.name}`}`,
     );
   } else if (args[0].toLowerCase() === "cmd" || args[0].toLowerCase() === "command") {
-    let data: { pages: Map<number, string[]>; pos: number };
+    let data: LeaderboardResult;
     let title: string;
     let url: string;
 
@@ -689,7 +689,7 @@ async function run(
 
     if (args[args.length - 1].toLowerCase() == "global") global = true;
 
-    let data: { pages: Map<number, string[]>; pos: number };
+    let data: LeaderboardResult;
 
     if (global) {
       data = await topItemGlobal(selected.id, message.member);
