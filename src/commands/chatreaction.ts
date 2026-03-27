@@ -30,7 +30,6 @@ import {
   createReactionStatsProfile,
   deleteStats,
   getReactionStats,
-  getServerLeaderboard,
   hasReactionStatsProfile,
 } from "../utils/functions/chatreactions/stats";
 import {
@@ -58,7 +57,10 @@ import {
   userExists,
 } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
-import { topChatReaction } from "../utils/functions/leaderboards/chat-reactions";
+import {
+  getServerLeaderboard,
+  topChatReaction,
+} from "../utils/functions/leaderboards/chat-reactions";
 import { getMember } from "../utils/functions/member";
 import PageManager from "../utils/functions/page";
 import { isPremium } from "../utils/functions/premium/premium";
