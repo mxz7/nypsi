@@ -5,13 +5,13 @@ import {
   topBalanceGlobal,
   topChatReactionGlobal,
   topCommandUsesGlobal,
-  topDailyStreakGlobal,
+  topDailyStreak,
   topItemGlobal,
-  topLottoWinsGlobal,
+  topLottoWins,
   topNetWorthGlobal,
   topPrestige,
-  topVoteGlobal,
-  topVoteStreakGlobal,
+  topVote,
+  topVoteStreak,
   topWordleGlobal,
   topWordleTimeGlobal,
 } from "../../utils/functions/economy/top";
@@ -28,7 +28,7 @@ export default {
 
     await topBalanceGlobal(100);
     await sleep(1000);
-    await topDailyStreakGlobal("", 100);
+    await topDailyStreak("global", undefined, "", 100);
     await sleep(1000);
     await topPrestige("global", undefined, undefined, 1000);
     await sleep(1000);
@@ -36,7 +36,7 @@ export default {
     await sleep(1000);
     await topWordleGlobal("");
     await sleep(1000);
-    await topVoteGlobal("", 100);
+    await topVote("global", undefined, "", 100);
     await sleep(1000);
     await topChatReactionGlobal("", false, 100);
     await sleep(1000);
@@ -44,11 +44,11 @@ export default {
     await sleep(1000);
     await topCommandUsesGlobal("");
     await sleep(1000);
-    await topVoteStreakGlobal();
+    await topVoteStreak("global", undefined);
     await sleep(1000);
     await topWordleTimeGlobal();
     await sleep(1000);
-    await topLottoWinsGlobal();
+    await topLottoWins("global", undefined);
 
     for (const item of itemIds) {
       await sleep(1000);

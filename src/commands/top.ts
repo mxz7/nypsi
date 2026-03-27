@@ -22,24 +22,19 @@ import {
   topChatReaction,
   topChatReactionGlobal,
   topCommand,
-  topCommandGlobal,
   topCommandUses,
   topCommandUsesGlobal,
   topCompletion,
   topDailyStreak,
-  topDailyStreakGlobal,
   topGuilds,
   topItem,
   topItemGlobal,
   topLottoWins,
-  topLottoWinsGlobal,
   topNetWorth,
   topNetWorthGlobal,
   topPrestige,
   topVote,
-  topVoteGlobal,
   topVoteStreak,
-  topVoteStreakGlobal,
   topWordle,
   topWordleGlobal,
   topWordleTime,
@@ -472,9 +467,9 @@ async function run(
     let data: LeaderboardResult;
 
     if (global) {
-      data = await topDailyStreakGlobal(message.member);
+      data = await topDailyStreak("global", undefined, message.member);
     } else {
-      data = await topDailyStreak(message.guild, message.member);
+      data = await topDailyStreak("guild", message.guild, message.member);
     }
 
     return show(
@@ -491,9 +486,9 @@ async function run(
     let data: LeaderboardResult;
 
     if (global) {
-      data = await topLottoWinsGlobal(message.member);
+      data = await topLottoWins("global", undefined, message.member);
     } else {
-      data = await topLottoWins(message.guild, message.member);
+      data = await topLottoWins("guild", message.guild, message.member);
     }
 
     return show(
@@ -548,9 +543,9 @@ async function run(
     let data: LeaderboardResult;
 
     if (global) {
-      data = await topVoteStreakGlobal(message.member);
+      data = await topVoteStreak("global", undefined, message.member);
     } else {
-      data = await topVoteStreak(message.guild, message.member);
+      data = await topVoteStreak("guild", message.guild, message.member);
     }
 
     return show(
@@ -566,9 +561,9 @@ async function run(
     let data: LeaderboardResult;
 
     if (global) {
-      data = await topVoteGlobal(message.member);
+      data = await topVote("global", undefined, message.member);
     } else {
-      data = await topVote(message.guild, message.member);
+      data = await topVote("guild", message.guild, message.member);
     }
 
     return show(
@@ -648,9 +643,9 @@ async function run(
       if (args[2]?.toLowerCase() == "global") global = true;
 
       if (global) {
-        data = await topCommandGlobal(cmd, message.member);
+        data = await topCommand("global", undefined, cmd, message.member);
       } else {
-        data = await topCommand(message.guild, cmd, message.member);
+        data = await topCommand("guild", message.guild, cmd, message.member);
       }
 
       title = `top ${(await getPrefix(message.guild))[0]}${cmd} uses ${
