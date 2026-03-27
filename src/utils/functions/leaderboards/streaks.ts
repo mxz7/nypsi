@@ -1,8 +1,7 @@
-import dayjs = require("dayjs");
 import { Guild } from "discord.js";
 import prisma from "../../../init/database";
-import { getUserId, MemberResolvable } from "../member";
 import { checkLeaderboardPositions } from "../economy/stats";
+import { getUserId, MemberResolvable } from "../member";
 import {
   createLeaderboardOutput,
   formatUsername,
@@ -36,11 +35,9 @@ export async function topDailyStreak(
 
   const query = await prisma.economy.findMany({
     where: {
-      AND: [
-        { dailyStreak: { gt: 0 } },
-        members ? { userId: { in: members } } : undefined,
-        { OR: [{ banned: null }, { banned: { lt: new Date() } }] },
-      ].filter(Boolean),
+      AND: [{ dailyStreak: { gt: 0 } }, members ? { userId: { in: members } } : undefined].filter(
+        Boolean,
+      ),
     },
     select: {
       userId: true,
@@ -92,7 +89,6 @@ export async function topDailyStreak(
   return createLeaderboardOutput(out, userIds, member ? getUserId(member) : undefined);
 }
 
-
 export async function topVoteStreak(
   scope: "global",
   guild: undefined,
@@ -115,11 +111,9 @@ export async function topVoteStreak(
 
   const query = await prisma.economy.findMany({
     where: {
-      AND: [
-        { voteStreak: { gt: 0 } },
-        members ? { userId: { in: members } } : undefined,
-        { OR: [{ banned: null }, { banned: { lt: new Date() } }] },
-      ].filter(Boolean),
+      AND: [{ voteStreak: { gt: 0 } }, members ? { userId: { in: members } } : undefined].filter(
+        Boolean,
+      ),
     },
     select: {
       userId: true,
@@ -170,4 +164,3 @@ export async function topVoteStreak(
 
   return createLeaderboardOutput(out, userIds, member ? getUserId(member) : undefined);
 }
-

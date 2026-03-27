@@ -35,11 +35,9 @@ export async function topChessSolved(
 
   const query = await prisma.chessPuzzleStats.findMany({
     where: {
-      AND: [
-        members ? { userId: { in: members } } : undefined,
-        { solved: { gt: 0 } },
-        { user: { blacklisted: false } },
-      ].filter(Boolean),
+      AND: [members ? { userId: { in: members } } : undefined, { solved: { gt: 0 } }].filter(
+        Boolean,
+      ),
     },
     orderBy: { solved: "desc" },
     select: {
@@ -109,7 +107,6 @@ export async function topChessAvgRating(
         members ? { userId: { in: members } } : undefined,
         { solved: { gt: 0 } },
         { averageWinningRating: { gt: 0 } },
-        { user: { blacklisted: false } },
       ].filter(Boolean),
     },
     orderBy: { averageWinningRating: "desc" },
@@ -179,7 +176,6 @@ export async function topChessFastestSolve(
       AND: [
         members ? { userId: { in: members } } : undefined,
         { fastestSolve: { not: null } },
-        { user: { blacklisted: false } },
       ].filter(Boolean),
     },
     orderBy: { fastestSolve: "asc" },

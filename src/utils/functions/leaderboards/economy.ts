@@ -39,12 +39,9 @@ export async function topBalance(
 
   const query = await prisma.economy.findMany({
     where: {
-      AND: [
-        members ? { userId: { in: members } } : undefined,
-        { money: { gt: 0 } },
-        { user: { blacklisted: false } },
-        { OR: [{ banned: null }, { banned: { lt: new Date() } }] },
-      ].filter(Boolean),
+      AND: [members ? { userId: { in: members } } : undefined, { money: { gt: 0 } }].filter(
+        Boolean,
+      ),
     },
     select: {
       userId: true,
@@ -118,12 +115,9 @@ export async function topNetWorth(
 
   const query = await prisma.economy.findMany({
     where: {
-      AND: [
-        members ? { userId: { in: members } } : undefined,
-        { user: { blacklisted: false } },
-        { netWorth: { gt: 0 } },
-        { OR: [{ banned: null }, { banned: { lt: new Date() } }] },
-      ].filter(Boolean),
+      AND: [members ? { userId: { in: members } } : undefined, { netWorth: { gt: 0 } }].filter(
+        Boolean,
+      ),
     },
     select: {
       userId: true,
@@ -278,17 +272,7 @@ export async function topItem(
 
   const query = await prisma.inventory.findMany({
     where: {
-      AND: [
-        { item },
-        members ? { userId: { in: members } } : undefined,
-        { economy: { user: { blacklisted: false } } },
-        {
-          OR: [
-            { economy: { banned: null } },
-            { economy: { banned: { lt: new Date() } } },
-          ],
-        },
-      ].filter(Boolean),
+      AND: [{ item }, members ? { userId: { in: members } } : undefined].filter(Boolean),
     },
     select: {
       userId: true,
@@ -349,7 +333,7 @@ export async function topCompletion(guild: Guild, member: MemberResolvable) {
 
   const query = await prisma.achievements.groupBy({
     where: {
-      AND: [{ userId: { in: members } }, { completed: true }, { user: { blacklisted: false } }],
+      AND: [{ userId: { in: members } }, { completed: true }],
     },
     by: ["userId"],
     _count: {
@@ -389,7 +373,8 @@ export async function topCompletion(guild: Guild, member: MemberResolvable) {
         guild,
       );
 
-      out[currentCount] = `${pos} ${await formatUsername(user.userId, username, true)} ${completion.toFixed(1)}%`;
+      out[currentCount] =
+        `${pos} ${await formatUsername(user.userId, username, true)} ${completion.toFixed(1)}%`;
     });
   }
 
@@ -418,7 +403,11 @@ export async function topGuilds(guildName?: string) {
     count++;
   }
 
-  return createLeaderboardOutput(out, query.map((g) => g.guildName), guildName);
+  return createLeaderboardOutput(
+    out,
+    query.map((g) => g.guildName),
+    guildName,
+  );
 }
 
 export async function topLottoWins(
@@ -526,8 +515,6 @@ export async function topVote(
       AND: [
         { OR: [{ monthVote: { gt: 0 } }, { seasonVote: { gt: 0 } }] },
         members ? { userId: { in: members } } : undefined,
-        { user: { blacklisted: false } },
-        { OR: [{ banned: null }, { banned: { lt: new Date() } }] },
       ].filter(Boolean),
     },
     select: {

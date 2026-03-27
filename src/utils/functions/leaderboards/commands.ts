@@ -45,11 +45,7 @@ export async function topCommand(
 
   const query = await prisma.commandUse.findMany({
     where: {
-      AND: [
-        members ? { userId: { in: members } } : undefined,
-        { command },
-        { user: { blacklisted: false } },
-      ].filter(Boolean),
+      AND: [members ? { userId: { in: members } } : undefined, { command }].filter(Boolean),
     },
     select: {
       userId: true,
@@ -106,7 +102,7 @@ export async function topCommandUses(guild: Guild, member: MemberResolvable) {
 
   const query = await prisma.commandUse.groupBy({
     where: {
-      AND: [{ userId: { in: members } }, { user: { blacklisted: false } }],
+      AND: [{ userId: { in: members } }],
     },
     by: ["userId"],
     _sum: {
@@ -178,9 +174,6 @@ export async function topCommandUses(guild: Guild, member: MemberResolvable) {
 
 export async function topCommandUsesGlobal(member?: MemberResolvable) {
   const query = await prisma.commandUse.groupBy({
-    where: {
-      user: { blacklisted: false },
-    },
     by: ["userId"],
     _sum: {
       uses: true,
