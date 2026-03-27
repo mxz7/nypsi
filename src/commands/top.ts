@@ -12,6 +12,7 @@ import redis from "../init/redis";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { Item } from "../types/Economy.js";
+import { showChessLeaderboard } from "../utils/functions/chess/leaderboard";
 import { getGuildByUser } from "../utils/functions/economy/guilds";
 import { selectItem } from "../utils/functions/economy/inventory";
 import { showMuseumLeaderboard } from "../utils/functions/economy/museum";
@@ -214,6 +215,23 @@ cmd.slashData
           .setDescription("show global/server")
           .setChoices(...scopeChoices)
           .setRequired(false),
+      ),
+  )
+  .addSubcommandGroup((chess) =>
+    chess
+      .setName("chess")
+      .setDescription("view chess puzzle leaderboards")
+      .addSubcommand((sub) =>
+        sub
+          .setName("leaderboard")
+          .setDescription("view chess puzzle leaderboards")
+          .addStringOption((option) =>
+            option
+              .setName("scope")
+              .setDescription("show global/server")
+              .setChoices(...scopeChoices)
+              .setRequired(false),
+          ),
       ),
   )
   .addSubcommandGroup((museum) =>
@@ -641,6 +659,9 @@ async function run(
     }
 
     return show(data.pages, data.pos, title, url);
+  } else if (args[0].toLowerCase() == "chess") {
+    const global = args[1]?.toLowerCase() === "global";
+    return showChessLeaderboard(message, send, global);
   } else if (args[0].toLowerCase() == "museum") {
     if (args.length == 1)
       return send({ embeds: [new ErrorEmbed(`/top museum <completion|item>`)] });
