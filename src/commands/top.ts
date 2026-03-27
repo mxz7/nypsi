@@ -344,11 +344,11 @@ async function run(
   };
 
   if (args.length == 0) {
-    const data = await topBalance(message.guild, message.member);
+    const data = await topBalance("guild", message.guild, message.member);
 
     return show(data.pages, data.pos, `top balance for ${message.guild.name}`);
   } else if (args[0].toLowerCase() == "balance") {
-    const data = await topBalance(message.guild, message.member);
+    const data = await topBalance("guild", message.guild, message.member);
 
     return show(data.pages, data.pos, `top balance for ${message.guild.name}`);
   } else if (args[0].toLowerCase() == "prestige" || args[0].toLowerCase() === "level") {

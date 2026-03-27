@@ -7,7 +7,6 @@ import { getAllMembers } from "../guilds/members";
 import { getUserId, MemberResolvable } from "../member";
 import PageManager from "../page";
 import { pluralize } from "../string";
-import { getPreferences } from "../users/notifications";
 import { getLastKnownUsername, updateLastKnownUsername } from "../users/username";
 import {
   createLeaderboardOutput,
@@ -21,17 +20,38 @@ import {
 } from "./helpers";
 import pAll = require("p-all");
 
-export async function topBalance(guild: Guild, member?: MemberResolvable) {
-  const members = await getAllMembers(guild);
+export async function topBalance(
+  scope: "global",
+  guild: undefined,
+  member?: MemberResolvable,
+  amount?: number,
+): Promise<LeaderboardResult>;
+export async function topBalance(
+  scope: "guild",
+  guild: Guild,
+  member?: MemberResolvable,
+  amount?: number,
+): Promise<LeaderboardResult>;
+export async function topBalance(
+  scope: "guild" | "global",
+  guild?: Guild,
+  member?: MemberResolvable,
+  amount?: number,
+): Promise<LeaderboardResult> {
+  const members = await getMembers(guild);
 
   const query = await prisma.economy.findMany({
     where: {
-      AND: [{ userId: { in: members } }, { money: { gt: 0 } }, { user: { blacklisted: false } }],
+      AND: [
+        members ? { userId: { in: members } } : undefined,
+        { money: { gt: 0 } },
+        { user: { blacklisted: false } },
+        { OR: [{ banned: null }, { banned: { lt: new Date() } }] },
+      ].filter(Boolean),
     },
     select: {
       userId: true,
       money: true,
-      banned: true,
       user: {
         select: {
           lastKnownUsername: true,
@@ -40,126 +60,43 @@ export async function topBalance(guild: Guild, member?: MemberResolvable) {
       },
     },
     orderBy: [{ money: "desc" }, { user: { lastKnownUsername: "asc" } }],
+    take: getAmount(guild, amount) || undefined,
   });
 
   const out: string[] = [];
-  let count = 0;
+  let count = 1;
   const userIds = query.map((i) => i.userId);
   const promises: (() => Promise<void>)[] = [];
-  const date = dayjs();
 
   for (const user of query) {
-    if (user.banned && date.isBefore(user.banned)) {
-      userIds.splice(userIds.indexOf(user.userId), 1);
-      continue;
-    }
-
     const currentCount = count;
-    let pos = (count + 1).toString();
-
-    if (pos == "1") {
-      pos = "🥇";
-    } else if (pos == "2") {
-      pos = "🥈";
-    } else if (pos == "3") {
-      pos = "🥉";
-    } else {
-      pos += ".";
-    }
+    const pos = getPos(count);
 
     count++;
 
     promises.push(async () => {
-      let username = user.user.lastKnownUsername;
-
-      if (user.user.usernameUpdatedAt.getTime() < date.valueOf() - UPDATE_USERNAME_MS) {
-        const discordUser = await guild.client.users.fetch(user.userId).catch(() => {});
-
-        if (discordUser) {
-          username = discordUser.username;
-          await updateLastKnownUsername(user.userId, username);
-        }
-      }
+      const username = await getUsername(
+        user.userId,
+        user.user.lastKnownUsername,
+        user.user.usernameUpdatedAt,
+        guild,
+      );
 
       out[currentCount] = `${pos} ${await formatUsername(
         user.userId,
         username,
-        true,
+        scope === "global",
       )} $${Number(user.money).toLocaleString()}`;
     });
   }
 
   await pAll(promises, { concurrency: 10 });
 
-  const pages = PageManager.createPages(out);
-
-  let pos = 0;
-
-  if (member) {
-    pos = userIds.indexOf(getUserId(member)) + 1;
+  if (scope === "global") {
+    checkLeaderboardPositions(userIds, "balance");
   }
 
-  return { pages, pos };
-}
-
-export async function topBalanceGlobal(amount: number, allowHidden = true): Promise<string[]> {
-  const query = await prisma.economy.findMany({
-    where: {
-      AND: [{ user: { blacklisted: false } }, { money: { gt: 10_000 } }],
-    },
-    select: {
-      userId: true,
-      money: true,
-      banned: true,
-      user: {
-        select: {
-          lastKnownUsername: true,
-        },
-      },
-    },
-    orderBy: [{ money: "desc" }, { user: { lastKnownUsername: "asc" } }],
-    take: amount * 2,
-  });
-
-  const usersFinal = [];
-
-  let count = 0;
-
-  for (const user of query) {
-    if (count >= amount) break;
-    if (usersFinal.join().length >= 1500) break;
-
-    if (user.banned && dayjs().isBefore(user.banned)) {
-      continue;
-    }
-
-    let pos = (count + 1).toString();
-
-    if (pos == "1") {
-      pos = "🥇";
-    } else if (pos == "2") {
-      pos = "🥈";
-    } else if (pos == "3") {
-      pos = "🥉";
-    } else {
-      pos += ".";
-    }
-
-    usersFinal[count] = `${pos} ${await formatUsername(
-      user.userId,
-      user.user.lastKnownUsername,
-      allowHidden ? (await getPreferences(user.userId)).leaderboards : true,
-    )} $${Number(user.money).toLocaleString()}`;
-
-    count++;
-  }
-
-  checkLeaderboardPositions(
-    query.map((i) => i.userId),
-    "balance",
-  );
-
-  return usersFinal.slice(0, amount);
+  return createLeaderboardOutput(out, userIds, member ? getUserId(member) : undefined);
 }
 
 export async function topNetWorth(

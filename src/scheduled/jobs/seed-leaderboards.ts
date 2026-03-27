@@ -5,7 +5,7 @@ import { getItems } from "../../utils/functions/economy/utils";
 import { topChatReaction } from "../../utils/functions/leaderboards/chat-reactions";
 import { topCommandUsesGlobal } from "../../utils/functions/leaderboards/commands";
 import {
-  topBalanceGlobal,
+  topBalance,
   topItem,
   topLottoWins,
   topNetWorth,
@@ -24,7 +24,7 @@ export default {
     const start = Date.now();
     const itemIds = Object.keys(getItems()).filter((i) => i !== "lottery_ticket");
 
-    await topBalanceGlobal(100);
+    await topBalance("global", undefined, undefined, 100);
     await sleep(1000);
     await topDailyStreak("global", undefined, "", 100);
     await sleep(1000);
