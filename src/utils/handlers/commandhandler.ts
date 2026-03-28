@@ -377,7 +377,13 @@ async function helpCmd(message: NypsiMessage, args: string[]) {
     } else if (selectedItem) {
       return await runItemInfo(message, args, selectedItem, "general");
     } else {
-      return message.channel.send({ embeds: [new ErrorEmbed("unknown command or item")] });
+      return message.channel.send({
+        embeds: [
+          new ErrorEmbed(
+            "unknown command or item\nyou may find what you're looking for on the wiki: https://nypsi.xyz/wiki",
+          ),
+        ],
+      });
     }
   }
 
