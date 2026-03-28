@@ -407,5 +407,19 @@
       "id:basic_crate:3"
     ],
     "type": "weekly"
+  },
+  "chess_weekly": {
+    "id": "chess_weekly",
+    "name": "puzzle solver",
+    "description": "complete a chess puzzle",
+    "target": [1],
+    "prizes": [
+      "id:lucky_scratch_card:2",
+      "xp:1500",
+      "id:basic_crate:3",
+      "id:basic_crate:3",
+      "id:nypsi_crate:1"
+    ],
+    "type": "weekly"
   }
 }
