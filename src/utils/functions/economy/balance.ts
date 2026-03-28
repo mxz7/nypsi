@@ -795,6 +795,8 @@ export async function calcNetWorth(
       : 0,
   );
 
+  const itemsData = getItems();
+  const itemsDataValues = Object.values(itemsData);
   const promises: Array<() => Promise<void>> = [];
 
   for (const sellOrder of query.Market.filter((i) => i.orderType == "sell")) {
@@ -803,7 +805,7 @@ export async function calcNetWorth(
     });
   }
 
-  await pAll(promises, { concurrency: 5 });
+  await pAll(promises, { concurrency: 10 });
   promises.length = 0;
 
   for (const buyOrder of query.Market.filter((i) => i.orderType == "buy")) {
@@ -825,7 +827,7 @@ export async function calcNetWorth(
 
   for (const upgrade of query.BakeryUpgrade) {
     promises.push(async () => {
-      const item = getItems()[upgrade.upgradeId];
+      const item = itemsData[upgrade.upgradeId];
 
       const value = (await calcItemValue(item.id)) || 0;
 
@@ -847,7 +849,7 @@ export async function calcNetWorth(
     });
   }
 
-  await pAll(promises, { concurrency: 5 });
+  await pAll(promises, { concurrency: 10 });
   promises.length = 0;
 
   for (const item of query.Inventory) {
@@ -859,7 +861,7 @@ export async function calcNetWorth(
     });
   }
 
-  await pAll(promises, { concurrency: 5 });
+  await pAll(promises, { concurrency: 10 });
   promises.length = 0;
 
   const museumItems = await prisma.museumDonation.groupBy({
@@ -885,7 +887,7 @@ export async function calcNetWorth(
     });
   }
 
-  await pAll(promises, { concurrency: 5 });
+  await pAll(promises, { concurrency: 10 });
   promises.length = 0;
 
   // museum net is only 25% of items donated this season
@@ -904,9 +906,8 @@ export async function calcNetWorth(
 
       for (const upgrade of car.upgrades) {
         garageBreakdown +=
-          ((await calcItemValue(
-            Object.values(getItems()).find((i) => i.upgrades === upgrade.type).id,
-          )) || 0) * upgrade.amount;
+          ((await calcItemValue(itemsDataValues.find((i) => i.upgrades === upgrade.type).id)) ||
+            0) * upgrade.amount;
       }
     });
   }
@@ -926,12 +927,10 @@ export async function calcNetWorth(
 
       for (const upgrade of worker.upgrades) {
         if (!baseUpgrades[upgrade.upgradeId].base_cost) {
-          const itemId = Array.from(Object.keys(getItems())).find(
-            (i) => getItems()[i].worker_upgrade_id === upgrade.upgradeId,
-          );
-          if (!itemId) continue;
+          const item = itemsDataValues.find((i) => i.worker_upgrade_id === upgrade.upgradeId);
+          if (!item) continue;
 
-          const value = Math.floor(((await calcItemValue(itemId)) || 0) * upgrade.amount);
+          const value = Math.floor(((await calcItemValue(item.id)) || 0) * upgrade.amount);
 
           worth += value;
           workersBreakdown += value;
@@ -979,11 +978,11 @@ export async function calcNetWorth(
     if (typesChecked.includes(farm.plantId)) continue;
     typesChecked.push(farm.plantId);
     promises.push(async () => {
-      const seed = Object.keys(getItems()).find((i) => getItems()[i].plantId === farm.plantId);
+      const seed = itemsDataValues.find((i) => i.plantId === farm.plantId);
 
       const seedValue =
         query.Farm.filter((i) => i.plantId === farm.plantId).length *
-        ((await calcItemValue(seed)) || 0);
+        ((await calcItemValue(seed.id)) || 0);
       const harvestValue =
         (await getClaimable(userId, farm.plantId, false)).items *
         ((await calcItemValue(getPlantsData()[farm.plantId].item)) || 0);

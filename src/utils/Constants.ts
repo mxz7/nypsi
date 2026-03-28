@@ -271,6 +271,7 @@ export default {
         ITEM_EXISTS: "cache:economy:item:exists",
         HAS_GEM: "cache:economy:item:hasgem",
         TOOL_PREFERENCES: "cache:economy:item:toolpreferences",
+        ITEM_VALUE: "cache:economy:item:value",
       },
       z: {
         profile: "cache:z:profile",

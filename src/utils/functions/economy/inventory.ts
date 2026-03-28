@@ -7,6 +7,7 @@ import { NypsiClient } from "../../../models/Client";
 import { CommandCategory } from "../../../models/Command";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { Item } from "../../../types/Economy";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { getUserId, MemberResolvable } from "../member";
@@ -34,6 +35,8 @@ const gemChanceCooldown = new Set<string>();
 setInterval(() => {
   gemChanceCooldown.clear();
 }, 60000);
+
+const itemValueCache = new RedisCache<number>(Constants.redis.cache.economy.ITEM_VALUE, 3600);
 
 export async function getInventory(member: MemberResolvable): Promise<Inventory> {
   const userId = getUserId(member);
@@ -793,6 +796,10 @@ export async function getSellFilter(member: MemberResolvable) {
 }
 
 export async function calcItemValue(item: string) {
+  const cache = await itemValueCache.get(item);
+
+  if (cache) return Number(cache) || 1000;
+
   let itemValue = 1000;
 
   if (
@@ -855,6 +862,8 @@ export async function calcItemValue(item: string) {
       },
     });
   })();
+
+  itemValueCache.set(item, itemValue || 1000);
 
   return itemValue;
 }
