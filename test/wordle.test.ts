@@ -2,9 +2,15 @@ import { readFileSync } from "node:fs";
 import { expect, test } from "vitest";
 
 // remove \r for windows
-const wordleWords: string[] = readFileSync("data/wordle.txt", "utf-8").trim().replaceAll("\r", "").split("\n");
+const wordleWords: string[] = readFileSync("data/wordle.txt", "utf-8")
+  .trim()
+  .replaceAll("\r", "")
+  .split("\n");
 
-const wordleGuesses: string[] = readFileSync("data/wordle_guesses.txt", "utf-8").trim().replaceAll("\r", "").split("\n");
+const wordleGuesses: string[] = readFileSync("data/wordle_guesses.txt", "utf-8")
+  .trim()
+  .replaceAll("\r", "")
+  .split("\n");
 
 test("wordle.txt - every word should be 5 characters and lowercase", () => {
   for (const word of wordleWords) {

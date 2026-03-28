@@ -1,6 +1,6 @@
-import { GuildCounter, TrackingType } from "#generated/prisma";
 import { ClusterClient, ClusterManager } from "discord-hybrid-sharding";
 import { ChannelType, Client, Guild, PermissionFlagsBits, User } from "discord.js";
+import { GuildCounter, TrackingType } from "#generated/prisma";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";

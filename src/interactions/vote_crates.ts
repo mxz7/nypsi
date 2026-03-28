@@ -17,8 +17,8 @@ import { getItems, isEcoBanned } from "../utils/functions/economy/utils";
 import { getVoteStreak } from "../utils/functions/economy/vote";
 import PageManager from "../utils/functions/page";
 import { getEmbedColor } from "../utils/functions/premium/color";
-import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { pluralize } from "../utils/functions/string";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 export default {
   name: "vote-crates",

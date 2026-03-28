@@ -1,5 +1,4 @@
 import dayjs = require("dayjs");
-import { OrderType } from "#generated/prisma";
 import {
   ActionRowBuilder,
   APIMessageComponentEmoji,
@@ -22,6 +21,7 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
+import { OrderType } from "#generated/prisma";
 import prisma from "../init/database";
 import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";

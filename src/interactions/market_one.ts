@@ -1,5 +1,5 @@
-import { Market } from "#generated/prisma";
 import { MessageFlags } from "discord.js";
+import { Market } from "#generated/prisma";
 import prisma from "../init/database";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";

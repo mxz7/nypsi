@@ -1,3 +1,4 @@
+import { readdir } from "fs/promises";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -6,7 +7,6 @@ import {
   MessageActionRowComponentBuilder,
   MessageFlags,
 } from "discord.js";
-import { readdir } from "fs/promises";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { ItemUse } from "../models/ItemUse";

@@ -1,4 +1,3 @@
-import { EconomyGuild, EconomyGuildMember, EconomyGuildRole } from "#generated/prisma";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -15,6 +14,7 @@ import {
 } from "discord.js";
 import { inPlaceSort, sort } from "fast-sort";
 import { nanoid } from "nanoid";
+import { EconomyGuild, EconomyGuildMember, EconomyGuildRole } from "#generated/prisma";
 import prisma from "../init/database";
 import redis from "../init/redis";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";

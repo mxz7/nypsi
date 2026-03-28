@@ -1,8 +1,8 @@
-import { PrismaClient } from "#generated/prisma";
+import * as fs from "fs";
 import { PrismaPg } from "@prisma/adapter-pg";
 import "dotenv/config";
-import * as fs from "fs";
 import Redis from "ioredis";
+import { PrismaClient } from "#generated/prisma";
 import { Item } from "../types/Economy";
 
 const redis = new Redis({ showFriendlyErrorStack: true });

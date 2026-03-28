@@ -1,10 +1,10 @@
-import { Event, EventContribution } from "#generated/prisma";
 import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
   MessageActionRowComponentBuilder,
 } from "discord.js";
+import { Event, EventContribution } from "#generated/prisma";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";

@@ -1,5 +1,5 @@
-import { CommandInteraction } from "discord.js";
 import { loadavg } from "os";
+import { CommandInteraction } from "discord.js";
 import prisma from "../init/database";
 import redis from "../init/redis";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";

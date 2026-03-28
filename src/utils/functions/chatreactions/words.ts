@@ -1,6 +1,6 @@
-import { ChatReactionWordList } from "#generated/prisma";
-import { Guild } from "discord.js";
 import { readFile } from "fs/promises";
+import { Guild } from "discord.js";
+import { ChatReactionWordList } from "#generated/prisma";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";

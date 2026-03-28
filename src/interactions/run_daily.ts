@@ -6,8 +6,11 @@ import {
   MessageActionRowComponentBuilder,
   MessageFlags,
 } from "discord.js";
+import redis from "../init/redis";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
+import Constants from "../utils/Constants";
+import { addProgress } from "../utils/functions/economy/achievements";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
 import {
   createUser,
@@ -18,13 +21,10 @@ import {
   isEcoBanned,
   userExists,
 } from "../utils/functions/economy/utils";
-import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
-import { percentChance } from "../utils/functions/random";
-import Constants from "../utils/Constants";
-import { logger } from "../utils/logger";
-import { addProgress } from "../utils/functions/economy/achievements";
 import { hasVoted } from "../utils/functions/economy/vote";
-import redis from "../init/redis";
+import { percentChance } from "../utils/functions/random";
+import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
+import { logger } from "../utils/logger";
 import dayjs = require("dayjs");
 
 export default {

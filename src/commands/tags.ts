@@ -1,6 +1,6 @@
+import { readFile } from "fs/promises";
 import { EmbedField } from "discord.js";
 import { sort } from "fast-sort";
-import { readFile } from "fs/promises";
 import { Command } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Tag } from "../types/Tags";

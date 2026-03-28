@@ -1,6 +1,6 @@
-import { EconomyGuildUpgrades } from "#generated/prisma";
 import { GuildMember } from "discord.js";
 import { sort } from "fast-sort";
+import { EconomyGuildUpgrades } from "#generated/prisma";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";

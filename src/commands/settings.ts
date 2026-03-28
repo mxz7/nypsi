@@ -1,4 +1,3 @@
-import { DMSettings, Preferences } from "#generated/prisma";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -18,6 +17,7 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
+import { DMSettings, Preferences } from "#generated/prisma";
 import redis from "../init/redis";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";

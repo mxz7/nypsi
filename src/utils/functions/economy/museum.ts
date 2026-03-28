@@ -1,4 +1,3 @@
-import { Prisma } from "#generated/prisma";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -8,6 +7,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
+import { Prisma } from "#generated/prisma";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiCommandInteraction, NypsiMessage, SendMessage } from "../../../models/Command";

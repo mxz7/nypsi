@@ -4,8 +4,8 @@ import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
-import { startOpenChatReaction } from "./game";
 import { pluralize } from "../string";
+import { startOpenChatReaction } from "./game";
 import ms = require("ms");
 
 const lastGame = new Map<string, number>();

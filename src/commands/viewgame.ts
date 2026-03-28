@@ -1,4 +1,4 @@
-import { Game, Prisma } from "#generated/prisma";
+import { readFile, writeFile } from "node:fs/promises";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -7,7 +7,7 @@ import {
   MessageActionRowComponentBuilder,
   MessageFlags,
 } from "discord.js";
-import { readFile, writeFile } from "node:fs/promises";
+import { Game, Prisma } from "#generated/prisma";
 import prisma from "../init/database";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";

@@ -1,3 +1,5 @@
+import { promisify } from "util";
+import { gzip } from "zlib";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -11,8 +13,6 @@ import {
   MessageEditOptions,
   MessageFlags,
 } from "discord.js";
-import { promisify } from "util";
-import { gzip } from "zlib";
 import prisma from "../init/database";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";

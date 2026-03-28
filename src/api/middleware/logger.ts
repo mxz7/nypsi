@@ -1,5 +1,5 @@
-import { MiddlewareHandler } from "hono";
 import { performance } from "perf_hooks";
+import { MiddlewareHandler } from "hono";
 import { logger } from "../../utils/logger";
 
 const loggerMiddleware: MiddlewareHandler = async (c, next) => {

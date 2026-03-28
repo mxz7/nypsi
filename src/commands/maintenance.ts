@@ -1,5 +1,5 @@
-import { CommandInteraction, Message } from "discord.js";
 import { exec } from "node:child_process";
+import { CommandInteraction, Message } from "discord.js";
 import prisma from "../init/database";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";

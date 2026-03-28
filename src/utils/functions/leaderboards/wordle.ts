@@ -1,6 +1,6 @@
 import dayjs = require("dayjs");
-import { Prisma } from "#generated/prisma";
 import { Guild } from "discord.js";
+import { Prisma } from "#generated/prisma";
 import prisma from "../../../init/database";
 import { checkLeaderboardPositions } from "../economy/stats";
 import { getAllMembers } from "../guilds/members";

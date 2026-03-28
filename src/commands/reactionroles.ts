@@ -1,10 +1,10 @@
-import { ReactionRole, ReactionRoleMode, ReactionRoleRoles } from "#generated/prisma";
 import {
   CommandInteraction,
   GuildTextBasedChannel,
   Message,
   PermissionFlagsBits,
 } from "discord.js";
+import { ReactionRole, ReactionRoleMode, ReactionRoleRoles } from "#generated/prisma";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";

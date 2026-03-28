@@ -1,5 +1,5 @@
-import { flavors } from "@catppuccin/palette";
 import { randomInt } from "crypto";
+import { flavors } from "@catppuccin/palette";
 import {
   ActionRowBuilder,
   APIApplicationCommandOptionChoice,

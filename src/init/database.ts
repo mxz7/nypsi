@@ -1,5 +1,5 @@
-import { PrismaPg } from "@prisma/adapter-pg";
 import { parentPort } from "worker_threads";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../generated/prisma/client";
 import Constants from "../utils/Constants";
 import { logger } from "../utils/logger";

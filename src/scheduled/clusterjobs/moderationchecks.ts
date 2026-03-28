@@ -1,14 +1,13 @@
 import dayjs = require("dayjs");
 import { APIEmbed, WebhookClient } from "discord.js";
-
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { NypsiClient } from "../../models/Client";
 import Constants from "../../utils/Constants";
 import { requestUnban } from "../../utils/functions/moderation/ban";
 import { requestUnmute } from "../../utils/functions/moderation/mute";
-import { logger } from "../../utils/logger";
 import { pluralize } from "../../utils/functions/string";
+import { logger } from "../../utils/logger";
 
 export const unmuteTimeouts = new Set<string>();
 export const unbanTimeouts = new Set<string>();

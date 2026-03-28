@@ -1,4 +1,3 @@
-import { Market, MarketWatch, OrderType, Prisma, PrismaClient } from "#generated/prisma";
 import { ClusterManager } from "discord-hybrid-sharding";
 import {
   ActionRowBuilder,
@@ -14,6 +13,7 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
+import { Market, MarketWatch, OrderType, Prisma, PrismaClient } from "#generated/prisma";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";

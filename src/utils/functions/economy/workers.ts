@@ -1,6 +1,6 @@
-import { EconomyWorker, EconomyWorkerUpgrades } from "#generated/prisma";
 import { ClusterManager } from "discord-hybrid-sharding";
 import { inPlaceSort } from "fast-sort";
+import { EconomyWorker, EconomyWorkerUpgrades } from "#generated/prisma";
 import prisma from "../../../init/database";
 import { NypsiClient } from "../../../models/Client";
 import { Worker, WorkerByproducts } from "../../../types/Workers";

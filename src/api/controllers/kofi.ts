@@ -1,8 +1,8 @@
-import { Prisma } from "#generated/prisma";
 import { WebhookClient } from "discord.js";
 import { Hono } from "hono";
 import { validator } from "hono/validator";
 import z from "zod";
+import { Prisma } from "#generated/prisma";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { CustomEmbed } from "../../models/EmbedBuilders";
