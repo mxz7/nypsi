@@ -232,13 +232,10 @@ async function startChessGame(
     await res.deferUpdate().catch(() => {});
     collector.stop("win");
     const solveTimeMs = Math.round(performance.now() - puzzleStartTime);
-    await addChessSolve(message.author.id, puzzle.rating, solveTimeMs);
-    const stats = await getChessStats(message.author.id);
+    addChessSolve(message.author.id, puzzle.rating, solveTimeMs);
 
     embed
-      .setDescription(
-        `**puzzle solved!!**\n\nrating: \`${puzzle.rating}\`\n\n${formatChessStatsDisplay(stats)}`,
-      )
+      .setDescription(`**puzzle solved!!**\n\nrating: \`${puzzle.rating}\``)
       .setColor(Constants.EMBED_SUCCESS_COLOR)
       .setFooter({ text: `solved in ${formatTime(solveTimeMs)}` });
 
