@@ -1,7 +1,7 @@
-import { BoosterScope } from "#generated/prisma";
+import { exec } from "node:child_process";
 import { GuildMember } from "discord.js";
 import { sort } from "fast-sort";
-import { exec } from "node:child_process";
+import { BoosterScope } from "#generated/prisma";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";

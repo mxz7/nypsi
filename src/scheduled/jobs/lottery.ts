@@ -1,5 +1,5 @@
-import { flavors } from "@catppuccin/palette";
 import { randomInt } from "crypto";
+import { flavors } from "@catppuccin/palette";
 import { ColorResolvable, WebhookClient } from "discord.js";
 import prisma from "../../init/database";
 import redis from "../../init/redis";

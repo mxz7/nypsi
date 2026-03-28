@@ -1,3 +1,4 @@
+import { exec } from "node:child_process";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -10,7 +11,6 @@ import {
   MessageFlags,
   PermissionFlagsBits,
 } from "discord.js";
-import { exec } from "node:child_process";
 import prisma from "../init/database";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";

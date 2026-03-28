@@ -1,7 +1,7 @@
+import { Worker, isMainThread, parentPort, workerData } from "worker_threads";
 import { Collection, GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { compareTwoStrings } from "string-similarity";
-import { Worker, isMainThread, parentPort, workerData } from "worker_threads";
 
 export default function chooseMember(
   members: Collection<string, GuildMember>,

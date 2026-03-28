@@ -1,10 +1,10 @@
 import { inPlaceSort } from "fast-sort";
 import redis from "../../init/redis";
+import { CustomEmbed } from "../../models/EmbedBuilders";
 import { Job } from "../../types/Jobs";
 import Constants from "../../utils/Constants";
-import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
 import { getItems } from "../../utils/functions/economy/utils";
-import { CustomEmbed } from "../../models/EmbedBuilders";
+import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
 
 export default {
   name: "autosell",

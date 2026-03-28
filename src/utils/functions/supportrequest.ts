@@ -1,8 +1,8 @@
-import { SupportRequest } from "#generated/prisma";
 import { Attachment, Collection, Embed } from "discord.js";
 import { nanoid } from "nanoid";
 import { zodTextFormat } from "openai/helpers/zod";
 import { z } from "zod";
+import { SupportRequest } from "#generated/prisma";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { NypsiClient } from "../../models/Client";

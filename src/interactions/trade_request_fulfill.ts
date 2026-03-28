@@ -2,8 +2,8 @@ import { ButtonInteraction, MessageFlags } from "discord.js";
 import prisma from "../init/database";
 import { ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
-import { isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { fulfillTradeRequest } from "../utils/functions/economy/trade_requests";
+import { isEcoBanned, userExists } from "../utils/functions/economy/utils";
 
 export default {
   name: "fr",

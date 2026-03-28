@@ -1,7 +1,6 @@
 import { CommandInteraction, PermissionFlagsBits, User } from "discord.js";
-import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
-
 import prisma from "../init/database";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { getMember } from "../utils/functions/member";

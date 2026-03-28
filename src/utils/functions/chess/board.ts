@@ -1,6 +1,6 @@
-import { Chess } from "chess.js";
 import * as fs from "fs/promises";
 import * as path from "path";
+import { Chess } from "chess.js";
 import { logger } from "../../logger";
 import sharp = require("sharp");
 

@@ -1,7 +1,7 @@
 import { exec } from "child_process";
+import * as fs from "fs";
 import { GuildMember, User } from "discord.js";
 import { inPlaceSort } from "fast-sort";
-import * as fs from "fs";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";

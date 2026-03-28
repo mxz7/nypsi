@@ -1,5 +1,5 @@
-import { Game } from "#generated/prisma";
 import { inPlaceSort, sort } from "fast-sort";
+import { Game } from "#generated/prisma";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { logger } from "../../logger";

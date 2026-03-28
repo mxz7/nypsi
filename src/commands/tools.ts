@@ -1,4 +1,3 @@
-import { ToolPreferenceSelection } from "#generated/prisma";
 import {
   ButtonBuilder,
   ButtonStyle,
@@ -12,6 +11,7 @@ import {
   StringSelectMenuOptionBuilder,
   TextDisplayBuilder,
 } from "discord.js";
+import { ToolPreferenceSelection } from "#generated/prisma";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { getColor } from "../models/EmbedBuilders";
 import { getInventory } from "../utils/functions/economy/inventory";

@@ -2,7 +2,6 @@ import { CommandInteraction, Message, PermissionFlagsBits, User } from "discord.
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { getMutedUsers } from "../utils/functions/moderation/mute";
-
 import PageManager from "../utils/functions/page";
 import { escapeFormattingCharacters } from "../utils/functions/string";
 import { getLastKnownUsername } from "../utils/functions/users/username";

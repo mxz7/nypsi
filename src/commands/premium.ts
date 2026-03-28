@@ -1,5 +1,5 @@
-import { ColorResolvable, CommandInteraction } from "discord.js";
 import { readFile } from "fs/promises";
+import { ColorResolvable, CommandInteraction } from "discord.js";
 import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";

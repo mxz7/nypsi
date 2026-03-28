@@ -1,6 +1,6 @@
-import { BakeryUpgrade } from "#generated/prisma";
 import { GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
+import { BakeryUpgrade } from "#generated/prisma";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";

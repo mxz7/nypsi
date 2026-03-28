@@ -15,7 +15,7 @@
 
     "typescript/ban-ts-comment": "warn",
     "typescript/no-deprecated": "warn",
-    
+
     "no-unreachable": "error"
   },
   "env": {

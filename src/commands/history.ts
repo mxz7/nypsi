@@ -9,15 +9,14 @@ import {
   MessageFlags,
   PermissionFlagsBits,
 } from "discord.js";
+import prisma from "../init/database";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import Constants from "../utils/Constants";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getExactMember } from "../utils/functions/member";
 import { getCases } from "../utils/functions/moderation/cases";
 import PageManager from "../utils/functions/page";
-
-import prisma from "../init/database";
-import Constants from "../utils/Constants";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("history", "view punishment history for a given user", "moderation")

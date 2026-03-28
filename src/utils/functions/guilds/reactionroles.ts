@@ -1,4 +1,3 @@
-import { ReactionRole, ReactionRoleMode, ReactionRoleRoles } from "#generated/prisma";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -9,6 +8,7 @@ import {
   MessageActionRowComponentBuilder,
   Role,
 } from "discord.js";
+import { ReactionRole, ReactionRoleMode, ReactionRoleRoles } from "#generated/prisma";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";

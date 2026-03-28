@@ -1,6 +1,8 @@
 import dayjs = require("dayjs");
-import { Prisma } from "#generated/prisma";
 import { exec } from "child_process";
+import * as fs from "fs/promises";
+import { promisify } from "util";
+import { gzip } from "zlib";
 import {
   ActionRowBuilder,
   AttachmentBuilder,
@@ -27,9 +29,7 @@ import {
   User,
 } from "discord.js";
 import { inPlaceSort, sort } from "fast-sort";
-import * as fs from "fs/promises";
-import { promisify } from "util";
-import { gzip } from "zlib";
+import { Prisma } from "#generated/prisma";
 import prisma from "../init/database";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";

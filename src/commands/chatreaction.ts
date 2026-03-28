@@ -1,4 +1,3 @@
-import { ChatReactionWordList } from "#generated/prisma";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -16,6 +15,7 @@ import {
   PermissionFlagsBits,
   TextChannel,
 } from "discord.js";
+import { ChatReactionWordList } from "#generated/prisma";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";

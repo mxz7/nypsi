@@ -1,6 +1,6 @@
 import dayjs = require("dayjs");
-import { inPlaceSort } from "fast-sort";
 import { isMainThread, parentPort, Worker, workerData } from "worker_threads";
+import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import { ChartData } from "../../../types/Chart";
 

@@ -1,4 +1,3 @@
-import { OrderType } from "#generated/prisma";
 import {
   ButtonInteraction,
   LabelBuilder,
@@ -8,6 +7,7 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
+import { OrderType } from "#generated/prisma";
 import prisma from "../init/database";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";

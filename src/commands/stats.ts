@@ -1,3 +1,4 @@
+import * as os from "os";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -15,7 +16,6 @@ import {
 } from "discord.js";
 import { inPlaceSort, sort } from "fast-sort";
 import { cpu } from "node-os-utils";
-import * as os from "os";
 import prisma from "../init/database";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";

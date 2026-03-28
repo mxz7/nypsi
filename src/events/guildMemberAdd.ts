@@ -18,7 +18,6 @@ import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import { isBanned, newBan } from "../utils/functions/moderation/ban";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
 import { deleteMute, getMuteRole, isMuted, newMute } from "../utils/functions/moderation/mute";
-
 import sleep from "../utils/functions/sleep";
 import { pluralize } from "../utils/functions/string";
 import { fetchUsernameHistory } from "../utils/functions/users/history";

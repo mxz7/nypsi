@@ -1,8 +1,8 @@
 import { exec } from "child_process";
-import { CommandInteraction, Message } from "discord.js";
 import { readFile } from "fs/promises";
-import { nanoid } from "nanoid";
 import { promisify } from "util";
+import { CommandInteraction, Message } from "discord.js";
+import { nanoid } from "nanoid";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import Constants from "../utils/Constants";
 import { uploadImage } from "../utils/functions/image";

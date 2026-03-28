@@ -1,3 +1,4 @@
+import * as fs from "fs/promises";
 import {
   BaseMessageOptions,
   CommandInteraction,
@@ -6,7 +7,6 @@ import {
   MessageEditOptions,
   MessageFlags,
 } from "discord.js";
-import * as fs from "fs/promises";
 import redis from "../init/redis";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";

@@ -1,5 +1,5 @@
-import { inPlaceSort } from "fast-sort";
 import { isMainThread, parentPort, Worker, workerData } from "worker_threads";
+import { inPlaceSort } from "fast-sort";
 
 export default function wordleSortWorker(
   query: {

@@ -1,5 +1,5 @@
-import { Interaction, MessageFlags } from "discord.js";
 import { readdir } from "fs/promises";
+import { Interaction, MessageFlags } from "discord.js";
 import redis from "../../init/redis";
 import { CustomEmbed, ErrorEmbed } from "../../models/EmbedBuilders";
 import { AutocompleteHandler, InteractionHandler } from "../../types/InteractionHandler";

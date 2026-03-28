@@ -1,4 +1,3 @@
-import { TradeRequest } from "#generated/prisma";
 import { ClusterManager } from "discord-hybrid-sharding";
 import {
   ActionRowBuilder,
@@ -10,6 +9,7 @@ import {
   MessageActionRowComponentBuilder,
   MessageFlags,
 } from "discord.js";
+import { TradeRequest } from "#generated/prisma";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";

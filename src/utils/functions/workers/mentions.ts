@@ -1,5 +1,5 @@
-import { Mention } from "#generated/prisma";
 import { Worker, isMainThread, parentPort, workerData } from "worker_threads";
+import { Mention } from "#generated/prisma";
 import prisma from "../../../init/database";
 import { MentionQueueItem } from "../users/mentions";
 import ms = require("ms");

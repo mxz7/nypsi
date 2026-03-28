@@ -1,7 +1,7 @@
 import dayjs = require("dayjs");
-import { inPlaceSort } from "fast-sort";
 import { appendFile, writeFile } from "fs/promises";
 import { Worker, isMainThread, parentPort } from "worker_threads";
+import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 
 export default function graphToCsv(): Promise<void> {

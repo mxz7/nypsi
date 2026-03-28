@@ -1,4 +1,3 @@
-import { Captcha } from "#generated/prisma";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -11,6 +10,7 @@ import {
   User,
   WebhookClient,
 } from "discord.js";
+import { Captcha } from "#generated/prisma";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { NypsiCommandInteraction, NypsiMessage } from "../../models/Command";

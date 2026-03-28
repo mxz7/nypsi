@@ -1,9 +1,9 @@
 import { exec } from "child_process";
-import * as Cluster from "discord-hybrid-sharding";
-import { ClusterManager } from "discord-hybrid-sharding";
-import "dotenv/config";
 import { loadavg } from "os";
 import { clearInterval } from "timers";
+import "dotenv/config";
+import * as Cluster from "discord-hybrid-sharding";
+import { ClusterManager } from "discord-hybrid-sharding";
 import { startAPI } from "./api/server";
 import prisma from "./init/database";
 import redis from "./init/redis";

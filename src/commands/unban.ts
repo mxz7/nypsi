@@ -5,8 +5,8 @@ import Constants from "../utils/Constants";
 import { isAltPunish } from "../utils/functions/guilds/altpunish";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
-import { newCase } from "../utils/functions/moderation/cases";
 import { deleteBan } from "../utils/functions/moderation/ban";
+import { newCase } from "../utils/functions/moderation/cases";
 import { pluralize } from "../utils/functions/string";
 import { getIdFromUsername, getLastKnownUsername } from "../utils/functions/users/username";
 

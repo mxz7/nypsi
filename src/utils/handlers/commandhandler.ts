@@ -1,3 +1,4 @@
+import * as fs from "fs";
 import { REST } from "@discordjs/rest";
 import {
   ActionRowBuilder,
@@ -18,7 +19,6 @@ import {
   Routes,
   WebhookClient,
 } from "discord.js";
-import * as fs from "fs";
 import { tips } from "../../../data/lists.json";
 import prisma from "../../init/database";
 import redis from "../../init/redis";

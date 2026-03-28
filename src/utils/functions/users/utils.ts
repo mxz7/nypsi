@@ -1,6 +1,6 @@
 import { exec } from "child_process";
-import { GuildMember, User, WebhookClient } from "discord.js";
 import { promisify } from "util";
+import { GuildMember, User, WebhookClient } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
