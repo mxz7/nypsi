@@ -390,7 +390,7 @@ async function run(
 
     await addCooldown(cmd.name, message.member, 900);
 
-    if (selected.role !== "sellable" && marketWorth > selected.sell) {
+    if (selected.role !== "sellable" && marketWorth > (selected.sell ?? 1000)) {
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setCustomId("✅").setLabel("confirm").setStyle(ButtonStyle.Success),
         new ButtonBuilder().setCustomId("❌").setLabel("cancel").setStyle(ButtonStyle.Danger),
