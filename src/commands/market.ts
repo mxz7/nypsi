@@ -1116,7 +1116,11 @@ async function run(
       (await getMarketTransactionData(item.id, parseInt(amount), "sell", message.member)).cost == -1
     ) {
       return send({
-        embeds: [new ErrorEmbed(`not enough ${item.plural} on the market`)],
+        embeds: [
+          new ErrorEmbed(`not enough ${item.plural} on the market`).setFooter({
+            text: "create a buy order with /market create",
+          }),
+        ],
       });
     }
 
@@ -1151,7 +1155,11 @@ async function run(
       (await getMarketTransactionData(item.id, parseInt(amount), "buy", message.member)).cost == -1
     ) {
       return send({
-        embeds: [new ErrorEmbed(`not enough ${item.plural} on the market`)],
+        embeds: [
+          new ErrorEmbed(`not enough ${item.plural} on the market`).setFooter({
+            text: "create a sell order with /market create",
+          }),
+        ],
       });
     }
 
