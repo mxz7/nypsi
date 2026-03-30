@@ -207,21 +207,16 @@ cmd.slashData
           .setRequired(false),
       ),
   )
-  .addSubcommandGroup((chess) =>
+  .addSubcommand((chess) =>
     chess
       .setName("chess")
       .setDescription("view chess puzzle leaderboards")
-      .addSubcommand((sub) =>
-        sub
-          .setName("leaderboard")
-          .setDescription("view chess puzzle leaderboards")
-          .addStringOption((option) =>
-            option
-              .setName("scope")
-              .setDescription("show global/server")
-              .setChoices(...scopeChoices)
-              .setRequired(false),
-          ),
+      .addStringOption((option) =>
+        option
+          .setName("scope")
+          .setDescription("show global/server")
+          .setChoices(...scopeChoices)
+          .setRequired(false),
       ),
   )
   .addSubcommandGroup((museum) =>
