@@ -9,6 +9,7 @@ import {
   MessageActionRowComponentBuilder,
   MessageFlags,
   ModalBuilder,
+  ModalMessageModalSubmitInteraction,
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
@@ -179,15 +180,16 @@ async function startChessGame(
     .setHeader("chess puzzle", message.author.avatarURL())
     .setImage("attachment://chess.png");
 
-  const updateEmbed = (opponentTurn: boolean) => {
-    const difficultyLine = difficulty ? `difficulty: \`${difficulty}\`\n` : "";
+  const updateEmbed = (opponentTurn: boolean, error?: string) => {
+    const difficultyLine = difficulty ? `difficulty: \`\n${difficulty}\`` : "";
 
     const colorTurn = !opponentTurn ? colorName : colorName === "White" ? "Black" : "White";
 
     embed.setDescription(
       `**${colorTurn.toLowerCase()} to move**\n\n` +
-        `rating: \`${puzzle.rating}\`\n` +
-        difficultyLine,
+        `rating: \`${puzzle.rating}\`` +
+        difficultyLine +
+        (error ? `\n\n**${error}**` : ""),
     );
     embed.setColor(colorTurn === "White" ? "#ffffff" : "#000001");
   };
@@ -227,9 +229,8 @@ async function startChessGame(
 
   const handleWin = async (
     lastMove: { from: string; to: string },
-    res: { deferUpdate: () => Promise<unknown> },
+    res: ModalMessageModalSubmitInteraction,
   ) => {
-    await res.deferUpdate().catch(() => {});
     collector.stop("win");
     const solveTimeMs = Math.round(performance.now() - puzzleStartTime);
     addChessSolve(message.author.id, puzzle.rating, solveTimeMs);
@@ -241,13 +242,19 @@ async function startChessGame(
 
     const buffer = await renderBoard(chess, { perspective, lastMove });
     row.components.forEach((c) => (c as ButtonBuilder).setDisabled(true));
-    await msg
-      .edit({
+    await res
+      .update({
         embeds: [embed.setImage("attachment://chess.png")],
         components: [row],
         files: [{ attachment: buffer, name: "chess.png" }],
       })
-      .catch(() => {});
+      .catch(() =>
+        msg.edit({
+          embeds: [embed.setImage("attachment://chess.png")],
+          components: [row],
+          files: [{ attachment: buffer, name: "chess.png" }],
+        }),
+      );
   };
 
   collector.on("collect", async (interaction) => {
@@ -277,13 +284,9 @@ async function startChessGame(
       if (hintIdx !== -1) row.components.splice(hintIdx, 1);
 
       const expectedFrom = solution[moveIndex].slice(0, 2);
+      updateEmbed(false, `the piece to move is on **${expectedFrom}**`);
       await interaction.update({ embeds: [embed], components: [row] });
-      await interaction
-        .followUp({
-          embeds: [new CustomEmbed(message.member, `the piece to move is on **${expectedFrom}**`)],
-          flags: MessageFlags.Ephemeral,
-        })
-        .catch(() => {});
+
       return;
     }
 
@@ -315,6 +318,7 @@ async function startChessGame(
       .catch((): null => null);
 
     if (!res || !res.isModalSubmit()) return;
+    if (!res.isFromMessage()) return;
 
     if (collector.ended) {
       res
@@ -333,12 +337,12 @@ async function startChessGame(
     const uci = normalizeToUci(input, chess);
 
     if (!uci) {
-      res
-        .reply({
-          embeds: [new ErrorEmbed(`\`${input}\` is not a valid or legal move, try again`)],
-          flags: MessageFlags.Ephemeral,
-        })
-        .catch(() => {});
+      updateEmbed(
+        false,
+        `\`${input}\` is not a valid or legal move\n\nyou can use [chess notation](https://www.chess.com/terms/chess-notation) or coordinates (e.g \`e2e4\` - e2 moves to e4)`,
+      );
+      res.update({ embeds: [embed] }).catch(() => msg.edit({ embeds: [embed] }));
+
       return;
     }
 
@@ -348,12 +352,8 @@ async function startChessGame(
     if (uci !== expectedNormalized) {
       wrongMoves++;
 
-      await res
-        .reply({
-          embeds: [new ErrorEmbed(`that's not the best move, try again (\`${wrongMoves}/3\`)`)],
-          flags: MessageFlags.Ephemeral,
-        })
-        .catch(() => {});
+      updateEmbed(false, `that's not the best move (\`${wrongMoves}/3\`)`);
+      res.update({ embeds: [embed] }).catch(() => msg.edit({ embeds: [embed] }));
 
       if (wrongMoves >= 3) {
         return collector.stop("strikes");
@@ -361,8 +361,6 @@ async function startChessGame(
 
       return;
     }
-
-    await res.deferUpdate().catch(() => {});
 
     // Correct move — apply it
     chess.move({ from: uci.slice(0, 2), to: uci.slice(2, 4), promotion: uci[4] || undefined });
@@ -382,13 +380,21 @@ async function startChessGame(
 
     row.components.forEach((c) => (c as ButtonBuilder).setDisabled(true));
 
-    await msg.edit({
-      embeds: [embed],
-      components: [row],
-      files: [{ attachment: buffer, name: "chess.png" }],
-    });
+    await res
+      .update({
+        embeds: [embed],
+        components: [row],
+        files: [{ attachment: buffer, name: "chess.png" }],
+      })
+      .catch(() =>
+        msg.edit({
+          embeds: [embed],
+          components: [row],
+          files: [{ attachment: buffer, name: "chess.png" }],
+        }),
+      );
 
-    await sleep(3000);
+    await sleep(2000);
 
     row.components.forEach((c) => (c as ButtonBuilder).setDisabled(false));
 
