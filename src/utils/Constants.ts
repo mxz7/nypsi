@@ -207,6 +207,7 @@ export default {
         aura: "cache:user:aura",
         CAPTCHA_HISTORY: "cache:user:captcha:history",
         LAST_MARRIED: "cache:user:married:last",
+        IS_BIRTHDAY: "cache:user:isbirthday",
       },
       guild: {
         EXISTS: "cache:guild:exists",

@@ -2,8 +2,11 @@ import dayjs = require("dayjs");
 import { sort } from "fast-sort";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
+
+const isBirthdayCache = new RedisCache<boolean>(Constants.redis.cache.user.IS_BIRTHDAY, 600);
 
 export async function getBirthday(member: MemberResolvable) {
   const query = await prisma.user.findUnique({
@@ -86,4 +89,35 @@ export async function getUpcomingBirthdays(userIds: string[]) {
   });
 
   return sort(filtered).asc((i) => dayjs(i.birthday).set("year", dayjs().year()).diff(dayjs()));
+}
+
+export async function isBirthday(member: MemberResolvable) {
+  const userId = getUserId(member);
+
+  const cache = await isBirthdayCache.get(userId);
+
+  if (typeof cache === "boolean") {
+    return cache;
+  }
+
+  const query = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      birthday: true,
+      birthdayAnnounce: true,
+    },
+  });
+
+  if (!query) {
+    await isBirthdayCache.set(userId, false);
+    return false;
+  }
+
+  const isBirthday =
+    query.birthdayAnnounce &&
+    dayjs(query.birthday).set("year", dayjs().year()).isSame(dayjs(), "day");
+
+  await isBirthdayCache.set(userId, isBirthday);
+
+  return isBirthday;
 }

@@ -50,6 +50,7 @@ import PageManager from "../utils/functions/page";
 import { getTier } from "../utils/functions/premium/premium";
 import { percentChance } from "../utils/functions/random";
 import { pluralize } from "../utils/functions/string";
+import { isBirthday } from "../utils/functions/users/birthday";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { isMarried } from "../utils/functions/users/marriage";
 import { getActiveTag, getTags, showTags } from "../utils/functions/users/tags";
@@ -145,6 +146,7 @@ async function run(
       tags,
       views,
       upgrades,
+      birthday,
     ] = await Promise.all([
       getBalance(target),
       getPrestige(target),
@@ -159,6 +161,7 @@ async function run(
       getTags(target),
       getViews(target),
       getUpgrades(target),
+      isBirthday(target),
     ]);
 
     const levelRequirements = getLevelRequirements(prestige, level);
@@ -183,6 +186,10 @@ async function run(
 
     if (marriage) {
       desc += `${desc ? "\n" : ""}${getItems()["ring"].emoji} married to **${await getLastKnownUsername(marriage.partnerId)}**`;
+    }
+
+    if (birthday) {
+      desc += `${desc ? "\n" : ""}🍰 happy birthday!!`;
     }
 
     if (
