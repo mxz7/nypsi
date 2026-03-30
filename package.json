@@ -65,7 +65,7 @@
     "@types/urban-dictionary": "3.0.2",
     "oxfmt": "^0.42.0",
     "oxlint": "^1.57.0",
-    "oxlint-tsgolint": "^0.17.4",
+    "oxlint-tsgolint": "^0.18.1",
     "prisma": "7.5.0",
     "tsx": "^4.21.0",
     "typescript": "6.0.2",
