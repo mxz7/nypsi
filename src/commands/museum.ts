@@ -37,6 +37,7 @@ import { createUser, formatNumber, getItems, userExists } from "../utils/functio
 import { getMember } from "../utils/functions/member";
 import { default as PageManager } from "../utils/functions/page";
 import { pluralize } from "../utils/functions/string";
+import { getInlineNotifications } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("museum", "view your museum progress", "money")
@@ -764,6 +765,15 @@ async function run(
         ],
         components: [],
       });
+
+      const notifs = await getInlineNotifications(message.member);
+
+      if (notifs.length > 0) {
+        await interaction.followUp({
+          embeds: notifs.map((n) => n.embed),
+          flags: MessageFlags.Ephemeral,
+        });
+      }
     } else {
       row.components.forEach((b) => b.setDisabled(true));
       interaction.update({ components: [row] });
