@@ -47,7 +47,7 @@ import { addHourlyCommand } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
 
-const cmd = new Command("chess", "play a chess puzzle", "fun").setAliases(["ch"]);
+const cmd = new Command("chess", "play a chess game or puzzle", "fun").setAliases(["ch"]);
 
 cmd.slashEnabled = true;
 cmd.slashData
