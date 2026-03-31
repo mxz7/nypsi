@@ -11,6 +11,7 @@ const CANVAS_SIZE = SQUARE_SIZE * 8 + BORDER * 2;
 const LIGHT_COLOR = "#F0D9B5";
 const DARK_COLOR = "#B58863";
 const HIGHLIGHT_COLOR = "rgba(20, 85, 30, 0.5)";
+const CHECK_COLOR = "rgba(235, 40, 30, 0.6)";
 const LABEL_COLOR = "#F0D9B5";
 
 const PIECES_DIR = path.join(process.cwd(), "data", "chess_pieces");
@@ -117,7 +118,27 @@ export interface RenderOptions {
   perspective?: "white" | "black";
 }
 
-function renderBaseBoardSvg(opts: RenderOptions, perspective: "white" | "black"): string {
+function findKingSquare(chess: Chess): string | null {
+  const turn = chess.turn(); // "w" or "b" – the side whose king is in check
+  const board = chess.board();
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      const piece = board[row][col];
+      if (piece && piece.type === "k" && piece.color === turn) {
+        const file = "abcdefgh"[col];
+        const rank = 8 - row;
+        return `${file}${rank}`;
+      }
+    }
+  }
+  return null;
+}
+
+function renderBaseBoardSvg(
+  opts: RenderOptions,
+  perspective: "white" | "black",
+  checkSquare?: string | null,
+): string {
   const parts: string[] = [];
 
   parts.push(
@@ -144,6 +165,13 @@ function renderBaseBoardSvg(opts: RenderOptions, perspective: "white" | "black")
         `<rect x="${x}" y="${y}" width="${SQUARE_SIZE}" height="${SQUARE_SIZE}" fill="${HIGHLIGHT_COLOR}"/>`,
       );
     }
+  }
+
+  if (checkSquare) {
+    const { x, y } = squareToXY(checkSquare, perspective);
+    parts.push(
+      `<rect x="${x}" y="${y}" width="${SQUARE_SIZE}" height="${SQUARE_SIZE}" fill="${CHECK_COLOR}"/>`,
+    );
   }
 
   // rank labels
@@ -176,7 +204,10 @@ export async function renderBoard(chess: Chess, opts: RenderOptions = {}): Promi
   await ensurePiecesLoaded();
 
   const perspective = opts.perspective ?? "white";
-  const baseSvg = renderBaseBoardSvg(opts, perspective);
+  const isCheck = chess.inCheck();
+  const isCheckmate = chess.isCheckmate();
+  const checkSquare = isCheck || isCheckmate ? findKingSquare(chess) : null;
+  const baseSvg = renderBaseBoardSvg(opts, perspective, checkSquare);
   const pieces: sharp.OverlayOptions[] = [];
 
   const board = chess.board();
@@ -186,13 +217,18 @@ export async function renderBoard(chess: Chess, opts: RenderOptions = {}): Promi
       if (!piece) continue;
 
       const code = toPieceCode(piece.type, piece.color);
-      const img = pieceCache.get(code);
+      let img = pieceCache.get(code);
       if (!img) continue;
 
       // board[row][col]: row 0 = rank 8, col 0 = file a
       const file = "abcdefgh"[col];
       const rank = 8 - row;
       const square = `${file}${rank}`;
+
+      if (isCheckmate && square === checkSquare) {
+        img = await sharp(img).rotate(90).png().toBuffer();
+      }
+
       const { x, y } = squareToXY(square, perspective);
       pieces.push({ input: img, left: Math.round(x), top: Math.round(y) });
     }
