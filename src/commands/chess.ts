@@ -94,7 +94,7 @@ async function run(
 
     if (!(await userExists(message.member))) await createUser(message.member);
 
-    const duelStats = (await getGambleStats(message.member)).find((s) => s.game === "chess_duel");
+    const duelStats = await getGambleStats(message.member, "chess_duel").then((r) => r[0]);
     const duelWins = duelStats ? await getGameWins(message.member, "chess_duel") : 0;
     const duelLosses = duelStats ? duelStats._count._all - duelWins : 0;
 

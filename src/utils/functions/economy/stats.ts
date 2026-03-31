@@ -7,10 +7,10 @@ import { getUserId, MemberResolvable } from "../member";
 import { addProgress } from "./achievements";
 import { addTaskProgress, setTaskProgress } from "./tasks";
 
-export async function getGambleStats(member: MemberResolvable) {
+export async function getGambleStats(member: MemberResolvable, game?: string) {
   const query = await prisma.game.groupBy({
     where: {
-      userId: getUserId(member),
+      AND: [{ userId: getUserId(member) }, game ? { game } : undefined].filter(Boolean),
     },
     by: ["game"],
     _count: {
