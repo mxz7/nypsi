@@ -1,9 +1,11 @@
+import { Chess } from "chess.js";
 import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
   ComponentType,
+  GuildMember,
   Interaction,
   LabelBuilder,
   Message,
@@ -33,10 +35,14 @@ import {
   getRandomPuzzle,
   normalizeToUci,
 } from "../utils/functions/chess/puzzle";
+import { createGame, getGambleStats, getGameWins } from "../utils/functions/economy/stats";
+import { createUser, userExists } from "../utils/functions/economy/utils";
+import { getMember } from "../utils/functions/member";
 import { percentChance } from "../utils/functions/random";
 import sleep from "../utils/functions/sleep";
-import { formatTime } from "../utils/functions/string";
+import { escapeFormattingCharacters, formatTime } from "../utils/functions/string";
 import { hasAdminPermission } from "../utils/functions/users/admin";
+import { getPreferences } from "../utils/functions/users/notifications";
 import { addHourlyCommand } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
@@ -58,8 +64,18 @@ cmd.slashData
       ),
   )
   .addSubcommand((option) =>
+    option
+      .setName("duel")
+      .setDescription("challenge another member to a chess game")
+      .addUserOption((user) =>
+        user.setName("member").setDescription("member you want to play against").setRequired(true),
+      ),
+  )
+  .addSubcommand((option) =>
     option.setName("stats").setDescription("view your chess puzzle stats"),
   );
+
+const duelRequests = new Set<string>();
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
@@ -76,11 +92,25 @@ async function run(
     await addCooldown(cmd.name, message.member, 3);
     const stats = await getChessStats(message.author.id);
 
+    if (!(await userExists(message.member))) await createUser(message.member);
+
+    const duelStats = (await getGambleStats(message.member)).find((s) => s.game === "chess_duel");
+    const duelWins = duelStats ? await getGameWins(message.member, "chess_duel") : 0;
+    const duelLosses = duelStats ? duelStats._count._all - duelWins : 0;
+
     const embed = new CustomEmbed(message.member);
     embed.setHeader(`${message.author.username}'s chess stats`, message.author.avatarURL());
-    embed.setDescription(formatChessStatsDisplay(stats));
+    embed.setDescription(
+      formatChessStatsDisplay(stats) +
+        "\n\n**duels**\n" +
+        (duelStats
+          ? `record: **${duelWins.toLocaleString()}**W - **${duelLosses.toLocaleString()}**L`
+          : "you haven't played any chess duels yet.\n\nuse **/chess duel** to start!"),
+    );
 
     return send({ embeds: [embed] });
+  } else if (args[0]?.toLowerCase() === "duel") {
+    return await handleDuel(message, send, args);
   } else if (
     ["puzzle", "p", "play", ...CHESS_PUZZLE_DIFFICULTIES].includes(args[0]?.toLowerCase())
   ) {
@@ -131,8 +161,9 @@ async function run(
           message.member,
           "**/chess puzzle [difficulty]** *play a random chess puzzle*\n" +
             `- difficulty: ${CHESS_PUZZLE_DIFFICULTIES.map((d) => `\`${d}\``).join(", ")}\n` +
+            "**/chess duel <member>** *challenge someone to a chess game*\n" +
             "**/chess stats** *view your stats*",
-        ).setHeader("chess puzzles", message.author.avatarURL()),
+        ).setHeader("chess", message.author.avatarURL()),
       ],
     });
   }
@@ -612,6 +643,442 @@ function formatChessStatsDisplay(stats: Awaited<ReturnType<typeof getChessStats>
       : "");
 
   return lines + timeLines;
+}
+
+async function handleDuel(
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
+  args: string[],
+) {
+  if (!args[1]) {
+    return send({
+      embeds: [new ErrorEmbed("you must specify a member to challenge")],
+    });
+  }
+
+  const target = await getMember(message.guild, args.slice(1).join(" "));
+
+  if (!target) {
+    return send({ embeds: [new ErrorEmbed("invalid user")] });
+  }
+
+  if (target.user.id === message.author.id) {
+    return send({ embeds: [new ErrorEmbed("you can't challenge yourself")] });
+  }
+
+  if (target.user.bot) {
+    return send({ embeds: [new ErrorEmbed("you can't challenge a bot")] });
+  }
+
+  if (!(await userExists(message.member))) await createUser(message.member);
+  if (!(await userExists(target))) await createUser(target);
+
+  if (!(await getPreferences(target)).duelRequests) {
+    return send({
+      embeds: [new ErrorEmbed(`${target.user.toString()} has duel requests disabled`)],
+    });
+  }
+
+  if (await redis.sismember(Constants.redis.nypsi.USERS_PLAYING, message.author.id)) {
+    return send({ embeds: [new ErrorEmbed("you have an active game")] });
+  }
+
+  if (await redis.sismember(Constants.redis.nypsi.USERS_PLAYING, target.user.id)) {
+    return send({ embeds: [new ErrorEmbed("they have an active game")] });
+  }
+
+  if (duelRequests.has(message.author.id)) {
+    return send({ embeds: [new ErrorEmbed("you already have a pending duel request")] });
+  }
+
+  if (duelRequests.has(target.user.id)) {
+    return send({ embeds: [new ErrorEmbed("they already have a pending duel request")] });
+  }
+
+  await addCooldown(cmd.name, message.member, 15);
+  duelRequests.add(message.author.id);
+
+  const embed = new CustomEmbed(message.member).setHeader("chess duel", message.author.avatarURL());
+  embed.setDescription(
+    `${escapeFormattingCharacters(message.author.username)} has challenged you to a chess game. do you accept?`,
+  );
+
+  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+    new ButtonBuilder().setCustomId("y").setLabel("accept").setStyle(ButtonStyle.Success),
+    new ButtonBuilder().setCustomId("n").setLabel("deny").setStyle(ButtonStyle.Danger),
+  );
+
+  const m = await send({
+    embeds: [embed],
+    components: [row],
+    content: `${target.user.toString()} you have been challenged to a chess game`,
+  });
+
+  const filter = (i: Interaction) => i.user.id === target.id;
+
+  const response = await m
+    .awaitMessageComponent({ filter, time: 60_000 })
+    .then(async (collected) => {
+      await collected.deferUpdate().catch(() => {});
+      duelRequests.delete(message.author.id);
+      return collected.customId;
+    })
+    .catch(async (): Promise<null> => {
+      duelRequests.delete(message.author.id);
+      embed.setDescription("chess duel request expired");
+      await m.edit({ embeds: [embed], components: [] }).catch(() => {});
+      return null;
+    });
+
+  if (!response) return;
+
+  if (response !== "y") {
+    embed.setDescription("chess duel request denied");
+    await m.edit({ embeds: [embed], components: [] }).catch(() => {});
+    return;
+  }
+
+  // Re-check playing state after accept
+  if (await redis.sismember(Constants.redis.nypsi.USERS_PLAYING, message.author.id)) {
+    embed.setDescription("the challenger has started another game");
+    await m.edit({ embeds: [embed], components: [] }).catch(() => {});
+    return;
+  }
+  if (await redis.sismember(Constants.redis.nypsi.USERS_PLAYING, target.user.id)) {
+    embed.setDescription("you have started another game");
+    await m.edit({ embeds: [embed], components: [] }).catch(() => {});
+    return;
+  }
+
+  await m.delete().catch(() => {});
+
+  await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+  await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, target.user.id);
+
+  // Randomly assign colors
+  const whitePlayer = Math.random() < 0.5 ? message.member : target;
+  const blackPlayer = whitePlayer.id === message.member.id ? target : message.member;
+
+  return startChessDuel(message, send, whitePlayer, blackPlayer);
+}
+
+async function startChessDuel(
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
+  whitePlayer: GuildMember,
+  blackPlayer: GuildMember,
+) {
+  const chess = new Chess();
+
+  const getActivePlayer = () => (chess.turn() === "w" ? whitePlayer : blackPlayer);
+  const getPerspective = (): "white" | "black" => (chess.turn() === "w" ? "white" : "black");
+  const getColorName = () => (chess.turn() === "w" ? "White" : "Black");
+
+  let lastMove: { from: string; to: string } | undefined;
+
+  let buffer = await renderBoard(chess, { perspective: getPerspective(), lastMove });
+
+  const embed = new CustomEmbed(message.member)
+    .setHeader(
+      `${whitePlayer.user.username} vs ${blackPlayer.user.username}`,
+      whitePlayer.user.avatarURL(),
+    )
+    .setImage("attachment://chess.png");
+
+  const updateEmbed = (error?: string) => {
+    const active = getActivePlayer();
+    const colorName = getColorName();
+
+    embed.setDescription(
+      `**${colorName.toLowerCase()} to move** (${active.user.toString()})\n` +
+        `${whitePlayer.user.username} (white) vs ${blackPlayer.user.username} (black)` +
+        (error ? `\n\n**${error}**` : ""),
+    );
+    embed.setColor(colorName === "White" ? "#ffffff" : "#000001");
+  };
+
+  updateEmbed();
+
+  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+    new ButtonBuilder()
+      .setCustomId("chess-duel-move")
+      .setLabel("move")
+      .setStyle(ButtonStyle.Primary),
+    new ButtonBuilder()
+      .setCustomId("chess-duel-resign")
+      .setLabel("resign")
+      .setStyle(ButtonStyle.Danger),
+  );
+
+  const msg =
+    message instanceof Message
+      ? await message.channel.send({
+          embeds: [embed],
+          components: [row],
+          files: [{ attachment: buffer, name: "chess.png" }],
+        })
+      : await message
+          .reply({
+            embeds: [embed],
+            components: [row],
+            files: [{ attachment: buffer, name: "chess.png" }],
+          })
+          .then((m) => m.fetch())
+          .catch(() =>
+            message
+              .editReply({
+                embeds: [embed],
+                components: [row],
+                files: [{ attachment: buffer, name: "chess.png" }],
+              })
+              .then((m) => m.fetch() as Promise<Message>),
+          );
+
+  const collector = msg.createMessageComponentCollector({
+    componentType: ComponentType.Button,
+    filter: (i) => i.user.id === whitePlayer.id || i.user.id === blackPlayer.id,
+    time: 300_000, // 5 min per move
+  });
+
+  const endGame = async (
+    result: "checkmate" | "stalemate" | "draw" | "resign" | "timeout",
+    winnerId?: string,
+  ) => {
+    collector.stop("ended");
+    row.components.forEach((c) => (c as ButtonBuilder).setDisabled(true));
+
+    const loserId = winnerId
+      ? winnerId === whitePlayer.id
+        ? blackPlayer.id
+        : whitePlayer.id
+      : undefined;
+
+    const winnerName = winnerId
+      ? (winnerId === whitePlayer.id ? whitePlayer : blackPlayer).user.username
+      : undefined;
+
+    let description: string;
+    switch (result) {
+      case "checkmate":
+        description = `**checkmate! ${winnerName} wins!**`;
+        embed.setColor(Constants.EMBED_SUCCESS_COLOR);
+        break;
+      case "resign":
+        description = `**${loserId === whitePlayer.id ? whitePlayer.user.username : blackPlayer.user.username} resigned. ${winnerName} wins!**`;
+        embed.setColor(Constants.EMBED_SUCCESS_COLOR);
+        break;
+      case "timeout":
+        description = `**${loserId === whitePlayer.id ? whitePlayer.user.username : blackPlayer.user.username} timed out. ${winnerName} wins!**`;
+        embed.setColor(Constants.EMBED_SUCCESS_COLOR);
+        break;
+      case "stalemate":
+        description = "**stalemate! it's a draw**";
+        embed.setColor("#808080");
+        break;
+      case "draw":
+        description = "**draw!**";
+        embed.setColor("#808080");
+        break;
+    }
+
+    embed.setDescription(
+      `${description}\n\n${whitePlayer.user.username} (white) vs ${blackPlayer.user.username} (black)`,
+    );
+
+    const finalBuffer = await renderBoard(chess, {
+      perspective: winnerId === blackPlayer.id ? "black" : "white",
+      lastMove,
+    });
+
+    await msg
+      .edit({
+        embeds: [embed.setImage("attachment://chess.png")],
+        components: [row],
+        files: [{ attachment: finalBuffer, name: "chess.png" }],
+      })
+      .catch(() => {});
+
+    // Record stats for both players
+    const isDraw = !winnerId;
+    const moveHistory = chess.history();
+    const outcome = `${moveHistory.length} moves`;
+
+    await createGame({
+      userId: whitePlayer.id,
+      game: "chess_duel",
+      result: isDraw ? "draw" : winnerId === whitePlayer.id ? "win" : "lose",
+      bet: 0,
+      outcome,
+    });
+
+    await createGame({
+      userId: blackPlayer.id,
+      game: "chess_duel",
+      result: isDraw ? "draw" : winnerId === blackPlayer.id ? "win" : "lose",
+      bet: 0,
+      outcome,
+    });
+
+    await redis.srem(Constants.redis.nypsi.USERS_PLAYING, whitePlayer.id);
+    await redis.srem(Constants.redis.nypsi.USERS_PLAYING, blackPlayer.id);
+  };
+
+  collector.on("collect", async (interaction) => {
+    if (interaction.customId === "chess-duel-resign") {
+      // Either player can resign
+      if (interaction.user.id !== whitePlayer.id && interaction.user.id !== blackPlayer.id) {
+        await interaction
+          .reply({
+            embeds: [new ErrorEmbed("you are not part of this game")],
+            flags: MessageFlags.Ephemeral,
+          })
+          .catch(() => {});
+        return;
+      }
+
+      const winnerId = interaction.user.id === whitePlayer.id ? blackPlayer.id : whitePlayer.id;
+      await interaction.deferUpdate().catch(() => {});
+      await endGame("resign", winnerId);
+      return;
+    }
+
+    if (interaction.customId === "chess-duel-move") {
+      // Only the active player can move
+      const activePlayer = getActivePlayer();
+
+      if (interaction.user.id !== activePlayer.id) {
+        if (interaction.user.id === whitePlayer.id || interaction.user.id === blackPlayer.id) {
+          await interaction
+            .reply({
+              embeds: [new ErrorEmbed("it's not your turn")],
+              flags: MessageFlags.Ephemeral,
+            })
+            .catch(() => {});
+        } else {
+          await interaction
+            .reply({
+              embeds: [new ErrorEmbed("you are not part of this game")],
+              flags: MessageFlags.Ephemeral,
+            })
+            .catch(() => {});
+        }
+        return;
+      }
+
+      const modalId = `chess-duel-${nanoid()}`;
+
+      const modal = new ModalBuilder()
+        .setCustomId(modalId)
+        .setTitle("enter your move")
+        .addLabelComponents(
+          new LabelBuilder()
+            .setLabel("move")
+            .setTextInputComponent(
+              new TextInputBuilder()
+                .setCustomId("move")
+                .setRequired(true)
+                .setPlaceholder("e.g. e2e4  or  Nf3")
+                .setStyle(TextInputStyle.Short),
+            ),
+        );
+
+      await interaction.showModal(modal);
+
+      const res = await interaction
+        .awaitModalSubmit({
+          time: 300_000,
+          filter: (i) => i.user.id === interaction.user.id && i.customId === modalId,
+        })
+        .catch((): null => null);
+
+      if (!res || !res.isModalSubmit()) return;
+      if (!res.isFromMessage()) return;
+
+      if (collector.ended) {
+        res
+          .reply({
+            embeds: [new ErrorEmbed("this game has already ended")],
+            flags: MessageFlags.Ephemeral,
+          })
+          .catch(() => {});
+        return;
+      }
+
+      const input = res.fields.getTextInputValue("move");
+      const uci = normalizeToUci(input, chess);
+
+      if (!uci) {
+        updateEmbed(
+          `\`${input}\` is not a valid or legal move\n\nyou can use [chess notation](https://www.chess.com/terms/chess-notation) or coordinates (e.g \`e2e4\` - e2 moves to e4)`,
+        );
+        res.update({ embeds: [embed] }).catch(() => msg.edit({ embeds: [embed] }));
+        return;
+      }
+
+      // Apply the move
+      chess.move({
+        from: uci.slice(0, 2),
+        to: uci.slice(2, 4),
+        promotion: uci[4] || undefined,
+      });
+
+      lastMove = { from: uci.slice(0, 2), to: uci.slice(2, 4) };
+      collector.resetTimer();
+
+      // Check game end conditions
+      if (chess.isCheckmate()) {
+        // The player who just moved wins
+        await res.deferUpdate().catch(() => {});
+        await endGame("checkmate", activePlayer.id);
+        return;
+      }
+
+      if (chess.isStalemate()) {
+        await res.deferUpdate().catch(() => {});
+        await endGame("stalemate");
+        return;
+      }
+
+      if (chess.isDraw()) {
+        await res.deferUpdate().catch(() => {});
+        await endGame("draw");
+        return;
+      }
+
+      // Game continues — render for next player
+      buffer = await renderBoard(chess, { perspective: getPerspective(), lastMove });
+      updateEmbed();
+
+      await res
+        .update({
+          embeds: [embed.setImage("attachment://chess.png")],
+          components: [row],
+          files: [{ attachment: buffer, name: "chess.png" }],
+        })
+        .catch(() =>
+          msg.edit({
+            embeds: [embed.setImage("attachment://chess.png")],
+            components: [row],
+            files: [{ attachment: buffer, name: "chess.png" }],
+          }),
+        );
+    }
+  });
+
+  collector.on("end", async (_, reason) => {
+    if (reason === "ended") return; // Already handled
+
+    if (reason === "time") {
+      // The player whose turn it is loses
+      const activePlayer = getActivePlayer();
+      const winnerId = activePlayer.id === whitePlayer.id ? blackPlayer.id : whitePlayer.id;
+      await endGame("timeout", winnerId);
+    } else {
+      // Unknown stop reason — clean up
+      await redis.srem(Constants.redis.nypsi.USERS_PLAYING, whitePlayer.id);
+      await redis.srem(Constants.redis.nypsi.USERS_PLAYING, blackPlayer.id);
+    }
+  });
 }
 
 cmd.setRun(run);
