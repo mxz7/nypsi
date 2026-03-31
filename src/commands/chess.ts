@@ -812,7 +812,7 @@ async function startChessDuel(
 
   const msg =
     message instanceof Message
-      ? await message.channel.send({
+      ? await send({
           embeds: [embed],
           components: [row],
           files: [{ attachment: buffer, name: "chess.png" }],
