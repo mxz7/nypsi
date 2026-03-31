@@ -931,17 +931,6 @@ async function startChessDuel(
 
   collector.on("collect", async (interaction) => {
     if (interaction.customId === "chess-duel-resign") {
-      // Either player can resign
-      if (interaction.user.id !== whitePlayer.id && interaction.user.id !== blackPlayer.id) {
-        await interaction
-          .reply({
-            embeds: [new ErrorEmbed("you are not part of this game")],
-            flags: MessageFlags.Ephemeral,
-          })
-          .catch(() => {});
-        return;
-      }
-
       const winnerId = interaction.user.id === whitePlayer.id ? blackPlayer.id : whitePlayer.id;
       await interaction.deferUpdate().catch(() => {});
       await endGame("resign", winnerId);
@@ -953,21 +942,12 @@ async function startChessDuel(
       const activePlayer = getActivePlayer();
 
       if (interaction.user.id !== activePlayer.id) {
-        if (interaction.user.id === whitePlayer.id || interaction.user.id === blackPlayer.id) {
-          await interaction
-            .reply({
-              embeds: [new ErrorEmbed("it's not your turn")],
-              flags: MessageFlags.Ephemeral,
-            })
-            .catch(() => {});
-        } else {
-          await interaction
-            .reply({
-              embeds: [new ErrorEmbed("you are not part of this game")],
-              flags: MessageFlags.Ephemeral,
-            })
-            .catch(() => {});
-        }
+        await interaction
+          .reply({
+            embeds: [new ErrorEmbed("it's not your turn")],
+            flags: MessageFlags.Ephemeral,
+          })
+          .catch(() => {});
         return;
       }
 
