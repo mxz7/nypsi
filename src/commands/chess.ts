@@ -536,6 +536,8 @@ async function playAgain(
       return null;
     });
 
+  if (!res || !res.isButton()) return;
+
   if (
     (await redis.get(
       `${Constants.redis.nypsi.RESTART}:${(message.client as NypsiClient).cluster.id}`,
@@ -607,6 +609,10 @@ async function playAgain(
   }
 
   logger.debug(`chess: ${message.author.id} starting puzzle (replay): ${puzzle.id}`);
+
+  setTimeout(() => {
+    res.deferUpdate().catch(() => {});
+  }, 2000);
 
   await startChessGame(message, puzzle, send, difficulty, res);
 }
