@@ -80,6 +80,7 @@ jobs:
     needs: [lint, test]
     concurrency: deploy
     runs-on: ubuntu-latest
+    environment: production
 
     steps:
       - name: checkout repository
