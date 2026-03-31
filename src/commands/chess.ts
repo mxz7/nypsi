@@ -216,7 +216,7 @@ async function startChessGame(
     .setImage("attachment://chess.png");
 
   const updateEmbed = (opponentTurn: boolean, error?: string) => {
-    const difficultyLine = difficulty ? `difficulty: \`\n${difficulty}\`` : "";
+    const difficultyLine = difficulty ? `\ndifficulty: \`${difficulty}\`` : "";
 
     const colorTurn = !opponentTurn ? colorName : colorName === "White" ? "Black" : "White";
 
