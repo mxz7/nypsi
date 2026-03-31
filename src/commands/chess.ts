@@ -846,6 +846,19 @@ async function startChessDuel(
     time: 300_000, // 5 min per move
   });
 
+  let turnStartedAt = Date.now();
+
+  const notifyIfSlow = () => {
+    if (Date.now() - turnStartedAt > 30_000 && "send" in msg.channel) {
+      const active = getActivePlayer();
+      msg
+        .reply({ content: `${active} it's your turn` })
+        .then((m: Message) => setTimeout(() => m.delete().catch(() => {}), 30_000))
+        .catch(() => {});
+    }
+    turnStartedAt = Date.now();
+  };
+
   const endGame = async (
     result: "checkmate" | "stalemate" | "draw" | "resign" | "timeout",
     winnerId?: string,
@@ -1010,6 +1023,7 @@ async function startChessDuel(
 
       lastMove = { from: uci.slice(0, 2), to: uci.slice(2, 4) };
       collector.resetTimer();
+      notifyIfSlow();
 
       // Check game end conditions
       if (chess.isCheckmate()) {
