@@ -4,9 +4,11 @@ import {
   ButtonStyle,
   CommandInteraction,
   ComponentType,
+  Interaction,
   LabelBuilder,
   Message,
   MessageActionRowComponentBuilder,
+  MessageComponentInteraction,
   MessageFlags,
   ModalBuilder,
   ModalMessageModalSubmitInteraction,
@@ -15,6 +17,7 @@ import {
 } from "discord.js";
 import { nanoid } from "nanoid";
 import redis from "../init/redis";
+import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
@@ -33,6 +36,8 @@ import {
 import { percentChance } from "../utils/functions/random";
 import sleep from "../utils/functions/sleep";
 import { formatTime } from "../utils/functions/string";
+import { hasAdminPermission } from "../utils/functions/users/admin";
+import { addHourlyCommand } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
 
@@ -101,28 +106,24 @@ async function run(
     }
 
     await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+    await addCooldown(cmd.name, message.member, 10);
 
-    try {
-      await addCooldown(cmd.name, message.member, 10);
+    const puzzle = await getRandomPuzzle({ difficulty: difficulty ?? undefined });
 
-      const puzzle = await getRandomPuzzle({ difficulty: difficulty ?? undefined });
-
-      if (puzzle === "unavailable") {
-        return send({
-          embeds: [
-            new ErrorEmbed(
-              "chess puzzle service is currently unavailable, please try again shortly\nsupport: https://nypsi.xyz/discord",
-            ),
-          ],
-        });
-      }
-
-      logger.debug(`chess: ${message.author.id} starting puzzle: ${puzzle.id}`);
-
-      return await startChessGame(message, puzzle, send, difficulty ?? undefined);
-    } finally {
+    if (puzzle === "unavailable") {
       await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+      return send({
+        embeds: [
+          new ErrorEmbed(
+            "chess puzzle service is currently unavailable, please try again shortly\nsupport: https://nypsi.xyz/discord",
+          ),
+        ],
+      });
     }
+
+    logger.debug(`chess: ${message.author.id} starting puzzle: ${puzzle.id}`);
+
+    return await startChessGame(message, puzzle, send, difficulty ?? undefined);
   } else {
     return send({
       embeds: [
@@ -142,6 +143,7 @@ async function startChessGame(
   puzzle: ChessPuzzle,
   send: SendMessage,
   difficulty?: ChessPuzzleDifficulty,
+  replayInteraction?: MessageComponentInteraction,
 ) {
   const beforeBuild = performance.now();
   const chess = buildChessFromPuzzle(puzzle);
@@ -162,6 +164,8 @@ async function startChessGame(
   const playerColor = chess.turn() as "w" | "b";
   const perspective = playerColor === "w" ? "white" : "black";
   const colorName = playerColor === "w" ? "White" : "Black";
+
+  const solutionDisplay = solution.join(" → ");
 
   // moveIndex tracks the next move in the solution array that the player must input.
   // solution[even] = player move, solution[odd] = opponent auto-reply.
@@ -202,6 +206,10 @@ async function startChessGame(
     new ButtonBuilder().setCustomId("chess-end").setLabel("resign").setStyle(ButtonStyle.Danger),
   );
 
+  const replayRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+    new ButtonBuilder().setLabel("play again").setStyle(ButtonStyle.Success).setCustomId("rp"),
+  );
+
   let msg: Message;
 
   const sendOpts = {
@@ -210,7 +218,12 @@ async function startChessGame(
     files: [{ attachment: buffer, name: "chess.png" }],
   };
 
-  if (message instanceof Message) {
+  if (replayInteraction) {
+    msg = await replayInteraction
+      .update(sendOpts)
+      .then((r) => r.fetch())
+      .catch(() => replayInteraction.message.edit(sendOpts));
+  } else if (message instanceof Message) {
     msg = await message.channel.send(sendOpts);
   } else {
     msg = await message
@@ -242,16 +255,17 @@ async function startChessGame(
 
     const buffer = await renderBoard(chess, { perspective, lastMove });
     row.components.forEach((c) => (c as ButtonBuilder).setDisabled(true));
+
     await res
       .update({
         embeds: [embed.setImage("attachment://chess.png")],
-        components: [row],
+        components: [row, replayRow],
         files: [{ attachment: buffer, name: "chess.png" }],
       })
       .catch(() =>
         msg.edit({
           embeds: [embed.setImage("attachment://chess.png")],
-          components: [row],
+          components: [row, replayRow],
           files: [{ attachment: buffer, name: "chess.png" }],
         }),
       );
@@ -259,10 +273,18 @@ async function startChessGame(
 
   collector.on("collect", async (interaction) => {
     if (interaction.customId === "chess-end") {
-      if (difficulty || percentChance(80)) {
-        await interaction.deferUpdate();
-      } else {
-        await interaction.reply({
+      row.components.forEach((c) => (c as ButtonBuilder).setDisabled(true));
+      embed
+        .setDescription(`**game ended**\n\nsolution: \`${solutionDisplay}\``)
+        .setColor(Constants.EMBED_FAIL_COLOR)
+        .setFooter(null);
+
+      await interaction
+        .update({ embeds: [embed], components: [row, replayRow] })
+        .catch(() => msg.edit({ embeds: [embed], components: [row, replayRow] }));
+
+      if (difficulty && percentChance(20)) {
+        interaction.followUp({
           flags: MessageFlags.Ephemeral,
           embeds: [
             new CustomEmbed(
@@ -284,7 +306,7 @@ async function startChessGame(
       if (hintIdx !== -1) row.components.splice(hintIdx, 1);
 
       const expectedFrom = solution[moveIndex].slice(0, 2);
-      updateEmbed(false, `the piece to move is on **${expectedFrom}**`);
+      updateEmbed(false, `the piece to move is on ${expectedFrom}`);
       await interaction.update({ embeds: [embed], components: [row] });
 
       return;
@@ -353,7 +375,22 @@ async function startChessGame(
       wrongMoves++;
 
       updateEmbed(false, `that's not the best move (\`${wrongMoves}/3\`)`);
-      res.update({ embeds: [embed] }).catch(() => msg.edit({ embeds: [embed] }));
+
+      if (wrongMoves >= 3) {
+        row.components.forEach((c) => (c as ButtonBuilder).setDisabled(true));
+        embed
+          .setDescription(`**failed (3 wrong moves)**\n\nsolution: \`${solutionDisplay}\``)
+          .setColor(Constants.EMBED_FAIL_COLOR)
+          .setFooter(null);
+
+        res
+          .update({ embeds: [embed] })
+          .catch(() => msg.edit({ embeds: [embed], components: [row, replayRow] }));
+      } else {
+        res
+          .update({ embeds: [embed] })
+          .catch(() => msg.edit({ embeds: [embed], components: [row] }));
+      }
 
       if (wrongMoves >= 3) {
         return collector.stop("strikes");
@@ -430,34 +467,117 @@ async function startChessGame(
   });
 
   collector.on("end", async (_, reason) => {
-    row.components.forEach((c) => (c as ButtonBuilder).setDisabled(true));
-
-    if (reason === "win") return; // already handled above
+    await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+    if (reason === "win") {
+      await playAgain(msg, message, send, difficulty);
+      return;
+    }
 
     await addChessFail(message.author.id);
 
-    const solutionDisplay = solution.join(" → ");
-
-    if (reason === "cancelled") {
-      embed
-        .setDescription(`**game ended**\n\nsolution: \`${solutionDisplay}\``)
-        .setColor(Constants.EMBED_FAIL_COLOR)
-        .setFooter(null);
-    } else if (reason === "strikes") {
-      embed
-        .setDescription(`**failed (3 wrong moves)**\n\nsolution: \`${solutionDisplay}\``)
-        .setColor(Constants.EMBED_FAIL_COLOR)
-        .setFooter(null);
-    } else {
-      // time
+    if (reason === "time") {
+      row.components.forEach((c) => (c as ButtonBuilder).setDisabled(true));
       embed
         .setDescription(`**out of time**\n\nsolution: \`${solutionDisplay}\``)
         .setColor(Constants.EMBED_FAIL_COLOR)
         .setFooter(null);
+
+      msg.edit({ embeds: [embed], components: [row, replayRow] }).catch(() => {});
     }
 
-    await msg.edit({ embeds: [embed], components: [row] }).catch(() => {});
+    await playAgain(msg, message, send, difficulty);
   });
+}
+
+async function playAgain(
+  msg: Message,
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
+  difficulty?: ChessPuzzleDifficulty,
+) {
+  const res = await msg
+    .awaitMessageComponent({
+      filter: (i: Interaction) => i.user.id === message.author.id,
+      time: 30_000,
+    })
+    .catch((): null => {
+      msg.edit({ components: [] }).catch(() => {});
+      return null;
+    });
+
+  if (
+    (await redis.get(
+      `${Constants.redis.nypsi.RESTART}:${(message.client as NypsiClient).cluster.id}`,
+    )) === "t"
+  ) {
+    if (message.author.id === Constants.OWNER_ID && message instanceof Message) {
+      message.react("💀");
+    } else {
+      await res
+        .update({
+          embeds: [
+            new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes"),
+          ],
+          components: [],
+        })
+        .catch(() => {});
+      await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+      return;
+    }
+  }
+
+  if (await redis.get("nypsi:maintenance")) {
+    if (
+      (await hasAdminPermission(message.member, "bypass-maintenance")) &&
+      message instanceof Message
+    ) {
+      message.react("💀");
+    } else {
+      await res
+        .update({
+          embeds: [
+            new CustomEmbed(
+              message.member,
+              "fun & moderation commands are still available to you. maintenance mode only prevents certain commands to prevent loss of progress",
+            ).setTitle("⚠️ nypsi is under maintenance"),
+          ],
+          components: [],
+        })
+        .catch(() => {});
+      await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+      return;
+    }
+  }
+
+  addHourlyCommand(message.member);
+  await addCooldown(cmd.name, message.member, 10);
+  redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+
+  logger.info(
+    `::cmd ${message.guild.id} ${message.channelId} ${message.author.username}: replaying chess`,
+    { userId: message.author.id, guildId: message.guildId, channelId: message.channelId },
+  );
+
+  const puzzle = await getRandomPuzzle({ difficulty: difficulty ?? undefined });
+
+  if (puzzle === "unavailable") {
+    await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+    await res
+      .update({
+        embeds: [
+          new ErrorEmbed(
+            "chess puzzle service is currently unavailable, please try again shortly\nsupport: https://nypsi.xyz/discord",
+          ),
+        ],
+        components: [],
+      })
+      .catch(() => {});
+    return;
+  }
+
+  logger.debug(`chess: ${message.author.id} starting puzzle (replay): ${puzzle.id}`);
+
+  await startChessGame(message, puzzle, send, difficulty, res);
 }
 
 function parsePuzzleDifficulty(value?: string): ChessPuzzleDifficulty | null {
