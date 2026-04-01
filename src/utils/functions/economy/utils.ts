@@ -29,11 +29,7 @@ import { getAllGroupAccountIds } from "../moderation/alts";
 import { pluralize } from "../string";
 import { isUserBlacklisted } from "../users/blacklist";
 import { isMarried } from "../users/marriage";
-import {
-  addInlineNotification,
-  addNotificationToQueue,
-  getDmSettings,
-} from "../users/notifications";
+import { addInlineNotification } from "../users/notifications";
 import { getLastKnownAvatar, getLastKnownUsername } from "../users/username";
 import { createProfile, hasProfile } from "../users/utils";
 import { setProgress } from "./achievements";
@@ -786,10 +782,7 @@ export async function doDaily(
     if (lastDaily && dayjs(lastDaily).isAfter(today)) {
       marriageBonus = true;
 
-      const [marriageStreak, marriageDmSettings] = await Promise.all([
-        getDailyStreak(marriage.partnerId),
-        getDmSettings(marriage.partnerId),
-      ]);
+      const marriageStreak = await getDailyStreak(marriage.partnerId);
 
       const marriageMoney = getDailyMoney(marriageStreak);
       const marriageXp = getDailyXp(marriageStreak);
@@ -810,17 +803,10 @@ export async function doDaily(
           `\n+ **1** ${items["daily_scratch_card"].emoji} ${pluralize(items["daily_scratch_card"], amount)}`,
       );
 
-      if (marriageDmSettings.other) {
-        addNotificationToQueue({
-          memberId: marriage.partnerId,
-          payload: { embed },
-        });
-      } else {
-        addInlineNotification({
-          memberId: marriage.partnerId,
-          embed,
-        });
-      }
+      addInlineNotification({
+        memberId: marriage.partnerId,
+        embed,
+      });
 
       // should only get 1 from /daily
       totalCards = 2;
