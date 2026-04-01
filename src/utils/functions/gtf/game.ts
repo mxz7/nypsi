@@ -20,6 +20,7 @@ import prisma from "../../../init/database";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../models/Command";
 import { CustomEmbed, ErrorEmbed, getColor } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
+import { logger } from "../../logger";
 import { MStoTime } from "../date";
 import { addProgress } from "../economy/achievements";
 import { addTaskProgress } from "../economy/tasks";
@@ -51,6 +52,10 @@ export async function startGTFGame(
   const embed = new CustomEmbed(message.member, "guess the country of the flag below")
     .setHeader(`${message.author.username}'s guess the flag game`, message.author.avatarURL())
     .setImage(country.flags.png);
+
+  logger.debug(
+    `gtf: starting game with country ${country.name.common} (${country.cca2}) for ${message.author.id} embed image: ${embed.data.image?.url}`,
+  );
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder().setLabel("guess").setCustomId("gtf-guess").setStyle(ButtonStyle.Primary),
