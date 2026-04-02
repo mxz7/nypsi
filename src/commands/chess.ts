@@ -38,6 +38,7 @@ import {
 import { createGame, getGambleStats, getGameWins } from "../utils/functions/economy/stats";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getMember } from "../utils/functions/member";
+import { getUserPlaying, removeUserPlaying, setUserPlaying } from "../utils/functions/playing";
 import { percentChance } from "../utils/functions/random";
 import sleep from "../utils/functions/sleep";
 import { escapeFormattingCharacters, formatTime } from "../utils/functions/string";
@@ -129,19 +130,20 @@ async function run(
       });
     }
 
-    if (await redis.sismember(Constants.redis.nypsi.USERS_PLAYING, message.author.id)) {
+    const currentGame = await getUserPlaying(message.author.id);
+    if (currentGame) {
       return send({
-        embeds: [new ErrorEmbed("you have an active game")],
+        embeds: [new ErrorEmbed(`you are already playing ${currentGame}`)],
       });
     }
 
-    await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+    await setUserPlaying(message.author.id, "chess");
     await addCooldown(cmd.name, message.member, 10);
 
     const puzzle = await getRandomPuzzle({ difficulty: difficulty ?? undefined });
 
     if (puzzle === "unavailable") {
-      await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+      await removeUserPlaying(message.author.id);
       return send({
         embeds: [
           new ErrorEmbed(
@@ -498,7 +500,7 @@ async function startChessGame(
   });
 
   collector.on("end", async (_, reason) => {
-    await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+    await removeUserPlaying(message.author.id);
     if (reason === "win") {
       await playAgain(msg, message, send, difficulty);
       return;
@@ -554,7 +556,7 @@ async function playAgain(
           components: [],
         })
         .catch(() => {});
-      await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+      await removeUserPlaying(message.author.id);
       return;
     }
   }
@@ -577,14 +579,14 @@ async function playAgain(
           components: [],
         })
         .catch(() => {});
-      await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+      await removeUserPlaying(message.author.id);
       return;
     }
   }
 
   addHourlyCommand(message.member);
   await addCooldown(cmd.name, message.member, 10);
-  redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+  setUserPlaying(message.author.id, "chess");
 
   logger.info(
     `::cmd ${message.guild.id} ${message.channelId} ${message.author.username}: replaying chess`,
@@ -594,7 +596,7 @@ async function playAgain(
   const puzzle = await getRandomPuzzle({ difficulty: difficulty ?? undefined });
 
   if (puzzle === "unavailable") {
-    await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+    await removeUserPlaying(message.author.id);
     await res
       .update({
         embeds: [
@@ -685,12 +687,14 @@ async function handleDuel(
     });
   }
 
-  if (await redis.sismember(Constants.redis.nypsi.USERS_PLAYING, message.author.id)) {
-    return send({ embeds: [new ErrorEmbed("you have an active game")] });
+  const authorGame = await getUserPlaying(message.author.id);
+  if (authorGame) {
+    return send({ embeds: [new ErrorEmbed(`you are already playing ${authorGame}`)] });
   }
 
-  if (await redis.sismember(Constants.redis.nypsi.USERS_PLAYING, target.user.id)) {
-    return send({ embeds: [new ErrorEmbed("they have an active game")] });
+  const targetGame = await getUserPlaying(target.user.id);
+  if (targetGame) {
+    return send({ embeds: [new ErrorEmbed(`they are already playing ${targetGame}`)] });
   }
 
   if (duelRequests.has(message.author.id)) {
@@ -745,21 +749,22 @@ async function handleDuel(
   }
 
   // Re-check playing state after accept
-  if (await redis.sismember(Constants.redis.nypsi.USERS_PLAYING, message.author.id)) {
-    embed.setDescription("the challenger has started another game");
+  const recheckAuthorGame = await getUserPlaying(message.author.id);
+  if (recheckAuthorGame) {
+    embed.setDescription(`the challenger has started another game (${recheckAuthorGame})`);
     await m.edit({ embeds: [embed], components: [] }).catch(() => {});
     return;
   }
-  if (await redis.sismember(Constants.redis.nypsi.USERS_PLAYING, target.user.id)) {
-    embed.setDescription("you have started another game");
+  const recheckTargetGame = await getUserPlaying(target.user.id);
+  if (recheckTargetGame) {
+    embed.setDescription(`you have started another game (${recheckTargetGame})`);
     await m.edit({ embeds: [embed], components: [] }).catch(() => {});
     return;
   }
 
   await m.delete().catch(() => {});
 
-  await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
-  await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, target.user.id);
+  await setUserPlaying(message.channelId, "chess duel");
 
   // Randomly assign colors
   const whitePlayer = Math.random() < 0.5 ? message.member : target;
@@ -938,8 +943,7 @@ async function startChessDuel(
       outcome,
     });
 
-    await redis.srem(Constants.redis.nypsi.USERS_PLAYING, whitePlayer.id);
-    await redis.srem(Constants.redis.nypsi.USERS_PLAYING, blackPlayer.id);
+    await removeUserPlaying(message.channelId);
   };
 
   collector.on("collect", async (interaction) => {
@@ -1066,6 +1070,7 @@ async function startChessDuel(
   });
 
   collector.on("end", async (_, reason) => {
+    await removeUserPlaying(message.channelId);
     if (reason === "ended") return; // Already handled
 
     if (reason === "time") {
@@ -1073,10 +1078,6 @@ async function startChessDuel(
       const activePlayer = getActivePlayer();
       const winnerId = activePlayer.id === whitePlayer.id ? blackPlayer.id : whitePlayer.id;
       await endGame("timeout", winnerId);
-    } else {
-      // Unknown stop reason — clean up
-      await redis.srem(Constants.redis.nypsi.USERS_PLAYING, whitePlayer.id);
-      await redis.srem(Constants.redis.nypsi.USERS_PLAYING, blackPlayer.id);
     }
   });
 }

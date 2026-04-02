@@ -40,6 +40,7 @@ import {
   userExists,
 } from "../utils/functions/economy/utils.js";
 import { addXp, calcEarnedGambleXp } from "../utils/functions/economy/xp.js";
+import { getUserPlaying, removeUserPlaying, setUserPlaying } from "../utils/functions/playing.js";
 import { getTier, isPremium } from "../utils/functions/premium/premium.js";
 import { percentChance, shuffle } from "../utils/functions/random.js";
 import { escapeFormattingCharacters } from "../utils/functions/string.js";
@@ -189,15 +190,19 @@ async function prepareGame(
     }
   }
 
-  if (await redis.sismember(Constants.redis.nypsi.USERS_PLAYING, message.author.id)) {
+  const currentGame = await getUserPlaying(message.author.id);
+  if (currentGame) {
     if (msg) {
-      return msg.edit({ embeds: [new ErrorEmbed("you have an active game")], components: [] });
+      return msg.edit({
+        embeds: [new ErrorEmbed(`you are already playing ${currentGame}`)],
+        components: [],
+      });
     }
-    return send({ embeds: [new ErrorEmbed("you have an active game")] });
+    return send({ embeds: [new ErrorEmbed(`you are already playing ${currentGame}`)] });
   }
 
   await addCooldown(cmd.name, message.member, 5);
-  await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+  await setUserPlaying(message.author.id, "highlow");
   await removeBalance(message.member, bet);
 
   const id = Math.random();
@@ -273,7 +278,7 @@ async function prepareGame(
       if (games.get(message.author.id).id == id) {
         const game = games.get(message.author.id);
         games.delete(message.author.id);
-        redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+        removeUserPlaying(message.author.id);
         logger.warn("highlow still in playing state after 5 minutes - deleting key", game);
       }
     }
@@ -313,7 +318,7 @@ async function prepareGame(
       `error occurred playing highlow - ${message.author.id} (${message.author.username})`,
     );
     logger.error("highlow error", e);
-    redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+    removeUserPlaying(message.author.id);
     return send({
       embeds: [new ErrorEmbed("an error occurred while running - join support server")],
     });
@@ -378,7 +383,7 @@ async function playGame(
   };
 
   const replay = async (embed: CustomEmbed, interaction: ButtonInteraction) => {
-    await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+    await removeUserPlaying(message.author.id);
     if (
       !(await isPremium(message.member)) ||
       !((await getTier(message.member)) >= 2) ||
@@ -621,7 +626,7 @@ async function playGame(
       logger.warn("hl error", e);
       fail = true;
       games.delete(message.author.id);
-      redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+      removeUserPlaying(message.author.id);
       message.channel.send({ content: message.author.toString() + " highlow game expired" });
     });
 
@@ -782,7 +787,7 @@ async function playGame(
     }
   } else {
     games.delete(message.author.id);
-    redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+    removeUserPlaying(message.author.id);
     m.reactions.removeAll();
     return;
   }

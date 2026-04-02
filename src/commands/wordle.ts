@@ -7,12 +7,12 @@ import {
   MessageEditOptions,
   MessageFlags,
 } from "discord.js";
-import redis from "../init/redis";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { addKarma } from "../utils/functions/karma/karma";
+import { getUserPlaying, removeUserPlaying, setUserPlaying } from "../utils/functions/playing";
 import { formatTime } from "../utils/functions/string";
 import { getPreferences } from "../utils/functions/users/notifications";
 import { getLastKnownAvatar, getLastKnownUsername } from "../utils/functions/users/username";
@@ -61,8 +61,9 @@ async function run(
     return send({ embeds: [new ErrorEmbed("you are already playing wordle")] });
   }
 
-  if (await redis.sismember(Constants.redis.nypsi.USERS_PLAYING, message.author.id)) {
-    return send({ embeds: [new ErrorEmbed("you have an active game")] });
+  const currentGame = await getUserPlaying(message.author.id);
+  if (currentGame) {
+    return send({ embeds: [new ErrorEmbed(`you are already playing ${currentGame}`)] });
   }
 
   const prefix = (await getPrefix(message.guild))[0];
@@ -144,7 +145,7 @@ async function run(
     }
 
     await addCooldown(cmd.name, message.member, 15);
-    await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+    await setUserPlaying(message.author.id, "wordle");
 
     const board = createBoard();
     const word = await generateWord();
@@ -196,14 +197,14 @@ async function play(
   const edit = async (data: MessageEditOptions) => {
     if (!(message instanceof Message)) {
       await message.editReply(data as InteractionEditReplyOptions).catch(() => {
-        redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+        removeUserPlaying(message.author.id);
         games.delete(message.author.id);
         return;
       });
       return await message.fetchReply();
     } else {
       return await m.edit(data).catch(() => {
-        redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+        removeUserPlaying(message.author.id);
         games.delete(message.author.id);
         return;
       });
@@ -225,7 +226,7 @@ async function play(
       fail = true;
       cancel(message, m);
       games.delete(message.author.id);
-      redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+      removeUserPlaying(message.author.id);
       message.channel.send({ content: `${message.author.toString()} wordle game expired` });
     });
 
@@ -282,7 +283,7 @@ async function play(
       fail = true;
     });
     if (fail) {
-      redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+      removeUserPlaying(message.author.id);
       games.delete(message.author.id);
       return;
     }
@@ -316,7 +317,7 @@ async function cancel(message: Message | (NypsiCommandInteraction & CommandInter
   embed.setColor(Constants.EMBED_FAIL_COLOR);
   embed.setFooter(null);
 
-  redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+  removeUserPlaying(message.author.id);
   games.delete(message.author.id);
 
   if (!message.member) {
@@ -364,7 +365,7 @@ async function win(message: Message | (NypsiCommandInteraction & CommandInteract
   });
 
   edit({ embeds: [embed] });
-  redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+  removeUserPlaying(message.author.id);
   games.delete(message.author.id);
 
   if (!karmaCooldown.has(message.author.id)) {
@@ -396,7 +397,7 @@ async function lose(message: Message | (NypsiCommandInteraction & CommandInterac
   embed.setColor(Constants.EMBED_FAIL_COLOR);
   embed.setFooter(null);
 
-  redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+  removeUserPlaying(message.author.id);
   games.delete(message.author.id);
 
   if (!message.member) {

@@ -42,6 +42,7 @@ import {
   userExists,
 } from "../utils/functions/economy/utils.js";
 import { addXp, calcEarnedGambleXp } from "../utils/functions/economy/xp";
+import { getUserPlaying, removeUserPlaying, setUserPlaying } from "../utils/functions/playing";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { percentChance, shuffle } from "../utils/functions/random";
 import sleep from "../utils/functions/sleep";
@@ -180,15 +181,19 @@ async function prepareGame(
     }
   }
 
-  if (await redis.sismember(Constants.redis.nypsi.USERS_PLAYING, message.author.id)) {
+  const currentGame = await getUserPlaying(message.author.id);
+  if (currentGame) {
     if (msg) {
-      return msg.edit({ embeds: [new ErrorEmbed("you have an active game")], components: [] });
+      return msg.edit({
+        embeds: [new ErrorEmbed(`you are already playing ${currentGame}`)],
+        components: [],
+      });
     }
-    return send({ embeds: [new ErrorEmbed("you have an active game")] });
+    return send({ embeds: [new ErrorEmbed(`you are already playing ${currentGame}`)] });
   }
 
   await addCooldown(cmd.name, message.member, 5);
-  await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+  await setUserPlaying(message.author.id, "blackjack");
   await removeBalance(message.member, bet);
 
   const id = Math.random();
@@ -264,7 +269,7 @@ async function prepareGame(
         `blackjack: ${message.author.id} still in playing state after 5 minutes - deleting key`,
         game,
       );
-      redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+      removeUserPlaying(message.author.id);
     }
   }, ms("5 minutes"));
 
@@ -418,7 +423,7 @@ async function playGame(
   };
 
   const replay = async (embed: CustomEmbed, interaction: ButtonInteraction, retry = false) => {
-    await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+    await removeUserPlaying(message.author.id);
     if (
       !(await isPremium(message.member)) ||
       !((await getTier(message.member)) >= 2) ||
@@ -744,7 +749,7 @@ async function playGame(
         logger.warn(`blackjack: ${message.author.id} interaction error`, e);
         fail = true;
         game.state = "end";
-        redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+        removeUserPlaying(message.author.id);
         message.channel.send({ content: message.author.toString() + " blackjack game expired" });
       });
 

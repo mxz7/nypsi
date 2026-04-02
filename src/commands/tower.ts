@@ -42,6 +42,7 @@ import {
   userExists,
 } from "../utils/functions/economy/utils";
 import { addXp, calcEarnedGambleXp } from "../utils/functions/economy/xp";
+import { getUserPlaying, removeUserPlaying, setUserPlaying } from "../utils/functions/playing";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { percentChance } from "../utils/functions/random";
 import { escapeFormattingCharacters } from "../utils/functions/string";
@@ -174,11 +175,15 @@ async function prepareGame(
   if (games.has(message.author.id))
     return send({ embeds: [new ErrorEmbed("you are already playing dragon tower")] });
 
-  if (await redis.sismember(Constants.redis.nypsi.USERS_PLAYING, message.author.id)) {
+  const currentGame = await getUserPlaying(message.author.id);
+  if (currentGame) {
     if (msg) {
-      return msg.edit({ embeds: [new ErrorEmbed("you have an active game")], components: [] });
+      return msg.edit({
+        embeds: [new ErrorEmbed(`you are already playing ${currentGame}`)],
+        components: [],
+      });
     }
-    return send({ embeds: [new ErrorEmbed("you have an active game")] });
+    return send({ embeds: [new ErrorEmbed(`you are already playing ${currentGame}`)] });
   }
   const maxBet = await calcMaxBet(message.member);
 
@@ -258,7 +263,7 @@ async function prepareGame(
 
   await addCooldown(cmd.name, message.member, 5);
 
-  await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+  await setUserPlaying(message.author.id, "dragon tower");
   await removeBalance(message.member, bet);
 
   const board = createBoard(chosenDifficulty);
@@ -296,7 +301,7 @@ async function prepareGame(
       if (games.get(message.author.id).gameId == gameId) {
         const game = games.get(message.author.id);
         games.delete(message.author.id);
-        redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+        removeUserPlaying(message.author.id);
         logger.warn("tower still in playing state after 5 minutes - deleting key", game);
       }
     }
@@ -314,7 +319,7 @@ async function prepareGame(
     );
     logger.error("tower error", e);
     console.trace();
-    redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+    removeUserPlaying(message.author.id);
     send({
       embeds: [new ErrorEmbed("an error occurred while running - join support server")],
     });
@@ -462,7 +467,7 @@ async function playGame(
   };
 
   const replay = async (embed: CustomEmbed, interaction: ButtonInteraction, update = true) => {
-    await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+    await removeUserPlaying(message.author.id);
 
     const components = createRows(board, true);
 
@@ -851,7 +856,7 @@ async function playGame(
       logger.warn("tower error", e);
       fail = true;
       games.delete(message.author.id);
-      redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+      removeUserPlaying(message.author.id);
       message.channel.send({ content: message.author.toString() + " tower game expired" });
     });
 

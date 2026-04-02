@@ -46,6 +46,7 @@ import {
   userExists,
 } from "../utils/functions/economy/utils.js";
 import { addXp, calcEarnedGambleXp } from "../utils/functions/economy/xp.js";
+import { getUserPlaying, removeUserPlaying, setUserPlaying } from "../utils/functions/playing.js";
 import { getTier, isPremium } from "../utils/functions/premium/premium.js";
 import { percentChance } from "../utils/functions/random.js";
 import { escapeFormattingCharacters } from "../utils/functions/string.js";
@@ -151,11 +152,15 @@ async function prepareGame(
 ) {
   recentCommands.set(message.author.id, Date.now());
 
-  if (await redis.sismember(Constants.redis.nypsi.USERS_PLAYING, message.author.id)) {
+  const currentGame = await getUserPlaying(message.author.id);
+  if (currentGame) {
     if (msg) {
-      return msg.edit({ embeds: [new ErrorEmbed("you have an active game")], components: [] });
+      return msg.edit({
+        embeds: [new ErrorEmbed(`you are already playing ${currentGame}`)],
+        components: [],
+      });
     }
-    return send({ embeds: [new ErrorEmbed("you have an active game")] });
+    return send({ embeds: [new ErrorEmbed(`you are already playing ${currentGame}`)] });
   }
 
   const [maxBet, defaultBet] = await Promise.all([
@@ -247,7 +252,7 @@ async function prepareGame(
 
   await addCooldown(cmd.name, message.member, 5);
 
-  await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+  await setUserPlaying(message.author.id, "mines");
 
   await removeBalance(message.member, bet);
 
@@ -379,7 +384,7 @@ async function prepareGame(
       `error occurred playing mines - ${message.author.id} (${message.author.username})`,
     );
     console.error(e);
-    redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+    removeUserPlaying(message.author.id);
     return send({
       embeds: [new ErrorEmbed("an error occurred while running - join support server")],
     });
@@ -510,7 +515,7 @@ async function playGame(
   };
 
   const replay = async (embed: CustomEmbed, interaction: ButtonInteraction, update = true) => {
-    await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+    await removeUserPlaying(message.author.id);
 
     if (
       percentChance(0.05) &&
@@ -773,7 +778,7 @@ async function playGame(
     .catch((e) => {
       logger.warn(`mines: ${message.author.id} interaction error`, e);
       fail = true;
-      redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+      removeUserPlaying(message.author.id);
       message.channel.send({ content: message.author.toString() + " mines game expired" });
     });
 

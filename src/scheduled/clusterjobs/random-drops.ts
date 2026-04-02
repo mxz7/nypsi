@@ -33,6 +33,7 @@ import {
   userExists,
 } from "../../utils/functions/economy/utils";
 import { getPrefix } from "../../utils/functions/guilds/utils";
+import { removeUserPlaying, setUserPlaying } from "../../utils/functions/playing";
 import { percentChance, shuffle } from "../../utils/functions/random";
 import sleep from "../../utils/functions/sleep";
 import { escapeFormattingCharacters, getZeroWidth } from "../../utils/functions/string";
@@ -729,7 +730,7 @@ export async function startLootRain(channel: GuildTextBasedChannel, user: User) 
   logger.info(`starting loot rain in ${channel.id}`);
   if (await redis.exists(`nypsi:lootrain:channel:${channel.id}`)) return;
   await redis.set(`nypsi:lootrain:channel:${channel.id}`, "meow", "EX", length * 2);
-  await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, channel.id);
+  await setUserPlaying(channel.id, "loot rain");
 
   let active = true;
 
@@ -747,7 +748,7 @@ export async function startLootRain(channel: GuildTextBasedChannel, user: User) 
   setTimeout(() => {
     active = false;
     redis.del(`nypsi:lootrain:channel:${channel.id}`);
-    redis.srem(Constants.redis.nypsi.USERS_PLAYING, channel.id);
+    removeUserPlaying(channel.id);
     logger.info(`${channel.id} loot rain has ended`);
   }, length * 1000);
 

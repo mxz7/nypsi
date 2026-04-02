@@ -13,6 +13,7 @@ import { Item } from "../../../types/Economy";
 import { LootPoolResult } from "../../../types/LootPool";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
+import { removeUserPlaying } from "../playing";
 import { percentChance, shuffle } from "../random";
 import { addProgress } from "./achievements";
 import { addEventProgress, EventData, formatEventProgress, getCurrentEvent } from "./events";
@@ -46,7 +47,7 @@ export default class ScratchCard {
 
     setTimeout(() => {
       if (this.state === "playing") {
-        redis.srem(Constants.redis.nypsi.USERS_PLAYING, member.user.id);
+        removeUserPlaying(member.user.id);
         logger.warn("scratch still in playing state after 7 minutes - deleting key", this);
       }
     }, ms("7 minutes"));

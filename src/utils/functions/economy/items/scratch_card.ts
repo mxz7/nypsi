@@ -21,6 +21,7 @@ import { addHourlyCommand } from "../../../handlers/commandhandler";
 import { getTimestamp, logger } from "../../../logger";
 import { a } from "../../anticheat";
 import { giveCaptcha, isLockedOut, verifyUser } from "../../captcha";
+import { getUserPlaying, removeUserPlaying, setUserPlaying } from "../../playing";
 import { percentChance } from "../../random";
 import { escapeFormattingCharacters, pluralize } from "../../string";
 import { hasAdminPermission } from "../../users/admin";
@@ -57,9 +58,10 @@ async function prepare(
     }
   };
 
-  if (await redis.sismember(Constants.redis.nypsi.USERS_PLAYING, message.author.id)) {
+  const currentGame = await getUserPlaying(message.author.id);
+  if (currentGame) {
     return send({
-      embeds: [new ErrorEmbed("you have an active game")],
+      embeds: [new ErrorEmbed(`you are already playing ${currentGame}`)],
       flags: MessageFlags.Ephemeral,
     });
   }
@@ -84,7 +86,7 @@ async function prepare(
   await removeInventoryItem(message.member, selected.id, 1);
   await addStat(message.member, selected.id);
 
-  await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+  await setUserPlaying(message.author.id, selected.name.toLowerCase());
 
   const card = await new ScratchCard(message.member, selected).setArea();
 
@@ -100,7 +102,7 @@ async function prepare(
     let fail = false;
 
     if (card.remainingClicks <= 0) {
-      await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+      await removeUserPlaying(message.author.id);
       inventory = await getInventory(message.member);
       const buttons = card.getButtons(true);
       card.state = "finished";
@@ -166,7 +168,7 @@ async function prepare(
           })
           .catch(() => {
             fail = true;
-            redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+            removeUserPlaying(message.author.id);
             msg.edit({ components: card.getButtons(true) });
           });
 
@@ -241,7 +243,7 @@ async function prepare(
       })
       .catch(() => {
         fail = true;
-        redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+        removeUserPlaying(message.author.id);
         message.channel.send({ content: message.author.toString() + " scratch card expired" });
       });
 
@@ -250,7 +252,7 @@ async function prepare(
     if (!response || !response.isButton()) return;
 
     await card.clicked(response).catch((e: any) => {
-      redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+      removeUserPlaying(message.author.id);
       logger.error("scratch card weird error !", { card, interactionId: response.customId });
       console.error(e);
       logger.error("follow up", e);
@@ -271,7 +273,7 @@ async function prepare(
         await msg
           .edit({ embeds: [embed], components: card.getButtons(card.remainingClicks == 0) })
           .catch(() => {
-            redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+            removeUserPlaying(message.author.id);
           });
       else
         await response
@@ -283,7 +285,7 @@ async function prepare(
             msg
               .edit({ embeds: [embed], components: card.getButtons(card.remainingClicks == 0) })
               .catch(() => {
-                redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+                removeUserPlaying(message.author.id);
               }),
           );
     }
