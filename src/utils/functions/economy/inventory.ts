@@ -16,7 +16,11 @@ import { percentChance } from "../random";
 import sleep from "../sleep";
 import { pluralize } from "../string";
 import { getTax } from "../tax";
-import { addNotificationToQueue, getDmSettings } from "../users/notifications";
+import {
+  addInlineNotification,
+  addNotificationToQueue,
+  getDmSettings,
+} from "../users/notifications";
 import { addProgress } from "./achievements";
 import { addBalance, getSellMulti } from "./balance";
 import {
@@ -682,6 +686,11 @@ export async function gemBreak(
       payload: {
         embed: embed,
       },
+    });
+  } else if (sendMessage) {
+    addInlineNotification({
+      memberId: userId,
+      embed,
     });
   }
 
