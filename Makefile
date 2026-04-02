@@ -1,4 +1,4 @@
-.PHONY: build watch run dev clean
+.PHONY: build watch run dev clean check
 
 build:
 	npx tsc --incremental
@@ -19,3 +19,8 @@ dev: build
 	trap 'kill 0' EXIT; \
 	$(MAKE) watch & \
 	$(MAKE) run
+
+check:
+	pnpm lint
+	pnpm format:check
+	$(MAKE) build
