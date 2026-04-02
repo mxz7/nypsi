@@ -30,7 +30,6 @@ import {
 import { hasVoted } from "./vote";
 import { calcWorkerValues } from "./workers";
 import ms = require("ms");
-import _ = require("lodash");
 import pAll = require("p-all");
 
 export async function getBalance(member: MemberResolvable) {
@@ -937,7 +936,7 @@ export async function calcNetWorth(
         } else {
           let totalCost = 0;
 
-          let baseCost = _.clone(baseUpgrades[upgrade.upgradeId]).base_cost;
+          let baseCost = { ...baseUpgrades[upgrade.upgradeId] }.base_cost;
 
           baseCost =
             baseCost *

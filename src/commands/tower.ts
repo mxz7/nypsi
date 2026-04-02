@@ -51,7 +51,6 @@ import { recentCommands } from "../utils/functions/users/commands";
 import { addHourlyCommand } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { gamble, getTimestamp, logger } from "../utils/logger";
-import _ = require("lodash");
 import ms = require("ms");
 
 const cmd = new Command("tower", "play dragon tower", "money").setAliases([
@@ -579,7 +578,7 @@ async function playGame(
   };
 
   const lose = async (interaction: ButtonInteraction) => {
-    const board = _.cloneDeep(game.board);
+    const board = structuredClone(game.board);
 
     const id = await createGame({
       userId: message.author.id,
@@ -654,7 +653,7 @@ async function playGame(
       }
     }
 
-    const board = _.cloneDeep(game.board);
+    const board = structuredClone(game.board);
 
     const id = await createGame({
       userId: message.author.id,
@@ -685,7 +684,7 @@ async function playGame(
   };
 
   const draw = async (interaction: ButtonInteraction) => {
-    const board = _.cloneDeep(game.board);
+    const board = structuredClone(game.board);
 
     const id = await createGame({
       userId: message.author.id,

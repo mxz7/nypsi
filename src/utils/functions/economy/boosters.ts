@@ -14,7 +14,6 @@ import { pluralize } from "../string";
 import { addNotificationToQueue, getDmSettings, getPreferences } from "../users/notifications";
 import { getLastKnownUsername } from "../users/username";
 import { getItems } from "./utils";
-import _ = require("lodash");
 
 const lastBoosterCheck = new Map<string, number>();
 
@@ -163,7 +162,7 @@ export async function getBoosters(member: MemberResolvable): Promise<Map<string,
   const cache = await redis.get(`${Constants.redis.cache.economy.BOOSTERS}:${userId}`);
 
   if (cache) {
-    if (_.isEmpty(JSON.parse(cache))) return new Map();
+    if (Object.keys(JSON.parse(cache)).length === 0) return new Map();
 
     const map = new Map<string, Booster[]>(Object.entries(JSON.parse(cache)));
 

@@ -43,7 +43,6 @@ import {
 import { pluralize } from "../utils/functions/string";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
-import _ = require("lodash");
 
 const cmd = new Command(
   "workers",
@@ -113,7 +112,7 @@ async function run(
 
     let totalCost = 0;
 
-    let baseCost = _.clone(baseUpgrades[upgradeId]).base_cost;
+    let baseCost = { ...baseUpgrades[upgradeId] }.base_cost;
 
     baseCost =
       baseCost *

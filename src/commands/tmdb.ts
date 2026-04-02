@@ -17,7 +17,6 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
-import { isNaN } from "lodash";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { MovieDetails, TVDetails, TVSeasonEpisodeDetails } from "../types/tmdb";
@@ -236,7 +235,7 @@ async function run(
         if (res) {
           const value = res.fields.getTextInputValue("number");
 
-          if (isNaN(value) && value !== "reset") {
+          if (isNaN(Number(value)) && value !== "reset") {
             await res.reply({
               embeds: [new ErrorEmbed("invalid number")],
               flags: MessageFlags.Ephemeral,
