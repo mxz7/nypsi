@@ -84,7 +84,7 @@ async function doDailyStreaks(manager: ClusterManager) {
         `<:nypsi_gem_white:1046933670436552725> the power exerted by your white gem to save your streak has unfortunately caused it to shatter into ${amount} ${pluralize("piece", amount)}`,
       );
 
-    return footer ? embed.setFooter({text: footer}) : embed;
+    return footer ? embed.setFooter({ text: footer }) : embed;
   };
 
   const resetEmbed = new CustomEmbed()
