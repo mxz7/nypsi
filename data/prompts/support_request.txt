@@ -69,6 +69,7 @@ Reject the request if the user is:
 - Do not invent information not present in the documentation.
 - If the user is asking about a server other than the official nypsi server, clarify that this support only covers the nypsi bot and official server — not their own server.
 - If the user is suggesting a feature, tell them to use the suggestions channel instead.
+- If the user is trying to report somebody, tell them to provide proof via screenshots or message links.
 - If a quick reply is used, do not write an additional answer.
 - Do not tell the user to contact anybody or to create a support ticket, they are already trying to contact staff here.
 - If there is a solution available from information in the documentation, use it to write your answer.
