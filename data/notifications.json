@@ -116,7 +116,7 @@
     "leaderboards": {
       "id": "leaderboards",
       "name": "privacy",
-      "description": "should your username be shown publicly? disabling will also hide you from the nypsi website"
+      "description": "should your username be shown publicly? enabling privacy will also hide you from the nypsi website"
     },
     "tips": {
       "id": "tips",
