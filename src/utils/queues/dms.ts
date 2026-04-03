@@ -14,9 +14,11 @@ import { CustomEmbed } from "../../models/EmbedBuilders";
 import { NotificationPayload } from "../../types/Notification";
 import { logger } from "../logger";
 
+type JobResponse = { success: true; cluster: number; user: { id: string; username: string } };
+
 const connection = new Redis({ maxRetriesPerRequest: null });
 
-export const dmQueueWorker = new Worker<NotificationPayload, boolean>(
+export const dmQueueWorker = new Worker<NotificationPayload, JobResponse>(
   "dms",
   async (job) => {
     const res = await requestDM({
@@ -27,14 +29,7 @@ export const dmQueueWorker = new Worker<NotificationPayload, boolean>(
       client: manager,
     });
 
-    switch (res) {
-      case "success":
-        return true;
-      case "failed":
-        return false;
-      case "error":
-        throw new Error(`failed to dm ${job.data.memberId} after 3 attempts`);
-    }
+    return { success: true, cluster: res.cluster, user: res.debug.user };
   },
   {
     removeOnComplete: { count: 100 },
@@ -53,19 +48,31 @@ dmQueueWorker.on("resumed", () => {
 });
 
 dmQueueWorker.on("error", (err) => {
-  logger.error("dm: queue error", err);
+  logger.info("dm: queue error", { name: err.name, message: err.message });
 });
 
 dmQueueWorker.on("stalled", (jobId) => {
-  logger.debug(`dm: job stalled: ${jobId}`);
+  logger.info(`dm: job stalled: ${jobId}`);
 });
 
 dmQueueWorker.on("completed", (job) => {
-  logger.debug(`dm: job completed: ${job.id} ${job.data.memberId}`);
+  logger.info(`::success dm: job completed: ${job.id} ${job.data.memberId}`, {
+    cluster: job.returnvalue.cluster,
+    user: job.returnvalue.user,
+    payload: job.data.payload,
+  });
 });
 
 dmQueueWorker.on("failed", (job, err) => {
-  logger.error(`dm: job failed: ${job.id} ${job.data.memberId}`, err);
+  logger.error(`dm: job failed: ${job.id} ${job.data.memberId}`, {
+    name: err.name,
+    message: err.message,
+    payload: job.data.payload,
+  });
+});
+
+dmQueueWorker.on("active", (job) => {
+  logger.info(`dm: job active: ${job.id} ${job.data.memberId}`);
 });
 
 dmQueueWorker.pause();
@@ -74,222 +81,147 @@ interface RequestDMOptions {
   memberId: string;
   content: string;
   embed?: CustomEmbed;
-  client: NypsiClient | ClusterManager;
+  client: ClusterManager;
   components?: ActionRowBuilder<MessageActionRowComponentBuilder>;
 }
 
-async function requestDM(options: RequestDMOptions): Promise<"success" | "failed" | "error"> {
-  logger.info(`dm: requested ${options.memberId}`);
+class NoClusterError extends Error {
+  constructor(userId: string, stage: number) {
+    super(
+      `no cluster found for member ${userId}, user is probably unknown to nypsi. stage: ${stage}`,
+    );
+    this.name = "NoClusterError";
+  }
+}
 
-  if (options.client instanceof NypsiClient) {
-    let clusterHas: (number | "not-found")[];
-    let shard: number;
-
-    try {
-      clusterHas = await options.client.cluster.broadcastEval(
-        async (c, { userId }) => {
-          const client = c as unknown as NypsiClient;
-          const user = await client.users.fetch(userId).catch(() => {});
-
-          if (user) {
-            return client.cluster.id;
-          } else {
-            return "not-found";
-          }
-        },
-        {
-          context: { userId: options.memberId },
-        },
-      );
-
-      for (const i of clusterHas) {
-        if (i != "not-found") {
-          shard = i;
-          break;
-        }
-      }
-    } catch {
-      logger.error(`dm: failed finding member/shard: ${options.memberId}`);
-      return "error";
-    }
-
-    if (isNaN(shard)) {
-      logger.warn(`dm: user not found: ${options.memberId}`);
-      return "failed";
-    }
-
-    const payload: BaseMessageOptions = {
-      content: options.content,
-    };
-
-    if (options.embed) {
-      try {
-        payload.embeds = [options.embed.toJSON()];
-      } catch {
-        payload.embeds = [options.embed as APIEmbed];
-      }
-    }
-
-    if (options.components) {
-      try {
-        payload.components = [options.components.toJSON()];
-      } catch {
-        payload.components = [options.components];
-      }
-    }
-
-    try {
-      const res: (
-        | { success: true; cluster: number; debug: any }
-        | { success: false; reason: string }
-      )[] = await options.client.cluster.broadcastEval(
-        async (c, { needed, memberId, payload }) => {
-          const client = c as unknown as NypsiClient;
-          if (client.cluster.id != needed)
-            return { success: false, reason: "wrong cluster", cluster: client.cluster.id };
-
-          const user = await client.users.fetch(memberId).catch(() => {});
-
-          if (!user)
-            return { success: false, reason: "user not found", cluster: client.cluster.id };
-
-          let fail = false;
-
-          await user.send(payload as MessagePayload).catch(() => {
-            fail = true;
-          });
-
-          if (fail) {
-            return { success: false, reason: "failed to send", cluster: client.cluster.id };
-          }
-          return { success: true, cluster: client.cluster.id, debug: user.toJSON() };
-        },
-        {
-          context: {
-            needed: shard,
-            memberId: options.memberId,
-            payload: payload,
-          },
-        },
-      );
-
-      if (res.filter((i) => i.success).length > 0) {
-        logger.info(`::success dm: sent ${options.memberId} (${shard})`, {
-          debug: res.find((i) => i.success === true)?.debug,
-        });
-        return "success";
-      } else {
-        logger.warn(`dm: failed to send: ${options.memberId}`, { results: res });
-        return "failed";
-      }
-    } catch {
-      logger.error(`dm: failed to send: ${options.memberId} (caught)`);
-      return "error";
-    }
-  } else {
-    let clusterHas: (number | "not-found")[];
-    let shard: number;
-
-    try {
-      clusterHas = await options.client.broadcastEval(
-        async (c, { userId }) => {
-          const client = c as unknown as NypsiClient;
-          const user = await client.users.fetch(userId).catch(() => {});
-
-          if (user) {
-            return client.cluster.id;
-          } else {
-            return "not-found";
-          }
-        },
-        {
-          context: { userId: options.memberId },
-        },
-      );
-
-      for (const i of clusterHas) {
-        if (i != "not-found") {
-          shard = i;
-          break;
-        }
-      }
-
-      if (isNaN(shard)) {
-        logger.warn(`dm: user not found: ${options.memberId}`);
-        return "failed";
-      }
-    } catch {
-      logger.error(`dm: failed finding user/shard: ${options.memberId}`);
-      return "error";
-    }
-
-    const payload: BaseMessageOptions = {
-      content: options.content,
-    };
-
-    if (options.embed) {
-      try {
-        payload.embeds = [options.embed.toJSON()];
-      } catch {
-        payload.embeds = [options.embed as APIEmbed];
-      }
-    }
-
-    if (options.components) {
-      try {
-        payload.components = [options.components.toJSON()];
-      } catch {
-        payload.components = [options.components];
-      }
-    }
-
-    try {
-      const res: (
-        | { success: true; cluster: number; debug: any }
-        | { success: false; reason: string }
-      )[] = await options.client.broadcastEval(
-        async (c, { needed, memberId, payload }) => {
-          const client = c as unknown as NypsiClient;
-          if (client.cluster.id != needed)
-            return { success: false, reason: "wrong cluster", cluster: client.cluster.id };
-
-          const user = await client.users.fetch(memberId).catch(() => {});
-
-          if (!user)
-            return { success: false, reason: "user not found", cluster: client.cluster.id };
-
-          let fail = false;
-
-          await user.send(payload as MessagePayload).catch(() => {
-            fail = true;
-          });
-
-          if (fail) {
-            return { success: false, reason: "failed to send", cluster: client.cluster.id };
-          }
-          return { success: true, debug: user.toJSON(), cluster: client.cluster.id };
-        },
-        {
-          context: {
-            needed: shard,
-            memberId: options.memberId,
-            payload: payload,
-          },
-        },
-      );
-
-      if (res.filter((i) => i.success).length > 0) {
-        logger.info(`::success dm: sent ${options.memberId} (${shard})`, {
-          debug: res.find((i) => i.success === true)?.debug,
-        });
-        return "success";
-      } else {
-        logger.warn(`dm: failed to send: ${options.memberId}`, { results: res });
-        return "failed";
-      }
-    } catch {
-      logger.error(`dm: failed to send: ${options.memberId} (caught)`);
-      return "error";
+class DMFailedError extends Error {
+  constructor(userId: string, data?: any) {
+    super(`failed to send DM to member ${userId}`);
+    this.name = "DMFailedError";
+    if (data) {
+      this.message += "\n" + JSON.stringify(data);
     }
   }
+}
+
+class UserNotFoundError extends Error {
+  constructor(userId: string, cluster: number) {
+    super(`user ${userId} not found in selected cluster: ${cluster}`);
+    this.name = "UserNotFoundError";
+  }
+}
+
+async function requestDM(options: RequestDMOptions) {
+  const cluster = await findCluster(options.client, options.memberId);
+
+  if (typeof cluster !== "number") {
+    throw new NoClusterError(options.memberId, 1);
+  }
+
+  const payload: BaseMessageOptions = {
+    content: options.content,
+  };
+
+  if (options.embed) {
+    try {
+      payload.embeds = [options.embed.toJSON()];
+    } catch {
+      payload.embeds = [options.embed as APIEmbed];
+    }
+  }
+
+  if (options.components) {
+    try {
+      payload.components = [options.components.toJSON()];
+    } catch {
+      payload.components = [options.components];
+    }
+  }
+
+  try {
+    const res: (
+      | { success: true; cluster: number; debug: { user: any } }
+      | { success: false; reason: string; error?: any }
+    )[] = await options.client.broadcastEval(
+      async (c, { cluster, memberId, payload }) => {
+        const client = c as unknown as NypsiClient;
+        if (client.cluster.id != cluster)
+          return { success: false, reason: "wrong cluster", cluster: client.cluster.id };
+
+        const user = await client.users.fetch(memberId).catch(() => {});
+
+        if (!user) return { success: false, reason: "user not found", cluster: client.cluster.id };
+
+        let error: any;
+
+        await user.send(payload as MessagePayload).catch((err) => {
+          error = err;
+        });
+
+        if (error) {
+          return { success: false, reason: "failed to send", error: error };
+        }
+        return { success: true, debug: { user: user.toJSON() }, cluster: client.cluster.id };
+      },
+      {
+        context: {
+          cluster,
+          memberId: options.memberId,
+          payload: payload,
+        },
+      },
+    );
+
+    if (res.some((i) => i.success)) {
+      const user = res.find((i) => i.success === true)?.debug.user;
+      return { success: true, cluster, debug: { user: { id: user.id, username: user.username } } };
+    } else {
+      if (
+        res.filter((i) => i.success === false && i.reason === "wrong cluster").length === res.length
+      ) {
+        throw new NoClusterError(options.memberId, 2);
+      } else {
+        const actual = res.find((i) => i.success === false && i.reason !== "wrong cluster");
+        if (actual.success === true) {
+          throw new Error("this does not fucking happen lol i hate typescript");
+        }
+
+        if (actual.reason === "user not found") {
+          throw new UserNotFoundError(options.memberId, cluster);
+        }
+
+        if (actual.reason === "failed to send") {
+          throw new DMFailedError(options.memberId, actual.error);
+        }
+      }
+    }
+  } catch {
+    throw new DMFailedError(options.memberId);
+  }
+}
+
+async function findCluster(manager: ClusterManager, userId: string) {
+  const clusterResponse = await manager.broadcastEval(
+    async (c, { userId }) => {
+      const client = c as unknown as NypsiClient;
+      const user = await client.users.fetch(userId).catch(() => {});
+
+      if (user) {
+        return client.cluster.id;
+      } else {
+        return "not-found";
+      }
+    },
+    {
+      context: { userId },
+    },
+  );
+
+  for (const i of clusterResponse) {
+    if (i != "not-found") {
+      return i;
+    }
+  }
+
+  return null;
 }
