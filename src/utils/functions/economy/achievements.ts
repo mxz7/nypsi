@@ -157,20 +157,20 @@ async function completeAchievement(userId: string, achievementId: string) {
       `you have completed ${achievements[achievementId].emoji} ${achievements[achievementId].name}`,
     );
 
-  let earnedXp = 100;
+  let earnedXp = 250;
   let earnedCrates = 0;
 
   if (achievementId.endsWith("_v")) {
-    earnedXp = 5000;
+    earnedXp = 7500;
     earnedCrates = 5;
   } else if (achievementId.endsWith("_iv")) {
-    earnedXp = 1500;
+    earnedXp = 3000;
     earnedCrates = 4;
   } else if (achievementId.endsWith("_iii")) {
-    earnedXp = 750;
+    earnedXp = 1500;
     earnedCrates = 3;
   } else if (achievementId.endsWith("_ii")) {
-    earnedXp = 250;
+    earnedXp = 500;
   }
 
   const rewardsDesc: string[] = [];

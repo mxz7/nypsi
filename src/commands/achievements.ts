@@ -312,18 +312,18 @@ async function run(
       const prizes: string[] = [];
 
       if (selected.id.endsWith("_v")) {
-        prizes.push("5,000xp");
+        prizes.push("7,500xp");
         prizes.push("69420_crate:5");
       } else if (selected.id.endsWith("_iv")) {
-        prizes.push("1,500xp");
+        prizes.push("3,000xp");
         prizes.push("69420_crate:4");
       } else if (selected.id.endsWith("_iii")) {
-        prizes.push("750xp");
+        prizes.push("1,500xp");
         prizes.push("69420_crate:3");
       } else if (selected.id.endsWith("_ii")) {
-        prizes.push("250xp");
+        prizes.push("500xp");
       } else {
-        prizes.push("100xp");
+        prizes.push("250xp");
       }
 
       if (selected.prize) prizes.push(...selected.prize);
