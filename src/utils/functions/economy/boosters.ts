@@ -258,7 +258,7 @@ export async function getBoostersDisplay(
       const ownerId = boosters.get(boosterId)[0].userId;
       let username: string;
 
-      if ((await getPreferences(ownerId)).leaderboards) {
+      if (!(await getPreferences(ownerId)).leaderboards) {
         username = await getLastKnownUsername(ownerId);
       }
 

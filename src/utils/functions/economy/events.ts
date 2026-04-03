@@ -397,7 +397,7 @@ async function completeEvent(client: NypsiClient, lastUser: string) {
   completing = false;
 
   await giveRewards(event);
-  const privacy = await getPreferences(lastUser).then((r) => r.leaderboards);
+  const privacy = await getPreferences(lastUser).then((r) => !r.leaderboards);
 
   let content = `🔱 the **${getEventsData()[event.type].name}** event has been completed!`;
   if (event.target) {

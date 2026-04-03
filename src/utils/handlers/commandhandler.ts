@@ -1260,7 +1260,7 @@ export async function runCommand(
     createAuraTransaction(message.author.id, message.client.user.id, 25);
   }
 
-  if ((await getPreferences(message.member)).leaderboards)
+  if (!(await getPreferences(message.member)).leaderboards)
     if (command.category == "money") {
       await prisma.activeChannels.upsert({
         where: { userId_channelId: { channelId: message.channelId, userId: message.author.id } },

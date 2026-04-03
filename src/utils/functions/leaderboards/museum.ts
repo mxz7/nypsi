@@ -243,7 +243,7 @@ export async function topMuseumCompletionsGlobal(member?: MemberResolvable, amou
     const formattedName = await formatUsername(
       user.userId,
       user.lastKnownUsername,
-      (await getPreferences(user.userId)).leaderboards,
+      !(await getPreferences(user.userId)).leaderboards,
     );
 
     amountOut[count] = `${pos} ${formattedName} ${user.totalCompleted.toLocaleString()}`;

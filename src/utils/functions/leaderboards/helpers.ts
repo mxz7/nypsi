@@ -12,7 +12,7 @@ export const UPDATE_USERNAME_MS = ms("3 weeks");
 
 export async function formatUsername(id: string, username: string, checkPrivacy: boolean) {
   if (checkPrivacy) {
-    const privacy = (await getPreferences(id)).leaderboards;
+    const privacy = !(await getPreferences(id)).leaderboards;
 
     if (!privacy) {
       return "[**[hidden]**](https://nypsi.xyz/wiki/economy/user-settings/hidden?ref=bot-lb)";

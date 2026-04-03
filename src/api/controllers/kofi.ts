@@ -166,7 +166,7 @@ async function handleKofiData(data: z.infer<typeof schema>) {
             };
 
             addNotificationToQueue(payload);
-            if (data.is_public && (await getPreferences(user.id)).leaderboards) {
+            if (data.is_public && !(await getPreferences(user.id)).leaderboards) {
               const hook = new WebhookClient({ url: process.env.THANKYOU_HOOK });
               await hook.send({
                 embeds: [
@@ -201,7 +201,7 @@ async function handleKofiData(data: z.infer<typeof schema>) {
             };
 
             addNotificationToQueue(payload);
-            if (data.is_public && (await getPreferences(user.id)).leaderboards) {
+            if (data.is_public && !(await getPreferences(user.id)).leaderboards) {
               const hook = new WebhookClient({ url: process.env.THANKYOU_HOOK });
 
               let content = `${user.lastKnownUsername} just bought `;
@@ -373,7 +373,7 @@ async function handleKofiData(data: z.infer<typeof schema>) {
           await setTier(user.id, premiums.indexOf(item.name) + 1);
           await setCredits(user.id, 0);
           await renewUser(user.id);
-          if (data.is_public && (await getPreferences(user.id)).leaderboards) {
+          if (data.is_public && !(await getPreferences(user.id)).leaderboards) {
             const hook = new WebhookClient({ url: process.env.THANKYOU_HOOK });
             await hook.send({
               embeds: [
@@ -392,7 +392,7 @@ async function handleKofiData(data: z.infer<typeof schema>) {
         }
       } else {
         await addMember(user.id, premiums.indexOf(item.name) + 1);
-        if (data.is_public && (await getPreferences(user.id)).leaderboards) {
+        if (data.is_public && !(await getPreferences(user.id)).leaderboards) {
           const hook = new WebhookClient({ url: process.env.THANKYOU_HOOK });
           await hook.send({
             embeds: [

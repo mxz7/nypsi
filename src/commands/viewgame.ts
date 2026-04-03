@@ -107,7 +107,7 @@ async function run(
             36,
           )}?ref=bot-game) \`(${game.id})\`\n` +
           `**user** \`${
-            game.economy.user.Preferences?.leaderboards
+            !game.economy.user.Preferences?.leaderboards
               ? game.economy.user.lastKnownUsername
               : "[hidden]"
           }\`\n` +
@@ -160,7 +160,7 @@ async function run(
         query.map((game) => {
           return {
             id: game.id.toString(36),
-            user: game.economy.user.Preferences?.leaderboards
+            user: !game.economy.user.Preferences?.leaderboards
               ? game.economy.user.lastKnownUsername
               : "[hidden]",
             game: game.game,
@@ -200,7 +200,7 @@ async function run(
     if (!game)
       return send({ embeds: [new ErrorEmbed(`couldn't find a game with id \`${args[0]}\``)] });
 
-    const username = (await getPreferences(game.userId))?.leaderboards
+    const username = !(await getPreferences(game.userId))?.leaderboards
       ? await getLastKnownUsername(game.userId, false).catch(() => {})
       : "[hidden]";
 

@@ -98,7 +98,7 @@ async function run(
         embeds: [new ErrorEmbed(`could not find game with id \`${args[1].toLowerCase()}\``)],
       });
 
-    const username = (await getPreferences(game.userId))?.leaderboards
+    const username = !(await getPreferences(game.userId))?.leaderboards
       ? await getLastKnownUsername(game.userId, false).catch(() => {})
       : "[hidden]";
 
