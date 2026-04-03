@@ -504,7 +504,7 @@ async function run(
       data.pages,
       data.pos,
       `fastest wordle wins ${global ? "[global]" : `for ${message.guild.name}`}`,
-      global ? "https://nypsi.xyz/leaderboards/wordle?ref=bot-lb" : null,
+      global ? "https://nypsi.xyz/leaderboards/wordle/time?ref=bot-lb" : null,
     );
   } else if (args[0].toLowerCase() === "wordle") {
     let global = false;
@@ -523,7 +523,7 @@ async function run(
       data.pages,
       data.pos,
       `top wordle wins ${global ? "[global]" : `for ${message.guild.name}`}`,
-      global ? "https://nypsi.xyz/leaderboards/wordle?ref=bot-lb" : null,
+      global ? "https://nypsi.xyz/leaderboards/wordle/wins?ref=bot-lb" : null,
     );
   } else if (args[0].toLowerCase() === "votestreak") {
     let global = false;
@@ -542,6 +542,7 @@ async function run(
       data.pages,
       data.pos,
       `top vote streak ${global ? "[global]" : `for ${message.guild.name}`}`,
+      global ? "https://nypsi.xyz/leaderboards/vote/streak?ref=bot-lb" : null,
     );
   } else if (args[0].toLowerCase() === "vote") {
     let global = false;
@@ -560,7 +561,7 @@ async function run(
       data.pages,
       data.pos,
       `top monthly votes ${global ? "[global]" : `for ${message.guild.name}`}`,
-      global ? "https://nypsi.xyz/leaderboards/vote?ref=bot-lb" : null,
+      global ? "https://nypsi.xyz/leaderboards/vote/month?ref=bot-lb" : null,
     );
   } else if (["cr", "crglobal", "cr-global", "chatreaction"].includes(args[0].toLowerCase())) {
     let global = false;

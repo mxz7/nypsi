@@ -53,6 +53,7 @@ export async function showChessLeaderboard(
     const e = new CustomEmbed(message.member).setHeader(
       title(),
       global ? message.client.user.avatarURL() : message.guild.iconURL(),
+      global ? `https://nypsi.xyz/leaderboards/chess/${currentType}?ref=bot-lb` : null,
     );
 
     if (data.pages.size === 0) {
