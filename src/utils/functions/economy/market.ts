@@ -4,13 +4,14 @@ import {
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
-  CheckboxGroupBuilder,
   LabelBuilder,
   MessageActionRowComponentBuilder,
   MessageFlags,
   ModalBuilder,
   ModalSubmitInteraction,
   TextChannel,
+  TextInputBuilder,
+  TextInputStyle,
 } from "discord.js";
 import { Market, MarketWatch, OrderType, Prisma, PrismaClient } from "#generated/prisma";
 import prisma from "../../../init/database";
@@ -1187,21 +1188,18 @@ export async function showMarketConfirmationModal(
   const modal = new ModalBuilder().setCustomId(id).setTitle("confirmation");
 
   modal.addLabelComponents(
-    new LabelBuilder()
-      .setLabel(`confirm your ${action == "buy" ? "purchase" : "sale"}`)
-      .setDescription(
-        action == "buy"
-          ? `this will cost $${cost.toLocaleString()}`
-          : `the average worth of this item is $${cost.toLocaleString()}`,
-      )
-      .setCheckboxGroupComponent(
-        new CheckboxGroupBuilder()
-          .setCustomId("confirmation")
-          .setOptions([{ label: "confirm", value: "confirm" }])
-          .setMinValues(0)
-          .setRequired(false)
-          .setMaxValues(1),
-      ),
+    new LabelBuilder().setLabel("type 'yes' to confirm").setTextInputComponent(
+      new TextInputBuilder()
+        .setCustomId("confirmation")
+        .setPlaceholder(
+          action == "buy"
+            ? `this will cost $${cost.toLocaleString()}`
+            : `the average worth of this item is $${cost.toLocaleString()}`,
+        )
+        .setStyle(TextInputStyle.Short)
+        .setRequired(true)
+        .setMaxLength(3),
+    ),
   );
 
   await interaction.showModal(modal);
@@ -1215,7 +1213,7 @@ export async function showMarketConfirmationModal(
 
   if (!res.isModalSubmit()) return;
 
-  if (!res.fields.getCheckboxGroup("confirmation").includes("confirm")) {
+  if (res.fields.getTextInputValue("confirmation") != "yes") {
     res.reply({
       embeds: [new CustomEmbed().setDescription("✅ cancelled purchase")],
       flags: MessageFlags.Ephemeral,
