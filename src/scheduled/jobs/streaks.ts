@@ -76,15 +76,13 @@ async function doDailyStreaks(manager: ClusterManager) {
       "<:nypsi_gem_white:1046933670436552725> white gems have a chance to protect your streaks. make sure to do /daily to continue your streak",
     );
 
-  const whiteGemBrokeEmbed = (amount: number, footer?: string) => {
-    const embed = new CustomEmbed()
+  const whiteGemBrokeEmbed = (amount: number) => {
+    return new CustomEmbed()
       .setColor(Constants.EMBED_FAIL_COLOR)
       .setTitle("your white gem has shattered")
       .setDescription(
         `<:nypsi_gem_white:1046933670436552725> the power exerted by your white gem to save your streak has unfortunately caused it to shatter into ${amount} ${pluralize("piece", amount)}`,
       );
-
-    return footer ? embed.setFooter({ text: footer }) : embed;
   };
 
   const resetEmbed = new CustomEmbed()
@@ -120,7 +118,7 @@ async function doDailyStreaks(manager: ClusterManager) {
           if (res) {
             notifications.push({
               memberId: user.userId,
-              payload: { embed: whiteGemBrokeEmbed(res.shards, res.footerMsg) },
+              payload: { embed: whiteGemBrokeEmbed(res.shards).setFooter({ text: res.footerMsg }) },
             });
           }
 
