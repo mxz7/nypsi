@@ -179,7 +179,7 @@ async function run(
     marriage &&
     lovePercent === 100 &&
     target &&
-    (!targetMarriage || targetMarriage.partnerId !== marriage.partnerId) &&
+    target.id !== marriage.partnerId &&
     (target1.id === message.author.id || target2.id === message.author.id)
   ) {
     await removeMarriage(message.member);
