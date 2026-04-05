@@ -74,15 +74,23 @@ async function run(
 
     const duration = getDuration(args[1].toLowerCase());
 
-    if (duration < 3600 || isNaN(duration) || typeof duration !== "number")
+    if (duration < 3600 || isNaN(duration) || typeof duration !== "number") {
       return send({
         embeds: [new ErrorEmbed("invalid duration. format: 15m = 15 minutes")],
       });
+    }
 
-    if (duration > 2629746)
+    if (duration < 3600) {
       return send({
-        embeds: [new ErrorEmbed("invalid duration. format: 15m = 15 minutes")],
+        embeds: [new ErrorEmbed("duration must be at least 1 hour")],
       });
+    }
+
+    if (duration > 7.776e6) {
+      return send({
+        embeds: [new ErrorEmbed("duration must be less than 90 days")],
+      });
+    }
 
     await setAutoMuteTimeout(message.guild, duration);
 
