@@ -4561,5 +4561,21 @@
     "buy": 0,
     "sell": 3000,
     "in_crates": false
+  },
+  "audi_tt": {
+    "id": "audi_tt",
+    "name": "audi tt",
+    "article": "an",
+    "aliases": ["tt", "titty"],
+    "emoji": "<:audi_tt:1490655812702572735>",
+    "longDesc": "actually [@m.axz's](https://nypsi.xyz/users/672793821850894347) car",
+    "role": "car_skin",
+    "museum": {
+      "category": "cars",
+      "threshold": 3
+    },
+    "sell": 100000,
+    "in_crates": true,
+    "rarity": 5
   }
 }
