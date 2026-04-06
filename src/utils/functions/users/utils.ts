@@ -195,6 +195,26 @@ export async function doProfileTransfer(fromId: string, toId: string) {
           where: { userId: fromId },
           data: { userId: toId },
         });
+
+        await prisma.chessPuzzleStats.update({
+          where: { userId: fromId },
+          data: { userId: toId },
+        });
+
+        await prisma.flagGame.updateMany({
+          where: { userId: fromId },
+          data: { userId: toId },
+        });
+
+        await prisma.wordleGame.updateMany({
+          where: { userId: fromId },
+          data: { userId: toId },
+        });
+
+        await prisma.museum.updateMany({
+          where: { userId: fromId },
+          data: { userId: toId },
+        });
       },
       { maxWait: 60000, timeout: 60000 },
     )

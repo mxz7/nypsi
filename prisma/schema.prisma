@@ -401,7 +401,7 @@ model MuseumDonation {
   amount    BigInt
   createdAt DateTime @default(now())
 
-  museum Museum @relation(fields: [userId, itemId], references: [userId, itemId], onDelete: Cascade)
+  museum Museum @relation(fields: [userId, itemId], references: [userId, itemId], onDelete: Cascade, onUpdate: Cascade)
 
   @@index([userId, itemId])
 }
