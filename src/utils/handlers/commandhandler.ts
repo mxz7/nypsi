@@ -928,9 +928,14 @@ export async function runCommand(
     }
   }
 
+  const hasHighrollerChannelBypass =
+    message.channel.id === "747056029795221516" &&
+    message.member.roles.cache.has(Constants.HIGHROLLER_ROLE);
+
   if (
     (await getDisabledChannels(message.guild)).includes(message.channel.id) &&
-    !message.member.permissions.has(PermissionFlagsBits.ManageMessages)
+    !message.member.permissions.has(PermissionFlagsBits.ManageMessages) &&
+    !hasHighrollerChannelBypass
   ) {
     if (!(await redis.exists(`cache:channeldisabledcooldown:${message.author.id}`))) {
       addNotificationToQueue({
