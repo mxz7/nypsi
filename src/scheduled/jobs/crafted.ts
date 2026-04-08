@@ -2,7 +2,7 @@ import prisma from "../../init/database";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import { Job } from "../../types/Jobs";
 import { addProgress } from "../../utils/functions/economy/achievements";
-import { addInventoryItem, isGem } from "../../utils/functions/economy/inventory";
+import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { getItems } from "../../utils/functions/economy/utils";
 import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
 
@@ -26,7 +26,6 @@ export default {
       await addInventoryItem(item.userId, item.itemId, item.amount);
 
       await addProgress(item.userId, "crafter", item.amount);
-      if (isGem(item.itemId)) await addProgress(item.userId, "gem_hunter", item.amount);
 
       if ((await getDmSettings(item.userId)).other) {
         addNotificationToQueue({
