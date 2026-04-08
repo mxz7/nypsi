@@ -304,6 +304,18 @@ async function startChessGame(
       );
   };
 
+  const doesMoveCheckmate = (uci: string) => {
+    const preview = new Chess(chess.fen());
+
+    preview.move({
+      from: uci.slice(0, 2),
+      to: uci.slice(2, 4),
+      promotion: uci[4] || undefined,
+    });
+
+    return preview.isCheckmate();
+  };
+
   collector.on("collect", async (interaction) => {
     if (interaction.customId === "chess-end") {
       row.components.forEach((c) => (c as ButtonBuilder).setDisabled(true));
@@ -403,8 +415,9 @@ async function startChessGame(
 
     const expected = solution[moveIndex];
     const expectedNormalized = expected.slice(0, 4) + (expected[4] ?? "");
+    const isCheckmateMove = doesMoveCheckmate(uci);
 
-    if (uci !== expectedNormalized) {
+    if (uci !== expectedNormalized && !isCheckmateMove) {
       wrongMoves++;
 
       updateEmbed(false, `that's not the best move (\`${wrongMoves}/3\`)`);
@@ -417,7 +430,7 @@ async function startChessGame(
           .setFooter(null);
 
         res
-          .update({ embeds: [embed] })
+          .update({ embeds: [embed], components: [row, replayRow] })
           .catch(() => msg.edit({ embeds: [embed], components: [row, replayRow] }));
       } else {
         res
@@ -438,7 +451,7 @@ async function startChessGame(
 
     const playerLastMove = { from: uci.slice(0, 2), to: uci.slice(2, 4) };
 
-    if (moveIndex >= solution.length) {
+    if (isCheckmateMove || moveIndex >= solution.length) {
       await handleWin(playerLastMove, res);
       return;
     }
