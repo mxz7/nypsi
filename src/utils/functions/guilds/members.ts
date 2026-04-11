@@ -91,7 +91,6 @@ export async function getAllMembers(
         "EX",
         ms("10 minute") / 1000,
       );
-      console.trace();
       discordMembers = await guild.members.fetch();
     }
 
