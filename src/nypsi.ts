@@ -95,7 +95,7 @@ const client = new NypsiClient({
     GuildTextThreadManager: 0,
     DMMessageManager: 0,
     UserManager: {
-      maxSize: 10_000,
+      maxSize: 2_500,
       keepOverLimit: (user) => {
         if (user.id === user.client.user.id) return true;
 
@@ -112,12 +112,12 @@ const client = new NypsiClient({
           }
         } else {
           // been in cache less than min time
-          return false;
+          return true;
         }
       },
     },
     GuildMemberManager: {
-      maxSize: 7_500,
+      maxSize: 2_500,
       keepOverLimit: (user) => {
         if (user.id === user.client.user.id) return true;
 
@@ -136,7 +136,7 @@ const client = new NypsiClient({
           }
         } else {
           // been in cache less than min time
-          return false;
+          return true;
         }
       },
     },
@@ -179,6 +179,21 @@ setTimeout(() => {
   logger.info("logging in...");
   client.login(process.env.BOT_TOKEN);
 }, 500);
+
+setInterval(() => {
+  const cutoff = Date.now() - Math.max(minTimeInCache.user, minTimeInCache.guildMember);
+
+  let count = 0;
+
+  for (const [key, ts] of cacheTimestamp) {
+    if (ts < cutoff) {
+      cacheTimestamp.delete(key);
+      count++;
+    }
+  }
+
+  if (count > 0) logger.info(`cache: cleared ${count} old entries that were never swept`);
+}, 60_000 * 15); // every 15 min
 
 process.on("uncaughtException", (error) => {
   logger.error(error.message, { type: error.name, stack: error.stack, error });
