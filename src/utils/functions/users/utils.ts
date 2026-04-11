@@ -9,42 +9,51 @@ import { getGuildByUser } from "../economy/guilds";
 import { deleteOffer, getTargetedOffers } from "../economy/offers";
 import { deleteImage } from "../image";
 import { getUserId, MemberResolvable } from "../member";
+import { Mutex } from "../mutex";
 import { addNewUsername, deleteAllAvatars } from "./history";
 import { isMarried, removeMarriage } from "./marriage";
 import ms = require("ms");
 
+const hasUserMutex = new Mutex();
+
 export async function hasProfile(member: MemberResolvable) {
   const userId = getUserId(member);
 
-  if (await redis.exists(`${Constants.redis.cache.user.EXISTS}:${userId}`)) {
-    return (await redis.get(`${Constants.redis.cache.user.EXISTS}:${userId}`)) === "true";
-  }
+  await hasUserMutex.acquire(userId);
 
-  const query = await prisma.user.findUnique({
-    where: {
-      id: userId,
-    },
-    select: {
-      id: true,
-    },
-  });
+  try {
+    if (await redis.exists(`${Constants.redis.cache.user.EXISTS}:${userId}`)) {
+      return (await redis.get(`${Constants.redis.cache.user.EXISTS}:${userId}`)) === "true";
+    }
 
-  if (query) {
-    await redis.set(
-      `${Constants.redis.cache.user.EXISTS}:${userId}`,
-      "true",
-      "EX",
-      Math.floor(ms("7 day") / 1000),
-    );
-    return true;
-  } else {
-    await redis.set(
-      `${Constants.redis.cache.user.EXISTS}:${userId}`,
-      "false",
-      "EX",
-      Math.floor(ms("7 day") / 1000),
-    );
-    return false;
+    const query = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (query) {
+      await redis.set(
+        `${Constants.redis.cache.user.EXISTS}:${userId}`,
+        "true",
+        "EX",
+        Math.floor(ms("7 day") / 1000),
+      );
+      return true;
+    } else {
+      await redis.set(
+        `${Constants.redis.cache.user.EXISTS}:${userId}`,
+        "false",
+        "EX",
+        Math.floor(ms("7 day") / 1000),
+      );
+      return false;
+    }
+  } finally {
+    hasUserMutex.release(userId);
   }
 }
 

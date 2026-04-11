@@ -26,6 +26,7 @@ import { logger } from "../../logger";
 import { deleteImage } from "../image";
 import { getUserId, MemberResolvable } from "../member";
 import { getAllGroupAccountIds } from "../moderation/alts";
+import { Mutex } from "../mutex";
 import { pluralize } from "../string";
 import { isUserBlacklisted } from "../users/blacklist";
 import { isMarried } from "../users/marriage";
@@ -212,42 +213,50 @@ export function runEconomySetup() {
   loadItems();
 }
 
+const userExistsMutex = new Mutex();
+
 export async function userExists(member: MemberResolvable): Promise<boolean> {
   const userId = getUserId(member);
 
-  if (!userId) return;
+  await userExistsMutex.acquire(userId);
 
-  const cache = await redis.get(`${Constants.redis.cache.economy.EXISTS}:${userId}`);
+  try {
+    if (!userId) return false;
 
-  if (cache) {
-    return cache === "true";
-  }
+    const cache = await redis.get(`${Constants.redis.cache.economy.EXISTS}:${userId}`);
 
-  const query = await prisma.economy.findUnique({
-    where: {
-      userId,
-    },
-    select: {
-      userId: true,
-    },
-  });
+    if (cache) {
+      return cache === "true";
+    }
 
-  if (query) {
-    await redis.set(
-      `${Constants.redis.cache.economy.EXISTS}:${userId}`,
-      "true",
-      "EX",
-      ms("7 day") / 1000,
-    );
-    return true;
-  } else {
-    await redis.set(
-      `${Constants.redis.cache.economy.EXISTS}:${userId}`,
-      "false",
-      "EX",
-      ms("7 day") / 1000,
-    );
-    return false;
+    const query = await prisma.economy.findUnique({
+      where: {
+        userId,
+      },
+      select: {
+        userId: true,
+      },
+    });
+
+    if (query) {
+      await redis.set(
+        `${Constants.redis.cache.economy.EXISTS}:${userId}`,
+        "true",
+        "EX",
+        ms("7 day") / 1000,
+      );
+      return true;
+    } else {
+      await redis.set(
+        `${Constants.redis.cache.economy.EXISTS}:${userId}`,
+        "false",
+        "EX",
+        ms("7 day") / 1000,
+      );
+      return false;
+    }
+  } finally {
+    userExistsMutex.release(userId);
   }
 }
 

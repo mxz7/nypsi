@@ -4,6 +4,7 @@ import redis from "../../../init/redis";
 import { SnipedMessage } from "../../../types/Snipe";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
+import { Mutex } from "../mutex";
 import ms = require("ms");
 
 const snipe: Map<string, SnipedMessage> = new Map();
@@ -104,41 +105,50 @@ export async function updateGuild(guild: Guild) {
   }
 }
 
+const hasGuildMutex = new Mutex();
+
 export async function hasGuild(guild: Guild | string): Promise<boolean> {
-  let guildId: string;
+  const key = guild instanceof Guild ? guild.id : guild;
+  await hasGuildMutex.acquire(key);
 
-  if (guild instanceof Guild) {
-    guildId = guild.id;
-  } else {
-    guildId = guild;
-  }
+  try {
+    let guildId: string;
 
-  if (guildExistsCache.has(guildId)) {
-    return guildExistsCache.get(guildId);
-  }
+    if (guild instanceof Guild) {
+      guildId = guild.id;
+    } else {
+      guildId = guild;
+    }
 
-  if (await redis.exists(`${Constants.redis.cache.guild.EXISTS}:${guildId}`)) return true;
-  const query = await prisma.guild.findUnique({
-    where: {
-      id: guildId,
-    },
-    select: {
-      id: true,
-    },
-  });
+    if (guildExistsCache.has(guildId)) {
+      return guildExistsCache.get(guildId);
+    }
 
-  guildExistsCache.set(guildId, Boolean(query));
+    if (await redis.exists(`${Constants.redis.cache.guild.EXISTS}:${guildId}`)) return true;
+    const query = await prisma.guild.findUnique({
+      where: {
+        id: guildId,
+      },
+      select: {
+        id: true,
+      },
+    });
 
-  if (query) {
-    await redis.set(
-      `${Constants.redis.cache.guild.EXISTS}:${guildId}`,
-      "1",
-      "EX",
-      ms("24 hour") / 1000,
-    );
-    return true;
-  } else {
-    return false;
+    guildExistsCache.set(guildId, Boolean(query));
+
+    if (query) {
+      await redis.set(
+        `${Constants.redis.cache.guild.EXISTS}:${guildId}`,
+        "1",
+        "EX",
+        ms("24 hour") / 1000,
+      );
+      return true;
+    } else {
+      return false;
+    }
+  } finally {
+    hasGuildMutex.release(key);
   }
 }
 
