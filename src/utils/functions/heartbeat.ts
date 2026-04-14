@@ -23,7 +23,7 @@ export async function sendHeartbeat(cluster: Cluster) {
     });
     setTimeout(() => {
       reject("no response from cluster");
-    }, 5000);
+    }, 10000);
   });
 }
 
