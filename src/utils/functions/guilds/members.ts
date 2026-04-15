@@ -6,6 +6,7 @@ import { Mutex } from "../mutex";
 import ms = require("ms");
 
 const mutex = new Mutex(true);
+const checkMutex = new Mutex(true);
 
 async function getDatabaseMembers(guildId: string) {
   const cache = await redis.get(`${Constants.redis.cache.guild.MEMBERS}:${guildId}`);
@@ -28,25 +29,44 @@ async function getDatabaseMembers(guildId: string) {
   return members;
 }
 
-async function checkMembers(guildId: string, discordMembers: string[]) {
-  const databaseMembers = await getDatabaseMembers(guildId);
+/**
+ *
+ * @param guildId
+ * @param discordMembers user ids from discord api
+ * @param wantedDiscord if true, they only wanted discord data - we only update db if data is already in there. if false, they only wanted ids meaning we should put in database no matter what
+ */
+async function checkMembers(guildId: string, discordMembers: string[], wantedDiscord: boolean) {
+  const mutexKey = `check_members_${guildId}`;
+  await checkMutex.acquire(mutexKey);
 
-  const dbSet = new Set(databaseMembers);
-  const discordSet = new Set(discordMembers);
+  try {
+    if (wantedDiscord) {
+      const check = await prisma.guildMember.findFirst({ where: { guildId } });
+      // no data in database, and caller only wanted discord data. not necessary to save
+      if (!check) return;
+    }
 
-  const missing = discordMembers.filter((x) => !dbSet.has(x));
-  const extra = databaseMembers.filter((x) => !discordSet.has(x));
+    const databaseMembers = await getDatabaseMembers(guildId);
 
-  if (missing.length > 0) {
-    await prisma.guildMember.createMany({
-      data: missing.map((userId) => ({ guildId, userId })),
-    });
-    redis.del(`${Constants.redis.cache.guild.MEMBERS}:${guildId}`);
-  }
+    const dbSet = new Set(databaseMembers);
+    const discordSet = new Set(discordMembers);
 
-  if (extra.length > 0) {
-    await prisma.guildMember.deleteMany({ where: { guildId, userId: { in: extra } } });
-    redis.del(`${Constants.redis.cache.guild.MEMBERS}:${guildId}`);
+    const missing = discordMembers.filter((x) => !dbSet.has(x));
+    const extra = databaseMembers.filter((x) => !discordSet.has(x));
+
+    if (missing.length > 0) {
+      await prisma.guildMember.createMany({
+        data: missing.map((userId) => ({ guildId, userId })),
+      });
+      redis.del(`${Constants.redis.cache.guild.MEMBERS}:${guildId}`);
+    }
+
+    if (extra.length > 0) {
+      await prisma.guildMember.deleteMany({ where: { guildId, userId: { in: extra } } });
+      redis.del(`${Constants.redis.cache.guild.MEMBERS}:${guildId}`);
+    }
+  } finally {
+    checkMutex.release(mutexKey);
   }
 }
 
@@ -96,7 +116,7 @@ export async function getAllMembers(
 
     const discordMemberIds = discordMembers.map((i) => i.id);
 
-    await checkMembers(guild.id, discordMemberIds);
+    checkMembers(guild.id, discordMemberIds, getCollection);
 
     return getCollection ? discordMembers : discordMemberIds;
   } finally {
