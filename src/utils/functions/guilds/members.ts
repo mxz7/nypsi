@@ -34,8 +34,8 @@ async function checkMembers(guildId: string, discordMembers: string[]) {
   const dbSet = new Set(databaseMembers);
   const discordSet = new Set(discordMembers);
 
-  const missing = [...new Set(discordMembers.filter((x) => !dbSet.has(x)))];
-  const extra = [...new Set(databaseMembers.filter((x) => !discordSet.has(x)))];
+  const missing = discordMembers.filter((x) => !dbSet.has(x));
+  const extra = databaseMembers.filter((x) => !discordSet.has(x));
 
   if (missing.length > 0) {
     await prisma.guildMember.createMany({
