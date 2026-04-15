@@ -30,7 +30,7 @@ export async function sendHeartbeat(cluster: Cluster) {
 export async function addFailedHeartbeat(cluster: Cluster) {
   if (failedHeartbeats.has(cluster.id)) {
     if (failedHeartbeats.get(cluster.id) >= 5) {
-      logger.info(`respawning cluster ${cluster.id} due to missing heartbeats`);
+      logger.info(`heartbeat: respawning cluster ${cluster.id} due to missing heartbeats`);
       webhook.send({
         content: `respawning cluster ${cluster.id} due to missing heartbeats <@&${Constants.STAFF_ROLE_ID}>`,
       });
@@ -39,9 +39,9 @@ export async function addFailedHeartbeat(cluster: Cluster) {
         webhook.send({
           content: `cluster ${cluster.id} respawned <@&${Constants.STAFF_ROLE_ID}>`,
         });
-        logger.debug(`${cluster.id} respawn promise resolved, sending ready event`);
+        logger.debug(`heartbeat: ${cluster.id} respawn promise resolved, sending ready event`);
         c.emit("ready");
-        logger.debug(`${cluster.id} ready event sent`);
+        logger.debug(`heatbeat: ${cluster.id} ready event sent`);
       });
       dmQueueWorker.resume();
       failedHeartbeats.delete(cluster.id);

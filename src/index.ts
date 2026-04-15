@@ -50,7 +50,7 @@ manager.on("clusterCreate", (cluster) => {
         const heartbeat = await sendHeartbeat(cluster).catch(() => {});
 
         if (!heartbeat) {
-          logger.warn(`cluster ${cluster.id} missed heartbeat`);
+          logger.warn(`heartbeat: cluster ${cluster.id} missed heartbeat`);
           addFailedHeartbeat(cluster);
         }
       }, 25000);
