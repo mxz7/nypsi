@@ -5,6 +5,7 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import s3 from "../../../init/s3";
 import Constants from "../../Constants";
+import { debounce } from "../../debounce";
 import { logger } from "../../logger";
 import { getRawLevel } from "../economy/levelling";
 import { isEcoBanned } from "../economy/utils";
@@ -77,10 +78,24 @@ export async function getCommandUses(member: MemberResolvable) {
   return query;
 }
 
-export async function updateUser(user: User, command: string) {
+const debouncedGuildLastCommand = debounce(async (guildId: string) => {
+  await prisma.guild.updateMany({
+    where: { id: guildId },
+    data: { lastCommand: new Date() },
+  });
+}, ms("5 minutes"));
+
+export async function updateUser(user: User, command: string, guildId?: string) {
   if (!user) return;
+
+  recentCommands.set(user.id, Date.now());
+
   const date = new Date();
-  recentCommands.set(user.id, date.getTime());
+
+  const [username, avatar] = await Promise.all([
+    getLastKnownUsername(user.id, false, true),
+    getLastKnownAvatar(user.id),
+  ]);
 
   await redis.set(
     `${Constants.redis.cache.user.LAST_COMMAND}:${user.id}`,
@@ -88,11 +103,6 @@ export async function updateUser(user: User, command: string) {
     "EX",
     1800,
   );
-
-  const [username, avatar] = await Promise.all([
-    getLastKnownUsername(user.id, false, true),
-    getLastKnownAvatar(user.id),
-  ]);
 
   let updateUsername = false;
   let updateAvatar = false;
@@ -181,4 +191,6 @@ export async function updateUser(user: User, command: string) {
       },
     },
   });
+
+  if (guildId) debouncedGuildLastCommand(guildId, guildId);
 }

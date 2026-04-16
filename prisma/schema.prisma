@@ -663,6 +663,8 @@ model Guild {
 
   birthdayHook String?
 
+  lastCommand DateTime @default(now())
+
   GuildChristmas GuildChristmas?
   counters       GuildCounter[]
   GuildCountdown GuildCountdown[]
