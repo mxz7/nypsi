@@ -23,6 +23,7 @@ import { getRole } from "../utils/functions/member";
 import PageManager from "../utils/functions/page";
 import sleep from "../utils/functions/sleep";
 import { pluralize } from "../utils/functions/string";
+import { logger } from "../utils/logger";
 
 const cmd = new Command("role", "role utilities", "utility");
 
@@ -641,6 +642,8 @@ async function run(
       return send({ embeds: [new ErrorEmbed("/role members <role>")] });
     }
 
+    const before = performance.now();
+
     args.shift();
 
     const role = message.mentions?.roles?.first() || (await getRole(message.guild, args.join(" ")));
@@ -653,6 +656,8 @@ async function run(
 
     const members = await getMembers();
 
+    const beforeFiltering = performance.now();
+
     const filteredMembers = sort(
       members.filter((m) => m.roles.cache.has(role.id)).map((m) => `\`${m.user.username}\``),
     ).asc();
@@ -662,6 +667,8 @@ async function run(
         embeds: [new CustomEmbed(message.member, `${role.toString()} has no members`)],
       });
     }
+
+    const afterFiltering = performance.now();
 
     const pages = PageManager.createPages(filteredMembers);
 
@@ -698,6 +705,12 @@ async function run(
         return manager.embed;
       },
     });
+
+    const after = performance.now();
+
+    logger.debug(
+      `role members: taken ${after - before}ms, filtering: ${afterFiltering - beforeFiltering}ms`,
+    );
 
     return manager.listen();
   }
