@@ -12,6 +12,7 @@ import {
   MessageActionRowComponentBuilder,
   MessageFlags,
   ModalBuilder,
+  ModalSubmitInteraction,
   resolveColor,
   StringSelectMenuBuilder,
   StringSelectMenuOptionBuilder,
@@ -35,7 +36,7 @@ import {
 } from "../utils/functions/economy/museum";
 import { createUser, formatNumber, getItems, userExists } from "../utils/functions/economy/utils";
 import { getMember } from "../utils/functions/member";
-import { default as PageManager } from "../utils/functions/page";
+import PageManager, { CustomMessageComponentCollector } from "../utils/functions/page";
 import { pluralize } from "../utils/functions/string";
 import { getInlineNotifications } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -159,18 +160,15 @@ async function run(
       );
   };
 
-  const doCategorySelect = async (interaction: Interaction) => {
-    if (!interaction.isStringSelectMenu() || interaction.customId != "select-category") {
-      return false;
-    }
-    return interaction.values[0];
-  };
+  const doFindItem = async (
+    interaction: ButtonInteraction,
+    collector: CustomMessageComponentCollector,
+    defer = true,
+  ) => {
+    const id = `museum-find-${interaction.id}`;
 
-  const itemsPerPage = 8;
-
-  const doFindItem = async (interaction: ButtonInteraction, defer = true) => {
     const modal = new ModalBuilder()
-      .setCustomId("museum-find")
+      .setCustomId(id)
       .setTitle("find an item")
       .addLabelComponents(
         new LabelBuilder()
@@ -186,11 +184,21 @@ async function run(
 
     await interaction.showModal(modal);
 
-    const filter = (i: Interaction) => i.user.id == interaction.user.id;
+    const filter = (i: ModalSubmitInteraction) =>
+      i.user.id == (interaction as ButtonInteraction).user.id && i.customId === id;
 
+    collector.refreshTimer(120000);
     const res = await interaction.awaitModalSubmit({ filter, time: 120000 }).catch(() => {});
 
     if (!res || !res.isModalSubmit()) return;
+
+    if (collector.instance.ended) {
+      await res.reply({
+        embeds: [new ErrorEmbed("action expired")],
+        flags: MessageFlags.Ephemeral,
+      });
+      return false;
+    }
 
     const item = selectItem(res.fields.getTextInputValue("item").toLowerCase());
 
@@ -217,9 +225,19 @@ async function run(
     const page = Math.floor(index / itemsPerPage) + 1;
 
     if (defer) await res.deferUpdate();
+    collector.refreshTimer();
 
     return { item, interaction: res, page: page, category: item.museum.category };
   };
+
+  const doCategorySelect = async (interaction: Interaction) => {
+    if (!interaction.isStringSelectMenu() || interaction.customId != "select-category") {
+      return false;
+    }
+    return interaction.values[0];
+  };
+
+  const itemsPerPage = 8;
 
   let msg: Message;
 
@@ -292,50 +310,43 @@ async function run(
 
     if (member.id != message.member.id) return;
 
-    const filter = (i: Interaction) => i.user.id == message.author.id;
+    const filter = (i: Interaction) => i.user.id === message.author.id;
 
-    const pageManager: any = async () => {
+    const collector = new CustomMessageComponentCollector(msg, filter, 60000);
+    const collectorInstance = collector.instance;
+
+    collectorInstance.on("collect", async (interaction) => {
+      const res = interaction.customId;
       let fail = false;
 
-      const response = await msg
-        .awaitMessageComponent({ filter, time: 60000 })
-        .then(async (collected) => {
-          if (collected.customId != "find")
-            await collected.deferUpdate().catch(() => {
-              fail = true;
-              return pageManager();
-            });
-          return { res: collected.customId, interaction: collected };
-        })
-        .catch(async () => {
+      if (res !== "find") {
+        await interaction.deferUpdate().catch(() => {
           fail = true;
-          await msg.edit({ flags: MessageFlags.IsComponentsV2, components: [container(true)] });
         });
+      }
 
       if (fail) return;
-      if (!response) return;
-
-      const { res, interaction } = response;
 
       const categorySelect = await doCategorySelect(interaction);
 
       if (categorySelect) {
+        collectorInstance.stop("swap");
         return categoryView(categorySelect);
-      } else if (res == "find") {
-        const res = await doFindItem(interaction as ButtonInteraction);
-
-        if (!res) return pageManager();
-
-        return categoryView(res.category, res.page);
-      } else if (res == "edit") {
+      } else if (res === "find") {
+        const findRes = await doFindItem(interaction as ButtonInteraction, collector);
+        if (!findRes) return;
+        collectorInstance.stop("swap");
+        return categoryView(findRes.category, findRes.page);
+      } else if (res === "edit") {
+        collectorInstance.stop("swap");
         return editView();
       }
+    });
 
-      await msg.edit({ flags: MessageFlags.IsComponentsV2, components: [container()] });
-      return pageManager();
-    };
-
-    return pageManager();
+    collectorInstance.on("end", async (_, reason) => {
+      if (reason == "time")
+        await msg.edit({ flags: MessageFlags.IsComponentsV2, components: [container(true)] });
+    });
   };
 
   const editView = async () => {
@@ -422,33 +433,22 @@ async function run(
       });
     }
 
-    const filter = (i: Interaction) => i.user.id == message.author.id;
+    const filter = (i: Interaction) => i.user.id === message.author.id;
 
-    const pageManager: any = async () => {
+    const collector = new CustomMessageComponentCollector(msg, filter, 60000);
+    const collectorInstance = collector.instance;
+
+    collectorInstance.on("collect", async (interaction) => {
+      const res = interaction.customId;
       let fail = false;
 
-      const response = await msg
-        .awaitMessageComponent({ filter, time: 60000 })
-        .then(async (collected) => {
-          if (!collected.customId.startsWith("alter-"))
-            await collected.deferUpdate().catch(() => {
-              fail = true;
-              return pageManager();
-            });
-          return { res: collected.customId, interaction: collected };
-        })
-        .catch(async () => {
+      if (!res.startsWith("alter-")) {
+        await interaction.deferUpdate().catch(() => {
           fail = true;
-          await msg.edit({
-            flags: MessageFlags.IsComponentsV2,
-            components: [await container(true)],
-          });
         });
+      }
 
       if (fail) return;
-      if (!response) return;
-
-      const { res, interaction } = response;
 
       if (res == "save") {
         if (
@@ -458,6 +458,7 @@ async function run(
           await museum.setFavoritedItems(featuredItems);
         }
 
+        collectorInstance.stop("swap");
         return homeView();
       } else if (res == "clear") {
         featuredItems = Array(5).fill(undefined);
@@ -468,15 +469,15 @@ async function run(
           featuredItems[slot] = undefined;
           await interaction.deferUpdate();
         } else {
-          const res = await doFindItem(interaction as ButtonInteraction, false);
-          if (!res) return pageManager();
+          const res = await doFindItem(interaction as ButtonInteraction, collector, false);
+          if (!res) return;
 
           if (!museum.has(res.item)) {
             await res.interaction.reply({
               embeds: [new ErrorEmbed("you have not donated that item yet")],
               flags: MessageFlags.Ephemeral,
             });
-            return pageManager();
+            return;
           }
 
           if (featuredItems.findIndex((i) => i?.id == res.item.id) != -1) {
@@ -484,7 +485,7 @@ async function run(
               embeds: [new ErrorEmbed("you already have that item featured")],
               flags: MessageFlags.Ephemeral,
             });
-            return pageManager();
+            return;
           }
 
           await res.interaction.deferUpdate();
@@ -510,10 +511,12 @@ async function run(
       }
 
       await msg.edit({ flags: MessageFlags.IsComponentsV2, components: [await container()] });
-      return pageManager();
-    };
+    });
 
-    return pageManager();
+    collectorInstance.on("end", async (_, reason) => {
+      if (reason == "time")
+        await msg.edit({ flags: MessageFlags.IsComponentsV2, components: [await container(true)] });
+    });
   };
 
   const categoryView = async (category: string, currentPage = 1) => {
@@ -619,50 +622,46 @@ async function run(
 
     const filter = (i: Interaction) => i.user.id == message.author.id;
 
-    const pageManager: any = async () => {
+    const collector = new CustomMessageComponentCollector(msg, filter, 60000);
+    const collectorInstance = collector.instance;
+
+    collectorInstance.on("collect", async (interaction) => {
+      const res = interaction.customId;
       let fail = false;
 
-      const response = await msg
-        .awaitMessageComponent({ filter, time: 60000 })
-        .then(async (collected) => {
-          if (collected.customId != "find")
-            await collected.deferUpdate().catch(() => {
-              fail = true;
-              return pageManager();
-            });
-          return { res: collected.customId, interaction: collected };
-        })
-        .catch(async () => {
+      if (res !== "find") {
+        await interaction.deferUpdate().catch(() => {
           fail = true;
-          await msg.edit({ flags: MessageFlags.IsComponentsV2, components: [container(true)] });
         });
+      }
 
       if (fail) return;
-      if (!response) return;
-
-      const { res, interaction } = response;
 
       const categorySelect = await doCategorySelect(interaction);
 
       if (categorySelect) {
+        collectorInstance.stop("swap");
         return categorySelect == "home" ? homeView() : categoryView(categorySelect);
       } else if (res == "➡") {
         if (currentPage < pages.size) currentPage++;
       } else if (res == "⬅") {
         if (currentPage > 1) currentPage--;
       } else if (res == "find") {
-        const res = await doFindItem(interaction as ButtonInteraction);
+        const res = await doFindItem(interaction as ButtonInteraction, collector);
 
-        if (!res) return pageManager();
+        if (!res) return;
 
+        collectorInstance.stop("swap");
         return categoryView(res.category, res.page);
       }
 
       await msg.edit({ flags: MessageFlags.IsComponentsV2, components: [container()] });
-      return pageManager();
-    };
+    });
 
-    return pageManager();
+    collectorInstance.on("end", async (_, reason) => {
+      if (reason == "time")
+        await msg.edit({ flags: MessageFlags.IsComponentsV2, components: [container(true)] });
+    });
   };
 
   await addCooldown(cmd.name, message.member, 3);

@@ -4,6 +4,7 @@ import {
   ButtonInteraction,
   ButtonStyle,
   ComponentType,
+  Interaction,
   Message,
   MessageActionRowComponentBuilder,
   MessageFlags,
@@ -242,5 +243,34 @@ export default class PageManager<T> {
     embed.setDescription(page.join("\n"));
 
     return embed;
+  }
+}
+
+export class CustomMessageComponentCollector {
+  private collector: ReturnType<Message["createMessageComponentCollector"]>;
+  private timer: NodeJS.Timeout;
+  private timeout: number;
+
+  constructor(msg: Message, filter: (i: Interaction) => boolean, timeout: number) {
+    this.timeout = timeout;
+    this.collector = msg.createMessageComponentCollector({ filter });
+    this.refreshTimer();
+
+    this.collector.on("collect", () => {
+      this.refreshTimer();
+    });
+
+    this.collector.on("end", () => {
+      clearTimeout(this.timer);
+    });
+  }
+
+  refreshTimer(ms = this.timeout) {
+    clearTimeout(this.timer);
+    this.timer = setTimeout(() => this.collector.stop("time"), ms);
+  }
+
+  get instance() {
+    return this.collector;
   }
 }
