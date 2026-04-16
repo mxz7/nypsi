@@ -47,7 +47,7 @@ manager.on("clusterCreate", (cluster) => {
 
     setTimeout(() => {
       const interval = setInterval(async () => {
-        const heartbeat = await sendHeartbeat(cluster).catch(() => {});
+        const heartbeat = await sendHeartbeat(cluster);
 
         if (!heartbeat) {
           logger.warn(`heartbeat: cluster ${cluster.id} missed heartbeat`);
