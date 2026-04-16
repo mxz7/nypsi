@@ -178,5 +178,20 @@ export default {
     });
 
     log(`cleared daily guild contributions`);
+
+    const inactiveGuildCutoff = dayjs().subtract(6, "months").toDate();
+
+    const inactiveGuildMembers = await prisma.guildMember.deleteMany({
+      where: {
+        guild: {
+          lastCommand: { lt: inactiveGuildCutoff },
+        },
+      },
+    });
+
+    if (inactiveGuildMembers.count > 0)
+      log(
+        `${inactiveGuildMembers.count.toLocaleString()} guild member records purged from inactive guilds`,
+      );
   },
 } satisfies Job;
