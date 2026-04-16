@@ -2,11 +2,12 @@ import { Collection, Guild, GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
+import { logger } from "../../logger";
 import { Mutex } from "../mutex";
 import ms = require("ms");
 
-const mutex = new Mutex(true);
-const checkMutex = new Mutex(true);
+const mutex = new Mutex();
+const checkMutex = new Mutex();
 
 async function getDatabaseMembers(guildId: string) {
   const cache = await redis.get(`${Constants.redis.cache.guild.MEMBERS}:${guildId}`);
@@ -39,6 +40,8 @@ async function checkMembers(guildId: string, discordMembers: string[], wantedDis
   const mutexKey = `check_members_${guildId}`;
   await checkMutex.acquire(mutexKey);
 
+  const before = performance.now();
+
   try {
     if (wantedDiscord) {
       const check = await prisma.guildMember.findFirst({ where: { guildId } });
@@ -67,6 +70,11 @@ async function checkMembers(guildId: string, discordMembers: string[], wantedDis
     }
   } finally {
     checkMutex.release(mutexKey);
+
+    logger.debug(`members: checkMembers duration`, {
+      guildId,
+      durationMs: +(performance.now() - before).toFixed(2),
+    });
   }
 }
 
@@ -80,31 +88,58 @@ export async function getAllMembers(
   guild: Guild | string,
   getCollection = false,
 ): Promise<string[] | Collection<string, GuildMember>> {
+  const totalStart = performance.now();
+
   const guildId = guild instanceof Guild ? guild.id : guild;
 
   const mutexKey = `member_fetch_${guildId}`;
+  const acquireStart = performance.now();
   await mutex.acquire(mutexKey);
+  const acquireDuration = performance.now() - acquireStart;
 
   try {
+    const lastFetchedStart = performance.now();
     const lastFetched = await redis
       .get(`${Constants.redis.cache.guild.MEMBERS_LAST_FETCHED}:${guildId}`)
       .then((v) => (v ? parseInt(v) : 0));
+    const lastFetchedDuration = performance.now() - lastFetchedStart;
 
     if (
       (lastFetched > Date.now() - ms("10 minute") && !getCollection) ||
       !(guild instanceof Guild)
     ) {
-      return getDatabaseMembers(guildId);
+      const dbMembersStart = performance.now();
+      const members = await getDatabaseMembers(guildId);
+      const dbMembersDuration = performance.now() - dbMembersStart;
+
+      logger.debug(`members: getAllMembers timings`, {
+        guildId,
+        memberCount: members.length,
+        getCollection,
+        usedDatabaseOnly: true,
+        timingsMs: {
+          acquireMutex: +acquireDuration.toFixed(2),
+          getLastFetched: +lastFetchedDuration.toFixed(2),
+          getDatabaseMembers: +dbMembersDuration.toFixed(2),
+          total: +(performance.now() - totalStart).toFixed(2),
+        },
+      });
+
+      return members;
     }
 
     let discordMembers: Collection<string, GuildMember>;
+    let resolveDiscordMembersDuration = 0;
 
     if (
       guild.memberCount === guild.members.cache.size ||
       (lastFetched > Date.now() - ms("3 minute") && getCollection)
     ) {
+      const resolveDiscordMembersStart = performance.now();
       discordMembers = guild.members.cache;
+      resolveDiscordMembersDuration = performance.now() - resolveDiscordMembersStart;
     } else {
+      const resolveDiscordMembersStart = performance.now();
       await redis.set(
         `${Constants.redis.cache.guild.MEMBERS_LAST_FETCHED}:${guild.id}`,
         Date.now(),
@@ -112,11 +147,28 @@ export async function getAllMembers(
         ms("10 minute") / 1000,
       );
       discordMembers = await guild.members.fetch();
+      resolveDiscordMembersDuration = performance.now() - resolveDiscordMembersStart;
     }
 
+    const mapIdsStart = performance.now();
     const discordMemberIds = discordMembers.map((i) => i.id);
+    const mapIdsDuration = performance.now() - mapIdsStart;
 
     checkMembers(guild.id, discordMemberIds, getCollection);
+
+    logger.debug(`members: getAllMembers timings`, {
+      guildId,
+      memberCount: discordMemberIds.length,
+      getCollection,
+      usedDatabaseOnly: false,
+      timingsMs: {
+        acquireMutex: +acquireDuration.toFixed(2),
+        getLastFetched: +lastFetchedDuration.toFixed(2),
+        resolveDiscordMembers: +resolveDiscordMembersDuration.toFixed(2),
+        mapDiscordMemberIds: +mapIdsDuration.toFixed(2),
+        total: +(performance.now() - totalStart).toFixed(2),
+      },
+    });
 
     return getCollection ? discordMembers : discordMemberIds;
   } finally {
