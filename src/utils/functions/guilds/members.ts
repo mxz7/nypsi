@@ -41,6 +41,7 @@ async function checkMembers(guildId: string, discordMembers: string[], wantedDis
   await checkMutex.acquire(mutexKey);
 
   const before = performance.now();
+  let filteringTime: number;
 
   try {
     if (wantedDiscord) {
@@ -51,11 +52,15 @@ async function checkMembers(guildId: string, discordMembers: string[], wantedDis
 
     const databaseMembers = await getDatabaseMembers(guildId);
 
+    const beforeFiltering = performance.now();
+
     const dbSet = new Set(databaseMembers);
     const discordSet = new Set(discordMembers);
 
     const missing = discordMembers.filter((x) => !dbSet.has(x));
     const extra = databaseMembers.filter((x) => !discordSet.has(x));
+
+    filteringTime = performance.now() - beforeFiltering;
 
     if (missing.length > 0) {
       await prisma.guildMember.createMany({
@@ -74,6 +79,7 @@ async function checkMembers(guildId: string, discordMembers: string[], wantedDis
     logger.debug(`members: checkMembers duration`, {
       guildId,
       durationMs: +(performance.now() - before).toFixed(2),
+      filteringTimeMs: filteringTime ? +filteringTime.toFixed(2) : undefined,
     });
   }
 }
