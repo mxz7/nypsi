@@ -1234,7 +1234,7 @@ export async function runCommand(
   await Promise.all([
     a(message.author.id, message.author.username, message.content, cmd),
     updateCommandUses(message.member),
-    updateUser(message.author || message.author || null, command.name),
+    updateUser(message.author || message.author || null, command.name, message.guildId),
     redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS, command.name, 1),
     addProgress(message.author.id, "nypsi", 1),
     addEventProgress(message.client as NypsiClient, message.member, "commands", 1),
