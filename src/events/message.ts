@@ -28,6 +28,7 @@ import { a } from "../utils/functions/anticheat";
 import { addEventProgress } from "../utils/functions/economy/events";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { userExists } from "../utils/functions/economy/utils";
+import { getLastCommand as getLastGuildCommand } from "../utils/functions/guilds/commands";
 import { checkAutoMute, checkMessageContent } from "../utils/functions/guilds/filters";
 import { getAllMembers } from "../utils/functions/guilds/members";
 import { isSlashOnly } from "../utils/functions/guilds/slash";
@@ -550,10 +551,11 @@ export default async function messageCreate(message: Message) {
   }
 
   if (
-    message.guild.memberCount < 150000 &&
+    message.guild.memberCount < 15000 &&
+    (await getLastGuildCommand(message.guildId)).getTime() >= Date.now() - ms("30 days") &&
     ((await userExists(message.guild.ownerId)) ||
       (await isPremium(message.guild.ownerId)) ||
-      (await getKarma(message.guild.ownerId)) >= 10 ||
+      (await getKarma(message.guild.ownerId)) >= 50 ||
       (await getLastCommand(message.guild.ownerId)).getTime() >= Date.now() - ms("30 days"))
   ) {
     const mentionMembers = new Set<string>();
