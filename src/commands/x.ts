@@ -3815,8 +3815,6 @@ async function run(
     await addInventoryItem(randomUser.userId, "christmas_tree", 1);
 
     logger.debug(`tree: random christmas_tree given to ${randomUser.userId}`);
-
-    // remove after migrating
   } else {
     return send({
       embeds: [new CustomEmbed(message.member, await getUsableCommands(message.member))],
