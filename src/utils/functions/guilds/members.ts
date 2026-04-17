@@ -6,7 +6,7 @@ import { logger } from "../../logger";
 import { Mutex } from "../mutex";
 import ms = require("ms");
 
-const mutex = new Mutex();
+const mutex = new Mutex(true);
 const checkMutex = new Mutex();
 
 async function getDatabaseMembers(guildId: string) {
@@ -100,6 +100,7 @@ export async function getAllMembers(
 
   const mutexKey = `member_fetch_${guildId}`;
   const acquireStart = performance.now();
+  console.trace();
   await mutex.acquire(mutexKey);
   const acquireDuration = performance.now() - acquireStart;
 
