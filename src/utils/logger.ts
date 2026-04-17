@@ -146,7 +146,7 @@ class FileTransport implements Transport {
 
     const out = {
       level: data.label,
-      msg: data.message.replace(/^::\w+/, "").trim(),
+      msg: data.message?.replace(/^::\w+/, "")?.trim(),
       time: data.date,
       data: data.data,
     };
