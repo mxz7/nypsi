@@ -1,20 +1,11 @@
-import ms from "ms";
 import prisma from "../../../init/database";
 import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { Mutex } from "../mutex";
 
-const lastCommand = new Map<string, { timestamp: number; storedAt: number }>();
+const lastCommand = new Map<string, number>();
 // guildId
 const pendingFetch = new Set<string>();
-
-setInterval(() => {
-  for (const [guildId, data] of lastCommand.entries()) {
-    if (Date.now() - data.storedAt > ms("12 hours")) {
-      lastCommand.delete(guildId);
-    }
-  }
-}, ms("15 minutes"));
 
 export function getLastCommandSync(guildId: string) {
   const data = lastCommand.get(guildId);
@@ -25,10 +16,7 @@ export function getLastCommandSync(guildId: string) {
 
       getLastCommand(guildId)
         .then((lastCommandDate) => {
-          lastCommand.set(guildId, {
-            timestamp: lastCommandDate ? lastCommandDate.getTime() : 0,
-            storedAt: Date.now(),
-          });
+          lastCommand.set(guildId, lastCommandDate ? lastCommandDate.getTime() : 0);
         })
         .finally(() => {
           pendingFetch.delete(guildId);
@@ -37,9 +25,7 @@ export function getLastCommandSync(guildId: string) {
     return null;
   }
 
-  lastCommand.set(guildId, { timestamp: data.timestamp, storedAt: Date.now() });
-
-  return data.timestamp;
+  return data;
 }
 
 const cache = new RedisCache<number | string>(Constants.redis.cache.guild.LAST_COMMAND, 3600);
@@ -73,5 +59,5 @@ export async function getLastCommand(guildId: string) {
 }
 
 export function setLastCommand(guildId: string, timestamp: number) {
-  lastCommand.set(guildId, { timestamp, storedAt: Date.now() });
+  lastCommand.set(guildId, timestamp);
 }
