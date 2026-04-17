@@ -1,11 +1,13 @@
 import { getInfo } from "discord-hybrid-sharding";
 import { ActivityType, GatewayIntentBits, Options, Partials } from "discord.js";
 import { NypsiClient } from "./models/Client";
+import { getLastCommandSync } from "./utils/functions/guilds/commands";
 import ms = require("ms");
 
 // when first seen in cache
 const cacheTimestamp = new Map<string, number>();
 const minTimeInCache = { guildMember: ms("2 minutes"), user: ms("10 minutes") };
+const inactiveGuild = ms("30 days");
 
 const client = new NypsiClient({
   allowedMentions: {
@@ -28,14 +30,24 @@ const client = new NypsiClient({
       interval: 900,
       filter: () => (member) => {
         if (!member || !member.user) return true;
+        if (!member.guild?.id) return true;
         if (member.user.id === member.client.user.id) return false;
+
+        const lastGuildCommand = getLastCommandSync(member.guild.id);
+
+        const now = Date.now();
+
+        if (typeof lastGuildCommand === "number" && lastGuildCommand > now - inactiveGuild) {
+          // guild is inactive - no point storing data
+          return false;
+        }
 
         const key = `${member.guild.id}-${member.id}`;
 
         if (!cacheTimestamp.has(key)) {
-          cacheTimestamp.set(key, Date.now());
+          cacheTimestamp.set(key, now);
           return false;
-        } else if (cacheTimestamp.get(key) < Date.now() - minTimeInCache.guildMember) {
+        } else if (cacheTimestamp.get(key) < now - minTimeInCache.guildMember) {
           // if they've been in cache longer than min time
           if (recentCommands.has(member.id)) {
             return false;
@@ -120,13 +132,23 @@ const client = new NypsiClient({
       maxSize: 2_500,
       keepOverLimit: (user) => {
         if (user.id === user.client.user.id) return true;
+        if (!user.guild?.id) return false;
+
+        const lastGuildCommand = getLastCommandSync(user.guild.id);
+
+        if (typeof lastGuildCommand === "number" && lastGuildCommand > Date.now() - inactiveGuild) {
+          // guild is inactive - no point storing data
+          return false;
+        }
+
+        const now = Date.now();
 
         const key = `${user.guild.id}-${user.id}`;
 
         if (!cacheTimestamp.has(key)) {
-          cacheTimestamp.set(key, Date.now());
+          cacheTimestamp.set(key, now);
           return true;
-        } else if (cacheTimestamp.get(key) < Date.now() - minTimeInCache.guildMember) {
+        } else if (cacheTimestamp.get(key) < now - minTimeInCache.guildMember) {
           // if they've been in cache longer than min time
           if (recentCommands.has(user.id)) {
             return true;

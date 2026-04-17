@@ -9,6 +9,7 @@ import { debounce } from "../../debounce";
 import { logger } from "../../logger";
 import { getRawLevel } from "../economy/levelling";
 import { isEcoBanned } from "../economy/utils";
+import { setLastCommand } from "../guilds/commands";
 import { getUserId, MemberResolvable } from "../member";
 import sleep from "../sleep";
 import { addNewAvatar, addNewUsername, fetchUsernameHistory, isTracking } from "./history";
@@ -192,5 +193,8 @@ export async function updateUser(user: User, command: string, guildId?: string) 
     },
   });
 
-  if (guildId) debouncedGuildLastCommand(guildId, guildId);
+  if (guildId) {
+    setLastCommand(guildId, date.getTime());
+    debouncedGuildLastCommand(guildId, guildId);
+  }
 }
