@@ -35,7 +35,7 @@ export function getLastCommandSync(guildId: string) {
 }
 
 const cache = new RedisCache<number | string>(Constants.redis.cache.guild.LAST_COMMAND, 3600);
-const mutex = new Mutex();
+const mutex = new Mutex(true);
 
 export async function getLastCommand(guildId: string) {
   await mutex.acquire(guildId);
