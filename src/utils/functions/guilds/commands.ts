@@ -1,6 +1,15 @@
+import ms from "ms";
 import prisma from "../../../init/database";
 
 const lastCommand = new Map<string, { timestamp: number; storedAt: number }>();
+
+setInterval(() => {
+  for (const [guildId, data] of lastCommand.entries()) {
+    if (Date.now() - data.storedAt > ms("12 hours")) {
+      lastCommand.delete(guildId);
+    }
+  }
+}, ms("15 minutes"));
 
 export function getLastCommandSync(guildId: string) {
   const data = lastCommand.get(guildId);
