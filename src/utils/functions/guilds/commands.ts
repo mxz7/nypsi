@@ -5,6 +5,8 @@ import Constants from "../../Constants";
 import { Mutex } from "../mutex";
 
 const lastCommand = new Map<string, { timestamp: number; storedAt: number }>();
+// guildId
+const pendingFetch = new Set<string>();
 
 setInterval(() => {
   for (const [guildId, data] of lastCommand.entries()) {
@@ -18,14 +20,20 @@ export function getLastCommandSync(guildId: string) {
   const data = lastCommand.get(guildId);
 
   if (!data) {
-    (async () => {
-      const lastCommandDate = await getLastCommand(guildId);
+    if (!pendingFetch.has(guildId)) {
+      pendingFetch.add(guildId);
 
-      lastCommand.set(guildId, {
-        timestamp: lastCommandDate ? lastCommandDate.getTime() : 0,
-        storedAt: Date.now(),
-      });
-    })();
+      getLastCommand(guildId)
+        .then((lastCommandDate) => {
+          lastCommand.set(guildId, {
+            timestamp: lastCommandDate ? lastCommandDate.getTime() : 0,
+            storedAt: Date.now(),
+          });
+        })
+        .finally(() => {
+          pendingFetch.delete(guildId);
+        });
+    }
     return null;
   }
 
