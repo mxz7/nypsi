@@ -697,6 +697,12 @@ async function run(
       new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
     );
 
+    const after = performance.now();
+
+    logger.debug(
+      `role members: taken ${after - before}ms, filtering: ${afterFiltering - beforeFiltering}ms`,
+    );
+
     if (pages.size > 1) {
       msg = await send({ embeds: [embed], components: [row] });
     } else {
@@ -715,12 +721,6 @@ async function run(
         return manager.embed;
       },
     });
-
-    const after = performance.now();
-
-    logger.debug(
-      `role members: taken ${after - before}ms, filtering: ${afterFiltering - beforeFiltering}ms`,
-    );
 
     return manager.listen();
   }
