@@ -30,11 +30,11 @@ async function run(
     return;
   }
 
-  if (message.guild.memberCount > 2000) {
+  if (message.guild.memberCount > 2500) {
     return send({
       embeds: [
         new ErrorEmbed(
-          "this command is temporarily disabled for large servers. it should return in a few days",
+          "this command is unfortunately disabled for large servers due to performance issues",
         ),
       ],
     });
