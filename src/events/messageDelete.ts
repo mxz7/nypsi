@@ -1,8 +1,6 @@
 import { Message, PartialMessage } from "discord.js";
-import { CustomEmbed } from "../models/EmbedBuilders";
 import { getChatFilter, getSnipeFilter } from "../utils/functions/guilds/filters";
 import { createGuild, hasGuild, snipe } from "../utils/functions/guilds/utils";
-import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
 import { cleanString } from "../utils/functions/string";
 import { logger } from "../utils/logger";
 
@@ -24,21 +22,6 @@ export default async function messageDelete(message: Message | PartialMessage) {
 
   if (message.content != "" && !message.author.bot && message.content.length > 1) {
     if (!(await hasGuild(message.guild))) await createGuild(message.guild);
-
-    if (await isLogsEnabled(message.guild)) {
-      const embed = new CustomEmbed().disableFooter().setTimestamp();
-
-      embed.setHeader(message.author.username, message.author.avatarURL());
-      embed.setTitle("message deleted");
-      embed.setDescription(
-        `${message.member.toString()} \`${
-          message.author.id
-        }\`\n\n**channel** ${message.channel.toString()} \`${message.channelId}\``,
-      );
-      embed.addField("content", `\`\`\`${message.content}\`\`\``);
-
-      await addLog(message.guild, "message", embed);
-    }
 
     const filter = await getSnipeFilter(message.guild);
 

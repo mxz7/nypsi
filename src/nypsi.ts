@@ -160,7 +160,6 @@ const client = new NypsiClient({
     GatewayIntentBits.MessageContent,
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMembers,
-    GatewayIntentBits.GuildExpressions,
     GatewayIntentBits.GuildMessages,
   ],
   partials: [Partials.Channel], // for direct messages

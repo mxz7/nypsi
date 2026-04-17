@@ -1,9 +1,7 @@
 import { GuildMember } from "discord.js";
 import prisma from "../init/database";
 import redis from "../init/redis";
-import { CustomEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
-import { daysAgo, formatDate } from "../utils/functions/date";
 import { isAltPunish } from "../utils/functions/guilds/altpunish";
 import {
   getAutoJoinRoles,
@@ -16,11 +14,8 @@ import { createGuild, hasGuild, updateGuild } from "../utils/functions/guilds/ut
 import { clearMemberCache } from "../utils/functions/member";
 import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import { isBanned, newBan } from "../utils/functions/moderation/ban";
-import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
 import { deleteMute, getMuteRole, isMuted, newMute } from "../utils/functions/moderation/mute";
 import sleep from "../utils/functions/sleep";
-import { pluralize } from "../utils/functions/string";
-import { fetchUsernameHistory } from "../utils/functions/users/history";
 import { logger } from "../utils/logger";
 
 const queue = new Set<string>();
@@ -30,33 +25,6 @@ export default async function guildMemberAdd(member: GuildMember) {
   if (!(await hasGuild(member.guild))) await createGuild(member.guild);
 
   await redis.del(`${Constants.redis.cache.guild.JOIN_ORDER}:${member.guild.id}`);
-
-  if (await isLogsEnabled(member.guild)) {
-    const embed = new CustomEmbed().disableFooter().setTimestamp();
-
-    embed.setHeader(member.user.username, member.user.avatarURL());
-    embed.setTitle("member joined");
-    embed.setDescription(
-      `${member.toString()} \`${member.id}\`\n\n**username** ${
-        member.user.username
-      }\n**created** ${daysAgo(member.user.createdAt)} ${pluralize("day", daysAgo(member.user.createdAt))} ago`,
-    );
-
-    const history = await fetchUsernameHistory(member);
-
-    if (history.length > 0) {
-      const text: string[] = [];
-
-      for (const un of history) {
-        if (text.length > 10) break;
-        text.push(`\`${un.value}\` | \`${formatDate(un.createdAt)}\``);
-      }
-
-      embed.addField("username history", text.join("\n"));
-    }
-
-    await addLog(member.guild, "member", embed);
-  }
 
   const autoRoles = await getAutoJoinRoles(member.guild);
 

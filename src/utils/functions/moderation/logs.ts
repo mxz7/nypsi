@@ -5,7 +5,6 @@ import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { LogType, PunishmentType } from "../../../types/Moderation";
 import Constants from "../../Constants";
-import { Mutex } from "../mutex";
 
 const logColors = new Map<LogType, ColorResolvable>();
 const modLogColors = new Map<PunishmentType, ColorResolvable>();
@@ -77,93 +76,6 @@ export async function addModLog(
     `${Constants.redis.cache.guild.MODLOGS}:${guild.id}`,
     JSON.stringify(embed.toJSON()),
   );
-}
-
-export async function addLog(guild: Guild, type: LogType, embed: CustomEmbed) {
-  embed.setColor(logColors.get(type));
-
-  await redis.lpush(
-    `${Constants.redis.nypsi.GUILD_LOG_QUEUE}:${guild.id}`,
-    JSON.stringify(embed.toJSON()),
-  );
-}
-
-const logsEnabledMutex = new Mutex();
-
-export async function isLogsEnabled(guild: Guild) {
-  if (await redis.exists(`${Constants.redis.cache.guild.LOGS}:${guild.id}`)) {
-    return (await redis.get(`${Constants.redis.cache.guild.LOGS}:${guild.id}`)) === "t";
-  }
-
-  await logsEnabledMutex.acquire(guild.id);
-
-  try {
-    const query = await prisma.guild.findUnique({
-      where: { id: guild.id },
-      select: { logs: true },
-    });
-
-    if (!query || !query.logs) {
-      await redis.set(`${Constants.redis.cache.guild.LOGS}:${guild.id}`, "f", "EX", 36000);
-      return false;
-    }
-
-    await redis.set(`${Constants.redis.cache.guild.LOGS}:${guild.id}`, "t", "EX", 36000);
-    return true;
-  } finally {
-    logsEnabledMutex.release(guild.id);
-  }
-}
-
-export async function setLogsChannelHook(guild: Guild, hook: string) {
-  await redis.del(`${Constants.redis.cache.guild.LOGS}:${guild.id}`);
-  await redis.del(Constants.redis.cache.guild.LOGS_GUILDS);
-
-  if (!hook) {
-    await redis.del(`${Constants.redis.nypsi.GUILD_LOG_QUEUE}:${guild.id}`);
-  }
-
-  const previous = await getLogsChannelHook(guild);
-
-  if (previous) {
-    try {
-      await previous.delete("logs moved/disabled");
-    } catch {
-      // silent fail
-    }
-  }
-
-  await prisma.guild.update({
-    where: {
-      id: guild.id,
-    },
-    data: {
-      logs: hook,
-    },
-  });
-}
-
-export async function getLogsChannelHook(guild: Guild) {
-  await logsEnabledMutex.acquire(`hook_${guild.id}`);
-
-  try {
-    const query = await prisma.guild.findUnique({
-      where: {
-        id: guild.id,
-      },
-      select: {
-        logs: true,
-      },
-    });
-
-    await redis.del(`nypsi:query:islogsenabled:searching:${guild.id}`);
-
-    if (!query.logs) return undefined;
-
-    return new WebhookClient({ url: query.logs });
-  } finally {
-    logsEnabledMutex.release(`hook_${guild.id}`);
-  }
 }
 
 export async function isModLogsEnabled(guild: Guild) {

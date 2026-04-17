@@ -33,12 +33,7 @@ import { setAltPunish } from "../utils/functions/guilds/altpunish";
 import { getDisabledChannels, setDisabledChannels } from "../utils/functions/guilds/channels";
 import { setSlashOnly } from "../utils/functions/guilds/slash";
 import { getPrefix, setPrefix } from "../utils/functions/guilds/utils";
-import {
-  getLogsChannelHook,
-  getModLogsHook,
-  setLogsChannelHook,
-  setModLogs,
-} from "../utils/functions/moderation/logs";
+import { getModLogsHook, setModLogs } from "../utils/functions/moderation/logs";
 import { cleanString } from "../utils/functions/string";
 import { checkPurchases, getEmail, setEmail } from "../utils/functions/users/email";
 import { getLastfmUsername, setLastfmUsername } from "../utils/functions/users/lastfm";
@@ -1226,146 +1221,15 @@ async function run(
       return;
     }
 
-    if (
-      !message.guild.members.me.permissions.has(PermissionFlagsBits.ManageWebhooks) ||
-      !message.guild.members.me.permissions.has(PermissionFlagsBits.ManageChannels)
-    ) {
-      return send({
-        embeds: [
-          new ErrorEmbed(
-            "i need the `manage webhooks` and `manage channels` permissions for this command",
-          ),
-        ],
-      });
-    }
-
-    if (args.length == 2) {
-      const current = await getLogsChannelHook(message.guild);
-
-      const embed = new CustomEmbed(message.member);
-
-      embed.setHeader("logs");
-
-      const notEnabled = `logs have not been enabled\n\nuse **/settings server logs <channel>** to enable them`;
-
-      if (!current) {
-        embed.setDescription(notEnabled);
-
-        return send({ embeds: [embed] });
-      } else {
-        try {
-          const hookMsg = await current.send({ content: "fetching channel..." });
-
-          const channel = message.guild.channels.cache.get(hookMsg.channel_id);
-
-          embed.setDescription(
-            `current channel: ${channel ? channel.toString() : `${hookMsg.channel_id}`}\n\n**/settings server logs <channel>** to change the channel`,
-          );
-
-          try {
-            await current.deleteMessage(hookMsg.id);
-          } catch {
-            // silent fail
-          }
-
-          const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-            new ButtonBuilder().setCustomId("d").setLabel("disable").setStyle(ButtonStyle.Danger),
-          );
-
-          const msg = await send({ embeds: [embed], components: [row] });
-
-          const filter = (i: Interaction) => i.user.id == message.author.id;
-
-          const pageManager: any = async () => {
-            let fail = false;
-
-            const response = await msg
-              .awaitMessageComponent({ filter, time: 60000 })
-              .then(async (collected) => {
-                await collected.deferUpdate().catch(() => {
-                  fail = true;
-                  return pageManager();
-                });
-                return { res: collected.customId };
-              })
-              .catch(async () => {
-                fail = true;
-                await msg.edit({ embeds: [embed], components: [] });
-              });
-
-            if (fail) return;
-            if (!response) return;
-
-            const { res } = response;
-
-            if (res == "d") {
-              await setLogsChannelHook(message.guild, null);
-
-              embed.setDescription(notEnabled);
-              return msg.edit({ embeds: [embed], components: [] });
-            }
-          };
-
-          return pageManager();
-        } catch {
-          await setLogsChannelHook(message.guild, null);
-          embed.setDescription(notEnabled);
-          return send({ embeds: [embed] });
-        }
-      }
-    } else {
-      let channel: string | Channel = args[0];
-
-      if (!message.guild.channels.cache.get(args[0])) {
-        if (!message.mentions.channels.first()) {
-          return send({
-            embeds: [
-              new ErrorEmbed(
-                "you need to mention a channel, you can use the channel ID, or mention the channel by putting a # before the channel name",
-              ),
-            ],
-          });
-        } else {
-          channel = message.mentions.channels.first();
-        }
-      } else {
-        channel = message.guild.channels.cache.find((ch) => ch.id == channel);
-      }
-
-      if (!channel || !channel.isTextBased() || channel.isThread()) {
-        return send({ embeds: [new ErrorEmbed("invalid channel")] });
-      }
-
-      if (channel.isDMBased()) return;
-
-      let fail = false;
-
-      const hook = await channel
-        .createWebhook({
-          name: "nypsi",
-          avatar: channel.client.user.avatarURL(),
-        })
-        .catch((e) => {
-          fail = true;
-          send({
-            embeds: [
-              new ErrorEmbed(
-                "i was unable to make a webhook in that channel, please check my permissions\n" +
-                  `\`\`\`${e.rawError.message}\`\`\``,
-              ),
-            ],
-          });
-        });
-
-      if (fail) return;
-      if (!hook) return;
-
-      await setLogsChannelHook(message.guild, hook.url);
-
-      return send({
-        embeds: [new CustomEmbed(message.member, `✅ logs channel set to ${channel.toString()}`)],
-      });
-    }
+    return send({
+      embeds: [
+        new CustomEmbed(
+          "nypsi logs have been removed, we recommend using a third party bot such as [sapphire](https://sapph.xyz) for server event logging\n\n" +
+            "we decided to remove server event logs due to performance issues and little usage of the feature, our implementation was also incredibly basic and not useful, " +
+            "we think the use of third party bot that has a specialised server event logging feature will serve your needs much better",
+        ),
+      ],
+    });
   };
 
   const doPrefix = async () => {
