@@ -1,5 +1,8 @@
 import ms from "ms";
 import prisma from "../../../init/database";
+import { RedisCache } from "../../cache";
+import Constants from "../../Constants";
+import { Mutex } from "../mutex";
 
 const lastCommand = new Map<string, { timestamp: number; storedAt: number }>();
 
@@ -31,13 +34,34 @@ export function getLastCommandSync(guildId: string) {
   return data.timestamp;
 }
 
-export async function getLastCommand(guildId: string) {
-  const query = await prisma.guild.findUnique({
-    where: { id: guildId },
-    select: { lastCommand: true },
-  });
+const cache = new RedisCache<number | string>(Constants.redis.cache.guild.LAST_COMMAND, 3600);
+const mutex = new Mutex();
 
-  return query?.lastCommand || null;
+export async function getLastCommand(guildId: string) {
+  await mutex.acquire(guildId);
+
+  try {
+    const cacheValue = await cache.get(guildId);
+
+    if (cacheValue) {
+      if (cacheValue === "null") {
+        return null;
+      }
+
+      return new Date(cacheValue);
+    }
+
+    const query = await prisma.guild.findUnique({
+      where: { id: guildId },
+      select: { lastCommand: true },
+    });
+
+    cache.set(guildId, query?.lastCommand.getTime() || "null");
+
+    return query?.lastCommand || null;
+  } finally {
+    mutex.release(guildId);
+  }
 }
 
 export function setLastCommand(guildId: string, timestamp: number) {
