@@ -30,6 +30,16 @@ async function run(
     return;
   }
 
+  if (message.guild.memberCount > 2000) {
+    return send({
+      embeds: [
+        new ErrorEmbed(
+          "this command is temporarily disabled for large servers. it should return in a few days",
+        ),
+      ],
+    });
+  }
+
   const prefix = (await getPrefix(message.guild))[0];
 
   if (args.length == 0) {

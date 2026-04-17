@@ -147,6 +147,16 @@ async function run(
     return send({ embeds: [new ErrorEmbed("i need the manage roles permission")] });
   }
 
+  if (message.guild.memberCount > 2000) {
+    return send({
+      embeds: [
+        new ErrorEmbed(
+          "this command is temporarily disabled for large servers. it should return in a few days",
+        ),
+      ],
+    });
+  }
+
   const getMembers = async () => {
     return Array.from((await getAllMembers(message.guild, true)).values());
   };
