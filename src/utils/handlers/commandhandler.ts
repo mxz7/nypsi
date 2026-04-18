@@ -1,5 +1,4 @@
 import * as fs from "fs";
-import { REST } from "@discordjs/rest";
 import {
   ActionRowBuilder,
   APIEmbed,
@@ -82,6 +81,7 @@ import {
 import { getLastKnownUsername } from "../functions/users/username";
 import { createProfile, hasProfile } from "../functions/users/utils";
 import { getTimestamp, logger } from "../logger";
+import { getRest } from "../rest";
 import dayjs = require("dayjs");
 import ms = require("ms");
 
@@ -1489,9 +1489,13 @@ export function startRestart() {
   restarting = true;
 }
 
-export async function uploadSlashCommandsToGuild(guildID: string, clientID: string) {
+export async function uploadSlashCommandsToGuild(
+  guildID: string,
+  clientID: string,
+  client: NypsiClient,
+) {
   logger.info("started refresh of [/] commands...");
-  const rest = new REST({ version: "9" }).setToken(process.env.BOT_TOKEN);
+  const rest = getRest(client);
 
   const slashData = [];
 
@@ -1510,9 +1514,9 @@ export async function uploadSlashCommandsToGuild(guildID: string, clientID: stri
   }
 }
 
-export async function uploadSlashCommands(clientID: string) {
+export async function uploadSlashCommands(clientID: string, client: NypsiClient) {
   logger.info("started refresh of global [/] commands...");
-  const rest = new REST({ version: "9" }).setToken(process.env.BOT_TOKEN);
+  const rest = getRest(client);
 
   const slashData = [];
 
@@ -1531,9 +1535,13 @@ export async function uploadSlashCommands(clientID: string) {
   }
 }
 
-export async function deleteSlashCommandsFromGuild(guildID: string, clientID: string) {
+export async function deleteSlashCommandsFromGuild(
+  guildID: string,
+  clientID: string,
+  client: NypsiClient,
+) {
   logger.info("started deletion of [/] commands...");
-  const rest = new REST({ version: "9" }).setToken(process.env.BOT_TOKEN);
+  const rest = getRest(client);
 
   try {
     await rest.put(Routes.applicationGuildCommands(clientID, guildID), { body: [] });
@@ -1544,9 +1552,9 @@ export async function deleteSlashCommandsFromGuild(guildID: string, clientID: st
   }
 }
 
-export async function deleteSlashCommands(clientID: string) {
+export async function deleteSlashCommands(clientID: string, client: NypsiClient) {
   logger.info("started deletion of global [/] commands...");
-  const rest = new REST({ version: "9" }).setToken(process.env.BOT_TOKEN);
+  const rest = getRest(client);
 
   try {
     await rest.put(Routes.applicationCommands(clientID), { body: [] });
