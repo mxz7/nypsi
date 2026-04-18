@@ -216,7 +216,7 @@ export function canDiscardGuildMember(guildId: string): boolean {
   return !(recentFetch || oftenFetch);
 }
 
-export type SlimMember = { userId: string; roles: string[] };
+export type SlimMember = { userId: string; username: string; roles: string[] };
 
 const restMembersCache = new MapCache<SlimMember[]>(ms("15 minutes"));
 const restMutex = new Mutex();
@@ -249,7 +249,9 @@ export async function getAllMembersRest(
 
       const batch = (await rest.get(Routes.guildMembers(guildId), { query })) as APIGuildMember[];
 
-      allMembers.push(...batch.map((m) => ({ userId: m.user!.id, roles: m.roles })));
+      allMembers.push(
+        ...batch.map((m) => ({ userId: m.user!.id, roles: m.roles, username: m.user!.username })),
+      );
 
       if (batch.length < 1000) break;
 

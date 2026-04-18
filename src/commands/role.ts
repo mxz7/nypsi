@@ -7,12 +7,14 @@ import {
   MessageActionRowComponentBuilder,
   PermissionFlagsBits,
   Role,
+  Routes,
 } from "discord.js";
 import { sort } from "fast-sort";
+import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { MStoTime } from "../utils/functions/date";
-import { getAllMembers } from "../utils/functions/guilds/members";
+import { getAllMembersRest, SlimMember } from "../utils/functions/guilds/members";
 import {
   getAutoJoinRoles,
   getPersistentRoles,
@@ -24,6 +26,7 @@ import PageManager from "../utils/functions/page";
 import sleep from "../utils/functions/sleep";
 import { pluralize } from "../utils/functions/string";
 import { logger } from "../utils/logger";
+import { getRest } from "../utils/rest";
 
 const cmd = new Command("role", "role utilities", "utility");
 
@@ -147,7 +150,7 @@ async function run(
     return send({ embeds: [new ErrorEmbed("i need the manage roles permission")] });
   }
 
-  if (message.guild.memberCount > 2500) {
+  if (message.guild.memberCount > 15000) {
     return send({
       embeds: [
         new ErrorEmbed(
@@ -157,9 +160,20 @@ async function run(
     });
   }
 
-  const getMembers = async () => {
-    return Array.from((await getAllMembers(message.guild, true)).values());
+  const getMembers = async (): Promise<SlimMember[]> => {
+    const cached = message.guild.members.cache;
+    if (cached.size === message.guild.memberCount) {
+      return cached.map((m) => ({
+        userId: m.id,
+        roles: m.roles.cache.map((r) => r.id),
+        username: m.user.username,
+      }));
+    }
+
+    return getAllMembersRest(message.guild.id, message.client as NypsiClient);
   };
+
+  const rest = getRest(message.client as NypsiClient);
 
   if (args.length == 0) {
     return send({
@@ -212,7 +226,7 @@ async function run(
       return send({ embeds: [new ErrorEmbed("invalid role")] });
     }
 
-    members = members.filter((m) => !m.roles.cache.has(role.id));
+    members = members.filter((m) => !m.roles.includes(role.id));
 
     if (!members || members.length === 0)
       return send({ embeds: [new ErrorEmbed("there are no members to give this role to")] });
@@ -299,9 +313,16 @@ async function run(
       }, 5000);
 
       for (const member of members) {
-        await member.roles.add(role).catch(() => {
-          fail = true;
-        });
+        await rest
+          .put(Routes.guildMemberRole(message.guild.id, member.userId, role.id), {
+            headers: {
+              "X-Audit-Log-Reason": `mass role operation by ${message.author.username} (${message.author.id})`,
+            },
+          })
+          .catch(() => {
+            fail = true;
+          });
+
         count++;
         await sleep(1000);
       }
@@ -312,9 +333,15 @@ async function run(
     let fail = false;
 
     for (const member of members) {
-      await member.roles.add(role).catch(() => {
-        fail = true;
-      });
+      await rest
+        .put(Routes.guildMemberRole(message.guild.id, member.userId, role.id), {
+          headers: {
+            "X-Audit-Log-Reason": `mass role operation by ${message.author.username} (${message.author.id})`,
+          },
+        })
+        .catch(() => {
+          fail = true;
+        });
     }
 
     if (fail) {
@@ -379,7 +406,7 @@ async function run(
         embeds: [new ErrorEmbed(`you do not have permission to modify ${role.toString()}`)],
       });
 
-    members = members.filter((m) => Array.from(m.roles.cache.keys()).includes(role.id));
+    members = members.filter((m) => m.roles.includes(role.id));
 
     if (members.length == 0) {
       return send({ embeds: [new ErrorEmbed("no members to remove role from")] });
@@ -456,9 +483,15 @@ async function run(
       }, 5000);
 
       for (const member of members) {
-        await member.roles.remove(role).catch(() => {
-          fail = true;
-        });
+        await rest
+          .delete(Routes.guildMemberRole(message.guild.id, member.userId, role.id), {
+            headers: {
+              "X-Audit-Log-Reason": `mass role operation by ${message.author.username} (${message.author.id})`,
+            },
+          })
+          .catch(() => {
+            fail = true;
+          });
         count++;
         await sleep(1000);
       }
@@ -469,9 +502,15 @@ async function run(
     let fail = false;
 
     for (const member of members) {
-      await member.roles.remove(role).catch(() => {
-        fail = true;
-      });
+      await rest
+        .delete(Routes.guildMemberRole(message.guild.id, member.userId, role.id), {
+          headers: {
+            "X-Audit-Log-Reason": `mass role operation by ${message.author.username} (${message.author.id})`,
+          },
+        })
+        .catch(() => {
+          fail = true;
+        });
     }
 
     if (fail) {
@@ -669,7 +708,7 @@ async function run(
     const beforeFiltering = performance.now();
 
     const filteredMembers = sort(
-      members.filter((m) => m.roles.cache.has(role.id)).map((m) => `\`${m.user.username}\``),
+      members.filter((m) => m.roles.includes(role.id)).map((m) => `\`${m.username}\``),
     ).asc();
 
     if (filteredMembers.length == 0) {
