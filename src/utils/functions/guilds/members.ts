@@ -94,6 +94,7 @@ export async function checkMembers(
     }
   } finally {
     checkMutex.release(mutexKey);
+    recentlyChecked.add(guildId);
 
     logger.debug(`members: checkMembers duration`, {
       guildId,
