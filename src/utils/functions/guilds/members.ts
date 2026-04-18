@@ -16,6 +16,13 @@ const checkMutex = new Mutex();
 const recentlyFetched = new MapCache<number>(ms("1 hour"));
 const oftenFetched = new MapCache<number>(ms("12 hour"));
 
+// recently checked against db
+const recentlyChecked = new Set<string>();
+
+setInterval(() => {
+  recentlyChecked.clear();
+}, ms("10 minutes"));
+
 async function getDatabaseMembers(guildId: string) {
   const cache = await redis.get(`${Constants.redis.cache.guild.MEMBERS}:${guildId}`);
 
@@ -48,6 +55,7 @@ export async function checkMembers(
   discordMembers: string[],
   wantedDiscord: boolean,
 ) {
+  if (recentlyChecked.has(guildId)) return;
   const mutexKey = `check_members_${guildId}`;
   await checkMutex.acquire(mutexKey);
 
