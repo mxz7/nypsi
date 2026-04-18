@@ -11,6 +11,7 @@ import { MentionJobData } from "../types/workers/mentions";
 import { MapCache } from "../utils/cache";
 import Constants from "../utils/Constants";
 import { checkMembers } from "../utils/functions/guilds/members";
+import { Mutex } from "../utils/functions/mutex";
 import { encrypt } from "../utils/functions/string";
 import { logger, setClusterId } from "../utils/logger";
 
@@ -108,6 +109,7 @@ worker.on("completed", (job) => {
 });
 
 const membersCache = new MapCache<APIGuildMember[]>(ms("1 hour"));
+const mutex = new Mutex();
 
 async function getAllMembers(guildId: string): Promise<APIGuildMember[]> {
   const cache = membersCache.get(guildId);
@@ -116,39 +118,45 @@ async function getAllMembers(guildId: string): Promise<APIGuildMember[]> {
     return cache;
   }
 
-  const allMembers: APIGuildMember[] = [];
-  let after: string | undefined;
+  await mutex.acquire(guildId);
 
-  await redis.set(
-    `${Constants.redis.cache.guild.MEMBERS_LAST_FETCHED}:${guildId}`,
-    Date.now(),
-    "EX",
-    ms("10 minute") / 1000,
-  );
+  try {
+    const allMembers: APIGuildMember[] = [];
+    let after: string | undefined;
 
-  while (true) {
-    const query = new URLSearchParams({ limit: "1000" });
-    if (after) query.set("after", after);
+    await redis.set(
+      `${Constants.redis.cache.guild.MEMBERS_LAST_FETCHED}:${guildId}`,
+      Date.now(),
+      "EX",
+      ms("10 minute") / 1000,
+    );
 
-    const batch = (await rest.get(Routes.guildMembers(guildId), { query })) as APIGuildMember[];
+    while (true) {
+      const query = new URLSearchParams({ limit: "1000" });
+      if (after) query.set("after", after);
 
-    allMembers.push(...batch);
+      const batch = (await rest.get(Routes.guildMembers(guildId), { query })) as APIGuildMember[];
 
-    if (batch.length < 1000) break;
+      allMembers.push(...batch);
 
-    after = batch.at(-1)!.user!.id;
+      if (batch.length < 1000) break;
+
+      after = batch.at(-1)!.user!.id;
+    }
+
+    membersCache.set(guildId, allMembers);
+
+    const userIds = allMembers.map((m) => m.user.id);
+
+    // might as well update database
+    checkMembers(guildId, userIds, true);
+
+    logger.debug(`fetched ${allMembers.length} members`, { guildId });
+
+    return allMembers;
+  } finally {
+    mutex.release(guildId);
   }
-
-  membersCache.set(guildId, allMembers);
-
-  const userIds = allMembers.map((m) => m.user.id);
-
-  // might as well update database
-  checkMembers(guildId, userIds, true);
-
-  logger.debug(`fetched ${allMembers.length} members`, { guildId });
-
-  return allMembers;
 }
 
 // After BullMQ JSON serialisation, PermissionOverwrites allow/deny are plain strings
