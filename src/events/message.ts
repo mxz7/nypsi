@@ -566,10 +566,12 @@ export default async function messageCreate(message: Message) {
         content: message.content,
         guildId: message.guildId,
         channelOverwrites: channel.isThread() ? null : channel.permissionOverwrites.cache.toJSON(),
-        roles: message.guild.roles.cache.map((r) => ({
-          id: r.id,
-          permissions: r.permissions.bitfield.toString(),
-        })),
+        roles: message.guild.roles.cache
+          .map((r) => ({
+            id: r.id,
+            permissions: r.permissions.bitfield.toString(),
+          }))
+          .filter((r) => r.permissions !== "0"),
         messageUrl: message.url,
         mentions: [],
         messageId: message.id,
