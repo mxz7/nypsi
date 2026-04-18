@@ -161,7 +161,9 @@ export async function getAllMembers(
     const discordMemberIds = discordMembers.map((i) => i.id);
     const mapIdsDuration = performance.now() - mapIdsStart;
 
-    checkMembers(guild.id, discordMemberIds, getCollection);
+    if (lastFetched < Date.now() - ms("10 minute")) {
+      checkMembers(guild.id, discordMemberIds, getCollection);
+    }
 
     logger.debug(`members: getAllMembers timings`, {
       guildId,
