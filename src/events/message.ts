@@ -563,7 +563,8 @@ export default async function messageCreate(message: Message) {
 
       const payload: MentionJobData = {
         channelId: message.channelId,
-        content: message.content,
+        content:
+          message.content.length > 100 ? message.content.substring(0, 97) + "..." : message.content,
         guildId: message.guildId,
         channelOverwrites: channel.isThread() ? null : channel.permissionOverwrites.cache.toJSON(),
         roles: message.guild.roles.cache
