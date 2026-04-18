@@ -10,7 +10,7 @@ import {
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { createUser, userExists } from "../utils/functions/economy/utils";
+import { createUser } from "../utils/functions/economy/utils";
 import { getLastCommand as getLastGuildCommand } from "../utils/functions/guilds/commands";
 import { getGuildName } from "../utils/functions/guilds/utils";
 import { getKarma } from "../utils/functions/karma/karma";
@@ -48,8 +48,7 @@ async function run(
   if (
     message.guild.memberCount < 15000 &&
     (await getLastGuildCommand(message.guildId)).getTime() >= Date.now() - ms("30 days") &&
-    ((await userExists(message.guild.ownerId)) ||
-      (await isPremium(message.guild.ownerId)) ||
+    ((await isPremium(message.guild.ownerId)) ||
       (await getKarma(message.guild.ownerId)) >= 50 ||
       (await getLastCommand(message.guild.ownerId)).getTime() >= Date.now() - ms("30 days"))
   ) {
