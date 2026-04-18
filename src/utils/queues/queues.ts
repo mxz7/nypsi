@@ -1,11 +1,11 @@
 import { Queue } from "bullmq";
 import ms from "ms";
 import redis from "../../init/redis";
-import { NotificationPayload } from "../../types/Notification";
+import { DMJobData } from "../../types/workers/dms";
 import { MentionJobData } from "../../types/workers/mentions";
 import { logger } from "../logger";
 
-export const dmQueue = new Queue<NotificationPayload>("dms", { connection: redis });
+export const dmQueue = new Queue<DMJobData>("dms", { connection: redis });
 export const mentionQueue = new Queue<MentionJobData>("mentions", { connection: redis });
 
 setInterval(async () => {

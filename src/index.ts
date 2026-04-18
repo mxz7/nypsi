@@ -13,7 +13,6 @@ import { loadItems, runEconomySetup } from "./utils/functions/economy/utils";
 import { addFailedHeartbeat, sendHeartbeat } from "./utils/functions/heartbeat";
 import { updateStats } from "./utils/functions/topgg";
 import { getWebhooks, logger, setClusterId } from "./utils/logger";
-import { dmQueueWorker } from "./utils/queues/dms";
 import ms = require("ms");
 import dayjs = require("dayjs");
 
@@ -70,10 +69,8 @@ manager.on("clusterCreate", (cluster) => {
     logger.debug(`received message: ${message}`, { message });
 
     if (message == "restart") {
-      dmQueueWorker.pause();
       const before = Date.now();
       manager.recluster.start({ restartMode: "rolling", delay: 2500 }).then(async () => {
-        dmQueueWorker.resume();
         const after = Date.now();
 
         logger.info(`reclustered in ${after - before}ms, giving back booster time`);
@@ -110,10 +107,6 @@ manager.on("clusterCreate", (cluster) => {
       return loadJobs(manager);
     } else if (typeof message === "string" && message === "reload_items") {
       return loadItems();
-    } else if (typeof message === "string" && message === "maintenance_on") {
-      dmQueueWorker.pause();
-    } else if (typeof message === "string" && message === "maintenance_off") {
-      dmQueueWorker.resume();
     }
   });
   logger.info(`launched cluster ${cluster.id}`);
@@ -133,7 +126,7 @@ process.on("uncaughtException", (e) => {
 
 manager.spawn().then(() => {
   logger.debug("manager spawn resolved");
-  dmQueueWorker.resume();
+
   runEconomySetup();
 });
 

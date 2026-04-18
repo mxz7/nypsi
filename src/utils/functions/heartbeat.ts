@@ -3,7 +3,6 @@ import { WebhookClient } from "discord.js";
 import redis from "../../init/redis";
 import Constants from "../Constants";
 import { logger } from "../logger";
-import { dmQueueWorker } from "../queues/dms";
 
 const failedHeartbeats = new Map<number, number>();
 const webhook = new WebhookClient({ url: process.env.NYPSI_DYING_HOOK });
@@ -34,7 +33,6 @@ export async function addFailedHeartbeat(cluster: Cluster) {
       webhook.send({
         content: `respawning cluster ${cluster.id} due to missing heartbeats <@&${Constants.STAFF_ROLE_ID}>`,
       });
-      await dmQueueWorker.pause();
       await cluster.respawn().then((c) => {
         webhook.send({
           content: `cluster ${cluster.id} respawned <@&${Constants.STAFF_ROLE_ID}>`,
@@ -43,7 +41,6 @@ export async function addFailedHeartbeat(cluster: Cluster) {
         c.emit("ready");
         logger.debug(`heatbeat: ${cluster.id} ready event sent`);
       });
-      dmQueueWorker.resume();
       failedHeartbeats.delete(cluster.id);
     } else {
       failedHeartbeats.set(cluster.id, failedHeartbeats.get(cluster.id) + 1);

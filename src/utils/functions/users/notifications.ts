@@ -134,8 +134,15 @@ export async function updatePreferences(member: MemberResolvable, data: Preferen
 export function addNotificationToQueue(...payload: NotificationPayload[]) {
   return dmQueue.addBulk(
     payload.map((data) => ({
-      data,
       name: data.memberId,
+      data: {
+        memberId: data.memberId,
+        payload: {
+          content: data.payload.content,
+          embeds: data.payload.embed ? [data.payload.embed.toJSON()] : undefined,
+          components: data.payload.components ? [data.payload.components.toJSON()] : undefined,
+        },
+      },
       opts: { attempts: 5, backoff: { type: "exponential", delay: 300000 } },
     })),
   );
