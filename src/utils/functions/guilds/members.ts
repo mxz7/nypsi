@@ -13,9 +13,6 @@ import ms = require("ms");
 const mutex = new Mutex(true);
 const checkMutex = new Mutex();
 
-const recentlyFetched = new MapCache<number>(ms("1 hour"));
-const oftenFetched = new MapCache<number>(ms("12 hour"));
-
 // recently checked against db
 const recentlyChecked = new Set<string>();
 
@@ -201,15 +198,6 @@ export async function getAllMembers(
     });
 
     if (getCollection) {
-      const recentFetch = recentlyFetched.get(guildId);
-      const oftenFetch = oftenFetched.get(guildId);
-
-      recentlyFetched.set(guildId, (recentFetch || 0) + 1);
-
-      if (recentFetch && recentFetch >= 4) {
-        oftenFetched.set(guildId, (oftenFetch || 0) + 1);
-      }
-
       return discordMembers;
     }
 
@@ -217,13 +205,6 @@ export async function getAllMembers(
   } finally {
     mutex.release(mutexKey);
   }
-}
-
-export function canDiscardGuildMember(guildId: string): boolean {
-  const recentFetch = recentlyFetched.get(guildId);
-  const oftenFetch = oftenFetched.get(guildId);
-
-  return !(recentFetch || oftenFetch);
 }
 
 export type SlimMember = {

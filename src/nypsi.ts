@@ -2,13 +2,12 @@ import { getInfo } from "discord-hybrid-sharding";
 import { ActivityType, GatewayIntentBits, Options, Partials } from "discord.js";
 import { NypsiClient } from "./models/Client";
 import { getLastCommandSync } from "./utils/functions/guilds/commands";
-import { canDiscardGuildMember } from "./utils/functions/guilds/members";
 import ms = require("ms");
 
 // when first seen in cache
 const cacheTimestamp = new Map<string, number>();
 const minTimeInCache = { guildMember: ms("5 minutes"), user: ms("7 minutes") };
-const inactiveGuild = ms("30 days");
+const inactiveGuild = ms("7 days");
 
 const client = new NypsiClient({
   allowedMentions: {
@@ -33,11 +32,6 @@ const client = new NypsiClient({
         if (!member || !member.user) return true;
         if (!member.guild?.id) return true;
         if (member.user.id === member.client.user.id) return false;
-
-        if (!canDiscardGuildMember(member.guild.id)) {
-          // guild members are often or recently fetched
-          return false;
-        }
 
         const lastGuildCommand = getLastCommandSync(member.guild.id);
 
@@ -139,11 +133,6 @@ const client = new NypsiClient({
       keepOverLimit: (user) => {
         if (user.id === user.client.user.id) return true;
         if (!user.guild?.id) return false;
-
-        if (!canDiscardGuildMember(user.guild.id)) {
-          // guild members are often or recently fetched
-          return true;
-        }
 
         const lastGuildCommand = getLastCommandSync(user.guild.id);
 
