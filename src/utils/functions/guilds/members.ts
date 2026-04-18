@@ -1,6 +1,7 @@
 import { Collection, Guild, GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
+import { MapCache } from "../../cache";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { Mutex } from "../mutex";
@@ -8,6 +9,9 @@ import ms = require("ms");
 
 const mutex = new Mutex(true);
 const checkMutex = new Mutex();
+
+const recentlyFetched = new MapCache<number>(ms("1 hour"));
+const oftenFetched = new MapCache<number>(ms("12 hour"));
 
 async function getDatabaseMembers(guildId: string) {
   const cache = await redis.get(`${Constants.redis.cache.guild.MEMBERS}:${guildId}`);
@@ -179,8 +183,28 @@ export async function getAllMembers(
       },
     });
 
-    return getCollection ? discordMembers : discordMemberIds;
+    if (getCollection) {
+      const recentFetch = recentlyFetched.get(guildId);
+      const oftenFetch = oftenFetched.get(guildId);
+
+      recentlyFetched.set(guildId, (recentFetch || 0) + 1);
+
+      if (recentFetch && recentFetch >= 4) {
+        oftenFetched.set(guildId, (oftenFetch || 0) + 1);
+      }
+
+      return discordMembers;
+    }
+
+    return discordMemberIds;
   } finally {
     mutex.release(mutexKey);
   }
+}
+
+export function canDiscardGuildMember(guildId: string): boolean {
+  const recentFetch = recentlyFetched.get(guildId);
+  const oftenFetch = oftenFetched.get(guildId);
+
+  return !(recentFetch || oftenFetch);
 }
