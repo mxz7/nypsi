@@ -10,7 +10,6 @@ import { MentionJobData } from "../types/workers/mentions";
 import { MapCache } from "../utils/cache";
 import { checkMembers } from "../utils/functions/guilds/members";
 import { encrypt } from "../utils/functions/string";
-import { applyLogs } from "../utils/functions/workers/helpers";
 import { logger, setClusterId } from "../utils/logger";
 
 setClusterId("worker-mentions");
@@ -49,7 +48,29 @@ const worker = new Worker<MentionJobData>(
   },
 );
 
-applyLogs(worker, "mentions");
+worker.on("paused", () => {
+  logger.info(`queue paused`);
+});
+
+worker.on("resumed", () => {
+  logger.info(`queue resumed`);
+});
+
+worker.on("error", (err) => {
+  logger.info(`queue error`, { name: err.name, message: err.message });
+});
+
+worker.on("stalled", (jobId) => {
+  logger.info(`job stalled: ${jobId}`);
+});
+
+worker.on("failed", (job, err) => {
+  logger.error(`job failed: ${job.id}`, {
+    name: err.name,
+    message: err.message,
+    payload: job.data,
+  });
+});
 
 // prevent duplicate message ids from being handled
 const handled = new Map<string, number>();
