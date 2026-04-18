@@ -557,7 +557,7 @@ export default async function messageCreate(message: Message) {
       ((await isPremium(message.guild.ownerId)) ||
         (await getKarma(message.guild.ownerId)) >= 50 ||
         ((await getLastCommand(message.guild.ownerId)) || new Date(0)).getTime() >=
-          Date.now() - ms("30 days"))
+          Date.now() - ms("90 days"))
     ) {
       const channel = message.channel;
 

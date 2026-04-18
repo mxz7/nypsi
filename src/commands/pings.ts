@@ -50,7 +50,7 @@ async function run(
     (await getLastGuildCommand(message.guildId)).getTime() >= Date.now() - ms("30 days") &&
     ((await isPremium(message.guild.ownerId)) ||
       (await getKarma(message.guild.ownerId)) >= 50 ||
-      (await getLastCommand(message.guild.ownerId)).getTime() >= Date.now() - ms("30 days"))
+      (await getLastCommand(message.guild.ownerId)).getTime() >= Date.now() - ms("90 days"))
   ) {
     qualified = true;
   } else if (message.author.id == message.guild.ownerId) {
