@@ -1,4 +1,3 @@
-import { Queue } from "bullmq";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -47,6 +46,7 @@ import { getLastKnownUsername } from "../utils/functions/users/username";
 import { hasProfile } from "../utils/functions/users/utils";
 import { runCommand } from "../utils/handlers/commandhandler";
 import { logger } from "../utils/logger";
+import { mentionQueue } from "../utils/queues/queues";
 import ms = require("ms");
 
 const dmCooldown = new Set<string>();
@@ -96,8 +96,6 @@ setInterval(() => {
 }, 60000);
 
 const removeExtraSpacesRegex = / +(?= )/g;
-
-const mentionQueue = new Queue<MentionJobData>("mentions", { connection: redis });
 
 export default async function messageCreate(message: Message) {
   if (!message.channel.isSendable()) return;
