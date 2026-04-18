@@ -75,7 +75,11 @@ worker.on("resumed", () => {
 });
 
 worker.on("error", (err) => {
-  logger.info(`queue error`, { name: err.name, message: err.message });
+  logger.error(`queue error`, {
+    name: err.name,
+    message: err.message,
+    stack: err.stack,
+  });
 });
 
 worker.on("stalled", (jobId) => {
