@@ -27,15 +27,11 @@ const worker = new Worker<MentionJobData>(
 
     let userIds: string[];
 
-    logger.debug("payload", { payload: data });
     const before = performance.now();
 
     if (data.mentions.some((m) => !m.startsWith("user:"))) {
-      logger.debug("fetching all members", { guildId: data.guildId });
       // there's roles or everyone, we need to fetch every user and handle permissiolns
       const members = await getAllMembers(data.guildId);
-
-      logger.debug(`fetched ${members.length} members`, { guildId: data.guildId });
 
       const channelMembers = getMembersWithChannelAccess(members, data);
 
@@ -49,8 +45,6 @@ const worker = new Worker<MentionJobData>(
       }
 
       userIds = filteredMembers.map((m) => m.userId);
-
-      logger.debug(`filtered members`, { guildId: data.guildId, userIds });
     } else {
       userIds = data.mentions.map((m) => m.split(":")[1]);
     }
