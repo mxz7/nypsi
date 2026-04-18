@@ -28,7 +28,7 @@ const worker = new Worker<MentionJobData>(
     const before = performance.now();
 
     if (data.mentions.some((m) => !m.startsWith("user:"))) {
-      // there's roles or everyone, we need to fetch every user and handle permissiolns
+      // there's roles or everyone, we need to fetch every user and handle permissions
       const members = await getAllMembers(data.guildId);
 
       const channelMembers = getMembersWithChannelAccess(members, data);
