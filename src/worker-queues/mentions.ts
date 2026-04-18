@@ -150,7 +150,9 @@ async function getAllMembers(guildId: string): Promise<SlimMember[]> {
     const userIds = allMembers.map((m) => m.userId);
 
     // might as well update database
-    checkMembers(guildId, userIds, true);
+    void checkMembers(guildId, userIds, true).catch((error) => {
+      logger.error("failed to update guild members in database", { guildId, error });
+    });
 
     logger.debug(`fetched ${allMembers.length} members`, { guildId });
 
