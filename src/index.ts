@@ -12,7 +12,6 @@ import Constants from "./utils/Constants";
 import { loadItems, runEconomySetup } from "./utils/functions/economy/utils";
 import { addFailedHeartbeat, sendHeartbeat } from "./utils/functions/heartbeat";
 import { updateStats } from "./utils/functions/topgg";
-import { startMentionInterval } from "./utils/handlers/mentions";
 import { getWebhooks, logger, setClusterId } from "./utils/logger";
 import { dmQueueWorker } from "./utils/queues/dms";
 import ms = require("ms");
@@ -135,7 +134,6 @@ process.on("uncaughtException", (e) => {
 manager.spawn().then(() => {
   logger.debug("manager spawn resolved");
   dmQueueWorker.resume();
-  startMentionInterval();
   runEconomySetup();
 });
 

@@ -15,10 +15,14 @@ clean:
 	rm tsconfig.tsbuildinfo
 	rm .prettiercache
 
+run-worker-mentions:
+	node dist/worker-queues/mentions.js
+
 dev: build
 	trap 'kill 0' EXIT; \
 	$(MAKE) watch & \
-	$(MAKE) run
+	$(MAKE) run & \
+	$(MAKE) run-worker-mentions
 
 check:
 	pnpm lint

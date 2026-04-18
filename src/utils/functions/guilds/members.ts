@@ -40,7 +40,11 @@ async function getDatabaseMembers(guildId: string) {
  * @param discordMembers user ids from discord api
  * @param wantedDiscord if true, they only wanted discord data - we only update db if data is already in there. if false, they only wanted ids meaning we should put in database no matter what
  */
-async function checkMembers(guildId: string, discordMembers: string[], wantedDiscord: boolean) {
+export async function checkMembers(
+  guildId: string,
+  discordMembers: string[],
+  wantedDiscord: boolean,
+) {
   const mutexKey = `check_members_${guildId}`;
   await checkMutex.acquire(mutexKey);
 

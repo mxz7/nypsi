@@ -39,6 +39,7 @@ import { getCommandUses } from "../utils/functions/users/commands";
 import { aliasesSize, commandsSize } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
+import { dmQueue, mentionQueue } from "../utils/queues/queues";
 
 const cmd = new Command("stats", "view your nypsi stats", "info");
 
@@ -549,10 +550,9 @@ async function run(
         true,
       )
       .addField(
-        "mentions",
-        `**queue size** ${await redis.llen(Constants.redis.nypsi.MENTION_QUEUE)}\n` +
-          `**delay** ${Number(await redis.get(Constants.redis.nypsi.MENTION_DELAY)) || 5}\n` +
-          `**max** ${Number(await redis.get(Constants.redis.nypsi.MENTION_MAX)) || 3}`,
+        "queues",
+        `**dm queue pending** ${await dmQueue.count()}\n` +
+          `**mention queue pending** ${await mentionQueue.count()}`,
         true,
       )
       .addField(

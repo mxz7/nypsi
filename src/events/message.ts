@@ -2,10 +2,8 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
-  Collection,
   Embed,
   EmbedBuilder,
-  GuildMember,
   Interaction,
   LabelBuilder,
   Message,
@@ -15,21 +13,19 @@ import {
   TextChannel,
   TextInputBuilder,
   TextInputStyle,
-  ThreadMember,
-  ThreadMemberManager,
 } from "discord.js";
 import { compareTwoStrings } from "string-similarity";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
 import { NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { Mention, MentionJobData } from "../types/workers/mentions";
 import Constants from "../utils/Constants";
 import { a } from "../utils/functions/anticheat";
 import { addEventProgress } from "../utils/functions/economy/events";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { getLastCommand as getLastGuildCommand } from "../utils/functions/guilds/commands";
 import { checkAutoMute, checkMessageContent } from "../utils/functions/guilds/filters";
-import { getAllMembers } from "../utils/functions/guilds/members";
 import { isSlashOnly } from "../utils/functions/guilds/slash";
 import { getGuildName, getPrefix, hasGuild } from "../utils/functions/guilds/utils";
 import { getKarma } from "../utils/functions/karma/karma";
@@ -46,11 +42,11 @@ import {
 import { createAuraTransaction } from "../utils/functions/users/aura";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { getLastCommand } from "../utils/functions/users/commands";
-import { MentionQueueItem } from "../utils/functions/users/mentions";
 import { getLastKnownUsername } from "../utils/functions/users/username";
 import { hasProfile } from "../utils/functions/users/utils";
 import { runCommand } from "../utils/handlers/commandhandler";
 import { logger } from "../utils/logger";
+import { mentionQueue } from "../utils/queues/queues";
 import ms = require("ms");
 
 const dmCooldown = new Set<string>();
@@ -550,68 +546,56 @@ export default async function messageCreate(message: Message) {
   }
 
   if (
-    message.guild.memberCount < 15000 &&
-    (await getLastGuildCommand(message.guildId)).getTime() >= Date.now() - ms("30 days") &&
-    ((await isPremium(message.guild.ownerId)) ||
-      (await getKarma(message.guild.ownerId)) >= 50 ||
-      (await getLastCommand(message.guild.ownerId)).getTime() >= Date.now() - ms("30 days"))
+    message.mentions.everyone ||
+    message.mentions.roles.size > 0 ||
+    message.mentions.members?.size > 0
   ) {
-    const mentionMembers = new Set<string>();
+    if (
+      message.guild.memberCount < 15000 &&
+      (await getLastGuildCommand(message.guildId)).getTime() >= Date.now() - ms("30 days") &&
+      ((await isPremium(message.guild.ownerId)) ||
+        (await getKarma(message.guild.ownerId)) >= 50 ||
+        (await getLastCommand(message.guild.ownerId)).getTime() >= Date.now() - ms("30 days"))
+    ) {
+      const channel = message.channel;
 
-    if (message.mentions.everyone) {
-      if (message.guild.members.cache.size != message.guild.memberCount) {
-        await getAllMembers(message.guild, true);
-      }
+      if (!channel.isTextBased()) return;
 
-      let members: Collection<string, GuildMember | ThreadMember> | ThreadMemberManager =
-        message.channel.members;
+      const payload: MentionJobData = {
+        channelId: message.channelId,
+        content:
+          message.content.length > 100 ? message.content.substring(0, 97) + "..." : message.content,
+        guildId: message.guildId,
+        channelOverwrites: channel.isThread() ? null : channel.permissionOverwrites.cache.toJSON(),
+        roles: message.guild.roles.cache
+          .map((r) => ({
+            id: r.id,
+            permissions: r.permissions.bitfield.toString(),
+          }))
+          .filter((r) => r.permissions !== "0"),
+        messageUrl: message.url,
+        mentions: [],
+        messageId: message.id,
+        username: message.author.username,
+        date: message.createdTimestamp,
+      };
 
-      if (members instanceof ThreadMemberManager) {
-        members = members.cache;
-      }
-
-      members.forEach((m) => mentionMembers.add(m.user.id));
-    } else if (message.mentions.roles.first()) {
-      if (message.guild.members.cache.size != message.guild.memberCount) {
-        await getAllMembers(message.guild, true);
-      }
-
-      message.mentions.roles.forEach((r) => {
-        r.members.forEach((m) => mentionMembers.add(m.user.id));
-      });
-    }
-
-    if (message.mentions?.members?.size > 0) {
-      if (mentionMembers) {
-        message.mentions.members.forEach((m) => mentionMembers.add(m.user.id));
+      if (message.mentions.everyone) {
+        payload.mentions.push("everyone");
       } else {
-        message.mentions.members.forEach((m) => mentionMembers.add(m.user.id));
-      }
-    }
+        if (message.mentions.roles.size > 0) {
+          payload.mentions.push(...message.mentions.roles.map((r) => `role:${r.id}` as Mention));
+        }
 
-    if (mentionMembers.size > 0) {
-      let channelMembers: Collection<string, GuildMember | ThreadMember> | ThreadMemberManager =
-        message.channel.members;
-
-      if (channelMembers instanceof ThreadMemberManager) {
-        channelMembers = channelMembers.cache;
+        if (message.mentions.members?.size > 0) {
+          payload.mentions.push(...message.mentions.members.map((m) => `user:${m.id}` as Mention));
+        }
       }
 
-      await redis.rpush(
-        Constants.redis.nypsi.MENTION_QUEUE,
-        JSON.stringify({
-          members: [...mentionMembers],
-          channelMembers: Array.from(channelMembers.mapValues((m) => m.user.id).values()),
-          content:
-            message.content.length > 100
-              ? message.content.substring(0, 97) + "..."
-              : message.content,
-          url: message.url,
-          username: message.author.username,
-          date: message.createdTimestamp,
-          guildId: message.guild.id,
-        } as MentionQueueItem),
-      );
+      mentionQueue.add(`${message.channelId}:${message.author.id}:${message.id}`, payload, {
+        attempts: 5,
+        backoff: { type: "exponential", delay: 300000 },
+      });
     }
   }
 }

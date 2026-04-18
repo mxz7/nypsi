@@ -2,16 +2,6 @@ import { Mention } from "#generated/prisma";
 import prisma from "../../../init/database";
 import { getUserId, MemberResolvable } from "../member";
 
-export interface MentionQueueItem {
-  members: string[];
-  channelMembers: string[];
-  content: string;
-  url: string;
-  username: string;
-  date: number;
-  guildId: string;
-}
-
 export async function fetchUserMentions(
   member: MemberResolvable,
   global: true | string,
