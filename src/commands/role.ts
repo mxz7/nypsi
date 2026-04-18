@@ -168,6 +168,7 @@ async function run(
         roles: m.roles.cache.map((r) => r.id),
         username: m.user.username,
         bot: m.user.bot,
+        joinedTimestamp: m.joinedTimestamp,
       }));
     }
 

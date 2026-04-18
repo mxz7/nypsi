@@ -5,7 +5,7 @@ import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../
 import { CustomContainer, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { daysAgo, formatDate } from "../utils/functions/date";
-import { getAllMembers } from "../utils/functions/guilds/members";
+import { getAllMembersRest } from "../utils/functions/guilds/members";
 import { getMember } from "../utils/functions/member";
 import { pluralize } from "../utils/functions/string";
 import workerSort from "../utils/functions/workers/sort";
@@ -40,7 +40,7 @@ async function run(
     return send({ embeds: [new ErrorEmbed("invalid user")] });
   }
 
-  const members = await getAllMembers(message.guild, true);
+  const members = await getAllMembersRest(message.guildId);
 
   let membersSorted: { id: string; joinedTimestamp: number }[] = [];
   let msg: Message;
@@ -50,20 +50,20 @@ async function run(
       await redis.get(`${Constants.redis.cache.guild.JOIN_ORDER}:${message.guildId}`),
     );
   } else {
-    if (members.size > 2000) {
-      if (members.size > 5000)
+    if (members.length > 2000) {
+      if (members.length > 5000)
         msg = await message.channel.send({
-          content: `sorting ${membersSorted.length.toLocaleString()} members..`,
+          content: `sorting ${members.length.toLocaleString()} members..`,
         });
 
       membersSorted = await workerSort(
-        Array.from(members.map((i) => ({ id: i.id, joinedTimestamp: i.joinedTimestamp }))),
+        members.map((i) => ({ id: i.userId, joinedTimestamp: i.joinedTimestamp })),
         "joinedTimestamp",
         "asc",
       );
     } else {
       membersSorted = sort(
-        Array.from(members.map((i) => ({ id: i.id, joinedTimestamp: i.joinedTimestamp }))),
+        members.map((i) => ({ id: i.userId, joinedTimestamp: i.joinedTimestamp })),
       ).asc((i) => i.joinedTimestamp);
     }
 

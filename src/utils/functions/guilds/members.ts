@@ -225,7 +225,13 @@ export function canDiscardGuildMember(guildId: string): boolean {
   return !(recentFetch || oftenFetch);
 }
 
-export type SlimMember = { userId: string; username: string; roles: string[]; bot: boolean };
+export type SlimMember = {
+  userId: string;
+  username: string;
+  roles: string[];
+  bot: boolean;
+  joinedTimestamp: number;
+};
 
 const restMembersCache = new MapCache<SlimMember[]>(ms("15 minutes"));
 const restMutex = new Mutex();
@@ -264,6 +270,7 @@ export async function getAllMembersRest(
           roles: m.roles,
           username: m.user!.username,
           bot: m.user!.bot,
+          joinedTimestamp: Date.parse(m.joined_at),
         })),
       );
 
