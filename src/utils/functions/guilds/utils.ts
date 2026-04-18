@@ -181,15 +181,17 @@ export async function createGuild(guild: Guild | string) {
     guildId = guild;
   }
 
-  await prisma.guild.create({
-    data: {
-      id: guildId,
-      prefixes: isDev ? ["£"] : undefined,
-      peak: guild instanceof Guild ? guild.memberCount : 0,
-      name: guild instanceof Guild ? guild.name : undefined,
-      icon: guild instanceof Guild ? guild.iconURL() : undefined,
-    },
-  });
+  await prisma.guild
+    .create({
+      data: {
+        id: guildId,
+        prefixes: isDev ? ["£"] : undefined,
+        peak: guild instanceof Guild ? guild.memberCount : 0,
+        name: guild instanceof Guild ? guild.name : undefined,
+        icon: guild instanceof Guild ? guild.iconURL() : undefined,
+      },
+    })
+    .catch(() => {});
 
   peaks.set(guildId, guild instanceof Guild ? guild.memberCount : 0);
 
