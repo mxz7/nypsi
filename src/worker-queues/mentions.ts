@@ -28,6 +28,7 @@ const worker = new Worker<MentionJobData>(
     let userIds: string[];
 
     logger.debug("payload", { payload: data });
+    const before = performance.now();
 
     if (data.mentions.some((m) => !m.startsWith("user:"))) {
       logger.debug("fetching all members", { guildId: data.guildId });
@@ -53,6 +54,10 @@ const worker = new Worker<MentionJobData>(
     } else {
       userIds = data.mentions.map((m) => m.split(":")[1]);
     }
+
+    logger.debug(`got filtered user ids in ${performance.now() - before}ms`, {
+      guildId: data.guildId,
+    });
 
     await createMentions({
       guildId: data.guildId,
