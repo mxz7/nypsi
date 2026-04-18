@@ -6,10 +6,8 @@ import "dotenv/config";
 import ms from "ms";
 import { Prisma } from "#generated/prisma";
 import prisma from "../init/database";
-import redis from "../init/redis";
 import { MentionJobData } from "../types/workers/mentions";
 import { MapCache } from "../utils/cache";
-import Constants from "../utils/Constants";
 import { checkMembers } from "../utils/functions/guilds/members";
 import { Mutex } from "../utils/functions/mutex";
 import { encrypt } from "../utils/functions/string";
@@ -124,13 +122,6 @@ async function getAllMembers(guildId: string): Promise<SlimMember[]> {
   try {
     const allMembers: SlimMember[] = [];
     let after: string | undefined;
-
-    await redis.set(
-      `${Constants.redis.cache.guild.MEMBERS_LAST_FETCHED}:${guildId}`,
-      Date.now(),
-      "EX",
-      ms("10 minute") / 1000,
-    );
 
     while (true) {
       const query = new URLSearchParams({ limit: "1000" });
