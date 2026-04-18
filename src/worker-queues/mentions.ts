@@ -47,7 +47,7 @@ const worker = new Worker<MentionJobData>(
         filteredMembers = filterRoles(channelMembers, roleIds);
       }
 
-      userIds = filteredMembers.map((m) => m.user!.id);
+      userIds = filteredMembers.map((m) => m.userId);
 
       logger.debug(`filtered members`, { guildId: data.guildId, userIds });
     } else {
@@ -108,10 +108,12 @@ worker.on("completed", (job) => {
   handled.set(job.data.messageId, Date.now());
 });
 
-const membersCache = new MapCache<APIGuildMember[]>(ms("1 hour"));
+type SlimMember = { userId: string; roles: string[] };
+
+const membersCache = new MapCache<SlimMember[]>(ms("1 hour"));
 const mutex = new Mutex();
 
-async function getAllMembers(guildId: string): Promise<APIGuildMember[]> {
+async function getAllMembers(guildId: string): Promise<SlimMember[]> {
   const cache = membersCache.get(guildId);
 
   if (cache) {
@@ -121,7 +123,7 @@ async function getAllMembers(guildId: string): Promise<APIGuildMember[]> {
   await mutex.acquire(guildId);
 
   try {
-    const allMembers: APIGuildMember[] = [];
+    const allMembers: SlimMember[] = [];
     let after: string | undefined;
 
     await redis.set(
@@ -137,7 +139,7 @@ async function getAllMembers(guildId: string): Promise<APIGuildMember[]> {
 
       const batch = (await rest.get(Routes.guildMembers(guildId), { query })) as APIGuildMember[];
 
-      allMembers.push(...batch);
+      allMembers.push(...batch.map((m) => ({ userId: m.user!.id, roles: m.roles })));
 
       if (batch.length < 1000) break;
 
@@ -146,7 +148,7 @@ async function getAllMembers(guildId: string): Promise<APIGuildMember[]> {
 
     membersCache.set(guildId, allMembers);
 
-    const userIds = allMembers.map((m) => m.user.id);
+    const userIds = allMembers.map((m) => m.userId);
 
     // might as well update database
     checkMembers(guildId, userIds, true);
@@ -162,10 +164,7 @@ async function getAllMembers(guildId: string): Promise<APIGuildMember[]> {
 // After BullMQ JSON serialisation, PermissionOverwrites allow/deny are plain strings
 type SerializedOverwrite = { id: string; type: number; allow: string; deny: string };
 
-function getMembersWithChannelAccess(
-  members: APIGuildMember[],
-  data: MentionJobData,
-): APIGuildMember[] {
+function getMembersWithChannelAccess(members: SlimMember[], data: MentionJobData): SlimMember[] {
   const { roles: guildRoles, channelOverwrites, guildId } = data;
 
   const rolePermMap = new Map<string, bigint>();
@@ -177,8 +176,6 @@ function getMembersWithChannelAccess(
   const overwrites = (channelOverwrites ?? []) as unknown as SerializedOverwrite[];
 
   return members.filter((member) => {
-    if (!member.user) return false;
-
     // 1. Base: @everyone role permissions
     let perms = everyonePerms;
 
@@ -213,7 +210,7 @@ function getMembersWithChannelAccess(
 
     // c. Member-specific overwrite
     const memberOw = overwrites.find(
-      (ow) => ow.id === member.user!.id && ow.type === OverwriteType.Member,
+      (ow) => ow.id === member.userId && ow.type === OverwriteType.Member,
     );
     if (memberOw) {
       perms &= ~BigInt(memberOw.deny);
@@ -224,7 +221,7 @@ function getMembersWithChannelAccess(
   });
 }
 
-function filterRoles(members: APIGuildMember[], roles: string[]): APIGuildMember[] {
+function filterRoles(members: SlimMember[], roles: string[]): SlimMember[] {
   return members.filter((member) => member.roles.some((role) => roles.includes(role)));
 }
 
