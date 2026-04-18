@@ -83,7 +83,7 @@ worker.on("error", (err) => {
 });
 
 worker.on("stalled", (jobId) => {
-  logger.info(`job stalled: ${jobId}`);
+  logger.warn(`job stalled: ${jobId}`);
 });
 
 worker.on("failed", (job, err) => {
