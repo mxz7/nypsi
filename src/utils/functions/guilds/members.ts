@@ -119,7 +119,7 @@ export async function getAllMembers(
 
   const mutexKey = `member_fetch_${guildId}`;
   const acquireStart = performance.now();
-  console.trace();
+
   await mutex.acquire(mutexKey);
   const acquireDuration = performance.now() - acquireStart;
 
@@ -172,6 +172,7 @@ export async function getAllMembers(
         "EX",
         ms("10 minute") / 1000,
       );
+      console.trace();
       discordMembers = await guild.members.fetch();
       resolveDiscordMembersDuration = performance.now() - resolveDiscordMembersStart;
     }
