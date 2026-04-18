@@ -35,7 +35,19 @@ const worker = new Worker<MentionJobData>(
 
       logger.debug(`fetched ${members.length} members`, { guildId: data.guildId });
 
-      userIds = getMembersWithChannelAccess(members, data);
+      const channelMembers = getMembersWithChannelAccess(members, data);
+
+      let filteredMembers = channelMembers;
+
+      if (data.mentions.some((m) => m.startsWith("role:"))) {
+        const roleIds = data.mentions
+          .filter((m) => m.startsWith("role:"))
+          .map((m) => m.split(":")[1]);
+        filteredMembers = filterRoles(channelMembers, roleIds);
+      }
+
+      userIds = filteredMembers.map((m) => m.user!.id);
+
       logger.debug(`filtered members`, { guildId: data.guildId, userIds });
     } else {
       userIds = data.mentions.map((m) => m.split(":")[1]);
@@ -142,7 +154,10 @@ async function getAllMembers(guildId: string): Promise<APIGuildMember[]> {
 // After BullMQ JSON serialisation, PermissionOverwrites allow/deny are plain strings
 type SerializedOverwrite = { id: string; type: number; allow: string; deny: string };
 
-function getMembersWithChannelAccess(members: APIGuildMember[], data: MentionJobData): string[] {
+function getMembersWithChannelAccess(
+  members: APIGuildMember[],
+  data: MentionJobData,
+): APIGuildMember[] {
   const { roles: guildRoles, channelOverwrites, guildId } = data;
 
   const rolePermMap = new Map<string, bigint>();
@@ -153,56 +168,56 @@ function getMembersWithChannelAccess(members: APIGuildMember[], data: MentionJob
   const everyonePerms = rolePermMap.get(guildId) ?? 0n;
   const overwrites = (channelOverwrites ?? []) as unknown as SerializedOverwrite[];
 
-  return members
-    .filter((member) => {
-      if (!member.user) return false;
+  return members.filter((member) => {
+    if (!member.user) return false;
 
-      // 1. Base: @everyone role permissions
-      let perms = everyonePerms;
+    // 1. Base: @everyone role permissions
+    let perms = everyonePerms;
 
-      // 2. OR in all of the member's role permissions
-      for (const roleId of member.roles) {
-        perms |= rolePermMap.get(roleId) ?? 0n;
+    // 2. OR in all of the member's role permissions
+    for (const roleId of member.roles) {
+      perms |= rolePermMap.get(roleId) ?? 0n;
+    }
+
+    // 3. Administrators bypass all channel permission checks
+    if (perms & PermissionFlagsBits.Administrator) return true;
+
+    // 4. Apply channel overwrites in Discord's defined order
+    // a. @everyone overwrite
+    const everyoneOw = overwrites.find((ow) => ow.id === guildId && ow.type === OverwriteType.Role);
+    if (everyoneOw) {
+      perms &= ~BigInt(everyoneOw.deny);
+      perms |= BigInt(everyoneOw.allow);
+    }
+
+    // b. Role overwrites — accumulate denies then allows across all member roles
+    let roleDeny = 0n;
+    let roleAllow = 0n;
+    for (const roleId of member.roles) {
+      const ow = overwrites.find((o) => o.id === roleId && o.type === OverwriteType.Role);
+      if (ow) {
+        roleDeny |= BigInt(ow.deny);
+        roleAllow |= BigInt(ow.allow);
       }
+    }
+    perms &= ~roleDeny;
+    perms |= roleAllow;
 
-      // 3. Administrators bypass all channel permission checks
-      if (perms & PermissionFlagsBits.Administrator) return true;
+    // c. Member-specific overwrite
+    const memberOw = overwrites.find(
+      (ow) => ow.id === member.user!.id && ow.type === OverwriteType.Member,
+    );
+    if (memberOw) {
+      perms &= ~BigInt(memberOw.deny);
+      perms |= BigInt(memberOw.allow);
+    }
 
-      // 4. Apply channel overwrites in Discord's defined order
-      // a. @everyone overwrite
-      const everyoneOw = overwrites.find(
-        (ow) => ow.id === guildId && ow.type === OverwriteType.Role,
-      );
-      if (everyoneOw) {
-        perms &= ~BigInt(everyoneOw.deny);
-        perms |= BigInt(everyoneOw.allow);
-      }
+    return Boolean(perms & PermissionFlagsBits.ViewChannel);
+  });
+}
 
-      // b. Role overwrites — accumulate denies then allows across all member roles
-      let roleDeny = 0n;
-      let roleAllow = 0n;
-      for (const roleId of member.roles) {
-        const ow = overwrites.find((o) => o.id === roleId && o.type === OverwriteType.Role);
-        if (ow) {
-          roleDeny |= BigInt(ow.deny);
-          roleAllow |= BigInt(ow.allow);
-        }
-      }
-      perms &= ~roleDeny;
-      perms |= roleAllow;
-
-      // c. Member-specific overwrite
-      const memberOw = overwrites.find(
-        (ow) => ow.id === member.user!.id && ow.type === OverwriteType.Member,
-      );
-      if (memberOw) {
-        perms &= ~BigInt(memberOw.deny);
-        perms |= BigInt(memberOw.allow);
-      }
-
-      return Boolean(perms & PermissionFlagsBits.ViewChannel);
-    })
-    .map((m) => m.user!.id);
+function filterRoles(members: APIGuildMember[], roles: string[]): APIGuildMember[] {
+  return members.filter((member) => member.roles.some((role) => roles.includes(role)));
 }
 
 async function createMentions(data: {
