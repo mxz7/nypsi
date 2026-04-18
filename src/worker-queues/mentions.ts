@@ -90,21 +90,6 @@ worker.on("failed", (job, err) => {
   });
 });
 
-// prevent duplicate message ids from being handled
-const handled = new Map<string, number>();
-
-setInterval(() => {
-  for (const [messageId, timestamp] of handled.entries()) {
-    if (Date.now() - timestamp > ms("1 hour")) {
-      handled.delete(messageId);
-    }
-  }
-}, ms("1 hour"));
-
-worker.on("completed", (job) => {
-  handled.set(job.data.messageId, Date.now());
-});
-
 type SlimMember = { userId: string; roles: string[] };
 
 const membersCache = new MapCache<SlimMember[]>(ms("1 hour"));
@@ -166,6 +151,10 @@ function getMembersWithChannelAccess(members: SlimMember[], data: MentionJobData
 
   const everyonePerms = rolePermMap.get(guildId) ?? 0n;
   const overwrites = (channelOverwrites ?? []) as unknown as SerializedOverwrite[];
+  const overwriteMap = new Map<string, SerializedOverwrite>();
+  for (const ow of overwrites) {
+    overwriteMap.set(`${ow.type}:${ow.id}`, ow);
+  }
 
   return members.filter((member) => {
     // 1. Base: @everyone role permissions
@@ -181,7 +170,7 @@ function getMembersWithChannelAccess(members: SlimMember[], data: MentionJobData
 
     // 4. Apply channel overwrites in Discord's defined order
     // a. @everyone overwrite
-    const everyoneOw = overwrites.find((ow) => ow.id === guildId && ow.type === OverwriteType.Role);
+    const everyoneOw = overwriteMap.get(`${OverwriteType.Role}:${guildId}`);
     if (everyoneOw) {
       perms &= ~BigInt(everyoneOw.deny);
       perms |= BigInt(everyoneOw.allow);
@@ -191,7 +180,7 @@ function getMembersWithChannelAccess(members: SlimMember[], data: MentionJobData
     let roleDeny = 0n;
     let roleAllow = 0n;
     for (const roleId of member.roles) {
-      const ow = overwrites.find((o) => o.id === roleId && o.type === OverwriteType.Role);
+      const ow = overwriteMap.get(`${OverwriteType.Role}:${roleId}`);
       if (ow) {
         roleDeny |= BigInt(ow.deny);
         roleAllow |= BigInt(ow.allow);
@@ -201,9 +190,7 @@ function getMembersWithChannelAccess(members: SlimMember[], data: MentionJobData
     perms |= roleAllow;
 
     // c. Member-specific overwrite
-    const memberOw = overwrites.find(
-      (ow) => ow.id === member.userId && ow.type === OverwriteType.Member,
-    );
+    const memberOw = overwriteMap.get(`${OverwriteType.Member}:${member.userId}`);
     if (memberOw) {
       perms &= ~BigInt(memberOw.deny);
       perms |= BigInt(memberOw.allow);
