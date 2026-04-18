@@ -1,5 +1,5 @@
 import { ClusterClient, ClusterManager } from "discord-hybrid-sharding";
-import { ChannelType, Client, Guild, PermissionFlagsBits, User } from "discord.js";
+import { ChannelType, Client, Guild, PermissionFlagsBits } from "discord.js";
 import { GuildCounter, TrackingType } from "#generated/prisma";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
@@ -7,7 +7,7 @@ import { NypsiClient } from "../../../models/Client";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { getItems } from "../economy/utils";
-import { getAllMembers } from "./members";
+import { getAllMembers, getAllMembersRest } from "./members";
 import ms = require("ms");
 
 export async function updateChannel(data: GuildCounter, client: NypsiClient | ClusterManager) {
@@ -124,45 +124,9 @@ async function getCounterText(
 ) {
   let value: string;
 
-  const members = async (filter?: (user: User) => boolean) => {
-    let res = await (clusterOrGuild instanceof Guild
-      ? (await getAllMembers(clusterOrGuild, true)).map((m) => m.user)
-      : clusterOrGuild
-          .broadcastEval(
-            async (c, { channelId, shard }) => {
-              const client = c as unknown as NypsiClient;
-
-              if (client.cluster.id != shard) return [];
-
-              const channel = client.channels.cache.get(channelId);
-              if (!channel || channel.isDMBased()) return [];
-
-              if (channel.guild.memberCount !== channel.guild.members.cache.size) {
-                return await channel.guild.members
-                  .fetch()
-                  .then((members) => members.map((m) => m.user));
-              }
-
-              return channel.guild.members.cache.map((m) => m.user);
-            },
-            { context: { channelId: data.channel, shard } },
-          )
-          .then((res) => {
-            for (const r of res) {
-              if (r) return r as User[];
-            }
-            return [] as User[];
-          }));
-
-    if (filter) {
-      res = res.filter(filter);
-    }
-
-    return res;
-  };
-
   if (data.tracks === TrackingType.HUMANS) {
-    value = (await members((m) => !m.bot)).length.toLocaleString();
+    const members = await getAllMembersRest(data.guildId);
+    value = members.filter((m) => !m.bot).length.toLocaleString();
   } else if (data.tracks === TrackingType.MEMBERS) {
     if (clusterOrGuild instanceof Guild) {
       value = clusterOrGuild.memberCount.toLocaleString();

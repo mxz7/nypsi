@@ -167,6 +167,7 @@ async function run(
         userId: m.id,
         roles: m.roles.cache.map((r) => r.id),
         username: m.user.username,
+        bot: m.user.bot,
       }));
     }
 
