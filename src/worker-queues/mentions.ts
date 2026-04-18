@@ -6,8 +6,10 @@ import "dotenv/config";
 import ms from "ms";
 import { Prisma } from "#generated/prisma";
 import prisma from "../init/database";
+import redis from "../init/redis";
 import { MentionJobData } from "../types/workers/mentions";
 import { MapCache } from "../utils/cache";
+import Constants from "../utils/Constants";
 import { checkMembers } from "../utils/functions/guilds/members";
 import { encrypt } from "../utils/functions/string";
 import { logger, setClusterId } from "../utils/logger";
@@ -24,11 +26,17 @@ const worker = new Worker<MentionJobData>(
 
     let userIds: string[];
 
+    logger.debug("payload", { payload: data });
+
     if (data.mentions.some((m) => !m.startsWith("user:"))) {
+      logger.debug("fetching all members", { guildId: data.guildId });
       // there's roles or everyone, we need to fetch every user and handle permissiolns
       const members = await getAllMembers(data.guildId);
 
+      logger.debug(`fetched ${members.length} members`, { guildId: data.guildId });
+
       userIds = getMembersWithChannelAccess(members, data);
+      logger.debug(`filtered members`, { guildId: data.guildId, userIds });
     } else {
       userIds = data.mentions.map((m) => m.split(":")[1]);
     }
@@ -89,23 +97,46 @@ worker.on("completed", (job) => {
 
 const membersCache = new MapCache<APIGuildMember[]>(ms("1 hour"));
 
-async function getAllMembers(guildId: string) {
+async function getAllMembers(guildId: string): Promise<APIGuildMember[]> {
   const cache = membersCache.get(guildId);
 
   if (cache) {
     return cache;
   }
 
-  const members = (await rest.get(Routes.guildMembers(guildId))) as APIGuildMember[];
+  const allMembers: APIGuildMember[] = [];
+  let after: string | undefined;
 
-  membersCache.set(guildId, members);
+  await redis.set(
+    `${Constants.redis.cache.guild.MEMBERS_LAST_FETCHED}:${guildId}`,
+    Date.now(),
+    "EX",
+    ms("10 minute") / 1000,
+  );
 
-  const userIds = members.map((m) => m.user.id);
+  while (true) {
+    const query = new URLSearchParams({ limit: "1000" });
+    if (after) query.set("after", after);
+
+    const batch = (await rest.get(Routes.guildMembers(guildId), { query })) as APIGuildMember[];
+
+    allMembers.push(...batch);
+
+    if (batch.length < 1000) break;
+
+    after = batch.at(-1)!.user!.id;
+  }
+
+  membersCache.set(guildId, allMembers);
+
+  const userIds = allMembers.map((m) => m.user.id);
 
   // might as well update database
   checkMembers(guildId, userIds, true);
 
-  return members;
+  logger.debug(`fetched ${allMembers.length} members`, { guildId });
+
+  return allMembers;
 }
 
 // After BullMQ JSON serialisation, PermissionOverwrites allow/deny are plain strings
