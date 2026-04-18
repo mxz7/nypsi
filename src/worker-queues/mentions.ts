@@ -11,7 +11,7 @@ import { MapCache } from "../utils/cache";
 import { checkMembers } from "../utils/functions/guilds/members";
 import { encrypt } from "../utils/functions/string";
 import { applyLogs } from "../utils/functions/workers/helpers";
-import { setClusterId } from "../utils/logger";
+import { logger, setClusterId } from "../utils/logger";
 
 setClusterId("worker-mentions");
 
@@ -187,3 +187,5 @@ async function createMentions(data: {
     await prisma.mention.createMany({ data: insertData });
   }
 }
+
+logger.info("online");
