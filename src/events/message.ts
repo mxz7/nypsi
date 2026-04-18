@@ -587,7 +587,10 @@ export default async function messageCreate(message: Message) {
         payload.mentions.push(...message.mentions.members.map((m) => `user:${m.id}` as Mention));
       }
 
-      mentionQueue.add(`${message.channelId}:${message.author.id}:${message.id}`, payload);
+      mentionQueue.add(`${message.channelId}:${message.author.id}:${message.id}`, payload, {
+        attempts: 5,
+        backoff: { type: "exponential", delay: 300000 },
+      });
     }
   }
 }
