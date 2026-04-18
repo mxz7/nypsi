@@ -43,13 +43,13 @@ const worker = new Worker<MentionJobData>(
       }
 
       userIds = filteredMembers.map((m) => m.userId);
+
+      logger.debug(`got filtered user ids in ${performance.now() - before}ms`, {
+        guildId: data.guildId,
+      });
     } else {
       userIds = data.mentions.map((m) => m.split(":")[1]);
     }
-
-    logger.debug(`got filtered user ids in ${performance.now() - before}ms`, {
-      guildId: data.guildId,
-    });
 
     await createMentions({
       guildId: data.guildId,
