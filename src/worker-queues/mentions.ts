@@ -9,6 +9,8 @@ import { getAllMembersRest, SlimMember } from "../utils/functions/guilds/members
 import { encrypt } from "../utils/functions/string";
 import { logger, setClusterId } from "../utils/logger";
 
+process.title = "nypsi: worker-mentions";
+
 setClusterId("worker-mentions");
 
 const connection = new Redis({ maxRetriesPerRequest: null });
