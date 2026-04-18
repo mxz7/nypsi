@@ -10,6 +10,7 @@ import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
+import { gamble } from "../utils/discord-logs";
 import {
   addBalance,
   calcMaxBet,
@@ -31,7 +32,6 @@ import { addXp, calcEarnedGambleXp } from "../utils/functions/economy/xp.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { shuffle } from "../utils/functions/random";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
-import { gamble } from "../utils/logger.js";
 
 const cmd = new Command("rps", "play rock paper scissors", "money").setAliases([
   "rockpaperscissors",

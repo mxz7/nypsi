@@ -15,6 +15,7 @@ import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { Item } from "../types/Economy";
+import { gamble } from "../utils/discord-logs";
 import {
   addBalance,
   calcMaxBet,
@@ -41,7 +42,6 @@ import { escapeFormattingCharacters } from "../utils/functions/string";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { getPreferences } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
-import { gamble } from "../utils/logger.js";
 
 const cmd = new Command("coinflip", "flip a coin, double or nothing", "money").setAliases(["cf"]);
 

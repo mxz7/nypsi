@@ -5,6 +5,7 @@ import { NypsiClient } from "../models/Client";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
 import Constants from "../utils/Constants";
+import { transaction } from "../utils/discord-logs";
 import { addBalance } from "../utils/functions/economy/balance";
 import {
   addInventoryItem,
@@ -19,7 +20,6 @@ import { getTier } from "../utils/functions/premium/premium";
 import { escapeFormattingCharacters } from "../utils/functions/string";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
-import { transaction } from "../utils/logger";
 
 export default {
   name: "accept-offer",

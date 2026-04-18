@@ -8,6 +8,7 @@ import {
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
+import { transaction } from "../utils/discord-logs";
 import { addBalance, getBalance, removeBalance } from "../utils/functions/economy/balance";
 import { addStat } from "../utils/functions/economy/stats";
 import {
@@ -27,7 +28,6 @@ import {
   getDmSettings,
 } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { transaction } from "../utils/logger";
 import dayjs = require("dayjs");
 
 const cmd = new Command("pay", "give other users money", "money");

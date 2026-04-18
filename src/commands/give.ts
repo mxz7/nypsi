@@ -3,6 +3,7 @@ import { CommandInteraction, MessageFlags } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
+import { transaction } from "../utils/discord-logs";
 import {
   addInventoryItem,
   getInventory,
@@ -20,7 +21,6 @@ import {
   getDmSettings,
 } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { transaction } from "../utils/logger";
 
 const cmd = new Command("give", "give other users items from your inventory", "money");
 

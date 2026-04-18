@@ -9,10 +9,11 @@ import prisma from "./init/database";
 import redis from "./init/redis";
 import { loadJobs, runJob } from "./scheduled/scheduler";
 import Constants from "./utils/Constants";
+import { getWebhooks } from "./utils/discord-logs";
 import { loadItems, runEconomySetup } from "./utils/functions/economy/utils";
 import { addFailedHeartbeat, sendHeartbeat } from "./utils/functions/heartbeat";
 import { updateStats } from "./utils/functions/topgg";
-import { getWebhooks, logger, setClusterId } from "./utils/logger";
+import { logger, setClusterId } from "./utils/logger";
 import ms = require("ms");
 import dayjs = require("dayjs");
 

@@ -4,7 +4,7 @@ import prisma from "../../../init/database";
 import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed, getColor } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
-import { gamble } from "../../logger";
+import { gamble } from "../../discord-logs";
 import { addProgress } from "../economy/achievements";
 import { addBalance } from "../economy/balance";
 import {

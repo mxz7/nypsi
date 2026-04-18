@@ -20,6 +20,7 @@ import redis from "../init/redis";
 import { runLogs, runModerationChecks } from "../scheduled/clusterjobs/moderationchecks";
 import startRandomDrops from "../scheduled/clusterjobs/random-drops";
 import Constants from "../utils/Constants";
+import { getWebhooks } from "../utils/discord-logs";
 import { doChatReactions } from "../utils/functions/chatreactions/utils";
 import { initCrashGame } from "../utils/functions/economy/crash";
 import { runEconomySetup } from "../utils/functions/economy/utils";
@@ -29,7 +30,7 @@ import { runSnipeClearIntervals } from "../utils/functions/guilds/utils";
 import { openKarmaShop } from "../utils/functions/karma/karmashop";
 import { getCustomPresence, randomPresence, setCustomPresence } from "../utils/functions/presence";
 import { runCommandUseTimers } from "../utils/handlers/commandhandler";
-import { getWebhooks, logger, setClusterId } from "../utils/logger";
+import { logger, setClusterId } from "../utils/logger";
 import ms = require("ms");
 
 export class NypsiClient extends Client {

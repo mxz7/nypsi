@@ -19,6 +19,7 @@ import { NypsiClient } from "../models/Client.js";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command.js";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
+import { gamble } from "../utils/discord-logs.js";
 import { a } from "../utils/functions/anticheat.js";
 import { giveCaptcha, isLockedOut, verifyUser } from "../utils/functions/captcha.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
@@ -48,7 +49,7 @@ import { hasAdminPermission } from "../utils/functions/users/admin.js";
 import { recentCommands } from "../utils/functions/users/commands.js";
 import { addHourlyCommand } from "../utils/handlers/commandhandler.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
-import { gamble, getTimestamp, logger } from "../utils/logger.js";
+import { getTimestamp, logger } from "../utils/logger.js";
 import ms = require("ms");
 
 const games = new Map<

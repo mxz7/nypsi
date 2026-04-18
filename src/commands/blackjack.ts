@@ -20,6 +20,7 @@ import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
+import { gamble } from "../utils/discord-logs";
 import { a } from "../utils/functions/anticheat";
 import { giveCaptcha, isLockedOut, verifyUser } from "../utils/functions/captcha";
 import { addProgress } from "../utils/functions/economy/achievements";
@@ -51,7 +52,7 @@ import { hasAdminPermission } from "../utils/functions/users/admin";
 import { recentCommands } from "../utils/functions/users/commands";
 import { addHourlyCommand } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
-import { gamble, getTimestamp, logger } from "../utils/logger";
+import { getTimestamp, logger } from "../utils/logger";
 import ms = require("ms");
 
 const cmd = new Command("blackjack", "play blackjack", "money").setAliases(["bj", "blowjob"]);
