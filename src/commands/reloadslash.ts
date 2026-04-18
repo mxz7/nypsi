@@ -1,4 +1,5 @@
 import { CommandInteraction, Message } from "discord.js";
+import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { hasAdminPermission } from "../utils/functions/users/admin";
 import { uploadSlashCommands, uploadSlashCommandsToGuild } from "../utils/handlers/commandhandler";
@@ -15,13 +16,17 @@ async function run(
   if (!(await hasAdminPermission(message.member, "reload"))) return;
 
   if (args.length == 0) {
-    await uploadSlashCommandsToGuild(message.guild.id, message.client.user.id);
+    await uploadSlashCommandsToGuild(
+      message.guild.id,
+      message.client.user.id,
+      message.client as NypsiClient,
+    );
 
     if (!(message instanceof Message)) return;
 
     return await message.react("✅");
   } else if (args[0].toLowerCase() == "global") {
-    await uploadSlashCommands(message.client.user.id);
+    await uploadSlashCommands(message.client.user.id, message.client as NypsiClient);
 
     if (!(message instanceof Message)) return;
 

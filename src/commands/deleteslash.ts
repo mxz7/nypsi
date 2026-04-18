@@ -1,4 +1,5 @@
 import { CommandInteraction, Message } from "discord.js";
+import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import Constants from "../utils/Constants";
 import {
@@ -18,13 +19,17 @@ async function run(
   if (message.author.id != Constants.OWNER_ID) return;
 
   if (args.length == 0) {
-    await deleteSlashCommandsFromGuild(message.guild.id, message.client.user.id);
+    await deleteSlashCommandsFromGuild(
+      message.guild.id,
+      message.client.user.id,
+      message.client as NypsiClient,
+    );
 
     if (!(message instanceof Message)) return;
 
     return await message.react("✅");
   } else if (args[0].toLowerCase() == "global") {
-    await deleteSlashCommands(message.client.user.id);
+    await deleteSlashCommands(message.client.user.id, message.client as NypsiClient);
 
     if (!(message instanceof Message)) return;
 
