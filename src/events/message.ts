@@ -471,7 +471,7 @@ export default async function messageCreate(message: Message) {
   const checkAura = async () => {
     if (
       (await hasProfile(message.member)) &&
-      (await getLastCommand(message.member)).getTime() > Date.now() - ms("1 day")
+      ((await getLastCommand(message.member)) || new Date(0)).getTime() > Date.now() - ms("1 day")
     ) {
       for (const brainrot of brainrotFilter) {
         if (lowercaseContent.includes(brainrot)) {
@@ -552,10 +552,12 @@ export default async function messageCreate(message: Message) {
   ) {
     if (
       message.guild.memberCount < 15000 &&
-      (await getLastGuildCommand(message.guildId)).getTime() >= Date.now() - ms("30 days") &&
+      ((await getLastGuildCommand(message.guildId)) || new Date(0)).getTime() >=
+        Date.now() - ms("30 days") &&
       ((await isPremium(message.guild.ownerId)) ||
         (await getKarma(message.guild.ownerId)) >= 50 ||
-        (await getLastCommand(message.guild.ownerId)).getTime() >= Date.now() - ms("30 days"))
+        ((await getLastCommand(message.guild.ownerId)) || new Date(0)).getTime() >=
+          Date.now() - ms("30 days"))
     ) {
       const channel = message.channel;
 
