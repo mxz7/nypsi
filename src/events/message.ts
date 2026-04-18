@@ -575,6 +575,8 @@ export default async function messageCreate(message: Message) {
         messageUrl: message.url,
         mentions: [],
         messageId: message.id,
+        username: message.author.username,
+        date: message.createdTimestamp,
       };
 
       if (message.mentions.everyone) {

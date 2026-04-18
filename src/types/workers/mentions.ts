@@ -11,4 +11,6 @@ export interface MentionJobData {
   roles: { id: string; permissions: string }[];
   content: string;
   mentions: Mention[];
+  username: string; //  user that tagged
+  date: number;
 }
