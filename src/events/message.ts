@@ -581,10 +581,14 @@ export default async function messageCreate(message: Message) {
 
       if (message.mentions.everyone) {
         payload.mentions.push("everyone");
-      } else if (message.mentions.roles.size > 0) {
-        payload.mentions.push(...message.mentions.roles.map((r) => `role:${r.id}` as Mention));
-      } else if (message.mentions.members?.size > 0) {
-        payload.mentions.push(...message.mentions.members.map((m) => `user:${m.id}` as Mention));
+      } else {
+        if (message.mentions.roles.size > 0) {
+          payload.mentions.push(...message.mentions.roles.map((r) => `role:${r.id}` as Mention));
+        }
+
+        if (message.mentions.members?.size > 0) {
+          payload.mentions.push(...message.mentions.members.map((m) => `user:${m.id}` as Mention));
+        }
       }
 
       mentionQueue.add(`${message.channelId}:${message.author.id}:${message.id}`, payload, {
