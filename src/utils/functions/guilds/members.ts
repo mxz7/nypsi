@@ -1,9 +1,12 @@
+import { APIGuildMember, Routes } from "discord-api-types/v10";
 import { Collection, Guild, GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
+import { NypsiClient } from "../../../models/Client";
 import { MapCache } from "../../cache";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
+import { getRest } from "../../rest";
 import { Mutex } from "../mutex";
 import ms = require("ms");
 
@@ -211,4 +214,60 @@ export function canDiscardGuildMember(guildId: string): boolean {
   const oftenFetch = oftenFetched.get(guildId);
 
   return !(recentFetch || oftenFetch);
+}
+
+export type SlimMember = { userId: string; roles: string[] };
+
+const restMembersCache = new MapCache<SlimMember[]>(ms("15 minutes"));
+const restMutex = new Mutex();
+
+export async function getAllMembersRest(
+  guildId: string,
+  client?: NypsiClient,
+): Promise<SlimMember[]> {
+  const cache = restMembersCache.get(guildId);
+
+  if (cache) {
+    return cache;
+  }
+
+  await restMutex.acquire(guildId);
+
+  try {
+    // re-check cache after acquiring lock in case another call already populated it
+    const cached = restMembersCache.get(guildId);
+    if (cached) return cached;
+
+    const rest = getRest(client);
+
+    const allMembers: SlimMember[] = [];
+    let after: string | undefined;
+
+    while (true) {
+      const query = new URLSearchParams({ limit: "1000" });
+      if (after) query.set("after", after);
+
+      const batch = (await rest.get(Routes.guildMembers(guildId), { query })) as APIGuildMember[];
+
+      allMembers.push(...batch.map((m) => ({ userId: m.user!.id, roles: m.roles })));
+
+      if (batch.length < 1000) break;
+
+      after = batch.at(-1)!.user!.id;
+    }
+
+    restMembersCache.set(guildId, allMembers);
+
+    const userIds = allMembers.map((m) => m.userId);
+
+    void checkMembers(guildId, userIds, true).catch((error) => {
+      logger.error("failed to update guild members in database", { guildId, error });
+    });
+
+    logger.debug(`fetched ${allMembers.length} members via REST`, { guildId });
+
+    return allMembers;
+  } finally {
+    restMutex.release(guildId);
+  }
 }
