@@ -61,7 +61,7 @@ async function run(
     return send({ embeds: [new ErrorEmbed("lol don't even try")] });
   }
 
-  let members = await getAllMembers(message.guild, true);
+  let members = await getAllMembers(message.guild, false);
 
   members = members.filter((m) => m.joinedTimestamp >= time);
 

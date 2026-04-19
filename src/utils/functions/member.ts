@@ -86,7 +86,7 @@ export async function getMember(
   if (guild.memberCount === guild.members.cache.size) {
     members = guild.members.cache;
   } else {
-    members = await getAllMembers(guild, true);
+    members = await getAllMembers(guild);
   }
 
   let target: GuildMember;
@@ -190,7 +190,7 @@ export async function getExactMember(guild: Guild, memberName: string): Promise<
   if (guild.memberCount == guild.members.cache.size && guild.memberCount <= 25) {
     members = guild.members.cache;
   } else {
-    members = await getAllMembers(guild, true);
+    members = await getAllMembers(guild);
   }
 
   return members.find(

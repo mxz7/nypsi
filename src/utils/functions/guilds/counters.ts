@@ -7,7 +7,7 @@ import { NypsiClient } from "../../../models/Client";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { getItems } from "../economy/utils";
-import { getAllMembers, getAllMembersRest } from "./members";
+import { getAllMembersRest } from "./members";
 import ms = require("ms");
 
 export async function updateChannel(data: GuildCounter, client: NypsiClient | ClusterManager) {
@@ -178,7 +178,11 @@ async function getCounterText(
         });
     }
   } else if (data.tracks === TrackingType.RICHEST_MEMBER) {
-    const memberIds = await getAllMembers(data.guildId);
+    const memberIds = await getAllMembersRest(
+      data.guildId,
+      clusterOrGuild instanceof Guild ? (clusterOrGuild.client as NypsiClient) : undefined,
+      true,
+    );
 
     const topMember = await prisma.economy.findFirst({
       where: {
@@ -196,7 +200,11 @@ async function getCounterText(
 
     value = topMember?.user?.lastKnownUsername || "null";
   } else if (data.tracks === TrackingType.TOTAL_BALANCE) {
-    const memberIds = await getAllMembers(data.guildId);
+    const memberIds = await getAllMembersRest(
+      data.guildId,
+      clusterOrGuild instanceof Guild ? (clusterOrGuild.client as NypsiClient) : undefined,
+      true,
+    );
 
     const total = await prisma.economy.aggregate({
       where: {
@@ -214,7 +222,11 @@ async function getCounterText(
       return;
     }
 
-    const memberIds = await getAllMembers(data.guildId);
+    const memberIds = await getAllMembersRest(
+      data.guildId,
+      clusterOrGuild instanceof Guild ? (clusterOrGuild.client as NypsiClient) : undefined,
+      true,
+    );
 
     const query = await prisma.inventory.aggregate({
       where: {

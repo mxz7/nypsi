@@ -1,8 +1,9 @@
 import { CommandInteraction } from "discord.js";
+import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders.js";
 import { formatDate } from "../utils/functions/date";
-import { getAllMembers } from "../utils/functions/guilds/members";
+import { getAllMembersRest } from "../utils/functions/guilds/members";
 import { getPeaks, updateGuild } from "../utils/functions/guilds/utils";
 import { escapeFormattingCharacters } from "../utils/functions/string";
 
@@ -22,10 +23,10 @@ async function run(
 
   const created = formatDate(server.createdAt).toLowerCase();
 
-  const members = await getAllMembers(message.guild, true);
+  const members = await getAllMembersRest(message.guild.id, message.client as NypsiClient, false);
 
-  const users = members.filter((member) => !member.user.bot);
-  const bots = members.filter((member) => member.user.bot);
+  const users = members.filter((member) => !member.bot);
+  const bots = members.filter((member) => member.bot);
 
   if (args.length == 1 && args[0] == "-id") {
     const embed = new CustomEmbed(message.member)
@@ -43,8 +44,8 @@ async function run(
       .addField(
         "member info",
         `**total** ${server.memberCount.toLocaleString()}\n` +
-          `**humans** ${users.size.toLocaleString()}\n` +
-          `**bots** ${bots.size.toLocaleString()}\n` +
+          `**humans** ${users.length.toLocaleString()}\n` +
+          `**bots** ${bots.length.toLocaleString()}\n` +
           `**member peak** ${(await getPeaks(message.guild)).toLocaleString()}`,
       );
 
@@ -81,8 +82,8 @@ async function run(
     .addField(
       "member info",
       `**total** ${server.memberCount.toLocaleString()}\n` +
-        `**humans** ${users.size.toLocaleString()}\n` +
-        `**bots** ${bots.size.toLocaleString()}\n` +
+        `**humans** ${users.length.toLocaleString()}\n` +
+        `**bots** ${bots.length.toLocaleString()}\n` +
         `**member peak** ${(await getPeaks(message.guild)).toLocaleString()}`,
     );
 

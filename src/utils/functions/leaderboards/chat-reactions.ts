@@ -2,9 +2,10 @@ import dayjs = require("dayjs");
 import { Guild } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
+import { NypsiClient } from "../../../models/Client";
 import { getBlacklisted } from "../chatreactions/blacklisted";
 import { checkLeaderboardPositions } from "../economy/stats";
-import { getAllMembers } from "../guilds/members";
+import { getAllMembersRest, SlimMember } from "../guilds/members";
 import { getUserId, MemberResolvable } from "../member";
 import {
   createLeaderboardOutput,
@@ -18,11 +19,13 @@ import {
 import pAll = require("p-all");
 
 export async function getServerLeaderboard(guild: Guild): Promise<Map<string, string>> {
-  let members = await getAllMembers(guild, true);
+  const membersRaw = await getAllMembersRest(guild.id, guild.client as NypsiClient);
+  const members = new Map<string, SlimMember>();
 
-  members = members.filter((m) => {
-    return !m.user.bot;
-  });
+  for (const member of membersRaw) {
+    if (member.bot) continue;
+    members.set(member.userId, member);
+  }
 
   const usersWins = [];
   const winsStats = new Map<string, number>();
@@ -102,7 +105,7 @@ export async function getServerLeaderboard(guild: Guild): Promise<Map<string, st
       pos = "🥉";
     }
 
-    winsMsg += `${pos} ${await formatUsername(user, members.get(user).user.username, true)} ${winsStats
+    winsMsg += `${pos} ${await formatUsername(user, members.get(user)?.username, true)} ${winsStats
       .get(user)
       .toLocaleString()}\n`;
     count++;
@@ -121,7 +124,7 @@ export async function getServerLeaderboard(guild: Guild): Promise<Map<string, st
       pos = "🥉";
     }
 
-    secondMsg += `${pos} ${await formatUsername(user, members.get(user).user.username, true)} ${secondStats
+    secondMsg += `${pos} ${await formatUsername(user, members.get(user)?.username, true)} ${secondStats
       .get(user)
       .toLocaleString()}\n`;
     count++;
@@ -140,7 +143,7 @@ export async function getServerLeaderboard(guild: Guild): Promise<Map<string, st
       pos = "🥉";
     }
 
-    thirdMsg += `${pos} ${await formatUsername(user, members.get(user).user.username, true)} ${thirdStats
+    thirdMsg += `${pos} ${await formatUsername(user, members.get(user)?.username, true)} ${thirdStats
       .get(user)
       .toLocaleString()}\n`;
     count++;
@@ -159,7 +162,7 @@ export async function getServerLeaderboard(guild: Guild): Promise<Map<string, st
       pos = "🥉";
     }
 
-    overallMsg += `${pos} ${await formatUsername(user, members.get(user).user.username, true)} ${overallStats
+    overallMsg += `${pos} ${await formatUsername(user, members.get(user)?.username, true)} ${overallStats
       .get(user)
       .toLocaleString()}\n`;
     count++;

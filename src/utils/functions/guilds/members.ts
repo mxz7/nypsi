@@ -3,7 +3,7 @@ import { Collection, Guild, GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
-import { MapCache } from "../../cache";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { getRest } from "../../rest";
@@ -101,15 +101,15 @@ export async function checkMembers(
   }
 }
 
+export async function getAllMembers(guild: Guild, userIdsOnly: true): Promise<string[]>;
 export async function getAllMembers(
   guild: Guild,
-  getCollection: true,
+  userIdsOnly?: false,
 ): Promise<Collection<string, GuildMember>>;
-export async function getAllMembers(guild: Guild, getCollection?: false): Promise<string[]>;
-export async function getAllMembers(guild: string): Promise<string[]>;
+export async function getAllMembers(guild: string, userIdsOnly?: boolean): Promise<string[]>;
 export async function getAllMembers(
   guild: Guild | string,
-  getCollection = false,
+  userIdsOnly = false,
 ): Promise<string[] | Collection<string, GuildMember>> {
   const totalStart = performance.now();
 
@@ -128,10 +128,7 @@ export async function getAllMembers(
       .then((v) => (v ? parseInt(v) : 0));
     const lastFetchedDuration = performance.now() - lastFetchedStart;
 
-    if (
-      (lastFetched > Date.now() - ms("10 minute") && !getCollection) ||
-      !(guild instanceof Guild)
-    ) {
+    if ((lastFetched > Date.now() - ms("10 minute") && userIdsOnly) || !(guild instanceof Guild)) {
       const dbMembersStart = performance.now();
       const members = await getDatabaseMembers(guildId);
       const dbMembersDuration = performance.now() - dbMembersStart;
@@ -139,7 +136,7 @@ export async function getAllMembers(
       logger.debug(`members: getAllMembers timings`, {
         guildId,
         memberCount: members.length,
-        getCollection,
+        userIdsOnly,
         usedDatabaseOnly: true,
         timingsMs: {
           acquireMutex: +acquireDuration.toFixed(2),
@@ -157,7 +154,7 @@ export async function getAllMembers(
 
     if (
       guild.memberCount === guild.members.cache.size ||
-      (lastFetched > Date.now() - ms("3 minute") && getCollection)
+      (lastFetched > Date.now() - ms("3 minute") && !userIdsOnly)
     ) {
       const resolveDiscordMembersStart = performance.now();
       discordMembers = guild.members.cache;
@@ -180,13 +177,13 @@ export async function getAllMembers(
     const mapIdsDuration = performance.now() - mapIdsStart;
 
     if (lastFetched < Date.now() - ms("10 minute")) {
-      checkMembers(guild.id, discordMemberIds, getCollection);
+      checkMembers(guild.id, discordMemberIds, !userIdsOnly);
     }
 
     logger.debug(`members: getAllMembers timings`, {
       guildId,
       memberCount: discordMemberIds.length,
-      getCollection,
+      userIdsOnly,
       usedDatabaseOnly: false,
       timingsMs: {
         acquireMutex: +acquireDuration.toFixed(2),
@@ -197,11 +194,11 @@ export async function getAllMembers(
       },
     });
 
-    if (getCollection) {
-      return discordMembers;
+    if (userIdsOnly) {
+      return discordMemberIds;
     }
 
-    return discordMemberIds;
+    return discordMembers;
   } finally {
     mutex.release(mutexKey);
   }
@@ -215,25 +212,39 @@ export type SlimMember = {
   joinedTimestamp: number;
 };
 
-const restMembersCache = new MapCache<SlimMember[]>(ms("15 minutes"));
+const restMembersCache = new RedisCache<SlimMember[]>(
+  Constants.redis.cache.guild.MEMBERS_SLIM,
+  ms("15 minutes"),
+);
 const restMutex = new Mutex();
 
 export async function getAllMembersRest(
   guildId: string,
   client?: NypsiClient,
-): Promise<SlimMember[]> {
-  const cache = restMembersCache.get(guildId);
+  userIdsOnly?: false,
+): Promise<SlimMember[]>;
+export async function getAllMembersRest(
+  guildId: string,
+  client: NypsiClient | undefined,
+  userIdsOnly: true,
+): Promise<string[]>;
+export async function getAllMembersRest(
+  guildId: string,
+  client?: NypsiClient,
+  userIdsOnly = false,
+): Promise<SlimMember[] | string[]> {
+  const cache = await restMembersCache.get(guildId);
 
   if (cache) {
-    return cache;
+    return userIdsOnly ? cache.map((m) => m.userId) : cache;
   }
 
   await restMutex.acquire(guildId);
 
   try {
     // re-check cache after acquiring lock in case another call already populated it
-    const cached = restMembersCache.get(guildId);
-    if (cached) return cached;
+    const cached = await restMembersCache.get(guildId);
+    if (cached) return userIdsOnly ? cached.map((m) => m.userId) : cached;
 
     const rest = getRest(client);
 
@@ -261,17 +272,17 @@ export async function getAllMembersRest(
       after = batch.at(-1)!.user!.id;
     }
 
-    restMembersCache.set(guildId, allMembers);
+    await restMembersCache.set(guildId, allMembers);
 
     const userIds = allMembers.map((m) => m.userId);
 
     void checkMembers(guildId, userIds, true).catch((error) => {
-      logger.error("failed to update guild members in database", { guildId, error });
+      logger.error("members: failed to update guild members in database", { guildId, error });
     });
 
-    logger.debug(`fetched ${allMembers.length} members via REST`, { guildId });
+    logger.debug(`members: fetched ${allMembers.length} members via REST`, { guildId });
 
-    return allMembers;
+    return userIdsOnly ? userIds : allMembers;
   } finally {
     restMutex.release(guildId);
   }

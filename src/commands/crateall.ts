@@ -1,10 +1,11 @@
 import { CommandInteraction } from "discord.js";
+import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
 import { getItems, userExists } from "../utils/functions/economy/utils";
-import { getAllMembers } from "../utils/functions/guilds/members";
+import { getAllMembersRest } from "../utils/functions/guilds/members";
 import { pluralize } from "../utils/functions/string";
 import { getLastKnownUsername } from "../utils/functions/users/username";
 import { logger } from "../utils/logger";
@@ -61,7 +62,7 @@ async function run(
   if (message.guild.memberCount == message.guild.members.cache.size) {
     members = message.guild.members.cache.map((i) => i.id);
   } else {
-    members = await getAllMembers(message.guild);
+    members = await getAllMembersRest(message.guild.id, message.client as NypsiClient, true);
   }
 
   let amount = 1;

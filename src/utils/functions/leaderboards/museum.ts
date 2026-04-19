@@ -1,9 +1,10 @@
 import dayjs = require("dayjs");
 import { Guild } from "discord.js";
 import prisma from "../../../init/database";
+import { NypsiClient } from "../../../models/Client";
 import { checkLeaderboardPositions } from "../economy/stats";
 import { getItems } from "../economy/utils";
-import { getAllMembers } from "../guilds/members";
+import { getAllMembersRest } from "../guilds/members";
 import { getUserId, MemberResolvable } from "../member";
 import PageManager from "../page";
 import { pluralize } from "../string";
@@ -101,7 +102,7 @@ export async function topMuseumCompletion(
 }
 
 export async function topMuseumCompletions(guild: Guild, member: MemberResolvable) {
-  const members = await getAllMembers(guild);
+  const members = await getAllMembersRest(guild.id, guild.client as NypsiClient, true);
 
   const query = await prisma.$queryRaw<
     {

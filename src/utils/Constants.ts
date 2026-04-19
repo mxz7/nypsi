@@ -227,6 +227,7 @@ export default {
         MEMBERS: "cache:guild:members",
         MEMBERS_LAST_FETCHED: "cache:guild:members:last_fetched",
         LAST_COMMAND: "cache:guild:last_command",
+        MEMBERS_SLIM: "cache:guild:members:slim",
       },
       chatReaction: {
         EXISTS: "cache:chatreaction:exists",

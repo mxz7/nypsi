@@ -2,8 +2,9 @@ import dayjs = require("dayjs");
 import { Guild } from "discord.js";
 import { Prisma } from "#generated/prisma";
 import prisma from "../../../init/database";
+import { NypsiClient } from "../../../models/Client";
 import { checkLeaderboardPositions } from "../economy/stats";
-import { getAllMembers } from "../guilds/members";
+import { getAllMembersRest } from "../guilds/members";
 import { getUserId, MemberResolvable } from "../member";
 import PageManager from "../page";
 import { formatTime, pluralize } from "../string";
@@ -82,7 +83,7 @@ export async function topWordle(
 }
 
 export async function topWordleTime(guild: Guild, member: MemberResolvable) {
-  const members = await getAllMembers(guild);
+  const members = await getAllMembersRest(guild.id, guild.client as NypsiClient, true);
 
   const query: { userId: string; time: number; gameId: number }[] =
     await prisma.$queryRaw`WITH ranked_results AS (

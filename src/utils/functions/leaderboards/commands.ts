@@ -1,7 +1,8 @@
 import { Guild } from "discord.js";
 import prisma from "../../../init/database";
+import { NypsiClient } from "../../../models/Client";
 import { checkLeaderboardPositions } from "../economy/stats";
-import { getAllMembers } from "../guilds/members";
+import { getAllMembersRest } from "../guilds/members";
 import { getUserId, MemberResolvable } from "../member";
 import { pluralize } from "../string";
 import { getLastKnownUsername } from "../users/username";
@@ -111,7 +112,9 @@ export async function topCommandUses(
   member?: MemberResolvable,
   amount?: number,
 ): Promise<LeaderboardResult> {
-  const members = guild ? await getAllMembers(guild) : null;
+  const members = guild
+    ? await getAllMembersRest(guild.id, guild.client as NypsiClient, true)
+    : null;
 
   const query = await prisma.commandUse.groupBy({
     where: {

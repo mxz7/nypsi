@@ -155,7 +155,7 @@ async function run(
       doingRoles = false;
     }, ms("1 hour"));
 
-    const members = await getAllMembers(message.guild, true);
+    const members = await getAllMembers(message.guild);
 
     const buffers: Record<string, Buffer<ArrayBufferLike>> = {};
 

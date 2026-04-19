@@ -1,8 +1,9 @@
 import { Guild } from "discord.js";
 import prisma from "../../../init/database";
+import { NypsiClient } from "../../../models/Client";
 import { checkLeaderboardPositions } from "../economy/stats";
 import { getAchievements, getItems } from "../economy/utils";
-import { getAllMembers } from "../guilds/members";
+import { getAllMembersRest } from "../guilds/members";
 import { getUserId, MemberResolvable } from "../member";
 import { pluralize } from "../string";
 import { getLastKnownUsername } from "../users/username";
@@ -329,7 +330,7 @@ export async function topItem(
 }
 
 export async function topCompletion(guild: Guild, member: MemberResolvable) {
-  const members = await getAllMembers(guild);
+  const members = await getAllMembersRest(guild.id, guild.client as NypsiClient, true);
 
   const query = await prisma.achievements.groupBy({
     where: {

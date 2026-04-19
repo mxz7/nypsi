@@ -19,10 +19,11 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
+import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { setBirthdayChannel } from "../utils/functions/guilds/birthday";
-import { getAllMembers } from "../utils/functions/guilds/members";
+import { getAllMembersRest } from "../utils/functions/guilds/members";
 import PageManager from "../utils/functions/page";
 import {
   getBirthday,
@@ -170,7 +171,7 @@ async function run(
       ],
     });
   } else if (args[0]?.toLowerCase() === "upcoming") {
-    const members = await getAllMembers(message.guild);
+    const members = await getAllMembersRest(message.guild.id, message.client as NypsiClient, true);
 
     const birthdays = await getUpcomingBirthdays(members);
 

@@ -51,7 +51,7 @@ async function run(
   if (args.length == 0) {
     target1 = message.member;
 
-    const members = Array.from((await getAllMembers(message.guild, true)).values());
+    const members = Array.from((await getAllMembers(message.guild)).values());
 
     target2 = members[Math.floor(Math.random() * members.length)];
   } else if (args.length == 1) {
