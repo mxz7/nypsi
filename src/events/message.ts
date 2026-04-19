@@ -24,13 +24,12 @@ import Constants from "../utils/Constants";
 import { a } from "../utils/functions/anticheat";
 import { addEventProgress } from "../utils/functions/economy/events";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
+import { userExists } from "../utils/functions/economy/utils";
 import { getLastCommand as getLastGuildCommand } from "../utils/functions/guilds/commands";
 import { checkAutoMute, checkMessageContent } from "../utils/functions/guilds/filters";
 import { isSlashOnly } from "../utils/functions/guilds/slash";
 import { getGuildName, getPrefix, hasGuild } from "../utils/functions/guilds/utils";
-import { getKarma } from "../utils/functions/karma/karma";
 import { checkTriggers } from "../utils/functions/message-triggers";
-import { isPremium } from "../utils/functions/premium/premium";
 import sleep from "../utils/functions/sleep";
 import {
   createSupportRequest,
@@ -551,13 +550,10 @@ export default async function messageCreate(message: Message) {
     message.mentions.members?.size > 0
   ) {
     if (
-      message.guild.memberCount < 15000 &&
+      message.guild.memberCount < 50000 &&
       ((await getLastGuildCommand(message.guildId)) || new Date(0)).getTime() >=
         Date.now() - ms("30 days") &&
-      ((await isPremium(message.guild.ownerId)) ||
-        (await getKarma(message.guild.ownerId)) >= 50 ||
-        ((await getLastCommand(message.guild.ownerId)) || new Date(0)).getTime() >=
-          Date.now() - ms("90 days"))
+      (await userExists(message.guild.ownerId))
     ) {
       const channel = message.channel;
 

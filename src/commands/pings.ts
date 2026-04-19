@@ -10,14 +10,12 @@ import {
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { createUser } from "../utils/functions/economy/utils";
+import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getLastCommand as getLastGuildCommand } from "../utils/functions/guilds/commands";
 import { getGuildName } from "../utils/functions/guilds/utils";
-import { getKarma } from "../utils/functions/karma/karma";
 import PageManager from "../utils/functions/page";
 import { isPremium } from "../utils/functions/premium/premium";
 import { decrypt } from "../utils/functions/string";
-import { getLastCommand } from "../utils/functions/users/commands";
 import { deleteUserMentions, fetchUserMentions } from "../utils/functions/users/mentions";
 import { getPreferences, updatePreferences } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -46,11 +44,10 @@ async function run(
   let qualified = false;
 
   if (
-    message.guild.memberCount < 15000 &&
-    (await getLastGuildCommand(message.guildId)).getTime() >= Date.now() - ms("30 days") &&
-    ((await isPremium(message.guild.ownerId)) ||
-      (await getKarma(message.guild.ownerId)) >= 50 ||
-      (await getLastCommand(message.guild.ownerId)).getTime() >= Date.now() - ms("90 days"))
+    message.guild.memberCount < 50000 &&
+    ((await getLastGuildCommand(message.guildId)) || new Date(0)).getTime() >=
+      Date.now() - ms("30 days") &&
+    (await userExists(message.guild.ownerId))
   ) {
     qualified = true;
   } else if (message.author.id == message.guild.ownerId) {
