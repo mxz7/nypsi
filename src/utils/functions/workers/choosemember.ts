@@ -1,10 +1,10 @@
 import { Worker, isMainThread, parentPort, workerData } from "worker_threads";
-import { Collection, GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { compareTwoStrings } from "string-similarity";
+import { SlimMember } from "../guilds/members";
 
 export default function chooseMember(
-  members: Collection<string, GuildMember>,
+  members: SlimMember[],
   targetName: string,
 ): Promise<string | null> {
   return new Promise((resolve, reject) => {
@@ -23,54 +23,47 @@ if (!isMainThread) {
   process.title = "nypsi: choosemember worker";
   let target: string;
   const scores: { id: string; score: number }[] = [];
-  const members: Collection<string, any> = workerData[0];
+  const members: SlimMember[] = workerData[0];
   const memberName: string = workerData[1];
 
-  for (const m of members.keys()) {
-    const member = members.get(m);
-
-    if (member.user.id === memberName) {
-      target = member.user.id;
+  for (const member of members) {
+    if (member.userId === memberName) {
+      target = member.userId;
       break;
-    } else if (member.user.username.toLowerCase() === memberName.toLowerCase()) {
-      target = member.user.id;
+    } else if (member.username.toLowerCase() === memberName) {
+      target = member.userId;
       break;
     } else {
       let score = 0;
 
-      if (member.user.username.toLowerCase().startsWith(memberName.toLowerCase())) score += 1.5;
-      if ((member.user.globalName || "").toLowerCase().startsWith(memberName.toLowerCase()))
-        score += 1.1;
-      if ((member.nickname || "").toLowerCase().startsWith(memberName.toLowerCase())) score += 0.5;
+      if (member.username.toLowerCase().startsWith(memberName)) score += 1.5;
+      if (member.displayName.toLowerCase().startsWith(memberName)) score += 1.1;
+      if (member.nickname?.toLowerCase().startsWith(memberName)) score += 0.5;
 
-      if (member.user.username.toLowerCase().includes(memberName.toLowerCase())) score += 0.75;
-      if ((member.user.globalName || "").toLowerCase().includes(memberName.toLowerCase()))
-        score += 0.5;
-      if ((member.nickname || "").toLowerCase().includes(memberName.toLowerCase())) score += 0.25;
+      if (member.username.toLowerCase().includes(memberName)) score += 0.75;
+      if (member.displayName.toLowerCase().includes(memberName)) score += 0.5;
+      if (member.nickname?.toLowerCase().includes(memberName)) score += 0.25;
 
-      const usernameComparison = compareTwoStrings(
-        member.user.username.toLowerCase(),
-        memberName.toLowerCase(),
-      );
-      const displayNameComparison = compareTwoStrings(
-        (member.user.globalName || "").toLowerCase(),
-        memberName.toLowerCase(),
-      );
+      const usernameComparison = compareTwoStrings(member.username.toLowerCase(), memberName);
+      const displayNameComparison = compareTwoStrings(member.displayName.toLowerCase(), memberName);
       const guildNameComparison = compareTwoStrings(
-        (member.nickname || "").toLowerCase(),
-        memberName.toLowerCase(),
+        member.nickname?.toLowerCase() || "",
+        memberName,
       );
 
       score += usernameComparison * 2.5;
       score += displayNameComparison === 1 ? 1.5 : displayNameComparison;
       score += guildNameComparison === 1 ? 1.2 : displayNameComparison;
 
-      if (score > 2) scores.push({ id: member.user.id, score });
+      // remember to change on worker
+      // higher = require more accurate typing
+      if (score > 2) scores.push({ id: member.userId, score });
     }
   }
 
   if (!target && scores.length > 0) {
-    target = members.get(inPlaceSort(scores).desc((i) => i.score)[0]?.id).user.id;
+    const sortedScores = inPlaceSort(scores).desc((i) => i.score);
+    target = members.find((m) => m.userId === sortedScores[0]?.id)?.userId;
   }
 
   if (!target) {

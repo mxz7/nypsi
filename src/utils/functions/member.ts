@@ -1,6 +1,5 @@
 import {
   APIInteractionGuildMember,
-  Collection,
   Guild,
   GuildMember,
   PartialGuildMember,
@@ -10,9 +9,15 @@ import {
 } from "discord.js";
 import { inPlaceSort, sort } from "fast-sort";
 import { compareTwoStrings } from "string-similarity";
+import { NypsiClient } from "../../models/Client";
 import Constants from "../Constants";
 import { logger } from "../logger";
-import { getAllMembers } from "./guilds/members";
+import {
+  getAllMembers,
+  getAllMembersRest,
+  SlimMember,
+  transformGuildMemberToSlim,
+} from "./guilds/members";
 import chooseMember from "./workers/choosemember";
 import ms = require("ms");
 
@@ -61,6 +66,8 @@ export async function getMember(
 ): Promise<GuildMember | { username: string; score: number }[]> {
   if (!guild) return null;
 
+  const fetchMember = (userId: string) => guild.members.fetch(userId).catch(() => {});
+
   memberName = memberName.toLowerCase();
 
   const cacheHit = memberCache.get(guild.id)?.get(memberName);
@@ -69,65 +76,70 @@ export async function getMember(
     if (cacheHit.expire < Date.now()) {
       memberCache.get(guild.id).delete(memberName);
     } else {
-      return (await guild.members.fetch(cacheHit.userId).catch(() => {})) || null;
+      return (await fetchMember(cacheHit.userId)) || null;
     }
   }
 
   if (memberName.match(Constants.MEMBER_MENTION_REGEX)) {
-    return (await guild.members.fetch(memberName.replaceAll(/\D/g, "")).catch(() => {})) || null;
+    return (await fetchMember(memberName.replaceAll(/\D/g, "")).catch(() => {})) || null;
   }
 
   if (memberName.match(Constants.SNOWFLAKE_REGEX)) {
-    return (await guild.members.fetch(memberName).catch(() => {})) || null;
+    return (await fetchMember(memberName).catch(() => {})) || null;
   }
 
-  let members: Collection<string, GuildMember>;
+  let members: SlimMember[];
 
   if (guild.memberCount === guild.members.cache.size) {
-    members = guild.members.cache;
+    members = guild.members.cache.map(transformGuildMemberToSlim);
   } else {
-    members = await getAllMembers(guild);
+    if (guild.memberCount > 1000) {
+      members = await getAllMembersRest(guild.id, guild.client as NypsiClient);
+    } else {
+      members = await getAllMembers(guild).then((c) => c.map(transformGuildMemberToSlim));
+    }
   }
 
-  let target: GuildMember;
+  let targetId: string;
   const scores: { id: string; score: number }[] = [];
 
-  if (memberName === "max" && members.get(Constants.OWNER_ID) && !debug)
-    return members.get(Constants.OWNER_ID);
+  if (memberName === "max" && !debug) {
+    const max = members.find((m) => m.userId === Constants.OWNER_ID);
+    if (max) {
+      return (await fetchMember(max.userId).catch(() => {})) || null;
+    }
+  }
 
-  if (members.size > 2000) {
-    const id = await chooseMember(members, memberName);
-    target = members.get(id);
+  if (members.length > 2000) {
+    targetId = await chooseMember(members, memberName);
   } else {
-    for (const m of members.keys()) {
-      const member = members.get(m);
-
-      if (member.user.id === memberName) {
-        target = member;
+    for (const member of members) {
+      if (member.userId === memberName) {
+        targetId = member.userId;
         break;
-      } else if (member.user.username.toLowerCase() === memberName) {
-        target = member;
+      } else if (member.username.toLowerCase() === memberName) {
+        targetId = member.userId;
         break;
       } else {
         let score = 0;
 
-        if (member.user.username.toLowerCase().startsWith(memberName)) score += 1.5;
-        if (member.user.displayName.toLowerCase().startsWith(memberName)) score += 1.1;
-        if (member.displayName.toLowerCase().startsWith(memberName)) score += 0.5;
+        if (member.username.toLowerCase().startsWith(memberName)) score += 1.5;
+        if (member.displayName.toLowerCase().startsWith(memberName)) score += 1.1;
+        if (member.nickname?.toLowerCase().startsWith(memberName)) score += 0.5;
 
-        if (member.user.username.toLowerCase().includes(memberName)) score += 0.75;
-        if (member.user.displayName.toLowerCase().includes(memberName)) score += 0.5;
-        if (member.displayName.toLowerCase().includes(memberName)) score += 0.25;
+        if (member.username.toLowerCase().includes(memberName)) score += 0.75;
+        if (member.displayName.toLowerCase().includes(memberName)) score += 0.5;
+        if (member.nickname?.toLowerCase().includes(memberName)) score += 0.25;
 
-        const usernameComparison = compareTwoStrings(
-          member.user.username.toLowerCase(),
-          memberName,
-        );
+        const usernameComparison = compareTwoStrings(member.username.toLowerCase(), memberName);
         const displayNameComparison = compareTwoStrings(
-          member.user.displayName.toLowerCase(),
+          member.displayName.toLowerCase(),
           memberName,
         );
-        const guildNameComparison = compareTwoStrings(member.displayName.toLowerCase(), memberName);
+        const guildNameComparison = compareTwoStrings(
+          member.nickname?.toLowerCase() || "",
+          memberName,
+        );
 
         score += usernameComparison * 2.5;
         score += displayNameComparison === 1 ? 1.5 : displayNameComparison;
@@ -135,43 +147,53 @@ export async function getMember(
 
         // remember to change on worker
         // higher = require more accurate typing
-        if (score > 2) scores.push({ id: member.id, score });
+        if (score > 2) scores.push({ id: member.userId, score });
       }
     }
 
-    if (!target && scores.length > 0) {
+    if (!targetId && scores.length > 0) {
       if (debug) {
         return sort(scores)
           .desc((i) => i.score)
-          .map((i) => ({ score: i.score, username: members.get(i.id).user.username }));
+          .map((i) => ({
+            score: i.score,
+            username: members.find((m) => m.userId === i.id)?.username,
+          }));
       }
-      target = members.get(inPlaceSort(scores).desc((i) => i.score)[0]?.id);
+      targetId = members.find(
+        (m) => m.userId === inPlaceSort(scores).desc((i) => i.score)[0]?.id,
+      )?.userId;
     }
   }
 
-  if (target?.id) {
+  if (targetId) {
     if (memberCache.get(guild.id)) {
       memberCache
         .get(guild.id)
-        .set(memberName, { userId: target.id, expire: Date.now() + ms("15 minutes") });
+        .set(memberName, { userId: targetId, expire: Date.now() + ms("15 minutes") });
     } else {
       memberCache.set(
         guild.id,
-        new Map([[memberName, { userId: target.id, expire: Date.now() + ms("15 minutes") }]]),
+        new Map([[memberName, { userId: targetId, expire: Date.now() + ms("15 minutes") }]]),
       );
     }
   }
 
   if (debug) {
     return [
-      ...(target ? [{ username: target.user.username, score: 10000 }] : []),
+      ...(targetId
+        ? [{ username: members.find((m) => m.userId === targetId)?.username, score: 10000 }]
+        : []),
       ...sort(scores)
         .desc((i) => i.score)
-        .map((i) => ({ score: i.score, username: members.get(i.id).user.username })),
+        .map((i) => ({
+          score: i.score,
+          username: members.find((m) => m.userId === i.id)?.username,
+        })),
     ];
   }
 
-  return target;
+  return (await fetchMember(targetId).catch(() => {})) || null;
 }
 
 export async function getExactMember(guild: Guild, memberName: string): Promise<GuildMember> {
@@ -185,20 +207,28 @@ export async function getExactMember(guild: Guild, memberName: string): Promise<
     return (await guild.members.fetch(memberName).catch(() => {})) || null;
   }
 
-  let members: Collection<string, GuildMember>;
+  let members: SlimMember[];
 
-  if (guild.memberCount == guild.members.cache.size && guild.memberCount <= 25) {
-    members = guild.members.cache;
+  if (guild.memberCount === guild.members.cache.size) {
+    members = guild.members.cache.map(transformGuildMemberToSlim);
+  } else if (guild.memberCount > 1000) {
+    members = await getAllMembersRest(guild.id, guild.client as NypsiClient);
   } else {
-    members = await getAllMembers(guild);
+    members = await getAllMembers(guild).then((c) => c.map(transformGuildMemberToSlim));
   }
 
-  return members.find(
+  const member = members.find(
     (member) =>
-      member.user.username.toLowerCase() == memberName.toLowerCase() ||
-      member.user.id == memberName ||
-      member.user.displayName.toLowerCase() == memberName.toLowerCase(),
+      member.username.toLowerCase() == memberName.toLowerCase() ||
+      member.userId == memberName ||
+      member.displayName.toLowerCase() == memberName.toLowerCase(),
   );
+
+  if (!member) {
+    return null;
+  }
+
+  return (await guild.members.fetch(member.userId).catch(() => {})) || null;
 }
 
 export async function getRole(guild: Guild, roleName: string): Promise<Role> {

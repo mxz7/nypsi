@@ -210,6 +210,8 @@ export type SlimMember = {
   roles: string[];
   bot: boolean;
   joinedTimestamp: number;
+  displayName: string;
+  nickname?: string;
 };
 
 const restMembersCache = new RedisCache<SlimMember[]>(
@@ -264,6 +266,8 @@ export async function getAllMembersRest(
           username: m.user!.username,
           bot: m.user!.bot,
           joinedTimestamp: Date.parse(m.joined_at),
+          displayName: m.user!.global_name ?? m.user!.username,
+          nickname: m.nick,
         })),
       );
 
@@ -286,4 +290,16 @@ export async function getAllMembersRest(
   } finally {
     restMutex.release(guildId);
   }
+}
+
+export function transformGuildMemberToSlim(member: GuildMember): SlimMember {
+  return {
+    userId: member.user.id,
+    username: member.user.username,
+    roles: member.roles.cache.map((r) => r.id),
+    bot: member.user.bot,
+    joinedTimestamp: member.joinedTimestamp,
+    displayName: member.user.displayName ?? member.user.username,
+    nickname: member.nickname || member.displayName || undefined,
+  };
 }

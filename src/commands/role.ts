@@ -14,7 +14,11 @@ import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { MStoTime } from "../utils/functions/date";
-import { getAllMembersRest, SlimMember } from "../utils/functions/guilds/members";
+import {
+  getAllMembersRest,
+  SlimMember,
+  transformGuildMemberToSlim,
+} from "../utils/functions/guilds/members";
 import {
   getAutoJoinRoles,
   getPersistentRoles,
@@ -163,13 +167,7 @@ async function run(
   const getMembers = async (): Promise<SlimMember[]> => {
     const cached = message.guild.members.cache;
     if (cached.size === message.guild.memberCount) {
-      return cached.map((m) => ({
-        userId: m.id,
-        roles: m.roles.cache.map((r) => r.id),
-        username: m.user.username,
-        bot: m.user.bot,
-        joinedTimestamp: m.joinedTimestamp,
-      }));
+      return cached.map(transformGuildMemberToSlim);
     }
 
     return getAllMembersRest(message.guild.id, message.client as NypsiClient);
