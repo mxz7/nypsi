@@ -5,9 +5,16 @@ import { DMJobData } from "../../types/workers/dms";
 import { MentionJobData } from "../../types/workers/mentions";
 import { logger } from "../logger";
 
-export const dmQueue = new Queue<DMJobData>("dms", { connection: redis });
-export const mentionQueue = new Queue<MentionJobData>("mentions", { connection: redis });
+export const dmQueue = new Queue<DMJobData>("dms", {
+  connection: redis,
+  defaultJobOptions: { removeOnComplete: true, removeOnFail: true },
+});
+export const mentionQueue = new Queue<MentionJobData>("mentions", {
+  connection: redis,
+  defaultJobOptions: { removeOnComplete: true, removeOnFail: true },
+});
 
+// this can be removed next time you see it lol
 setInterval(async () => {
   if (logger.meta["cluster"] !== "main") return;
 
