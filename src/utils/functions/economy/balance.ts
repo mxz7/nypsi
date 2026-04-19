@@ -1,5 +1,4 @@
 import { ClusterManager } from "discord-hybrid-sharding";
-import { Guild } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
@@ -7,7 +6,6 @@ import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
-import { getAllMembers } from "../guilds/members";
 import { getUserId, MemberResolvable } from "../member";
 import { isBooster } from "../premium/boosters";
 import { getTier } from "../premium/premium";
@@ -478,67 +476,6 @@ export async function getMaxBankBalance(member: MemberResolvable): Promise<numbe
   const max = bonus + starting;
 
   return max + base;
-}
-
-export async function bottomAmount(guild: Guild, amount: number): Promise<string[]> {
-  let members = await getAllMembers(guild, true);
-
-  members = members.filter((m) => {
-    return !m.user.bot;
-  });
-
-  const query = await prisma.economy.findMany({
-    where: {
-      AND: [{ money: { gt: 0 } }, { userId: { in: Array.from(members.keys()) } }],
-    },
-    select: {
-      userId: true,
-      money: true,
-    },
-    orderBy: {
-      money: "asc",
-    },
-    take: amount,
-  });
-
-  const usersFinal = [];
-
-  let count = 0;
-
-  const getMemberID = (guild: Guild, id: string) => {
-    const target = guild.members.cache.find((member) => {
-      return member.user.id == id;
-    });
-
-    return target;
-  };
-
-  for (const user of query) {
-    if (count >= amount) break;
-    if (usersFinal.join().length >= 1500) break;
-
-    if (Number(user.money) != 0) {
-      let pos: number | string = count + 1;
-
-      if (pos == 1) {
-        pos = "🥇";
-      } else if (pos == 2) {
-        pos = "🥈";
-      } else if (pos == 3) {
-        pos = "🥉";
-      }
-
-      usersFinal[count] =
-        pos +
-        " **" +
-        getMemberID(guild, user.userId).user.username +
-        "** $" +
-        Number(user.money).toLocaleString();
-      count++;
-    }
-  }
-
-  return usersFinal;
 }
 
 export async function hasPadlock(member: MemberResolvable): Promise<boolean> {
