@@ -17,11 +17,11 @@ import { addTaskProgress } from "../utils/functions/economy/tasks.js";
 import { getTagsData } from "../utils/functions/economy/utils.js";
 import { checkMessageContent } from "../utils/functions/guilds/filters.js";
 import { isMuted } from "../utils/functions/moderation/mute.js";
-import { cleanString } from "../utils/functions/string.js";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications.js";
 import { getActiveTag } from "../utils/functions/users/tags.js";
 import { getLastKnownUsername } from "../utils/functions/users/username.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
+import { logger } from "../utils/logger.js";
 
 const cmd = new Command("sex", "find horny milfs in ur area 😏", "fun").setAliases([
   "findhornymilfsinmyarea",
@@ -45,29 +45,6 @@ cmd.slashData.addStringOption((option) =>
   option.setName("message").setDescription("a good pickup line always works (;"),
 );
 
-const descFilter = [
-  "nigger",
-  "nigga",
-  "faggot",
-  "fag",
-  "nig",
-  "ugly",
-  "discordgg",
-  "discordcom",
-  "discordappcom",
-  "gay",
-  "tranny",
-  "cracker",
-  "chink",
-  "pornhub",
-  "porn",
-  "xvideos",
-  "xhamster",
-  "redtube",
-  "grabify",
-  "bitly",
-];
-
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   send: SendMessage,
@@ -80,10 +57,8 @@ async function run(
     return;
   }
 
-  for (const item of descFilter) {
-    if (message.guild.name.toLowerCase().includes(item)) {
-      return send({ embeds: [new ErrorEmbed("this server is not able to use this command")] });
-    }
+  if (await checkMessageContent(Constants.NYPSI_SERVER_ID, message.guild.name, false)) {
+    return send({ embeds: [new ErrorEmbed("this server is not able to use this command")] });
   }
 
   if ((await redis.exists(`${Constants.redis.cooldown.SEX_CHASTITY}:${message.author.id}`)) == 1) {
@@ -120,14 +95,20 @@ async function run(
 
   if (args.length > 0) {
     description = args.join(" ");
-    const descriptionCheck = cleanString(description);
 
-    for (const word of descFilter) {
-      if (descriptionCheck.includes(word)) {
-        description = "";
-        break;
-      }
+    const check = await checkMessageContent(Constants.NYPSI_SERVER_ID, description, false);
+
+    if (!check) {
+      logger.info(`sex: ${message.author.id} tried to send inappropriate content: ${description}`);
+      return send({
+        embeds: [
+          new ErrorEmbed(
+            "⚠️ your message contains inappropriate content, if you keep doing this, you **WILL** be banned from nypsi",
+          ),
+        ],
+      });
     }
+
     if (description.length > 50) {
       description = description.substring(0, 50) + "...";
     }
@@ -198,16 +179,10 @@ async function run(
 
     if (args.length > 0) {
       description = args.join(" ");
-      const descriptionCheck = cleanString(description);
+      const check = await checkMessageContent(Constants.NYPSI_SERVER_ID, description, false);
 
-      for (const word of descFilter) {
-        if (descriptionCheck.includes(word)) {
-          description = "";
-          break;
-        }
-      }
-      if (description.length > 50) {
-        description = description.substring(0, 50) + "...";
+      if (!check) {
+        description = "";
       }
     }
 
