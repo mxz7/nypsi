@@ -2,7 +2,7 @@ import { Guild } from "discord.js";
 import { NypsiClient } from "../../../models/Client";
 import { logger } from "../../logger";
 import { getTagsData } from "../economy/utils";
-import { getAllMembersRest } from "../guilds/members";
+import { getAllMembers, getAllMembersRest } from "../guilds/members";
 import PageManager from "../page";
 import { getPreferences } from "../users/notifications";
 import { getActiveTag } from "../users/tags";
@@ -32,7 +32,13 @@ export async function formatUsername(id: string, username: string, checkPrivacy:
 export async function getMembers(guild?: Guild) {
   if (!guild) return null;
 
-  const members = await getAllMembersRest(guild.id, guild.client as NypsiClient, true);
+  let members: string[];
+
+  if (guild.memberCount < 1000) {
+    members = await getAllMembers(guild.id, true);
+  } else {
+    members = await getAllMembersRest(guild.id, guild.client as NypsiClient, true);
+  }
 
   return members;
 }
