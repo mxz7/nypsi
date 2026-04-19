@@ -107,6 +107,8 @@ const client = new NypsiClient({
     GuildForumThreadManager: 0,
     GuildTextThreadManager: 0,
     DMMessageManager: 0,
+    ApplicationEmojiManager: 0,
+    EntitlementManager: 0,
     UserManager: {
       maxSize: 2_500,
       keepOverLimit: (user) => {
