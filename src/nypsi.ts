@@ -15,17 +15,6 @@ const client = new NypsiClient({
   },
   sweepers: {
     ...Options.DefaultSweeperSettings,
-    messages: {
-      interval: 45,
-      filter: () => (msg) => {
-        if (!msg.author) return true;
-        if (msg.author?.bot) return true;
-
-        return !(
-          msg.createdTimestamp > Date.now() - 30000 || msg.editedTimestamp > Date.now() - 30000
-        );
-      },
-    },
     guildMembers: {
       interval: 900,
       filter: () => (member) => {
@@ -93,7 +82,19 @@ const client = new NypsiClient({
     GuildStickerManager: 0,
     GuildScheduledEventManager: 0,
     MessageManager: 10,
-    GuildMessageManager: 10,
+    GuildMessageManager: {
+      maxSize: 15,
+      keepOverLimit: (message) => {
+        if (!message.guild) return false;
+        const lastGuildCommand = getLastCommandSync(message.guild.id);
+        if (!lastGuildCommand || lastGuildCommand < Date.now() - inactiveGuild) {
+          // guild is inactive - no point storing data
+          return false;
+        }
+
+        return true;
+      },
+    },
     PresenceManager: 0,
     ReactionManager: 0,
     ReactionUserManager: 0,
