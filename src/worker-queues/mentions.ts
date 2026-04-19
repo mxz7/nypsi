@@ -44,6 +44,7 @@ const worker = new Worker<MentionJobData>(
       logger.debug(`got filtered user ids in ${performance.now() - before}ms`, {
         guildId: data.guildId,
         result: userIds.length,
+        before: members.length,
       });
     } else {
       userIds = data.mentions.map((m) => m.split(":")[1]);
