@@ -9,13 +9,14 @@ import {
   MessageFlags,
 } from "discord.js";
 import redis from "../init/redis";
+import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
 import { getItems } from "../utils/functions/economy/utils";
-import { getAllMembers } from "../utils/functions/guilds/members";
+import { getAllMembersRest } from "../utils/functions/guilds/members";
 import { getMember } from "../utils/functions/member";
 import { percentChance } from "../utils/functions/random";
 import { escapeFormattingCharacters } from "../utils/functions/string";
@@ -51,9 +52,17 @@ async function run(
   if (args.length == 0) {
     target1 = message.member;
 
-    const members = Array.from((await getAllMembers(message.guild)).values());
+    const members = await getAllMembersRest(message.guild.id, message.client as NypsiClient, true);
 
-    target2 = members[Math.floor(Math.random() * members.length)];
+    const target = await message.guild.members.fetch(
+      members[Math.floor(Math.random() * members.length)],
+    );
+
+    if (!target) {
+      return send({ embeds: [new ErrorEmbed("couldn't find a love match for you :(")] });
+    }
+
+    target2 = target;
   } else if (args.length == 1) {
     target1 = message.member;
     target2 = await getMember(message.guild, args[0]);
