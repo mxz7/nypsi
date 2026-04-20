@@ -19,6 +19,8 @@ const hasUserMutex = new Mutex();
 export async function hasProfile(member: MemberResolvable) {
   const userId = getUserId(member);
 
+  if (!userId) return false;
+
   await hasUserMutex.acquire(userId);
 
   try {
@@ -59,6 +61,9 @@ export async function hasProfile(member: MemberResolvable) {
 
 export async function createProfile(member: MemberResolvable) {
   const userId = getUserId(member);
+
+  if (!userId) return;
+
   let username = "";
 
   if (member instanceof User) {
