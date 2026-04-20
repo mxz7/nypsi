@@ -57,7 +57,7 @@ async function run(
     return;
   }
 
-  if (await checkMessageContent(Constants.NYPSI_SERVER_ID, message.guild.name, false)) {
+  if (!(await checkMessageContent(Constants.NYPSI_SERVER_ID, message.guild.name, false))) {
     return send({ embeds: [new ErrorEmbed("this server is not able to use this command")] });
   }
 
