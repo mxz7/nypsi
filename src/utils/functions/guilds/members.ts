@@ -47,11 +47,7 @@ async function getDatabaseMembers(guildId: string) {
  * @param discordMembers user ids from discord api
  * @param wantedDiscord if true, they only wanted discord data - we only update db if data is already in there. if false, they only wanted ids meaning we should put in database no matter what
  */
-export async function checkMembers(
-  guildId: string,
-  discordMembers: string[],
-  wantedDiscord: boolean,
-) {
+export async function checkMembers(guildId: string, discordMembers: string[]) {
   if (recentlyChecked.has(guildId)) return;
   const mutexKey = `check_members_${guildId}`;
   await checkMutex.acquire(mutexKey);
@@ -60,12 +56,6 @@ export async function checkMembers(
   let filteringTime: number;
 
   try {
-    if (wantedDiscord) {
-      const check = await prisma.guildMember.findFirst({ where: { guildId } });
-      // no data in database, and caller only wanted discord data. not necessary to save
-      if (!check) return;
-    }
-
     const databaseMembers = await getDatabaseMembers(guildId);
 
     const beforeFiltering = performance.now();
@@ -177,7 +167,7 @@ export async function getAllMembers(
     const mapIdsDuration = performance.now() - mapIdsStart;
 
     if (lastFetched < Date.now() - ms("10 minute")) {
-      checkMembers(guild.id, discordMemberIds, !userIdsOnly);
+      checkMembers(guild.id, discordMemberIds);
     }
 
     logger.debug(`members: getAllMembers timings`, {
@@ -249,6 +239,14 @@ export async function getAllMembersRest(
     const cached = restMembersCache.get(guildId) ?? (await restMembersCacheRedis.get(guildId));
     if (cached) return userIdsOnly ? cached.map((m) => m.userId) : cached;
 
+    const lastFetched = await redis.get(
+      `${Constants.redis.cache.guild.MEMBERS_RECENTLY_FETCHED_REST}:${guildId}`,
+    );
+
+    if (lastFetched && userIdsOnly) {
+      return await getDatabaseMembers(guildId);
+    }
+
     const rest = getRest(client);
 
     const allMembers: SlimMember[] = [];
@@ -282,7 +280,7 @@ export async function getAllMembersRest(
 
     const userIds = allMembers.map((m) => m.userId);
 
-    void checkMembers(guildId, userIds, true).catch((error) => {
+    void checkMembers(guildId, userIds).catch((error) => {
       logger.error("members: failed to update guild members in database", { guildId, error });
     });
 

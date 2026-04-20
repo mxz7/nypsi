@@ -228,6 +228,8 @@ export default {
         MEMBERS_LAST_FETCHED: "cache:guild:members:last_fetched",
         LAST_COMMAND: "cache:guild:last_command",
         MEMBERS_SLIM: "cache:guild:members:slim",
+        // deleted after 30 min ttl, just exists to show it was done recently
+        MEMBERS_RECENTLY_FETCHED_REST: "cache:guild:members:recently_fetched_rest",
       },
       chatReaction: {
         EXISTS: "cache:chatreaction:exists",
