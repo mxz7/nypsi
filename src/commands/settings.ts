@@ -1224,6 +1224,7 @@ async function run(
     return send({
       embeds: [
         new CustomEmbed(
+          message.member,
           "nypsi logs have been removed, we recommend using a third party bot such as [sapphire](https://sapph.xyz) for server event logging\n\n" +
             "we decided to remove server event logs due to performance issues and little usage of the feature, our implementation was also incredibly basic and not useful, " +
             "we think the use of third party bot that has a specialised server event logging feature will serve your needs much better",
