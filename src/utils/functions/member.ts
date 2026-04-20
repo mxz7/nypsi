@@ -66,7 +66,10 @@ export async function getMember(
 ): Promise<GuildMember | { username: string; score: number }[]> {
   if (!guild) return null;
 
-  const fetchMember = (userId: string) => guild.members.fetch(userId).catch(() => {});
+  const fetchMember = (userId: string) => {
+    if (!userId) return null;
+    return guild.members.fetch(userId).catch(() => {});
+  };
 
   memberName = memberName.toLowerCase();
 
