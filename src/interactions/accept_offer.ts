@@ -107,7 +107,7 @@ export default {
       taxedAmount = Math.floor(Number(offer.money) * tax);
 
     await Promise.all([
-      await addToNypsiBank(taxedAmount),
+      addToNypsiBank(taxedAmount),
       addBalance(interaction.user.id, Number(offer.money) - taxedAmount),
       addInventoryItem(offer.ownerId, offer.itemId, Number(offer.itemAmount)),
       addStat(interaction.user.id, "earned-offers", Math.floor(Number(offer.money)) - taxedAmount),

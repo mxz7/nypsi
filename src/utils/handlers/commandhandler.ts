@@ -1233,7 +1233,11 @@ export async function runCommand(
 
   await Promise.all([
     a(message.author.id, message.author.username, message.content, cmd),
-    updateCommandUses(message.member),
+    setProgress(
+      message.member,
+      "discordian",
+      parseInt(await redis.hget(Constants.redis.nypsi.TOP_COMMANDS_USER, message.author.id)) || 0,
+    ),
     updateUser(message.author || message.author || null, command.name, message.guildId),
     redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS, command.name, 1),
     addProgress(message.author.id, "nypsi", 1),
@@ -1251,11 +1255,7 @@ export async function runCommand(
     ),
   ]);
 
-  setProgress(
-    message.member,
-    "discordian",
-    parseInt(await redis.hget(Constants.redis.nypsi.TOP_COMMANDS_USER, message.author.id)) || 0,
-  );
+  updateCommandUses(message.member);
 
   if (
     (parseInt(await redis.hget(Constants.redis.nypsi.TOP_COMMANDS_USER, message.author.id)) || 1) %
