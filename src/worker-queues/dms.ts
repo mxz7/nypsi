@@ -37,7 +37,12 @@ const worker = new Worker<DMJobData, Result>(
       })) as { id: string };
     } catch (err) {
       if (err instanceof DiscordAPIError) {
-        if (err.code === 50007) {
+        if (
+          // 50007: dms disabled
+          err.code === 50007 ||
+          // 50278: in no guilds with user
+          err.code === 50278
+        ) {
           // auto removed by mapcache
           blocked.set(memberId, 69);
           return "skipped - blocked";
