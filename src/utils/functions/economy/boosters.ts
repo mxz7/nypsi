@@ -1,6 +1,7 @@
 import { exec } from "node:child_process";
 import { GuildMember } from "discord.js";
 import { sort } from "fast-sort";
+import ms from "ms";
 import { BoosterScope } from "#generated/prisma";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
@@ -16,6 +17,14 @@ import { getLastKnownUsername } from "../users/username";
 import { getItems } from "./utils";
 
 const lastBoosterCheck = new Map<string, number>();
+
+setInterval(() => {
+  for (const [key, value] of lastBoosterCheck.entries()) {
+    if (Date.now() - value > 500) {
+      lastBoosterCheck.delete(key);
+    }
+  }
+}, ms("10 minutes"));
 
 async function checkBoosters(member: MemberResolvable, boosters: Map<string, Booster[]>) {
   const userId = getUserId(member);
