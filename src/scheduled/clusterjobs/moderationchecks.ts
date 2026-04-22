@@ -149,6 +149,7 @@ export function runModerationChecks(client: NypsiClient) {
         unmuteTimeouts.add(`${unmute.guildId}_${unmute.userId}`);
         setTimeout(() => {
           logger.info(`::auto requesting unmute in ${unmute.guildId} for ${unmute.userId}`);
+          unmuteTimeouts.delete(`${unmute.guildId}_${unmute.userId}`);
           requestUnmute(unmute.guildId, unmute.userId, client);
         }, unmute.expire.getTime() - Date.now());
       }
@@ -174,6 +175,7 @@ export function runModerationChecks(client: NypsiClient) {
         unbanTimeouts.add(`${unban.guildId}_${unban.userId}`);
         setTimeout(() => {
           logger.info(`::auto requesting unban in ${unban.guildId} for ${unban.userId}`);
+          unbanTimeouts.delete(`${unban.guildId}_${unban.userId}`);
           requestUnban(unban.guildId, unban.userId, client);
         }, unban.expire.getTime() - Date.now());
       }
