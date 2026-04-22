@@ -373,6 +373,7 @@ class Race {
     if (this.started) return;
     this.started = true;
     this.startedAt = Date.now();
+    this.collector.stop();
 
     if (this.members.length < 2) {
       if (this.bet > 0) {

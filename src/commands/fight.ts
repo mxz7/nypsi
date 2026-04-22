@@ -235,7 +235,10 @@ async function run(
   const fightMessageFilter = (interaction: Interaction) =>
     interaction.user.id == message.author.id || interaction.user.id == target.user.id;
 
-  const collector = msg.createMessageComponentCollector({ filter: fightMessageFilter });
+  const collector = msg.createMessageComponentCollector({
+    filter: fightMessageFilter,
+    idle: 300_000,
+  });
 
   let lastUpdate = Date.now();
 
@@ -299,6 +302,12 @@ async function run(
     }
 
     if (!i.deferred && !i.replied) i.deferUpdate();
+  });
+
+  collector.on("end", async (_, reason) => {
+    if (!ended && reason === "idle") {
+      msg.edit({ components: [] }).catch(() => {});
+    }
   });
 }
 
