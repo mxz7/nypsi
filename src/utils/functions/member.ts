@@ -66,9 +66,9 @@ export async function getMember(
 ): Promise<GuildMember | { username: string; score: number }[]> {
   if (!guild) return null;
 
-  const fetchMember = (userId: string) => {
+  const fetchMember = async (userId: string) => {
     if (!userId) return null;
-    return guild.members.fetch(userId).catch(() => {});
+    return await guild.members.fetch(userId).catch(() => {});
   };
 
   memberName = memberName.toLowerCase();
@@ -84,11 +84,11 @@ export async function getMember(
   }
 
   if (memberName.match(Constants.MEMBER_MENTION_REGEX)) {
-    return (await fetchMember(memberName.replaceAll(/\D/g, "")).catch(() => {})) || null;
+    return (await fetchMember(memberName.replaceAll(/\D/g, ""))) || null;
   }
 
   if (memberName.match(Constants.SNOWFLAKE_REGEX)) {
-    return (await fetchMember(memberName).catch(() => {})) || null;
+    return (await fetchMember(memberName)) || null;
   }
 
   let members: SlimMember[];
@@ -109,7 +109,7 @@ export async function getMember(
   if (memberName === "max" && !debug) {
     const max = members.find((m) => m.userId === Constants.OWNER_ID);
     if (max) {
-      return (await fetchMember(max.userId).catch(() => {})) || null;
+      return (await fetchMember(max.userId)) || null;
     }
   }
 
@@ -196,7 +196,7 @@ export async function getMember(
     ];
   }
 
-  return (await fetchMember(targetId).catch(() => {})) || null;
+  return (await fetchMember(targetId)) || null;
 }
 
 export async function getExactMember(guild: Guild, memberName: string): Promise<GuildMember> {
