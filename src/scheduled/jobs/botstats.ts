@@ -64,22 +64,29 @@ export default {
 
     const rawResults = await manager.broadcastEval((c) => {
       const client = c as unknown as NypsiClient;
+      const mem = process.memoryUsage();
 
       return {
         cluster: client.cluster.id,
-        rss: process.memoryUsage().rss,
+        rss: mem.rss,
+        heapUsed: mem.heapUsed,
+        heapTotal: mem.heapTotal,
       };
     });
 
     const bytesToMb = (b: number) => +(b / 1024 / 1024).toFixed(2);
 
     const results = Object.fromEntries(
-      rawResults.map((r: { cluster: number; rss: number }) => [r.cluster, `${bytesToMb(r.rss)}mb`]),
+      rawResults.map((r: { cluster: number; rss: number; heapUsed: number; heapTotal: number }) => [
+        r.cluster,
+        `rss=${bytesToMb(r.rss)}mb heap=${bytesToMb(r.heapUsed)}/${bytesToMb(r.heapTotal)}mb`,
+      ]),
     );
 
+    const mainMem = process.memoryUsage();
     log("cluster memory usage", {
       clusters: results,
-      main: `${bytesToMb(process.memoryUsage().rss)}mb`,
+      main: `rss=${bytesToMb(mainMem.rss)}mb heap=${bytesToMb(mainMem.heapUsed)}/${bytesToMb(mainMem.heapTotal)}mb`,
     });
   },
 } satisfies Job;
