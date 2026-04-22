@@ -54,9 +54,9 @@ async function run(
 
     const members = await getAllMembersRest(message.guild.id, message.client as NypsiClient, true);
 
-    const target = await message.guild.members.fetch(
-      members[Math.floor(Math.random() * members.length)],
-    );
+    const target = await message.guild.members
+      .fetch(members[Math.floor(Math.random() * members.length)])
+      .catch(() => {});
 
     if (!target) {
       return send({ embeds: [new ErrorEmbed("couldn't find a love match for you :(")] });
