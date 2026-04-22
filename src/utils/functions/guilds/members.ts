@@ -3,7 +3,7 @@ import { Collection, Guild, GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
-import { MapCache, RedisCache } from "../../cache";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { getRest } from "../../rest";
@@ -208,7 +208,6 @@ const restMembersCacheRedis = new RedisCache<SlimMember[]>(
   Constants.redis.cache.guild.MEMBERS_SLIM,
   ms("15 minutes"),
 );
-const restMembersCache = new MapCache<SlimMember[]>(ms("15 minutes"));
 const restMutex = new Mutex();
 
 export async function getAllMembersRest(
@@ -226,7 +225,7 @@ export async function getAllMembersRest(
   client?: NypsiClient,
   userIdsOnly = false,
 ): Promise<SlimMember[] | string[]> {
-  const cache = restMembersCache.get(guildId) ?? (await restMembersCacheRedis.get(guildId));
+  const cache = await restMembersCacheRedis.get(guildId);
 
   if (cache) {
     return userIdsOnly ? cache.map((m) => m.userId) : cache;
@@ -236,7 +235,7 @@ export async function getAllMembersRest(
 
   try {
     // re-check cache after acquiring lock in case another call already populated it
-    const cached = restMembersCache.get(guildId) ?? (await restMembersCacheRedis.get(guildId));
+    const cached = await restMembersCacheRedis.get(guildId);
     if (cached) return userIdsOnly ? cached.map((m) => m.userId) : cached;
 
     const lastFetched = await redis.get(
@@ -275,7 +274,6 @@ export async function getAllMembersRest(
       after = batch.at(-1)!.user!.id;
     }
 
-    restMembersCache.set(guildId, allMembers);
     await restMembersCacheRedis.set(guildId, allMembers);
 
     const userIds = allMembers.map((m) => m.userId);
