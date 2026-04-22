@@ -132,7 +132,7 @@ const client = new NypsiClient({
       },
     },
     GuildMemberManager: {
-      maxSize: 2_500,
+      maxSize: 200,
       keepOverLimit: (user) => {
         if (user.id === user.client.user.id) return true;
         if (!user.guild?.id) return false;
