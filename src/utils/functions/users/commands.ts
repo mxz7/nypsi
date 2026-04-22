@@ -80,7 +80,7 @@ export async function getCommandUses(member: MemberResolvable) {
 }
 
 const debouncedGuildLastCommand = debounce(async (guildId: string) => {
-  await prisma.guild.updateMany({
+  await prisma.guild.update({
     where: { id: guildId },
     data: { lastCommand: new Date() },
   });
