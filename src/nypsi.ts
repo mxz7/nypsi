@@ -81,20 +81,8 @@ const client = new NypsiClient({
     GuildInviteManager: 0,
     GuildStickerManager: 0,
     GuildScheduledEventManager: 0,
-    MessageManager: 10,
-    GuildMessageManager: {
-      maxSize: 15,
-      keepOverLimit: (message) => {
-        if (!message.guild) return false;
-        const lastGuildCommand = getLastCommandSync(message.guild.id);
-        if (!lastGuildCommand || lastGuildCommand < Date.now() - inactiveGuild) {
-          // guild is inactive - no point storing data
-          return false;
-        }
-
-        return true;
-      },
-    },
+    MessageManager: 0,
+    GuildMessageManager: 0,
     PresenceManager: 0,
     ReactionManager: 0,
     ReactionUserManager: 0,
