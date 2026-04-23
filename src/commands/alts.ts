@@ -246,7 +246,7 @@ async function run(
 
             for (const id of accountIds.filter((i) => !banned.includes(i))) {
               await message.guild.bans
-                .create(id, { reason: "in group of banned accounts" })
+                .create(id, { reason: `in group of banned accounts - see $alts ${id}` })
                 .catch(() => {});
             }
           }

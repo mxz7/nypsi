@@ -50,9 +50,12 @@ export default async function guildMemberAdd(member: GuildMember) {
     for (const roleId of userRoles) {
       if (persistentRoles.includes(roleId)) {
         count++;
-        await member.roles.add(roleId).catch(async () => {
+        await member.roles.add(roleId).catch(async (err) => {
           persistentRoles.splice(persistentRoles.indexOf(roleId));
           await setPersistentRoles(member.guild, persistentRoles);
+          logger.warn(`roles: failed to add ${roleId} to ${member.id} in ${member.guild.id}`, {
+            err,
+          });
         });
         await sleep(500);
       }
