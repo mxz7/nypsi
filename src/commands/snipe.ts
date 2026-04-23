@@ -34,22 +34,24 @@ async function run(
     }
   }
 
-  if (!snipe || !snipe.get(channel.id)) {
+  const msg = snipe.get(channel.id);
+
+  if (!msg) {
     return send({
       embeds: [new ErrorEmbed("nothing to snipe in " + channel.toString())],
     });
   }
 
-  let content = snipe.get(channel.id).content;
+  let content = msg.content;
 
   if (content.split("\n").length > 10) {
     content = content.split("\n").join(".");
   }
 
-  const created = new Date(snipe.get(channel.id).createdTimestamp);
+  const created = new Date(msg.createdAt);
 
   const embed = new CustomEmbed(message.member, content)
-    .setHeader(snipe.get(channel.id).member, snipe.get(channel.id).memberAvatar)
+    .setHeader(msg.user.username, msg.user.avatar)
     .setFooter({ text: MStoTime(Date.now() - created.getTime()) + " ago" });
 
   send({ embeds: [embed] });

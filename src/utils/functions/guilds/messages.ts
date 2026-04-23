@@ -4,6 +4,8 @@ import { logger } from "../../logger";
 export const snipe: Map<string, SnipedMessage> = new Map();
 export const eSnipe: Map<string, SnipedMessage> = new Map();
 
+export const messageCache = new Map<string, SnipedMessage[]>();
+
 export function runSnipeClearIntervals() {
   setInterval(() => {
     const now = new Date().getTime();
@@ -12,10 +14,10 @@ export function runSnipeClearIntervals() {
     let eSnipeCount = 0;
 
     snipe.forEach((msg) => {
-      const diff = now - msg.createdTimestamp;
+      const diff = now - msg.createdAt;
 
       if (diff >= 43200000) {
-        snipe.delete(msg.channel.id);
+        snipe.delete(msg.channelId);
         snipeCount++;
       }
     });
@@ -25,10 +27,10 @@ export function runSnipeClearIntervals() {
     }
 
     eSnipe.forEach((msg) => {
-      const diff = now - msg.createdTimestamp;
+      const diff = now - msg.createdAt;
 
       if (diff >= 43200000) {
-        eSnipe.delete(msg.channel.id);
+        eSnipe.delete(msg.channelId);
         eSnipeCount++;
       }
     });

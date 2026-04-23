@@ -1,9 +1,9 @@
 export interface SnipedMessage {
   content: string;
-  member: string;
-  createdTimestamp: number;
-  memberAvatar: string;
-  channel: {
-    id: string;
+  user: {
+    username: string;
+    avatar: string;
   };
+  createdAt: number;
+  channelId: string;
 }

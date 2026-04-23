@@ -36,22 +36,24 @@ async function run(
     }
   }
 
-  if (!eSnipe || !eSnipe.get(channel.id)) {
+  const msg = eSnipe.get(channel.id);
+
+  if (!msg) {
     return send({
       embeds: [new ErrorEmbed("nothing to edit snipe in " + channel.toString())],
     });
   }
 
-  let content = eSnipe.get(channel.id).content;
+  let content = msg.content;
 
   if (content.split("\n").length > 10) {
     content = content.split("\n").join(".");
   }
 
-  const created = new Date(eSnipe.get(channel.id).createdTimestamp);
+  const created = new Date(msg.createdAt);
 
   const embed = new CustomEmbed(message.member, content)
-    .setHeader(eSnipe.get(channel.id).member, eSnipe.get(channel.id).memberAvatar)
+    .setHeader(msg.user.username, msg.user.avatar)
     .setFooter({ text: MStoTime(Date.now() - created.getTime()) + " ago" });
 
   send({ embeds: [embed] });
