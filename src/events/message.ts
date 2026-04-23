@@ -499,23 +499,6 @@ export default async function messageCreate(message: Message) {
   }
 
   if (
-    message.content == `<@!${message.client.user.id}>` ||
-    message.content == `<@${message.client.user.id}>`
-  ) {
-    const prefixes = await getPrefix(message.guild);
-
-    if (message.client.user.id == "685193083570094101") prefixes.push("£");
-
-    return message.channel
-      .send({ content: `my prefixes for this server: \`${prefixes.join("` `")}\`` })
-      .catch(() => {
-        return message.member.send({
-          content: `my prefixes for this server: \`${prefixes.join("` `")}\` -- i do not have permission to send messages in that channel`,
-        });
-      });
-  }
-
-  if (
     (await hasGuild(message.guild)) &&
     !message.member?.permissions.has(PermissionsBitField.Flags.ManageMessages)
   ) {
@@ -530,6 +513,21 @@ export default async function messageCreate(message: Message) {
   const prefixes = await getPrefix(message.guild);
 
   if (message.client.user.id == "685193083570094101") prefixes.push("£");
+
+  if (
+    message.content == `<@!${message.client.user.id}>` ||
+    message.content == `<@${message.client.user.id}>`
+  ) {
+    if (message.client.user.id == "685193083570094101") prefixes.push("£");
+
+    return message.channel
+      .send({ content: `my prefixes for this server: \`${prefixes.join("` `")}\`` })
+      .catch(() => {
+        return message.member.send({
+          content: `my prefixes for this server: \`${prefixes.join("` `")}\` -- i do not have permission to send messages in that channel`,
+        });
+      });
+  }
 
   if (!(await isSlashOnly(message.guild))) {
     for (const prefix of prefixes) {
