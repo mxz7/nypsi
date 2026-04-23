@@ -175,7 +175,12 @@ const client = new NypsiClient({
     GatewayIntentBits.GuildMembers,
     GatewayIntentBits.GuildMessages,
   ],
-  partials: [Partials.Channel], // for direct messages
+  // for direct messages
+  partials: [
+    Partials.Channel,
+    // for message delete / update events, we store the old message manuually
+    Partials.Message,
+  ],
 });
 
 import { recentCommands } from "./utils/functions/users/commands";

@@ -27,6 +27,7 @@ import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { userExists } from "../utils/functions/economy/utils";
 import { getLastCommand as getLastGuildCommand } from "../utils/functions/guilds/commands";
 import { checkAutoMute, checkMessageContent } from "../utils/functions/guilds/filters";
+import { addToMessageCache } from "../utils/functions/guilds/messages";
 import { isSlashOnly } from "../utils/functions/guilds/slash";
 import { getGuildName, getPrefix, hasGuild } from "../utils/functions/guilds/utils";
 import { checkTriggers } from "../utils/functions/message-triggers";
@@ -97,6 +98,8 @@ setInterval(() => {
 const removeExtraSpacesRegex = / +(?= )/g;
 
 export default async function messageCreate(message: Message) {
+  if (message.partial) await message.fetch();
+
   if (!message.channel.isSendable()) return;
 
   if (message.channel.isDMBased() && !message.author.bot) {
@@ -509,6 +512,9 @@ export default async function messageCreate(message: Message) {
       return;
     }
   }
+
+  // for snipe/esnipe
+  addToMessageCache(message);
 
   const prefixes = await getPrefix(message.guild);
 

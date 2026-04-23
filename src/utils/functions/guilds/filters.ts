@@ -22,7 +22,6 @@ import {
 import { isAltPunish } from "./altpunish";
 import ms = require("ms");
 
-const snipeFilterCache = new Map<string, string[]>();
 const chatFilterCache = new Map<
   string,
   { content: string; percentMatch: number; guildId: string }[]
@@ -31,43 +30,6 @@ const chatFilterCache = new Map<
 setInterval(() => {
   chatFilterCache.clear();
 }, 10000);
-
-export async function getSnipeFilter(guild: Guild): Promise<string[]> {
-  if (snipeFilterCache.has(guild.id)) {
-    return snipeFilterCache.get(guild.id);
-  }
-
-  const query = await prisma.guild.findUnique({
-    where: {
-      id: guild.id,
-    },
-    select: {
-      snipeFilter: true,
-    },
-  });
-
-  const filter = query.snipeFilter;
-
-  snipeFilterCache.set(guild.id, filter);
-
-  setTimeout(() => {
-    if (snipeFilterCache.has(guild.id)) snipeFilterCache.delete(guild.id);
-  }, 43200000);
-
-  return filter;
-}
-
-export async function updateSnipeFilter(guild: Guild, array: string[]) {
-  await prisma.guild.update({
-    where: {
-      id: guild.id,
-    },
-    data: {
-      snipeFilter: array,
-    },
-  });
-  if (snipeFilterCache.has(guild.id)) snipeFilterCache.delete(guild.id);
-}
 
 export async function getChatFilter(guild: Guild | string): Promise<
   {
