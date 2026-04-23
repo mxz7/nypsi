@@ -155,6 +155,11 @@ async function run(
                   },
                 },
                 TradeRequest: true,
+                Museum: {
+                  include: {
+                    breakdown: true,
+                  },
+                },
               },
             },
             Premium: {
@@ -189,6 +194,9 @@ async function run(
             Event: true,
             EventContribution: true,
             FlagGame: true,
+            ChessPuzzleStats: true,
+            tmdbRatings: true,
+            z: true,
           },
         }),
         moderation: {
