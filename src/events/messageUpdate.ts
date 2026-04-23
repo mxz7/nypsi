@@ -5,7 +5,8 @@ import {
   getChatFilter,
   getSnipeFilter,
 } from "../utils/functions/guilds/filters";
-import { createGuild, eSnipe, hasGuild } from "../utils/functions/guilds/utils";
+import { eSnipe } from "../utils/functions/guilds/messages";
+import { createGuild, hasGuild } from "../utils/functions/guilds/utils";
 import { addMuteViolation } from "../utils/functions/moderation/mute";
 import { cleanString } from "../utils/functions/string";
 import { logger } from "../utils/logger";

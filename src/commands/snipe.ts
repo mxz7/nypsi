@@ -2,7 +2,7 @@ import { Channel, CommandInteraction, GuildMember } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { MStoTime } from "../utils/functions/date";
-import { snipe } from "../utils/functions/guilds/utils";
+import { snipe } from "../utils/functions/guilds/messages";
 
 const cmd = new Command("snipe", "snipe the most recently deleted message", "fun").setAliases([
   "s",

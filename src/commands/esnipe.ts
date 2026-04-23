@@ -2,7 +2,7 @@ import { Channel, CommandInteraction } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { MStoTime } from "../utils/functions/date";
-import { eSnipe } from "../utils/functions/guilds/utils";
+import { eSnipe } from "../utils/functions/guilds/messages";
 
 const cmd = new Command("esnipe", "snipe the most recently edited message", "fun").setAliases([
   "es",

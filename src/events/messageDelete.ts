@@ -1,6 +1,7 @@
 import { Message, PartialMessage } from "discord.js";
 import { getChatFilter, getSnipeFilter } from "../utils/functions/guilds/filters";
-import { createGuild, hasGuild, snipe } from "../utils/functions/guilds/utils";
+import { snipe } from "../utils/functions/guilds/messages";
+import { createGuild, hasGuild } from "../utils/functions/guilds/utils";
 import { cleanString } from "../utils/functions/string";
 import { logger } from "../utils/logger";
 

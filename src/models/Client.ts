@@ -26,7 +26,7 @@ import { initCrashGame } from "../utils/functions/economy/crash";
 import { runEconomySetup } from "../utils/functions/economy/utils";
 import { runChristmas } from "../utils/functions/guilds/christmas";
 import { runCountdowns } from "../utils/functions/guilds/countdowns";
-import { runSnipeClearIntervals } from "../utils/functions/guilds/utils";
+import { runSnipeClearIntervals } from "../utils/functions/guilds/messages";
 import { openKarmaShop } from "../utils/functions/karma/karmashop";
 import { getCustomPresence, randomPresence, setCustomPresence } from "../utils/functions/presence";
 import { runCommandUseTimers } from "../utils/handlers/commandhandler";
