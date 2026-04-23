@@ -106,6 +106,7 @@ export async function getLastKnownAvatar(id: string) {
   const cache = await redis.get(`${Constants.redis.cache.user.avatar}:${id}`);
 
   if (cache) {
+    if (cache === "null") return null;
     return cache;
   }
 
@@ -118,7 +119,12 @@ export async function getLastKnownAvatar(id: string) {
     },
   });
 
-  await redis.set(`${Constants.redis.cache.user.avatar}:${id}`, query.avatar, "EX", 86400);
+  await redis.set(
+    `${Constants.redis.cache.user.avatar}:${id}`,
+    query?.avatar || "null",
+    "EX",
+    86400,
+  );
 
-  return query.avatar;
+  return query?.avatar || null;
 }
