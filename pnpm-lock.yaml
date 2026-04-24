@@ -77,8 +77,8 @@ importers:
         specifier: 3.0.1
         version: 3.0.1
       discord.js:
-        specifier: 14.25.1
-        version: 14.25.1(bufferutil@4.1.0)
+        specifier: 14.26.3
+        version: 14.26.3(bufferutil@4.1.0)
       dotenv:
         specifier: 17.4.2
         version: 17.4.2
@@ -1874,8 +1874,8 @@ packages:
   discord-hybrid-sharding@3.0.1:
     resolution: {integrity: sha512-a4MhJs9Ga2yiIGEz+Lj0WgBOS785DSqX3PIr/vkOMpqugS1QJk79T8YFvGr26JmOVRAhgqaWE2eUjuekR/8MJA==}
 
-  discord.js@14.25.1:
-    resolution: {integrity: sha512-2l0gsPOLPs5t6GFZfQZKnL1OJNYFcuC/ETWsW4VtKVD/tg4ICa9x+jb9bkPffkMdRpRpuUaO/fKkHCBeiCKh8g==}
+  discord.js@14.26.3:
+    resolution: {integrity: sha512-XEKtYn28YFsiJ5l4fLRyikdbo6RD5oFyqfVHQlvXz2104JhH/E8slN28dbky05w3DCrJcNVWvhVvcJCTSl/KIg==}
     engines: {node: '>=18'}
 
   dotenv@16.6.1:
@@ -4328,7 +4328,7 @@ snapshots:
 
   discord-hybrid-sharding@3.0.1: {}
 
-  discord.js@14.25.1(bufferutil@4.1.0):
+  discord.js@14.26.3(bufferutil@4.1.0):
     dependencies:
       '@discordjs/builders': 1.14.1
       '@discordjs/collection': 1.5.3
