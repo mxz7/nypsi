@@ -52,9 +52,26 @@ const worker = new Worker<DMJobData, Result>(
       throw err;
     }
 
-    await rest.post(Routes.channelMessages(dmChannel.id), {
-      body: payload,
-    });
+    try {
+      await rest.post(Routes.channelMessages(dmChannel.id), {
+        body: payload,
+      });
+    } catch (err) {
+      if (err instanceof DiscordAPIError) {
+        if (
+          // 50007: dms disabled
+          err.code === 50007 ||
+          // 50278: in no guilds with user
+          err.code === 50278
+        ) {
+          // auto removed by mapcache
+          blocked.set(memberId, 69);
+          return "skipped - blocked";
+        }
+      }
+
+      throw err;
+    }
 
     return "success";
   },
