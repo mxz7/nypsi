@@ -220,6 +220,7 @@ export default class PageManager<T> {
 
     if (!res) {
       if (
+        this.message.components.length > 1 &&
         this.message.components[0].type === ComponentType.ActionRow &&
         this.message.components[0].components.length === 2
       ) {
