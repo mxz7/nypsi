@@ -6,9 +6,9 @@ export class RedisCache<T> {
   private key: string;
   private ttl: number;
 
-  constructor(key: string, ttl: number) {
+  constructor(key: string, ttlSeconds: number) {
     this.key = key;
-    this.ttl = ttl;
+    this.ttl = ttlSeconds;
   }
 
   async get(arg: string): Promise<T | null> {

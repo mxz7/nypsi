@@ -206,7 +206,7 @@ export type SlimMember = {
 
 const restMembersCacheRedis = new RedisCache<SlimMember[]>(
   Constants.redis.cache.guild.MEMBERS_SLIM,
-  ms("15 minutes"),
+  Math.floor(ms("15 minutes") / 1000),
 );
 const restMutex = new Mutex();
 
