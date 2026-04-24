@@ -855,7 +855,14 @@ async function startChessDuel(
                 components: [row],
                 files: [{ attachment: buffer, name: "chess.png" }],
               })
-              .then((m) => m.fetch() as Promise<Message>),
+              .then((m) => m.fetch() as Promise<Message>)
+              .catch(() =>
+                message.channel.send({
+                  embeds: [embed],
+                  components: [row],
+                  files: [{ attachment: buffer, name: "chess.png" }],
+                }),
+              ),
           );
 
   const collector = msg.createMessageComponentCollector({
