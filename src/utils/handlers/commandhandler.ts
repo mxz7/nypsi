@@ -942,6 +942,7 @@ export async function runCommand(
         memberId: message.author.id,
         payload: {
           embed: new CustomEmbed(
+            message.member,
             `commands are disabled in ${message.channel.name} in ${message.guild.name}`,
           ),
         },
