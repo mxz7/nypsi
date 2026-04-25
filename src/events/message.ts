@@ -437,13 +437,13 @@ export default async function messageCreate(message: Message) {
     } else {
       let fail = false;
 
-      if (lastContents.last > Date.now() - 2500) {
+      if (lastContents.last > Date.now() - 1500) {
         fail = true;
       } else {
         for (const content of lastContents.history) {
           const similarity = compareTwoStrings(content, lowercaseContent);
 
-          if (similarity > 80) {
+          if (similarity > 90) {
             fail = true;
             break;
           }
