@@ -2,7 +2,7 @@ import { exec } from "node:child_process";
 import { GuildMember } from "discord.js";
 import { sort } from "fast-sort";
 import ms from "ms";
-import { BoosterScope } from "#generated/prisma";
+import { BoosterScope, Prisma } from "#generated/prisma";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
@@ -231,12 +231,12 @@ export async function addBooster(
   const items = getItems();
 
   await prisma.booster.createMany({
-    data: new Array(amount).fill({
+    data: Array.from({ length: amount }).fill({
       boosterId: boosterId,
       expire: expire || new Date(Date.now() + items[boosterId].boosterEffect.time * 1000),
       userId,
       scope,
-    }),
+    }) as Prisma.BoosterCreateManyInput[],
   });
 
   await redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${userId}`);

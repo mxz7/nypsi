@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["typescript", "node"],
+  "plugins": ["typescript", "node", "oxc", "unicorn"],
   "categories": {},
   "rules": {
     "typescript/restrict-template-expressions": "off",

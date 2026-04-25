@@ -350,16 +350,16 @@ function createBoard(diff: string) {
 
     switch (diff) {
       case "easy":
-        row = populate(3, new Array(4).fill("a"));
+        row = populate(3, Array.from({ length: 4 }).fill("a") as string[]);
         break;
       case "medium":
-        row = populate(2, new Array(3).fill("a"));
+        row = populate(2, Array.from({ length: 3 }).fill("a") as string[]);
         break;
       case "hard":
-        row = populate(1, new Array(2).fill("a"));
+        row = populate(1, Array.from({ length: 2 }).fill("a") as string[]);
         break;
       case "expert":
-        row = populate(1, new Array(4).fill("a"));
+        row = populate(1, Array.from({ length: 4 }).fill("a") as string[]);
         break;
     }
     board.push(row);

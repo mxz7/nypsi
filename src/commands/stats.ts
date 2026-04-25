@@ -229,7 +229,9 @@ async function run(
     let desc = "";
 
     for (const stat of await wins) {
-      desc += `${new Array(stat.guessAmount - 1).fill("<:solid_grey:987046773157691452>").join("")}:green_square: **${stat.count.toLocaleString()}**\n`;
+      desc += `${Array.from({ length: stat.guessAmount - 1 })
+        .fill("<:solid_grey:987046773157691452>")
+        .join("")}:green_square: **${stat.count.toLocaleString()}**\n`;
     }
 
     if (await loses) desc += `:red_square: **${(await loses).toLocaleString()}**\n`;
