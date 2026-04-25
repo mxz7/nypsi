@@ -5,7 +5,7 @@ import Constants from "../utils/Constants";
 import { logger } from "../utils/logger";
 import redis from "./redis";
 
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL, max: 20 });
 
 const prisma = new PrismaClient({ adapter }).$extends({
   query: {
