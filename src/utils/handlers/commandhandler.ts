@@ -1239,7 +1239,7 @@ export async function runCommand(
       "discordian",
       parseInt(await redis.hget(Constants.redis.nypsi.TOP_COMMANDS_USER, message.author.id)) || 0,
     ),
-    updateUser(message.author || message.author || null, command.name, message.guildId),
+    updateUser(message.author || null, command.name, message.guildId),
     redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS, command.name, 1),
     addProgress(message.author.id, "nypsi", 1),
     addEventProgress(message.client as NypsiClient, message.member, "commands", 1),

@@ -1,22 +1,22 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["typescript", "node"],
+  "plugins": ["typescript", "node", "oxc", "unicorn"],
   "categories": {},
   "rules": {
-    "typescript/restrict-template-expressions": "off",
-    "typescript/require-array-sort-compare": "off",
-    "typescript/no-floating-promises": "off",
-    "typescript/no-require-imports": "off",
-    "typescript/no-base-to-string": "off",
-    "typescript/no-empty-function": "off",
-    "typescript/no-explicit-any": "off",
-    "typescript/unbound-method": "off",
     "no-case-declarations": "off",
+    "no-unreachable": "error",
 
     "typescript/ban-ts-comment": "warn",
+    "typescript/no-base-to-string": "off",
     "typescript/no-deprecated": "warn",
-
-    "no-unreachable": "error"
+    "typescript/no-empty-function": "off",
+    "typescript/no-explicit-any": "off",
+    "typescript/no-floating-promises": "off",
+    "typescript/no-require-imports": "off",
+    "typescript/no-useless-default-assignment": "off",
+    "typescript/require-array-sort-compare": "off",
+    "typescript/restrict-template-expressions": "off",
+    "typescript/unbound-method": "off"
   },
   "env": {
     "builtin": true,

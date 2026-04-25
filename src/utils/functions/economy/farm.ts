@@ -1,5 +1,6 @@
 import { GuildMember } from "discord.js";
 import { sort } from "fast-sort";
+import { Prisma } from "#generated/prisma";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
@@ -137,7 +138,7 @@ export async function addFarm(member: MemberResolvable, plantId: string, amount 
   const userId = getUserId(member);
 
   await prisma.farm.createMany({
-    data: new Array(amount).fill({ userId, plantId }),
+    data: Array.from({ length: amount }).fill({ userId, plantId }) as Prisma.FarmCreateManyInput[],
   });
   await redis.del(`${Constants.redis.cache.economy.farm}:${userId}`);
 }
