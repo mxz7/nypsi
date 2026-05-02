@@ -413,6 +413,8 @@ async function startChessGame(
       return;
     }
 
+    collector.resetTimer();
+
     const expected = solution[moveIndex];
     const expectedNormalized = expected.slice(0, 4) + (expected[4] ?? "");
     const isCheckmateMove = doesMoveCheckmate(uci);
