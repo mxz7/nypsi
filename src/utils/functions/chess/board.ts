@@ -15,6 +15,8 @@ const CHECK_COLOR = "rgba(235, 40, 30, 0.6)";
 
 const PIECES_DIR = path.join(process.cwd(), "data", "chess_pieces");
 
+const FONT_FAMILY = "Inter, sans-serif";
+
 // Piece cache keyed by lichess code e.g. "wK", "bP"
 const pieceCache = new Map<string, Buffer>();
 
@@ -183,7 +185,7 @@ function renderBaseBoardSvg(
     const y = BORDER + row * SQUARE_SIZE + 18;
 
     parts.push(
-      `<text x="${x}" y="${y}" fill="${labelColor}" font-size="16" font-weight="800" font-family="sans-serif">${displayRank}</text>`,
+      `<text x="${x}" y="${y}" fill="${labelColor}" font-size="16" font-weight="800" font-family="${FONT_FAMILY}">${displayRank}</text>`,
     );
   }
 
@@ -198,7 +200,7 @@ function renderBaseBoardSvg(
     const y = BORDER + row * SQUARE_SIZE + SQUARE_SIZE - 7;
 
     parts.push(
-      `<text x="${x}" y="${y}" fill="${labelColor}" font-size="16" font-weight="800" font-family="sans-serif" text-anchor="end">${displayFile}</text>`,
+      `<text x="${x}" y="${y}" fill="${labelColor}" font-size="16" font-weight="800" font-family="${FONT_FAMILY}" text-anchor="end">${displayFile}</text>`,
     );
   }
 
