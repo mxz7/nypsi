@@ -126,6 +126,6 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd ~/nypsi
-            nvm use lts
+            fnm use lts-latest
             npm i -g pnpm
             pnpm install --frozen-lockfile
