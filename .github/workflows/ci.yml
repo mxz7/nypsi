@@ -125,6 +125,9 @@ jobs:
           port: 22
           key: ${{ secrets.SSH_KEY }}
           script: |
+            export FNM_DIR="$HOME/.local/share/fnm"
+            export PATH="$FNM_DIR:$PATH"
+            eval "$(fnm env --shell bash)"
             cd ~/nypsi
             fnm use lts-latest
             npm i -g pnpm
