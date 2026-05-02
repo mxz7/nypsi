@@ -12,7 +12,6 @@ const LIGHT_COLOR = "#F0D9B5";
 const DARK_COLOR = "#B58863";
 const HIGHLIGHT_COLOR = "rgba(20, 85, 30, 0.5)";
 const CHECK_COLOR = "rgba(235, 40, 30, 0.6)";
-const LABEL_COLOR = "#F0D9B5";
 
 const PIECES_DIR = path.join(process.cwd(), "data", "chess_pieces");
 
@@ -174,23 +173,32 @@ function renderBaseBoardSvg(
     );
   }
 
-  // rank labels
+  // rank labels inside the left edge squares (chess.com style)
   for (let row = 0; row < 8; row++) {
+    const col = 0;
+    const isLight = (row + col) % 2 === 0;
+    const labelColor = isLight ? DARK_COLOR : LIGHT_COLOR;
     const displayRank = perspective === "white" ? 8 - row : row + 1;
-    const y = BORDER + row * SQUARE_SIZE + SQUARE_SIZE / 2;
+    const x = BORDER + col * SQUARE_SIZE + 7;
+    const y = BORDER + row * SQUARE_SIZE + 18;
+
     parts.push(
-      `<text x="${BORDER / 2}" y="${y}" fill="${LABEL_COLOR}" font-size="11" font-weight="700" font-family="sans-serif" text-anchor="middle" dominant-baseline="middle">${displayRank}</text>`,
+      `<text x="${x}" y="${y}" fill="${labelColor}" font-size="16" font-weight="800" font-family="sans-serif">${displayRank}</text>`,
     );
   }
 
-  // file labels
+  // file labels inside the bottom edge squares (chess.com style)
   const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
+  const row = 7;
   for (let col = 0; col < 8; col++) {
+    const isLight = (row + col) % 2 === 0;
+    const labelColor = isLight ? DARK_COLOR : LIGHT_COLOR;
     const displayFile = perspective === "white" ? files[col] : files[7 - col];
-    const x = BORDER + col * SQUARE_SIZE + SQUARE_SIZE / 2;
-    const y = BORDER + 8 * SQUARE_SIZE + BORDER / 2;
+    const x = BORDER + col * SQUARE_SIZE + SQUARE_SIZE - 7;
+    const y = BORDER + row * SQUARE_SIZE + SQUARE_SIZE - 7;
+
     parts.push(
-      `<text x="${x}" y="${y}" fill="${LABEL_COLOR}" font-size="11" font-weight="700" font-family="sans-serif" text-anchor="middle" dominant-baseline="middle">${displayFile}</text>`,
+      `<text x="${x}" y="${y}" fill="${labelColor}" font-size="16" font-weight="800" font-family="sans-serif" text-anchor="end">${displayFile}</text>`,
     );
   }
 
