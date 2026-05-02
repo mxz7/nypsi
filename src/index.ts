@@ -34,8 +34,7 @@ const manager = new ClusterManager(`${__dirname}/nypsi.js`, {
     interval: ms("1 hour"),
   },
 
-  // totalShards: 6,
-  // shardsPerClusters: 3, // force clusters
+  totalClusters: 2,
 });
 
 manager.extend(new Cluster.ReClusterManager());
