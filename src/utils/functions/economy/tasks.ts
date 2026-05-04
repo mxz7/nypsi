@@ -20,13 +20,12 @@ import { getPrestige } from "./levelling";
 import { getItems, getTasksData, isEcoBanned, maxPrestige, userExists } from "./utils";
 import { addXp } from "./xp";
 
-const taskGeneration = new Map<string, number>();
-
-const mutex = new Mutex(false);
-
 async function generateDailyTasks(member: MemberResolvable, count: number) {
-  const tasks = Object.values(getTasksData()).filter((i) => i.type === "daily");
   const userId = getUserId(member);
+
+  logger.debug(`task: generating ${count} daily tasks for ${userId}`);
+
+  const tasks = Object.values(getTasksData()).filter((i) => i.type === "daily");
 
   const usersTasks: Task[] = [];
 
@@ -56,8 +55,11 @@ async function generateDailyTasks(member: MemberResolvable, count: number) {
 }
 
 async function generateWeeklyTasks(member: MemberResolvable, count: number) {
-  let tasks = Object.values(getTasksData()).filter((i) => i.type === "weekly");
   const userId = getUserId(member);
+
+  logger.debug(`task: generating ${count} weekly tasks for ${userId}`);
+
+  let tasks = Object.values(getTasksData()).filter((i) => i.type === "weekly");
 
   if ((await getPrestige(member)) >= maxPrestige) {
     tasks = tasks.filter((i) => !i.exclude?.includes("max_prestige"));
@@ -90,101 +92,89 @@ async function generateWeeklyTasks(member: MemberResolvable, count: number) {
   await redis.del(`${Constants.redis.cache.economy.TASKS}:${userId}`);
 }
 
+const tasksMutex = new Mutex();
+
 export async function getTasks(member: MemberResolvable): Promise<PrismaTask[]> {
   const userId = getUserId(member);
 
-  if (taskGeneration.has(userId)) {
-    await sleep(25 + Math.floor(Math.random() * 50));
-    return getTasks(userId);
-  }
-
-  const queueId = Math.random();
-
-  taskGeneration.set(userId, queueId);
-
-  setTimeout(() => {
-    if (taskGeneration.has(userId)) {
-      if (taskGeneration.get(userId) === queueId) taskGeneration.delete(userId);
-    }
-  }, 3000);
-
-  const cache = await redis.get(`${Constants.redis.cache.economy.TASKS}:${userId}`);
-
-  if (cache) {
-    taskGeneration.delete(userId);
-    return JSON.parse(cache) as PrismaTask[];
-  }
-
-  const query = await prisma.task.findMany({
-    where: { user_id: userId },
-    orderBy: {
-      task_id: "asc",
-    },
-  });
+  await tasksMutex.acquire(userId);
 
   try {
-    if (query.length < 6) {
-      const dailiesCount = query.filter((t) => t.type === "daily").length;
-      const weekliesCount = query.length - dailiesCount;
+    const cache = await redis.get(`${Constants.redis.cache.economy.TASKS}:${userId}`);
 
-      if (dailiesCount < 3) {
-        await generateDailyTasks(userId, 3 - dailiesCount);
-      }
+    if (cache) {
+      return JSON.parse(cache) as PrismaTask[];
+    }
 
-      if (weekliesCount < 3) {
-        await generateWeeklyTasks(userId, 3 - weekliesCount);
-      }
+    const query = await prisma.task.findMany({
+      where: { user_id: userId },
+      orderBy: {
+        task_id: "asc",
+      },
+    });
 
-      await sleep(100);
+    try {
+      if (query.length < 6) {
+        const dailiesCount = query.filter((t) => t.type === "daily").length;
+        const weekliesCount = query.length - dailiesCount;
 
-      taskGeneration.delete(userId);
-      return getTasks(userId);
-    } else if (query.length > 6) {
-      const dailies = query.filter((i) => i.type === "daily");
-      const weeklies = query.filter((i) => i.type === "weekly");
+        if (dailiesCount < 3) {
+          await generateDailyTasks(userId, 3 - dailiesCount);
+        }
 
-      if (dailies.length > 3) {
-        await prisma.task.delete({
-          where: {
-            user_id_task_id: {
-              task_id: dailies[0].task_id,
-              user_id: dailies[0].user_id,
+        if (weekliesCount < 3) {
+          await generateWeeklyTasks(userId, 3 - weekliesCount);
+        }
+
+        await sleep(100);
+
+        return getTasks(userId);
+      } else if (query.length > 6) {
+        const dailies = query.filter((i) => i.type === "daily");
+        const weeklies = query.filter((i) => i.type === "weekly");
+
+        if (dailies.length > 3) {
+          await prisma.task.delete({
+            where: {
+              user_id_task_id: {
+                task_id: dailies[0].task_id,
+                user_id: dailies[0].user_id,
+              },
             },
-          },
-        });
-      } else {
-        await prisma.task.delete({
-          where: {
-            user_id_task_id: {
-              task_id: weeklies[0].task_id,
-              user_id: weeklies[0].user_id,
+          });
+        } else {
+          await prisma.task.delete({
+            where: {
+              user_id_task_id: {
+                task_id: weeklies[0].task_id,
+                user_id: weeklies[0].user_id,
+              },
             },
-          },
-        });
+          });
+        }
+
+        await sleep(10);
+
+        return getTasks(userId);
       }
+    } catch (error) {
+      await redis.del(`${Constants.redis.cache.economy.TASKS}:${userId}`);
 
-      await sleep(10);
-
-      taskGeneration.delete(userId);
+      logger.debug(`task: weird error when handling odd tasks for ${userId}, retrying`, { error });
       return getTasks(userId);
     }
-  } catch (error) {
-    await redis.del(`${Constants.redis.cache.economy.TASKS}:${userId}`);
-    taskGeneration.delete(userId);
 
-    logger.debug(`task: weird error when handling odd tasks for ${userId}, retrying`, { error });
-    return getTasks(userId);
+    await redis.set(
+      `${Constants.redis.cache.economy.TASKS}:${userId}`,
+      JSON.stringify(query, (key, value) => (typeof value === "bigint" ? Number(value) : value)),
+      "EX",
+      3600,
+    );
+
+    return query;
+  } finally {
+    tasksMutex.release(userId);
   }
-
-  await redis.set(
-    `${Constants.redis.cache.economy.TASKS}:${userId}`,
-    JSON.stringify(query, (key, value) => (typeof value === "bigint" ? Number(value) : value)),
-    "EX",
-    3600,
-  );
-
-  taskGeneration.delete(userId);
-  return query;
 }
 
 export async function getTaskStreaks(member: MemberResolvable) {
@@ -257,11 +247,13 @@ export function parseReward(reward: string) {
   return out;
 }
 
+const taskProgressMutex = new Mutex(false);
+
 export async function addTaskProgress(member: MemberResolvable, taskId: string, amount = 1) {
   const userId = getUserId(member);
   const mutexKey = `${userId}_${taskId}`;
 
-  await mutex.acquire(mutexKey);
+  await taskProgressMutex.acquire(mutexKey);
 
   try {
     if (!(await userExists(userId))) return;
@@ -338,7 +330,7 @@ export async function addTaskProgress(member: MemberResolvable, taskId: string, 
     }
   } finally {
     redis.del(`${Constants.redis.cache.economy.TASKS}:${userId}`);
-    mutex.release(mutexKey);
+    taskProgressMutex.release(mutexKey);
   }
 }
 
