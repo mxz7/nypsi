@@ -25,7 +25,7 @@ import {
   setAutoJoinRoles,
   setPersistentRoles,
 } from "../utils/functions/guilds/roles";
-import { getRole } from "../utils/functions/member";
+import { getMember, getRole } from "../utils/functions/member";
 import PageManager from "../utils/functions/page";
 import sleep from "../utils/functions/sleep";
 import { pluralize } from "../utils/functions/string";
@@ -165,12 +165,25 @@ async function run(
   }
 
   const getMembers = async (): Promise<SlimMember[]> => {
-    const cached = message.guild.members.cache;
-    if (cached.size === message.guild.memberCount) {
-      return cached.map(transformGuildMemberToSlim);
-    }
+    if (args[1].toLowerCase() == "all") {
+      const cached = message.guild.members.cache;
+      if (cached.size === message.guild.memberCount) {
+        return cached.map(transformGuildMemberToSlim);
+      }
 
-    return getAllMembersRest(message.guild.id, message.client as NypsiClient);
+      return getAllMembersRest(message.guild.id, message.client as NypsiClient);
+    } else {
+      if (message.mentions?.members?.first()) {
+        return [transformGuildMemberToSlim(message.mentions.members.first())];
+      } else {
+        const member = await getMember(message.guild, args[2]);
+
+        if (!member) {
+          return [];
+        }
+        return [transformGuildMemberToSlim(member)];
+      }
+    }
   };
 
   const rest = getRest(message.client as NypsiClient);
