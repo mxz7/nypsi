@@ -84,15 +84,20 @@ async function run(
   const joined = formatDate(member.joinedAt);
   const created = formatDate(member.user.createdAt);
   const roles = member.roles.cache;
+  const rolesText = roles.reverse().reduce((str, role) => {
+    if (str.length > 900) {
+      if (!str.endsWith("more")) {
+        const currentCount = str.split(" ").length - 1;
 
-  let rolesText: string[] = [];
+        return str + `*+${roles.size - currentCount}* more`;
+      }
 
-  roles.forEach((role) => {
-    if (role.name == "@everyone") return;
-    rolesText[role.position] = role.toString();
-  });
+      return str;
+    }
 
-  rolesText = rolesText.reverse();
+    if (role.name == "@everyone") return str;
+    return str + role.toString() + " ";
+  }, "");
 
   const usernameHistory = await fetchUsernameHistory(member, 5);
 
@@ -117,7 +122,7 @@ async function run(
     .addField("\u200B", "\u200B", true);
 
   if (member.roles.cache.size > 1) {
-    embed.addField("roles [" + (member.roles.cache.size - 1) + "]", rolesText.join(" "), true);
+    embed.addField("roles [" + (member.roles.cache.size - 1) + "]", rolesText, true);
   }
 
   if (usernameHistory.length > 1) {
