@@ -1,5 +1,5 @@
 allowBuilds:
-  '@prisma/engines': true
+  "@prisma/engines": true
   bufferutil: true
   esbuild: false
   msgpackr-extract: true
