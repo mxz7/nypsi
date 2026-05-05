@@ -7,6 +7,7 @@ import ms = require("ms");
 
 const prompts = {
   support_request: readFileSync("data/prompts/support_request.txt").toString(),
+  help_chatbot: readFileSync("data/prompts/help_chatbot.txt").toString(),
   user_context: readFileSync("data/prompts/user_context.txt").toString(),
 } as const;
 

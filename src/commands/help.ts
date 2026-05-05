@@ -206,6 +206,17 @@ cmd.setRun(async (message, send, args) => {
       components: [row],
     });
   } else {
+    if (args.length === 0) {
+      const homeRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder()
+          .setCustomId("help-ai-start")
+          .setLabel("ask nypsi help ai")
+          .setStyle(ButtonStyle.Secondary),
+      );
+
+      return await message.channel.send({ embeds: [embed], components: [homeRow] });
+    }
+
     return await message.channel.send({ embeds: [embed] });
   }
 
