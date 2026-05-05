@@ -16,6 +16,10 @@ runs:
         node-version: 24
         cache: "pnpm"
 
+    - name: install build tools
+      shell: bash
+      run: sudo apt-get update && sudo apt-get install -y python3 make g++
+
     - name: install dependencies
       shell: bash
       run: pnpm install --frozen-lockfile
