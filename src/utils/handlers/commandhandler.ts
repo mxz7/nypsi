@@ -1,18 +1,13 @@
 import * as fs from "fs";
 import {
-  ActionRowBuilder,
   APIEmbed,
   BaseMessageOptions,
-  ButtonBuilder,
-  ButtonStyle,
   CommandInteraction,
   Embed,
   GuildMember,
-  Interaction,
   InteractionEditReplyOptions,
   InteractionReplyOptions,
   Message,
-  MessageActionRowComponentBuilder,
   MessageFlags,
   PermissionFlagsBits,
   Routes,
@@ -24,7 +19,6 @@ import redis from "../../init/redis";
 import { NypsiClient } from "../../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../models/EmbedBuilders";
-import { Item } from "../../types/Economy";
 import Constants from "../Constants";
 import { a } from "../functions/anticheat";
 import { giveCaptcha, isLockedOut, verifyUser } from "../functions/captcha";
@@ -44,7 +38,6 @@ import {
   gemBreak,
   getInventory,
 } from "../functions/economy/inventory";
-import { runItemInfo } from "../functions/economy/item_info";
 import { getLevelRequirements, getRawLevel } from "../functions/economy/levelling";
 import { addTaskProgress } from "../functions/economy/tasks";
 import {
@@ -223,290 +216,6 @@ export function reloadCommand(commandsArray: string[]) {
   return true;
 }
 
-async function helpCmd(message: NypsiMessage, args: string[]) {
-  logCommand(message, args);
-
-  const helpCategories = new Map<string, Map<number, string[]>>();
-
-  const prefix = (await getPrefix(message.guild))[0];
-
-  for (const cmd of commands.keys()) {
-    const category = getCmdCategory(cmd);
-
-    if (category == "none") continue;
-
-    if (helpCategories.has(category)) {
-      const current = helpCategories.get(category);
-      const lastPage = current.get(current.size);
-
-      if (lastPage.length == 10) {
-        const newPage = [];
-
-        newPage.push(`${prefix}**${getCmdName(cmd)}** *${getCmdDesc(cmd)}*`);
-        current.set(current.size + 1, newPage);
-      } else {
-        const page = current.get(current.size);
-        page.push(`${prefix}**${getCmdName(cmd)}** *${getCmdDesc(cmd)}*`);
-        current.set(current.size, page);
-      }
-
-      helpCategories.set(category, current);
-    } else {
-      const pages = new Map<number, string[]>();
-
-      pages.set(1, [`${prefix}**${getCmdName(cmd)}** *${getCmdDesc(cmd)}*`]);
-
-      helpCategories.set(category, pages);
-    }
-  }
-
-  const embed = new CustomEmbed(message.member);
-
-  /**
-   * FINDING WHAT THE USER REQUESTED
-   */
-
-  let pageSystemNeeded = false;
-
-  if (args.length == 0) {
-    const categories = Array.from(helpCategories.keys()).sort();
-
-    let categoriesMsg = "";
-
-    for (const category of categories) {
-      categoriesMsg += `» ${prefix}help **${category}**\n`;
-    }
-
-    const news = await getNews();
-
-    embed.setTitle("help menu");
-    embed.setDescription(
-      "[invite nypsi to your server](https://discord.com/oauth2/authorize?client_id=678711738845102087&permissions=1377879583830&scope=bot%20applications.commands)\n\n" +
-        `if you need support, want to report a bug or suggest a feature, you can join the nypsi server: ${Constants.NYPSI_SERVER_INVITE_LINK}\n\n` +
-        `my prefix for this server is \`${prefix}\``,
-    );
-    embed.addField("command categories", categoriesMsg, true);
-    embed.setThumbnail(message.client.user.displayAvatarURL({ size: 128 }));
-
-    if (news.text != "") {
-      embed.addField("news", `${news.text} - *${formatDate(news.date)}*`);
-    }
-  } else {
-    if (args[0].toLowerCase() == "mod") args[0] = "moderation";
-    if (args[0].toLowerCase() == "util") args[0] = "utility";
-    if (args[0].toLowerCase() == "pictures") args[0] = "animals";
-    if (args[0].toLowerCase() == "eco") args[0] = "money";
-    if (args[0].toLowerCase() == "economy") args[0] = "money";
-    if (args[0].toLowerCase() == "gamble") args[0] = "money";
-    if (args[0].toLowerCase() == "gambling") args[0] = "money";
-
-    const items = getItems();
-
-    let selectedItem: Item;
-    const searchTag = args.join(" ");
-
-    for (const itemName of Array.from(Object.keys(items))) {
-      const aliases = items[itemName].aliases ? items[itemName].aliases : [];
-      if (searchTag == itemName) {
-        selectedItem = items[itemName];
-        break;
-      } else if (searchTag == itemName.split("_").join("")) {
-        selectedItem = items[itemName];
-        break;
-      } else if (aliases.indexOf(searchTag) != -1) {
-        selectedItem = items[itemName];
-        break;
-      } else if (searchTag == items[itemName].name) {
-        selectedItem = items[itemName];
-        break;
-      }
-    }
-
-    if (helpCategories.has(args[0].toLowerCase())) {
-      const pages = helpCategories.get(args[0].toLowerCase());
-
-      if (pages.size > 1) {
-        pageSystemNeeded = true;
-      }
-
-      embed.setTitle(`${args[0].toLowerCase()} commands`);
-      embed.setDescription(pages.get(1).join("\n"));
-      embed.setFooter({ text: `page 1/${pages.size}` });
-    } else if (commands.has(args[0].toLowerCase()) || aliases.has(args[0].toLowerCase())) {
-      let cmd: Command;
-
-      if (aliases.has(args[0].toLowerCase())) {
-        cmd = commands.get(aliases.get(args[0].toLowerCase()));
-      } else {
-        cmd = commands.get(args[0].toLowerCase());
-      }
-
-      let desc =
-        "**name** " +
-        cmd.name +
-        "\n" +
-        "**description** " +
-        cmd.description +
-        "\n" +
-        "**category** " +
-        cmd.category;
-
-      if (cmd.permissions) {
-        desc = desc + "\n**permission(s) required** `" + cmd.permissions.join("`, `") + "`";
-      }
-
-      if (cmd.aliases) {
-        desc = desc + "\n**aliases** `" + prefix + cmd.aliases.join("`, `" + prefix) + "`";
-      }
-
-      if (cmd.docs) {
-        desc += `\n**wiki** ${cmd.docs}`;
-      }
-
-      embed.setTitle(`${cmd.name} command`);
-      embed.setDescription(desc);
-    } else if (await getCommand(args[0].toLowerCase())) {
-      const owner = (await getCommand(args[0].toLowerCase())).owner;
-      const member = message.guild.members.cache.find((m) => m.id == owner);
-      embed.setTitle("custom command");
-      embed.setDescription(
-        `this is a custom command${
-          member ? ` owned by ${member.toString()}` : ""
-        }\n\nto disable custom commands in your server you can do:\n${prefix}disablecmd + customcommand`,
-      );
-    } else if (selectedItem) {
-      return await runItemInfo(message, args, selectedItem, "general");
-    } else {
-      return message.channel.send({
-        embeds: [
-          new ErrorEmbed(
-            "unknown command or item\nyou may find what you're looking for on the wiki: https://nypsi.xyz/wiki",
-          ),
-        ],
-      });
-    }
-  }
-
-  let msg: Message;
-
-  let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder()
-      .setCustomId("⬅")
-      .setLabel("back")
-      .setStyle(ButtonStyle.Primary)
-      .setDisabled(true),
-    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
-  );
-
-  if (pageSystemNeeded) {
-    msg = await message.channel.send({
-      embeds: [embed],
-      components: [row],
-    });
-  } else {
-    return await message.channel.send({ embeds: [embed] });
-  }
-
-  const pages = helpCategories.get(args[0].toLowerCase());
-
-  let currentPage = 1;
-  const lastPage = pages.size;
-
-  const filter = (i: Interaction) => i.user.id == message.author.id;
-
-  const pageManager = async (): Promise<void> => {
-    const reaction = await msg
-      .awaitMessageComponent({ filter, time: 30000 })
-      .then(async (collected) => {
-        await collected.deferUpdate();
-        return collected.customId;
-      })
-      .catch(async () => {
-        await msg.edit({ components: [] }).catch(() => {});
-      });
-
-    if (!reaction) return;
-
-    if (reaction == "⬅") {
-      if (currentPage <= 1) {
-        return pageManager();
-      } else {
-        currentPage--;
-        embed.setDescription(pages.get(currentPage).join("\n"));
-        embed.setFooter({ text: `page ${currentPage}/${lastPage}` });
-        if (currentPage == 1) {
-          row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-            new ButtonBuilder()
-              .setCustomId("⬅")
-              .setLabel("back")
-              .setStyle(ButtonStyle.Primary)
-              .setDisabled(true),
-            new ButtonBuilder()
-              .setCustomId("➡")
-              .setLabel("next")
-              .setStyle(ButtonStyle.Primary)
-              .setDisabled(false),
-          );
-        } else {
-          row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-            new ButtonBuilder()
-              .setCustomId("⬅")
-              .setLabel("back")
-              .setStyle(ButtonStyle.Primary)
-              .setDisabled(false),
-            new ButtonBuilder()
-              .setCustomId("➡")
-              .setLabel("next")
-              .setStyle(ButtonStyle.Primary)
-              .setDisabled(false),
-          );
-        }
-        await msg.edit({ embeds: [embed], components: [row] });
-        return pageManager();
-      }
-    } else if (reaction == "➡") {
-      if (currentPage >= lastPage) {
-        return pageManager();
-      } else {
-        currentPage++;
-        embed.setDescription(pages.get(currentPage).join("\n"));
-        embed.setFooter({ text: `page ${currentPage}/${lastPage}` });
-        if (currentPage == lastPage) {
-          row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-            new ButtonBuilder()
-              .setCustomId("⬅")
-              .setLabel("back")
-              .setStyle(ButtonStyle.Primary)
-              .setDisabled(false),
-            new ButtonBuilder()
-              .setCustomId("➡")
-              .setLabel("next")
-              .setStyle(ButtonStyle.Primary)
-              .setDisabled(true),
-          );
-        } else {
-          row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-            new ButtonBuilder()
-              .setCustomId("⬅")
-              .setLabel("back")
-              .setStyle(ButtonStyle.Primary)
-              .setDisabled(false),
-            new ButtonBuilder()
-              .setCustomId("➡")
-              .setLabel("next")
-              .setStyle(ButtonStyle.Primary)
-              .setDisabled(false),
-          );
-        }
-        await msg.edit({ embeds: [embed], components: [row] });
-        return pageManager();
-      }
-    }
-  };
-
-  return pageManager();
-}
-
 export async function runCommand(
   cmd: string,
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
@@ -529,10 +238,6 @@ export async function runCommand(
         cooldown.clear();
       }
     }, 300);
-  }
-
-  if (cmd == "help" && message instanceof Message) {
-    return helpCmd(message, args);
   }
 
   let command: Command;
@@ -1311,16 +1016,24 @@ export function getCommandFromAlias(alias: string) {
   return aliases.get(alias);
 }
 
-function getCmdName(cmd: string): string {
+export function getCmdName(cmd: string): string {
   return commands.get(cmd).name;
 }
 
-function getCmdDesc(cmd: string): string {
+export function getCmdDesc(cmd: string): string {
   return commands.get(cmd).description;
 }
 
-function getCmdCategory(cmd: string): string {
+export function getCmdCategory(cmd: string): string {
   return commands.get(cmd).category;
+}
+
+export function getCommandData(cmd: string): Command {
+  return commands.get(cmd);
+}
+
+export function getCommandKeys(): IterableIterator<string> {
+  return commands.keys();
 }
 
 export function getRandomCommand(): Command {
