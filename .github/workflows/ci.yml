@@ -132,4 +132,5 @@ jobs:
             cd ~/nypsi
             fnm use lts-latest
             npm i -g pnpm@11
+            export CI=true
             pnpm install --frozen-lockfile
