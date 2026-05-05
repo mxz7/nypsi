@@ -131,5 +131,5 @@ jobs:
             eval "$(fnm env --shell bash)"
             cd ~/nypsi
             fnm use lts-latest
-            npm i -g pnpm
+            npm i -g pnpm@11
             pnpm install --frozen-lockfile
