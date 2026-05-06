@@ -13,7 +13,7 @@ import {
 } from "discord.js";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
-import { createHelpChat, getAiChatConversationById } from "../utils/functions/help-chat";
+import { createHelpChat, getAiChatConversationById } from "../utils/functions/ai/help-chat";
 
 async function showQuestionModal(interaction: ButtonInteraction) {
   const id = `help-ai-question-${Math.floor(Math.random() * 10_000_000)}`;

@@ -1,8 +1,8 @@
 import { readFileSync } from "node:fs";
 import OpenAI from "openai";
-import redis from "../../init/redis";
-import Constants from "../Constants";
-import { logger } from "../logger";
+import redis from "../../../init/redis";
+import Constants from "../../Constants";
+import { logger } from "../../logger";
 import ms = require("ms");
 
 const prompts = {
