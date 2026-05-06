@@ -1,0 +1,8 @@
+allowBuilds:
+  "@prisma/engines": true
+  bufferutil: true
+  esbuild: false
+  msgpackr-extract: true
+  prisma: true
+  sharp: true
+  zlib-sync: true
