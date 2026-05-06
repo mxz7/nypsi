@@ -42,7 +42,7 @@ async function showQuestionModal(interaction: ButtonInteraction) {
 
 function buildResponseMessage(
   userId: string,
-  chatId: number,
+  conversationId: string,
   question: string,
   response: string,
   icon?: string,
@@ -53,7 +53,7 @@ function buildResponseMessage(
     .addField("answer", response)
     .setFooter({
       text: "this service is powered by AI and can make mistakes",
-      iconURL: `https://nypsi.xyz/wiki?chatid=${chatId}`,
+      iconURL: `https://nypsi.xyz/wiki?conversationid=${conversationId}`,
     });
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -89,7 +89,7 @@ export default {
 
     const message = buildResponseMessage(
       modalSubmit.user.id,
-      result.chatId,
+      result.conversationId,
       question,
       result.aiResponse,
       interaction.client.user.avatarURL(),

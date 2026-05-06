@@ -13,7 +13,7 @@ import {
 } from "discord.js";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
-import { createHelpChat, getAiChatMessageById } from "../utils/functions/help-chat";
+import { createHelpChat, getAiChatConversationById } from "../utils/functions/help-chat";
 
 async function showQuestionModal(interaction: ButtonInteraction) {
   const id = `help-ai-question-${Math.floor(Math.random() * 10_000_000)}`;
@@ -43,7 +43,7 @@ async function showQuestionModal(interaction: ButtonInteraction) {
 
 function buildResponseMessage(
   userId: string,
-  chatId: number,
+  conversationId: string,
   question: string,
   response: string,
   icon?: string,
@@ -54,7 +54,7 @@ function buildResponseMessage(
     .addField("answer", response)
     .setFooter({
       text: "this service is powered by AI and can make mistakes",
-      iconURL: `https://nypsi.xyz/wiki?chatid=${chatId}`,
+      iconURL: `https://nypsi.xyz/wiki?conversationid=${conversationId}`,
     });
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -75,25 +75,25 @@ export default {
 
     const footerIcon = interaction.message.embeds.at(0)?.footer?.iconURL;
     const parsedFooterIcon = new URL(footerIcon || "");
-    const sourceChatId = parseInt(parsedFooterIcon.searchParams.get("chatid") || "", 10);
+    const sourceConversationId = parsedFooterIcon.searchParams.get("conversationid") || "";
 
-    if (!sourceChatId || Number.isNaN(sourceChatId)) {
+    if (!sourceConversationId) {
       return await interaction.reply({
         embeds: [new ErrorEmbed("this help chat can no longer be continued")],
         flags: MessageFlags.Ephemeral,
       });
     }
 
-    const sourceMessage = await getAiChatMessageById(sourceChatId);
+    const sourceConversation = await getAiChatConversationById(sourceConversationId);
 
-    if (!sourceMessage) {
+    if (!sourceConversation) {
       return await interaction.reply({
         embeds: [new ErrorEmbed("this help chat can no longer be continued")],
         flags: MessageFlags.Ephemeral,
       });
     }
 
-    if (sourceMessage.userId !== interaction.user.id) {
+    if (sourceConversation.userId !== interaction.user.id) {
       return await interaction.reply({
         embeds: [new ErrorEmbed("only the user who started this help chat can continue it")],
         flags: MessageFlags.Ephemeral,
@@ -107,7 +107,7 @@ export default {
     await modalSubmit.deferReply();
 
     const question = modalSubmit.fields.getTextInputValue("question").trim();
-    const result = await createHelpChat(modalSubmit.user.id, question);
+    const result = await createHelpChat(modalSubmit.user.id, question, sourceConversation.id);
 
     if (!result.aiResponse) {
       return await modalSubmit.editReply({
@@ -117,7 +117,7 @@ export default {
 
     const message = buildResponseMessage(
       modalSubmit.user.id,
-      result.chatId,
+      result.conversationId,
       question,
       result.aiResponse,
       interaction.client.user.avatarURL(),

@@ -10,6 +10,7 @@ import { getLastCommand } from "./users/commands";
 import { getLastKnownUsername } from "./users/username";
 
 const MODEL: ResponsesModel = "gpt-5.4-nano";
+type ChatHistoryInput = { role: "user" | "assistant"; content: string };
 
 function getCommandList() {
   const rows: string[] = [];
@@ -68,10 +69,42 @@ async function getUserContext(userId: string) {
   return buildPrompt("user_context", context);
 }
 
-export async function createHelpChat(userId: string, userQuery: string) {
+export async function createHelpChat(userId: string, userQuery: string, conversationId?: string) {
+  const conversation = conversationId
+    ? await prisma.aiChatConversation.findUnique({
+        where: {
+          id: conversationId,
+        },
+      })
+    : await prisma.aiChatConversation.create({
+        data: {
+          userId,
+        },
+      });
+
+  if (!conversation || conversation.userId !== userId) {
+    throw new Error("invalid ai help conversation");
+  }
+
+  const previousMessages = await prisma.aiChatMessage.findMany({
+    where: {
+      conversationId: conversation.id,
+      aiResponse: {
+        not: null,
+      },
+    },
+    select: {
+      userQuery: true,
+      aiResponse: true,
+    },
+    orderBy: {
+      id: "desc",
+    },
+  });
+
   const chatMessage = await prisma.aiChatMessage.create({
     data: {
-      userId,
+      conversationId: conversation.id,
       userQuery,
       model: MODEL,
     },
@@ -83,12 +116,17 @@ export async function createHelpChat(userId: string, userQuery: string) {
       commands: getCommandList(),
     });
     const userContext = await getUserContext(userId);
+    const historyInput: ChatHistoryInput[] = previousMessages.reverse().flatMap((message) => [
+      { role: "user", content: message.userQuery },
+      { role: "assistant", content: message.aiResponse as string },
+    ]);
 
     const response = await openai.responses.create({
       model: MODEL,
       input: [
         { role: "system", content: prompt },
         { role: "system", content: userContext },
+        ...historyInput,
         { role: "user", content: userQuery },
       ],
     });
@@ -112,15 +150,15 @@ export async function createHelpChat(userId: string, userQuery: string) {
       },
     });
 
-    return { chatId: chatMessage.id, aiResponse };
+    return { chatId: chatMessage.id, conversationId: conversation.id, aiResponse };
   } catch (e) {
     logger.error("help-chat: failed to generate ai response", { e, userId });
-    return { chatId: chatMessage.id, aiResponse: null };
+    return { chatId: chatMessage.id, conversationId: conversation.id, aiResponse: null };
   }
 }
 
-export async function getAiChatMessageById(id: number) {
-  return await prisma.aiChatMessage.findUnique({
+export async function getAiChatConversationById(id: string) {
+  return await prisma.aiChatConversation.findUnique({
     where: {
       id,
     },
