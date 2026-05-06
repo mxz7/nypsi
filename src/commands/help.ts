@@ -210,7 +210,7 @@ cmd.setRun(async (message, send, args) => {
       const homeRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
           .setCustomId("help-ai-start")
-          .setLabel("ask nypsi help ai")
+          .setLabel("ask ai")
           .setStyle(ButtonStyle.Secondary),
       );
 
