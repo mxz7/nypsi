@@ -30,6 +30,7 @@ import { checkAutoMute, checkMessageContent } from "../utils/functions/guilds/fi
 import { addToMessageCache } from "../utils/functions/guilds/messages";
 import { isSlashOnly } from "../utils/functions/guilds/slash";
 import { getGuildName, getPrefix, hasGuild } from "../utils/functions/guilds/utils";
+import { isScamImage } from "../utils/functions/image";
 import { checkTriggers } from "../utils/functions/message-triggers";
 import sleep from "../utils/functions/sleep";
 import {
@@ -493,10 +494,35 @@ export default async function messageCreate(message: Message) {
     !message.author.bot
   ) {
     if (message.guildId === Constants.NYPSI_SERVER_ID) {
-      setTimeout(() => {
+      setTimeout(async () => {
         checkNeedSupport();
         checkTask();
         checkAura();
+
+        if (message.attachments.size > 0) {
+          for (const attachment of message.attachments.values()) {
+            if (!attachment.contentType?.startsWith("image/")) continue;
+
+            try {
+              const result = await isScamImage(attachment.url);
+              if (result.scam) {
+                logger.info("scamtest: image detected", {
+                  url: attachment.url,
+                  messageUrl: message.url,
+                  user: {
+                    id: message.author.id,
+                    username: message.author.username,
+                  },
+                  result,
+                });
+              } else {
+                logger.debug("scamtest: image not detected", { url: attachment.url, result });
+              }
+            } catch (error) {
+              logger.warn("failed to check scam image", { error, url: attachment.url });
+            }
+          }
+        }
       }, 1000);
     }
   }

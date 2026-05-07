@@ -1,5 +1,6 @@
 import { DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { parse } from "@twemoji/parser";
+import sharp from "sharp";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import s3 from "../../init/s3";
@@ -96,4 +97,66 @@ export async function deleteImage(id: string) {
   await s3.send(new DeleteObjectCommand({ Bucket: process.env.S3_BUCKET, Key: id }));
   await prisma.images.delete({ where: { id } });
   await redis.del(`${Constants.redis.cache.IMAGE}:${id}`);
+}
+
+export async function dhash(input: Buffer): Promise<bigint> {
+  const size = 16;
+
+  const { data } = await sharp(input)
+    .resize(size + 1, size, { fit: "fill" })
+    .greyscale()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+
+  let hash = 0n;
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const left = data[y * (size + 1) + x];
+      const right = data[y * (size + 1) + x + 1];
+      hash = (hash << 1n) | (left < right ? 1n : 0n);
+    }
+  }
+
+  return hash;
+}
+
+export function hammingDistance(a: bigint, b: bigint): number {
+  let xor = a ^ b;
+  let dist = 0;
+  while (xor > 0n) {
+    dist += Number(xor & 1n);
+    xor >>= 1n;
+  }
+  return dist;
+}
+
+// the mr beast twitter scam images
+const scamImages = [
+  70806595034094802434197228670771698004542809934543937388893117000598274840616n,
+  16299498945533816812946099902609874616368689868885371594108161188289690714651n,
+  72709621701496836174492615962861494187683811105911528458021576705924029629438n,
+  21716678152258230268502918861209221640347971977606760092143576553946478608384n,
+];
+
+export async function isScamImage(
+  url: string,
+): Promise<{ scam: boolean; distance?: number; timeTaken?: number }> {
+  const buffer = await fetch(url)
+    .then((r) => r.arrayBuffer())
+    .then((b) => Buffer.from(b));
+
+  const before = performance.now();
+
+  const hash = await dhash(buffer);
+
+  let closest: number;
+
+  for (const scamHash of scamImages) {
+    closest = hammingDistance(hash, scamHash);
+    if (closest <= 10) {
+      return { scam: true, distance: closest, timeTaken: performance.now() - before };
+    }
+  }
+
+  return { scam: false, distance: closest, timeTaken: performance.now() - before };
 }
