@@ -1,5 +1,6 @@
 import { Guild } from "discord.js";
 import { NypsiClient } from "../../../models/Client";
+import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { getTagsData } from "../economy/utils";
 import { getAllMembers, getAllMembersRest } from "../guilds/members";
@@ -40,7 +41,7 @@ export async function getMembers(guild?: Guild) {
     members = await getAllMembersRest(guild.id, guild.client as NypsiClient, true);
   }
 
-  return members;
+  return members.filter((userId) => userId !== Constants.BOT_USER_ID);
 }
 
 export async function getUsername(
