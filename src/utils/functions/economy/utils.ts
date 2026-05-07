@@ -809,7 +809,7 @@ export async function doDaily(
       embed.addField(
         "rewards",
         `+$**${marriageMoney.toLocaleString()}**` +
-          `\n+ **1** ${items["daily_scratch_card"].emoji} ${pluralize(items["daily_scratch_card"], amount)}`,
+          `\n+ **1** ${items["daily_scratch_card"].emoji} ${pluralize(items["daily_scratch_card"], 1)}`,
       );
 
       addInlineNotification({
@@ -826,7 +826,7 @@ export async function doDaily(
 
   const rewards: string[] = [
     `+$**${totalMoney.toLocaleString()}**`,
-    `+ ${totalCards > 1 ? `**${amount.toLocaleString()}** ` : ""}${items["daily_scratch_card"].emoji} ${pluralize(items["daily_scratch_card"], amount)}`,
+    `+ ${totalCards > 1 ? `**${totalCards.toLocaleString()}** ` : ""}${items["daily_scratch_card"].emoji} ${pluralize(items["daily_scratch_card"], totalCards)}`,
   ];
 
   for (const [itemId, amount] of totalRewards) {
