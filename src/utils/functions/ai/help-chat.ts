@@ -164,3 +164,21 @@ export async function getAiChatConversationById(id: string) {
     },
   });
 }
+
+export async function getAiChatConversationMessages(conversationId: string) {
+  return await prisma.aiChatMessage.findMany({
+    where: {
+      conversationId,
+      aiResponse: {
+        not: null,
+      },
+    },
+    select: {
+      userQuery: true,
+      aiResponse: true,
+    },
+    orderBy: {
+      createdAt: "asc",
+    },
+  });
+}
