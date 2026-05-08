@@ -1,67 +1,24 @@
 import {
-  ActionRowBuilder,
-  ButtonBuilder,
   ButtonInteraction,
-  ButtonStyle,
   LabelBuilder,
   Message,
-  MessageActionRowComponentBuilder,
   MessageFlags,
   ModalBuilder,
   ModalSubmitInteraction,
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
-import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
 import {
+  buildHelpPageEmbed,
   createHelpChat,
-  getAiChatConversationById,
-  getAiChatConversationMessages,
+  createHelpPageRows,
+  extractConversationIdFromEmbed,
+  HelpChatPage,
+  preparePagesFromConversation,
 } from "../utils/functions/ai/help-chat";
 import PageManager from "../utils/functions/page";
-
-type HelpChatPage = {
-  userQuery: string;
-  aiResponse: string;
-};
-
-function createHelpPageRows(singlePage = false) {
-  const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [];
-
-  if (!singlePage) {
-    rows.push(PageManager.defaultRow(false));
-  }
-
-  rows.push(
-    new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder()
-        .setCustomId("help-ai-continue")
-        .setLabel("ask another question")
-        .setStyle(ButtonStyle.Primary),
-    ),
-  );
-
-  return rows;
-}
-
-function buildHelpPageEmbed(
-  userId: string,
-  conversationId: string,
-  page: HelpChatPage,
-  icon: string,
-  pageNumber: number,
-  lastPage: number,
-) {
-  return new CustomEmbed(userId)
-    .setHeader("nypsi help", icon)
-    .addField("your question", page.userQuery)
-    .addField("answer", page.aiResponse)
-    .setFooter({
-      text: `this service is powered by AI and can make mistakes • page ${pageNumber}/${lastPage}`,
-      iconURL: `https://nypsi.xyz/wiki?conversationid=${conversationId}`,
-    });
-}
 
 async function showQuestionModal(interaction: ButtonInteraction) {
   const id = `help-ai-question-${Math.floor(Math.random() * 10_000_000)}`;
@@ -89,6 +46,68 @@ async function showQuestionModal(interaction: ButtonInteraction) {
   return await interaction.awaitModalSubmit({ filter, time: 300000 }).catch(() => {});
 }
 
+async function setupHelpChatPageManager(
+  message: Message,
+  userId: string,
+  conversationId: string,
+  icon: string | undefined,
+  handleContinueQuestion: (
+    manager: PageManager<HelpChatPage>,
+    btnInteraction: ButtonInteraction,
+  ) => Promise<void>,
+) {
+  const pagesData = await preparePagesFromConversation(conversationId);
+
+  if (!pagesData) {
+    return null;
+  }
+
+  const { pages, lastPage } = pagesData;
+  const initialPage = pages.get(lastPage)?.[0];
+
+  if (!initialPage) {
+    return null;
+  }
+
+  const rows = createHelpPageRows(lastPage <= 1);
+  const embed = buildHelpPageEmbed(userId, conversationId, initialPage, icon, lastPage, lastPage);
+
+  const manager = new PageManager<HelpChatPage>({
+    message,
+    pages,
+    row: rows,
+    userId,
+    embed,
+    updateEmbed: (page, currentEmbed) => {
+      const current = page?.[0];
+      if (!current) return currentEmbed;
+
+      return buildHelpPageEmbed(userId, conversationId, current, icon, 1, 1);
+    },
+    onPageUpdate: (pageManager) => {
+      const current = pageManager.pages.get(pageManager.currentPage)?.[0];
+
+      if (!current) {
+        return pageManager.embed;
+      }
+
+      return buildHelpPageEmbed(
+        userId,
+        conversationId,
+        current,
+        icon,
+        pageManager.currentPage,
+        pageManager.lastPage,
+      );
+    },
+    handleResponses: new Map([["help-ai-continue", handleContinueQuestion]]),
+  });
+
+  manager.currentPage = manager.lastPage;
+
+  return { manager, embed, rows };
+}
+
 export default {
   name: "help-ai-start",
   type: "interaction",
@@ -110,214 +129,107 @@ export default {
       });
     }
 
-    const pagesData = await getAiChatConversationMessages(result.conversationId);
+    const icon = interaction.client.user.avatarURL() || undefined;
 
-    const pages = PageManager.createPages<HelpChatPage>(
-      pagesData.map((i) => ({ userQuery: i.userQuery, aiResponse: i.aiResponse as string })),
-      1,
+    const initialSetup = await setupHelpChatPageManager(
+      (await modalSubmit.fetchReply()) as Message,
+      modalSubmit.user.id,
+      result.conversationId,
+      icon,
+      handleContinueQuestion,
     );
 
-    const lastPage = pages.size;
-    const initialPage = pages.get(lastPage)?.[0];
-
-    if (!initialPage) {
+    if (!initialSetup) {
       return await modalSubmit.editReply({
         embeds: [new ErrorEmbed("failed to build help chat pages, please try again")],
       });
     }
 
-    const icon = interaction.client.user.avatarURL() || undefined;
-    const rows = createHelpPageRows(lastPage <= 1);
-    const embed = buildHelpPageEmbed(
-      modalSubmit.user.id,
-      result.conversationId,
-      initialPage,
-      icon,
-      lastPage,
-      lastPage,
-    );
+    const { manager, embed, rows } = initialSetup;
 
     await modalSubmit.editReply({
       embeds: [embed],
       components: rows,
     });
 
-    const message = (await modalSubmit.fetchReply()) as Message;
-
-    const handleContinueQuestion = async (
-      manager: PageManager<HelpChatPage>,
-      btnInteraction: ButtonInteraction,
-    ): Promise<void> => {
-      // Extract conversation ID from embed footer
-      const footerIcon = btnInteraction.message.embeds.at(0)?.footer?.iconURL;
-      const parsedFooterIcon = new URL(footerIcon || "");
-      const sourceConversationId = parsedFooterIcon.searchParams.get("conversationid") || "";
-
-      if (!sourceConversationId) {
-        await btnInteraction
-          .reply({
-            embeds: [new ErrorEmbed("this help chat can no longer be continued")],
-            flags: MessageFlags.Ephemeral,
-          })
-          .catch(() => {});
-        return;
-      }
-
-      const sourceConversation = await getAiChatConversationById(sourceConversationId);
-
-      if (!sourceConversation) {
-        await btnInteraction
-          .reply({
-            embeds: [new ErrorEmbed("this help chat can no longer be continued")],
-            flags: MessageFlags.Ephemeral,
-          })
-          .catch(() => {});
-        return;
-      }
-
-      if (sourceConversation.userId !== btnInteraction.user.id) {
-        await btnInteraction
-          .reply({
-            embeds: [new ErrorEmbed("only the user who started this help chat can continue it")],
-            flags: MessageFlags.Ephemeral,
-          })
-          .catch(() => {});
-        return;
-      }
-
-      const newModalSubmit = await showQuestionModal(btnInteraction);
-
-      if (!newModalSubmit) return;
-
-      await newModalSubmit.deferUpdate();
-
-      const newQuestion = newModalSubmit.fields.getTextInputValue("question").trim();
-      const newResult = await createHelpChat(
-        btnInteraction.user.id,
-        newQuestion,
-        sourceConversationId,
-      );
-
-      if (!newResult.aiResponse) {
-        await newModalSubmit
-          .followUp({
-            embeds: [new ErrorEmbed("failed to get an ai answer, please try again")],
-            flags: MessageFlags.Ephemeral,
-          })
-          .catch(() => {});
-        return;
-      }
-
-      const newPagesData = await getAiChatConversationMessages(newResult.conversationId);
-
-      const newPages = PageManager.createPages<HelpChatPage>(
-        newPagesData.map((i) => ({ userQuery: i.userQuery, aiResponse: i.aiResponse as string })),
-        1,
-      );
-
-      const newLastPage = newPages.size;
-      const newInitialPage = newPages.get(newLastPage)?.[0];
-
-      if (!newInitialPage) {
-        await newModalSubmit
-          .followUp({
-            embeds: [new ErrorEmbed("failed to build help chat pages, please try again")],
-            flags: MessageFlags.Ephemeral,
-          })
-          .catch(() => {});
-        return;
-      }
-
-      const newIcon = btnInteraction.client.user.avatarURL() || undefined;
-      const newRows = createHelpPageRows(newLastPage <= 1);
-      const newEmbed = buildHelpPageEmbed(
-        btnInteraction.user.id,
-        newResult.conversationId,
-        newInitialPage,
-        newIcon,
-        newLastPage,
-        newLastPage,
-      );
-
-      await manager.message.edit({
-        embeds: [newEmbed],
-        components: newRows,
-      });
-
-      const newManager = new PageManager<HelpChatPage>({
-        message: manager.message,
-        pages: newPages,
-        row: newRows,
-        userId: btnInteraction.user.id,
-        embed: newEmbed,
-        updateEmbed: (page, currentEmbed) => {
-          const current = page?.[0];
-          if (!current) return currentEmbed;
-
-          return buildHelpPageEmbed(
-            btnInteraction.user.id,
-            newResult.conversationId,
-            current,
-            newIcon,
-            1,
-            1,
-          );
-        },
-        onPageUpdate: (pageManager) => {
-          const current = pageManager.pages.get(pageManager.currentPage)?.[0];
-
-          if (!current) {
-            return pageManager.embed;
-          }
-
-          return buildHelpPageEmbed(
-            btnInteraction.user.id,
-            newResult.conversationId,
-            current,
-            newIcon,
-            pageManager.currentPage,
-            pageManager.lastPage,
-          );
-        },
-        handleResponses: new Map([["help-ai-continue", handleContinueQuestion]]),
-      });
-
-      newManager.currentPage = newManager.lastPage;
-      void newManager.listen();
-    };
-
-    const manager = new PageManager<HelpChatPage>({
-      message,
-      pages,
-      row: rows,
-      userId: modalSubmit.user.id,
-      embed,
-      updateEmbed: (page, currentEmbed) => {
-        const current = page?.[0];
-        if (!current) return currentEmbed;
-
-        return buildHelpPageEmbed(modalSubmit.user.id, result.conversationId, current, icon, 1, 1);
-      },
-      onPageUpdate: (pageManager) => {
-        const current = pageManager.pages.get(pageManager.currentPage)?.[0];
-
-        if (!current) {
-          return pageManager.embed;
-        }
-
-        return buildHelpPageEmbed(
-          modalSubmit.user.id,
-          result.conversationId,
-          current,
-          icon,
-          pageManager.currentPage,
-          pageManager.lastPage,
-        );
-      },
-      handleResponses: new Map([["help-ai-continue", handleContinueQuestion]]),
-    });
-
-    manager.currentPage = manager.lastPage;
     void manager.listen();
   },
 } as InteractionHandler;
+
+async function handleContinueQuestion(
+  manager: PageManager<HelpChatPage>,
+  btnInteraction: ButtonInteraction,
+): Promise<void> {
+  const footerIcon = btnInteraction.message.embeds.at(0)?.footer?.iconURL;
+  const conversationData = await extractConversationIdFromEmbed(footerIcon);
+
+  if (!conversationData) {
+    await btnInteraction
+      .reply({
+        embeds: [new ErrorEmbed("this help chat can no longer be continued")],
+        flags: MessageFlags.Ephemeral,
+      })
+      .catch(() => {});
+    return;
+  }
+
+  const { conversationId, conversation } = conversationData;
+
+  if (conversation.userId !== btnInteraction.user.id) {
+    await btnInteraction
+      .reply({
+        embeds: [new ErrorEmbed("only the user who started this help chat can continue it")],
+        flags: MessageFlags.Ephemeral,
+      })
+      .catch(() => {});
+    return;
+  }
+
+  const newModalSubmit = await showQuestionModal(btnInteraction);
+
+  if (!newModalSubmit) return;
+
+  await newModalSubmit.deferUpdate();
+
+  const newQuestion = newModalSubmit.fields.getTextInputValue("question").trim();
+  const newResult = await createHelpChat(btnInteraction.user.id, newQuestion, conversationId);
+
+  if (!newResult.aiResponse) {
+    await newModalSubmit
+      .followUp({
+        embeds: [new ErrorEmbed("failed to get an ai answer, please try again")],
+        flags: MessageFlags.Ephemeral,
+      })
+      .catch(() => {});
+    return;
+  }
+
+  const icon = btnInteraction.client.user.avatarURL() || undefined;
+
+  const newSetup = await setupHelpChatPageManager(
+    manager.message,
+    btnInteraction.user.id,
+    newResult.conversationId,
+    icon,
+    handleContinueQuestion,
+  );
+
+  if (!newSetup) {
+    await newModalSubmit
+      .followUp({
+        embeds: [new ErrorEmbed("failed to build help chat pages, please try again")],
+        flags: MessageFlags.Ephemeral,
+      })
+      .catch(() => {});
+    return;
+  }
+
+  const { manager: newManager, embed: newEmbed, rows: newRows } = newSetup;
+
+  await manager.message.edit({
+    embeds: [newEmbed],
+    components: newRows,
+  });
+
+  void newManager.listen();
+}

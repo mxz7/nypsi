@@ -1,16 +1,29 @@
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  MessageActionRowComponentBuilder,
+} from "discord.js";
 import { ResponsesModel } from "openai/resources";
 import prisma from "../../../init/database";
+import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { getCommandData, getCommandKeys } from "../../handlers/commandhandler";
 import { logger } from "../../logger";
 import { isLockedOut } from "../captcha";
 import { getLevel, getPrestige } from "../economy/levelling";
 import { isEcoBanned, userExists } from "../economy/utils";
+import PageManager from "../page";
 import { getLastCommand } from "../users/commands";
 import { getLastKnownUsername } from "../users/username";
 import openai, { buildPrompt, getDocsRaw } from "./openai";
 
 const MODEL: ResponsesModel = "gpt-5.4-nano";
 type ChatHistoryInput = { role: "user" | "assistant"; content: string };
+
+export type HelpChatPage = {
+  userQuery: string;
+  aiResponse: string;
+};
 
 function getCommandList() {
   const rows: string[] = [];
@@ -181,4 +194,90 @@ export async function getAiChatConversationMessages(conversationId: string) {
       createdAt: "asc",
     },
   });
+}
+
+export function buildHelpPageEmbed(
+  userId: string,
+  conversationId: string,
+  page: HelpChatPage,
+  icon: string | undefined,
+  pageNumber: number,
+  lastPage: number,
+): CustomEmbed {
+  return new CustomEmbed(userId)
+    .setHeader("nypsi help", icon)
+    .addField("your question", page.userQuery)
+    .addField("answer", page.aiResponse)
+    .setFooter({
+      text: `this service is powered by AI and can make mistakes • page ${pageNumber}/${lastPage}`,
+      iconURL: `https://nypsi.xyz/wiki?conversationid=${conversationId}`,
+    });
+}
+
+export function createHelpPageRows(
+  singlePage = false,
+): ActionRowBuilder<MessageActionRowComponentBuilder>[] {
+  const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [];
+
+  if (!singlePage) {
+    rows.push(PageManager.defaultRow(false));
+  }
+
+  rows.push(
+    new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId("help-ai-continue")
+        .setLabel("ask another question")
+        .setStyle(ButtonStyle.Primary),
+    ),
+  );
+
+  return rows;
+}
+
+export async function preparePagesFromConversation(
+  conversationId: string,
+): Promise<{ pages: Map<number, HelpChatPage[]>; lastPage: number } | null> {
+  const pagesData = await getAiChatConversationMessages(conversationId);
+
+  const pages = PageManager.createPages<HelpChatPage>(
+    pagesData.map((i) => ({ userQuery: i.userQuery, aiResponse: i.aiResponse as string })),
+    1,
+  );
+
+  const lastPage = pages.size;
+
+  if (lastPage === 0) {
+    return null;
+  }
+
+  return { pages, lastPage };
+}
+
+export async function extractConversationIdFromEmbed(footerIconUrl: string | undefined): Promise<{
+  conversationId: string;
+  conversation: Awaited<ReturnType<typeof getAiChatConversationById>>;
+} | null> {
+  if (!footerIconUrl) {
+    return null;
+  }
+
+  try {
+    const parsedFooterIcon = new URL(footerIconUrl);
+    const sourceConversationId = parsedFooterIcon.searchParams.get("conversationid") || "";
+
+    if (!sourceConversationId) {
+      return null;
+    }
+
+    const conversation = await getAiChatConversationById(sourceConversationId);
+
+    if (!conversation) {
+      return null;
+    }
+
+    return { conversationId: sourceConversationId, conversation };
+  } catch {
+    return null;
+  }
 }
