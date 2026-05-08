@@ -4,17 +4,17 @@ import {
   Message,
   MessageFlags,
   ModalBuilder,
+  ModalMessageModalSubmitInteraction,
   ModalSubmitInteraction,
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
-import { ErrorEmbed } from "../models/EmbedBuilders";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
 import {
   buildHelpPageEmbed,
   createHelpChat,
   createHelpPageRows,
-  extractConversationIdFromEmbed,
   HelpChatPage,
   preparePagesFromConversation,
 } from "../utils/functions/ai/help-chat";
@@ -51,10 +51,6 @@ async function setupHelpChatPageManager(
   userId: string,
   conversationId: string,
   icon: string | undefined,
-  handleContinueQuestion: (
-    manager: PageManager<HelpChatPage>,
-    btnInteraction: ButtonInteraction,
-  ) => Promise<void>,
 ) {
   const pagesData = await preparePagesFromConversation(conversationId);
 
@@ -70,7 +66,63 @@ async function setupHelpChatPageManager(
   }
 
   const rows = createHelpPageRows(lastPage <= 1);
-  const embed = buildHelpPageEmbed(userId, conversationId, initialPage, icon, lastPage, lastPage);
+  const embed = buildHelpPageEmbed(userId, initialPage, icon, lastPage, lastPage);
+
+  const handleContinue = async (
+    manager: PageManager<HelpChatPage>,
+    btnInteraction: ButtonInteraction,
+  ): Promise<void> => {
+    const newModalSubmit = await showQuestionModal(btnInteraction);
+
+    if (!newModalSubmit || !newModalSubmit.isFromMessage()) return;
+
+    const newQuestion = newModalSubmit.fields.getTextInputValue("question").trim();
+    const thinkingEmbed = new CustomEmbed(btnInteraction.user.id)
+      .setHeader("nypsi help", icon)
+      .addField("your question", newQuestion)
+      .addField("answer", "*thinking...*");
+
+    await (newModalSubmit as ModalMessageModalSubmitInteraction).update({
+      embeds: [thinkingEmbed],
+      components: createHelpPageRows(true, true),
+    });
+
+    const newResult = await createHelpChat(btnInteraction.user.id, newQuestion, conversationId);
+
+    if (!newResult.aiResponse) {
+      await newModalSubmit
+        .followUp({
+          embeds: [new ErrorEmbed("failed to get an ai answer, please try again")],
+          flags: MessageFlags.Ephemeral,
+        })
+        .catch(() => {});
+      return;
+    }
+
+    const newSetup = await setupHelpChatPageManager(
+      manager.message,
+      btnInteraction.user.id,
+      conversationId,
+      icon,
+    );
+
+    if (!newSetup) {
+      await newModalSubmit
+        .followUp({
+          embeds: [new ErrorEmbed("failed to build help chat pages, please try again")],
+          flags: MessageFlags.Ephemeral,
+        })
+        .catch(() => {});
+      return;
+    }
+
+    await manager.message.edit({
+      embeds: [newSetup.embed],
+      components: newSetup.rows,
+    });
+
+    void newSetup.manager.listen();
+  };
 
   const manager = new PageManager<HelpChatPage>({
     message,
@@ -82,7 +134,7 @@ async function setupHelpChatPageManager(
       const current = page?.[0];
       if (!current) return currentEmbed;
 
-      return buildHelpPageEmbed(userId, conversationId, current, icon, 1, 1);
+      return buildHelpPageEmbed(userId, current, icon, 1, 1);
     },
     onPageUpdate: (pageManager) => {
       const current = pageManager.pages.get(pageManager.currentPage)?.[0];
@@ -93,14 +145,13 @@ async function setupHelpChatPageManager(
 
       return buildHelpPageEmbed(
         userId,
-        conversationId,
         current,
         icon,
         pageManager.currentPage,
         pageManager.lastPage,
       );
     },
-    handleResponses: new Map([["help-ai-continue", handleContinueQuestion]]),
+    handleResponses: new Map([["help-ai-continue", handleContinue]]),
   });
 
   manager.currentPage = manager.lastPage;
@@ -121,6 +172,19 @@ export default {
     await modalSubmit.deferReply();
 
     const question = modalSubmit.fields.getTextInputValue("question").trim();
+    const icon = interaction.client.user.avatarURL() || undefined;
+
+    const thinkingEmbed = new CustomEmbed(modalSubmit.user.id)
+      .setHeader("nypsi help", icon)
+      .addField("your question", question)
+      .addField("answer", "*thinking...*");
+
+    await modalSubmit.editReply({
+      embeds: [thinkingEmbed],
+      components: createHelpPageRows(true, true),
+    });
+
+    const message = (await modalSubmit.fetchReply()) as Message;
     const result = await createHelpChat(modalSubmit.user.id, question);
 
     if (!result.aiResponse) {
@@ -129,107 +193,24 @@ export default {
       });
     }
 
-    const icon = interaction.client.user.avatarURL() || undefined;
-
-    const initialSetup = await setupHelpChatPageManager(
-      (await modalSubmit.fetchReply()) as Message,
+    const setup = await setupHelpChatPageManager(
+      message,
       modalSubmit.user.id,
       result.conversationId,
       icon,
-      handleContinueQuestion,
     );
 
-    if (!initialSetup) {
+    if (!setup) {
       return await modalSubmit.editReply({
         embeds: [new ErrorEmbed("failed to build help chat pages, please try again")],
       });
     }
 
-    const { manager, embed, rows } = initialSetup;
-
     await modalSubmit.editReply({
-      embeds: [embed],
-      components: rows,
+      embeds: [setup.embed],
+      components: setup.rows,
     });
 
-    void manager.listen();
+    void setup.manager.listen();
   },
 } as InteractionHandler;
-
-async function handleContinueQuestion(
-  manager: PageManager<HelpChatPage>,
-  btnInteraction: ButtonInteraction,
-): Promise<void> {
-  const footerIcon = btnInteraction.message.embeds.at(0)?.footer?.iconURL;
-  const conversationData = await extractConversationIdFromEmbed(footerIcon);
-
-  if (!conversationData) {
-    await btnInteraction
-      .reply({
-        embeds: [new ErrorEmbed("this help chat can no longer be continued")],
-        flags: MessageFlags.Ephemeral,
-      })
-      .catch(() => {});
-    return;
-  }
-
-  const { conversationId, conversation } = conversationData;
-
-  if (conversation.userId !== btnInteraction.user.id) {
-    await btnInteraction
-      .reply({
-        embeds: [new ErrorEmbed("only the user who started this help chat can continue it")],
-        flags: MessageFlags.Ephemeral,
-      })
-      .catch(() => {});
-    return;
-  }
-
-  const newModalSubmit = await showQuestionModal(btnInteraction);
-
-  if (!newModalSubmit) return;
-
-  await newModalSubmit.deferUpdate();
-
-  const newQuestion = newModalSubmit.fields.getTextInputValue("question").trim();
-  const newResult = await createHelpChat(btnInteraction.user.id, newQuestion, conversationId);
-
-  if (!newResult.aiResponse) {
-    await newModalSubmit
-      .followUp({
-        embeds: [new ErrorEmbed("failed to get an ai answer, please try again")],
-        flags: MessageFlags.Ephemeral,
-      })
-      .catch(() => {});
-    return;
-  }
-
-  const icon = btnInteraction.client.user.avatarURL() || undefined;
-
-  const newSetup = await setupHelpChatPageManager(
-    manager.message,
-    btnInteraction.user.id,
-    newResult.conversationId,
-    icon,
-    handleContinueQuestion,
-  );
-
-  if (!newSetup) {
-    await newModalSubmit
-      .followUp({
-        embeds: [new ErrorEmbed("failed to build help chat pages, please try again")],
-        flags: MessageFlags.Ephemeral,
-      })
-      .catch(() => {});
-    return;
-  }
-
-  const { manager: newManager, embed: newEmbed, rows: newRows } = newSetup;
-
-  await manager.message.edit({
-    embeds: [newEmbed],
-    components: newRows,
-  });
-
-  void newManager.listen();
-}

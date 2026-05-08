@@ -22,7 +22,7 @@ type ChatHistoryInput = { role: "user" | "assistant"; content: string };
 
 export type HelpChatPage = {
   userQuery: string;
-  aiResponse: string;
+  aiResponse: string | null;
 };
 
 function getCommandList() {
@@ -182,9 +182,6 @@ export async function getAiChatConversationMessages(conversationId: string) {
   return await prisma.aiChatMessage.findMany({
     where: {
       conversationId,
-      aiResponse: {
-        not: null,
-      },
     },
     select: {
       userQuery: true,
@@ -198,7 +195,6 @@ export async function getAiChatConversationMessages(conversationId: string) {
 
 export function buildHelpPageEmbed(
   userId: string,
-  conversationId: string,
   page: HelpChatPage,
   icon: string | undefined,
   pageNumber: number,
@@ -207,20 +203,33 @@ export function buildHelpPageEmbed(
   return new CustomEmbed(userId)
     .setHeader("nypsi help", icon)
     .addField("your question", page.userQuery)
-    .addField("answer", page.aiResponse)
+    .addField("answer", page.aiResponse || "*thinking...*")
     .setFooter({
       text: `this service is powered by AI and can make mistakes • page ${pageNumber}/${lastPage}`,
-      iconURL: `https://nypsi.xyz/wiki?conversationid=${conversationId}`,
     });
 }
 
 export function createHelpPageRows(
   singlePage = false,
+  disableContinue = false,
 ): ActionRowBuilder<MessageActionRowComponentBuilder>[] {
   const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [];
 
   if (!singlePage) {
-    rows.push(PageManager.defaultRow(false));
+    rows.push(
+      new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder()
+          .setCustomId("⬅")
+          .setLabel("back")
+          .setStyle(ButtonStyle.Primary)
+          .setDisabled(false),
+        new ButtonBuilder()
+          .setCustomId("➡")
+          .setLabel("next")
+          .setStyle(ButtonStyle.Primary)
+          .setDisabled(true),
+      ),
+    );
   }
 
   rows.push(
@@ -228,7 +237,8 @@ export function createHelpPageRows(
       new ButtonBuilder()
         .setCustomId("help-ai-continue")
         .setLabel("ask another question")
-        .setStyle(ButtonStyle.Primary),
+        .setStyle(ButtonStyle.Secondary)
+        .setDisabled(disableContinue),
     ),
   );
 
@@ -241,7 +251,10 @@ export async function preparePagesFromConversation(
   const pagesData = await getAiChatConversationMessages(conversationId);
 
   const pages = PageManager.createPages<HelpChatPage>(
-    pagesData.map((i) => ({ userQuery: i.userQuery, aiResponse: i.aiResponse as string })),
+    pagesData.map((i) => ({
+      userQuery: i.userQuery,
+      aiResponse: i.aiResponse as string | null,
+    })),
     1,
   );
 
@@ -252,32 +265,4 @@ export async function preparePagesFromConversation(
   }
 
   return { pages, lastPage };
-}
-
-export async function extractConversationIdFromEmbed(footerIconUrl: string | undefined): Promise<{
-  conversationId: string;
-  conversation: Awaited<ReturnType<typeof getAiChatConversationById>>;
-} | null> {
-  if (!footerIconUrl) {
-    return null;
-  }
-
-  try {
-    const parsedFooterIcon = new URL(footerIconUrl);
-    const sourceConversationId = parsedFooterIcon.searchParams.get("conversationid") || "";
-
-    if (!sourceConversationId) {
-      return null;
-    }
-
-    const conversation = await getAiChatConversationById(sourceConversationId);
-
-    if (!conversation) {
-      return null;
-    }
-
-    return { conversationId: sourceConversationId, conversation };
-  } catch {
-    return null;
-  }
 }
