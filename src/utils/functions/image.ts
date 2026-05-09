@@ -140,7 +140,7 @@ const scamImages = [
 
 export async function isScamImage(
   url: string,
-): Promise<{ scam: boolean; distance?: number; timeTaken?: number }> {
+): Promise<{ scam: boolean; distance?: number; timeTaken?: { total: number; hash: number } }> {
   const buffer = await fetch(url)
     .then((r) => r.arrayBuffer())
     .then((b) => Buffer.from(b));
@@ -149,14 +149,24 @@ export async function isScamImage(
 
   const hash = await dhash(buffer);
 
+  const afterHash = performance.now();
+
   let closest: number;
 
   for (const scamHash of scamImages) {
     closest = hammingDistance(hash, scamHash);
     if (closest <= 10) {
-      return { scam: true, distance: closest, timeTaken: performance.now() - before };
+      return {
+        scam: true,
+        distance: closest,
+        timeTaken: { total: performance.now() - before, hash: afterHash - before },
+      };
     }
   }
 
-  return { scam: false, distance: closest, timeTaken: performance.now() - before };
+  return {
+    scam: false,
+    distance: closest,
+    timeTaken: { total: performance.now() - before, hash: afterHash - before },
+  };
 }
