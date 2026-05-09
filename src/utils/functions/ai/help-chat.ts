@@ -4,7 +4,9 @@ import {
   ButtonStyle,
   MessageActionRowComponentBuilder,
 } from "discord.js";
+import { zodTextFormat } from "openai/helpers/zod";
 import { ResponsesModel } from "openai/resources";
+import { z } from "zod";
 import prisma from "../../../init/database";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { getCommandData, getCommandKeys } from "../../handlers/commandhandler";
@@ -19,6 +21,11 @@ import openai, { buildPrompt, getDocsRaw } from "./openai";
 
 const MODEL: ResponsesModel = "gpt-5.4-nano";
 type ChatHistoryInput = { role: "user" | "assistant"; content: string };
+
+const helpChatResponseFormat = z.object({
+  can_answer: z.boolean(),
+  answer: z.string().optional(),
+});
 
 export type HelpChatPage = {
   userQuery: string;
@@ -134,7 +141,7 @@ export async function createHelpChat(userId: string, userQuery: string, conversa
       { role: "assistant", content: message.aiResponse as string },
     ]);
 
-    const response = await openai.responses.create({
+    const response = await openai.responses.parse({
       model: MODEL,
       input: [
         { role: "system", content: prompt },
@@ -142,13 +149,16 @@ export async function createHelpChat(userId: string, userQuery: string, conversa
         ...historyInput,
         { role: "user", content: userQuery },
       ],
+      text: { format: zodTextFormat(helpChatResponseFormat, "help_chat_response") },
     });
 
-    const aiResponse = response.output_text?.trim();
+    const parsed = response.output_parsed;
 
-    if (!aiResponse) {
+    if (!parsed) {
       throw new Error("empty help ai response");
     }
+
+    const aiResponse = parsed.can_answer ? (parsed.answer ?? null) : null;
 
     await prisma.aiChatMessage.update({
       where: {
@@ -163,10 +173,20 @@ export async function createHelpChat(userId: string, userQuery: string, conversa
       },
     });
 
-    return { chatId: chatMessage.id, conversationId: conversation.id, aiResponse };
+    return {
+      chatId: chatMessage.id,
+      conversationId: conversation.id,
+      aiResponse,
+      canAnswer: parsed.can_answer,
+    };
   } catch (e) {
     logger.error("help-chat: failed to generate ai response", { e, userId });
-    return { chatId: chatMessage.id, conversationId: conversation.id, aiResponse: null };
+    return {
+      chatId: chatMessage.id,
+      conversationId: conversation.id,
+      aiResponse: null,
+      canAnswer: false,
+    };
   }
 }
 
@@ -245,16 +265,37 @@ export function createHelpPageRows(
   return rows;
 }
 
+export function buildCannotAnswerEmbed(userId: string, icon: string | undefined): CustomEmbed {
+  return new CustomEmbed(userId)
+    .setHeader("nypsi help", icon)
+    .setDescription(
+      "a confident answer couldn't be generated for your question\n\nyou can try rephrasing your question, or talk directly to a nypsi staff member",
+    );
+}
+
+export function createCannotAnswerRows(): ActionRowBuilder<MessageActionRowComponentBuilder>[] {
+  return [
+    new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId("help-ai-support")
+        .setLabel("talk to staff")
+        .setStyle(ButtonStyle.Danger),
+    ),
+  ];
+}
+
 export async function preparePagesFromConversation(
   conversationId: string,
 ): Promise<{ pages: Map<number, HelpChatPage[]>; lastPage: number } | null> {
   const pagesData = await getAiChatConversationMessages(conversationId);
 
   const pages = PageManager.createPages<HelpChatPage>(
-    pagesData.map((i) => ({
-      userQuery: i.userQuery,
-      aiResponse: i.aiResponse as string | null,
-    })),
+    pagesData
+      .filter((i) => i.aiResponse !== null)
+      .map((i) => ({
+        userQuery: i.userQuery,
+        aiResponse: i.aiResponse as string,
+      })),
     1,
   );
 

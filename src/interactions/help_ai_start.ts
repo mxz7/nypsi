@@ -12,7 +12,9 @@ import {
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
 import {
+  buildCannotAnswerEmbed,
   buildHelpPageEmbed,
+  createCannotAnswerRows,
   createHelpChat,
   createHelpPageRows,
   HelpChatPage,
@@ -89,13 +91,11 @@ async function setupHelpChatPageManager(
 
     const newResult = await createHelpChat(btnInteraction.user.id, newQuestion, conversationId);
 
-    if (!newResult.aiResponse) {
-      await newModalSubmit
-        .followUp({
-          embeds: [new ErrorEmbed("failed to get an ai answer, please try again")],
-          flags: MessageFlags.Ephemeral,
-        })
-        .catch(() => {});
+    if (!newResult.canAnswer) {
+      await manager.message.edit({
+        embeds: [buildCannotAnswerEmbed(btnInteraction.user.id, icon)],
+        components: createCannotAnswerRows(),
+      });
       return;
     }
 
@@ -187,9 +187,10 @@ export default {
     const message = (await modalSubmit.fetchReply()) as Message;
     const result = await createHelpChat(modalSubmit.user.id, question);
 
-    if (!result.aiResponse) {
+    if (!result.canAnswer) {
       return await modalSubmit.editReply({
-        embeds: [new ErrorEmbed("failed to get an ai answer, please try again")],
+        embeds: [buildCannotAnswerEmbed(modalSubmit.user.id, icon)],
+        components: createCannotAnswerRows(),
       });
     }
 
