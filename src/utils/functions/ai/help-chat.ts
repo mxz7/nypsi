@@ -19,6 +19,7 @@ import { isEcoBanned, userExists } from "../economy/utils";
 import PageManager from "../page";
 import { getLastCommand } from "../users/commands";
 import { getLastKnownUsername } from "../users/username";
+import { createProfile, hasProfile } from "../users/utils";
 import openai, { buildPrompt, getDocsRaw } from "./openai";
 
 const MODEL: ResponsesModel = "gpt-5.4-nano";
@@ -147,11 +148,14 @@ export async function createHelpChat(userId: string, userQuery: string, conversa
           id: conversationId,
         },
       })
-    : await prisma.aiChatConversation.create({
-        data: {
-          userId,
-        },
-      });
+    : await (async () => {
+        if (!(await hasProfile(userId))) await createProfile(userId);
+        return prisma.aiChatConversation.create({
+          data: {
+            userId,
+          },
+        });
+      })();
 
   if (!conversation || conversation.userId !== userId) {
     throw new Error("invalid ai help conversation");

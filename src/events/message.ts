@@ -18,6 +18,7 @@ import { NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Mention, MentionJobData } from "../types/workers/mentions";
 import Constants from "../utils/Constants";
+import { isHelpChatAvailable } from "../utils/functions/ai/help-chat";
 import { a } from "../utils/functions/anticheat";
 import { addEventProgress } from "../utils/functions/economy/events";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
@@ -134,7 +135,20 @@ export default async function messageCreate(message: Message) {
             "\n\n**ONLY CLICK IF YOU WISH TO TALK TO A NYPSI STAFF MEMBER**",
         );
 
-      const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      const aiAvailable = await isHelpChatAvailable();
+
+      const rowComponents: ButtonBuilder[] = [];
+
+      if (aiAvailable) {
+        rowComponents.push(
+          new ButtonBuilder()
+            .setCustomId("help-ai-start")
+            .setLabel("ask ai for help")
+            .setStyle(ButtonStyle.Primary),
+        );
+      }
+
+      rowComponents.push(
         new ButtonBuilder()
           .setCustomId("s")
           .setLabel("talk to a staff member")
@@ -143,6 +157,10 @@ export default async function messageCreate(message: Message) {
           .setStyle(ButtonStyle.Link)
           .setLabel("view your active punishments")
           .setURL("https://nypsi.xyz/me/punishments?ref=bot-dm"),
+      );
+
+      const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        ...rowComponents,
       );
 
       const msg = await message.reply({
