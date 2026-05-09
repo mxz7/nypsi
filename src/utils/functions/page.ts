@@ -224,7 +224,9 @@ export default class PageManager<T> {
         const newRow = new ActionRowBuilder<MessageActionRowComponentBuilder>();
         for (const component of row.components) {
           if (component instanceof ButtonBuilder) {
-            component.setDisabled(true);
+            const disabledComponent = new ButtonBuilder(component.toJSON()).setDisabled(true);
+            newRow.addComponents(disabledComponent);
+            continue;
           }
           newRow.addComponents(component);
         }
