@@ -161,6 +161,8 @@ export default {
       SEX_CHASTITY: "cd:sex-chastity",
       SUPPORT: "cd:support",
       SUPPORT_MESSAGE: "cd:support:message",
+      HELP_CHAT_USER: "cd:helpchat",
+      HELP_CHAT_GLOBAL_TOKENS: "cd:helpchat:global:tokens",
     },
     cache: {
       tmdb: {

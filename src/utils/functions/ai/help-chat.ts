@@ -8,7 +8,9 @@ import { zodTextFormat } from "openai/helpers/zod";
 import { ResponsesModel } from "openai/resources";
 import { z } from "zod";
 import prisma from "../../../init/database";
+import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
+import Constants from "../../Constants";
 import { getCommandData, getCommandKeys } from "../../handlers/commandhandler";
 import { logger } from "../../logger";
 import { isLockedOut } from "../captcha";
@@ -21,6 +23,19 @@ import openai, { buildPrompt, getDocsRaw } from "./openai";
 
 const MODEL: ResponsesModel = "gpt-5.4-nano";
 type ChatHistoryInput = { role: "user" | "assistant"; content: string };
+
+// per-user: max messages per week
+const USER_WEEKLY_LIMIT = 20;
+// global: max total output tokens across all users per week before the feature is paused
+const GLOBAL_WEEKLY_TOKEN_LIMIT = 5_000_000;
+// TTL to the next Monday 00:00 UTC (approx — capped at 7 days)
+function weekTtl(): number {
+  const now = new Date();
+  const nextMonday = new Date(now);
+  nextMonday.setUTCDate(now.getUTCDate() + ((8 - now.getUTCDay()) % 7 || 7));
+  nextMonday.setUTCHours(0, 0, 0, 0);
+  return Math.max(Math.floor((nextMonday.getTime() - now.getTime()) / 1000), 1);
+}
 
 const helpChatResponseFormat = z.object({
   can_answer: z.boolean(),
@@ -90,6 +105,35 @@ async function getUserContext(userId: string) {
 }
 
 export async function createHelpChat(userId: string, userQuery: string, conversationId?: string) {
+  // global token budget check
+  const globalTokens = parseInt(
+    (await redis.get(Constants.redis.cooldown.HELP_CHAT_GLOBAL_TOKENS)) || "0",
+  );
+  if (globalTokens >= GLOBAL_WEEKLY_TOKEN_LIMIT) {
+    logger.warn("help-chat: global weekly token limit reached", { globalTokens });
+    return {
+      chatId: null as number | null,
+      conversationId: (conversationId ?? null) as string | null,
+      aiResponse: null as string | null,
+      canAnswer: false,
+      rateLimited: true as const,
+    };
+  }
+
+  // per-user weekly message limit
+  const userKey = `${Constants.redis.cooldown.HELP_CHAT_USER}:${userId}`;
+  const userCount = parseInt((await redis.get(userKey)) || "0");
+  if (userCount >= USER_WEEKLY_LIMIT) {
+    logger.info("help-chat: user weekly limit reached", { userId, userCount });
+    return {
+      chatId: null as number | null,
+      conversationId: (conversationId ?? null) as string | null,
+      aiResponse: null as string | null,
+      canAnswer: false,
+      rateLimited: true as const,
+    };
+  }
+
   const conversation = conversationId
     ? await prisma.aiChatConversation.findUnique({
         where: {
@@ -160,6 +204,18 @@ export async function createHelpChat(userId: string, userQuery: string, conversa
 
     const aiResponse = parsed.can_answer ? (parsed.answer ?? null) : null;
 
+    const inputTokens = response.usage?.input_tokens ?? 0;
+    const outputTokens = response.usage?.output_tokens ?? 0;
+    const cachedInputTokens = response.usage?.input_tokens_details?.cached_tokens ?? 0;
+
+    logger.info("help-chat: query", {
+      userId,
+      canAnswer: parsed.can_answer,
+      query: userQuery,
+      response: aiResponse,
+      tokens: { input: inputTokens, cachedInput: cachedInputTokens, output: outputTokens },
+    });
+
     await prisma.aiChatMessage.update({
       where: {
         id: chatMessage.id,
@@ -167,17 +223,25 @@ export async function createHelpChat(userId: string, userQuery: string, conversa
       data: {
         aiResponse,
         model: MODEL,
-        inputTokens: response.usage?.input_tokens ?? null,
-        cachedInputTokens: response.usage?.input_tokens_details?.cached_tokens ?? null,
-        outputTokens: response.usage?.output_tokens ?? null,
+        inputTokens: inputTokens || null,
+        cachedInputTokens: cachedInputTokens || null,
+        outputTokens: outputTokens || null,
       },
     });
+
+    // increment counters
+    const ttl = weekTtl();
+    await redis.incrby(Constants.redis.cooldown.HELP_CHAT_GLOBAL_TOKENS, outputTokens);
+    await redis.expire(Constants.redis.cooldown.HELP_CHAT_GLOBAL_TOKENS, ttl);
+    const newUserCount = await redis.incr(userKey);
+    if (newUserCount === 1) await redis.expire(userKey, ttl);
 
     return {
       chatId: chatMessage.id,
       conversationId: conversation.id,
       aiResponse,
       canAnswer: parsed.can_answer,
+      rateLimited: false as const,
     };
   } catch (e) {
     logger.error("help-chat: failed to generate ai response", { e, userId });
@@ -186,6 +250,7 @@ export async function createHelpChat(userId: string, userQuery: string, conversa
       conversationId: conversation.id,
       aiResponse: null,
       canAnswer: false,
+      rateLimited: false as const,
     };
   }
 }
@@ -270,6 +335,14 @@ export function buildCannotAnswerEmbed(userId: string, icon: string | undefined)
     .setHeader("nypsi help", icon)
     .setDescription(
       "a confident answer couldn't be generated for your question\n\nyou can try rephrasing your question, or talk directly to a nypsi staff member",
+    );
+}
+
+export function buildRateLimitedEmbed(userId: string, icon: string | undefined): CustomEmbed {
+  return new CustomEmbed(userId)
+    .setHeader("nypsi help", icon)
+    .setDescription(
+      "the AI help feature is temporarily unavailable, either you've reached your weekly question limit or the service is under high demand\n\nplease try again next week, or talk directly to a nypsi staff member",
     );
 }
 

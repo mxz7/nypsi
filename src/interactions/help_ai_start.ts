@@ -17,6 +17,7 @@ import { InteractionHandler } from "../types/InteractionHandler";
 import {
   buildCannotAnswerEmbed,
   buildHelpPageEmbed,
+  buildRateLimitedEmbed,
   createCannotAnswerRows,
   createHelpChat,
   createHelpPageRows,
@@ -118,6 +119,19 @@ async function setupHelpChatPageManager(
 
     const newResult = await createHelpChat(btnInteraction.user.id, newQuestion, conversationId);
 
+    if (newResult.rateLimited) {
+      await manager.message.edit({
+        embeds: [buildRateLimitedEmbed(btnInteraction.user.id, icon)],
+        components: createCannotAnswerRows(),
+      });
+      void listenForSupportRequest(
+        manager.message,
+        btnInteraction.user.id,
+        btnInteraction.client as NypsiClient,
+      );
+      return;
+    }
+
     if (!newResult.canAnswer) {
       await manager.message.edit({
         embeds: [buildCannotAnswerEmbed(btnInteraction.user.id, icon)],
@@ -218,6 +232,15 @@ export default {
 
     const message = (await modalSubmit.fetchReply()) as Message;
     const result = await createHelpChat(modalSubmit.user.id, question);
+
+    if (result.rateLimited) {
+      await modalSubmit.editReply({
+        embeds: [buildRateLimitedEmbed(modalSubmit.user.id, icon)],
+        components: createCannotAnswerRows(),
+      });
+      void listenForSupportRequest(message, modalSubmit.user.id, interaction.client as NypsiClient);
+      return;
+    }
 
     if (!result.canAnswer) {
       await modalSubmit.editReply({
