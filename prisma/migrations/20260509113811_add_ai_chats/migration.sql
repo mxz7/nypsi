@@ -1,6 +1,6 @@
 -- CreateTable
 CREATE TABLE "AiChatConversation" (
-    "id" UUID NOT NULL,
+    "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "userId" TEXT NOT NULL,
 
@@ -11,7 +11,7 @@ CREATE TABLE "AiChatConversation" (
 CREATE TABLE "AiChatMessage" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "conversationId" UUID NOT NULL,
+    "conversationId" INTEGER NOT NULL,
     "userQuery" TEXT NOT NULL,
     "aiResponse" TEXT,
     "model" TEXT NOT NULL,
@@ -21,6 +21,9 @@ CREATE TABLE "AiChatMessage" (
 
     CONSTRAINT "AiChatMessage_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE INDEX "AiChatMessage_conversationId_idx" ON "AiChatMessage"("conversationId");
 
 -- AddForeignKey
 ALTER TABLE "AiChatConversation" ADD CONSTRAINT "AiChatConversation_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
