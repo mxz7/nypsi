@@ -1013,6 +1013,8 @@ model AiChatMessage {
   outputTokens      Int?
 
   conversation AiChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
 }
 
 model Purchases {
