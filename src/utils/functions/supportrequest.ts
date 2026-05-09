@@ -1,4 +1,15 @@
-import { Attachment, Collection, Embed } from "discord.js";
+import {
+  Attachment,
+  ButtonInteraction,
+  Collection,
+  Embed,
+  LabelBuilder,
+  MessageFlags,
+  ModalBuilder,
+  ModalSubmitInteraction,
+  TextInputBuilder,
+  TextInputStyle,
+} from "discord.js";
 import { nanoid } from "nanoid";
 import { zodTextFormat } from "openai/helpers/zod";
 import { z } from "zod";
@@ -6,7 +17,7 @@ import { SupportRequest } from "#generated/prisma";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { NypsiClient } from "../../models/Client";
-import { CustomEmbed } from "../../models/EmbedBuilders";
+import { CustomEmbed, ErrorEmbed } from "../../models/EmbedBuilders";
 import Constants from "../Constants";
 import { logger } from "../logger";
 import openai, { buildPrompt, getDocsRaw, prompt } from "./ai/openai";
@@ -454,6 +465,131 @@ export async function isRequestSuitable(
   } catch (e) {
     logger.error("supportrequest: error while checking if suitable", { e, content });
     return { decision: true, reason: "ahhh" };
+  }
+}
+
+export async function openSupportRequest(
+  interaction: ButtonInteraction,
+  client: NypsiClient,
+): Promise<void> {
+  const userId = interaction.user.id;
+
+  if (await getSupportRequest(userId)) {
+    await interaction.reply({
+      embeds: [new ErrorEmbed("you already have an open support request")],
+      flags: MessageFlags.Ephemeral,
+    });
+    return;
+  }
+
+  if (await redis.exists(`${Constants.redis.cooldown.SUPPORT}:${userId}`)) {
+    await interaction.reply({
+      embeds: [
+        new ErrorEmbed(
+          `you have created a support request recently, try again later.\nif you need support and don't want to wait, you can join the nypsi support server [here](${Constants.NYPSI_SERVER_INVITE_LINK})`,
+        ),
+      ],
+      flags: MessageFlags.Ephemeral,
+    });
+    return;
+  }
+
+  const id = `support-request-modal-${Math.floor(Math.random() * 10_000_000)}`;
+
+  const modal = new ModalBuilder().setCustomId(id).setTitle("nypsi support request");
+
+  modal.addLabelComponents(
+    new LabelBuilder()
+      .setLabel("message")
+      .setTextInputComponent(
+        new TextInputBuilder()
+          .setCustomId("ticket_message")
+          .setPlaceholder("what do you need help with?")
+          .setStyle(TextInputStyle.Paragraph)
+          .setRequired(true)
+          .setMinLength(15)
+          .setMaxLength(300),
+      ),
+  );
+
+  await interaction.showModal(modal);
+
+  const filter = (i: ModalSubmitInteraction) => i.user.id === userId && i.customId === id;
+
+  const modalSubmit = await interaction.awaitModalSubmit({ filter, time: 300000 }).catch(() => {});
+
+  if (!modalSubmit) return;
+
+  await modalSubmit.deferReply({ flags: MessageFlags.Ephemeral });
+
+  const helpMessage = modalSubmit.fields.getTextInputValue("ticket_message");
+
+  if (await getSupportRequest(userId)) {
+    await modalSubmit.editReply({
+      embeds: [new ErrorEmbed("you already have an open support request")],
+    });
+    return;
+  }
+
+  const aiResponse = await isRequestSuitable(userId, helpMessage);
+
+  logger.info(`supportrequest: ${userId} (${interaction.user.username}) ai response`, {
+    content: helpMessage,
+    aiResponse,
+  });
+
+  if (!aiResponse.decision) {
+    await modalSubmit.editReply({
+      embeds: [
+        new CustomEmbed()
+          .setDescription(
+            "this isn't suitable for a support request. try including more information about what you need help with",
+          )
+          .setFooter({ text: "this is an automated system, please let us know of any issues" }),
+      ],
+    });
+    return;
+  }
+
+  const r = await createSupportRequest(userId, client, interaction.user.username);
+
+  if (!r) {
+    await modalSubmit.editReply({
+      embeds: [new CustomEmbed().setDescription("failed to create support request")],
+    });
+    return;
+  }
+
+  const embed = new CustomEmbed()
+    .setHeader(interaction.user.username, interaction.user.avatarURL())
+    .setColor("#111111")
+    .setDescription(helpMessage);
+
+  await sendToRequestChannel(userId, embed, userId, client);
+
+  await modalSubmit.editReply({
+    embeds: [
+      new CustomEmbed().setDescription(
+        "✅ created support request, anything you send to the bot via DM while this is open will be sent directly to nypsi staff",
+      ),
+    ],
+  });
+
+  if (aiResponse.answer) {
+    const autoEmbed = new CustomEmbed()
+      .setHeader("nypsi", client.user.avatarURL())
+      .setColor(Constants.PURPLE)
+      .setDescription(aiResponse.answer)
+      .setFooter({
+        text: "this is an automatic message. please tell us if this doesn't match your query",
+      });
+
+    sendToRequestChannel(userId, autoEmbed, userId, client);
+    modalSubmit.followUp({
+      embeds: [autoEmbed],
+      content: "you have received a message from your support ticket",
+      flags: MessageFlags.Ephemeral,
+    });
   }
 }
 

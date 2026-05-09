@@ -1,5 +1,7 @@
 import {
+  ButtonBuilder,
   ButtonInteraction,
+  ComponentType,
   LabelBuilder,
   Message,
   MessageFlags,
@@ -9,6 +11,7 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
+import { NypsiClient } from "../models/Client";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
 import {
@@ -21,6 +24,30 @@ import {
   preparePagesFromConversation,
 } from "../utils/functions/ai/help-chat";
 import PageManager from "../utils/functions/page";
+import { openSupportRequest } from "../utils/functions/supportrequest";
+
+async function listenForSupportRequest(message: Message, userId: string, client: NypsiClient) {
+  const res = await message
+    .awaitMessageComponent({
+      filter: (i) => i.user.id === userId,
+      time: 300000,
+      componentType: ComponentType.Button,
+    })
+    .catch(() => {});
+
+  if (!res) {
+    const rows = createCannotAnswerRows();
+    for (const row of rows) {
+      for (const component of row.components) {
+        if (component instanceof ButtonBuilder) component.setDisabled(true);
+      }
+    }
+    await message.edit({ components: rows }).catch(() => {});
+    return;
+  }
+
+  await openSupportRequest(res, client);
+}
 
 async function showQuestionModal(interaction: ButtonInteraction) {
   const id = `help-ai-question-${Math.floor(Math.random() * 10_000_000)}`;
@@ -96,6 +123,11 @@ async function setupHelpChatPageManager(
         embeds: [buildCannotAnswerEmbed(btnInteraction.user.id, icon)],
         components: createCannotAnswerRows(),
       });
+      void listenForSupportRequest(
+        manager.message,
+        btnInteraction.user.id,
+        btnInteraction.client as NypsiClient,
+      );
       return;
     }
 
@@ -188,10 +220,12 @@ export default {
     const result = await createHelpChat(modalSubmit.user.id, question);
 
     if (!result.canAnswer) {
-      return await modalSubmit.editReply({
+      await modalSubmit.editReply({
         embeds: [buildCannotAnswerEmbed(modalSubmit.user.id, icon)],
         components: createCannotAnswerRows(),
       });
+      void listenForSupportRequest(message, modalSubmit.user.id, interaction.client as NypsiClient);
+      return;
     }
 
     const setup = await setupHelpChatPageManager(
