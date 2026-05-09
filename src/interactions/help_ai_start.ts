@@ -15,7 +15,6 @@ import { NypsiClient } from "../models/Client";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
 import {
-  buildCannotAnswerEmbed,
   buildHelpPageEmbed,
   buildRateLimitedEmbed,
   createCannotAnswerRows,
@@ -132,19 +131,6 @@ async function setupHelpChatPageManager(
       return;
     }
 
-    if (!newResult.canAnswer) {
-      await manager.message.edit({
-        embeds: [buildCannotAnswerEmbed(btnInteraction.user.id, icon)],
-        components: createCannotAnswerRows(),
-      });
-      void listenForSupportRequest(
-        manager.message,
-        btnInteraction.user.id,
-        btnInteraction.client as NypsiClient,
-      );
-      return;
-    }
-
     const newSetup = await setupHelpChatPageManager(
       manager.message,
       btnInteraction.user.id,
@@ -236,15 +222,6 @@ export default {
     if (result.rateLimited) {
       await modalSubmit.editReply({
         embeds: [buildRateLimitedEmbed(modalSubmit.user.id, icon)],
-        components: createCannotAnswerRows(),
-      });
-      void listenForSupportRequest(message, modalSubmit.user.id, interaction.client as NypsiClient);
-      return;
-    }
-
-    if (!result.canAnswer) {
-      await modalSubmit.editReply({
-        embeds: [buildCannotAnswerEmbed(modalSubmit.user.id, icon)],
         components: createCannotAnswerRows(),
       });
       void listenForSupportRequest(message, modalSubmit.user.id, interaction.client as NypsiClient);

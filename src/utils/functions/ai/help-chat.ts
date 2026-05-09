@@ -39,8 +39,8 @@ function weekTtl(): number {
 }
 
 const helpChatResponseFormat = z.object({
-  can_answer: z.boolean(),
-  answer: z.string().nullable(),
+  confident: z.boolean(),
+  answer: z.string(),
 });
 
 export type HelpChatPage = {
@@ -123,7 +123,7 @@ export async function createHelpChat(userId: string, userQuery: string, conversa
       chatId: null as number | null,
       conversationId: conversationId ?? null,
       aiResponse: null as string | null,
-      canAnswer: false,
+      confident: true,
       rateLimited: true as const,
     };
   }
@@ -137,7 +137,7 @@ export async function createHelpChat(userId: string, userQuery: string, conversa
       chatId: null as number | null,
       conversationId: (conversationId ?? null) as number | null,
       aiResponse: null as string | null,
-      canAnswer: false,
+      confident: true,
       rateLimited: true as const,
     };
   }
@@ -213,7 +213,8 @@ export async function createHelpChat(userId: string, userQuery: string, conversa
       throw new Error("empty help ai response");
     }
 
-    const aiResponse = parsed.can_answer ? (parsed.answer ?? null) : null;
+    const disclaimerSuffix = `\n\n*I'm not fully confident in this answer. For more accurate help, join the [official nypsi server](${Constants.NYPSI_SERVER_INVITE_LINK})*`;
+    const aiResponse = parsed.confident ? parsed.answer : parsed.answer + disclaimerSuffix;
 
     const inputTokens = response.usage?.input_tokens ?? 0;
     const outputTokens = response.usage?.output_tokens ?? 0;
@@ -221,7 +222,7 @@ export async function createHelpChat(userId: string, userQuery: string, conversa
 
     logger.info("help-chat: query", {
       userId,
-      canAnswer: parsed.can_answer,
+      confident: parsed.confident,
       query: userQuery,
       response: aiResponse,
       tokens: { input: inputTokens, cachedInput: cachedInputTokens, output: outputTokens },
@@ -251,7 +252,7 @@ export async function createHelpChat(userId: string, userQuery: string, conversa
       chatId: chatMessage.id,
       conversationId: conversation.id,
       aiResponse,
-      canAnswer: parsed.can_answer,
+      confident: parsed.confident,
       rateLimited: false as const,
     };
   } catch (e) {
@@ -259,8 +260,8 @@ export async function createHelpChat(userId: string, userQuery: string, conversa
     return {
       chatId: chatMessage.id,
       conversationId: conversation.id,
-      aiResponse: null,
-      canAnswer: false,
+      aiResponse: null as string | null,
+      confident: true,
       rateLimited: false as const,
     };
   }

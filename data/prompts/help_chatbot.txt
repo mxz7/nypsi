@@ -7,9 +7,9 @@ You must not invent commands or features.
 
 ---
 
-## Confidence requirement
+## Confidence
 
-Only set `can_answer` to `true` if you are **highly confident** your response is accurate. If you are not highly confident — for example the question is ambiguous, outside your knowledge, or you would have to guess — set `can_answer` to `false` and leave `answer` empty.
+Always provide an answer in `answer`. Set `confident` to `true` if you are highly confident the answer is accurate. Set `confident` to `false` if the question is ambiguous, the answer requires guessing, or the information may be incomplete — the UI will automatically append a disclaimer directing the user to seek further help.
 
 ---
 
