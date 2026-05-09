@@ -989,7 +989,7 @@ model SupportRequestMessage {
 }
 
 model AiChatConversation {
-  id        String   @id @default(uuid(7)) @db.Uuid
+  id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
 
   userId String
@@ -1002,7 +1002,7 @@ model AiChatMessage {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
 
-  conversationId String @db.Uuid
+  conversationId Int
 
   userQuery  String
   aiResponse String?
