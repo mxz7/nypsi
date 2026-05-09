@@ -165,24 +165,33 @@ async function run(
   }
 
   const getMembers = async (): Promise<SlimMember[]> => {
-    if (args[1].toLowerCase() == "all") {
+    if (args[1]) {
+      if (args[1].toLowerCase() == "all") {
+        const cached = message.guild.members.cache;
+        if (cached.size === message.guild.memberCount) {
+          return cached.map(transformGuildMemberToSlim);
+        }
+
+        return getAllMembersRest(message.guild.id, message.client as NypsiClient);
+      } else {
+        if (message.mentions?.members?.first()) {
+          return [transformGuildMemberToSlim(message.mentions.members.first())];
+        } else {
+          const member = await getMember(message.guild, args[2]);
+
+          if (!member) {
+            return [];
+          }
+          return [transformGuildMemberToSlim(member)];
+        }
+      }
+    } else {
       const cached = message.guild.members.cache;
       if (cached.size === message.guild.memberCount) {
         return cached.map(transformGuildMemberToSlim);
       }
 
       return getAllMembersRest(message.guild.id, message.client as NypsiClient);
-    } else {
-      if (message.mentions?.members?.first()) {
-        return [transformGuildMemberToSlim(message.mentions.members.first())];
-      } else {
-        const member = await getMember(message.guild, args[2]);
-
-        if (!member) {
-          return [];
-        }
-        return [transformGuildMemberToSlim(member)];
-      }
     }
   };
 
