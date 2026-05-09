@@ -111,7 +111,7 @@ export async function isHelpChatAvailable(): Promise<boolean> {
   return globalTokens < GLOBAL_WEEKLY_TOKEN_LIMIT;
 }
 
-export async function createHelpChat(userId: string, userQuery: string, conversationId?: string) {
+export async function createHelpChat(userId: string, userQuery: string, conversationId?: number) {
   // global token budget check
   const globalTokens = parseInt(
     (await redis.get(Constants.redis.cooldown.HELP_CHAT_GLOBAL_TOKENS)) || "0",
@@ -120,7 +120,7 @@ export async function createHelpChat(userId: string, userQuery: string, conversa
     logger.warn("help-chat: global weekly token limit reached", { globalTokens });
     return {
       chatId: null as number | null,
-      conversationId: (conversationId ?? null) as string | null,
+      conversationId: conversationId ?? null,
       aiResponse: null as string | null,
       canAnswer: false,
       rateLimited: true as const,
@@ -134,7 +134,7 @@ export async function createHelpChat(userId: string, userQuery: string, conversa
     logger.info("help-chat: user weekly limit reached", { userId, userCount });
     return {
       chatId: null as number | null,
-      conversationId: (conversationId ?? null) as string | null,
+      conversationId: (conversationId ?? null) as number | null,
       aiResponse: null as string | null,
       canAnswer: false,
       rateLimited: true as const,
@@ -262,7 +262,7 @@ export async function createHelpChat(userId: string, userQuery: string, conversa
   }
 }
 
-export async function getAiChatConversationById(id: string) {
+export async function getAiChatConversationById(id: number) {
   return await prisma.aiChatConversation.findUnique({
     where: {
       id,
@@ -270,7 +270,7 @@ export async function getAiChatConversationById(id: string) {
   });
 }
 
-export async function getAiChatConversationMessages(conversationId: string) {
+export async function getAiChatConversationMessages(conversationId: number) {
   return await prisma.aiChatMessage.findMany({
     where: {
       conversationId,
@@ -365,7 +365,7 @@ export function createCannotAnswerRows(): ActionRowBuilder<MessageActionRowCompo
 }
 
 export async function preparePagesFromConversation(
-  conversationId: string,
+  conversationId: number,
 ): Promise<{ pages: Map<number, HelpChatPage[]>; lastPage: number } | null> {
   const pagesData = await getAiChatConversationMessages(conversationId);
 

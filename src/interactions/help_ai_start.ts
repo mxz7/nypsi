@@ -79,7 +79,7 @@ async function showQuestionModal(interaction: ButtonInteraction) {
 async function setupHelpChatPageManager(
   message: Message,
   userId: string,
-  conversationId: string,
+  conversationId: number,
   icon: string | undefined,
 ) {
   const pagesData = await preparePagesFromConversation(conversationId);
