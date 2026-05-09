@@ -40,7 +40,7 @@ function weekTtl(): number {
 
 const helpChatResponseFormat = z.object({
   can_answer: z.boolean(),
-  answer: z.string().optional(),
+  answer: z.string().nullable(),
 });
 
 export type HelpChatPage = {
