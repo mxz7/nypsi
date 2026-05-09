@@ -104,6 +104,13 @@ async function getUserContext(userId: string) {
   return buildPrompt("user_context", context);
 }
 
+export async function isHelpChatAvailable(): Promise<boolean> {
+  const globalTokens = parseInt(
+    (await redis.get(Constants.redis.cooldown.HELP_CHAT_GLOBAL_TOKENS)) || "0",
+  );
+  return globalTokens < GLOBAL_WEEKLY_TOKEN_LIMIT;
+}
+
 export async function createHelpChat(userId: string, userQuery: string, conversationId?: string) {
   // global token budget check
   const globalTokens = parseInt(
