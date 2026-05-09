@@ -18,7 +18,7 @@ importers:
         specifier: 2.6.1
         version: 2.6.1
       '@hono/node-server':
-        specifier: ^2.0.1
+        specifier: ^2.0.2
         version: 2.0.2(hono@4.12.18)
       '@prisma/adapter-pg':
         specifier: ^7.8.0
