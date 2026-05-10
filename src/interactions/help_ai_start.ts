@@ -23,6 +23,7 @@ import {
   HelpChatPage,
   preparePagesFromConversation,
 } from "../utils/functions/ai/help-chat";
+import { isEcoBanned } from "../utils/functions/economy/utils";
 import PageManager from "../utils/functions/page";
 import { openSupportRequest } from "../utils/functions/supportrequest";
 
@@ -196,6 +197,14 @@ export default {
   type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;
+
+    if (await isEcoBanned(interaction.user.id)) {
+      await interaction.reply({
+        embeds: [new ErrorEmbed("you are currently ecobanned")],
+        ephemeral: true,
+      });
+      return;
+    }
 
     const modalSubmit = await showQuestionModal(interaction);
 
