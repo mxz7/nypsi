@@ -91,8 +91,10 @@ export class NypsiClient extends Client {
       logger.debug("guild create event loaded");
       this.on("guildDelete", guildDelete.bind(null, this));
       logger.debug("guild delete event loaded");
-      this.rest.on("rateLimited", (rate) => {
-        logger.warn("rate limit: " + rate.url);
+      this.rest.on("rateLimited", (info) => {
+        logger.warn(`rest: rate limited: ${info.route} ${info.timeToReset}ms until reset`, {
+          ...info,
+        });
       });
       logger.debug("rest rate limit event loaded");
       this.on("guildMemberUpdate", guildMemberUpdate.bind(null));
