@@ -154,7 +154,7 @@ async function run(
     return send({ embeds: [new ErrorEmbed("i need the manage roles permission")] });
   }
 
-  if (message.guild.memberCount > 15000) {
+  if (message.guild.memberCount > 25000) {
     return send({
       embeds: [
         new ErrorEmbed(
