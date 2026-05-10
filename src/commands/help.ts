@@ -10,6 +10,7 @@ import { Command } from "../models/Command.js";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { Item } from "../types/Economy.js";
 import Constants from "../utils/Constants.js";
+import { isHelpChatAvailable } from "../utils/functions/ai/help-chat.js";
 import { formatDate } from "../utils/functions/date.js";
 import { runItemInfo } from "../utils/functions/economy/item_info.js";
 import { getItems } from "../utils/functions/economy/utils.js";
@@ -206,6 +207,23 @@ cmd.setRun(async (message, send, args) => {
       components: [row],
     });
   } else {
+    if (args.length === 0) {
+      const components = [];
+
+      if (await isHelpChatAvailable()) {
+        components.push(
+          new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+            new ButtonBuilder()
+              .setCustomId("help-ai-start")
+              .setLabel("ask ai")
+              .setStyle(ButtonStyle.Secondary),
+          ),
+        );
+      }
+
+      return await message.channel.send({ embeds: [embed], components });
+    }
+
     return await message.channel.send({ embeds: [embed] });
   }
 

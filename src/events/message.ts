@@ -1,18 +1,15 @@
 import {
   ActionRowBuilder,
   ButtonBuilder,
+  ButtonInteraction,
   ButtonStyle,
   Embed,
   EmbedBuilder,
   Interaction,
-  LabelBuilder,
   Message,
   MessageActionRowComponentBuilder,
-  ModalBuilder,
   PermissionsBitField,
   TextChannel,
-  TextInputBuilder,
-  TextInputStyle,
 } from "discord.js";
 import { compareTwoStrings } from "string-similarity";
 import redis from "../init/redis";
@@ -21,6 +18,7 @@ import { NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Mention, MentionJobData } from "../types/workers/mentions";
 import Constants from "../utils/Constants";
+import { isHelpChatAvailable } from "../utils/functions/ai/help-chat";
 import { a } from "../utils/functions/anticheat";
 import { addEventProgress } from "../utils/functions/economy/events";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
@@ -34,10 +32,9 @@ import { isScamImage } from "../utils/functions/image";
 import { checkTriggers } from "../utils/functions/message-triggers";
 import sleep from "../utils/functions/sleep";
 import {
-  createSupportRequest,
   getSupportRequest,
   handleAttachments,
-  isRequestSuitable,
+  openSupportRequest,
   sendToRequestChannel,
 } from "../utils/functions/supportrequest";
 import { createAuraTransaction } from "../utils/functions/users/aura";
@@ -139,7 +136,20 @@ export default async function messageCreate(message: Message) {
             "\n\n**ONLY CLICK IF YOU WISH TO TALK TO A NYPSI STAFF MEMBER**",
         );
 
-      const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      const aiAvailable = await isHelpChatAvailable();
+
+      const rowComponents: ButtonBuilder[] = [];
+
+      if (aiAvailable) {
+        rowComponents.push(
+          new ButtonBuilder()
+            .setCustomId("help-ai-start")
+            .setLabel("ask ai for help")
+            .setStyle(ButtonStyle.Primary),
+        );
+      }
+
+      rowComponents.push(
         new ButtonBuilder()
           .setCustomId("s")
           .setLabel("talk to a staff member")
@@ -150,28 +160,15 @@ export default async function messageCreate(message: Message) {
           .setURL("https://nypsi.xyz/me/punishments?ref=bot-dm"),
       );
 
+      const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        ...rowComponents,
+      );
+
       const msg = await message.reply({
         content: Constants.NYPSI_SERVER_INVITE_LINK,
         embeds: [embed],
         components: [row],
       });
-
-      const modal = new ModalBuilder()
-        .setCustomId("support_ticket")
-        .setTitle("nypsi support request")
-        .addLabelComponents(
-          new LabelBuilder()
-            .setLabel("message")
-            .setTextInputComponent(
-              new TextInputBuilder()
-                .setCustomId("ticket_message")
-                .setPlaceholder("what do you need help with?")
-                .setStyle(TextInputStyle.Paragraph)
-                .setRequired(true)
-                .setMinLength(15)
-                .setMaxLength(300),
-            ),
-        );
 
       const filter = (i: Interaction) => i.user.id == message.author.id;
 
@@ -183,106 +180,7 @@ export default async function messageCreate(message: Message) {
       }
 
       if (res.customId == "s") {
-        if (await redis.exists(`${Constants.redis.cooldown.SUPPORT}:${message.author.id}`)) {
-          return res.reply({
-            embeds: [
-              new ErrorEmbed(
-                `you have created a support request recently, try again later.\nif you need support and don't want to wait, you can join the nypsi support server [here](${Constants.NYPSI_SERVER_INVITE_LINK})`,
-              ),
-            ],
-          });
-        }
-
-        await res.showModal(modal);
-
-        const modalSubmit = await res.awaitModalSubmit({ filter, time: 300000 }).catch(() => {});
-
-        if (!modalSubmit) return;
-        if (!modalSubmit.isModalSubmit()) return;
-
-        await modalSubmit.deferReply();
-
-        const helpMessage = modalSubmit.fields.getTextInputValue("ticket_message");
-
-        const a = await getSupportRequest(message.author.id);
-
-        if (a) return;
-
-        const aiResponse = await isRequestSuitable(message.author.id, helpMessage);
-
-        logger.info(
-          `supportrequest: ${message.author.id} (${message.author.username}) ai response`,
-          { content: helpMessage, aiResponse },
-        );
-
-        if (!aiResponse.decision) {
-          return modalSubmit.editReply({
-            embeds: [
-              new CustomEmbed()
-                .setDescription(
-                  "this isn't suitable for a support request. try including more information about what you need help with",
-                )
-                .setFooter({
-                  text: "this is an automated system, please let us know of any issues",
-                }),
-            ],
-          });
-        }
-
-        const r = await createSupportRequest(
-          message.author.id,
-          message.client as NypsiClient,
-          message.author.username,
-        );
-
-        if (!r) {
-          return modalSubmit.editReply({
-            embeds: [new CustomEmbed().setDescription("failed to create support request")],
-          });
-        }
-
-        const embed = new CustomEmbed()
-          .setHeader(message.author.username, message.author.avatarURL())
-          .setColor("#111111");
-
-        embed.setDescription(helpMessage);
-
-        await sendToRequestChannel(
-          message.author.id,
-          embed,
-          message.author.id,
-          message.client as NypsiClient,
-        );
-
-        await modalSubmit.editReply({
-          embeds: [
-            new CustomEmbed().setDescription(
-              "✅ created support request, anything you send while this is open will be sent directly to nypsi staff",
-            ),
-          ],
-        });
-
-        if (aiResponse.answer) {
-          const embed = new CustomEmbed()
-            .setHeader("nypsi", message.client.user.avatarURL())
-            .setColor(Constants.PURPLE)
-            .setDescription(aiResponse.answer)
-            .setFooter({
-              text: "this is an automatic message. please tell us if this doesn't match your query",
-            });
-
-          sendToRequestChannel(
-            message.author.id,
-            embed,
-            message.author.id,
-            message.client as NypsiClient,
-          );
-          modalSubmit.followUp({
-            embeds: [embed],
-            content: "you have received a message from your support ticket",
-          });
-        }
-
+        await openSupportRequest(res as ButtonInteraction, message.client as NypsiClient);
         return;
       }
     } else {

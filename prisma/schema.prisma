@@ -52,6 +52,7 @@ model User {
   EventContribution        EventContribution[]
   tmdbRatings              tmdbRatings[]
   ChessPuzzleStats         ChessPuzzleStats?
+  AiChatConversation       AiChatConversation[]
 }
 
 model ProfileView {
@@ -985,6 +986,35 @@ model SupportRequestMessage {
   content          String
 
   supportRequest SupportRequest @relation(fields: [supportRequestId], references: [userId], onDelete: Cascade)
+}
+
+model AiChatConversation {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  messages AiChatMessage[]
+}
+
+model AiChatMessage {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  conversationId Int
+
+  userQuery  String
+  aiResponse String?
+
+  model             String
+  inputTokens       Int?
+  cachedInputTokens Int?
+  outputTokens      Int?
+
+  conversation AiChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
 }
 
 model Purchases {

@@ -213,22 +213,26 @@ export default class PageManager<T> {
     const res = await this.message
       .awaitMessageComponent({
         filter: this.filter,
-        time: 90000,
+        time: 300000,
         componentType: ComponentType.Button,
       })
       .catch(() => {});
 
     if (!res) {
-      if (
-        this.message.components.length > 1 &&
-        this.message.components[0].type === ComponentType.ActionRow &&
-        this.message.components[0].components.length === 2
-      ) {
-        const components = PageManager.defaultRow(true);
-        await this.message.edit({ components: [components] }).catch(() => {});
-      } else {
-        await this.message.edit({ components: [] }).catch(() => {});
-      }
+      // Disable all buttons on expiry instead of removing them
+      const disabledRows = this.rows.map((row) => {
+        const newRow = new ActionRowBuilder<MessageActionRowComponentBuilder>();
+        for (const component of row.components) {
+          if (component instanceof ButtonBuilder) {
+            const disabledComponent = new ButtonBuilder(component.toJSON()).setDisabled(true);
+            newRow.addComponents(disabledComponent);
+            continue;
+          }
+          newRow.addComponents(component);
+        }
+        return newRow;
+      });
+      await this.message.edit({ components: disabledRows }).catch(() => {});
       return;
     }
 

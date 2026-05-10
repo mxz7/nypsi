@@ -1,3 +1,7 @@
+# may 2026
+
+- add help chat bot
+
 # march 2026
 
 - add museum (@growling_grizzly)
