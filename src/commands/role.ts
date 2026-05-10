@@ -164,34 +164,25 @@ async function run(
     });
   }
 
-  const getMembers = async (): Promise<SlimMember[]> => {
-    if (args[1]) {
-      if (args[1].toLowerCase() == "all") {
-        const cached = message.guild.members.cache;
-        if (cached.size === message.guild.memberCount) {
-          return cached.map(transformGuildMemberToSlim);
-        }
-
-        return getAllMembersRest(message.guild.id, message.client as NypsiClient);
-      } else {
-        if (message.mentions?.members?.first()) {
-          return [transformGuildMemberToSlim(message.mentions.members.first())];
-        } else {
-          const member = await getMember(message.guild, args[2]);
-
-          if (!member) {
-            return [];
-          }
-          return [transformGuildMemberToSlim(member)];
-        }
-      }
-    } else {
+  const getMembers = async (target: string): Promise<SlimMember[]> => {
+    if (target === "all") {
       const cached = message.guild.members.cache;
       if (cached.size === message.guild.memberCount) {
         return cached.map(transformGuildMemberToSlim);
       }
 
       return getAllMembersRest(message.guild.id, message.client as NypsiClient);
+    } else {
+      if (message.mentions?.members?.first()) {
+        return [transformGuildMemberToSlim(message.mentions.members.first())];
+      } else {
+        const member = await getMember(message.guild, target);
+
+        if (!member) {
+          return [];
+        }
+        return [transformGuildMemberToSlim(member)];
+      }
     }
   };
 
@@ -226,7 +217,15 @@ async function run(
         embeds: [new ErrorEmbed("please wait until the current mass operation has finished")],
       });
 
-    let members = await getMembers();
+    let addTarget: string;
+    if (!(message instanceof Message) && message.isChatInputCommand()) {
+      const sub = message.options.getSubcommand();
+      addTarget = sub === "all" ? "all" : message.options.getUser("member").id;
+    } else {
+      addTarget = args[1]?.toLowerCase() === "all" ? "all" : args[2];
+    }
+
+    let members = await getMembers(addTarget);
 
     if (!members || members.length == 0) {
       return send({
@@ -395,7 +394,15 @@ async function run(
         embeds: [new ErrorEmbed("please wait until the current mass operation has finished")],
       });
 
-    let members = await getMembers();
+    let removeTarget: string;
+    if (!(message instanceof Message) && message.isChatInputCommand()) {
+      const sub = message.options.getSubcommand();
+      removeTarget = sub === "all" ? "all" : message.options.getUser("member").id;
+    } else {
+      removeTarget = args[1]?.toLowerCase() === "all" ? "all" : args[2];
+    }
+
+    let members = await getMembers(removeTarget);
 
     if (!members || members.length == 0) {
       return send({
@@ -725,7 +732,7 @@ async function run(
       });
     }
 
-    const members = await getMembers();
+    const members = await getMembers("all");
 
     const beforeFiltering = performance.now();
 
