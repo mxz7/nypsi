@@ -50,18 +50,18 @@ async function run(
     serverAvatar = undefined;
   }
 
-  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder()
-      .setCustomId("x")
-      .setLabel("show server avatar")
-      .setStyle(ButtonStyle.Primary),
-  );
-
   const embed = new CustomEmbed(member).setHeader(member.user.username).setImage(avatar);
 
   let msg: Message;
 
   if (serverAvatar) {
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId("toggle")
+        .setLabel("show server avatar")
+        .setStyle(ButtonStyle.Primary),
+    );
+
     msg = await send({ embeds: [embed], components: [row] });
   } else {
     return send({ embeds: [embed] });
@@ -81,21 +81,32 @@ async function run(
 
   const filter = (i: Interaction) => i.user.id == message.author.id;
 
-  const reaction = await msg
-    .awaitMessageComponent({ filter, time: 15000 })
-    .then(async (collected) => {
-      await collected.deferUpdate();
-      return collected.customId;
-    })
-    .catch(async () => {
-      await edit({ components: [] });
-    });
+  let showingServerAvatar = false;
 
-  if (reaction == "x") {
-    embed.setImage(serverAvatar);
+  const buildRow = () =>
+    new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId("toggle")
+        .setLabel(showingServerAvatar ? "show user avatar" : "show server avatar")
+        .setStyle(ButtonStyle.Primary),
+    );
 
-    await edit({ embeds: [embed], components: [] });
-  }
+  const listen = async () => {
+    await msg
+      .awaitMessageComponent({ filter, time: 15000 })
+      .then(async (collected) => {
+        await collected.deferUpdate();
+        showingServerAvatar = !showingServerAvatar;
+        embed.setImage(showingServerAvatar ? serverAvatar : avatar);
+        msg = (await edit({ embeds: [embed], components: [buildRow()] })) ?? msg;
+        return listen();
+      })
+      .catch(async () => {
+        await edit({ components: [] });
+      });
+  };
+
+  await listen();
 }
 
 avatar.setRun(run);
