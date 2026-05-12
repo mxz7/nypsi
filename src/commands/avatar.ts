@@ -5,7 +5,6 @@ import {
   CommandInteraction,
   GuildMember,
   Interaction,
-  Message,
   MessageActionRowComponentBuilder,
   MessageFlags,
 } from "discord.js";
