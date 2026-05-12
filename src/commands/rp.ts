@@ -1,8 +1,21 @@
-import { CommandInteraction, MessageFlags } from "discord.js";
+import {
+  ActionRowBuilder,
+  CommandInteraction,
+  Interaction,
+  MessageActionRowComponentBuilder,
+  MessageFlags,
+  StringSelectMenuBuilder,
+  StringSelectMenuOptionBuilder,
+} from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getMember } from "../utils/functions/member";
-import { addRoleplayStat } from "../utils/functions/roleplay";
+import {
+  addRoleplayStat,
+  getRoleplayActionTotals,
+  getRoleplayStatsByAction,
+  getRoleplayTargetTotals,
+} from "../utils/functions/roleplay";
 import { pluralize } from "../utils/functions/string";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -51,6 +64,10 @@ for (const [action] of Object.entries(actions)) {
   );
 }
 
+cmd.slashData.addSubcommand((sub) =>
+  sub.setName("stats").setDescription("view your roleplay stats"),
+);
+
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   send: SendMessage,
@@ -63,6 +80,128 @@ async function run(
   }
 
   const action = args[0]?.toLowerCase();
+
+  if (action === "stats") {
+    const [actionTotals, targetTotals] = await Promise.all([
+      getRoleplayActionTotals(message.author.id),
+      getRoleplayTargetTotals(message.author.id),
+    ]);
+
+    if (actionTotals.length === 0) {
+      return send({
+        embeds: [
+          new CustomEmbed(message.member)
+            .setHeader("roleplay stats", message.author.avatarURL())
+            .setDescription("you haven't done any roleplay actions yet"),
+        ],
+      });
+    }
+
+    const buildEmbed = () => {
+      const embed = new CustomEmbed(message.member).setHeader(
+        "roleplay stats",
+        message.author.avatarURL(),
+      );
+
+      embed.addField(
+        "most used actions",
+        actionTotals.map((r) => `\`${r.action}\` — ${pluralize("time", r.count)}`).join("\n"),
+        true,
+      );
+
+      embed.addField(
+        "most actioned users",
+        targetTotals.map((t) => `**${t.username}** — ${pluralize("time", t.count)}`).join("\n"),
+        true,
+      );
+
+      return embed;
+    };
+
+    const buildActionEmbed = async (selectedAction: string) => {
+      const topUsers = await getRoleplayStatsByAction(message.author.id, selectedAction);
+      const embed = new CustomEmbed(message.member).setHeader(
+        "roleplay stats",
+        message.author.avatarURL(),
+      );
+
+      embed.addField(
+        `top users you've ${selectedAction}ed`,
+        topUsers
+          .map(
+            (r, i) => `${i + 1}. **${r.target.lastKnownUsername}** — ${pluralize("time", r.count)}`,
+          )
+          .join("\n") || "none",
+      );
+
+      return embed;
+    };
+
+    const actionNames = actionTotals.map((r) => r.action);
+
+    const buildSelectRow = (current: string | null) =>
+      new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new StringSelectMenuBuilder()
+          .setCustomId("rp-stats-action")
+          .setPlaceholder("view top users per action")
+          .setOptions([
+            new StringSelectMenuOptionBuilder()
+              .setLabel("overview")
+              .setValue("__overview__")
+              .setDefault(current === null),
+            ...actionNames.map((a) =>
+              new StringSelectMenuOptionBuilder()
+                .setLabel(a)
+                .setValue(a)
+                .setDefault(a === current),
+            ),
+          ]),
+      );
+
+    const overviewEmbed = buildEmbed();
+
+    let msg = await send({
+      embeds: [overviewEmbed],
+      components: [buildSelectRow(null)],
+    });
+
+    const filter = (i: Interaction) => i.user.id === message.author.id;
+
+    const pageManager: () => Promise<void> = async () => {
+      const i = await msg.awaitMessageComponent({ filter, time: 60_000 }).catch(() => null as null);
+
+      if (!i) {
+        msg.edit({ components: [] }).catch(() => {});
+        return;
+      }
+
+      setTimeout(() => {
+        if (!i.deferred && !i.replied) i.deferUpdate().catch(() => {});
+      }, 2000);
+
+      if (i.isStringSelectMenu()) {
+        const selectedAction = i.values[0];
+
+        if (selectedAction === "__overview__") {
+          await i
+            .update({ embeds: [overviewEmbed], components: [buildSelectRow(null)] })
+            .catch(() => msg.edit({ embeds: [overviewEmbed], components: [buildSelectRow(null)] }));
+        } else {
+          const actionEmbed = await buildActionEmbed(selectedAction);
+          const selectRow = buildSelectRow(selectedAction);
+
+          await i
+            .update({ embeds: [actionEmbed], components: [selectRow] })
+            .catch(() => msg.edit({ embeds: [actionEmbed], components: [selectRow] }));
+        }
+      }
+
+      return pageManager();
+    };
+
+    pageManager();
+    return;
+  }
 
   if (!action || !actions[action]) {
     const list = Object.keys(actions).join(", ");
