@@ -19,6 +19,7 @@ export class Command {
   public docs?: string;
   public permissions?: string[];
   public aliases?: string[];
+  public shorthands?: Record<string, string>;
   public slashData?: SlashCommandBuilder;
   public slashEnabled: boolean;
   public data?: any;
@@ -59,6 +60,11 @@ export class Command {
 
   public setAliases(aliases: string[]) {
     this.aliases = aliases;
+    return this;
+  }
+
+  public setShorthands(shorthands: Record<string, string>) {
+    this.shorthands = shorthands;
     return this;
   }
 
