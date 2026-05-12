@@ -5,10 +5,8 @@ import {
   CommandInteraction,
   GuildMember,
   Interaction,
-  InteractionEditReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
-  MessageEditOptions,
   MessageFlags,
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
@@ -52,35 +50,6 @@ async function run(
 
   const embed = new CustomEmbed(member).setHeader(member.user.username).setImage(avatar);
 
-  let msg: Message;
-
-  if (serverAvatar) {
-    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder()
-        .setCustomId("toggle")
-        .setLabel("show server avatar")
-        .setStyle(ButtonStyle.Primary),
-    );
-
-    msg = await send({ embeds: [embed], components: [row] });
-  } else {
-    return send({ embeds: [embed] });
-  }
-
-  const edit = async (data: MessageEditOptions) => {
-    if (!(message instanceof Message)) {
-      await message.editReply(data as InteractionEditReplyOptions);
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await msg.edit(data);
-    }
-  };
-
-  const filter = (i: Interaction) => i.user.id == message.author.id;
-
   let showingServerAvatar = false;
 
   const buildRow = () =>
@@ -91,19 +60,27 @@ async function run(
         .setStyle(ButtonStyle.Primary),
     );
 
+  if (!serverAvatar) {
+    return send({ embeds: [embed] });
+  }
+
+  const msg = await send({ embeds: [embed], components: [buildRow()] });
+
+  const filter = (i: Interaction) => i.user.id == message.author.id;
+
   const listen = async () => {
-    await msg
+    const collected = await msg
       .awaitMessageComponent({ filter, time: 15000 })
-      .then(async (collected) => {
-        await collected.deferUpdate();
-        showingServerAvatar = !showingServerAvatar;
-        embed.setImage(showingServerAvatar ? serverAvatar : avatar);
-        msg = (await edit({ embeds: [embed], components: [buildRow()] })) ?? msg;
-        return listen();
-      })
       .catch(async () => {
-        await edit({ components: [] });
+        await msg.edit({ components: [] });
       });
+
+    if (!collected) return;
+
+    showingServerAvatar = !showingServerAvatar;
+    embed.setImage(showingServerAvatar ? serverAvatar : avatar);
+    await collected.update({ embeds: [embed], components: [buildRow()] });
+    return listen();
   };
 
   await listen();
