@@ -101,6 +101,31 @@ const actions: Record<string, RoleplayAction> = {
     text: "**{sender}** {action} **{target}** 👅",
     action: "licked",
   },
+  peg: {
+    gifs: [
+      "https://c.tenor.com/yG-niONE83sAAAAd/tenor.gif",
+      "https://c.tenor.com/uBwsOmhiUBoAAAAd/tenor.gif",
+    ],
+    text: "**{sender}** {action} **{target}** 🍑",
+    action: "pegged",
+  },
+  bite: {
+    gifs: [
+      "https://c.tenor.com/gTQqusq0Kt8AAAAd/tenor.gif",
+      "https://c.tenor.com/FlNpqVlWb6YAAAAd/tenor.gif",
+      "https://c.tenor.com/0_D9iWPRVAUAAAAd/tenor.gif",
+    ],
+    text: "**{sender}** {action} **{target}** 🦷",
+    action: "bit",
+  },
+  squirt: {
+    gifs: [
+      "https://c.tenor.com/BpMZTkzYG9oAAAAC/tenor.gif",
+      "https://c.tenor.com/vzB4NFf84lMAAAAC/tenor.gif",
+    ],
+    text: "**{sender}** {action} **{target}** 💦",
+    action: "squirted on",
+  },
 };
 
 const cmd = new Command("rp", "roleplay actions", "fun").setAliases(["roleplay"]);
