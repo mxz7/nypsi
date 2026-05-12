@@ -69,11 +69,9 @@ async function run(
   const filter = (i: Interaction) => i.user.id == message.author.id;
 
   const listen = async () => {
-    const collected = await msg
-      .awaitMessageComponent({ filter, time: 15000 })
-      .catch(async () => {
-        await msg.edit({ components: [] });
-      });
+    const collected = await msg.awaitMessageComponent({ filter, time: 15000 }).catch(async () => {
+      await msg.edit({ components: [] });
+    });
 
     if (!collected) return;
 
