@@ -21,8 +21,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 
 type RoleplayAction = {
   gifs: string[];
-  senderText: string; // e.g. "**{sender}** kissed **{target}**"
-  selfText: string; // used when no target given
+  senderText: string;
 };
 
 const actions: Record<string, RoleplayAction> = {
@@ -30,17 +29,36 @@ const actions: Record<string, RoleplayAction> = {
     gifs: [
       "https://c.tenor.com/N57Xg6F8-vYAAAAd/tenor.gif",
       "https://c.tenor.com/W-R9sPkk_IMAAAAd/tenor.gif",
+      "https://c.tenor.com/cIMCczKDW8oAAAAd/tenor.gif",
     ],
     senderText: "**{sender}** kissed **{target}** 💋",
-    selfText: "**{sender}** kissed themselves... that's a bit lonely 💋",
   },
   hug: {
     gifs: [
       "https://c.tenor.com/ac3otYT77RcAAAAd/tenor.gif",
       "https://c.tenor.com/2s-NG_10o4MAAAAd/tenor.gif",
+      "https://c.tenor.com/o8lR_BGgZCgAAAAd/tenor.gif",
+      "https://c.tenor.com/wSJZSQqIHhUAAAAd/tenor.gif",
     ],
     senderText: "**{sender}** hugged **{target}** 🤗",
-    selfText: "**{sender}** hugged themselves 🤗",
+  },
+  punch: {
+    gifs: [
+      "https://c.tenor.com/wSB-uAoR48UAAAAC/tenor.gif",
+      "https://c.tenor.com/6Cp5tiRwh-YAAAAC/tenor.gif",
+    ],
+    senderText: "**{sender}** punched **{target}** 👊",
+  },
+  slap: {
+    gifs: [
+      "https://c.tenor.com/j5rPRPBwSOMAAAAd/tenor.gif",
+      "https://c.tenor.com/ysk3CJtdi60AAAAC/tenor.gif",
+    ],
+    senderText: "**{sender}** slapped **{target}** 👋",
+  },
+  boop: {
+    gifs: ["https://c.tenor.com/88HZjGgr3k0AAAAd/tenor.gif"],
+    senderText: "**{sender}** booped **{target}**",
   },
 };
 
@@ -59,7 +77,7 @@ for (const [action] of Object.entries(actions)) {
       .setName(action)
       .setDescription(`${action} someone`)
       .addUserOption((opt) =>
-        opt.setName("target").setDescription(`the person to ${action}`).setRequired(false),
+        opt.setName("target").setDescription(`the person to ${action}`).setRequired(true),
       ),
   );
 }
@@ -233,28 +251,26 @@ async function run(
     return send({ embeds: [new ErrorEmbed(`you need to specify someone to ${action}`)] });
   }
 
+  if (target.user.id === message.author.id) {
+    return send({ embeds: [new ErrorEmbed("you can't do that to yourself. loser.")] });
+  }
+
   const senderName = message.author.username;
   const targetName = target.user.username;
 
-  const text =
-    target.user.id !== message.author.id
-      ? actionData.senderText.replace("{sender}", senderName).replace("{target}", targetName)
-      : actionData.selfText.replace("{sender}", senderName);
+  const text = actionData.senderText
+    .replace("{sender}", senderName)
+    .replace("{target}", targetName);
 
   const gif = actionData.gifs[Math.floor(Math.random() * actionData.gifs.length)];
 
-  const count =
-    target.user.id !== message.author.id
-      ? await addRoleplayStat(message.author.id, target.user.id, action)
-      : null;
+  const count = await addRoleplayStat(message.author.id, target.user.id, action);
 
   const embed = new CustomEmbed(message.member)
     .setHeader(text, message.author.avatarURL())
     .setImage(gif);
 
-  if (count !== null) {
-    embed.setFooter({ text: `${action}ed ${targetName} ${pluralize("time", count)}` });
-  }
+  embed.setFooter({ text: `${action}ed ${targetName} ${pluralize("time", count)}` });
 
   return send({ embeds: [embed] });
 }
