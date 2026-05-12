@@ -194,13 +194,17 @@ async function run(
 
       embed.addField(
         "most used actions",
-        actionTotals.map((r) => `\`${r.action}\` — ${pluralize("time", r.count)}`).join("\n"),
+        actionTotals
+          .map((r) => `\`${r.action}\` ${r.count.toLocaleString()} ${pluralize("time", r.count)}`)
+          .join("\n"),
         true,
       );
 
       embed.addField(
         "most actioned users",
-        targetTotals.map((t) => `**${t.username}** — ${pluralize("time", t.count)}`).join("\n"),
+        targetTotals
+          .map((t) => `**${t.username}** ${t.count.toLocaleString()} ${pluralize("time", t.count)}`)
+          .join("\n"),
         true,
       );
 
@@ -218,7 +222,8 @@ async function run(
         `top users you've ${selectedAction}ed`,
         topUsers
           .map(
-            (r, i) => `${i + 1}. **${r.target.lastKnownUsername}** — ${pluralize("time", r.count)}`,
+            (r, i) =>
+              `${i + 1}. **${r.target.lastKnownUsername}** ${r.count.toLocaleString()} ${pluralize("time", r.count)}`,
           )
           .join("\n") || "none",
       );
@@ -343,7 +348,9 @@ async function run(
     .setHeader(text, message.author.avatarURL())
     .setImage(gif);
 
-  embed.setFooter({ text: `${actionData.action} ${targetName} ${pluralize("time", count)}` });
+  embed.setFooter({
+    text: `${actionData.action} ${targetName} ${count.toLocaleString()} ${pluralize("time", count)}`,
+  });
 
   return send({ embeds: [embed] });
 }
