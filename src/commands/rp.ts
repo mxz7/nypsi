@@ -2,6 +2,7 @@ import { CommandInteraction, MessageFlags } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getMember } from "../utils/functions/member";
+import { addRoleplayStat } from "../utils/functions/roleplay";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 type RoleplayAction = {
@@ -100,7 +101,16 @@ async function run(
 
   const gif = actionData.gifs[Math.floor(Math.random() * actionData.gifs.length)];
 
-  const embed = new CustomEmbed(message.member).setDescription(text).setImage(gif);
+  const count =
+    target.user.id !== message.author.id
+      ? await addRoleplayStat(message.author.id, target.user.id, action)
+      : null;
+
+  const embed = new CustomEmbed(message.member).setHeader(text, message.author.avatarURL()).setImage(gif);
+
+  if (count !== null) {
+    embed.setFooter({ text: `${count} time${count === 1 ? "" : "s"}` });
+  }
 
   return send({ embeds: [embed] });
 }

@@ -53,6 +53,8 @@ model User {
   tmdbRatings              tmdbRatings[]
   ChessPuzzleStats         ChessPuzzleStats?
   AiChatConversation       AiChatConversation[]
+  RoleplayStat             RoleplayStat[]
+  RoleplayStatTarget       RoleplayStat[]             @relation(name: "target")
 }
 
 model ProfileView {
@@ -546,6 +548,22 @@ model FlagGame {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+model RoleplayStat {
+  userId   String
+  targetId String
+
+  action String
+  count  Int    @default(1)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  target User @relation(fields: [targetId], references: [id], name: "target", onDelete: Cascade)
+
+  @@id([userId, action, targetId])
 }
 
 model ChessPuzzleStats {
