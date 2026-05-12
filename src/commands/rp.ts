@@ -349,7 +349,7 @@ async function run(
     .setImage(gif);
 
   embed.setFooter({
-    text: `${actionData.action} ${targetName} ${count.toLocaleString()} ${pluralize("time", count)}`,
+    text: `you've ${actionData.action} ${targetName} ${count.toLocaleString()} ${pluralize("time", count)}`,
   });
 
   return send({ embeds: [embed] });
