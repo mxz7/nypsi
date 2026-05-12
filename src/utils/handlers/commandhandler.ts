@@ -80,6 +80,7 @@ import ms = require("ms");
 
 const commands = new Map<string, Command>();
 const aliases = new Map<string, string>();
+const shorthands = new Map<string, string>();
 const hourlyCommandCount = new Map<string, number>();
 const commandUses = new Map<string, number>();
 const recentlyUsedUserAliases = new Map<string, Map<string, string>>();
@@ -94,8 +95,9 @@ const cooldown = new Set<string>();
 
 let commandsSize = 0;
 let aliasesSize = 0;
+let shorthandsSize = 0;
 
-export { aliasesSize, commandsSize };
+export { aliasesSize, commandsSize, shorthandsSize };
 
 let restarting = false;
 
@@ -122,6 +124,7 @@ export function loadCommands() {
     }
     commands.clear();
     aliases.clear();
+    shorthands.clear();
   }
 
   for (const file of commandFiles) {
@@ -151,6 +154,17 @@ export function loadCommands() {
             }
           }
         }
+        if (command.shorthands) {
+          for (const [shorthand, expansion] of Object.entries(command.shorthands)) {
+            if (shorthands.has(shorthand) || commands.has(shorthand) || aliases.has(shorthand)) {
+              logger.warn(
+                `duplicate shorthand: ${shorthand} [command: ${command.name}] - not overwriting`,
+              );
+            } else {
+              shorthands.set(shorthand, expansion as string);
+            }
+          }
+        }
       } else {
         logger.error(`failed to load ${file}`);
         logger.error(file + " missing name, description, category or run");
@@ -161,9 +175,11 @@ export function loadCommands() {
   }
   aliasesSize = aliases.size;
   commandsSize = commands.size;
+  shorthandsSize = shorthands.size;
 
   logger.info(`${commands.size.toLocaleString()} commands loaded`);
   logger.info(`${aliases.size.toLocaleString()} aliases loaded`);
+  logger.info(`${shorthands.size.toLocaleString()} shorthands loaded`);
 }
 
 export function reloadCommand(commandsArray: string[]) {
@@ -202,6 +218,21 @@ export function reloadCommand(commandsArray: string[]) {
             }
           }
         }
+        if (commandData.shorthands) {
+          for (const [shorthand, expansion] of Object.entries(commandData.shorthands)) {
+            if (
+              (shorthands.has(shorthand) && shorthands.get(shorthand) !== expansion) ||
+              commands.has(shorthand) ||
+              aliases.has(shorthand)
+            ) {
+              logger.error(
+                `duplicate shorthand: ${shorthand} [command: ${commandData.name}] - not overwriting`,
+              );
+            } else {
+              shorthands.set(shorthand, expansion);
+            }
+          }
+        }
         commandsSize = commands.size;
       } else {
         commandsSize = commands.size;
@@ -212,6 +243,7 @@ export function reloadCommand(commandsArray: string[]) {
   }
   aliasesSize = aliases.size;
   commandsSize = commands.size;
+  shorthandsSize = shorthands.size;
 
   return true;
 }
@@ -244,6 +276,20 @@ export async function runCommand(
 
   if (!commands.has(cmd) && aliases.has(cmd)) {
     command = commands.get(aliases.get(cmd));
+  } else if (!commands.has(cmd) && shorthands.has(cmd)) {
+    const expansion = shorthands.get(cmd);
+    const expandedParts = expansion.split(" ");
+    const targetCmd = expandedParts[0];
+    command = commands.get(targetCmd);
+    if (command) {
+      const originalArgsStr = args.join(" ");
+      args = [targetCmd, ...expandedParts.slice(1), ...args.slice(1)];
+      if (message instanceof Message) {
+        const prefix = message.content.slice(0, message.content.length - originalArgsStr.length);
+        message.content = `${prefix}${command.name} ${args.slice(1).join(" ")}`;
+      }
+      cmd = targetCmd;
+    }
   } else {
     command = commands.get(cmd);
   }
