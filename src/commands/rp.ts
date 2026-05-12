@@ -21,8 +21,9 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 
 type RoleplayAction = {
   gifs: string[];
-  senderText: string;
-  pastTense: string;
+  text: string;
+  action: string;
+  aliases?: string[];
 };
 
 const actions: Record<string, RoleplayAction> = {
@@ -32,8 +33,8 @@ const actions: Record<string, RoleplayAction> = {
       "https://c.tenor.com/W-R9sPkk_IMAAAAd/tenor.gif",
       "https://c.tenor.com/cIMCczKDW8oAAAAd/tenor.gif",
     ],
-    senderText: "**{sender}** kissed **{target}** 💋",
-    pastTense: "kissed",
+    text: "**{sender}** {action} **{target}** 💋",
+    action: "kissed",
   },
   hug: {
     gifs: [
@@ -42,37 +43,76 @@ const actions: Record<string, RoleplayAction> = {
       "https://c.tenor.com/o8lR_BGgZCgAAAAd/tenor.gif",
       "https://c.tenor.com/wSJZSQqIHhUAAAAd/tenor.gif",
     ],
-    senderText: "**{sender}** hugged **{target}** 🤗",
-    pastTense: "hugged",
+    text: "**{sender}** {action} **{target}** 🤗",
+    action: "hugged",
+    aliases: ["cuddle"],
   },
   punch: {
     gifs: [
       "https://c.tenor.com/wSB-uAoR48UAAAAC/tenor.gif",
       "https://c.tenor.com/6Cp5tiRwh-YAAAAC/tenor.gif",
     ],
-    senderText: "**{sender}** punched **{target}** 👊",
-    pastTense: "punched",
+    text: "**{sender}** {action} **{target}** 👊",
+    action: "punched",
   },
   slap: {
     gifs: [
       "https://c.tenor.com/j5rPRPBwSOMAAAAd/tenor.gif",
       "https://c.tenor.com/ysk3CJtdi60AAAAC/tenor.gif",
     ],
-    senderText: "**{sender}** slapped **{target}** 👋",
-    pastTense: "slapped",
+    text: "**{sender}** {action} **{target}** 👋",
+    action: "slapped",
   },
   boop: {
     gifs: ["https://c.tenor.com/88HZjGgr3k0AAAAd/tenor.gif"],
-    senderText: "**{sender}** booped **{target}**",
-    pastTense: "booped",
+    text: "**{sender}** {action} **{target}**",
+    action: "booped",
+  },
+  sex: {
+    gifs: [
+      "https://c.tenor.com/9bVN6z6kJlMAAAAC/tenor.gif",
+      "https://c.tenor.com/NHtslet7pEEAAAAd/tenor.gif",
+    ],
+    text: "**{sender}** {action} **{target}** 💦",
+    action: "had sex with",
+  },
+  spank: {
+    gifs: [
+      "https://c.tenor.com/KI2iIP6dFTcAAAAC/tenor.gif",
+      "https://c.tenor.com/fF3_SJgiUDgAAAAC/tenor.gif",
+    ],
+    text: "**{sender}** {action} **{target}** 🍑",
+    action: "spanked",
+  },
+  flirt: {
+    gifs: [
+      "https://c.tenor.com/rt23AR7cgwUAAAAd/tenor.gif",
+      "https://c.tenor.com/ikB16DROyTEAAAAd/tenor.gif",
+      "https://c.tenor.com/H25zF6Pu734AAAAC/tenor.gif",
+    ],
+    text: "**{sender}** {action} **{target}** 😏",
+    action: "flirted with",
+  },
+  lick: {
+    gifs: [
+      "https://c.tenor.com/1w_SiTTl8joAAAAd/tenor.gif",
+      "https://c.tenor.com/K9_q0nhLQyEAAAAC/tenor.gif",
+    ],
+    text: "**{sender}** {action} **{target}** 👅",
+    action: "licked",
   },
 };
 
 const cmd = new Command("rp", "roleplay actions", "fun").setAliases(["roleplay"]);
 
-// build shorthands from actions: kiss -> rp kiss, hug -> rp hug
+// build shorthands from actions: kiss -> rp kiss, hug -> rp hug, cuddle -> rp hug
 cmd.setShorthands(
-  Object.fromEntries(Object.keys(actions).map((action) => [action, `rp ${action}`])),
+  Object.fromEntries([
+    ...Object.keys(actions).map((name) => [name, `rp ${name}`]),
+    ...Object.entries(actions).flatMap(([name, data]) =>
+      (data.aliases ?? []).map((alias) => [alias, `rp ${name}`]),
+    ),
+  ]),
 );
 
 cmd.slashEnabled = true;
@@ -228,7 +268,8 @@ async function run(
   }
 
   if (!action || !actions[action]) {
-    const list = Object.keys(actions).join(", ");
+    const list = `\`${Object.keys(actions).join("`, `")}\``;
+
     return send({
       embeds: [
         new CustomEmbed(message.member)
@@ -264,8 +305,9 @@ async function run(
   const senderName = message.author.username;
   const targetName = target.user.username;
 
-  const text = actionData.senderText
+  const text = actionData.text
     .replace("{sender}", senderName)
+    .replace("{action}", actionData.action)
     .replace("{target}", targetName);
 
   const gif = actionData.gifs[Math.floor(Math.random() * actionData.gifs.length)];
@@ -276,7 +318,7 @@ async function run(
     .setHeader(text, message.author.avatarURL())
     .setImage(gif);
 
-  embed.setFooter({ text: `${actionData.pastTense} ${targetName} ${pluralize("time", count)}` });
+  embed.setFooter({ text: `${actionData.action} ${targetName} ${pluralize("time", count)}` });
 
   return send({ embeds: [embed] });
 }
