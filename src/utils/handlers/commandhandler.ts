@@ -208,7 +208,7 @@ export function reloadCommand(commandsArray: string[]) {
         if (commandData.aliases) {
           for (const a of commandData.aliases) {
             if (aliases.has(a) && aliases.get(a) != commandData.name) {
-              logger.error(
+              logger.warn(
                 `duplicate alias: ${a} [original: ${aliases.get(a)} copy: ${
                   commandData.name
                 }] - not overwriting`,
@@ -225,7 +225,7 @@ export function reloadCommand(commandsArray: string[]) {
               commands.has(shorthand) ||
               aliases.has(shorthand)
             ) {
-              logger.error(
+              logger.warn(
                 `duplicate shorthand: ${shorthand} [command: ${commandData.name}] - not overwriting`,
               );
             } else {
