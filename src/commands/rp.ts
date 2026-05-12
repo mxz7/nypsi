@@ -33,7 +33,7 @@ const actions: Record<string, RoleplayAction> = {
       "https://c.tenor.com/W-R9sPkk_IMAAAAd/tenor.gif",
       "https://c.tenor.com/cIMCczKDW8oAAAAd/tenor.gif",
     ],
-    text: "**{sender}** {action} **{target}** 💋",
+    text: "{sender} {action} {target} 💋",
     action: "kissed",
   },
   hug: {
@@ -43,7 +43,7 @@ const actions: Record<string, RoleplayAction> = {
       "https://c.tenor.com/o8lR_BGgZCgAAAAd/tenor.gif",
       "https://c.tenor.com/wSJZSQqIHhUAAAAd/tenor.gif",
     ],
-    text: "**{sender}** {action} **{target}** 🤗",
+    text: "{sender} {action} {target} 🤗",
     action: "hugged",
     aliases: ["cuddle"],
   },
@@ -52,7 +52,7 @@ const actions: Record<string, RoleplayAction> = {
       "https://c.tenor.com/wSB-uAoR48UAAAAC/tenor.gif",
       "https://c.tenor.com/6Cp5tiRwh-YAAAAC/tenor.gif",
     ],
-    text: "**{sender}** {action} **{target}** 👊",
+    text: "{sender} {action} {target} 👊",
     action: "punched",
   },
   slap: {
@@ -60,12 +60,12 @@ const actions: Record<string, RoleplayAction> = {
       "https://c.tenor.com/j5rPRPBwSOMAAAAd/tenor.gif",
       "https://c.tenor.com/ysk3CJtdi60AAAAC/tenor.gif",
     ],
-    text: "**{sender}** {action} **{target}** 👋",
+    text: "{sender} {action} {target} 👋",
     action: "slapped",
   },
   boop: {
     gifs: ["https://c.tenor.com/88HZjGgr3k0AAAAd/tenor.gif"],
-    text: "**{sender}** {action} **{target}**",
+    text: "{sender} {action} {target}",
     action: "booped",
   },
   sex: {
@@ -73,7 +73,7 @@ const actions: Record<string, RoleplayAction> = {
       "https://c.tenor.com/9bVN6z6kJlMAAAAC/tenor.gif",
       "https://c.tenor.com/NHtslet7pEEAAAAd/tenor.gif",
     ],
-    text: "**{sender}** {action} **{target}** 💦",
+    text: "{sender} {action} {target} 💦",
     action: "had sex with",
   },
   spank: {
@@ -81,7 +81,7 @@ const actions: Record<string, RoleplayAction> = {
       "https://c.tenor.com/KI2iIP6dFTcAAAAC/tenor.gif",
       "https://c.tenor.com/fF3_SJgiUDgAAAAC/tenor.gif",
     ],
-    text: "**{sender}** {action} **{target}** 🍑",
+    text: "{sender} {action} {target} 🍑",
     action: "spanked",
   },
   flirt: {
@@ -90,7 +90,7 @@ const actions: Record<string, RoleplayAction> = {
       "https://c.tenor.com/ikB16DROyTEAAAAd/tenor.gif",
       "https://c.tenor.com/H25zF6Pu734AAAAC/tenor.gif",
     ],
-    text: "**{sender}** {action} **{target}** 😏",
+    text: "{sender} {action} {target} 😏",
     action: "flirted with",
   },
   lick: {
@@ -98,7 +98,7 @@ const actions: Record<string, RoleplayAction> = {
       "https://c.tenor.com/1w_SiTTl8joAAAAd/tenor.gif",
       "https://c.tenor.com/K9_q0nhLQyEAAAAC/tenor.gif",
     ],
-    text: "**{sender}** {action} **{target}** 👅",
+    text: "{sender} {action} {target} 👅",
     action: "licked",
   },
   peg: {
@@ -106,7 +106,7 @@ const actions: Record<string, RoleplayAction> = {
       "https://c.tenor.com/yG-niONE83sAAAAd/tenor.gif",
       "https://c.tenor.com/uBwsOmhiUBoAAAAd/tenor.gif",
     ],
-    text: "**{sender}** {action} **{target}** 🍑",
+    text: "{sender} {action} {target} 🍑",
     action: "pegged",
   },
   bite: {
@@ -115,7 +115,7 @@ const actions: Record<string, RoleplayAction> = {
       "https://c.tenor.com/FlNpqVlWb6YAAAAd/tenor.gif",
       "https://c.tenor.com/0_D9iWPRVAUAAAAd/tenor.gif",
     ],
-    text: "**{sender}** {action} **{target}** 🦷",
+    text: "{sender} {action} {target} 🦷",
     action: "bit",
   },
   squirt: {
@@ -123,7 +123,7 @@ const actions: Record<string, RoleplayAction> = {
       "https://c.tenor.com/BpMZTkzYG9oAAAAC/tenor.gif",
       "https://c.tenor.com/vzB4NFf84lMAAAAC/tenor.gif",
     ],
-    text: "**{sender}** {action} **{target}** 💦",
+    text: "{sender} {action} {target} 💦",
     action: "squirted on",
   },
 };
