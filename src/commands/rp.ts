@@ -209,7 +209,9 @@ async function run(
       embeds: [
         new CustomEmbed(message.member)
           .setHeader("roleplay")
-          .setDescription(`available actions: ${list}\n\nusage: \`$rp <action> [user]\``),
+          .setDescription(
+            `available actions: ${list}\n\nusage: \`/rp <action> [user]\`\n\`/rp stats\` - view your roleplay stats`,
+          ),
       ],
     });
   }
