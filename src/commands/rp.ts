@@ -3,6 +3,7 @@ import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getMember } from "../utils/functions/member";
 import { addRoleplayStat } from "../utils/functions/roleplay";
+import { pluralize } from "../utils/functions/string";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 type RoleplayAction = {
@@ -106,10 +107,12 @@ async function run(
       ? await addRoleplayStat(message.author.id, target.user.id, action)
       : null;
 
-  const embed = new CustomEmbed(message.member).setHeader(text, message.author.avatarURL()).setImage(gif);
+  const embed = new CustomEmbed(message.member)
+    .setHeader(text, message.author.avatarURL())
+    .setImage(gif);
 
   if (count !== null) {
-    embed.setFooter({ text: `${count} time${count === 1 ? "" : "s"}` });
+    embed.setFooter({ text: `${action}ed ${targetName} ${pluralize("time", count)}` });
   }
 
   return send({ embeds: [embed] });
