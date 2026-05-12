@@ -22,6 +22,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 type RoleplayAction = {
   gifs: string[];
   senderText: string;
+  pastTense: string;
 };
 
 const actions: Record<string, RoleplayAction> = {
@@ -32,6 +33,7 @@ const actions: Record<string, RoleplayAction> = {
       "https://c.tenor.com/cIMCczKDW8oAAAAd/tenor.gif",
     ],
     senderText: "**{sender}** kissed **{target}** 💋",
+    pastTense: "kissed",
   },
   hug: {
     gifs: [
@@ -41,6 +43,7 @@ const actions: Record<string, RoleplayAction> = {
       "https://c.tenor.com/wSJZSQqIHhUAAAAd/tenor.gif",
     ],
     senderText: "**{sender}** hugged **{target}** 🤗",
+    pastTense: "hugged",
   },
   punch: {
     gifs: [
@@ -48,6 +51,7 @@ const actions: Record<string, RoleplayAction> = {
       "https://c.tenor.com/6Cp5tiRwh-YAAAAC/tenor.gif",
     ],
     senderText: "**{sender}** punched **{target}** 👊",
+    pastTense: "punched",
   },
   slap: {
     gifs: [
@@ -55,10 +59,12 @@ const actions: Record<string, RoleplayAction> = {
       "https://c.tenor.com/ysk3CJtdi60AAAAC/tenor.gif",
     ],
     senderText: "**{sender}** slapped **{target}** 👋",
+    pastTense: "slapped",
   },
   boop: {
     gifs: ["https://c.tenor.com/88HZjGgr3k0AAAAd/tenor.gif"],
     senderText: "**{sender}** booped **{target}**",
+    pastTense: "booped",
   },
 };
 
@@ -270,7 +276,7 @@ async function run(
     .setHeader(text, message.author.avatarURL())
     .setImage(gif);
 
-  embed.setFooter({ text: `${action}ed ${targetName} ${pluralize("time", count)}` });
+  embed.setFooter({ text: `${actionData.pastTense} ${targetName} ${pluralize("time", count)}` });
 
   return send({ embeds: [embed] });
 }
