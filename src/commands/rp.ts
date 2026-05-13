@@ -7,8 +7,11 @@ import {
   StringSelectMenuBuilder,
   StringSelectMenuOptionBuilder,
 } from "discord.js";
+import redis from "../init/redis";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import Constants from "../utils/Constants";
+import { MStoTime } from "../utils/functions/date";
 import { getMember } from "../utils/functions/member";
 import {
   addRoleplayStat,
@@ -313,6 +316,23 @@ async function run(
   }
 
   const actionData = actions[action];
+
+  if (
+    action === "sex" &&
+    (await redis.exists(`${Constants.redis.cooldown.SEX_CHASTITY}:${message.author.id}`)) == 1
+  ) {
+    const init = parseInt(
+      await redis.get(`${Constants.redis.cooldown.SEX_CHASTITY}:${message.author.id}`),
+    );
+    const remaining = MStoTime(Date.now() + 10800000 - init);
+    return send({
+      embeds: [
+        new ErrorEmbed(
+          `you can't have sex when you're wearing a chastity cage!! it'll be removed in **${remaining}**`,
+        ),
+      ],
+    });
+  }
 
   await addCooldown(cmd.name, message.member, 3);
 
