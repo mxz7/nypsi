@@ -53,7 +53,7 @@
     "sharp": "^0.34.5",
     "string-similarity": "4.0.4",
     "zlib-sync": "^0.1.10",
-    "zod": "^4.3.6"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/crypto-js": "4.2.2",
