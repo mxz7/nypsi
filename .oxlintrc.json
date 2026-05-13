@@ -2,6 +2,9 @@
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "plugins": ["typescript", "node", "oxc", "unicorn"],
   "categories": {},
+  "options": {
+    "typeAware": true
+  },
   "rules": {
     "no-case-declarations": "off",
     "no-unreachable": "error",
