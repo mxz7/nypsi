@@ -75,6 +75,7 @@ const actions: Record<string, RoleplayAction> = {
     ],
     text: "{sender} {action} {target} 💦",
     action: "had sex with",
+    aliases: ["fuck"],
   },
   spank: {
     gifs: [
