@@ -1,6 +1,7 @@
 import {
   ActionRowBuilder,
   CommandInteraction,
+  GuildMember,
   Interaction,
   MessageActionRowComponentBuilder,
   MessageFlags,
@@ -336,9 +337,9 @@ async function run(
 
   await addCooldown(cmd.name, message.member, 3);
 
-  let target = message.mentions?.members?.first();
+  let target: GuildMember;
 
-  if (!target && args[1]) {
+  if (args[1]) {
     target = await getMember(message.guild, args.slice(1).join(" "));
     if (!target) {
       return send({ embeds: [new ErrorEmbed("couldn't find that user")] });
