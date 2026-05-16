@@ -204,47 +204,27 @@ export type SlimMember = {
   nickname?: string;
 };
 
-const restMembersCacheRedis = new RedisCache<SlimMember[]>(
+type RestMembersCache = {
+  fetchedAt: number;
+  members: SlimMember[];
+};
+
+const restMembersCacheRedis = new RedisCache<RestMembersCache>(
   Constants.redis.cache.guild.MEMBERS_SLIM,
-  Math.floor(ms("15 minutes") / 1000),
+  Math.floor(ms("24 hours") / 1000),
 );
 const restMutex = new Mutex();
 
-export async function getAllMembersRest(
+async function fetchAndCacheMembersRest(
   guildId: string,
   client?: NypsiClient,
-  userIdsOnly?: false,
-): Promise<SlimMember[]>;
-export async function getAllMembersRest(
-  guildId: string,
-  client: NypsiClient | undefined,
-  userIdsOnly: true,
-): Promise<string[]>;
-export async function getAllMembersRest(
-  guildId: string,
-  client?: NypsiClient,
-  userIdsOnly = false,
-): Promise<SlimMember[] | string[]> {
-  const cache = await restMembersCacheRedis.get(guildId);
-
-  if (cache) {
-    return userIdsOnly ? cache.map((m) => m.userId) : cache;
-  }
-
+): Promise<SlimMember[]> {
   await restMutex.acquire(guildId);
 
   try {
-    // re-check cache after acquiring lock in case another call already populated it
+    // re-check freshness after acquiring lock in case another call already revalidated
     const cached = await restMembersCacheRedis.get(guildId);
-    if (cached) return userIdsOnly ? cached.map((m) => m.userId) : cached;
-
-    const lastFetched = await redis.get(
-      `${Constants.redis.cache.guild.MEMBERS_RECENTLY_FETCHED_REST}:${guildId}`,
-    );
-
-    if (lastFetched && userIdsOnly) {
-      return await getDatabaseMembers(guildId);
-    }
+    if (cached && Date.now() - cached.fetchedAt < ms("15 minutes")) return cached.members;
 
     const rest = getRest(client);
 
@@ -274,20 +254,53 @@ export async function getAllMembersRest(
       after = batch.at(-1)!.user!.id;
     }
 
-    await restMembersCacheRedis.set(guildId, allMembers);
+    await restMembersCacheRedis.set(guildId, { fetchedAt: Date.now(), members: allMembers });
 
-    const userIds = allMembers.map((m) => m.userId);
-
-    void checkMembers(guildId, userIds).catch((error) => {
+    void checkMembers(
+      guildId,
+      allMembers.map((m) => m.userId),
+    ).catch((error) => {
       logger.error("members: failed to update guild members in database", { guildId, error });
     });
 
     logger.debug(`members: fetched ${allMembers.length} members via REST`, { guildId });
 
-    return userIdsOnly ? userIds : allMembers;
+    return allMembers;
   } finally {
     restMutex.release(guildId);
   }
+}
+
+export async function getAllMembersRest(
+  guildId: string,
+  client?: NypsiClient,
+  userIdsOnly?: false,
+): Promise<SlimMember[]>;
+export async function getAllMembersRest(
+  guildId: string,
+  client: NypsiClient | undefined,
+  userIdsOnly: true,
+): Promise<string[]>;
+export async function getAllMembersRest(
+  guildId: string,
+  client?: NypsiClient,
+  userIdsOnly = false,
+): Promise<SlimMember[] | string[]> {
+  const cached = await restMembersCacheRedis.get(guildId);
+
+  if (cached) {
+    if (Date.now() - cached.fetchedAt >= ms("15 minutes")) {
+      // stale: serve cached data and revalidate in the background
+      void fetchAndCacheMembersRest(guildId, client).catch((error) => {
+        logger.error("members: background revalidation failed", { guildId, error });
+      });
+    }
+
+    return userIdsOnly ? cached.members.map((m) => m.userId) : cached.members;
+  }
+
+  const allMembers = await fetchAndCacheMembersRest(guildId, client);
+  return userIdsOnly ? allMembers.map((m) => m.userId) : allMembers;
 }
 
 export function transformGuildMemberToSlim(member: GuildMember): SlimMember {
