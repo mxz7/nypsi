@@ -48,6 +48,7 @@ Accept the request if the user is:
 - Asking about the nypsi bot or the official nypsi server
 - Suggesting a new feature
 - Saying they will provide screenshots or other info
+- Asking about purchases, especially for premium membership or items / currency
 
 If the topic seems bot-related but isn't in the documentation, still accept it.
 When in doubt, it is better to wrongly accept a request than to wrongly deny one.
