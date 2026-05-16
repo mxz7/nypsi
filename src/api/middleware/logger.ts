@@ -6,7 +6,7 @@ const loggerMiddleware: MiddlewareHandler = async (c, next) => {
   const start = performance.now();
 
   await next();
-  const duration = Math.round(performance.now() - start);
+  const duration = (performance.now() - start).toFixed(1);
 
   logger.info(`api: ${c.req.method} ${c.req.path} - ${c.res.status} (${duration}ms)`);
 };
