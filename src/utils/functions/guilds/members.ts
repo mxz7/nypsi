@@ -7,11 +7,11 @@ import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { getRest } from "../../rest";
-import { Mutex } from "../mutex";
+import { MemoryMutex } from "../mutex";
 import ms = require("ms");
 
-const mutex = new Mutex(true);
-const checkMutex = new Mutex();
+const mutex = new MemoryMutex(true);
+const checkMutex = new MemoryMutex();
 
 // recently checked against db
 const recentlyChecked = new Set<string>();
@@ -213,7 +213,7 @@ const restMembersCacheRedis = new RedisCache<RestMembersCache>(
   Constants.redis.cache.guild.MEMBERS_SLIM,
   Math.floor(ms("24 hours") / 1000),
 );
-const restMutex = new Mutex();
+const restMutex = new MemoryMutex();
 
 async function fetchAndCacheMembersRest(
   guildId: string,

@@ -1,13 +1,18 @@
 import { logger } from "../logger";
 
-export class Mutex {
-  private locks = new Map<string, { locked: boolean; queue: (() => void)[] }>();
-
-  private shouldLog: boolean;
+export abstract class Mutex {
+  protected shouldLog: boolean;
 
   constructor(shouldLog = false) {
     this.shouldLog = shouldLog;
   }
+
+  abstract acquire(key: string): Promise<void>;
+  abstract release(key: string): void;
+}
+
+export class MemoryMutex extends Mutex {
+  private locks = new Map<string, { locked: boolean; queue: (() => void)[] }>();
 
   async acquire(key: string): Promise<void> {
     if (this.shouldLog) {

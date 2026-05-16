@@ -26,7 +26,7 @@ import { logger } from "../../logger";
 import { deleteImage } from "../image";
 import { getUserId, MemberResolvable } from "../member";
 import { getAllGroupAccountIds } from "../moderation/alts";
-import { Mutex } from "../mutex";
+import { MemoryMutex } from "../mutex";
 import { pluralize } from "../string";
 import { isUserBlacklisted } from "../users/blacklist";
 import { isMarried } from "../users/marriage";
@@ -213,7 +213,7 @@ export function runEconomySetup() {
   loadItems();
 }
 
-const userExistsMutex = new Mutex();
+const userExistsMutex = new MemoryMutex();
 
 export async function userExists(member: MemberResolvable): Promise<boolean> {
   const userId = getUserId(member);

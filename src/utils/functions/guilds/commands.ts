@@ -1,7 +1,7 @@
 import prisma from "../../../init/database";
 import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
-import { Mutex } from "../mutex";
+import { MemoryMutex } from "../mutex";
 
 const lastCommand = new Map<string, number>();
 // guildId
@@ -29,7 +29,7 @@ export function getLastCommandSync(guildId: string) {
 }
 
 const cache = new RedisCache<number | string>(Constants.redis.cache.guild.LAST_COMMAND, 3600);
-const mutex = new Mutex();
+const mutex = new MemoryMutex();
 
 export async function getLastCommand(guildId: string) {
   await mutex.acquire(guildId);

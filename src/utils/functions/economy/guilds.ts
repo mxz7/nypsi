@@ -9,7 +9,7 @@ import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { deleteImage } from "../image";
 import { getUserId, MemberResolvable } from "../member";
-import { Mutex } from "../mutex";
+import { MemoryMutex } from "../mutex";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { addInventoryItem } from "./inventory";
 import { getUpgrades } from "./levelling";
@@ -440,7 +440,7 @@ interface EconomyGuildMember {
   contributedXpThisLevel: number;
 }
 
-const checkUpgradeMutex = new Mutex();
+const checkUpgradeMutex = new MemoryMutex();
 
 async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
   if (await redis.exists(Constants.redis.nypsi.INFINITE_MAX_BET)) return false;

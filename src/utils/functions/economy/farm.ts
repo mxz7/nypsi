@@ -6,7 +6,7 @@ import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
-import { Mutex } from "../mutex";
+import { MemoryMutex } from "../mutex";
 import { addProgress } from "./achievements";
 import { getBoosters } from "./boosters";
 import { addEventProgress } from "./events";
@@ -19,7 +19,7 @@ import ms = require("ms");
 
 const PLANTS_PER_FERTILISER = 5;
 
-const farmClaimMutex = new Mutex();
+const farmClaimMutex = new MemoryMutex();
 
 export async function getFarm(member: MemberResolvable) {
   const userId = getUserId(member);

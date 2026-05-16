@@ -3,7 +3,7 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
-import { Mutex } from "../mutex";
+import { MemoryMutex } from "../mutex";
 import ms = require("ms");
 
 const peaks = new Map<string, number>();
@@ -65,7 +65,7 @@ export async function updateGuild(guild: Guild) {
   }
 }
 
-const hasGuildMutex = new Mutex();
+const hasGuildMutex = new MemoryMutex();
 
 export async function hasGuild(guild: Guild | string): Promise<boolean> {
   const key = guild instanceof Guild ? guild.id : guild;

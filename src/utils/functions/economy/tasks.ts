@@ -8,7 +8,7 @@ import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { addKarma } from "../karma/karma";
 import { getUserId, MemberResolvable } from "../member";
-import { Mutex } from "../mutex";
+import { MemoryMutex } from "../mutex";
 import sleep from "../sleep";
 import { addInlineNotification } from "../users/notifications";
 import { getLastKnownAvatar } from "../users/username";
@@ -92,7 +92,7 @@ async function generateWeeklyTasks(member: MemberResolvable, count: number) {
   await redis.del(`${Constants.redis.cache.economy.TASKS}:${userId}`);
 }
 
-const tasksMutex = new Mutex();
+const tasksMutex = new MemoryMutex();
 
 export async function getTasks(member: MemberResolvable): Promise<PrismaTask[]> {
   const userId = getUserId(member);
@@ -247,7 +247,7 @@ export function parseReward(reward: string) {
   return out;
 }
 
-const taskProgressMutex = new Mutex(false);
+const taskProgressMutex = new MemoryMutex(false);
 
 export async function addTaskProgress(member: MemberResolvable, taskId: string, amount = 1) {
   const userId = getUserId(member);

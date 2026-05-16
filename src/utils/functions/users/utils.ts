@@ -9,12 +9,12 @@ import { getGuildByUser } from "../economy/guilds";
 import { deleteOffer, getTargetedOffers } from "../economy/offers";
 import { deleteImage } from "../image";
 import { getUserId, MemberResolvable } from "../member";
-import { Mutex } from "../mutex";
+import { MemoryMutex } from "../mutex";
 import { addNewUsername, deleteAllAvatars } from "./history";
 import { isMarried, removeMarriage } from "./marriage";
 import ms = require("ms");
 
-const hasUserMutex = new Mutex();
+const hasUserMutex = new MemoryMutex();
 
 export async function hasProfile(member: MemberResolvable) {
   const userId = getUserId(member);
