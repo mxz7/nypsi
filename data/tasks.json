@@ -391,7 +391,7 @@
     "name": "couch potato",
     "description": "rate a movie or tv show (/tmdb)",
     "target": [1],
-    "prizes": ["id:basic_crate:1", "xp:1000", "id:basic_crate:2"],
+    "prizes": ["id:basic_crate:1", "xp:500", "id:basic_crate:2"],
     "type": "daily"
   },
   "museum_weekly": {
@@ -421,5 +421,13 @@
       "id:nypsi_crate:1"
     ],
     "type": "weekly"
+  },
+  "roleplay_daily": {
+    "id": "roleplay_daily",
+    "name": "roleplayer",
+    "description": "roleplay with another user (/rp)",
+    "target": [3, 5, 7],
+    "prizes": ["id:basic_crate:1", "xp:500", "id:basic_crate:2"],
+    "type": "daily"
   }
 }
