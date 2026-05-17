@@ -275,21 +275,28 @@ export async function getAllMembersRest(
   guildId: string,
   client?: NypsiClient,
   userIdsOnly?: false,
+  noStale?: boolean,
 ): Promise<SlimMember[]>;
 export async function getAllMembersRest(
   guildId: string,
   client: NypsiClient | undefined,
   userIdsOnly: true,
+  noStale?: boolean,
 ): Promise<string[]>;
 export async function getAllMembersRest(
   guildId: string,
   client?: NypsiClient,
   userIdsOnly = false,
+  noStale = false,
 ): Promise<SlimMember[] | string[]> {
   const cached = await restMembersCacheRedis.get(guildId);
 
   if (cached) {
     if (Date.now() - cached.fetchedAt >= ms("15 minutes")) {
+      if (noStale) {
+        const allMembers = await fetchAndCacheMembersRest(guildId, client);
+        return userIdsOnly ? allMembers.map((m) => m.userId) : allMembers;
+      }
       // stale: serve cached data and revalidate in the background
       void fetchAndCacheMembersRest(guildId, client).catch((error) => {
         logger.error("members: background revalidation failed", { guildId, error });
