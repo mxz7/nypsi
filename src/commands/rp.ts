@@ -131,6 +131,16 @@ const actions: Record<string, RoleplayAction> = {
     text: "{sender} {action} {target}!! messy",
     action: "squirted on",
   },
+  pat: {
+    gifs: [
+      "https://c.tenor.com/f5asRSsfl-wAAAAC/tenor.gif",
+      "https://c.tenor.com/9PAkJvbE6R0AAAAC/tenor.gif",
+      "https://c.tenor.com/gERa1EVU2ocAAAAd/tenor.gif",
+    ],
+    text: "{sender} gave {target} head pats!! there there",
+    action: "gave head pats to",
+    aliases: ["headpat"],
+  },
 };
 
 const cmd = new Command("rp", "roleplay actions", "fun").setAliases(["roleplay"]);
