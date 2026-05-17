@@ -96,7 +96,7 @@ export class RedisMutex extends Mutex {
     const redisKey = this.redisKey(key);
 
     if (this.shouldLog) {
-      logger.debug(`redis-mutex: requested ${key}`);
+      logger.debug(`redis-mutex: requested ${redisKey}`);
     }
 
     while (true) {
