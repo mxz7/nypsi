@@ -720,7 +720,7 @@ export async function runCommand(
     if (!(message instanceof Message)) {
       let res: Message;
 
-      if (message.deferred) {
+      if (message.deferred || message.replied) {
         res = await message.editReply(data as InteractionEditReplyOptions).catch(() => {
           logger.warn("send: failed to edit deferred reply");
           return message.channel.send(data as BaseMessageOptions);
