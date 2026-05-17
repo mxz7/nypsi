@@ -198,7 +198,7 @@ export default {
   async run(interaction) {
     if (!interaction.isButton()) return;
 
-    if (await isEcoBanned(interaction.user.id)) {
+    if ((await isEcoBanned(interaction.user.id)).banned) {
       await interaction.reply({
         embeds: [new ErrorEmbed("you are currently ecobanned")],
         ephemeral: true,
