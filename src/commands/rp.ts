@@ -13,6 +13,7 @@ import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { MStoTime } from "../utils/functions/date";
+import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { getMember } from "../utils/functions/member";
 import {
   addRoleplayStat,
@@ -384,6 +385,7 @@ async function run(
   const gif = actionData.gifs[Math.floor(Math.random() * actionData.gifs.length)];
 
   const count = await addRoleplayStat(message.author.id, target.user.id, action);
+  addTaskProgress(message.author.id, "roleplay_daily", 1);
 
   const embed = new CustomEmbed(message.member)
     .setHeader(text, message.author.avatarURL())
