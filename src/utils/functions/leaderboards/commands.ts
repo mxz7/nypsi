@@ -70,7 +70,7 @@ export async function topCommand(
     count++;
 
     promises.push(async () => {
-      const username = await getUsername(
+      const username = getUsername(
         user.userId,
         user.user.lastKnownUsername,
         user.user.usernameUpdatedAt,
@@ -146,7 +146,7 @@ export async function topCommandUses(
     promises.push(async () => {
       const usernameData = await getLastKnownUsername(user.userId, false, true);
 
-      const username = await getUsername(
+      const username = getUsername(
         user.userId,
         usernameData.lastKnownUsername,
         usernameData.usernameUpdatedAt,

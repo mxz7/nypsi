@@ -65,7 +65,7 @@ export async function topDailyStreak(
     count++;
 
     promises.push(async () => {
-      const username = await getUsername(
+      const username = getUsername(
         user.userId,
         user.user.lastKnownUsername,
         user.user.usernameUpdatedAt,
@@ -141,7 +141,7 @@ export async function topVoteStreak(
     count++;
 
     promises.push(async () => {
-      const username = await getUsername(
+      const username = getUsername(
         user.userId,
         user.user.lastKnownUsername,
         user.user.usernameUpdatedAt,

@@ -63,7 +63,7 @@ export async function topWordle(
 
     promises.push(async () => {
       const usernameData = await getLastKnownUsername(user.userId, false, true);
-      const username = await getUsername(
+      const username = getUsername(
         user.userId,
         usernameData.lastKnownUsername,
         usernameData.usernameUpdatedAt,

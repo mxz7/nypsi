@@ -1,4 +1,5 @@
 import { Guild } from "discord.js";
+import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
@@ -44,7 +45,7 @@ export async function getMembers(guild?: Guild) {
   return members.filter((userId) => userId !== Constants.BOT_USER_ID);
 }
 
-export async function getUsername(
+export function getUsername(
   userId: string,
   lastKnownUsername: string,
   lastUpdatedUsername: Date,
@@ -53,13 +54,26 @@ export async function getUsername(
   let username = lastKnownUsername;
 
   if (guild && lastUpdatedUsername.getTime() < Date.now() - UPDATE_USERNAME_MS) {
-    const discordUser = await guild.client.users.fetch(userId).catch(() => {});
-    if (discordUser) {
-      username = discordUser.username;
-      updateLastKnownUsername(userId, username).catch(() => {
-        logger.warn(`leaderboards: failed to update last known username for ${userId}`);
-      });
-    }
+    (async () => {
+      const cached = await redis.get(`${Constants.redis.cache.user.username}:${userId}`);
+      if (cached) {
+        const { usernameUpdatedAt } = JSON.parse(cached) as { usernameUpdatedAt: string };
+        if (new Date(usernameUpdatedAt).getTime() > Date.now() - UPDATE_USERNAME_MS) return;
+      }
+
+      await redis.set(
+        `${Constants.redis.cache.user.username}:${userId}`,
+        JSON.stringify({ lastKnownUsername: username, usernameUpdatedAt: new Date() }),
+        "EX",
+        7200,
+      );
+      const discordUser = await guild.client.users.fetch(userId).catch(() => {});
+      if (discordUser) {
+        updateLastKnownUsername(userId, username).catch(() => {
+          logger.warn(`leaderboards: failed to update last known username for ${userId}`);
+        });
+      }
+    })();
   }
 
   return username;

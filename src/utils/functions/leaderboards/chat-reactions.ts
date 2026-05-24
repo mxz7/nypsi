@@ -239,7 +239,7 @@ export async function topChatReaction(
     count++;
 
     promises.push(async () => {
-      const username = await getUsername(
+      const username = getUsername(
         user.userId,
         user.user.lastKnownUsername,
         user.user.usernameUpdatedAt,

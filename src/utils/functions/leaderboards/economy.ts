@@ -70,7 +70,7 @@ export async function topBalance(
     count++;
 
     promises.push(async () => {
-      const username = await getUsername(
+      const username = getUsername(
         user.userId,
         user.user.lastKnownUsername,
         user.user.usernameUpdatedAt,
@@ -146,7 +146,7 @@ export async function topNetWorth(
     count++;
 
     promises.push(async () => {
-      const username = await getUsername(
+      const username = getUsername(
         user.userId,
         user.user.lastKnownUsername,
         user.user.usernameUpdatedAt,
@@ -224,7 +224,7 @@ export async function topPrestige(
     count++;
 
     promises.push(async () => {
-      const username = await getUsername(
+      const username = getUsername(
         user.userId,
         user.user.lastKnownUsername,
         user.user.usernameUpdatedAt,
@@ -305,7 +305,7 @@ export async function topItem(
     count++;
 
     promises.push(async () => {
-      const username = await getUsername(
+      const username = getUsername(
         user.userId,
         user.economy.user.lastKnownUsername,
         user.economy.user.usernameUpdatedAt,
@@ -367,7 +367,7 @@ export async function topCompletion(guild: Guild, member: MemberResolvable) {
 
     promises.push(async () => {
       const usernameData = await getLastKnownUsername(user.userId, false, true);
-      const username = await getUsername(
+      const username = getUsername(
         user.userId,
         usernameData.lastKnownUsername,
         usernameData.usernameUpdatedAt,
@@ -471,7 +471,7 @@ export async function topLottoWins(
     count++;
 
     promises.push(async () => {
-      const username = await getUsername(
+      const username = getUsername(
         user.userId,
         user.user.lastKnownUsername,
         user.user.usernameUpdatedAt,
@@ -544,7 +544,7 @@ export async function topVote(
     count++;
 
     promises.push(async () => {
-      const username = await getUsername(
+      const username = getUsername(
         user.userId,
         user.user.lastKnownUsername,
         user.user.usernameUpdatedAt,

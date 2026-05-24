@@ -82,7 +82,7 @@ export async function topMuseumCompletion(
     const pos = getPos(index + 1);
 
     promises.push(async () => {
-      const username = await getUsername(
+      const username = getUsername(
         user.userId,
         user.economy.user.lastKnownUsername,
         user.economy.user.usernameUpdatedAt,
@@ -324,7 +324,7 @@ export async function topMuseumAmount(
     const pos = getPos(index + 1);
 
     promises.push(async () => {
-      const username = await getUsername(
+      const username = getUsername(
         user.userId,
         user.economy.user.lastKnownUsername,
         user.economy.user.usernameUpdatedAt,

@@ -65,7 +65,7 @@ export async function topChessSolved(
     count++;
 
     promises.push(async () => {
-      const username = await getUsername(
+      const username = getUsername(
         user.userId,
         user.user.lastKnownUsername,
         user.user.usernameUpdatedAt,
@@ -135,7 +135,7 @@ export async function topChessAvgRating(
     count++;
 
     promises.push(async () => {
-      const username = await getUsername(
+      const username = getUsername(
         user.userId,
         user.user.lastKnownUsername,
         user.user.usernameUpdatedAt,
@@ -204,7 +204,7 @@ export async function topChessFastestSolve(
     count++;
 
     promises.push(async () => {
-      const username = await getUsername(
+      const username = getUsername(
         user.userId,
         user.user.lastKnownUsername,
         user.user.usernameUpdatedAt,
