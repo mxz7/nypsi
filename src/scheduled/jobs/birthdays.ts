@@ -92,13 +92,17 @@ export default {
                         );
                       });
                   } catch (e) {
-                    logger.error(`error handling birthday in ${guildData.id} for ${member.id}`, e);
+                    logger.error(`error handling birthday in ${guildData.id} for ${member.id}`, {
+                      error: e,
+                    });
                   }
                 }
 
                 hook.destroy();
               } catch (e) {
-                logger.error(`error handling birthdays in ${guildData.id}`, e);
+                logger.error(`error handling birthdays in ${guildData.id}`, {
+                  error: e,
+                });
               }
             }
 
