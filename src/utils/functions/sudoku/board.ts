@@ -3,8 +3,8 @@ import { logger } from "../../logger";
 import { indexToCoord } from "./game";
 import sharp = require("sharp");
 
-const CELL = 64;
-const CANVAS = CELL * 9; // 576
+const CELL = 96;
+const CANVAS = CELL * 9; // 864
 
 type SudokuGameBoard = {
   puzzle: string;
@@ -12,15 +12,14 @@ type SudokuGameBoard = {
   board: string;
 };
 
-const BG = "#1e1e2e";
-const BG_COMPLETE = "#1e2a3a";
-const BG_WRONG = "#3a1e1e";
-const GRID_BOX = "#888899";
-const GRID_THIN = "#3a3a52";
-const TEXT_GIVEN = "#cdd6f4";
-const TEXT_CORRECT = "#89b4fa";
-const TEXT_WRONG = "#f38ba8";
-const TEXT_COORD = "#585870";
+const BG = "#313136";
+const BG_COMPLETE = "#3d3d43";
+const GRID_BOX = "#555560";
+const GRID_THIN = "#47474f";
+const TEXT_GIVEN = "#e8e8f0";
+const TEXT_CORRECT = "#7ab8f5";
+const TEXT_WRONG = "#f47067";
+const TEXT_COORD = "#6e6e7e";
 
 function isGroupComplete(board: string, solution: string, indices: number[]): boolean {
   return indices.every((i) => board[i] !== "-" && board[i] === solution[i]);
@@ -74,9 +73,7 @@ function buildSvg(game: SudokuGameBoard, coordMode: SudokuCoordMode): string {
     const boxIndex = Math.floor(row / 3) * 3 + Math.floor(col / 3);
     const groupComplete = completedRows[row] || completedCols[col] || completedBoxes[boxIndex];
 
-    if (isWrong) {
-      parts.push(`<rect x="${x}" y="${y}" width="${CELL}" height="${CELL}" fill="${BG_WRONG}"/>`);
-    } else if (groupComplete) {
+    if (groupComplete) {
       parts.push(
         `<rect x="${x}" y="${y}" width="${CELL}" height="${CELL}" fill="${BG_COMPLETE}"/>`,
       );
@@ -85,7 +82,7 @@ function buildSvg(game: SudokuGameBoard, coordMode: SudokuCoordMode): string {
     // Coord label
     const coordLabel = indexToCoord(i, coordMode);
     parts.push(
-      `<text x="${x + 3}" y="${y + 11}" font-family="monospace" font-size="10" fill="${TEXT_COORD}">${coordLabel}</text>`,
+      `<text x="${x + 4}" y="${y + 17}" font-family="monospace" font-size="15" fill="${TEXT_COORD}">${coordLabel}</text>`,
     );
 
     // Number
@@ -94,16 +91,16 @@ function buildSvg(game: SudokuGameBoard, coordMode: SudokuCoordMode): string {
       const textColor = isWrong ? TEXT_WRONG : isGiven ? TEXT_GIVEN : TEXT_CORRECT;
       const fontWeight = isGiven ? "bold" : "normal";
       parts.push(
-        `<text x="${x + 32}" y="${y + 47}" font-family="monospace" font-size="38" font-weight="${fontWeight}" text-anchor="middle" fill="${textColor}">${num}</text>`,
+        `<text x="${x + 48}" y="${y + 70}" font-family="monospace" font-size="54" font-weight="${fontWeight}" text-anchor="middle" fill="${textColor}">${num}</text>`,
       );
     }
   }
 
-  // Grid lines
-  for (let i = 0; i <= 9; i++) {
+  // Grid lines (inner only — no outer border)
+  for (let i = 1; i <= 8; i++) {
     const pos = i * CELL;
     const isBox = i % 3 === 0;
-    const strokeWidth = isBox ? 2 : 0.5;
+    const strokeWidth = isBox ? 3 : 0.5;
     const stroke = isBox ? GRID_BOX : GRID_THIN;
 
     parts.push(

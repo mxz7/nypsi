@@ -1,11 +1,11 @@
-import { SudokuCoordMode, SudokuDifficulty } from "#generated/prisma";
 import {
-	ActionRowBuilder,
-	AttachmentBuilder,
-	ButtonBuilder,
-	ButtonStyle,
-	MessageActionRowComponentBuilder,
+  ActionRowBuilder,
+  AttachmentBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  MessageActionRowComponentBuilder,
 } from "discord.js";
+import { SudokuCoordMode, SudokuDifficulty } from "#generated/prisma";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { renderBoard } from "./board";
 
