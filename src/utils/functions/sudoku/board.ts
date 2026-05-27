@@ -96,9 +96,8 @@ function buildSvg(game: SudokuGameBoard, coordMode: SudokuCoordMode, highlight?:
     if (isFilled) {
       const num = isGiven ? game.puzzle[i] : boardChar;
       const textColor = isWrong ? TEXT_WRONG : isGiven ? TEXT_GIVEN : TEXT_CORRECT;
-      const fontWeight = isGiven ? "bold" : "normal";
       parts.push(
-        `<text x="${x + 48}" y="${y + 70}" font-family="monospace" font-size="54" font-weight="${fontWeight}" text-anchor="middle" fill="${textColor}">${num}</text>`,
+        `<text x="${x + 48}" y="${y + 70}" font-family="monospace" font-size="54" font-weight="bold" text-anchor="middle" fill="${textColor}">${num}</text>`,
       );
     }
   }
