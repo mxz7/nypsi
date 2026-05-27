@@ -101,6 +101,9 @@ importers:
       string-similarity:
         specifier: 4.0.4
         version: 4.0.4
+      sudoku-gen:
+        specifier: ^1.0.2
+        version: 1.0.2
       zlib-sync:
         specifier: ^0.1.10
         version: 0.1.10
@@ -2386,6 +2389,9 @@ packages:
 
   strnum@2.3.0:
     resolution: {integrity: sha512-ums3KNd42PGyx5xaoVTO1mjU1bH3NpY4vsrVlnv9PNGqQj8wd7rJ6nEypLrJ7z5vxK5RP0yMLo6J/Gsm62DI5Q==}
+
+  sudoku-gen@1.0.2:
+    resolution: {integrity: sha512-zQFQNbar9qGpbteAH7CQShGoR5lk7r4KYlt0Wsvts1eVMzLb2EZUovzc7gAmoHp+HmXGYadmqCyyXoY7QVEyhA==}
 
   supports-color@7.2.0:
     resolution: {integrity: sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==}
@@ -4885,6 +4891,8 @@ snapshots:
   string-similarity@4.0.4: {}
 
   strnum@2.3.0: {}
+
+  sudoku-gen@1.0.2: {}
 
   supports-color@7.2.0:
     dependencies:
