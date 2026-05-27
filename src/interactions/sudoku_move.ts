@@ -5,6 +5,7 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
+import { ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
 import {
   applyMove,
@@ -28,14 +29,14 @@ export default {
     const game = await getGameById(gameId);
     if (!game || game.state !== "active") {
       return interaction.reply({
-        content: "no active sudoku game found",
+        embeds: [new ErrorEmbed("no active sudoku game found")],
         flags: MessageFlags.Ephemeral,
       });
     }
 
     if (game.userId !== interaction.user.id) {
       return interaction.reply({
-        content: "this is not your game",
+        embeds: [new ErrorEmbed("this is not your game")],
         flags: MessageFlags.Ephemeral,
       });
     }
