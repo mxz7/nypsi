@@ -119,9 +119,9 @@ async function run(
   }
   await addCooldown(cmd.name, message.member, 5);
 
-  let difficulty: SudokuDifficulty = "medium";
+  let difficulty: SudokuDifficulty = "easy";
   if (!(message instanceof Message) && message.isChatInputCommand()) {
-    difficulty = (message.options.getString("difficulty") as SudokuDifficulty) ?? "medium";
+    difficulty = (message.options.getString("difficulty") as SudokuDifficulty) ?? "easy";
   } else if (args[1] && (DIFFICULTIES as string[]).includes(args[1].toLowerCase())) {
     difficulty = args[1].toLowerCase() as SudokuDifficulty;
   }
