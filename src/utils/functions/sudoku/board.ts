@@ -15,6 +15,7 @@ type SudokuGameBoard = {
 const BG = "#313136";
 const BG_COMPLETE = "#3d3d43";
 const BG_HIGHLIGHT = "#29292e";
+const BG_CROSSHAIR = "#393940";
 const BG_LASTMOVE_CORRECT = "#19324a"; // faded blue
 const BG_LASTMOVE_WRONG = "#4a2320"; // faded red
 const GRID_BOX = "#555560";
@@ -33,6 +34,7 @@ function buildSvg(
   coordMode: SudokuCoordMode,
   highlight?: number,
   lastCell?: number,
+  crosshair?: number,
 ): string {
   const parts: string[] = [];
 
@@ -81,6 +83,8 @@ function buildSvg(
     const boxIndex = Math.floor(row / 3) * 3 + Math.floor(col / 3);
     const groupComplete = completedRows[row] || completedCols[col] || completedBoxes[boxIndex];
     const cellDigit = isFilled ? parseInt(isGiven ? game.puzzle[i] : boardChar, 10) : null;
+    const inCrosshair =
+      crosshair !== undefined && (row === Math.floor(crosshair / 9) || col === crosshair % 9);
 
     if (lastCell === i && isFilled) {
       // Strong highlight for last move
@@ -90,6 +94,10 @@ function buildSvg(
     } else if (highlight !== undefined && cellDigit === highlight) {
       parts.push(
         `<rect x="${x}" y="${y}" width="${CELL}" height="${CELL}" fill="${BG_HIGHLIGHT}"/>`,
+      );
+    } else if (inCrosshair) {
+      parts.push(
+        `<rect x="${x}" y="${y}" width="${CELL}" height="${CELL}" fill="${BG_CROSSHAIR}"/>`,
       );
     } else if (groupComplete) {
       parts.push(
@@ -137,9 +145,10 @@ export async function renderBoard(
   coordMode: SudokuCoordMode,
   highlight?: number,
   lastCell?: number,
+  crosshair?: number,
 ): Promise<Buffer> {
   const start = performance.now();
-  const svg = buildSvg(game, coordMode, highlight, lastCell);
+  const svg = buildSvg(game, coordMode, highlight, lastCell, crosshair);
 
   const sharpBefore = performance.now();
   const result = await sharp(Buffer.from(svg)).png().toBuffer();

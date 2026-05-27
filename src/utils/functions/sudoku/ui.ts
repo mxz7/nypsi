@@ -69,8 +69,9 @@ export async function buildGameMessage(
   avatarUrl: string,
   highlight?: number,
   lastCell?: number,
+  crosshair?: number,
 ) {
-  const board = await renderBoard(game, coordMode, highlight, lastCell);
+  const board = await renderBoard(game, coordMode, highlight, lastCell, crosshair);
   const attachment = new AttachmentBuilder(board, { name: "sudoku.png" });
 
   const totalCells = game.puzzle.split("").filter((c) => c === "-").length;
@@ -94,6 +95,10 @@ export async function buildGameMessage(
       .setCustomId("sudoku-move")
       .setLabel("make move")
       .setStyle(ButtonStyle.Primary),
+    new ButtonBuilder()
+      .setCustomId("sudoku-highlight")
+      .setLabel("highlight")
+      .setStyle(ButtonStyle.Secondary),
     new ButtonBuilder()
       .setCustomId("sudoku-resign")
       .setLabel("resign")
