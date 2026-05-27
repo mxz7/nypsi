@@ -15,6 +15,8 @@ type SudokuGameBoard = {
 const BG = "#313136";
 const BG_COMPLETE = "#3d3d43";
 const BG_HIGHLIGHT = "#29292e";
+const BG_LASTMOVE_CORRECT = "#19324a"; // faded blue
+const BG_LASTMOVE_WRONG = "#4a2320"; // faded red
 const GRID_BOX = "#555560";
 const GRID_THIN = "#47474f";
 const TEXT_GIVEN = "#e8e8f0";
@@ -26,7 +28,12 @@ function isGroupComplete(board: string, solution: string, indices: number[]): bo
   return indices.every((i) => board[i] !== "-" && board[i] === solution[i]);
 }
 
-function buildSvg(game: SudokuGameBoard, coordMode: SudokuCoordMode, highlight?: number): string {
+function buildSvg(
+  game: SudokuGameBoard,
+  coordMode: SudokuCoordMode,
+  highlight?: number,
+  lastCell?: number,
+): string {
   const parts: string[] = [];
 
   const completedRows = Array.from({ length: 9 }, (_, r) =>
@@ -74,9 +81,13 @@ function buildSvg(game: SudokuGameBoard, coordMode: SudokuCoordMode, highlight?:
     const boxIndex = Math.floor(row / 3) * 3 + Math.floor(col / 3);
     const groupComplete = completedRows[row] || completedCols[col] || completedBoxes[boxIndex];
     const cellDigit = isFilled ? parseInt(isGiven ? game.puzzle[i] : boardChar, 10) : null;
-    const isHighlighted = highlight !== undefined && cellDigit === highlight;
 
-    if (isHighlighted) {
+    if (lastCell === i && isFilled) {
+      // Strong highlight for last move
+      const isLastCorrect = boardChar === game.solution[i];
+      const lastBg = isLastCorrect ? BG_LASTMOVE_CORRECT : BG_LASTMOVE_WRONG;
+      parts.push(`<rect x="${x}" y="${y}" width="${CELL}" height="${CELL}" fill="${lastBg}"/>`);
+    } else if (highlight !== undefined && cellDigit === highlight) {
       parts.push(
         `<rect x="${x}" y="${y}" width="${CELL}" height="${CELL}" fill="${BG_HIGHLIGHT}"/>`,
       );
@@ -125,9 +136,10 @@ export async function renderBoard(
   game: SudokuGameBoard,
   coordMode: SudokuCoordMode,
   highlight?: number,
+  lastCell?: number,
 ): Promise<Buffer> {
   const start = performance.now();
-  const svg = buildSvg(game, coordMode, highlight);
+  const svg = buildSvg(game, coordMode, highlight, lastCell);
 
   const sharpBefore = performance.now();
   const result = await sharp(Buffer.from(svg)).png().toBuffer();

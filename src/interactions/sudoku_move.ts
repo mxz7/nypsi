@@ -9,6 +9,7 @@ import { ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
 import {
   applyMove,
+  coordToIndex,
   eraseCell,
   getGameById,
   getUserCoordMode,
@@ -102,11 +103,12 @@ export default {
     }
 
     let result: Awaited<ReturnType<typeof applyMove | typeof eraseCell>>;
-
+    let lastCell: number | undefined = undefined;
     if (digit === 0) {
       result = await eraseCell(freshGame, cellInput, coordMode);
     } else {
       result = await applyMove(freshGame, cellInput, digit, coordMode);
+      lastCell = coordToIndex(cellInput, coordMode) ?? undefined;
     }
 
     if ("invalid" in result && result.invalid) {
@@ -117,7 +119,7 @@ export default {
     const updatedGame = await getGameById(gameId);
     if (!updatedGame) return;
 
-    const highlight = digit === 0 ? null : digit;
+    const highlight = digit === 0 ? undefined : digit;
 
     if ("complete" in result && result.complete) {
       const msg = await buildEndedGameMessage(
@@ -134,6 +136,7 @@ export default {
       coordMode,
       interaction.user.avatarURL(),
       highlight,
+      lastCell,
     );
     return res.update({ ...msg, content: "" });
   },

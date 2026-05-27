@@ -66,8 +66,9 @@ export async function buildGameMessage(
   coordMode: SudokuCoordMode,
   avatarUrl: string,
   highlight?: number,
+  lastCell?: number,
 ) {
-  const board = await renderBoard(game, coordMode, highlight);
+  const board = await renderBoard(game, coordMode, highlight, lastCell);
   const attachment = new AttachmentBuilder(board, { name: "sudoku.png" });
 
   const totalCells = game.puzzle.split("").filter((c) => c === "-").length;
