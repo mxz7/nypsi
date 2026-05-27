@@ -124,6 +124,8 @@ async function run(
     difficulty = (message.options.getString("difficulty") as SudokuDifficulty) ?? "easy";
   } else if (args[1] && (DIFFICULTIES as string[]).includes(args[1].toLowerCase())) {
     difficulty = args[1].toLowerCase() as SudokuDifficulty;
+  } else if (args[0] && (DIFFICULTIES as string[]).includes(args[0].toLowerCase())) {
+    difficulty = args[0].toLowerCase() as SudokuDifficulty;
   }
 
   const [activeGame, coordMode] = await Promise.all([
