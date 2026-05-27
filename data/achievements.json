@@ -1706,7 +1706,7 @@
     "name": "sudoku professional **I**",
     "emoji": "<:knight:1487063018188701887>",
     "target": 1,
-    "description": "solve 1 sudoku puzzles",
+    "description": "solve 1 sudoku puzzle",
     "prize": ["lucky_scratch_card:1"]
   },
   "sudoku_ii": {
@@ -1722,7 +1722,7 @@
     "name": "sudoku professional **III**",
     "emoji": "<:knight:1487063018188701887>",
     "target": 50,
-    "description": "solve 75 sudoku puzzles",
+    "description": "solve 50 sudoku puzzles",
     "prize": ["lucky_scratch_card:3"]
   },
   "sudoku_iv": {
@@ -1730,7 +1730,7 @@
     "name": "sudoku professional **IV**",
     "emoji": "<:knight:1487063018188701887>",
     "target": 100,
-    "description": "solve 150 sudoku puzzles",
+    "description": "solve 100 sudoku puzzles",
     "prize": ["legendary_scratch_card:1"]
   },
   "sudoku_v": {
@@ -1738,7 +1738,7 @@
     "name": "sudoku professional **V**",
     "emoji": "<:knight:1487063018188701887>",
     "target": 250,
-    "description": "solve 300 sudoku puzzles",
+    "description": "solve 250 sudoku puzzles",
     "prize": ["legendary_scratch_card:2", "nypsi_crate:1"]
   }
 }

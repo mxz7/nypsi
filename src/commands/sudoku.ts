@@ -29,7 +29,7 @@ cmd.slashData
       .addStringOption((opt) =>
         opt
           .setName("difficulty")
-          .setDescription("puzzle difficulty (default: medium)")
+          .setDescription("puzzle difficulty (default: easy)")
           .setRequired(false)
           .addChoices(DIFFICULTIES.map((d) => ({ name: d, value: d }))),
       ),
