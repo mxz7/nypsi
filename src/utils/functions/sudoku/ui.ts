@@ -9,9 +9,6 @@ import { SudokuCoordMode, SudokuDifficulty } from "#generated/prisma";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { renderBoard } from "./board";
 
-export const FIELD_DIFFICULTY = "difficulty";
-export const FIELD_MODE = "mode";
-
 type GameBoard = {
   puzzle: string;
   solution: string;
@@ -41,20 +38,20 @@ export function buildConfirmationMessage(difficulty: SudokuDifficulty, coordMode
   const embed = new CustomEmbed()
     .setTitle("sudoku")
     .setDescription(
-      `starting a new **${difficulty}** puzzle.\n\ncoordinate mode: **${modeLabel(coordMode)}**`,
-    )
-    .addField(FIELD_DIFFICULTY, difficulty, true)
-    .addField(FIELD_MODE, coordMode, true);
+      `**difficulty:** ${difficulty}\n**coordinate mode:** ${modeLabel(coordMode)}\n\n` +
+        `fill the 9×9 grid so every row, column, and 3×3 box contains the digits 1–9.\n\n` +
+        `use **make move** to enter a cell coordinate and digit. enter \`0\` as the digit to erase a cell.`,
+    );
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+    new ButtonBuilder()
+      .setCustomId("sudoku-confirm-start")
+      .setLabel("play")
+      .setStyle(ButtonStyle.Success),
     new ButtonBuilder()
       .setCustomId("sudoku-coord-toggle")
       .setLabel(modeToggleLabel(coordMode))
       .setStyle(ButtonStyle.Secondary),
-    new ButtonBuilder()
-      .setCustomId("sudoku-confirm-start")
-      .setLabel("start game")
-      .setStyle(ButtonStyle.Primary),
   );
 
   return { embeds: [embed], components: [row] };

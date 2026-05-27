@@ -1,12 +1,15 @@
-import { Message, MessageFlags } from "discord.js";
+import { ComponentType, Message, MessageFlags } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { formatTime } from "../utils/functions/string";
 import {
+  createSudokuGame,
   getActiveGame,
   getSudokuStats,
   getUserCoordMode,
+  setUserCoordMode,
+  SudokuCoordMode,
   SudokuDifficulty,
 } from "../utils/functions/sudoku/game";
 import { buildConfirmationMessage, buildGameMessage } from "../utils/functions/sudoku/ui";
@@ -100,7 +103,33 @@ async function run(
     return send(await buildGameMessage(activeGame, coordMode));
   }
 
-  return send(buildConfirmationMessage(difficulty, coordMode));
+  let currentMode: SudokuCoordMode = coordMode;
+
+  const msg = await send(buildConfirmationMessage(difficulty, currentMode));
+
+  const collector = msg.createMessageComponentCollector({
+    componentType: ComponentType.Button,
+    filter: (i) => i.user.id === message.author.id,
+    time: 120_000,
+  });
+
+  collector.on("collect", async (interaction) => {
+    if (interaction.customId === "sudoku-coord-toggle") {
+      currentMode = currentMode === "box" ? "coordinates" : "box";
+      await setUserCoordMode(message.author.id, currentMode);
+      await interaction.update(buildConfirmationMessage(difficulty, currentMode));
+    } else if (interaction.customId === "sudoku-confirm-start") {
+      collector.stop("started");
+      const game = await createSudokuGame(message.author.id, difficulty);
+      await interaction.update(await buildGameMessage(game, currentMode));
+    }
+  });
+
+  collector.on("end", (_, reason) => {
+    if (reason !== "started") {
+      msg.edit({ components: [] }).catch(() => {});
+    }
+  });
 }
 
 cmd.setRun(run);
