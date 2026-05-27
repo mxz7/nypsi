@@ -70,9 +70,17 @@ export async function buildGameMessage(
   const board = await renderBoard(game, coordMode, highlight);
   const attachment = new AttachmentBuilder(board, { name: "sudoku.png" });
 
+  const totalCells = game.puzzle.split("").filter((c) => c === "-").length;
+  const correctCells = game.board
+    .split("")
+    .filter((c, i) => game.puzzle[i] === "-" && c === game.solution[i]).length;
+  const completionPct = totalCells === 0 ? 100 : (correctCells / totalCells) * 100;
+
   const embed = new CustomEmbed()
     .setHeader("sudoku", `${avatarUrl}?sudokuGameId=${game.id}`)
-    .setDescription(`difficulty: \`${game.difficulty}\`\nmistakes: \`${game.mistakes}\``)
+    .setDescription(
+      `difficulty: \`${game.difficulty}\`\nmistakes: \`${game.mistakes}\`\ncompletion: \`${completionPct.toFixed(1)}%\``,
+    )
     .setImage("attachment://sudoku.png");
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
