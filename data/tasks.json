@@ -429,5 +429,19 @@
     "target": [3, 5, 7],
     "prizes": ["id:basic_crate:1", "xp:500", "id:basic_crate:2"],
     "type": "daily"
+  },
+  "sudoku_weekly": {
+    "id": "sudoku_weekly",
+    "name": "sudoku solver",
+    "description": "complete a sudoku puzzle",
+    "target": [1],
+    "prizes": [
+      "id:lucky_scratch_card:2",
+      "xp:1500",
+      "id:basic_crate:3",
+      "id:basic_crate:3",
+      "id:nypsi_crate:1"
+    ],
+    "type": "weekly"
   }
 }

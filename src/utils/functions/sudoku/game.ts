@@ -1,6 +1,7 @@
 import { getSudoku } from "sudoku-gen";
 import { SudokuCoordMode, SudokuDifficulty, SudokuGame } from "#generated/prisma";
 import prisma from "../../../init/database";
+import { addTaskProgress } from "../economy/tasks";
 import { getPreferences, updatePreferences } from "../users/notifications";
 
 export { SudokuCoordMode, SudokuDifficulty, SudokuGame };
@@ -142,6 +143,10 @@ export async function applyMove(
       ...(complete ? { state: "completed", completedAt: new Date() } : {}),
     },
   });
+
+  if (complete) {
+    addTaskProgress(game.userId, "sudoku_weekly", 1);
+  }
 
   return { ok: true, correct, complete };
 }
