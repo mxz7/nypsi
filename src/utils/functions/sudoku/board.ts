@@ -82,7 +82,7 @@ function buildSvg(game: SudokuGameBoard, coordMode: SudokuCoordMode): string {
     // Coord label
     const coordLabel = indexToCoord(i, coordMode);
     parts.push(
-      `<text x="${x + 4}" y="${y + 17}" font-family="monospace" font-size="15" fill="${TEXT_COORD}">${coordLabel}</text>`,
+      `<text x="${x + 4}" y="${y + 17}" font-family="monospace" font-size="18" fill="${TEXT_COORD}">${coordLabel}</text>`,
     );
 
     // Number
