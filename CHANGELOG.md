@@ -1,6 +1,7 @@
 # may 2026
 
 - add help chat bot
+- add sodoku
 
 # march 2026
 
