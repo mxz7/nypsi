@@ -65,8 +65,9 @@ export async function buildGameMessage(
   game: ActiveGame,
   coordMode: SudokuCoordMode,
   avatarUrl: string,
+  highlight?: number,
 ) {
-  const board = await renderBoard(game, coordMode);
+  const board = await renderBoard(game, coordMode, highlight);
   const attachment = new AttachmentBuilder(board, { name: "sudoku.png" });
 
   const embed = new CustomEmbed()

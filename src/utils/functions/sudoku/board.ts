@@ -14,6 +14,7 @@ type SudokuGameBoard = {
 
 const BG = "#313136";
 const BG_COMPLETE = "#3d3d43";
+const BG_HIGHLIGHT = "#29292e";
 const GRID_BOX = "#555560";
 const GRID_THIN = "#47474f";
 const TEXT_GIVEN = "#e8e8f0";
@@ -25,7 +26,7 @@ function isGroupComplete(board: string, solution: string, indices: number[]): bo
   return indices.every((i) => board[i] !== "-" && board[i] === solution[i]);
 }
 
-function buildSvg(game: SudokuGameBoard, coordMode: SudokuCoordMode): string {
+function buildSvg(game: SudokuGameBoard, coordMode: SudokuCoordMode, highlight?: number): string {
   const parts: string[] = [];
 
   const completedRows = Array.from({ length: 9 }, (_, r) =>
@@ -72,8 +73,14 @@ function buildSvg(game: SudokuGameBoard, coordMode: SudokuCoordMode): string {
 
     const boxIndex = Math.floor(row / 3) * 3 + Math.floor(col / 3);
     const groupComplete = completedRows[row] || completedCols[col] || completedBoxes[boxIndex];
+    const cellDigit = isFilled ? parseInt(isGiven ? game.puzzle[i] : boardChar, 10) : null;
+    const isHighlighted = highlight !== undefined && cellDigit === highlight;
 
-    if (groupComplete) {
+    if (isHighlighted) {
+      parts.push(
+        `<rect x="${x}" y="${y}" width="${CELL}" height="${CELL}" fill="${BG_HIGHLIGHT}"/>`,
+      );
+    } else if (groupComplete) {
       parts.push(
         `<rect x="${x}" y="${y}" width="${CELL}" height="${CELL}" fill="${BG_COMPLETE}"/>`,
       );
@@ -118,9 +125,10 @@ function buildSvg(game: SudokuGameBoard, coordMode: SudokuCoordMode): string {
 export async function renderBoard(
   game: SudokuGameBoard,
   coordMode: SudokuCoordMode,
+  highlight?: number,
 ): Promise<Buffer> {
   const start = performance.now();
-  const svg = buildSvg(game, coordMode);
+  const svg = buildSvg(game, coordMode, highlight);
 
   const sharpBefore = performance.now();
   const result = await sharp(Buffer.from(svg)).png().toBuffer();

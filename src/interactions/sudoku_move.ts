@@ -119,6 +119,8 @@ export default {
     const updatedGame = await getGameById(gameId);
     if (!updatedGame) return;
 
+    const highlight = digit === 0 ? null : digit;
+
     if ("complete" in result && result.complete) {
       const msg = await buildEndedGameMessage(
         updatedGame,
@@ -129,7 +131,12 @@ export default {
       return res.update({ ...msg, content: "" });
     }
 
-    const msg = await buildGameMessage(updatedGame, coordMode, interaction.user.avatarURL());
+    const msg = await buildGameMessage(
+      updatedGame,
+      coordMode,
+      interaction.user.avatarURL(),
+      highlight,
+    );
     return res.update({ ...msg, content: "" });
   },
 } as InteractionHandler;
