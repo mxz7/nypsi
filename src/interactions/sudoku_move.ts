@@ -98,8 +98,7 @@ export default {
     const digit = parseInt(digitRaw, 10);
 
     if (isNaN(digit) || digit < 0 || digit > 9) {
-      const msg = await buildGameMessage(freshGame, coordMode, interaction.user.avatarURL());
-      return res.update({ ...msg, content: "digit must be 0–9 (0 = erase)" });
+      return res.reply({ content: "digit must be 0-9 (0 = erase)", flags: MessageFlags.Ephemeral });
     }
 
     let result: Awaited<ReturnType<typeof applyMove | typeof eraseCell>>;
@@ -111,8 +110,7 @@ export default {
     }
 
     if ("invalid" in result && result.invalid) {
-      const msg = await buildGameMessage(freshGame, coordMode, interaction.user.avatarURL());
-      return res.update({ ...msg, content: `**${result.invalid}**` });
+      return res.reply({ content: result.invalid, flags: MessageFlags.Ephemeral });
     }
 
     // Fetch updated game state
