@@ -105,4 +105,4 @@ async function run(
 
 cmd.setRun(run);
 
-export default cmd;
+module.exports = cmd;
