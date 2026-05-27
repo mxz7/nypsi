@@ -46,7 +46,18 @@ export default {
       for (const guildData of guilds) {
         try {
           const hook = new WebhookClient({ url: guildData.birthdayHook });
-          const guildMemberIds = await getAllMembersRest(guildData.id, undefined, true);
+          let guildMemberIds: string[];
+
+          try {
+            guildMemberIds = await getAllMembersRest(guildData.id, undefined, true);
+          } catch (e) {
+            logger.warn(
+              `birthdays: failed to fetch members for guild ${guildData.id} while handling birthdays`,
+              {
+                error: e,
+              },
+            );
+          }
 
           for (const member of birthdayMembers) {
             if (!guildMemberIds.includes(member.id)) continue;
@@ -73,7 +84,7 @@ export default {
 
           hook.destroy();
         } catch (e) {
-          logger.error(`error handling birthdays in ${guildData.id}`, {
+          logger.error(`birithday: error handling birthdays in ${guildData.id}`, {
             error: e,
           });
         }
