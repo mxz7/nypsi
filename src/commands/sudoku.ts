@@ -21,10 +21,11 @@ const cmd = new Command("sudoku", "play sudoku puzzles", "fun");
 
 cmd.slashEnabled = true;
 cmd.slashData
+  .addSubcommand((sub) => sub.setName("help").setDescription("how to play sudoku"))
   .addSubcommand((sub) =>
     sub
-      .setName("start")
-      .setDescription("start or resume a sudoku game")
+      .setName("play")
+      .setDescription("play or resume a sudoku game")
       .addStringOption((opt) =>
         opt
           .setName("difficulty")
@@ -42,7 +43,38 @@ async function run(
 ) {
   if (!(await userExists(message.member))) await createUser(message.member);
 
-  if (args[0]?.toLowerCase() === "stats") {
+  const subcommand =
+    !(message instanceof Message) && message.isChatInputCommand()
+      ? message.options.getSubcommand()
+      : args[0]?.toLowerCase();
+
+  if (!subcommand || subcommand === "help") {
+    const embed = new CustomEmbed(
+      message.member,
+      "**/sudoku play [difficulty]** *play a new sudoku puzzle*\n" +
+        `- difficulty: ${DIFFICULTIES.map((d) => `\`${d}\``).join(", ")}\n` +
+        "**/sudoku stats** *view your sudoku stats*",
+    )
+      .setHeader("sudoku", message.author.avatarURL())
+      .addField(
+        "rules",
+        "- the board is a 9×9 grid split into nine 3×3 boxes\n" +
+          "- some cells are already filled in, you can't change those\n" +
+          "- fill in the empty cells using the numbers **1–9**\n" +
+          "- each **row** must contain every number from 1–9 exactly once\n" +
+          "- each **column** must contain every number from 1–9 exactly once\n" +
+          "- each **3×3 box** must contain every number from 1–9 exactly once",
+      )
+      .addField(
+        "coordinate modes",
+        "- **box** — identify cells by box (A–I) then position within the box (1–9)\n" +
+          "- **coordinates** — identify cells by column (A–I) and row (1–9)",
+      );
+
+    return send({ embeds: [embed] });
+  }
+
+  if (subcommand === "stats") {
     await addCooldown(cmd.name, message.member, 5);
 
     const stats = await getSudokuStats(message.author.id);
@@ -52,7 +84,7 @@ async function run(
         embeds: [
           new CustomEmbed(
             message.member,
-            "you haven't played any sudoku yet.\n\nuse **/sudoku start** to begin!",
+            "you haven't played any sudoku yet. use **/sudoku play** to begin!",
           ),
         ],
       });
