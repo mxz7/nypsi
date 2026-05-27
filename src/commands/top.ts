@@ -38,6 +38,7 @@ import {
   topWordleTimeGlobal,
 } from "../utils/functions/leaderboards/wordle";
 import PageManager from "../utils/functions/page";
+import { showSudokuLeaderboard } from "../utils/functions/sudoku/leaderboard";
 import {
   commandAliasExists,
   commandExists,
@@ -211,6 +212,18 @@ cmd.slashData
     chess
       .setName("chess")
       .setDescription("view chess puzzle leaderboards")
+      .addStringOption((option) =>
+        option
+          .setName("scope")
+          .setDescription("show global/server")
+          .setChoices(...scopeChoices)
+          .setRequired(false),
+      ),
+  )
+  .addSubcommand((sudoku) =>
+    sudoku
+      .setName("sudoku")
+      .setDescription("view sudoku leaderboards")
       .addStringOption((option) =>
         option
           .setName("scope")
@@ -648,6 +661,9 @@ async function run(
   } else if (args[0].toLowerCase() == "chess") {
     const global = args[1]?.toLowerCase() === "global";
     return showChessLeaderboard(message, send, global);
+  } else if (args[0].toLowerCase() == "sudoku") {
+    const global = args[1]?.toLowerCase() === "global";
+    return showSudokuLeaderboard(message, send, global);
   } else if (args[0].toLowerCase() == "museum") {
     if (args.length == 1)
       return send({ embeds: [new ErrorEmbed(`/top museum <completion|item>`)] });

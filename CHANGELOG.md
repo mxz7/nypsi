@@ -1,6 +1,7 @@
 # may 2026
 
 - add help chat bot
+- add sudoku
 
 # march 2026
 

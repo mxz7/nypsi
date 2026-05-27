@@ -53,6 +53,7 @@
     "p-all": "3.0.0",
     "sharp": "^0.34.5",
     "string-similarity": "4.0.4",
+    "sudoku-gen": "^1.0.2",
     "zlib-sync": "^0.1.10",
     "zod": "^4.3.6"
   },

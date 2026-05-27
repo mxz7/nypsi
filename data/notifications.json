@@ -127,6 +127,11 @@
       "id": "mentionsGlobal",
       "name": "global pings",
       "description": "show pings in all servers (that nypsi is in) with $pings"
+    },
+    "sudokuCoordMode": {
+      "id": "sudokuCoordMode",
+      "name": "sudoku coordinate mode",
+      "description": "the coordinate mode used for sudoku. current: {VALUE}"
     }
   }
 }

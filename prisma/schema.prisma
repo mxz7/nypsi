@@ -55,6 +55,7 @@ model User {
   AiChatConversation       AiChatConversation[]
   RoleplayStat             RoleplayStat[]
   RoleplayStatTarget       RoleplayStat[]             @relation(name: "target")
+  SudokuGame               SudokuGame[]
 }
 
 model ProfileView {
@@ -77,6 +78,44 @@ model ProfileView {
 enum ProfileViewSource {
   WEB
   BOT
+}
+
+enum SudokuDifficulty {
+  easy
+  medium
+  hard
+  expert
+}
+
+enum SudokuState {
+  active
+  completed
+  resigned
+}
+
+enum SudokuCoordMode {
+  box
+  coordinates
+}
+
+model SudokuGame {
+  id String @id @default(uuid(7))
+
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+
+  puzzle     String
+  solution   String
+  difficulty SudokuDifficulty
+
+  board    String
+  state    SudokuState @default(active)
+  mistakes Int         @default(0)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, state])
 }
 
 model Tags {
@@ -147,13 +186,14 @@ enum LevelDmSetting {
 model Preferences {
   userId String @id
 
-  duelRequests   Boolean @default(true)
-  offers         Int     @default(3)
-  leaderboards   Boolean @default(true)
-  tips           Boolean @default(true)
-  marketConfirm  BigInt  @default(25000000)
-  marketDelay    Int     @default(300) // seconds
-  mentionsGlobal Boolean @default(false)
+  duelRequests    Boolean         @default(true)
+  offers          Int             @default(3)
+  leaderboards    Boolean         @default(true)
+  tips            Boolean         @default(true)
+  marketConfirm   BigInt          @default(25000000)
+  marketDelay     Int             @default(300) // seconds
+  mentionsGlobal  Boolean         @default(false)
+  sudokuCoordMode SudokuCoordMode @default(box)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
