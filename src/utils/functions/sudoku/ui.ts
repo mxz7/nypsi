@@ -79,8 +79,11 @@ export async function buildGameMessage(
     .filter((c, i) => game.puzzle[i] === "-" && c === game.solution[i]).length;
   const completionPct = totalCells === 0 ? 100 : (correctCells / totalCells) * 100;
 
+  const headerUrl = new URL(avatarUrl);
+  headerUrl.searchParams.set("sudokuGameId", game.id);
+
   const embed = new CustomEmbed()
-    .setHeader("sudoku", `${avatarUrl}?sudokuGameId=${game.id}`)
+    .setHeader("sudoku", headerUrl.toString())
     .setDescription(
       `difficulty: \`${game.difficulty}\`\nmistakes: \`${game.mistakes}\`\ncompletion: \`${completionPct.toFixed(1)}%\``,
     )
@@ -124,8 +127,11 @@ export async function buildEndedGameMessage(
     color = Constants.EMBED_FAIL_COLOR;
   }
 
+  const headerUrl = new URL(avatarUrl);
+  headerUrl.searchParams.set("sudokuGameId", game.id);
+
   const embed = new CustomEmbed()
-    .setHeader("sudoku", `${avatarUrl}?sudokuGameId=${game.id}`)
+    .setHeader("sudoku", headerUrl.toString())
     .setDescription(desc)
     .setImage("attachment://sudoku.png");
 
