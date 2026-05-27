@@ -1,11 +1,11 @@
-import {
-  ActionRowBuilder,
-  AttachmentBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  MessageActionRowComponentBuilder,
-} from "discord.js";
 import { SudokuCoordMode, SudokuDifficulty } from "#generated/prisma";
+import {
+	ActionRowBuilder,
+	AttachmentBuilder,
+	ButtonBuilder,
+	ButtonStyle,
+	MessageActionRowComponentBuilder,
+} from "discord.js";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { renderBoard } from "./board";
 
@@ -34,9 +34,13 @@ function modeToggleLabel(mode: SudokuCoordMode): string {
   return mode === "box" ? "switch to coordinates" : "switch to box";
 }
 
-export function buildConfirmationMessage(difficulty: SudokuDifficulty, coordMode: SudokuCoordMode) {
+export function buildConfirmationMessage(
+  difficulty: SudokuDifficulty,
+  coordMode: SudokuCoordMode,
+  avatarUrl: string,
+) {
   const embed = new CustomEmbed()
-    .setTitle("sudoku")
+    .setHeader("sudoku", avatarUrl)
     .setDescription(
       `**difficulty:** ${difficulty}\n**coordinate mode:** ${modeLabel(coordMode)}\n\n` +
         `fill the 9×9 grid so every row, column, and 3×3 box contains the digits 1–9.\n\n` +
@@ -57,15 +61,18 @@ export function buildConfirmationMessage(difficulty: SudokuDifficulty, coordMode
   return { embeds: [embed], components: [row] };
 }
 
-export async function buildGameMessage(game: ActiveGame, coordMode: SudokuCoordMode) {
+export async function buildGameMessage(
+  game: ActiveGame,
+  coordMode: SudokuCoordMode,
+  avatarUrl: string,
+) {
   const board = await renderBoard(game, coordMode);
   const attachment = new AttachmentBuilder(board, { name: "sudoku.png" });
 
   const embed = new CustomEmbed()
-    .setTitle("sudoku")
+    .setHeader("sudoku", `${avatarUrl}?sudokuGameId=${game.id}`)
     .setDescription(`difficulty: \`${game.difficulty}\`\nmistakes: \`${game.mistakes}\``)
-    .setImage("attachment://sudoku.png")
-    .setFooter({ text: "", iconURL: `https://nypsi.xyz/wiki?id=${game.id}` });
+    .setImage("attachment://sudoku.png");
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder()
@@ -85,6 +92,7 @@ export async function buildEndedGameMessage(
   game: EndedGame,
   coordMode: SudokuCoordMode,
   reason: "completed" | "resigned",
+  avatarUrl: string,
 ) {
   const board = await renderBoard(game, coordMode);
   const attachment = new AttachmentBuilder(board, { name: "sudoku.png" });
@@ -101,10 +109,9 @@ export async function buildEndedGameMessage(
   }
 
   const embed = new CustomEmbed()
-    .setTitle("sudoku")
+    .setHeader("sudoku", `${avatarUrl}?sudokuGameId=${game.id}`)
     .setDescription(desc)
-    .setImage("attachment://sudoku.png")
-    .setFooter({ text: "​", iconURL: `https://nypsi.xyz/wiki?id=${game.id}` });
+    .setImage("attachment://sudoku.png");
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder()

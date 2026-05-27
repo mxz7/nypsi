@@ -20,7 +20,9 @@ export default {
   async run(interaction) {
     if (!interaction.isButton()) return;
 
-    const gameId = new URL(interaction.message.embeds[0]?.footer?.iconURL).searchParams.get("id");
+    const gameId = new URL(interaction.message.embeds[0]?.author?.iconURL).searchParams.get(
+      "sudokuGameId",
+    );
     if (!gameId) return;
 
     const game = await getGameById(gameId);
@@ -95,7 +97,7 @@ export default {
     const digit = parseInt(digitRaw, 10);
 
     if (isNaN(digit) || digit < 0 || digit > 9) {
-      const msg = await buildGameMessage(freshGame, coordMode);
+      const msg = await buildGameMessage(freshGame, coordMode, interaction.user.avatarURL());
       return res.update({ ...msg, content: "digit must be 0–9 (0 = erase)" });
     }
 
@@ -108,7 +110,7 @@ export default {
     }
 
     if ("invalid" in result && result.invalid) {
-      const msg = await buildGameMessage(freshGame, coordMode);
+      const msg = await buildGameMessage(freshGame, coordMode, interaction.user.avatarURL());
       return res.update({ ...msg, content: `**${result.invalid}**` });
     }
 
@@ -117,11 +119,16 @@ export default {
     if (!updatedGame) return;
 
     if ("complete" in result && result.complete) {
-      const msg = await buildEndedGameMessage(updatedGame, coordMode, "completed");
+      const msg = await buildEndedGameMessage(
+        updatedGame,
+        coordMode,
+        "completed",
+        interaction.user.avatarURL(),
+      );
       return res.update({ ...msg, content: "" });
     }
 
-    const msg = await buildGameMessage(updatedGame, coordMode);
+    const msg = await buildGameMessage(updatedGame, coordMode, interaction.user.avatarURL());
     return res.update({ ...msg, content: "" });
   },
 } as InteractionHandler;

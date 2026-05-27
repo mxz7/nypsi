@@ -15,7 +15,9 @@ export default {
     if (!interaction.isButton()) return;
 
     // Look up previous game to reuse difficulty
-    const gameId = new URL(interaction.message.embeds[0]?.footer?.iconURL).searchParams.get("id");
+    const gameId = new URL(interaction.message.embeds[0]?.author?.iconURL).searchParams.get(
+      "sudokuGameId",
+    );
     const prevGame = gameId ? await getGameById(gameId) : null;
     const difficulty: SudokuDifficulty = (prevGame?.difficulty as SudokuDifficulty) ?? "easy";
 
@@ -26,7 +28,7 @@ export default {
     const game = existing ?? (await createSudokuGame(interaction.user.id, difficulty));
 
     const coordMode = await getUserCoordMode(interaction.user.id);
-    const msg = await buildGameMessage(game, coordMode);
+    const msg = await buildGameMessage(game, coordMode, interaction.user.avatarURL());
     await interaction.editReply(msg);
   },
 } as InteractionHandler;

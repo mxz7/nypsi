@@ -9,7 +9,9 @@ export default {
   async run(interaction) {
     if (!interaction.isButton()) return;
 
-    const gameId = new URL(interaction.message.embeds[0]?.footer?.iconURL).searchParams.get("id");
+    const gameId = new URL(interaction.message.embeds[0]?.author?.iconURL).searchParams.get(
+      "sudokuGameId",
+    );
     if (!gameId) return;
 
     const game = await getGameById(gameId);
@@ -34,7 +36,12 @@ export default {
       getUserCoordMode(interaction.user.id),
     ]);
 
-    const msg = await buildEndedGameMessage(resigned, coordMode, "resigned");
+    const msg = await buildEndedGameMessage(
+      resigned,
+      coordMode,
+      "resigned",
+      interaction.user.avatarURL(),
+    );
     await interaction.editReply(msg);
   },
 } as InteractionHandler;

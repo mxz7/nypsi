@@ -132,12 +132,14 @@ async function run(
   ]);
 
   if (activeGame) {
-    return send(await buildGameMessage(activeGame, coordMode));
+    return send(await buildGameMessage(activeGame, coordMode, message.author.avatarURL()));
   }
 
   let currentMode: SudokuCoordMode = coordMode;
 
-  const msg = await send(buildConfirmationMessage(difficulty, currentMode));
+  const msg = await send(
+    buildConfirmationMessage(difficulty, currentMode, message.author.avatarURL()),
+  );
 
   const collector = msg.createMessageComponentCollector({
     componentType: ComponentType.Button,
@@ -149,11 +151,15 @@ async function run(
     if (interaction.customId === "sudoku-coord-toggle") {
       currentMode = currentMode === "box" ? "coordinates" : "box";
       await setUserCoordMode(message.author.id, currentMode);
-      await interaction.update(buildConfirmationMessage(difficulty, currentMode));
+      await interaction.update(
+        buildConfirmationMessage(difficulty, currentMode, message.author.avatarURL()),
+      );
     } else if (interaction.customId === "sudoku-confirm-start") {
       collector.stop("started");
       const game = await createSudokuGame(message.author.id, difficulty);
-      await interaction.update(await buildGameMessage(game, currentMode));
+      await interaction.update(
+        await buildGameMessage(game, currentMode, message.author.avatarURL()),
+      );
     }
   });
 
