@@ -1,6 +1,5 @@
 import {
   ActionRowBuilder,
-  APIApplicationCommandOptionChoice,
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
@@ -19,21 +18,6 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 import { logger } from "../utils/logger";
 
 const cmd = new Command("topartists", "view your top artists", "music").setAliases(["ta"]);
-
-const lengthChoices: APIApplicationCommandOptionChoice<string>[] = [
-  { name: "1 week", value: "week" },
-  { name: "1 month", value: "month" },
-  { name: "1 year", value: "year" },
-  { name: "all time", value: "all" },
-];
-
-cmd.slashEnabled = true;
-cmd.slashData.addStringOption((option) =>
-  option
-    .setName("length")
-    .setDescription("length to fetch results from")
-    .setChoices(...lengthChoices),
-);
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),

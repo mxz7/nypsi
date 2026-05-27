@@ -11,8 +11,6 @@ const cmd = new Command(
   "music",
 ).setAliases(["np"]);
 
-cmd.slashEnabled = true;
-
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   send: SendMessage,
