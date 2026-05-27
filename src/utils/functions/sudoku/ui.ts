@@ -3,10 +3,12 @@ import {
   AttachmentBuilder,
   ButtonBuilder,
   ButtonStyle,
+  ColorResolvable,
   MessageActionRowComponentBuilder,
 } from "discord.js";
 import { SudokuCoordMode, SudokuDifficulty } from "#generated/prisma";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
+import Constants from "../../Constants";
 import { renderBoard } from "./board";
 
 type GameBoard = {
@@ -108,20 +110,26 @@ export async function buildEndedGameMessage(
   const attachment = new AttachmentBuilder(board, { name: "sudoku.png" });
 
   let desc: string;
+  let color: ColorResolvable;
+
   if (reason === "completed") {
     const elapsed = game.completedAt ? game.completedAt.getTime() - game.startedAt.getTime() : 0;
     const mins = Math.floor(elapsed / 60000);
     const secs = Math.round((elapsed % 60000) / 1000);
     const timeStr = mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
     desc = `**puzzle solved!**\ndifficulty: \`${game.difficulty}\`\nmistakes: \`${game.mistakes}\`\ntime: \`${timeStr}\``;
+    color = Constants.EMBED_SUCCESS_COLOR;
   } else {
     desc = `**game resigned**\ndifficulty: \`${game.difficulty}\`\nmistakes: \`${game.mistakes}\``;
+    color = Constants.EMBED_FAIL_COLOR;
   }
 
   const embed = new CustomEmbed()
     .setHeader("sudoku", `${avatarUrl}?sudokuGameId=${game.id}`)
     .setDescription(desc)
     .setImage("attachment://sudoku.png");
+
+  if (color) embed.setColor(color);
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder()
