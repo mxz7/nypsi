@@ -20,7 +20,7 @@ export default {
   async run(interaction) {
     if (!interaction.isButton()) return;
 
-    const gameId = interaction.message.embeds[0]?.footer?.text;
+    const gameId = new URL(interaction.message.embeds[0]?.footer?.iconURL).searchParams.get("id");
     if (!gameId) return;
 
     const game = await getGameById(gameId);

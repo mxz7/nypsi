@@ -15,7 +15,7 @@ export default {
     if (!interaction.isButton()) return;
 
     // Look up previous game to reuse difficulty
-    const gameId = interaction.message.embeds[0]?.footer?.text;
+    const gameId = new URL(interaction.message.embeds[0]?.footer?.iconURL).searchParams.get("id");
     const prevGame = gameId ? await getGameById(gameId) : null;
     const difficulty: SudokuDifficulty = (prevGame?.difficulty as SudokuDifficulty) ?? "easy";
 

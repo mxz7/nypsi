@@ -65,7 +65,7 @@ export async function buildGameMessage(game: ActiveGame, coordMode: SudokuCoordM
     .setTitle("sudoku")
     .setDescription(`difficulty: \`${game.difficulty}\`\nmistakes: \`${game.mistakes}\``)
     .setImage("attachment://sudoku.png")
-    .setFooter({ text: game.id });
+    .setFooter({ text: "", iconURL: `https://nypsi.xyz/wiki?id=${game.id}` });
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder()
@@ -104,7 +104,7 @@ export async function buildEndedGameMessage(
     .setTitle("sudoku")
     .setDescription(desc)
     .setImage("attachment://sudoku.png")
-    .setFooter({ text: game.id });
+    .setFooter({ text: "​", iconURL: `https://nypsi.xyz/wiki?id=${game.id}` });
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder()
