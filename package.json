@@ -55,7 +55,7 @@
     "string-similarity": "4.0.4",
     "sudoku-gen": "^1.0.2",
     "zlib-sync": "^0.1.10",
-    "zod": "^4.3.6"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/crypto-js": "4.2.2",
