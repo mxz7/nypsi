@@ -131,7 +131,15 @@
     "sudokuCoordMode": {
       "id": "sudokuCoordMode",
       "name": "sudoku coordinate mode",
-      "description": "the coordinate mode used for sudoku. current: {VALUE}"
+      "description": "the coordinate mode used for sudoku",
+      "types": [
+        { "name": "box", "description": "box based coordinates (default)", "value": "box" },
+        {
+          "name": "coordinates",
+          "description": "classic battleship/chess style coordinates",
+          "value": "coordinates"
+        }
+      ]
     }
   }
 }
