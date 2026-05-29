@@ -65,7 +65,7 @@ export default {
               .setRequired(true)
               .setPlaceholder("1-9 to toggle notes, 0 to clear all")
               .setMinLength(1)
-              .setMaxLength(1)
+              .setMaxLength(20)
               .setStyle(TextInputStyle.Short),
           ),
       );
@@ -89,19 +89,52 @@ export default {
 
     const cellInput = res.fields.getTextInputValue("cell").trim().toUpperCase();
     const digitRaw = res.fields.getTextInputValue("digit").trim();
-    const digit = parseInt(digitRaw, 10);
 
-    if (isNaN(digit) || digit < 0 || digit > 9) {
+    const compact = digitRaw.replaceAll(/[\s,]+/g, "");
+    if (compact.length === 0 || /[^0-9]/.test(compact)) {
       return res.reply({
-        content: "digit must be 0-9 (0 = clear all notes)",
+        content: "digits must be 0-9 (example: 13 or 1 3)",
         flags: MessageFlags.Ephemeral,
       });
     }
 
-    const result = await toggleNote(freshGame, cellInput, digit, coordMode);
+    if (compact === "0") {
+      const result = await toggleNote(freshGame, cellInput, 0, coordMode);
+      if (result.invalid) {
+        return res.reply({ content: result.invalid, flags: MessageFlags.Ephemeral });
+      }
+    } else if (compact.includes("0")) {
+      return res.reply({
+        content: "0 can only be used by itself to clear all notes",
+        flags: MessageFlags.Ephemeral,
+      });
+    } else if (compact.length === 1) {
+      const digit = parseInt(compact, 10);
+      const result = await toggleNote(freshGame, cellInput, digit, coordMode);
+      if (result.invalid) {
+        return res.reply({ content: result.invalid, flags: MessageFlags.Ephemeral });
+      }
+    } else {
+      const digits = Array.from(new Set(compact.split("").map((d) => parseInt(d, 10))));
+      let workingGame = freshGame;
 
-    if (result.invalid) {
-      return res.reply({ content: result.invalid, flags: MessageFlags.Ephemeral });
+      for (const digit of digits) {
+        const result = await toggleNote(workingGame, cellInput, digit, coordMode);
+
+        if (result.invalid) {
+          return res.reply({ content: result.invalid, flags: MessageFlags.Ephemeral });
+        }
+
+        const nextGame = await getGameById(gameId);
+        if (!nextGame || nextGame.state !== "active") {
+          return res.reply({
+            content: "this game has already ended",
+            flags: MessageFlags.Ephemeral,
+          });
+        }
+
+        workingGame = nextGame;
+      }
     }
 
     const updatedGame = await getGameById(gameId);
