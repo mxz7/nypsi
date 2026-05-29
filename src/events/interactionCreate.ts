@@ -19,15 +19,18 @@ import { logger } from "../utils/logger";
 
 export default async function interactionCreate(interaction: Interaction) {
   if (interaction.isButton()) {
-    logger.info(
-      `::cmd ${interaction.guildId} ${interaction.channelId} ${interaction.user.username}: ${interaction.customId}`,
-      {
-        userId: interaction.user.id,
-        guildId: interaction.guildId,
-        channelId: interaction.channelId,
-        customId: interaction.customId,
-      },
-    );
+    let msg = `${interaction.guildId} ${interaction.channelId} ${interaction.user.username}: ${interaction.customId}`;
+
+    if (!interaction.guildId) {
+      msg = `${interaction.user.username}: ${interaction.customId}`;
+    }
+
+    logger.info(`::cmd ${msg}`, {
+      userId: interaction.user.id,
+      guildId: interaction.guildId,
+      channelId: interaction.channelId,
+      customId: interaction.customId,
+    });
   }
 
   if ((await isUserBlacklisted(interaction.user.id)).blacklisted) return;
