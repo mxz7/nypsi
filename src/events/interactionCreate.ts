@@ -19,7 +19,7 @@ import { logger } from "../utils/logger";
 
 export default async function interactionCreate(interaction: Interaction) {
   if (interaction.isButton()) {
-    logger.debug(`btn interaction: ${interaction.user.id} ${interaction.customId}`);
+    logger.info(`btn interaction: ${interaction.user.id} ${interaction.customId}`);
   }
 
   if ((await isUserBlacklisted(interaction.user.id)).blacklisted) return;
