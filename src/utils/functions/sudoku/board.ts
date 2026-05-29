@@ -1,5 +1,6 @@
 import { SudokuCoordMode } from "#generated/prisma";
 import { logger } from "../../logger";
+import { decodeCellChar, hasNote, isRawDigitChar } from "./cell";
 import { indexToCoord } from "./game";
 import sharp = require("sharp");
 
@@ -27,7 +28,7 @@ const TEXT_COORD = "#6e6e7e";
 const TEXT_NOTE = "#7a7a98";
 
 function isGroupComplete(board: string, solution: string, indices: number[]): boolean {
-  return indices.every((i) => board[i] !== "-" && board[i] === solution[i]);
+  return indices.every((i) => isRawDigitChar(board[i]) && board[i] === solution[i]);
 }
 
 function buildSvg(
@@ -38,17 +39,18 @@ function buildSvg(
   crosshair?: number,
 ): string {
   const parts: string[] = [];
+  const board = game.board;
 
   const completedRows = Array.from({ length: 9 }, (_, r) =>
     isGroupComplete(
-      game.board,
+      board,
       game.solution,
       Array.from({ length: 9 }, (__, c) => r * 9 + c),
     ),
   );
   const completedCols = Array.from({ length: 9 }, (_, c) =>
     isGroupComplete(
-      game.board,
+      board,
       game.solution,
       Array.from({ length: 9 }, (__, r) => r * 9 + c),
     ),
@@ -57,7 +59,7 @@ function buildSvg(
     const br = Math.floor(b / 3) * 3;
     const bc = (b % 3) * 3;
     return isGroupComplete(
-      game.board,
+      board,
       game.solution,
       [0, 1, 2].flatMap((r) => [0, 1, 2].map((c) => (br + r) * 9 + (bc + c))),
     );
@@ -77,20 +79,21 @@ function buildSvg(
     const y = row * CELL;
 
     const isGiven = game.puzzle[i] !== "-";
-    const boardChar = game.board[i];
-    const isNote = boardChar >= "a" && boardChar <= "i";
-    const isFilled = boardChar !== "-" && !isNote;
-    const isWrong = isFilled && boardChar !== game.solution[i];
+    const boardChar = board[i];
+    const decoded = decodeCellChar(boardChar);
+    const isFilled = isGiven || decoded.kind === "digit";
+    const shownDigit = isGiven ? game.puzzle[i] : decoded.kind === "digit" ? decoded.raw : null;
+    const isWrong = !isGiven && decoded.kind === "digit" && decoded.raw !== game.solution[i];
 
     const boxIndex = Math.floor(row / 3) * 3 + Math.floor(col / 3);
     const groupComplete = completedRows[row] || completedCols[col] || completedBoxes[boxIndex];
-    const cellDigit = isFilled ? parseInt(isGiven ? game.puzzle[i] : boardChar, 10) : null;
+    const cellDigit = shownDigit ? parseInt(shownDigit, 10) : null;
     const inCrosshair =
       crosshair !== undefined && (row === Math.floor(crosshair / 9) || col === crosshair % 9);
 
     if (lastCell === i && isFilled) {
       // Strong highlight for last move
-      const isLastCorrect = boardChar === game.solution[i];
+      const isLastCorrect = shownDigit === game.solution[i];
       const lastBg = isLastCorrect ? BG_LASTMOVE_CORRECT : BG_LASTMOVE_WRONG;
       parts.push(`<rect x="${x}" y="${y}" width="${CELL}" height="${CELL}" fill="${lastBg}"/>`);
     } else if (highlight !== undefined && cellDigit === highlight) {
@@ -115,16 +118,26 @@ function buildSvg(
 
     // Number or note
     if (isFilled) {
-      const num = isGiven ? game.puzzle[i] : boardChar;
+      const num = shownDigit;
       const textColor = isWrong ? TEXT_WRONG : isGiven ? TEXT_GIVEN : TEXT_CORRECT;
       parts.push(
         `<text x="${x + 48}" y="${y + 70}" font-family="monospace" font-size="54" font-weight="bold" text-anchor="middle" fill="${textColor}">${num}</text>`,
       );
-    } else if (boardChar >= "a" && boardChar <= "i") {
-      const noteDigit = boardChar.charCodeAt(0) - "a".charCodeAt(0) + 1;
-      parts.push(
-        `<text x="${x + 48}" y="${y + 70}" font-family="monospace" font-size="54" font-weight="bold" text-anchor="middle" fill="${TEXT_NOTE}">${noteDigit}</text>`,
-      );
+    } else {
+      const mask = decoded.kind === "notes" ? decoded.mask : 0;
+      const noteXs = [x + 18, x + 48, x + 78];
+      const noteYs = [y + 38, y + 62, y + 86];
+
+      for (let noteDigit = 1; noteDigit <= 9; noteDigit++) {
+        if (!hasNote(mask, noteDigit)) continue;
+
+        const idx = noteDigit - 1;
+        const noteCol = idx % 3;
+        const noteRow = Math.floor(idx / 3);
+        parts.push(
+          `<text x="${noteXs[noteCol]}" y="${noteYs[noteRow]}" font-family="monospace" font-size="20" font-weight="bold" text-anchor="middle" fill="${TEXT_NOTE}">${noteDigit}</text>`,
+        );
+      }
     }
   }
 

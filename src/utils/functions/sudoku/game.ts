@@ -4,6 +4,13 @@ import prisma from "../../../init/database";
 import { addProgress } from "../economy/achievements";
 import { addTaskProgress } from "../economy/tasks";
 import { getPreferences, updatePreferences } from "../users/notifications";
+import {
+  decodeCellChar,
+  EMPTY_CELL_CHAR,
+  encodeNoteMask,
+  sanitizeBoardString,
+  toggleNoteMask,
+} from "./cell";
 
 export { SudokuCoordMode, SudokuDifficulty, SudokuGame };
 
@@ -72,6 +79,7 @@ export function isGivenCell(puzzle: string, index: number): boolean {
 
 export async function createSudokuGame(userId: string, difficulty: SudokuDifficulty) {
   const sudoku = getSudoku(difficulty);
+
   return prisma.sudokuGame.create({
     data: {
       userId,
@@ -84,14 +92,37 @@ export async function createSudokuGame(userId: string, difficulty: SudokuDifficu
 }
 
 export async function getGameById(id: string) {
-  return prisma.sudokuGame.findUnique({ where: { id } });
+  const game = await prisma.sudokuGame.findUnique({ where: { id } });
+  if (!game) return null;
+
+  const sanitizedBoard = sanitizeBoardString(game.board);
+  if (sanitizedBoard !== game.board) {
+    return prisma.sudokuGame.update({
+      where: { id: game.id },
+      data: { board: sanitizedBoard },
+    });
+  }
+
+  return game;
 }
 
 export async function getActiveGame(userId: string) {
-  return prisma.sudokuGame.findFirst({
+  const game = await prisma.sudokuGame.findFirst({
     where: { userId, state: "active" },
     orderBy: { startedAt: "desc" },
   });
+
+  if (!game) return null;
+
+  const sanitizedBoard = sanitizeBoardString(game.board);
+  if (sanitizedBoard !== game.board) {
+    return prisma.sudokuGame.update({
+      where: { id: game.id },
+      data: { board: sanitizedBoard },
+    });
+  }
+
+  return game;
 }
 
 export async function resignGame(id: string) {
@@ -163,18 +194,17 @@ export async function toggleNote(
   if (index === null) return { invalid: "invalid coordinate" };
   if (isGivenCell(game.puzzle, index)) return { invalid: "cannot add a note to a given cell" };
 
-  const current = game.board[index];
-  if (current >= "1" && current <= "9") return { invalid: "cell already has a placed digit" };
+  const boardArr = game.board.split("");
+  const current = decodeCellChar(boardArr[index]);
+  if (current.kind === "digit") return { invalid: "cell already has a placed digit" };
 
   let newChar: string;
   if (digit === 0) {
-    newChar = "-";
+    newChar = EMPTY_CELL_CHAR;
   } else {
-    const noteChar = String.fromCharCode("a".charCodeAt(0) + digit - 1);
-    newChar = current === noteChar ? "-" : noteChar;
+    newChar = encodeNoteMask(toggleNoteMask(current.mask, digit));
   }
 
-  const boardArr = game.board.split("");
   boardArr[index] = newChar;
   const newBoard = boardArr.join("");
 
@@ -196,7 +226,7 @@ export async function eraseCell(
   if (isGivenCell(game.puzzle, index)) return { invalid: "cannot erase a given cell" };
 
   const boardArr = game.board.split("");
-  boardArr[index] = "-";
+  boardArr[index] = EMPTY_CELL_CHAR;
   const newBoard = boardArr.join("");
 
   await prisma.sudokuGame.update({

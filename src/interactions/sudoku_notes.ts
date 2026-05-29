@@ -63,7 +63,7 @@ export default {
             new TextInputBuilder()
               .setCustomId("digit")
               .setRequired(true)
-              .setPlaceholder("1–9 to toggle note, 0 to clear")
+              .setPlaceholder("1-9 to toggle notes, 0 to clear all")
               .setMinLength(1)
               .setMaxLength(1)
               .setStyle(TextInputStyle.Short),
@@ -93,7 +93,7 @@ export default {
 
     if (isNaN(digit) || digit < 0 || digit > 9) {
       return res.reply({
-        content: "digit must be 0-9 (0 = clear note)",
+        content: "digit must be 0-9 (0 = clear all notes)",
         flags: MessageFlags.Ephemeral,
       });
     }
