@@ -132,7 +132,7 @@ function buildSvg(
   for (let i = 1; i <= 8; i++) {
     const pos = i * CELL;
     const isBox = i % 3 === 0;
-    const strokeWidth = isBox ? 3 : 0.5;
+    const strokeWidth = isBox ? 3 : 1.5;
     const stroke = isBox ? GRID_BOX : GRID_THIN;
 
     parts.push(
