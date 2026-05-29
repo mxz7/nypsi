@@ -19,8 +19,8 @@ const BG_HIGHLIGHT = "#29292e";
 const BG_CROSSHAIR = "#393940";
 const BG_LASTMOVE_CORRECT = "#19324a"; // faded blue
 const BG_LASTMOVE_WRONG = "#4a2320"; // faded red
-const GRID_BOX = "#555560";
-const GRID_THIN = "#47474f";
+const GRID_BOX = "#8b8b98";
+const GRID_THIN = "#646470";
 const TEXT_GIVEN = "#e8e8f0";
 const TEXT_CORRECT = "#7ab8f5";
 const TEXT_WRONG = "#f47067";
@@ -155,6 +155,10 @@ function buildSvg(
       `<line x1="${pos}" y1="0" x2="${pos}" y2="${CANVAS}" stroke="${stroke}" stroke-width="${strokeWidth}"/>`,
     );
   }
+
+  parts.push(
+    `<rect x="1.5" y="1.5" width="${CANVAS - 3}" height="${CANVAS - 3}" fill="none" stroke="${GRID_BOX}" stroke-width="3"/>`,
+  );
 
   parts.push("</svg>");
   return parts.join("\n");
