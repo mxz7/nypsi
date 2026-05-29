@@ -116,7 +116,7 @@
     "leaderboards": {
       "id": "leaderboards",
       "name": "privacy",
-      "description": "should your username be shown publicly? enabling privacy will also hide you from the nypsi website"
+      "description": "enabling privacy hides your username from global leaderboards and stops your profile being visible on the nypsi website"
     },
     "tips": {
       "id": "tips",
