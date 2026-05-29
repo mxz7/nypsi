@@ -39,6 +39,10 @@ Prisma client generates to `src/generated/prisma/` (not the default location). I
 
 ## Conventions
 
+### User Facing Messages
+
+Use `CustomEmbed` for standard messages, and `ErrorEmbed` for error messages. Only use `content` string if a mention is specifically needed.
+
 ### Commands
 
 Create a `Command` instance and export it as default:
