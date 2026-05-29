@@ -153,6 +153,39 @@ export async function applyMove(
   return { ok: true, correct, complete };
 }
 
+export async function toggleNote(
+  game: SudokuGame,
+  coord: string,
+  digit: number,
+  coordMode: SudokuCoordMode,
+): Promise<{ invalid?: string }> {
+  const index = coordToIndex(coord, coordMode);
+  if (index === null) return { invalid: "invalid coordinate" };
+  if (isGivenCell(game.puzzle, index)) return { invalid: "cannot add a note to a given cell" };
+
+  const current = game.board[index];
+  if (current >= "1" && current <= "9") return { invalid: "cell already has a placed digit" };
+
+  let newChar: string;
+  if (digit === 0) {
+    newChar = "-";
+  } else {
+    const noteChar = String.fromCharCode("a".charCodeAt(0) + digit - 1);
+    newChar = current === noteChar ? "-" : noteChar;
+  }
+
+  const boardArr = game.board.split("");
+  boardArr[index] = newChar;
+  const newBoard = boardArr.join("");
+
+  await prisma.sudokuGame.update({
+    where: { id: game.id },
+    data: { board: newBoard },
+  });
+
+  return {};
+}
+
 export async function eraseCell(
   game: SudokuGame,
   coord: string,

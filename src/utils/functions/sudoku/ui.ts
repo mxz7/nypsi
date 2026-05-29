@@ -96,6 +96,10 @@ export async function buildGameMessage(
       .setLabel("make move")
       .setStyle(ButtonStyle.Primary),
     new ButtonBuilder()
+      .setCustomId("sudoku-notes")
+      .setLabel("note")
+      .setStyle(ButtonStyle.Secondary),
+    new ButtonBuilder()
       .setCustomId("sudoku-highlight")
       .setLabel("highlight")
       .setStyle(ButtonStyle.Secondary),

@@ -24,6 +24,7 @@ const TEXT_GIVEN = "#e8e8f0";
 const TEXT_CORRECT = "#7ab8f5";
 const TEXT_WRONG = "#f47067";
 const TEXT_COORD = "#6e6e7e";
+const TEXT_NOTE = "#7a7a98";
 
 function isGroupComplete(board: string, solution: string, indices: number[]): boolean {
   return indices.every((i) => board[i] !== "-" && board[i] === solution[i]);
@@ -77,7 +78,8 @@ function buildSvg(
 
     const isGiven = game.puzzle[i] !== "-";
     const boardChar = game.board[i];
-    const isFilled = boardChar !== "-";
+    const isNote = boardChar >= "a" && boardChar <= "i";
+    const isFilled = boardChar !== "-" && !isNote;
     const isWrong = isFilled && boardChar !== game.solution[i];
 
     const boxIndex = Math.floor(row / 3) * 3 + Math.floor(col / 3);
@@ -111,12 +113,17 @@ function buildSvg(
       `<text x="${x + 4}" y="${y + 17}" font-family="monospace" font-size="18" fill="${TEXT_COORD}">${coordLabel}</text>`,
     );
 
-    // Number
+    // Number or note
     if (isFilled) {
       const num = isGiven ? game.puzzle[i] : boardChar;
       const textColor = isWrong ? TEXT_WRONG : isGiven ? TEXT_GIVEN : TEXT_CORRECT;
       parts.push(
         `<text x="${x + 48}" y="${y + 70}" font-family="monospace" font-size="54" font-weight="bold" text-anchor="middle" fill="${textColor}">${num}</text>`,
+      );
+    } else if (boardChar >= "a" && boardChar <= "i") {
+      const noteDigit = boardChar.charCodeAt(0) - "a".charCodeAt(0) + 1;
+      parts.push(
+        `<text x="${x + 48}" y="${y + 70}" font-family="monospace" font-size="54" font-weight="bold" text-anchor="middle" fill="${TEXT_NOTE}">${noteDigit}</text>`,
       );
     }
   }
