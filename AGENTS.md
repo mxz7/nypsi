@@ -76,3 +76,5 @@ Export an `InteractionHandler` or `AutocompleteHandler` from `src/interactions/`
 **`strictNullChecks` is off:** `tsconfig.json` sets `strictNullChecks: false`. Don't rely on null-safety; validate at system boundaries explicitly.
 
 **Data files drive tests:** Changing JSON files in `data/` may break tests in `test/`. Run `pnpm test` after any data file changes.
+
+**Comments should describe code only**: Comments should only be used to describe code, use them only when absolutely needed, for example a complex piece of code that isn't obvious at first sight what it does - not for basic or simple things that can easily be understood.
