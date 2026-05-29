@@ -75,7 +75,10 @@ export default {
     const crosshair = coordToIndex(cellInput, coordMode);
 
     if (crosshair === null) {
-      return res.reply({ content: "invalid coordinate", flags: MessageFlags.Ephemeral });
+      return res.reply({
+        embeds: [new ErrorEmbed("invalid coordinate")],
+        flags: MessageFlags.Ephemeral,
+      });
     }
 
     const msg = await buildGameMessage(

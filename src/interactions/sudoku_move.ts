@@ -91,7 +91,10 @@ export default {
     // Re-fetch game in case another interaction modified it
     const freshGame = await getGameById(gameId);
     if (!freshGame || freshGame.state !== "active") {
-      return res.reply({ content: "this game has already ended", flags: MessageFlags.Ephemeral });
+      return res.reply({
+        embeds: [new ErrorEmbed("this game has already ended")],
+        flags: MessageFlags.Ephemeral,
+      });
     }
 
     const cellInput = res.fields.getTextInputValue("cell").trim().toUpperCase();
@@ -99,7 +102,10 @@ export default {
     const digit = parseInt(digitRaw, 10);
 
     if (isNaN(digit) || digit < 0 || digit > 9) {
-      return res.reply({ content: "digit must be 0-9 (0 = erase)", flags: MessageFlags.Ephemeral });
+      return res.reply({
+        embeds: [new ErrorEmbed("digit must be 0-9 (0 = erase)")],
+        flags: MessageFlags.Ephemeral,
+      });
     }
 
     let result: Awaited<ReturnType<typeof applyMove | typeof eraseCell>>;
@@ -112,7 +118,10 @@ export default {
     }
 
     if ("invalid" in result && result.invalid) {
-      return res.reply({ content: result.invalid, flags: MessageFlags.Ephemeral });
+      return res.reply({
+        embeds: [new ErrorEmbed(result.invalid)],
+        flags: MessageFlags.Ephemeral,
+      });
     }
 
     // Fetch updated game state

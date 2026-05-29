@@ -84,7 +84,10 @@ export default {
 
     const freshGame = await getGameById(gameId);
     if (!freshGame || freshGame.state !== "active") {
-      return res.reply({ content: "this game has already ended", flags: MessageFlags.Ephemeral });
+      return res.reply({
+        embeds: [new ErrorEmbed("this game has already ended")],
+        flags: MessageFlags.Ephemeral,
+      });
     }
 
     const cellInput = res.fields.getTextInputValue("cell").trim().toUpperCase();
@@ -93,7 +96,7 @@ export default {
     const compact = digitRaw.replaceAll(/[\s,]+/g, "");
     if (compact.length === 0 || /[^0-9]/.test(compact)) {
       return res.reply({
-        content: "digits must be 0-9 (example: 13 or 1 3)",
+        embeds: [new ErrorEmbed("digits must be 0-9 (example: 13 or 1 3)")],
         flags: MessageFlags.Ephemeral,
       });
     }
@@ -101,18 +104,24 @@ export default {
     if (compact === "0") {
       const result = await toggleNote(freshGame, cellInput, 0, coordMode);
       if (result.invalid) {
-        return res.reply({ content: result.invalid, flags: MessageFlags.Ephemeral });
+        return res.reply({
+          embeds: [new ErrorEmbed(result.invalid)],
+          flags: MessageFlags.Ephemeral,
+        });
       }
     } else if (compact.includes("0")) {
       return res.reply({
-        content: "0 can only be used by itself to clear all notes",
+        embeds: [new ErrorEmbed("0 can only be used by itself to clear all notes")],
         flags: MessageFlags.Ephemeral,
       });
     } else if (compact.length === 1) {
       const digit = parseInt(compact, 10);
       const result = await toggleNote(freshGame, cellInput, digit, coordMode);
       if (result.invalid) {
-        return res.reply({ content: result.invalid, flags: MessageFlags.Ephemeral });
+        return res.reply({
+          embeds: [new ErrorEmbed(result.invalid)],
+          flags: MessageFlags.Ephemeral,
+        });
       }
     } else {
       const digits = Array.from(new Set(compact.split("").map((d) => parseInt(d, 10))));
@@ -122,13 +131,16 @@ export default {
         const result = await toggleNote(workingGame, cellInput, digit, coordMode);
 
         if (result.invalid) {
-          return res.reply({ content: result.invalid, flags: MessageFlags.Ephemeral });
+          return res.reply({
+            embeds: [new ErrorEmbed(result.invalid)],
+            flags: MessageFlags.Ephemeral,
+          });
         }
 
         const nextGame = await getGameById(gameId);
         if (!nextGame || nextGame.state !== "active") {
           return res.reply({
-            content: "this game has already ended",
+            embeds: [new ErrorEmbed("this game has already ended")],
             flags: MessageFlags.Ephemeral,
           });
         }
