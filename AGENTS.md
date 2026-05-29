@@ -71,7 +71,7 @@ Export an `InteractionHandler` or `AutocompleteHandler` from `src/interactions/`
 
 **BigInt & Redis:** Several Prisma models use `BigInt` fields (e.g. `ProfileView`). Plain `JSON.stringify` throws on BigInt. Use the custom `RedisCache` class from `src/utils/cache.ts` which handles BigInt serialization/deserialization automatically.
 
-**Prisma schema edits:** When modifying `prisma/schema.prisma`, replace the entire model block rather than inserting partial lines near block boundaries – partial edits at model edges can corrupt the schema.
+**Prisma schema edits:** When modifying `prisma/schema.prisma`, replace the entire model block rather than inserting partial lines near block boundaries – partial edits at model edges can corrupt the schema. Do not create migrations yourself, the user will handle them once all schema changes are confirmed, use `npx prisma generate` to generate types.
 
 **`strictNullChecks` is off:** `tsconfig.json` sets `strictNullChecks: false`. Don't rely on null-safety; validate at system boundaries explicitly.
 
