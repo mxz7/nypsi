@@ -5,7 +5,7 @@ import { logger } from "../../logger";
 import sharp = require("sharp");
 
 const SQUARE_SIZE = 70;
-const BORDER = 20;
+const BORDER = 0;
 const CANVAS_SIZE = SQUARE_SIZE * 8 + BORDER * 2;
 
 const LIGHT_COLOR = "#F0D9B5";
