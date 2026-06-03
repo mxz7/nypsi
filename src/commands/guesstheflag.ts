@@ -62,10 +62,10 @@ async function run(
       ],
     });
   } else if (args[0].toLowerCase() === "play" || args[0].toLowerCase() === "p") {
-    await addCooldown(cmd.name, message.member, 10);
+    await addCooldown(cmd.name, message.member, 5);
     return startGTFGame(message);
   } else if (args[0].toLowerCase() === "stats") {
-    await addCooldown(cmd.name, message.member, 10);
+    await addCooldown(cmd.name, message.member, 5);
     const [quick, average, won, lost, avgGuess] = await Promise.all([
       prisma.flagGame.aggregate({
         _min: {
