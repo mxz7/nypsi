@@ -131,6 +131,9 @@ export async function giveVoteRewards(
 
   const crateAmount = determineCrateAmount(votes.voteStreak);
   const newCrateAmount = determineCrateAmount(votes.voteStreak - 1) < crateAmount;
+  const nextVoteCrateIncrease = [...Constants.PROGRESSION.VOTE_CRATE.entries()]
+    .sort((a, b) => a[0] - b[0])
+    .find(([streak, amount]) => streak > votes.voteStreak && amount > crateAmount);
 
   try {
     await Promise.all([
@@ -187,6 +190,15 @@ export async function giveVoteRewards(
         `\n+ **${crateAmount}** ${pluralize("lottery ticket", crateAmount)}\n\n` +
         (newCrateAmount && votes.voteStreak > 5
           ? `you will now receive **${crateAmount}** crates each vote thanks to your streak\n\n`
+          : "") +
+        (nextVoteCrateIncrease
+          ? `**${(nextVoteCrateIncrease[0] - votes.voteStreak).toLocaleString()}** ${pluralize(
+              "vote",
+              nextVoteCrateIncrease[0] - votes.voteStreak,
+            )} until your next crate increase! (**${nextVoteCrateIncrease[1]}** ${pluralize(
+              "crate",
+              nextVoteCrateIncrease[1],
+            )} per vote)\n\n`
           : "") +
         `you have voted **${votes.monthVote}** ${pluralize("time", votes.monthVote)} this month`,
     )
