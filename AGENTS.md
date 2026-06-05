@@ -15,7 +15,7 @@ make dev           # watch + bot + worker-mentions + worker-dms (full local dev)
 make check         # lint + format:check + build
 ```
 
-Note: use `make check` after a batch of changes to ensure there are no lint/type errors
+Note: use `make check` after any changes to ensure there are no lint/type errors, prefer this over tool calls for type errors.
 
 Prisma client generates to `src/generated/prisma/` (not the default location). Import via the path alias `#generated/prisma`.
 
