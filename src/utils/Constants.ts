@@ -365,6 +365,12 @@ export default {
   STAFF_ROLE_ID: "1091314758986256424",
   OWNER_ID: "672793821850894347",
   PROGRESSION: {
+    DAILY_REWARD_BREAKPOINTS: [
+      { itemId: "basic_crate", interval: 7 },
+      { itemId: "69420_crate", interval: 69 },
+      { itemId: "nypsi_crate", interval: 100 },
+      { itemId: "gem_crate", interval: 500 },
+    ],
     VOTE_CRATE: new Map([
       [1, 1],
       [2, 2],

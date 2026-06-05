@@ -1,6 +1,6 @@
 import { exec } from "child_process";
 import * as fs from "fs";
-import { GuildMember, User } from "discord.js";
+import { ComponentType, GuildMember, Message, MessageFlags, User } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
@@ -742,26 +742,8 @@ export async function doDaily(
     totalMoney += money;
     totalXp += xp;
 
-    if (streak % 7 == 0) {
-      let crate = 1;
-
-      crate += Math.floor(math.sqrt(streak / 1.3) as number);
-
-      if (crate > 10) crate = 10;
-
-      totalRewards.set("basic_crate", (totalRewards.get("basic_crate") ?? 0) + crate);
-    }
-
-    if (streak % 69 == 0) {
-      totalRewards.set("69420_crate", (totalRewards.get("69420_crate") ?? 0) + 5);
-    }
-
-    if (streak % 100 == 0) {
-      totalRewards.set("nypsi_crate", (totalRewards.get("nypsi_crate") ?? 0) + 1);
-    }
-
-    if (streak % 500 == 0) {
-      totalRewards.set("gem_crate", (totalRewards.get("gem_crate") ?? 0) + 1);
+    for (const [itemId, rewardAmount] of getDailyStreakRewardItems(streak)) {
+      totalRewards.set(itemId, (totalRewards.get(itemId) ?? 0) + rewardAmount);
     }
   };
 
@@ -887,6 +869,100 @@ export async function doDaily(
   addTaskProgress(member, "daily_streaks", amount);
 
   return embed;
+}
+
+function getDailyBasicCrateAmount(streak: number) {
+  let crate = 1;
+
+  crate += Math.floor(math.sqrt(streak / 1.3) as number);
+
+  if (crate > 10) crate = 10;
+
+  return crate;
+}
+
+export function getDailyStreakRewardItems(streak: number) {
+  const rewards = new Map<string, number>();
+
+  for (const reward of Constants.PROGRESSION.DAILY_REWARD_BREAKPOINTS) {
+    if (streak % reward.interval !== 0) continue;
+
+    switch (reward.itemId) {
+      case "basic_crate":
+        rewards.set(reward.itemId, getDailyBasicCrateAmount(streak));
+        break;
+      case "69420_crate":
+        rewards.set(reward.itemId, 5);
+        break;
+      case "nypsi_crate":
+        rewards.set(reward.itemId, 1);
+        break;
+      case "gem_crate":
+        rewards.set(reward.itemId, 1);
+        break;
+      default:
+        break;
+    }
+  }
+
+  return rewards;
+}
+
+function getDaysUntilNextDailyReward(streak: number, interval: number) {
+  const remainder = streak % interval;
+
+  if (remainder === 0) {
+    return interval;
+  }
+
+  return interval - remainder;
+}
+
+function buildUpcomingDailyRewardsEmbed(userId: string, streak: number) {
+  const rewards = Constants.PROGRESSION.DAILY_REWARD_BREAKPOINTS.map(({ itemId, interval }) => {
+    const daysUntil = getDaysUntilNextDailyReward(streak, interval);
+    const nextStreak = streak + daysUntil;
+    const amount = getDailyStreakRewardItems(nextStreak).get(itemId) ?? 0;
+
+    return { amount, daysUntil, itemId, nextStreak };
+  })
+    .filter((reward) => reward.amount > 0)
+    .map((reward) => {
+      const item = items[reward.itemId];
+
+      return (
+        `- in **${reward.daysUntil.toLocaleString()}** ${pluralize("day", reward.daysUntil)} ` +
+        `(streak **${reward.nextStreak.toLocaleString()}**): ` +
+        `**${reward.amount.toLocaleString()}** ${item.emoji} ${pluralize(item, reward.amount)}`
+      );
+    });
+
+  return new CustomEmbed(userId)
+    .setHeader("upcoming rewards")
+    .setDescription(
+      `current daily streak: **${streak.toLocaleString()}**\n\n${rewards.join("\n")}`,
+    );
+}
+
+export async function awaitDailyUpcomingRewardsInteraction(message: Message, userId: string) {
+  const interaction = await message
+    .awaitMessageComponent({
+      componentType: ComponentType.Button,
+      filter: (i) => i.user.id === userId && i.customId === "daily-upcoming-rewards",
+      time: 60000,
+    })
+    .catch((): null => null);
+
+  if (!interaction) return;
+
+  const streak = await getDailyStreak(userId);
+
+  await interaction
+    .reply({
+      embeds: [buildUpcomingDailyRewardsEmbed(userId, streak)],
+      flags: MessageFlags.Ephemeral,
+    })
+    .catch(() => {});
 }
 
 function getDailyMoney(currentStreak: number) {

@@ -14,6 +14,7 @@ import Constants from "../utils/Constants";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
 import {
+  awaitDailyUpcomingRewardsInteraction,
   createUser,
   doDaily,
   getDailyStreak,
@@ -52,7 +53,17 @@ async function run(
     const next = dayjs().add(1, "day").startOf("day").unix();
     const embed = new ErrorEmbed(`your next daily bonus is available <t:${next}:R>`).removeTitle();
     embed.setFooter({ text: `current streak: ${await getDailyStreak(message.member)}` });
-    return send({ embeds: [embed] });
+
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder()
+        .setStyle(ButtonStyle.Secondary)
+        .setCustomId("daily-upcoming-rewards")
+        .setLabel("upcoming rewards"),
+    );
+
+    const msg = await send({ embeds: [embed], components: [row] });
+    void awaitDailyUpcomingRewardsInteraction(msg, message.author.id);
+    return;
   }
 
   if (percentChance(0.03) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
@@ -76,19 +87,28 @@ async function run(
 
   const embed = await doDaily(message.member);
 
+  const voteButton = new ButtonBuilder()
+    .setStyle(ButtonStyle.Link)
+    .setURL("https://top.gg/bot/678711738845102087/vote")
+    .setLabel("vote for more rewards")
+    .setEmoji("<:topgg:1355915569286610964>");
+
+  const upcomingButton = new ButtonBuilder()
+    .setStyle(ButtonStyle.Secondary)
+    .setCustomId("daily-upcoming-rewards")
+    .setLabel("upcoming");
+
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder()
-      .setStyle(ButtonStyle.Link)
-      .setURL("https://top.gg/bot/678711738845102087/vote")
-      .setLabel("vote for more rewards")
-      .setEmoji("<:topgg:1355915569286610964>"),
+    upcomingButton,
   );
 
   if (!(await hasVoted(message.member))) {
-    return send({ embeds: [embed], components: [row] });
-  } else {
-    return send({ embeds: [embed] });
+    row.addComponents(voteButton);
   }
+
+  const msg = await send({ embeds: [embed], components: [row] });
+  void awaitDailyUpcomingRewardsInteraction(msg, message.author.id);
+  return;
 }
 
 cmd.setRun(run);

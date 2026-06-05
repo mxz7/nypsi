@@ -13,6 +13,7 @@ import Constants from "../utils/Constants";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
 import {
+  awaitDailyUpcomingRewardsInteraction,
   createUser,
   doDaily,
   getDailyStreak,
@@ -51,7 +52,18 @@ export default {
         `your next daily bonus is available <t:${next}:R>`,
       ).removeTitle();
       embed.setFooter({ text: `current streak: ${await getDailyStreak(interaction.user.id)}` });
-      return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+
+      const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder()
+          .setStyle(ButtonStyle.Secondary)
+          .setCustomId("daily-upcoming-rewards")
+          .setLabel("upcoming"),
+      );
+
+      await interaction.reply({ embeds: [embed], components: [row], flags: MessageFlags.Ephemeral });
+      const msg = await interaction.fetchReply();
+      void awaitDailyUpcomingRewardsInteraction(msg, interaction.user.id);
+      return;
     }
 
     if (percentChance(0.03) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
@@ -75,22 +87,33 @@ export default {
 
     const embed = await doDaily(interaction.member as GuildMember);
 
+    const voteButton = new ButtonBuilder()
+      .setStyle(ButtonStyle.Link)
+      .setURL("https://top.gg/bot/678711738845102087/vote")
+      .setLabel("vote for more rewards")
+      .setEmoji("<:topgg:1355915569286610964>");
+
+    const upcomingButton = new ButtonBuilder()
+      .setStyle(ButtonStyle.Secondary)
+      .setCustomId("daily-upcoming-rewards")
+      .setLabel("upcoming");
+
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder()
-        .setStyle(ButtonStyle.Link)
-        .setURL("https://top.gg/bot/678711738845102087/vote")
-        .setLabel("vote for more rewards")
-        .setEmoji("<:topgg:1355915569286610964>"),
+      upcomingButton,
     );
 
     if (!(await hasVoted(interaction.user.id))) {
-      return interaction.reply({
-        embeds: [embed],
-        components: [row],
-        flags: MessageFlags.Ephemeral,
-      });
-    } else {
-      return interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+      row.addComponents(voteButton);
     }
+
+    await interaction.reply({
+      embeds: [embed],
+      components: [row],
+      flags: MessageFlags.Ephemeral,
+    });
+
+    const msg = await interaction.fetchReply();
+    void awaitDailyUpcomingRewardsInteraction(msg, interaction.user.id);
+    return;
   },
 } as InteractionHandler;
