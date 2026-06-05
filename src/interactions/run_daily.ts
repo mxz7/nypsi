@@ -60,7 +60,11 @@ export default {
           .setLabel("upcoming"),
       );
 
-      await interaction.reply({ embeds: [embed], components: [row], flags: MessageFlags.Ephemeral });
+      await interaction.reply({
+        embeds: [embed],
+        components: [row],
+        flags: MessageFlags.Ephemeral,
+      });
       const msg = await interaction.fetchReply();
       void awaitDailyUpcomingRewardsInteraction(msg, interaction.user.id);
       return;
