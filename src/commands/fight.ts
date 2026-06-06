@@ -187,8 +187,8 @@ async function run(
   await wait(2);
 
   const fightRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("at").setLabel("attack").setStyle(ButtonStyle.Danger),
-    new ButtonBuilder().setCustomId("he").setLabel("heal").setStyle(ButtonStyle.Success),
+    new ButtonBuilder().setCustomId("fight-attack").setLabel("attack").setStyle(ButtonStyle.Danger),
+    new ButtonBuilder().setCustomId("fight-heal").setLabel("heal").setStyle(ButtonStyle.Success),
   );
 
   const [homeBoosters, awayBoosters] = await Promise.all([
@@ -247,13 +247,13 @@ async function run(
   collector.on("collect", async (i) => {
     if (ended) return;
 
-    if (i.customId == "at") {
+    if (i.customId == "fight-attack") {
       if (i.user.id == message.author.id) {
         fight.homeHit();
       } else {
         fight.awayHit();
       }
-    } else {
+    } else if (i.customId == "fight-heal") {
       if (i.user.id == message.author.id) {
         const res = fight.homeHeal();
 
