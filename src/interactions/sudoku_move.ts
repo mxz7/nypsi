@@ -53,14 +53,14 @@ export default {
       .setTitle("sudoku move")
       .addLabelComponents(
         new LabelBuilder()
-          .setLabel("cell coordinate")
+          .setLabel("cell coordinate(s)")
           .setTextInputComponent(
             new TextInputBuilder()
               .setCustomId("cell")
               .setRequired(true)
               .setPlaceholder(cellPlaceholder)
               .setMinLength(2)
-              .setMaxLength(2)
+              .setMaxLength(20)
               .setStyle(TextInputStyle.Short),
           ),
         new LabelBuilder()
@@ -98,6 +98,7 @@ export default {
     }
 
     const cellInput = res.fields.getTextInputValue("cell").trim().toUpperCase();
+    const coordinates = cellInput.split(" ").filter(Boolean);
     const digitRaw = res.fields.getTextInputValue("digit").trim();
     const digit = parseInt(digitRaw, 10);
 
@@ -108,20 +109,55 @@ export default {
       });
     }
 
-    let result: Awaited<ReturnType<typeof applyMove | typeof eraseCell>>;
-    let lastCell: number | undefined = undefined;
-    if (digit === 0) {
-      result = await eraseCell(freshGame, cellInput, coordMode);
-    } else {
-      result = await applyMove(freshGame, cellInput, digit, coordMode);
-      lastCell = coordToIndex(cellInput, coordMode) ?? undefined;
-    }
-
-    if ("invalid" in result && result.invalid) {
+    if (coordinates.length === 0) {
       return res.reply({
-        embeds: [new ErrorEmbed(result.invalid)],
+        embeds: [new ErrorEmbed("invalid coordinate")],
         flags: MessageFlags.Ephemeral,
       });
+    }
+
+    let workingGame = freshGame;
+    let completed = false;
+    let lastCell: number | undefined = undefined;
+
+    for (const coordinate of coordinates) {
+      if (digit === 0) {
+        const result = await eraseCell(workingGame, coordinate, coordMode);
+
+        if (result.invalid) {
+          return res.reply({
+            embeds: [new ErrorEmbed(result.invalid)],
+            flags: MessageFlags.Ephemeral,
+          });
+        }
+      } else {
+        const result = await applyMove(workingGame, coordinate, digit, coordMode);
+
+        // type error if we do !result.ok stupid typescript
+        if (result.ok === false) {
+          return res.reply({
+            embeds: [new ErrorEmbed(result.invalid)],
+            flags: MessageFlags.Ephemeral,
+          });
+        }
+
+        if (result.complete) {
+          completed = true;
+        }
+      }
+
+      lastCell = coordToIndex(coordinate, coordMode) ?? undefined;
+
+      const nextGame = await getGameById(gameId);
+      if (!nextGame) return;
+
+      if (nextGame.state !== "active") {
+        workingGame = nextGame;
+        completed = true;
+        break;
+      }
+
+      workingGame = nextGame;
     }
 
     // Fetch updated game state
@@ -130,7 +166,7 @@ export default {
 
     const highlight = digit === 0 ? undefined : digit;
 
-    if ("complete" in result && result.complete) {
+    if (completed || updatedGame.state !== "active") {
       const msg = await buildEndedGameMessage(
         updatedGame,
         coordMode,
