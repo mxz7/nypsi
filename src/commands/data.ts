@@ -197,6 +197,10 @@ async function run(
             ChessPuzzleStats: true,
             tmdbRatings: true,
             z: true,
+            AiChatConversation: true,
+            RoleplayStat: true,
+            RoleplayStatTarget: true,
+            SudokuGame: true,
           },
         }),
         moderation: {
