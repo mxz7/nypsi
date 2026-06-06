@@ -1713,32 +1713,32 @@
     "id": "sudoku_ii",
     "name": "sudoku professional **II**",
     "emoji": "🧩",
-    "target": 15,
-    "description": "solve 15 sudoku puzzles",
+    "target": 5,
+    "description": "solve 5 sudoku puzzles",
     "prize": ["lucky_scratch_card:2"]
   },
   "sudoku_iii": {
     "id": "sudoku_iii",
     "name": "sudoku professional **III**",
     "emoji": "🧩",
-    "target": 50,
-    "description": "solve 50 sudoku puzzles",
+    "target": 25,
+    "description": "solve 25 sudoku puzzles",
     "prize": ["lucky_scratch_card:3"]
   },
   "sudoku_iv": {
     "id": "sudoku_iv",
     "name": "sudoku professional **IV**",
     "emoji": "🧩",
-    "target": 100,
-    "description": "solve 100 sudoku puzzles",
+    "target": 50,
+    "description": "solve 50 sudoku puzzles",
     "prize": ["legendary_scratch_card:1"]
   },
   "sudoku_v": {
     "id": "sudoku_v",
     "name": "sudoku professional **V**",
     "emoji": "🧩",
-    "target": 250,
-    "description": "solve 250 sudoku puzzles",
+    "target": 100,
+    "description": "solve 100 sudoku puzzles",
     "prize": ["legendary_scratch_card:2", "nypsi_crate:1"]
   }
 }
