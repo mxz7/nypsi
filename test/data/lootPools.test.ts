@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { expect, test } from "vitest";
-import { Item } from "../src/types/Economy";
-import { LootPool } from "../src/types/LootPool";
+import { Item } from "../../src/types/Economy";
+import { LootPool } from "../../src/types/LootPool";
 
 const items: Record<string, Item> = JSON.parse(readFileSync("data/items.json").toString());
 const lootPools: Record<string, LootPool> = JSON.parse(

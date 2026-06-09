@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { expect, test } from "vitest";
-import { NotificationData } from "../src/types/Notification";
+import { NotificationData } from "../../src/types/Notification";
 
 const data = JSON.parse(readFileSync("data/notifications.json").toString());
 

@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { expect, test } from "vitest";
-import { AchievementData } from "../src/types/Economy";
-import Constants from "../src/utils/Constants";
+import { AchievementData } from "../../src/types/Economy";
+import Constants from "../../src/utils/Constants";
 
 const data: Record<string, AchievementData> = JSON.parse(
   readFileSync("data/achievements.json").toString(),

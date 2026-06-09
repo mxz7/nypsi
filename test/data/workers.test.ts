@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { expect, test } from "vitest";
-import { Worker, WorkerUpgrades } from "../src/types/Workers";
-import Constants from "../src/utils/Constants";
+import { Worker, WorkerUpgrades } from "../../src/types/Workers";
+import Constants from "../../src/utils/Constants";
 
 const data = JSON.parse(readFileSync("data/workers.json").toString());
 

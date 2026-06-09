@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { expect, test } from "vitest";
-import { DabloonShopItem, Item } from "../src/types/Economy";
+import { DabloonShopItem, Item } from "../../src/types/Economy";
 
 const data: Record<string, DabloonShopItem> = JSON.parse(
   readFileSync("data/dabloon_shop.json").toString(),

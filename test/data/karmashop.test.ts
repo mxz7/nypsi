@@ -1,8 +1,8 @@
 import { readFileSync } from "node:fs";
 import { expect, test } from "vitest";
-import { Item } from "../src/types/Economy";
-import { KarmaShopItem } from "../src/types/Karmashop";
-import Constants from "../src/utils/Constants";
+import { Item } from "../../src/types/Economy";
+import { KarmaShopItem } from "../../src/types/Karmashop";
+import Constants from "../../src/utils/Constants";
 
 const data: Record<string, KarmaShopItem> = JSON.parse(
   readFileSync("data/karmashop.json").toString(),

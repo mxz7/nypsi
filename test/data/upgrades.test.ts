@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { expect, test } from "vitest";
-import { UserUpgrade } from "../src/types/Economy";
+import { UserUpgrade } from "../../src/types/Economy";
 
 const data: Record<string, UserUpgrade> = JSON.parse(readFileSync("data/upgrades.json").toString());
 

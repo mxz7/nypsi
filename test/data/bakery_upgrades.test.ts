@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { expect, test } from "vitest";
-import { BakeryUpgradeData } from "../src/types/Economy";
-import Constants from "../src/utils/Constants";
+import { BakeryUpgradeData } from "../../src/types/Economy";
+import Constants from "../../src/utils/Constants";
 
 const data: Record<string, BakeryUpgradeData> = JSON.parse(
   readFileSync("data/bakery_upgrades.json").toString(),

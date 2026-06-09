@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { expect, test } from "vitest";
-import { GuildUpgrade } from "../src/types/Economy";
+import { GuildUpgrade } from "../../src/types/Economy";
 
 const data: Record<string, GuildUpgrade> = JSON.parse(
   readFileSync("data/guild_upgrades.json").toString(),

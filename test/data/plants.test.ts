@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { expect, test } from "vitest";
-import { Item, Plant, PlantUpgrade } from "../src/types/Economy";
+import { Item, Plant, PlantUpgrade } from "../../src/types/Economy";
 
 const data = JSON.parse(readFileSync("data/plants.json").toString());
 

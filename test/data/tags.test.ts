@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { expect, test } from "vitest";
-import { Tag } from "../src/types/Tags";
-import Constants from "../src/utils/Constants";
+import { Tag } from "../../src/types/Tags";
+import Constants from "../../src/utils/Constants";
 
 const data: Record<string, Tag> = JSON.parse(readFileSync("data/tags.json").toString());
 

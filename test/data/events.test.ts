@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { expect, test } from "vitest";
-import { Event } from "../src/types/Economy";
+import { Event } from "../../src/types/Economy";
 
 const data: Record<string, Event> = JSON.parse(readFileSync("data/events.json").toString());
 
