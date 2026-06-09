@@ -57,6 +57,18 @@ export default {
                 error: e,
               },
             );
+
+            hook.destroy();
+            continue;
+          }
+
+          if (!guildMemberIds || guildMemberIds.length === 0) {
+            logger.warn(
+              `birthdays: no members found for guild ${guildData.id} while handling birthdays`,
+            );
+
+            hook.destroy();
+            continue;
           }
 
           for (const member of birthdayMembers) {
