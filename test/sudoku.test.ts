@@ -1,8 +1,10 @@
 import { expect, test } from "vitest";
 import {
+  clearDigitNotesFromPeers,
   EMPTY_CELL_CHAR,
   decodeCellChar,
   encodeNoteMask,
+  getPeerIndexes,
   hasNote,
   isRawDigitChar,
   isValidNoteChar,
@@ -84,5 +86,70 @@ test("encode/decode note masks round-trip", () => {
     if (decoded.kind === "notes") {
       expect(decoded.mask).toBe(mask);
     }
+  }
+});
+
+test("getPeerIndexes returns 20 unique peers", () => {
+  const peers = getPeerIndexes(40);
+
+  expect(peers.length).toBe(20);
+  expect(new Set(peers).size).toBe(20);
+  expect(peers.includes(40)).toBe(false);
+});
+
+test("clearDigitNotesFromPeers removes digit notes in row/column/box peers", () => {
+  const targetIndex = 40;
+  const targetDigit = 5;
+  const noteMask = (1 << (targetDigit - 1)) | (1 << 1);
+
+  const board = Array(81).fill("1") as string[];
+  board[targetIndex] = String(targetDigit);
+
+  const rowPeer = 36;
+  const colPeer = 4;
+  const boxPeer = 30;
+  const nonPeer = 0;
+
+  board[rowPeer] = encodeNoteMask(noteMask);
+  board[colPeer] = encodeNoteMask(noteMask);
+  board[boxPeer] = encodeNoteMask(noteMask);
+  board[nonPeer] = encodeNoteMask(noteMask);
+
+  const updated = clearDigitNotesFromPeers(board.join(""), targetIndex, targetDigit);
+
+  const rowDecoded = decodeCellChar(updated[rowPeer]);
+  const colDecoded = decodeCellChar(updated[colPeer]);
+  const boxDecoded = decodeCellChar(updated[boxPeer]);
+  const nonPeerDecoded = decodeCellChar(updated[nonPeer]);
+
+  expect(rowDecoded.kind).toBe("notes");
+  expect(colDecoded.kind).toBe("notes");
+  expect(boxDecoded.kind).toBe("notes");
+  expect(nonPeerDecoded.kind).toBe("notes");
+
+  if (rowDecoded.kind === "notes") expect(hasNote(rowDecoded.mask, targetDigit)).toBe(false);
+  if (colDecoded.kind === "notes") expect(hasNote(colDecoded.mask, targetDigit)).toBe(false);
+  if (boxDecoded.kind === "notes") expect(hasNote(boxDecoded.mask, targetDigit)).toBe(false);
+  if (nonPeerDecoded.kind === "notes") expect(hasNote(nonPeerDecoded.mask, targetDigit)).toBe(true);
+});
+
+test("clearDigitNotesFromPeers preserves other notes in peers", () => {
+  const targetIndex = 0;
+  const targetDigit = 9;
+
+  const board = Array(81).fill("1") as string[];
+  board[targetIndex] = String(targetDigit);
+
+  const peer = 1;
+  const peerMask = (1 << (targetDigit - 1)) | (1 << 2);
+  board[peer] = encodeNoteMask(peerMask);
+
+  const updated = clearDigitNotesFromPeers(board.join(""), targetIndex, targetDigit);
+  const updatedCell = decodeCellChar(updated[peer]);
+
+  expect(updatedCell.kind).toBe("notes");
+  if (updatedCell.kind === "notes") {
+    expect(hasNote(updatedCell.mask, targetDigit)).toBe(false);
+    expect(hasNote(updatedCell.mask, 3)).toBe(true);
   }
 });

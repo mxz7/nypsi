@@ -5,6 +5,7 @@ import { addProgress } from "../economy/achievements";
 import { addTaskProgress } from "../economy/tasks";
 import { getPreferences, updatePreferences } from "../users/notifications";
 import {
+  clearDigitNotesFromPeers,
   decodeCellChar,
   EMPTY_CELL_CHAR,
   encodeNoteMask,
@@ -163,7 +164,8 @@ export async function applyMove(
 
   const boardArr = game.board.split("");
   boardArr[index] = String(digit);
-  const newBoard = boardArr.join("");
+  const boardWithMove = boardArr.join("");
+  const newBoard = correct ? clearDigitNotesFromPeers(boardWithMove, index, digit) : boardWithMove;
 
   const complete = newBoard === game.solution;
 
