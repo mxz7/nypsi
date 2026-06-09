@@ -25,6 +25,24 @@ levelLabelMap.set(20, "warn");
 levelLabelMap.set(30, "info");
 levelLabelMap.set(40, "debug");
 
+function stringifyLogValue(_key: string, value: unknown) {
+  if (typeof value === "bigint") {
+    return value.toString();
+  }
+
+  if (value instanceof Error) {
+    return {
+      ...Object.fromEntries(Object.entries(value)),
+      name: value.name,
+      message: value.message,
+      stack: value.stack,
+      cause: value.cause,
+    };
+  }
+
+  return value;
+}
+
 class Logger {
   public transports: Transport[];
   public preprocessors: ((data: WriteData) => WriteData | Promise<WriteData>)[];
@@ -155,11 +173,7 @@ class FileTransport implements Transport {
     }
 
     try {
-      this.stream.write(
-        JSON.stringify(out, (key, value) =>
-          typeof value === "bigint" ? value.toString() : value,
-        ) + "\n",
-      );
+      this.stream.write(JSON.stringify(out, stringifyLogValue) + "\n");
     } catch (e) {
       console.error("logger: failed writing to log - creating new stream");
       console.error(e);
@@ -221,11 +235,7 @@ class ConsoleTransport implements Transport {
     let jsonData = "";
 
     if (Boolean(data.data) && Object.keys(data.data).length > 0) {
-      jsonData = JSON.stringify(
-        data.data,
-        (key, value) => (typeof value === "bigint" ? value.toString() : value),
-        2,
-      );
+      jsonData = JSON.stringify(data.data, stringifyLogValue, 2);
       jsonData = jsonColor(jsonData.substring(1, jsonData.length - 1).trim());
     }
 
@@ -270,11 +280,7 @@ const formatter = (data: WriteData) => {
   let jsonData = "";
 
   if (Boolean(data.data) && Object.keys(data.data).length > 0) {
-    jsonData = JSON.stringify(
-      data.data,
-      (key, value) => (typeof value === "bigint" ? value.toString() : value),
-      2,
-    );
+    jsonData = JSON.stringify(data.data, stringifyLogValue, 2);
     jsonData = jsonColor(
       jsonData
         .substring(1, jsonData.length - 1)
@@ -282,11 +288,7 @@ const formatter = (data: WriteData) => {
         .replaceAll("\\n", "\n"),
     );
   } else if (typeof data.message === "object") {
-    jsonData = JSON.stringify(
-      data.message,
-      (key, value) => (typeof value === "bigint" ? value.toString() : value),
-      2,
-    );
+    jsonData = JSON.stringify(data.message, stringifyLogValue, 2);
     jsonData = jsonColor(
       jsonData
         .substring(1, jsonData.length - 1)
