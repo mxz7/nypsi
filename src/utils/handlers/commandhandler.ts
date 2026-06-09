@@ -294,99 +294,93 @@ export async function runCommand(
     command = commands.get(cmd);
   }
 
-  if (typeof command !== "undefined") {
-    const requiredSendPermission = message.channel.isThread()
-      ? PermissionFlagsBits.SendMessagesInThreads
-      : PermissionFlagsBits.SendMessages;
+  const requiredSendPermission = message.channel.isThread()
+    ? PermissionFlagsBits.SendMessagesInThreads
+    : PermissionFlagsBits.SendMessages;
 
-    if (
-      !message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.ViewChannel) ||
-      !message.guild.members.me.permissions.has(PermissionFlagsBits.ViewChannel)
-    ) {
-      if (message instanceof Message) {
-        return message.member
-          .send(
-            "i don't have access to that channel. please contact server staff if this is an error",
-          )
-          .catch(() => {});
-      } else {
-        return message
-          .reply({
-            embeds: [
-              new ErrorEmbed(
-                "i don't have access to this channel. please contact server staff if this is an error",
-              ),
-            ],
-          })
-          .catch(() => {});
-      }
-    }
-
-    if (
-      !message.channel.permissionsFor(message.client.user).has(requiredSendPermission) ||
-      !message.guild.members.me.permissions.has(requiredSendPermission)
-    ) {
+  if (
+    !message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.ViewChannel) ||
+    !message.guild.members.me.permissions.has(PermissionFlagsBits.ViewChannel)
+  ) {
+    if (message instanceof Message) {
       return message.member
         .send(
-          `❌ i don't have permission to send messages ${message.channel.isThread() ? "in that thread" : "in that channel"} - please contact server staff if this is an error`,
+          "i don't have access to that channel. please contact server staff if this is an error",
         )
         .catch(() => {});
-    }
-
-    if (
-      !message.channel
-        .permissionsFor(message.client.user)
-        .has(PermissionFlagsBits.UseApplicationCommands) ||
-      !message.guild.members.me.permissions.has(PermissionFlagsBits.UseApplicationCommands)
-    ) {
-      return message.member
-        .send(
-          "❌ i don't have permission to perform commands in that channel - please contact server staff if this is an error",
-        )
+    } else {
+      return message
+        .reply({
+          embeds: [
+            new ErrorEmbed(
+              "i don't have access to this channel. please contact server staff if this is an error",
+            ),
+          ],
+        })
         .catch(() => {});
     }
+  }
 
-    let missingPermission = "";
+  if (
+    !message.channel.permissionsFor(message.client.user).has(requiredSendPermission) ||
+    !message.guild.members.me.permissions.has(requiredSendPermission)
+  ) {
+    return message.member
+      .send(
+        `❌ i don't have permission to send messages ${message.channel.isThread() ? "in that thread" : "in that channel"} - please contact server staff if this is an error`,
+      )
+      .catch(() => {});
+  }
 
-    if (
-      !message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.EmbedLinks) ||
-      !message.guild.members.me.permissions.has(PermissionFlagsBits.EmbedLinks)
-    ) {
-      missingPermission = "embed links";
-    } else if (
-      !message.channel
-        .permissionsFor(message.client.user)
-        .has(PermissionFlagsBits.ManageMessages) ||
-      !message.guild.members.me.permissions.has(PermissionFlagsBits.ManageMessages)
-    ) {
-      missingPermission = "manage messages";
-    } else if (
-      !message.channel
-        .permissionsFor(message.client.user)
-        .has(PermissionFlagsBits.UseExternalEmojis)
-    ) {
-      missingPermission = "use external emojis";
-    } else if (
-      !message.channel
-        .permissionsFor(message.client.user)
-        .has(PermissionFlagsBits.ReadMessageHistory) ||
-      !message.guild.members.me.permissions.has(PermissionFlagsBits.ReadMessageHistory)
-    ) {
-      missingPermission = "read message history";
-    }
+  if (
+    !message.channel
+      .permissionsFor(message.client.user)
+      .has(PermissionFlagsBits.UseApplicationCommands) ||
+    !message.guild.members.me.permissions.has(PermissionFlagsBits.UseApplicationCommands)
+  ) {
+    return message.member
+      .send(
+        "❌ i don't have permission to perform commands in that channel - please contact server staff if this is an error",
+      )
+      .catch(() => {});
+  }
 
-    if (missingPermission) {
-      const errorMessage =
-        `❌ i don't have the \`${missingPermission}\` permission, this is a required permission for nypsi to work\n\n` +
-        `to fix this go to: server settings -> roles -> find my role and enable \`${missingPermission}\`\n` +
-        "if this error still shows, check channel specific permissions\n\n" +
-        "an alternative is to enable the `administrator` permission - this will give nypsi every permission";
+  let missingPermission = "";
 
-      if (message instanceof Message) {
-        return message.channel.send(errorMessage).catch(() => {});
-      } else {
-        return message.reply(errorMessage).catch(() => {});
-      }
+  if (
+    !message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.EmbedLinks) ||
+    !message.guild.members.me.permissions.has(PermissionFlagsBits.EmbedLinks)
+  ) {
+    missingPermission = "embed links";
+  } else if (
+    !message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.ManageMessages) ||
+    !message.guild.members.me.permissions.has(PermissionFlagsBits.ManageMessages)
+  ) {
+    missingPermission = "manage messages";
+  } else if (
+    !message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.UseExternalEmojis)
+  ) {
+    missingPermission = "use external emojis";
+  } else if (
+    !message.channel
+      .permissionsFor(message.client.user)
+      .has(PermissionFlagsBits.ReadMessageHistory) ||
+    !message.guild.members.me.permissions.has(PermissionFlagsBits.ReadMessageHistory)
+  ) {
+    missingPermission = "read message history";
+  }
+
+  if (missingPermission) {
+    const errorMessage =
+      `❌ i don't have the \`${missingPermission}\` permission, this is a required permission for nypsi to work\n\n` +
+      `to fix this go to: server settings -> roles -> find my role and enable \`${missingPermission}\`\n` +
+      "if this error still shows, check channel specific permissions\n\n" +
+      "an alternative is to enable the `administrator` permission - this will give nypsi every permission";
+
+    if (message instanceof Message) {
+      return message.channel.send(errorMessage).catch(() => {});
+    } else {
+      return message.reply(errorMessage).catch(() => {});
     }
   }
 
