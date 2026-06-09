@@ -295,6 +295,10 @@ export async function runCommand(
   }
 
   if (typeof command !== "undefined") {
+    const requiredSendPermission = message.channel.isThread()
+      ? PermissionFlagsBits.SendMessagesInThreads
+      : PermissionFlagsBits.SendMessages;
+
     if (
       !message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.ViewChannel) ||
       !message.guild.members.me.permissions.has(PermissionFlagsBits.ViewChannel)
@@ -319,12 +323,12 @@ export async function runCommand(
     }
 
     if (
-      !message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.SendMessages) ||
-      !message.guild.members.me.permissions.has(PermissionFlagsBits.SendMessages)
+      !message.channel.permissionsFor(message.client.user).has(requiredSendPermission) ||
+      !message.guild.members.me.permissions.has(requiredSendPermission)
     ) {
       return message.member
         .send(
-          "❌ i don't have permission to send messages in that channel - please contact server staff if this is an error",
+          `❌ i don't have permission to send messages ${message.channel.isThread() ? "in that thread" : "in that channel"} - please contact server staff if this is an error`,
         )
         .catch(() => {});
     }
