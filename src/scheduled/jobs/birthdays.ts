@@ -84,7 +84,7 @@ export default {
 
           hook.destroy();
         } catch (e) {
-          logger.error(`birithday: error handling birthdays in ${guildData.id}`, {
+          logger.error(`birthday: error handling birthdays in ${guildData.id}`, {
             error: e,
           });
         }
