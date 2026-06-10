@@ -86,9 +86,6 @@ jobs:
       - name: checkout repository
         uses: actions/checkout@v6
 
-      - name: setup
-        uses: ./.github/actions/setup
-
       - name: restore build artifacts
         uses: actions/cache/restore@v5
         with:
