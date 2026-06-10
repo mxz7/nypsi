@@ -20,10 +20,9 @@ import { getDuration, pluralize } from "../utils/functions/string";
 import ms = require("ms");
 import dayjs = require("dayjs");
 
-const cmd = new Command("mute", "mute a user", "moderation").setPermissions([
-  "MANAGE_MESSAGES",
-  "MODERATE_MEMBERS",
-]);
+const cmd = new Command("mute", "mute a user", "moderation")
+  .setAliases(["timeout"])
+  .setPermissions(["MANAGE_MESSAGES", "MODERATE_MEMBERS"]);
 
 cmd.slashEnabled = true;
 cmd.slashData

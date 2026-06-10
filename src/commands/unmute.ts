@@ -16,10 +16,9 @@ import { newCase } from "../utils/functions/moderation/cases";
 import { deleteMute, getMuteRole, isMuted } from "../utils/functions/moderation/mute";
 import { pluralize } from "../utils/functions/string";
 
-const cmd = new Command("unmute", "unmute a user", "moderation").setPermissions([
-  "MANAGE_MESSAGES",
-  "MODERATE_MEMBERS",
-]);
+const cmd = new Command("unmute", "unmute a user", "moderation")
+  .setAliases(["untimeout"])
+  .setPermissions(["MANAGE_MESSAGES", "MODERATE_MEMBERS"]);
 
 cmd.slashEnabled = true;
 cmd.slashData.addUserOption((option) =>
