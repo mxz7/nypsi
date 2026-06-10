@@ -151,6 +151,15 @@ const actions: Record<string, RoleplayAction> = {
     action: "apologised to",
     aliases: ["apologize", "apology", "sorry"],
   },
+  castrate: {
+    gifs: [
+      "https://c.tenor.com/ct1lQGJ3ZXkAAAAd/tenor.gif",
+      "https://c.tenor.com/9Da4cs6SH9sAAAAd/tenor.gif",
+      "https://c.tenor.com/a6YUZRratdkAAAAd/tenor.gif",
+    ],
+    text: "{sender} castrated {target}!!",
+    action: "castrated",
+  },
 };
 
 const cmd = new Command("rp", "roleplay actions", "fun").setAliases(["roleplay"]);
