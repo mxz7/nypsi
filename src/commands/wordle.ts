@@ -88,7 +88,7 @@ async function run(
     );
     embed.setFooter({ text: "type 'stop' to cancel the game when you're playing" });
 
-    return await send({ embeds: [embed] });
+    return await send({ embeds: [embed] }).catch(() => {});
   }
 
   if ((args.length >= 2 && args[0].toLowerCase() == "id") || args[0].toLowerCase() == "result") {
