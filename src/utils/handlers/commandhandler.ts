@@ -294,16 +294,12 @@ export async function runCommand(
     command = commands.get(cmd);
   }
 
+  const channelPermissions = message.channel.permissionsFor(message.guild.members.me);
   const requiredSendPermission = message.channel.isThread()
     ? PermissionFlagsBits.SendMessagesInThreads
     : PermissionFlagsBits.SendMessages;
 
-  if (
-    !message.channel
-      .permissionsFor(message.guild.members.me)
-      .has(PermissionFlagsBits.ViewChannel) ||
-    !message.guild.members.me.permissions.has(PermissionFlagsBits.ViewChannel)
-  ) {
+  if (!channelPermissions?.has(PermissionFlagsBits.ViewChannel)) {
     if (message instanceof Message) {
       return message.member
         .send(
@@ -323,10 +319,7 @@ export async function runCommand(
     }
   }
 
-  if (
-    !message.channel.permissionsFor(message.guild.members.me).has(requiredSendPermission) ||
-    !message.guild.members.me.permissions.has(requiredSendPermission)
-  ) {
+  if (!message.channel.isSendable() || !channelPermissions.has(requiredSendPermission)) {
     return message.member
       .send(
         `❌ i don't have permission to send messages ${message.channel.isThread() ? "in that thread" : "in that channel"} - please contact server staff if this is an error`,
@@ -334,12 +327,7 @@ export async function runCommand(
       .catch(() => {});
   }
 
-  if (
-    !message.channel
-      .permissionsFor(message.guild.members.me)
-      .has(PermissionFlagsBits.UseApplicationCommands) ||
-    !message.guild.members.me.permissions.has(PermissionFlagsBits.UseApplicationCommands)
-  ) {
+  if (!channelPermissions.has(PermissionFlagsBits.UseApplicationCommands)) {
     return message.member
       .send(
         "❌ i don't have permission to perform commands in that channel - please contact server staff if this is an error",
@@ -349,30 +337,13 @@ export async function runCommand(
 
   let missingPermission = "";
 
-  if (
-    !message.channel.permissionsFor(message.guild.members.me).has(PermissionFlagsBits.EmbedLinks) ||
-    !message.guild.members.me.permissions.has(PermissionFlagsBits.EmbedLinks)
-  ) {
+  if (!channelPermissions.has(PermissionFlagsBits.EmbedLinks)) {
     missingPermission = "embed links";
-  } else if (
-    !message.channel
-      .permissionsFor(message.guild.members.me)
-      .has(PermissionFlagsBits.ManageMessages) ||
-    !message.guild.members.me.permissions.has(PermissionFlagsBits.ManageMessages)
-  ) {
+  } else if (!channelPermissions.has(PermissionFlagsBits.ManageMessages)) {
     missingPermission = "manage messages";
-  } else if (
-    !message.channel
-      .permissionsFor(message.guild.members.me)
-      .has(PermissionFlagsBits.UseExternalEmojis)
-  ) {
+  } else if (!channelPermissions.has(PermissionFlagsBits.UseExternalEmojis)) {
     missingPermission = "use external emojis";
-  } else if (
-    !message.channel
-      .permissionsFor(message.guild.members.me)
-      .has(PermissionFlagsBits.ReadMessageHistory) ||
-    !message.guild.members.me.permissions.has(PermissionFlagsBits.ReadMessageHistory)
-  ) {
+  } else if (!channelPermissions.has(PermissionFlagsBits.ReadMessageHistory)) {
     missingPermission = "read message history";
   }
 
