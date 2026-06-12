@@ -52,6 +52,8 @@ async function run(
     return send({ embeds: [embed] });
   }
 
+  const owner = await server.members.fetch(server.ownerId).catch(() => {});
+
   const embed = new CustomEmbed(message.member)
     .setThumbnail(server.iconURL({ size: 128 }))
     .setHeader(server.name)
@@ -59,7 +61,7 @@ async function run(
     .addField(
       "info",
       "**owner** " +
-        escapeFormattingCharacters(server.members.cache.get(server.ownerId).user.username) +
+        (owner ? escapeFormattingCharacters(owner.user.username) : "unknown") +
         "\n" +
         "**created** " +
         created,
