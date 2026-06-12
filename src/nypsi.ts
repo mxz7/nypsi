@@ -56,10 +56,12 @@ const client = new NypsiClient({
         if (!user) return true;
         if (user.id === user.client.user.id) return false;
 
+        const now = Date.now();
+
         if (!cacheTimestamp.has(user.id)) {
-          cacheTimestamp.set(user.id, Date.now());
+          cacheTimestamp.set(user.id, now);
           return false;
-        } else if (cacheTimestamp.get(user.id) < Date.now() - minTimeInCache.user) {
+        } else if (cacheTimestamp.get(user.id) < now - minTimeInCache.user) {
           // if they've been in cache longer than min time
           if (recentCommands.has(user.id)) {
             return false;
@@ -102,10 +104,12 @@ const client = new NypsiClient({
       keepOverLimit: (user) => {
         if (user.id === user.client.user.id) return true;
 
+        const now = Date.now();
+
         if (!cacheTimestamp.has(user.id)) {
-          cacheTimestamp.set(user.id, Date.now());
+          cacheTimestamp.set(user.id, now);
           return true;
-        } else if (cacheTimestamp.get(user.id) < Date.now() - minTimeInCache.user) {
+        } else if (cacheTimestamp.get(user.id) < now - minTimeInCache.user) {
           // if they've been in cache longer than min time
           if (recentCommands.has(user.id)) {
             return true;
