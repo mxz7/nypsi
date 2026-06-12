@@ -127,12 +127,12 @@ const client = new NypsiClient({
 
         const lastGuildCommand = getLastCommandSync(user.guild.id);
 
-        if (typeof lastGuildCommand === "number" && lastGuildCommand < Date.now() - inactiveGuild) {
+        const now = Date.now();
+        
+        if (typeof lastGuildCommand === "number" && lastGuildCommand < now - inactiveGuild) {
           // guild is inactive - no point storing data
           return false;
         }
-
-        const now = Date.now();
 
         const key = `${user.guild.id}-${user.id}`;
 
