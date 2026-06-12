@@ -299,7 +299,9 @@ export async function runCommand(
     : PermissionFlagsBits.SendMessages;
 
   if (
-    !message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.ViewChannel) ||
+    !message.channel
+      .permissionsFor(message.guild.members.me)
+      .has(PermissionFlagsBits.ViewChannel) ||
     !message.guild.members.me.permissions.has(PermissionFlagsBits.ViewChannel)
   ) {
     if (message instanceof Message) {
@@ -322,7 +324,7 @@ export async function runCommand(
   }
 
   if (
-    !message.channel.permissionsFor(message.client.user).has(requiredSendPermission) ||
+    !message.channel.permissionsFor(message.guild.members.me).has(requiredSendPermission) ||
     !message.guild.members.me.permissions.has(requiredSendPermission)
   ) {
     return message.member
@@ -334,7 +336,7 @@ export async function runCommand(
 
   if (
     !message.channel
-      .permissionsFor(message.client.user)
+      .permissionsFor(message.guild.members.me)
       .has(PermissionFlagsBits.UseApplicationCommands) ||
     !message.guild.members.me.permissions.has(PermissionFlagsBits.UseApplicationCommands)
   ) {
@@ -348,22 +350,26 @@ export async function runCommand(
   let missingPermission = "";
 
   if (
-    !message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.EmbedLinks) ||
+    !message.channel.permissionsFor(message.guild.members.me).has(PermissionFlagsBits.EmbedLinks) ||
     !message.guild.members.me.permissions.has(PermissionFlagsBits.EmbedLinks)
   ) {
     missingPermission = "embed links";
   } else if (
-    !message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.ManageMessages) ||
+    !message.channel
+      .permissionsFor(message.guild.members.me)
+      .has(PermissionFlagsBits.ManageMessages) ||
     !message.guild.members.me.permissions.has(PermissionFlagsBits.ManageMessages)
   ) {
     missingPermission = "manage messages";
   } else if (
-    !message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.UseExternalEmojis)
+    !message.channel
+      .permissionsFor(message.guild.members.me)
+      .has(PermissionFlagsBits.UseExternalEmojis)
   ) {
     missingPermission = "use external emojis";
   } else if (
     !message.channel
-      .permissionsFor(message.client.user)
+      .permissionsFor(message.guild.members.me)
       .has(PermissionFlagsBits.ReadMessageHistory) ||
     !message.guild.members.me.permissions.has(PermissionFlagsBits.ReadMessageHistory)
   ) {
