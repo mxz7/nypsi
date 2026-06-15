@@ -53,7 +53,7 @@ export async function startGTFGame(
     .setHeader(`${message.author.username}'s guess the flag game`, message.author.avatarURL())
     .setImage(country.flags.png);
 
-  logger.debug(
+  logger.info(
     `gtf: starting game with country ${country.name.common} (${country.cca2}) for ${message.author.id} embed image: ${embed.data.image?.url}`,
   );
 
