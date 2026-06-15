@@ -1,10 +1,18 @@
 import { RestCountries } from "@yusifaliyevpro/countries";
-import redis from "../../../init/redis";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import ms = require("ms");
 
 const countries = new RestCountries({ apiKey: process.env.COUNTRIES_API_KEY! });
 const COUNTRY_FIELDS = ["names", "codes", "population", "flag", "continents"] as const;
+const countryDataCache = new RedisCache<CountryData>(
+  Constants.redis.cache.COUNTRY_DATA,
+  ms("21 days") / 1000,
+);
+const countryValidNamesCache = new RedisCache<string>(
+  Constants.redis.cache.COUNTRY_VALID_NAMES,
+  ms("3 days") / 1000,
+);
 
 type RestCountry = {
   names: {
@@ -58,15 +66,11 @@ function mapCountryData(country: RestCountry): CountryData {
 
 export async function fetchCountryData(country: string): Promise<CountryData | "failed"> {
   const countryLower = country.toLowerCase();
-  const validNameCache = await redis.get(
-    `${Constants.redis.cache.COUNTRY_VALID_NAMES}:${countryLower}`,
-  );
-  const cache = await redis.get(
-    `${Constants.redis.cache.COUNTRY_DATA}:${validNameCache || countryLower}`,
-  );
+  const validNameCache = await countryValidNamesCache.get(countryLower);
+  const cache = await countryDataCache.get(validNameCache || countryLower);
 
   if (cache) {
-    return JSON.parse(cache) as CountryData;
+    return cache;
   } else {
     const codeQuery = country.trim().toUpperCase();
     let byCode: CountryData | undefined;
@@ -85,19 +89,8 @@ export async function fetchCountryData(country: string): Promise<CountryData | "
     if (byCode) {
       const normalizedOfficial = normalizeName(byCode.name.official);
 
-      await redis.set(
-        `${Constants.redis.cache.COUNTRY_DATA}:${normalizedOfficial}`,
-        JSON.stringify(byCode),
-        "EX",
-        ms("21 days") / 1000,
-      );
-
-      await redis.set(
-        `${Constants.redis.cache.COUNTRY_VALID_NAMES}:${countryLower}`,
-        normalizedOfficial,
-        "EX",
-        ms("3 days") / 1000,
-      );
+      await countryDataCache.set(normalizedOfficial, byCode);
+      await countryValidNamesCache.set(countryLower, normalizedOfficial);
 
       return byCode;
     }
@@ -114,20 +107,10 @@ export async function fetchCountryData(country: string): Promise<CountryData | "
     const byName = mapCountryData(byNameRes.countries[0] as RestCountry);
     const normalizedOfficial = normalizeName(byName.name.official);
 
-    await redis.set(
-      `${Constants.redis.cache.COUNTRY_DATA}:${normalizedOfficial}`,
-      JSON.stringify(byName),
-      "EX",
-      ms("21 days") / 1000,
-    );
+    await countryDataCache.set(normalizedOfficial, byName);
 
     if (countryLower !== normalizedOfficial) {
-      await redis.set(
-        `${Constants.redis.cache.COUNTRY_VALID_NAMES}:${countryLower}`,
-        normalizedOfficial,
-        "EX",
-        ms("3 days") / 1000,
-      );
+      await countryValidNamesCache.set(countryLower, normalizedOfficial);
     }
 
     return byName;
