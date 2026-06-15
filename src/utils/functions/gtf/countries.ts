@@ -5,13 +5,15 @@ import ms = require("ms");
 
 const countries = new RestCountries({ apiKey: process.env.COUNTRIES_API_KEY! });
 const COUNTRY_FIELDS = ["names", "codes", "population", "flag", "continents"] as const;
+const COUNTRY_DATA_CACHE_TTL_SECONDS = ms("365 days") / 1000;
+const COUNTRY_VALID_NAMES_CACHE_TTL_SECONDS = ms("365 days") / 1000;
 const countryDataCache = new RedisCache<CountryData>(
   Constants.redis.cache.COUNTRY_DATA,
-  ms("21 days") / 1000,
+  COUNTRY_DATA_CACHE_TTL_SECONDS,
 );
 const countryValidNamesCache = new RedisCache<string>(
   Constants.redis.cache.COUNTRY_VALID_NAMES,
-  ms("3 days") / 1000,
+  COUNTRY_VALID_NAMES_CACHE_TTL_SECONDS,
 );
 
 type RestCountry = {
