@@ -16,20 +16,10 @@ import { getUpgrades } from "./levelling";
 import { getItems, getUpgradesData, isEcoBanned } from "./utils";
 import ms = require("ms");
 
-/**
- * Calculate base money required for guild upgrade at a given level.
- * Uses exponential formula: 3M * level^1.93
- */
 function calculateMoneyRequired(level: number): number {
   return 3000000 * Math.pow(level, 1.93);
 }
 
-/**
- * Calculate base xp required for guild upgrade at a given level.
- * Uses exponential formula: 500 * level^2.1
- * Lower base (500 vs 1750) makes early levels more accessible.
- * Higher exponent (2.1) makes xp the scaling bottleneck at higher levels.
- */
 function calculateXpRequired(level: number): number {
   return 500 * Math.pow(level, 2.095);
 }
