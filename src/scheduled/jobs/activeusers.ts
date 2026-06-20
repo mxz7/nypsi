@@ -65,6 +65,8 @@ export default {
     if (currentCount >= GLOBAL_BOOSTER_TARGET) {
       log("booster target hit");
       activateGlobalBooster(manager);
+    } else {
+      log(`booster target not hit, ${currentCount}/${GLOBAL_BOOSTER_TARGET}`);
     }
   },
 } satisfies Job;
