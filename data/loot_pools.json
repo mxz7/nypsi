@@ -108,7 +108,7 @@
       "10000": 100
     },
     "items": {
-      "infinity_tag": 40,
+      "infinity_tag": 15,
       "unbreaking": 90,
       "highroller": 100,
       "turbo_upgrade_part": 75,
@@ -116,21 +116,21 @@
       "double_xp": 100,
       "gem_crate": 25,
       "boosters_crate": 75,
-      "workers_crate": 75,
+      "workers_crate": 30,
       "white_gem": 5,
-      "platinum_credit": 1,
-      "gold_credit": 3,
-      "silver_credit": 4,
+      "platinum_credit": 2,
+      "gold_credit": 5,
+      "silver_credit": 6,
       "bronze_credit": 15,
       "nypsi_crate": 75,
       "pink_gem": 40,
       "blue_gem": 55,
       "purple_gem": 40,
       "green_gem": 75,
-      "gem_shard": 90,
+      "gem_shard": 80,
       "palm_tree": 10,
       "goat_tag": 0.1,
-      "cat_tag": 0.5,
+      "cat_tag": 0.3,
       "clown_tag": 2,
       "bugatti_skin": 15,
       "ferrari_skin": 15,
@@ -138,7 +138,7 @@
       "coffee": 40,
       "cookie": {
         "weight": 1,
-        "count": 5000
+        "count": 100000
       },
       "legendary_scratch_card": 90,
       "lucky_cheese": 100,
@@ -149,9 +149,10 @@
       "strawberry_seed": 50,
       "mango_seed": 25,
       "coconut_seed": 25,
+      "pineapple_seed": 25,
       "rain": 7,
-      "pot_of_gold": 15,
-      "magic_potato": 12,
+      "pot_of_gold": 30,
+      "magic_potato": 50,
       "dabloon": {
         "weight": 10,
         "count": {
@@ -159,7 +160,15 @@
           "max": 750
         }
       },
-      "ring": 25
+      "ring": 30,
+      "fertiliser": {
+        "weight": 10,
+        "count": {
+          "min": 25,
+          "max": 100
+        }
+      },
+      "stick": 25
     }
   },
   "corner_shop_scratchie": {
