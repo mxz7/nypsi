@@ -8,7 +8,7 @@ import { addBooster } from "../../utils/functions/economy/boosters";
 import { getItems } from "../../utils/functions/economy/utils";
 import { sendToAnnouncements } from "../../utils/functions/news";
 
-const GLOBAL_BOOSTER_TARGET = 500_000;
+const GLOBAL_BOOSTER_TARGET = 100_000;
 
 export default {
   name: "active users",
