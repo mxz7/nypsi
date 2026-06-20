@@ -18,8 +18,8 @@ importers:
         specifier: 2.6.1
         version: 2.6.1
       '@hono/node-server':
-        specifier: ^2.0.4
-        version: 2.0.4(hono@4.12.25)
+        specifier: ^2.0.5
+        version: 2.0.5(hono@4.12.26)
       '@prisma/adapter-pg':
         specifier: ^7.8.0
         version: 7.8.0
@@ -72,8 +72,8 @@ importers:
         specifier: 3.4.1
         version: 3.4.1
       hono:
-        specifier: ^4.12.25
-        version: 4.12.25
+        specifier: ^4.12.26
+        version: 4.12.26
       ioredis:
         specifier: 5.10.1
         version: 5.10.1
@@ -685,8 +685,8 @@ packages:
     peerDependencies:
       hono: ^4
 
-  '@hono/node-server@2.0.4':
-    resolution: {integrity: sha512-Ut3y0dMMPWy6bZ2kVfx25EOVbZlm15dhF4mOsezMlhpNHy+4MkU1qN9Y6lnruYi4wPmFzimGX2X7LF/FwHli4A==}
+  '@hono/node-server@2.0.5':
+    resolution: {integrity: sha512-yQFvDmyDo3y6rEOJZDUYPJ49DIKTPpIk4kGvm40xx4Ejne0Pu9a1+exxPN+C1UppWK/WGZX9F++/Xs231tE86g==}
     engines: {node: '>=20'}
     peerDependencies:
       hono: ^4
@@ -2011,8 +2011,8 @@ packages:
     resolution: {integrity: sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==}
     engines: {node: '>=8'}
 
-  hono@4.12.25:
-    resolution: {integrity: sha512-2NFaIyNVgJmBs/ecmtGzlmluTFs5cHEWGTdu0t1HBwYzoGXOL5nUQBRMXsXWla5i4KkG//QMzVP88m1+I3fdAQ==}
+  hono@4.12.26:
+    resolution: {integrity: sha512-uyZtpnYxM9CmQ7QsQknM4zN8EftNqhON1qYeIKM0Se67CCEe2c44xyGURwB0axX2fBDu1dqHrHAc1hmNT8ITkw==}
     engines: {node: '>=16.9.0'}
 
   http-status-codes@2.3.0:
@@ -3257,13 +3257,13 @@ snapshots:
   '@esbuild/win32-x64@0.27.7':
     optional: true
 
-  '@hono/node-server@1.19.11(hono@4.12.25)':
+  '@hono/node-server@1.19.11(hono@4.12.26)':
     dependencies:
-      hono: 4.12.25
+      hono: 4.12.26
 
-  '@hono/node-server@2.0.4(hono@4.12.25)':
+  '@hono/node-server@2.0.5(hono@4.12.26)':
     dependencies:
-      hono: 4.12.25
+      hono: 4.12.26
 
   '@img/colour@1.0.0': {}
 
@@ -3553,13 +3553,13 @@ snapshots:
       '@electric-sql/pglite': 0.4.1
       '@electric-sql/pglite-socket': 0.1.1(@electric-sql/pglite@0.4.1)
       '@electric-sql/pglite-tools': 0.3.1(@electric-sql/pglite@0.4.1)
-      '@hono/node-server': 1.19.11(hono@4.12.25)
+      '@hono/node-server': 1.19.11(hono@4.12.26)
       '@prisma/get-platform': 7.2.0
       '@prisma/query-plan-executor': 7.2.0
       '@prisma/streams-local': 0.1.2
       foreground-child: 3.3.1
       get-port-please: 3.2.0
-      hono: 4.12.25
+      hono: 4.12.26
       http-status-codes: 2.3.0
       pathe: 2.0.3
       proper-lockfile: 4.1.2
@@ -4483,7 +4483,7 @@ snapshots:
 
   has-flag@4.0.0: {}
 
-  hono@4.12.25: {}
+  hono@4.12.26: {}
 
   http-status-codes@2.3.0: {}
 
