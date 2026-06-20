@@ -313,17 +313,19 @@ async function run(
 
       if (selected.id.endsWith("_v")) {
         prizes.push("7,500xp");
-        prizes.push("69420_crate:5");
+        prizes.push("69420_crate:20");
       } else if (selected.id.endsWith("_iv")) {
         prizes.push("3,000xp");
-        prizes.push("69420_crate:4");
+        prizes.push("69420_crate:15");
       } else if (selected.id.endsWith("_iii")) {
         prizes.push("1,500xp");
-        prizes.push("69420_crate:3");
+        prizes.push("69420_crate:10");
       } else if (selected.id.endsWith("_ii")) {
         prizes.push("500xp");
+        prizes.push("69420_crate:5");
       } else {
         prizes.push("250xp");
+        prizes.push("69420_crate:2");
       }
 
       if (selected.prize) prizes.push(...selected.prize);
