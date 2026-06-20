@@ -162,15 +162,18 @@ async function completeAchievement(userId: string, achievementId: string) {
 
   if (achievementId.endsWith("_v")) {
     earnedXp = 7500;
-    earnedCrates = 5;
+    earnedCrates = 20;
   } else if (achievementId.endsWith("_iv")) {
     earnedXp = 3000;
-    earnedCrates = 4;
+    earnedCrates = 15;
   } else if (achievementId.endsWith("_iii")) {
     earnedXp = 1500;
-    earnedCrates = 3;
+    earnedCrates = 10;
   } else if (achievementId.endsWith("_ii")) {
     earnedXp = 500;
+    earnedCrates = 5;
+  } else {
+    earnedCrates = 2;
   }
 
   const rewardsDesc: string[] = [];

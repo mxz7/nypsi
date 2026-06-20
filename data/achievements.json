@@ -769,7 +769,7 @@
     "name": "mike tyson **I**",
     "emoji": "🥊",
     "target": 5,
-    "description": "win 10 fights"
+    "description": "win 5 fights"
   },
   "fighter_ii": {
     "id": "fighter_ii",
@@ -1001,7 +1001,7 @@
     "emoji": "🐲",
     "target": 250,
     "description": "complete the dragons tower 250 times",
-    "prize": ["legendary_scratch_card:3", "nypsi_crate:2", "lucky_scratch_card:5", "rain:1s"]
+    "prize": ["legendary_scratch_card:3", "nypsi_crate:2", "lucky_scratch_card:5", "rain:1"]
   },
   "scratchies_pro_i": {
     "id": "scratchies_pro_i",
@@ -1665,40 +1665,40 @@
     "id": "chess_i",
     "name": "grandmaster **I**",
     "emoji": "<:knight:1487063018188701887>",
-    "target": 15,
-    "description": "solve 15 chess puzzles",
+    "target": 1,
+    "description": "solve 1 chess puzzle",
     "prize": ["lucky_scratch_card:1"]
   },
   "chess_ii": {
     "id": "chess_ii",
     "name": "grandmaster **II**",
     "emoji": "<:knight:1487063018188701887>",
-    "target": 75,
-    "description": "solve 75 chess puzzles",
+    "target": 25,
+    "description": "solve 25 chess puzzles",
     "prize": ["lucky_scratch_card:2"]
   },
   "chess_iii": {
     "id": "chess_iii",
     "name": "grandmaster **III**",
     "emoji": "<:knight:1487063018188701887>",
-    "target": 250,
-    "description": "solve 250 chess puzzles",
+    "target": 50,
+    "description": "solve 50 chess puzzles",
     "prize": ["lucky_scratch_card:3"]
   },
   "chess_iv": {
     "id": "chess_iv",
     "name": "grandmaster **IV**",
     "emoji": "<:knight:1487063018188701887>",
-    "target": 1000,
-    "description": "solve 1,000 chess puzzles",
+    "target": 100,
+    "description": "solve 100 chess puzzles",
     "prize": ["legendary_scratch_card:1"]
   },
   "chess_v": {
     "id": "chess_v",
     "name": "grandmaster **V**",
     "emoji": "<:knight:1487063018188701887>",
-    "target": 2500,
-    "description": "solve 2,500 chess puzzles",
+    "target": 500,
+    "description": "solve 500 chess puzzles",
     "prize": ["legendary_scratch_card:2", "nypsi_crate:1", "tag:grandmaster"]
   },
   "sudoku_i": {
@@ -1740,5 +1740,43 @@
     "target": 100,
     "description": "solve 100 sudoku puzzles",
     "prize": ["legendary_scratch_card:2", "nypsi_crate:1"]
+  },
+  "roleplayer_i": {
+    "id": "roleplayer_i",
+    "name": "roleplayer **I**",
+    "emoji": "🎭",
+    "target": 50,
+    "description": "use 50 roleplay commands"
+  },
+  "roleplayer_ii": {
+    "id": "roleplayer_ii",
+    "name": "roleplayer **II**",
+    "emoji": "🎭",
+    "target": 250,
+    "description": "use 250 roleplay commands"
+  },
+  "roleplayer_iii": {
+    "id": "roleplayer_iii",
+    "name": "roleplayer **III**",
+    "emoji": "🎭",
+    "target": 1000,
+    "description": "use 1,000 roleplay commands",
+    "prize": ["lucky_scratch_card:1"]
+  },
+  "roleplayer_iv": {
+    "id": "roleplayer_iv",
+    "name": "roleplayer **IV**",
+    "emoji": "🎭",
+    "target": 5000,
+    "description": "use 5,000 roleplay commands",
+    "prize": ["lucky_scratch_card:2"]
+  },
+  "roleplayer_v": {
+    "id": "roleplayer_v",
+    "name": "roleplayer **V**",
+    "emoji": "🎭",
+    "target": 15000,
+    "description": "use 15,000 roleplay commands",
+    "prize": ["legendary_scratch_card:1"]
   }
 }

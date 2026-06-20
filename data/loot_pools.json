@@ -38,28 +38,36 @@
       "lucky_7": 7,
       "lucky_scratch_card": 40,
       "redbull": 25,
-      "incredible_gun": 50,
-      "incredible_fishing_rod": 50,
+      "incredible_gun": 30,
+      "incredible_fishing_rod": 30,
       "cursor": 65,
       "grandma": 65,
       "lamborghini": 5,
-      "orphan": 50,
+      "orphan": 30,
       "hook": 32,
-      "magnet": 8,
-      "big_tiddy_goth_gf": 75,
-      "viagra": 30,
+      "magnet": 10,
+      "viagra": 5,
       "looting": 30,
-      "super_cursor": 20,
-      "bob": 80,
+      "super_cursor": 45,
+      "bob": 70,
       "stolen_credit_card": 100,
       "banana_seed": 10,
       "apple_seed": 7,
       "strawberry_seed": 10,
       "orange_seed": 15,
       "pineapple_seed": 5,
+      "mango_seed": 7,
+      "coconut_seed": 7,
       "rain": 2,
-      "magic_potato": 1.5,
-      "ring": 5
+      "magic_potato": 2,
+      "ring": 15,
+      "fertiliser": {
+        "weight": 25,
+        "count": {
+          "min": 10,
+          "max": 25
+        }
+      }
     }
   },
   "mineshaft_chest": {
@@ -100,7 +108,7 @@
       "10000": 100
     },
     "items": {
-      "infinity_tag": 40,
+      "infinity_tag": 15,
       "unbreaking": 90,
       "highroller": 100,
       "turbo_upgrade_part": 75,
@@ -108,21 +116,21 @@
       "double_xp": 100,
       "gem_crate": 25,
       "boosters_crate": 75,
-      "workers_crate": 75,
+      "workers_crate": 30,
       "white_gem": 5,
-      "platinum_credit": 1,
-      "gold_credit": 3,
-      "silver_credit": 4,
+      "platinum_credit": 2,
+      "gold_credit": 5,
+      "silver_credit": 6,
       "bronze_credit": 15,
       "nypsi_crate": 75,
       "pink_gem": 40,
       "blue_gem": 55,
       "purple_gem": 40,
       "green_gem": 75,
-      "gem_shard": 90,
+      "gem_shard": 80,
       "palm_tree": 10,
       "goat_tag": 0.1,
-      "cat_tag": 0.5,
+      "cat_tag": 0.3,
       "clown_tag": 2,
       "bugatti_skin": 15,
       "ferrari_skin": 15,
@@ -130,7 +138,7 @@
       "coffee": 40,
       "cookie": {
         "weight": 1,
-        "count": 5000
+        "count": 100000
       },
       "legendary_scratch_card": 90,
       "lucky_cheese": 100,
@@ -141,9 +149,10 @@
       "strawberry_seed": 50,
       "mango_seed": 25,
       "coconut_seed": 25,
+      "pineapple_seed": 25,
       "rain": 7,
-      "pot_of_gold": 15,
-      "magic_potato": 12,
+      "pot_of_gold": 30,
+      "magic_potato": 50,
       "dabloon": {
         "weight": 10,
         "count": {
@@ -151,7 +160,15 @@
           "max": 750
         }
       },
-      "ring": 25
+      "ring": 30,
+      "fertiliser": {
+        "weight": 10,
+        "count": {
+          "min": 25,
+          "max": 100
+        }
+      },
+      "stick": 25
     }
   },
   "corner_shop_scratchie": {
@@ -315,7 +332,7 @@
       },
       "basic_crate": 95,
       "69420_crate": 90,
-      "nypsi_crate": 10,
+      "nypsi_crate": 6,
       "bronze_credit": 0.7,
       "gem_shard": 0.9,
       "omega_crate": 0.05,
@@ -366,7 +383,7 @@
         "count": 5
       },
       "69420_crate": 100,
-      "nypsi_crate": 40,
+      "nypsi_crate": 25,
       "bronze_credit": 1,
       "pink_gem": 0.7,
       "gem_shard": 75,
@@ -422,7 +439,7 @@
       "wheel_upgrade_part": 40,
       "lamborghini": 45,
       "quarry_scrap": 100,
-      "nypsi_crate": 50,
+      "nypsi_crate": 55,
       "platinum_credit": 0.5,
       "bronze_credit": 3,
       "silver_credit": 2,
@@ -467,7 +484,7 @@
       "mineshaft_chest": 40,
       "basic_crate": 100,
       "69420_crate": 100,
-      "nypsi_crate": 50,
+      "nypsi_crate": 40,
       "unbreaking": 15,
       "grandma": 75,
       "oven": 60,
