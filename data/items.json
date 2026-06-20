@@ -4578,5 +4578,21 @@
     "speed": 3,
     "in_crates": true,
     "rarity": 5
+  },
+  "rubber_duck": {
+    "id": "rubber_duck",
+    "name": "rubber duck",
+    "article": "a",
+    "plural": "rubber ducks",
+    "aliases": ["duck"],
+    "emoji": "<:rubber_duck:1517828907510796288>",
+    "longDesc": "quack quack",
+    "rarity": 1,
+    "role": "collectable",
+    "museum": {
+      "category": "collectables",
+      "threshold": 50
+    },
+    "in_crates": true
   }
 }
