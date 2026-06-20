@@ -38,28 +38,36 @@
       "lucky_7": 7,
       "lucky_scratch_card": 40,
       "redbull": 25,
-      "incredible_gun": 50,
-      "incredible_fishing_rod": 50,
+      "incredible_gun": 30,
+      "incredible_fishing_rod": 30,
       "cursor": 65,
       "grandma": 65,
       "lamborghini": 5,
-      "orphan": 50,
+      "orphan": 30,
       "hook": 32,
-      "magnet": 8,
-      "big_tiddy_goth_gf": 75,
-      "viagra": 30,
+      "magnet": 10,
+      "viagra": 5,
       "looting": 30,
-      "super_cursor": 20,
-      "bob": 80,
+      "super_cursor": 45,
+      "bob": 70,
       "stolen_credit_card": 100,
       "banana_seed": 10,
       "apple_seed": 7,
       "strawberry_seed": 10,
       "orange_seed": 15,
       "pineapple_seed": 5,
+      "mango_seed": 7,
+      "coconut_seed": 7,
       "rain": 2,
-      "magic_potato": 1.5,
-      "ring": 5
+      "magic_potato": 2,
+      "ring": 15,
+      "fertiliser": {
+        "weight": 25,
+        "count": {
+          "min": 10,
+          "max": 25
+        }
+      }
     }
   },
   "mineshaft_chest": {
