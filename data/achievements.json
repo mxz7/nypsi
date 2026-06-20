@@ -1001,7 +1001,7 @@
     "emoji": "🐲",
     "target": 250,
     "description": "complete the dragons tower 250 times",
-    "prize": ["legendary_scratch_card:3", "nypsi_crate:2", "lucky_scratch_card:5", "rain:1s"]
+    "prize": ["legendary_scratch_card:3", "nypsi_crate:2", "lucky_scratch_card:5", "rain:1"]
   },
   "scratchies_pro_i": {
     "id": "scratchies_pro_i",
