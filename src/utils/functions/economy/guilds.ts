@@ -16,6 +16,24 @@ import { getUpgrades } from "./levelling";
 import { getItems, getUpgradesData, isEcoBanned } from "./utils";
 import ms = require("ms");
 
+/**
+ * Calculate base money required for guild upgrade at a given level.
+ * Uses exponential formula: 3M * level^1.93
+ */
+function calculateMoneyRequired(level: number): number {
+  return 3000000 * Math.pow(level, 1.93);
+}
+
+/**
+ * Calculate base xp required for guild upgrade at a given level.
+ * Uses exponential formula: 500 * level^2.1
+ * Lower base (500 vs 1750) makes early levels more accessible.
+ * Higher exponent (2.1) makes xp the scaling bottleneck at higher levels.
+ */
+function calculateXpRequired(level: number): number {
+  return 500 * Math.pow(level, 2.095);
+}
+
 const upgrades = new Map<number, string[]>();
 
 upgrades.set(1, ["69420_crate:1"]);
@@ -350,8 +368,8 @@ export async function getRequiredForGuildUpgrade(
 
   const guild = await getGuildByName(name);
 
-  const money = 3000000 * Math.pow(guild.level, 2.1125);
-  const xp = 1750 * Math.pow(guild.level, 1.81225);
+  const money = calculateMoneyRequired(guild.level);
+  const xp = calculateXpRequired(guild.level);
 
   let slots = guild.upgrades.find((i) => i.upgradeId === "member")?.amount || 0;
 
