@@ -4594,5 +4594,20 @@
       "threshold": 50
     },
     "in_crates": true
+  },
+  "gnome": {
+    "id": "gnome",
+    "name": "gnome",
+    "article": "a",
+    "plural": "gnomes",
+    "emoji": "<:gnome:1517829804848582706>",
+    "longDesc": "have you seen gnomeo and juliet?",
+    "rarity": 1,
+    "role": "collectable",
+    "museum": {
+      "category": "collectables",
+      "threshold": 50
+    },
+    "in_crates": true
   }
 }
