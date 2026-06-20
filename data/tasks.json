@@ -286,7 +286,7 @@
     "id": "chat_reaction_weekly",
     "name": "fast typer",
     "description": "win chat reactions",
-    "target": [15, 25, 35],
+    "target": [10, 13, 15],
     "prizes": ["id:basic_crate:3", "xp:1250", "id:basic_crate:4"],
     "type": "weekly"
   },
@@ -326,7 +326,7 @@
     "id": "wordles_weekly",
     "name": "old man gamer",
     "description": "win wordles",
-    "target": [10, 15, 20],
+    "target": [3, 5, 10],
     "prizes": ["id:basic_crate:3", "xp:2500", "id:basic_crate:5"],
     "type": "weekly"
   },
@@ -374,7 +374,7 @@
     "id": "flag_weekly",
     "name": "old man gamer",
     "description": "win guess the flag games",
-    "target": [15, 25, 35],
+    "target": [10, 13, 15],
     "prizes": ["id:basic_crate:3", "xp:1500", "id:basic_crate:5"],
     "type": "weekly"
   },
