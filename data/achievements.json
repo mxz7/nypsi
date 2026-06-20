@@ -1740,5 +1740,43 @@
     "target": 100,
     "description": "solve 100 sudoku puzzles",
     "prize": ["legendary_scratch_card:2", "nypsi_crate:1"]
+  },
+  "roleplayer_i": {
+    "id": "roleplayer_i",
+    "name": "roleplayer **I**",
+    "emoji": "🎭",
+    "target": 50,
+    "description": "use 50 roleplay commands"
+  },
+  "roleplayer_ii": {
+    "id": "roleplayer_ii",
+    "name": "roleplayer **II**",
+    "emoji": "🎭",
+    "target": 250,
+    "description": "use 250 roleplay commands"
+  },
+  "roleplayer_iii": {
+    "id": "roleplayer_iii",
+    "name": "roleplayer **III**",
+    "emoji": "🎭",
+    "target": 1000,
+    "description": "use 1,000 roleplay commands",
+    "prize": ["lucky_scratch_card:1"]
+  },
+  "roleplayer_iv": {
+    "id": "roleplayer_iv",
+    "name": "roleplayer **IV**",
+    "emoji": "🎭",
+    "target": 5000,
+    "description": "use 5,000 roleplay commands",
+    "prize": ["lucky_scratch_card:2"]
+  },
+  "roleplayer_v": {
+    "id": "roleplayer_v",
+    "name": "roleplayer **V**",
+    "emoji": "🎭",
+    "target": 15000,
+    "description": "use 15,000 roleplay commands",
+    "prize": ["legendary_scratch_card:1"]
   }
 }
