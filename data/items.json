@@ -4609,5 +4609,21 @@
       "threshold": 50
     },
     "in_crates": true
+  },
+  "discord_mod": {
+    "id": "discord_mod",
+    "name": "discord mod",
+    "article": "a",
+    "aliases": ["dmod"],
+    "plural": "discord mods",
+    "emoji": "<:discord_mod:1517830563443114124>",
+    "longDesc": "uhmm actually 👆🤓",
+    "rarity": 1,
+    "role": "collectable",
+    "museum": {
+      "category": "collectables",
+      "threshold": 50
+    },
+    "in_crates": true
   }
 }
