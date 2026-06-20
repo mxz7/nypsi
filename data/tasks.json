@@ -266,16 +266,8 @@
     "prizes": ["id:basic_crate:2", "id:incredible_gun:20", "id:basic_crate:5"],
     "type": "weekly"
   },
-  "mike_tyson": {
-    "id": "mike_tyson",
-    "name": "mike tyson",
-    "description": "win fights",
-    "target": [5, 10, 15],
-    "prizes": ["id:lucky_scratch_card:2", "id:69420_crate:2"],
-    "type": "weekly"
-  },
   "mike_tyson_daily": {
-    "id": "mike_tyson",
+    "id": "mike_tyson_daily",
     "name": "mike tyson",
     "description": "win fights",
     "target": [1, 3],
