@@ -8,7 +8,7 @@ import { addBooster } from "../../utils/functions/economy/boosters";
 import { getItems } from "../../utils/functions/economy/utils";
 import { sendToAnnouncements } from "../../utils/functions/news";
 
-const GLOBAL_BOOSTER_TARGET = 500_000;
+const GLOBAL_BOOSTER_TARGET = 100_000;
 
 export default {
   name: "active users",
@@ -65,6 +65,8 @@ export default {
     if (currentCount >= GLOBAL_BOOSTER_TARGET) {
       log("booster target hit");
       activateGlobalBooster(manager);
+    } else {
+      log(`booster target not hit, ${currentCount}/${GLOBAL_BOOSTER_TARGET}`);
     }
   },
 } satisfies Job;
