@@ -185,9 +185,9 @@ export async function giveVoteRewards(
     .setDescription(
       "you have received the following: \n\n" +
         `+ $**${amount.toLocaleString()}**\n` +
-        "+ **3**% multiplier\n" +
-        `+ **${crateAmount}** ${pluralize("vote crate", crateAmount)}` +
-        `\n+ **${crateAmount}** ${pluralize("lottery ticket", crateAmount)}\n\n` +
+        "+ `3%` multiplier\n" +
+        `+ \`${crateAmount}x\` ${pluralize("vote crate", crateAmount)}\n` +
+        `+ \`${crateAmount}x\` ${pluralize("lottery ticket", crateAmount)}\n\n` +
         (newCrateAmount && votes.voteStreak > 5
           ? `you will now receive **${crateAmount}** crates each vote thanks to your streak\n\n`
           : "") +
