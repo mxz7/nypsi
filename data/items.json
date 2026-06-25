@@ -2771,7 +2771,8 @@
     "role": "item",
     "museum": {
       "category": "tools",
-      "threshold": 15
+      "threshold": 15,
+      "no_overflow": true
     },
     "rarity": 1,
     "buy": 0,
