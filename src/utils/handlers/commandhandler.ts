@@ -824,7 +824,7 @@ export async function runCommand(
         await redis.del(`achievements:completed:${message.author.id}`);
 
         if (message instanceof Message) {
-          message.reply({ embeds: [embed] });
+          message.reply({ embeds: [embed] }).catch(() => {});
         } else {
           message.followUp({ embeds: [embed] }).catch(() => {
             setTimeout(() => {
