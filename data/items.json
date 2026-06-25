@@ -545,7 +545,8 @@
     "role": "tool",
     "museum": {
       "category": "tools",
-      "threshold": 500
+      "threshold": 500,
+      "no_overflow": true
     },
     "rarity": 1,
     "buy": 0,
@@ -564,7 +565,8 @@
     "role": "tool",
     "museum": {
       "category": "tools",
-      "threshold": 250
+      "threshold": 250,
+      "no_overflow": true
     },
     "rarity": 3,
     "buy": 0,
@@ -603,7 +605,8 @@
     "role": "tool",
     "museum": {
       "category": "tools",
-      "threshold": 500
+      "threshold": 500,
+      "no_overflow": true
     },
     "rarity": 1,
     "buy": 0,
@@ -622,7 +625,8 @@
     "role": "tool",
     "museum": {
       "category": "tools",
-      "threshold": 250
+      "threshold": 250,
+      "no_overflow": true
     },
     "rarity": 3,
     "buy": 0,
@@ -694,7 +698,8 @@
     "role": "tool",
     "museum": {
       "category": "tools",
-      "threshold": 500
+      "threshold": 500,
+      "no_overflow": true
     },
     "rarity": 1,
     "buy": 0,
@@ -713,7 +718,8 @@
     "role": "tool",
     "museum": {
       "category": "tools",
-      "threshold": 250
+      "threshold": 250,
+      "no_overflow": true
     },
     "rarity": 3,
     "buy": 0,
@@ -1130,7 +1136,8 @@
     "role": "item",
     "museum": {
       "category": "general",
-      "threshold": 10
+      "threshold": 10,
+      "no_overflow": true
     },
     "rarity": 4,
     "buy": 0,
@@ -2046,8 +2053,7 @@
     "role": "booster",
     "museum": {
       "category": "boosters",
-      "threshold": 1,
-      "no_overflow": true
+      "threshold": 150
     },
     "stackable": false,
     "boosterEffect": {
@@ -2112,7 +2118,8 @@
     "role": "item",
     "museum": {
       "category": "general",
-      "threshold": 10
+      "threshold": 10,
+      "no_overflow": true
     },
     "in_crates": true
   },
@@ -2135,7 +2142,8 @@
     },
     "museum": {
       "category": "general",
-      "threshold": 1
+      "threshold": 1,
+      "no_overflow": true
     }
   },
   "magnet": {
@@ -2152,7 +2160,8 @@
     "in_crates": true,
     "museum": {
       "category": "general",
-      "threshold": 1
+      "threshold": 1,
+      "no_overflow": true
     }
   },
   "stolen_nasa_computer": {
@@ -2170,7 +2179,8 @@
     "in_crates": true,
     "museum": {
       "category": "general",
-      "threshold": 1
+      "threshold": 1,
+      "no_overflow": true
     }
   },
   "launchpad": {
@@ -2188,7 +2198,8 @@
     "in_crates": true,
     "museum": {
       "category": "general",
-      "threshold": 1
+      "threshold": 1,
+      "no_overflow": true
     }
   },
   "warehouse_permit": {
@@ -2206,7 +2217,8 @@
     "in_crates": true,
     "museum": {
       "category": "general",
-      "threshold": 1
+      "threshold": 1,
+      "no_overflow": true
     }
   },
   "orphan": {
@@ -2223,7 +2235,8 @@
     "in_crates": true,
     "museum": {
       "category": "general",
-      "threshold": 1
+      "threshold": 1,
+      "no_overflow": true
     }
   },
   "grandma": {
@@ -2240,7 +2253,8 @@
     "in_crates": true,
     "museum": {
       "category": "general",
-      "threshold": 1
+      "threshold": 1,
+      "no_overflow": true
     }
   },
   "grandpa": {
@@ -2257,7 +2271,8 @@
     "in_crates": true,
     "museum": {
       "category": "general",
-      "threshold": 1
+      "threshold": 1,
+      "no_overflow": true
     }
   },
   "oven": {
@@ -2274,7 +2289,8 @@
     "in_crates": true,
     "museum": {
       "category": "general",
-      "threshold": 1
+      "threshold": 1,
+      "no_overflow": true
     }
   },
   "highroller": {
@@ -2543,7 +2559,8 @@
     "in_crates": true,
     "museum": {
       "category": "general",
-      "threshold": 1
+      "threshold": 1,
+      "no_overflow": true
     }
   },
   "super_cursor": {
@@ -2564,7 +2581,8 @@
     "in_crates": true,
     "museum": {
       "category": "general",
-      "threshold": 1
+      "threshold": 1,
+      "no_overflow": true
     }
   },
   "workers_crate": {
@@ -2808,7 +2826,8 @@
     "role": "item",
     "museum": {
       "category": "general",
-      "threshold": 5
+      "threshold": 5,
+      "no_overflow": true
     },
     "rarity": 69,
     "buy": 0,
@@ -2835,7 +2854,8 @@
     },
     "museum": {
       "category": "general",
-      "threshold": 1
+      "threshold": 1,
+      "no_overflow": true
     }
   },
   "earth_scanner": {
@@ -2858,7 +2878,8 @@
     },
     "museum": {
       "category": "general",
-      "threshold": 1
+      "threshold": 1,
+      "no_overflow": true
     }
   },
   "manager": {
@@ -2876,7 +2897,8 @@
     "worker_upgrade_id": "manager",
     "museum": {
       "category": "general",
-      "threshold": 1
+      "threshold": 1,
+      "no_overflow": true
     }
   },
   "shipping_container": {
@@ -2895,7 +2917,8 @@
     "worker_upgrade_id": "shipping_containers",
     "museum": {
       "category": "general",
-      "threshold": 1
+      "threshold": 1,
+      "no_overflow": true
     }
   },
   "viagra": {
@@ -3114,7 +3137,8 @@
     "role": "item",
     "museum": {
       "category": "tools",
-      "threshold": 1
+      "threshold": 1,
+      "no_overflow": true
     },
     "aliases": ["reroll"],
     "rarity": 7,
@@ -3207,7 +3231,8 @@
     "role": "resource",
     "museum": {
       "category": "sellables",
-      "threshold": 5
+      "threshold": 5,
+      "no_overflow": true
     },
     "aliases": ["eye", "ender", "endereye", "ender_eye"],
     "in_crates": false,
@@ -3414,7 +3439,8 @@
     "in_crates": true,
     "museum": {
       "category": "general",
-      "threshold": 1
+      "threshold": 1,
+      "no_overflow": true
     }
   },
   "engine_upgrade": {
@@ -3435,7 +3461,8 @@
     "in_crates": false,
     "museum": {
       "category": "general",
-      "threshold": 1
+      "threshold": 1,
+      "no_overflow": true
     }
   },
   "turbo_upgrade_part": {
@@ -3452,7 +3479,8 @@
     "in_crates": true,
     "museum": {
       "category": "general",
-      "threshold": 1
+      "threshold": 1,
+      "no_overflow": true
     }
   },
   "turbo_upgrade": {
@@ -3473,7 +3501,8 @@
     "in_crates": false,
     "museum": {
       "category": "general",
-      "threshold": 1
+      "threshold": 1,
+      "no_overflow": true
     }
   },
   "wheel_upgrade_part": {
@@ -3490,7 +3519,8 @@
     "in_crates": true,
     "museum": {
       "category": "general",
-      "threshold": 1
+      "threshold": 1,
+      "no_overflow": true
     }
   },
   "wheel_upgrade": {
@@ -3511,7 +3541,8 @@
     "in_crates": false,
     "museum": {
       "category": "general",
-      "threshold": 1
+      "threshold": 1,
+      "no_overflow": true
     }
   },
   "range_rover_skin": {
@@ -3755,7 +3786,8 @@
     "role": "item",
     "museum": {
       "category": "tools",
-      "threshold": 5
+      "threshold": 5,
+      "no_overflow": true
     },
     "buy": 0,
     "sell": 10000,
@@ -3824,7 +3856,8 @@
     "role": "item",
     "museum": {
       "category": "tools",
-      "threshold": 3
+      "threshold": 3,
+      "no_overflow": true
     },
     "buy": 0,
     "sell": 10000,
