@@ -402,7 +402,9 @@ export async function setInventoryItem(member: MemberResolvable, itemId: string,
 }
 
 export async function getTotalAmountOfItem(itemId: string) {
-  if (itemId === "lottery_ticket") return 0;
+  if (itemId === "lottery_ticket" || itemId === "superdraw_lottery_ticket") {
+    return 0;
+  }
 
   const query = await prisma.inventory.aggregate({
     where: {

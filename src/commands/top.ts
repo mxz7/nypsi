@@ -405,7 +405,7 @@ async function run(
       return send({ embeds: [new ErrorEmbed(`couldn't find ${searchTag}`)] });
     }
 
-    if (item.id === "lottery_ticket")
+    if (item.role === "lottery ticket")
       return send({ embeds: [new ErrorEmbed("leaderboards for this item are unavailable")] });
 
     if (item.id == "gold_star") return showMuseumLeaderboard(message, send, args);
@@ -681,7 +681,7 @@ async function run(
 
     if (!selected) return send({ embeds: [new ErrorEmbed("invalid option")] });
 
-    if (selected.id === "lottery_ticket")
+    if (selected.id === "lottery ticket")
       return send({ embeds: [new ErrorEmbed("leaderboards for this item are unavailable")] });
 
     if (selected.id == "gold_star")
