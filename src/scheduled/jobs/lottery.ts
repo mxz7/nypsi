@@ -9,6 +9,7 @@ import Constants from "../../utils/Constants";
 import { addProgress } from "../../utils/functions/economy/achievements";
 import { addBalance, getBalance, removeBalance } from "../../utils/functions/economy/balance";
 import { addInventoryItem, setInventoryItem } from "../../utils/functions/economy/inventory";
+import { createLotteryEntry } from "../../utils/functions/economy/lottery";
 import { addStat } from "../../utils/functions/economy/stats";
 import { getItems } from "../../utils/functions/economy/utils";
 import { percentChance } from "../../utils/functions/random";
@@ -20,7 +21,7 @@ import pAll = require("p-all");
 
 export default {
   name: "lottery",
-  cron: "0 0 * * *",
+  cron: "0 */8 * * *",
   async run(log) {
     await redis.set("nypsi:lottery", "boobies", "EX", 3600);
     const hook = new WebhookClient({ url: process.env.LOTTERY_HOOK });
@@ -71,6 +72,7 @@ export default {
       log(`winner: ${winner.userId} (${winnerUsername})`);
 
       await Promise.all([
+        createLotteryEntry(winner.userId, winner.amount, total),
         addBalance(winner.userId, totalPrize),
         addProgress(winner.userId, "lucky", 1),
         addStat(winner.userId, "earned-lottery", totalPrize),
@@ -125,13 +127,18 @@ export default {
 
     await redis.del("nypsi:lottery");
 
+    const isDailyAutoBuyRun = new Date().getHours() === 0;
+
     const autoBuys = await prisma.economy.findMany({
       where: {
-        dailyLottery: { gt: 0 },
+        autobuyLotteryTicketsAmount: { gt: 0 },
+        autobuyLotteryTicketsTime: {
+          in: isDailyAutoBuyRun ? ["lottery", "daily"] : ["lottery"],
+        },
       },
       select: {
         userId: true,
-        dailyLottery: true,
+        autobuyLotteryTicketsAmount: true,
         user: {
           select: {
             DMSettings: {
@@ -147,13 +154,19 @@ export default {
     for (const user of autoBuys) {
       const balance = await getBalance(user.userId);
 
-      const cost = Math.ceil(getItems()["lottery_ticket"].buy * user.dailyLottery * 0.95);
+      const amount = user.autobuyLotteryTicketsAmount;
+
+      if (!amount || amount <= 0) {
+        continue;
+      }
+
+      const cost = Math.ceil(getItems()["lottery_ticket"].buy * amount * 0.95);
 
       if (balance >= cost) {
-        log(`auto buying ${user.dailyLottery} lottery tickets for ${user.userId}`);
+        log(`auto buying ${amount} lottery tickets for ${user.userId}`);
         await removeBalance(user.userId, cost);
         addStat(user.userId, "spent-shop", cost);
-        await addInventoryItem(user.userId, "lottery_ticket", user.dailyLottery);
+        await addInventoryItem(user.userId, "lottery_ticket", amount);
 
         if (user.user.DMSettings.other) {
           await addNotificationToQueue({
@@ -161,7 +174,7 @@ export default {
             payload: {
               embed: new CustomEmbed(
                 user.userId,
-                `you have auto bought **${user.dailyLottery}** lottery tickets`,
+                `you have auto bought **${amount}** lottery tickets`,
               ),
             },
           });

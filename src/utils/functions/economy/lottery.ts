@@ -43,3 +43,17 @@ export async function setDailyLotteryTickets(member: MemberResolvable, amount: n
     },
   });
 }
+
+export async function createLotteryEntry(
+  winnerId: string,
+  winnerTickets: number,
+  totalTickets: number,
+) {
+  await prisma.lottery.create({
+    data: {
+      winnerId,
+      winnerTickets: BigInt(winnerTickets),
+      totalTickets: BigInt(totalTickets),
+    },
+  });
+}
