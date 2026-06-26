@@ -133,7 +133,6 @@ async function run(
     const tickets = inventory.count("lottery_ticket");
     const superdrawTickets = inventory.count("superdraw_lottery_ticket");
     const embed = new CustomEmbed(message.member);
-
     const pool = await getApproximatePrizePool();
     const autoBuy = await getLotteryAutoBuySettings(message.member);
     const autoBuyText =
@@ -142,18 +141,21 @@ async function run(
             autoBuy.time === "lottery" ? "every lottery" : "daily"
           }`
         : "";
-
     embed.setHeader("lottery", message.author.avatarURL());
+
+    const now = dayjs();
+    const hoursUntilNext = 8 - (now.hour() % 8);
+    const nextDrawTime = now.add(hoursUntilNext, "hour").startOf("hour");
+
+    const nextDrawIsSuperdraw = nextDrawTime.day() === 6;
+    const nextDrawText = `<t:${nextDrawTime.unix()}:R>${nextDrawIsSuperdraw ? " ([superdraw](https://nypsi.xyz/wiki/economy/lottery?ref=bot-lottery#superdraw))" : ""}`;
+
     embed.setDescription(
-      `nypsi lottery is a daily draw which happens in the [official nypsi server](${Constants.NYPSI_SERVER_INVITE_LINK})\nnext draw <t:${dayjs()
-        .add(1, "day")
-        .startOf("day")
-        .unix()}:R>\n\n` +
+      `nypsi lottery draws happen every 8 hours in the [official nypsi server](${Constants.NYPSI_SERVER_INVITE_LINK})\nnext draw ${nextDrawText}\n\n` +
         `current prize pool is $**${formatNumberPretty(pool.min)}** - $**${formatNumberPretty(pool.max)}**\n\n` +
         `you can buy lottery tickets with ${(await getPrefix(message.guild))[0]}**buy lotto**\n` +
         `you have **${tickets.toLocaleString()}** tickets and **${superdrawTickets.toLocaleString()}** [superdraw tickets](https://nypsi.xyz/wiki/economy/lottery?ref=bot-lottery#superdraw)${autoBuyText}`,
     );
-
     return send({ embeds: [embed] });
   };
 
