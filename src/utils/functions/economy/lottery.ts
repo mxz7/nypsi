@@ -41,8 +41,8 @@ export async function getLotteryAutoBuySettings(member: MemberResolvable) {
 
 export async function setLotteryAutoBuySettings(
   member: MemberResolvable,
-  amount: number,
-  mode: LotteryAutoBuyMode,
+  amount: number | null,
+  mode: LotteryAutoBuyMode | null,
 ) {
   await prisma.economy.update({
     where: {
@@ -50,7 +50,7 @@ export async function setLotteryAutoBuySettings(
     },
     data: {
       autobuyLotteryTicketsAmount: amount,
-      autobuyLotteryTicketsTime: amount > 0 ? mode : null,
+      autobuyLotteryTicketsTime: mode,
     },
   });
 }
