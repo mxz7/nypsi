@@ -6,8 +6,8 @@ import Constants from "../utils/Constants";
 import { getInventory } from "../utils/functions/economy/inventory";
 import {
   getApproximatePrizePool,
-  getDailyLottoTickets,
-  setDailyLotteryTickets,
+  getLotteryAutoBuySettings,
+  setLotteryAutoBuySettings,
 } from "../utils/functions/economy/lottery";
 import {
   createUser,
@@ -48,7 +48,13 @@ async function run(
     const embed = new CustomEmbed(message.member);
 
     const pool = await getApproximatePrizePool();
-    const autoBuy = await getDailyLottoTickets(message.member);
+    const autoBuy = await getLotteryAutoBuySettings(message.member);
+    const autoBuyText =
+      typeof autoBuy.amount === "number"
+        ? `, auto buying ${autoBuy.amount} tickets ${
+            autoBuy.time === "lottery" ? "every lottery" : "daily"
+          }`
+        : "";
 
     embed.setHeader("lottery", message.author.avatarURL());
     embed.setDescription(
@@ -57,7 +63,7 @@ async function run(
         .startOf("day")
         .unix()}:R>\n\n` +
         `current prize pool is $**${formatNumberPretty(pool.min)}** - $**${formatNumberPretty(pool.max)}**\n\n` +
-        `you can buy lottery tickets with ${(await getPrefix(message.guild))[0]}**buy lotto**\nyou have **${tickets.toLocaleString()}** tickets${typeof autoBuy === "number" ? `, auto buying ${autoBuy} tickets daily` : ""}`,
+        `you can buy lottery tickets with ${(await getPrefix(message.guild))[0]}**buy lotto**\nyou have **${tickets.toLocaleString()}** tickets${autoBuyText}`,
     );
 
     return send({ embeds: [embed] });
@@ -91,7 +97,7 @@ async function run(
       return send({ embeds: [new ErrorEmbed("invalid number")] });
     }
 
-    await setDailyLotteryTickets(message.member, amount);
+    await setLotteryAutoBuySettings(message.member, amount, "daily");
 
     return send({
       embeds: [

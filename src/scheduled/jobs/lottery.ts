@@ -9,7 +9,7 @@ import Constants from "../../utils/Constants";
 import { addProgress } from "../../utils/functions/economy/achievements";
 import { addBalance, getBalance, removeBalance } from "../../utils/functions/economy/balance";
 import { addInventoryItem, setInventoryItem } from "../../utils/functions/economy/inventory";
-import { createLotteryEntry } from "../../utils/functions/economy/lottery";
+import { createLotteryEntry, getLotteryAutoBuyUsers } from "../../utils/functions/economy/lottery";
 import { addStat } from "../../utils/functions/economy/stats";
 import { getItems } from "../../utils/functions/economy/utils";
 import { percentChance } from "../../utils/functions/random";
@@ -128,28 +128,7 @@ export default {
     await redis.del("nypsi:lottery");
 
     const isDailyAutoBuyRun = new Date().getHours() === 0;
-
-    const autoBuys = await prisma.economy.findMany({
-      where: {
-        autobuyLotteryTicketsAmount: { gt: 0 },
-        autobuyLotteryTicketsTime: {
-          in: isDailyAutoBuyRun ? ["lottery", "daily"] : ["lottery"],
-        },
-      },
-      select: {
-        userId: true,
-        autobuyLotteryTicketsAmount: true,
-        user: {
-          select: {
-            DMSettings: {
-              select: {
-                other: true,
-              },
-            },
-          },
-        },
-      },
-    });
+    const autoBuys = await getLotteryAutoBuyUsers(isDailyAutoBuyRun);
 
     for (const user of autoBuys) {
       const balance = await getBalance(user.userId);

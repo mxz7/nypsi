@@ -2,6 +2,8 @@ import prisma from "../../../init/database";
 import { getUserId, MemberResolvable } from "../member";
 import { getItems } from "./utils";
 
+type LotteryAutoBuyMode = "daily" | "lottery";
+
 export async function getApproximatePrizePool() {
   const tickets = await prisma.inventory.aggregate({
     where: {
@@ -20,26 +22,59 @@ export async function getApproximatePrizePool() {
   };
 }
 
-export async function getDailyLottoTickets(member: MemberResolvable) {
+export async function getLotteryAutoBuySettings(member: MemberResolvable) {
   const query = await prisma.economy.findUnique({
     where: {
       userId: getUserId(member),
     },
     select: {
-      dailyLottery: true,
+      autobuyLotteryTicketsAmount: true,
+      autobuyLotteryTicketsTime: true,
     },
   });
 
-  return query.dailyLottery;
+  return {
+    amount: query.autobuyLotteryTicketsAmount,
+    time: query.autobuyLotteryTicketsTime,
+  };
 }
 
-export async function setDailyLotteryTickets(member: MemberResolvable, amount: number) {
+export async function setLotteryAutoBuySettings(
+  member: MemberResolvable,
+  amount: number,
+  mode: LotteryAutoBuyMode,
+) {
   await prisma.economy.update({
     where: {
       userId: getUserId(member),
     },
     data: {
-      dailyLottery: amount,
+      autobuyLotteryTicketsAmount: amount,
+      autobuyLotteryTicketsTime: amount > 0 ? mode : null,
+    },
+  });
+}
+
+export async function getLotteryAutoBuyUsers(isDailyAutoBuyRun: boolean) {
+  return prisma.economy.findMany({
+    where: {
+      autobuyLotteryTicketsAmount: { gt: 0 },
+      autobuyLotteryTicketsTime: {
+        in: isDailyAutoBuyRun ? ["lottery", "daily"] : ["lottery"],
+      },
+    },
+    select: {
+      userId: true,
+      autobuyLotteryTicketsAmount: true,
+      user: {
+        select: {
+          DMSettings: {
+            select: {
+              other: true,
+            },
+          },
+        },
+      },
     },
   });
 }
