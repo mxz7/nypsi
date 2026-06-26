@@ -200,7 +200,9 @@ export default {
   },
 } satisfies Job;
 
-async function findWinner(tickets: { userId: string; amount: bigint }[]) {
+async function findWinner(
+  tickets: { userId: string; amount: bigint }[],
+): Promise<{ userId: string; amount: number }> {
   const ticketCount = tickets.map((i) => i.amount).reduce((a, b) => a + b);
 
   let r = BigInt(randomInt(Number(ticketCount) + 1));
@@ -213,7 +215,7 @@ async function findWinner(tickets: { userId: string; amount: bigint }[]) {
   }
 
   // this should never happen
-  return { userId: Constants.BOT_USER_ID, tickets: -1 };
+  return { userId: Constants.BOT_USER_ID, amount: -1 };
 }
 
 function getProgressiveTaxMultiplier(winnerShare: number): number {
