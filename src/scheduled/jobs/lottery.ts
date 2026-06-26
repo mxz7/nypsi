@@ -14,7 +14,7 @@ import { addStat } from "../../utils/functions/economy/stats";
 import { getItems } from "../../utils/functions/economy/utils";
 import { percentChance } from "../../utils/functions/random";
 import { pluralize } from "../../utils/functions/string";
-import { getTax } from "../../utils/functions/tax";
+import { addToNypsiBank, getTax } from "../../utils/functions/tax";
 import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
 import { getLastKnownAvatar, getLastKnownUsername } from "../../utils/functions/users/username";
 import { logger } from "../../utils/logger";
@@ -69,10 +69,6 @@ export default {
       await hook.send({ embeds: [embed] });
       hook.destroy();
     } else {
-      const taxedAmount = Math.floor(totalPool * (await getTax())) * 1.5;
-
-      const totalPrize = Math.floor(totalPool - taxedAmount);
-
       const before = performance.now();
       const winner = await findWinner(tickets);
       const after = performance.now();
@@ -84,6 +80,12 @@ export default {
         await redis.del("nypsi:lottery");
         return;
       }
+
+      const winnerShare = winner.amount / total;
+      const progressiveTaxMultiplier = getProgressiveTaxMultiplier(winnerShare);
+      const taxedAmount = Math.floor(totalPool * (await getTax()) * progressiveTaxMultiplier);
+      const nypsiBankShare = Math.floor(taxedAmount / 2);
+      const totalPrize = Math.floor(totalPool - taxedAmount);
 
       const winnerUsername = await getLastKnownUsername(winner.userId, false);
       const winnerAvatar = await getLastKnownAvatar(winner.userId);
@@ -106,6 +108,7 @@ export default {
           total,
           isSuperDraw ? "superdraw" : "standard",
         ),
+        addToNypsiBank(nypsiBankShare),
         addBalance(winner.userId, totalPrize),
         addProgress(winner.userId, "lucky", 1),
         addStat(winner.userId, "earned-lottery", totalPrize),
@@ -210,6 +213,17 @@ async function findWinner(tickets: { userId: string; amount: bigint }[]) {
 
   // this should never happen
   return { userId: Constants.BOT_USER_ID, tickets: -1 };
+}
+
+function getProgressiveTaxMultiplier(winnerShare: number): number {
+  const minMultiplier = 0.5;
+  const maxMultiplier = 1.5;
+  const clampedShare = Math.min(Math.max(winnerShare, 0), 1);
+
+  // Smoothstep keeps transitions gradual while preserving low->high scaling by winner share.
+  const t = clampedShare * clampedShare * (3 - 2 * clampedShare);
+
+  return minMultiplier + (maxMultiplier - minMultiplier) * t;
 }
 
 async function deleteAllTickets(userIds: string[], isSuperDraw: boolean) {
