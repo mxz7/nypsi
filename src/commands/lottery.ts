@@ -33,7 +33,7 @@ cmd.slashData
       ),
   )
   .addSubcommand((tickets) =>
-    tickets.setName("tickets").setDescription("view your current tickets"),
+    tickets.setName("view").setDescription("view the current lottery status"),
   );
 
 async function run(
@@ -80,7 +80,7 @@ async function run(
         ),
       ],
     });
-  } else if (args[0].toLowerCase() == "tickets") {
+  } else if (args[0].toLowerCase() == "view") {
     return help();
   } else if (args[0].toLowerCase() === "autobuy") {
     if (args.length === 1) {
