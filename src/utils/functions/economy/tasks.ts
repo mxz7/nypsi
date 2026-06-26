@@ -320,6 +320,7 @@ export async function addTaskProgress(member: MemberResolvable, taskId: string, 
 
       addInlineNotification({ embed, memberId: task.user_id });
       addProgress(task.user_id, "taskmaster", 1);
+      addInventoryItem(task.user_id, "lottery_ticket", 1);
 
       if (task.type === "daily") addTaskProgress(task.user_id, "all_dailies");
     } else {

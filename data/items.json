@@ -3741,7 +3741,8 @@
     "buy": 30000,
     "sell": 10000,
     "in_crates": true,
-    "aliases": ["lotto", "lottery"]
+    "aliases": ["lotto", "lottery"],
+    "default_count": 3
   },
   "superdraw_lottery_ticket": {
     "id": "superdraw_lottery_ticket",
@@ -3753,7 +3754,8 @@
     "rarity": 0,
     "role": "lottery ticket",
     "sell": 10000,
-    "in_crates": true
+    "in_crates": true,
+    "default_count": 2
   },
   "orange": {
     "id": "orange",
