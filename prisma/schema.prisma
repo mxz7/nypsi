@@ -38,6 +38,16 @@ enum LevelDmSetting {
   OnlyReward
 }
 
+enum LotteryType {
+  standard
+  superdraw
+}
+
+enum LotteryAutoBuy {
+  daily // every day
+  lottery // every lottery
+}
+
 enum OrderType {
   buy
   sell
@@ -156,6 +166,7 @@ model User {
   RoleplayStat             RoleplayStat[]
   RoleplayStatTarget       RoleplayStat[]             @relation(name: "target")
   SudokuGame               SudokuGame[]
+  lotteryWins              Lottery[]
 }
 
 model ProfileView {
@@ -316,7 +327,8 @@ model Economy {
   sellallFilter String[]
   offersBlock   String[]
 
-  dailyLottery Int?
+  autobuyLotteryTicketsAmount Int?
+  autobuyLotteryTicketsTime   LotteryAutoBuy?
 
   preferredPickaxe        ToolPreferenceSelection @default(highest)
   preferredRod            ToolPreferenceSelection @default(highest)
@@ -732,6 +744,19 @@ model Marriage {
   marriageStart DateTime @default(now())
 
   @@id([userId, partnerId])
+}
+
+model Lottery {
+  id   Int      @id @default(autoincrement())
+  date DateTime @default(now())
+
+  type LotteryType @default(standard)
+
+  winnerId String?
+  winner   User?   @relation(fields: [winnerId], references: [id], onDelete: SetNull)
+
+  winnerTickets BigInt
+  totalTickets  BigInt
 }
 
 // guild specific tables
