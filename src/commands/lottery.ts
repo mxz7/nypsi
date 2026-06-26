@@ -20,6 +20,7 @@ import { getInventory } from "../utils/functions/economy/inventory";
 import {
   getApproximatePrizePool,
   getLotteryAutoBuySettings,
+  getLotteryStats,
   setLotteryAutoBuySettings,
 } from "../utils/functions/economy/lottery";
 import {
@@ -39,7 +40,8 @@ cmd.slashData
   )
   .addSubcommand((tickets) =>
     tickets.setName("view").setDescription("view the current lottery status"),
-  );
+  )
+  .addSubcommand((stats) => stats.setName("stats").setDescription("view your lottery stats"));
 
 type LotteryAutoBuyMode = "daily" | "lottery";
 
@@ -155,6 +157,32 @@ async function run(
     return send({ embeds: [embed] });
   };
 
+  const stats = async () => {
+    const data = await getLotteryStats(message.member);
+    const embed = new CustomEmbed(message.member).setHeader(
+      "lottery stats",
+      message.author.avatarURL(),
+    );
+
+    if (data.wins === 0) {
+      embed.setDescription("you have not won any lotteries yet");
+      return send({ embeds: [embed] });
+    }
+
+    const recent = data.mostRecentWin;
+    const biggest = data.biggestWin;
+
+    embed.setDescription(
+      `wins: **${data.wins.toLocaleString()}**\n\n` +
+        `most recent win: **${recent.type}** <t:${Math.floor(recent.date.getTime() / 1000)}:R>\n` +
+        `you won with **${recent.winnerTickets.toLocaleString()}** tickets (**${recent.totalTickets.toLocaleString()}** total bought)\n\n` +
+        `biggest win: **${biggest.type}**\n` +
+        `you won with **${biggest.winnerTickets.toLocaleString()}** tickets (**${biggest.totalTickets.toLocaleString()}** total bought)`,
+    );
+
+    return send({ embeds: [embed] });
+  };
+
   if (args.length == 0) {
     return help();
   } else if (args[0].toLowerCase() == "buy" || args[0].toLowerCase() == "b") {
@@ -168,6 +196,8 @@ async function run(
     });
   } else if (args[0].toLowerCase() == "view") {
     return help();
+  } else if (args[0].toLowerCase() == "stats") {
+    return stats();
   } else if (args[0].toLowerCase() === "autobuy") {
     const settings = await getLotteryAutoBuySettings(message.member);
 

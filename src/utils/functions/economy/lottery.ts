@@ -94,3 +94,38 @@ export async function createLotteryEntry(
     },
   });
 }
+
+export async function getLotteryStats(member: MemberResolvable) {
+  const userId = getUserId(member);
+
+  const wins = await prisma.lottery.findMany({
+    where: {
+      winnerId: userId,
+    },
+    orderBy: {
+      date: "desc",
+    },
+    select: {
+      date: true,
+      type: true,
+      winnerTickets: true,
+      totalTickets: true,
+    },
+  });
+
+  const mostRecentWin = wins[0] ?? null;
+
+  let biggestWin = wins[0] ?? null;
+
+  for (const win of wins) {
+    if (!biggestWin || win.winnerTickets > biggestWin.winnerTickets) {
+      biggestWin = win;
+    }
+  }
+
+  return {
+    wins: wins.length,
+    mostRecentWin,
+    biggestWin,
+  };
+}
