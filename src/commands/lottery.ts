@@ -156,7 +156,16 @@ async function run(
         `you can buy lottery tickets with ${(await getPrefix(message.guild))[0]}**buy lotto**\n` +
         `you have **${tickets.toLocaleString()}** tickets and **${superdrawTickets.toLocaleString()}** [superdraw tickets](https://nypsi.xyz/wiki/economy/lottery?ref=bot-lottery#superdraw)${autoBuyText}`,
     );
-    return send({ embeds: [embed] });
+
+    const components = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder()
+        .setStyle(ButtonStyle.Link)
+        .setLabel("history")
+        .setEmoji("💎")
+        .setURL("https://nypsi.xyz/lotteries?ref=bot-lottery"),
+    );
+
+    return send({ embeds: [embed], components: [components] });
   };
 
   const stats = async () => {
