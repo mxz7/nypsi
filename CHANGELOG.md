@@ -2,7 +2,7 @@
 
 - lottery updates
   - lottery every 8 hours (3/day)
-	- superdraw on friday night, 2-10% of all tickets bought through the week get added to a draw
+  - superdraw on friday night, 2-10% of all tickets bought through the week get added to a draw
 
 # may 2026
 
