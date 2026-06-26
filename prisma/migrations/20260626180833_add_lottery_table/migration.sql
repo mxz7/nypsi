@@ -1,3 +1,9 @@
+/*
+  Warnings:
+
+  - You are about to drop the column `dailyLottery` on the `Economy` table. All the data in the column will be lost.
+
+*/
 -- CreateEnum
 CREATE TYPE "LotteryType" AS ENUM ('standard', 'superdraw');
 
@@ -5,10 +11,9 @@ CREATE TYPE "LotteryType" AS ENUM ('standard', 'superdraw');
 CREATE TYPE "LotteryAutoBuy" AS ENUM ('daily', 'lottery');
 
 -- AlterTable
-ALTER TABLE "Economy" RENAME COLUMN "dailyLottery" TO "autobuyLotteryTicketsAmount";
-
--- AlterTable
-ALTER TABLE "Economy" ADD COLUMN "autobuyLotteryTicketsTime" "LotteryAutoBuy";
+ALTER TABLE "Economy" DROP COLUMN "dailyLottery",
+ADD COLUMN     "autobuyLotteryTicketsAmount" INTEGER,
+ADD COLUMN     "autobuyLotteryTicketsTime" "LotteryAutoBuy";
 
 -- Backfill existing autobuy users to the previous behavior (daily)
 UPDATE "Economy"
@@ -22,6 +27,7 @@ CREATE TABLE "Lottery" (
     "winnerId" TEXT,
     "winnerTickets" BIGINT NOT NULL,
     "totalTickets" BIGINT NOT NULL,
+    "totalWin" BIGINT,
 
     CONSTRAINT "Lottery_pkey" PRIMARY KEY ("id")
 );

@@ -106,6 +106,7 @@ export default {
           winner.userId,
           winner.amount,
           total,
+          totalPrize,
           isSuperDraw ? "superdraw" : "standard",
         ),
         addToNypsiBank(nypsiBankShare),

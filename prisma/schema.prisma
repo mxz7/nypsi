@@ -757,6 +757,7 @@ model Lottery {
 
   winnerTickets BigInt
   totalTickets  BigInt
+  totalWin      BigInt?
 }
 
 // guild specific tables
