@@ -13,6 +13,7 @@ import { createLotteryEntry, getLotteryAutoBuyUsers } from "../../utils/function
 import { addStat } from "../../utils/functions/economy/stats";
 import { getItems } from "../../utils/functions/economy/utils";
 import { percentChance } from "../../utils/functions/random";
+import { pluralize } from "../../utils/functions/string";
 import { getTax } from "../../utils/functions/tax";
 import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
 import { getLastKnownAvatar, getLastKnownUsername } from "../../utils/functions/users/username";
@@ -25,7 +26,6 @@ export default {
   async run(log) {
     const now = new Date();
     const isSuperDraw = now.getDay() === 6 && now.getHours() === 0;
-    const lotteryType = isSuperDraw ? "superdraw" : "standard";
     const drawTicketItems = isSuperDraw
       ? ["lottery_ticket", "superdraw_lottery_ticket"]
       : ["lottery_ticket"];
@@ -88,6 +88,10 @@ export default {
       const winnerUsername = await getLastKnownUsername(winner.userId, false);
       const winnerAvatar = await getLastKnownAvatar(winner.userId);
 
+      if (!isSuperDraw) {
+        await addSuperdrawRolloverTickets(tickets, log);
+      }
+
       await deleteAllTickets(
         tickets.map((i) => i.userId),
         isSuperDraw,
@@ -96,7 +100,12 @@ export default {
       log(`winner: ${winner.userId} (${winnerUsername})`);
 
       await Promise.all([
-        createLotteryEntry(winner.userId, winner.amount, total, lotteryType),
+        createLotteryEntry(
+          winner.userId,
+          winner.amount,
+          total,
+          isSuperDraw ? "superdraw" : "standard",
+        ),
         addBalance(winner.userId, totalPrize),
         addProgress(winner.userId, "lucky", 1),
         addStat(winner.userId, "earned-lottery", totalPrize),
@@ -104,9 +113,9 @@ export default {
 
       const embed = new CustomEmbed();
 
-      embed.setHeader(`${lotteryType} winner`, winnerAvatar);
+      embed.setHeader(`lottery winner`, winnerAvatar);
       embed.setDescription(
-        `**${winnerUsername.replaceAll("_", "\\_")}** has won the lottery with ${winner.amount.toLocaleString()} tickets!!\n\n` +
+        `**${winnerUsername.replaceAll("_", "\\_")}** has won the ${isSuperDraw ? "**SUPERDRAW**" : ""} lottery with ${winner.amount.toLocaleString()} tickets!!\n\n` +
           `they have won $**${totalPrize.toLocaleString()}**`,
       );
       embed.setFooter({ text: `a total of ${total.toLocaleString()} tickets were bought` });
@@ -117,9 +126,9 @@ export default {
       hook.destroy();
 
       if ((await getDmSettings(winner.userId)).lottery) {
-        embed.setTitle(`you have won the ${lotteryType}!`);
+        embed.setTitle(`you have won the lottery!`);
         embed.setDescription(
-          `you have won a total of $**${totalPrize.toLocaleString()}**\n\nyou had ${winner.amount.toLocaleString()} tickets`,
+          `you have won a total of $**${totalPrize.toLocaleString()}**\n\nyou had ${winner.amount.toLocaleString()} ${pluralize("ticket", winner.amount)}`,
         );
         embed.setColor(flavors.latte.colors.base.hex as ColorResolvable);
 
@@ -215,4 +224,57 @@ async function deleteAllTickets(userIds: string[], isSuperDraw: boolean) {
   }
 
   await pAll(promises, { concurrency: 5 });
+}
+
+function getSuperdrawChance(ticketAmount: number): number {
+  const maxChance = 0.1;
+  const minChance = 0.025;
+  const maxTicketsForMinChance = 1000;
+
+  const clamped = Math.min(Math.max(ticketAmount, 1), maxTicketsForMinChance);
+  const t = (clamped - 1) / (maxTicketsForMinChance - 1);
+  const progress = 1 - Math.pow(1 - t, 5);
+
+  return maxChance - (maxChance - minChance) * progress;
+}
+
+function rollSuperdrawTickets(ticketAmount: number): number {
+  const chance = getSuperdrawChance(ticketAmount);
+  let granted = 0;
+
+  for (let i = 0; i < ticketAmount; i++) {
+    if (percentChance(chance)) {
+      granted++;
+    }
+  }
+
+  return granted;
+}
+
+async function addSuperdrawRolloverTickets(
+  tickets: { userId: string; amount: bigint }[],
+  log: (message: string) => void,
+) {
+  const tasks: (() => Promise<void>)[] = [];
+
+  for (const ticket of tickets) {
+    const amount = Number(ticket.amount);
+
+    if (!amount || amount <= 0) {
+      continue;
+    }
+
+    const granted = rollSuperdrawTickets(amount);
+
+    if (granted <= 0) {
+      continue;
+    }
+
+    tasks.push(async () => {
+      await addInventoryItem(ticket.userId, "superdraw_lottery_ticket", granted);
+      log(`rolled ${granted} superdraw tickets for ${ticket.userId} from ${amount} tickets`);
+    });
+  }
+
+  await pAll(tasks, { concurrency: 5 });
 }

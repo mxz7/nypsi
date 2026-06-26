@@ -127,7 +127,9 @@ async function run(
   if (!(await userExists(message.member))) await createUser(message.member);
 
   const help = async () => {
-    const tickets = (await getInventory(message.member)).count("lottery_ticket");
+    const inventory = await getInventory(message.member);
+    const tickets = inventory.count("lottery_ticket");
+    const superdrawTickets = inventory.count("superdraw_lottery_ticket");
     const embed = new CustomEmbed(message.member);
 
     const pool = await getApproximatePrizePool();
@@ -146,7 +148,8 @@ async function run(
         .startOf("day")
         .unix()}:R>\n\n` +
         `current prize pool is $**${formatNumberPretty(pool.min)}** - $**${formatNumberPretty(pool.max)}**\n\n` +
-        `you can buy lottery tickets with ${(await getPrefix(message.guild))[0]}**buy lotto**\nyou have **${tickets.toLocaleString()}** tickets${autoBuyText}`,
+        `you can buy lottery tickets with ${(await getPrefix(message.guild))[0]}**buy lotto**\n` +
+        `you have **${tickets.toLocaleString()}** tickets and **${superdrawTickets.toLocaleString()}** [superdraw tickets](https://nypsi.xyz/wiki/economy/lottery?ref=bot-lottery#superdraw)${autoBuyText}`,
     );
 
     return send({ embeds: [embed] });
