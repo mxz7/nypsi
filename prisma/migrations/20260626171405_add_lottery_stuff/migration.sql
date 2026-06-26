@@ -10,6 +10,10 @@ ALTER TABLE "Economy" RENAME COLUMN "dailyLottery" TO "autobuyLotteryTicketsAmou
 -- AlterTable
 ALTER TABLE "Economy" ADD COLUMN "autobuyLotteryTicketsTime" "LotteryAutoBuy";
 
+-- Backfill existing autobuy users to the previous behavior (daily)
+UPDATE "Economy"
+SET "autobuyLotteryTicketsTime" = 'daily'
+WHERE "autobuyLotteryTicketsAmount" IS NOT NULL AND "autobuyLotteryTicketsAmount" > 0;
 -- CreateTable
 CREATE TABLE "Lottery" (
     "id" SERIAL NOT NULL,

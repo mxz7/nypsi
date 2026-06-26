@@ -681,7 +681,7 @@ async function run(
 
     if (!selected) return send({ embeds: [new ErrorEmbed("invalid option")] });
 
-    if (selected.id === "lottery ticket")
+    if (selected.role === "lottery ticket")
       return send({ embeds: [new ErrorEmbed("leaderboards for this item are unavailable")] });
 
     if (selected.id == "gold_star")
