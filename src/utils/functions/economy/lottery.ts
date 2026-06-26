@@ -83,9 +83,11 @@ export async function createLotteryEntry(
   winnerId: string,
   winnerTickets: number,
   totalTickets: number,
+  type: "standard" | "superdraw" = "standard",
 ) {
   await prisma.lottery.create({
     data: {
+      type,
       winnerId,
       winnerTickets: BigInt(winnerTickets),
       totalTickets: BigInt(totalTickets),

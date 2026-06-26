@@ -23,23 +23,45 @@ export default {
   name: "lottery",
   cron: "0 */8 * * *",
   async run(log) {
+    const now = new Date();
+    const isSuperDraw = now.getDay() === 6 && now.getHours() === 0;
+    const lotteryType = isSuperDraw ? "superdraw" : "standard";
+    const drawTicketItems = isSuperDraw
+      ? ["lottery_ticket", "superdraw_lottery_ticket"]
+      : ["lottery_ticket"];
+
     await redis.set("nypsi:lottery", "boobies", "EX", 3600);
     const hook = new WebhookClient({ url: process.env.LOTTERY_HOOK });
 
-    const tickets = await prisma.inventory.findMany({
-      where: { item: "lottery_ticket" },
-      select: { userId: true, amount: true },
+    const ticketRows = await prisma.inventory.findMany({
+      where: { item: { in: drawTicketItems } },
+      select: { userId: true, item: true, amount: true },
     });
-    const total = Number(tickets.map((i) => i.amount).reduce((a, b) => a + b, 0n));
 
-    if (total < 100) {
+    const ticketMap = new Map<string, bigint>();
+
+    for (const ticket of ticketRows) {
+      ticketMap.set(ticket.userId, (ticketMap.get(ticket.userId) ?? 0n) + ticket.amount);
+    }
+
+    const tickets = Array.from(ticketMap.entries()).map(([userId, amount]) => ({ userId, amount }));
+    const total = Number(tickets.map((i) => i.amount).reduce((a, b) => a + b, 0n));
+    const lotteryTicketValue = getItems()["lottery_ticket"].buy;
+    const totalPool = total * lotteryTicketValue;
+
+    const uniqueUsers = ticketRows.reduce(
+      (acc, curr) => acc.add(curr.userId),
+      new Set<string>(),
+    ).size;
+
+    if (total < 500 || uniqueUsers < 10) {
       log(`${total} tickets were bought ): maybe tomorrow you'll have something to live for`);
 
       const embed = new CustomEmbed();
 
       embed.setTitle("lottery cancelled");
       embed.setDescription(
-        `the lottery has been cancelled as only **${total}** tickets were bought ):\n\nthese tickets will remain and the lottery will happen tomorrow`,
+        `**ROLLOVER**\n\nnot enough participating tickets, existing tickets will rollover to the next draw`,
       );
       embed.setColor(flavors.latte.colors.base.hex as ColorResolvable);
       embed.disableFooter();
@@ -47,10 +69,9 @@ export default {
       await hook.send({ embeds: [embed] });
       hook.destroy();
     } else {
-      const taxedAmount =
-        Math.floor(total * getItems()["lottery_ticket"].buy * (await getTax())) * 1.5;
+      const taxedAmount = Math.floor(totalPool * (await getTax())) * 1.5;
 
-      const totalPrize = Math.floor(total * getItems()["lottery_ticket"].buy - taxedAmount);
+      const totalPrize = Math.floor(totalPool - taxedAmount);
 
       const before = performance.now();
       const winner = await findWinner(tickets);
@@ -67,12 +88,15 @@ export default {
       const winnerUsername = await getLastKnownUsername(winner.userId, false);
       const winnerAvatar = await getLastKnownAvatar(winner.userId);
 
-      deleteAllTickets(tickets);
+      await deleteAllTickets(
+        tickets.map((i) => i.userId),
+        isSuperDraw,
+      );
 
       log(`winner: ${winner.userId} (${winnerUsername})`);
 
       await Promise.all([
-        createLotteryEntry(winner.userId, winner.amount, total),
+        createLotteryEntry(winner.userId, winner.amount, total, lotteryType),
         addBalance(winner.userId, totalPrize),
         addProgress(winner.userId, "lucky", 1),
         addStat(winner.userId, "earned-lottery", totalPrize),
@@ -80,7 +104,7 @@ export default {
 
       const embed = new CustomEmbed();
 
-      embed.setHeader("lottery winner", winnerAvatar);
+      embed.setHeader(`${lotteryType} winner`, winnerAvatar);
       embed.setDescription(
         `**${winnerUsername.replaceAll("_", "\\_")}** has won the lottery with ${winner.amount.toLocaleString()} tickets!!\n\n` +
           `they have won $**${totalPrize.toLocaleString()}**`,
@@ -93,7 +117,7 @@ export default {
       hook.destroy();
 
       if ((await getDmSettings(winner.userId)).lottery) {
-        embed.setTitle("you have won the lottery!");
+        embed.setTitle(`you have won the ${lotteryType}!`);
         embed.setDescription(
           `you have won a total of $**${totalPrize.toLocaleString()}**\n\nyou had ${winner.amount.toLocaleString()} tickets`,
         );
@@ -127,7 +151,7 @@ export default {
 
     await redis.del("nypsi:lottery");
 
-    const isDailyAutoBuyRun = new Date().getHours() === 0;
+    const isDailyAutoBuyRun = now.getHours() === 0;
     const autoBuys = await getLotteryAutoBuyUsers(isDailyAutoBuyRun);
 
     for (const user of autoBuys) {
@@ -179,11 +203,15 @@ async function findWinner(tickets: { userId: string; amount: bigint }[]) {
   return { userId: Constants.BOT_USER_ID, tickets: -1 };
 }
 
-async function deleteAllTickets(tickets: { userId: string }[]) {
+async function deleteAllTickets(userIds: string[], isSuperDraw: boolean) {
   const promises: (() => Promise<void>)[] = [];
 
-  for (const ticket of tickets) {
-    promises.push(() => setInventoryItem(ticket.userId, "lottery_ticket", 0));
+  for (const userId of userIds) {
+    promises.push(() => setInventoryItem(userId, "lottery_ticket", 0));
+
+    if (isSuperDraw) {
+      promises.push(() => setInventoryItem(userId, "superdraw_lottery_ticket", 0));
+    }
   }
 
   await pAll(promises, { concurrency: 5 });
