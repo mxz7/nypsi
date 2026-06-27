@@ -833,7 +833,7 @@
     "emoji": "🍀",
     "target": 75,
     "description": "win the lottery 75 times",
-    "prize": ["legendary_scratch_card:2", "nypsi_crate:2", "omega_crate:1"]
+    "prize": ["legendary_scratch_card:2", "nypsi_crate:2"]
   },
   "lucky_v": {
     "id": "lucky_v",
@@ -841,7 +841,7 @@
     "emoji": "🍀",
     "target": 150,
     "description": "win the lottery 150 times",
-    "prize": ["nypsi_crate:3", "platinum_credit:4", "omega_crate:2", "rain:1"]
+    "prize": ["nypsi_crate:3", "silver_credit:3", "rain:1"]
   },
   "wordle_i": {
     "id": "wordle_i",

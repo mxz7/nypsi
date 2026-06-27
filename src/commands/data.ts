@@ -162,6 +162,7 @@ async function run(
                 },
               },
             },
+            lotteryWins: true,
             Premium: {
               include: {
                 PremiumCommand: true,

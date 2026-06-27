@@ -368,7 +368,7 @@ function getGeneralMessage(
       `**worth** ${value ? `$${Math.floor(value).toLocaleString()}` : "[unvalued](https://nypsi.xyz/wiki/economy/items/worth?ref=bot-item#unvalued)"}`,
     );
 
-    if (total && selected.id !== "lottery_ticket") {
+    if (total && selected.role !== "lottery ticket") {
       description.push(`\n**in world** ${total.toLocaleString()}`);
     }
 

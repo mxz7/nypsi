@@ -779,6 +779,7 @@ export async function doDaily(
       promises.push(() => addBalance(marriage.partnerId, marriageMoney));
       promises.push(() => addXp(marriage.partnerId, marriageXp));
       promises.push(() => addInventoryItem(marriage.partnerId, "daily_scratch_card", 1));
+      promises.push(() => addInventoryItem(marriage.partnerId, "lottery_ticket", 1));
 
       const embed = new CustomEmbed(marriage.partnerId);
 
@@ -810,27 +811,19 @@ export async function doDaily(
   ];
 
   for (const [itemId, amount] of totalRewards) {
-    promises.push(async () => {
-      await addInventoryItem(member, itemId, amount);
-    });
+    promises.push(() => addInventoryItem(member, itemId, amount));
 
     rewards.push(
       `+ **${amount.toLocaleString()}** ${items[itemId].emoji} ${pluralize(items[itemId], amount)}`,
     );
   }
 
-  promises.push(async () => {
-    await addBalance(member, totalMoney);
-  });
-
-  promises.push(async () => {
-    await addInventoryItem(member, "daily_scratch_card", totalCards);
-  });
+  promises.push(() => addBalance(member, totalMoney));
+  promises.push(() => addInventoryItem(member, "daily_scratch_card", totalCards));
+  promises.push(() => addInventoryItem(member, "lottery_ticket", totalCards));
 
   if (!rerun) {
-    promises.push(async () => {
-      await updateLastDaily(member, updateLast, amount);
-    });
+    promises.push(() => updateLastDaily(member, updateLast, amount));
   }
 
   await pAll(promises, { concurrency: 3 });

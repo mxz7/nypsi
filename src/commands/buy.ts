@@ -88,7 +88,7 @@ async function run(
     return send({ embeds: [new ErrorEmbed("you cannot buy this item")] });
   }
 
-  if (selected.id === "lottery_ticket") {
+  if (selected.role === "lottery ticket") {
     const limit = dayjs().set("hour", 23).set("minute", 59).set("second", 0).set("millisecond", 0);
 
     if (dayjs().isAfter(limit) || (await redis.exists("nypsi:lottery"))) {
@@ -163,7 +163,7 @@ async function run(
         .catch(() => msg.edit({ components: [row] }));
     }
 
-    if (selected.id === "lottery_ticket") {
+    if (selected.role === "lottery ticket") {
       const limit = dayjs()
         .set("hour", 23)
         .set("minute", 59)
