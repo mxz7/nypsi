@@ -49,7 +49,7 @@ export async function setLotteryAutoBuySettings(
       userId: getUserId(member),
     },
     data: {
-      autobuyLotteryTicketsAmount: amount,
+      autobuyLotteryTicketsAmount: amount < 1 ? null : amount,
       autobuyLotteryTicketsTime: mode,
     },
   });
