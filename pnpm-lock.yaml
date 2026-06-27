@@ -90,8 +90,8 @@ importers:
         specifier: 1.3.7
         version: 1.3.7
       openai:
-        specifier: ^6.36.0
-        version: 6.36.0(ws@8.20.0(bufferutil@4.1.0))(zod@4.4.3)
+        specifier: ^6.45.0
+        version: 6.45.0(@aws-sdk/credential-provider-node@3.972.14)(ws@8.20.0(bufferutil@4.1.0))(zod@4.4.3)
       p-all:
         specifier: 3.0.0
         version: 3.0.0
@@ -2136,13 +2136,21 @@ packages:
   ohash@2.0.11:
     resolution: {integrity: sha512-RdR9FQrFwNBNXAr4GixM8YaRZRJ5PUWbKYbE5eOsrwAjJW0q2REGcf79oYPsLyskQCZG1PLN+S/K1V00joZAoQ==}
 
-  openai@6.36.0:
-    resolution: {integrity: sha512-Has2YbIusMq9wQEierFsgf9c783dy1y9arX459LmphNacEkkM5yxi2RIyXP0LmkOroQyW19iTwALHL8Yf26UKA==}
-    hasBin: true
+  openai@6.45.0:
+    resolution: {integrity: sha512-5DQVNErssk0afNpTTHUm/qZPU4iKR9OYdNid8Ib4puq4gHNNvGWZht2zY4h9a8JMF949Ik6m8gQutllVPbjdnw==}
     peerDependencies:
+      '@aws-sdk/credential-provider-node': '>=3.972.0 <4'
+      '@smithy/hash-node': '>=4.3.0 <5'
+      '@smithy/signature-v4': '>=5.4.0 <6'
       ws: ^8.18.0
       zod: ^3.25 || ^4.0
     peerDependenciesMeta:
+      '@aws-sdk/credential-provider-node':
+        optional: true
+      '@smithy/hash-node':
+        optional: true
+      '@smithy/signature-v4':
+        optional: true
       ws:
         optional: true
       zod:
@@ -4614,8 +4622,9 @@ snapshots:
 
   ohash@2.0.11: {}
 
-  openai@6.36.0(ws@8.20.0(bufferutil@4.1.0))(zod@4.4.3):
+  openai@6.45.0(@aws-sdk/credential-provider-node@3.972.14)(ws@8.20.0(bufferutil@4.1.0))(zod@4.4.3):
     optionalDependencies:
+      '@aws-sdk/credential-provider-node': 3.972.14
       ws: 8.20.0(bufferutil@4.1.0)
       zod: 4.4.3
 
