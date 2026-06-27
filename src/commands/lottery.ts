@@ -147,7 +147,7 @@ async function run(
     const hoursUntilNext = 8 - (now.hour() % 8);
     const nextDrawTime = now.add(hoursUntilNext, "hour").startOf("hour");
 
-    const nextDrawIsSuperdraw = nextDrawTime.day() === 6;
+    const nextDrawIsSuperdraw = nextDrawTime.day() === 6 && nextDrawTime.hour() === 0;
     const nextDrawText = `<t:${nextDrawTime.unix()}:R>${nextDrawIsSuperdraw ? " ([superdraw](https://nypsi.xyz/wiki/economy/lottery?ref=bot-lottery#superdraw))" : ""}`;
 
     embed.setDescription(
