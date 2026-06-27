@@ -78,7 +78,7 @@ if (!isMainThread) {
 
       await appendFile(
         `/tmp/${fileName}`,
-        `\n${tag.replace(",", "") || userId},${balances.join(",")}`,
+        `\n${tag?.replace(",", "") || userId},${balances.join(",")}`,
       );
     }
   };
