@@ -24,6 +24,11 @@ export default {
   name: "lottery",
   cron: "0 */8 * * *",
   async run(log) {
+    if (await redis.exists(Constants.redis.nypsi.INFINITE_MAX_BET)) {
+      log("skipping lottery during season interim");
+      return;
+    }
+
     const now = new Date();
     const isSuperDraw = now.getDay() === 6 && now.getHours() === 0;
     const drawTicketItems = isSuperDraw
