@@ -1681,24 +1681,24 @@
     "id": "chess_iii",
     "name": "grandmaster **III**",
     "emoji": "<:knight:1487063018188701887>",
-    "target": 50,
-    "description": "solve 50 chess puzzles",
+    "target": 100,
+    "description": "solve 100 chess puzzles",
     "prize": ["lucky_scratch_card:3"]
   },
   "chess_iv": {
     "id": "chess_iv",
     "name": "grandmaster **IV**",
     "emoji": "<:knight:1487063018188701887>",
-    "target": 100,
-    "description": "solve 100 chess puzzles",
+    "target": 250,
+    "description": "solve 250 chess puzzles",
     "prize": ["legendary_scratch_card:1"]
   },
   "chess_v": {
     "id": "chess_v",
     "name": "grandmaster **V**",
     "emoji": "<:knight:1487063018188701887>",
-    "target": 500,
-    "description": "solve 500 chess puzzles",
+    "target": 1000,
+    "description": "solve 1,000 chess puzzles",
     "prize": ["legendary_scratch_card:2", "nypsi_crate:1", "tag:grandmaster"]
   },
   "sudoku_i": {
