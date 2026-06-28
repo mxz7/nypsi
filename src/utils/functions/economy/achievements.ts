@@ -301,29 +301,28 @@ export async function addProgress(
     achievement: { achievementId: string; progress: number | bigint },
     incrementNext = true,
   ) => {
-    const res = await addAchievementProgress(userId, achievement.achievementId, amount);
+    let achievementId = achievement.achievementId;
+    let progress = amount;
 
-    if (res && !achievement.achievementId.endsWith("_v")) {
+    while (await addAchievementProgress(userId, achievementId, progress)) {
+      if (!incrementNext) break;
+
       let nextId: string;
-      if (achievement.achievementId.endsWith("_i")) {
+
+      if (achievementId.endsWith("_i")) {
         nextId = `${achievementStartName}_ii`;
-      } else if (achievement.achievementId.endsWith("_ii")) {
+      } else if (achievementId.endsWith("_ii")) {
         nextId = `${achievementStartName}_iii`;
-      } else if (achievement.achievementId.endsWith("_iii")) {
+      } else if (achievementId.endsWith("_iii")) {
         nextId = `${achievementStartName}_iv`;
-      } else if (achievement.achievementId.endsWith("iv")) {
+      } else if (achievementId.endsWith("_iv")) {
         nextId = `${achievementStartName}_v`;
       }
 
-      if (nextId) {
-        let progress = Number(achievement.progress) + amount;
+      if (!nextId) break;
+      achievementId = nextId;
 
-        if (!incrementNext) {
-          progress = amount;
-        }
-
-        await addAchievementProgress(userId, nextId, progress);
-      }
+      progress = Number(achievement.progress) + amount;
     }
   };
 
