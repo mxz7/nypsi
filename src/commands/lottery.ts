@@ -187,7 +187,7 @@ async function run(
       `wins: **${data.wins.toLocaleString()}**\n\n` +
         `most recent win: **${recent.type}** <t:${Math.floor(recent.date.getTime() / 1000)}:R>\n` +
         `you won with **${recent.winnerTickets.toLocaleString()}** tickets (**${recent.totalTickets.toLocaleString()}** total bought)\n\n` +
-        `biggest win: **${biggest.type}**\n` +
+        `biggest win: **${biggest.type}** <t:${Math.floor(biggest.date.getTime() / 1000)}:R>\n` +
         `you won with **${biggest.winnerTickets.toLocaleString()}** tickets (**${biggest.totalTickets.toLocaleString()}** total bought)`,
     );
 
