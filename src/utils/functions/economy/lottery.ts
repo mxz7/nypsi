@@ -1,24 +1,43 @@
+import { Prisma } from "#generated/prisma";
 import prisma from "../../../init/database";
 import { getUserId, MemberResolvable } from "../member";
 import { getItems } from "./utils";
 
 type LotteryAutoBuyMode = "daily" | "lottery";
 
-export async function getApproximatePrizePool() {
+export async function getApproximatePrizePool(superdraw = false) {
+  let where: Prisma.InventoryWhereInput = {
+    item: "lottery_ticket",
+  };
+
+  if (superdraw) {
+    where = {
+      item: { in: ["lottery_ticket", "superdraw_lottery_ticket"] },
+    };
+  }
+
   const tickets = await prisma.inventory.aggregate({
-    where: {
-      item: "lottery_ticket",
-    },
+    where,
     _sum: {
       amount: true,
     },
   });
 
-  const value = Number(tickets._sum.amount) * getItems()["lottery_ticket"].buy;
+  return getPoolRange(Number(tickets._sum.amount ?? 0n));
+}
+
+function getPoolRange(ticketCount: number) {
+  const effectiveTickets = Math.max(ticketCount, 750);
+  const value = getItems()["lottery_ticket"].buy;
+
+  const stepTickets = Math.max(750, Math.round(effectiveTickets));
+
+  const minTickets = Math.floor(effectiveTickets / stepTickets) * stepTickets;
+  const maxTickets = minTickets + stepTickets;
 
   return {
-    min: Math.floor(value / 100_000_000) * 100_000_000,
-    max: Math.ceil(value / 100_000_000) * 100_000_000,
+    min: minTickets * value,
+    max: maxTickets * value,
   };
 }
 

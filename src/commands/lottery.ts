@@ -133,7 +133,7 @@ async function run(
     const tickets = inventory.count("lottery_ticket");
     const superdrawTickets = inventory.count("superdraw_lottery_ticket");
     const embed = new CustomEmbed(message.member);
-    const pool = await getApproximatePrizePool();
+
     const autoBuy = await getLotteryAutoBuySettings(message.member);
     const autoBuyText =
       typeof autoBuy.amount === "number"
@@ -149,6 +149,8 @@ async function run(
 
     const nextDrawIsSuperdraw = nextDrawTime.day() === 6 && nextDrawTime.hour() === 0;
     const nextDrawText = `<t:${nextDrawTime.unix()}:R>${nextDrawIsSuperdraw ? " ([superdraw](https://nypsi.xyz/wiki/economy/lottery?ref=bot-lottery#superdraw))" : ""}`;
+
+    const pool = await getApproximatePrizePool(nextDrawIsSuperdraw);
 
     embed.setDescription(
       `nypsi lottery draws happen every 8 hours in the [official nypsi server](${Constants.NYPSI_SERVER_INVITE_LINK})\nnext draw ${nextDrawText}\n\n` +
