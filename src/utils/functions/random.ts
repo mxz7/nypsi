@@ -11,7 +11,9 @@ export function shuffle<T>(array: T[]): T[] {
   }
   return arr;
 }
-
+/**
+ * @param percent - a number between 0 and 100, can be a decimal
+ */
 export function percentChance(percent: number) {
   if (percent <= 0) return false;
   let max = 100;
