@@ -82,3 +82,13 @@ Export an `InteractionHandler` or `AutocompleteHandler` from `src/interactions/`
 **Data files drive tests:** Changing JSON files in `data/` may break tests in `test/`. Run `pnpm test` after any data file changes.
 
 **Comments should describe code only**: Comments should only be used to describe code, use them only when absolutely needed, for example a complex piece of code that isn't obvious at first sight what it does - not for basic or simple things that can easily be understood.
+
+## Further Knowledge and Helping Future Agents
+
+Check [.agents/readme.md](.agents/readme.md) first – it's a maintained index of the other files in that directory. If a file there covers what you're working on, read it before searching the codebase yourself.
+
+If you dedicate time to searching the codebase for non-obvious information, add your findings to an existing file in `.agents/` (if the topic overlaps) or create a new one and add it to the index in `readme.md`. Keep explanations brief and to the point.
+
+Update these files if you are changing details they describe, and correct or remove notes you notice are stale/wrong even if unrelated to your current task.
+
+This directory is committed to the repo and shared across any agent/tool working on it – prefer it over a private or tool-specific memory system for anything durable that future agents/contributors should see.
