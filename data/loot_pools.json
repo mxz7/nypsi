@@ -67,6 +67,13 @@
           "min": 10,
           "max": 25
         }
+      },
+      "lottery_ticket": {
+        "weight": 10,
+        "count": {
+          "min": 250,
+          "max": 500
+        }
       }
     }
   },
@@ -286,7 +293,14 @@
       "christmas_tree": 100,
       "wheat_seed": 30,
       "redbull": 10,
-      "ring": 0.75
+      "ring": 0.75,
+      "lottery_ticket": {
+        "weight": 50,
+        "count": {
+          "min": 25,
+          "max": 100
+        }
+      }
     }
   },
   "lucky_scratch_card": {
@@ -353,7 +367,14 @@
           "max": 50
         }
       },
-      "ring": 2
+      "ring": 2,
+      "superdraw_lottery_ticket": {
+        "weight": 40,
+        "count": {
+          "min": 150,
+          "max": 250
+        }
+      }
     }
   },
   "karma_scratch_card": {
