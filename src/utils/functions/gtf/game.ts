@@ -4,9 +4,11 @@ import {
   ButtonStyle,
   CommandInteraction,
   ComponentType,
+  Interaction,
   LabelBuilder,
   Message,
   MessageActionRowComponentBuilder,
+  MessageComponentInteraction,
   MessageFlags,
   ModalBuilder,
   TextInputBuilder,
@@ -20,6 +22,7 @@ import prisma from "../../../init/database";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../models/Command";
 import { CustomEmbed, ErrorEmbed, getColor } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
+import { addCooldown } from "../../handlers/cooldownhandler";
 import { logger } from "../../logger";
 import { MStoTime } from "../date";
 import { addProgress } from "../economy/achievements";
@@ -31,6 +34,7 @@ export async function startGTFGame(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   secondPlayer?: User,
   requestMessage?: Message,
+  replayInteraction?: MessageComponentInteraction,
 ) {
   const id = countries[Math.floor(Math.random() * countries.length)];
 
@@ -77,7 +81,18 @@ export async function startGTFGame(
   let winner: User;
   const guesses: string[] = [];
 
-  if (requestMessage) {
+  if (replayInteraction) {
+    msg = await replayInteraction
+      .update({ embeds: [embed], components: [row] })
+      .then((m) => m.fetch())
+      .catch(
+        () =>
+          replayInteraction.message.edit({
+            embeds: [embed],
+            components: [row],
+          }) as Promise<Message>,
+      );
+  } else if (requestMessage) {
     msg = await requestMessage.reply({ embeds: [embed], components: [row] });
   } else {
     if (message instanceof Message) {
@@ -272,10 +287,50 @@ export async function startGTFGame(
       }
     }
 
-    if (reason === "cancelled")
-      await collected.last().update({ embeds: [embed], components: [row] });
-    else await msg.edit({ embeds: [embed], components: [row] });
+    const components: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [row];
+
+    if (!secondPlayer) {
+      components.push(
+        new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+          new ButtonBuilder()
+            .setCustomId("gtf-play-again")
+            .setLabel("play again")
+            .setStyle(ButtonStyle.Success),
+        ),
+      );
+    }
+
+    if (reason === "cancelled") await collected.last().update({ embeds: [embed], components });
+    else await msg.edit({ embeds: [embed], components });
+
+    if (!secondPlayer) await playAgain(msg, message);
   });
+}
+
+async function playAgain(
+  msg: Message,
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+) {
+  const res = await msg
+    .awaitMessageComponent({
+      filter: (i: Interaction) => i.user.id === message.author.id,
+      time: 30000,
+      componentType: ComponentType.Button,
+    })
+    .catch(() => {
+      msg.edit({ components: [] }).catch(() => {});
+      return;
+    });
+
+  if (!res || res.customId !== "gtf-play-again") return;
+
+  await addCooldown("guesstheflag", message.member, 5);
+
+  setTimeout(() => {
+    res.deferUpdate().catch(() => {});
+  }, 2000);
+
+  await startGTFGame(message, undefined, undefined, res);
 }
 
 async function saveGameStats(
