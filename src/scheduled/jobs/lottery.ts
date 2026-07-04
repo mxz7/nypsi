@@ -265,7 +265,8 @@ function rollSuperdrawTickets(ticketAmount: number): number {
   let granted = 0;
 
   for (let i = 0; i < ticketAmount; i++) {
-    if (percentChance(chance)) {
+    // comes as decimal, we want percentage
+    if (percentChance(chance * 100)) {
       granted++;
     }
   }
