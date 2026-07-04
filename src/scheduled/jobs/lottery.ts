@@ -249,13 +249,13 @@ async function deleteAllTickets(userIds: string[], isSuperDraw: boolean) {
 }
 
 function getSuperdrawChance(ticketAmount: number): number {
-  const maxChance = 0.65;
-  const minChance = 0.1;
+  const maxChance = 0.1;
+  const minChance = 0.025;
   const maxTicketsForMinChance = 1000;
 
   const clamped = Math.min(Math.max(ticketAmount, 1), maxTicketsForMinChance);
   const t = (clamped - 1) / (maxTicketsForMinChance - 1);
-  const progress = 1 - Math.pow(1 - t, 3);
+  const progress = 1 - Math.pow(1 - t, 5);
 
   return maxChance - (maxChance - minChance) * progress;
 }
