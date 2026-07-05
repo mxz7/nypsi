@@ -305,7 +305,7 @@
   },
   "lucky_scratch_card": {
     "money": {
-      "2500000": 100
+      "3000000": 100
     },
     "xp": {
       "500": 100
@@ -371,8 +371,8 @@
       "superdraw_lottery_ticket": {
         "weight": 40,
         "count": {
-          "min": 150,
-          "max": 250
+          "min": 75,
+          "max": 200
         }
       }
     }
