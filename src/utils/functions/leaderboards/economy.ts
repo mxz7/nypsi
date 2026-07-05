@@ -1,4 +1,5 @@
 import { Guild } from "discord.js";
+import { Prisma } from "#generated/prisma";
 import prisma from "../../../init/database";
 import { NypsiClient } from "../../../models/Client";
 import { checkLeaderboardPositions } from "../economy/stats";
@@ -431,37 +432,46 @@ export async function topLottoWins(
 ): Promise<LeaderboardResult> {
   const members = await getMembers(guild);
 
-  const query = await prisma.achievements.findMany({
-    where: {
-      AND: [
-        {
-          OR: [
-            { AND: [{ completed: false }, { achievementId: { startsWith: "lucky_" } }] },
-            { AND: [{ completed: true }, { achievementId: { equals: "lucky_v" } }] },
-          ],
-        },
-        members ? { userId: { in: members } } : undefined,
-      ].filter(Boolean),
-    },
-    select: {
-      userId: true,
-      progress: true,
-      user: {
-        select: {
-          lastKnownUsername: true,
-          usernameUpdatedAt: true,
-        },
-      },
-    },
-    orderBy: {
-      progress: "desc",
-    },
-    take: getAmount(guild, amount) || undefined,
-  });
+  let query: {
+    winnerId: string;
+    wins: number;
+    lastKnownUsername: string;
+    usernameUpdatedAt: Date;
+  }[];
+
+  if (members) {
+    query = await prisma.$queryRaw`
+      SELECT 
+        "Lottery"."winnerId",
+        COUNT(*) as wins,
+        "User"."lastKnownUsername",
+        "User"."usernameUpdatedAt"
+      FROM "Lottery"
+      INNER JOIN "User" ON "Lottery"."winnerId" = "User"."id"
+      WHERE "Lottery"."winnerId" IS NOT NULL AND "Lottery"."winnerId" IN (${Prisma.join(members)})
+      GROUP BY "Lottery"."winnerId", "User"."lastKnownUsername", "User"."usernameUpdatedAt"
+      ORDER BY wins DESC
+      LIMIT ${getAmount(guild, amount) || 100}
+    `;
+  } else {
+    query = await prisma.$queryRaw`
+      SELECT 
+        "Lottery"."winnerId",
+        COUNT(*) as wins,
+        "User"."lastKnownUsername",
+        "User"."usernameUpdatedAt"
+      FROM "Lottery"
+      INNER JOIN "User" ON "Lottery"."winnerId" = "User"."id"
+      WHERE "Lottery"."winnerId" IS NOT NULL
+      GROUP BY "Lottery"."winnerId", "User"."lastKnownUsername", "User"."usernameUpdatedAt"
+      ORDER BY wins DESC
+      LIMIT ${getAmount(guild, amount) || 100}
+    `;
+  }
 
   const out: string[] = [];
   let count = 1;
-  const userIds = query.map((i) => i.userId);
+  const userIds = query.map((i) => i.winnerId);
   const promises: (() => Promise<void>)[] = [];
 
   for (const user of query) {
@@ -472,17 +482,17 @@ export async function topLottoWins(
 
     promises.push(async () => {
       const username = getUsername(
-        user.userId,
-        user.user.lastKnownUsername,
-        user.user.usernameUpdatedAt,
+        user.winnerId,
+        user.lastKnownUsername,
+        user.usernameUpdatedAt,
         guild,
       );
 
       out[currentCount] = `${pos} ${await formatUsername(
-        user.userId,
+        user.winnerId,
         username,
         scope === "global",
-      )} ${user.progress}`;
+      )} ${user.wins}`;
     });
   }
 
