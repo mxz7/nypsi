@@ -1203,7 +1203,7 @@ export async function showMarketConfirmationModal(
 
   if (!res.isModalSubmit()) return;
 
-  if (res.fields.getTextInputValue("confirmation") != "yes") {
+  if (res.fields.getTextInputValue("confirmation").toLowerCase() !== "yes") {
     res.reply({
       embeds: [new CustomEmbed().setDescription("✅ cancelled purchase")],
       flags: MessageFlags.Ephemeral,
