@@ -2170,7 +2170,7 @@
     "article": "a",
     "plural": "stolen nasa computers",
     "aliases": ["nasa", "computer"],
-    "emoji": "🖥",
+    "emoji": "🖥️",
     "longDesc": "applies the nasa computer upgrade to the spacex worker",
     "rarity": 2,
     "sell": 100000,
