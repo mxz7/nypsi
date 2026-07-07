@@ -62,5 +62,3 @@ If you dedicate time to searching the codebase for non-obvious information, add 
 Update these files if you are changing details they describe, and correct or remove notes you notice are stale/wrong even if unrelated to your current task.
 
 This directory is committed to the repo and shared across any agent/tool working on it – prefer it over a private or tool-specific memory system for anything durable that future agents/contributors should see.
-
-You may also update this AGENTS.md file directly if you believe something is wrong, shouldn't be here, should be added or if it should be moved to the `.agents` folder.
