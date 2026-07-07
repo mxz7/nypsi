@@ -39,45 +39,15 @@ Prisma client generates to `src/generated/prisma/` (not the default location). I
 
 ## Conventions
 
-### User Facing Messages
-
-Use `CustomEmbed` for standard messages, and `ErrorEmbed` for error messages. Only use `content` string if a mention is specifically needed.
-
-### Commands
-
-Create a `Command` instance and export it as default:
-
-```ts
-import { Command } from "../models/Command.js";
-
-const cmd = new Command("name", "description", "category")
-  .setAliases(["alias"])
-  .setRun(async (message, send, args) => { … });
-
-export default cmd;
-```
-
-Commands are auto-loaded from `src/commands/` at startup. See [src/models/Command.ts](src/models/Command.ts) for full API.
-
-### Scheduled Jobs
-
-Export a `Job` object from `src/scheduled/jobs/`:
-
-```ts
-export default { name: "job-name", cron: "0 * * * *", run: async (log) => { … } } satisfies Job;
-```
-
-### Interaction Handlers
-
-Export an `InteractionHandler` or `AutocompleteHandler` from `src/interactions/`. See [src/types/InteractionHandler.ts](src/types/InteractionHandler.ts).
+See [.agents/conventions.md](.agents/conventions.md) for how to structure commands, scheduled jobs, interaction handlers, and user-facing messages.
 
 ## Key Pitfalls
 
-**BigInt & Redis:** Several Prisma models use `BigInt` fields (e.g. `ProfileView`). Plain `JSON.stringify` throws on BigInt. Use the custom `RedisCache` class from `src/utils/cache.ts` which handles BigInt serialization/deserialization automatically.
-
-**Prisma schema edits:** When modifying `prisma/schema.prisma`, replace the entire model block rather than inserting partial lines near block boundaries – partial edits at model edges can corrupt the schema. Do not create migrations yourself, the user will handle them once all schema changes are confirmed, use `npx prisma generate` to generate types.
+**Prisma schema edits:** do not create migrations yourself, the user will handle them once all schema changes are confirmed, use `npx prisma generate` to generate types. See [.agents/prisma-schema.md](.agents/prisma-schema.md) for how to edit the schema file safely.
 
 **`strictNullChecks` is off:** `tsconfig.json` sets `strictNullChecks: false`. Don't rely on null-safety; validate at system boundaries explicitly.
+
+**Redis caching:** see [.agents/redis-caching.md](.agents/redis-caching.md) before caching Prisma results - some models have `BigInt` fields that break plain `JSON.stringify`.
 
 **Data files drive tests:** Changing JSON files in `data/` may break tests in `test/`. Run `pnpm test` after any data file changes.
 
