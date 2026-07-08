@@ -18,8 +18,8 @@ importers:
         specifier: 2.6.1
         version: 2.6.1
       '@hono/node-server':
-        specifier: ^2.0.6
-        version: 2.0.6(hono@4.12.27)
+        specifier: ^2.0.8
+        version: 2.0.8(hono@4.12.27)
       '@prisma/adapter-pg':
         specifier: ^7.8.0
         version: 7.8.0
@@ -30,8 +30,8 @@ importers:
         specifier: ^17.0.2
         version: 17.0.2
       '@yusifaliyevpro/countries':
-        specifier: ^5.1.5
-        version: 5.1.5
+        specifier: ^5.1.6
+        version: 5.1.6
       '@zeyrbot/urbandictionary':
         specifier: ^1.0.3
         version: 1.0.3
@@ -685,8 +685,8 @@ packages:
     peerDependencies:
       hono: ^4
 
-  '@hono/node-server@2.0.6':
-    resolution: {integrity: sha512-7DeRlKG57JDBNZ5Qj2jwVdgwQy4b0tLubRLl3zCf91/rCf9i7p1V5FtW/yWibm1uUHE493ts9ZXH/7g/LQWl+g==}
+  '@hono/node-server@2.0.8':
+    resolution: {integrity: sha512-GuCWzLxwg218fy1JaHculFsdcuY12hxit83V+algozTPnwhNjLrRL/Alg9OYjLZLoUZ1rw/S4CdTMsnkSKCmFA==}
     engines: {node: '>=20'}
     peerDependencies:
       hono: ^4
@@ -1713,8 +1713,8 @@ packages:
     resolution: {integrity: sha512-Xfe6rpCTxSxfbswi/W/Pz7zp1WWSNn4A0eW4mLkQUewCrXXtMj31lCg+iQyTkh/CkusZSq9eDflu7tjEDXUY6g==}
     engines: {node: '>=v14.0.0', npm: '>=7.0.0'}
 
-  '@yusifaliyevpro/countries@5.1.5':
-    resolution: {integrity: sha512-qECFuQRSKG8EtKb5dgd9+mK7DcFBh+zow9iG3MMVfJjKPHem15Wz2lm5XJtA3bQYtVELwQvvMvGe6yp6mwHisQ==}
+  '@yusifaliyevpro/countries@5.1.6':
+    resolution: {integrity: sha512-rnoDPZE5hOGzJKlCrIIVD6kqcydm+HU5xuBN4OMHk3XxjPcPF20/WtGtSkOXdLEkXh2M4U7KeVdcNHuQojue6g==}
 
   '@zeyrbot/urbandictionary@1.0.3':
     resolution: {integrity: sha512-w4Nc88ikL4DakWTXwvKfCztDVmKNhcP3tLwmGWH7BwJcyDpvL5eJp+duumVyh6wrqhbRzlE7fLuDJPnl7jHkBw==}
@@ -3246,7 +3246,7 @@ snapshots:
     dependencies:
       hono: 4.12.27
 
-  '@hono/node-server@2.0.6(hono@4.12.27)':
+  '@hono/node-server@2.0.8(hono@4.12.27)':
     dependencies:
       hono: 4.12.27
 
@@ -4183,7 +4183,7 @@ snapshots:
 
   '@vladfrangu/async_event_emitter@2.4.7': {}
 
-  '@yusifaliyevpro/countries@5.1.5':
+  '@yusifaliyevpro/countries@5.1.6':
     dependencies:
       zod: 4.4.3
 
