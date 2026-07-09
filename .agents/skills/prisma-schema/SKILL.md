@@ -1,3 +1,8 @@
+---
+name: prisma-schema
+description: Safe workflow for editing prisma/schema.prisma without corrupting model blocks, and for regenerating the Prisma client. Use whenever you need to add, remove, or modify a field or model in the Prisma schema.
+---
+
 # Prisma Schema Editing
 
 - When modifying `prisma/schema.prisma`, replace the entire model block rather than inserting/editing partial lines near block boundaries (e.g. adding a field right before the closing `}`). Partial edits at model edges have corrupted the schema in past sessions (stray braces, misplaced fields).

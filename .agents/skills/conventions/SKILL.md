@@ -1,0 +1,38 @@
+---
+name: conventions
+description: Describes how to structure commands, scheduled jobs, interaction handlers, and user-facing messages/embeds in nypsi. Use when creating or modifying a command, a cron job in src/scheduled/jobs, an interaction/autocomplete handler, or when sending any message to a user.
+---
+
+# Conventions
+
+## User Facing Messages
+
+Use `CustomEmbed` for standard messages, and `ErrorEmbed` for error messages. Only use `content` string if a mention is specifically needed.
+
+## Commands
+
+Create a `Command` instance and export it as default:
+
+```ts
+import { Command } from "../models/Command.js";
+
+const cmd = new Command("name", "description", "category")
+  .setAliases(["alias"])
+  .setRun(async (message, send, args) => { … });
+
+export default cmd;
+```
+
+Commands are auto-loaded from `src/commands/` at startup. See [src/models/Command.ts](../../../src/models/Command.ts) for full API, and the `codebase-structure` skill for slash option/subcommand patterns.
+
+## Scheduled Jobs
+
+Export a `Job` object from `src/scheduled/jobs/`:
+
+```ts
+export default { name: "job-name", cron: "0 * * * *", run: async (log) => { … } } satisfies Job;
+```
+
+## Interaction Handlers
+
+Export an `InteractionHandler` or `AutocompleteHandler` from `src/interactions/`. See [src/types/InteractionHandler.ts](../../../src/types/InteractionHandler.ts) and the `codebase-structure` skill for routing/autocomplete/button examples.

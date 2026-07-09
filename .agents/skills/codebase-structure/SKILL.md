@@ -1,10 +1,15 @@
+---
+name: codebase-structure
+description: Explains command/interaction handler patterns, slash command option builders, Sharp image processing usage, and the sudoku-gen package status. Use when adding or modifying commands, interaction handlers (buttons/autocomplete), slash command options/subcommands, or any image generation code.
+---
+
 # Codebase Structure Notes
 
 ## Command System
 
 ### Command Definition Pattern
 
-Located in [src/commands/](../src/commands/) (~180 commands)
+Located in [src/commands/](../../../src/commands/) (~180 commands)
 
 ```ts
 // General structure:
@@ -96,7 +101,7 @@ export interface NypsiCommandInteraction extends CommandInteraction {
 
 ## Interaction Handlers
 
-Located in [src/interactions/](../src/interactions/). Routed by [src/utils/handlers/interactions.ts](../src/utils/handlers/interactions.ts).
+Located in [src/interactions/](../../../src/interactions/). Routed by [src/utils/handlers/interactions.ts](../../../src/utils/handlers/interactions.ts).
 
 ### Types (src/types/InteractionHandler.ts)
 
@@ -116,7 +121,7 @@ export type AutocompleteHandler = {
 
 ### Autocomplete Example
 
-**File: [src/interactions/item.ts](../src/interactions/item.ts)**
+**File: [src/interactions/item.ts](../../../src/interactions/item.ts)**
 
 ```ts
 export default {
@@ -150,7 +155,7 @@ export default {
 
 ### Button Interaction Example
 
-**File: [src/interactions/accept_offer.ts](../src/interactions/accept_offer.ts)**
+**File: [src/interactions/accept_offer.ts](../../../src/interactions/accept_offer.ts)**
 
 ```ts
 export default {
@@ -166,7 +171,7 @@ export default {
 
 ### Routing Logic
 
-**File: [src/utils/handlers/interactions.ts](../src/utils/handlers/interactions.ts)**
+**File: [src/utils/handlers/interactions.ts](../../../src/utils/handlers/interactions.ts)**
 
 - Loads all handlers from `dist/interactions/` at startup
 - Maps by handler name into `Map<string, InteractionHandler>` and `Map<string, AutocompleteHandler>`
@@ -180,7 +185,7 @@ export default {
 
 Sharp is used in 5 files for image generation and optimization:
 
-### 1. Chess Board Rendering ([src/utils/functions/chess/board.ts](../src/utils/functions/chess/board.ts))
+### 1. Chess Board Rendering ([src/utils/functions/chess/board.ts](../../../src/utils/functions/chess/board.ts))
 
 ```ts
 import sharp = require("sharp");
@@ -199,7 +204,7 @@ const png = await sharp(Buffer.from(svg))
   .toBuffer();
 ```
 
-### 2. Guild Avatar Upload ([src/commands/guild.ts](../src/commands/guild.ts#L1069))
+### 2. Guild Avatar Upload ([src/commands/guild.ts](../../../src/commands/guild.ts#L1069))
 
 ```ts
 const buffer = await sharp(arrayBuffer, { animated: contentType.split("/")[1] === "gif" })
@@ -209,7 +214,7 @@ const buffer = await sharp(arrayBuffer, { animated: contentType.split("/")[1] ==
 await uploadImage(id, buffer, contentType);
 ```
 
-### 3. Color Circle Generation ([src/commands/color.ts](../src/commands/color.ts#L82))
+### 3. Color Circle Generation ([src/commands/color.ts](../../../src/commands/color.ts#L82))
 
 ```ts
 const circleImage = await sharp(arrayBuffer)
@@ -219,7 +224,7 @@ const circleImage = await sharp(arrayBuffer)
   .toBuffer();
 ```
 
-### 4. Evidence Compression ([src/utils/functions/guilds/evidence.ts](../src/utils/functions/guilds/evidence.ts#L108))
+### 4. Evidence Compression ([src/utils/functions/guilds/evidence.ts](../../../src/utils/functions/guilds/evidence.ts#L108))
 
 ```ts
 if (contentType.split("/")[1] === "png") {
@@ -240,7 +245,7 @@ if (contentType.split("/")[1] === "png") {
 
 ## sudoku-gen Package
 
-**Status:** Installed (`"sudoku-gen": "^1.0.2"` in [package.json](../package.json#L56)) but **not currently used in source code**.
+**Status:** Installed (`"sudoku-gen": "^1.0.2"` in [package.json](../../../package.json#L56)) but **not currently used in source code**.
 
 No imports of `sudoku-gen` found in `src/` directory. Likely:
 

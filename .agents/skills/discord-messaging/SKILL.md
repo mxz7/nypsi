@@ -1,4 +1,9 @@
-# sending messages outside the main client
+---
+name: discord-messaging
+description: Explains how to send Discord messages from cron jobs that don't have a NypsiClient/gateway connection, covering WebhookClient vs the shared getRest() REST client. Use when writing or editing a scheduled job in src/scheduled/jobs/ that needs to post a message to a channel.
+---
+
+# Sending Messages Outside the Main Client
 
 Two patterns exist in `src/scheduled/jobs/` for posting messages from cron jobs (no `NypsiClient`/gateway connection available):
 
