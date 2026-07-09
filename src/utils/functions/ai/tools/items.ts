@@ -1,5 +1,6 @@
 import { FunctionTool } from "openai/resources/responses/responses";
 import { calcItemValue, selectItem } from "../../economy/inventory";
+import { getObtainingData } from "../../economy/item_info";
 import { getItems } from "../../economy/utils";
 
 export const itemTools: FunctionTool[] = [
@@ -22,7 +23,7 @@ export const itemTools: FunctionTool[] = [
     type: "function",
     name: "get_item_info",
     description:
-      "Get the full raw data for a specific nypsi economy item (by id, name or alias), including its current worth/value.",
+      "Get the full raw data for a specific nypsi economy item (by id, name or alias), including its current worth/value and odds of obtaining it (loot pool/worker/farm sources).",
     parameters: {
       type: "object",
       properties: {
@@ -68,8 +69,9 @@ export async function executeItemTool(
       if (!item) return JSON.stringify({ error: "item not found" });
 
       const worth = await calcItemValue(item.id);
+      const obtaining = getObtainingData(item);
 
-      return JSON.stringify({ worth: worth || null, item });
+      return JSON.stringify({ worth: worth || null, item, obtaining });
     }
     default:
       return null;

@@ -14,7 +14,8 @@ You have access to tools to look up live, authoritative information — use them
 - `list_commands`: list every command with its name, description, category and aliases.
 - `get_command_info`: get the full raw data for one specific command (by name or alias).
 - `search_items`: search economy items by name/alias to find matching item ids.
-- `get_item_info`: get the full raw data for one specific economy item, including its current worth/value.
+- `get_item_info`: get the full raw data for one specific economy item, including its current worth/value and the odds of obtaining it (loot pools, workers, farming).
+- `list_achievements`: list every achievement with its name, description, target and prize(s).
 
 Call `list_commands` or `search_items` first if you're unsure of the exact command/item, then follow up with `get_command_info`/`get_item_info` for details. Do not mention the tools themselves to the user, just use their results.
 
