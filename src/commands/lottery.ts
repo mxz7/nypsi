@@ -63,8 +63,7 @@ function createAutoBuyEmbed(
       `configure your lottery autobuy settings\n\n` +
         `mode: **${modeText}**\n` +
         `amount: **${amountText}**\n` +
-        `cost per run: **${costText}** (5% discount)\n\n` +
-        `use the buttons below to change mode, set amount, or disable autobuy`,
+        `cost per run: **${costText}** (5% discount)`,
     );
 }
 
