@@ -361,7 +361,7 @@ export function createHelpPageRows(
     new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
         .setCustomId("help-ai-continue")
-        .setLabel("ask another question")
+        .setLabel("reply")
         .setStyle(ButtonStyle.Secondary)
         .setDisabled(disableContinue),
     ),
