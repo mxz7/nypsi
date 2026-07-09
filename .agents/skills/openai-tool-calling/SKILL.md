@@ -94,6 +94,17 @@ final call, when tracking token usage/rate limits. Log every tool call
 - Tool functions return a `string` (JSON.stringify'd) — the Responses API expects `output` to be text (or the file/image content list type).
 - When dumping a repo object as raw JSON for the model (e.g. a `Command` instance), strip functions first: `JSON.stringify(obj, (k, v) => (typeof v === "function" ? undefined : v))` — `Command` instances have a non-serializable `run` function property.
 - Wrap each tool's logic in try/catch and return `JSON.stringify({ error: "..." })` on failure instead of throwing, so one bad tool call doesn't kill the whole conversation.
+- Prefer reusing existing pure data-lookup functions over recomputing logic in a tool executor (e.g. `selectItem`/`calcItemValue`/`getObtainingData` for items — see the `economy-items` skill). Only write new matching/filtering logic when nothing suitable already exists.
+- Current categories: `commands.ts` (`list_commands`, `get_command_info`), `items.ts` (`search_items`, `get_item_info`), `achievements.ts` (`list_achievements`). Not every category needs both a "list/search" and a "get info" tool — only split into two when the full data set is too large to return in one call (compare the small, flat `AchievementData` in `achievements.ts`, returned in full via one tool, against the larger `Item`/`Command` objects which get a lightweight search + separate detail tool).
+
+## Downsides of more tool-call round trips
+
+Each round trip is a full extra request to the model, so more tool calls means:
+
+- **Latency** — the user waits on every extra round trip; noticeable in an interactive Discord flow.
+- **Cost/tokens** — the entire growing `input` transcript (system prompt + history + all prior tool calls/outputs) is resent as input tokens on every round trip, so cost scales roughly quadratically with the number of tool calls, not linearly. Note `GLOBAL_WEEKLY_TOKEN_LIMIT` in `help-chat.ts` currently only tracks **output** tokens — heavy tool use inflates input-token cost without tripping that budget.
+- **Hitting `MAX_TOOL_ROUNDTRIPS`** — if the model keeps calling tools without converging on a final answer, the loop exits with `parsed` still `null`, surfacing as `"empty help ai response"` and no answer for the user.
+- Keep tool result payloads reasonably small/targeted (e.g. `search_items` caps results to 25) since every tool output is echoed back into the transcript and paid for again on the next round trip.
 
 ## Reducing prompt size
 

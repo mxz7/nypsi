@@ -25,3 +25,14 @@ Note: several older commands (`help.ts`, `autosell.ts`, `buy.ts`, `karmashop.ts`
 ## Fuzzy/substring search (multiple results)
 
 `selectItem` only returns a single exact match. If you need to find _candidate_ items from a partial/fuzzy query (e.g. an AI tool letting a model discover an item id first), filter `getItems()` yourself with substring checks against `id`/`name`/`aliases`, still excluding `hidden` items — see `search_items` in `src/utils/functions/ai/tools/items.ts` for the pattern.
+
+## Odds of obtaining an item — `getObtainingData(item: Item)`
+
+`src/utils/functions/economy/item_info.ts` exports `getObtainingData`, a synchronous function that computes **all** the ways an item can be obtained, already used by the `item`/`help` command's "obtaining" tab. Don't recompute loot pool weights/chances by hand — reuse this. Returns `ObtainingData`:
+
+- `sources: string[]` — human-facing summary strings (shop, crafting, karma shop, mining, fishing, hunting, voting, streaks, etc).
+- `workers: string[]` / `farm: string[]` — which workers produce it as a byproduct / which plants grow it.
+- `obtaining: { itemId, chance }[]` — other items (crates/pools) that can drop this item, with the average % chance.
+- `pools: { poolName, count, breakdown: { chance, itemId?, amount? }[] }[]` — if the item itself is a container (e.g. a crate), the full odds breakdown of everything inside it, per pool.
+
+`getItems()`/`getLootPools()`/`getBaseWorkers()`/`getPlantsData()` are all read synchronously under the hood — no DB calls, safe to call from anywhere (including AI tool executors) without extra caching.
