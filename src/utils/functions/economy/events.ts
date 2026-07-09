@@ -27,10 +27,10 @@ export type EventData = Event & { contributions: EventContribution[] };
 
 let completing = false;
 
-const REWARDS_TOP5P = 5;
-const REWARDS_TOP10P = 7;
-const REWARDS_TOP50P = 5;
-const REWARDS_BOTTOM50P = 3;
+const REWARDS_TOP5P = 10;
+const REWARDS_TOP10P = 15;
+const REWARDS_TOP50P = 10;
+const REWARDS_BOTTOM50P = 7;
 
 export async function createEvent(
   client: NypsiClient,
@@ -342,8 +342,8 @@ async function giveRewards(event: EventData) {
     }
   };
 
-  await giveRewardToGroup(top5, 3, "pandora_box");
-  await giveRewardToGroup(top10, 200, "dabloon");
+  await giveRewardToGroup(top5, 7, "pandora_box");
+  await giveRewardToGroup(top10, 2000, "dabloon");
   await giveRewardToGroup(top5p, REWARDS_TOP5P, "pandora_box");
   await giveRewardToGroup(top10p, REWARDS_TOP10P, "pandora_box");
   await giveRewardToGroup(top50p, REWARDS_TOP50P, "pandora_box");
