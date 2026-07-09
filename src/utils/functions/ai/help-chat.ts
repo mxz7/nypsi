@@ -214,9 +214,23 @@ export async function createHelpChat(userId: string, userQuery: string, conversa
         break;
       }
 
-      input.push(...toolCalls);
+      // strip the `parsed_arguments` field added by responses.parse() — the API rejects it if echoed back
+      input.push(
+        ...toolCalls.map((call) => ({
+          type: "function_call" as const,
+          call_id: call.call_id,
+          name: call.name,
+          arguments: call.arguments,
+        })),
+      );
 
       for (const call of toolCalls) {
+        logger.info(`help-chat: tool call tool: ${call.name} (${call.arguments})`, {
+          userId,
+          tool: call.name,
+          arguments: call.arguments,
+        });
+
         const result = await executeAiTool(call.name, call.arguments);
 
         input.push({

@@ -28,6 +28,19 @@ category file or inlining tools back into the chat flow file.
 - `ResponseInput` — `Array<ResponseInputItem>`, the type for the growing `input` array you pass to `responses.parse`/`responses.create`.
 - `ParsedResponseFunctionToolCall` — **use this, not `ResponseFunctionToolCall`**, when narrowing `response.output` items from a `.parse()` call. `.parse()` always augments `function_call` items with a `parsed_arguments` field (even for plain, non-zod-wrapped tools — it's just `null` in that case), so a type predicate typed as the plain `ResponseFunctionToolCall` fails to compile ("predicate not assignable") and silently stops narrowing, causing cascading errors on `.name`/`.arguments`/`.call_id`.
 
+**Never push the raw `ParsedResponseFunctionToolCall` items straight back into `input`.** The API rejects the extra `parsed_arguments` field with `400 Unknown parameter: 'input[N].parsed_arguments'`. Strip it by re-mapping to a plain object before pushing:
+
+```ts
+input.push(
+  ...toolCalls.map((call) => ({
+    type: "function_call" as const,
+    call_id: call.call_id,
+    name: call.name,
+    arguments: call.arguments,
+  })),
+);
+```
+
 ## Loop pattern
 
 ```ts
@@ -53,9 +66,18 @@ for (let i = 0; i < MAX_TOOL_ROUNDTRIPS; i++) {
     break;
   }
 
-  input.push(...toolCalls); // echo the model's tool call(s) back into the transcript
+  // see above — strip `parsed_arguments` before echoing tool calls back into the transcript
+  input.push(
+    ...toolCalls.map((call) => ({
+      type: "function_call" as const,
+      call_id: call.call_id,
+      name: call.name,
+      arguments: call.arguments,
+    })),
+  );
 
   for (const call of toolCalls) {
+    logger.info("<flow>: tool call", { userId, tool: call.name, arguments: call.arguments }); // log every tool invocation
     const result = await executeMyTool(call.name, call.arguments); // arguments is a JSON string
     input.push({ type: "function_call_output", call_id: call.call_id, output: result });
   }
@@ -64,7 +86,8 @@ for (let i = 0; i < MAX_TOOL_ROUNDTRIPS; i++) {
 
 Cap the loop (`MAX_TOOL_ROUNDTRIPS`, e.g. 6) to avoid runaway tool-call loops.
 Accumulate `response.usage` across every iteration of the loop, not just the
-final call, when tracking token usage/rate limits.
+final call, when tracking token usage/rate limits. Log every tool call
+(tool name + raw arguments) so tool usage is visible/debuggable in prod logs.
 
 ## Tool executor conventions
 
