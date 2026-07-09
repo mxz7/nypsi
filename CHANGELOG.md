@@ -1,3 +1,7 @@
+# july 2026
+
+- adds tool calls to ai chatbot, allows for much better nypsi knowledge to assist with queries
+
 # june 2026
 
 - lottery updates
