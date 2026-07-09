@@ -6,12 +6,15 @@ import {
 } from "discord.js";
 import { zodTextFormat } from "openai/helpers/zod";
 import { ResponsesModel } from "openai/resources";
+import {
+  ParsedResponseFunctionToolCall,
+  ResponseInput,
+} from "openai/resources/responses/responses";
 import { z } from "zod";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
-import { getCommandData, getCommandKeys } from "../../handlers/commandhandler";
 import { logger } from "../../logger";
 import { isLockedOut } from "../captcha";
 import { getLevel, getPrestige } from "../economy/levelling";
@@ -21,9 +24,13 @@ import { getLastCommand } from "../users/commands";
 import { getLastKnownUsername } from "../users/username";
 import { createProfile, hasProfile } from "../users/utils";
 import openai, { buildPrompt, getDocsRaw } from "./openai";
+import { aiTools, executeAiTool } from "./tools";
 
 const MODEL: ResponsesModel = "gpt-5.4-nano";
 type ChatHistoryInput = { role: "user" | "assistant"; content: string };
+
+// max amount of tool-call round trips per user message, to prevent runaway loops
+const MAX_TOOL_ROUNDTRIPS = 6;
 
 // per-user: max messages per week
 const USER_WEEKLY_LIMIT = 20;
@@ -47,27 +54,6 @@ export type HelpChatPage = {
   userQuery: string;
   aiResponse: string | null;
 };
-
-function getCommandList() {
-  const rows: string[] = [];
-
-  for (const commandName of Array.from(getCommandKeys()).sort((a, b) => a.localeCompare(b))) {
-    const command = getCommandData(commandName);
-    if (!command) continue;
-
-    rows.push(
-      [
-        `command: ${command.name}`,
-        `description: ${command.description}`,
-        `permissions: ${command.permissions?.join(", ") || "none"}`,
-        `docs: ${command.docs || "none"}`,
-        `aliases: ${command.aliases?.join(", ") || "none"}`,
-      ].join(" | "),
-    );
-  }
-
-  return rows.join("\n");
-}
 
 async function getUserContext(userId: string) {
   const context: Record<string, string> = {
@@ -188,7 +174,6 @@ export async function createHelpChat(userId: string, userQuery: string, conversa
   try {
     const prompt = buildPrompt("help_chatbot", {
       documentation: await getDocsRaw(),
-      commands: getCommandList(),
     });
     const userContext = await getUserContext(userId);
     const historyInput: ChatHistoryInput[] = previousMessages.reverse().flatMap((message) => [
@@ -196,18 +181,51 @@ export async function createHelpChat(userId: string, userQuery: string, conversa
       { role: "assistant", content: message.aiResponse as string },
     ]);
 
-    const response = await openai.responses.parse({
-      model: MODEL,
-      input: [
-        { role: "system", content: prompt },
-        { role: "system", content: userContext },
-        ...historyInput,
-        { role: "user", content: userQuery },
-      ],
-      text: { format: zodTextFormat(helpChatResponseFormat, "help_chat_response") },
-    });
+    const input: ResponseInput = [
+      { role: "system", content: prompt },
+      { role: "system", content: userContext },
+      ...historyInput,
+      { role: "user", content: userQuery },
+    ];
 
-    const parsed = response.output_parsed;
+    let inputTokens = 0;
+    let outputTokens = 0;
+    let cachedInputTokens = 0;
+    let parsed: z.infer<typeof helpChatResponseFormat> | null = null;
+
+    for (let i = 0; i < MAX_TOOL_ROUNDTRIPS; i++) {
+      const response = await openai.responses.parse({
+        model: MODEL,
+        input,
+        tools: aiTools,
+        text: { format: zodTextFormat(helpChatResponseFormat, "help_chat_response") },
+      });
+
+      inputTokens += response.usage?.input_tokens ?? 0;
+      outputTokens += response.usage?.output_tokens ?? 0;
+      cachedInputTokens += response.usage?.input_tokens_details?.cached_tokens ?? 0;
+
+      const toolCalls = response.output.filter(
+        (item): item is ParsedResponseFunctionToolCall => item.type === "function_call",
+      );
+
+      if (toolCalls.length === 0) {
+        parsed = response.output_parsed;
+        break;
+      }
+
+      input.push(...toolCalls);
+
+      for (const call of toolCalls) {
+        const result = await executeAiTool(call.name, call.arguments);
+
+        input.push({
+          type: "function_call_output",
+          call_id: call.call_id,
+          output: result,
+        });
+      }
+    }
 
     if (!parsed) {
       throw new Error("empty help ai response");
@@ -215,10 +233,6 @@ export async function createHelpChat(userId: string, userQuery: string, conversa
 
     const disclaimerSuffix = `\n\n*I'm not fully confident in this answer. For more accurate help, join the [official nypsi server](${Constants.NYPSI_SERVER_INVITE_LINK})*`;
     const aiResponse = parsed.confident ? parsed.answer : parsed.answer + disclaimerSuffix;
-
-    const inputTokens = response.usage?.input_tokens ?? 0;
-    const outputTokens = response.usage?.output_tokens ?? 0;
-    const cachedInputTokens = response.usage?.input_tokens_details?.cached_tokens ?? 0;
 
     logger.info("help-chat: query", {
       userId,
