@@ -95,7 +95,7 @@ async function run(
       new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(
         new ButtonBuilder()
           .setEmoji("🔱")
-          .setLabel("live data")
+          .setLabel("leaderboard")
           .setStyle(ButtonStyle.Link)
           .setURL(`https://nypsi.xyz/events/${event.id}?ref=bot-event-command`),
         new ButtonBuilder()
