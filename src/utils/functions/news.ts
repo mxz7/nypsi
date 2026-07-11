@@ -1,8 +1,10 @@
+import { Routes } from "discord-api-types/v10";
 import { ClusterManager } from "discord-hybrid-sharding";
 import { MessageCreateOptions } from "discord.js";
 import redis from "../../init/redis";
 import { NypsiClient } from "../../models/Client";
 import Constants from "../Constants";
+import { getRest } from "../rest";
 import { getUserId, MemberResolvable } from "./member";
 
 type News = {
@@ -45,17 +47,9 @@ export async function sendToAnnouncements(
   client: NypsiClient | ClusterManager,
   payload: MessageCreateOptions,
 ) {
-  const cluster = client instanceof NypsiClient ? client.cluster : client;
+  const rest = getRest(client instanceof NypsiClient ? client : undefined);
 
-  cluster.broadcastEval(
-    async (c, { payload }) => {
-      const channel = c.channels.cache.get(Constants.ANNOUNCEMENTS_CHANNEL_ID);
-
-      if (!channel || !channel.isSendable() || !channel.isTextBased()) return;
-
-      // @ts-expect-error fuck discordjs it's a fucking message payload stupid fucking types
-      await channel.send(payload);
-    },
-    { context: { payload } },
-  );
+  await rest.post(Routes.channelMessages(Constants.ANNOUNCEMENTS_CHANNEL_ID), {
+    body: payload,
+  });
 }
