@@ -195,7 +195,13 @@ async function calcValues(message: Message | (NypsiCommandInteraction & CommandI
   const selected = new Map<string, number>();
 
   for (const item of inventory.entries) {
-    if (item.item === "gold_star" || item.item === "dave" || item.item === "dabloon") continue;
+    if (
+      item.item === "gold_star" ||
+      item.item === "dave" ||
+      item.item === "dabloon" ||
+      item.item === "wilson"
+    )
+      continue;
     selected.set(item.item, inventory.count(item.item));
   }
 

@@ -4673,5 +4673,22 @@
       "threshold": 50
     },
     "in_crates": true
+  },
+  "wilson": {
+    "id": "wilson",
+    "name": "wilson",
+    "plural": "wilsons",
+    "aliases": ["willy"],
+    "article": "a",
+    "emoji": "<:wilson:1525483404345348257>",
+    "longDesc": "meow meow meow meow meow meow meow",
+    "rarity": 6,
+    "role": "cat",
+    "museum": {
+      "category": "cats",
+      "threshold": 1
+    },
+    "sell": 50000000,
+    "in_crates": true
   }
 }

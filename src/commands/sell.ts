@@ -374,14 +374,12 @@ async function run(
 
     if (selected.id === "gold_star") {
       return send({ embeds: [new ErrorEmbed("you can never get rid of gold stars 😈")] });
-    }
-
-    if (selected.id === "dabloon") {
+    } else if (selected.id === "dabloon") {
       return send({ embeds: [new ErrorEmbed("you can't sell dabloons")] });
-    }
-
-    if (selected.id === "dave") {
+    } else if (selected.id === "dave") {
       return send({ embeds: [new ErrorEmbed("you can't sell dave 😡")] });
+    } else if (selected.id === "wilson") {
+      return send({ embeds: [new ErrorEmbed("you can't sell wilson 😡")] });
     }
 
     let msg: Message;

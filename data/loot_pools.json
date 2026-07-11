@@ -232,7 +232,8 @@
       "toe": 50,
       "pumpkin": 10,
       "christmas_tree": 15,
-      "rice_seed": 1
+      "rice_seed": 1,
+      "wilson": 0.01
     }
   },
   "daily_scratch_card": {
