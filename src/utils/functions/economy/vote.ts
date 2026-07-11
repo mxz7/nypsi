@@ -17,9 +17,8 @@ import { createAuraTransaction } from "../users/aura";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { addProgress } from "./achievements";
 import { addBalance } from "./balance";
-import { addBooster } from "./boosters";
 import { addToGuildXP, getGuildByUser } from "./guilds";
-import { addInventoryItem } from "./inventory";
+import { addInventoryItem, getInventory } from "./inventory";
 import { getRawLevel } from "./levelling";
 import { addStat } from "./stats";
 import { getItems } from "./utils";
@@ -109,7 +108,13 @@ export async function giveVoteRewards(
   );
 
   let level = await getRawLevel(user);
-  const guild = await getGuildByUser(user);
+  const [guild, inventory] = await Promise.all([getGuildByUser(user), getInventory(user)]);
+
+  let receivedVoteBooster = false;
+  if (inventory.count("vote_booster") < 1) {
+    addInventoryItem(user, "vote_booster", 1);
+    receivedVoteBooster = true;
+  }
 
   if (level > 100) level = 100;
 
@@ -140,7 +145,6 @@ export async function giveVoteRewards(
       addBalance(user, amount),
       addKarma(user, 10),
       addXp(user, 100),
-      addBooster(user, "vote_booster"),
       redis.del(`${Constants.redis.cache.economy.VOTE}:${user}`),
       redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${user}`),
       addStat(user, "earned-vote", amount),
@@ -185,9 +189,9 @@ export async function giveVoteRewards(
     .setDescription(
       "you have received the following: \n\n" +
         `+ $**${amount.toLocaleString()}**\n` +
-        "+ `3%` multiplier\n" +
         `+ \`${crateAmount}x\` ${getItems()["vote_crate"].emoji} ${pluralize("vote crate", crateAmount)}\n` +
-        `+ \`${crateAmount}x\` ${getItems()["lottery_ticket"].emoji} ${pluralize("lottery ticket", crateAmount)}\n\n` +
+        `+ \`${crateAmount}x\` ${getItems()["lottery_ticket"].emoji} ${pluralize("lottery ticket", crateAmount)}\n` +
+        `${receivedVoteBooster ? `+ \`1x\` ${getItems()["vote_booster"].emoji} vote booster` : "you already have a vote booster"}\n\n` +
         (newCrateAmount && votes.voteStreak > 5
           ? `you will now receive **${crateAmount}** crates each vote thanks to your streak\n\n`
           : "") +

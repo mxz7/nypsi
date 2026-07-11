@@ -2069,7 +2069,7 @@
     "plural": "vote boosters",
     "article": "a",
     "emoji": "✨",
-    "longDesc": "increase your multiplier by 3% from voting",
+    "longDesc": "increase your multiplier by 3% from voting, you can only have one at a time",
     "rarity": 100,
     "role": "booster",
     "stackable": false,
@@ -2079,7 +2079,7 @@
       "time": 3600
     },
     "in_crates": false,
-    "hidden": true
+    "account_locked": true
   },
   "coffee": {
     "id": "coffee",

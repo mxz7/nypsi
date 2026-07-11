@@ -47,7 +47,6 @@ export async function executeItemTool(
         .trim();
 
       const matches = Object.values(getItems())
-        .filter((item) => !item.hidden)
         .filter(
           (item) =>
             item.id.includes(query) ||

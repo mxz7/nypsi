@@ -1,6 +1,7 @@
 # july 2026
 
 - adds tool calls to ai chatbot, allows for much better nypsi knowledge to assist with queries
+- vote booster becomes a useable item, meaning you can decide when to get the benefits
 
 # june 2026
 
