@@ -187,7 +187,7 @@ async function completeAchievement(userId: string, achievementId: string) {
   if (earnedCrates > 0) {
     const earnedTickets = earnedCrates * 25;
     rewardsDesc.push(`+ \`${earnedCrates}x\` 🎁 69420 crate`);
-    rewardsDesc.push(`+ \`${earnedTickets}x\` 🎟️ lottery ticket`);
+    rewardsDesc.push(`+ \`${earnedTickets}x\` 🎫 lottery ticket`);
     await addInventoryItem(userId, "69420_crate", earnedCrates);
     await addInventoryItem(userId, "lottery_ticket", earnedTickets);
   }
