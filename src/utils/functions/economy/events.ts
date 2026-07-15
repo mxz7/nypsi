@@ -296,7 +296,7 @@ async function giveRewards(event: EventData) {
   const top5 = event.contributions.slice(0, 5);
   const top10 = event.contributions.slice(0, 10);
 
-  const achGroup = event.contributions.slice(0, Math.ceil(event.contributions.length * 0.025));
+  const achGroup = event.contributions.slice(0, Math.ceil(event.contributions.length * 0.075));
   const top5p = event.contributions.slice(0, Math.ceil(event.contributions.length * 0.05));
   const top10p = event.contributions.slice(0, Math.ceil(event.contributions.length * 0.1));
   const top50p = event.contributions.slice(0, Math.ceil(event.contributions.length * 0.5));
