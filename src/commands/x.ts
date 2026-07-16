@@ -246,6 +246,7 @@ async function run(
           Captchas: true,
           ChatReactionLeaderboards: true,
           ModerationEvidence: true,
+          punishments: true,
           Viewed: true,
           Views: true,
         },
@@ -289,6 +290,228 @@ async function run(
     if (buffer.byteLength > 7e6) gzipped = await promisify(gzip)(buffer);
 
     return { attachment: gzipped || buffer, name: `${user.id}.json${gzipped ? ".gz" : ""}` };
+  };
+
+  const doPunishments = async (user: User, response?: ButtonInteraction) => {
+    const canEcoBan = await hasAdminPermission(message.member, "ecoban");
+    const canBlacklist = await hasAdminPermission(message.member, "blacklist");
+
+    if (!canEcoBan && !canBlacklist) {
+      const payload = { embeds: [requiredLevelEmbed("ecoban")] };
+
+      if (response) await response.editReply(payload);
+      else await send(payload);
+      return;
+    }
+
+    const getPanel = async () => {
+      const profile = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: { id: true },
+      });
+      const latestPunishments = await prisma.punishment.findMany({
+        where: {
+          userId: user.id,
+          endedAt: null,
+          OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+        },
+        orderBy: { createdAt: "desc" },
+      });
+      const latestEconomyBan = latestPunishments.find((i) => i.type === "ECONOMY_BAN");
+      const latestBlacklist = latestPunishments.find((i) => i.type === "BLACKLIST");
+      const economyBan = latestEconomyBan?.expiresAt;
+      const economyBanned = Boolean(economyBan);
+      const blacklisted = Boolean(latestBlacklist);
+
+      const description = [
+        `user: ${user.username} \`${user.id}\``,
+        "",
+        `economy ban: **${economyBanned ? "active" : "inactive"}**${economyBanned ? ` until <t:${Math.floor(economyBan.getTime() / 1000)}:f>` : ""}`,
+        economyBanned && latestEconomyBan ? `reason: ${latestEconomyBan.reason}` : undefined,
+        `blacklist: **${blacklisted ? "active" : "inactive"}**`,
+        latestBlacklist ? `reason: ${latestBlacklist.reason}` : undefined,
+      ]
+        .filter((line) => line !== undefined)
+        .join("\n");
+
+      const components = [
+        new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+          new ButtonBuilder()
+            .setCustomId("punishment-economy")
+            .setLabel(economyBanned ? "remove economy ban" : "economy ban")
+            .setStyle(economyBanned ? ButtonStyle.Secondary : ButtonStyle.Danger)
+            .setDisabled(!canEcoBan || !profile),
+          new ButtonBuilder()
+            .setCustomId("punishment-blacklist")
+            .setLabel(blacklisted ? "remove blacklist" : "blacklist")
+            .setStyle(blacklisted ? ButtonStyle.Secondary : ButtonStyle.Danger)
+            .setDisabled(!canBlacklist || !profile),
+        ),
+      ];
+
+      return {
+        embeds: [new CustomEmbed(message.member, description).setHeader("punishments")],
+        components,
+        economyBanned,
+        blacklisted,
+      };
+    };
+
+    const initialPanel = await getPanel();
+    const panelMessage = response
+      ? await response.editReply({
+          embeds: initialPanel.embeds,
+          components: initialPanel.components,
+        })
+      : await send({ embeds: initialPanel.embeds, components: initialPanel.components });
+
+    const waitForPunishment = async (): Promise<void> => {
+      const action = await panelMessage
+        .awaitMessageComponent({
+          componentType: ComponentType.Button,
+          filter: (interaction) => interaction.user.id === message.author.id,
+          time: 120000,
+        })
+        .catch(async () => {
+          await panelMessage.edit({ components: [] });
+        });
+
+      if (!action) return;
+
+      if (!["punishment-economy", "punishment-blacklist"].includes(action.customId)) {
+        await action.reply({
+          embeds: [new ErrorEmbed("invalid punishment action")],
+          flags: MessageFlags.Ephemeral,
+        });
+        return waitForPunishment();
+      }
+
+      const panel = await getPanel();
+      const economy = action.customId === "punishment-economy";
+      const active = economy ? panel.economyBanned : panel.blacklisted;
+      const permission = economy ? "ecoban" : "blacklist";
+
+      if (!(await hasAdminPermission(message.member, permission))) {
+        await action.reply({
+          embeds: [requiredLevelEmbed(permission)],
+          flags: MessageFlags.Ephemeral,
+        });
+        return waitForPunishment();
+      }
+
+      const modalId = `punishment-${user.id}-${Date.now()}`;
+      const modal = new ModalBuilder()
+        .setCustomId(modalId)
+        .setTitle(`${active ? "remove" : "issue"} ${economy ? "economy ban" : "blacklist"}`);
+
+      if (economy && !active) {
+        modal.addLabelComponents(
+          new LabelBuilder()
+            .setLabel("duration")
+            .setDescription("for example: 7d, 12h, or 1d6h")
+            .setTextInputComponent(
+              new TextInputBuilder()
+                .setCustomId("duration")
+                .setStyle(TextInputStyle.Short)
+                .setRequired(true)
+                .setMaxLength(30),
+            ),
+        );
+      }
+
+      modal.addLabelComponents(
+        new LabelBuilder()
+          .setLabel(active ? "removal reason" : "reason")
+          .setDescription(
+            active
+              ? "record why this punishment is being removed"
+              : "this will be visible to the user",
+          )
+          .setTextInputComponent(
+            new TextInputBuilder()
+              .setCustomId("reason")
+              .setStyle(TextInputStyle.Paragraph)
+              .setRequired(true)
+              .setMaxLength(1000),
+          ),
+      );
+
+      await action.showModal(modal);
+      const submitted = await action
+        .awaitModalSubmit({
+          filter: (interaction) =>
+            interaction.user.id === message.author.id && interaction.customId === modalId,
+          time: 120000,
+        })
+        .catch(() => {});
+
+      if (!submitted) return waitForPunishment();
+
+      if (!(await hasAdminPermission(message.member, permission))) {
+        await submitted.reply({
+          embeds: [requiredLevelEmbed(permission)],
+          flags: MessageFlags.Ephemeral,
+        });
+        return waitForPunishment();
+      }
+
+      const reason = submitted.fields.getTextInputValue("reason").trim();
+
+      if (!reason) {
+        await submitted.reply({
+          embeds: [new ErrorEmbed("reason cannot be empty")],
+          flags: MessageFlags.Ephemeral,
+        });
+        return waitForPunishment();
+      }
+
+      if (economy) {
+        if (active) {
+          await setEcoBan(user, undefined, {
+            moderatorId: message.author.id,
+            endNote: reason,
+          });
+        } else {
+          const duration = getDuration(submitted.fields.getTextInputValue("duration"));
+          const expiresAt = new Date(Date.now() + duration * 1000);
+
+          if (!duration || !Number.isSafeInteger(duration) || isNaN(expiresAt.getTime())) {
+            await submitted.reply({
+              embeds: [new ErrorEmbed("invalid duration")],
+              flags: MessageFlags.Ephemeral,
+            });
+            return waitForPunishment();
+          }
+
+          await setEcoBan(user, expiresAt, {
+            moderatorId: message.author.id,
+            reason,
+          });
+        }
+      } else {
+        await setUserBlacklist(user, !active, {
+          moderatorId: message.author.id,
+          ...(active ? { endNote: reason } : { reason }),
+        });
+      }
+
+      logger.info(
+        `admin: ${message.author.id} (${message.author.username}) ${active ? "removed" : "issued"} ${economy ? "economy ban" : "blacklist"} for ${user.id}`,
+      );
+      await submitted.reply({
+        embeds: [new CustomEmbed(message.member, "✅ punishment updated")],
+        flags: MessageFlags.Ephemeral,
+      });
+
+      const updatedPanel = await getPanel();
+      await panelMessage.edit({
+        embeds: updatedPanel.embeds,
+        components: updatedPanel.components,
+      });
+      return waitForPunishment();
+    };
+
+    return waitForPunishment();
   };
 
   const showUser = async (id: string) => {
@@ -409,17 +632,14 @@ async function run(
           .setEmoji("🔮")
           .setDisabled(!(await hasAdminPermission(message.member, "set-karma"))),
         new ButtonBuilder()
-          .setCustomId("ecoban")
-          .setLabel("economy ban")
+          .setCustomId("punishments")
+          .setLabel("punishments")
           .setStyle(ButtonStyle.Danger)
           .setEmoji("❌")
-          .setDisabled(!(await hasAdminPermission(message.member, "ecoban"))),
-        new ButtonBuilder()
-          .setCustomId("blacklist")
-          .setLabel("blacklist")
-          .setStyle(ButtonStyle.Danger)
-          .setEmoji("❌")
-          .setDisabled(!(await hasAdminPermission(message.member, "blacklist"))),
+          .setDisabled(
+            !(await hasAdminPermission(message.member, "ecoban")) &&
+              !(await hasAdminPermission(message.member, "blacklist")),
+          ),
         new ButtonBuilder()
           .setCustomId("wipe")
           .setLabel("wipe")
@@ -436,7 +656,6 @@ async function run(
     if (!(await hasProfile(user))) desc += "\n**has no user profile**";
 
     if ((await isUserBlacklisted(user)).blacklisted) {
-      rows[3].components[1].setDisabled(true);
       desc += "\n**currently blacklisted**";
     } else if ((await isEcoBanned(user)).banned) {
       desc += `\n**currently economy banned** - unbanned <t:${Math.floor((await getEcoBanTime(user.id)).getTime() / 1000)}:R>`;
@@ -983,76 +1202,9 @@ async function run(
 
         msg.react("✅");
         return waitForButton();
-      } else if (res.customId === "ecoban") {
-        if (!(await hasAdminPermission(message.member, "ecoban"))) {
-          await res.editReply({
-            embeds: [requiredLevelEmbed("ecoban")],
-          });
-          return waitForButton();
-        }
-
-        if ((await isEcoBanned(user)).banned) {
-          logger.info(
-            `admin: ${message.author.id} (${message.author.username}) removed ecoban for ${user.id} `,
-          );
-          await setEcoBan(user);
-          await res.editReply({ embeds: [new CustomEmbed(message.member, "removed ecoban")] });
-          return;
-        }
-
-        await res.editReply({
-          embeds: [new CustomEmbed(message.member, "ban length format pls")],
-        });
-
-        const msg = await message.channel
-          .awaitMessages({
-            filter: (msg: Message) => msg.author.id === message.author.id,
-            max: 1,
-            time: 30000,
-          })
-          .then((collected) => collected.first())
-          .catch(() => {
-            res.editReply({ embeds: [new CustomEmbed(message.member, "expired")] });
-          });
-
-        if (!msg) return;
-
-        const time = new Date(Date.now() + getDuration(msg.content.toLowerCase()) * 1000);
-
-        if (!time) {
-          await res.editReply({ embeds: [new ErrorEmbed("invalid length")] });
-          return waitForButton();
-        }
-
-        logger.info(
-          `admin: ${message.author.id} (${message.author.username}) set ${user.id} ecoban to ${msg.content}`,
-        );
-        await setEcoBan(user, time);
-        msg.react("✅");
+      } else if (res.customId === "punishments") {
+        await doPunishments(user, res as ButtonInteraction);
         return waitForButton();
-      } else if (res.customId === "blacklist") {
-        if (!(await hasAdminPermission(message.member, "blacklist"))) {
-          await res.editReply({
-            embeds: [requiredLevelEmbed("blacklist")],
-          });
-          return waitForButton();
-        }
-
-        if ((await isUserBlacklisted(user)).blacklisted) {
-          logger.info(
-            `admin: ${message.author.id} (${message.author.username}) removed blacklist for ${user.id} `,
-          );
-          await setUserBlacklist(user, false);
-          await res.editReply({ embeds: [new CustomEmbed(message.member, "user unblacklisted")] });
-          return waitForButton();
-        } else {
-          logger.info(
-            `admin: ${message.author.id} (${message.author.username}) added blacklist for ${user.id} `,
-          );
-          await setUserBlacklist(user, true);
-          await res.editReply({ embeds: [new CustomEmbed(message.member, "user blacklisted")] });
-          return waitForButton();
-        }
       } else if (res.customId === "ac") {
         if (!(await hasAdminPermission(message.member, "view-user-info"))) {
           await res.editReply({
@@ -2768,55 +2920,14 @@ async function run(
     );
   };
 
-  const doEcoban = async (args: string[]) => {
-    args.shift();
-
-    const target = await getUserFromId(args[0]);
-
-    if (!target) {
-      return send({ embeds: [new ErrorEmbed("invalid user")] });
-    }
-
-    if (!args[1]) {
-      if ((await isEcoBanned(target)).banned) {
-        await setEcoBan(target); // unbans user
-        logger.info(
-          `admin: ${message.author.id} (${message.author.username}) set ${target.id} ecoban to unban`,
-        );
-      }
-    } else {
-      const time = new Date(Date.now() + getDuration(args[1].toLowerCase()) * 1000);
-
-      await setEcoBan(target, time);
-
-      logger.info(
-        `admin: ${message.author.id} (${message.author.username}) set ${target.id} ecoban to ${time.toString()}`,
-      );
-    }
-
-    return message.react("✅");
-  };
-
-  const doBlacklist = async (id: string) => {
+  const doPunishmentCommand = async (id: string) => {
     const target = await getUserFromId(id);
 
     if (!target) {
       return send({ embeds: [new ErrorEmbed("invalid user")] });
     }
 
-    if ((await isUserBlacklisted(target)).blacklisted) {
-      await setUserBlacklist(target, false);
-      logger.info(
-        `admin: ${message.author.id} (${message.author.username}) removed blacklist from ${target.id}`,
-      );
-    } else {
-      await setUserBlacklist(target, true);
-      logger.info(
-        `admin: ${message.author.id} (${message.author.username}) blacklisted ${target.id}`,
-      );
-    }
-
-    return message.react("✅");
+    return doPunishments(target);
   };
 
   const addCmd = async () => {
@@ -3207,18 +3318,21 @@ async function run(
     }
 
     return doCmdWatch(args[1], args[2]);
-  } else if (args[0].toLowerCase() == "ecoban") {
-    if (!(await hasAdminPermission(message.member, "ecoban"))) {
+  } else if (args[0].toLowerCase() === "ban") {
+    if (
+      !(await hasAdminPermission(message.member, "ecoban")) &&
+      !(await hasAdminPermission(message.member, "blacklist"))
+    ) {
       return send({
         embeds: [requiredLevelEmbed("ecoban")],
       });
     }
 
     if (args.length == 1) {
-      return send({ embeds: [new ErrorEmbed("$x ecoban <id>")] });
+      return send({ embeds: [new ErrorEmbed("$x ban <id>")] });
     }
 
-    return doEcoban(args);
+    return doPunishmentCommand(args[1]);
   } else if (args[0].toLowerCase() == "blacklist") {
     if (!(await hasAdminPermission(message.member, "blacklist"))) {
       return send({
@@ -3230,7 +3344,7 @@ async function run(
       return send({ embeds: [new ErrorEmbed("$x blacklist <id>")] });
     }
 
-    return doBlacklist(args[1]);
+    return doPunishmentCommand(args[1]);
   } else if (args[0].toLowerCase() === "transfer") {
     if (!(await hasAdminPermission(message.member, "profile-transfer"))) {
       return send({
@@ -3869,8 +3983,8 @@ async function getUsableCommands(member: MemberResolvable) {
       permission: "view-transactions",
     },
     {
-      command: "$x ecoban <id> [time]",
-      description: "ban a user from economy (no time removes ban)",
+      command: "$x ban <id>",
+      description: "manage a user's nypsi punishments",
       permission: "ecoban",
     },
     {
