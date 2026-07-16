@@ -107,6 +107,17 @@ enum TrackingType {
   TOTAL_BALANCE
 }
 
+enum PunishmentType {
+  ECONOMY_BAN
+  BLACKLIST
+}
+
+enum PunishmentEndReason {
+  REVOKED
+  REPLACED
+  SEASON_RESET
+}
+
 enum TransactionType {
   money
   item
@@ -130,7 +141,6 @@ model User {
   tracking          Boolean  @default(true)
   lastfmUsername    String?
   email             String?  @unique
-  blacklisted       Boolean  @default(false)
   adminLevel        Int      @default(0)
   booster           Boolean  @default(false)
 
@@ -167,6 +177,31 @@ model User {
   RoleplayStatTarget       RoleplayStat[]             @relation(name: "target")
   SudokuGame               SudokuGame[]
   lotteryWins              Lottery[]
+  punishments              Punishment[]               @relation(name: "punishedUser")
+  punishmentsModerated     Punishment[]               @relation(name: "punishmentModerator")
+  punishmentsEnded         Punishment[]               @relation(name: "punishmentEndedBy")
+}
+
+model Punishment {
+  id          Int            @id @default(autoincrement())
+  userId      String
+  type        PunishmentType
+  reason      String
+  moderatorId String?
+  createdAt   DateTime       @default(now())
+  expiresAt   DateTime?
+  season      Int?
+
+  endedAt   DateTime?
+  endedById String?
+  endReason PunishmentEndReason?
+  endNote   String?
+
+  user      User  @relation(name: "punishedUser", fields: [userId], references: [id], onDelete: Cascade)
+  moderator User? @relation(name: "punishmentModerator", fields: [moderatorId], references: [id], onDelete: SetNull)
+  endedBy   User? @relation(name: "punishmentEndedBy", fields: [endedById], references: [id], onDelete: SetNull)
+
+  @@index([userId, type])
 }
 
 model ProfileView {
@@ -320,8 +355,6 @@ model Economy {
   dailyStreak      Int @default(0)
   dailyTaskStreak  Int @default(0)
   weeklyTaskStreak Int @default(0)
-
-  banned DateTime?
 
   autosell      String[]
   sellallFilter String[]
