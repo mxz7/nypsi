@@ -107,6 +107,8 @@ export async function startGTFGame(
     }
   }
 
+  const startedAt = replayInteraction ? (msg.editedTimestamp ?? Date.now()) : msg.createdTimestamp;
+
   const collector = msg.createMessageComponentCollector({
     componentType: ComponentType.Button,
     filter: (i) =>
@@ -202,12 +204,13 @@ export async function startGTFGame(
     if (correct) {
       winner = res.user;
       collector.stop("win");
+      const completionTime = res.createdTimestamp - startedAt;
       await res
         .reply({
           embeds: [
             new CustomEmbed(
               undefined,
-              `correct! you won in \`${MStoTime(res.createdTimestamp - msg.createdTimestamp)}\``,
+              `correct! you won in \`${MStoTime(completionTime)}\``,
             ).setColor(Constants.EMBED_SUCCESS_COLOR),
           ],
           flags: MessageFlags.Ephemeral,
@@ -218,7 +221,7 @@ export async function startGTFGame(
         id,
         guesses.filter((i) => i.startsWith(winner.username + ":")),
         true,
-        res.createdTimestamp - msg.createdTimestamp,
+        completionTime,
       );
       if (winner.id === message.author.id) {
         if (secondPlayer)
