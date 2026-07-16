@@ -14,7 +14,11 @@ import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { addBalance, getSellMulti } from "../utils/functions/economy/balance";
-import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
+import {
+  getInventory,
+  getSellFilter,
+  setInventoryItem,
+} from "../utils/functions/economy/inventory";
 import { addStat } from "../utils/functions/economy/stats";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import PageManager from "../utils/functions/page";
@@ -190,12 +194,16 @@ async function run(
 async function calcValues(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
   const items = getItems();
 
-  const inventory = await getInventory(message.member);
+  const [inventory, filter] = await Promise.all([
+    getInventory(message.member),
+    getSellFilter(message.member),
+  ]);
 
   const selected = new Map<string, number>();
 
   for (const item of inventory.entries) {
     if (
+      filter.includes(item.item) ||
       item.item === "gold_star" ||
       item.item === "dave" ||
       item.item === "dabloon" ||
