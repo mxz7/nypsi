@@ -6,7 +6,7 @@ import { BoosterScope, Prisma } from "#generated/prisma";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
-import { Booster } from "../../../types/Economy";
+import { Booster, JeremyData } from "../../../types/Economy";
 import { SteveData } from "../../../types/Workers";
 import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
@@ -128,6 +128,25 @@ async function checkBoosters(member: MemberResolvable, boosters: Map<string, Boo
           }
 
           if (descOther.length > 0) desc += `\n${descOther.join("\n")}\n\n`;
+        } else if (expiredBoosterId === "jeremy") {
+          let earned: JeremyData = JSON.parse(
+            await redis.get(`${Constants.redis.nypsi.JEREMY_EARNED}:${userId}`),
+          );
+
+          if (!earned) earned = { harvested: {} };
+
+          desc += `\`${expired.get(expiredBoosterId)}x\` ${items[expiredBoosterId].emoji} ${
+            items[expiredBoosterId].name
+          }\n`;
+
+          const harvested = Object.entries(earned.harvested)
+            .filter(([, amount]) => amount > 0)
+            .map(
+              ([itemId, amount]) =>
+                `jeremy harvested **${amount.toLocaleString()}x** ${items[itemId].emoji} ${items[itemId].name}`,
+            );
+
+          if (harvested.length > 0) desc += `\n${harvested.join("\n")}\n\n`;
         } else {
           desc += `\`${expired.get(expiredBoosterId)}x\` ${items[expiredBoosterId].emoji} ${
             items[expiredBoosterId].name
@@ -160,6 +179,7 @@ async function checkBoosters(member: MemberResolvable, boosters: Map<string, Boo
     }
 
     if (expired.has("steve")) await redis.del(`${Constants.redis.nypsi.STEVE_EARNED}:${userId}`);
+    if (expired.has("jeremy")) await redis.del(`${Constants.redis.nypsi.JEREMY_EARNED}:${userId}`);
   }
 
   return boosters;

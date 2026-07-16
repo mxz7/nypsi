@@ -68,6 +68,10 @@ export interface Booster {
   userId: string;
 }
 
+export type JeremyData = {
+  harvested: Record<string, number>;
+};
+
 export interface AchievementData {
   id: string;
   name: string;

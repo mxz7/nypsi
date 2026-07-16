@@ -1,3 +1,4 @@
+import { ClusterManager } from "discord-hybrid-sharding";
 import { GuildMember } from "discord.js";
 import { sort } from "fast-sort";
 import { Prisma } from "#generated/prisma";
@@ -147,7 +148,7 @@ export function getClaimable(
   member: MemberResolvable,
   plantId: string,
   claim: true,
-  client: NypsiClient,
+  client?: NypsiClient | ClusterManager,
 ): Promise<{ sold: number; eventProgress?: number; multiplier?: string }>;
 export function getClaimable(
   member: MemberResolvable,
@@ -158,7 +159,7 @@ export async function getClaimable(
   member: MemberResolvable,
   plantId: string,
   claim: boolean,
-  client?: NypsiClient,
+  client?: NypsiClient | ClusterManager,
 ): Promise<
   | { items: number; multiplier?: string }
   | { sold: number; eventProgress?: number; multiplier?: string }
@@ -313,7 +314,9 @@ export async function getClaimable(
     if (claim && items > 0) {
       await addInventoryItem(member, plantData.item, items);
       await addProgress(member, "green_fingers", items);
-      const eventProgress = await addEventProgress(client, member, "farming", items);
+      const eventProgress = client
+        ? await addEventProgress(client, member, "farming", items)
+        : undefined;
 
       return {
         sold: items,

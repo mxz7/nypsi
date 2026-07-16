@@ -2341,6 +2341,30 @@
     },
     "in_crates": true
   },
+  "jeremy": {
+    "id": "jeremy",
+    "name": "jeremy",
+    "article": "a",
+    "plural": "jeremys",
+    "aliases": ["clarkson"],
+    "emoji": "👨🏼‍🌾",
+    "longDesc": "jeremy will automatically water and harvest your farm every hour for 24h\n[HAMMONDDDD](https://www.youtube.com/watch?v=F33ogus-jbo)",
+    "rarity": 3,
+    "sell": 1000000,
+    "role": "booster",
+    "museum": {
+      "category": "boosters",
+      "threshold": 1,
+      "no_overflow": true
+    },
+    "stackable": false,
+    "boosterEffect": {
+      "boosts": ["farm_claim"],
+      "effect": 1,
+      "time": 86400
+    },
+    "in_crates": true
+  },
   "palm_tree": {
     "id": "palm_tree",
     "name": "palm tree necklace",

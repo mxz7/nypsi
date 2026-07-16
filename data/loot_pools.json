@@ -30,6 +30,7 @@
       "gem_shard": 10,
       "clown_tag": 0.1,
       "steve": 50,
+      "jeremy": 25,
       "coffee": 50,
       "cookie": 5,
       "legendary_scratch_card": 15,
@@ -141,7 +142,8 @@
       "clown_tag": 2,
       "bugatti_skin": 15,
       "ferrari_skin": 15,
-      "steve": 75,
+      "steve": 50,
+      "jeremy": 80,
       "coffee": 40,
       "cookie": {
         "weight": 1,
@@ -312,6 +314,7 @@
       "500": 100
     },
     "items": {
+      "steve": 5,
       "calendar": 60,
       "bob": 100,
       "lucky_7": 7,
@@ -389,6 +392,7 @@
       "50": 100
     },
     "items": {
+      "jeremy": 20,
       "super_cursor": 100,
       "oven": 100,
       "bob": 100,
@@ -446,6 +450,7 @@
       "double_xp": 100,
       "super_cursor": 100,
       "steve": 100,
+      "jeremy": 100,
       "nether_portal": 50,
       "highroller": 80,
       "lucky_7": 70,

@@ -1,3 +1,4 @@
+import { ClusterManager } from "discord-hybrid-sharding";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -205,7 +206,7 @@ export async function getCurrentEvent(useCache = true): Promise<EventData> {
 }
 
 export async function addEventProgress(
-  client: NypsiClient,
+  client: NypsiClient | ClusterManager,
   user: MemberResolvable,
   type: string,
   amount: number,
@@ -367,7 +368,7 @@ async function giveRewards(event: EventData) {
   return givenRewards;
 }
 
-async function completeEvent(client: NypsiClient, lastUser: string) {
+async function completeEvent(client: NypsiClient | ClusterManager, lastUser: string) {
   if (completing) {
     return;
   }
@@ -412,12 +413,15 @@ async function completeEvent(client: NypsiClient, lastUser: string) {
 
   content += `<@&${Constants.EVENTS_ROLE_ID}>`;
 
+  const manager = client instanceof ClusterManager ? client : client.cluster;
+  const botUserId =
+    client instanceof ClusterManager
+      ? (await client.broadcastEval((client) => client.user.id))[0]
+      : client.user.id;
   const targetChannel =
-    client.user.id === Constants.BOT_USER_ID
-      ? Constants.ANNOUNCEMENTS_CHANNEL_ID
-      : "819640200699052052"; // dev channel
+    botUserId === Constants.BOT_USER_ID ? Constants.ANNOUNCEMENTS_CHANNEL_ID : "819640200699052052"; // dev channel
 
-  const clusters = await client.cluster.broadcastEval(
+  const clusters = await manager.broadcastEval(
     (client, { channelId }) => {
       const guild = client.channels.cache.get(channelId);
 
@@ -436,7 +440,7 @@ async function completeEvent(client: NypsiClient, lastUser: string) {
     }
   }
 
-  await client.cluster
+  await manager
     .broadcastEval(
       async (client, { content, channelId, components, cluster }) => {
         if ((client as unknown as NypsiClient).cluster.id != cluster) return;

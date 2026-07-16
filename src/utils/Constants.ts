@@ -294,6 +294,7 @@ export default {
       NEWS: "nypsi:news",
       PRESENCE: "nypsi:presence",
       RESTART: "nypsi:restarting",
+      JEREMY_EARNED: "nypsi:jeremyearned",
       STEVE_EARNED: "nypsi:steveearned",
       TAX: "nypsi:tax",
       TOP_COMMANDS_USER: "nypsi:topcommands:user",

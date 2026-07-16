@@ -12,6 +12,7 @@ import { inPlaceSort } from "fast-sort";
 import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { getBoosters } from "../utils/functions/economy/boosters";
 import { EventData, formatEventProgress, getCurrentEvent } from "../utils/functions/economy/events";
 import {
   addFarmUpgrade,
@@ -68,6 +69,7 @@ async function run(
   if (farms.length === 0) return send({ embeds: [new ErrorEmbed("you don't have any farms")] });
 
   if (args.length === 0 || args[0].toLowerCase() === "view") {
+    const boosters = await getBoosters(message.member);
     const options = new StringSelectMenuBuilder().setCustomId("farm");
 
     const plants = new Map<string, number>();
@@ -159,7 +161,8 @@ async function run(
           `${unhealthy > 0 ? `${unhealthy.toLocaleString()} unhealthy\n` : ""}` +
           `${healthy > 0 ? `${healthy.toLocaleString()} healthy\n` : ""}` +
           `${ready > 0 ? `\n\`${ready.toLocaleString()}x\` ${getItems()[getPlantsData()[plantId].item].emoji} ${pluralize(getItems()[getPlantsData()[plantId].item], ready)} ready for harvest` : ""}` +
-          `${multiplier ? `\n**+${multiplier}%** bonus` : ""}`,
+          `${multiplier ? `\n**+${multiplier}%** bonus` : ""}` +
+          `${boosters.has("jeremy") ? `\n\n${getItems()["jeremy"].emoji} jeremy is hard at work` : ""}`,
       );
 
       return embed;

@@ -2,6 +2,7 @@
 
 - adds tool calls to ai chatbot, allows for much better nypsi knowledge to assist with queries
 - vote booster becomes a useable item, meaning you can decide when to get the benefits
+- add jeremy 👨🏼‍🌾 (same as steve but for farm)
 
 # june 2026
 
