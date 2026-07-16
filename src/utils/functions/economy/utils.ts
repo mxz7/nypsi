@@ -2,6 +2,7 @@ import { exec } from "child_process";
 import * as fs from "fs";
 import { ComponentType, GuildMember, Message, MessageFlags, User } from "discord.js";
 import { inPlaceSort } from "fast-sort";
+import { PunishmentType } from "#generated/prisma";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
@@ -31,6 +32,11 @@ import { pluralize } from "../string";
 import { isUserBlacklisted } from "../users/blacklist";
 import { isMarried } from "../users/marriage";
 import { addInlineNotification } from "../users/notifications";
+import {
+  endEconomyPunishmentsForSeasonReset,
+  PunishmentContext,
+  setEconomyPunishment,
+} from "../users/punishments";
 import { getLastKnownAvatar, getLastKnownUsername } from "../users/username";
 import { createProfile, hasProfile } from "../users/utils";
 import { setProgress } from "./achievements";
@@ -384,28 +390,36 @@ export async function isEcoBanned(member: MemberResolvable): Promise<BanCache> {
         return res;
       }
     } else {
-      const query = await prisma.economy.findUnique({
-        where: { userId: accountId },
-        select: { banned: true },
+      const punishment = await prisma.punishment.findFirst({
+        where: {
+          userId: accountId,
+          type: PunishmentType.ECONOMY_BAN,
+          endedAt: null,
+          expiresAt: { gt: new Date() },
+        },
+        select: { expiresAt: true },
+        orderBy: { expiresAt: "desc" },
       });
 
-      if (query && query.banned) {
-        if (query.banned.getTime() > Date.now()) {
-          for (const accountId2 of accounts) {
-            await redis.set(
-              `${Constants.redis.cache.economy.BANNED}:${accountId2}`,
-              JSON.stringify({
-                banned: true,
-                bannedAccount: accountId,
-                expire: query.banned.getTime(),
-              }),
-              "EX",
-              ms("3 hour") / 1000,
-            );
-          }
-
-          return { banned: true, bannedAccount: accountId, expire: query.banned.getTime() };
+      if (punishment?.expiresAt) {
+        for (const accountId2 of accounts) {
+          await redis.set(
+            `${Constants.redis.cache.economy.BANNED}:${accountId2}`,
+            JSON.stringify({
+              banned: true,
+              bannedAccount: accountId,
+              expire: punishment.expiresAt.getTime(),
+            }),
+            "EX",
+            ms("3 hour") / 1000,
+          );
         }
+
+        return {
+          banned: true,
+          bannedAccount: accountId,
+          expire: punishment.expiresAt.getTime(),
+        };
       }
     }
   }
@@ -425,39 +439,29 @@ export async function getEcoBanTime(member: MemberResolvable) {
   const accounts = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, getUserId(member));
 
   for (const accountId of accounts) {
-    const query = await prisma.economy.findUnique({
-      where: { userId: accountId },
-      select: { banned: true },
+    const punishment = await prisma.punishment.findFirst({
+      where: {
+        userId: accountId,
+        type: PunishmentType.ECONOMY_BAN,
+        endedAt: null,
+        expiresAt: { gt: new Date() },
+      },
+      select: { expiresAt: true },
+      orderBy: { expiresAt: "desc" },
     });
 
-    if (query && query.banned && query.banned.getTime() > Date.now()) {
-      return query.banned;
-    }
+    if (punishment?.expiresAt) return punishment.expiresAt;
   }
 }
 
-export async function setEcoBan(member: MemberResolvable, date?: Date) {
+export async function setEcoBan(
+  member: MemberResolvable,
+  date?: Date,
+  context: PunishmentContext = {},
+) {
   const userId = getUserId(member);
 
-  if (!date) {
-    await prisma.economy.update({
-      where: {
-        userId,
-      },
-      data: {
-        banned: new Date(0),
-      },
-    });
-  } else {
-    await prisma.economy.update({
-      where: {
-        userId,
-      },
-      data: {
-        banned: date,
-      },
-    });
-  }
+  await setEconomyPunishment(userId, date, context);
 
   exec(`redis-cli KEYS "*economy:banned*" | xargs redis-cli DEL`);
 }
@@ -516,10 +520,18 @@ export async function reset() {
     },
   });
   logger.info("deleting banned/blacklisted");
-  await prisma.economy.deleteMany({
+  const punishedUserIds = await prisma.punishment.findMany({
     where: {
-      OR: [{ banned: { gt: new Date() } }, { user: { blacklisted: true } }],
+      type: { in: [PunishmentType.ECONOMY_BAN, PunishmentType.BLACKLIST] },
+      endedAt: null,
+      OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
     },
+    select: { userId: true },
+    distinct: ["userId"],
+  });
+  await endEconomyPunishmentsForSeasonReset();
+  await prisma.economy.deleteMany({
+    where: { userId: { in: punishedUserIds.map((i) => i.userId) } },
   });
 
   logger.info("deleting inactive");

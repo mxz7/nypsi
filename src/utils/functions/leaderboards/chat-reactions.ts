@@ -1,6 +1,7 @@
 import dayjs = require("dayjs");
 import { Guild } from "discord.js";
 import { inPlaceSort } from "fast-sort";
+import { PunishmentType } from "#generated/prisma";
 import prisma from "../../../init/database";
 import { NypsiClient } from "../../../models/Client";
 import { getBlacklisted } from "../chatreactions/blacklisted";
@@ -203,12 +204,16 @@ export async function topChatReaction(
       AND: [
         { daily },
         members ? { userId: { in: members } } : undefined,
-        { user: { blacklisted: false } },
         {
-          OR: [
-            { user: { Economy: { banned: null } } },
-            { user: { Economy: { banned: { lt: new Date() } } } },
-          ],
+          user: {
+            punishments: {
+              none: {
+                type: { in: [PunishmentType.ECONOMY_BAN, PunishmentType.BLACKLIST] },
+                endedAt: null,
+                OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+              },
+            },
+          },
         },
       ].filter(Boolean),
     },
