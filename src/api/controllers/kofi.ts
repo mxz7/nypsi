@@ -2,7 +2,7 @@ import { WebhookClient } from "discord.js";
 import { Hono } from "hono";
 import { validator } from "hono/validator";
 import z from "zod";
-import { Prisma } from "#generated/prisma";
+import { Prisma, PunishmentType } from "#generated/prisma";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { CustomEmbed } from "../../models/EmbedBuilders";
@@ -76,7 +76,14 @@ export default kofiController;
 async function handleKofiData(data: z.infer<typeof schema>) {
   const user = await prisma.user.findFirst({
     where: {
-      AND: [{ email: data.email }, { blacklisted: false }],
+      email: data.email,
+      punishments: {
+        none: {
+          type: PunishmentType.BLACKLIST,
+          endedAt: null,
+          OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+        },
+      },
     },
   });
 
