@@ -3,7 +3,7 @@ import { Guild } from "discord.js";
 import prisma from "../../../init/database";
 import { NypsiClient } from "../../../models/Client";
 import { checkLeaderboardPositions } from "../economy/stats";
-import { getItems, isEcoBanned } from "../economy/utils";
+import { getItems } from "../economy/utils";
 import { getAllMembersRest } from "../guilds/members";
 import { getUserId, MemberResolvable } from "../member";
 import PageManager from "../page";
@@ -134,11 +134,6 @@ export async function topMuseumCompletions(guild: Guild, member: MemberResolvabl
   const museumItemCount = Object.values(getItems()).filter((i) => i.museum).length;
 
   for (const user of query) {
-    if ((await isEcoBanned(user.userId)).banned) {
-      userIds.splice(userIds.indexOf(user.userId), 1);
-      continue;
-    }
-
     const currentCount = count;
     let pos = (count + 1).toString();
 
@@ -217,11 +212,6 @@ export async function topMuseumCompletionsGlobal(member?: MemberResolvable, amou
   const museumItemCount = Object.values(getItems()).filter((i) => i.museum).length;
 
   for (const user of query) {
-    if ((await isEcoBanned(user.userId)).banned) {
-      userIds.splice(userIds.indexOf(user.userId), 1);
-      continue;
-    }
-
     let pos = (count + 1).toString();
 
     if (pos == "1") {
