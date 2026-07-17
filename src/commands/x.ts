@@ -87,7 +87,6 @@ import {
   maxPrestige,
   reset,
   setDaily,
-  setEcoBan,
   userExists,
 } from "../utils/functions/economy/utils";
 import {
@@ -120,13 +119,14 @@ import { createSupportRequest } from "../utils/functions/supportrequest";
 import { exportTransactions } from "../utils/functions/transactions";
 import { getAdminLevel, hasAdminPermission, setAdminLevel } from "../utils/functions/users/admin";
 import { getBirthday, getFormattedBirthday, setBirthday } from "../utils/functions/users/birthday";
-import { isUserBlacklisted, setUserBlacklist } from "../utils/functions/users/blacklist";
+import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { getCommandUses, getLastCommand } from "../utils/functions/users/commands";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
 import {
   addInlineNotification,
   addNotificationToQueue,
 } from "../utils/functions/users/notifications";
+import { setBlacklistPunishment, setEconomyPunishment } from "../utils/functions/users/punishments";
 import { addTag, getTags, removeTag } from "../utils/functions/users/tags";
 import { getLastKnownUsername } from "../utils/functions/users/username";
 import { hasProfile } from "../utils/functions/users/utils";
@@ -467,7 +467,7 @@ async function run(
 
       if (economy) {
         if (active) {
-          await setEcoBan(user, undefined, {
+          await setEconomyPunishment(user.id, undefined, {
             moderatorId: message.author.id,
             endNote: reason,
           });
@@ -483,13 +483,13 @@ async function run(
             return waitForPunishment();
           }
 
-          await setEcoBan(user, expiresAt, {
+          await setEconomyPunishment(user.id, expiresAt, {
             moderatorId: message.author.id,
             reason,
           });
         }
       } else {
-        await setUserBlacklist(user, !active, {
+        await setBlacklistPunishment(user.id, !active, {
           moderatorId: message.author.id,
           ...(active ? { endNote: reason } : { reason }),
         });

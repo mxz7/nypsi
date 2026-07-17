@@ -18,7 +18,7 @@ import { CustomEmbed } from "../../models/EmbedBuilders";
 import Constants from "../Constants";
 import { getTimestamp } from "../logger";
 import { MStoTime } from "./date";
-import { isEcoBanned, setEcoBan } from "./economy/utils";
+import { isEcoBanned } from "./economy/utils";
 import { getUserId, MemberResolvable } from "./member";
 import { getAllGroupAccountIds } from "./moderation/alts";
 import {
@@ -26,6 +26,7 @@ import {
   addNotificationToQueue,
   getDmSettings,
 } from "./users/notifications";
+import { setEconomyPunishment } from "./users/punishments";
 import ms = require("ms");
 import dayjs = require("dayjs");
 
@@ -217,7 +218,9 @@ export async function failedCaptcha(member: GuildMember, content: string) {
       50 &&
     !(await isEcoBanned(member.user.id)).banned
   ) {
-    await setEcoBan(member.user.id, dayjs().add(1, "day").toDate());
+    await setEconomyPunishment(member.user.id, dayjs().add(1, "day").toDate(), {
+      reason: "failed too many captchas",
+    });
     await hook.send(
       `[${getTimestamp()}] **${member.user.username.replaceAll("_", "\\_")}** (${
         member.user.id

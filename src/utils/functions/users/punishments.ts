@@ -1,3 +1,4 @@
+import { exec } from "node:child_process";
 import { Prisma, PunishmentEndReason, PunishmentType } from "#generated/prisma";
 import prisma from "../../../init/database";
 import Constants from "../../Constants";
@@ -57,6 +58,8 @@ export async function setEconomyPunishment(
       });
     }
   });
+
+  exec(`redis-cli KEYS "*economy:banned*" | xargs redis-cli DEL`);
 }
 
 export async function setBlacklistPunishment(
@@ -96,6 +99,8 @@ export async function setBlacklistPunishment(
       });
     }
   });
+
+  exec(`redis-cli KEYS "*blacklist*" | xargs redis-cli DEL`);
 }
 
 export async function endEconomyPunishmentsForSeasonReset() {

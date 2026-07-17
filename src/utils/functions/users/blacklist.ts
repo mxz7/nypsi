@@ -1,12 +1,10 @@
 import ms = require("ms");
-import { exec } from "node:child_process";
 import { PunishmentType } from "#generated/prisma";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
 import { getAllGroupAccountIds } from "../moderation/alts";
-import { PunishmentContext, setBlacklistPunishment } from "./punishments";
 
 type Blacklisted = {
   blacklisted: boolean;
@@ -72,14 +70,4 @@ export async function isUserBlacklisted(member: MemberResolvable): Promise<Black
     );
 
   return { blacklisted: false };
-}
-
-export async function setUserBlacklist(
-  member: MemberResolvable,
-  value: boolean,
-  context: PunishmentContext = {},
-) {
-  await setBlacklistPunishment(getUserId(member), value, context);
-
-  exec(`redis-cli KEYS "*blacklist*" | xargs redis-cli DEL`);
 }

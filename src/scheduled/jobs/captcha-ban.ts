@@ -4,8 +4,9 @@ import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { Job } from "../../types/Jobs";
 import Constants from "../../utils/Constants";
-import { isEcoBanned, setEcoBan } from "../../utils/functions/economy/utils";
+import { isEcoBanned } from "../../utils/functions/economy/utils";
 import { addNotificationToQueue } from "../../utils/functions/users/notifications";
+import { setEconomyPunishment } from "../../utils/functions/users/punishments";
 import { getLastKnownUsername } from "../../utils/functions/users/username";
 import { getTimestamp } from "../../utils/logger";
 
@@ -38,7 +39,9 @@ export default {
       });
 
       if (!(await isEcoBanned(captcha.userId)).banned) {
-        setEcoBan(captcha.userId, dayjs().add(7, "day").toDate());
+        await setEconomyPunishment(captcha.userId, dayjs().add(7, "day").toDate(), {
+          reason: "ignored captcha for too long",
+        });
         addNotificationToQueue({
           memberId: captcha.userId,
           payload: {

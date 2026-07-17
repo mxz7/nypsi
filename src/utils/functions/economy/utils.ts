@@ -32,11 +32,7 @@ import { pluralize } from "../string";
 import { isUserBlacklisted } from "../users/blacklist";
 import { isMarried } from "../users/marriage";
 import { addInlineNotification } from "../users/notifications";
-import {
-  endEconomyPunishmentsForSeasonReset,
-  PunishmentContext,
-  setEconomyPunishment,
-} from "../users/punishments";
+import { endEconomyPunishmentsForSeasonReset } from "../users/punishments";
 import { getLastKnownAvatar, getLastKnownUsername } from "../users/username";
 import { createProfile, hasProfile } from "../users/utils";
 import { setProgress } from "./achievements";
@@ -452,18 +448,6 @@ export async function getEcoBanTime(member: MemberResolvable) {
 
     if (punishment?.expiresAt) return punishment.expiresAt;
   }
-}
-
-export async function setEcoBan(
-  member: MemberResolvable,
-  date?: Date,
-  context: PunishmentContext = {},
-) {
-  const userId = getUserId(member);
-
-  await setEconomyPunishment(userId, date, context);
-
-  exec(`redis-cli KEYS "*economy:banned*" | xargs redis-cli DEL`);
 }
 
 export async function reset() {

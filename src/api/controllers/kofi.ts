@@ -10,7 +10,7 @@ import { NotificationPayload } from "../../types/Notification";
 import Constants from "../../utils/Constants";
 import { addProgress } from "../../utils/functions/economy/achievements";
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
-import { getItems, setEcoBan } from "../../utils/functions/economy/utils";
+import { getItems } from "../../utils/functions/economy/utils";
 import {
   addMember,
   getTier,
@@ -26,6 +26,7 @@ import {
   getDmSettings,
   getPreferences,
 } from "../../utils/functions/users/notifications";
+import { setEconomyPunishment } from "../../utils/functions/users/punishments";
 import { logger } from "../../utils/logger";
 
 const kofiController = new Hono();
@@ -160,7 +161,7 @@ async function handleKofiData(data: z.infer<typeof schema>) {
         });
 
         if (item.name === "unecoban") {
-          await setEcoBan(user.id);
+          await setEconomyPunishment(user.id);
           logger.info(`unbanned ${user.id} (${user.email})`, item);
 
           if ((await getDmSettings(user.id)).premium) {
