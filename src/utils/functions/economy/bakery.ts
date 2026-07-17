@@ -11,6 +11,7 @@ import { getTier, isPremium } from "../premium/premium";
 import { percentChance } from "../random";
 import { pluralize } from "../string";
 import { addProgress } from "./achievements";
+import { applyPassiveBakePenalty } from "./bakery-range";
 import { addEventProgress, formatEventProgress, getCurrentEvent } from "./events";
 import { getGuildName, getGuildUpgradesByUser } from "./guilds";
 import { addInventoryItem, getInventory } from "./inventory";
@@ -174,13 +175,7 @@ export async function runBakery(member: GuildMember) {
   }
 
   if (await isPassive(member)) {
-    click[1] -= 2;
-
-    if (click[1] > 10) click[1] -= 5;
-    if (click[1] > 30) click[1] -= 5;
-    if (click[1] > 50) click[1] -= 5;
-    if (click[1] > 100) click[1] *= 0.75;
-    if (click[1] > 100) click[1] -= 10;
+    [click[0], click[1]] = applyPassiveBakePenalty(click[0], click[1]);
   }
 
   if (passive > 0) {
