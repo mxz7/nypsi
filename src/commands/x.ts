@@ -350,7 +350,11 @@ async function run(
       ];
 
       return {
-        embeds: [new CustomEmbed(message.member, description).setHeader("punishments")],
+        embeds: [
+          new CustomEmbed(message.member, description)
+            .setHeader("punishments")
+            .setURL(`https://nypsi.xyz/users/${user.id}?tab=punishments`),
+        ],
         components,
         economyBanned,
         blacklisted,
