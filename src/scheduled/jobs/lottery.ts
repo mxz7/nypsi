@@ -1,6 +1,13 @@
 import { randomInt } from "crypto";
 import { flavors } from "@catppuccin/palette";
-import { ColorResolvable, WebhookClient } from "discord.js";
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  ColorResolvable,
+  MessageActionRowComponentBuilder,
+  WebhookClient,
+} from "discord.js";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { CustomEmbed } from "../../models/EmbedBuilders";
@@ -37,6 +44,7 @@ export default {
 
     await redis.set("nypsi:lottery", "boobies", "EX", 3600);
     const hook = new WebhookClient({ url: process.env.LOTTERY_HOOK });
+    let winnerMessageUrl: string;
 
     const ticketRows = await prisma.inventory.findMany({
       where: { item: { in: drawTicketItems } },
@@ -130,7 +138,8 @@ export default {
       embed.setFooter({ text: `a total of ${total.toLocaleString()} tickets were bought` });
       embed.setColor(flavors.latte.colors.base.hex as ColorResolvable);
 
-      await hook.send({ embeds: [embed] });
+      const winnerMessage = await hook.send({ embeds: [embed] });
+      winnerMessageUrl = `https://discord.com/channels/${Constants.NYPSI_SERVER_ID}/${winnerMessage.channel_id}/${winnerMessage.id}`;
 
       hook.destroy();
 
@@ -190,6 +199,15 @@ export default {
         await addInventoryItem(user.userId, "lottery_ticket", amount);
 
         if (user.user.DMSettings.other) {
+          const components = winnerMessageUrl
+            ? new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+                new ButtonBuilder()
+                  .setLabel("view previous draw")
+                  .setStyle(ButtonStyle.Link)
+                  .setURL(winnerMessageUrl),
+              )
+            : undefined;
+
           await addNotificationToQueue({
             memberId: user.userId,
             payload: {
@@ -197,6 +215,7 @@ export default {
                 user.userId,
                 `you have auto bought **${amount}** lottery tickets`,
               ),
+              components,
             },
           });
         }
