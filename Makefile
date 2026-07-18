@@ -1,4 +1,4 @@
-.PHONY: build watch run dev clean check
+.PHONY: build watch run dev clean check checks
 
 build:
 	npx tsc --incremental
@@ -28,7 +28,9 @@ dev: build
 	$(MAKE) run-worker-mentions & \
 	$(MAKE) run-worker-dms
 
-check:
+checks:
 	pnpm lint
 	pnpm format:check
+
+check: checks
 	$(MAKE) build

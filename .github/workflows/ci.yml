@@ -29,8 +29,8 @@ jobs:
           path: dist/
           key: build-${{ runner.os }}-${{ github.sha }}
 
-  lint:
-    name: linting
+  checks:
+    name: checks
     runs-on: ubuntu-latest
     steps:
       - name: checkout repository
@@ -39,21 +39,8 @@ jobs:
       - name: setup
         uses: ./.github/actions/setup
 
-      - name: linting
-        run: pnpm run lint
-
-  formatting:
-    name: formatting
-    runs-on: ubuntu-latest
-    steps:
-      - name: checkout repository
-        uses: actions/checkout@v7
-
-      - name: setup
-        uses: ./.github/actions/setup
-
-      - name: check formatting
-        run: pnpm run format:check
+      - name: run checks
+        run: make checks
 
   test:
     name: tests
@@ -77,7 +64,7 @@ jobs:
 
   deploy:
     if: github.ref == 'refs/heads/main'
-    needs: [lint, test]
+    needs: [checks, test]
     concurrency: deploy
     runs-on: ubuntu-latest
     environment: production
