@@ -346,6 +346,10 @@ async function run(
             .setLabel(blacklisted ? "remove blacklist" : "blacklist")
             .setStyle(blacklisted ? ButtonStyle.Secondary : ButtonStyle.Danger)
             .setDisabled(!canBlacklist || !profile),
+          new ButtonBuilder()
+            .setLabel("view punishments")
+            .setStyle(ButtonStyle.Link)
+            .setURL(`https://nypsi.xyz/users/${user.id}?tab=punishments`),
         ),
       ];
 
