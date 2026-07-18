@@ -19,6 +19,8 @@ make check         # lint + format:check + build
 
 Prisma client generates to `src/generated/prisma/` (not the default location). Import via the path alias `#generated/prisma`.
 
+Use `pnpm install` for adding packages, optionally specifying `-D`, you will very rarely have to add any other fancy options
+
 ## Architecture
 
 | Directory              | Role                                                            |
