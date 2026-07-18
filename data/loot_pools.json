@@ -235,7 +235,8 @@
       "pumpkin": 10,
       "christmas_tree": 15,
       "rice_seed": 1,
-      "wilson": 0.01
+      "wilson": 0.01,
+      "lily": 0.075
     }
   },
   "daily_scratch_card": {

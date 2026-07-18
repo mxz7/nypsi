@@ -4187,6 +4187,22 @@
     "sell": 100000,
     "in_crates": true
   },
+  "lily": {
+    "id": "lily",
+    "name": "lily",
+    "plural": "lilies",
+    "article": "a",
+    "emoji": "<:lily:1528002024866844702>",
+    "longDesc": "a lovely lily",
+    "rarity": 5,
+    "role": "flower",
+    "museum": {
+      "category": "flowers",
+      "threshold": 1
+    },
+    "sell": 100000,
+    "in_crates": true
+  },
   "mango": {
     "id": "mango",
     "name": "mango",
