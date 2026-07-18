@@ -4,6 +4,7 @@
 - vote booster becomes a useable item, meaning you can decide when to get the benefits
 - add jeremy 👨🏼‍🌾 (same as steve but for farm)
 - new punishment system allowing better history tracking
+- add lily flower
 
 # june 2026
 
