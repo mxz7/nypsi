@@ -367,7 +367,7 @@ async function run(
 
         const role = await guildMember.guild.roles.create({
           name: "custom",
-          color: colour,
+          colors: { primaryColor: colour },
           position: separatorRole.position + 1,
           permissions: [],
           unicodeEmoji: tagEmoji && isTagUnicode ? tagEmoji : undefined,
@@ -380,7 +380,7 @@ async function run(
 
         if (role.hexColor !== colour) {
           await sleep(250);
-          await guildMember.guild.roles.edit(role, { color: colour });
+          await guildMember.guild.roles.edit(role, { colors: { primaryColor: colour } });
         }
       }
     }
@@ -528,7 +528,7 @@ async function run(
 
       if (existingRole) {
         if (color !== "default") {
-          await existingRole.edit({ color: color as ColorResolvable });
+          await existingRole.edit({ colors: { primaryColor: color as ColorResolvable } });
 
           if (tagEmoji) {
             if (isTagUnicode) {
@@ -547,7 +547,9 @@ async function run(
 
         const newRole = await message.guild.roles.create({
           name: "custom",
-          color: color as ColorResolvable,
+          colors: {
+            primaryColor: color as ColorResolvable,
+          },
           position: seperatorRole.position + 1,
           permissions: [],
           unicodeEmoji: tagEmoji && isTagUnicode ? tagEmoji : undefined,
