@@ -1146,7 +1146,6 @@ december
 decent
 decide
 decision
-decision-making
 decisive
 deck
 declaration
@@ -1911,7 +1910,6 @@ fry
 fuel
 fulfill
 full
-full-time
 fully
 fun
 function
@@ -2124,7 +2122,6 @@ hidden
 hide
 hierarchy
 high
-high-profile
 highlight
 highly
 highway
@@ -2508,7 +2505,6 @@ language
 lap
 laptop
 large
-large-scale
 largely
 laser
 last
@@ -2591,7 +2587,6 @@ limit
 limitation
 limited
 line
-line-up
 linear
 linger
 link
@@ -2627,9 +2622,6 @@ logical
 logo
 lonely
 long
-long-standing
-long-term
-long-time
 look
 loom
 loop
@@ -2675,7 +2667,6 @@ maintenance
 major
 majority
 make
-make-up
 making
 male
 mall
@@ -2953,7 +2944,6 @@ noisy
 nominate
 nomination
 nominee
-non-profit
 none
 nonetheless
 nonsense
@@ -2990,7 +2980,6 @@ nursery
 nursing
 nut
 nutrition
-o'clock
 obesity
 obey
 object
@@ -3035,7 +3024,6 @@ oh
 oil
 ok
 old
-old-fashioned
 on
 once
 one
@@ -3153,7 +3141,6 @@ parking
 parliament
 parliamentary
 part
-part-time
 partial
 partially
 participant
@@ -3322,7 +3309,6 @@ possibility
 possible
 possibly
 post
-post-war
 poster
 postpone
 pot
@@ -3931,7 +3917,6 @@ serve
 service
 session
 set
-set-up
 setting
 settle
 settlement
@@ -3982,7 +3967,6 @@ shop
 shopping
 shore
 short
-short-term
 shortage
 shortly
 shot
@@ -4077,7 +4061,6 @@ snake
 snap
 snow
 so
-so-called
 soak
 soap
 soar
@@ -4376,7 +4359,6 @@ syndrome
 synthesis
 system
 systematic
-t-shirt
 table
 tablet
 tackle
@@ -4490,7 +4472,6 @@ thorough
 thoroughly
 though
 thought
-thought-provoking
 thoughtful
 thousand
 thread
@@ -4842,7 +4823,6 @@ weird
 welcome
 welfare
 well
-well-being
 west
 western
 wet
