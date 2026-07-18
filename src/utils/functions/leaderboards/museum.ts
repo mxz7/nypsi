@@ -108,7 +108,6 @@ export async function topMuseumCompletions(guild: Guild, member: MemberResolvabl
     {
       userId: string;
       totalCompleted: number;
-      banned: Date;
       lastKnownUsername: string;
       usernameUpdatedAt: Date;
     }[]
@@ -116,16 +115,13 @@ export async function topMuseumCompletions(guild: Guild, member: MemberResolvabl
       SELECT
         m."userId",
         COUNT(m."completedAt") AS "totalCompleted",
-        e."banned",
         u."lastKnownUsername",
         u."usernameUpdatedAt"
       FROM "Museum" m
-      JOIN "Economy" e ON m."userId" = e."userId"
-      JOIN "User" u ON e."userId" = u."id"
+      JOIN "User" u ON m."userId" = u."id"
       WHERE m."completedAt" IS NOT NULL
         AND m."userId" = ANY(${members})
-        AND u."blacklisted" = false
-      GROUP BY m."userId", e."banned", u."lastKnownUsername", u."usernameUpdatedAt"
+      GROUP BY m."userId", u."lastKnownUsername", u."usernameUpdatedAt"
       ORDER BY "totalCompleted" DESC, "lastKnownUsername" ASC;
     `;
 
@@ -138,11 +134,6 @@ export async function topMuseumCompletions(guild: Guild, member: MemberResolvabl
   const museumItemCount = Object.values(getItems()).filter((i) => i.museum).length;
 
   for (const user of query) {
-    if (user.banned && date.isBefore(user.banned)) {
-      userIds.splice(userIds.indexOf(user.userId), 1);
-      continue;
-    }
-
     const currentCount = count;
     let pos = (count + 1).toString();
 
@@ -197,20 +188,17 @@ export async function topMuseumCompletionsGlobal(member?: MemberResolvable, amou
     {
       userId: string;
       totalCompleted: number;
-      banned: Date;
       lastKnownUsername: string;
     }[]
   >`
     SELECT
       m."userId",
       COUNT(m."completedAt") AS "totalCompleted",
-      e."banned",
       u."lastKnownUsername"
     FROM "Museum" m
-    JOIN "Economy" e ON m."userId" = e."userId"
-    JOIN "User" u ON e."userId" = u."id"
+    JOIN "User" u ON m."userId" = u."id"
     WHERE m."completedAt" IS NOT NULL
-    GROUP BY m."userId", e."banned", u."lastKnownUsername"
+    GROUP BY m."userId", u."lastKnownUsername"
     ORDER BY "totalCompleted" DESC, "lastKnownUsername" ASC
     LIMIT ${amount};
     `;
@@ -224,11 +212,6 @@ export async function topMuseumCompletionsGlobal(member?: MemberResolvable, amou
   const museumItemCount = Object.values(getItems()).filter((i) => i.museum).length;
 
   for (const user of query) {
-    if (user.banned && dayjs().isBefore(user.banned)) {
-      userIds.splice(userIds.indexOf(user.userId), 1);
-      continue;
-    }
-
     let pos = (count + 1).toString();
 
     if (pos == "1") {

@@ -1,5 +1,5 @@
 import ms = require("ms");
-import { exec } from "node:child_process";
+import { PunishmentType } from "#generated/prisma";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
@@ -33,12 +33,17 @@ export async function isUserBlacklisted(member: MemberResolvable): Promise<Black
         return res;
       }
     } else {
-      const query = await prisma.user.findUnique({
-        where: { id: accountId },
-        select: { blacklisted: true },
+      const punishment = await prisma.punishment.findFirst({
+        where: {
+          userId: accountId,
+          type: PunishmentType.BLACKLIST,
+          endedAt: null,
+          OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+        },
+        select: { id: true },
       });
 
-      if (query && query.blacklisted) {
+      if (punishment) {
         for (const accountId2 of accounts) {
           await redis.set(
             `${Constants.redis.cache.user.BLACKLIST}:${accountId2}`,
@@ -65,17 +70,4 @@ export async function isUserBlacklisted(member: MemberResolvable): Promise<Black
     );
 
   return { blacklisted: false };
-}
-
-export async function setUserBlacklist(member: MemberResolvable, value: boolean) {
-  await prisma.user.update({
-    where: {
-      id: getUserId(member),
-    },
-    data: {
-      blacklisted: value,
-    },
-  });
-
-  exec(`redis-cli KEYS "*blacklist*" | xargs redis-cli DEL`);
 }

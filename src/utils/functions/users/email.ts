@@ -5,7 +5,7 @@ import { NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { addInventoryItem } from "../economy/inventory";
-import { getItems, setEcoBan } from "../economy/utils";
+import { getItems } from "../economy/utils";
 import { getUserId, MemberResolvable } from "../member";
 import {
   addMember,
@@ -17,6 +17,7 @@ import {
   setTier,
 } from "../premium/premium";
 import { addNotificationToQueue, getDmSettings } from "./notifications";
+import { setEconomyPunishment } from "./punishments";
 
 export async function getEmail(member: MemberResolvable) {
   const query = await prisma.user.findUnique({
@@ -103,7 +104,7 @@ export async function checkPurchases(member: MemberResolvable) {
         }
       } else {
         if (item.item === "unecoban") {
-          await setEcoBan(userId);
+          await setEconomyPunishment(userId);
 
           if ((await getDmSettings(userId)).premium) {
             const payload: NotificationPayload = {

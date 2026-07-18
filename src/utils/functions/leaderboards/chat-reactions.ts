@@ -3,7 +3,6 @@ import { Guild } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import { NypsiClient } from "../../../models/Client";
-import { getBlacklisted } from "../chatreactions/blacklisted";
 import { checkLeaderboardPositions } from "../economy/stats";
 import { getAllMembersRest, SlimMember } from "../guilds/members";
 import { getUserId, MemberResolvable } from "../member";
@@ -48,12 +47,8 @@ export async function getServerLeaderboard(guild: Guild): Promise<Map<string, st
     },
   });
 
-  const blacklisted = await getBlacklisted(guild);
-
   for (const user of query) {
     let overall = false;
-
-    if (blacklisted.includes(user.userId)) continue;
 
     if (members.get(user.userId) && user.wins != 0) {
       usersWins.push(user.userId);
@@ -200,17 +195,7 @@ export async function topChatReaction(
 
   const query = await prisma.chatReactionLeaderboards.findMany({
     where: {
-      AND: [
-        { daily },
-        members ? { userId: { in: members } } : undefined,
-        { user: { blacklisted: false } },
-        {
-          OR: [
-            { user: { Economy: { banned: null } } },
-            { user: { Economy: { banned: { lt: new Date() } } } },
-          ],
-        },
-      ].filter(Boolean),
+      AND: [{ daily }, members ? { userId: { in: members } } : undefined].filter(Boolean),
     },
     select: {
       userId: true,
