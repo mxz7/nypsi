@@ -41,6 +41,7 @@ import { formatEventProgress, getCurrentEvent } from "./events";
 import { addToGuildXP, getGuildByUser, getGuildName } from "./guilds";
 import { addInventoryItem } from "./inventory";
 import { getDefaultLootPool } from "./loot_pools";
+import { formatNumber, formatNumberPretty } from "./number";
 import { addStat } from "./stats";
 import { addTaskProgress } from "./tasks";
 import { addXp } from "./xp";
@@ -321,37 +322,7 @@ export async function formatBet(
   return bet;
 }
 
-export function formatNumber(number: string | number) {
-  number = number.toString().toLowerCase().replaceAll(",", "");
-  if (number.includes("b")) {
-    number = parseFloat(number.toString()) * 1000000000;
-  } else if (number.includes("m")) {
-    number = parseFloat(number.toString()) * 1000000;
-  } else if (number.includes("k")) {
-    number = parseFloat(number.toString()) * 1000;
-  }
-
-  if (isNaN(parseFloat(number.toString()))) return null;
-
-  return Math.floor(parseFloat(number.toString()));
-}
-
-export function formatNumberPretty(number: number): string {
-  let out: string;
-  if (number >= 1e12) {
-    out = (number / 1e12).toFixed(1) + "t";
-  } else if (number >= 1e9) {
-    out = (number / 1e9).toFixed(1) + "b";
-  } else if (number >= 1e6) {
-    out = (number / 1e6).toFixed(1) + "m";
-  } else if (number >= 1e3) {
-    out = (number / 1e3).toFixed(1) + "k";
-  } else {
-    return number.toString();
-  }
-
-  return out.replace(".0", "");
-}
+export { formatNumber, formatNumberPretty };
 
 export async function isEcoBanned(member: MemberResolvable): Promise<BanCache> {
   const userId = getUserId(member);

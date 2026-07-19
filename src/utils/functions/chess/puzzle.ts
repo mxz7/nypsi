@@ -3,6 +3,9 @@ import prisma from "../../../init/database";
 import { logger } from "../../logger";
 import { addProgress } from "../economy/achievements";
 import { addTaskProgress } from "../economy/tasks";
+import { normalizeToUci } from "./moves";
+
+export { normalizeToUci };
 
 export const CHESS_PUZZLE_DIFFICULTIES = [
   "beginner",
@@ -148,39 +151,6 @@ export function buildChessFromPuzzle(puzzle: ChessPuzzle): Chess {
   }
 
   return chess;
-}
-
-/**
- * Accepts either UCI (e.g. "e2e4", "e7e8q") or SAN (e.g. "Nf3", "e4").
- * Applies the move to a clone of `chess`, returns the normalized UCI string
- * (from+to[promotion]) on success, or null if the move is illegal/invalid.
- * The passed `chess` instance is NOT mutated.
- */
-export function normalizeToUci(input: string, chess: Chess): string | null {
-  const clone = new Chess(chess.fen());
-  input = input.trim();
-
-  // Try UCI first (4–5 chars: from + to + optional promotion)
-  const uciMatch = input.match(/^([a-h][1-8])([a-h][1-8])([qrbn]?)$/i);
-  if (uciMatch) {
-    const [, from, to, promotion] = uciMatch;
-    try {
-      const move = clone.move({ from, to, promotion: promotion || undefined });
-      if (move) return move.from + move.to + (move.promotion ?? "");
-    } catch {
-      // fall through to SAN
-    }
-  }
-
-  // Try SAN
-  try {
-    const move = clone.move(input);
-    if (move) return move.from + move.to + (move.promotion ?? "");
-  } catch {
-    // invalid
-  }
-
-  return null;
 }
 
 export async function getChessStats(userId: string) {

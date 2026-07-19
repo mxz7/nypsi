@@ -94,7 +94,10 @@ function toPieceCode(type: string, color: string): string {
 }
 
 /** Convert a board square (e.g. "e4") to canvas pixel coordinates (top-left of square) */
-function squareToXY(square: string, perspective: "white" | "black"): { x: number; y: number } {
+export function squareToXY(
+  square: string,
+  perspective: "white" | "black",
+): { x: number; y: number } {
   const file = square.charCodeAt(0) - "a".charCodeAt(0); // 0-7
   const rank = parseInt(square[1]) - 1; // 0-7
 

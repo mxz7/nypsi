@@ -1,7 +1,7 @@
 import { Worker, isMainThread, parentPort, workerData } from "worker_threads";
 import { inPlaceSort } from "fast-sort";
 import { compareTwoStrings } from "string-similarity";
-import { SlimMember } from "../guilds/members";
+import type { SlimMember } from "../guilds/members";
 
 export default function chooseMember(
   members: SlimMember[],
