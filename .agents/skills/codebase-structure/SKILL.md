@@ -245,13 +245,7 @@ if (contentType.split("/")[1] === "png") {
 
 ## sudoku-gen Package
 
-**Status:** Installed (`"sudoku-gen": "^1.0.2"` in [package.json](../../../package.json#L56)) but **not currently used in source code**.
-
-No imports of `sudoku-gen` found in `src/` directory. Likely:
-
-- Planned for future feature (sudoku game command)
-- Left from removed feature
-- Available for custom scripting
+**Status:** Used by [src/utils/functions/sudoku/game.ts](../../../src/utils/functions/sudoku/game.ts) to generate puzzles in `createSudokuGame()`.
 
 ---
 
