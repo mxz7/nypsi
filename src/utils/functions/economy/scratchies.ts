@@ -221,33 +221,17 @@ export default class ScratchCard {
       let eventProgress: Awaited<ReturnType<typeof addEventProgress>>;
       let eventData: EventData;
 
-      if (Object.hasOwn(prize, "item")) {
-        switch (prize.item) {
-          case "pumpkin":
-            eventProgress = await addEventProgress(
-              this.member.client as NypsiClient,
-              this.member,
-              "halloween",
-              1,
-            );
-            break;
-          case "christmas_tree":
-            eventProgress = await addEventProgress(
-              this.member.client as NypsiClient,
-              this.member,
-              "christmas",
-              1,
-            );
-            break;
-          default:
-            eventProgress = await addEventProgress(
-              this.member.client as NypsiClient,
-              this.member,
-              "gamble",
-              1,
-            );
-        }
-      }
+      let eventType = "gamble";
+
+      if (prize.item === "pumpkin") eventType = "halloween";
+      if (prize.item === "christmas_tree") eventType = "christmas";
+
+      eventProgress = await addEventProgress(
+        this.member.client as NypsiClient,
+        this.member,
+        eventType,
+        1,
+      );
 
       if (eventProgress) {
         eventData = await getCurrentEvent();
