@@ -301,5 +301,11 @@
     "name": "year 5",
     "description": "be in the official nypsi server for over 5 years",
     "emoji": "🪷"
+  },
+  "year6": {
+    "id": "year6",
+    "name": "year 6",
+    "description": "be in the official nypsi server for over 6 years",
+    "emoji": "🌺"
   }
 }
