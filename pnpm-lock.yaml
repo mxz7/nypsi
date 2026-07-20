@@ -18,8 +18,8 @@ importers:
         specifier: 2.6.2
         version: 2.6.2
       '@hono/node-server':
-        specifier: ^2.0.9
-        version: 2.0.9(hono@4.12.30)
+        specifier: ^2.0.10
+        version: 2.0.10(hono@4.12.30)
       '@prisma/adapter-pg':
         specifier: ^7.8.0
         version: 7.8.0
@@ -39,8 +39,8 @@ importers:
         specifier: 4.1.0
         version: 4.1.0
       bullmq:
-        specifier: ^5.80.4
-        version: 5.80.4
+        specifier: ^5.80.7
+        version: 5.80.7
       chalk:
         specifier: 4.1.2
         version: 4.1.2
@@ -685,8 +685,8 @@ packages:
     peerDependencies:
       hono: ^4
 
-  '@hono/node-server@2.0.9':
-    resolution: {integrity: sha512-cNMw3ziCdDcx0+ldta60zvUL5XO0OLt521n2hjPp0PB0ugczDCEczXsf33qQbkKIXWGFQ03f0LC85u6YK8pCLA==}
+  '@hono/node-server@2.0.10':
+    resolution: {integrity: sha512-ZcnNVhKTmyDJeg0UlnZjvM73JBsTAuhrH/J4fjwGOw59PwOW51r4J+p6CsKZWXdKSme4MFqU62CZMOsdDrU4CA==}
     engines: {node: '>=20'}
     peerDependencies:
       hono: ^4
@@ -1871,8 +1871,8 @@ packages:
     resolution: {integrity: sha512-ZMANVnAixE6AWWnPzlW2KpUrxhm9woycYvPOo67jWHyFowASTEd9s+QN1EIMsSDtwhIxN4sWE1jotpuDUIgyIw==}
     engines: {node: '>=6.14.2'}
 
-  bullmq@5.80.4:
-    resolution: {integrity: sha512-n8lYxE8YYZQ1ar1JyQ668yUx0HbaVrzUNuNf7hSDG6XKYE5F+I/LpgGYLIJ2Pi4UNouDf3PMEsGsapg6FpXlKg==}
+  bullmq@5.80.7:
+    resolution: {integrity: sha512-hMBxHhwmpP8Yy94AhI9WI2H2mLaa7I9AMTmwD2HZW2Iij3lHOkMC9/MjUnwj5v6QbknYTV2sF7Z41Km2trbLMw==}
     engines: {node: '>=12.22.0'}
     peerDependencies:
       redis: '>=5.0.0'
@@ -2333,8 +2333,8 @@ packages:
   pkg-types@2.3.0:
     resolution: {integrity: sha512-SIqCzDRg0s9npO5XQ3tNZioRY1uK06lA41ynBC1YmFTmnY6FjUjVt6s4LoADmwoig1qqD0oK8h1p/8mlMx8Oig==}
 
-  postcss@8.5.19:
-    resolution: {integrity: sha512-Mz8SaolMd8nB+G13WkORcxQKHZ/NE4xXevtkJHVuG+guo9/wYKlIMTKAqGdEmYOXR2ijPjTYNHssizdaVSUNdQ==}
+  postcss@8.5.20:
+    resolution: {integrity: sha512-lW616l85ucIQL+FocMmL7pQFPqBmwejrCMg+iPxyImlrANNJG9NHq/RkyCZopDhd8C3LA03PHRJDjkbGu8vvug==}
     engines: {node: ^10 || ^12 || >=14}
 
   postgres-array@2.0.0:
@@ -3363,7 +3363,7 @@ snapshots:
     dependencies:
       hono: 4.12.30
 
-  '@hono/node-server@2.0.9(hono@4.12.30)':
+  '@hono/node-server@2.0.10(hono@4.12.30)':
     dependencies:
       hono: 4.12.30
 
@@ -4401,7 +4401,7 @@ snapshots:
     dependencies:
       node-gyp-build: 4.8.4
 
-  bullmq@5.80.4:
+  bullmq@5.80.7:
     dependencies:
       cron-parser: 4.9.0
       ioredis: 5.11.1
@@ -4891,7 +4891,7 @@ snapshots:
       exsolve: 1.0.8
       pathe: 2.0.3
 
-  postcss@8.5.19:
+  postcss@8.5.20:
     dependencies:
       nanoid: 3.3.16
       picocolors: 1.1.1
@@ -5143,7 +5143,7 @@ snapshots:
       esbuild: 0.27.7
       fdir: 6.5.0(picomatch@4.0.5)
       picomatch: 4.0.5
-      postcss: 8.5.19
+      postcss: 8.5.20
       rollup: 4.62.2
       tinyglobby: 0.2.17
     optionalDependencies:
