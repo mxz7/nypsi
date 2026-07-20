@@ -178,6 +178,22 @@ async function startChessGame(
   difficulty?: ChessPuzzleDifficulty,
   replayInteraction?: MessageComponentInteraction,
 ) {
+  try {
+    const started = await createChessGame(message, puzzle, send, difficulty, replayInteraction);
+    if (!started) await removeUserPlaying(message.author.id);
+  } catch (error) {
+    await removeUserPlaying(message.author.id);
+    throw error;
+  }
+}
+
+async function createChessGame(
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  puzzle: ChessPuzzle,
+  send: SendMessage,
+  difficulty?: ChessPuzzleDifficulty,
+  replayInteraction?: MessageComponentInteraction,
+) {
   const beforeBuild = performance.now();
   const chess = buildChessFromPuzzle(puzzle);
   const afterBuild = performance.now();
@@ -185,13 +201,15 @@ async function startChessGame(
   logger.debug(`chess: built chess instance from puzzle in ${afterBuild - beforeBuild}ms`);
 
   if (chess.isGameOver()) {
-    return send({ embeds: [new ErrorEmbed("invalid puzzle data received, please try again")] });
+    await send({ embeds: [new ErrorEmbed("invalid puzzle data received, please try again")] });
+    return false;
   }
 
   const solution = puzzle.solution;
 
   if (solution.length < 1) {
-    return send({ embeds: [new ErrorEmbed("invalid puzzle data received, please try again")] });
+    await send({ embeds: [new ErrorEmbed("invalid puzzle data received, please try again")] });
+    return false;
   }
 
   const playerColor = chess.turn() as "w" | "b";
@@ -256,13 +274,8 @@ async function startChessGame(
       .update(sendOpts)
       .then((r) => r.fetch())
       .catch(() => replayInteraction.message.edit(sendOpts));
-  } else if (message instanceof Message) {
-    msg = await message.channel.send(sendOpts);
   } else {
-    msg = await message
-      .reply(sendOpts)
-      .then((m) => m.fetch())
-      .catch(() => message.editReply(sendOpts).then((m) => m.fetch() as Promise<Message>));
+    msg = await send(sendOpts);
   }
 
   const puzzleStartTime = performance.now();
@@ -535,6 +548,8 @@ async function startChessGame(
 
     await playAgain(msg, message, send, difficulty);
   });
+
+  return true;
 }
 
 async function playAgain(
@@ -785,7 +800,12 @@ async function handleDuel(
   const whitePlayer = Math.random() < 0.5 ? message.member : target;
   const blackPlayer = whitePlayer.id === message.member.id ? target : message.member;
 
-  return startChessDuel(message, send, whitePlayer, blackPlayer);
+  try {
+    return await startChessDuel(message, send, whitePlayer, blackPlayer);
+  } catch (error) {
+    await removeUserPlaying(message.channelId);
+    throw error;
+  }
 }
 
 async function startChessDuel(
