@@ -9,6 +9,7 @@ export default function workerSort<T>(
   return new Promise((resolve, reject) => {
     const worker = new Worker(__filename, {
       workerData: [data, sortFunction, direction],
+      execArgv: getSourceWorkerExecArgv(),
     });
     worker.on("message", resolve);
     worker.on("error", reject);
@@ -16,6 +17,15 @@ export default function workerSort<T>(
       if (code !== 0) reject(new Error(`Worker stopped with exit code ${code}`));
     });
   });
+}
+
+function getSourceWorkerExecArgv(): string[] | undefined {
+  if (!__filename.endsWith(".ts")) return undefined;
+
+  const warningFlag = "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON";
+  return process.execArgv.includes(warningFlag)
+    ? process.execArgv
+    : [...process.execArgv, warningFlag];
 }
 
 if (!isMainThread) {
