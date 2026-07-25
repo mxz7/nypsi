@@ -288,20 +288,20 @@ export async function getBoostersDisplay(
       let username: string;
 
       if (!(await getPreferences(ownerId)).leaderboards) {
-        username = await getLastKnownUsername(ownerId);
+        username = await getLastKnownUsername(ownerId, false);
       }
 
       if (count === 1) {
         globalBoosters.push(
           `${items[boosterId].emoji} **${items[boosterId].name}** - expires <t:${Math.round(
             boosters.get(boosterId)[0].expire / 1000,
-          )}:R>${username ? `, by **[${username}](https://nypsi.xyz/users/${ownerId}?ref=bot-global-booster)**` : ""}`,
+          )}:R>${username ? `, by [**${username}**](https://nypsi.xyz/users/${ownerId}?ref=bot-global-booster)` : ""}`,
         );
       } else {
         globalBoosters.push(
           `${items[boosterId].emoji} **${items[boosterId].name}** \`x${count}\` - next expires <t:${Math.round(
             boosters.get(boosterId)[0].expire / 1000,
-          )}:R>${username ? `, by **[${username}](https://nypsi.xyz/users/${ownerId}?ref=bot-global-booster)**` : ""}`,
+          )}:R>${username ? `, by [**${username}**](https://nypsi.xyz/users/${ownerId}?ref=bot-global-booster)` : ""}`,
         );
       }
     } else {
