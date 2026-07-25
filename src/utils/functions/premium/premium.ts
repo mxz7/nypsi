@@ -8,7 +8,8 @@ import { logger } from "../../logger";
 import { findGuildCluster } from "../clusters";
 import { formatDate } from "../date";
 import { getUserId, MemberResolvable } from "../member";
-import { addNotificationToQueue, getDmSettings } from "../users/notifications";
+import { addNotificationToQueue } from "../users/notifications";
+import { getPreferences } from "../users/preferences";
 import { getLastKnownUsername } from "../users/username";
 import { removeUserAlias } from "./aliases";
 import dayjs = require("dayjs");
@@ -113,7 +114,7 @@ export async function addMember(member: MemberResolvable, level: number, expires
 
   logger.info(`premium level ${level} given to ${userId}`);
 
-  if ((await getDmSettings(userId)).premium) {
+  if ((await getPreferences(userId)).premium) {
     addNotificationToQueue({
       memberId: userId,
       payload: {
@@ -158,7 +159,7 @@ export async function setTier(member: MemberResolvable, level: number) {
 
   logger.info(`premium level updated to ${level} for ${userId}`);
 
-  if ((await getDmSettings(userId)).premium) {
+  if ((await getPreferences(userId)).premium) {
     addNotificationToQueue({
       memberId: userId,
       payload: {
@@ -182,7 +183,7 @@ export async function renewUser(member: MemberResolvable) {
     },
   });
 
-  if ((await getDmSettings(member)).premium) {
+  if ((await getPreferences(member)).premium) {
     addNotificationToQueue({
       memberId: userId,
       payload: {
@@ -262,7 +263,7 @@ export async function expireUser(member: MemberResolvable, client?: NypsiClient 
       });
   }
 
-  if ((await getDmSettings(member)).premium) {
+  if ((await getPreferences(member)).premium) {
     addNotificationToQueue({
       memberId: getUserId(member),
       payload: {
@@ -286,7 +287,7 @@ export async function setExpireDate(member: MemberResolvable, date: Date) {
     },
   });
 
-  if ((await getDmSettings(userId)).premium) {
+  if ((await getPreferences(userId)).premium) {
     addNotificationToQueue({
       memberId: userId,
       payload: { content: `your membership will now expire on **${formatDate(date)}**` },

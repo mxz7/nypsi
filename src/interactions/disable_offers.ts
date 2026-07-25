@@ -5,7 +5,7 @@ import { CustomEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
 import Constants from "../utils/Constants";
 import { isEcoBanned } from "../utils/functions/economy/utils";
-import { getPreferences, updatePreferences } from "../utils/functions/users/notifications";
+import { updatePreference } from "../utils/functions/users/preferences";
 
 export default {
   name: "disable-offers",
@@ -37,11 +37,7 @@ export default {
 
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
-    const preferences = await getPreferences(interaction.user.id);
-
-    preferences.offers = 0;
-
-    await updatePreferences(interaction.user.id, preferences);
+    await updatePreference(interaction.user.id, "offers", 0);
 
     await redis.del(`${Constants.redis.nypsi.OFFER_PROCESS}:${interaction.user.id}`);
 

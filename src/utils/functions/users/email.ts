@@ -18,7 +18,8 @@ import {
   setCredits,
   setTier,
 } from "../premium/premium";
-import { addNotificationToQueue, getDmSettings } from "./notifications";
+import { addNotificationToQueue } from "./notifications";
+import { getPreferences } from "./preferences";
 import { setEconomyPunishment } from "./punishments";
 
 export async function getEmail(member: MemberResolvable) {
@@ -75,7 +76,7 @@ export async function checkPurchases(member: MemberResolvable) {
     logger.info(`giving purchased item to ${userId}`, item);
 
     if (item.item === "donation") {
-      if ((await getDmSettings(userId)).premium) {
+      if ((await getPreferences(userId)).premium) {
         const payload: NotificationPayload = {
           memberId: userId,
           payload: {
@@ -108,7 +109,7 @@ export async function checkPurchases(member: MemberResolvable) {
         if (item.item === "unecoban") {
           await setEconomyPunishment(userId);
 
-          if ((await getDmSettings(userId)).premium) {
+          if ((await getPreferences(userId)).premium) {
             const payload: NotificationPayload = {
               memberId: userId,
               payload: {
@@ -122,7 +123,7 @@ export async function checkPurchases(member: MemberResolvable) {
         } else {
           await addInventoryItem(userId, item.item, item.amount || 1);
 
-          if ((await getDmSettings(userId)).premium) {
+          if ((await getPreferences(userId)).premium) {
             const payload: NotificationPayload = {
               memberId: userId,
               payload: {

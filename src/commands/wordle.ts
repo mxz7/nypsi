@@ -14,7 +14,7 @@ import { getPrefix } from "../utils/functions/guilds/utils";
 import { addKarma } from "../utils/functions/karma/karma";
 import { getUserPlaying, removeUserPlaying, setUserPlaying } from "../utils/functions/playing";
 import { formatTime } from "../utils/functions/string";
-import { getPreferences } from "../utils/functions/users/notifications";
+import { getPreferences } from "../utils/functions/users/preferences";
 import { getLastKnownAvatar, getLastKnownUsername } from "../utils/functions/users/username";
 import { addWordleGame, getWordleGame } from "../utils/functions/users/wordle";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";

@@ -1,4 +1,4 @@
-import { SudokuCoordMode } from "#generated/prisma";
+import { SudokuCoordMode } from "../../../types/Sudoku";
 import { logger } from "../../logger";
 import { decodeCellChar, hasNote, isRawDigitChar } from "./cell";
 import { indexToCoord } from "./game";

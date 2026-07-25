@@ -14,7 +14,7 @@ import { getRawLevel } from "../utils/functions/economy/levelling";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getLastVote, getVoteStreak, hasVoted } from "../utils/functions/economy/vote";
 import { pluralize } from "../utils/functions/string";
-import { getDmSettings } from "../utils/functions/users/notifications";
+import { getPreferences } from "../utils/functions/users/preferences";
 
 const cmd = new Command("vote", "vote every 12 hours to get rewards", "money");
 
@@ -45,7 +45,7 @@ async function run(
       where: { userId: message.author.id },
       select: { monthVote: true, seasonVote: true },
     }),
-    getDmSettings(message.member),
+    getPreferences(message.member),
     getVoteStreak(message.member),
   ]);
 

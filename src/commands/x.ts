@@ -238,7 +238,6 @@ async function run(
           Preferences: true,
           CommandUse: true,
           Achievements: true,
-          DMSettings: true,
           ActiveChannels: true,
           Leaderboards: true,
           Tags: true,

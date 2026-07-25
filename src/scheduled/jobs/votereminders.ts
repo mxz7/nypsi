@@ -19,10 +19,10 @@ export default {
   name: "vote reminders",
   cron: "0 * * * *",
   run: async (log) => {
-    const userIds = await prisma.dMSettings.findMany({
+    const userIds = await prisma.preferences.findMany({
       where: {
         AND: [
-          { voteReminder: true },
+          { key: "voteReminder", value: { equals: true } },
           {
             user: {
               Economy: {

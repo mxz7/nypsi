@@ -43,7 +43,7 @@ import { percentChance } from "../utils/functions/random";
 import sleep from "../utils/functions/sleep";
 import { escapeFormattingCharacters, formatTime } from "../utils/functions/string";
 import { hasAdminPermission } from "../utils/functions/users/admin";
-import { getPreferences } from "../utils/functions/users/notifications";
+import { getPreferences } from "../utils/functions/users/preferences";
 import { addHourlyCommand } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";

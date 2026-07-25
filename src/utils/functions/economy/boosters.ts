@@ -13,7 +13,8 @@ import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
 import PageManager from "../page";
 import { pluralize } from "../string";
-import { addNotificationToQueue, getDmSettings, getPreferences } from "../users/notifications";
+import { addNotificationToQueue } from "../users/notifications";
+import { getPreferences } from "../users/preferences";
 import { getLastKnownUsername } from "../users/username";
 import { getItems } from "./utils";
 
@@ -66,7 +67,7 @@ async function checkBoosters(member: MemberResolvable, boosters: Map<string, Boo
           })
           .catch(() => {});
 
-        if (booster.scope === "global" && (await getDmSettings(booster.userId)).booster) {
+        if (booster.scope === "global" && (await getPreferences(booster.userId)).booster) {
           addNotificationToQueue({
             memberId: booster.userId,
             payload: {
@@ -98,7 +99,7 @@ async function checkBoosters(member: MemberResolvable, boosters: Map<string, Boo
   if (expired.size != 0) {
     await boostersCache.delete(userId);
 
-    if ((await getDmSettings(userId)).booster) {
+    if ((await getPreferences(userId)).booster) {
       const embed = new CustomEmbed(userId).setFooter({ text: "/settings me notifications" });
 
       let desc = "";

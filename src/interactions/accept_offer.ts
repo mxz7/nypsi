@@ -19,7 +19,8 @@ import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import { getTier } from "../utils/functions/premium/premium";
 import { escapeFormattingCharacters } from "../utils/functions/string";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
-import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
+import { addNotificationToQueue } from "../utils/functions/users/notifications";
+import { getPreferences } from "../utils/functions/users/preferences";
 
 export default {
   name: "accept-offer",
@@ -121,7 +122,7 @@ export default {
 
     await interaction.message.edit({ embeds: [embed], components: [] });
 
-    if ((await getDmSettings(offer.ownerId)).market) {
+    if ((await getPreferences(offer.ownerId)).market) {
       addNotificationToQueue({
         memberId: offer.ownerId,
         payload: {

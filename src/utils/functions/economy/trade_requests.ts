@@ -22,7 +22,8 @@ import { getUserId, MemberResolvable } from "../member";
 import { getAllGroupAccountIds } from "../moderation/alts";
 import { getTier, isPremium } from "../premium/premium";
 import { addToNypsiBank, getTax } from "../tax";
-import { addNotificationToQueue, getDmSettings } from "../users/notifications";
+import { addNotificationToQueue } from "../users/notifications";
+import { getPreferences } from "../users/preferences";
 import { addBalance } from "./balance";
 import { addInventoryItem, getInventory, isGem, removeInventoryItem } from "./inventory";
 import { createUser, getItems, userExists } from "./utils";
@@ -530,7 +531,7 @@ export async function fulfillTradeRequest(
     );
   }
 
-  if ((await getDmSettings(tradeRequest.ownerId)).market) {
+  if ((await getPreferences(tradeRequest.ownerId)).market) {
     const embedDm = new CustomEmbed(tradeRequest.ownerId).setDescription(
       `your trade request has been fulfilled\n\nyou have received:\n${tradeRequest.requestedItems.map((item) => `- **${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} ${items[item.split(":")[0]].name}`).join("\n")}`,
     );

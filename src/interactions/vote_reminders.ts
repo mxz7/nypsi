@@ -2,15 +2,13 @@ import { MessageFlags } from "discord.js";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
 import Constants from "../utils/Constants";
-import { getDmSettings, updateDmSettings } from "../utils/functions/users/notifications";
+import { updatePreference } from "../utils/functions/users/preferences";
 
 export default {
   name: "enable-vote-reminders",
   type: "interaction",
   async run(interaction) {
-    const settings = await getDmSettings(interaction.user.id);
-    settings.voteReminder = true;
-    await updateDmSettings(interaction.user.id, settings);
+    await updatePreference(interaction.user.id, "voteReminder", true);
 
     return interaction.reply({
       embeds: [

@@ -5,7 +5,8 @@ import Constants from "../../utils/Constants";
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { getItems } from "../../utils/functions/economy/utils";
 import { pluralize } from "../../utils/functions/string";
-import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
+import { addNotificationToQueue } from "../../utils/functions/users/notifications";
+import { getPreferences } from "../../utils/functions/users/preferences";
 
 export default {
   name: "weeklycrates",
@@ -67,7 +68,7 @@ export default {
 
       embed.addField("rewards", desc.join("\n"));
 
-      if ((await getDmSettings(member.id)).premium) {
+      if ((await getPreferences(member.id)).premium) {
         addNotificationToQueue({
           memberId: member.id,
           payload: {

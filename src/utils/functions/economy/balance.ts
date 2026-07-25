@@ -10,7 +10,8 @@ import { logger } from "../../logger";
 import { getUserId, MemberResolvable } from "../member";
 import { isBooster } from "../premium/boosters";
 import { getTier } from "../premium/premium";
-import { addNotificationToQueue, getDmSettings } from "../users/notifications";
+import { addNotificationToQueue } from "../users/notifications";
+import { getPreferences } from "../users/preferences";
 import { getBoosters } from "./boosters";
 import { calcCarCost } from "./cars";
 import { getClaimable } from "./farm";
@@ -203,7 +204,7 @@ export async function getGambleMulti(
     getBoosters(member),
     getGuildUpgradesByUser(member),
     isPassive(member),
-    getDmSettings(member),
+    getPreferences(member),
     getInventory(member),
     getTier(member),
     getUpgrades(member),
@@ -400,7 +401,7 @@ export async function getSellMulti(
   }
 
   if (
-    (await getDmSettings(member)).voteReminder &&
+    (await getPreferences(member)).voteReminder &&
     !(await redis.sismember(Constants.redis.nypsi.VOTE_REMINDER_RECEIVED, getUserId(member)))
   ) {
     multi += 5;
@@ -949,7 +950,7 @@ export async function calcNetWorth(
   });
 
   setImmediate(async () => {
-    const dmSettings = await getDmSettings(userId);
+    const dmSettings = await getPreferences(userId);
 
     if (query.netWorth && dmSettings.netWorth > 0) {
       const payload: NotificationPayload = {

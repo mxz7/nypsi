@@ -35,7 +35,7 @@ import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
 import { escapeFormattingCharacters } from "../utils/functions/string";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
-import { getDmSettings } from "../utils/functions/users/notifications";
+import { getPreferences } from "../utils/functions/users/preferences";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
 
@@ -424,7 +424,7 @@ async function run(
     setTimeout(async () => {
       await edit({ embeds: [embed2] }, m);
 
-      if ((await getDmSettings(target)).rob) {
+      if ((await getPreferences(target)).rob) {
         if (robberySuccess) {
           await target
             .send({ content: "you have been robbed!!", embeds: [embed3] })

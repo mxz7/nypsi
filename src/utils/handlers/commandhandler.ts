@@ -69,8 +69,8 @@ import {
   addInlineNotification,
   addNotificationToQueue,
   getInlineNotifications,
-  getPreferences,
 } from "../functions/users/notifications";
+import { getPreferences } from "../functions/users/preferences";
 import { getLastKnownUsername } from "../functions/users/username";
 import { createProfile, hasProfile } from "../functions/users/utils";
 import { getTimestamp, logger } from "../logger";

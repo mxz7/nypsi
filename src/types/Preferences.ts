@@ -1,6 +1,12 @@
-import { LevelDmSetting, SudokuCoordMode, WorkerDmSetting } from "#generated/prisma";
+import { SudokuCoordMode } from "./Sudoku";
 
 export type PreferenceValue = boolean | number | string;
+
+export const WORKER_NOTIFICATION_PREFERENCES = ["Disabled", "All", "OnlyWhenFull"] as const;
+export type WorkerNotificationPreference = (typeof WORKER_NOTIFICATION_PREFERENCES)[number];
+
+export const LEVEL_NOTIFICATION_PREFERENCES = ["Disabled", "All", "OnlyReward"] as const;
+export type LevelNotificationPreference = (typeof LEVEL_NOTIFICATION_PREFERENCES)[number];
 
 export interface PreferenceData {
   id: string;
@@ -16,13 +22,13 @@ export interface Preferences {
   premium: boolean;
   market: boolean;
   voteReminder: boolean;
-  worker: WorkerDmSetting;
+  worker: WorkerNotificationPreference;
   booster: boolean;
   payment: boolean;
   other: boolean;
   netWorth: number;
   autosellStatus: boolean;
-  level: LevelDmSetting;
+  level: LevelNotificationPreference;
   farmHealth: boolean;
   duelRequests: boolean;
   offers: number;

@@ -8,7 +8,7 @@ import { getAllMembersRest } from "../guilds/members";
 import { getUserId, MemberResolvable } from "../member";
 import PageManager from "../page";
 import { pluralize } from "../string";
-import { getPreferences } from "../users/notifications";
+import { getPreferences } from "../users/preferences";
 import { updateLastKnownUsername } from "../users/username";
 import {
   createLeaderboardOutput,

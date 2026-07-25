@@ -11,7 +11,8 @@ import { logger } from "../../logger";
 import { deleteImage } from "../image";
 import { getUserId, MemberResolvable } from "../member";
 import { MemoryMutex } from "../mutex";
-import { addNotificationToQueue, getDmSettings } from "../users/notifications";
+import { addNotificationToQueue } from "../users/notifications";
+import { getPreferences } from "../users/preferences";
 import { addInventoryItem } from "./inventory";
 import { getUpgrades } from "./levelling";
 import { getItems, getUpgradesData, isEcoBanned } from "./utils";
@@ -528,7 +529,7 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
           .find((i) => i.userId === dm.id)
           .contributedMoneyThisLevel.toLocaleString()} for this level`;
 
-        if ((await getDmSettings(dm.id)).other) {
+        if ((await getPreferences(dm.id)).other) {
           addNotificationToQueue({
             memberId: dm.id,
             payload: {

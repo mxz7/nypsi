@@ -65,7 +65,8 @@ import { MemberResolvable } from "../utils/functions/member";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { pluralize } from "../utils/functions/string";
 import { hasAdminPermission } from "../utils/functions/users/admin";
-import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
+import { addNotificationToQueue } from "../utils/functions/users/notifications";
+import { getPreferences } from "../utils/functions/users/preferences";
 import { addCooldown, addExpiry, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
 
@@ -1448,7 +1449,7 @@ async function run(
         await addInventoryItem(order.ownerId, order.itemId, order.itemAmount);
       }
 
-      if ((await getDmSettings(order.ownerId)).market) {
+      if ((await getPreferences(order.ownerId)).market) {
         const embed = new CustomEmbed().setColor(Constants.EMBED_FAIL_COLOR);
 
         embed.setDescription(

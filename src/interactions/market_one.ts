@@ -13,7 +13,7 @@ import {
   showMarketConfirmationModal,
 } from "../utils/functions/economy/market";
 import { getItems, isEcoBanned, userExists } from "../utils/functions/economy/utils";
-import { getPreferences } from "../utils/functions/users/notifications";
+import { getPreferences } from "../utils/functions/users/preferences";
 
 export default {
   name: "market-one",

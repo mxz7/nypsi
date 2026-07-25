@@ -17,7 +17,8 @@ import PageManager from "../utils/functions/page";
 import { isPremium } from "../utils/functions/premium/premium";
 import { decrypt } from "../utils/functions/string";
 import { deleteUserMentions, fetchUserMentions } from "../utils/functions/users/mentions";
-import { getPreferences, updatePreferences } from "../utils/functions/users/notifications";
+import { getPreferences } from "../utils/functions/users/preferences";
+import { updatePreference } from "../utils/functions/users/preferences";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
 
@@ -184,8 +185,7 @@ async function run(
           "toggle-global",
           async (manager: PageManager<string>, interaction: ButtonInteraction) => {
             await interaction.deferUpdate();
-            preferences.mentionsGlobal = !preferences.mentionsGlobal;
-            await updatePreferences(message.member, preferences);
+            await updatePreference(message.member, "mentionsGlobal", !preferences.mentionsGlobal);
 
             return showMentions(manager.message);
           },

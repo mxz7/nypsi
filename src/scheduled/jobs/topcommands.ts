@@ -4,7 +4,7 @@ import { inPlaceSort } from "fast-sort";
 import redis from "../../init/redis";
 import { Job } from "../../types/Jobs";
 import Constants from "../../utils/Constants";
-import { getPreferences } from "../../utils/functions/users/notifications";
+import { getPreferences } from "../../utils/functions/users/preferences";
 import { getLastKnownUsername } from "../../utils/functions/users/username";
 
 export default {

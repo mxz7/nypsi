@@ -15,7 +15,8 @@ import { getUserId, MemberResolvable } from "../member";
 import { percentChance } from "../random";
 import { pluralize } from "../string";
 import { createAuraTransaction } from "../users/aura";
-import { addNotificationToQueue, getDmSettings } from "../users/notifications";
+import { addNotificationToQueue } from "../users/notifications";
+import { getPreferences } from "../users/preferences";
 import { addProgress } from "./achievements";
 import { addBalance } from "./balance";
 import { hasGemBeenGiven, markGemAsGiven } from "./gems";
@@ -152,7 +153,7 @@ export async function giveVoteRewards(
     await addInventoryItem(user, "blue_gem", 1);
     addProgress(user, "gem_hunter", 1);
 
-    if ((await getDmSettings(user)).other) {
+    if ((await getPreferences(user)).other) {
       addNotificationToQueue({
         memberId: user,
         payload: {
@@ -201,7 +202,7 @@ export async function giveVoteRewards(
       .setStyle(ButtonStyle.Success),
   );
 
-  if (!(await getDmSettings(user)).voteReminder) {
+  if (!(await getPreferences(user)).voteReminder) {
     row.addComponents(
       new ButtonBuilder()
         .setLabel("enable vote reminders")

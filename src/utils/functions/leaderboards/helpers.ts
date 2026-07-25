@@ -6,7 +6,7 @@ import { logger } from "../../logger";
 import { getTagsData } from "../economy/utils";
 import { getAllMembers, getAllMembersRest } from "../guilds/members";
 import PageManager from "../page";
-import { getPreferences } from "../users/notifications";
+import { getPreferences } from "../users/preferences";
 import { getActiveTag } from "../users/tags";
 import { updateLastKnownUsername } from "../users/username";
 import ms = require("ms");

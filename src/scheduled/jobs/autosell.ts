@@ -4,7 +4,8 @@ import { CustomEmbed } from "../../models/EmbedBuilders";
 import { Job } from "../../types/Jobs";
 import Constants from "../../utils/Constants";
 import { getItems } from "../../utils/functions/economy/utils";
-import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
+import { addNotificationToQueue } from "../../utils/functions/users/notifications";
+import { getPreferences } from "../../utils/functions/users/preferences";
 
 export default {
   name: "autosell",
@@ -14,7 +15,7 @@ export default {
     await redis.del(Constants.redis.nypsi.AUTO_SELL_ITEMS_MEMBERS);
 
     for (const user of users) {
-      if (!(await getDmSettings(user)).autosellStatus) continue;
+      if (!(await getPreferences(user)).autosellStatus) continue;
       const items = await redis.hgetall(`${Constants.redis.nypsi.AUTO_SELL_ITEMS}:${user}`);
       await redis.del(`${Constants.redis.nypsi.AUTO_SELL_ITEMS}:${user}`);
 
