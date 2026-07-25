@@ -1,12 +1,17 @@
 import { Guild } from "discord.js";
 import prisma from "../../../init/database";
+import { RedisCache } from "../../cache";
+import Constants from "../../Constants";
 
-const disabledChannels = new Map<string, string[]>();
+const disabledChannels = new RedisCache<string[]>(
+  Constants.redis.cache.guild.DISABLED_CHANNELS,
+  43200,
+);
 
 export async function getDisabledChannels(guild: Guild) {
-  if (disabledChannels.has(guild.id)) {
-    return disabledChannels.get(guild.id);
-  }
+  const cached = await disabledChannels.get(guild.id);
+
+  if (cached !== null) return cached;
 
   const query = await prisma.guild.findUnique({
     where: {
@@ -17,11 +22,7 @@ export async function getDisabledChannels(guild: Guild) {
     },
   });
 
-  setTimeout(() => {
-    if (disabledChannels.has(guild.id)) disabledChannels.delete(guild.id);
-  }, 43200000);
-
-  disabledChannels.set(guild.id, query.disabledChannels);
+  await disabledChannels.set(guild.id, query.disabledChannels);
 
   return query.disabledChannels;
 }
@@ -36,9 +37,5 @@ export async function setDisabledChannels(guild: Guild, channels: string[]) {
     },
   });
 
-  setTimeout(() => {
-    if (disabledChannels.has(guild.id)) disabledChannels.delete(guild.id);
-  }, 43200000);
-
-  disabledChannels.set(guild.id, channels);
+  await disabledChannels.set(guild.id, channels);
 }

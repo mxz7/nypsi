@@ -226,6 +226,7 @@ export default {
         EVIDENCE_MAX: "cache:guilds:evidence:max",
         AUTOMUTE_VL: "cache:guild:automute",
         CHATFILTER: "cache:guild:chatfilter",
+        DISABLED_CHANNELS: "cache:guild:disabledchannels",
         MEMBERS: "cache:guild:members",
         MEMBERS_LAST_FETCHED: "cache:guild:members:last_fetched",
         LAST_COMMAND: "cache:guild:last_command",

@@ -31,6 +31,10 @@ export class RedisCache<T> {
       logger.error("redis-cache: failed to set cached data", { key: this.key, arg, error });
     }
   }
+
+  async delete(arg: string): Promise<void> {
+    await redis.del(`${this.key}:${arg.toLowerCase()}`);
+  }
 }
 
 export function redisSerialize(value: unknown) {

@@ -1,23 +1,14 @@
 import { Guild } from "discord.js";
 import prisma from "../../../init/database";
-import redis from "../../../init/redis";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
-import ms = require("ms");
 
-const slashOnlyCache = new Map<string, boolean>();
-
-setInterval(() => {
-  slashOnlyCache.clear();
-}, 300000);
+const slashOnlyCache = new RedisCache<boolean>(Constants.redis.cache.guild.SLASH_ONLY, 86400);
 
 export async function isSlashOnly(guild: Guild) {
-  if (slashOnlyCache.has(guild.id)) {
-    return slashOnlyCache.get(guild.id);
-  }
+  const cached = await slashOnlyCache.get(guild.id);
 
-  if (await redis.exists(`${Constants.redis.cache.guild.SLASH_ONLY}:${guild.id}`)) {
-    return (await redis.get(`${Constants.redis.cache.guild.SLASH_ONLY}:${guild.id}`)) === "t";
-  }
+  if (cached !== null) return cached;
 
   const res = await prisma.guild
     .findUnique({
@@ -30,23 +21,7 @@ export async function isSlashOnly(guild: Guild) {
     })
     .then((q) => q.slash_only);
 
-  if (res) {
-    await redis.set(
-      `${Constants.redis.cache.guild.SLASH_ONLY}:${guild.id}`,
-      "t",
-      "EX",
-      ms("24 hour") / 1000,
-    );
-  } else {
-    await redis.set(
-      `${Constants.redis.cache.guild.SLASH_ONLY}:${guild.id}`,
-      "f",
-      "EX",
-      ms("24 hour") / 1000,
-    );
-  }
-
-  slashOnlyCache.set(guild.id, res);
+  await slashOnlyCache.set(guild.id, res);
 
   return res;
 }
@@ -61,6 +36,5 @@ export async function setSlashOnly(guild: Guild, bool: boolean) {
     },
   });
 
-  await redis.del(`${Constants.redis.cache.guild.SLASH_ONLY}:${guild.id}`);
-  slashOnlyCache.delete(guild.id);
+  await slashOnlyCache.set(guild.id, bool);
 }

@@ -1,6 +1,7 @@
 import { Guild } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { MemoryMutex } from "../mutex";
@@ -10,12 +11,10 @@ const peaks = new Map<string, number>();
 const names = new Map<string, string>();
 const icons = new Map<string, string>();
 
-// guildid => value
-const prefixCache = new Map<string, string[]>();
+const prefixCache = new RedisCache<string[]>(Constants.redis.cache.guild.PREFIX, 86400);
 const guildExistsCache = new Map<string, boolean>();
 
 setInterval(() => {
-  prefixCache.clear();
   guildExistsCache.clear();
 }, 300000);
 
@@ -173,13 +172,9 @@ export async function getPrefix(guild: Guild | string): Promise<string[]> {
   }
 
   try {
-    if (prefixCache.has(guildId)) {
-      return prefixCache.get(guildId);
-    }
+    const cached = await prefixCache.get(guildId);
 
-    if (await redis.exists(`${Constants.redis.cache.guild.PREFIX}:${guildId}`)) {
-      return (await redis.get(`${Constants.redis.cache.guild.PREFIX}:${guildId}`)).split(" ");
-    }
+    if (cached !== null) return cached;
 
     const query = await prisma.guild.findUnique({
       where: {
@@ -202,14 +197,7 @@ export async function getPrefix(guild: Guild | string): Promise<string[]> {
       });
     }
 
-    await redis.set(
-      `${Constants.redis.cache.guild.PREFIX}:${guildId}`,
-      query.prefixes.join(" "),
-      "EX",
-      ms("24 hour") / 1000,
-    );
-
-    prefixCache.set(guildId, query.prefixes);
+    await prefixCache.set(guildId, query.prefixes);
 
     return query.prefixes;
   } catch {
@@ -229,8 +217,7 @@ export async function setPrefix(guild: Guild, prefix: string[]) {
     },
   });
 
-  await redis.del(`${Constants.redis.cache.guild.PREFIX}:${guild.id}`);
-  prefixCache.delete(guild.id);
+  await prefixCache.set(guild.id, prefix);
 }
 
 export async function getGuildName(id: string) {
