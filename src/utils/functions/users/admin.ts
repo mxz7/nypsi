@@ -1,8 +1,13 @@
 import ms = require("ms");
 import prisma from "../../../init/database";
-import redis from "../../../init/redis";
+import { RedisCache } from "../../cache";
 import Constants, { AdminPermission } from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
+
+const adminLevelCache = new RedisCache<number>(
+  Constants.redis.cache.user.ADMIN_LEVEL,
+  Math.floor(ms("3 hours") / 1000),
+);
 
 export async function hasAdminPermission(member: MemberResolvable, permission: AdminPermission) {
   return (await getAdminLevel(member)) >= Constants.ADMIN_PERMISSIONS.get(permission);
@@ -11,9 +16,8 @@ export async function hasAdminPermission(member: MemberResolvable, permission: A
 export async function getAdminLevel(member: MemberResolvable) {
   const userId = getUserId(member);
 
-  if (await redis.exists(`${Constants.redis.cache.user.ADMIN_LEVEL}:${userId}`)) {
-    return parseInt(await redis.get(`${Constants.redis.cache.user.ADMIN_LEVEL}:${userId}`));
-  }
+  const cached = await adminLevelCache.get(userId);
+  if (cached !== null) return cached;
 
   let query = await prisma.user.findUnique({
     where: {
@@ -30,12 +34,7 @@ export async function getAdminLevel(member: MemberResolvable) {
     };
   }
 
-  await redis.set(
-    `${Constants.redis.cache.user.ADMIN_LEVEL}:${userId}`,
-    query.adminLevel,
-    "EX",
-    Math.floor(ms("3 hours") / 1000),
-  );
+  await adminLevelCache.set(userId, query.adminLevel);
 
   return query.adminLevel;
 }
@@ -43,7 +42,7 @@ export async function getAdminLevel(member: MemberResolvable) {
 export async function setAdminLevel(member: MemberResolvable, level: number) {
   const userId = getUserId(member);
 
-  await redis.del(`${Constants.redis.cache.user.ADMIN_LEVEL}:${userId}`);
+  await adminLevelCache.delete(userId);
   await prisma.user.update({
     where: {
       id: userId,

@@ -2,9 +2,9 @@ import { GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { BakeryUpgrade } from "#generated/prisma";
 import prisma from "../../../init/database";
-import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
 import { getTier, isPremium } from "../premium/premium";
@@ -20,7 +20,11 @@ import { isPassive } from "./passive";
 import { addStat } from "./stats";
 import { addTaskProgress } from "./tasks";
 import { getBakeryUpgradesData, getItems, getUpgradesData } from "./utils";
-import ms = require("ms");
+
+const bakeryUpgradesCache = new RedisCache<BakeryUpgrade[]>(
+  Constants.redis.cache.economy.BAKERY_UPGRADES,
+  3 * 60 * 60,
+);
 
 async function getLastBake(member: MemberResolvable) {
   const userId = getUserId(member);
@@ -57,17 +61,14 @@ export async function addBakeryUpgrade(member: MemberResolvable, itemId: string,
     },
   });
 
-  await redis.del(`${Constants.redis.cache.economy.BAKERY_UPGRADES}:${userId}`);
+  await bakeryUpgradesCache.delete(userId);
 }
 
 export async function getBakeryUpgrades(member: MemberResolvable) {
   const userId = getUserId(member);
 
-  if (await redis.exists(`${Constants.redis.cache.economy.BAKERY_UPGRADES}:${userId}`)) {
-    return JSON.parse(
-      await redis.get(`${Constants.redis.cache.economy.BAKERY_UPGRADES}:${userId}`),
-    ) as BakeryUpgrade[];
-  }
+  const cache = await bakeryUpgradesCache.get(userId);
+  if (cache) return cache;
 
   const query = await prisma.bakeryUpgrade.findMany({
     where: {
@@ -78,12 +79,7 @@ export async function getBakeryUpgrades(member: MemberResolvable) {
     },
   });
 
-  await redis.set(
-    `${Constants.redis.cache.economy.BAKERY_UPGRADES}:${userId}`,
-    JSON.stringify(query),
-    "EX",
-    ms("3 hour") / 1000,
-  );
+  await bakeryUpgradesCache.set(userId, query);
 
   return query;
 }

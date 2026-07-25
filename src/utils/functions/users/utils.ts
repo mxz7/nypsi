@@ -3,6 +3,7 @@ import { promisify } from "util";
 import { GuildMember, User, WebhookClient } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { getTimestamp, logger } from "../../logger";
 import { getGuildByUser } from "../economy/guilds";
@@ -15,6 +16,10 @@ import { isMarried, removeMarriage } from "./marriage";
 import ms = require("ms");
 
 const hasUserMutex = new MemoryMutex();
+const userExistsCache = new RedisCache<boolean>(
+  Constants.redis.cache.user.EXISTS,
+  Math.floor(ms("7 day") / 1000),
+);
 
 export async function hasProfile(member: MemberResolvable) {
   const userId = getUserId(member);
@@ -24,9 +29,8 @@ export async function hasProfile(member: MemberResolvable) {
   await hasUserMutex.acquire(userId);
 
   try {
-    if (await redis.exists(`${Constants.redis.cache.user.EXISTS}:${userId}`)) {
-      return (await redis.get(`${Constants.redis.cache.user.EXISTS}:${userId}`)) === "true";
-    }
+    const cached = await userExistsCache.get(userId);
+    if (cached !== null) return cached;
 
     const query = await prisma.user.findUnique({
       where: {
@@ -37,23 +41,8 @@ export async function hasProfile(member: MemberResolvable) {
       },
     });
 
-    if (query) {
-      await redis.set(
-        `${Constants.redis.cache.user.EXISTS}:${userId}`,
-        "true",
-        "EX",
-        Math.floor(ms("7 day") / 1000),
-      );
-      return true;
-    } else {
-      await redis.set(
-        `${Constants.redis.cache.user.EXISTS}:${userId}`,
-        "false",
-        "EX",
-        Math.floor(ms("7 day") / 1000),
-      );
-      return false;
-    }
+    await userExistsCache.set(userId, Boolean(query));
+    return Boolean(query);
   } finally {
     hasUserMutex.release(userId);
   }
@@ -84,7 +73,7 @@ export async function createProfile(member: MemberResolvable) {
       },
     })
     .catch(() => {});
-  await redis.del(`${Constants.redis.cache.user.EXISTS}:${userId}`);
+  await userExistsCache.delete(userId);
 
   if (username) {
     addNewUsername(userId, username);

@@ -2,8 +2,8 @@ import { DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { parse } from "@twemoji/parser";
 import sharp from "sharp";
 import prisma from "../../init/database";
-import redis from "../../init/redis";
 import s3 from "../../init/s3";
+import { RedisCache } from "../cache";
 import Constants from "../Constants";
 
 export function isImageUrl(url: string): boolean {
@@ -20,19 +20,18 @@ type Image = {
   image: string;
 };
 
+const imageListCache = new RedisCache<Image[]>(Constants.redis.cache.IMAGE, 86400);
+const imageExistsCache = new RedisCache<boolean>(Constants.redis.cache.IMAGE, 86400);
+
 export async function getRandomImage(type: string) {
-  const cache = await redis.get(`${Constants.redis.cache.IMAGE}:${type}`);
+  let images = await imageListCache.get(type);
 
-  let images: Image[];
-
-  if (cache) {
-    images = JSON.parse(cache) as Image[];
-  } else {
+  if (!images) {
     images = await fetch(`https://animals.maxz.dev/api/${type}/all`).then((r) =>
       r.json().then((i) => i.map((i: any) => ({ id: i.id, url: i.image, name: i.name }))),
     );
 
-    await redis.set(`${Constants.redis.cache.IMAGE}:${type}`, JSON.stringify(images), "EX", 86400);
+    await imageListCache.set(type, images);
   }
 
   const chosen = images[Math.floor(Math.random() * images.length)];
@@ -65,12 +64,12 @@ export function getEmojiImage(emoji: string) {
 }
 
 export async function imageExists(id: string) {
-  if (await redis.exists(`${Constants.redis.cache.IMAGE}:${id}`)) return true;
+  if (await imageExistsCache.get(id)) return true;
   const query = await prisma.images.findUnique({ where: { id } });
 
   const exists = Boolean(query);
 
-  if (exists) await redis.set(`${Constants.redis.cache.IMAGE}:${id}`, "y", "EX", 86400);
+  if (exists) await imageExistsCache.set(id, true);
 
   return exists;
 }
@@ -88,7 +87,7 @@ export async function uploadImage(id: string, buffer: Buffer, ContentType: strin
     prisma.images.create({ data: { id, bytes: buffer.byteLength } }),
   ]);
 
-  await redis.set(`${Constants.redis.cache.IMAGE}:${id}`, "y", "EX", 86400);
+  await imageExistsCache.set(id, true);
 
   return true;
 }
@@ -96,7 +95,7 @@ export async function uploadImage(id: string, buffer: Buffer, ContentType: strin
 export async function deleteImage(id: string) {
   await s3.send(new DeleteObjectCommand({ Bucket: process.env.S3_BUCKET, Key: id }));
   await prisma.images.delete({ where: { id } });
-  await redis.del(`${Constants.redis.cache.IMAGE}:${id}`);
+  await imageExistsCache.delete(id);
 }
 
 export async function dhash(input: Buffer): Promise<bigint> {

@@ -3,8 +3,8 @@ import { GuildMember } from "discord.js";
 import { sort } from "fast-sort";
 import { Prisma } from "#generated/prisma";
 import prisma from "../../../init/database";
-import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
 import { MemoryMutex } from "../mutex";
@@ -16,29 +16,25 @@ import { getUpgrades } from "./levelling";
 import { addStat } from "./stats";
 import { getItems, getPlantsData, getPlantUpgrades, getUpgradesData } from "./utils";
 import dayjs = require("dayjs");
-import ms = require("ms");
 
 const PLANTS_PER_FERTILISER = 5;
 
 const farmClaimMutex = new MemoryMutex();
+type Farm = Awaited<ReturnType<typeof prisma.farm.findMany>>[number];
+type FarmUpgrade = Awaited<ReturnType<typeof prisma.farmUpgrades.findMany>>[number];
+const farmCache = new RedisCache<Farm[]>(Constants.redis.cache.economy.farm, 3 * 60 * 60);
+const farmUpgradesCache = new RedisCache<FarmUpgrade[]>(
+  Constants.redis.cache.economy.farmUpgrades,
+  3 * 60 * 60,
+);
 
 export async function getFarm(member: MemberResolvable) {
   const userId = getUserId(member);
 
-  const cache = await redis.get(`${Constants.redis.cache.economy.farm}:${userId}`);
+  const cache = await farmCache.get(userId);
 
   if (cache) {
-    return (
-      JSON.parse(cache) as {
-        id: number;
-        userId: string;
-        plantId: string;
-        plantedAt: Date;
-        harvestedAt: Date;
-        wateredAt: Date;
-        fertilisedAt: Date;
-      }[]
-    ).map((i) => {
+    return cache.map((i) => {
       i.plantedAt = new Date(i.plantedAt);
       i.harvestedAt = new Date(i.harvestedAt);
       i.wateredAt = new Date(i.wateredAt);
@@ -56,12 +52,7 @@ export async function getFarm(member: MemberResolvable) {
     },
   });
 
-  await redis.set(
-    `${Constants.redis.cache.economy.farm}:${userId}`,
-    JSON.stringify(query),
-    "EX",
-    Math.floor(ms("3 hour") / 1000),
-  );
+  await farmCache.set(userId, query);
 
   return query;
 }
@@ -69,20 +60,13 @@ export async function getFarm(member: MemberResolvable) {
 export async function getFarmUpgrades(member: MemberResolvable, plantId?: string) {
   const userId = getUserId(member);
 
-  const cache = await redis.get(`${Constants.redis.cache.economy.farmUpgrades}:${userId}`);
+  const cache = await farmUpgradesCache.get(userId);
 
   if (cache) {
-    const data = JSON.parse(cache) as {
-      userId: string;
-      plantId: string;
-      upgradeId: string;
-      amount: number;
-    }[];
-
     if (plantId) {
-      return data.filter((i) => i.plantId === plantId);
+      return cache.filter((i) => i.plantId === plantId);
     }
-    return data;
+    return cache;
   }
 
   const query = await prisma.farmUpgrades.findMany({
@@ -91,12 +75,7 @@ export async function getFarmUpgrades(member: MemberResolvable, plantId?: string
     },
   });
 
-  await redis.set(
-    `${Constants.redis.cache.economy.farmUpgrades}:${userId}`,
-    JSON.stringify(query),
-    "EX",
-    Math.floor(ms("3 hour") / 1000),
-  );
+  await farmUpgradesCache.set(userId, query);
 
   if (plantId) {
     return query.filter((i) => i.plantId === plantId);
@@ -132,7 +111,7 @@ export async function addFarmUpgrade(
     },
   });
 
-  await redis.del(`${Constants.redis.cache.economy.farmUpgrades}:${userId}`);
+  await farmUpgradesCache.delete(userId);
 }
 
 export async function addFarm(member: MemberResolvable, plantId: string, amount = 1) {
@@ -141,7 +120,7 @@ export async function addFarm(member: MemberResolvable, plantId: string, amount 
   await prisma.farm.createMany({
     data: Array.from({ length: amount }).fill({ userId, plantId }) as Prisma.FarmCreateManyInput[],
   });
-  await redis.del(`${Constants.redis.cache.economy.farm}:${userId}`);
+  await farmCache.delete(userId);
 }
 
 export function getClaimable(
@@ -209,7 +188,7 @@ export async function getClaimable(
         },
       });
 
-      await redis.del(`${Constants.redis.cache.economy.farm}:${getUserId(member)}`);
+      await farmCache.delete(getUserId(member));
     }
 
     const upgradesData = getPlantUpgrades();
@@ -359,7 +338,7 @@ async function checkDead(member: MemberResolvable, plantId?: string) {
     }
   }
 
-  if (count > 0) await redis.del(`${Constants.redis.cache.economy.farm}:${getUserId(member)}`);
+  if (count > 0) await farmCache.delete(getUserId(member));
 
   return count;
 }
@@ -386,7 +365,7 @@ export async function waterFarm(member: MemberResolvable) {
       wateredAt: new Date(),
     },
   });
-  await redis.del(`${Constants.redis.cache.economy.farm}:${getUserId(member)}`);
+  await farmCache.delete(getUserId(member));
 
   return { count: toWater.length, dead };
 }
@@ -436,7 +415,7 @@ export async function fertiliseFarm(member: MemberResolvable): Promise<{
     Math.ceil(possible.length / PLANTS_PER_FERTILISER),
   );
   await addStat(member, "fertiliser", Math.ceil(possible.length / PLANTS_PER_FERTILISER));
-  await redis.del(`${Constants.redis.cache.economy.farm}:${getUserId(member)}`);
+  await farmCache.delete(getUserId(member));
 
   return { done: possible.length, dead };
 }

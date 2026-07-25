@@ -1,8 +1,8 @@
 import { CommandInteraction, Message } from "discord.js";
 import { sort } from "fast-sort";
-import redis from "../init/redis";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import { RedisCache } from "../utils/cache";
 import Constants from "../utils/Constants";
 import { formatDate } from "../utils/functions/date";
 import { getAllMembersRest } from "../utils/functions/guilds/members";
@@ -10,6 +10,12 @@ import { getMember } from "../utils/functions/member";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
 import { addView } from "../utils/functions/users/views";
 import workerSort from "../utils/functions/workers/sort";
+
+type JoinOrderEntry = { id: string; joinedTimestamp: number };
+const joinOrderCache = new RedisCache<JoinOrderEntry[]>(
+  Constants.redis.cache.guild.JOIN_ORDER,
+  3600 * 3,
+);
 
 const cmd = new Command("user", "view info about a user in the server", "info").setAliases([
   "whois",
@@ -42,13 +48,12 @@ async function run(
 
   const members = await getAllMembersRest(message.guildId);
 
-  let membersSorted: { id: string; joinedTimestamp: number }[] = [];
+  let membersSorted: JoinOrderEntry[] = [];
   let msg: Message;
 
-  if (await redis.exists(`${Constants.redis.cache.guild.JOIN_ORDER}:${message.guildId}`)) {
-    membersSorted = JSON.parse(
-      await redis.get(`${Constants.redis.cache.guild.JOIN_ORDER}:${message.guildId}`),
-    );
+  const cached = await joinOrderCache.get(message.guildId);
+  if (cached) {
+    membersSorted = cached;
   } else {
     if (members.length > 2000) {
       if (members.length > 5000)
@@ -69,12 +74,7 @@ async function run(
       ).asc((i) => i.joinedTimestamp);
     }
 
-    await redis.set(
-      `${Constants.redis.cache.guild.JOIN_ORDER}:${message.guildId}`,
-      JSON.stringify(membersSorted),
-      "EX",
-      3600 * 3,
-    );
+    await joinOrderCache.set(message.guildId, membersSorted);
   }
 
   let joinPos: number | string = membersSorted.findIndex((i) => i.id === member.id) + 1;

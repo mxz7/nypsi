@@ -3,6 +3,7 @@ import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { addKarma } from "../karma/karma";
@@ -17,8 +18,14 @@ import { addInventoryItem } from "./inventory";
 import { addStat } from "./stats";
 import { addTaskProgress } from "./tasks";
 import { getXp, removeXp } from "./xp";
-import ms = require("ms");
 import dayjs = require("dayjs");
+
+const prestigeCache = new RedisCache<number>(Constants.redis.cache.economy.PRESTIGE, 6 * 60 * 60);
+const levelCache = new RedisCache<number>(Constants.redis.cache.economy.LEVEL, 12 * 60 * 60);
+const upgradesCache = new RedisCache<{ upgradeId: string; amount: number }[]>(
+  Constants.redis.cache.economy.UPGRADES,
+  3600,
+);
 
 const levellingRewards = new Map<number, { text: string[]; rewards?: string[] }>();
 
@@ -233,11 +240,9 @@ const cratesFormula = (rawLevel: number) => {
 export async function getPrestige(member: MemberResolvable): Promise<number> {
   const userId = getUserId(member);
 
-  const cache = await redis.get(`${Constants.redis.cache.economy.PRESTIGE}:${userId}`);
+  const cache = await prestigeCache.get(userId);
 
-  if (cache) {
-    return parseInt(cache);
-  }
+  if (cache !== null) return cache;
 
   const query = await prisma.economy.findUnique({
     where: {
@@ -248,12 +253,7 @@ export async function getPrestige(member: MemberResolvable): Promise<number> {
     },
   });
 
-  await redis.set(
-    `${Constants.redis.cache.economy.PRESTIGE}:${userId}`,
-    query?.prestige || 0,
-    "EX",
-    ms("6 hour") / 1000,
-  );
+  await prestigeCache.set(userId, query?.prestige || 0);
 
   return query?.prestige || 0;
 }
@@ -270,17 +270,15 @@ export async function setPrestige(member: MemberResolvable, amount: number) {
     },
   });
 
-  await redis.del(`${Constants.redis.cache.economy.PRESTIGE}:${userId}`);
+  await prestigeCache.delete(userId);
 }
 
 export async function getLevel(member: MemberResolvable): Promise<number> {
   const userId = getUserId(member);
 
-  const cache = await redis.get(`${Constants.redis.cache.economy.LEVEL}:${userId}`);
+  const cache = await levelCache.get(userId);
 
-  if (cache) {
-    return parseInt(cache);
-  }
+  if (cache !== null) return cache;
 
   const query = await prisma.economy.findUnique({
     where: {
@@ -291,12 +289,7 @@ export async function getLevel(member: MemberResolvable): Promise<number> {
     },
   });
 
-  await redis.set(
-    `${Constants.redis.cache.economy.LEVEL}:${userId}`,
-    query?.level || 0,
-    "EX",
-    ms("12 hours") / 1000,
-  );
+  await levelCache.set(userId, query?.level || 0);
 
   return query?.level || 0;
 }
@@ -331,7 +324,7 @@ export async function setLevel(member: MemberResolvable, amount: number) {
     },
   });
 
-  await redis.del(`${Constants.redis.cache.economy.LEVEL}:${userId}`);
+  await levelCache.delete(userId);
 
   return query.level;
 }
@@ -390,9 +383,9 @@ export async function getUpgrades(member: MemberResolvable): Promise<
 > {
   const userId = getUserId(member);
 
-  const cache = await redis.get(`${Constants.redis.cache.economy.UPGRADES}:${userId}`);
+  const cache = await upgradesCache.get(userId);
 
-  if (cache) return JSON.parse(cache);
+  if (cache) return cache;
 
   const query = await prisma.upgrades.findMany({
     where: {
@@ -404,12 +397,7 @@ export async function getUpgrades(member: MemberResolvable): Promise<
     },
   });
 
-  await redis.set(
-    `${Constants.redis.cache.economy.UPGRADES}:${userId}`,
-    JSON.stringify(query),
-    "EX",
-    3600,
-  );
+  await upgradesCache.set(userId, query);
 
   return query;
 }
@@ -438,7 +426,7 @@ export async function setUpgrade(member: MemberResolvable, upgradeId: string, am
       },
     });
 
-  await redis.del(`${Constants.redis.cache.economy.UPGRADES}:${userId}`);
+  await upgradesCache.delete(userId);
 
   return await getUpgrades(member);
 }

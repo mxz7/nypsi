@@ -2,6 +2,7 @@ import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
 import { isBooster } from "../premium/boosters";
@@ -12,14 +13,14 @@ import { gemBreak, getInventory } from "./inventory";
 import { doLevelUp, getRawLevel, getUpgrades } from "./levelling";
 import { getItems, getUpgradesData } from "./utils";
 
+const xpCache = new RedisCache<number>(Constants.redis.cache.economy.XP, 3600);
+
 export async function getXp(member: MemberResolvable): Promise<number> {
   const userId = getUserId(member);
 
-  const cache = await redis.get(`${Constants.redis.cache.economy.XP}:${userId}`);
+  const cache = await xpCache.get(userId);
 
-  if (cache) {
-    return parseInt(cache);
-  }
+  if (cache !== null) return cache;
 
   const query = await prisma.economy.findUnique({
     where: {
@@ -30,7 +31,7 @@ export async function getXp(member: MemberResolvable): Promise<number> {
     },
   });
 
-  await redis.set(`${Constants.redis.cache.economy.XP}:${userId}`, query.xp.toString(), "EX", 3600);
+  await xpCache.set(userId, Number(query.xp));
 
   return Number(query.xp);
 }
@@ -46,7 +47,7 @@ export async function updateXp(member: MemberResolvable, amount: number, check =
       xp: amount,
     },
   });
-  await redis.del(`${Constants.redis.cache.economy.XP}:${userId}`);
+  await xpCache.delete(userId);
 
   if (check) doLevelUp(member);
 }
@@ -65,7 +66,7 @@ export async function addXp(member: MemberResolvable, amount: number, check = tr
       xp: true,
     },
   });
-  await redis.set(`${Constants.redis.cache.economy.XP}:${userId}`, query.xp.toString(), "EX", 3600);
+  await xpCache.set(userId, Number(query.xp));
 
   if (check) doLevelUp(member);
 }
@@ -84,7 +85,7 @@ export async function removeXp(member: MemberResolvable, amount: number, check =
       xp: true,
     },
   });
-  await redis.set(`${Constants.redis.cache.economy.XP}:${userId}`, query.xp.toString(), "EX", 3600);
+  await xpCache.set(userId, Number(query.xp));
 
   if (check) doLevelUp(member);
 }

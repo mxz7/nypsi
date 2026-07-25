@@ -15,6 +15,7 @@ import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { NypsiCommandInteraction, NypsiMessage } from "../../models/Command";
 import { CustomEmbed } from "../../models/EmbedBuilders";
+import { RedisCache } from "../cache";
 import Constants from "../Constants";
 import { getTimestamp } from "../logger";
 import { MStoTime } from "./date";
@@ -35,6 +36,11 @@ type CaptchaType2 = {
   id: string;
 };
 
+const captchaHistoryCache = new RedisCache<Captcha[]>(
+  Constants.redis.cache.user.CAPTCHA_HISTORY,
+  Math.floor(ms("1 day") / 1000),
+);
+
 export async function isLockedOut(member: MemberResolvable): Promise<false | CaptchaType2> {
   const cache = await redis.get(`${Constants.redis.nypsi.LOCKED_OUT}:${getUserId(member)}`);
   if (!cache) return false;
@@ -46,7 +52,7 @@ export async function giveCaptcha(member: MemberResolvable, type: 1 | 2 = 2, for
   const userId = getUserId(member);
 
   if (!force && (await isVerified(userId))) return false;
-  await redis.del(`${Constants.redis.cache.user.CAPTCHA_HISTORY}:${userId}`);
+  await captchaHistoryCache.delete(userId);
 
   if (type === 2) {
     const id = await prisma.captcha.create({
@@ -268,7 +274,7 @@ export async function verifyUser(
 
   if (check.solved) {
     await redis.del(`${Constants.redis.nypsi.LOCKED_OUT}:${message.author.id}`);
-    await redis.del(`${Constants.redis.cache.user.CAPTCHA_HISTORY}:${message.author.id}`);
+    await captchaHistoryCache.delete(message.author.id);
     passedCaptcha(message.member, check);
     return true;
   }
@@ -321,12 +327,12 @@ export async function verifyUser(
 
     await redis.del(`${Constants.redis.nypsi.LOCKED_OUT}:${message.author.id}`);
     passedCaptcha(message.member, query);
-    await redis.del(`${Constants.redis.cache.user.CAPTCHA_HISTORY}:${message.author.id}`);
+    await captchaHistoryCache.delete(message.author.id);
 
     return true;
   } else if (query.received > 1) {
     failedCaptcha(message.member, message.content);
-    await redis.del(`${Constants.redis.cache.user.CAPTCHA_HISTORY}:${message.author.id}`);
+    await captchaHistoryCache.delete(message.author.id);
     return false;
   }
 
@@ -336,21 +342,15 @@ export async function verifyUser(
 export async function getCaptchaHistory(member: MemberResolvable) {
   const userId = getUserId(member);
 
-  const cache = await redis.get(`${Constants.redis.cache.user.CAPTCHA_HISTORY}:${userId}`);
-
-  if (cache) return JSON.parse(cache) as Captcha[];
+  const cached = await captchaHistoryCache.get(userId);
+  if (cached) return cached;
 
   const history = await prisma.captcha.findMany({
     where: { userId },
     orderBy: { createdAt: "desc" },
   });
 
-  await redis.set(
-    `${Constants.redis.cache.user.CAPTCHA_HISTORY}:${userId}`,
-    JSON.stringify(history),
-    "EX",
-    Math.floor(ms("1 day") / 1000),
-  );
+  await captchaHistoryCache.set(userId, history);
 
   return history;
 }

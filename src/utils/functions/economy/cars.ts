@@ -1,6 +1,6 @@
 import { CarUpgradeType } from "#generated/prisma";
 import prisma from "../../../init/database";
-import redis from "../../../init/redis";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
 import { getInventory } from "./inventory";
@@ -15,6 +15,8 @@ export type Car = {
   id: number;
   skin?: string;
 };
+
+const garageCache = new RedisCache<Car[]>(Constants.redis.cache.economy.GARAGE, 86400);
 
 const carEmojis = new Map<number, string>();
 carEmojis.set(0, "<:nypsi_car_0:1227982579139874896>");
@@ -52,11 +54,11 @@ export async function checkSkins(member: MemberResolvable, cars: Car[]) {
 export async function getGarage(member: MemberResolvable) {
   const userId = getUserId(member);
 
-  const cache = await redis.get(`${Constants.redis.cache.economy.GARAGE}:${userId}`);
+  const cache = await garageCache.get(userId);
 
   if (cache) {
-    checkSkins(userId, JSON.parse(cache));
-    return JSON.parse(cache) as Car[];
+    checkSkins(userId, cache);
+    return cache;
   }
 
   const query = await prisma.customCar.findMany({
@@ -79,12 +81,7 @@ export async function getGarage(member: MemberResolvable) {
     },
   });
 
-  await redis.set(
-    `${Constants.redis.cache.economy.GARAGE}:${userId}`,
-    JSON.stringify(query),
-    "EX",
-    86400,
-  );
+  await garageCache.set(userId, query);
 
   checkSkins(userId, query);
 
@@ -128,7 +125,7 @@ export async function addCar(member: MemberResolvable) {
     },
   });
 
-  await redis.del(`${Constants.redis.cache.economy.GARAGE}:${userId}`);
+  await garageCache.delete(userId);
 }
 
 export async function addCarUpgrade(
@@ -154,7 +151,7 @@ export async function addCarUpgrade(
     },
   });
 
-  await redis.del(`${Constants.redis.cache.economy.GARAGE}:${userId}`);
+  await garageCache.delete(userId);
 }
 
 export function calcCarCost(amount: number) {
@@ -179,7 +176,7 @@ export async function setCarName(member: MemberResolvable, carId: number, name: 
     },
   });
 
-  await redis.del(`${Constants.redis.cache.economy.GARAGE}:${userId}`);
+  await garageCache.delete(userId);
 }
 
 export async function setSkin(member: MemberResolvable, carId: number, skin?: string) {
@@ -192,5 +189,5 @@ export async function setSkin(member: MemberResolvable, carId: number, skin?: st
     },
   });
 
-  await redis.del(`${Constants.redis.cache.economy.GARAGE}:${getUserId(member)}`);
+  await garageCache.delete(getUserId(member));
 }

@@ -18,6 +18,7 @@ import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { NypsiClient } from "../../models/Client";
 import { CustomEmbed, ErrorEmbed } from "../../models/EmbedBuilders";
+import { RedisCache } from "../cache";
 import Constants from "../Constants";
 import { logger } from "../logger";
 import openai, { buildPrompt, getDocsRaw, prompt } from "./ai/openai";
@@ -31,6 +32,7 @@ import pAll = require("p-all");
 import dayjs = require("dayjs");
 
 export const quickResponses = new Map<string, string>();
+const supportRequestCache = new RedisCache<SupportRequest>(Constants.redis.cache.SUPPORT, 900);
 
 quickResponses.set(
   "auto.scam",
@@ -80,9 +82,8 @@ export async function getSupportRequestByChannelId(id: string) {
 }
 
 export async function getSupportRequest(id: string): Promise<SupportRequest> {
-  if (await redis.exists(`${Constants.redis.cache.SUPPORT}:${id}`)) {
-    return JSON.parse(await redis.get(`${Constants.redis.cache.SUPPORT}:${id}`));
-  }
+  const cached = await supportRequestCache.get(id);
+  if (cached) return cached;
 
   const query = await prisma.supportRequest.findUnique({
     where: {
@@ -91,7 +92,7 @@ export async function getSupportRequest(id: string): Promise<SupportRequest> {
   });
 
   if (query) {
-    await redis.set(`${Constants.redis.cache.SUPPORT}:${id}`, JSON.stringify(query), "EX", 900);
+    await supportRequestCache.set(id, query);
     return query;
   } else {
     return null;
@@ -335,7 +336,7 @@ export async function toggleNotify(id: string, userId: string) {
     });
   }
 
-  await redis.del(`${Constants.redis.cache.SUPPORT}:${id}`);
+  await supportRequestCache.delete(id);
 
   return true;
 }

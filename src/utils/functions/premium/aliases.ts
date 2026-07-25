@@ -1,19 +1,21 @@
 import { UserAlias } from "#generated/prisma";
 import prisma from "../../../init/database";
-import redis from "../../../init/redis";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
 import { isPremium } from "./premium";
 import ms = require("ms");
 
+const aliasesCache = new RedisCache<UserAlias[]>(
+  Constants.redis.cache.premium.ALIASES,
+  ms("12 hour") / 1000,
+);
+
 export async function getUserAliases(member: MemberResolvable) {
   const userId = getUserId(member);
 
-  if (await redis.exists(`${Constants.redis.cache.premium.ALIASES}:${userId}`)) {
-    return JSON.parse(
-      await redis.get(`${Constants.redis.cache.premium.ALIASES}:${userId}`),
-    ) as UserAlias[];
-  }
+  const cached = await aliasesCache.get(userId);
+  if (cached) return cached;
 
   const query = (await isPremium(userId))
     ? await prisma.userAlias.findMany({
@@ -23,12 +25,7 @@ export async function getUserAliases(member: MemberResolvable) {
       })
     : [];
 
-  await redis.set(
-    `${Constants.redis.cache.premium.ALIASES}:${userId}`,
-    JSON.stringify(query || []),
-    "EX",
-    ms("12 hour") / 1000,
-  );
+  await aliasesCache.set(userId, query || []);
 
   return query;
 }
@@ -44,7 +41,7 @@ export async function addUserAlias(member: MemberResolvable, alias: string, comm
     },
   });
 
-  await redis.del(`${Constants.redis.cache.premium.ALIASES}:${userId}`);
+  await aliasesCache.delete(userId);
 }
 
 export async function removeUserAlias(member: MemberResolvable, alias: string) {
@@ -59,5 +56,5 @@ export async function removeUserAlias(member: MemberResolvable, alias: string) {
     },
   });
 
-  await redis.del(`${Constants.redis.cache.premium.ALIASES}:${userId}`);
+  await aliasesCache.delete(userId);
 }

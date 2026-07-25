@@ -1,8 +1,8 @@
 import { Guild, GuildMember, Message, Role, ThreadChannel } from "discord.js";
 import * as stringSimilarity from "string-similarity";
 import prisma from "../../../init/database";
-import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { MStoTime } from "../date";
@@ -26,6 +26,9 @@ const chatFilterCache = new Map<
   string,
   { content: string; percentMatch: number; guildId: string }[]
 >();
+const chatFilterRedisCache = new RedisCache<
+  { content: string; percentMatch: number; guildId: string }[]
+>(Constants.redis.cache.guild.CHATFILTER, 3600);
 
 setInterval(() => {
   chatFilterCache.clear();
@@ -44,9 +47,8 @@ export async function getChatFilter(guild: Guild | string): Promise<
     return chatFilterCache.get(guildId);
   }
 
-  const cache = await redis.get(`${Constants.redis.cache.guild.CHATFILTER}:${guildId}`);
-
-  if (cache) return JSON.parse(cache);
+  const cached = await chatFilterRedisCache.get(guildId);
+  if (cached) return cached;
 
   const query = await prisma.chatFilter.findMany({
     where: {
@@ -54,12 +56,7 @@ export async function getChatFilter(guild: Guild | string): Promise<
     },
   });
 
-  await redis.set(
-    `${Constants.redis.cache.guild.CHATFILTER}:${guildId}`,
-    JSON.stringify(query),
-    "EX",
-    3600,
-  );
+  await chatFilterRedisCache.set(guildId, query);
 
   chatFilterCache.set(guildId, query);
 
@@ -76,7 +73,7 @@ export async function deleteChatFilterWord(guildId: string, content: string) {
     },
   });
 
-  await redis.del(`${Constants.redis.cache.guild.CHATFILTER}:${guildId}`);
+  await chatFilterRedisCache.delete(guildId);
   chatFilterCache.delete(guildId);
 }
 
@@ -89,7 +86,7 @@ export async function addChatFilterWord(guildId: string, content: string, percen
     },
   });
 
-  await redis.del(`${Constants.redis.cache.guild.CHATFILTER}:${guildId}`);
+  await chatFilterRedisCache.delete(guildId);
   chatFilterCache.delete(guildId);
 }
 

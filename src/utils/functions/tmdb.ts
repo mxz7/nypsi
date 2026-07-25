@@ -9,18 +9,35 @@ import {
   TVSearch,
   TVSeasonEpisodeDetails,
 } from "../../types/tmdb";
+import { RedisCache } from "../cache";
 import Constants from "../Constants";
 import { addTaskProgress } from "./economy/tasks";
 import { getUserId, MemberResolvable } from "./member";
 
 const BASE = "https://api.themoviedb.org/3";
+const CACHE_TTL_SECONDS = ms("1 day") / 1000;
+const movieSearchCache = new RedisCache<MovieSearch>(
+  Constants.redis.cache.tmdb.MOVIE_SEARCH,
+  CACHE_TTL_SECONDS,
+);
+const tvSearchCache = new RedisCache<TVSearch>(
+  Constants.redis.cache.tmdb.TV_SEARCH,
+  CACHE_TTL_SECONDS,
+);
+const movieCache = new RedisCache<MovieDetails>(
+  Constants.redis.cache.tmdb.MOVIE,
+  CACHE_TTL_SECONDS,
+);
+const tvCache = new RedisCache<TVDetails>(Constants.redis.cache.tmdb.TV, CACHE_TTL_SECONDS);
+const tvEpisodesCache = new RedisCache<TVSeasonEpisodeDetails[]>(
+  Constants.redis.cache.tmdb.TV_EPISODES,
+  CACHE_TTL_SECONDS,
+);
 
 export async function movieSearch(query: string): Promise<MovieSearch | "unavailable" | number> {
-  const cache = await redis.get(`${Constants.redis.cache.tmdb.MOVIE_SEARCH}:${query}`);
+  const cache = await movieSearchCache.get(query);
 
-  if (cache) {
-    return JSON.parse(cache);
-  }
+  if (cache) return cache;
 
   if (await redis.exists("nypsi:tmdb:ratelimit")) return "unavailable";
 
@@ -33,12 +50,7 @@ export async function movieSearch(query: string): Promise<MovieSearch | "unavail
   if (response.ok && response.status === 200) {
     const data: MovieSearch = await response.json();
 
-    await redis.set(
-      `${Constants.redis.cache.tmdb.MOVIE_SEARCH}:${query}`,
-      JSON.stringify(data),
-      "EX",
-      ms("1 day") / 1000,
-    );
+    await movieSearchCache.set(query, data);
 
     return data;
   }
@@ -50,11 +62,9 @@ export async function movieSearch(query: string): Promise<MovieSearch | "unavail
 }
 
 export async function tvSearch(query: string): Promise<TVSearch | "unavailable" | number> {
-  const cache = await redis.get(`${Constants.redis.cache.tmdb.TV_SEARCH}:${query}`);
+  const cache = await tvSearchCache.get(query);
 
-  if (cache) {
-    return JSON.parse(cache);
-  }
+  if (cache) return cache;
 
   if (await redis.exists("nypsi:tmdb:ratelimit")) return "unavailable";
 
@@ -67,12 +77,7 @@ export async function tvSearch(query: string): Promise<TVSearch | "unavailable" 
   if (response.ok && response.status === 200) {
     const data: TVSearch = await response.json();
 
-    await redis.set(
-      `${Constants.redis.cache.tmdb.TV_SEARCH}:${query}`,
-      JSON.stringify(data),
-      "EX",
-      ms("1 day") / 1000,
-    );
+    await tvSearchCache.set(query, data);
 
     return data;
   }
@@ -84,11 +89,9 @@ export async function tvSearch(query: string): Promise<TVSearch | "unavailable" 
 }
 
 export async function getMovie(id: number): Promise<MovieDetails | "unavailable" | number> {
-  const cache = await redis.get(`${Constants.redis.cache.tmdb.MOVIE}:${id}`);
+  const cache = await movieCache.get(id.toString());
 
-  if (cache) {
-    return JSON.parse(cache);
-  }
+  if (cache) return cache;
 
   if (await redis.exists("nypsi:tmdb:ratelimit")) return "unavailable";
 
@@ -102,17 +105,12 @@ export async function getMovie(id: number): Promise<MovieDetails | "unavailable"
   );
 
   if (response.ok && response.status === 200) {
-    const data = await response.json();
+    const data = (await response.json()) as MovieDetails & { "watch/providers": unknown };
     data.type = "movie";
     data.providers = transformProviders(data["watch/providers"]);
     data["watch/providers"] = undefined;
 
-    await redis.set(
-      `${Constants.redis.cache.tmdb.MOVIE}:${id}`,
-      JSON.stringify(data),
-      "EX",
-      ms("1 day") / 1000,
-    );
+    await movieCache.set(id.toString(), data);
 
     return data;
   }
@@ -124,11 +122,9 @@ export async function getMovie(id: number): Promise<MovieDetails | "unavailable"
 }
 
 export async function getTv(id: number): Promise<TVDetails | "unavailable" | number> {
-  const cache = await redis.get(`${Constants.redis.cache.tmdb.TV}:${id}`);
+  const cache = await tvCache.get(id.toString());
 
-  if (cache) {
-    return JSON.parse(cache);
-  }
+  if (cache) return cache;
 
   if (await redis.exists("nypsi:tmdb:ratelimit")) return "unavailable";
 
@@ -139,17 +135,12 @@ export async function getTv(id: number): Promise<TVDetails | "unavailable" | num
   });
 
   if (response.ok && response.status === 200) {
-    const data = await response.json();
+    const data = (await response.json()) as TVDetails & { "watch/providers": unknown };
     data.type = "tv";
     data.providers = transformProviders(data["watch/providers"]);
     data["watch/providers"] = undefined;
 
-    await redis.set(
-      `${Constants.redis.cache.tmdb.TV}:${id}`,
-      JSON.stringify(data),
-      "EX",
-      ms("1 day") / 1000,
-    );
+    await tvCache.set(id.toString(), data);
 
     return data;
   }
@@ -164,11 +155,9 @@ export async function getEpisodes(
   id: number,
   season: number,
 ): Promise<TVSeasonEpisodeDetails[] | "unavailable" | number> {
-  const cache = await redis.get(`${Constants.redis.cache.tmdb.TV_EPISODES}:${id}:${season}`);
+  const cache = await tvEpisodesCache.get(`${id}:${season}`);
 
-  if (cache) {
-    return JSON.parse(cache);
-  }
+  if (cache) return cache;
 
   if (await redis.exists("nypsi:tmdb:ratelimit")) return "unavailable";
 
@@ -181,12 +170,7 @@ export async function getEpisodes(
   if (response.ok && response.status === 200) {
     const data = (await response.json()).episodes;
 
-    await redis.set(
-      `${Constants.redis.cache.tmdb.TV_EPISODES}:${id}:${season}`,
-      JSON.stringify(data),
-      "EX",
-      ms("1 day") / 1000,
-    );
+    await tvEpisodesCache.set(`${id}:${season}`, data);
 
     return data;
   }

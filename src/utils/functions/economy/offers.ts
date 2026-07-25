@@ -9,9 +9,9 @@ import {
 } from "discord.js";
 import { Offer } from "#generated/prisma";
 import prisma from "../../../init/database";
-import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { getUserId, MemberResolvable } from "../member";
@@ -21,6 +21,11 @@ import { getTax } from "../tax";
 import { addBalance } from "./balance";
 import { getInventory, Inventory } from "./inventory";
 import { createUser, getItems, userExists } from "./utils";
+
+const offersAverageCache = new RedisCache<number>(
+  Constants.redis.cache.economy.OFFER_AVG,
+  3 * 60 * 60,
+);
 
 export async function createOffer(
   target: User,
@@ -167,8 +172,8 @@ export async function checkOffer(offer: Offer, client: NypsiClient) {
 }
 
 export async function getOffersAverage(item: string) {
-  if (await redis.exists(`${Constants.redis.cache.economy.OFFER_AVG}:${item}`))
-    return parseInt(await redis.get(`${Constants.redis.cache.economy.OFFER_AVG}:${item}`));
+  const cache = await offersAverageCache.get(item);
+  if (cache !== null) return cache;
 
   const date = Constants.SEASON_START_HISTORY[Math.max(0, Constants.SEASON_NUMBER - 2)];
 
@@ -208,7 +213,7 @@ export async function getOffersAverage(item: string) {
   const sum = costs.reduce((a, b) => a + b, 0);
   const avg = Math.floor(sum / costs.length) || 0;
 
-  await redis.set(`${Constants.redis.cache.economy.OFFER_AVG}:${item}`, avg, "EX", 3600 * 3);
+  await offersAverageCache.set(item, avg);
 
   return avg;
 }

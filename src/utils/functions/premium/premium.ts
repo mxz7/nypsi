@@ -1,7 +1,7 @@
 import { ClusterManager } from "discord-hybrid-sharding";
 import prisma from "../../../init/database";
-import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { clearExpiredUserAliases } from "../../handlers/commandhandler";
 import { logger } from "../../logger";
@@ -14,18 +14,20 @@ import { removeUserAlias } from "./aliases";
 import dayjs = require("dayjs");
 import ms = require("ms");
 
+const premiumLevelCache = new RedisCache<number>(
+  Constants.redis.cache.premium.LEVEL,
+  ms("1 hour") / 1000,
+);
+const aliasesCache = new RedisCache<unknown[]>(
+  Constants.redis.cache.premium.ALIASES,
+  ms("12 hour") / 1000,
+);
+
 export async function isPremium(member: MemberResolvable): Promise<boolean> {
   const userId = getUserId(member);
 
-  if (await redis.exists(`${Constants.redis.cache.premium.LEVEL}:${userId}`)) {
-    const level = parseInt(await redis.get(`${Constants.redis.cache.premium.LEVEL}:${userId}`));
-
-    if (level == 0) {
-      return false;
-    } else {
-      return true;
-    }
-  }
+  const cached = await premiumLevelCache.get(userId);
+  if (cached !== null) return cached !== 0;
 
   const query = await prisma.premium.findUnique({
     where: {
@@ -39,29 +41,14 @@ export async function isPremium(member: MemberResolvable): Promise<boolean> {
 
   if (query) {
     if (query.level == 0) {
-      await redis.set(
-        `${Constants.redis.cache.premium.LEVEL}:${userId}`,
-        0,
-        "EX",
-        ms("1 hour") / 1000,
-      );
+      await premiumLevelCache.set(userId, 0);
       return false;
     }
 
-    await redis.set(
-      `${Constants.redis.cache.premium.LEVEL}:${userId}`,
-      query.level,
-      "EX",
-      ms("1 hour") / 1000,
-    );
+    await premiumLevelCache.set(userId, query.level);
     return true;
   } else {
-    await redis.set(
-      `${Constants.redis.cache.premium.LEVEL}:${userId}`,
-      0,
-      "EX",
-      ms("1 hour") / 1000,
-    );
+    await premiumLevelCache.set(userId, 0);
     return false;
   }
 }
@@ -69,8 +56,8 @@ export async function isPremium(member: MemberResolvable): Promise<boolean> {
 export async function getTier(member: MemberResolvable): Promise<number> {
   const userId = getUserId(member);
 
-  if (await redis.exists(`${Constants.redis.cache.premium.LEVEL}:${userId}`))
-    return parseInt(await redis.get(`${Constants.redis.cache.premium.LEVEL}:${userId}`));
+  const cached = await premiumLevelCache.get(userId);
+  if (cached !== null) return cached;
 
   const query = await prisma.premium.findUnique({
     where: {
@@ -81,12 +68,7 @@ export async function getTier(member: MemberResolvable): Promise<number> {
     },
   });
 
-  await redis.set(
-    `${Constants.redis.cache.premium.LEVEL}:${userId}`,
-    query?.level || 0,
-    "EX",
-    ms("1 hour") / 1000,
-  );
+  await premiumLevelCache.set(userId, query?.level || 0);
 
   return query?.level || 0;
 }
@@ -144,8 +126,8 @@ export async function addMember(member: MemberResolvable, level: number, expires
     });
   }
 
-  await redis.del(`${Constants.redis.cache.premium.LEVEL}:${userId}`);
-  await redis.del(`${Constants.redis.cache.premium.ALIASES}:${userId}`);
+  await premiumLevelCache.delete(userId);
+  await aliasesCache.delete(userId);
 }
 
 export async function getPremiumProfile(member: MemberResolvable) {
@@ -185,7 +167,7 @@ export async function setTier(member: MemberResolvable, level: number) {
     });
   }
 
-  await redis.del(`${Constants.redis.cache.premium.LEVEL}:${userId}`);
+  await premiumLevelCache.delete(userId);
 }
 
 export async function renewUser(member: MemberResolvable) {
@@ -211,7 +193,7 @@ export async function renewUser(member: MemberResolvable) {
     });
   }
 
-  await redis.del(`${Constants.redis.cache.premium.LEVEL}:${userId}`);
+  await premiumLevelCache.delete(userId);
 }
 
 export async function expireUser(member: MemberResolvable, client?: NypsiClient | ClusterManager) {
@@ -245,8 +227,8 @@ export async function expireUser(member: MemberResolvable, client?: NypsiClient 
       break;
   }
 
-  await redis.del(`${Constants.redis.cache.premium.LEVEL}:${userId}`);
-  await redis.del(`${Constants.redis.cache.premium.ALIASES}:${userId}`);
+  await premiumLevelCache.delete(userId);
+  await aliasesCache.delete(userId);
 
   clearExpiredUserAliases(await getLastKnownUsername(userId, false));
 

@@ -1,8 +1,16 @@
 import prisma from "../../../init/database";
-import redis from "../../../init/redis";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
 import { escapeFormattingCharacters } from "../string";
+
+type CachedUsername = {
+  lastKnownUsername: string;
+  usernameUpdatedAt: Date;
+};
+
+const usernameCache = new RedisCache<CachedUsername>(Constants.redis.cache.user.username, 7200);
+const avatarCache = new RedisCache<string | false>(Constants.redis.cache.user.avatar, 86400);
 
 export async function updateLastKnownUsername(member: MemberResolvable, tag: string) {
   const userId = getUserId(member);
@@ -17,12 +25,7 @@ export async function updateLastKnownUsername(member: MemberResolvable, tag: str
     },
   });
 
-  await redis.set(
-    `${Constants.redis.cache.user.username}:${userId}`,
-    JSON.stringify({ lastKnownUsername: tag, usernameUpdatedAt: new Date() }),
-    "EX",
-    7200,
-  );
+  await usernameCache.set(userId, { lastKnownUsername: tag, usernameUpdatedAt: new Date() });
 }
 
 export async function getLastKnownUsername(
@@ -40,25 +43,20 @@ export async function getLastKnownUsername(
   escape = true,
   showUpdatedAt?: boolean,
 ): Promise<string | { lastKnownUsername: string; usernameUpdatedAt: Date }> {
-  const cache = await redis.get(`${Constants.redis.cache.user.username}:${id}`);
+  const cached = await usernameCache.get(id);
 
-  if (cache) {
-    const data: {
-      lastKnownUsername: string;
-      usernameUpdatedAt: Date;
-    } = JSON.parse(cache);
-
-    data.usernameUpdatedAt = new Date(data.usernameUpdatedAt);
+  if (cached) {
+    cached.usernameUpdatedAt = new Date(cached.usernameUpdatedAt);
 
     if (escape) {
-      data.lastKnownUsername = escapeFormattingCharacters(data.lastKnownUsername);
+      cached.lastKnownUsername = escapeFormattingCharacters(cached.lastKnownUsername);
     }
 
     if (showUpdatedAt) {
-      return data;
+      return cached;
     }
 
-    return data.lastKnownUsername;
+    return cached.lastKnownUsername;
   }
 
   const query = await prisma.user.findUnique({
@@ -71,11 +69,9 @@ export async function getLastKnownUsername(
     },
   });
 
-  await redis.set(
-    `${Constants.redis.cache.user.username}:${id}`,
-    JSON.stringify(query ? query : { lastKnownUsername: "unknown", usernameUpdatedAt: new Date() }),
-    "EX",
-    7200,
+  await usernameCache.set(
+    id,
+    query ? query : { lastKnownUsername: "unknown", usernameUpdatedAt: new Date() },
   );
 
   if (!query) return "unknown";
@@ -103,12 +99,8 @@ export async function getIdFromUsername(username: string) {
 }
 
 export async function getLastKnownAvatar(id: string) {
-  const cache = await redis.get(`${Constants.redis.cache.user.avatar}:${id}`);
-
-  if (cache) {
-    if (cache === "null") return null;
-    return cache;
-  }
+  const cached = await avatarCache.get(id);
+  if (cached !== null) return cached || null;
 
   const query = await prisma.user.findUnique({
     where: {
@@ -119,12 +111,11 @@ export async function getLastKnownAvatar(id: string) {
     },
   });
 
-  await redis.set(
-    `${Constants.redis.cache.user.avatar}:${id}`,
-    query?.avatar || "null",
-    "EX",
-    86400,
-  );
+  await avatarCache.set(id, query?.avatar || false);
 
   return query?.avatar || null;
+}
+
+export async function updateLastKnownAvatarCache(id: string, avatar: string) {
+  await avatarCache.set(id, avatar);
 }

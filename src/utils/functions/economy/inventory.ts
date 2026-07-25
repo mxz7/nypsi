@@ -33,7 +33,6 @@ import { getOffersAverage } from "./offers";
 import { addStat } from "./stats";
 import { deleteTradeRequest, getTradeRequests } from "./trade_requests";
 import { createUser, getItems, userExists } from "./utils";
-import ms = require("ms");
 
 const gemChanceCooldown = new Set<string>();
 setInterval(() => {
@@ -41,21 +40,26 @@ setInterval(() => {
 }, 60000);
 
 const itemValueCache = new RedisCache<number>(Constants.redis.cache.economy.ITEM_VALUE, 3600);
+const inventoryCache = new RedisCache<Record<string, number>>(
+  Constants.redis.cache.economy.INVENTORY,
+  180,
+);
+const hasGemCache = new RedisCache<{
+  any: boolean;
+  inInventory: boolean;
+  inOrders: boolean;
+  inTrades: boolean;
+}>(Constants.redis.cache.economy.HAS_GEM, 180);
+const autosellCache = new RedisCache<string[]>(Constants.redis.cache.economy.AUTO_SELL, 3600);
+const sellFilterCache = new RedisCache<string[]>(Constants.redis.cache.economy.SELL_FILTER, 3600);
 
 export async function getInventory(member: MemberResolvable): Promise<Inventory> {
   const userId = getUserId(member);
 
-  const cache = await redis.get(`${Constants.redis.cache.economy.INVENTORY}:${userId}`);
+  const cache = await inventoryCache.get(userId);
 
   if (cache) {
-    try {
-      const parsed = JSON.parse(cache);
-      return new Inventory(userId, parsed);
-    } catch (e) {
-      console.error(e);
-      logger.error("weird inventory cache error", { error: e });
-      return new Inventory(userId);
-    }
+    return new Inventory(userId, cache);
   }
 
   const query = await prisma.inventory
@@ -77,23 +81,13 @@ export async function getInventory(member: MemberResolvable): Promise<Inventory>
 
   if (!query || query.length == 0) {
     if (!(await userExists(userId))) await createUser(userId);
-    await redis.set(
-      `${Constants.redis.cache.economy.INVENTORY}:${userId}`,
-      JSON.stringify({}),
-      "EX",
-      180,
-    );
+    await inventoryCache.set(userId, {});
     return new Inventory(userId);
   }
 
   const inventory = new Inventory(userId, query);
 
-  await redis.set(
-    `${Constants.redis.cache.economy.INVENTORY}:${userId}`,
-    JSON.stringify(inventory.toJSON()),
-    "EX",
-    180,
-  );
+  await inventoryCache.set(userId, inventory.toJSON());
 
   return inventory;
 }
@@ -142,10 +136,8 @@ export class Inventory {
   async hasGem(
     id: "crystal_heart" | "white_gem" | "pink_gem" | "purple_gem" | "blue_gem" | "green_gem",
   ): Promise<{ any: boolean; inInventory: boolean; inOrders: boolean; inTrades: boolean }> {
-    const cache = await redis.get(`${Constants.redis.cache.economy.HAS_GEM}:${this.userId}:${id}`);
-    if (cache) {
-      return JSON.parse(cache);
-    }
+    const cache = await hasGemCache.get(`${this.userId}:${id}`);
+    if (cache) return cache;
 
     const inInv = this.has(id);
 
@@ -164,12 +156,7 @@ export class Inventory {
       inTrades: inTrades,
     };
 
-    await redis.set(
-      `${Constants.redis.cache.economy.HAS_GEM}:${this.userId}:${id}`,
-      JSON.stringify(res),
-      "EX",
-      180,
-    );
+    await hasGemCache.set(`${this.userId}:${id}`, res);
 
     return res;
   }
@@ -285,11 +272,9 @@ export async function addInventoryItem(member: MemberResolvable, itemId: string,
     },
   });
 
-  await redis.del(
-    `${Constants.redis.cache.economy.INVENTORY}:${userId}`,
-    `${Constants.redis.cache.economy.ITEM_EXISTS}:${itemId}`,
-    ...(isGem(itemId) ? [`${Constants.redis.cache.economy.HAS_GEM}:${userId}:${itemId}`] : []),
-  );
+  await inventoryCache.delete(userId);
+  await redis.del(`${Constants.redis.cache.economy.ITEM_EXISTS}:${itemId}`);
+  if (isGem(itemId)) await hasGemCache.delete(`${userId}:${itemId}`);
 }
 
 export async function removeInventoryItem(
@@ -341,11 +326,9 @@ export async function removeInventoryItem(
       .catch(() => {});
   }
 
-  await redis.del(
-    `${Constants.redis.cache.economy.INVENTORY}:${userId}`,
-    `${Constants.redis.cache.economy.ITEM_EXISTS}:${itemId}`,
-    ...(isGem(itemId) ? [`${Constants.redis.cache.economy.HAS_GEM}:${userId}:${itemId}`] : []),
-  );
+  await inventoryCache.delete(userId);
+  await redis.del(`${Constants.redis.cache.economy.ITEM_EXISTS}:${itemId}`);
+  if (isGem(itemId)) await hasGemCache.delete(`${userId}:${itemId}`);
 }
 
 export async function setInventoryItem(member: MemberResolvable, itemId: string, amount: number) {
@@ -394,11 +377,9 @@ export async function setInventoryItem(member: MemberResolvable, itemId: string,
     });
   }
 
-  await redis.del(
-    `${Constants.redis.cache.economy.INVENTORY}:${userId}`,
-    `${Constants.redis.cache.economy.ITEM_EXISTS}:${itemId}`,
-    ...(isGem(itemId) ? [`${Constants.redis.cache.economy.HAS_GEM}:${userId}:${itemId}`] : []),
-  );
+  await inventoryCache.delete(userId);
+  await redis.del(`${Constants.redis.cache.economy.ITEM_EXISTS}:${itemId}`);
+  if (isGem(itemId)) await hasGemCache.delete(`${userId}:${itemId}`);
 }
 
 export async function getTotalAmountOfItem(itemId: string) {
@@ -719,7 +700,7 @@ export async function setAutosellItems(member: MemberResolvable, items: string[]
     })
     .then((q) => q.autosell);
 
-  await redis.del(`${Constants.redis.cache.economy.AUTO_SELL}:${userId}`);
+  await autosellCache.delete(userId);
 
   return query;
 }
@@ -727,11 +708,8 @@ export async function setAutosellItems(member: MemberResolvable, items: string[]
 export async function getAutosellItems(member: MemberResolvable) {
   const userId = getUserId(member);
 
-  if (await redis.exists(`${Constants.redis.cache.economy.AUTO_SELL}:${userId}`)) {
-    return JSON.parse(
-      await redis.get(`${Constants.redis.cache.economy.AUTO_SELL}:${userId}`),
-    ) as string[];
-  }
+  const cache = await autosellCache.get(userId);
+  if (cache) return cache;
 
   const query = await prisma.economy
     .findUnique({
@@ -744,12 +722,7 @@ export async function getAutosellItems(member: MemberResolvable) {
     })
     .then((q) => q.autosell);
 
-  await redis.set(
-    `${Constants.redis.cache.economy.AUTO_SELL}:${userId}`,
-    JSON.stringify(query),
-    "EX",
-    Math.floor(ms("1 hour") / 1000),
-  );
+  await autosellCache.set(userId, query);
 
   return query;
 }
@@ -771,7 +744,7 @@ export async function setSellFilter(member: MemberResolvable, items: string[]) {
     })
     .then((q) => q.sellallFilter);
 
-  await redis.del(`${Constants.redis.cache.economy.SELL_FILTER}:${userId}`);
+  await sellFilterCache.delete(userId);
 
   return query;
 }
@@ -779,11 +752,8 @@ export async function setSellFilter(member: MemberResolvable, items: string[]) {
 export async function getSellFilter(member: MemberResolvable) {
   const userId = getUserId(member);
 
-  if (await redis.exists(`${Constants.redis.cache.economy.SELL_FILTER}:${userId}`)) {
-    return JSON.parse(
-      await redis.get(`${Constants.redis.cache.economy.SELL_FILTER}:${userId}`),
-    ) as string[];
-  }
+  const cache = await sellFilterCache.get(userId);
+  if (cache) return cache;
 
   const query = await prisma.economy
     .findUnique({
@@ -796,12 +766,7 @@ export async function getSellFilter(member: MemberResolvable) {
     })
     .then((q) => q.sellallFilter);
 
-  await redis.set(
-    `${Constants.redis.cache.economy.SELL_FILTER}:${userId}`,
-    JSON.stringify(query),
-    "EX",
-    Math.floor(ms("1 hour") / 1000),
-  );
+  await sellFilterCache.set(userId, query);
 
   return query;
 }

@@ -1,37 +1,31 @@
 import prisma from "../../../init/database";
-import redis from "../../../init/redis";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
 import { cleanString } from "../string";
 import ms = require("ms");
 
+const lastfmCache = new RedisCache<string>(Constants.redis.cache.user.LASTFM, ms("1 hour") / 1000);
+
 export async function getLastfmUsername(member: MemberResolvable) {
   const userId = getUserId(member);
 
-  if (await redis.exists(`${Constants.redis.cache.user.LASTFM}:${userId}`)) {
-    return await redis.get(`${Constants.redis.cache.user.LASTFM}:${userId}`);
-  } else {
-    const query = await prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
-      select: {
-        lastfmUsername: true,
-      },
-    });
+  const cached = await lastfmCache.get(userId);
+  if (cached) return cached;
 
-    if (query && query.lastfmUsername) {
-      await redis.set(
-        `${Constants.redis.cache.user.LASTFM}:${userId}`,
-        query.lastfmUsername,
-        "EX",
-        ms("1 hour") / 1000,
-      );
-      return query.lastfmUsername;
-    } else {
-      return undefined;
-    }
-  }
+  const query = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      lastfmUsername: true,
+    },
+  });
+
+  if (!query?.lastfmUsername) return undefined;
+
+  await lastfmCache.set(userId, query.lastfmUsername);
+  return query.lastfmUsername;
 }
 
 export async function setLastfmUsername(member: MemberResolvable, username: string) {
@@ -45,7 +39,7 @@ export async function setLastfmUsername(member: MemberResolvable, username: stri
 
   if (res.error && res.error == 6) return false;
 
-  await redis.del(`${Constants.redis.cache.user.LASTFM}:${userId}`);
+  await lastfmCache.delete(userId);
 
   await prisma.user.update({
     where: {

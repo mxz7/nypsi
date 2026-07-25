@@ -1,19 +1,20 @@
 import { ToolPreferenceSelection } from "#generated/prisma";
 import prisma from "../../../init/database";
-import redis from "../../../init/redis";
 import { ToolPreferences } from "../../../types/Economy";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
-import ms = require("ms");
+const toolPreferencesCache = new RedisCache<ToolPreferences>(
+  Constants.redis.cache.economy.TOOL_PREFERENCES,
+  6 * 60 * 60,
+);
 
 export async function getToolPreferences(member: MemberResolvable): Promise<ToolPreferences> {
   const userId = getUserId(member);
 
-  const cache = await redis.get(`${Constants.redis.cache.economy.TOOL_PREFERENCES}:${userId}`);
+  const cache = await toolPreferencesCache.get(userId);
 
-  if (cache) {
-    return JSON.parse(cache);
-  }
+  if (cache) return cache;
 
   const query = await prisma.economy.findUnique({
     where: { userId },
@@ -26,12 +27,7 @@ export async function getToolPreferences(member: MemberResolvable): Promise<Tool
     },
   });
 
-  await redis.set(
-    `${Constants.redis.cache.economy.TOOL_PREFERENCES}:${userId}`,
-    JSON.stringify(query),
-    "EX",
-    Math.floor(ms("6 hours") / 1000),
-  );
+  await toolPreferencesCache.set(userId, query);
 
   return query;
 }
@@ -54,7 +50,7 @@ export async function toggleToolPreference(
     },
   });
 
-  await redis.del(`${Constants.redis.cache.economy.TOOL_PREFERENCES}:${userId}`);
+  await toolPreferencesCache.delete(userId);
 }
 
 export async function setToolPreference(
@@ -73,5 +69,5 @@ export async function setToolPreference(
     },
   });
 
-  await redis.del(`${Constants.redis.cache.economy.TOOL_PREFERENCES}:${userId}`);
+  await toolPreferencesCache.delete(userId);
 }

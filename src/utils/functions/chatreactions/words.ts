@@ -2,17 +2,21 @@ import { readFile } from "fs/promises";
 import { Guild } from "discord.js";
 import { ChatReactionWordList } from "#generated/prisma";
 import prisma from "../../../init/database";
-import redis from "../../../init/redis";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 
 let english1k: string[];
 let english5k: string[];
 let english10k: string[];
+const wordListTypeCache = new RedisCache<ChatReactionWordList>(
+  Constants.redis.cache.chatReaction.WORD_LIST_TYPE,
+  3600,
+);
+const wordListCache = new RedisCache<string[]>(Constants.redis.cache.chatReaction.WORD_LIST, 86400);
 
 export async function getWordListType(guild: Guild) {
-  const cache = await redis.get(`${Constants.redis.cache.chatReaction.WORD_LIST_TYPE}:${guild.id}`);
-
-  if (cache) return cache as ChatReactionWordList;
+  const cached = await wordListTypeCache.get(guild.id);
+  if (cached) return cached;
 
   const query = await prisma.chatReaction.findUnique({
     where: {
@@ -23,12 +27,7 @@ export async function getWordListType(guild: Guild) {
     },
   });
 
-  await redis.set(
-    `${Constants.redis.cache.chatReaction.WORD_LIST_TYPE}:${guild.id}`,
-    query.wordListType,
-    "EX",
-    3600,
-  );
+  await wordListTypeCache.set(guild.id, query.wordListType);
 
   return query.wordListType;
 }
@@ -37,13 +36,11 @@ export async function getWords(guild: Guild, type?: ChatReactionWordList) {
   if (!type) type = await getWordListType(guild);
 
   if (type === "custom") {
-    const cache = await redis.get(`${Constants.redis.cache.chatReaction.WORD_LIST}:${guild.id}`);
+    const cached = await wordListCache.get(guild.id);
 
-    if (cache) {
-      const words = cache.split(" ");
-
-      if (words.length === 0) return getWords(guild, "english_1k");
-      return words;
+    if (cached) {
+      if (cached.length === 0) return getWords(guild, "english_1k");
+      return cached;
     } else {
       const query = await prisma.chatReaction.findUnique({
         where: {
@@ -54,12 +51,7 @@ export async function getWords(guild: Guild, type?: ChatReactionWordList) {
         },
       });
 
-      await redis.set(
-        `${Constants.redis.cache.chatReaction.WORD_LIST}:${guild.id}`,
-        query.wordList.join(" "),
-        "EX",
-        86400,
-      );
+      await wordListCache.set(guild.id, query.wordList);
 
       if (query.wordList.length === 0) return getWords(guild, "english_1k");
 
@@ -131,14 +123,11 @@ export async function setWordListType(guild: Guild, type: ChatReactionWordList) 
     },
   });
 
-  await redis.del(
-    `${Constants.redis.cache.chatReaction.WORD_LIST}:${guild.id}`,
-    `${Constants.redis.cache.chatReaction.WORD_LIST_TYPE}:${guild.id}`,
-  );
+  await Promise.all([wordListCache.delete(guild.id), wordListTypeCache.delete(guild.id)]);
 }
 
 export async function updateWords(guild: Guild, newWordList: string[]) {
-  await redis.del(`${Constants.redis.cache.chatReaction.WORD_LIST}:${guild.id}`);
+  await wordListCache.delete(guild.id);
 
   await prisma.chatReaction.update({
     where: {

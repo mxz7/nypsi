@@ -15,28 +15,24 @@ const checkMutex = new MemoryMutex();
 
 // recently checked against db
 const recentlyChecked = new Set<string>();
+const databaseMembersCache = new RedisCache<string[]>(
+  Constants.redis.cache.guild.MEMBERS,
+  ms("30 minute") / 1000,
+);
 
 setInterval(() => {
   recentlyChecked.clear();
 }, ms("10 minutes"));
 
 async function getDatabaseMembers(guildId: string) {
-  const cache = await redis.get(`${Constants.redis.cache.guild.MEMBERS}:${guildId}`);
-
-  if (cache) {
-    return JSON.parse(cache) as string[];
-  }
+  const cached = await databaseMembersCache.get(guildId);
+  if (cached) return cached;
 
   const members = await prisma.guildMember
     .findMany({ where: { guildId }, select: { userId: true } })
     .then((members) => members.map(({ userId }) => userId));
 
-  await redis.set(
-    `${Constants.redis.cache.guild.MEMBERS}:${guildId}`,
-    JSON.stringify(members),
-    "EX",
-    ms("30 minute") / 1000,
-  );
+  await databaseMembersCache.set(guildId, members);
 
   return members;
 }
@@ -72,12 +68,12 @@ export async function checkMembers(guildId: string, discordMembers: string[]) {
       await prisma.guildMember.createMany({
         data: missing.map((userId) => ({ guildId, userId })),
       });
-      redis.del(`${Constants.redis.cache.guild.MEMBERS}:${guildId}`);
+      databaseMembersCache.delete(guildId);
     }
 
     if (extra.length > 0) {
       await prisma.guildMember.deleteMany({ where: { guildId, userId: { in: extra } } });
-      redis.del(`${Constants.redis.cache.guild.MEMBERS}:${guildId}`);
+      databaseMembersCache.delete(guildId);
     }
   } finally {
     checkMutex.release(mutexKey);

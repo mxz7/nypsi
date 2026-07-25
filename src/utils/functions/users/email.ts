@@ -1,12 +1,14 @@
 import prisma from "../../../init/database";
-import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { NotificationPayload } from "../../../types/Notification";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { addInventoryItem } from "../economy/inventory";
 import { getItems } from "../economy/utils";
 import { getUserId, MemberResolvable } from "../member";
+
+const totalSpendCache = new RedisCache<number>(Constants.redis.cache.premium.TOTAL_SPEND, 3600);
 import {
   addMember,
   getTier,
@@ -152,16 +154,13 @@ export async function checkPurchases(member: MemberResolvable) {
     },
   });
 
-  await redis.del(`${Constants.redis.cache.premium.TOTAL_SPEND}:${userId}`);
+  await totalSpendCache.delete(userId);
 }
 
 export async function getTotalSpend(member: MemberResolvable) {
   const userId = getUserId(member);
-  const cache = await redis.get(`${Constants.redis.cache.premium.TOTAL_SPEND}:${userId}`);
-
-  if (cache) {
-    return parseFloat(cache);
-  }
+  const cached = await totalSpendCache.get(userId);
+  if (cached !== null) return cached;
 
   const query = await prisma.purchases.aggregate({
     where: {
@@ -172,12 +171,7 @@ export async function getTotalSpend(member: MemberResolvable) {
     },
   });
 
-  await redis.set(
-    `${Constants.redis.cache.premium.TOTAL_SPEND}:${userId}`,
-    query._sum.cost?.toNumber() || 0,
-    "EX",
-    3600,
-  );
+  await totalSpendCache.set(userId, query._sum.cost?.toNumber() || 0);
 
   return query._sum.cost?.toNumber() || 0;
 }

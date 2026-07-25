@@ -1,18 +1,22 @@
 import ms = require("ms");
 import prisma from "../../../init/database";
-import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { createProfile } from "../users/utils";
 
+const boosterCache = new RedisCache<boolean>(
+  Constants.redis.cache.premium.BOOSTER,
+  ms("3 hours") / 1000,
+);
+
 export async function isBooster(member: MemberResolvable) {
   const userId = getUserId(member);
 
-  if (await redis.exists(`${Constants.redis.cache.premium.BOOSTER}:${userId}`)) {
-    return (await redis.get(`${Constants.redis.cache.premium.BOOSTER}:${userId}`)) === "t";
-  }
+  const cached = await boosterCache.get(userId);
+  if (cached !== null) return cached;
 
   const query = await prisma.user.findUnique({
     where: {
@@ -27,12 +31,7 @@ export async function isBooster(member: MemberResolvable) {
     return false;
   }
 
-  await redis.set(
-    `${Constants.redis.cache.premium.BOOSTER}:${userId}`,
-    query.booster ? "t" : "f",
-    "EX",
-    ms("3 hours") / 1000,
-  );
+  await boosterCache.set(userId, query.booster);
 
   return query.booster;
 }
@@ -59,7 +58,7 @@ export async function setBooster(member: MemberResolvable, value: boolean): Prom
     return setBooster(member, value);
   }
 
-  await redis.del(`${Constants.redis.cache.premium.BOOSTER}:${userId}`);
+  await boosterCache.delete(userId);
 
   if (value && (await getDmSettings(member)).premium) {
     addNotificationToQueue({

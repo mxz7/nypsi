@@ -1,13 +1,17 @@
 import { Guild } from "discord.js";
 import prisma from "../../../init/database";
-import redis from "../../../init/redis";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import ms = require("ms");
 
+const altPunishCache = new RedisCache<boolean>(
+  Constants.redis.cache.guild.ALT_PUNISH,
+  ms("24 hour") / 1000,
+);
+
 export async function isAltPunish(guild: Guild) {
-  if (await redis.exists(`${Constants.redis.cache.guild.ALT_PUNISH}:${guild.id}`)) {
-    return (await redis.get(`${Constants.redis.cache.guild.ALT_PUNISH}:${guild.id}`)) === "t";
-  }
+  const cached = await altPunishCache.get(guild.id);
+  if (cached !== null) return cached;
 
   const res = await prisma.guild
     .findUnique({
@@ -20,21 +24,7 @@ export async function isAltPunish(guild: Guild) {
     })
     .then((q) => q.alt_punish);
 
-  if (res) {
-    await redis.set(
-      `${Constants.redis.cache.guild.ALT_PUNISH}:${guild.id}`,
-      "t",
-      "EX",
-      ms("24 hour") / 1000,
-    );
-  } else {
-    await redis.set(
-      `${Constants.redis.cache.guild.ALT_PUNISH}:${guild.id}`,
-      "f",
-      "EX",
-      ms("24 hour") / 1000,
-    );
-  }
+  await altPunishCache.set(guild.id, res);
 
   return res;
 }
@@ -49,5 +39,5 @@ export async function setAltPunish(guild: Guild, bool: boolean) {
     },
   });
 
-  await redis.del(`${Constants.redis.cache.guild.ALT_PUNISH}:${guild.id}`);
+  await altPunishCache.delete(guild.id);
 }

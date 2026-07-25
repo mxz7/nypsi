@@ -7,6 +7,7 @@ import {
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { addKarma } from "../karma/karma";
@@ -25,6 +26,8 @@ import { getItems } from "./utils";
 import { addXp } from "./xp";
 import ms = require("ms");
 
+const voteCache = new RedisCache<number>(Constants.redis.cache.economy.VOTE, 3600);
+
 export async function getLastVote(member: MemberResolvable) {
   const query = await prisma.economy.findUnique({
     where: {
@@ -41,29 +44,16 @@ export async function getLastVote(member: MemberResolvable) {
 export async function hasVoted(member: MemberResolvable) {
   const userId = getUserId(member);
 
-  if (await redis.exists(`${Constants.redis.cache.economy.VOTE}:${userId}`)) {
-    const res = parseInt(await redis.get(`${Constants.redis.cache.economy.VOTE}:${userId}`));
-
-    return Date.now() - res < ms("12 hours");
-  }
+  const cache = await voteCache.get(userId);
+  if (cache !== null) return Date.now() - cache < ms("12 hours");
 
   const lastVote = await getLastVote(userId);
 
   if (Date.now() - lastVote.getTime() < ms("12 hours")) {
-    redis.set(
-      `${Constants.redis.cache.economy.VOTE}:${userId}`,
-      lastVote.getTime(),
-      "EX",
-      ms("1 hour") / 1000,
-    );
+    voteCache.set(userId, lastVote.getTime());
     return true;
   } else {
-    redis.set(
-      `${Constants.redis.cache.economy.VOTE}:${userId}`,
-      lastVote.getTime(),
-      "EX",
-      ms("1 hour") / 1000,
-    );
+    voteCache.set(userId, lastVote.getTime());
     return false;
   }
 }
@@ -100,12 +90,7 @@ export async function giveVoteRewards(
     voteStreak: number;
   },
 ) {
-  await redis.set(
-    `${Constants.redis.cache.economy.VOTE}:${user}`,
-    "true",
-    "EX",
-    ms("1 hour") / 1000,
-  );
+  await voteCache.set(user, Date.now());
 
   let level = await getRawLevel(user);
   const [guild, inventory] = await Promise.all([getGuildByUser(user), getInventory(user)]);
@@ -145,7 +130,7 @@ export async function giveVoteRewards(
       addBalance(user, amount),
       addKarma(user, 10),
       addXp(user, 100),
-      redis.del(`${Constants.redis.cache.economy.VOTE}:${user}`),
+      voteCache.delete(user),
       redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${user}`),
       addStat(user, "earned-vote", amount),
       addInventoryItem(user, "lottery_ticket", crateAmount),

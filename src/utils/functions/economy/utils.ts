@@ -22,6 +22,7 @@ import { LootPool } from "../../../types/LootPool";
 import { Tag } from "../../../types/Tags";
 import { Task } from "../../../types/Tasks";
 import { Worker, WorkerUpgrades } from "../../../types/Workers";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { deleteImage } from "../image";
@@ -45,7 +46,6 @@ import { formatNumber, formatNumberPretty } from "./number";
 import { addStat } from "./stats";
 import { addTaskProgress } from "./tasks";
 import { addXp } from "./xp";
-import ms = require("ms");
 import math = require("mathjs");
 import pAll = require("p-all");
 import dayjs = require("dayjs");
@@ -66,6 +66,9 @@ let events: { [key: string]: Event };
 let dabloonShop: Record<string, DabloonShopItem>;
 
 export let maxPrestige = 0;
+
+const userExistsCache = new RedisCache<boolean>(Constants.redis.cache.economy.EXISTS, 7 * 86400);
+const ecoBanCache = new RedisCache<BanCache>(Constants.redis.cache.economy.BANNED, 3 * 60 * 60);
 
 export function loadItems(crypto = true) {
   maxPrestige = 0;
@@ -226,11 +229,9 @@ export async function userExists(member: MemberResolvable): Promise<boolean> {
   try {
     if (!userId) return false;
 
-    const cache = await redis.get(`${Constants.redis.cache.economy.EXISTS}:${userId}`);
+    const cache = await userExistsCache.get(userId);
 
-    if (cache) {
-      return cache === "true";
-    }
+    if (cache !== null) return cache;
 
     const query = await prisma.economy.findUnique({
       where: {
@@ -242,20 +243,10 @@ export async function userExists(member: MemberResolvable): Promise<boolean> {
     });
 
     if (query) {
-      await redis.set(
-        `${Constants.redis.cache.economy.EXISTS}:${userId}`,
-        "true",
-        "EX",
-        ms("7 day") / 1000,
-      );
+      await userExistsCache.set(userId, true);
       return true;
     } else {
-      await redis.set(
-        `${Constants.redis.cache.economy.EXISTS}:${userId}`,
-        "false",
-        "EX",
-        ms("7 day") / 1000,
-      );
+      await userExistsCache.set(userId, false);
       return false;
     }
   } finally {
@@ -285,7 +276,7 @@ export async function createUser(member: MemberResolvable) {
       lastDaily: new Date(0),
     },
   });
-  await redis.del(`${Constants.redis.cache.economy.EXISTS}:${userId}`);
+  await userExistsCache.delete(userId);
   await addInventoryItem(userId, "beginner_booster", 1);
 }
 
@@ -331,30 +322,26 @@ export async function isEcoBanned(member: MemberResolvable): Promise<BanCache> {
   if (blacklist.blacklisted)
     return { banned: true, bannedAccount: blacklist.relation, expire: 0 } as BanCache;
 
-  const cache = await redis.get(`${Constants.redis.cache.economy.BANNED}:${userId}`);
+  const cache = await ecoBanCache.get(userId);
 
   if (cache) {
-    const res = JSON.parse(cache) as BanCache;
+    if (cache.banned && cache.expire < Date.now()) return { banned: false } as BanCache;
 
-    if (res.banned && res.expire < Date.now()) return { banned: false } as BanCache;
-
-    return res;
+    return cache;
   }
 
   const accounts = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, userId);
 
   for (const accountId of accounts) {
-    const cache = await redis.get(`${Constants.redis.cache.economy.BANNED}:${accountId}`);
+    const cache = await ecoBanCache.get(accountId);
 
     if (cache) {
-      const res = JSON.parse(cache) as BanCache;
-
-      if (res.banned) {
-        if (res.expire < Date.now()) {
-          await redis.del(`${Constants.redis.cache.economy.BANNED}:${accountId}`);
+      if (cache.banned) {
+        if (cache.expire < Date.now()) {
+          await ecoBanCache.delete(accountId);
           return { banned: false };
         }
-        return res;
+        return cache;
       }
     } else {
       const punishment = await prisma.punishment.findFirst({
@@ -370,16 +357,11 @@ export async function isEcoBanned(member: MemberResolvable): Promise<BanCache> {
 
       if (punishment?.expiresAt) {
         for (const accountId2 of accounts) {
-          await redis.set(
-            `${Constants.redis.cache.economy.BANNED}:${accountId2}`,
-            JSON.stringify({
-              banned: true,
-              bannedAccount: accountId,
-              expire: punishment.expiresAt.getTime(),
-            }),
-            "EX",
-            ms("3 hour") / 1000,
-          );
+          await ecoBanCache.set(accountId2, {
+            banned: true,
+            bannedAccount: accountId,
+            expire: punishment.expiresAt.getTime(),
+          });
         }
 
         return {
@@ -391,13 +373,7 @@ export async function isEcoBanned(member: MemberResolvable): Promise<BanCache> {
     }
   }
 
-  for (const id of accounts)
-    await redis.set(
-      `${Constants.redis.cache.economy.BANNED}:${id}`,
-      JSON.stringify({ banned: false }),
-      "EX",
-      ms("3 hour") / 1000,
-    );
+  for (const id of accounts) await ecoBanCache.set(id, { banned: false } as BanCache);
 
   return { banned: false };
 }

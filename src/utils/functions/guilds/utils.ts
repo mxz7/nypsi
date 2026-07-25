@@ -1,6 +1,5 @@
 import { Guild } from "discord.js";
 import prisma from "../../../init/database";
-import redis from "../../../init/redis";
 import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
@@ -12,6 +11,10 @@ const names = new Map<string, string>();
 const icons = new Map<string, string>();
 
 const prefixCache = new RedisCache<string[]>(Constants.redis.cache.guild.PREFIX, 86400);
+const guildExistsRedisCache = new RedisCache<boolean>(
+  Constants.redis.cache.guild.EXISTS,
+  ms("24 hour") / 1000,
+);
 const guildExistsCache = new Map<string, boolean>();
 
 setInterval(() => {
@@ -83,7 +86,7 @@ export async function hasGuild(guild: Guild | string): Promise<boolean> {
       return guildExistsCache.get(guildId);
     }
 
-    if (await redis.exists(`${Constants.redis.cache.guild.EXISTS}:${guildId}`)) return true;
+    if ((await guildExistsRedisCache.get(guildId)) === true) return true;
     const query = await prisma.guild.findUnique({
       where: {
         id: guildId,
@@ -96,12 +99,7 @@ export async function hasGuild(guild: Guild | string): Promise<boolean> {
     guildExistsCache.set(guildId, Boolean(query));
 
     if (query) {
-      await redis.set(
-        `${Constants.redis.cache.guild.EXISTS}:${guildId}`,
-        "1",
-        "EX",
-        ms("24 hour") / 1000,
-      );
+      await guildExistsRedisCache.set(guildId, true);
       return true;
     } else {
       return false;
@@ -154,12 +152,7 @@ export async function createGuild(guild: Guild | string) {
 
   peaks.set(guildId, guild instanceof Guild ? guild.memberCount : 0);
 
-  await redis.set(
-    `${Constants.redis.cache.guild.EXISTS}:${guildId}`,
-    1,
-    "EX",
-    ms("24 hour") / 1000,
-  );
+  await guildExistsRedisCache.set(guildId, true);
 }
 
 export async function getPrefix(guild: Guild | string): Promise<string[]> {

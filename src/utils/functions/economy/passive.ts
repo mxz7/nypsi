@@ -1,20 +1,18 @@
 import prisma from "../../../init/database";
-import redis from "../../../init/redis";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
 import { userExists } from "./utils";
-import ms = require("ms");
+const passiveCache = new RedisCache<boolean>(Constants.redis.cache.economy.PASSIVE, 24 * 60 * 60);
 
 export async function isPassive(member: MemberResolvable) {
   if (!(await userExists(member))) return false;
 
   const userId = getUserId(member);
 
-  const cache = await redis.get(`${Constants.redis.cache.economy.PASSIVE}:${userId}`);
+  const cache = await passiveCache.get(userId);
 
-  if (cache) {
-    return cache == "t";
-  }
+  if (cache !== null) return cache;
 
   const query = await prisma.economy.findUnique({
     where: {
@@ -25,12 +23,7 @@ export async function isPassive(member: MemberResolvable) {
     },
   });
 
-  await redis.set(
-    `${Constants.redis.cache.economy.PASSIVE}:${userId}`,
-    query.passive ? "t" : "f",
-    "EX",
-    ms("24 hours") / 1000,
-  );
+  await passiveCache.set(userId, query.passive);
 
   return query.passive;
 }
@@ -47,5 +40,5 @@ export async function setPassive(member: MemberResolvable, value: boolean) {
     },
   });
 
-  await redis.del(`${Constants.redis.cache.economy.PASSIVE}:${userId}`);
+  await passiveCache.delete(userId);
 }

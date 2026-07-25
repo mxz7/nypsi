@@ -1,17 +1,18 @@
 import { DeleteObjectCommand, DeleteObjectsCommand } from "@aws-sdk/client-s3";
 import prisma from "../../../init/database";
-import redis from "../../../init/redis";
 import s3 from "../../../init/s3";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
 import { hasProfile } from "./utils";
 
+const trackingCache = new RedisCache<boolean>(Constants.redis.cache.user.TRACKING, 86400);
+
 export async function isTracking(member: MemberResolvable): Promise<boolean> {
   const userId = getUserId(member);
 
-  if (await redis.exists(`${Constants.redis.cache.user.TRACKING}:${userId}`)) {
-    return (await redis.get(`${Constants.redis.cache.user.TRACKING}:${userId}`)) == "t";
-  }
+  const cached = await trackingCache.get(userId);
+  if (cached !== null) return cached;
 
   if (!(await hasProfile(userId))) return false;
 
@@ -24,15 +25,8 @@ export async function isTracking(member: MemberResolvable): Promise<boolean> {
     },
   });
 
-  if (query.tracking) {
-    await redis.set(`${Constants.redis.cache.user.TRACKING}:${userId}`, "t", "EX", 86400);
-
-    return true;
-  } else {
-    await redis.set(`${Constants.redis.cache.user.TRACKING}:${userId}`, "f", "EX", 86400);
-
-    return false;
-  }
+  await trackingCache.set(userId, query.tracking);
+  return query.tracking;
 }
 
 export async function disableTracking(member: MemberResolvable) {
@@ -47,7 +41,7 @@ export async function disableTracking(member: MemberResolvable) {
     },
   });
 
-  await redis.del(`${Constants.redis.cache.user.TRACKING}:${userId}`);
+  await trackingCache.delete(userId);
 }
 
 export async function enableTracking(member: MemberResolvable) {
@@ -62,7 +56,7 @@ export async function enableTracking(member: MemberResolvable) {
     },
   });
 
-  await redis.del(`${Constants.redis.cache.user.TRACKING}:${userId}`);
+  await trackingCache.delete(userId);
 }
 
 export async function addNewUsername(member: MemberResolvable, username: string) {

@@ -2,8 +2,8 @@ import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { User } from "discord.js";
 import { nanoid } from "nanoid";
 import prisma from "../../../init/database";
-import redis from "../../../init/redis";
 import s3 from "../../../init/s3";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { debounce } from "../../debounce";
 import { logger } from "../../logger";
@@ -13,10 +13,14 @@ import { setLastCommand } from "../guilds/commands";
 import { getUserId, MemberResolvable } from "../member";
 import sleep from "../sleep";
 import { addNewAvatar, addNewUsername, fetchUsernameHistory, isTracking } from "./history";
-import { getLastKnownAvatar, getLastKnownUsername } from "./username";
+import { getLastKnownAvatar, getLastKnownUsername, updateLastKnownAvatarCache } from "./username";
 import ms = require("ms");
 
 export const recentCommands = new Map<string, number>();
+const lastCommandCache = new RedisCache<number>(
+  Constants.redis.cache.user.LAST_COMMAND,
+  ms("30 minutes") / 1000,
+);
 
 setInterval(async () => {
   logger.debug(`recent commands size: ${recentCommands.size}`);
@@ -38,10 +42,8 @@ setInterval(async () => {
 export async function getLastCommand(member: MemberResolvable): Promise<Date> {
   const userId = getUserId(member);
 
-  if (await redis.exists(`${Constants.redis.cache.user.LAST_COMMAND}:${userId}`))
-    return new Date(
-      parseInt(await redis.get(`${Constants.redis.cache.user.LAST_COMMAND}:${userId}`)),
-    );
+  const cached = await lastCommandCache.get(userId);
+  if (cached !== null) return new Date(cached);
 
   const query = await prisma.user.findUnique({
     where: {
@@ -56,12 +58,7 @@ export async function getLastCommand(member: MemberResolvable): Promise<Date> {
     return new Date(0);
   }
 
-  await redis.set(
-    `${Constants.redis.cache.user.LAST_COMMAND}:${userId}`,
-    query.lastCommand.getTime(),
-    "EX",
-    ms("30 minutes") / 1000,
-  );
+  await lastCommandCache.set(userId, query.lastCommand.getTime());
 
   return query.lastCommand;
 }
@@ -98,12 +95,7 @@ export async function updateUser(user: User, command: string, guildId?: string) 
     getLastKnownAvatar(user.id),
   ]);
 
-  await redis.set(
-    `${Constants.redis.cache.user.LAST_COMMAND}:${user.id}`,
-    date.getTime(),
-    "EX",
-    1800,
-  );
+  await lastCommandCache.set(user.id, date.getTime());
 
   let updateUsername = false;
   let updateAvatar = false;
@@ -125,7 +117,7 @@ export async function updateUser(user: User, command: string, guildId?: string) 
   const newAvatar = user.displayAvatarURL({ size: 256, extension: "png" });
 
   if (newAvatar !== avatar && user.client.user.id === Constants.BOT_USER_ID) {
-    await redis.set(`${Constants.redis.cache.user.avatar}:${user.id}`, newAvatar);
+    await updateLastKnownAvatarCache(user.id, newAvatar);
 
     updateAvatar = true;
     const level = await getRawLevel(user.id).catch(() => 0);

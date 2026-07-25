@@ -1,37 +1,28 @@
 import { GuildMember } from "discord.js";
+import { Tags } from "#generated/prisma";
 import prisma from "../../../init/database";
-import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { getTagsData } from "../economy/utils";
 import { getUserId, MemberResolvable } from "../member";
 import PageManager from "../page";
 
+const tagsCache = new RedisCache<Tags[]>(Constants.redis.cache.user.tags, 604800);
+const tagCountCache = new RedisCache<number>(Constants.redis.cache.user.tagCount, 84000);
+
 export async function getTags(member: MemberResolvable) {
   const userId = getUserId(member);
 
-  const cache = await redis.get(`${Constants.redis.cache.user.tags}:${userId}`);
-
-  if (cache) {
-    return JSON.parse(cache) as {
-      userId: string;
-      tagId: string;
-      selected: boolean;
-      created: Date;
-    }[];
-  }
+  const cached = await tagsCache.get(userId);
+  if (cached) return cached;
 
   const query = await prisma.tags.findMany({
     where: { userId },
   });
 
-  await redis.set(
-    `${Constants.redis.cache.user.tags}:${userId}`,
-    JSON.stringify(query),
-    "EX",
-    604800,
-  );
+  await tagsCache.set(userId, query);
 
   return query;
 }
@@ -39,7 +30,7 @@ export async function getTags(member: MemberResolvable) {
 export async function removeTag(member: MemberResolvable, tagId: string) {
   const userId = getUserId(member);
 
-  await redis.del(`${Constants.redis.cache.user.tags}:${userId}`);
+  await tagsCache.delete(userId);
 
   await prisma.tags.delete({
     where: {
@@ -63,10 +54,7 @@ export async function addTag(member: MemberResolvable, tagId: string) {
     return getTags(userId);
   }
 
-  await redis.del(
-    `${Constants.redis.cache.user.tags}:${userId}`,
-    `${Constants.redis.cache.user.tagCount}:${tagId}`,
-  );
+  await Promise.all([tagsCache.delete(userId), tagCountCache.delete(tagId)]);
 
   await prisma.tags.create({
     data: {
@@ -81,7 +69,7 @@ export async function addTag(member: MemberResolvable, tagId: string) {
 export async function setActiveTag(member: MemberResolvable, tagId: string) {
   const userId = getUserId(member);
 
-  await redis.del(`${Constants.redis.cache.user.tags}:${userId}`);
+  await tagsCache.delete(userId);
 
   await prisma.tags.updateMany({
     where: { userId },
@@ -113,13 +101,12 @@ export async function getActiveTag(member: MemberResolvable) {
 }
 
 export async function getTagCount(tagId: string) {
-  const cache = await redis.get(`${Constants.redis.cache.user.tagCount}:${tagId}`);
-
-  if (cache) return parseInt(cache);
+  const cached = await tagCountCache.get(tagId);
+  if (cached !== null) return cached;
 
   const query = await prisma.tags.count({ where: { tagId } });
 
-  await redis.set(`${Constants.redis.cache.user.tagCount}:${tagId}`, query, "EX", 84000);
+  await tagCountCache.set(tagId, query);
 
   return query;
 }

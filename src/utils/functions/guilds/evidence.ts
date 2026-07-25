@@ -2,18 +2,17 @@ import { DeleteObjectCommand, DeleteObjectsCommand, PutObjectCommand } from "@aw
 import { Guild } from "discord.js";
 import { nanoid } from "nanoid";
 import prisma from "../../../init/database";
-import redis from "../../../init/redis";
 import s3 from "../../../init/s3";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import sharp = require("sharp");
 
-export async function getMaxEvidenceBytes(guild: Guild) {
-  const cache = await redis.get(`${Constants.redis.cache.guild.EVIDENCE_MAX}:${guild.id}`);
+const evidenceMaxCache = new RedisCache<number>(Constants.redis.cache.guild.EVIDENCE_MAX, 21600);
 
-  if (cache) {
-    return parseInt(cache);
-  }
+export async function getMaxEvidenceBytes(guild: Guild) {
+  const cached = await evidenceMaxCache.get(guild.id);
+  if (cached !== null) return cached;
 
   const query = await prisma.guildEvidenceCredit.findMany({
     where: {
@@ -28,7 +27,7 @@ export async function getMaxEvidenceBytes(guild: Guild) {
 
   if (query.length > 0) total += Number(query.map((a) => a.bytes).reduce((a, b) => a + b));
 
-  await redis.set(`${Constants.redis.cache.guild.EVIDENCE_MAX}:${guild.id}`, total, "EX", 21600); // 6 hours
+  await evidenceMaxCache.set(guild.id, total);
 
   return total;
 }

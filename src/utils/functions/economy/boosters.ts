@@ -8,6 +8,7 @@ import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { Booster, JeremyData } from "../../../types/Economy";
 import { SteveData } from "../../../types/Workers";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
 import PageManager from "../page";
@@ -17,6 +18,10 @@ import { getLastKnownUsername } from "../users/username";
 import { getItems } from "./utils";
 
 const lastBoosterCheck = new Map<string, number>();
+const boostersCache = new RedisCache<Record<string, Booster[]>>(
+  Constants.redis.cache.economy.BOOSTERS,
+  300,
+);
 
 setInterval(() => {
   for (const [key, value] of lastBoosterCheck.entries()) {
@@ -91,7 +96,7 @@ async function checkBoosters(member: MemberResolvable, boosters: Map<string, Boo
   }
 
   if (expired.size != 0) {
-    await redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${userId}`);
+    await boostersCache.delete(userId);
 
     if ((await getDmSettings(userId)).booster) {
       const embed = new CustomEmbed(userId).setFooter({ text: "/settings me notifications" });
@@ -188,12 +193,12 @@ async function checkBoosters(member: MemberResolvable, boosters: Map<string, Boo
 export async function getBoosters(member: MemberResolvable): Promise<Map<string, Booster[]>> {
   const userId = getUserId(member);
 
-  const cache = await redis.get(`${Constants.redis.cache.economy.BOOSTERS}:${userId}`);
+  const cache = await boostersCache.get(userId);
 
   if (cache) {
-    if (Object.keys(JSON.parse(cache)).length === 0) return new Map();
+    if (Object.keys(cache).length === 0) return new Map();
 
-    const map = new Map<string, Booster[]>(Object.entries(JSON.parse(cache)));
+    const map = new Map<string, Booster[]>(Object.entries(cache));
 
     return await checkBoosters(member, map);
   }
@@ -230,12 +235,7 @@ export async function getBoosters(member: MemberResolvable): Promise<Map<string,
 
   map = await checkBoosters(member, map);
 
-  await redis.set(
-    `${Constants.redis.cache.economy.BOOSTERS}:${userId}`,
-    JSON.stringify(Object.fromEntries(map)),
-    "EX",
-    300,
-  );
+  await boostersCache.set(userId, Object.fromEntries(map));
 
   return map;
 }
@@ -259,7 +259,7 @@ export async function addBooster(
     }) as Prisma.BoosterCreateManyInput[],
   });
 
-  await redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${userId}`);
+  await boostersCache.delete(userId);
 
   if (scope === "global") {
     exec(`redis-cli KEYS "*cache:economy:boosters*" | xargs redis-cli DEL`);

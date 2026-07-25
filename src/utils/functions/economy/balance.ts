@@ -4,6 +4,7 @@ import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { NotificationPayload } from "../../../types/Notification";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { getUserId, MemberResolvable } from "../member";
@@ -27,17 +28,22 @@ import {
 } from "./utils";
 import { hasVoted } from "./vote";
 import { calcWorkerValues } from "./workers";
-import ms = require("ms");
 import pAll = require("p-all");
+
+const balanceCache = new RedisCache<number>(Constants.redis.cache.economy.BALANCE, 3600);
+const padlockCache = new RedisCache<boolean>(Constants.redis.cache.economy.PADLOCK, 6 * 60 * 60);
+const defaultBetCache = new RedisCache<number>(
+  Constants.redis.cache.economy.DEFAULT_BET,
+  6 * 60 * 60,
+);
+const netWorthCache = new RedisCache<number>(Constants.redis.cache.economy.NETWORTH, 2 * 60 * 60);
 
 export async function getBalance(member: MemberResolvable) {
   const userId = getUserId(member);
 
-  const cache = await redis.get(`${Constants.redis.cache.economy.BALANCE}:${userId}`);
+  const cache = await balanceCache.get(userId);
 
-  if (cache) {
-    return parseInt(cache);
-  }
+  if (cache !== null) return cache;
 
   const query = await prisma.economy.findUnique({
     where: {
@@ -48,12 +54,7 @@ export async function getBalance(member: MemberResolvable) {
     },
   });
 
-  await redis.set(
-    `${Constants.redis.cache.economy.BALANCE}:${userId}`,
-    Number(query.money),
-    "EX",
-    3600,
-  );
+  await balanceCache.set(userId, Number(query.money));
 
   return Number(query.money);
 }
@@ -73,12 +74,7 @@ export async function updateBalance(member: MemberResolvable, amount: number) {
     },
   });
 
-  await redis.set(
-    `${Constants.redis.cache.economy.BALANCE}:${userId}`,
-    Number(query.money),
-    "EX",
-    3600,
-  );
+  await balanceCache.set(userId, Number(query.money));
 }
 
 export async function addBalance(member: MemberResolvable, amount: number) {
@@ -96,12 +92,7 @@ export async function addBalance(member: MemberResolvable, amount: number) {
     },
   });
 
-  await redis.set(
-    `${Constants.redis.cache.economy.BALANCE}:${userId}`,
-    Number(query.money),
-    "EX",
-    3600,
-  );
+  await balanceCache.set(userId, Number(query.money));
 
   return query.money;
 }
@@ -121,12 +112,7 @@ export async function removeBalance(member: MemberResolvable, amount: number) {
     },
   });
 
-  await redis.set(
-    `${Constants.redis.cache.economy.BALANCE}:${userId}`,
-    Number(query.money),
-    "EX",
-    3600,
-  );
+  await balanceCache.set(userId, Number(query.money));
 
   return query.money;
 }
@@ -481,11 +467,9 @@ export async function getMaxBankBalance(member: MemberResolvable): Promise<numbe
 export async function hasPadlock(member: MemberResolvable): Promise<boolean> {
   const userId = getUserId(member);
 
-  const cache = await redis.get(`${Constants.redis.cache.economy.PADLOCK}:${userId}`);
+  const cache = await padlockCache.get(userId);
 
-  if (cache) {
-    return cache === "y";
-  }
+  if (cache !== null) return cache;
 
   const query = await prisma.economy.findUnique({
     where: {
@@ -496,12 +480,7 @@ export async function hasPadlock(member: MemberResolvable): Promise<boolean> {
     },
   });
 
-  await redis.set(
-    `${Constants.redis.cache.economy.PADLOCK}:${userId}`,
-    query.padlock ? "y" : "n",
-    "EX",
-    Math.floor(ms("6 hours") / 1000),
-  );
+  await padlockCache.set(userId, query.padlock);
 
   return query.padlock;
 }
@@ -518,15 +497,14 @@ export async function setPadlock(member: MemberResolvable, setting: boolean) {
     },
   });
 
-  await redis.del(`${Constants.redis.cache.economy.PADLOCK}:${userId}`);
+  await padlockCache.delete(userId);
 }
 
 export async function getDefaultBet(member: MemberResolvable): Promise<number> {
   const userId = getUserId(member);
 
-  if (await redis.exists(`${Constants.redis.cache.economy.DEFAULT_BET}:${userId}`)) {
-    return parseInt(await redis.get(`${Constants.redis.cache.economy.DEFAULT_BET}:${userId}`));
-  }
+  const cache = await defaultBetCache.get(userId);
+  if (cache !== null) return cache;
 
   const query = await prisma.economy.findUnique({
     where: {
@@ -537,12 +515,7 @@ export async function getDefaultBet(member: MemberResolvable): Promise<number> {
     },
   });
 
-  await redis.set(
-    `${Constants.redis.cache.economy.DEFAULT_BET}:${userId}`,
-    query.defaultBet,
-    "EX",
-    Math.floor(ms("6 hours") / 1000),
-  );
+  await defaultBetCache.set(userId, query.defaultBet);
 
   return query.defaultBet;
 }
@@ -559,7 +532,7 @@ export async function setDefaultBet(member: MemberResolvable, setting: number) {
     },
   });
 
-  await redis.del(`${Constants.redis.cache.economy.DEFAULT_BET}:${userId}`);
+  await defaultBetCache.delete(userId);
 }
 
 export async function calcMaxBet(member: MemberResolvable): Promise<number> {
@@ -624,11 +597,8 @@ export async function calcNetWorth(
 ) {
   const userId = getUserId(member);
 
-  if (!breakdown && (await redis.exists(`${Constants.redis.cache.economy.NETWORTH}:${userId}`))) {
-    return {
-      amount: parseInt(await redis.get(`${Constants.redis.cache.economy.NETWORTH}:${userId}`)),
-    };
-  }
+  const cache = !breakdown ? await netWorthCache.get(userId) : null;
+  if (cache !== null) return { amount: cache };
 
   const query = await prisma.economy.findUnique({
     where: {
@@ -713,12 +683,7 @@ export async function calcNetWorth(
   const breakdownItems = new Map<string, number>();
 
   if (!query) {
-    await redis.set(
-      `${Constants.redis.cache.economy.NETWORTH}:${userId}`,
-      worth,
-      "EX",
-      ms("1 hour") / 1000,
-    );
+    await netWorthCache.set(userId, worth, 3600);
 
     return { amount: worth };
   }
@@ -951,12 +916,7 @@ export async function calcNetWorth(
 
   breakdownItems.set("farm", farmBreakdown);
 
-  await redis.set(
-    `${Constants.redis.cache.economy.NETWORTH}:${userId}`,
-    Math.floor(worth),
-    "EX",
-    ms("2 hour") / 1000,
-  );
+  await netWorthCache.set(userId, Math.floor(worth));
 
   await prisma.economy.update({
     where: {

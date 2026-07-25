@@ -13,6 +13,7 @@ import redis from "../../../init/redis";
 import { NypsiCommandInteraction, NypsiMessage, SendMessage } from "../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../models/EmbedBuilders";
 import { Item } from "../../../types/Economy";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import {
@@ -27,7 +28,6 @@ import { addProgress } from "./achievements";
 import { selectItem } from "./inventory";
 import { addTaskProgress } from "./tasks";
 import { createUser, getItems, userExists } from "./utils";
-import ms = require("ms");
 
 type MuseumItem = {
   [itemId: string]: {
@@ -41,6 +41,16 @@ type MuseumEntry = {
   amount: bigint | number;
   completedAt: Date | string;
 };
+
+const museumCache = new RedisCache<MuseumItem>(Constants.redis.cache.economy.MUSEUM, 180);
+const completionPlacementsCache = new RedisCache<Record<string, number>>(
+  Constants.redis.cache.economy.MUSEUM_COMPLETION_PLACEMENTS,
+  3 * 24 * 60 * 60,
+);
+const leaderboardPlacementsCache = new RedisCache<Record<string, number>>(
+  Constants.redis.cache.economy.MUSEUM_LEADERBOARD_PLACEMENTS,
+  24 * 60 * 60,
+);
 
 export class Museum {
   private items: MuseumItem;
@@ -110,13 +120,8 @@ export class Museum {
     const itemId = typeof item === "string" ? item : item.id;
     if (!this.completed(itemId)) return undefined;
 
-    const cache = await redis.get(
-      `${Constants.redis.cache.economy.MUSEUM_COMPLETION_PLACEMENTS}:${this.userId}`,
-    );
-    if (cache) {
-      const parsed: Record<string, number> = JSON.parse(cache);
-      return parsed[itemId] || -1;
-    }
+    const cache = await completionPlacementsCache.get(this.userId);
+    if (cache) return cache[itemId] || -1;
 
     const completedItems = Object.entries(this.items)
       .filter(([_, item]) => item.completedAt)
@@ -147,12 +152,7 @@ export class Museum {
       placements[row.itemId] = Number(row.placement);
     }
 
-    await redis.set(
-      `${Constants.redis.cache.economy.MUSEUM_COMPLETION_PLACEMENTS}:${this.userId}`,
-      JSON.stringify(placements),
-      "EX",
-      ms("3 days") / 1000,
-    );
+    await completionPlacementsCache.set(this.userId, placements);
 
     return placements[itemId] || -1;
   }
@@ -162,13 +162,8 @@ export class Museum {
   async leaderboardPlacement(item: Item | string): Promise<number> {
     const itemId = typeof item === "string" ? item : item.id;
 
-    const cache = await redis.get(
-      `${Constants.redis.cache.economy.MUSEUM_LEADERBOARD_PLACEMENTS}:${itemId}`,
-    );
-    if (cache) {
-      const parsed: Record<string, number> = JSON.parse(cache);
-      return parsed[this.userId];
-    }
+    const cache = await leaderboardPlacementsCache.get(itemId);
+    if (cache) return cache[this.userId];
 
     const results = await prisma.$queryRaw<{ userId: string; placement: number }[]>`
       SELECT "userId", placement
@@ -190,12 +185,7 @@ export class Museum {
       placements[row.userId] = Number(row.placement);
     }
 
-    await redis.set(
-      `${Constants.redis.cache.economy.MUSEUM_LEADERBOARD_PLACEMENTS}:${itemId}`,
-      JSON.stringify(placements),
-      "EX",
-      ms("1 day") / 1000,
-    );
+    await leaderboardPlacementsCache.set(itemId, placements);
 
     return placements[this.userId];
   }
@@ -258,17 +248,10 @@ export class Museum {
 export async function getMuseum(member: MemberResolvable): Promise<Museum> {
   const userId = getUserId(member);
 
-  const cache = await redis.get(`${Constants.redis.cache.economy.MUSEUM}:${userId}`);
+  const cache = await museumCache.get(userId);
 
   if (cache) {
-    try {
-      const parsed: MuseumEntry[] = JSON.parse(cache);
-      return new Museum(member, parsed);
-    } catch (e) {
-      console.error(e);
-      logger.error("weird museum cache error", { error: e });
-      return new Museum(member);
-    }
+    return new Museum(member, cache);
   }
 
   const query = await prisma.museum
@@ -286,23 +269,13 @@ export async function getMuseum(member: MemberResolvable): Promise<Museum> {
 
   if (!query || query.length == 0) {
     if (!(await userExists(userId))) await createUser(userId);
-    await redis.set(
-      `${Constants.redis.cache.economy.MUSEUM}:${userId}`,
-      JSON.stringify({}),
-      "EX",
-      180,
-    );
+    await museumCache.set(userId, {});
     return new Museum(member);
   }
 
   const museum = new Museum(member, query);
 
-  await redis.set(
-    `${Constants.redis.cache.economy.MUSEUM}:${userId}`,
-    JSON.stringify(museum.toJSON()),
-    "EX",
-    180,
-  );
+  await museumCache.set(userId, museum.toJSON());
 
   return museum;
 }
@@ -370,7 +343,7 @@ export async function addToMuseum(member: MemberResolvable, itemId: string, amou
         completedAt: now,
       },
     });
-    await redis.del(`${Constants.redis.cache.economy.MUSEUM_COMPLETION_PLACEMENTS}:${userId}`);
+    await completionPlacementsCache.delete(userId);
     addProgress(member, "artifact_discoverer", 1);
     addInlineNotification({
       memberId: userId,
@@ -381,10 +354,8 @@ export async function addToMuseum(member: MemberResolvable, itemId: string, amou
     });
   }
 
-  await redis.del(
-    `${Constants.redis.cache.economy.MUSEUM_LEADERBOARD_PLACEMENTS}:${itemId}`,
-    `${Constants.redis.cache.economy.MUSEUM}:${userId}`,
-  );
+  await leaderboardPlacementsCache.delete(itemId);
+  await museumCache.delete(userId);
 }
 
 export function getMuseumCategories() {

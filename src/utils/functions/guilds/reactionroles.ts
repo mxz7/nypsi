@@ -10,19 +10,21 @@ import {
 } from "discord.js";
 import { ReactionRole, ReactionRoleMode, ReactionRoleRoles } from "#generated/prisma";
 import prisma from "../../../init/database";
-import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import ms = require("ms");
 
+type ReactionRoleWithRoles = ReactionRole & { roles: ReactionRoleRoles[] };
+
+const reactionRolesCache = new RedisCache<ReactionRoleWithRoles[]>(
+  Constants.redis.cache.guild.REACTION_ROLES,
+  ms("1 hour") / 1000,
+);
+
 export async function getReactionRolesByGuild(guild: Guild) {
-  if (await redis.exists(`${Constants.redis.cache.guild.REACTION_ROLES}:${guild.id}`)) {
-    return JSON.parse(
-      await redis.get(`${Constants.redis.cache.guild.REACTION_ROLES}:${guild.id}`),
-    ) as (ReactionRole & {
-      roles: ReactionRoleRoles[];
-    })[];
-  }
+  const cached = await reactionRolesCache.get(guild.id);
+  if (cached) return cached;
 
   const query = await prisma.reactionRole.findMany({
     where: {
@@ -37,12 +39,7 @@ export async function getReactionRolesByGuild(guild: Guild) {
     },
   });
 
-  await redis.set(
-    `${Constants.redis.cache.guild.REACTION_ROLES}:${guild.id}`,
-    JSON.stringify(query),
-    "EX",
-    ms("1 hour") / 1000,
-  );
+  await reactionRolesCache.set(guild.id, query);
 
   return query;
 }
@@ -72,7 +69,7 @@ export async function createReactionRole(options: {
     },
   });
 
-  await redis.del(`${Constants.redis.cache.guild.REACTION_ROLES}:${options.guildId}`);
+  await reactionRolesCache.delete(options.guildId);
 }
 
 export async function addRoleToReactionRole(options: {
@@ -91,7 +88,7 @@ export async function addRoleToReactionRole(options: {
     },
   });
 
-  await redis.del(`${Constants.redis.cache.guild.REACTION_ROLES}:${options.guildId}`);
+  await reactionRolesCache.delete(options.guildId);
 }
 
 export async function deleteRoleFromReactionRole(
@@ -108,7 +105,7 @@ export async function deleteRoleFromReactionRole(
     },
   });
 
-  await redis.del(`${Constants.redis.cache.guild.REACTION_ROLES}:${guildId}`);
+  await reactionRolesCache.delete(guildId);
 }
 
 export async function deleteReactionRole(guildId: string, messageId: string) {
@@ -118,11 +115,11 @@ export async function deleteReactionRole(guildId: string, messageId: string) {
     },
   });
 
-  await redis.del(`${Constants.redis.cache.guild.REACTION_ROLES}:${guildId}`);
+  await reactionRolesCache.delete(guildId);
 }
 
 export async function sendReactionRole(
-  reactionRole: ReactionRole & { roles: ReactionRoleRoles[] },
+  reactionRole: ReactionRoleWithRoles,
   channel: GuildTextBasedChannel,
 ) {
   const embed = new CustomEmbed().setColor(Constants.PURPLE);
@@ -174,7 +171,7 @@ export async function sendReactionRole(
     },
   });
 
-  await redis.del(`${Constants.redis.cache.guild.REACTION_ROLES}:${reactionRole.guildId}`);
+  await reactionRolesCache.delete(reactionRole.guildId);
 }
 
 export async function setReactionRoleMode(
@@ -191,7 +188,7 @@ export async function setReactionRoleMode(
     },
   });
 
-  await redis.del(`${Constants.redis.cache.guild.REACTION_ROLES}:${guildId}`);
+  await reactionRolesCache.delete(guildId);
 }
 
 export async function setReactionRoleTitle(guildId: string, messageId: string, title: string) {
@@ -204,7 +201,7 @@ export async function setReactionRoleTitle(guildId: string, messageId: string, t
     },
   });
 
-  await redis.del(`${Constants.redis.cache.guild.REACTION_ROLES}:${guildId}`);
+  await reactionRolesCache.delete(guildId);
 }
 
 export async function setReactionRoleDescription(
@@ -221,7 +218,7 @@ export async function setReactionRoleDescription(
     },
   });
 
-  await redis.del(`${Constants.redis.cache.guild.REACTION_ROLES}:${guildId}`);
+  await reactionRolesCache.delete(guildId);
 }
 
 export async function setReactionRoleColour(guildId: string, messageId: string, colour: string) {
@@ -234,7 +231,7 @@ export async function setReactionRoleColour(guildId: string, messageId: string, 
     },
   });
 
-  await redis.del(`${Constants.redis.cache.guild.REACTION_ROLES}:${guildId}`);
+  await reactionRolesCache.delete(guildId);
 }
 
 export async function setReactionRoleWhitelist(
@@ -251,5 +248,5 @@ export async function setReactionRoleWhitelist(
     },
   });
 
-  await redis.del(`${Constants.redis.cache.guild.REACTION_ROLES}:${guildId}`);
+  await reactionRolesCache.delete(guildId);
 }

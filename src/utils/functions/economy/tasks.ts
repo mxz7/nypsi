@@ -1,9 +1,9 @@
 import { Task as PrismaTask } from "#generated/prisma";
 import prisma from "../../../init/database";
-import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { Item } from "../../../types/Economy";
 import { Task } from "../../../types/Tasks";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { addKarma } from "../karma/karma";
@@ -19,6 +19,8 @@ import { addInventoryItem } from "./inventory";
 import { getPrestige } from "./levelling";
 import { getItems, getTasksData, isEcoBanned, maxPrestige, userExists } from "./utils";
 import { addXp } from "./xp";
+
+const tasksCache = new RedisCache<PrismaTask[]>(Constants.redis.cache.economy.TASKS, 3600);
 
 async function generateDailyTasks(member: MemberResolvable, count: number) {
   const userId = getUserId(member);
@@ -51,7 +53,7 @@ async function generateDailyTasks(member: MemberResolvable, count: number) {
       };
     }),
   });
-  await redis.del(`${Constants.redis.cache.economy.TASKS}:${userId}`);
+  await tasksCache.delete(userId);
 }
 
 async function generateWeeklyTasks(member: MemberResolvable, count: number) {
@@ -89,7 +91,7 @@ async function generateWeeklyTasks(member: MemberResolvable, count: number) {
       };
     }),
   });
-  await redis.del(`${Constants.redis.cache.economy.TASKS}:${userId}`);
+  await tasksCache.delete(userId);
 }
 
 const tasksMutex = new MemoryMutex();
@@ -100,11 +102,9 @@ export async function getTasks(member: MemberResolvable): Promise<PrismaTask[]> 
   await tasksMutex.acquire(userId);
 
   try {
-    const cache = await redis.get(`${Constants.redis.cache.economy.TASKS}:${userId}`);
+    const cache = await tasksCache.get(userId);
 
-    if (cache) {
-      return JSON.parse(cache) as PrismaTask[];
-    }
+    if (cache) return cache;
 
     const query = await prisma.task.findMany({
       where: { user_id: userId },
@@ -158,18 +158,13 @@ export async function getTasks(member: MemberResolvable): Promise<PrismaTask[]> 
         return getTasks(userId);
       }
     } catch (error) {
-      await redis.del(`${Constants.redis.cache.economy.TASKS}:${userId}`);
+      await tasksCache.delete(userId);
 
       logger.debug(`task: weird error when handling odd tasks for ${userId}, retrying`, { error });
       return getTasks(userId);
     }
 
-    await redis.set(
-      `${Constants.redis.cache.economy.TASKS}:${userId}`,
-      JSON.stringify(query, (key, value) => (typeof value === "bigint" ? Number(value) : value)),
-      "EX",
-      3600,
-    );
+    await tasksCache.set(userId, query);
 
     return query;
   } finally {
@@ -330,7 +325,7 @@ export async function addTaskProgress(member: MemberResolvable, taskId: string, 
       });
     }
   } finally {
-    redis.del(`${Constants.redis.cache.economy.TASKS}:${userId}`);
+    tasksCache.delete(userId);
     taskProgressMutex.release(mutexKey);
   }
 }
@@ -347,7 +342,7 @@ export async function setTaskProgress(member: MemberResolvable, taskId: string, 
   if (!task) return;
   if (task.completed) return;
 
-  await redis.del(`${Constants.redis.cache.economy.TASKS}:${userId}`);
+  await tasksCache.delete(userId);
 
   if (amount >= Number(task.target)) {
     await prisma.task.update({

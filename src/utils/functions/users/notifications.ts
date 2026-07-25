@@ -6,6 +6,7 @@ import {
   NotificationData,
   NotificationPayload,
 } from "../../../types/Notification";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { dmQueue } from "../../queues/queues";
 import { createUser, userExists } from "../economy/utils";
@@ -18,15 +19,20 @@ const notificationsData: { [key: string]: NotificationData } =
   require("../../../../data/notifications.json").notifications;
 const preferencesData: { [key: string]: NotificationData } =
   require("../../../../data/notifications.json").preferences;
+const dmSettingsCache = new RedisCache<DMSettings>(
+  Constants.redis.cache.user.DM_SETTINGS,
+  ms("12 hour") / 1000,
+);
+const preferencesCache = new RedisCache<Preferences>(
+  Constants.redis.cache.user.PREFERENCES,
+  ms("12 hour") / 1000,
+);
 
 export async function getDmSettings(member: MemberResolvable) {
   const userId = getUserId(member);
 
-  if (await redis.exists(`${Constants.redis.cache.user.DM_SETTINGS}:${userId}`)) {
-    return (await JSON.parse(
-      await redis.get(`${Constants.redis.cache.user.DM_SETTINGS}:${userId}`),
-    )) as DMSettings;
-  }
+  const cached = await dmSettingsCache.get(userId);
+  if (cached) return cached;
 
   let query = await prisma.dMSettings.findUnique({
     where: {
@@ -42,12 +48,7 @@ export async function getDmSettings(member: MemberResolvable) {
     });
   }
 
-  await redis.set(
-    `${Constants.redis.cache.user.DM_SETTINGS}:${userId}`,
-    JSON.stringify(query),
-    "EX",
-    ms("12 hour") / 1000,
-  );
+  await dmSettingsCache.set(userId, query);
 
   return query;
 }
@@ -62,7 +63,7 @@ export async function updateDmSettings(member: MemberResolvable, data: DMSetting
     data,
   });
 
-  await redis.del(`${Constants.redis.cache.user.DM_SETTINGS}:${userId}`);
+  await dmSettingsCache.delete(userId);
 
   return query;
 }
@@ -78,17 +79,8 @@ export function getPreferencesData() {
 export async function getPreferences(member: MemberResolvable): Promise<Preferences> {
   const userId = getUserId(member);
 
-  if (await redis.exists(`${Constants.redis.cache.user.PREFERENCES}:${userId}`)) {
-    return JSON.parse(
-      await redis.get(`${Constants.redis.cache.user.PREFERENCES}:${userId}`),
-      // json can't parse bigints on its own so we have to do it manually
-      (key, value) => {
-        return key !== "userId" && typeof value === "string" && !isNaN(Number(value))
-          ? BigInt(value)
-          : value;
-      },
-    ) as Preferences;
-  }
+  const cached = await preferencesCache.get(userId);
+  if (cached) return cached;
 
   let query = await prisma.preferences.findUnique({
     where: {
@@ -106,12 +98,7 @@ export async function getPreferences(member: MemberResolvable): Promise<Preferen
     });
   }
 
-  await redis.set(
-    `${Constants.redis.cache.user.PREFERENCES}:${userId}`,
-    JSON.stringify(query, (key, value) => (typeof value === "bigint" ? Number(value) : value)),
-    "EX",
-    ms("12 hour") / 1000,
-  );
+  await preferencesCache.set(userId, query);
 
   return query;
 }
@@ -126,7 +113,7 @@ export async function updatePreferences(member: MemberResolvable, data: Preferen
     data,
   });
 
-  await redis.del(`${Constants.redis.cache.user.PREFERENCES}:${userId}`);
+  await preferencesCache.delete(userId);
 
   return query;
 }

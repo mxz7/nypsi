@@ -1,7 +1,7 @@
 import { Guild, TextChannel } from "discord.js";
 import prisma from "../../../init/database";
-import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { pluralize } from "../string";
@@ -9,6 +9,10 @@ import { startOpenChatReaction } from "./game";
 import ms = require("ms");
 
 const lastGame = new Map<string, number>();
+const reactionProfileCache = new RedisCache<boolean>(
+  Constants.redis.cache.chatReaction.EXISTS,
+  ms("12 hours") / 1000,
+);
 
 export function doChatReactions(client: NypsiClient) {
   setInterval(async () => {
@@ -121,16 +125,11 @@ export async function createReactionProfile(guild: Guild) {
     },
   });
 
-  await redis.set(
-    `${Constants.redis.cache.chatReaction.EXISTS}:${guild.id}`,
-    "t",
-    "EX",
-    ms("12 hours") / 1000,
-  );
+  await reactionProfileCache.set(guild.id, true);
 }
 
 export async function hasReactionProfile(guild: Guild) {
-  if (await redis.exists(`${Constants.redis.cache.chatReaction.EXISTS}:${guild.id}`)) return true;
+  if (await reactionProfileCache.get(guild.id)) return true;
   const query = await prisma.chatReaction.findUnique({
     where: {
       guildId: guild.id,
@@ -141,12 +140,7 @@ export async function hasReactionProfile(guild: Guild) {
   });
 
   if (query) {
-    await redis.set(
-      `${Constants.redis.cache.chatReaction.EXISTS}:${guild.id}`,
-      "t",
-      "EX",
-      ms("12 hours") / 1000,
-    );
+    await reactionProfileCache.set(guild.id, true);
 
     return true;
   } else {

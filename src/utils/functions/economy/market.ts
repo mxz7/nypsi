@@ -20,6 +20,7 @@ import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed, getColor } from "../../../models/EmbedBuilders";
 import { DMQueue } from "../../../types/Market";
 import { NotificationPayload } from "../../../types/Notification";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { transaction } from "../../discord-logs";
 import { logger } from "../../logger";
@@ -39,6 +40,10 @@ import { createUser, getItems, userExists } from "./utils";
 import ms = require("ms");
 
 const inTransaction = new Set<string>();
+const marketAverageCache = new RedisCache<number>(
+  Constants.redis.cache.economy.MARKET_AVG,
+  3 * 60 * 60,
+);
 /**
  * items is map of itemId -> map of userId -> amount
  */
@@ -108,8 +113,8 @@ export async function getMarketItemOrders(
 }
 
 export async function getMarketAverage(item: string) {
-  if (await redis.exists(`${Constants.redis.cache.economy.MARKET_AVG}:${item}`))
-    return parseInt(await redis.get(`${Constants.redis.cache.economy.MARKET_AVG}:${item}`));
+  const cache = await marketAverageCache.get(item);
+  if (cache !== null) return cache;
 
   const date = Constants.SEASON_START_HISTORY[Math.max(0, Constants.SEASON_NUMBER - 2)];
 
@@ -144,12 +149,7 @@ export async function getMarketAverage(item: string) {
   const sum = filtered.reduce((a, b) => a + b, 0);
   const avg = Math.floor(sum / filtered.length) || 0;
 
-  await redis.set(
-    `${Constants.redis.cache.economy.MARKET_AVG}:${item}`,
-    avg,
-    "EX",
-    ms("3 hour") / 1000,
-  );
+  await marketAverageCache.set(item, avg);
 
   return avg;
 }

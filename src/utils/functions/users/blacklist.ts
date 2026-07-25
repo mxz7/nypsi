@@ -1,7 +1,7 @@
 import ms = require("ms");
 import { PunishmentType } from "#generated/prisma";
 import prisma from "../../../init/database";
-import redis from "../../../init/redis";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
 import { getAllGroupAccountIds } from "../moderation/alts";
@@ -11,27 +11,23 @@ type Blacklisted = {
   relation?: string;
 };
 
+const blacklistCache = new RedisCache<Blacklisted>(
+  Constants.redis.cache.user.BLACKLIST,
+  ms("3 hour") / 1000,
+);
+
 export async function isUserBlacklisted(member: MemberResolvable): Promise<Blacklisted> {
   const userId = getUserId(member);
-  const cache = await redis.get(`${Constants.redis.cache.user.BLACKLIST}:${userId}`);
-
-  if (cache) {
-    const res = JSON.parse(cache) as Blacklisted;
-
-    return res;
-  }
+  const cached = await blacklistCache.get(userId);
+  if (cached) return cached;
 
   const accounts = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, userId);
 
   for (const accountId of accounts) {
-    const cache = await redis.get(`${Constants.redis.cache.user.BLACKLIST}:${accountId}`);
+    const cached = await blacklistCache.get(accountId);
 
-    if (cache) {
-      const res = JSON.parse(cache) as Blacklisted;
-
-      if (res.blacklisted) {
-        return res;
-      }
+    if (cached) {
+      if (cached.blacklisted) return cached;
     } else {
       const punishment = await prisma.punishment.findFirst({
         where: {
@@ -45,15 +41,7 @@ export async function isUserBlacklisted(member: MemberResolvable): Promise<Black
 
       if (punishment) {
         for (const accountId2 of accounts) {
-          await redis.set(
-            `${Constants.redis.cache.user.BLACKLIST}:${accountId2}`,
-            JSON.stringify({
-              blacklisted: true,
-              relation: accountId,
-            }),
-            "EX",
-            ms("3 hour") / 1000,
-          );
+          await blacklistCache.set(accountId2, { blacklisted: true, relation: accountId });
         }
 
         return { blacklisted: true, relation: accountId };
@@ -61,13 +49,7 @@ export async function isUserBlacklisted(member: MemberResolvable): Promise<Black
     }
   }
 
-  for (const id of accounts)
-    await redis.set(
-      `${Constants.redis.cache.user.BLACKLIST}:${id}`,
-      JSON.stringify({ blacklisted: false }),
-      "EX",
-      ms("3 hour") / 1000,
-    );
+  for (const id of accounts) await blacklistCache.set(id, { blacklisted: false });
 
   return { blacklisted: false };
 }

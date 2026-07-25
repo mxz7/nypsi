@@ -1,7 +1,10 @@
 import prisma from "../../../init/database";
-import redis from "../../../init/redis";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
+
+type EmbedColor = `#${string}` | "default";
+const embedColorCache = new RedisCache<EmbedColor>(Constants.redis.cache.premium.COLOR, 3600);
 
 export async function setEmbedColor(member: MemberResolvable, color: string) {
   const userId = getUserId(member);
@@ -15,15 +18,14 @@ export async function setEmbedColor(member: MemberResolvable, color: string) {
     },
   });
 
-  await redis.del(`${Constants.redis.cache.premium.COLOR}:${userId}`);
+  await embedColorCache.delete(userId);
 }
 
-export async function getEmbedColor(member: MemberResolvable): Promise<`#${string}` | "default"> {
+export async function getEmbedColor(member: MemberResolvable): Promise<EmbedColor> {
   const userId = getUserId(member);
 
-  const cache = await redis.get(`${Constants.redis.cache.premium.COLOR}:${userId}`);
-
-  if (cache) return cache as `#${string}` | "default";
+  const cached = await embedColorCache.get(userId);
+  if (cached) return cached;
 
   const query = await prisma.premium.findFirst({
     where: {
@@ -34,12 +36,7 @@ export async function getEmbedColor(member: MemberResolvable): Promise<`#${strin
     },
   });
 
-  await redis.set(
-    `${Constants.redis.cache.premium.COLOR}:${userId}`,
-    query?.embedColor || "default",
-    "EX",
-    3600,
-  );
+  await embedColorCache.set(userId, (query?.embedColor as EmbedColor) || "default");
 
-  return (query?.embedColor as `#${string}` | "default") || "default";
+  return (query?.embedColor as EmbedColor) || "default";
 }

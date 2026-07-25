@@ -1,24 +1,29 @@
 import { ProfileViewSource } from "#generated/prisma";
 import prisma from "../../../init/database";
-import redis from "../../../init/redis";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { getUserId, MemberResolvable } from "../member";
 import ms = require("ms");
 import dayjs = require("dayjs");
 
+type CachedView = {
+  createdAt: Date;
+  source: ProfileViewSource;
+  viewerId: string;
+  referrer: string;
+};
+
+const viewsCache = new RedisCache<CachedView[]>(
+  Constants.redis.cache.user.views,
+  ms("1 hour") / 1000,
+);
+
 export async function getViews(member: MemberResolvable, limit?: Date) {
   const userId = getUserId(member);
 
-  const cache = await redis.get(`${Constants.redis.cache.user.views}:${userId}`);
-
-  if (cache)
-    return JSON.parse(cache) as {
-      createdAt: Date;
-      source: ProfileViewSource;
-      viewerId: string;
-      referrer: string;
-    }[];
+  const cached = await viewsCache.get(userId);
+  if (cached) return cached;
 
   const query = await prisma.profileView.findMany({
     where: { AND: [{ userId }, { createdAt: { gt: limit || new Date(0) } }] },
@@ -31,12 +36,7 @@ export async function getViews(member: MemberResolvable, limit?: Date) {
     orderBy: { id: "desc" },
   });
 
-  await redis.set(
-    `${Constants.redis.cache.user.views}:${userId}`,
-    JSON.stringify(query),
-    "EX",
-    ms("1 hour"),
-  );
+  await viewsCache.set(userId, query);
 
   return query;
 }
@@ -69,5 +69,5 @@ export async function addView(member: MemberResolvable, viewer: MemberResolvable
     })
     .catch(() => {});
 
-  redis.del(`${Constants.redis.cache.user.views}:${userId}`);
+  viewsCache.delete(userId);
 }

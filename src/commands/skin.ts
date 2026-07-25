@@ -1,10 +1,13 @@
 import { CommandInteraction } from "discord.js";
-import redis from "../init/redis";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import { RedisCache } from "../utils/cache";
 import Constants from "../utils/Constants";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+
+type MinecraftProfile = { name: string; id: string };
+const uuidCache = new RedisCache<MinecraftProfile>(Constants.redis.cache.minecraft.UUID, 604800);
 
 const cmd = new Command("skin", "view the skin of a minecraft account", "minecraft");
 
@@ -45,10 +48,9 @@ async function run(
   return send({ embeds: [embed] });
 }
 
-async function getUUID(username: string): Promise<{ name: string; id: string }> {
-  if (await redis.exists(`${Constants.redis.cache.minecraft.UUID}:${username}`)) {
-    return JSON.parse(await redis.get(`${Constants.redis.cache.minecraft.UUID}:${username}`));
-  }
+async function getUUID(username: string): Promise<MinecraftProfile> {
+  const cached = await uuidCache.get(username);
+  if (cached) return cached;
 
   let uuid = await fetch(`https://api.mojang.com/users/profiles/minecraft/${username}`).then(
     (uuidURL) => uuidURL.json(),
@@ -56,12 +58,7 @@ async function getUUID(username: string): Promise<{ name: string; id: string }> 
 
   if (uuid.errorMessage) uuid = { id: "null", string: "null" };
 
-  await redis.set(
-    `${Constants.redis.cache.minecraft.UUID}:${username}`,
-    JSON.stringify(uuid),
-    "EX",
-    604800,
-  );
+  await uuidCache.set(username, uuid);
 
   return uuid;
 }
