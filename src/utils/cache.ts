@@ -69,7 +69,7 @@ export class MapCache<T> {
     setInterval(() => {
       const now = Date.now();
       for (const [key, entry] of this.store.entries()) {
-        if (now > entry.expiresAt) {
+        if (now >= entry.expiresAt) {
           this.store.delete(key);
         }
       }
@@ -82,7 +82,7 @@ export class MapCache<T> {
     if (!entry) return null;
 
     // Check if expired
-    if (Date.now() > entry.expiresAt) {
+    if (Date.now() >= entry.expiresAt) {
       this.store.delete(key);
       return null;
     }
