@@ -32,12 +32,6 @@ enum EconomyGuildRole {
   owner
 }
 
-enum LevelDmSetting {
-  Disabled
-  All
-  OnlyReward
-}
-
 enum LotteryType {
   standard
   superdraw
@@ -66,11 +60,6 @@ enum RatingType {
 enum ReactionRoleMode {
   MANY
   UNIQUE
-}
-
-enum SudokuCoordMode {
-  box
-  coordinates
 }
 
 enum SudokuDifficulty {
@@ -121,12 +110,6 @@ enum PunishmentEndReason {
 enum TransactionType {
   money
   item
-}
-
-enum WorkerDmSetting {
-  Disabled
-  All
-  OnlyWhenFull
 }
 
 // user specific tables (economy etc.)
