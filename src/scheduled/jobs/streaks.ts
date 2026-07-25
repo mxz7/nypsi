@@ -97,7 +97,7 @@ async function doDailyStreaks(manager: ClusterManager) {
       ]);
 
       if (inventory.has("calendar")) {
-        if (preferences.other)
+        if (preferences.dms.other)
           notifications.push({ memberId: user.userId, payload: { embed: calendarSavedEmbed } });
 
         await removeInventoryItem(user.userId, "calendar", 1);
@@ -123,7 +123,7 @@ async function doDailyStreaks(manager: ClusterManager) {
         }
       }
 
-      if (preferences.other && user.dailyStreak >= 7)
+      if (preferences.dms.other && user.dailyStreak >= 7)
         notifications.push({ memberId: user.userId, payload: { embed: resetEmbed } });
 
       await prisma.economy.update({
@@ -212,8 +212,8 @@ async function doVoteStreaks(manager: ClusterManager) {
         const gemSaveChance = Math.floor(Math.random() * 10);
 
         if (gemSaveChance < 5) {
-          if (preferences.other) {
-            if (preferences.voteReminder) {
+          if (preferences.dms.other) {
+            if (preferences.dms.voteReminder) {
               notifications.push({
                 memberId: user.userId,
                 payload: { embed: gemSavedEmbed, components: voteRow },
@@ -229,8 +229,8 @@ async function doVoteStreaks(manager: ClusterManager) {
           const res = await gemBreak(user.userId, 7, "white_gem", manager, true, false);
 
           if (res) {
-            if (preferences.other) {
-              if (preferences.voteReminder) {
+            if (preferences.dms.other) {
+              if (preferences.dms.voteReminder) {
                 notifications.push({
                   memberId: user.userId,
                   payload: {
@@ -254,8 +254,8 @@ async function doVoteStreaks(manager: ClusterManager) {
         }
       }
 
-      if (preferences.other && user.voteStreak >= 3) {
-        if (preferences.voteReminder) {
+      if (preferences.dms.other && user.voteStreak >= 3) {
+        if (preferences.dms.voteReminder) {
           notifications.push({
             memberId: user.userId,
             payload: { embed: resetEmbed, components: voteRow },

@@ -64,7 +64,7 @@ export default {
 
     await interaction.update({ embeds: [embed], components: [] });
 
-    if ((await getPreferences(offer.ownerId)).market) {
+    if ((await getPreferences(offer.ownerId)).dms.market) {
       addNotificationToQueue({
         memberId: offer.ownerId,
         payload: {

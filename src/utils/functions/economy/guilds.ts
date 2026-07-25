@@ -529,7 +529,7 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
           .find((i) => i.userId === dm.id)
           .contributedMoneyThisLevel.toLocaleString()} for this level`;
 
-        if ((await getPreferences(dm.id)).other) {
+        if ((await getPreferences(dm.id)).dms.other) {
           addNotificationToQueue({
             memberId: dm.id,
             payload: {

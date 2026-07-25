@@ -16,7 +16,7 @@ export interface PreferenceData {
   types?: { name: string; description: string; value: string }[];
 }
 
-export interface Preferences {
+export interface DmPreferences {
   rob: boolean;
   lottery: boolean;
   premium: boolean;
@@ -30,6 +30,10 @@ export interface Preferences {
   autosellStatus: boolean;
   level: LevelNotificationPreference;
   farmHealth: boolean;
+}
+
+export interface Preferences {
+  dms: DmPreferences;
   duelRequests: boolean;
   offers: number;
   leaderboards: boolean;
@@ -39,3 +43,16 @@ export interface Preferences {
   mentionsGlobal: boolean;
   sudokuCoordMode: SudokuCoordMode;
 }
+
+export type DmPreferenceKey = keyof DmPreferences;
+export type DmPreferencePath = `dms.${DmPreferenceKey}`;
+export type GeneralPreferenceKey = Exclude<keyof Preferences, "dms">;
+export type PreferenceKey = DmPreferencePath | GeneralPreferenceKey;
+
+export type PreferenceValueForKey<K extends PreferenceKey> = K extends `dms.${infer DmKey}`
+  ? DmKey extends DmPreferenceKey
+    ? DmPreferences[DmKey]
+    : never
+  : K extends GeneralPreferenceKey
+    ? Preferences[K]
+    : never;

@@ -1,6 +1,13 @@
 import prisma from "../../../init/database";
-import redis from "../../../init/redis";
-import { PreferenceData, Preferences, PreferenceValue } from "../../../types/Preferences";
+import {
+  DmPreferences,
+  PreferenceData,
+  PreferenceKey,
+  Preferences,
+  PreferenceValue,
+  PreferenceValueForKey,
+} from "../../../types/Preferences";
+import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { createUser, userExists } from "../economy/utils";
 import { getUserId, MemberResolvable } from "../member";
@@ -12,16 +19,30 @@ const notificationPreferences: Record<string, PreferenceData> =
   require("../../../../data/preferences.json").notifications;
 const generalPreferences: Record<string, PreferenceData> =
   require("../../../../data/preferences.json").general;
-const preferenceData = { ...notificationPreferences, ...generalPreferences };
+const preferenceData: Record<string, PreferenceData> = {
+  ...Object.fromEntries(
+    Object.entries(notificationPreferences).map(([key, value]) => [`dms.${key}`, value]),
+  ),
+  ...generalPreferences,
+};
+const preferencesCache = new RedisCache<Preferences>(
+  Constants.redis.cache.user.PREFERENCES,
+  ms("12 hours") / 1000,
+);
 
 function getDefaults(): Preferences {
-  return Object.fromEntries(
-    Object.entries(preferenceData).map(([key, preference]) => [key, preference.default]),
-  ) as unknown as Preferences;
+  return {
+    dms: Object.fromEntries(
+      Object.entries(notificationPreferences).map(([key, preference]) => [key, preference.default]),
+    ) as unknown as DmPreferences,
+    ...Object.fromEntries(
+      Object.entries(generalPreferences).map(([key, preference]) => [key, preference.default]),
+    ),
+  } as Preferences;
 }
 
 function hydratePreferences(rows: { key: string; value: unknown }[]): Preferences {
-  const preferences = getDefaults() as unknown as Record<string, PreferenceValue>;
+  const preferences = getDefaults();
 
   for (const row of rows) {
     const definition = preferenceData[row.key];
@@ -31,7 +52,13 @@ function hydratePreferences(rows: { key: string; value: unknown }[]): Preference
       typeof row.value === typeof definition.default &&
       (definition.types === undefined || definition.types.some((type) => type.value === row.value))
     ) {
-      preferences[row.key] = row.value as PreferenceValue;
+      if (row.key.startsWith("dms.")) {
+        const key = row.key.slice(4) as keyof DmPreferences;
+        preferences.dms[key] = row.value as never;
+      } else {
+        (preferences as unknown as Record<string, PreferenceValue>)[row.key] =
+          row.value as PreferenceValue;
+      }
     }
   }
 
@@ -47,24 +74,22 @@ function validatePreferenceValue(data: PreferenceData, value: PreferenceValue) {
 
 export async function getPreferences(member: MemberResolvable): Promise<Preferences> {
   const userId = getUserId(member);
-  const cacheKey = `${Constants.redis.cache.user.PREFERENCES}:${userId}`;
+  const cached = await preferencesCache.get(userId);
 
-  if (await redis.exists(cacheKey)) {
-    return JSON.parse(await redis.get(cacheKey)) as Preferences;
-  }
+  if (cached) return cached;
 
   const rows = await prisma.preferences.findMany({ where: { userId } });
   const preferences = hydratePreferences(rows);
 
-  await redis.set(cacheKey, JSON.stringify(preferences), "EX", ms("12 hour") / 1000);
+  await preferencesCache.set(userId, preferences);
 
   return preferences;
 }
 
-export async function updatePreference<K extends keyof Preferences>(
+export async function updatePreference<K extends PreferenceKey>(
   member: MemberResolvable,
   key: K,
-  value: Preferences[K],
+  value: PreferenceValueForKey<K>,
 ) {
   const userId = getUserId(member);
   const definition = preferenceData[key];
@@ -85,7 +110,7 @@ export async function updatePreference<K extends keyof Preferences>(
     });
   }
 
-  await redis.del(`${Constants.redis.cache.user.PREFERENCES}:${userId}`);
+  await preferencesCache.delete(userId);
 
   return getPreferences(userId);
 }

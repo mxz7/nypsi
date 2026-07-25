@@ -570,7 +570,7 @@ export async function checkMarketWatchers(
   };
 
   for (const userId of users) {
-    if (!(await getPreferences(userId)).market) continue;
+    if (!(await getPreferences(userId)).dms.market) continue;
 
     if (await redis.exists(`${Constants.redis.cooldown.MARKET_WATCH}:${userId}`)) continue;
 
@@ -842,7 +842,7 @@ export async function completeOrder(
       "market",
     );
 
-    if ((await getPreferences(order.ownerId)).market) {
+    if ((await getPreferences(order.ownerId)).dms.market) {
       let dmQueue = await redis
         .hget(`${Constants.redis.nypsi.MARKET_DM}:${order.orderType}`, order.ownerId)
         .then((r) => (r ? (JSON.parse(r) as DMQueue) : undefined));

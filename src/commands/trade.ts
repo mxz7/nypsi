@@ -851,7 +851,7 @@ async function run(
         await addBalance(tradeRequest.ownerId, Number(tradeRequest.offeredMoney));
       }
 
-      if ((await getPreferences(tradeRequest.ownerId)).market) {
+      if ((await getPreferences(tradeRequest.ownerId)).dms.market) {
         const embed = new CustomEmbed().setColor(Constants.EMBED_FAIL_COLOR);
 
         embed.setDescription(

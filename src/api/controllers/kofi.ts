@@ -161,7 +161,7 @@ async function handleKofiData(data: z.infer<typeof schema>) {
           await setEconomyPunishment(user.id);
           logger.info(`unbanned ${user.id} (${user.email})`, item);
 
-          if ((await getPreferences(user.id)).premium) {
+          if ((await getPreferences(user.id)).dms.premium) {
             const payload: NotificationPayload = {
               memberId: user.id,
               payload: {
@@ -192,7 +192,7 @@ async function handleKofiData(data: z.infer<typeof schema>) {
 
           logger.info(`given to ${user.id} (${user.email})`, { item, amount });
 
-          if ((await getPreferences(user.id)).premium) {
+          if ((await getPreferences(user.id)).dms.premium) {
             const payload: NotificationPayload = {
               memberId: user.id,
               payload: {
@@ -239,7 +239,7 @@ async function handleKofiData(data: z.infer<typeof schema>) {
           await addInventoryItem(user.id, "pink_gem", 1);
           addProgress(user.id, "gem_hunter", 1);
 
-          if ((await getPreferences(user.id)).other) {
+          if ((await getPreferences(user.id)).dms.other) {
             addNotificationToQueue({
               memberId: user.id,
               payload: {
@@ -257,7 +257,7 @@ async function handleKofiData(data: z.infer<typeof schema>) {
           await addInventoryItem(user.id, "blue_gem", 1);
           addProgress(user.id, "gem_hunter", 1);
 
-          if ((await getPreferences(user.id)).other) {
+          if ((await getPreferences(user.id)).dms.other) {
             addNotificationToQueue({
               memberId: user.id,
               payload: {
@@ -275,7 +275,7 @@ async function handleKofiData(data: z.infer<typeof schema>) {
           await addInventoryItem(user.id, "purple_gem", 1);
           addProgress(user.id, "gem_hunter", 1);
 
-          if ((await getPreferences(user.id)).other) {
+          if ((await getPreferences(user.id)).dms.other) {
             addNotificationToQueue({
               memberId: user.id,
               payload: {
@@ -293,7 +293,7 @@ async function handleKofiData(data: z.infer<typeof schema>) {
           await addInventoryItem(user.id, "green_gem", 1);
           addProgress(user.id, "gem_hunter", 1);
 
-          if ((await getPreferences(user.id)).other) {
+          if ((await getPreferences(user.id)).dms.other) {
             addNotificationToQueue({
               memberId: user.id,
               payload: {
@@ -310,7 +310,7 @@ async function handleKofiData(data: z.infer<typeof schema>) {
         } else if (gemChance == 57) {
           const gemChance2 = Math.floor(Math.random() * 50);
 
-          if (gemChance2 == 7 && (await getPreferences(user.id)).other) {
+          if (gemChance2 == 7 && (await getPreferences(user.id)).dms.other) {
             await addInventoryItem(user.id, "white_gem", 1);
             addProgress(user.id, "gem_hunter", 1);
 

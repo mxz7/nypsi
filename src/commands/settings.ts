@@ -20,7 +20,13 @@ import {
 import redis from "../init/redis";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { Preferences } from "../types/Preferences";
+import {
+  DmPreferenceKey,
+  DmPreferencePath,
+  GeneralPreferenceKey,
+  Preferences,
+  PreferenceValue,
+} from "../types/Preferences";
 import {
   calcMaxBet,
   getDefaultBet,
@@ -180,6 +186,19 @@ async function run(
 
   const showNotificationPreferences = async (settingId?: string) => {
     const notificationPreferences = getPreferenceData("notifications");
+    const getValue = (preferences: Preferences, key: string) =>
+      preferences.dms[key as DmPreferenceKey];
+    const setValue = (preferences: Preferences, key: string, value: PreferenceValue) => {
+      preferences.dms[key as DmPreferenceKey] = value as never;
+    };
+    const savePreference = (preferences: Preferences, key: string) => {
+      const preferenceKey = key as DmPreferenceKey;
+      return updatePreference(
+        message.member,
+        `dms.${preferenceKey}` as DmPreferencePath,
+        preferences.dms[preferenceKey],
+      );
+    };
 
     const showSetting = async (
       settings: Preferences,
@@ -187,16 +206,13 @@ async function run(
       options: StringSelectMenuOptionBuilder[],
       msg?: Message,
     ) => {
+      const value = getValue(settings, settingId);
       const embed = new CustomEmbed(message.member).setHeader(
         notificationPreferences[settingId].name,
       );
 
       embed.setDescription(
-        notificationPreferences[settingId].description.replace(
-          "{VALUE}",
-          // @ts-expect-error loser
-          settings[settingId].toLocaleString(),
-        ),
+        notificationPreferences[settingId].description.replace("{VALUE}", value.toLocaleString()),
       );
 
       const userSelection = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -210,8 +226,7 @@ async function run(
           .setStyle(ButtonStyle.Danger),
       );
 
-      // @ts-expect-error hate life innit
-      if (typeof settings[settingId] === "number" || typeof settings[settingId] === "bigint") {
+      if (typeof value === "number") {
         const boobies = [
           new ButtonBuilder()
             .setCustomId("enable")
@@ -221,8 +236,7 @@ async function run(
             .setCustomId("disable")
             .setLabel("disable")
             .setStyle(ButtonStyle.Danger)
-            // @ts-expect-error gay
-            .setDisabled(settings[settingId] === 0 || settings[settingId] === 0n),
+            .setDisabled(value === 0),
         ];
 
         userSelection.setComponents(boobies);
@@ -235,8 +249,7 @@ async function run(
             .setDescription(type.description)
             .setValue(type.value);
 
-          //@ts-expect-error silly ts
-          if (settings[settingId] == type.value) {
+          if (value == type.value) {
             option.setDefault(true);
           }
 
@@ -247,8 +260,7 @@ async function run(
           new StringSelectMenuBuilder().setCustomId("typesetting").setOptions(boobies),
         );
       } else {
-        // @ts-expect-error annoying grr
-        if (settings[settingId]) {
+        if (value) {
           userSelection.components[0].setDisabled(true);
         } else {
           userSelection.components[1].setDisabled(true);
@@ -323,23 +335,17 @@ async function run(
         const selected = options.find((o) => o.data.default).data.value;
         const value = notificationPreferences[selected].types.find((x) => x.value == res.values[0]);
 
-        // @ts-expect-error silly ts
-        settings[selected] = value.value;
+        setValue(settings, selected, value.value);
         await res.deferUpdate();
 
-        settings = await updatePreference(
-          message.member,
-          selected as keyof Preferences,
-          settings[selected as keyof Preferences],
-        );
+        settings = await savePreference(settings, selected);
         msg = await showSetting(settings, selected, options, res.message);
 
         return pageManager();
       } else if (res.customId.startsWith("enable")) {
         const selected = options.find((o) => o.data.default).data.value;
 
-        // @ts-expect-error grr
-        if (typeof settings[selected] == "number") {
+        if (typeof getValue(settings, selected) == "number") {
           const modal = new ModalBuilder()
             .setCustomId("settings-update")
             .setTitle("net worth notifications");
@@ -378,21 +384,15 @@ async function run(
               flags: MessageFlags.Ephemeral,
             });
           } else {
-            // @ts-expect-error ts is a loser !
-            settings[selected] = value;
+            setValue(settings, selected, value);
             await modalResponse.deferUpdate();
           }
         } else {
-          // @ts-expect-error doesn't like doing this!
-          settings[selected] = true;
+          setValue(settings, selected, true);
           await res.deferUpdate();
         }
 
-        settings = await updatePreference(
-          message.member,
-          selected as keyof Preferences,
-          settings[selected as keyof Preferences],
-        );
+        settings = await savePreference(settings, selected);
         msg = await showSetting(settings, selected, options, res.message);
 
         return pageManager();
@@ -401,20 +401,13 @@ async function run(
 
         await res.deferUpdate();
 
-        // @ts-expect-error doesn't like doing this!
-        if (typeof settings[selected] === "number" || typeof settings[selected] === "bigint") {
-          // @ts-expect-error doesn't like doing this!
-          settings[selected] = 0;
+        if (typeof getValue(settings, selected) === "number") {
+          setValue(settings, selected, 0);
         } else {
-          // @ts-expect-error doesn't like doing this!
-          settings[selected] = false;
+          setValue(settings, selected, false);
         }
 
-        settings = await updatePreference(
-          message.member,
-          selected as keyof Preferences,
-          settings[selected as keyof Preferences],
-        );
+        settings = await savePreference(settings, selected);
         msg = await showSetting(settings, selected, options, res.message);
 
         return pageManager();
@@ -573,8 +566,8 @@ async function run(
 
         settings = await updatePreference(
           message.member,
-          selected as keyof Preferences,
-          settings[selected as keyof Preferences],
+          selected as GeneralPreferenceKey,
+          settings[selected as GeneralPreferenceKey],
         );
         msg = await showSetting(settings, selected, options, res.message);
 
@@ -644,8 +637,8 @@ async function run(
 
         settings = await updatePreference(
           message.member,
-          selected as keyof Preferences,
-          settings[selected as keyof Preferences],
+          selected as GeneralPreferenceKey,
+          settings[selected as GeneralPreferenceKey],
         );
         msg = await showSetting(settings, selected, options, res.message);
 
@@ -672,8 +665,8 @@ async function run(
 
         settings = await updatePreference(
           message.member,
-          selected as keyof Preferences,
-          settings[selected as keyof Preferences],
+          selected as GeneralPreferenceKey,
+          settings[selected as GeneralPreferenceKey],
         );
         msg = await showSetting(settings, selected, options, res.message);
 

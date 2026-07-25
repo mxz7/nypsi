@@ -424,7 +424,7 @@ async function run(
     setTimeout(async () => {
       await edit({ embeds: [embed2] }, m);
 
-      if ((await getPreferences(target)).rob) {
+      if ((await getPreferences(target)).dms.rob) {
         if (robberySuccess) {
           await target
             .send({ content: "you have been robbed!!", embeds: [embed3] })

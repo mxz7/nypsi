@@ -1449,7 +1449,7 @@ async function run(
         await addInventoryItem(order.ownerId, order.itemId, order.itemAmount);
       }
 
-      if ((await getPreferences(order.ownerId)).market) {
+      if ((await getPreferences(order.ownerId)).dms.market) {
         const embed = new CustomEmbed().setColor(Constants.EMBED_FAIL_COLOR);
 
         embed.setDescription(

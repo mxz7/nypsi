@@ -58,7 +58,7 @@ export default {
         } has expired. you have been given back your money`,
       );
 
-      if ((await getPreferences(order.ownerId)).market) {
+      if ((await getPreferences(order.ownerId)).dms.market) {
         addNotificationToQueue({
           memberId: order.ownerId,
           payload: {
@@ -84,7 +84,7 @@ export default {
         } has expired. you have been given back your ${pluralize("item", order.itemAmount)}`,
       );
 
-      if ((await getPreferences(order.ownerId)).market) {
+      if ((await getPreferences(order.ownerId)).dms.market) {
         addNotificationToQueue({
           memberId: order.ownerId,
           payload: {

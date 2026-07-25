@@ -67,7 +67,7 @@ async function checkBoosters(member: MemberResolvable, boosters: Map<string, Boo
           })
           .catch(() => {});
 
-        if (booster.scope === "global" && (await getPreferences(booster.userId)).booster) {
+        if (booster.scope === "global" && (await getPreferences(booster.userId)).dms.booster) {
           addNotificationToQueue({
             memberId: booster.userId,
             payload: {
@@ -99,7 +99,7 @@ async function checkBoosters(member: MemberResolvable, boosters: Map<string, Boo
   if (expired.size != 0) {
     await boostersCache.delete(userId);
 
-    if ((await getPreferences(userId)).booster) {
+    if ((await getPreferences(userId)).dms.booster) {
       const embed = new CustomEmbed(userId).setFooter({ text: "/settings me notifications" });
 
       let desc = "";

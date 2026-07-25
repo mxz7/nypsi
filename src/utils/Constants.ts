@@ -190,7 +190,7 @@ export default {
       user: {
         DM_BLOCK: "cache:user:dmblock",
         BLACKLIST: "cache:user:blacklist",
-        PREFERENCES: "cache:user:preferences:v2",
+        PREFERENCES: "cache:user:preferences",
         EXISTS: "cache:user:exists",
         KARMA: "cache:user:karma",
         LAST_COMMAND: "cache:user:lastcmd",

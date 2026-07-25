@@ -145,7 +145,7 @@ export default {
 
       hook.destroy();
 
-      if ((await getPreferences(winner.userId)).lottery) {
+      if ((await getPreferences(winner.userId)).dms.lottery) {
         embed.setTitle(`you have won the lottery!`);
         embed.setDescription(
           `you have won a total of $**${totalPrize.toLocaleString()}**\n\nyou had ${winner.amount.toLocaleString()} ${pluralize("ticket", winner.amount)}`,
@@ -160,7 +160,7 @@ export default {
           await addInventoryItem(winner.userId, "purple_gem", 1);
           addProgress(winner.userId, "gem_hunter", 1);
 
-          if ((await getPreferences(winner.userId)).other) {
+          if ((await getPreferences(winner.userId)).dms.other) {
             addNotificationToQueue({
               memberId: winner.userId,
               payload: {
@@ -200,7 +200,7 @@ export default {
         addStat(user.userId, "spent-shop", cost);
         await addInventoryItem(user.userId, "lottery_ticket", amount);
 
-        if ((await getPreferences(user.userId)).other) {
+        if ((await getPreferences(user.userId)).dms.other) {
           const components = winnerMessageUrl
             ? new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                 new ButtonBuilder()

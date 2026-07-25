@@ -22,7 +22,7 @@ export default {
     const userIds = await prisma.preferences.findMany({
       where: {
         AND: [
-          { key: "voteReminder", value: { equals: true } },
+          { key: "dms.voteReminder", value: { equals: true } },
           {
             user: {
               Economy: {

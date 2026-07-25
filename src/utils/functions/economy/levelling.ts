@@ -652,7 +652,7 @@ export async function doLevelUp(member: MemberResolvable) {
 
   embed.setDescription(desc);
 
-  const dmSetting = (await getPreferences(member)).level;
+  const dmSetting = (await getPreferences(member)).dms.level;
 
   switch (dmSetting) {
     case "All":

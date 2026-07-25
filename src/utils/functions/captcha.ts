@@ -132,7 +132,7 @@ export async function passedCaptcha(member: GuildMember | User, check: Captcha, 
         "you have missed a lot of captchas, if this continues you may be automatically banned",
       ).setTitle("⚠️ warning");
 
-      if ((await getPreferences(member.id)).other) {
+      if ((await getPreferences(member.id)).dms.other) {
         addNotificationToQueue({
           memberId: member.id,
           payload: {

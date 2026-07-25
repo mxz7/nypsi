@@ -282,7 +282,7 @@ setInterval(async () => {
     const milf = JSON.parse(obj) as MilfSearchData;
     if (dayjs(milf.date).isBefore(dayjs().subtract(6, "hours"))) {
       await redis.lrem(Constants.redis.nypsi.MILF_QUEUE, 1, obj);
-      if ((await getPreferences(milf.userId)).other) {
+      if ((await getPreferences(milf.userId)).dms.other) {
         addNotificationToQueue({
           memberId: milf.userId,
           payload: {

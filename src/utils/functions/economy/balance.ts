@@ -267,7 +267,7 @@ export async function getGambleMulti(
   }
 
   if (
-    dmSettings.voteReminder &&
+    dmSettings.dms.voteReminder &&
     !(await redis.sismember(Constants.redis.nypsi.VOTE_REMINDER_RECEIVED, getUserId(member)))
   ) {
     multi += 2;
@@ -401,7 +401,7 @@ export async function getSellMulti(
   }
 
   if (
-    (await getPreferences(member)).voteReminder &&
+    (await getPreferences(member)).dms.voteReminder &&
     !(await redis.sismember(Constants.redis.nypsi.VOTE_REMINDER_RECEIVED, getUserId(member)))
   ) {
     multi += 5;
@@ -952,7 +952,7 @@ export async function calcNetWorth(
   setImmediate(async () => {
     const dmSettings = await getPreferences(userId);
 
-    if (query.netWorth && dmSettings.netWorth > 0) {
+    if (query.netWorth && dmSettings.dms.netWorth > 0) {
       const payload: NotificationPayload = {
         memberId: userId,
         payload: {
@@ -963,11 +963,11 @@ export async function calcNetWorth(
         },
       };
 
-      if (Number(query.netWorth) < Math.floor(worth) - dmSettings.netWorth) {
+      if (Number(query.netWorth) < Math.floor(worth) - dmSettings.dms.netWorth) {
         payload.payload.content = `your net worth has increased by $${(
           Math.floor(worth) - Number(query.netWorth)
         ).toLocaleString()}`;
-      } else if (Number(query.netWorth) > Math.floor(worth) + dmSettings.netWorth) {
+      } else if (Number(query.netWorth) > Math.floor(worth) + dmSettings.dms.netWorth) {
         payload.payload.content = `your net worth has decreased by $${(
           Number(query.netWorth) - Math.floor(worth)
         ).toLocaleString()}`;

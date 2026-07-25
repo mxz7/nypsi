@@ -356,7 +356,7 @@ async function run(
     if (
       percentChance(0.05) &&
       !(await hasGemBeenGiven()) &&
-      (await getPreferences(message.member)).other &&
+      (await getPreferences(message.member)).dms.other &&
       !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))
     ) {
       await markGemAsGiven();

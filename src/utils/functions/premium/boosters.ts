@@ -61,7 +61,7 @@ export async function setBooster(member: MemberResolvable, value: boolean): Prom
 
   await boosterCache.delete(userId);
 
-  if (value && (await getPreferences(member)).premium) {
+  if (value && (await getPreferences(member)).dms.premium) {
     addNotificationToQueue({
       memberId: userId,
       payload: {

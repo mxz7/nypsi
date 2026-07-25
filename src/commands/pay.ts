@@ -164,7 +164,7 @@ async function run(
     ).toLocaleString()}**`,
   );
 
-  if ((await getPreferences(target)).payment) {
+  if ((await getPreferences(target)).dms.payment) {
     notificationEmbed
       .setHeader("you have received a payment")
       .setFooter({ text: "/settings me notifications" });

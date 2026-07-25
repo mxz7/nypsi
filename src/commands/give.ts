@@ -165,7 +165,7 @@ async function run(
     )}`,
   );
 
-  if ((await getPreferences(target)).payment) {
+  if ((await getPreferences(target)).dms.payment) {
     notificationEmbed
       .setHeader(
         `you have received ${pluralize(`${selected.article} ${selected.name}`, amount, `${amount.toLocaleString()} ${selected.plural}`)}`,

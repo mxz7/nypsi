@@ -53,7 +53,7 @@ export default {
                   `you didnt complete all of your daily tasks and lost your streak of ${streak.dailyTaskStreak.toLocaleString()} ):`,
               );
 
-            if ((await getPreferences(user.user_id)).other)
+            if ((await getPreferences(user.user_id)).dms.other)
               addNotificationToQueue({ memberId: user.user_id, payload: { embed } });
             else addInlineNotification({ memberId: user.user_id, embed });
           }

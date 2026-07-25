@@ -76,7 +76,7 @@ export async function checkPurchases(member: MemberResolvable) {
     logger.info(`giving purchased item to ${userId}`, item);
 
     if (item.item === "donation") {
-      if ((await getPreferences(userId)).premium) {
+      if ((await getPreferences(userId)).dms.premium) {
         const payload: NotificationPayload = {
           memberId: userId,
           payload: {
@@ -109,7 +109,7 @@ export async function checkPurchases(member: MemberResolvable) {
         if (item.item === "unecoban") {
           await setEconomyPunishment(userId);
 
-          if ((await getPreferences(userId)).premium) {
+          if ((await getPreferences(userId)).dms.premium) {
             const payload: NotificationPayload = {
               memberId: userId,
               payload: {
@@ -123,7 +123,7 @@ export async function checkPurchases(member: MemberResolvable) {
         } else {
           await addInventoryItem(userId, item.item, item.amount || 1);
 
-          if ((await getPreferences(userId)).premium) {
+          if ((await getPreferences(userId)).dms.premium) {
             const payload: NotificationPayload = {
               memberId: userId,
               payload: {

@@ -77,7 +77,7 @@ export default {
       await addInventoryItem(interaction.user.id, "blue_gem", 1);
       addProgress(interaction.user.id, "gem_hunter", 1);
 
-      if ((await getPreferences(interaction.user.id)).other) {
+      if ((await getPreferences(interaction.user.id)).dms.other) {
         addNotificationToQueue({
           memberId: interaction.user.id,
           payload: {

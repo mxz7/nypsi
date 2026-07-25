@@ -58,14 +58,14 @@ async function run(
     embed
       .setDescription(
         `you can vote again <t:${nextVote}:R>${
-          dmSettings.voteReminder
+          dmSettings.dms.voteReminder
             ? ""
             : "\n\nenable vote reminders for an extra **2%** gamble multiplier and **5%** sell multiplier"
         }\n\nyou've voted **${votes.monthVote}** ${pluralize("time", votes.monthVote)} this month and **${votes.seasonVote}** ${pluralize("time", votes.seasonVote)} this season`,
       )
       .setFooter({ text: `streak: ${streak.toLocaleString()}` });
 
-    if (dmSettings.voteReminder)
+    if (dmSettings.dms.voteReminder)
       send({
         embeds: [embed],
       });
@@ -99,7 +99,7 @@ async function run(
         .setEmoji("<:topgg:1355915569286610964>"),
     );
 
-    if (!dmSettings.voteReminder)
+    if (!dmSettings.dms.voteReminder)
       row.addComponents(
         new ButtonBuilder()
           .setCustomId("enable-vote-reminders")

@@ -51,7 +51,7 @@ export default {
     let dms = 0;
 
     for (const [userId, plants] of grouped.entries()) {
-      if (!(await getPreferences(userId)).farmHealth) continue;
+      if (!(await getPreferences(userId)).dms.farmHealth) continue;
       if (await redis.exists(`${Constants.redis.nypsi.FARM_STATUS_DM}:${userId}`)) continue;
       let needWater = 0;
       let needFertiliser = 0;

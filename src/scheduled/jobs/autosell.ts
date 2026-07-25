@@ -15,7 +15,7 @@ export default {
     await redis.del(Constants.redis.nypsi.AUTO_SELL_ITEMS_MEMBERS);
 
     for (const user of users) {
-      if (!(await getPreferences(user)).autosellStatus) continue;
+      if (!(await getPreferences(user)).dms.autosellStatus) continue;
       const items = await redis.hgetall(`${Constants.redis.nypsi.AUTO_SELL_ITEMS}:${user}`);
       await redis.del(`${Constants.redis.nypsi.AUTO_SELL_ITEMS}:${user}`);
 

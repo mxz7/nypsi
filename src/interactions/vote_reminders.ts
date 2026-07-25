@@ -8,7 +8,7 @@ export default {
   name: "enable-vote-reminders",
   type: "interaction",
   async run(interaction) {
-    await updatePreference(interaction.user.id, "voteReminder", true);
+    await updatePreference(interaction.user.id, "dms.voteReminder", true);
 
     return interaction.reply({
       embeds: [

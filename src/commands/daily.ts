@@ -72,7 +72,7 @@ async function run(
     await addInventoryItem(message.member, "blue_gem", 1);
     addProgress(message.member, "gem_hunter", 1);
 
-    if ((await getPreferences(message.member)).other) {
+    if ((await getPreferences(message.member)).dms.other) {
       addNotificationToQueue({
         memberId: message.author.id,
         payload: {

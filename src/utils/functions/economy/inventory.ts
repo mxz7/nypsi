@@ -437,7 +437,7 @@ export async function commandGemCheck(member: MemberResolvable, commandCategory:
 
   if (await hasGemBeenGiven()) return;
   if (!(await userExists(member))) return;
-  if (!(await getPreferences(member)).other) return;
+  if (!(await getPreferences(member)).dms.other) return;
   if (gemChanceCooldown.has(userId)) return;
   gemChanceCooldown.add(userId);
 
@@ -452,7 +452,7 @@ export async function commandGemCheck(member: MemberResolvable, commandCategory:
     await addInventoryItem(member, gem, 1);
     addProgress(member, "gem_hunter", 1);
 
-    if ((await getPreferences(member)).other) {
+    if ((await getPreferences(member)).dms.other) {
       addNotificationToQueue({
         memberId: userId,
         payload: {
@@ -472,7 +472,7 @@ export async function commandGemCheck(member: MemberResolvable, commandCategory:
       await addInventoryItem(member, "pink_gem", 1);
       addProgress(userId, "gem_hunter", 1);
 
-      if ((await getPreferences(member)).other) {
+      if ((await getPreferences(member)).dms.other) {
         addNotificationToQueue({
           memberId: userId,
           payload: {
@@ -493,7 +493,7 @@ export async function commandGemCheck(member: MemberResolvable, commandCategory:
       await addInventoryItem(member, "purple_gem", 1);
       addProgress(member, "gem_hunter", 1);
 
-      if ((await getPreferences(member)).other) {
+      if ((await getPreferences(member)).dms.other) {
         addNotificationToQueue({
           memberId: userId,
           payload: {
@@ -550,7 +550,7 @@ export async function gemBreak(
     uniqueGemCount === 5 &&
     percentChance(25) &&
     !(await hasGemBeenGiven()) &&
-    (await getPreferences(userId)).other
+    (await getPreferences(userId)).dms.other
   ) {
     await Promise.all([
       removeInventoryItem(userId, "pink_gem", 1),
@@ -666,7 +666,7 @@ export async function gemBreak(
 
   if (footer) embed.setFooter({ text: footer });
 
-  if (sendMessage && (await getPreferences(userId)).other) {
+  if (sendMessage && (await getPreferences(userId)).dms.other) {
     addNotificationToQueue({
       memberId: userId,
       payload: {

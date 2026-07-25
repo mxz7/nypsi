@@ -222,7 +222,7 @@ async function completeAchievement(userId: string, achievementId: string) {
     userEmbed.setDescription((userEmbed.data.description += `\n ${prizes.join("\n")}`));
   }
 
-  if ((await getPreferences(userId)).other) {
+  if ((await getPreferences(userId)).dms.other) {
     const payload: NotificationPayload = {
       memberId: userId,
       payload: {

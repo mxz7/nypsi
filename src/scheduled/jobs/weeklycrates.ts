@@ -68,7 +68,7 @@ export default {
 
       embed.addField("rewards", desc.join("\n"));
 
-      if ((await getPreferences(member.id)).premium) {
+      if ((await getPreferences(member.id)).dms.premium) {
         addNotificationToQueue({
           memberId: member.id,
           payload: {

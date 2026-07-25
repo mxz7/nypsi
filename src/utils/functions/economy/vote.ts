@@ -153,7 +153,7 @@ export async function giveVoteRewards(
     await addInventoryItem(user, "blue_gem", 1);
     addProgress(user, "gem_hunter", 1);
 
-    if ((await getPreferences(user)).other) {
+    if ((await getPreferences(user)).dms.other) {
       addNotificationToQueue({
         memberId: user,
         payload: {
@@ -202,7 +202,7 @@ export async function giveVoteRewards(
       .setStyle(ButtonStyle.Success),
   );
 
-  if (!(await getPreferences(user)).voteReminder) {
+  if (!(await getPreferences(user)).dms.voteReminder) {
     row.addComponents(
       new ButtonBuilder()
         .setLabel("enable vote reminders")

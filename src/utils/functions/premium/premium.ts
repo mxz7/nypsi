@@ -114,7 +114,7 @@ export async function addMember(member: MemberResolvable, level: number, expires
 
   logger.info(`premium level ${level} given to ${userId}`);
 
-  if ((await getPreferences(userId)).premium) {
+  if ((await getPreferences(userId)).dms.premium) {
     addNotificationToQueue({
       memberId: userId,
       payload: {
@@ -159,7 +159,7 @@ export async function setTier(member: MemberResolvable, level: number) {
 
   logger.info(`premium level updated to ${level} for ${userId}`);
 
-  if ((await getPreferences(userId)).premium) {
+  if ((await getPreferences(userId)).dms.premium) {
     addNotificationToQueue({
       memberId: userId,
       payload: {
@@ -183,7 +183,7 @@ export async function renewUser(member: MemberResolvable) {
     },
   });
 
-  if ((await getPreferences(member)).premium) {
+  if ((await getPreferences(member)).dms.premium) {
     addNotificationToQueue({
       memberId: userId,
       payload: {
@@ -263,7 +263,7 @@ export async function expireUser(member: MemberResolvable, client?: NypsiClient 
       });
   }
 
-  if ((await getPreferences(member)).premium) {
+  if ((await getPreferences(member)).dms.premium) {
     addNotificationToQueue({
       memberId: getUserId(member),
       payload: {
@@ -287,7 +287,7 @@ export async function setExpireDate(member: MemberResolvable, date: Date) {
     },
   });
 
-  if ((await getPreferences(userId)).premium) {
+  if ((await getPreferences(userId)).dms.premium) {
     addNotificationToQueue({
       memberId: userId,
       payload: { content: `your membership will now expire on **${formatDate(date)}**` },

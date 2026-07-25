@@ -145,7 +145,7 @@ export default new ItemUse(
         "your money is no longer protected by a padlock",
     );
 
-    if ((await getPreferences(lockPickTarget)).rob) {
+    if ((await getPreferences(lockPickTarget)).dms.rob) {
       await lockPickTarget.send({ embeds: [targetEmbed] });
     }
 

@@ -531,7 +531,7 @@ export async function fulfillTradeRequest(
     );
   }
 
-  if ((await getPreferences(tradeRequest.ownerId)).market) {
+  if ((await getPreferences(tradeRequest.ownerId)).dms.market) {
     const embedDm = new CustomEmbed(tradeRequest.ownerId).setDescription(
       `your trade request has been fulfilled\n\nyou have received:\n${tradeRequest.requestedItems.map((item) => `- **${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} ${items[item.split(":")[0]].name}`).join("\n")}`,
     );

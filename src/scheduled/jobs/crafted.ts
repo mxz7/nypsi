@@ -28,7 +28,7 @@ export default {
 
       await addProgress(item.userId, "crafter", item.amount);
 
-      if ((await getPreferences(item.userId)).other) {
+      if ((await getPreferences(item.userId)).dms.other) {
         addNotificationToQueue({
           memberId: item.userId,
           payload: {
