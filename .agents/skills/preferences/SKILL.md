@@ -10,7 +10,6 @@ description: Explains the sparse key-value storage used for personal preferences
 Use the helpers in `src/utils/functions/users/preferences.ts`:
 
 - `getPreferences()` and `updatePreference()` are the only read/write API.
-- Use `getPreferencesForUsers()` when resolving preferences for many users to avoid per-user database queries.
 - Setting a key back to its default removes its row.
 - All preferences share one versioned per-user Redis cache entry.
 

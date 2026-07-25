@@ -61,22 +61,6 @@ export async function getPreferences(member: MemberResolvable): Promise<Preferen
   return preferences;
 }
 
-export async function getPreferencesForUsers(userIds: string[]) {
-  const uniqueUserIds = [...new Set(userIds)];
-  const rows = await prisma.preferences.findMany({ where: { userId: { in: uniqueUserIds } } });
-  const rowsByUser = new Map<string, typeof rows>();
-
-  for (const row of rows) {
-    const userRows = rowsByUser.get(row.userId) ?? [];
-    userRows.push(row);
-    rowsByUser.set(row.userId, userRows);
-  }
-
-  return new Map(
-    uniqueUserIds.map((userId) => [userId, hydratePreferences(rowsByUser.get(userId) ?? [])]),
-  );
-}
-
 export async function updatePreference<K extends keyof Preferences>(
   member: MemberResolvable,
   key: K,
