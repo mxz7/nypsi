@@ -344,9 +344,9 @@ async function run(
         await addInventoryItem(message.member, wanted.value, 1);
         break;
       case "xp":
-        await addXp(message.member, parseInt(wanted.value));
+        await addXp(message.member, wanted.value);
         if (guild) {
-          await addToGuildXP(guild, parseInt(wanted.value), message.member);
+          await addToGuildXP(guild, wanted.value, message.member);
         }
         break;
     }

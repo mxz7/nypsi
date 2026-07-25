@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { expect, test } from "vitest";
 import { AchievementData } from "../../src/types/Economy";
 import Constants from "../../src/utils/Constants";
+import { expectIdMatchesKey, expectNonEmptyString, expectPositiveInteger } from "./helpers";
 
 const data: Record<string, AchievementData> = JSON.parse(
   readFileSync("data/achievements.json").toString(),
@@ -11,38 +12,35 @@ const data: Record<string, AchievementData> = JSON.parse(
 const items: Record<string, unknown> = JSON.parse(readFileSync("data/items.json").toString());
 const tags: Record<string, unknown> = JSON.parse(readFileSync("data/tags.json").toString());
 
-for (const ach of Object.values(data)) {
-  test(ach.id, () => {
-    expect.soft(typeof ach.id).toBe("string");
-    expect.soft(typeof ach.name).toBe("string");
+for (const [id, ach] of Object.entries(data)) {
+  test(id, () => {
+    expectIdMatchesKey(id, ach);
+    expectNonEmptyString(ach.name, `${id}.name`);
     expect.soft(typeof ach.emoji).toBe("string");
     expect
       .soft(Constants.EMOJI_REGEX.test(ach.emoji) || Constants.UNICODE_EMOJI_REGEX.test(ach.emoji))
       .toBe(true);
-    expect.soft(typeof ach.target).toBe("number");
-    expect.soft(ach.target).toBeGreaterThan(0);
-    expect.soft(typeof ach.description).toBe("string");
+    expectPositiveInteger(ach.target, `${id}.target`);
+    expectNonEmptyString(ach.description, `${id}.description`);
 
-    if (ach.prize) {
+    if (ach.prize !== undefined) {
       expect(Array.isArray(ach.prize)).toBe(true);
+      expect.soft(ach.prize.length, `${id}.prize should not be empty`).toBeGreaterThan(0);
 
-      // each prize entry should either be a valid item with quantity or a tag
       for (const p of ach.prize) {
-        expect.soft(typeof p).toBe("string");
+        expectNonEmptyString(p, `${id}.prize entry`);
+        const tagMatch = /^tag:([^:]+)$/.exec(p);
+        const itemMatch = /^([^:]+):([1-9]\d*)$/.exec(p);
 
-        if (p.startsWith("tag:")) {
-          // tags are prefixed with tag:<id>
-          const parts = p.split(":");
-          expect.soft(parts.length).toBe(2);
-          const tagName = parts[1];
+        if (tagMatch) {
+          const tagName = tagMatch[1];
           expect.soft(tags[tagName], `tag ${tagName} exists`).toBeDefined();
         } else {
-          const parts = p.split(":");
-          expect.soft(parts.length).toBe(2);
-          const [itemName, qtyStr] = parts;
+          expect.soft(itemMatch, `${id} has invalid prize "${p}"`).not.toBeNull();
+          if (!itemMatch) continue;
+          const [, itemName, qtyStr] = itemMatch;
           expect.soft(items[itemName], `item ${itemName} exists`).toBeDefined();
-          const qty = parseInt(qtyStr, 10);
-          expect.soft(!isNaN(qty) && qty > 0).toBe(true);
+          expectPositiveInteger(Number(qtyStr), `${id} prize quantity`);
         }
       }
     }

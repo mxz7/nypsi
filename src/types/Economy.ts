@@ -44,8 +44,8 @@ export interface Item {
   clicks?: number; // amount of clicks for scratch cards
   tagId?: string;
   upgrades?: CarUpgradeType;
-  plantId: string; // for seeds
-  unique: boolean; // only allow one in world at a time
+  plantId?: string; // for seeds
+  unique?: boolean; // only allow one in world at a time
   hidden?: boolean; // can be viewed by users
 }
 

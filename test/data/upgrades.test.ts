@@ -1,22 +1,26 @@
 import { readFileSync } from "node:fs";
-import { expect, test } from "vitest";
+import { test } from "vitest";
 import { UserUpgrade } from "../../src/types/Economy";
+import {
+  expectIdMatchesKey,
+  expectNonEmptyString,
+  expectPositiveInteger,
+  expectPositiveNumber,
+} from "./helpers";
 
 const data: Record<string, UserUpgrade> = JSON.parse(readFileSync("data/upgrades.json").toString());
 
-for (const u of Object.values(data)) {
-  test(u.id, () => {
-    expect.soft(typeof u.id).toBe("string");
-    expect.soft(typeof u.name).toBe("string");
-    expect.soft(typeof u.effect).toBe("number");
-    if (u.description) expect.soft(typeof u.description).toBe("string");
+for (const [id, u] of Object.entries(data)) {
+  test(id, () => {
+    expectIdMatchesKey(id, u);
+    expectNonEmptyString(u.name, `${id}.name`);
+    expectNonEmptyString(u.description, `${id}.description`);
+    expectPositiveNumber(u.effect, `${id}.effect`);
     if (u.max !== undefined) {
-      expect.soft(typeof u.max).toBe("number");
-      expect.soft(u.max).toBeGreaterThan(0);
+      expectPositiveInteger(u.max, `${id}.max`);
     }
     if (u.chance !== undefined) {
-      expect.soft(typeof u.chance).toBe("number");
-      expect.soft(u.chance).toBeGreaterThan(0);
+      expectPositiveNumber(u.chance, `${id}.chance`);
     }
   });
 }

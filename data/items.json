@@ -1474,7 +1474,7 @@
       "threshold": 1,
       "no_overflow": true
     },
-    "aliases": ["policescanner, policeradio, police"],
+    "aliases": ["policescanner", "policeradio", "police"],
     "buy": 150000,
     "sell": 25000,
     "in_crates": true
@@ -2018,7 +2018,7 @@
     "name": "blue rocks",
     "article": "a",
     "plural": "blue rocks",
-    "aliases": ["meth", "C10H15N"],
+    "aliases": ["meth", "c10h15n"],
     "emoji": "<:nypsi_bluerock:1003408529954177144>",
     "longDesc": "https://youtu.be/Dbt-OfbQTpw?t=28",
     "booster_desc": "improves fight durability",
@@ -3772,7 +3772,7 @@
     "id": "superdraw_lottery_ticket",
     "name": "superdraw lottery ticket",
     "article": "a",
-    "plural": "lottery tickets",
+    "plural": "superdraw lottery tickets",
     "emoji": "🎫",
     "longDesc": "maybe you'll get lucky on friday night!",
     "rarity": 0,
@@ -4653,6 +4653,7 @@
   "audi_tt": {
     "id": "audi_tt",
     "name": "audi tt",
+    "plural": "audi tts",
     "article": "an",
     "aliases": ["tt", "titty"],
     "emoji": "<:audi_tt:1490655812702572735>",

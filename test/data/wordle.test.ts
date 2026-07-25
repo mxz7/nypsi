@@ -1,28 +1,18 @@
-import { readFileSync } from "node:fs";
 import { expect, test } from "vitest";
+import { readLines } from "./helpers";
 
-// remove \r for windows
-const wordleWords: string[] = readFileSync("data/wordle.txt", "utf-8")
-  .trim()
-  .replaceAll("\r", "")
-  .split("\n");
-
-const wordleGuesses: string[] = readFileSync("data/wordle_guesses.txt", "utf-8")
-  .trim()
-  .replaceAll("\r", "")
-  .split("\n");
+const wordleWords = readLines("data/wordle.txt");
+const wordleGuesses = readLines("data/wordle_guesses.txt");
 
 test("wordle.txt - every word should be 5 characters and lowercase", () => {
   for (const word of wordleWords) {
-    expect.soft(word, `word "${word}" is not lowercase`).toBe(word.toLowerCase());
-    expect.soft(word.length, `word "${word}" is not 5 characters long`).toBe(5);
+    expect.soft(word, `invalid word "${word}"`).toMatch(/^[a-z]{5}$/);
   }
 });
 
 test("wordle_guesses.txt - every word should be 5 characters and lowercase", () => {
   for (const word of wordleGuesses) {
-    expect.soft(word, `word "${word}" is not lowercase`).toBe(word.toLowerCase());
-    expect.soft(word.length, `word "${word}" is not 5 characters long`).toBe(5);
+    expect.soft(word, `invalid word "${word}"`).toMatch(/^[a-z]{5}$/);
   }
 });
 
