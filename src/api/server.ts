@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import { bearerAuth } from "hono/bearer-auth";
 import { logger } from "../utils/logger";
 import achievementController from "./controllers/achievements";
+import guildController from "./controllers/guilds";
 import itemController from "./controllers/item";
 import kofiController from "./controllers/kofi";
 import redisController from "./controllers/redis";
@@ -33,6 +34,7 @@ app.route("/vote", voteController);
 authedApp.route("/", statusController);
 authedApp.route("/", systemController);
 authedApp.route("/achievement", achievementController);
+authedApp.route("/guilds", guildController);
 authedApp.route("/items", itemController);
 authedApp.route("/redis", redisController);
 
