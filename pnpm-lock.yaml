@@ -15,11 +15,11 @@ importers:
         specifier: 1.8.0
         version: 1.8.0
       '@discordjs/rest':
-        specifier: 2.6.2
-        version: 2.6.2
+        specifier: 2.6.3
+        version: 2.6.3
       '@hono/node-server':
-        specifier: ^2.0.10
-        version: 2.0.10(hono@4.12.30)
+        specifier: ^2.0.11
+        version: 2.0.11(hono@4.12.31)
       '@prisma/adapter-pg':
         specifier: ^7.8.0
         version: 7.8.0
@@ -39,8 +39,8 @@ importers:
         specifier: 4.1.0
         version: 4.1.0
       bullmq:
-        specifier: ^5.80.4
-        version: 5.80.4
+        specifier: ^5.80.11
+        version: 5.80.11
       chalk:
         specifier: 4.1.2
         version: 4.1.2
@@ -72,8 +72,8 @@ importers:
         specifier: 3.4.1
         version: 3.4.1
       hono:
-        specifier: ^4.12.30
-        version: 4.12.30
+        specifier: ^4.12.31
+        version: 4.12.31
       ioredis:
         specifier: 5.11.1
         version: 5.11.1
@@ -338,8 +338,8 @@ packages:
     resolution: {integrity: sha512-y4UPwWhH6vChKRkGdMB4odasUbHOUwy7KL+OVwF86PvT6QVOwElx+TiI1/6kcmcEe+g5YRXJFiXSXUdabqZOvQ==}
     engines: {node: '>=16.11.0'}
 
-  '@discordjs/rest@2.6.2':
-    resolution: {integrity: sha512-c5HI3hJuRWWrnpyCZAUYfIUTAEv9weX4tE2UfDqtM3ztizdKE9RFEf3G5IWhPyO+kPldUDpGv02XJAQzdUTC9Q==}
+  '@discordjs/rest@2.6.3':
+    resolution: {integrity: sha512-wvOylxNYJkwKjctS/Mn5GP1w9r3/rzyH+ThD1JlAca6zEdlHs8QWBBUQJpU5Q+W6DoIj/Ljh1IPlZs7hTU+UAg==}
     engines: {node: '>=18'}
 
   '@discordjs/util@1.2.0':
@@ -685,8 +685,8 @@ packages:
     peerDependencies:
       hono: ^4
 
-  '@hono/node-server@2.0.10':
-    resolution: {integrity: sha512-ZcnNVhKTmyDJeg0UlnZjvM73JBsTAuhrH/J4fjwGOw59PwOW51r4J+p6CsKZWXdKSme4MFqU62CZMOsdDrU4CA==}
+  '@hono/node-server@2.0.11':
+    resolution: {integrity: sha512-bjD221KPLoJTWUwso1J6fGKiTXEUFedG/s0visavY4zakFPkeGURMRNly+FhBHs7T8Dz4qHaZIMX9ZoJHSJtKA==}
     engines: {node: '>=20'}
     peerDependencies:
       hono: ^4
@@ -1871,8 +1871,8 @@ packages:
     resolution: {integrity: sha512-ZMANVnAixE6AWWnPzlW2KpUrxhm9woycYvPOo67jWHyFowASTEd9s+QN1EIMsSDtwhIxN4sWE1jotpuDUIgyIw==}
     engines: {node: '>=6.14.2'}
 
-  bullmq@5.80.4:
-    resolution: {integrity: sha512-n8lYxE8YYZQ1ar1JyQ668yUx0HbaVrzUNuNf7hSDG6XKYE5F+I/LpgGYLIJ2Pi4UNouDf3PMEsGsapg6FpXlKg==}
+  bullmq@5.80.11:
+    resolution: {integrity: sha512-c0yBKdlIZMeR+ErM0OxBG4kTBa5vtllnf4duSBFvfHaQTPtthubhrI5zQb16f1XxoRKwQa/p038YmNTI3m12oA==}
     engines: {node: '>=12.22.0'}
     peerDependencies:
       redis: '>=5.0.0'
@@ -2097,8 +2097,8 @@ packages:
     resolution: {integrity: sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==}
     engines: {node: '>=8'}
 
-  hono@4.12.30:
-    resolution: {integrity: sha512-emn+JoJjrN9YTpRDS5it/UI2SO9BAE37T6I3d963RxcZ81G9A4pr2SZTEiiaiKbzx+NKRg5BZ89fCL7gCJCUog==}
+  hono@4.12.31:
+    resolution: {integrity: sha512-zJIHFrl6bq3RDd2YusFNCDlM8qUprxKswyi/OPzPyzKDdyBXDqWx8bZlZ7R+saTdSTatUmb3O7K4SspGPaEOQg==}
     engines: {node: '>=16.9.0'}
 
   http-status-codes@2.3.0:
@@ -2151,6 +2151,9 @@ packages:
 
   magic-bytes.js@1.13.0:
     resolution: {integrity: sha512-afO2mnxW7GDTXMm5/AoN1WuOcdoKhtgXjIvHmobqTD1grNplhGdv3PFOyjCVmrnOZBIT/gD/koDKpYG+0mvHcg==}
+
+  magic-bytes.js@1.13.1:
+    resolution: {integrity: sha512-x5sn4UX2k5gCWlcfmoFwG4TPie8+dctESyqOBdhB5p6MsgWXdBKGmt9nXPObj/JI50TTL928lc5Yt1WntMn1bw==}
 
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
@@ -2333,8 +2336,8 @@ packages:
   pkg-types@2.3.0:
     resolution: {integrity: sha512-SIqCzDRg0s9npO5XQ3tNZioRY1uK06lA41ynBC1YmFTmnY6FjUjVt6s4LoADmwoig1qqD0oK8h1p/8mlMx8Oig==}
 
-  postcss@8.5.22:
-    resolution: {integrity: sha512-KBDEIpLrvpv16pp3K0Fw+UCoZfopFjjgeB+0tA/aaThfEE74kKDLrgg603YvOWJyg3+WYtyq3xYsQWsIyZlPqQ==}
+  postcss@8.5.23:
+    resolution: {integrity: sha512-g50586zr4bZmwFiTlflMu8E0bDTb5I5gertgwAKmsdUlTQIhZtunzUlD1WSzwcVWPoAVpsrA6vlfCD7oXvRwgg==}
     engines: {node: ^10 || ^12 || >=14}
 
   postgres-array@2.0.0:
@@ -2557,8 +2560,8 @@ packages:
     resolution: {integrity: sha512-sC+b0tB1whOCzbtlx20fx3WgCXwkW627p4EA9uM+/tNNPkSS+eSEld6pAs9nDv7WbY1UUljBMYPtu9BCOrCWKA==}
     engines: {node: '>=18.17'}
 
-  undici@6.27.0:
-    resolution: {integrity: sha512-YmfV3YnEDzXRC5lZ2jWtWWHKGUm1zIt8AhesR1tens+HTNv+YZlN/dp6G727LOvMJ8xjP9Be7Y2Sdr96LDm+pg==}
+  undici@6.28.0:
+    resolution: {integrity: sha512-LIY910g9TI13YS95lrMFrs8Rm/u/irgHeTWoKCoteeJ04CUJ92eEfj0rVn+7VKMPBpUPiUoBKfhNyLI23EE/KA==}
     engines: {node: '>=18.17'}
 
   valibot@1.2.0:
@@ -3157,7 +3160,7 @@ snapshots:
     dependencies:
       discord-api-types: 0.38.50
 
-  '@discordjs/rest@2.6.2':
+  '@discordjs/rest@2.6.3':
     dependencies:
       '@discordjs/collection': 2.1.1
       '@discordjs/util': 1.2.0
@@ -3165,9 +3168,9 @@ snapshots:
       '@sapphire/snowflake': 3.5.5
       '@vladfrangu/async_event_emitter': 2.4.7
       discord-api-types: 0.38.50
-      magic-bytes.js: 1.13.0
+      magic-bytes.js: 1.13.1
       tslib: 2.8.1
-      undici: 6.27.0
+      undici: 6.28.0
 
   '@discordjs/util@1.2.0':
     dependencies:
@@ -3176,7 +3179,7 @@ snapshots:
   '@discordjs/ws@1.2.3(bufferutil@4.1.0)':
     dependencies:
       '@discordjs/collection': 2.1.1
-      '@discordjs/rest': 2.6.2
+      '@discordjs/rest': 2.6.3
       '@discordjs/util': 1.2.0
       '@sapphire/async-queue': 1.5.5
       '@types/ws': 8.18.1
@@ -3359,13 +3362,13 @@ snapshots:
   '@esbuild/win32-x64@0.28.1':
     optional: true
 
-  '@hono/node-server@1.19.11(hono@4.12.30)':
+  '@hono/node-server@1.19.11(hono@4.12.31)':
     dependencies:
-      hono: 4.12.30
+      hono: 4.12.31
 
-  '@hono/node-server@2.0.10(hono@4.12.30)':
+  '@hono/node-server@2.0.11(hono@4.12.31)':
     dependencies:
-      hono: 4.12.30
+      hono: 4.12.31
 
   '@img/colour@1.1.0': {}
 
@@ -3665,13 +3668,13 @@ snapshots:
       '@electric-sql/pglite': 0.4.1
       '@electric-sql/pglite-socket': 0.1.1(@electric-sql/pglite@0.4.1)
       '@electric-sql/pglite-tools': 0.3.1(@electric-sql/pglite@0.4.1)
-      '@hono/node-server': 1.19.11(hono@4.12.30)
+      '@hono/node-server': 1.19.11(hono@4.12.31)
       '@prisma/get-platform': 7.2.0
       '@prisma/query-plan-executor': 7.2.0
       '@prisma/streams-local': 0.1.2
       foreground-child: 3.3.1
       get-port-please: 3.2.0
-      hono: 4.12.30
+      hono: 4.12.31
       http-status-codes: 2.3.0
       pathe: 2.0.3
       proper-lockfile: 4.1.2
@@ -4401,7 +4404,7 @@ snapshots:
     dependencies:
       node-gyp-build: 4.8.4
 
-  bullmq@5.80.4:
+  bullmq@5.80.11:
     dependencies:
       cron-parser: 4.9.0
       ioredis: 5.11.1
@@ -4512,7 +4515,7 @@ snapshots:
       '@discordjs/builders': 1.14.1
       '@discordjs/collection': 1.5.3
       '@discordjs/formatters': 0.6.2
-      '@discordjs/rest': 2.6.2
+      '@discordjs/rest': 2.6.3
       '@discordjs/util': 1.2.0
       '@discordjs/ws': 1.2.3(bufferutil@4.1.0)
       '@sapphire/snowflake': 3.5.3
@@ -4651,7 +4654,7 @@ snapshots:
 
   has-flag@4.0.0: {}
 
-  hono@4.12.30: {}
+  hono@4.12.31: {}
 
   http-status-codes@2.3.0: {}
 
@@ -4694,6 +4697,8 @@ snapshots:
   luxon@3.7.2: {}
 
   magic-bytes.js@1.13.0: {}
+
+  magic-bytes.js@1.13.1: {}
 
   magic-string@0.30.21:
     dependencies:
@@ -4891,7 +4896,7 @@ snapshots:
       exsolve: 1.0.8
       pathe: 2.0.3
 
-  postcss@8.5.22:
+  postcss@8.5.23:
     dependencies:
       nanoid: 3.3.16
       picocolors: 1.1.1
@@ -5132,7 +5137,7 @@ snapshots:
 
   undici@6.24.1: {}
 
-  undici@6.27.0: {}
+  undici@6.28.0: {}
 
   valibot@1.2.0(typescript@7.0.2):
     optionalDependencies:
@@ -5143,7 +5148,7 @@ snapshots:
       esbuild: 0.27.7
       fdir: 6.5.0(picomatch@4.0.5)
       picomatch: 4.0.5
-      postcss: 8.5.22
+      postcss: 8.5.23
       rollup: 4.62.2
       tinyglobby: 0.2.17
     optionalDependencies:
