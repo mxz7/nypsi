@@ -44,7 +44,7 @@ import {
   maxPrestige,
   userExists,
 } from "../utils/functions/economy/utils.js";
-import { getXp } from "../utils/functions/economy/xp";
+import { getXp, getXpBonus } from "../utils/functions/economy/xp";
 import { getMember } from "../utils/functions/member.js";
 import PageManager from "../utils/functions/page";
 import { getTier } from "../utils/functions/premium/premium";
@@ -483,11 +483,17 @@ async function run(
 
       await addCooldown("p-mul", message.member, 5);
 
-      const gamble = await getGambleMulti(target, target.client as NypsiClient);
-      const sell = await getSellMulti(target, target.client as NypsiClient);
+      const [gamble, sell, xp] = await Promise.all([
+        getGambleMulti(target, target.client as NypsiClient),
+        getSellMulti(target, target.client as NypsiClient),
+        getXpBonus(target, target.client as NypsiClient),
+      ]);
 
       let gambleBreakdown = "";
       let sellBreakdown = "";
+      let xpBaseBreakdown = "";
+      let gambleXpMultiplierBreakdown = "";
+      let hfmXpBreakdown = "";
 
       for (const [key, value] of sort(Array.from(gamble.breakdown.entries())).desc((i) => i[1])) {
         gambleBreakdown += `- \`${value}%\` ${key}\n`;
@@ -497,6 +503,40 @@ async function run(
         sellBreakdown += `- \`${value}%\` ${key}\n`;
       }
 
+      for (const [key, value] of sort(Array.from(xp.baseBreakdown.entries())).desc((i) => i[1])) {
+        xpBaseBreakdown += `- \`${Math.round(value)}xp\` ${key}\n`;
+      }
+
+      const formatXpPercent = (value: number) => `${parseFloat(value.toFixed(2))}%`;
+
+      for (const [key, value] of sort(Array.from(xp.multiplierBreakdown.entries())).desc(
+        (i) => i[1],
+      )) {
+        gambleXpMultiplierBreakdown += `- \`${formatXpPercent(value)}\` ${key}\n`;
+      }
+
+      const defaultHfmMultiplier = 1 + Math.log2(2) / 200;
+      const hfmXpValues = new Map<string, number>();
+      let hfmRunningXp = 5;
+
+      for (const [key, value] of xp.baseBreakdown.entries()) {
+        const before = 1 + Math.log2(1 + hfmRunningXp / 5) / 200;
+        hfmRunningXp += value;
+        const after = 1 + Math.log2(1 + hfmRunningXp / 5) / 200;
+        hfmXpValues.set(key, ((after - before) / defaultHfmMultiplier) * 100);
+      }
+
+      for (const [key, value] of sort(Array.from(hfmXpValues.entries())).desc((i) => i[1])) {
+        const sign = value < 0 ? "-" : "";
+        hfmXpBreakdown += `- \`${sign}${formatXpPercent(Math.abs(value))}\` ${key}\n`;
+      }
+
+      for (const [key, value] of sort(Array.from(xp.multiplierBreakdown.entries())).desc(
+        (i) => i[1],
+      )) {
+        hfmXpBreakdown += `- \`${formatXpPercent(value)}\` ${key}\n`;
+      }
+
       const embed = new CustomEmbed(target)
         .setHeader(`${target.user.username}'s multipliers`, target.user.avatarURL())
         .addField(
@@ -504,7 +544,14 @@ async function run(
           `**total** ${Math.round(gamble.multi * 100)}%\n${gambleBreakdown}`,
           true,
         )
-        .addField("sell", `**total** ${Math.round(sell.multi * 100)}%\n${sellBreakdown}`, true);
+        .addField("sell", `**total** ${Math.round(sell.multi * 100)}%\n${sellBreakdown}`, true)
+        .addField("\u200b", "\u200b", true)
+        .addField(
+          "xp (gamble)",
+          `${xpBaseBreakdown}${gambleXpMultiplierBreakdown}` || "no bonuses",
+          true,
+        )
+        .addField("xp (fish/hunt/mine)", hfmXpBreakdown || "no bonuses", true);
 
       await reaction.reply({ embeds: [embed] });
 

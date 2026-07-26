@@ -90,6 +90,87 @@ export async function removeXp(member: MemberResolvable, amount: number, check =
   if (check) doLevelUp(member);
 }
 
+export async function getXpBonus(member: MemberResolvable, client: NypsiClient) {
+  let min = 5;
+  const baseBreakdown = new Map<string, number>();
+  const multiplierBreakdown = new Map<string, number>();
+
+  const [inventory, tier, booster, boosters, upgrades, rawLevel] = await Promise.all([
+    getInventory(member),
+    getTier(member),
+    isBooster(member),
+    getBoosters(member),
+    getUpgrades(member),
+    getRawLevel(member),
+  ]);
+
+  const levelBonus = rawLevel / 20 > 35 ? 35 : rawLevel / 20;
+  min += levelBonus;
+  if (levelBonus > 0) baseBreakdown.set("level", levelBonus);
+
+  if (booster) {
+    min += 5;
+    baseBreakdown.set("booster", 5);
+  }
+
+  if (tier) {
+    const premiumBonus = tier * 2.7;
+    min += premiumBonus;
+    baseBreakdown.set("premium", premiumBonus);
+  }
+
+  const beforeGems = min;
+
+  if ((await inventory.hasGem("crystal_heart")).any) min += Math.floor(Math.random() * 10);
+  if ((await inventory.hasGem("white_gem")).any) {
+    const chance = Math.floor(Math.random() * 10);
+
+    if (chance < 2) {
+      min -= Math.floor(Math.random() * 7);
+    } else {
+      gemBreak(member, 0.007, "white_gem", client);
+      min += Math.floor(Math.random() * 17) + 1;
+    }
+  }
+
+  if (min !== beforeGems) baseBreakdown.set("gems", min - beforeGems);
+
+  const max = min * 1.3;
+  let boosterEffect = 0;
+
+  const items = getItems();
+
+  const xpUpgrade = upgrades.find((i) => i.upgradeId === "xp");
+
+  if (xpUpgrade) {
+    const upgradeBonus = xpUpgrade.amount * getUpgradesData()["xp"].effect;
+    boosterEffect += upgradeBonus;
+    multiplierBreakdown.set("upgrades", upgradeBonus * 100);
+  }
+
+  const beforeBoosters = boosterEffect;
+
+  for (const boosterId of boosters.keys()) {
+    if (boosterId == "beginner_booster") {
+      boosterEffect += 1;
+    } else if (items[boosterId].boosterEffect.boosts.includes("xp")) {
+      boosterEffect += items[boosterId].boosterEffect.effect * boosters.get(boosterId).length;
+    }
+  }
+
+  if (boosterEffect !== beforeBoosters)
+    multiplierBreakdown.set("boosters", (boosterEffect - beforeBoosters) * 100);
+
+  return {
+    min,
+    max,
+    boosterEffect,
+    baseBreakdown,
+    multiplierBreakdown,
+    rawLevel,
+  };
+}
+
 export async function calcEarnedGambleXp(
   member: MemberResolvable,
   client: NypsiClient,
@@ -104,34 +185,8 @@ export async function calcEarnedGambleXp(
     return 0;
   }
 
-  let min = 5;
-
-  const [inventory, tier, booster, boosters, upgrades, rawLevel, maxBet] = await Promise.all([
-    getInventory(member),
-    getTier(member),
-    isBooster(member),
-    getBoosters(member),
-    getUpgrades(member),
-    getRawLevel(member),
-    calcMaxBet(member),
-  ]);
-
-  min += rawLevel / 20 > 35 ? 35 : rawLevel / 20;
-
-  if (booster) min += 5;
-  if (tier) min += tier * 2.7;
-
-  if ((await inventory.hasGem("crystal_heart")).any) min += Math.floor(Math.random() * 10);
-  if ((await inventory.hasGem("white_gem")).any) {
-    const chance = Math.floor(Math.random() * 10);
-
-    if (chance < 2) {
-      min -= Math.floor(Math.random() * 7);
-    } else {
-      gemBreak(member, 0.007, "white_gem", client);
-      min += Math.floor(Math.random() * 17) + 1;
-    }
-  }
+  let { min, boosterEffect, rawLevel } = await getXpBonus(member, client);
+  const maxBet = await calcMaxBet(member);
 
   let maxBetAdjusted = maxBet;
 
@@ -166,22 +221,6 @@ export async function calcEarnedGambleXp(
 
   if (min > earned) earned = min;
 
-  let boosterEffect = 0;
-
-  const items = getItems();
-
-  if (upgrades.find((i) => i.upgradeId === "xp"))
-    boosterEffect +=
-      upgrades.find((i) => i.upgradeId === "xp").amount * getUpgradesData()["xp"].effect;
-
-  for (const boosterId of boosters.keys()) {
-    if (boosterId == "beginner_booster") {
-      boosterEffect += 1;
-    } else if (items[boosterId].boosterEffect.boosts.includes("xp")) {
-      boosterEffect += items[boosterId].boosterEffect.effect * boosters.get(boosterId).length;
-    }
-  }
-
   earned += boosterEffect * earned;
 
   if (earned < 0) earned = 0;
@@ -203,34 +242,18 @@ export async function calcEarnedHFMXp(member: GuildMember, items: number) {
 
   min *= 1.369;
 
-  const [boosters, level, upgrades] = await Promise.all([
-    getBoosters(member),
-    getRawLevel(member),
-    getUpgrades(member),
-  ]);
+  const xpBonus = await getXpBonus(member, member.client as NypsiClient);
 
-  let max = min + level / 50 > 30 ? 30 : level / 50;
+  let max = min + xpBonus.rawLevel / 50 > 30 ? 30 : xpBonus.rawLevel / 50;
 
   if (max < 15) max = 15;
 
+  min *= 1 + Math.log2(1 + xpBonus.min / 5) / 200;
+  max *= 1 + Math.log2(1 + xpBonus.max / 6.5) / 200;
+
   let earned = Math.random() * (max - min) + min;
 
-  let boosterEffect = 0;
-
-  for (const boosterId of boosters.keys()) {
-    if (boosterId == "beginner_booster") {
-      boosterEffect += 1;
-    } else if (getItems()[boosterId].boosterEffect.boosts.includes("xp")) {
-      boosterEffect += getItems()[boosterId].boosterEffect.effect * boosters.get(boosterId).length;
-    }
-  }
-
-  if (upgrades.find((i) => i.upgradeId === "xp")) {
-    boosterEffect +=
-      upgrades.find((i) => i.upgradeId === "xp").amount * getUpgradesData()["xp"].effect;
-  }
-
-  earned += boosterEffect * earned;
+  earned += xpBonus.boosterEffect * earned;
 
   return Math.floor(earned);
 }
