@@ -44,9 +44,7 @@ input.push(
 ## Loop pattern
 
 ```ts
-const input: ResponseInput = [
-  /* system/user messages */
-];
+const input: ResponseInput = [/* system/user messages */];
 
 let parsed: MyZodType | null = null;
 for (let i = 0; i < MAX_TOOL_ROUNDTRIPS; i++) {
