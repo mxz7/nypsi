@@ -82,6 +82,6 @@ async function activateGlobalBooster(manager: ClusterManager) {
   );
 
   await sendToAnnouncements(manager, {
-    content: "✨ a **12 hour** global double xp booster has been activated!!",
+    content: "✨ a **24 hour** global double xp booster has been activated!!",
   });
 }

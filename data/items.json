@@ -4512,7 +4512,7 @@
     "plural": "double xps",
     "article": "a",
     "emoji": "✨",
-    "longDesc": "earn double xp for 12 hours",
+    "longDesc": "earn double xp for 24 hours",
     "buy": 0,
     "sell": 0,
     "role": "booster",
@@ -4521,7 +4521,7 @@
     "boosterEffect": {
       "boosts": ["xp"],
       "effect": 1,
-      "time": 43200,
+      "time": 86400,
       "global": true
     },
     "in_crates": false,
