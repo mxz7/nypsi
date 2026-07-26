@@ -348,7 +348,9 @@ async function prepareGame(
     }
   }
 
-  const multi = (await getGambleMulti(message.member, message.client as NypsiClient)).multi;
+  const multi = (
+    await getGambleMulti(message.member, message.client as NypsiClient, message.guildId)
+  ).multi;
 
   const game: Game = {
     bet: bet,
@@ -699,6 +701,7 @@ async function playGame(
       message.client as NypsiClient,
       game.bet,
       game.win,
+      message.guildId,
     );
 
     if (earnedXp > 0) {

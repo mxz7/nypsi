@@ -484,9 +484,9 @@ async function run(
       await addCooldown("p-mul", message.member, 5);
 
       const [gamble, sell, xp] = await Promise.all([
-        getGambleMulti(target, target.client as NypsiClient),
-        getSellMulti(target, target.client as NypsiClient),
-        getXpBonus(target, target.client as NypsiClient),
+        getGambleMulti(target, target.client as NypsiClient, message.guildId),
+        getSellMulti(target, target.client as NypsiClient, message.guildId),
+        getXpBonus(target, target.client as NypsiClient, message.guildId),
       ]);
 
       let gambleBreakdown = "";

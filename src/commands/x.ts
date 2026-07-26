@@ -2608,7 +2608,7 @@ async function run(
             **xp** ${(await getXp(user)).toLocaleString()}
             **voted** ${voted}
             **prestige** ${await getPrestige(user)}
-            **bonus** ${Math.floor((await getGambleMulti(message.member, message.client as NypsiClient)).multi * 100)}%`,
+            **bonus** ${Math.floor((await getGambleMulti(message.member, message.client as NypsiClient, message.guildId)).multi * 100)}%`,
           true,
         );
       }

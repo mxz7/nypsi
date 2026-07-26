@@ -272,7 +272,8 @@ async function run(
       "roulette",
       1,
     );
-    multi = (await getGambleMulti(message.member, message.client as NypsiClient)).multi;
+    multi = (await getGambleMulti(message.member, message.client as NypsiClient, message.guildId))
+      .multi;
 
     winnings -= bet;
 
@@ -345,6 +346,7 @@ async function run(
         message.client as NypsiClient,
         bet,
         multiplier,
+        message.guildId,
       );
 
       if (earnedXp > 0) {

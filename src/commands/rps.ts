@@ -198,7 +198,8 @@ async function run(
 
   if (win) {
     eventProgress = await addEventProgress(message.client as NypsiClient, message.member, "rps", 1);
-    multi = (await getGambleMulti(message.member, message.client as NypsiClient)).multi;
+    multi = (await getGambleMulti(message.member, message.client as NypsiClient, message.guildId))
+      .multi;
 
     winnings -= bet;
 
@@ -278,6 +279,7 @@ async function run(
         message.client as NypsiClient,
         bet,
         1.5,
+        message.guildId,
       );
 
       if (earnedXp > 0) {

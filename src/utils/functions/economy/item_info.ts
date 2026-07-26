@@ -72,7 +72,7 @@ export async function runItemInfo(
     getTotalAmountOfItem(selected.id),
     countItemOnMarket(selected.id, "sell"),
     calcItemValue(selected.id),
-    getSellMulti(message.author, message.client as NypsiClient),
+    getSellMulti(message.author, message.client as NypsiClient, message.guildId),
     getInventory(message.member),
     prisma.museumDonation
       .aggregate({

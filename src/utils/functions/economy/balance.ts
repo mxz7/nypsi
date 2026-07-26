@@ -180,7 +180,11 @@ export async function increaseBaseBankStorage(member: MemberResolvable, amount: 
   });
 }
 
-export async function getGambleMulti(member: MemberResolvable, client: NypsiClient) {
+export async function getGambleMulti(
+  member: MemberResolvable,
+  client: NypsiClient,
+  guildId?: string,
+) {
   let multi = 0;
   const breakdownMap = new Map<string, number>();
 
@@ -238,6 +242,11 @@ export async function getGambleMulti(member: MemberResolvable, client: NypsiClie
   if (booster) {
     multi += 2;
     breakdownMap.set("booster", 2);
+  }
+
+  if (guildId === Constants.NYPSI_SERVER_ID) {
+    multi += 1;
+    breakdownMap.set("nypsi discord", 1);
   }
 
   const items = getItems();
@@ -317,7 +326,11 @@ export async function getGambleMulti(member: MemberResolvable, client: NypsiClie
   return { multi: parseFloat(multi.toFixed(2)), breakdown: breakdownMap };
 }
 
-export async function getSellMulti(member: MemberResolvable, client: NypsiClient) {
+export async function getSellMulti(
+  member: MemberResolvable,
+  client: NypsiClient,
+  guildId?: string,
+) {
   const [level, tier, booster, boosters, guildUpgrades, passive, inventory, upgrades] =
     await Promise.all([
       getRawLevel(member),
@@ -361,6 +374,11 @@ export async function getSellMulti(member: MemberResolvable, client: NypsiClient
   if (booster) {
     multi += 3;
     breakdown.set("booster", 3);
+  }
+
+  if (guildId === Constants.NYPSI_SERVER_ID) {
+    multi += 3;
+    breakdown.set("nypsi discord", 3);
   }
 
   const items = getItems();

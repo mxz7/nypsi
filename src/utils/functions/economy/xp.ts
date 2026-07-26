@@ -90,7 +90,7 @@ export async function removeXp(member: MemberResolvable, amount: number, check =
   if (check) doLevelUp(member);
 }
 
-export async function getXpBonus(member: MemberResolvable, client: NypsiClient) {
+export async function getXpBonus(member: MemberResolvable, client: NypsiClient, guildId: string) {
   let min = 5;
   const baseBreakdown = new Map<string, number>();
   const multiplierBreakdown = new Map<string, number>();
@@ -148,6 +148,11 @@ export async function getXpBonus(member: MemberResolvable, client: NypsiClient) 
     multiplierBreakdown.set("upgrades", upgradeBonus * 100);
   }
 
+  if (guildId === Constants.NYPSI_SERVER_ID) {
+    boosterEffect += 0.075;
+    multiplierBreakdown.set("nypsi discord", 7.5);
+  }
+
   const beforeBoosters = boosterEffect;
 
   for (const boosterId of boosters.keys()) {
@@ -176,6 +181,7 @@ export async function calcEarnedGambleXp(
   client: NypsiClient,
   bet: number,
   multiplier: number,
+  guildId: string,
 ): Promise<number> {
   if (await redis.exists(Constants.redis.nypsi.INFINITE_MAX_BET)) return 0;
 
@@ -185,7 +191,7 @@ export async function calcEarnedGambleXp(
     return 0;
   }
 
-  let { min, boosterEffect, rawLevel } = await getXpBonus(member, client);
+  let { min, boosterEffect, rawLevel } = await getXpBonus(member, client, guildId);
   const maxBet = await calcMaxBet(member);
 
   let maxBetAdjusted = maxBet;
@@ -228,7 +234,7 @@ export async function calcEarnedGambleXp(
   return Math.floor(earned);
 }
 
-export async function calcEarnedHFMXp(member: GuildMember, items: number) {
+export async function calcEarnedHFMXp(member: GuildMember, items: number, guildId: string) {
   let min = 0;
 
   if (items > 30) {
@@ -242,7 +248,7 @@ export async function calcEarnedHFMXp(member: GuildMember, items: number) {
 
   min *= 1.369;
 
-  const xpBonus = await getXpBonus(member, member.client as NypsiClient);
+  const xpBonus = await getXpBonus(member, member.client as NypsiClient, guildId);
 
   let max = min + xpBonus.rawLevel / 50 > 30 ? 30 : xpBonus.rawLevel / 50;
 

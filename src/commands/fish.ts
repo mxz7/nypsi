@@ -367,7 +367,7 @@ async function run(
     total = 0;
   }
 
-  const earnedXp = await calcEarnedHFMXp(member, total);
+  const earnedXp = await calcEarnedHFMXp(member, total, message.guildId);
 
   if (earnedXp > 0) {
     embed.setFooter({

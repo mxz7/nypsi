@@ -25,8 +25,8 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
   if (!(await userExists(message.member))) await createUser(message.member);
 
   const embed = new CustomEmbed(message.member).setDescription(
-    `gamble multiplier: **${Math.floor((await getGambleMulti(message.member, message.client as NypsiClient)).multi * 100)}**%\n` +
-      `sell multiplier: **${Math.floor((await getSellMulti(message.member, message.client as NypsiClient)).multi * 100)}**%`,
+    `gamble multiplier: **${Math.floor((await getGambleMulti(message.member, message.client as NypsiClient, message.guildId)).multi * 100)}**%\n` +
+      `sell multiplier: **${Math.floor((await getSellMulti(message.member, message.client as NypsiClient, message.guildId)).multi * 100)}**%`,
   );
 
   embed.setHeader(`${message.author.username}`, message.author.avatarURL());

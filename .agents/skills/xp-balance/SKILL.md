@@ -18,7 +18,7 @@ Work primarily in:
 
 Keep these responsibilities separate:
 
-- `getXpBonus()` collects account bonus data.
+- `getXpBonus(member, client, guildId)` collects account and guild-context bonus data.
 - `calcEarnedGambleXp()` owns bet and gambling-multiplier adjustments.
 - `calcEarnedHFMXp()` owns fish/hunt/mine item-count logic and HFM scaling.
 - `profile.ts` sorts and renders prepared breakdown data. Do not reproduce XP formulas there.
@@ -41,8 +41,18 @@ Base sources include capped raw level, Nitro/server boosting, premium tier, and 
 actual randomly generated gem value. Do not replace it with an average, expected value, or newly
 generated display value.
 
-Multiplier sources include the personal XP upgrade and active XP boosters. The beginner booster is
-part of this path.
+Multiplier sources include the personal XP upgrade, active XP boosters, and the official nypsi
+server bonus. The beginner booster is part of this path.
+
+When `guildId === Constants.NYPSI_SERVER_ID`, add the 7.5% official-server bonus to
+`boosterEffect` as `0.075` and to `multiplierBreakdown` as `7.5`, labelled `official nypsi server`.
+Pass the originating guild ID through both XP calculation helpers and every caller. Crash is hosted
+only in the official server, so its calls use `Constants.NYPSI_SERVER_ID` directly.
+
+The official-server reward also includes a 1% gamble multiplier and 3% sell multiplier. Keep the
+same guild context when calling `getGambleMulti()` and `getSellMulti()` so those helpers can add
+their respective named breakdown entries. Background autosell has no command guild context and
+therefore does not receive the server-specific sell bonus.
 
 Do not reinterpret a `baseBreakdown` value:
 
@@ -71,8 +81,8 @@ min *= 1 + Math.log2(1 + xpBonus.min / 5) / 200;
 max *= 1 + Math.log2(1 + xpBonus.max / 6.5) / 200;
 ```
 
-Then apply `xpBonus.boosterEffect` and preserve the final floor. The `/200` scaling is deliberate
-and leaves room for a planned server-specific bonus; do not retune it casually.
+Then apply `xpBonus.boosterEffect` and preserve the final floor. The `/200` scaling is deliberate;
+do not retune it casually.
 
 All configured percentage sources apply to HFM. Base sources such as level, premium, Nitro, and
 gems affect HFM through the logarithmic scaling. If a profile breakdown needs their HFM effect,

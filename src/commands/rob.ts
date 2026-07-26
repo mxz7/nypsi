@@ -287,6 +287,7 @@ async function run(
         message.client as NypsiClient,
         1_000_000,
         1,
+        message.guildId,
       );
       const eventProgress = await addEventProgress(
         message.client as NypsiClient,

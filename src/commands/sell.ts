@@ -443,7 +443,9 @@ async function run(
 
     let sellWorth = Math.floor(selected.sell * amount);
 
-    const multi = (await getSellMulti(message.member, message.client as NypsiClient)).multi;
+    const multi = (
+      await getSellMulti(message.member, message.client as NypsiClient, message.guildId)
+    ).multi;
 
     if (selected.role == "fish" || selected.role == "prey" || selected.role == "sellable") {
       sellWorth = Math.floor(sellWorth + sellWorth * multi);
@@ -513,7 +515,8 @@ async function calcValues(message: Message | (NypsiCommandInteraction & CommandI
     }
   }
 
-  const multi = (await getSellMulti(message.member, message.client as NypsiClient)).multi;
+  const multi = (await getSellMulti(message.member, message.client as NypsiClient, message.guildId))
+    .multi;
 
   let total = 0;
   let taxedAmount = 0;

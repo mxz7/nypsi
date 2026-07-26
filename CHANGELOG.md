@@ -8,6 +8,7 @@
 - global double xp
   - changed to 24 hours
   - obtainable item
+- add xp/multi bonus for playing in nypsi server
 
 # june 2026
 

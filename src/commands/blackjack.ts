@@ -626,8 +626,9 @@ async function playGame(
 
     let winnings = game.bet * 2;
 
-    const multi = (await getGambleMulti(message.member, message.member.client as NypsiClient))
-      .multi;
+    const multi = (
+      await getGambleMulti(message.member, message.member.client as NypsiClient, message.guildId)
+    ).multi;
 
     if (game.playerHand.length === 2 && total(game.playerHand) === 21) {
       winnings = game.bet * 2.5;
@@ -642,6 +643,7 @@ async function playGame(
       message.client as NypsiClient,
       game.bet,
       game.playerHand.length === 2 && total(game.playerHand) === 21 ? 2.5 : 2,
+      message.guildId,
     );
 
     if (earnedXp > 0) {

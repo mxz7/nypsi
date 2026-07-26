@@ -213,7 +213,8 @@ async function calcValues(message: Message | (NypsiCommandInteraction & CommandI
     selected.set(item.item, inventory.count(item.item));
   }
 
-  const multi = (await getSellMulti(message.member, message.client as NypsiClient)).multi;
+  const multi = (await getSellMulti(message.member, message.client as NypsiClient, message.guildId))
+    .multi;
 
   let total = 0;
   let taxedAmount = 0;

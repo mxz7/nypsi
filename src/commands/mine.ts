@@ -367,7 +367,7 @@ async function run(
     total = 0;
   }
 
-  const earnedXp = Math.floor((await calcEarnedHFMXp(member, total)) / 2);
+  const earnedXp = Math.floor((await calcEarnedHFMXp(member, total, message.guildId)) / 2);
 
   if (earnedXp > 0) {
     embed.setFooter({ text: `+${earnedXp.toLocaleString()}xp` });
