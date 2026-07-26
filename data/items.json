@@ -4511,6 +4511,7 @@
     "name": "global double xp",
     "plural": "global double xps",
     "booster_name": "double xp",
+    "aliases": ["gdoublexp", "globaldoublexp"],
     "article": "a",
     "emoji": "✨",
     "longDesc": "earn double xp for 24 hours",
