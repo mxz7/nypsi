@@ -18,7 +18,8 @@ import { findChannelCluster } from "../../utils/functions/clusters";
 import { MStoTime } from "../../utils/functions/date";
 import { addProgress } from "../../utils/functions/economy/achievements";
 import { addEventProgress } from "../../utils/functions/economy/events";
-import { itemExists } from "../../utils/functions/economy/inventory";
+import { hasGemBeenGiven, markGemAsGiven } from "../../utils/functions/economy/gems";
+import { isGem, itemExists } from "../../utils/functions/economy/inventory";
 import {
   describeLootPoolResult,
   giveLootPoolResult,
@@ -99,6 +100,24 @@ async function getChannels() {
     .map((i) => i.channelId);
 }
 
+async function rollRandomDrop() {
+  const gemGiven = await hasGemBeenGiven();
+
+  return await rollLootPool(
+    getLootPools().random_drop,
+    async (itemId) =>
+      (getItems()[itemId].unique && (await itemExists(itemId))) || (gemGiven && isGem(itemId)),
+  );
+}
+
+async function giveRandomDropResult(winner: string, prize: LootPoolResult) {
+  await giveLootPoolResult(winner, prize);
+
+  if (prize.item && isGem(prize.item)) {
+    await markGemAsGiven();
+  }
+}
+
 async function randomDrop(client: NypsiClient) {
   const channels = await getChannels();
 
@@ -122,11 +141,7 @@ async function randomDrop(client: NypsiClient) {
 
       await redis.set(`nypsi:lootdrop:channel:cd:${channelId}`, "69", "EX", cooldownSeconds);
 
-      const pool = getLootPools().random_drop;
-      const prize = await rollLootPool(
-        pool,
-        async (e) => getItems()[e].unique && (await itemExists(e)),
-      );
+      const prize = await rollRandomDrop();
 
       const games = [fastClickGame, clickSpecificGame, typeFastGame];
 
@@ -158,7 +173,7 @@ async function randomDrop(client: NypsiClient) {
             break;
         }
 
-        giveLootPoolResult(winner, prize);
+        await giveRandomDropResult(winner, prize);
         addProgress(winner, "lootdrops_pro", 1);
         addTaskProgress(winner, "lootdrops");
       }
@@ -677,11 +692,7 @@ async function clickSpecificGame(
 }
 
 export async function startRandomDrop(client: NypsiClient, channelId: string, rain?: string) {
-  const pool = getLootPools().random_drop;
-  const prize = await rollLootPool(
-    pool,
-    async (e) => getItems()[e].unique && (await itemExists(e)),
-  );
+  const prize = await rollRandomDrop();
 
   const games = [fastClickGame, clickSpecificGame, typeFastGame];
 
@@ -719,7 +730,7 @@ export async function startRandomDrop(client: NypsiClient, channelId: string, ra
       addTaskProgress(winner, "lootdrops");
     }
 
-    await giveLootPoolResult(winner, prize);
+    await giveRandomDropResult(winner, prize);
   }
 }
 

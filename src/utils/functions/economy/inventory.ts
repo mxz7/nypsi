@@ -552,6 +552,7 @@ export async function gemBreak(
     !shatterOnly &&
     uniqueGemCount === 5 &&
     percentChance(25) &&
+    !(await hasGemBeenGiven()) &&
     (await getDmSettings(userId)).other
   ) {
     await Promise.all([
@@ -569,6 +570,8 @@ export async function gemBreak(
         },
       }),
     ]);
+
+    await markGemAsGiven();
 
     addNotificationToQueue({
       memberId: userId,
