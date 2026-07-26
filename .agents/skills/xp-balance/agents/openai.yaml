@@ -1,0 +1,4 @@
+interface:
+  display_name: "XP Balance"
+  short_description: "Safely change and display Nypsi XP bonuses"
+  default_prompt: "Use $xp-balance to modify Nypsi XP bonuses without changing unintended balance."
