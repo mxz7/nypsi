@@ -9,6 +9,7 @@
   - changed to 24 hours
   - obtainable item
 - add xp/multi bonus for playing in nypsi server
+- redesign how dm settings & user preferences are stored and handled, makes adding new preferences and settings much eaiser
 
 # june 2026
 
