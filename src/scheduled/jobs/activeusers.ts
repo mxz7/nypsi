@@ -63,8 +63,22 @@ export default {
     );
 
     if (currentCount >= GLOBAL_BOOSTER_TARGET) {
+      const activeGlobalDoubleXp = await prisma.booster.findFirst({
+        where: {
+          boosterId: "global_double_xp",
+          scope: "global",
+          expire: { gt: new Date() },
+        },
+        select: { id: true },
+      });
+
+      if (activeGlobalDoubleXp) {
+        log("booster target hit, global double xp already active, deferring booster activation");
+        return;
+      }
+
       log("booster target hit");
-      activateGlobalBooster(manager);
+      await activateGlobalBooster(manager);
     } else {
       log(`booster target not hit, ${currentCount}/${GLOBAL_BOOSTER_TARGET}`);
     }

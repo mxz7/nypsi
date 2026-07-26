@@ -5,6 +5,9 @@
 - add jeremy 👨🏼‍🌾 (same as steve but for farm)
 - new punishment system allowing better history tracking
 - add lily flower
+- global double xp
+  - changed to 24 hours
+  - obtainable item
 
 # june 2026
 

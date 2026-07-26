@@ -16,6 +16,7 @@ export interface Item {
   };
   default_count?: number;
   booster_desc?: string;
+  booster_name?: string;
   aliases?: string[];
   speed?: number;
   rarity?: number;

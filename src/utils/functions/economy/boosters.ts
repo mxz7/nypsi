@@ -282,6 +282,8 @@ export async function getBoostersDisplay(
   const globalBoosters: string[] = [];
 
   for (const boosterId of sort(Array.from(boosters.keys())).asc((i) => i)) {
+    const boosterName = items[boosterId].booster_name ?? items[boosterId].name;
+
     if (boosters.get(boosterId)[0].scope === "global") {
       const count = boosters.get(boosterId).length;
       const ownerId = boosters.get(boosterId)[0].userId;
@@ -293,13 +295,13 @@ export async function getBoostersDisplay(
 
       if (count === 1) {
         globalBoosters.push(
-          `${items[boosterId].emoji} **${items[boosterId].name}** - expires <t:${Math.round(
+          `${items[boosterId].emoji} **${boosterName}** - expires <t:${Math.round(
             boosters.get(boosterId)[0].expire / 1000,
           )}:R>${username ? `, by [**${username}**](https://nypsi.xyz/users/${ownerId}?ref=bot-global-booster)` : ""}`,
         );
       } else {
         globalBoosters.push(
-          `${items[boosterId].emoji} **${items[boosterId].name}** \`x${count}\` - next expires <t:${Math.round(
+          `${items[boosterId].emoji} **${boosterName}** \`x${count}\` - next expires <t:${Math.round(
             boosters.get(boosterId)[0].expire / 1000,
           )}:R>${username ? `, by [**${username}**](https://nypsi.xyz/users/${ownerId}?ref=bot-global-booster)` : ""}`,
         );
@@ -307,7 +309,7 @@ export async function getBoostersDisplay(
     } else {
       if (boosters.get(boosterId).length == 1) {
         desc.push(
-          `${items[boosterId].emoji} **${items[boosterId].name}** - expires <t:${Math.round(
+          `${items[boosterId].emoji} **${boosterName}** - expires <t:${Math.round(
             boosters.get(boosterId)[0].expire / 1000,
           )}:R>`,
         );
@@ -319,7 +321,7 @@ export async function getBoostersDisplay(
         }
 
         desc.push(
-          `${items[boosterId].emoji} **${items[boosterId].name}** \`x${
+          `${items[boosterId].emoji} **${boosterName}** \`x${
             boosters.get(boosterId).length
           }\` - next expires <t:${Math.round(boosters.get(boosterId)[0].expire / 1000)}:R>`,
         );

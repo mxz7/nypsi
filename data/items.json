@@ -4508,15 +4508,16 @@
   },
   "global_double_xp": {
     "id": "global_double_xp",
-    "name": "double xp",
-    "plural": "double xps",
+    "name": "global double xp",
+    "plural": "global double xps",
+    "booster_name": "double xp",
     "article": "a",
     "emoji": "✨",
     "longDesc": "earn double xp for 24 hours",
     "buy": 0,
-    "sell": 0,
+    "sell": 1000000,
     "role": "booster",
-    "rarity": 100,
+    "rarity": 6,
     "stackable": false,
     "boosterEffect": {
       "boosts": ["xp"],
@@ -4524,8 +4525,7 @@
       "time": 86400,
       "global": true
     },
-    "in_crates": false,
-    "hidden": true
+    "in_crates": true
   },
   "magic_potato": {
     "id": "magic_potato",

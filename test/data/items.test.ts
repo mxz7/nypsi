@@ -134,6 +134,11 @@ for (const [id, item] of Object.entries(items)) {
     if (item.booster_desc !== undefined) {
       expectNonEmptyString(item.booster_desc, `${id}.booster_desc`);
     }
+    if (item.booster_name !== undefined) {
+      expectNonEmptyString(item.booster_name, `${id}.booster_name`);
+      expect.soft(item.booster_name).toBe(item.booster_name.toLowerCase());
+      expect.soft(item.role).toBe("booster");
+    }
     if (item.shortDesc !== undefined) expectNonEmptyString(item.shortDesc, `${id}.shortDesc`);
 
     if (item.sell !== undefined) {

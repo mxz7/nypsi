@@ -75,7 +75,8 @@
           "min": 250,
           "max": 500
         }
-      }
+      },
+      "global_double_xp": 0.1
     }
   },
   "mineshaft_chest": {
@@ -177,7 +178,8 @@
           "max": 100
         }
       },
-      "stick": 25
+      "stick": 25,
+      "global_double_xp": 0.75
     }
   },
   "corner_shop_scratchie": {
@@ -576,7 +578,8 @@
           "min": 5,
           "max": 100
         }
-      }
+      },
+      "global_double_xp": 0.01
     }
   },
   "pot_of_gold": {
