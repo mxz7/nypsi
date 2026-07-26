@@ -24,6 +24,7 @@ import {
 } from "../users/notifications";
 import { addProgress } from "./achievements";
 import { addBalance, getSellMulti } from "./balance";
+import { hasGemBeenGiven, markGemAsGiven } from "./gems";
 import {
   deleteMarketOrder,
   getMarketAverage,
@@ -437,14 +438,14 @@ export function selectItem(search: string) {
 export async function commandGemCheck(member: MemberResolvable, commandCategory: CommandCategory) {
   const userId = getUserId(member);
 
-  if (await redis.exists(Constants.redis.nypsi.GEM_GIVEN)) return;
+  if (await hasGemBeenGiven()) return;
   if (!(await userExists(member))) return;
   if (!(await getDmSettings(member)).other) return;
   if (gemChanceCooldown.has(userId)) return;
   gemChanceCooldown.add(userId);
 
   if (percentChance(0.001)) {
-    await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t", "EX", 86400);
+    await markGemAsGiven();
     const gems = ["green_gem", "blue_gem", "purple_gem", "pink_gem"];
 
     const gem = gems[Math.floor(Math.random() * gems.length)];
@@ -469,7 +470,7 @@ export async function commandGemCheck(member: MemberResolvable, commandCategory:
 
   if (commandCategory == "moderation") {
     if (percentChance(0.07)) {
-      await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t", "EX", 86400);
+      await markGemAsGiven();
       logger.info(`${userId} received pink_gem randomly`);
       await addInventoryItem(member, "pink_gem", 1);
       addProgress(userId, "gem_hunter", 1);
@@ -490,7 +491,7 @@ export async function commandGemCheck(member: MemberResolvable, commandCategory:
     }
   } else if (commandCategory == "animals") {
     if (percentChance(0.007)) {
-      await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t", "EX", 86400);
+      await markGemAsGiven();
       logger.info(`${userId} received purple_gem randomly`);
       await addInventoryItem(member, "purple_gem", 1);
       addProgress(member, "gem_hunter", 1);

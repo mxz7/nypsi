@@ -15,6 +15,7 @@ import { Job } from "../../types/Jobs";
 import Constants from "../../utils/Constants";
 import { addProgress } from "../../utils/functions/economy/achievements";
 import { addBalance, getBalance, removeBalance } from "../../utils/functions/economy/balance";
+import { hasGemBeenGiven, markGemAsGiven } from "../../utils/functions/economy/gems";
 import { addInventoryItem, setInventoryItem } from "../../utils/functions/economy/inventory";
 import { createLotteryEntry, getLotteryAutoBuyUsers } from "../../utils/functions/economy/lottery";
 import { addStat } from "../../utils/functions/economy/stats";
@@ -152,8 +153,8 @@ export default {
 
         addNotificationToQueue({ memberId: winner.userId, payload: { embed } });
 
-        if (percentChance(0.9) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
-          await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t", "EX", 86400);
+        if (percentChance(0.9) && !(await hasGemBeenGiven())) {
+          await markGemAsGiven();
           logger.info(`${winner.userId} received purple_gem randomly (mines)`);
           await addInventoryItem(winner.userId, "purple_gem", 1);
           addProgress(winner.userId, "gem_hunter", 1);

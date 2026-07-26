@@ -6,7 +6,6 @@ import {
   GuildMember,
   MessageActionRowComponentBuilder,
 } from "discord.js";
-import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { Item } from "../../../types/Economy";
@@ -17,6 +16,7 @@ import { removeUserPlaying } from "../playing";
 import { percentChance, shuffle } from "../random";
 import { addProgress } from "./achievements";
 import { addEventProgress, EventData, formatEventProgress, getCurrentEvent } from "./events";
+import { hasGemBeenGiven, markGemAsGiven } from "./gems";
 import { isGem, itemExists } from "./inventory";
 import { describeLootPoolResult, giveLootPoolResult, rollLootPool } from "./loot_pools";
 import { addStat } from "./stats";
@@ -245,7 +245,7 @@ export default class ScratchCard {
         addStat(this.member, "earned-scratch", prize.money);
       }
       if (Object.hasOwn(prize, "item") && isGem(prize.item)) {
-        await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t", "EX", 86400);
+        await markGemAsGiven();
       }
 
       setTimeout(() => {
@@ -301,8 +301,7 @@ export default class ScratchCard {
     }
 
     const excludedItems = async (e: string) =>
-      (getItems()[e].unique && (await itemExists(e))) ||
-      (isGem(e) && !!(await redis.exists(Constants.redis.nypsi.GEM_GIVEN)));
+      (getItems()[e].unique && (await itemExists(e))) || (isGem(e) && (await hasGemBeenGiven()));
 
     let totalCount = 2;
     let createVert = -1;

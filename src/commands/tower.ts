@@ -33,6 +33,7 @@ import {
   removeBalance,
 } from "../utils/functions/economy/balance";
 import { addEventProgress } from "../utils/functions/economy/events";
+import { hasGemBeenGiven, markGemAsGiven } from "../utils/functions/economy/gems";
 import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
 import { createGame } from "../utils/functions/economy/stats";
@@ -776,8 +777,8 @@ async function playGame(
           row[x] = "gc";
           game.win += 3;
 
-          if (percentChance(0.5) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
-            await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t", "EX", 86400);
+          if (percentChance(0.5) && !(await hasGemBeenGiven())) {
+            await markGemAsGiven();
             logger.info(`gems: ${message.author.id} received green_gem randomly (tower)`);
             addInventoryItem(message.member, "green_gem", 1);
             addProgress(message.member, "gem_hunter", 1);

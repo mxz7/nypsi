@@ -1,5 +1,4 @@
 import prisma from "../../../init/database";
-import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
@@ -13,6 +12,7 @@ import {
   getDmSettings,
 } from "../users/notifications";
 import { addTag } from "../users/tags";
+import { hasGemBeenGiven, markGemAsGiven } from "./gems";
 import { addInventoryItem } from "./inventory";
 import {
   createUser,
@@ -235,8 +235,8 @@ async function completeAchievement(userId: string, achievementId: string) {
 
     addNotificationToQueue(payload);
 
-    if (percentChance(0.07) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
-      await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t", "EX", 86400);
+    if (percentChance(0.07) && !(await hasGemBeenGiven())) {
+      await markGemAsGiven();
       const gems = ["green_gem", "blue_gem", "purple_gem", "pink_gem"];
 
       const gem = gems[Math.floor(Math.random() * gems.length)];

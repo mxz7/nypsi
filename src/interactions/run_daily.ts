@@ -9,8 +9,8 @@ import {
 import redis from "../init/redis";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
-import Constants from "../utils/Constants";
 import { addProgress } from "../utils/functions/economy/achievements";
+import { hasGemBeenGiven, markGemAsGiven } from "../utils/functions/economy/gems";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
 import {
   awaitDailyUpcomingRewardsInteraction,
@@ -70,8 +70,8 @@ export default {
       return;
     }
 
-    if (percentChance(0.03) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
-      await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t", "EX", 86400);
+    if (percentChance(0.03) && !(await hasGemBeenGiven())) {
+      await markGemAsGiven();
       logger.info(`${interaction.user.id} received blue_gem randomly (daily)`);
       await addInventoryItem(interaction.user.id, "blue_gem", 1);
       addProgress(interaction.user.id, "gem_hunter", 1);

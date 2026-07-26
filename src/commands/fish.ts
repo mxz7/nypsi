@@ -7,11 +7,9 @@ import {
   MessageActionRowComponentBuilder,
   MessageFlags,
 } from "discord.js";
-import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import Constants from "../utils/Constants";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { addBalance } from "../utils/functions/economy/balance";
 import { getBoosters } from "../utils/functions/economy/boosters";
@@ -21,6 +19,7 @@ import {
   formatEventProgress,
   getCurrentEvent,
 } from "../utils/functions/economy/events";
+import { hasGemBeenGiven, markGemAsGiven } from "../utils/functions/economy/gems";
 import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds";
 import {
   addInventoryItem,
@@ -167,7 +166,7 @@ async function run(
     if (items[i].role == "crate" && !percentChance(35)) continue;
     if (items[i].id.includes("gem") && !percentChance(0.77)) continue;
     if (items[i].unique && (await itemExists(i))) continue;
-    if (isGem(i) && (await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) continue;
+    if (isGem(i) && (await hasGemBeenGiven())) continue;
 
     if (
       [
@@ -351,7 +350,7 @@ async function run(
 
       if (isGem(chosen)) {
         await addProgress(member, "gem_hunter", amount);
-        await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t", "EX", 86400);
+        await markGemAsGiven();
       }
 
       foundItems.set(chosen, foundItems.has(chosen) ? foundItems.get(chosen) + amount : amount);

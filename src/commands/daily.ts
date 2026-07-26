@@ -7,11 +7,10 @@ import {
   MessageActionRowComponentBuilder,
   MessageFlags,
 } from "discord.js";
-import redis from "../init/redis";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import Constants from "../utils/Constants";
 import { addProgress } from "../utils/functions/economy/achievements";
+import { hasGemBeenGiven, markGemAsGiven } from "../utils/functions/economy/gems";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
 import {
   awaitDailyUpcomingRewardsInteraction,
@@ -66,8 +65,8 @@ async function run(
     return;
   }
 
-  if (percentChance(0.03) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
-    await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t", "EX", 86400);
+  if (percentChance(0.03) && !(await hasGemBeenGiven())) {
+    await markGemAsGiven();
     logger.info(`${message.author.id} received blue_gem randomly (daily)`);
     await addInventoryItem(message.member, "blue_gem", 1);
     addProgress(message.member, "gem_hunter", 1);

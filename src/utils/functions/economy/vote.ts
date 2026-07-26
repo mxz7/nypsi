@@ -18,6 +18,7 @@ import { createAuraTransaction } from "../users/aura";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { addProgress } from "./achievements";
 import { addBalance } from "./balance";
+import { hasGemBeenGiven, markGemAsGiven } from "./gems";
 import { addToGuildXP, getGuildByUser } from "./guilds";
 import { addInventoryItem, getInventory } from "./inventory";
 import { getRawLevel } from "./levelling";
@@ -145,8 +146,8 @@ export async function giveVoteRewards(
     logger.error("vote: error", e);
   }
 
-  if (percentChance(0.05) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
-    await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t", "EX", 86400);
+  if (percentChance(0.05) && !(await hasGemBeenGiven())) {
+    await markGemAsGiven();
     logger.info(`${user} received blue_gem randomly (vote)`);
     await addInventoryItem(user, "blue_gem", 1);
     addProgress(user, "gem_hunter", 1);
