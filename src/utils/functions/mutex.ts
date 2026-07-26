@@ -72,10 +72,10 @@ export class RedisMutex extends Mutex {
   private readonly ttl: number;
   private readonly pollInterval: number;
   private readonly prefix: string;
-  private tokens = new Map<string, string>();
+  private tokens = new Map<string | undefined, string>();
 
   /**
-   * @param prefix        - key prefix to namespace locks and avoid conflicts between instances
+   * @param prefix        - lock key namespace, used directly when acquire/release omit a key
    * @param shouldLog     - emit debug log lines
    * @param ttl           - lock TTL in milliseconds (default 5 min)
    * @param pollInterval  - retry interval in milliseconds when the lock is held (default 50 ms)
@@ -87,11 +87,11 @@ export class RedisMutex extends Mutex {
     this.prefix = `mutex:${prefix}`;
   }
 
-  private redisKey(key: string): string {
-    return `${this.prefix}:${key}`;
+  private redisKey(key?: string): string {
+    return key === undefined ? this.prefix : `${this.prefix}:${key}`;
   }
 
-  async acquire(key: string): Promise<void> {
+  async acquire(key?: string): Promise<void> {
     const token = crypto.randomUUID();
     const redisKey = this.redisKey(key);
 
@@ -112,7 +112,7 @@ export class RedisMutex extends Mutex {
     }
   }
 
-  release(key: string): void {
+  release(key?: string): void {
     if (this.shouldLog) {
       logger.debug(`redis-mutex: release ${this.redisKey(key)}`);
     }

@@ -78,6 +78,26 @@ describe("MemoryMutex", () => {
 });
 
 describe("RedisMutex", () => {
+  test("uses its namespace as the lock key when no key is provided", async () => {
+    redisMock.set.mockResolvedValue("OK");
+    redisMock.eval.mockResolvedValue(1);
+    const mutex = new RedisMutex("economy");
+
+    await mutex.acquire();
+    const token = redisMock.set.mock.calls[0][1];
+    mutex.release();
+
+    expect(redisMock.set).toHaveBeenCalledWith("mutex:economy", token, "PX", 300_000, "NX");
+    await vi.waitFor(() =>
+      expect(redisMock.eval).toHaveBeenCalledWith(
+        expect.stringContaining("redis.call('get', KEYS[1]) == ARGV[1]"),
+        1,
+        "mutex:economy",
+        token,
+      ),
+    );
+  });
+
   test("acquires a namespaced lock with a unique token and TTL", async () => {
     redisMock.set.mockResolvedValue("OK");
     const mutex = new RedisMutex("economy", false, 1_500, 25);
