@@ -22,6 +22,8 @@ Note: several older commands (`help.ts`, `autosell.ts`, `buy.ts`, `karmashop.ts`
 
 `src/utils/functions/economy/inventory.ts` exports `calcItemValue(item: string): Promise<number | undefined>`. It's cached (`RedisCache`, 1hr TTL). Logic: if the item has a fixed `buy`/`sell` price (or is cookie/bitcoin/ethereum/prey/fish/sellable/ore), it uses `item.sell`; otherwise it averages market + offer prices. Can resolve to `undefined` if there's no sell price and no market/offer data.
 
+After calculating a cache miss, it asynchronously records one global `item-value-<itemId>` `GraphMetrics` row per day for historic graphs. An atomic Redis `SET NX EX` gate limits each item to one database existence check every 7–12 hours, and a shared `RedisMutex` serializes these checks across all processes. This history write is not awaited by the caller.
+
 ## Fuzzy/substring search (multiple results)
 
 `selectItem` only returns a single exact match. If you need to find _candidate_ items from a partial/fuzzy query (e.g. an AI tool letting a model discover an item id first), filter `getItems()` yourself with substring checks against `id`/`name`/`aliases`, still excluding `hidden` items — see `search_items` in `src/utils/functions/ai/tools/items.ts` for the pattern.

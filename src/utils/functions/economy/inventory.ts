@@ -11,6 +11,7 @@ import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { getUserId, MemberResolvable } from "../member";
+import { RedisMutex } from "../mutex";
 import { getTier, isPremium } from "../premium/premium";
 import { percentChance } from "../random";
 import sleep from "../sleep";
@@ -40,6 +41,7 @@ setInterval(() => {
 }, 60000);
 
 const itemValueCache = new RedisCache<number>(Constants.redis.cache.economy.ITEM_VALUE, 3600);
+const itemValueHistoryMutex = new RedisMutex("item-value-history");
 const inventoryCache = new RedisCache<Record<string, number>>(
   Constants.redis.cache.economy.INVENTORY,
   180,
@@ -805,39 +807,49 @@ export async function calcItemValue(item: string) {
     }
   }
 
-  (async () => {
-    if (await redis.exists(`nypsi:item:value:store:cache:delay:thing:${item}`)) return;
-    await redis.set(
+  void (async () => {
+    const shouldStoreItemValue = await redis.set(
       `nypsi:item:value:store:cache:delay:thing:${item}`,
       "69",
       "EX",
-      3600 * Math.floor(Math.random() * 6) + 7,
+      3600 * (Math.floor(Math.random() * 6) + 7),
+      "NX",
     );
 
-    const date = dayjs()
-      .set("hours", 0)
-      .set("minutes", 0)
-      .set("seconds", 0)
-      .set("milliseconds", 0)
-      .toDate();
+    if (!shouldStoreItemValue) return;
 
-    const itemCheck = await prisma.graphMetrics.findFirst({
-      where: {
-        AND: [{ date }, { category: `item-value-${item}` }, { userId: "global" }],
-      },
-    });
+    await itemValueHistoryMutex.acquire();
 
-    if (itemCheck) return;
+    try {
+      const date = dayjs()
+        .set("hours", 0)
+        .set("minutes", 0)
+        .set("seconds", 0)
+        .set("milliseconds", 0)
+        .toDate();
 
-    await prisma.graphMetrics.create({
-      data: {
-        date,
-        category: `item-value-${item}`,
-        userId: "global",
-        value: itemValue || getItems()[item].sell || 1000,
-      },
-    });
-  })();
+      const itemCheck = await prisma.graphMetrics.findFirst({
+        where: {
+          AND: [{ date }, { category: `item-value-${item}` }, { userId: "global" }],
+        },
+      });
+
+      if (itemCheck) return;
+
+      await prisma.graphMetrics.create({
+        data: {
+          date,
+          category: `item-value-${item}`,
+          userId: "global",
+          value: itemValue || getItems()[item].sell || 1000,
+        },
+      });
+    } finally {
+      itemValueHistoryMutex.release();
+    }
+  })().catch((error) => {
+    logger.error("item value: failed to store graph history", { item, error });
+  });
 
   itemValueCache.set(item, itemValue || 1000);
 
