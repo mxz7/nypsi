@@ -1,0 +1,4 @@
+interface:
+  display_name: "Components v2"
+  short_description: "Build Nypsi messages with Discord Components v2"
+  default_prompt: "Use $components-v2 to convert this Nypsi command response to Discord Components v2."
