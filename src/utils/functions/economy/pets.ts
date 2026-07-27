@@ -148,13 +148,20 @@ export async function rollPet(
   member: MemberResolvable,
   target: PetTarget,
 ): Promise<number | undefined> {
-  const pet = await getActivePetForTarget(member, target);
+  const [pet, inventory] = await Promise.all([
+    getActivePetForTarget(member, target),
+    getInventory(member),
+  ]);
   if (!pet) return;
 
   const data = getPetsData()[pet.petId];
   const levelIndex = pet.level - 1;
 
-  if (!percentChance(data.chance[levelIndex] * 100)) return;
+  if (!percentChance(data.chance[levelIndex] * 100)) {
+    if (await inventory.hasGem("crystal_heart")) {
+      if (!percentChance(0.1)) return;
+    }
+  }
 
   await updatePet(member, pet.petId, { activationIncrement: 1 });
   return data.benefit[levelIndex];
