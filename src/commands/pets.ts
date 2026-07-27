@@ -1,15 +1,14 @@
 import {
-  ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
-  MessageActionRowComponentBuilder,
+  MessageFlags,
   StringSelectMenuBuilder,
   StringSelectMenuOptionBuilder,
 } from "discord.js";
 import { Pet } from "#generated/prisma";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
-import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { CustomContainer, ErrorEmbed } from "../models/EmbedBuilders";
 import {
   activatePet,
   deactivatePet,
@@ -40,12 +39,7 @@ async function runPets(
 
   if (userPets.length === 0) {
     return send({
-      embeds: [
-        new CustomEmbed(message.member, "you have not unlocked any pets").setHeader(
-          "pets",
-          message.author.avatarURL(),
-        ),
-      ],
+      embeds: [new ErrorEmbed("you don't have any pets yet")],
     });
   }
 
@@ -63,7 +57,7 @@ async function runPets(
     }
   }
 
-  const render = async () => {
+  const render = async (disabled = false) => {
     const result = await Promise.all([
       getUserPets(message.member),
       getPetSlotCount(message.member),
@@ -71,23 +65,23 @@ async function runPets(
     userPets = result[0];
     const slots = result[1];
     const activePets = userPets.filter((pet) => pet.active);
-    const select = new StringSelectMenuBuilder().setCustomId("pets-select").addOptions(
-      new StringSelectMenuOptionBuilder()
-        .setLabel("overview")
-        .setValue("overview")
-        .setDefault(!selectedPetId),
-      ...userPets.map((pet) => {
-        const item = getItems()[getPetsData()[pet.petId].item];
-        return new StringSelectMenuOptionBuilder()
-          .setLabel(item.name)
-          .setValue(pet.petId)
-          .setEmoji(item.emoji)
-          .setDefault(pet.petId === selectedPetId);
-      }),
-    );
-    const navigation = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      select,
-    );
+    const select = new StringSelectMenuBuilder()
+      .setCustomId("pets-select")
+      .setDisabled(disabled)
+      .addOptions(
+        new StringSelectMenuOptionBuilder()
+          .setLabel("overview")
+          .setValue("overview")
+          .setDefault(!selectedPetId),
+        ...userPets.map((pet) => {
+          const item = getItems()[getPetsData()[pet.petId].item];
+          return new StringSelectMenuOptionBuilder()
+            .setLabel(item.name)
+            .setValue(pet.petId)
+            .setEmoji(item.emoji)
+            .setDefault(pet.petId === selectedPetId);
+        }),
+      );
 
     if (!selectedPetId) {
       const activeDescription =
@@ -100,13 +94,15 @@ async function runPets(
               })
               .join("\n\n");
 
-      return {
-        embed: new CustomEmbed(
-          message.member,
-          `**active pets** ${activePets.length}/${slots}\n\n${activeDescription}`,
-        ).setHeader(`${message.author.username}'s pets`, message.author.avatarURL()),
-        components: [navigation],
-      };
+      return new CustomContainer(message.member)
+        .addTextDisplayComponents((text) =>
+          text.setContent(
+            `## ${message.author.username}'s pets\n### active pets (${activePets.length}/${slots})`,
+          ),
+        )
+        .addSeparatorComponents((separator) => separator)
+        .addTextDisplayComponents((text) => text.setContent(activeDescription))
+        .addActionRowComponents((row) => row.addComponents(select));
     }
 
     const pet = userPets.find((entry) => entry.petId === selectedPetId) ?? userPets[0];
@@ -115,33 +111,38 @@ async function runPets(
     const item = getItems()[petData.item];
     const nextLevel =
       pet.level < petData.items.length
-        ? `\n\`${petData.items[pet.level].toLocaleString()}x\` needed for next level`
+        ? `\n\n\`${petData.items[pet.level].toLocaleString()}x\` needed for next level`
         : "\n**max level**";
     const toggle = new ButtonBuilder()
       .setCustomId("pets-toggle")
       .setLabel(pet.active ? "deactivate" : "activate")
-      .setStyle(pet.active ? ButtonStyle.Danger : ButtonStyle.Success);
+      .setStyle(pet.active ? ButtonStyle.Danger : ButtonStyle.Success)
+      .setDisabled(disabled);
 
-    return {
-      embed: new CustomEmbed(
-        message.member,
-        `${item.emoji} **${item.name}**\n\n` +
-          `**level** ${pet.level}/${petData.items.length}\n` +
-          `**status** ${pet.active ? "active" : "inactive"}\n` +
-          `**effect** ${formatDescription(pet)}\n` +
-          `**activations** ${pet.activations.toLocaleString()}` +
-          nextLevel +
-          `\n\n**active pets** ${activePets.length}/${slots}`,
-      ).setHeader(`${message.author.username}'s pets`, message.author.avatarURL()),
-      components: [
-        navigation,
-        new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(toggle),
-      ],
-    };
+    return new CustomContainer(message.member)
+      .addTextDisplayComponents((text) =>
+        text.setContent(
+          `## ${item.emoji} ${item.name}\n` +
+            `**level** ${pet.level}/${petData.items.length}\n` +
+            `**status** ${pet.active ? "active" : "inactive"}\n` +
+            `**effect** ${formatDescription(pet)}\n` +
+            `**activations** ${pet.activations.toLocaleString()}` +
+            nextLevel,
+        ),
+      )
+      .addSeparatorComponents((separator) => separator)
+      .addActionRowComponents((row) => row.addComponents(select))
+      .addActionRowComponents((row) => row.addComponents(toggle))
+      .addTextDisplayComponents((text) =>
+        text.setContent(`-# active pets ${activePets.length}/${slots}`),
+      );
   };
 
   const initial = await render();
-  const response = await send({ embeds: [initial.embed], components: initial.components });
+  const response = await send({
+    components: [initial],
+    flags: MessageFlags.IsComponentsV2,
+  });
   const collector = response.createMessageComponentCollector({
     filter: (interaction) => interaction.user.id === message.author.id,
     time: 60_000,
@@ -181,15 +182,16 @@ async function runPets(
     }
 
     const updated = await render();
-    await interaction.update({ embeds: [updated.embed], components: updated.components });
+    await interaction.update({ components: [updated] });
   });
 
   collector.on("end", async () => {
-    const updated = await render();
-    for (const row of updated.components) {
-      for (const component of row.components) component.setDisabled(true);
-    }
-    await response.edit({ components: updated.components }).catch(() => {});
+    await response
+      .edit({
+        components: [await render(true)],
+        flags: MessageFlags.IsComponentsV2,
+      })
+      .catch(() => {});
   });
 }
 
