@@ -50,6 +50,17 @@ export interface Item {
   hidden?: boolean; // can be viewed by users
 }
 
+export type PetTarget = "farm" | "fish" | "hunt" | "mine";
+
+export type PetData = {
+  item: string;
+  target: PetTarget;
+  description: string;
+  chance: number[];
+  benefit: number[];
+  items: number[];
+};
+
 export interface LotteryTicket {
   userId: string;
   id: number;

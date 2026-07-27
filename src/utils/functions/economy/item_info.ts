@@ -403,6 +403,11 @@ function getGeneralMessage(
         roleDescription = `you can activate your booster with **/use <booster>**`;
       }
 
+      if (selected.role === "pet") {
+        roleDescription =
+          "use this pet with **/use <pet>** to unlock or upgrade it, then manage active pets with **/pets**";
+      }
+
       if (["collectable", "flower", "cat"].includes(selected.role)) {
         roleDescription =
           "collectables don't do anything, they're just *collectables*. if you don't want them, you can get rid of them by selling them";
