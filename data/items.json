@@ -4716,6 +4716,50 @@
     },
     "in_crates": true
   },
+  "cow": {
+    "id": "cow",
+    "name": "cow",
+    "plural": "cows",
+    "article": "a",
+    "emoji": "🐮",
+    "longDesc": "has a chance to increase the output of harvested crops",
+    "rarity": 4,
+    "role": "pet",
+    "in_crates": false
+  },
+  "beaver": {
+    "id": "beaver",
+    "name": "beaver",
+    "plural": "beavers",
+    "article": "a",
+    "emoji": "🦫",
+    "longDesc": "has a chance to fish more",
+    "rarity": 4,
+    "role": "pet",
+    "in_crates": false
+  },
+  "tiger": {
+    "id": "tiger",
+    "name": "tiger",
+    "plural": "tigers",
+    "article": "a",
+    "emoji": "🐯",
+    "longDesc": "has a chance to hunt more",
+    "rarity": 4,
+    "role": "pet",
+    "in_crates": false
+  },
+  "mole": {
+    "id": "mole",
+    "name": "mole",
+    "plural": "moles",
+    "article": "a",
+    "emoji": "<:nypsi_mole:0>",
+    "longDesc": "has a chance to mine more",
+    "rarity": 4,
+    "role": "pet",
+    "in_crates": false
+  },
   "wilson": {
     "id": "wilson",
     "name": "wilson",

@@ -1,0 +1,34 @@
+{
+  "cow": {
+    "item": "cow",
+    "target": "farm",
+    "description": "{chance}% chance to increase harvested crop output by {bonus}%",
+    "chance": [0.01, 0.0175, 0.0275, 0.04, 0.06],
+    "benefit": [0.05, 0.075, 0.1, 0.15, 0.25],
+    "items": [1, 2, 4, 8, 16]
+  },
+  "beaver": {
+    "item": "beaver",
+    "target": "fish",
+    "description": "{chance}% chance to fish more items",
+    "chance": [0.01, 0.0175, 0.0275, 0.04, 0.06],
+    "benefit": [1, 1, 1, 1, 1],
+    "items": [1, 2, 4, 8, 16]
+  },
+  "tiger": {
+    "item": "tiger",
+    "target": "hunt",
+    "description": "{chance}% chance to hunt more items",
+    "chance": [0.01, 0.0175, 0.0275, 0.04, 0.06],
+    "benefit": [1, 1, 1, 1, 1],
+    "items": [1, 2, 4, 8, 16]
+  },
+  "mole": {
+    "item": "mole",
+    "target": "mine",
+    "description": "{chance}% chance to mine more items",
+    "chance": [0.01, 0.0175, 0.0275, 0.04, 0.06],
+    "benefit": [1, 1, 1, 1, 1],
+    "items": [1, 2, 4, 8, 16]
+  }
+}
