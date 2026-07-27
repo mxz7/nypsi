@@ -4760,12 +4760,12 @@
     "role": "pet",
     "in_crates": false
   },
-  "mole": {
-    "id": "mole",
-    "name": "mole",
-    "plural": "moles",
+  "fox": {
+    "id": "fox",
+    "name": "fox",
+    "plural": "foxes",
     "article": "a",
-    "emoji": "<:nypsi_mole:0>",
+    "emoji": "🦊",
     "longDesc": "has a chance to mine more",
     "rarity": 4,
     "role": "pet",

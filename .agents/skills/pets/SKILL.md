@@ -12,7 +12,7 @@ generic effects framework, manager, repository, or separate manual upgrade flow.
 
 - Pet definitions live in `data/pets.json`; corresponding economy items live in `data/items.json`.
 - Supported pets are `cow` (bakery), `chicken` (farm), `beaver` (fish), `tiger` (hunt),
-  `mole` (mine), `eagle` (XP), `rocky` (event progress), and `shark` (gamble multi).
+  `fox` (mine), `eagle` (XP), `rocky` (event progress), and `shark` (gamble multi).
 - Each definition has `item`, `target`, `description`, `chance`, `benefit`, and `items`.
 - `chance`, `benefit`, and `items` are parallel arrays. Stored level 1 reads index 0; the array
   length is the maximum level.
