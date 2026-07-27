@@ -19,6 +19,7 @@ import { getGuildUpgradesByUser } from "./guilds";
 import { calcItemValue, gemBreak, getInventory } from "./inventory";
 import { doLevelUp, getRawLevel, getUpgrades } from "./levelling";
 import { isPassive } from "./passive";
+import { rollPet } from "./pets";
 import {
   getBaseUpgrades,
   getBaseWorkers,
@@ -288,6 +289,12 @@ export async function getGambleMulti(
   }
 
   if (multi - beforeBoosters !== 0) breakdownMap.set("boosters", multi - beforeBoosters);
+
+  const petBonus = await rollPet(member, "multi");
+  if (petBonus) {
+    multi += petBonus;
+    breakdownMap.set("pets", petBonus);
+  }
 
   const beforeGems = multi;
 

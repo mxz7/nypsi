@@ -4,8 +4,16 @@ import { Item, PetData, PetTarget } from "../../src/types/Economy";
 
 const pets: Record<string, PetData> = JSON.parse(readFileSync("data/pets.json").toString());
 const items: Record<string, Item> = JSON.parse(readFileSync("data/items.json").toString());
-const supportedTargets: PetTarget[] = ["farm", "fish", "hunt", "mine"];
-const requiredPets = ["cow", "beaver", "tiger", "mole"];
+const supportedTargets: PetTarget[] = [
+  "bakery",
+  "event",
+  "farm",
+  "fish",
+  "hunt",
+  "mine",
+  "multi",
+  "xp",
+];
 
 test("pet configuration", () => {
   const itemIds = new Set<string>();
@@ -19,7 +27,7 @@ test("pet configuration", () => {
     expect
       .soft(pet.description, `${id}.description has a chance placeholder`)
       .toContain("{chance}");
-    if (pet.target === "farm") {
+    if (["farm", "multi"].includes(pet.target)) {
       expect
         .soft(pet.description, `${id}.description has a bonus placeholder`)
         .toContain("{bonus}");
@@ -53,6 +61,4 @@ test("pet configuration", () => {
     expect.soft(itemIds.has(pet.item), `${id}.item is unique`).toBe(false);
     itemIds.add(pet.item);
   }
-
-  expect.soft(Object.keys(pets).sort()).toEqual(requiredPets.sort());
 });

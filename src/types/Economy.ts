@@ -50,7 +50,7 @@ export interface Item {
   hidden?: boolean; // can be viewed by users
 }
 
-export type PetTarget = "farm" | "fish" | "hunt" | "mine";
+export type PetTarget = "bakery" | "event" | "farm" | "fish" | "hunt" | "mine" | "multi" | "xp";
 
 export type PetData = {
   item: string;

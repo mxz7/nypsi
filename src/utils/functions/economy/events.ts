@@ -21,6 +21,7 @@ import { getLastKnownUsername } from "../users/username";
 import { hasProfile } from "../users/utils";
 import { addProgress } from "./achievements";
 import { addInventoryItem } from "./inventory";
+import { rollPet } from "./pets";
 import { getEventsData, getItems, isEcoBanned } from "./utils";
 import ms = require("ms");
 import dayjs = require("dayjs");
@@ -242,6 +243,8 @@ export async function addEventProgress(
     }
     return;
   }
+
+  amount += amount * ((await rollPet(user, "event")) ?? 0);
 
   await prisma.eventContribution.upsert({
     where: {

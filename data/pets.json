@@ -1,6 +1,14 @@
 {
   "cow": {
     "item": "cow",
+    "target": "bakery",
+    "description": "{chance}% chance to double bakery output",
+    "chance": [0.01, 0.0175, 0.0275, 0.04, 0.06],
+    "benefit": [1, 1, 1, 1, 1],
+    "items": [1, 2, 4, 8, 16]
+  },
+  "chicken": {
+    "item": "chicken",
     "target": "farm",
     "description": "{chance}% chance to increase harvested crop output by {bonus}%",
     "chance": [0.01, 0.0175, 0.0275, 0.04, 0.06],
@@ -27,6 +35,30 @@
     "item": "mole",
     "target": "mine",
     "description": "{chance}% chance to mine more items",
+    "chance": [0.01, 0.0175, 0.0275, 0.04, 0.06],
+    "benefit": [1, 1, 1, 1, 1],
+    "items": [1, 2, 4, 8, 16]
+  },
+  "eagle": {
+    "item": "eagle",
+    "target": "xp",
+    "description": "{chance}% chance to earn double xp",
+    "chance": [0.01, 0.0175, 0.0275, 0.04, 0.06],
+    "benefit": [1, 1, 1, 1, 1],
+    "items": [1, 2, 4, 8, 16]
+  },
+  "rocky": {
+    "item": "rocky",
+    "target": "event",
+    "description": "{chance}% chance to earn double event progress",
+    "chance": [0.01, 0.0175, 0.0275, 0.04, 0.06],
+    "benefit": [1, 1, 1, 1, 1],
+    "items": [1, 2, 4, 8, 16]
+  },
+  "shark": {
+    "item": "shark",
+    "target": "multi",
+    "description": "{chance}% chance to gain {bonus}% gamble multi",
     "chance": [0.01, 0.0175, 0.0275, 0.04, 0.06],
     "benefit": [1, 1, 1, 1, 1],
     "items": [1, 2, 4, 8, 16]
