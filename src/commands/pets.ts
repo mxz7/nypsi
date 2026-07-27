@@ -2,25 +2,40 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
+  CommandInteraction,
   MessageActionRowComponentBuilder,
   StringSelectMenuBuilder,
   StringSelectMenuOptionBuilder,
 } from "discord.js";
-import { Command } from "../models/Command";
+import { Pet } from "#generated/prisma";
+import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import {
   activatePet,
   deactivatePet,
+  getActivePets,
   getPetSlotCount,
   getUserPet,
   getUserPets,
 } from "../utils/functions/economy/pets";
 import { getItems, getPetsData } from "../utils/functions/economy/utils";
 
-const cmd = new Command("pets", "view and manage your pets", "money");
-cmd.slashEnabled = true;
+function formatDescription(pet: Pet) {
+  const data = getPetsData()[pet.petId];
+  const levelIndex = pet.level - 1;
+  const chance = data.chance[levelIndex] * 100;
+  const bonus = data.target === "farm" ? data.benefit[levelIndex] * 100 : data.benefit[levelIndex];
 
-cmd.setRun(async (message, send) => {
+  return data.description
+    .replaceAll("{chance}", chance.toLocaleString())
+    .replaceAll("{bonus}", bonus.toLocaleString());
+}
+
+async function runPets(
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
+  args: string[],
+) {
   let userPets = await getUserPets(message.member);
 
   if (userPets.length === 0) {
@@ -34,57 +49,92 @@ cmd.setRun(async (message, send) => {
     });
   }
 
-  let selectedPetId = userPets[0].petId;
+  let selectedPetId: string;
+
+  if (args[0]) {
+    const search = args.join(" ").toLowerCase();
+    selectedPetId = userPets.find((pet) => {
+      const item = getItems()[getPetsData()[pet.petId].item];
+      return pet.petId === search || item.name === search || item.aliases?.includes(search);
+    })?.petId;
+
+    if (!selectedPetId) {
+      return send({ embeds: [new ErrorEmbed("you have not unlocked this pet")] });
+    }
+  }
 
   const render = async () => {
-    userPets = await getUserPets(message.member);
-    const pet = userPets.find((entry) => entry.petId === selectedPetId) ?? userPets[0];
-    const petData = getPetsData()[pet.petId];
-    const item = getItems()[petData.item];
-    const levelIndex = pet.level - 1;
-    const chance = petData.chance[levelIndex] * 100;
-    const bonus =
-      petData.target === "farm" ? petData.benefit[levelIndex] * 100 : petData.benefit[levelIndex];
-    const description = petData.description
-      .replaceAll("{chance}", chance.toLocaleString())
-      .replaceAll("{bonus}", bonus.toLocaleString());
-    const nextLevel =
-      pet.level < petData.items.length
-        ? `\n**next level** ${petData.items[pet.level].toLocaleString()}x ${item.emoji} ${item.name}`
-        : "\n**next level** max";
-    const activeCount = userPets.filter((entry) => entry.active).length;
-    const slots = await getPetSlotCount(message.member);
-
-    const embed = new CustomEmbed(
-      message.member,
-      `${item.emoji} **${item.name}**\n\n` +
-        `**level** ${pet.level}/${petData.items.length}\n` +
-        `**status** ${pet.active ? "active" : "inactive"}\n` +
-        `**effect** ${description}\n` +
-        `**activations** ${pet.activations.toLocaleString()}` +
-        nextLevel +
-        `\n\n**active pets** ${activeCount}/${slots}`,
-    ).setHeader(`${message.author.username}'s pets`, message.author.avatarURL());
-
+    const result = await Promise.all([
+      getUserPets(message.member),
+      getPetSlotCount(message.member),
+    ]);
+    userPets = result[0];
+    const slots = result[1];
+    const activePets = userPets.filter((pet) => pet.active);
     const select = new StringSelectMenuBuilder().setCustomId("pets-select").addOptions(
-      userPets.map((entry) => {
-        const entryItem = getItems()[getPetsData()[entry.petId].item];
+      new StringSelectMenuOptionBuilder()
+        .setLabel("overview")
+        .setValue("overview")
+        .setDefault(!selectedPetId),
+      ...userPets.map((pet) => {
+        const item = getItems()[getPetsData()[pet.petId].item];
         return new StringSelectMenuOptionBuilder()
-          .setLabel(entryItem.name)
-          .setValue(entry.petId)
-          .setEmoji(entryItem.emoji)
-          .setDefault(entry.petId === pet.petId);
+          .setLabel(item.name)
+          .setValue(pet.petId)
+          .setEmoji(item.emoji)
+          .setDefault(pet.petId === selectedPetId);
       }),
     );
+    const navigation = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      select,
+    );
+
+    if (!selectedPetId) {
+      const activeDescription =
+        activePets.length === 0
+          ? "*no active pets*"
+          : activePets
+              .map((pet) => {
+                const item = getItems()[getPetsData()[pet.petId].item];
+                return `${item.emoji} **${item.name}** (${pet.level})\n- ${formatDescription(pet)}`;
+              })
+              .join("\n\n");
+
+      return {
+        embed: new CustomEmbed(
+          message.member,
+          `**active pets** ${activePets.length}/${slots}\n\n${activeDescription}`,
+        ).setHeader(`${message.author.username}'s pets`, message.author.avatarURL()),
+        components: [navigation],
+      };
+    }
+
+    const pet = userPets.find((entry) => entry.petId === selectedPetId) ?? userPets[0];
+    selectedPetId = pet.petId;
+    const petData = getPetsData()[pet.petId];
+    const item = getItems()[petData.item];
+    const nextLevel =
+      pet.level < petData.items.length
+        ? `\n\`${petData.items[pet.level].toLocaleString()}x\` needed for next level`
+        : "\n**max level**";
     const toggle = new ButtonBuilder()
       .setCustomId("pets-toggle")
       .setLabel(pet.active ? "deactivate" : "activate")
       .setStyle(pet.active ? ButtonStyle.Danger : ButtonStyle.Success);
 
     return {
-      embed,
+      embed: new CustomEmbed(
+        message.member,
+        `${item.emoji} **${item.name}**\n\n` +
+          `**level** ${pet.level}/${petData.items.length}\n` +
+          `**status** ${pet.active ? "active" : "inactive"}\n` +
+          `**effect** ${formatDescription(pet)}\n` +
+          `**activations** ${pet.activations.toLocaleString()}` +
+          nextLevel +
+          `\n\n**active pets** ${activePets.length}/${slots}`,
+      ).setHeader(`${message.author.username}'s pets`, message.author.avatarURL()),
       components: [
-        new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(select),
+        navigation,
         new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(toggle),
       ],
     };
@@ -99,7 +149,7 @@ cmd.setRun(async (message, send) => {
 
   collector.on("collect", async (interaction) => {
     if (interaction.isStringSelectMenu()) {
-      selectedPetId = interaction.values[0];
+      selectedPetId = interaction.values[0] === "overview" ? undefined : interaction.values[0];
     } else if (interaction.isButton()) {
       try {
         const pet = await getUserPet(message.member, selectedPetId);
@@ -109,10 +159,23 @@ cmd.setRun(async (message, send) => {
           await activatePet(message.member, selectedPetId);
         }
       } catch (error) {
-        await interaction.reply({
-          embeds: [new ErrorEmbed(error instanceof Error ? error.message : "failed to update pet")],
-          ephemeral: true,
-        });
+        const messageText = error instanceof Error ? error.message : "failed to update pet";
+        const embed = new ErrorEmbed(messageText);
+
+        if (messageText === "all of your active pet slots are occupied") {
+          const activePets = await getActivePets(message.member);
+          embed.addField(
+            "active pets",
+            activePets
+              .map((pet) => {
+                const item = getItems()[getPetsData()[pet.petId].item];
+                return `${item.emoji} ${item.name}`;
+              })
+              .join("\n"),
+          );
+        }
+
+        await interaction.reply({ embeds: [embed], ephemeral: true });
         return;
       }
     }
@@ -128,6 +191,17 @@ cmd.setRun(async (message, send) => {
     }
     await response.edit({ components: updated.components }).catch(() => {});
   });
-});
+}
 
-export default cmd;
+const cmd = new Command("pets", "view and manage your pets", "money").setAliases(["pet"]);
+cmd.slashEnabled = true;
+cmd.slashData.addStringOption((option) =>
+  option
+    .setName("pet")
+    .setDescription("pet you want to view")
+    .setRequired(false)
+    .setAutocomplete(true),
+);
+cmd.setRun(runPets);
+
+module.exports = cmd;
