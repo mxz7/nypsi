@@ -158,7 +158,7 @@ export async function rollPet(
   const levelIndex = pet.level - 1;
 
   if (!percentChance(data.chance[levelIndex] * 100)) {
-    if (await inventory.hasGem("crystal_heart")) {
+    if ((await inventory.hasGem("crystal_heart")).any) {
       if (!percentChance(0.1)) return;
     }
   }
