@@ -74,6 +74,9 @@ again for pet-generated attempts, or add activation feedback messages.
   `src/interactions/pet.ts`.
 - When activation fails because slots are full, include an `active pets` field listing each active
   pet's emoji and name.
+- Pet detail views include a level-up button. Render it green when the current inventory has enough
+  pet items and disabled otherwise. On click, call `addPet` so inventory is checked again under the
+  pet mutex before items are removed and the level is updated.
 - Pet items are consumed through `/use`; `addPet` decides whether to unlock or upgrade. Item info
   should explain the benefit and direct users to `/use <pet>` and `/pets`.
 

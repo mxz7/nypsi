@@ -9,8 +9,10 @@ import {
 import { Pet } from "#generated/prisma";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomContainer, ErrorEmbed } from "../models/EmbedBuilders";
+import { getInventory } from "../utils/functions/economy/inventory";
 import {
   activatePet,
+  addPet,
   deactivatePet,
   getActivePets,
   getPetSlotCount,
@@ -58,13 +60,14 @@ async function runPets(
   }
 
   const render = async (disabled = false) => {
-    const result = await Promise.all([
+    const [refreshedPets, slots, inventory] = await Promise.all([
       getUserPets(message.member),
       getPetSlotCount(message.member),
+      getInventory(message.member),
     ]);
-    userPets = result[0];
-    const slots = result[1];
+    userPets = refreshedPets;
     const activePets = userPets.filter((pet) => pet.active);
+
     const select = new StringSelectMenuBuilder()
       .setCustomId("pets-select")
       .setDisabled(disabled)
@@ -107,17 +110,28 @@ async function runPets(
 
     const pet = userPets.find((entry) => entry.petId === selectedPetId) ?? userPets[0];
     selectedPetId = pet.petId;
+
     const petData = getPetsData()[pet.petId];
     const item = getItems()[petData.item];
+
+    const requiredItems = petData.items[pet.level];
+    const canUpgrade =
+      requiredItems !== undefined && inventory.count(petData.item) >= requiredItems;
     const nextLevel =
-      pet.level < petData.items.length
-        ? `\n\n\`${petData.items[pet.level].toLocaleString()}x\` needed for next level`
+      requiredItems !== undefined
+        ? `\n\n\`${requiredItems.toLocaleString()}x\` needed for next level`
         : "\n**max level**";
+
     const toggle = new ButtonBuilder()
       .setCustomId("pets-toggle")
       .setLabel(pet.active ? "deactivate" : "activate")
       .setStyle(pet.active ? ButtonStyle.Danger : ButtonStyle.Success)
       .setDisabled(disabled);
+    const levelUp = new ButtonBuilder()
+      .setCustomId("pets-level-up")
+      .setLabel("level up")
+      .setStyle(canUpgrade ? ButtonStyle.Success : ButtonStyle.Secondary)
+      .setDisabled(disabled || !canUpgrade);
 
     return new CustomContainer(message.member)
       .addTextDisplayComponents((text) =>
@@ -132,7 +146,7 @@ async function runPets(
       )
       .addSeparatorComponents((separator) => separator)
       .addActionRowComponents((row) => row.addComponents(select))
-      .addActionRowComponents((row) => row.addComponents(toggle))
+      .addActionRowComponents((row) => row.addComponents(toggle, levelUp))
       .addTextDisplayComponents((text) =>
         text.setContent(`-# active pets ${activePets.length}/${slots}`),
       );
@@ -143,6 +157,7 @@ async function runPets(
     components: [initial],
     flags: MessageFlags.IsComponentsV2,
   });
+
   const collector = response.createMessageComponentCollector({
     filter: (interaction) => interaction.user.id === message.author.id,
     time: 60_000,
@@ -153,11 +168,15 @@ async function runPets(
       selectedPetId = interaction.values[0] === "overview" ? undefined : interaction.values[0];
     } else if (interaction.isButton()) {
       try {
-        const pet = await getUserPet(message.member, selectedPetId);
-        if (pet?.active) {
-          await deactivatePet(message.member, selectedPetId);
+        if (interaction.customId === "pets-level-up") {
+          await addPet(message.member, selectedPetId);
         } else {
-          await activatePet(message.member, selectedPetId);
+          const pet = await getUserPet(message.member, selectedPetId);
+          if (pet?.active) {
+            await deactivatePet(message.member, selectedPetId);
+          } else {
+            await activatePet(message.member, selectedPetId);
+          }
         }
       } catch (error) {
         const messageText = error instanceof Error ? error.message : "failed to update pet";
