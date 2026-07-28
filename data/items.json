@@ -4725,7 +4725,7 @@
     "longDesc": "has a chance to double bakery output",
     "rarity": 4,
     "role": "pet",
-    "in_crates": false
+    "in_crates": true
   },
   "chicken": {
     "id": "chicken",
@@ -4734,9 +4734,9 @@
     "article": "a",
     "emoji": "🐔",
     "longDesc": "has a chance to increase the output of harvested crops",
-    "rarity": 4,
+    "rarity": 5,
     "role": "pet",
-    "in_crates": false
+    "in_crates": true
   },
   "beaver": {
     "id": "beaver",
@@ -4778,9 +4778,9 @@
     "article": "an",
     "emoji": "🦅",
     "longDesc": "has a chance to double earned xp",
-    "rarity": 4,
+    "rarity": 6,
     "role": "pet",
-    "in_crates": false
+    "in_crates": true
   },
   "rocky": {
     "id": "rocky",
@@ -4789,9 +4789,10 @@
     "article": "a",
     "emoji": "<:nypsi_rocky:0>",
     "longDesc": "has a chance to double event progress",
-    "rarity": 4,
+    "shortDesc": "amaze amaze amaze!",
+    "rarity": 5,
     "role": "pet",
-    "in_crates": false
+    "in_crates": true
   },
   "shark": {
     "id": "shark",
@@ -4800,9 +4801,9 @@
     "article": "a",
     "emoji": "🦈",
     "longDesc": "has a chance to increase gamble multi",
-    "rarity": 4,
+    "rarity": 6,
     "role": "pet",
-    "in_crates": false
+    "in_crates": true
   },
   "wilson": {
     "id": "wilson",
