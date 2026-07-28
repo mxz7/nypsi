@@ -3,6 +3,7 @@ import prisma from "../../../init/database";
 import { PetTarget } from "../../../types/Economy";
 import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
+import { logger } from "../../logger";
 import { getUserId, MemberResolvable } from "../member";
 import { RedisMutex } from "../mutex";
 import { percentChance } from "../random";
@@ -163,6 +164,7 @@ export async function rollPet(
     }
   }
 
+  logger.info(`pets: ${getUserId(member)}'s ${pet.petId} activated`);
   await updatePet(member, pet.petId, { activationIncrement: 1 });
   return data.benefit[levelIndex];
 }
