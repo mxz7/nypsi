@@ -1,9 +1,11 @@
 import { getSudoku } from "sudoku-gen";
-import { SudokuCoordMode, SudokuDifficulty, SudokuGame } from "#generated/prisma";
+import { SudokuDifficulty, SudokuGame } from "#generated/prisma";
 import prisma from "../../../init/database";
+import { SudokuCoordMode } from "../../../types/Sudoku";
 import { addProgress } from "../economy/achievements";
 import { addTaskProgress } from "../economy/tasks";
-import { getPreferences, updatePreferences } from "../users/notifications";
+import { getPreferences } from "../users/preferences";
+import { updatePreference } from "../users/preferences";
 import {
   clearDigitNotesFromPeers,
   decodeCellChar,
@@ -14,7 +16,8 @@ import {
 } from "./cell";
 import { coordToIndex, indexToCoord, isGivenCell } from "./coordinate";
 
-export { SudokuCoordMode, SudokuDifficulty, SudokuGame };
+export { SudokuDifficulty, SudokuGame };
+export type { SudokuCoordMode };
 export { coordToIndex, indexToCoord, isGivenCell };
 
 export async function createSudokuGame(userId: string, difficulty: SudokuDifficulty) {
@@ -78,9 +81,7 @@ export async function getUserCoordMode(userId: string): Promise<SudokuCoordMode>
 }
 
 export async function setUserCoordMode(userId: string, mode: SudokuCoordMode): Promise<void> {
-  const prefs = await getPreferences(userId);
-  prefs.sudokuCoordMode = mode;
-  await updatePreferences(userId, prefs);
+  await updatePreference(userId, "sudokuCoordMode", mode);
 }
 
 export type ApplyMoveResult =

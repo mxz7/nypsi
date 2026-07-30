@@ -14,7 +14,7 @@ import { getRawLevel } from "../utils/functions/economy/levelling";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getLastVote, getVoteStreak, hasVoted } from "../utils/functions/economy/vote";
 import { pluralize } from "../utils/functions/string";
-import { getDmSettings } from "../utils/functions/users/notifications";
+import { getPreferences } from "../utils/functions/users/preferences";
 
 const cmd = new Command("vote", "vote every 12 hours to get rewards", "money");
 
@@ -45,7 +45,7 @@ async function run(
       where: { userId: message.author.id },
       select: { monthVote: true, seasonVote: true },
     }),
-    getDmSettings(message.member),
+    getPreferences(message.member),
     getVoteStreak(message.member),
   ]);
 
@@ -58,14 +58,14 @@ async function run(
     embed
       .setDescription(
         `you can vote again <t:${nextVote}:R>${
-          dmSettings.voteReminder
+          dmSettings.dms.voteReminder
             ? ""
             : "\n\nenable vote reminders for an extra **2%** gamble multiplier and **5%** sell multiplier"
         }\n\nyou've voted **${votes.monthVote}** ${pluralize("time", votes.monthVote)} this month and **${votes.seasonVote}** ${pluralize("time", votes.seasonVote)} this season`,
       )
       .setFooter({ text: `streak: ${streak.toLocaleString()}` });
 
-    if (dmSettings.voteReminder)
+    if (dmSettings.dms.voteReminder)
       send({
         embeds: [embed],
       });
@@ -99,7 +99,7 @@ async function run(
         .setEmoji("<:topgg:1355915569286610964>"),
     );
 
-    if (!dmSettings.voteReminder)
+    if (!dmSettings.dms.voteReminder)
       row.addComponents(
         new ButtonBuilder()
           .setCustomId("enable-vote-reminders")

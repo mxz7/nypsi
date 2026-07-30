@@ -46,7 +46,8 @@ import {
 import { createUser, formatBet, getItems, userExists } from "../utils/functions/economy/utils";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { hasAdminPermission } from "../utils/functions/users/admin";
-import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
+import { addNotificationToQueue } from "../utils/functions/users/notifications";
+import { getPreferences } from "../utils/functions/users/preferences";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
 
@@ -850,7 +851,7 @@ async function run(
         await addBalance(tradeRequest.ownerId, Number(tradeRequest.offeredMoney));
       }
 
-      if ((await getDmSettings(tradeRequest.ownerId)).market) {
+      if ((await getPreferences(tradeRequest.ownerId)).dms.market) {
         const embed = new CustomEmbed().setColor(Constants.EMBED_FAIL_COLOR);
 
         embed.setDescription(

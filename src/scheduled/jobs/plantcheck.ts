@@ -7,6 +7,7 @@ import Constants from "../../utils/Constants";
 import { deletePlant } from "../../utils/functions/economy/farm";
 import { getPlantsData } from "../../utils/functions/economy/utils";
 import { addNotificationToQueue } from "../../utils/functions/users/notifications";
+import { getPreferences } from "../../utils/functions/users/preferences";
 
 export default {
   name: "plant health check",
@@ -21,14 +22,9 @@ export default {
         wateredAt: true,
       },
       where: {
-        AND: [
-          { economy: { user: { DMSettings: { farmHealth: true } } } },
-          {
-            OR: [
-              { fertilisedAt: { lt: dayjs().subtract(1, "day").toDate() } },
-              { wateredAt: { lt: dayjs().subtract(1, "day").toDate() } },
-            ],
-          },
+        OR: [
+          { fertilisedAt: { lt: dayjs().subtract(1, "day").toDate() } },
+          { wateredAt: { lt: dayjs().subtract(1, "day").toDate() } },
         ],
       },
     });
@@ -55,6 +51,7 @@ export default {
     let dms = 0;
 
     for (const [userId, plants] of grouped.entries()) {
+      if (!(await getPreferences(userId)).dms.farmHealth) continue;
       if (await redis.exists(`${Constants.redis.nypsi.FARM_STATUS_DM}:${userId}`)) continue;
       let needWater = 0;
       let needFertiliser = 0;

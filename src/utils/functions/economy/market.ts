@@ -31,7 +31,8 @@ import { filterOutliers } from "../outliers";
 import { getTier } from "../premium/premium";
 import { pluralize } from "../string";
 import { addToNypsiBank, getTax } from "../tax";
-import { addNotificationToQueue, getDmSettings } from "../users/notifications";
+import { addNotificationToQueue } from "../users/notifications";
+import { getPreferences } from "../users/preferences";
 import { getLastKnownAvatar, getLastKnownUsername } from "../users/username";
 import { addBalance, getBalance, removeBalance } from "./balance";
 import { addInventoryItem, getInventory, isGem, removeInventoryItem } from "./inventory";
@@ -569,7 +570,7 @@ export async function checkMarketWatchers(
   };
 
   for (const userId of users) {
-    if (!(await getDmSettings(userId)).market) continue;
+    if (!(await getPreferences(userId)).dms.market) continue;
 
     if (await redis.exists(`${Constants.redis.cooldown.MARKET_WATCH}:${userId}`)) continue;
 
@@ -841,7 +842,7 @@ export async function completeOrder(
       "market",
     );
 
-    if ((await getDmSettings(order.ownerId)).market) {
+    if ((await getPreferences(order.ownerId)).dms.market) {
       let dmQueue = await redis
         .hget(`${Constants.redis.nypsi.MARKET_DM}:${order.orderType}`, order.ownerId)
         .then((r) => (r ? (JSON.parse(r) as DMQueue) : undefined));

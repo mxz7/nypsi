@@ -6,8 +6,9 @@ import {
   ColorResolvable,
   MessageActionRowComponentBuilder,
 } from "discord.js";
-import { SudokuCoordMode, SudokuDifficulty } from "#generated/prisma";
+import { SudokuDifficulty } from "#generated/prisma";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
+import { SudokuCoordMode } from "../../../types/Sudoku";
 import Constants from "../../Constants";
 import { renderBoard } from "./board";
 

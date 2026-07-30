@@ -17,7 +17,8 @@ import { addTaskProgress } from "../utils/functions/economy/tasks.js";
 import { getTagsData } from "../utils/functions/economy/utils.js";
 import { checkMessageContent } from "../utils/functions/guilds/filters.js";
 import { isMuted } from "../utils/functions/moderation/mute.js";
-import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications.js";
+import { addNotificationToQueue } from "../utils/functions/users/notifications.js";
+import { getPreferences } from "../utils/functions/users/preferences.js";
 import { getActiveTag } from "../utils/functions/users/tags.js";
 import { getLastKnownUsername } from "../utils/functions/users/username.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
@@ -281,7 +282,7 @@ setInterval(async () => {
     const milf = JSON.parse(obj) as MilfSearchData;
     if (dayjs(milf.date).isBefore(dayjs().subtract(6, "hours"))) {
       await redis.lrem(Constants.redis.nypsi.MILF_QUEUE, 1, obj);
-      if ((await getDmSettings(milf.userId)).other) {
+      if ((await getPreferences(milf.userId)).dms.other) {
         addNotificationToQueue({
           memberId: milf.userId,
           payload: {

@@ -3,32 +3,38 @@
     "rob": {
       "id": "rob",
       "name": "robbery notifications",
-      "description": "get a dm when someone attempts to rob you"
+      "description": "get a dm when someone attempts to rob you",
+      "default": true
     },
     "lottery": {
       "id": "lottery",
       "name": "lottery notifications",
-      "description": "get a dm when you win the lottery"
+      "description": "get a dm when you win the lottery",
+      "default": true
     },
     "premium": {
       "id": "premium",
       "name": "premium notifications",
-      "description": "get dm notifications for updates on your premium membership"
+      "description": "get dm notifications for updates on your premium membership",
+      "default": true
     },
     "market": {
       "id": "market",
       "name": "market notifications",
-      "description": "get a dm when someone buys or fills your market order"
+      "description": "get a dm when someone buys or fills your market order",
+      "default": true
     },
     "voteReminder": {
       "id": "voteReminder",
       "name": "vote reminders",
-      "description": "receive a reminder in your dms when you are able to vote again\n\n+**2**% gamble multiplier\n+**5**% sell multiplier"
+      "description": "receive a reminder in your dms when you are able to vote again\n\n+**2**% gamble multiplier\n+**5**% sell multiplier",
+      "default": false
     },
     "worker": {
       "id": "worker",
       "name": "worker notifications",
       "description": "get a dm when one of your workers has reached full capacity",
+      "default": "OnlyWhenFull",
       "types": [
         { "name": "disabled", "description": "no worker notifications", "value": "Disabled" },
         {
@@ -46,27 +52,32 @@
     "booster": {
       "id": "booster",
       "name": "booster notifications",
-      "description": "get a dm when one or more of your boosters have expired"
+      "description": "get a dm when one or more of your boosters have expired",
+      "default": false
     },
     "payment": {
       "id": "payment",
       "name": "payment notifications",
-      "description": "get a dm when someone sends you money or gives you an item"
+      "description": "get a dm when someone sends you money or gives you an item",
+      "default": true
     },
     "netWorth": {
       "id": "netWorth",
       "name": "net worth updates",
-      "description": "get a dm when your net worth changes by the amount set. currently: ${VALUE}"
+      "description": "get a dm when your net worth changes by the amount set. currently: ${VALUE}",
+      "default": 0
     },
     "autosellStatus": {
       "id": "autosellStatus",
       "name": "autosell status",
-      "description": "get a dm hourly for autosell status (/autosell)"
+      "description": "get a dm hourly for autosell status (/autosell)",
+      "default": true
     },
     "level": {
       "id": "level",
       "name": "level notifications",
       "description": "get a dm when you level up",
+      "default": "OnlyReward",
       "types": [
         { "name": "disabled", "description": "no level notifications", "value": "Disabled" },
         {
@@ -84,54 +95,64 @@
     "farmHealth": {
       "id": "farmHealth",
       "name": "farm health",
-      "description": "get a dm when your plants are unhealthy and dying"
+      "description": "get a dm when your plants are unhealthy and dying",
+      "default": true
     },
     "other": {
       "id": "other",
       "name": "miscellaneous",
-      "description": "get a dm for miscellaneous things, such as guild level upgrades"
+      "description": "get a dm for miscellaneous things, such as guild level upgrades",
+      "default": true
     }
   },
-  "preferences": {
+  "general": {
     "duelRequests": {
       "id": "duelRequests",
       "name": "duel requests",
-      "description": "receive coinflip/chatreaction requests"
+      "description": "receive coinflip/chatreaction requests",
+      "default": true
     },
     "marketConfirm": {
       "id": "marketConfirm",
       "name": "market confirmation",
-      "description": "require buying from market confirmation on items more expensive than: ${VALUE} (0 = never)"
+      "description": "require buying from market confirmation on items more expensive than: ${VALUE} (0 = never)",
+      "default": 25000000
     },
     "marketDelay": {
       "id": "marketDelay",
       "name": "market notification delay",
-      "description": "delay your market notifications by: {VALUE}s. this will help you get less dms if you are selling/buying a lot of items"
+      "description": "delay your market notifications by: {VALUE}s. this will help you get less dms if you are selling/buying a lot of items",
+      "default": 300
     },
     "offers": {
       "id": "offers",
       "name": "receive offers",
-      "description": "how many offers do you want to be able to receive at once? current: {VALUE}"
+      "description": "how many offers do you want to be able to receive at once? current: {VALUE}",
+      "default": 3
     },
     "leaderboards": {
       "id": "leaderboards",
       "name": "privacy",
-      "description": "enabling privacy hides your username from global leaderboards and stops your profile being visible on the nypsi website"
+      "description": "enabling privacy hides your username from global leaderboards and stops your profile being visible on the nypsi website",
+      "default": true
     },
     "tips": {
       "id": "tips",
       "name": "tips",
-      "description": "send occasional tips when you do commands"
+      "description": "send occasional tips when you do commands",
+      "default": true
     },
     "mentionsGlobal": {
       "id": "mentionsGlobal",
       "name": "global pings",
-      "description": "show pings in all servers (that nypsi is in) with $pings"
+      "description": "show pings in all servers (that nypsi is in) with $pings",
+      "default": false
     },
     "sudokuCoordMode": {
       "id": "sudokuCoordMode",
       "name": "sudoku coordinate mode",
       "description": "the coordinate mode used for sudoku",
+      "default": "box",
       "types": [
         { "name": "box", "description": "box based coordinates (default)", "value": "box" },
         {

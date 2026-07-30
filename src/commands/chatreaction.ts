@@ -65,7 +65,7 @@ import { getMember } from "../utils/functions/member";
 import PageManager from "../utils/functions/page";
 import { isPremium } from "../utils/functions/premium/premium";
 import sleep from "../utils/functions/sleep";
-import { getPreferences } from "../utils/functions/users/notifications";
+import { getPreferences } from "../utils/functions/users/preferences";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("chatreaction", "see who can type the fastest", "fun")

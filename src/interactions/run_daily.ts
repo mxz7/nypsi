@@ -24,7 +24,8 @@ import {
 } from "../utils/functions/economy/utils";
 import { hasVoted } from "../utils/functions/economy/vote";
 import { percentChance } from "../utils/functions/random";
-import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
+import { addNotificationToQueue } from "../utils/functions/users/notifications";
+import { getPreferences } from "../utils/functions/users/preferences";
 import { logger } from "../utils/logger";
 import dayjs = require("dayjs");
 
@@ -76,7 +77,7 @@ export default {
       await addInventoryItem(interaction.user.id, "blue_gem", 1);
       addProgress(interaction.user.id, "gem_hunter", 1);
 
-      if ((await getDmSettings(interaction.user.id)).other) {
+      if ((await getPreferences(interaction.user.id)).dms.other) {
         addNotificationToQueue({
           memberId: interaction.user.id,
           payload: {

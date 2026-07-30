@@ -22,11 +22,8 @@ import { MStoTime } from "./date";
 import { isEcoBanned } from "./economy/utils";
 import { getUserId, MemberResolvable } from "./member";
 import { getAllGroupAccountIds } from "./moderation/alts";
-import {
-  addInlineNotification,
-  addNotificationToQueue,
-  getDmSettings,
-} from "./users/notifications";
+import { addInlineNotification, addNotificationToQueue } from "./users/notifications";
+import { getPreferences } from "./users/preferences";
 import { setEconomyPunishment } from "./users/punishments";
 import ms = require("ms");
 import dayjs = require("dayjs");
@@ -135,7 +132,7 @@ export async function passedCaptcha(member: GuildMember | User, check: Captcha, 
         "you have missed a lot of captchas, if this continues you may be automatically banned",
       ).setTitle("⚠️ warning");
 
-      if ((await getDmSettings(member.id)).other) {
+      if ((await getPreferences(member.id)).dms.other) {
         addNotificationToQueue({
           memberId: member.id,
           payload: {

@@ -20,6 +20,7 @@ import {
 import { addStat } from "../../utils/functions/economy/stats";
 import { pluralize } from "../../utils/functions/string";
 import { addNotificationToQueue } from "../../utils/functions/users/notifications";
+import { getPreferences } from "../../utils/functions/users/preferences";
 import pAll = require("p-all");
 
 export default {
@@ -50,15 +51,6 @@ async function doDailyStreaks(manager: ClusterManager) {
     select: {
       userId: true,
       dailyStreak: true,
-      user: {
-        select: {
-          DMSettings: {
-            select: {
-              other: true,
-            },
-          },
-        },
-      },
     },
   });
 
@@ -99,10 +91,13 @@ async function doDailyStreaks(manager: ClusterManager) {
 
   for (const user of users) {
     promises.push(async () => {
-      const inventory = await getInventory(user.userId);
+      const [inventory, preferences] = await Promise.all([
+        getInventory(user.userId),
+        getPreferences(user.userId),
+      ]);
 
       if (inventory.has("calendar")) {
-        if (user.user.DMSettings?.other)
+        if (preferences.dms.other)
           notifications.push({ memberId: user.userId, payload: { embed: calendarSavedEmbed } });
 
         await removeInventoryItem(user.userId, "calendar", 1);
@@ -128,7 +123,7 @@ async function doDailyStreaks(manager: ClusterManager) {
         }
       }
 
-      if (user.user.DMSettings?.other && user.dailyStreak >= 7)
+      if (preferences.dms.other && user.dailyStreak >= 7)
         notifications.push({ memberId: user.userId, payload: { embed: resetEmbed } });
 
       await prisma.economy.update({
@@ -158,16 +153,6 @@ async function doVoteStreaks(manager: ClusterManager) {
     select: {
       userId: true,
       voteStreak: true,
-      user: {
-        select: {
-          DMSettings: {
-            select: {
-              other: true,
-              voteReminder: true,
-            },
-          },
-        },
-      },
     },
   });
 
@@ -218,14 +203,17 @@ async function doVoteStreaks(manager: ClusterManager) {
 
   for (const user of users) {
     promises.push(async () => {
-      const inventory = await getInventory(user.userId);
+      const [inventory, preferences] = await Promise.all([
+        getInventory(user.userId),
+        getPreferences(user.userId),
+      ]);
 
       if ((await inventory.hasGem("white_gem")).any) {
         const gemSaveChance = Math.floor(Math.random() * 10);
 
         if (gemSaveChance < 5) {
-          if (user.user.DMSettings?.other) {
-            if (user.user.DMSettings.voteReminder) {
+          if (preferences.dms.other) {
+            if (preferences.dms.voteReminder) {
               notifications.push({
                 memberId: user.userId,
                 payload: { embed: gemSavedEmbed, components: voteRow },
@@ -241,8 +229,8 @@ async function doVoteStreaks(manager: ClusterManager) {
           const res = await gemBreak(user.userId, 7, "white_gem", manager, true, false);
 
           if (res) {
-            if (user.user.DMSettings?.other) {
-              if (user.user.DMSettings.voteReminder) {
+            if (preferences.dms.other) {
+              if (preferences.dms.voteReminder) {
                 notifications.push({
                   memberId: user.userId,
                   payload: {
@@ -266,8 +254,8 @@ async function doVoteStreaks(manager: ClusterManager) {
         }
       }
 
-      if (user.user.DMSettings?.other && user.voteStreak >= 3) {
-        if (user.user.DMSettings.voteReminder) {
+      if (preferences.dms.other && user.voteStreak >= 3) {
+        if (preferences.dms.voteReminder) {
           notifications.push({
             memberId: user.userId,
             payload: { embed: resetEmbed, components: voteRow },

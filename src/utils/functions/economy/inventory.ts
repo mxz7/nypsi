@@ -17,11 +17,8 @@ import { percentChance } from "../random";
 import sleep from "../sleep";
 import { pluralize } from "../string";
 import { getTax } from "../tax";
-import {
-  addInlineNotification,
-  addNotificationToQueue,
-  getDmSettings,
-} from "../users/notifications";
+import { addInlineNotification, addNotificationToQueue } from "../users/notifications";
+import { getPreferences } from "../users/preferences";
 import { addProgress } from "./achievements";
 import { addBalance, getSellMulti } from "./balance";
 import { hasGemBeenGiven, markGemAsGiven } from "./gems";
@@ -440,7 +437,7 @@ export async function commandGemCheck(member: MemberResolvable, commandCategory:
 
   if (await hasGemBeenGiven()) return;
   if (!(await userExists(member))) return;
-  if (!(await getDmSettings(member)).other) return;
+  if (!(await getPreferences(member)).dms.other) return;
   if (gemChanceCooldown.has(userId)) return;
   gemChanceCooldown.add(userId);
 
@@ -455,7 +452,7 @@ export async function commandGemCheck(member: MemberResolvable, commandCategory:
     await addInventoryItem(member, gem, 1);
     addProgress(member, "gem_hunter", 1);
 
-    if ((await getDmSettings(member)).other) {
+    if ((await getPreferences(member)).dms.other) {
       addNotificationToQueue({
         memberId: userId,
         payload: {
@@ -475,7 +472,7 @@ export async function commandGemCheck(member: MemberResolvable, commandCategory:
       await addInventoryItem(member, "pink_gem", 1);
       addProgress(userId, "gem_hunter", 1);
 
-      if ((await getDmSettings(member)).other) {
+      if ((await getPreferences(member)).dms.other) {
         addNotificationToQueue({
           memberId: userId,
           payload: {
@@ -496,7 +493,7 @@ export async function commandGemCheck(member: MemberResolvable, commandCategory:
       await addInventoryItem(member, "purple_gem", 1);
       addProgress(member, "gem_hunter", 1);
 
-      if ((await getDmSettings(member)).other) {
+      if ((await getPreferences(member)).dms.other) {
         addNotificationToQueue({
           memberId: userId,
           payload: {
@@ -553,7 +550,7 @@ export async function gemBreak(
     uniqueGemCount === 5 &&
     percentChance(25) &&
     !(await hasGemBeenGiven()) &&
-    (await getDmSettings(userId)).other
+    (await getPreferences(userId)).dms.other
   ) {
     await Promise.all([
       removeInventoryItem(userId, "pink_gem", 1),
@@ -669,7 +666,7 @@ export async function gemBreak(
 
   if (footer) embed.setFooter({ text: footer });
 
-  if (sendMessage && (await getDmSettings(userId)).other) {
+  if (sendMessage && (await getPreferences(userId)).dms.other) {
     addNotificationToQueue({
       memberId: userId,
       payload: {

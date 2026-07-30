@@ -4,7 +4,8 @@ import { Job } from "../../types/Jobs";
 import { addProgress } from "../../utils/functions/economy/achievements";
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { getItems } from "../../utils/functions/economy/utils";
-import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
+import { addNotificationToQueue } from "../../utils/functions/users/notifications";
+import { getPreferences } from "../../utils/functions/users/preferences";
 
 export default {
   name: "crafted",
@@ -27,7 +28,7 @@ export default {
 
       await addProgress(item.userId, "crafter", item.amount);
 
-      if ((await getDmSettings(item.userId)).other) {
+      if ((await getPreferences(item.userId)).dms.other) {
         addNotificationToQueue({
           memberId: item.userId,
           payload: {

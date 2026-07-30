@@ -23,7 +23,8 @@ import { getItems } from "../../utils/functions/economy/utils";
 import { percentChance } from "../../utils/functions/random";
 import { pluralize } from "../../utils/functions/string";
 import { addToNypsiBank, getTax } from "../../utils/functions/tax";
-import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
+import { addNotificationToQueue } from "../../utils/functions/users/notifications";
+import { getPreferences } from "../../utils/functions/users/preferences";
 import { getLastKnownAvatar, getLastKnownUsername } from "../../utils/functions/users/username";
 import { logger } from "../../utils/logger";
 import pAll = require("p-all");
@@ -144,7 +145,7 @@ export default {
 
       hook.destroy();
 
-      if ((await getDmSettings(winner.userId)).lottery) {
+      if ((await getPreferences(winner.userId)).dms.lottery) {
         embed.setTitle(`you have won the lottery!`);
         embed.setDescription(
           `you have won a total of $**${totalPrize.toLocaleString()}**\n\nyou had ${winner.amount.toLocaleString()} ${pluralize("ticket", winner.amount)}`,
@@ -159,7 +160,7 @@ export default {
           await addInventoryItem(winner.userId, "purple_gem", 1);
           addProgress(winner.userId, "gem_hunter", 1);
 
-          if ((await getDmSettings(winner.userId)).other) {
+          if ((await getPreferences(winner.userId)).dms.other) {
             addNotificationToQueue({
               memberId: winner.userId,
               payload: {
@@ -199,7 +200,7 @@ export default {
         addStat(user.userId, "spent-shop", cost);
         await addInventoryItem(user.userId, "lottery_ticket", amount);
 
-        if (user.user.DMSettings.other) {
+        if ((await getPreferences(user.userId)).dms.other) {
           const components = winnerMessageUrl
             ? new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                 new ButtonBuilder()

@@ -6,11 +6,8 @@ import { logger } from "../../logger";
 import { getUserId, MemberResolvable } from "../member";
 import { percentChance } from "../random";
 import sleep from "../sleep";
-import {
-  addInlineNotification,
-  addNotificationToQueue,
-  getDmSettings,
-} from "../users/notifications";
+import { addInlineNotification, addNotificationToQueue } from "../users/notifications";
+import { getPreferences } from "../users/preferences";
 import { addTag } from "../users/tags";
 import { hasGemBeenGiven, markGemAsGiven } from "./gems";
 import { addInventoryItem } from "./inventory";
@@ -225,7 +222,7 @@ async function completeAchievement(userId: string, achievementId: string) {
     userEmbed.setDescription((userEmbed.data.description += `\n ${prizes.join("\n")}`));
   }
 
-  if ((await getDmSettings(userId)).other) {
+  if ((await getPreferences(userId)).dms.other) {
     const payload: NotificationPayload = {
       memberId: userId,
       payload: {

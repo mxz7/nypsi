@@ -7,7 +7,8 @@ import Constants from "../utils/Constants";
 import { addBalance } from "../utils/functions/economy/balance";
 import { getItems, isEcoBanned } from "../utils/functions/economy/utils";
 import { escapeFormattingCharacters } from "../utils/functions/string";
-import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
+import { addNotificationToQueue } from "../utils/functions/users/notifications";
+import { getPreferences } from "../utils/functions/users/preferences";
 
 export default {
   name: "deny-offer",
@@ -63,7 +64,7 @@ export default {
 
     await interaction.update({ embeds: [embed], components: [] });
 
-    if ((await getDmSettings(offer.ownerId)).market) {
+    if ((await getPreferences(offer.ownerId)).dms.market) {
       addNotificationToQueue({
         memberId: offer.ownerId,
         payload: {

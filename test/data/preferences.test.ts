@@ -1,41 +1,39 @@
 import { readFileSync } from "node:fs";
 import { expect, test } from "vitest";
-import { LevelDmSetting, Prisma, SudokuCoordMode, WorkerDmSetting } from "#generated/prisma";
-import { NotificationData } from "../../src/types/Notification";
+import {
+  LEVEL_NOTIFICATION_PREFERENCES,
+  PreferenceData,
+  WORKER_NOTIFICATION_PREFERENCES,
+} from "../../src/types/Preferences";
+import { SUDOKU_COORD_MODES } from "../../src/types/Sudoku";
 import { expectIdMatchesKey, expectNonEmptyString, expectUniqueStrings } from "./helpers";
 
-const data = JSON.parse(readFileSync("data/notifications.json").toString());
+const data = JSON.parse(readFileSync("data/preferences.json").toString());
 
 test("notifications keys", () => {
   expect.soft(typeof data).toBe("object");
   expect.soft(data.notifications).toBeDefined();
-  expect.soft(data.preferences).toBeDefined();
+  expect.soft(data.general).toBeDefined();
 });
 
-const notifications: Record<string, NotificationData> = data.notifications;
-const preferences: Record<string, NotificationData> = data.preferences;
+const notifications: Record<string, PreferenceData> = data.notifications;
+const preferences: Record<string, PreferenceData> = data.general;
 
-test("notification and preference ids should match database settings", () => {
-  const notificationFields = Object.values(Prisma.DMSettingsScalarFieldEnum).filter(
-    (field) => field !== "userId",
-  );
-  const preferenceFields = Object.values(Prisma.PreferencesScalarFieldEnum).filter(
-    (field) => field !== "userId",
-  );
+test("notification and preference keys should not overlap", () => {
+  const preferenceKeys = new Set(Object.keys(preferences));
 
-  expect(Object.keys(notifications).sort()).toEqual(notificationFields.sort());
-  expect(Object.keys(preferences).sort()).toEqual(preferenceFields.sort());
+  expect(Object.keys(notifications).filter((key) => preferenceKeys.has(key))).toEqual([]);
 });
 
-test("notification option values should match database enums", () => {
+test("notification option values should match application enums", () => {
   expect(notifications.worker.types?.map((type) => type.value).sort()).toEqual(
-    Object.values(WorkerDmSetting).sort(),
+    [...WORKER_NOTIFICATION_PREFERENCES].sort(),
   );
   expect(notifications.level.types?.map((type) => type.value).sort()).toEqual(
-    Object.values(LevelDmSetting).sort(),
+    [...LEVEL_NOTIFICATION_PREFERENCES].sort(),
   );
   expect(preferences.sudokuCoordMode.types?.map((type) => type.value).sort()).toEqual(
-    Object.values(SudokuCoordMode).sort(),
+    [...SUDOKU_COORD_MODES].sort(),
   );
 });
 
@@ -45,6 +43,7 @@ for (const [k, v] of Object.entries(notifications)) {
     expectIdMatchesKey(k, v);
     expectNonEmptyString(v.name, `${k}.name`);
     expectNonEmptyString(v.description, `${k}.description`);
+    expect(["boolean", "number", "string"]).toContain(typeof v.default);
     if (v.types !== undefined) {
       expect.soft(Array.isArray(v.types)).toBe(true);
       expect.soft(v.types.length, `${k}.types should not be empty`).toBeGreaterThan(0);
@@ -52,6 +51,7 @@ for (const [k, v] of Object.entries(notifications)) {
         v.types.map((type) => type.value),
         `${k}.types values`,
       );
+      expect(v.types.map((type) => type.value)).toContain(v.default);
       for (const t of v.types) {
         expectNonEmptyString(t.name, `${k}.types.name`);
         expectNonEmptyString(t.description, `${k}.types.description`);
@@ -65,6 +65,7 @@ for (const [k, v] of Object.entries(preferences)) {
     expectIdMatchesKey(k, v);
     expectNonEmptyString(v.name, `${k}.name`);
     expectNonEmptyString(v.description, `${k}.description`);
+    expect(["boolean", "number", "string"]).toContain(typeof v.default);
     if (v.types !== undefined) {
       expect.soft(Array.isArray(v.types)).toBe(true);
       expect.soft(v.types.length, `${k}.types should not be empty`).toBeGreaterThan(0);
@@ -72,6 +73,7 @@ for (const [k, v] of Object.entries(preferences)) {
         v.types.map((type) => type.value),
         `${k}.types values`,
       );
+      expect(v.types.map((type) => type.value)).toContain(v.default);
       for (const t of v.types) {
         expectNonEmptyString(t.name, `${k}.types.name`);
         expectNonEmptyString(t.description, `${k}.types.description`);

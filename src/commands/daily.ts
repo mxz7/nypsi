@@ -23,7 +23,8 @@ import {
 } from "../utils/functions/economy/utils";
 import { hasVoted } from "../utils/functions/economy/vote";
 import { percentChance } from "../utils/functions/random";
-import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
+import { addNotificationToQueue } from "../utils/functions/users/notifications";
+import { getPreferences } from "../utils/functions/users/preferences";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
 
@@ -71,7 +72,7 @@ async function run(
     await addInventoryItem(message.member, "blue_gem", 1);
     addProgress(message.member, "gem_hunter", 1);
 
-    if ((await getDmSettings(message.member)).other) {
+    if ((await getPreferences(message.member)).dms.other) {
       addNotificationToQueue({
         memberId: message.author.id,
         payload: {

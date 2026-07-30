@@ -18,8 +18,8 @@ import { escapeFormattingCharacters, pluralize } from "../utils/functions/string
 import {
   addInlineNotification,
   addNotificationToQueue,
-  getDmSettings,
 } from "../utils/functions/users/notifications";
+import { getPreferences } from "../utils/functions/users/preferences";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("give", "give other users items from your inventory", "money");
@@ -165,7 +165,7 @@ async function run(
     )}`,
   );
 
-  if ((await getDmSettings(target)).payment) {
+  if ((await getPreferences(target)).dms.payment) {
     notificationEmbed
       .setHeader(
         `you have received ${pluralize(`${selected.article} ${selected.name}`, amount, `${amount.toLocaleString()} ${selected.plural}`)}`,

@@ -9,7 +9,8 @@ import { logger } from "../../logger";
 import { addKarma } from "../karma/karma";
 import { getUserId, MemberResolvable } from "../member";
 import { pluralize } from "../string";
-import { addNotificationToQueue, getDmSettings } from "../users/notifications";
+import { addNotificationToQueue } from "../users/notifications";
+import { getPreferences } from "../users/preferences";
 import { addTag } from "../users/tags";
 import { getLastKnownAvatar } from "../users/username";
 import { addBalance, getBankBalance, removeBankBalance } from "./balance";
@@ -651,7 +652,7 @@ export async function doLevelUp(member: MemberResolvable) {
 
   embed.setDescription(desc);
 
-  const dmSetting = (await getDmSettings(member)).level;
+  const dmSetting = (await getPreferences(member)).dms.level;
 
   switch (dmSetting) {
     case "All":

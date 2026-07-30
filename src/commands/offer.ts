@@ -30,7 +30,7 @@ import { getMember } from "../utils/functions/member";
 import PageManager from "../utils/functions/page";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { escapeFormattingCharacters } from "../utils/functions/string";
-import { getPreferences } from "../utils/functions/users/notifications";
+import { getPreferences } from "../utils/functions/users/preferences";
 import { getLastKnownUsername } from "../utils/functions/users/username";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";

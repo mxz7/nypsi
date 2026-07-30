@@ -25,8 +25,8 @@ import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import {
   addInlineNotification,
   addNotificationToQueue,
-  getDmSettings,
 } from "../utils/functions/users/notifications";
+import { getPreferences } from "../utils/functions/users/preferences";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import dayjs = require("dayjs");
 
@@ -164,7 +164,7 @@ async function run(
     ).toLocaleString()}**`,
   );
 
-  if ((await getDmSettings(target)).payment) {
+  if ((await getPreferences(target)).dms.payment) {
     notificationEmbed
       .setHeader("you have received a payment")
       .setFooter({ text: "/settings me notifications" });

@@ -7,7 +7,8 @@ import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { deleteMarketOrder } from "../../utils/functions/economy/market";
 import { getItems, userExists } from "../../utils/functions/economy/utils";
 import { pluralize } from "../../utils/functions/string";
-import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
+import { addNotificationToQueue } from "../../utils/functions/users/notifications";
+import { getPreferences } from "../../utils/functions/users/preferences";
 
 export default {
   name: "checkmarket",
@@ -57,7 +58,7 @@ export default {
         } has expired. you have been given back your money`,
       );
 
-      if ((await getDmSettings(order.ownerId)).market) {
+      if ((await getPreferences(order.ownerId)).dms.market) {
         addNotificationToQueue({
           memberId: order.ownerId,
           payload: {
@@ -83,7 +84,7 @@ export default {
         } has expired. you have been given back your ${pluralize("item", order.itemAmount)}`,
       );
 
-      if ((await getDmSettings(order.ownerId)).market) {
+      if ((await getPreferences(order.ownerId)).dms.market) {
         addNotificationToQueue({
           memberId: order.ownerId,
           payload: {

@@ -14,7 +14,7 @@ import { getMember } from "../../member";
 import sleep from "../../sleep";
 import { escapeFormattingCharacters } from "../../string";
 import { isUserBlacklisted } from "../../users/blacklist";
-import { getDmSettings } from "../../users/notifications";
+import { getPreferences } from "../../users/preferences";
 import { hasPadlock, setPadlock } from "../balance";
 import { removeInventoryItem } from "../inventory";
 import { isPassive } from "../passive";
@@ -145,7 +145,7 @@ export default new ItemUse(
         "your money is no longer protected by a padlock",
     );
 
-    if ((await getDmSettings(lockPickTarget)).rob) {
+    if ((await getPreferences(lockPickTarget)).dms.rob) {
       await lockPickTarget.send({ embeds: [targetEmbed] });
     }
 

@@ -22,7 +22,8 @@ import {
   evaluateWorker,
   getWorkers,
 } from "../../utils/functions/economy/workers";
-import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
+import { addNotificationToQueue } from "../../utils/functions/users/notifications";
+import { getPreferences } from "../../utils/functions/users/preferences";
 import ms = require("ms");
 
 export default {
@@ -57,7 +58,7 @@ export default {
 
       if (worker.stored + incrementAmount > maxStorage) {
         incrementAmount = maxStorage - worker.stored;
-        if ((await getDmSettings(worker.userId)).worker != "Disabled") {
+        if ((await getPreferences(worker.userId)).dms.worker != "Disabled") {
           dms.add(worker.userId);
         }
       }
@@ -171,11 +172,11 @@ export default {
           data.payload.embed = new CustomEmbed(userId).setDescription(
             "all of your workers are full",
           );
-        } else if (full.length == 1 && (await getDmSettings(userId)).worker == "All") {
+        } else if (full.length == 1 && (await getPreferences(userId)).dms.worker == "All") {
           data.payload.embed = new CustomEmbed(userId).setDescription(
             `your ${getBaseWorkers()[full[0]].item_emoji} ${getBaseWorkers()[full[0]].name} is full`,
           );
-        } else if ((await getDmSettings(userId)).worker == "All") {
+        } else if ((await getPreferences(userId)).dms.worker == "All") {
           data.payload.content = `${full.length} of your workers are full`;
           data.payload.embed = new CustomEmbed(userId)
             .setDescription(

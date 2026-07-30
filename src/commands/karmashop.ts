@@ -35,7 +35,8 @@ import {
 import PageManager from "../utils/functions/page";
 import { percentChance } from "../utils/functions/random";
 import sleep from "../utils/functions/sleep";
-import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
+import { addNotificationToQueue } from "../utils/functions/users/notifications";
+import { getPreferences } from "../utils/functions/users/preferences";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
 import dayjs = require("dayjs");
@@ -354,8 +355,9 @@ async function run(
 
     if (
       percentChance(0.05) &&
-      (await getDmSettings(message.member)).other &&
-      !(await hasGemBeenGiven())
+      !(await hasGemBeenGiven()) &&
+      (await getPreferences(message.member)).dms.other &&
+      !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))
     ) {
       await markGemAsGiven();
       logger.info(`${message.author.id} received purple_gem randomly (karmashop)`);

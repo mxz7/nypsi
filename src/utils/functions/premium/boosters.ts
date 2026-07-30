@@ -4,7 +4,8 @@ import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
-import { addNotificationToQueue, getDmSettings } from "../users/notifications";
+import { addNotificationToQueue } from "../users/notifications";
+import { getPreferences } from "../users/preferences";
 import { createProfile } from "../users/utils";
 
 const boosterCache = new RedisCache<boolean>(
@@ -60,7 +61,7 @@ export async function setBooster(member: MemberResolvable, value: boolean): Prom
 
   await boosterCache.delete(userId);
 
-  if (value && (await getDmSettings(member)).premium) {
+  if (value && (await getPreferences(member)).dms.premium) {
     addNotificationToQueue({
       memberId: userId,
       payload: {

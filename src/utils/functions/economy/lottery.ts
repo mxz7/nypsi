@@ -85,15 +85,6 @@ export async function getLotteryAutoBuyUsers(isDailyAutoBuyRun: boolean) {
     select: {
       userId: true,
       autobuyLotteryTicketsAmount: true,
-      user: {
-        select: {
-          DMSettings: {
-            select: {
-              other: true,
-            },
-          },
-        },
-      },
     },
   });
 }
