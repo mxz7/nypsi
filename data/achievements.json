@@ -831,16 +831,16 @@
     "id": "lucky_iv",
     "name": "lucky **IV**",
     "emoji": "🍀",
-    "target": 75,
-    "description": "win the lottery 75 times",
+    "target": 125,
+    "description": "win the lottery 125 times",
     "prize": ["legendary_scratch_card:2", "nypsi_crate:2"]
   },
   "lucky_v": {
     "id": "lucky_v",
     "name": "lucky **V**",
     "emoji": "🍀",
-    "target": 150,
-    "description": "win the lottery 150 times",
+    "target": 200,
+    "description": "win the lottery 200 times",
     "prize": ["nypsi_crate:3", "silver_credit:3", "rain:1"]
   },
   "wordle_i": {
