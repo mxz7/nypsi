@@ -553,7 +553,7 @@ async function run(
     const pages = PageManager.createPages(desc, itemsPerPage);
 
     const container = (disabled = false) => {
-      const builder = new CustomContainer()
+      const builder = new CustomContainer(message.member)
         .addTextDisplayComponents(
           new TextDisplayBuilder().setContent(
             `### ${message.member.user.username}'s museum\n**${category}${completed === itemsInCategory.length ? " (completed)" : ""}**`,
