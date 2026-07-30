@@ -157,12 +157,7 @@ async function addActivateNotification(user: MemberResolvable, petId: string) {
 
     await addInlineNotification({
       memberId: userId,
-      embed: new CustomEmbed(
-        userId,
-        `your ${item.emoji}  **${item.name}** pet activated!`,
-      ).setFooter({
-        text: "/settings me notifications",
-      }),
+      embed: new CustomEmbed(userId, `your ${item.emoji}  **${item.name}** pet activated!`),
     });
   }
 }
