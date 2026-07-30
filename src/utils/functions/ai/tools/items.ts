@@ -8,11 +8,14 @@ export const itemTools: FunctionTool[] = [
     type: "function",
     name: "search_items",
     description:
-      "Search nypsi economy items by name or alias. Returns matching item ids/names to use with get_item_info.",
+      "Search nypsi economy items by name, alias or category. Returns matching item ids/names to use with get_item_info.",
     parameters: {
       type: "object",
       properties: {
-        query: { type: "string", description: "search query, e.g. item name or alias" },
+        query: {
+          type: "string",
+          description: "search query, e.g. item name, alias or category/role",
+        },
       },
       required: ["query"],
       additionalProperties: false,
@@ -51,7 +54,8 @@ export async function executeItemTool(
           (item) =>
             item.id.includes(query) ||
             item.name?.toLowerCase().includes(query) ||
-            (item.aliases || []).some((alias) => alias.toLowerCase().includes(query)),
+            (item.aliases || []).some((alias) => alias.toLowerCase().includes(query)) ||
+            item.role.toLowerCase().includes(query),
         )
         .slice(0, 25)
         .map((item) => ({ id: item.id, name: item.name, category: item.role }));

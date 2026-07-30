@@ -26,7 +26,7 @@ After calculating a cache miss, it asynchronously records one global `item-value
 
 ## Fuzzy/substring search (multiple results)
 
-`selectItem` only returns a single exact match. If you need to find _candidate_ items from a partial/fuzzy query (e.g. an AI tool letting a model discover an item id first), filter `getItems()` yourself with substring checks against `id`/`name`/`aliases`, still excluding `hidden` items — see `search_items` in `src/utils/functions/ai/tools/items.ts` for the pattern.
+`selectItem` only returns a single exact match. If you need to find _candidate_ items from a partial/fuzzy query (e.g. an AI tool letting a model discover an item id first), filter `getItems()` yourself with substring checks against the relevant searchable fields, still excluding `hidden` items. The AI `search_items` tool in `src/utils/functions/ai/tools/items.ts` searches `id`/`name`/`aliases`/`role`, allowing category searches through the same query input.
 
 ## Odds of obtaining an item — `getObtainingData(item: Item)`
 
