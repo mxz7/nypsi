@@ -11,6 +11,7 @@
 - add xp/multi bonus for playing in nypsi server
 - redesign how dm settings & user preferences are stored and handled, makes adding new preferences and settings much eaiser
 - add pets
+- add tag for sudoku
 
 # june 2026
 

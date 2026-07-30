@@ -272,6 +272,12 @@
     "emoji": "<:knight:1487063018188701887>",
     "image": "knight.png"
   },
+  "puzzle": {
+    "id": "puzzle",
+    "name": "puzzle",
+    "description": "found in the sudoku professional v achievement",
+    "emoji": "🧩"
+  },
   "year1": {
     "id": "year1",
     "name": "year 1",

@@ -1739,7 +1739,7 @@
     "emoji": "🧩",
     "target": 100,
     "description": "solve 100 sudoku puzzles",
-    "prize": ["legendary_scratch_card:2", "nypsi_crate:1"]
+    "prize": ["legendary_scratch_card:2", "nypsi_crate:1", "tag:puzzle"]
   },
   "roleplayer_i": {
     "id": "roleplayer_i",
