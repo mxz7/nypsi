@@ -84,7 +84,7 @@ export default {
     const msg = await buildGameMessage(
       game,
       coordMode,
-      interaction.user.avatarURL(),
+      interaction.user.displayAvatarURL(),
       undefined,
       undefined,
       crosshair,

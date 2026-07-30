@@ -171,7 +171,7 @@ export default {
         updatedGame,
         coordMode,
         "completed",
-        interaction.user.avatarURL(),
+        interaction.user.displayAvatarURL(),
       );
       return res.update({ ...msg, content: "" });
     }
@@ -179,7 +179,7 @@ export default {
     const msg = await buildGameMessage(
       updatedGame,
       coordMode,
-      interaction.user.avatarURL(),
+      interaction.user.displayAvatarURL(),
       highlight,
       lastCell,
     );

@@ -28,7 +28,7 @@ export default {
     const game = existing ?? (await createSudokuGame(interaction.user.id, difficulty));
 
     const coordMode = await getUserCoordMode(interaction.user.id);
-    const msg = await buildGameMessage(game, coordMode, interaction.user.avatarURL());
+    const msg = await buildGameMessage(game, coordMode, interaction.user.displayAvatarURL());
     await interaction.editReply(msg);
   },
 } as InteractionHandler;

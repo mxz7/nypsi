@@ -41,7 +41,7 @@ export default {
       resigned,
       coordMode,
       "resigned",
-      interaction.user.avatarURL(),
+      interaction.user.displayAvatarURL(),
     );
     await interaction.editReply(msg);
   },

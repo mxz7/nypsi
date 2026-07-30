@@ -55,7 +55,7 @@ async function run(
         `- difficulty: ${DIFFICULTIES.map((d) => `\`${d}\``).join(", ")}\n` +
         "**/sudoku stats** *view your sudoku stats*",
     )
-      .setHeader("sudoku", message.author.avatarURL())
+      .setHeader("sudoku", message.author.displayAvatarURL())
       .addField(
         "rules",
         "- the board is a 9×9 grid split into nine 3×3 boxes\n" +
@@ -91,7 +91,7 @@ async function run(
     }
 
     const embed = new CustomEmbed(message.member);
-    embed.setHeader(`${message.author.username}'s sudoku stats`, message.author.avatarURL());
+    embed.setHeader(`${message.author.username}'s sudoku stats`, message.author.displayAvatarURL());
 
     embed.setDescription(
       [
@@ -134,13 +134,13 @@ async function run(
   ]);
 
   if (activeGame) {
-    return send(await buildGameMessage(activeGame, coordMode, message.author.avatarURL()));
+    return send(await buildGameMessage(activeGame, coordMode, message.author.displayAvatarURL()));
   }
 
   let currentMode: SudokuCoordMode = coordMode;
 
   const msg = await send(
-    buildConfirmationMessage(difficulty, currentMode, message.author.avatarURL()),
+    buildConfirmationMessage(difficulty, currentMode, message.author.displayAvatarURL()),
   );
 
   const collector = msg.createMessageComponentCollector({
@@ -154,13 +154,13 @@ async function run(
       currentMode = currentMode === "box" ? "coordinates" : "box";
       await setUserCoordMode(message.author.id, currentMode);
       await interaction.update(
-        buildConfirmationMessage(difficulty, currentMode, message.author.avatarURL()),
+        buildConfirmationMessage(difficulty, currentMode, message.author.displayAvatarURL()),
       );
     } else if (interaction.customId === "sudoku-confirm-start") {
       collector.stop("started");
       const game = await createSudokuGame(message.author.id, difficulty);
       await interaction.update(
-        await buildGameMessage(game, currentMode, message.author.avatarURL()),
+        await buildGameMessage(game, currentMode, message.author.displayAvatarURL()),
       );
     }
   });

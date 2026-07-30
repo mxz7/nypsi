@@ -146,7 +146,7 @@ export default {
     const updatedGame = await getGameById(gameId);
     if (!updatedGame) return;
 
-    const msg = await buildGameMessage(updatedGame, coordMode, interaction.user.avatarURL());
+    const msg = await buildGameMessage(updatedGame, coordMode, interaction.user.displayAvatarURL());
     return res.update({ ...msg });
   },
 } as InteractionHandler;
