@@ -30,6 +30,7 @@ export interface DmPreferences {
   autosellStatus: boolean;
   level: LevelNotificationPreference;
   farmHealth: boolean;
+  petActivation: boolean;
 }
 
 export interface Preferences {

@@ -98,6 +98,12 @@
       "description": "get a dm when your plants are unhealthy and dying",
       "default": true
     },
+    "petActivation": {
+      "id": "petActivation",
+      "name": "pet activation",
+      "description": "show an inline notification when one of your pets activate",
+      "default": true
+    },
     "other": {
       "id": "other",
       "name": "miscellaneous",

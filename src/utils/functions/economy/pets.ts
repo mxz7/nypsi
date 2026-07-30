@@ -1,5 +1,6 @@
 import { Pet } from "#generated/prisma";
 import prisma from "../../../init/database";
+import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { PetTarget } from "../../../types/Economy";
 import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
@@ -7,9 +8,11 @@ import { logger } from "../../logger";
 import { getUserId, MemberResolvable } from "../member";
 import { RedisMutex } from "../mutex";
 import { percentChance } from "../random";
+import { addInlineNotification } from "../users/notifications";
+import { getPreferences } from "../users/preferences";
 import { getInventory, removeInventoryItem } from "./inventory";
 import { getUpgrades } from "./levelling";
-import { getPetsData } from "./utils";
+import { getItems, getPetsData } from "./utils";
 
 const petsCache = new RedisCache<Pet[]>(Constants.redis.cache.economy.PETS, 180);
 const petsMutex = new RedisMutex("pets");
@@ -145,10 +148,30 @@ export async function deactivatePet(member: MemberResolvable, petId: string): Pr
   return updatePet(member, petId, { active: false });
 }
 
+async function addActivateNotification(user: MemberResolvable, petId: string) {
+  if ((await getPreferences(user)).dms.petActivation) {
+    const pet = getPetsData()[petId];
+    const item = getItems()[pet.item];
+
+    const userId = getUserId(user);
+
+    await addInlineNotification({
+      memberId: userId,
+      embed: new CustomEmbed(
+        userId,
+        `your ${item.emoji}  **${item.name}** pet activated!`,
+      ).setFooter({
+        text: "/settings me notifications",
+      }),
+    });
+  }
+}
+
 export async function rollPet(
   member: MemberResolvable,
   target: PetTarget,
 ): Promise<number | undefined> {
+  const userId = getUserId(member);
   const [pet, inventory] = await Promise.all([
     getActivePetForTarget(member, target),
     getInventory(member),
@@ -164,7 +187,10 @@ export async function rollPet(
     }
   }
 
-  logger.info(`pets: ${getUserId(member)}'s ${pet.petId} activated`);
+  logger.info(`pets: ${userId}'s ${pet.petId} activated`);
   await updatePet(member, pet.petId, { activationIncrement: 1 });
+
+  addActivateNotification(userId, pet.petId);
+
   return data.benefit[levelIndex];
 }
