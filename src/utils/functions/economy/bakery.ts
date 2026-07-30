@@ -17,6 +17,7 @@ import { getGuildName, getGuildUpgradesByUser } from "./guilds";
 import { addInventoryItem, getInventory } from "./inventory";
 import { getUpgrades } from "./levelling";
 import { isPassive } from "./passive";
+import { rollPet } from "./pets";
 import { addStat } from "./stats";
 import { addTaskProgress } from "./tasks";
 import { getBakeryUpgradesData, getItems, getUpgradesData } from "./utils";
@@ -195,6 +196,8 @@ export async function runBakery(member: GuildMember) {
   }
 
   let total = chosenAmount + passive;
+
+  total += total * ((await rollPet(member, "bakery")) ?? 0);
 
   if (guildUpgrades.find((i) => i.upgradeId === "bakery")) {
     if (percentChance(2 * guildUpgrades.find((i) => i.upgradeId === "bakery").amount)) {

@@ -16,6 +16,7 @@ import {
   Item,
   Plant,
   PlantUpgrade,
+  PetData,
   UserUpgrade,
 } from "../../../types/Economy";
 import { LootPool } from "../../../types/LootPool";
@@ -64,6 +65,7 @@ let plantUpgrades: { [key: string]: PlantUpgrade };
 let lootPools: { [key: string]: LootPool };
 let events: { [key: string]: Event };
 let dabloonShop: Record<string, DabloonShopItem>;
+let pets: Record<string, PetData>;
 
 export let maxPrestige = 0;
 
@@ -84,6 +86,7 @@ export function loadItems(crypto = true) {
   const lootPoolsFile: any = fs.readFileSync("./data/loot_pools.json");
   const eventsFile: any = fs.readFileSync("./data/events.json");
   const dabloonShopFile: any = fs.readFileSync("./data/dabloon_shop.json");
+  const petsFile: any = fs.readFileSync("./data/pets.json");
 
   items = JSON.parse(itemsFile);
   achievements = JSON.parse(achievementsFile);
@@ -99,6 +102,7 @@ export function loadItems(crypto = true) {
   lootPools = JSON.parse(lootPoolsFile);
   events = JSON.parse(eventsFile);
   dabloonShop = JSON.parse(dabloonShopFile);
+  pets = JSON.parse(petsFile);
 
   lootPools.basic_crate = getDefaultLootPool((i) => i.in_crates);
   lootPools.basic_crate.money = { 50000: 100, 100000: 100, 500000: 100 };
@@ -422,6 +426,8 @@ export async function reset() {
   logger.info("deleting workers");
   await prisma.economyWorkerUpgrades.deleteMany();
   await prisma.economyWorker.deleteMany();
+  logger.info("deleting pets");
+  await prisma.pet.deleteMany();
   logger.info("deleting inventory");
   await prisma.inventory.deleteMany({ where: { item: { notIn: ["gold_star", "dabloon"] } } });
   logger.info("deleting crafting");
@@ -532,6 +538,14 @@ export function getItems(): { [key: string]: Item } {
 
 export function getDabloonsShop() {
   return dabloonShop;
+}
+
+export function getPetsData(): Record<string, PetData> {
+  if (!pets) {
+    return JSON.parse(fs.readFileSync("./data/pets.json").toString());
+  }
+
+  return pets;
 }
 
 export function getTagsData() {

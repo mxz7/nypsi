@@ -147,6 +147,13 @@ export async function doProfileTransfer(fromId: string, toId: string) {
           });
         }
 
+        const pets = await prisma.pet.findMany({ where: { userId: fromId } });
+        if (pets.length > 0) {
+          await prisma.pet.createMany({
+            data: pets.map((pet) => ({ ...pet, userId: toId })),
+          });
+        }
+
         const farm = await prisma.farm.findMany({ where: { userId: fromId } });
 
         if (farm.length > 0) {

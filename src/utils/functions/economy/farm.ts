@@ -13,6 +13,7 @@ import { getBoosters } from "./boosters";
 import { addEventProgress } from "./events";
 import { addInventoryItem, gemBreak, getInventory, removeInventoryItem } from "./inventory";
 import { getUpgrades } from "./levelling";
+import { rollPet } from "./pets";
 import { addStat } from "./stats";
 import { getItems, getPlantsData, getPlantUpgrades, getUpgradesData } from "./utils";
 import dayjs = require("dayjs");
@@ -227,6 +228,8 @@ export async function getClaimable(
     if (prestigeUpgrade) {
       outputMulti += getUpgradesData()[prestigeUpgrade.upgradeId].effect * prestigeUpgrade.amount;
     }
+
+    if (claim) outputMulti += (await rollPet(member, "farm")) ?? 0;
 
     if ((await inventory.hasGem("green_gem")).any) {
       storageMulti += 0.2;

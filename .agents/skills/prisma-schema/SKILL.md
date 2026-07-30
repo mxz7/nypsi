@@ -9,3 +9,5 @@ description: Safe workflow for editing prisma/schema.prisma without corrupting m
 - Prefer reading the full model block first, then doing one `replace_string_in_file` swapping the whole `model X { ... }` block for the updated version.
 - After confirming schema changes are correct, run `npx prisma generate` to refresh `src/generated/prisma/` types (imported via `#generated/prisma`). If a model delegate seems missing from the generated client (e.g. `prisma.lottery` not existing) even though the schema has it, that's usually a stale generate - rerun it.
 - Do not create migrations yourself - the user handles `prisma migrate dev` once all schema changes for a task are confirmed.
+  Migrations created by the user should be committed to git; do not flag an existing committed migration
+  merely because agents are prohibited from generating one.

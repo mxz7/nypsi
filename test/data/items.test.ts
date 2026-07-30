@@ -42,6 +42,7 @@ const itemRoles = [
   "item",
   "lottery ticket",
   "ore",
+  "pet",
   "prey",
   "resource",
   "scratch-card",

@@ -257,6 +257,7 @@ export default {
         GUILD_USER: "cache:economy:guild:user",
         GUILD_UPGRADES: "cache:economy:guild:upgrades",
         INVENTORY: "cache:economy:inventory",
+        PETS: "cache:economy:pets",
         MUSEUM: "cache:economy:museum",
         MUSEUM_COMPLETION_PLACEMENTS: "cache:economy:museum:placement:completion",
         MUSEUM_LEADERBOARD_PLACEMENTS: "cache:economy:museum:placement:leaderboard",

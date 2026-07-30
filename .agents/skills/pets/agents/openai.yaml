@@ -1,0 +1,4 @@
+interface:
+  display_name: "Pets"
+  short_description: "Maintain Nypsi pet data, UI, and bonuses"
+  default_prompt: "Use $pets to modify the Nypsi pets feature safely."

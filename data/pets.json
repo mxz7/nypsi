@@ -1,0 +1,66 @@
+{
+  "cow": {
+    "item": "cow",
+    "target": "bakery",
+    "description": "{chance}% chance to double bakery output",
+    "chance": [0.01, 0.02, 0.03, 0.05, 0.1],
+    "benefit": [1, 1, 1, 1, 1],
+    "items": [1, 3, 6, 15, 50]
+  },
+  "chicken": {
+    "item": "chicken",
+    "target": "farm",
+    "description": "{chance}% chance to increase harvested crop output by {bonus}%",
+    "chance": [0.05, 0.05, 0.075, 0.075, 0.1],
+    "benefit": [0.05, 0.1, 0.1, 0.15, 0.2],
+    "items": [1, 3, 6, 15, 50]
+  },
+  "beaver": {
+    "item": "beaver",
+    "target": "fish",
+    "description": "{chance}% chance to fish more items",
+    "chance": [0.01, 0.05, 0.1, 0.15, 0.25],
+    "benefit": [1, 1, 1, 1, 1],
+    "items": [1, 3, 10, 15, 30]
+  },
+  "tiger": {
+    "item": "tiger",
+    "target": "hunt",
+    "description": "{chance}% chance to hunt more items",
+    "chance": [0.01, 0.05, 0.1, 0.15, 0.25],
+    "benefit": [1, 1, 1, 1, 1],
+    "items": [1, 3, 10, 15, 30]
+  },
+  "fox": {
+    "item": "fox",
+    "target": "mine",
+    "description": "{chance}% chance to mine more items",
+    "chance": [0.01, 0.05, 0.1, 0.15, 0.25],
+    "benefit": [1, 1, 1, 1, 1],
+    "items": [1, 3, 10, 15, 30]
+  },
+  "eagle": {
+    "item": "eagle",
+    "target": "xp",
+    "description": "{chance}% chance to earn double xp",
+    "chance": [0.01, 0.02, 0.03, 0.04, 0.05],
+    "benefit": [1, 1, 1, 1, 1],
+    "items": [1, 5, 10, 15, 30]
+  },
+  "rocky": {
+    "item": "rocky",
+    "target": "event",
+    "description": "{chance}% chance to earn double event progress",
+    "chance": [0.01, 0.025, 0.05, 0.075, 0.1],
+    "benefit": [1, 1, 1, 1, 1],
+    "items": [1, 5, 10, 15, 30]
+  },
+  "shark": {
+    "item": "shark",
+    "target": "multi",
+    "description": "{chance}% chance to gain {bonus}% gamble multi",
+    "chance": [0.01, 0.02, 0.02, 0.03, 0.03],
+    "benefit": [1, 1, 2, 2, 3],
+    "items": [1, 5, 10, 15, 30]
+  }
+}

@@ -394,7 +394,6 @@ async function run(
     listen();
   } else if (["claim", "harvest"].includes(args[0].toLowerCase())) {
     const promises = [];
-
     const plantTypes: string[] = [];
 
     farms.forEach((plant) =>
@@ -405,7 +404,6 @@ async function run(
     let eventProgress = 0;
 
     const multiplierValues: number[] = [];
-
     for (const plant of plantTypes) {
       promises.push(
         (async () => {

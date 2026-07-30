@@ -25,6 +25,7 @@ import {
   getInventory,
   removeInventoryItem,
 } from "../utils/functions/economy/inventory";
+import { rollPet } from "../utils/functions/economy/pets";
 import { addStat } from "../utils/functions/economy/stats";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { getToolPreferences } from "../utils/functions/economy/tool_preferences";
@@ -249,6 +250,7 @@ async function run(
   if (chosenArea == "nether") await addStat(member, "nether_portal");
   else if (chosenArea === "end") await addStat(member, "end_portal");
 
+  times += (await rollPet(member, "mine")) ?? 0;
   const foundItems = new Map<string, number>();
 
   for (let i = 0; i < times; i++) {

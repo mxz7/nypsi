@@ -4716,6 +4716,95 @@
     },
     "in_crates": true
   },
+  "cow": {
+    "id": "cow",
+    "name": "cow",
+    "plural": "cows",
+    "article": "a",
+    "emoji": "🐮",
+    "longDesc": "has a chance to double bakery output",
+    "rarity": 4,
+    "role": "pet",
+    "in_crates": true
+  },
+  "chicken": {
+    "id": "chicken",
+    "name": "chicken",
+    "plural": "chickens",
+    "article": "a",
+    "emoji": "🐔",
+    "longDesc": "has a chance to increase the output of harvested crops",
+    "rarity": 5,
+    "role": "pet",
+    "in_crates": true
+  },
+  "beaver": {
+    "id": "beaver",
+    "name": "beaver",
+    "plural": "beavers",
+    "article": "a",
+    "emoji": "🦫",
+    "longDesc": "has a chance to fish more",
+    "rarity": 4,
+    "role": "pet",
+    "in_crates": false
+  },
+  "tiger": {
+    "id": "tiger",
+    "name": "tiger",
+    "plural": "tigers",
+    "article": "a",
+    "emoji": "🐯",
+    "longDesc": "has a chance to hunt more",
+    "rarity": 4,
+    "role": "pet",
+    "in_crates": false
+  },
+  "fox": {
+    "id": "fox",
+    "name": "fox",
+    "plural": "foxes",
+    "article": "a",
+    "emoji": "🦊",
+    "longDesc": "has a chance to mine more",
+    "rarity": 4,
+    "role": "pet",
+    "in_crates": false
+  },
+  "eagle": {
+    "id": "eagle",
+    "name": "eagle",
+    "plural": "eagles",
+    "article": "an",
+    "emoji": "🦅",
+    "longDesc": "has a chance to double earned xp",
+    "rarity": 6,
+    "role": "pet",
+    "in_crates": true
+  },
+  "rocky": {
+    "id": "rocky",
+    "name": "rocky",
+    "plural": "rockies",
+    "article": "a",
+    "emoji": "<:rocky:1531700895283150878>",
+    "longDesc": "has a chance to double event progress",
+    "shortDesc": "amaze amaze amaze!",
+    "rarity": 5,
+    "role": "pet",
+    "in_crates": true
+  },
+  "shark": {
+    "id": "shark",
+    "name": "shark",
+    "plural": "sharks",
+    "article": "a",
+    "emoji": "🦈",
+    "longDesc": "has a chance to increase gamble multi",
+    "rarity": 6,
+    "role": "pet",
+    "in_crates": true
+  },
   "wilson": {
     "id": "wilson",
     "name": "wilson",

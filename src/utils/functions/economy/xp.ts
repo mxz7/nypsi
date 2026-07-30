@@ -11,6 +11,7 @@ import { calcMaxBet, getRequiredBetForXp } from "./balance";
 import { getBoosters } from "./boosters";
 import { gemBreak, getInventory } from "./inventory";
 import { doLevelUp, getRawLevel, getUpgrades } from "./levelling";
+import { rollPet } from "./pets";
 import { getItems, getUpgradesData } from "./utils";
 
 const xpCache = new RedisCache<number>(Constants.redis.cache.economy.XP, 3600);
@@ -165,6 +166,12 @@ export async function getXpBonus(member: MemberResolvable, client: NypsiClient, 
 
   if (boosterEffect !== beforeBoosters)
     multiplierBreakdown.set("boosters", (boosterEffect - beforeBoosters) * 100);
+
+  const petBonus = await rollPet(member, "xp");
+  if (petBonus) {
+    boosterEffect += petBonus;
+    multiplierBreakdown.set("eagle", petBonus * 100);
+  }
 
   return {
     min,

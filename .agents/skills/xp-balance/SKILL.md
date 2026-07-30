@@ -41,8 +41,10 @@ Base sources include capped raw level, Nitro/server boosting, premium tier, and 
 actual randomly generated gem value. Do not replace it with an average, expected value, or newly
 generated display value.
 
-Multiplier sources include the personal XP upgrade, active XP boosters, and the official nypsi
-server bonus. The beginner booster is part of this path.
+Multiplier sources include the personal XP upgrade, active XP boosters, the active eagle pet roll,
+and the official nypsi server bonus. The beginner booster is part of this path. Roll eagle in
+`getXpBonus`, add its benefit to `boosterEffect`, and include its successful activation in
+`multiplierBreakdown`.
 
 When `guildId === Constants.NYPSI_SERVER_ID`, add the 7.5% official-server bonus to
 `boosterEffect` as `0.075` and to `multiplierBreakdown` as `7.5`, labelled `official nypsi server`.

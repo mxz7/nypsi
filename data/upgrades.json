@@ -54,5 +54,13 @@
     "description": "+{x}% farm output",
     "max": 10,
     "chance": 15
+  },
+  "pet_slots": {
+    "id": "pet_slots",
+    "name": "pet slot",
+    "effect": 1,
+    "description": "+{x} active pet slots",
+    "max": 4,
+    "chance": 10
   }
 }

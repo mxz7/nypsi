@@ -76,7 +76,28 @@
           "max": 500
         }
       },
-      "global_double_xp": 0.1
+      "global_double_xp": 0.1,
+      "fox": {
+        "weight": 10,
+        "count": {
+          "min": 1,
+          "max": 3
+        }
+      },
+      "tiger": {
+        "weight": 10,
+        "count": {
+          "min": 1,
+          "max": 3
+        }
+      },
+      "beaver": {
+        "weight": 10,
+        "count": {
+          "min": 1,
+          "max": 3
+        }
+      }
     }
   },
   "mineshaft_chest": {
@@ -179,7 +200,28 @@
         }
       },
       "stick": 25,
-      "global_double_xp": 0.75
+      "global_double_xp": 0.75,
+      "shark": {
+        "weight": 10,
+        "count": {
+          "min": 1,
+          "max": 3
+        }
+      },
+      "rocky": {
+        "weight": 10,
+        "count": {
+          "min": 1,
+          "max": 3
+        }
+      },
+      "eagle": {
+        "weight": 10,
+        "count": {
+          "min": 1,
+          "max": 3
+        }
+      }
     }
   },
   "corner_shop_scratchie": {
@@ -238,7 +280,9 @@
       "christmas_tree": 15,
       "rice_seed": 1,
       "wilson": 0.01,
-      "lily": 0.075
+      "lily": 0.075,
+      "chicken": 0.05,
+      "beaver": 0.075
     }
   },
   "daily_scratch_card": {
@@ -306,7 +350,9 @@
           "min": 25,
           "max": 100
         }
-      }
+      },
+      "cow": 1,
+      "fox": 0.3
     }
   },
   "lucky_scratch_card": {
@@ -371,7 +417,7 @@
         "weight": 1,
         "count": {
           "min": 5,
-          "max": 50
+          "max": 75
         }
       },
       "ring": 2,
@@ -381,7 +427,10 @@
           "min": 75,
           "max": 200
         }
-      }
+      },
+      "tiger": 1,
+      "beaver": 1,
+      "fox": 1
     }
   },
   "karma_scratch_card": {
@@ -439,7 +488,8 @@
         }
       },
       "wheat_seed": 50,
-      "rice_seed": 60
+      "rice_seed": 60,
+      "eagle": 1
     }
   },
   "legendary_scratch_card": {
@@ -494,7 +544,11 @@
           "max": 300
         }
       },
-      "ring": 10
+      "ring": 10,
+      "rocky": 5,
+      "tiger": 10,
+      "fox": 10,
+      "beaver": 10
     }
   },
   "random_drop": {
@@ -579,7 +633,13 @@
           "max": 100
         }
       },
-      "global_double_xp": 0.01
+      "global_double_xp": 0.01,
+      "shark": 3,
+      "wilson": 0.5,
+      "tiger": 5,
+      "beaver": 5,
+      "chicken": 4,
+      "cow": 6
     }
   },
   "pot_of_gold": {

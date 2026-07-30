@@ -5,6 +5,19 @@ description: Describes how to structure commands, scheduled jobs, interaction ha
 
 # Conventions
 
+## Variable grouping
+
+Group variable declarations by context and separate different groups with a blank line:
+
+- Keep related user, database, cache, or inventory fetches together. Destructure `Promise.all`
+  directly when fetching independent values concurrently.
+- Keep values derived from the fetched data together in the following block.
+- Keep UI construction together, such as embeds, containers, selects, and buttons, with whitespace
+  separating it from fetched and derived data.
+- Start another block when declarations serve a different purpose or lifecycle. Do not interleave
+  fetching, domain calculations, and component construction.
+- Avoid adding whitespace between declarations that form one small, cohesive operation.
+
 ## User Facing Messages
 
 Use `CustomEmbed` for standard messages, and `ErrorEmbed` for error messages. Only use `content` string if a mention is specifically needed.

@@ -18,6 +18,7 @@ import {
   removeInventoryItem,
   selectItem,
 } from "../utils/functions/economy/inventory";
+import { addPet, getUserPet } from "../utils/functions/economy/pets";
 import { addStat } from "../utils/functions/economy/stats";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
 import {
@@ -27,6 +28,7 @@ import {
   getBaseUpgrades,
   getBaseWorkers,
   getItems,
+  getPetsData,
   getTagsData,
   userExists,
 } from "../utils/functions/economy/utils";
@@ -297,6 +299,30 @@ async function run(
         ).setHeader("use", message.author.avatarURL()),
       ],
     });
+  } else if (selected.role === "pet") {
+    const currentLevel = (await getUserPet(message.member, selected.id))?.level ?? 0;
+    const petData = getPetsData()[selected.id];
+
+    try {
+      const pet = await addPet(message.member, selected.id);
+      addStat(message.member, selected.id, petData.items[pet.level - 1]);
+
+      return send({
+        embeds: [
+          new CustomEmbed(
+            message.member,
+            `${selected.emoji} your **${selected.name}** is now level **${pet.level}/${petData.items.length}**`,
+          ).setHeader(
+            currentLevel === 0 ? "pet unlocked" : "pet upgraded",
+            message.author.avatarURL(),
+          ),
+        ],
+      });
+    } catch (error) {
+      return send({
+        embeds: [new ErrorEmbed(error instanceof Error ? error.message : "failed to add pet")],
+      });
+    }
   } else if (selected.role == "crate") {
     return itemFunctions.get("crates").run(message, args);
   } else if (selected.role == "scratch-card") {
