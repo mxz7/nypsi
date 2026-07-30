@@ -23,7 +23,7 @@ export class CustomContainer extends ContainerBuilder {
   constructor(member?: MemberResolvable, text?: string) {
     super();
 
-    this.setColor(getColor(member));
+    this.setColor(member ? getColor(member) : Constants.PURPLE);
 
     if (text) {
       super.addTextDisplayComponents((display) => display.setContent(text));
