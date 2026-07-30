@@ -26,7 +26,7 @@ import { createProfile, hasProfile } from "../users/utils";
 import openai, { buildPrompt, getDocsRaw } from "./openai";
 import { aiTools, executeAiTool } from "./tools";
 
-const MODEL: ResponsesModel = "gpt-5.4-nano";
+const MODEL: ResponsesModel = "gpt-5.6-luna";
 type ChatHistoryInput = { role: "user" | "assistant"; content: string };
 
 // max amount of tool-call round trips per user message, to prevent runaway loops
@@ -196,6 +196,7 @@ export async function createHelpChat(userId: string, userQuery: string, conversa
     for (let i = 0; i < MAX_TOOL_ROUNDTRIPS; i++) {
       const response = await openai.responses.parse({
         model: MODEL,
+        reasoning: { effort: "none" },
         input,
         tools: aiTools,
         text: { format: zodTextFormat(helpChatResponseFormat, "help_chat_response") },
