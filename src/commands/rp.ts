@@ -161,6 +161,15 @@ const actions: Record<string, RoleplayAction> = {
     text: "{sender} castrated {target}!!",
     action: "castrated",
   },
+  mourn: {
+    gifs: [
+      "https://c.tenor.com/sg22NY-VmxIAAAAC/tenor.gif",
+      "https://c.tenor.com/2bAKt_bnAYMAAAAd/tenor.gif",
+    ],
+    text: "{sender} mourned the loss of {target} ):",
+    action: "mourned",
+    aliases: ["rip"],
+  },
 };
 
 const cmd = new Command("rp", "roleplay actions", "fun").setAliases(["roleplay"]);
