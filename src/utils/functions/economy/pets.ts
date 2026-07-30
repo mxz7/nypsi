@@ -190,7 +190,7 @@ export async function rollPet(
   logger.info(`pets: ${userId}'s ${pet.petId} activated`);
   await updatePet(member, pet.petId, { activationIncrement: 1 });
 
-  addActivateNotification(userId, pet.petId);
+  if (pet.petId !== "cow") addActivateNotification(userId, pet.petId);
 
   return data.benefit[levelIndex];
 }

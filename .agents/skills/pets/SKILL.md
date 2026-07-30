@@ -65,7 +65,8 @@ again for pet-generated attempts, or add command-specific activation feedback.
 
 After a successful activation count update, check `dms.petActivation`. When enabled, add a concise
 activation notice with `addInlineNotification`. This notification is inline only; never send it
-through `addNotificationToQueue`.
+through `addNotificationToQueue`. Cow activations are the exception: do not add an inline
+notification because the bakery response shows the cow's contributed cookies in its `stats` field.
 
 ## Command and item use
 

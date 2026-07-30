@@ -197,7 +197,14 @@ export async function runBakery(member: GuildMember) {
 
   let total = chosenAmount + passive;
 
-  total += total * ((await rollPet(member, "bakery")) ?? 0);
+  const petBonus = await rollPet(member, "bakery");
+
+  if (petBonus !== undefined) {
+    const petEarned = total * petBonus;
+
+    total += petEarned;
+    earned.set("cow", Math.floor(petEarned));
+  }
 
   if (guildUpgrades.find((i) => i.upgradeId === "bakery")) {
     if (percentChance(2 * guildUpgrades.find((i) => i.upgradeId === "bakery").amount)) {
