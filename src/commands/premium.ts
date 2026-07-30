@@ -29,6 +29,7 @@ import {
 import sleep from "../utils/functions/sleep";
 import { cleanString, pluralize } from "../utils/functions/string";
 import { getTotalSpend } from "../utils/functions/users/email";
+import { fetchFirstSeen } from "../utils/functions/users/first-seen";
 import { addTag, getActiveTag, getTags, removeTag } from "../utils/functions/users/tags";
 import {
   commandAliasExists,
@@ -164,17 +165,22 @@ async function run(
 
       const level = await getRawLevel(guildMember);
       const tags = await getTags(guildMember);
+      const firstSeen = await fetchFirstSeen(guildMember);
+      const yearlyTagDate = Math.min(
+        guildMember.joinedTimestamp,
+        firstSeen?.getTime() ?? guildMember.joinedTimestamp,
+      );
 
       if (level >= 99) {
-        for (let i = 1; i <= 5; i++) {
+        for (let i = 1; i <= 6; i++) {
           if (
-            guildMember.joinedTimestamp < Date.now() - ms(`${i} year`) &&
+            yearlyTagDate < Date.now() - ms(`${i} year`) &&
             !tags.some((tag) => tag.tagId === `year${i}`)
           ) {
             logger.info(`premium: adding year${i} to ${guildMember.user.id}`);
             await addTag(guildMember, `year${i}`);
           } else if (
-            guildMember.joinedTimestamp > Date.now() - ms(`${i} year`) &&
+            yearlyTagDate > Date.now() - ms(`${i} year`) &&
             tags.some((i) => i.tagId === `year${i}`)
           ) {
             logger.info(`premium: removing year${i} from ${guildMember.user.id}`);

@@ -196,6 +196,7 @@ export default {
         LAST_COMMAND: "cache:user:lastcmd",
         LASTFM: "cache:user:lastfm",
         TRACKING: "cache:user:tracking",
+        FIRST_SEEN: "cache:user:first-seen",
         ADMIN_LEVEL: "cache:user:adminlvl",
         MARRIED: "cache:user:married",
         tags: "cache:user:tags",

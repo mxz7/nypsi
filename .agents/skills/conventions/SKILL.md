@@ -5,6 +5,10 @@ description: Describes how to structure commands, scheduled jobs, interaction ha
 
 # Conventions
 
+## File names
+
+Use kebab-case for file names.
+
 ## Variable grouping
 
 Group variable declarations by context and separate different groups with a blank line:
@@ -23,6 +27,9 @@ Group variable declarations by context and separate different groups with a blan
 Use `CustomEmbed` for standard messages, and `ErrorEmbed` for error messages. Only use `content` string if a mention is specifically needed.
 
 ## Commands
+
+Do not import or query Prisma directly in command files. Put database access in domain utility
+functions under `src/utils/functions/` and call those functions from the command.
 
 Create a `Command` instance and export it as default:
 
