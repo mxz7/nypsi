@@ -12,6 +12,7 @@
 - redesign how dm settings & user preferences are stored and handled, makes adding new preferences and settings much eaiser
 - add pets
 - add tag for sudoku
+- use first seen (first message in nypsi server) for yearly tags
 
 # june 2026
 
