@@ -196,14 +196,13 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel, 
       if (winners.length == 0) {
         embed.setDescription(embed.data.description + "\n\nnobody won ):");
       } else {
+        await addProgress(winners[0].user.id, "fast_typer", 1);
+        await addTaskProgress(winners[0].user.id, "chat_reaction_daily");
+        await addTaskProgress(winners[0].user.id, "chat_reaction_weekly");
+
         if (winners.length == 1) {
           embed.setFooter({ text: "ended with 1 winner" });
         } else {
-          if (winners.length === 3) {
-            await addProgress(winners[0].user.id, "fast_typer", 1);
-            await addTaskProgress(winners[0].user.id, "chat_reaction_daily");
-            await addTaskProgress(winners[0].user.id, "chat_reaction_weekly");
-          }
           embed.setFooter({ text: `ended with ${winners.length} winners` });
         }
         updateWinnersText();
