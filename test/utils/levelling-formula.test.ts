@@ -30,10 +30,10 @@ describe("levelling XP formula", () => {
     expect(calculateLevelXp(0)).toBe(50);
     expect(calculateLevelXp(500)).toBe(394);
     expect(calculateLevelXp(2_000)).toBe(2_286);
-    expect(calculateLevelXp(5_000)).toBe(6_126);
-    expect(calculateLevelXp(8_000)).toBe(19_544);
-    expect(calculateLevelXp(15_000)).toBe(79_195);
-    expect(calculateLevelXp(20_000)).toBe(139_534);
+    expect(calculateLevelXp(5_000)).toBe(6_358);
+    expect(calculateLevelXp(8_000)).toBe(19_906);
+    expect(calculateLevelXp(15_000)).toBe(79_445);
+    expect(calculateLevelXp(20_000)).toBe(139_784);
   });
 
   test("preserves the early-prestige level reset", () => {
@@ -52,7 +52,7 @@ describe("levelling XP formula", () => {
     }
 
     expect(totalToP20).toBe(2_154_413);
-    expect(totalToP80).toBe(49_895_800);
+    expect(totalToP80).toBe(51_261_903);
   });
 
   test("keeps prestige costs and their increases monotonic", () => {
@@ -136,8 +136,8 @@ describe("levelling crate formula", () => {
     expect(cratesFormula(1_500)).toBe(6);
     expect(cratesFormula(2_000)).toBe(7);
     expect(cratesFormula(4_005)).toBe(11);
-    expect(cratesFormula(6_000)).toBe(18);
-    expect(cratesFormula(7_500)).toBe(28);
+    expect(cratesFormula(6_000)).toBe(19);
+    expect(cratesFormula(7_500)).toBe(29);
     expect(cratesFormula(8_010)).toBe(30);
   });
 
@@ -161,6 +161,6 @@ describe("levelling crate formula", () => {
       totalCrates += cratesFormula(rawLevel);
     }
 
-    expect(totalCrates).toBe(6_119);
+    expect(totalCrates).toBe(6_293);
   });
 });
