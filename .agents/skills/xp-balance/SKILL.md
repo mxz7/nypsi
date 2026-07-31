@@ -140,3 +140,24 @@ Do not introduce arbitrary caps or discard helper data to force matching output.
 refactor as balance-preserving unless the end calculation is demonstrably unchanged.
 
 Run `make check` after changes.
+
+## Level requirement formula
+
+`src/utils/functions/economy/levelling-formula.ts` owns the XP required for a
+level. Its `calculateLevelXp()` helper takes one raw level; keep direct level
+requirements, next-prestige totals, and crate scaling routed through it.
+
+The production curve implemented on 31 July 2026 has these locked cumulative
+checkpoints:
+
+- P20: `2,154,413` XP
+- P80: `49,895,800` XP
+
+The P80 checkpoint is 9.99% above the historical formula. Preserve the early
+raw-level reset (`100` is easier than `99`) and the monotonic increase in both
+complete-prestige costs and their first differences. At high prestige, the
+growth between prestiges can exceed the small within-prestige reset, so do not
+assume every first level after prestiging is cheaper than the preceding level.
+
+Update `test/utils/levelling-formula.test.ts` whenever intentionally changing
+the curve or its checkpoints.

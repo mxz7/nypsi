@@ -16,6 +16,7 @@ import { getLastKnownAvatar } from "../users/username";
 import { addBalance, getBankBalance, removeBankBalance } from "./balance";
 import { addBooster, getBoosters } from "./boosters";
 import { addInventoryItem } from "./inventory";
+import { calculateLevelXp } from "./levelling-formula";
 import { addStat } from "./stats";
 import { addTaskProgress } from "./tasks";
 import { getXp, removeXp } from "./xp";
@@ -158,41 +159,9 @@ levellingRewards.set(8000, {
   rewards: ["tag:80"],
 });
 
-const xpFormula = (level: number, prestige: number) => {
-  let prestigeModifier = 30;
-
-  if (prestige >= 1) prestigeModifier = 35;
-  if (prestige >= 2) prestigeModifier = 40;
-  if (prestige >= 3) prestigeModifier = 45;
-  if (prestige >= 4) prestigeModifier = 50;
-  if (prestige >= 5) prestigeModifier = 75;
-  if (prestige >= 6) prestigeModifier = 80;
-  if (prestige >= 7) prestigeModifier = 90;
-  if (prestige >= 8) prestigeModifier = 100;
-  if (prestige >= 9) prestigeModifier = 110;
-  if (prestige >= 10) prestigeModifier = 120;
-  if (prestige >= 20) prestigeModifier = 115;
-  if (prestige >= 25) prestigeModifier = 110;
-  if (prestige >= 30) prestigeModifier = 105;
-
-  if (prestige >= 55) prestigeModifier = 115;
-  if (prestige >= 60) prestigeModifier = 125;
-  if (prestige >= 65) prestigeModifier = 135;
-  if (prestige >= 70) prestigeModifier = 145;
-  if (prestige >= 75) prestigeModifier = 175;
-  if (prestige >= 80) prestigeModifier = 200;
-  if (prestige >= 85) prestigeModifier = 225;
-  if (prestige >= 90) prestigeModifier = 250;
-  if (prestige >= 95) prestigeModifier = 275;
-  if (prestige >= 100) prestigeModifier = 300;
-
-  return Math.floor((level + 1) * 1.77 + prestigeModifier * prestige + 50 + 15 * prestige) - 1;
-};
 const moneyFormula = (level: number) => Math.floor(Math.pow(level + 1, 2.1) + 10_000) - 1;
 const cratesFormula = (rawLevel: number) => {
-  const prestige = Math.floor(rawLevel / 100);
-  const level = rawLevel - prestige * 100;
-  const neededXp = xpFormula(level, prestige);
+  const neededXp = calculateLevelXp(rawLevel);
 
   let crates = neededXp / 200;
 
@@ -336,6 +305,7 @@ export function getLevelRequirements(
   level: number,
 ): { xp: number; money: number };
 export function getLevelRequirements(prestige: number, level?: number) {
+  const xpRawLevel = level === undefined ? prestige : prestige * 100 + level;
   let rawLevel = prestige;
 
   if (level) {
@@ -347,7 +317,7 @@ export function getLevelRequirements(prestige: number, level?: number) {
     rawLevel = prestige * 100 + level;
   }
 
-  const requiredXp = xpFormula(level, prestige);
+  const requiredXp = calculateLevelXp(xpRawLevel);
   const requiredMoney = moneyFormula(rawLevel);
 
   return { xp: requiredXp, money: requiredMoney };
@@ -369,7 +339,7 @@ export function getNextPrestigeRequirements(prestige: number, level: number) {
   let requiredMoney = 0;
 
   for (let i = 0; i < levelsRequired; i++) {
-    requiredXp += xpFormula(level + i, prestige);
+    requiredXp += calculateLevelXp(rawLevel + i);
     requiredMoney += moneyFormula(rawLevel + i);
   }
 
