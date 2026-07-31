@@ -16,7 +16,7 @@ import { getLastKnownAvatar } from "../users/username";
 import { addBalance, getBankBalance, removeBankBalance } from "./balance";
 import { addBooster, getBoosters } from "./boosters";
 import { addInventoryItem } from "./inventory";
-import { calculateLevelXp } from "./levelling-formula";
+import { calculateLevelXp, cratesFormula, moneyFormula } from "./levelling-formula";
 import { addStat } from "./stats";
 import { addTaskProgress } from "./tasks";
 import { getXp, removeXp } from "./xp";
@@ -158,54 +158,6 @@ levellingRewards.set(8000, {
   text: ["- 💚 prestige 80 tag"],
   rewards: ["tag:80"],
 });
-
-const moneyFormula = (level: number) => Math.floor(Math.pow(level + 1, 2.1) + 10_000) - 1;
-const cratesFormula = (rawLevel: number) => {
-  const neededXp = calculateLevelXp(rawLevel);
-
-  let crates = neededXp / 200;
-
-  if (rawLevel < 1000) {
-    if (rawLevel % 30 !== 0) crates = 0;
-  } else if (rawLevel < 1500) {
-    crates = neededXp / 250;
-    if (rawLevel % 30 !== 0) crates = 0;
-  } else if (rawLevel < 2000) {
-    crates = neededXp / 250;
-    if (rawLevel % 25 !== 0) crates = 0;
-  } else if (rawLevel < 3000) {
-    crates = neededXp / 350;
-    if (rawLevel % 25 !== 0) crates = 0;
-  } else if (rawLevel < 4000) {
-    crates = neededXp / 400;
-    if (rawLevel % 20 !== 0) crates = 0;
-  } else if (rawLevel < 5000) {
-    crates = neededXp / 450;
-    if (rawLevel % 15 !== 0) crates = 0;
-  } else if (rawLevel < 6000) {
-    crates = neededXp / 500;
-    if (rawLevel % 15 !== 0) crates = 0;
-  } else if (rawLevel < 7000) {
-    crates = neededXp / 500;
-    if (rawLevel % 15 !== 0) crates = 0;
-  } else {
-    if (rawLevel < 8000) {
-      crates = neededXp / 600;
-    } else if (rawLevel < 9000) {
-      crates = neededXp / 700;
-    } else if (rawLevel < 10000) {
-      crates = neededXp / 800;
-    } else if (rawLevel < 11000) {
-      crates = neededXp / 900;
-    } else {
-      crates = neededXp / 1000;
-    }
-
-    if (rawLevel % 15 !== 0) crates = 0;
-  }
-
-  return Math.floor(crates);
-};
 
 export async function getPrestige(member: MemberResolvable): Promise<number> {
   const userId = getUserId(member);
