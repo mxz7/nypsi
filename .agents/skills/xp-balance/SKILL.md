@@ -161,3 +161,24 @@ assume every first level after prestiging is cheaper than the preceding level.
 
 Update `test/utils/levelling-formula.test.ts` whenever intentionally changing
 the curve or its checkpoints.
+
+## Basic crate level rewards
+
+`cratesFormula()` in `src/utils/functions/economy/levelling-formula.ts` owns the
+variable basic-crate reward granted by level-ups. Reward frequency remains:
+
+- every 30 raw levels before P15;
+- every 25 raw levels from P15;
+- every 20 raw levels from P30;
+- every 15 raw levels from P40 onward.
+
+The amount uses the average XP requirement of the current prestige and a
+smoothly transitioning divisor. This keeps every qualifying reward within a
+prestige consistent and prevents the reward amount from decreasing at divisor
+boundaries. The cumulative target before P80 is `6,119` basic crates, 0.36%
+above the previous `6,097`.
+
+Preserve monotonic qualifying rewards and check cumulative supply whenever
+changing the XP curve, divisor transitions, or reward intervals. Separate fixed
+milestone rewards such as Nypsi crates, 69420 crates, bronze credits, and omega
+crates are not part of `cratesFormula()`.

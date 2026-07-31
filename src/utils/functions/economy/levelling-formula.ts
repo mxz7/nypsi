@@ -5,6 +5,26 @@ const integratedSmoothstep = (value: number) => {
   return value ** 3 - value ** 4 / 2;
 };
 
+const smoothstep = (value: number) => {
+  if (value <= 0) return 0;
+  if (value >= 1) return 1;
+
+  return value ** 2 * (3 - 2 * value);
+};
+
+const crateDivisorTransitions = [
+  { startPrestige: 5, duration: 10, increase: 50 },
+  { startPrestige: 15, duration: 10, increase: 100 },
+  { startPrestige: 25, duration: 10, increase: 50 },
+  { startPrestige: 35, duration: 10, increase: 50 },
+  { startPrestige: 45, duration: 10, increase: 50 },
+  { startPrestige: 60, duration: 20, increase: 100 },
+  { startPrestige: 75, duration: 10, increase: 100 },
+  { startPrestige: 85, duration: 10, increase: 100 },
+  { startPrestige: 95, duration: 10, increase: 100 },
+  { startPrestige: 105, duration: 10, increase: 100 },
+] as const;
+
 export const calculateLevelXp = (rawLevel: number) => {
   const prestige = Math.floor(rawLevel / 100);
   const level = rawLevel % 100;
@@ -25,49 +45,38 @@ export const moneyFormula = (rawLevel: number) => {
   return Math.floor(Math.pow(level, 2.1) * multiplier + 10_000) - 1;
 };
 
-export const cratesFormula = (rawLevel: number) => {
-  const neededXp = calculateLevelXp(rawLevel);
+const calculateAveragePrestigeXp = (prestige: number) => {
+  let totalXp = 0;
 
-  let crates = neededXp / 200;
-
-  if (rawLevel < 1000) {
-    if (rawLevel % 30 !== 0) crates = 0;
-  } else if (rawLevel < 1500) {
-    crates = neededXp / 250;
-    if (rawLevel % 30 !== 0) crates = 0;
-  } else if (rawLevel < 2000) {
-    crates = neededXp / 250;
-    if (rawLevel % 25 !== 0) crates = 0;
-  } else if (rawLevel < 3000) {
-    crates = neededXp / 350;
-    if (rawLevel % 25 !== 0) crates = 0;
-  } else if (rawLevel < 4000) {
-    crates = neededXp / 400;
-    if (rawLevel % 20 !== 0) crates = 0;
-  } else if (rawLevel < 5000) {
-    crates = neededXp / 450;
-    if (rawLevel % 15 !== 0) crates = 0;
-  } else if (rawLevel < 6000) {
-    crates = neededXp / 500;
-    if (rawLevel % 15 !== 0) crates = 0;
-  } else if (rawLevel < 7000) {
-    crates = neededXp / 500;
-    if (rawLevel % 15 !== 0) crates = 0;
-  } else {
-    if (rawLevel < 8000) {
-      crates = neededXp / 600;
-    } else if (rawLevel < 9000) {
-      crates = neededXp / 700;
-    } else if (rawLevel < 10000) {
-      crates = neededXp / 800;
-    } else if (rawLevel < 11000) {
-      crates = neededXp / 900;
-    } else {
-      crates = neededXp / 1000;
-    }
-
-    if (rawLevel % 15 !== 0) crates = 0;
+  for (let level = 0; level < 100; level++) {
+    totalXp += calculateLevelXp(prestige * 100 + level);
   }
 
-  return Math.floor(crates);
+  return totalXp / 100;
+};
+
+const calculateCrateDivisor = (prestige: number) => {
+  return crateDivisorTransitions.reduce((divisor, transition) => {
+    const progress = (prestige - transition.startPrestige) / transition.duration;
+
+    return divisor + transition.increase * smoothstep(progress);
+  }, 200);
+};
+
+const getCrateRewardInterval = (rawLevel: number) => {
+  if (rawLevel < 1500) return 30;
+  if (rawLevel < 3000) return 25;
+  if (rawLevel < 4000) return 20;
+
+  return 15;
+};
+
+export const cratesFormula = (rawLevel: number) => {
+  if (rawLevel % getCrateRewardInterval(rawLevel) !== 0) return 0;
+
+  const prestige = Math.floor(rawLevel / 100);
+  const averageXp = calculateAveragePrestigeXp(prestige);
+  const divisor = calculateCrateDivisor(prestige);
+
+  return Math.max(1, Math.floor(averageXp / divisor));
 };

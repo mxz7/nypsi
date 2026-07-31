@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 import {
   calculateLevelXp,
+  cratesFormula,
   moneyFormula,
 } from "../../src/utils/functions/economy/levelling-formula";
 
@@ -116,5 +117,50 @@ describe("levelling money formula", () => {
       previousCost = cost;
       previousIncrease = increase;
     }
+  });
+});
+
+describe("levelling crate formula", () => {
+  test("uses the configured reward intervals", () => {
+    expect(cratesFormula(29)).toBe(0);
+    expect(cratesFormula(30)).toBe(1);
+    expect(cratesFormula(1_515)).toBe(0);
+    expect(cratesFormula(1_525)).toBeGreaterThan(0);
+    expect(cratesFormula(3_015)).toBe(0);
+    expect(cratesFormula(3_020)).toBeGreaterThan(0);
+    expect(cratesFormula(4_005)).toBeGreaterThan(0);
+  });
+
+  test("matches the smoothed prestige checkpoints", () => {
+    expect(cratesFormula(90)).toBe(1);
+    expect(cratesFormula(1_500)).toBe(6);
+    expect(cratesFormula(2_000)).toBe(7);
+    expect(cratesFormula(4_005)).toBe(11);
+    expect(cratesFormula(6_000)).toBe(18);
+    expect(cratesFormula(7_500)).toBe(28);
+    expect(cratesFormula(8_010)).toBe(30);
+  });
+
+  test("keeps rewards monotonic through P200", () => {
+    let previousReward = 0;
+
+    for (let rawLevel = 1; rawLevel < 20_000; rawLevel++) {
+      const crates = cratesFormula(rawLevel);
+
+      if (crates === 0) continue;
+
+      expect(crates).toBeGreaterThanOrEqual(previousReward);
+      previousReward = crates;
+    }
+  });
+
+  test("keeps cumulative supply close to the previous P80 total", () => {
+    let totalCrates = 0;
+
+    for (let rawLevel = 1; rawLevel < 8_000; rawLevel++) {
+      totalCrates += cratesFormula(rawLevel);
+    }
+
+    expect(totalCrates).toBe(6_119);
   });
 });
