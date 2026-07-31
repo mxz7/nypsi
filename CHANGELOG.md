@@ -1,3 +1,7 @@
+# august 2026
+
+- add item source tracking stats
+
 # july 2026
 
 - adds tool calls to ai chatbot, allows for much better nypsi knowledge to assist with queries
