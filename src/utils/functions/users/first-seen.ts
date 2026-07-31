@@ -75,9 +75,7 @@ export async function fetchFirstSeen(member: GuildMember) {
     if (!("messages" in result)) return;
 
     const firstMessage = result.messages.flat().find((message) => message.author.id === member.id);
-    if (!firstMessage) return;
-
-    const firstSeen = new Date(firstMessage.timestamp);
+    const firstSeen = firstMessage ? new Date(firstMessage.timestamp) : member.joinedAt;
 
     await setFirstSeen(member, firstSeen);
 
