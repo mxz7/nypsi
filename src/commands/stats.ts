@@ -738,6 +738,7 @@ async function run(
 
     const breakdownItems = [
       { key: "grandma", emoji: "👵🏻", name: "grandma" },
+      { key: "cow", itemId: "cow" },
       { key: "guild", emoji: ":busts_in_silhouette:", name: "your guild" },
       { key: "heart", itemId: "crystal_heart" },
       { key: "white", itemId: "white_gem" },

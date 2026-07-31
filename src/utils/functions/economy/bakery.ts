@@ -204,6 +204,7 @@ export async function runBakery(member: GuildMember) {
 
     total += petEarned;
     earned.set("cow", Math.floor(petEarned));
+    addStat(member, "bake-cow", Math.floor(petEarned));
   }
 
   if (guildUpgrades.find((i) => i.upgradeId === "bakery")) {
