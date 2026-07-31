@@ -115,18 +115,18 @@ enum TransactionType {
 // user specific tables (economy etc.)
 
 model User {
-  id                String   @id
+  id                String    @id
   lastKnownUsername String
-  usernameUpdatedAt DateTime @default("1970-01-01T14:21:00+02:00")
-  avatar            String   @default("https://cdn.discordapp.com/embed/avatars/0.png")
-  karma             Int      @default(1)
+  usernameUpdatedAt DateTime  @default("1970-01-01T14:21:00+02:00")
+  avatar            String    @default("https://cdn.discordapp.com/embed/avatars/0.png")
+  karma             Int       @default(1)
   lastCommand       DateTime
   firstSeen         DateTime?
-  tracking          Boolean  @default(true)
+  tracking          Boolean   @default(true)
   lastfmUsername    String?
-  email             String?  @unique
-  adminLevel        Int      @default(0)
-  booster           Boolean  @default(false)
+  email             String?   @unique
+  adminLevel        Int       @default(0)
+  booster           Boolean   @default(false)
 
   birthday         DateTime?
   birthdayAnnounce Boolean   @default(true)
@@ -471,6 +471,14 @@ model Inventory {
   economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
   @@id([userId, item])
+}
+
+model ItemSourceStats {
+  itemId String
+  source String
+  amount BigInt @default(0)
+
+  @@id([itemId, source])
 }
 
 model Museum {
