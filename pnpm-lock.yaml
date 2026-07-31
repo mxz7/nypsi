@@ -84,8 +84,8 @@ importers:
         specifier: 2.1.3
         version: 2.1.3
       nanoid:
-        specifier: ^3.3.15
-        version: 3.3.15
+        specifier: ^6.0.0
+        version: 6.0.0
       node-os-utils:
         specifier: 1.3.7
         version: 1.3.7
@@ -1943,14 +1943,14 @@ packages:
   nan@2.26.2:
     resolution: {integrity: sha512-0tTvBTYkt3tdGw22nrAy50x7gpbGCCFH3AFcyS5WiUu7Eu4vWlri1woE6qHBSfy11vksDqkiwjOnlR7WV8G1Hw==}
 
-  nanoid@3.3.15:
-    resolution: {integrity: sha512-y7Wygv/7mEOvxTuEQDB8StXdMRBWf1kR/tlhAzBRUFkB2jfcLOAxO/SHmOO2zgz1pVgK29/kyupn059/bCHdjA==}
-    engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
-    hasBin: true
-
   nanoid@3.3.16:
     resolution: {integrity: sha512-bzlKTyNJ7+LdGIIwy8ijFpIqEQIvafahV7eYykJ8Cvh42EdJeODoJ6gUJXpQJvej1BddH8OqTXZNE/KfbWAu8Q==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
+    hasBin: true
+
+  nanoid@6.0.0:
+    resolution: {integrity: sha512-mkUH+rPkwU2qPadJ0oJZOjeZ5Mxn8Q1UhevwkTRWNuUZzyia3h4rhzK39hxaHTk0o2OxB8W2SQ6A8k23ZDi1pQ==}
+    engines: {node: ^22 || ^24 || >=26}
     hasBin: true
 
   node-abort-controller@3.1.1:
@@ -3921,9 +3921,9 @@ snapshots:
 
   nan@2.26.2: {}
 
-  nanoid@3.3.15: {}
-
   nanoid@3.3.16: {}
+
+  nanoid@6.0.0: {}
 
   node-abort-controller@3.1.1: {}
 
