@@ -451,6 +451,7 @@ class Fight {
       await addTaskProgress(winner.member, "mike_tyson");
       addTaskProgress(winner.member, "mike_tyson_daily");
       await addInventoryItem(winner.member, "cookie", 1);
+      addItemSourceStat("cookie", "fight", 1);
       embed.setFooter({ text: "well done. enjoy this cookie 🍪" });
     }
 

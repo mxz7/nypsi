@@ -322,6 +322,7 @@ export async function claimFromWorkers(
           byproductAmounts[byproduct],
       );
       await addInventoryItem(worker.userId, byproduct, byproductAmounts[byproduct]);
+      addItemSourceStat(byproduct, "worker", byproductAmounts[byproduct]);
     }
   }
 

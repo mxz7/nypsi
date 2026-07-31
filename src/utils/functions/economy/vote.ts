@@ -100,6 +100,7 @@ export async function giveVoteRewards(
   let receivedVoteBooster = false;
   if (inventory.count("vote_booster") < 1) {
     addInventoryItem(user, "vote_booster", 1);
+    addItemSourceStat("vote_booster", "vote", 1);
     receivedVoteBooster = true;
   }
 
@@ -135,9 +136,13 @@ export async function giveVoteRewards(
       voteCache.delete(user),
       redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${user}`),
       addStat(user, "earned-vote", amount),
-      addInventoryItem(user, "lottery_ticket", crateAmount),
+      addInventoryItem(user, "lottery_ticket", crateAmount).then(() => {
+        addItemSourceStat("lottery_ticket", "vote", crateAmount);
+      }),
       createAuraTransaction(user, Constants.BOT_USER_ID, 50),
-      addInventoryItem(user, "vote_crate", crateAmount),
+      addInventoryItem(user, "vote_crate", crateAmount).then(() => {
+        addItemSourceStat("vote_crate", "vote", crateAmount);
+      }),
     ]).catch((e) => {
       logger.error("vote error", e);
     });
@@ -151,6 +156,7 @@ export async function giveVoteRewards(
     await markGemAsGiven();
     logger.info(`${user} received blue_gem randomly (vote)`);
     await addInventoryItem(user, "blue_gem", 1);
+    addItemSourceStat("blue_gem", "vote", 1);
     addProgress(user, "gem_hunter", 1);
 
     if ((await getPreferences(user)).dms.other) {

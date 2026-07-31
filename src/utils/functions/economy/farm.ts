@@ -295,6 +295,7 @@ export async function getClaimable(
 
     if (claim && items > 0) {
       await addInventoryItem(member, plantData.item, items);
+      addItemSourceStat(plantData.item, "farm", items);
       await addProgress(member, "green_fingers", items);
       const eventProgress = client
         ? await addEventProgress(client, member, "farming", items)

@@ -48,8 +48,11 @@ async function run(
 
   await addBalance(message.member, amount);
   await addInventoryItem(message.member, "wooden_pickaxe", pickaxes);
+  addItemSourceStat("wooden_pickaxe", "free", pickaxes);
   await addInventoryItem(message.member, "terrible_fishing_rod", fishingRods);
+  addItemSourceStat("terrible_fishing_rod", "free", fishingRods);
   await addInventoryItem(message.member, "terrible_gun", guns);
+  addItemSourceStat("terrible_gun", "free", guns);
   addStat(message.member, "earned-freemoney", amount);
 
   const items = getItems();

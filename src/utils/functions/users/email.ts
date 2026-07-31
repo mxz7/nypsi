@@ -7,8 +7,6 @@ import { logger } from "../../logger";
 import { addInventoryItem } from "../economy/inventory";
 import { getItems } from "../economy/utils";
 import { getUserId, MemberResolvable } from "../member";
-
-const totalSpendCache = new RedisCache<number>(Constants.redis.cache.premium.TOTAL_SPEND, 3600);
 import {
   addMember,
   getTier,
@@ -21,6 +19,8 @@ import {
 import { addNotificationToQueue } from "./notifications";
 import { getPreferences } from "./preferences";
 import { setEconomyPunishment } from "./punishments";
+
+const totalSpendCache = new RedisCache<number>(Constants.redis.cache.premium.TOTAL_SPEND, 3600);
 
 export async function getEmail(member: MemberResolvable) {
   const query = await prisma.user.findUnique({
@@ -122,6 +122,7 @@ export async function checkPurchases(member: MemberResolvable) {
           }
         } else {
           await addInventoryItem(userId, item.item, item.amount || 1);
+          addItemSourceStat(item.item, "premium", item.amount || 1);
 
           if ((await getPreferences(userId)).dms.premium) {
             const payload: NotificationPayload = {

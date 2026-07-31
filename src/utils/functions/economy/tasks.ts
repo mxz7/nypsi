@@ -288,6 +288,7 @@ export async function addTaskProgress(member: MemberResolvable, taskId: string, 
         case "item":
           desc += `\n\nyou have received ${reward.value}x ${reward.item.emoji} ${reward.item.name}`;
           addInventoryItem(task.user_id, reward.item.id, reward.value);
+          addItemSourceStat(reward.item.id, `task:${task.type}`, reward.value);
           break;
         case "karma":
           desc += `\n\nyou have received 🔮 ${reward.value} karma`;
@@ -316,6 +317,7 @@ export async function addTaskProgress(member: MemberResolvable, taskId: string, 
       addInlineNotification({ embed, memberId: task.user_id });
       addProgress(task.user_id, "taskmaster", 1);
       addInventoryItem(task.user_id, "lottery_ticket", 1);
+      addItemSourceStat("lottery_ticket", `task:${task.type}`, 1);
 
       if (task.type === "daily") addTaskProgress(task.user_id, "all_dailies");
     } else {
@@ -370,6 +372,7 @@ export async function setTaskProgress(member: MemberResolvable, taskId: string, 
       case "item":
         desc += `\n\nyou have received ${reward.value}x ${reward.item.emoji} ${reward.item.name}`;
         await addInventoryItem(task.user_id, reward.item.id, reward.value);
+        addItemSourceStat(reward.item.id, `task:${task.type}`, reward.value);
         break;
       case "karma":
         desc += `\n\nyou have received 🔮 ${reward.value} karma`;

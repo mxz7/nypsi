@@ -784,6 +784,7 @@ async function playGame(
             await markGemAsGiven();
             logger.info(`gems: ${message.author.id} received green_gem randomly (tower)`);
             addInventoryItem(message.member, "green_gem", 1);
+            addItemSourceStat("green_gem", "tower", 1);
             addProgress(message.member, "gem_hunter", 1);
             if (response.replied || response.deferred)
               response.followUp({

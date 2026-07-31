@@ -193,6 +193,7 @@ async function run(
   ) {
     await removeMarriage(message.member);
     await addInventoryItem(marriage.partnerId, "broken_ring", 1);
+    addItemSourceStat("broken_ring", "divorce", 1);
 
     addNotificationToQueue({
       memberId: marriage.partnerId,

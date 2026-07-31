@@ -867,6 +867,7 @@ async function run(
 
         if (getItems()[item]) {
           await addInventoryItem(user.id, item, amount ? parseInt(amount) : 1);
+          addItemSourceStat(item, source, amount ? parseInt(amount) : 1);
         }
 
         msgResponse.first().react("✅");
@@ -3732,7 +3733,7 @@ async function run(
       logger.debug(`pumpkin: ${user.userId} ${user.amount}`);
       for (let i = 0; i < user.amount; i++) {
         const found = await rollLootPool(pool);
-        await giveLootPoolResult(user.userId, found);
+        await giveLootPoolResult(user.userId, found, "item:pumpkin");
 
         foundAll.money += found.money ?? 0;
         foundAll.xp += found.xp ?? 0;
@@ -3804,6 +3805,7 @@ async function run(
     const randomUser = pumpkins[Math.floor(Math.random() * pumpkins.length)];
 
     await addInventoryItem(randomUser.userId, "pumpkin", 1);
+    addItemSourceStat("pumpkin", "halloween", 1);
 
     logger.debug(`pumpkin: random pumpkin given to ${randomUser.userId}`);
   } else if (args[0].toLowerCase() === "dotree") {
@@ -3862,7 +3864,7 @@ async function run(
       logger.debug(`tree: ${user.userId} ${user.amount}`);
       for (let i = 0; i < user.amount; i++) {
         const found = await rollLootPool(pool);
-        await giveLootPoolResult(user.userId, found);
+        await giveLootPoolResult(user.userId, found, "item:christmas_tree");
 
         foundAll.money += found.money ?? 0;
         foundAll.xp += found.xp ?? 0;
@@ -3934,6 +3936,7 @@ async function run(
     const randomUser = trees[Math.floor(Math.random() * trees.length)];
 
     await addInventoryItem(randomUser.userId, "christmas_tree", 1);
+    addItemSourceStat("christmas_tree", "christmas", 1);
 
     logger.debug(`tree: random christmas_tree given to ${randomUser.userId}`);
   } else {

@@ -509,6 +509,7 @@ export async function doLevelUp(member: MemberResolvable) {
   if (items.size > 0) {
     for (const [itemId, amount] of items.entries()) {
       await addInventoryItem(userId, itemId, amount);
+      addItemSourceStat(itemId, "level", amount);
     }
   }
   if (tags.length > 0) {

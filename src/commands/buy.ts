@@ -199,6 +199,7 @@ async function run(
   await removeBalance(message.member, selected.buy * amount);
   addStat(message.member, "spent-shop", selected.buy * amount);
   await addInventoryItem(message.member, selected.id, amount);
+  addItemSourceStat(selected.id, "shop", amount);
 
   const embed = new CustomEmbed(
     message.member,

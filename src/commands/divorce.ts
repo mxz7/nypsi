@@ -100,6 +100,7 @@ async function run(
     interaction.deferUpdate();
     await removeMarriage(message.member);
     await addInventoryItem(married.partnerId, "broken_ring", 1);
+    addItemSourceStat("broken_ring", "divorce", 1);
 
     embed.setDescription(`✅ you have divorced ${partnerName}`);
 

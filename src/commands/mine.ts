@@ -350,6 +350,7 @@ async function run(
     }
 
     await addInventoryItem(member, chosen, amount);
+    addItemSourceStat(chosen, "mine", amount);
 
     foundItems.set(chosen, foundItems.has(chosen) ? foundItems.get(chosen) + amount : amount);
   }
@@ -357,6 +358,7 @@ async function run(
   if (!unbreakable && percentChance(0.65)) {
     foundItems.set("stick", 1);
     await addInventoryItem(member, "stick", 1);
+    addItemSourceStat("stick", "mine", 1);
   }
 
   let total = 0;

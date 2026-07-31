@@ -216,7 +216,7 @@ export default class ScratchCard {
         );
 
       const prize = this.area[y][x].result;
-      await giveLootPoolResult(this.member.user.id, prize);
+      await giveLootPoolResult(this.member.user.id, prize, `item:${this.item.id}`);
 
       let eventProgress: Awaited<ReturnType<typeof addEventProgress>>;
       let eventData: EventData;

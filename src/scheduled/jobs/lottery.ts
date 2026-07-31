@@ -158,6 +158,7 @@ export default {
           await markGemAsGiven();
           logger.info(`${winner.userId} received purple_gem randomly (mines)`);
           await addInventoryItem(winner.userId, "purple_gem", 1);
+          addItemSourceStat("purple_gem", "lottery", 1);
           addProgress(winner.userId, "gem_hunter", 1);
 
           if ((await getPreferences(winner.userId)).dms.other) {
@@ -199,6 +200,7 @@ export default {
         await removeBalance(user.userId, cost);
         addStat(user.userId, "spent-shop", cost);
         await addInventoryItem(user.userId, "lottery_ticket", amount);
+        addItemSourceStat("lottery_ticket", "shop", amount);
 
         if ((await getPreferences(user.userId)).dms.other) {
           const components = winnerMessageUrl
@@ -316,6 +318,7 @@ async function addSuperdrawRolloverTickets(
 
     tasks.push(async () => {
       await addInventoryItem(ticket.userId, "superdraw_lottery_ticket", granted);
+      addItemSourceStat("superdraw_lottery_ticket", "item:lottery_ticket", granted);
       log(`rolled ${granted} superdraw tickets for ${ticket.userId} from ${amount} tickets`);
     });
   }

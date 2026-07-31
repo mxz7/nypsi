@@ -246,6 +246,7 @@ async function listen(
 
     await removeInventoryItem(message.member, "dabloon", item.cost);
     await addInventoryItem(message.member, item.itemId, item.amount);
+    addItemSourceStat(item.itemId, "dabloon_shop", item.amount);
 
     interaction.reply({
       embeds: [

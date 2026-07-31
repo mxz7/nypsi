@@ -75,6 +75,7 @@ export default {
       await markGemAsGiven();
       logger.info(`${interaction.user.id} received blue_gem randomly (daily)`);
       await addInventoryItem(interaction.user.id, "blue_gem", 1);
+      addItemSourceStat("blue_gem", "daily", 1);
       addProgress(interaction.user.id, "gem_hunter", 1);
 
       if ((await getPreferences(interaction.user.id)).dms.other) {

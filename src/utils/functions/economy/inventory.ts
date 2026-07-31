@@ -277,6 +277,20 @@ export async function addInventoryItem(member: MemberResolvable, itemId: string,
   if (isGem(itemId)) await hasGemCache.delete(`${userId}:${itemId}`);
 }
 
+export async function addItemSourceStat(itemId: string, source: string, amount: number) {
+  if (amount <= 0 || !source || !getItems()[itemId]) return;
+
+  return prisma.itemSourceStats
+    .upsert({
+      where: { itemId_source: { itemId, source } },
+      update: { amount: { increment: amount } },
+      create: { itemId, source, amount },
+    })
+    .catch((error) =>
+      logger.error(`failed to record item stat for ${itemId} from ${source}`, error),
+    );
+}
+
 export async function removeInventoryItem(
   member: MemberResolvable,
   itemId: string,
@@ -450,6 +464,7 @@ export async function commandGemCheck(member: MemberResolvable, commandCategory:
     logger.info(`${userId} received ${gem} randomly`);
 
     await addInventoryItem(member, gem, 1);
+    addItemSourceStat(gem, `command:${commandCategory}`, 1);
     addProgress(member, "gem_hunter", 1);
 
     if ((await getPreferences(member)).dms.other) {
@@ -470,6 +485,7 @@ export async function commandGemCheck(member: MemberResolvable, commandCategory:
       await markGemAsGiven();
       logger.info(`${userId} received pink_gem randomly`);
       await addInventoryItem(member, "pink_gem", 1);
+      addItemSourceStat("pink_gem", "command:moderation", 1);
       addProgress(userId, "gem_hunter", 1);
 
       if ((await getPreferences(member)).dms.other) {
@@ -491,6 +507,7 @@ export async function commandGemCheck(member: MemberResolvable, commandCategory:
       await markGemAsGiven();
       logger.info(`${userId} received purple_gem randomly`);
       await addInventoryItem(member, "purple_gem", 1);
+      addItemSourceStat("purple_gem", "command:animals", 1);
       addProgress(member, "gem_hunter", 1);
 
       if ((await getPreferences(member)).dms.other) {
@@ -653,6 +670,7 @@ export async function gemBreak(
   const amount = Math.floor(Math.random() * shardMax.get(gem) - 1) + 1;
 
   await addInventoryItem(userId, "gem_shard", amount);
+  addItemSourceStat("gem_shard", `item:${gem}`, amount);
 
   logger.debug(`gems: ${userId} shattered ${gem} into ${amount} shards`);
 

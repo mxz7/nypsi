@@ -194,6 +194,7 @@ async function run(
 
   if (fail) {
     await addInventoryItem(message.member, "ring", 1);
+    addItemSourceStat("ring", "marry", 1);
     return;
   }
 
@@ -210,6 +211,7 @@ async function run(
     }
   } else {
     await addInventoryItem(message.member, "broken_ring", 1);
+    addItemSourceStat("broken_ring", "marry", 1);
     embed.setDescription("oh. that was awkward.").setFooter({ text: `+1 broken ring` });
   }
 

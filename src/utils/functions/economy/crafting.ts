@@ -39,6 +39,7 @@ export async function getCraftingItems(member: MemberResolvable, deleteOld = tru
         });
 
         await addInventoryItem(userId, item.itemId, item.amount);
+        addItemSourceStat(item.itemId, "craft", item.amount);
       }
     }
   }

@@ -114,6 +114,7 @@ export default {
           }
           steveStorage.byproducts[byproduct] += byproductAmounts[byproduct];
           await addInventoryItem(worker.userId, byproduct, byproductAmounts[byproduct]);
+          addItemSourceStat(byproduct, "worker", byproductAmounts[byproduct]);
         }
 
         await redis.set(

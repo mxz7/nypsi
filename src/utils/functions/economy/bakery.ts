@@ -244,10 +244,12 @@ export async function runBakery(member: GuildMember) {
   while (percentChance(cakeChance > 25 ? 25 : cakeChance)) cakeAmount++;
 
   await addInventoryItem(member, "cookie", Math.round(total));
+  addItemSourceStat("cookie", "bake", Math.round(total));
   addStat(member, "bake-total", Math.round(total));
 
   if (cakeAmount > 0) {
     await addInventoryItem(member, "cake", cakeAmount);
+    addItemSourceStat("cake", "bake", cakeAmount);
     addStat(member, "bake-cake", cakeAmount);
   }
 

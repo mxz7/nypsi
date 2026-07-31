@@ -295,6 +295,7 @@ async function run(
     }
 
     await addInventoryItem(member, chosen, amount);
+    addItemSourceStat(chosen, "hunt", amount);
 
     if (!chosen) {
       console.error(chosen);

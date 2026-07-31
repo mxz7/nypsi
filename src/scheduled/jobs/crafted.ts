@@ -25,6 +25,7 @@ export default {
       });
 
       await addInventoryItem(item.userId, item.itemId, item.amount);
+      addItemSourceStat(item.itemId, "craft", item.amount);
 
       await addProgress(item.userId, "crafter", item.amount);
 

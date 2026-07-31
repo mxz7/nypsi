@@ -344,6 +344,7 @@ async function run(
       case "item":
       case "premium":
         await addInventoryItem(message.member, wanted.value, 1);
+        addItemSourceStat(wanted.value, "karma_shop", 1);
         break;
       case "xp":
         await addXp(message.member, wanted.value);
@@ -362,6 +363,7 @@ async function run(
       await markGemAsGiven();
       logger.info(`${message.author.id} received purple_gem randomly (karmashop)`);
       await addInventoryItem(message.member, "purple_gem", 1);
+      addItemSourceStat("purple_gem", "karma_shop", 1);
       addProgress(message.member, "gem_hunter", 1);
       addNotificationToQueue({
         memberId: message.author.id,

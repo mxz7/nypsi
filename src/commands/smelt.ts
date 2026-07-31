@@ -124,7 +124,11 @@ async function run(
 
     res += `\n${smelted.get(ore)} ${items[ingot].emoji} ${items[ingot].name}`;
 
-    promises.push(addInventoryItem(message.member, ingot, smelted.get(ore)));
+    promises.push(
+      addInventoryItem(message.member, ingot, smelted.get(ore)).then(() => {
+        addItemSourceStat(ingot, "smelt", smelted.get(ore));
+      }),
+    );
   }
 
   promises.push(removeInventoryItem(message.member, "coal", coal));

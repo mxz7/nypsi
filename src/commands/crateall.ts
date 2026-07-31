@@ -80,6 +80,7 @@ async function run(
         if (!(await userExists(m))) return;
 
         await addInventoryItem(m, selected.id, amount);
+        addItemSourceStat(selected.id, "admin", amount);
 
         logger.info(`${amount} ${selected.id} given to ${m} (${await getLastKnownUsername(m)})`);
         count += amount;

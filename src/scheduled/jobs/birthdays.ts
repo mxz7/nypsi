@@ -30,6 +30,7 @@ export default {
 
       functions.push(async () => {
         await addInventoryItem(member.id, "cake", 1);
+        addItemSourceStat("cake", "birthday", 1);
       });
     }
 

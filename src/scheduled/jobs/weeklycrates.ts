@@ -63,6 +63,7 @@ export default {
       for (const [key, value] of rewards.entries()) {
         log(`${member.id} receiving ${value}x ${key}`);
         await addInventoryItem(member.id, key, value);
+        addItemSourceStat(key, "premium", value);
         desc.push(`+**${value}** ${getItems()[key].emoji} ${pluralize(getItems()[key], value)}`);
       }
 

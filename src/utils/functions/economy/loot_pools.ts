@@ -47,7 +47,11 @@ export function getDefaultLootPool(predicate?: (item: Item) => boolean): LootPoo
   return lootPool;
 }
 
-export async function giveLootPoolResult(member: MemberResolvable, result: LootPoolResult) {
+export async function giveLootPoolResult(
+  member: MemberResolvable,
+  result: LootPoolResult,
+  source: string,
+) {
   if (Object.hasOwn(result, "money")) {
     await addBalance(member, result.money);
   }
@@ -63,6 +67,7 @@ export async function giveLootPoolResult(member: MemberResolvable, result: LootP
   }
   if (Object.hasOwn(result, "item")) {
     await addInventoryItem(member, result.item, Object.hasOwn(result, "count") ? result.count : 1);
+    addItemSourceStat(result.item, source, Object.hasOwn(result, "count") ? result.count : 1);
     if (isGem(result.item)) {
       await addProgress(member, "gem_hunter", result.count ?? 1);
     }
@@ -217,6 +222,7 @@ export async function openCrate(member: MemberResolvable, item: Item): Promise<L
   await removeInventoryItem(member, item.id, 1);
 
   const crateItems: LootPoolResult[] = [];
+  const source = `item:${item.id}`;
 
   for (const poolName in item.loot_pools) {
     const pool = getLootPools()[poolName];
@@ -225,7 +231,7 @@ export async function openCrate(member: MemberResolvable, item: Item): Promise<L
         pool,
         async (e) => getItems()[e].unique && (await itemExists(e)),
       );
-      await giveLootPoolResult(member, item);
+      await giveLootPoolResult(member, item, source);
       crateItems.push(item);
     }
   }

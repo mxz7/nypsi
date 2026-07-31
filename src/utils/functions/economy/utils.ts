@@ -14,9 +14,9 @@ import {
   Event,
   GuildUpgrade,
   Item,
+  PetData,
   Plant,
   PlantUpgrade,
-  PetData,
   UserUpgrade,
 } from "../../../types/Economy";
 import { LootPool } from "../../../types/LootPool";
@@ -282,6 +282,7 @@ export async function createUser(member: MemberResolvable) {
   });
   await userExistsCache.delete(userId);
   await addInventoryItem(userId, "beginner_booster", 1);
+  addItemSourceStat("beginner_booster", "new_user", 1);
 }
 
 export async function formatBet(
@@ -735,8 +736,14 @@ export async function doDaily(
 
       promises.push(() => addBalance(marriage.partnerId, marriageMoney));
       promises.push(() => addXp(marriage.partnerId, marriageXp));
-      promises.push(() => addInventoryItem(marriage.partnerId, "daily_scratch_card", 1));
-      promises.push(() => addInventoryItem(marriage.partnerId, "lottery_ticket", 1));
+      promises.push(async () => {
+        await addInventoryItem(marriage.partnerId, "daily_scratch_card", 1);
+        addItemSourceStat("daily_scratch_card", "daily", 1);
+      });
+      promises.push(async () => {
+        await addInventoryItem(marriage.partnerId, "lottery_ticket", 1);
+        addItemSourceStat("lottery_ticket", "daily", 1);
+      });
 
       const embed = new CustomEmbed(marriage.partnerId);
 
@@ -768,7 +775,10 @@ export async function doDaily(
   ];
 
   for (const [itemId, amount] of totalRewards) {
-    promises.push(() => addInventoryItem(member, itemId, amount));
+    promises.push(async () => {
+      await addInventoryItem(member, itemId, amount);
+      addItemSourceStat(itemId, "daily", amount);
+    });
 
     rewards.push(
       `+ **${amount.toLocaleString()}** ${items[itemId].emoji} ${pluralize(items[itemId], amount)}`,
@@ -776,8 +786,14 @@ export async function doDaily(
   }
 
   promises.push(() => addBalance(member, totalMoney));
-  promises.push(() => addInventoryItem(member, "daily_scratch_card", totalCards));
-  promises.push(() => addInventoryItem(member, "lottery_ticket", totalCards));
+  promises.push(async () => {
+    await addInventoryItem(member, "daily_scratch_card", totalCards);
+    addItemSourceStat("daily_scratch_card", "daily", totalCards);
+  });
+  promises.push(async () => {
+    await addInventoryItem(member, "lottery_ticket", totalCards);
+    addItemSourceStat("lottery_ticket", "daily", totalCards);
+  });
 
   if (!rerun) {
     promises.push(() => updateLastDaily(member, updateLast, amount));

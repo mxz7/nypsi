@@ -335,6 +335,7 @@ async function run(
       }
 
       await addInventoryItem(member, chosen, amount);
+      addItemSourceStat(chosen, "fish", amount);
 
       foundItems.set(chosen, foundItems.has(chosen) ? foundItems.get(chosen) + amount : amount);
     } else {
@@ -349,6 +350,7 @@ async function run(
       }
 
       await addInventoryItem(member, chosen, amount);
+      addItemSourceStat(chosen, "fish", amount);
 
       if (isGem(chosen)) {
         await addProgress(member, "gem_hunter", amount);

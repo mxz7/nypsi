@@ -189,6 +189,7 @@ async function handleKofiData(data: z.infer<typeof schema>) {
           const amount = item.itemAmount ? item.itemAmount * (shopItem.quantity || 1) : 1;
 
           await addInventoryItem(user.id, itemData.id, amount);
+          addItemSourceStat(itemData.id, "kofi", amount);
 
           logger.info(`given to ${user.id} (${user.email})`, { item, amount });
 
@@ -237,6 +238,7 @@ async function handleKofiData(data: z.infer<typeof schema>) {
 
         if (gemChance == 7) {
           await addInventoryItem(user.id, "pink_gem", 1);
+          addItemSourceStat("pink_gem", "kofi", 1);
           addProgress(user.id, "gem_hunter", 1);
 
           if ((await getPreferences(user.id)).dms.other) {
@@ -255,6 +257,7 @@ async function handleKofiData(data: z.infer<typeof schema>) {
           }
         } else if (gemChance == 17) {
           await addInventoryItem(user.id, "blue_gem", 1);
+          addItemSourceStat("blue_gem", "kofi", 1);
           addProgress(user.id, "gem_hunter", 1);
 
           if ((await getPreferences(user.id)).dms.other) {
@@ -273,6 +276,7 @@ async function handleKofiData(data: z.infer<typeof schema>) {
           }
         } else if (gemChance == 77) {
           await addInventoryItem(user.id, "purple_gem", 1);
+          addItemSourceStat("purple_gem", "kofi", 1);
           addProgress(user.id, "gem_hunter", 1);
 
           if ((await getPreferences(user.id)).dms.other) {
@@ -291,6 +295,7 @@ async function handleKofiData(data: z.infer<typeof schema>) {
           }
         } else if (gemChance == 27) {
           await addInventoryItem(user.id, "green_gem", 1);
+          addItemSourceStat("green_gem", "kofi", 1);
           addProgress(user.id, "gem_hunter", 1);
 
           if ((await getPreferences(user.id)).dms.other) {
@@ -312,6 +317,7 @@ async function handleKofiData(data: z.infer<typeof schema>) {
 
           if (gemChance2 == 7 && (await getPreferences(user.id)).dms.other) {
             await addInventoryItem(user.id, "white_gem", 1);
+            addItemSourceStat("white_gem", "kofi", 1);
             addProgress(user.id, "gem_hunter", 1);
 
             addNotificationToQueue({

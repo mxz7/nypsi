@@ -170,6 +170,7 @@ export default new ItemUse(
           );
           embed.setColor(Constants.EMBED_FAIL_COLOR);
           await addInventoryItem(message.member, "gem_shard", pieces);
+          addItemSourceStat("gem_shard", "item:reroll_token", pieces);
         }
 
         await sleep(2000);
