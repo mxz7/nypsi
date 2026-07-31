@@ -77,9 +77,9 @@
         }
       },
       "global_double_xp": 0.1,
-      "fox": 10,
-      "tiger": 10,
-      "beaver": 10
+      "fox": 7,
+      "tiger": 7,
+      "beaver": 7
     }
   },
   "mineshaft_chest": {
@@ -184,24 +184,24 @@
       "stick": 25,
       "global_double_xp": 0.75,
       "shark": {
-        "weight": 10,
+        "weight": 7,
         "count": {
           "min": 1,
-          "max": 3
+          "max": 2
         }
       },
       "rocky": {
-        "weight": 10,
+        "weight": 7,
         "count": {
           "min": 1,
-          "max": 3
+          "max": 2
         }
       },
       "eagle": {
-        "weight": 10,
+        "weight": 7,
         "count": {
           "min": 1,
-          "max": 3
+          "max": 2
         }
       }
     }
@@ -263,8 +263,8 @@
       "rice_seed": 1,
       "wilson": 0.01,
       "lily": 0.075,
-      "chicken": 0.05,
-      "beaver": 0.075
+      "chicken": 0.04,
+      "beaver": 0.06
     }
   },
   "daily_scratch_card": {
@@ -333,8 +333,8 @@
           "max": 100
         }
       },
-      "cow": 1,
-      "fox": 0.3
+      "cow": 0.5,
+      "fox": 0.2
     }
   },
   "lucky_scratch_card": {
@@ -410,9 +410,9 @@
           "max": 200
         }
       },
-      "tiger": 1,
-      "beaver": 1,
-      "fox": 1
+      "tiger": 0.8,
+      "beaver": 0.8,
+      "fox": 0.8
     }
   },
   "karma_scratch_card": {
@@ -471,7 +471,7 @@
       },
       "wheat_seed": 50,
       "rice_seed": 60,
-      "eagle": 1
+      "eagle": 0.8
     }
   },
   "legendary_scratch_card": {
@@ -527,10 +527,10 @@
         }
       },
       "ring": 10,
-      "rocky": 5,
-      "tiger": 10,
-      "fox": 10,
-      "beaver": 10
+      "rocky": 4,
+      "tiger": 8,
+      "fox": 8,
+      "beaver": 8
     }
   },
   "random_drop": {
@@ -616,12 +616,12 @@
         }
       },
       "global_double_xp": 0.01,
-      "shark": 3,
+      "shark": 2.5,
       "wilson": 0.5,
-      "tiger": 5,
-      "beaver": 5,
-      "chicken": 4,
-      "cow": 6
+      "tiger": 3,
+      "beaver": 3,
+      "chicken": 2.5,
+      "cow": 4.5
     }
   },
   "pot_of_gold": {
