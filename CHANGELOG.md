@@ -13,6 +13,7 @@
 - add pets
 - add tag for sudoku
 - use first seen (first message in nypsi server) for yearly tags
+- improved money/xp balance for levelling
 
 # june 2026
 
