@@ -291,6 +291,13 @@ export async function addItemSourceStat(itemId: string, source: string, amount: 
     );
 }
 
+export async function getItemSourceStats(itemId: string) {
+  return prisma.itemSourceStats.findMany({
+    where: { itemId, amount: { gt: 0 } },
+    orderBy: { amount: "desc" },
+  });
+}
+
 export async function removeInventoryItem(
   member: MemberResolvable,
   itemId: string,

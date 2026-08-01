@@ -27,7 +27,14 @@ import { MStoTime } from "../date";
 import { getEmojiImage } from "../image";
 import { pluralize } from "../string";
 import { getSellMulti } from "./balance";
-import { calcItemValue, getInventory, getTotalAmountOfItem, Inventory, isGem } from "./inventory";
+import {
+  calcItemValue,
+  getInventory,
+  getItemSourceStats,
+  getTotalAmountOfItem,
+  Inventory,
+  isGem,
+} from "./inventory";
 import { getItemCount, getItemWeight, getTotalWeight } from "./loot_pools";
 import { countItemOnMarket } from "./market";
 import { getBaseWorkers, getItems, getLootPools, getPlantsData } from "./utils";
@@ -49,6 +56,11 @@ type ItemMessageMember = GuildMember | (GuildMember & APIInteractionGuildMember)
 
 type ItemMessageData = {
   embed: CustomEmbed | CustomEmbed[];
+  alternate?: {
+    buttonLabel: string;
+    embed: CustomEmbed | CustomEmbed[];
+    returnButtonLabel: string;
+  };
   subEmbeds?: { [subTab: string]: CustomEmbed | CustomEmbed[] };
   subTabs?: StringSelectMenuOptionBuilder[];
   widgets?: ActionRowBuilder<MessageActionRowComponentBuilder>;
@@ -68,7 +80,7 @@ export async function runItemInfo(
   const tabs: { [tab: string]: ItemMessageData } = {};
   const metaTabs: StringSelectMenuOptionBuilder[] = [];
 
-  const [total, inMarket, value, sellMulti, inventory, inMuseum] = await Promise.all([
+  const [total, inMarket, value, sellMulti, inventory, inMuseum, sourceStats] = await Promise.all([
     getTotalAmountOfItem(selected.id),
     countItemOnMarket(selected.id, "sell"),
     calcItemValue(selected.id),
@@ -80,6 +92,7 @@ export async function runItemInfo(
         _sum: { amount: true },
       })
       .then((i) => Number(i._sum.amount)),
+    getItemSourceStats(selected.id),
   ]);
 
   // =====vvvvv===== MESSAGE DATA =====vvvvv=====
@@ -97,7 +110,7 @@ export async function runItemInfo(
   metaTabs.push(new StringSelectMenuOptionBuilder().setLabel("general").setValue("general"));
 
   // obtaining
-  tabs["obtaining"] = getObtainingMessage(selected, message.member);
+  tabs["obtaining"] = getObtainingMessage(selected, message.member, sourceStats);
   metaTabs.push(new StringSelectMenuOptionBuilder().setLabel("obtaining").setValue("obtaining"));
 
   // crafting
@@ -181,6 +194,9 @@ export async function runItemInfo(
 
   for (const tab in tabs) {
     formatEmbed(tabs[tab].embed, inventory, selected);
+    if (tabs[tab].alternate) {
+      formatEmbed(tabs[tab].alternate.embed, inventory, selected);
+    }
     for (const subTab in tabs[tab].subEmbeds ?? {}) {
       formatEmbed(tabs[tab].subEmbeds[subTab], inventory, selected);
     }
@@ -191,7 +207,12 @@ export async function runItemInfo(
     msg?: Message,
     res?: StringSelectMenuInteraction,
   ): Promise<{ buttonRow: any; embed: any }> => {
-    const showItemPage = async (tabName: string, subTab?: string, page?: number) => {
+    const showItemPage = async (
+      tabName: string,
+      subTab?: string,
+      page?: number,
+      showAlternate = false,
+    ) => {
       for (const tab of metaTabs) {
         tab.setDefault(tab.data.value === tabName);
       }
@@ -217,7 +238,12 @@ export async function runItemInfo(
         );
       }
 
-      let target = subTab === undefined ? tabs[tabName].embed : tabs[tabName].subEmbeds[subTab];
+      const alternate = tabs[tabName].alternate;
+      let target = showAlternate
+        ? alternate.embed
+        : subTab === undefined
+          ? tabs[tabName].embed
+          : tabs[tabName].subEmbeds[subTab];
 
       if (target instanceof Array) {
         if (target.length > 1) {
@@ -243,12 +269,28 @@ export async function runItemInfo(
         rows.push(tabs[tabName].widgets);
       }
 
+      if (alternate) {
+        rows.push(
+          new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+            new ButtonBuilder()
+              .setCustomId("item-info-alternate")
+              .setLabel(showAlternate ? alternate.returnButtonLabel : alternate.buttonLabel)
+              .setStyle(ButtonStyle.Secondary),
+          ),
+        );
+      }
+
       return { embed: target, widgetRows: rows };
     };
 
     const filter = (i: Interaction) => i.user.id == message.author.id;
 
-    const pageManager: any = async (tabName: string, subTab?: string, page?: number) => {
+    const pageManager: any = async (
+      tabName: string,
+      subTab?: string,
+      page?: number,
+      showAlternate = false,
+    ) => {
       const res = await msg
         .awaitMessageComponent({ filter, time: 30_000 })
         .then(async (i) => {
@@ -272,27 +314,40 @@ export async function runItemInfo(
       let targetTab = tabName;
       let targetSub = subTab;
       let targetPage = page;
+      let targetShowAlternate = showAlternate;
 
       if (res.isButton() && ["⬅", "➡"].includes(res.customId)) {
         targetPage = (page ?? 0) + +(res.customId === "➡") - +(res.customId === "⬅");
       }
 
+      if (res.isButton() && res.customId === "item-info-alternate") {
+        targetShowAlternate = !showAlternate;
+        targetPage = undefined;
+      }
+
       if (res.isStringSelectMenu() && res.customId === "subtabs") {
         targetSub = res.values[0];
         targetPage = undefined;
+        targetShowAlternate = false;
       }
 
       if (res.isStringSelectMenu() && res.customId === "tabs") {
         targetTab = res.values[0];
         targetSub = undefined;
         targetPage = undefined;
+        targetShowAlternate = false;
       }
 
-      const { embed, widgetRows } = await showItemPage(targetTab, targetSub, targetPage);
+      const { embed, widgetRows } = await showItemPage(
+        targetTab,
+        targetSub,
+        targetPage,
+        targetShowAlternate,
+      );
       await res
         .update({ embeds: [embed], components: widgetRows })
         .catch(() => res.message.edit({ embeds: [embed], components: widgetRows }));
-      return pageManager(targetTab, targetSub, targetPage);
+      return pageManager(targetTab, targetSub, targetPage, targetShowAlternate);
     };
 
     const { embed, widgetRows } = await showItemPage(defaultTab);
@@ -750,7 +805,11 @@ export function poolBreakdownData(pool: LootPool): {
   }));
 }
 
-function getObtainingMessage(selected: Item, member: ItemMessageMember): ItemMessageData {
+function getObtainingMessage(
+  selected: Item,
+  member: ItemMessageMember,
+  sourceStats: Awaited<ReturnType<typeof getItemSourceStats>>,
+): ItemMessageData {
   const embed = new CustomEmbed(member);
   const data = getObtainingData(selected);
   if (data.sources.length > 0) embed.setDescription(data.sources.join("\n"));
@@ -777,7 +836,59 @@ function getObtainingMessage(selected: Item, member: ItemMessageMember): ItemMes
     embed.setDescription("no sources found");
   }
 
-  return { embed: embed };
+  const message: ItemMessageData = { embed };
+
+  if (sourceStats.length > 0) {
+    message.alternate = {
+      buttonLabel: "view source stats",
+      embed: getSourceStatsMessage(member, sourceStats),
+      returnButtonLabel: "view calculated odds",
+    };
+  }
+
+  return message;
+}
+
+function getSourceStatsMessage(
+  member: ItemMessageMember,
+  sourceStats: Awaited<ReturnType<typeof getItemSourceStats>>,
+) {
+  const pageLength = 15;
+  const items = getItems();
+  const total = sourceStats.reduce((sum, stat) => sum + stat.amount, 0n);
+  const descriptions: string[] = [];
+
+  for (const stat of sourceStats) {
+    let source = stat.source.replaceAll("_", " ");
+
+    if (stat.source.startsWith("item:")) {
+      const sourceItem = items[stat.source.slice("item:".length)];
+      if (sourceItem) source = `${sourceItem.emoji} ${sourceItem.name}`;
+    } else if (stat.source.startsWith("task:")) {
+      source = `${stat.source.slice("task:".length)} task`;
+    } else if (stat.source.startsWith("command:")) {
+      source = `${stat.source.slice("command:".length)} commands`;
+    }
+
+    const percentage = Number((stat.amount * 1_000_000n) / total) / 10_000;
+    const percentageText =
+      percentage === 0
+        ? "<0.0001"
+        : percentage.toLocaleString("en-GB", { maximumFractionDigits: 4 });
+
+    descriptions.push(`**${source}**: ${stat.amount.toLocaleString()} (\`${percentageText}%\`)`);
+  }
+
+  const embeds: CustomEmbed[] = [];
+  for (let i = 0; i < descriptions.length; i += pageLength) {
+    embeds.push(
+      new CustomEmbed(member).setDescription(
+        `**${total.toLocaleString()} found this season**\n\n${descriptions.slice(i, i + pageLength).join("\n")}`,
+      ),
+    );
+  }
+
+  return embeds.length === 1 ? embeds[0] : embeds;
 }
 
 function getCraftingMessage(

@@ -30,6 +30,8 @@ After calculating a cache miss, it asynchronously records one global `item-value
 
 Do not record transfers, trades, market/offer fulfillment, refunds, or inventory restoration. Rewards obtained from a crate or scratch card use `item:<containerItemId>` as their source; `giveLootPoolResult()` and `openCrate()` already propagate this attribution.
 
+`getItemSourceStats(itemId)` returns the current season's rows ordered by amount. The item command's obtaining tab uses it for the optional **view source stats** alternate view; items without recorded rows do not show the toggle.
+
 ## Fuzzy/substring search (multiple results)
 
 `selectItem` only returns a single exact match. If you need to find _candidate_ items from a partial/fuzzy query (e.g. an AI tool letting a model discover an item id first), filter `getItems()` yourself with substring checks against the relevant searchable fields, still excluding `hidden` items. The AI `search_items` tool in `src/utils/functions/ai/tools/items.ts` searches `id`/`name`/`aliases`/`role`, allowing category searches through the same query input.
