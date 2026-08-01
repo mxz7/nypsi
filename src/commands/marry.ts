@@ -15,6 +15,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { daysAgo, formatDate } from "../utils/functions/date";
 import {
   addInventoryItem,
+  addItemSourceStat,
   getInventory,
   removeInventoryItem,
 } from "../utils/functions/economy/inventory";

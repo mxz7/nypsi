@@ -35,7 +35,7 @@ import {
 import { addEventProgress } from "../utils/functions/economy/events";
 import { hasGemBeenGiven, markGemAsGiven } from "../utils/functions/economy/gems";
 import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds";
-import { addInventoryItem } from "../utils/functions/economy/inventory";
+import { addInventoryItem, addItemSourceStat } from "../utils/functions/economy/inventory";
 import { createGame } from "../utils/functions/economy/stats";
 import {
   createUser,

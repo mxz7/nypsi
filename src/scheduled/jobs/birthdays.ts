@@ -4,7 +4,7 @@ import { WebhookClient } from "discord.js";
 import prisma from "../../init/database";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import { Job } from "../../types/Jobs";
-import { addInventoryItem } from "../../utils/functions/economy/inventory";
+import { addInventoryItem, addItemSourceStat } from "../../utils/functions/economy/inventory";
 import { getItems } from "../../utils/functions/economy/utils";
 import { getAllMembersRest } from "../../utils/functions/guilds/members";
 import { getOrdinalSuffix, pluralize } from "../../utils/functions/string";

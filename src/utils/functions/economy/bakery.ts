@@ -14,7 +14,7 @@ import { addProgress } from "./achievements";
 import { applyPassiveBakePenalty } from "./bakery-range";
 import { addEventProgress, formatEventProgress, getCurrentEvent } from "./events";
 import { getGuildName, getGuildUpgradesByUser } from "./guilds";
-import { addInventoryItem, getInventory } from "./inventory";
+import { addInventoryItem, addItemSourceStat, getInventory } from "./inventory";
 import { getUpgrades } from "./levelling";
 import { isPassive } from "./passive";
 import { rollPet } from "./pets";

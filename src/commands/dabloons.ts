@@ -22,6 +22,7 @@ import { DabloonShopItem } from "../types/Economy";
 import Constants from "../utils/Constants";
 import {
   addInventoryItem,
+  addItemSourceStat,
   getInventory,
   removeInventoryItem,
 } from "../utils/functions/economy/inventory";

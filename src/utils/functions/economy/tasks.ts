@@ -15,7 +15,7 @@ import { getLastKnownAvatar } from "../users/username";
 import { addProgress } from "./achievements";
 import { addBalance } from "./balance";
 import { addToGuildXP, getGuildName } from "./guilds";
-import { addInventoryItem } from "./inventory";
+import { addInventoryItem, addItemSourceStat } from "./inventory";
 import { getPrestige } from "./levelling";
 import { getItems, getTasksData, isEcoBanned, maxPrestige, userExists } from "./utils";
 import { addXp } from "./xp";

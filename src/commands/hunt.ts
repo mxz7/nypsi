@@ -21,6 +21,7 @@ import {
 import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds";
 import {
   addInventoryItem,
+  addItemSourceStat,
   gemBreak,
   getInventory,
   removeInventoryItem,

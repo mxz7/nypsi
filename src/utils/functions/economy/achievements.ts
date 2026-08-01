@@ -10,7 +10,7 @@ import { addInlineNotification, addNotificationToQueue } from "../users/notifica
 import { getPreferences } from "../users/preferences";
 import { addTag } from "../users/tags";
 import { hasGemBeenGiven, markGemAsGiven } from "./gems";
-import { addInventoryItem } from "./inventory";
+import { addInventoryItem, addItemSourceStat } from "./inventory";
 import {
   createUser,
   getAchievements,

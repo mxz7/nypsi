@@ -13,7 +13,7 @@ import { getUserId, MemberResolvable } from "../member";
 import { MemoryMutex } from "../mutex";
 import { addNotificationToQueue } from "../users/notifications";
 import { getPreferences } from "../users/preferences";
-import { addInventoryItem } from "./inventory";
+import { addInventoryItem, addItemSourceStat } from "./inventory";
 import { getUpgrades } from "./levelling";
 import { getItems, getUpgradesData, isEcoBanned } from "./utils";
 

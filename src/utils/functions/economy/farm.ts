@@ -11,7 +11,13 @@ import { MemoryMutex } from "../mutex";
 import { addProgress } from "./achievements";
 import { getBoosters } from "./boosters";
 import { addEventProgress } from "./events";
-import { addInventoryItem, gemBreak, getInventory, removeInventoryItem } from "./inventory";
+import {
+  addInventoryItem,
+  addItemSourceStat,
+  gemBreak,
+  getInventory,
+  removeInventoryItem,
+} from "./inventory";
 import { getUpgrades } from "./levelling";
 import { rollPet } from "./pets";
 import { addStat } from "./stats";

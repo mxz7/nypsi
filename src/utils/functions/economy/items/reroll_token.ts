@@ -12,7 +12,12 @@ import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import Constants from "../../../Constants";
 import sleep from "../../sleep";
-import { addInventoryItem, getInventory, removeInventoryItem } from "../inventory";
+import {
+  addInventoryItem,
+  addItemSourceStat,
+  getInventory,
+  removeInventoryItem,
+} from "../inventory";
 import { getUpgrades, setUpgrade } from "../levelling";
 import { addStat } from "../stats";
 import { getUpgradesData, maxPrestige } from "../utils";

@@ -34,6 +34,7 @@ import {
 } from "../functions/economy/events";
 import {
   addInventoryItem,
+  addItemSourceStat,
   commandGemCheck,
   gemBreak,
   getInventory,

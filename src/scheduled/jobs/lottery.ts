@@ -16,7 +16,11 @@ import Constants from "../../utils/Constants";
 import { addProgress } from "../../utils/functions/economy/achievements";
 import { addBalance, getBalance, removeBalance } from "../../utils/functions/economy/balance";
 import { hasGemBeenGiven, markGemAsGiven } from "../../utils/functions/economy/gems";
-import { addInventoryItem, setInventoryItem } from "../../utils/functions/economy/inventory";
+import {
+  addInventoryItem,
+  addItemSourceStat,
+  setInventoryItem,
+} from "../../utils/functions/economy/inventory";
 import { createLotteryEntry, getLotteryAutoBuyUsers } from "../../utils/functions/economy/lottery";
 import { addStat } from "../../utils/functions/economy/stats";
 import { getItems } from "../../utils/functions/economy/utils";

@@ -41,7 +41,7 @@ import { setProgress } from "./achievements";
 import { addBalance, calcMaxBet, getBalance } from "./balance";
 import { formatEventProgress, getCurrentEvent } from "./events";
 import { addToGuildXP, getGuildByUser, getGuildName } from "./guilds";
-import { addInventoryItem } from "./inventory";
+import { addInventoryItem, addItemSourceStat } from "./inventory";
 import { getDefaultLootPool } from "./loot_pools";
 import { formatNumber, formatNumberPretty } from "./number";
 import { addStat } from "./stats";

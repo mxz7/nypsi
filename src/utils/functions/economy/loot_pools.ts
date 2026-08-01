@@ -9,6 +9,7 @@ import { addBalance } from "./balance";
 import { addToGuildXP, getGuildName } from "./guilds";
 import {
   addInventoryItem,
+  addItemSourceStat,
   getInventory,
   isGem,
   itemExists,

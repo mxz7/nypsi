@@ -21,7 +21,7 @@ import { addProgress } from "./achievements";
 import { addBalance } from "./balance";
 import { hasGemBeenGiven, markGemAsGiven } from "./gems";
 import { addToGuildXP, getGuildByUser } from "./guilds";
-import { addInventoryItem, getInventory } from "./inventory";
+import { addInventoryItem, addItemSourceStat, getInventory } from "./inventory";
 import { getRawLevel } from "./levelling";
 import { addStat } from "./stats";
 import { getItems } from "./utils";

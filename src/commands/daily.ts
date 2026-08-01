@@ -11,7 +11,7 @@ import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { hasGemBeenGiven, markGemAsGiven } from "../utils/functions/economy/gems";
-import { addInventoryItem } from "../utils/functions/economy/inventory";
+import { addInventoryItem, addItemSourceStat } from "../utils/functions/economy/inventory";
 import {
   awaitDailyUpcomingRewardsInteraction,
   createUser,

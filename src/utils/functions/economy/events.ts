@@ -20,7 +20,7 @@ import { getPreferences } from "../users/preferences";
 import { getLastKnownUsername } from "../users/username";
 import { hasProfile } from "../users/utils";
 import { addProgress } from "./achievements";
-import { addInventoryItem } from "./inventory";
+import { addInventoryItem, addItemSourceStat } from "./inventory";
 import { rollPet } from "./pets";
 import { getEventsData, getItems, isEcoBanned } from "./utils";
 import ms = require("ms");

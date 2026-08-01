@@ -11,7 +11,7 @@ import { pluralize } from "../string";
 import { addProgress } from "./achievements";
 import { addBalance } from "./balance";
 import { getBoosters } from "./boosters";
-import { addInventoryItem, gemBreak, getInventory } from "./inventory";
+import { addInventoryItem, addItemSourceStat, gemBreak, getInventory } from "./inventory";
 import { addStat } from "./stats";
 import { getBaseUpgrades, getBaseWorkers, getItems } from "./utils";
 

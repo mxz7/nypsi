@@ -66,6 +66,7 @@ import { createEvent, getCurrentEvent } from "../utils/functions/economy/events"
 import { getGuildByUser } from "../utils/functions/economy/guilds";
 import {
   addInventoryItem,
+  addItemSourceStat,
   calcItemValue,
   getInventory,
   setInventoryItem,

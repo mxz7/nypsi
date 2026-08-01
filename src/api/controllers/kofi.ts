@@ -9,7 +9,7 @@ import { CustomEmbed } from "../../models/EmbedBuilders";
 import { NotificationPayload } from "../../types/Notification";
 import Constants from "../../utils/Constants";
 import { addProgress } from "../../utils/functions/economy/achievements";
-import { addInventoryItem } from "../../utils/functions/economy/inventory";
+import { addInventoryItem, addItemSourceStat } from "../../utils/functions/economy/inventory";
 import { getItems } from "../../utils/functions/economy/utils";
 import {
   addMember,

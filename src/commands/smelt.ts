@@ -10,6 +10,7 @@ import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import {
   addInventoryItem,
+  addItemSourceStat,
   getInventory,
   removeInventoryItem,
 } from "../utils/functions/economy/inventory";

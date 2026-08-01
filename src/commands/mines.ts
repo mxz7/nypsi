@@ -39,7 +39,7 @@ import {
 import { addEventProgress } from "../utils/functions/economy/events.js";
 import { hasGemBeenGiven, markGemAsGiven } from "../utils/functions/economy/gems.js";
 import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds.js";
-import { addInventoryItem } from "../utils/functions/economy/inventory.js";
+import { addInventoryItem, addItemSourceStat } from "../utils/functions/economy/inventory.js";
 import { createGame } from "../utils/functions/economy/stats.js";
 import {
   createUser,

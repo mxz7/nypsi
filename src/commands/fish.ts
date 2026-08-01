@@ -23,6 +23,7 @@ import { hasGemBeenGiven, markGemAsGiven } from "../utils/functions/economy/gems
 import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds";
 import {
   addInventoryItem,
+  addItemSourceStat,
   gemBreak,
   getInventory,
   isGem,

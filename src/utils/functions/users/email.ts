@@ -4,7 +4,7 @@ import { NotificationPayload } from "../../../types/Notification";
 import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
-import { addInventoryItem } from "../economy/inventory";
+import { addInventoryItem, addItemSourceStat } from "../economy/inventory";
 import { getItems } from "../economy/utils";
 import { getUserId, MemberResolvable } from "../member";
 import {
