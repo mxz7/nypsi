@@ -26,7 +26,7 @@ After calculating a cache miss, it asynchronously records one global `item-value
 
 ## Recording item acquisition sources
 
-`addItemSourceStat(itemId, source, amount)` in `src/utils/functions/economy/inventory.ts` increments the global `ItemStats` row identified by `(itemId, source)`. Call it explicitly and without `await` after a successful `addInventoryItem()` whenever an item is newly generated. The function handles and logs its own database errors.
+`addItemSourceStat(itemId, source, amount)` in `src/utils/functions/economy/inventory.ts` increments the global `ItemSourceStats` row identified by `(itemId, source)`. Call it explicitly and without `await` after a successful `addInventoryItem()` whenever an item is newly generated. The function handles and logs its own database errors. The season reset deletes all source-stat rows.
 
 Do not record transfers, trades, market/offer fulfillment, refunds, or inventory restoration. Rewards obtained from a crate or scratch card use `item:<containerItemId>` as their source; `giveLootPoolResult()` and `openCrate()` already propagate this attribution.
 
