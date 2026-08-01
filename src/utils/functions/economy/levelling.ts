@@ -29,9 +29,13 @@ const upgradesCache = new RedisCache<{ upgradeId: string; amount: number }[]>(
   3600,
 );
 
-const levellingRewards = new Map<number, { text: string[]; rewards?: string[] }>();
+const levellingRewards = new Map<
+  number,
+  { preview: string[]; text: string[]; rewards?: string[] }
+>();
 
 levellingRewards.set(1, {
+  preview: ["🔮 50 karma", "$30,000"],
   text: [
     "congratulations on your first level up and welcome to nypsi!!\ndon't forget to </vote:1014905682341924944> daily for rewards\n" +
       "- 🔮 50 karma" +
@@ -40,6 +44,7 @@ levellingRewards.set(1, {
   rewards: ["karma:50", "money:30000"],
 });
 levellingRewards.set(3, {
+  preview: ["🪨 quarry worker"],
   text: [
     "congratulations on level 3!! it's about time we teach you about workers\n" +
       "\nworkers fill up their capacity in the background, whether you're using nypsi or not. when workers are full, you can use </workers claim:1014905682341924945> to empty their inventory and earn money." +
@@ -49,6 +54,7 @@ levellingRewards.set(3, {
   ],
 });
 levellingRewards.set(7, {
+  preview: ["`1x` 📦 basic crate", "$100,000"],
   text: [
     "just a little bonus for my favourite number 😁\n\n" +
       "- `1x` 📦 basic crate" +
@@ -57,6 +63,13 @@ levellingRewards.set(7, {
   rewards: ["id:basic_crate", "money:100000"],
 });
 levellingRewards.set(10, {
+  preview: [
+    "`2x` 📦 basic crates",
+    "🔮 100 karma",
+    "$100,000",
+    "🥔 potato farmer",
+    "+1% gamble multi",
+  ],
   text: [
     "you're making *very* good progress. keep it up!!\n\n" +
       "- `2x` 📦 basic crate" +
@@ -68,15 +81,24 @@ levellingRewards.set(10, {
   ],
   rewards: ["id:basic_crate", "id:basic_crate", "karma:100", "money:100000"],
 });
-levellingRewards.set(20, { text: ["you have unlocked:\n" + "- +1% gamble multi"] });
+levellingRewards.set(20, {
+  preview: ["+1% gamble multi"],
+  text: ["you have unlocked:\n" + "- +1% gamble multi"],
+});
 levellingRewards.set(25, {
+  preview: ["🎣 fisherman"],
   text: ["you have unlocked:" + "- 🎣 fisherman (</workers view:1014905682341924945>)"],
 });
-levellingRewards.set(35, { text: ["you have unlocked:\n" + "- +1% gamble multi"] });
+levellingRewards.set(35, {
+  preview: ["+1% gamble multi"],
+  text: ["you have unlocked:\n" + "- +1% gamble multi"],
+});
 levellingRewards.set(40, {
+  preview: ["🍟 mcdonalds"],
   text: ["you have unlocked:\n" + "- 🍟 mcdonalds (</workers view:1014905682341924945>)"],
 });
 levellingRewards.set(50, {
+  preview: ["⛏️ miner", "🪓 lumberjack", "🥓 butcher", "+1% gamble multi"],
   text: [
     "you have unlocked:" +
       "\n- ⛏️ miner (</workers view:1014905682341924945>)" +
@@ -86,16 +108,20 @@ levellingRewards.set(50, {
   ],
 });
 levellingRewards.set(60, {
+  preview: ["🔩 scrapyard"],
   text: ["you have unlocked:\n" + "- 🔩 scrapyard (</workers view:1014905682341924945>)"],
 });
 levellingRewards.set(69, {
+  preview: ["`3x` 🎁 69420 crates"],
   text: ["hahaaaaahaha......\n\n" + "- `3x` 🎁 69420 crate"],
   rewards: ["id:69420_crate", "id:69420_crate", "id:69420_crate"],
 });
 levellingRewards.set(75, {
+  preview: ["👕 tailor"],
   text: ["you have unlocked:\n" + "- 👕 tailor (</workers view:1014905682341924945>)"],
 });
 levellingRewards.set(100, {
+  preview: ["🚀 spacex", "📦 amazon", "create your own guild", "+1% gamble multi"],
   text: [
     "you have unlocked:\n" +
       "- 🚀 spacex (</workers view:1014905682341924945>)\n" +
@@ -105,28 +131,35 @@ levellingRewards.set(100, {
   ],
 });
 levellingRewards.set(250, {
+  preview: ["+1% gamble multi"],
   text: ["you have unlocked:\n" + "- +1% gamble multi"],
 });
 levellingRewards.set(300, {
+  preview: ["avatar history tracking"],
   text: ["you have unlocked:\n" + "- avatar history tracking (disabled with $toggletracking)"],
 });
 levellingRewards.set(1000, {
+  preview: ["✨ prestige 10 tag"],
   text: ["- ✨ prestige 10 tag"],
   rewards: ["tag:p10"],
 });
 levellingRewards.set(1500, {
+  preview: ["⭐️ prestige 15 tag"],
   text: ["- ⭐️ prestige 15 tag"],
   rewards: ["tag:p15"],
 });
 levellingRewards.set(2000, {
+  preview: ["🌟 prestige 20 tag"],
   text: ["- 🌟 prestige 20 tag"],
   rewards: ["tag:p20"],
 });
 levellingRewards.set(2500, {
+  preview: ["💫 prestige 25 tag"],
   text: ["- 💫 prestige 25 tag"],
   rewards: ["tag:p25"],
 });
 levellingRewards.set(3000, {
+  preview: ["❤️ prestige 30 tag", "`1x` <:nypsi_omega:1139279162276855890> omega crate"],
   text: [
     "you have received:\n" +
       "- ❤️ prestige 30 tag\n" +
@@ -135,14 +168,17 @@ levellingRewards.set(3000, {
   rewards: ["tag:p30", "id:omega_crate"],
 });
 levellingRewards.set(4000, {
+  preview: ["💛 prestige 40 tag"],
   text: ["- 💛 prestige 40 tag"],
   rewards: ["tag:p40"],
 });
 levellingRewards.set(5000, {
+  preview: ["💜 prestige 50 tag"],
   text: ["- 💜 prestige 50 tag"],
   rewards: ["tag:p50"],
 });
 levellingRewards.set(6000, {
+  preview: ["🖤 prestige 60 tag", "`1x` <:nypsi_omega:1139279162276855890> omega crate"],
   text: [
     "you have received:\n" +
       "- 🖤 prestige 60 tag\n" +
@@ -151,13 +187,55 @@ levellingRewards.set(6000, {
   rewards: ["tag:p60", "id:omega_crate"],
 });
 levellingRewards.set(7000, {
+  preview: ["🤍 prestige 70 tag"],
   text: ["- 🤍 prestige 70 tag"],
   rewards: ["tag:p70"],
 });
 levellingRewards.set(8000, {
+  preview: ["💚 prestige 80 tag"],
   text: ["- 💚 prestige 80 tag"],
   rewards: ["tag:80"],
 });
+
+export function getUpcomingLevelRewards(
+  rawLevel: number,
+  currentPrestige: number,
+  limit = 5,
+): { level: number; rewards: string[] }[] {
+  const upcoming: { level: number; rewards: string[] }[] = [];
+  let rewardLevel = rawLevel + 1;
+
+  while (upcoming.length < limit) {
+    const levelData = levellingRewards.get(rewardLevel);
+    const rewards = [...(levelData?.preview || [])];
+
+    if (!levelData?.rewards) {
+      const crates = cratesFormula(rewardLevel);
+
+      if (crates > 0) rewards.push(`\`${crates}x\` 📦 ${pluralize("basic crate", crates)}`);
+      if (rewardLevel % 200 === 0) rewards.push("`1x` <:xnypsi:1135923012458254416> nypsi crate");
+      if (rewardLevel % 69 === 0) rewards.push("`5x` 🎁 69420 crates");
+      if (rewardLevel % 750 === 0)
+        rewards.push("`1x` <:nypsi_bronze:1108083689478443058> bronze credit");
+      if (rewardLevel % 1500 === 0)
+        rewards.push("`1x` <:nypsi_omega:1139279162276855890> omega crate");
+    }
+
+    if (rewardLevel % 50 === 0) {
+      let boosterMinutes = currentPrestige >= 5 ? 15 : 10;
+
+      if (rewardLevel.toString().endsWith("50")) boosterMinutes *= 2;
+
+      rewards.push(`\`${boosterMinutes}m\` ✨ xp booster*`);
+    }
+
+    if (rewards.length > 0) upcoming.push({ level: rewardLevel, rewards });
+
+    rewardLevel++;
+  }
+
+  return upcoming;
+}
 
 export async function getPrestige(member: MemberResolvable): Promise<number> {
   const userId = getUserId(member);

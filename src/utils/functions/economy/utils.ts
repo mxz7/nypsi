@@ -1,6 +1,14 @@
 import { exec } from "child_process";
 import * as fs from "fs";
-import { ComponentType, GuildMember, Message, MessageFlags, User } from "discord.js";
+import {
+  ActionRow,
+  ComponentType,
+  GuildMember,
+  Message,
+  MessageActionRowComponent,
+  MessageFlags,
+  User,
+} from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { PunishmentType } from "#generated/prisma";
 import prisma from "../../../init/database";
@@ -919,16 +927,32 @@ export async function awaitDailyUpcomingRewardsInteraction(message: Message, use
     })
     .catch((): null => null);
 
-  if (!interaction) return;
+  if (interaction) {
+    const streak = await getDailyStreak(userId);
 
-  const streak = await getDailyStreak(userId);
+    await interaction
+      .reply({
+        embeds: [buildUpcomingDailyRewardsEmbed(userId, streak)],
+        flags: MessageFlags.Ephemeral,
+      })
+      .catch(() => {});
+  }
 
-  await interaction
-    .reply({
-      embeds: [buildUpcomingDailyRewardsEmbed(userId, streak)],
-      flags: MessageFlags.Ephemeral,
+  const components = message.components
+    .filter((component) => component.type === ComponentType.ActionRow)
+    .map((component) => {
+      const row = component as ActionRow<MessageActionRowComponent>;
+
+      return {
+        type: ComponentType.ActionRow as const,
+        components: row.components
+          .filter((child) => child.customId !== "daily-upcoming-rewards")
+          .map((child) => child.toJSON()),
+      };
     })
-    .catch(() => {});
+    .filter((row) => row.components.length > 0);
+
+  await message.edit({ components }).catch(() => {});
 }
 
 function getDailyMoney(currentStreak: number) {

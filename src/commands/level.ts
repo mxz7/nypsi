@@ -1,4 +1,12 @@
-import { MessageFlags } from "discord.js";
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  ComponentType,
+  Message,
+  MessageActionRowComponentBuilder,
+  MessageFlags,
+} from "discord.js";
 import { Command } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { getBankBalance, getMaxBankBalance } from "../utils/functions/economy/balance";
@@ -8,6 +16,7 @@ import {
   getLevelRequirements,
   getNextPrestigeRequirements,
   getPrestige,
+  getUpcomingLevelRewards,
 } from "../utils/functions/economy/levelling";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getXp } from "../utils/functions/economy/xp";
@@ -18,6 +27,28 @@ const cmd = new Command("level", "view your progress to the next level", "money"
   "lu",
   "levelup",
 ]);
+
+async function awaitUpcomingRewardsInteraction(
+  response: Message,
+  userId: string,
+  rewardsEmbed: CustomEmbed,
+) {
+  const interaction = await response
+    .awaitMessageComponent({
+      componentType: ComponentType.Button,
+      filter: (i) => i.user.id === userId && i.customId === "level-upcoming-rewards",
+      time: 60000,
+    })
+    .catch((): null => null);
+
+  if (interaction) {
+    await interaction
+      .reply({ embeds: [rewardsEmbed], flags: MessageFlags.Ephemeral })
+      .catch(() => {});
+  }
+
+  await response.edit({ components: [] }).catch(() => {});
+}
 
 cmd.setRun(async (message, send) => {
   if (!(await userExists(message.member))) await createUser(message.member);
@@ -41,6 +72,13 @@ cmd.setRun(async (message, send) => {
   const nextPrestigeRequirements = getNextPrestigeRequirements(prestige, level);
 
   const rawLevel = calculateRawLevel(level, prestige);
+  const upcomingRewards = getUpcomingLevelRewards(rawLevel, prestige, 3);
+  const upcomingRewardsDescription = upcomingRewards
+    .map(
+      (reward) =>
+        `**level ${reward.level - prestige * 100}**\n${reward.rewards.map((item) => `- ${item}`).join("\n")}`,
+    )
+    .join("\n");
 
   const showSccNotice = nextLevelRequirements.money > maxBank && rawLevel < 700;
 
@@ -64,15 +102,31 @@ cmd.setRun(async (message, send) => {
     )
     .setFooter({ text: `currently prestige ${prestige} level ${level}` });
 
+  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+    new ButtonBuilder()
+      .setCustomId("level-upcoming-rewards")
+      .setLabel("upcoming rewards")
+      .setStyle(ButtonStyle.Secondary),
+  );
+  const rewardsEmbed = new CustomEmbed(message.member)
+    .setHeader("upcoming level rewards", message.author.avatarURL())
+    .setDescription(
+      `${upcomingRewardsDescription}\n\n xp boosters are only awarded if you don't have one active`,
+    );
+
   if (showSccNotice) {
     embed.setDescription(
       "your bank is too small for the next level up, you can use [stolen credit cards](https://nypsi.xyz/items/stolen_credit_card?ref=bot-level) to increase your bank size",
     );
   }
 
-  return send({
+  const response = await send({
     embeds: [embed],
+    components: [row],
   });
+
+  void awaitUpcomingRewardsInteraction(response, message.author.id, rewardsEmbed);
+  return response;
 });
 
 module.exports = cmd;

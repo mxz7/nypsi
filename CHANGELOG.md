@@ -1,6 +1,7 @@
 # august 2026
 
 - add item source tracking stats
+- show upcoming levelling rewards in $level
 
 # july 2026
 
