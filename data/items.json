@@ -1983,7 +1983,7 @@
     "aliases": ["scc", "credit", "card", "cc"],
     "emoji": "💳",
     "longDesc": "increase your bank limit by $10,000-$250,000",
-    "rarity": 1,
+    "rarity": 0,
     "buy": 0,
     "sell": 75000,
     "role": "tool",
