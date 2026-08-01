@@ -151,9 +151,9 @@ The production curve implemented on 31 July 2026 has these locked cumulative
 checkpoints:
 
 - P20: `2,154,413` XP
-- P80: `51,261,903` XP
+- P80: `48,762,535` XP
 
-The P80 checkpoint is 13.00% above the historical formula. Preserve the early
+The P80 checkpoint is 7.49% above the historical formula. Preserve the early
 raw-level reset (`100` is easier than `99`) and the monotonic increase in both
 complete-prestige costs and their first differences. At high prestige, the
 growth between prestiges can exceed the small within-prestige reset, so do not
@@ -176,7 +176,7 @@ The amount uses the average XP requirement of the current prestige and a
 smoothly transitioning divisor. This keeps every qualifying reward within a
 prestige consistent and prevents the reward amount from decreasing at divisor
 boundaries. With the current XP curve, the cumulative target before P80 is
-`6,293` basic crates, 3.21% above the original `6,097`.
+`5,993` basic crates, 1.71% below the original `6,097`.
 
 Preserve monotonic qualifying rewards and check cumulative supply whenever
 changing the XP curve, divisor transitions, or reward intervals. Separate fixed

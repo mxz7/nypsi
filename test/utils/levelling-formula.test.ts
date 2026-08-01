@@ -30,10 +30,10 @@ describe("levelling XP formula", () => {
     expect(calculateLevelXp(0)).toBe(50);
     expect(calculateLevelXp(500)).toBe(394);
     expect(calculateLevelXp(2_000)).toBe(2_286);
-    expect(calculateLevelXp(5_000)).toBe(6_358);
-    expect(calculateLevelXp(8_000)).toBe(19_906);
-    expect(calculateLevelXp(15_000)).toBe(79_445);
-    expect(calculateLevelXp(20_000)).toBe(139_784);
+    expect(calculateLevelXp(5_000)).toBe(6_219);
+    expect(calculateLevelXp(8_000)).toBe(18_576);
+    expect(calculateLevelXp(15_000)).toBe(77_906);
+    expect(calculateLevelXp(20_000)).toBe(138_244);
   });
 
   test("preserves the early-prestige level reset", () => {
@@ -52,7 +52,7 @@ describe("levelling XP formula", () => {
     }
 
     expect(totalToP20).toBe(2_154_413);
-    expect(totalToP80).toBe(51_261_903);
+    expect(totalToP80).toBe(48_762_535);
   });
 
   test("keeps prestige costs and their increases monotonic", () => {
@@ -75,17 +75,17 @@ describe("levelling XP formula", () => {
 describe("levelling money formula", () => {
   test("matches the agreed early, midgame, and high-prestige checkpoints", () => {
     expect(moneyFormula(0)).toBe(9_999);
-    expect(moneyFormula(500)).toBe(314_456);
-    expect(moneyFormula(2_000)).toBe(5_853_292);
-    expect(moneyFormula(5_000)).toBe(46_341_904);
-    expect(moneyFormula(8_000)).toBe(133_460_914);
-    expect(moneyFormula(15_000)).toBe(521_584_877);
-    expect(moneyFormula(20_000)).toBe(961_444_010);
+    expect(moneyFormula(500)).toBe(388_941);
+    expect(moneyFormula(2_000)).toBe(7_101_279);
+    expect(moneyFormula(5_000)).toBe(52_098_795);
+    expect(moneyFormula(8_000)).toBe(144_878_000);
+    expect(moneyFormula(15_000)).toBe(554_626_986);
+    expect(moneyFormula(20_000)).toBe(1_018_747_178);
   });
 
   test("matches the agreed P25 and P80 prestige costs", () => {
-    expect(calculatePrestigeMoney(25)).toBe(1_001_924_740);
-    expect(calculatePrestigeMoney(80)).toBe(13_529_664_704);
+    expect(calculatePrestigeMoney(25)).toBe(1_197_305_742);
+    expect(calculatePrestigeMoney(80)).toBe(14_682_137_563);
   });
 
   test("matches the cumulative P30 and P80 balance targets", () => {
@@ -99,8 +99,8 @@ describe("levelling money formula", () => {
       totalToP80 += requiredMoney;
     }
 
-    expect(totalToP30).toBe(13_486_547_108);
-    expect(totalToP80).toBe(328_664_327_825);
+    expect(totalToP30).toBe(16_220_790_667);
+    expect(totalToP80).toBe(365_069_585_650);
   });
 
   test("keeps prestige costs and their increases monotonic", () => {
@@ -136,9 +136,9 @@ describe("levelling crate formula", () => {
     expect(cratesFormula(1_500)).toBe(6);
     expect(cratesFormula(2_000)).toBe(7);
     expect(cratesFormula(4_005)).toBe(11);
-    expect(cratesFormula(6_000)).toBe(19);
-    expect(cratesFormula(7_500)).toBe(29);
-    expect(cratesFormula(8_010)).toBe(30);
+    expect(cratesFormula(6_000)).toBe(18);
+    expect(cratesFormula(7_500)).toBe(27);
+    expect(cratesFormula(8_010)).toBe(28);
   });
 
   test("keeps rewards monotonic through P200", () => {
@@ -161,6 +161,6 @@ describe("levelling crate formula", () => {
       totalCrates += cratesFormula(rawLevel);
     }
 
-    expect(totalCrates).toBe(6_293);
+    expect(totalCrates).toBe(5_993);
   });
 });

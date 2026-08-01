@@ -34,14 +34,14 @@ export const calculateLevelXp = (rawLevel: number) => {
   const establishedGrowth = 77 * ((latePrestige + 4) ** 1.5 - 3 * latePrestige - 8);
   const shoulderPrestige = Math.max(0, prestige - 45);
   const shoulderProgress = shoulderPrestige / 10;
-  const midgameShoulder = 2_570 * (1 - (1 + shoulderProgress) * Math.exp(-shoulderProgress));
+  const midgameShoulder = 1_030 * (1 - (1 + shoulderProgress) * Math.exp(-shoulderProgress));
 
   return Math.floor((level + 1) * 1.77 + earlyToMid + establishedGrowth + midgameShoulder + 50) - 1;
 };
 
 export const moneyFormula = (rawLevel: number) => {
   const level = rawLevel + 1;
-  const multiplier = 0.65 + 0.25 / (1 + Math.pow(4500 / level, 2.35));
+  const multiplier = 0.81 + 0.14 / (1 + Math.pow(4500 / level, 2.35));
 
   return Math.floor(Math.pow(level, 2.1) * multiplier + 10_000) - 1;
 };
