@@ -838,7 +838,7 @@ function getObtainingMessage(
 
   const message: ItemMessageData = { embed };
 
-  if (sourceStats.length > 0) {
+  if (sourceStats.length > 0 && !selected.id.includes("lottery_ticket")) {
     message.alternate = {
       buttonLabel: "view source stats",
       embed: getSourceStatsMessage(member, sourceStats),
