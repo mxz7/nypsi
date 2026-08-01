@@ -2,7 +2,7 @@ import prisma from "../../init/database";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import { Job } from "../../types/Jobs";
 import Constants from "../../utils/Constants";
-import { addInventoryItem } from "../../utils/functions/economy/inventory";
+import { addInventoryItem, addItemSourceStat } from "../../utils/functions/economy/inventory";
 import { getItems } from "../../utils/functions/economy/utils";
 import { pluralize } from "../../utils/functions/string";
 import { addNotificationToQueue } from "../../utils/functions/users/notifications";
@@ -63,6 +63,7 @@ export default {
       for (const [key, value] of rewards.entries()) {
         log(`${member.id} receiving ${value}x ${key}`);
         await addInventoryItem(member.id, key, value);
+        addItemSourceStat(key, "premium", value);
         desc.push(`+**${value}** ${getItems()[key].emoji} ${pluralize(getItems()[key], value)}`);
       }
 

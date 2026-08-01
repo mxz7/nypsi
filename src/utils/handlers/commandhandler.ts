@@ -34,6 +34,7 @@ import {
 } from "../functions/economy/events";
 import {
   addInventoryItem,
+  addItemSourceStat,
   commandGemCheck,
   gemBreak,
   getInventory,
@@ -881,6 +882,7 @@ export async function runCommand(
           redis.set(Constants.redis.nypsi.LAST_SEASONAL_ITEM, message.author.id, "EX", 300),
           addInventoryItem(message.member, "pumpkin", amount),
         ]);
+        addItemSourceStat("pumpkin", "halloween", amount);
 
         const embed = new CustomEmbed(
           message.member,
@@ -921,6 +923,7 @@ export async function runCommand(
           redis.set(Constants.redis.nypsi.LAST_SEASONAL_ITEM, message.author.id, "EX", 120),
           addInventoryItem(message.member, "christmas_tree", amount),
         ]);
+        addItemSourceStat("christmas_tree", "christmas", amount);
 
         const embed = new CustomEmbed(
           message.member,

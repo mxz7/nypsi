@@ -3,7 +3,7 @@ import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
-import { addInventoryItem } from "../utils/functions/economy/inventory";
+import { addInventoryItem, addItemSourceStat } from "../utils/functions/economy/inventory";
 import { getItems, userExists } from "../utils/functions/economy/utils";
 import { getAllMembersRest } from "../utils/functions/guilds/members";
 import { pluralize } from "../utils/functions/string";
@@ -80,6 +80,7 @@ async function run(
         if (!(await userExists(m))) return;
 
         await addInventoryItem(m, selected.id, amount);
+        addItemSourceStat(selected.id, "admin", amount);
 
         logger.info(`${amount} ${selected.id} given to ${m} (${await getLastKnownUsername(m)})`);
         count += amount;

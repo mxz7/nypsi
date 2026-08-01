@@ -35,7 +35,7 @@ import {
 import { addEventProgress } from "../utils/functions/economy/events";
 import { hasGemBeenGiven, markGemAsGiven } from "../utils/functions/economy/gems";
 import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds";
-import { addInventoryItem } from "../utils/functions/economy/inventory";
+import { addInventoryItem, addItemSourceStat } from "../utils/functions/economy/inventory";
 import { createGame } from "../utils/functions/economy/stats";
 import {
   createUser,
@@ -784,6 +784,7 @@ async function playGame(
             await markGemAsGiven();
             logger.info(`gems: ${message.author.id} received green_gem randomly (tower)`);
             addInventoryItem(message.member, "green_gem", 1);
+            addItemSourceStat("green_gem", "tower", 1);
             addProgress(message.member, "gem_hunter", 1);
             if (response.replied || response.deferred)
               response.followUp({

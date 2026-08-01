@@ -111,7 +111,7 @@ async function rollRandomDrop() {
 }
 
 async function giveRandomDropResult(winner: string, prize: LootPoolResult) {
-  await giveLootPoolResult(winner, prize);
+  await giveLootPoolResult(winner, prize, "random_drop");
 
   if (prize.item && isGem(prize.item)) {
     await markGemAsGiven();

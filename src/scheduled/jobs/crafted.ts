@@ -2,7 +2,7 @@ import prisma from "../../init/database";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import { Job } from "../../types/Jobs";
 import { addProgress } from "../../utils/functions/economy/achievements";
-import { addInventoryItem } from "../../utils/functions/economy/inventory";
+import { addInventoryItem, addItemSourceStat } from "../../utils/functions/economy/inventory";
 import { getItems } from "../../utils/functions/economy/utils";
 import { addNotificationToQueue } from "../../utils/functions/users/notifications";
 import { getPreferences } from "../../utils/functions/users/preferences";
@@ -25,6 +25,7 @@ export default {
       });
 
       await addInventoryItem(item.userId, item.itemId, item.amount);
+      addItemSourceStat(item.itemId, "craft", item.amount);
 
       await addProgress(item.userId, "crafter", item.amount);
 

@@ -2,7 +2,7 @@ import { CommandInteraction, MessageFlags } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders.js";
 import { addBalance } from "../utils/functions/economy/balance";
-import { addInventoryItem } from "../utils/functions/economy/inventory";
+import { addInventoryItem, addItemSourceStat } from "../utils/functions/economy/inventory";
 import { getRawLevel } from "../utils/functions/economy/levelling";
 import { addStat } from "../utils/functions/economy/stats";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
@@ -48,8 +48,11 @@ async function run(
 
   await addBalance(message.member, amount);
   await addInventoryItem(message.member, "wooden_pickaxe", pickaxes);
+  addItemSourceStat("wooden_pickaxe", "free", pickaxes);
   await addInventoryItem(message.member, "terrible_fishing_rod", fishingRods);
+  addItemSourceStat("terrible_fishing_rod", "free", fishingRods);
   await addInventoryItem(message.member, "terrible_gun", guns);
+  addItemSourceStat("terrible_gun", "free", guns);
   addStat(message.member, "earned-freemoney", amount);
 
   const items = getItems();

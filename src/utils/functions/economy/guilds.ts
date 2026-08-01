@@ -13,7 +13,7 @@ import { getUserId, MemberResolvable } from "../member";
 import { MemoryMutex } from "../mutex";
 import { addNotificationToQueue } from "../users/notifications";
 import { getPreferences } from "../users/preferences";
-import { addInventoryItem } from "./inventory";
+import { addInventoryItem, addItemSourceStat } from "./inventory";
 import { getUpgrades } from "./levelling";
 import { getItems, getUpgradesData, isEcoBanned } from "./utils";
 
@@ -501,6 +501,7 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
         for (const reward of rewards) {
           const [itemId, amount] = reward.split(":");
           await addInventoryItem(member.userId, itemId, parseInt(amount) || 0);
+          addItemSourceStat(itemId, "guild", parseInt(amount) || 0);
           desc.push(`\`${amount}x\` ${getItems()[itemId].emoji} ${getItems()[itemId].name}`);
         }
 
@@ -514,6 +515,7 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
         for (const reward of rewards) {
           const [itemId, amount] = reward.split(":");
           await addInventoryItem(member.userId, itemId, parseInt(amount) || 0);
+          addItemSourceStat(itemId, "guild", parseInt(amount) || 0);
           desc.push(`\`${amount}x\` ${getItems()[itemId].emoji} ${getItems()[itemId].name}`);
         }
 

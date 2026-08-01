@@ -11,7 +11,7 @@ import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { hasGemBeenGiven, markGemAsGiven } from "../utils/functions/economy/gems";
-import { addInventoryItem } from "../utils/functions/economy/inventory";
+import { addInventoryItem, addItemSourceStat } from "../utils/functions/economy/inventory";
 import {
   awaitDailyUpcomingRewardsInteraction,
   createUser,
@@ -70,6 +70,7 @@ async function run(
     await markGemAsGiven();
     logger.info(`${message.author.id} received blue_gem randomly (daily)`);
     await addInventoryItem(message.member, "blue_gem", 1);
+    addItemSourceStat("blue_gem", "daily", 1);
     addProgress(message.member, "gem_hunter", 1);
 
     if ((await getPreferences(message.member)).dms.other) {

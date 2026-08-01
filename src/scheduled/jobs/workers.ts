@@ -14,7 +14,7 @@ import Constants from "../../utils/Constants";
 import { addProgress } from "../../utils/functions/economy/achievements";
 import { addBalance } from "../../utils/functions/economy/balance";
 import { getBoosters } from "../../utils/functions/economy/boosters";
-import { addInventoryItem } from "../../utils/functions/economy/inventory";
+import { addInventoryItem, addItemSourceStat } from "../../utils/functions/economy/inventory";
 import { addStat } from "../../utils/functions/economy/stats";
 import { getBaseWorkers } from "../../utils/functions/economy/utils";
 import {
@@ -114,6 +114,7 @@ export default {
           }
           steveStorage.byproducts[byproduct] += byproductAmounts[byproduct];
           await addInventoryItem(worker.userId, byproduct, byproductAmounts[byproduct]);
+          addItemSourceStat(byproduct, "worker", byproductAmounts[byproduct]);
         }
 
         await redis.set(

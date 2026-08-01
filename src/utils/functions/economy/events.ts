@@ -20,7 +20,7 @@ import { getPreferences } from "../users/preferences";
 import { getLastKnownUsername } from "../users/username";
 import { hasProfile } from "../users/utils";
 import { addProgress } from "./achievements";
-import { addInventoryItem } from "./inventory";
+import { addInventoryItem, addItemSourceStat } from "./inventory";
 import { rollPet } from "./pets";
 import { getEventsData, getItems, isEcoBanned } from "./utils";
 import ms = require("ms");
@@ -319,6 +319,7 @@ async function giveRewards(event: EventData) {
   if (!(await isEcoBanned(top5[0].userId)).banned) {
     givenRewards.set(top5[0].userId, [{ itemId: "pandora_box", amount: 3 }]);
     await addInventoryItem(top5[0].userId, "pandora_box", 3);
+    addItemSourceStat("pandora_box", "event", 3);
   }
 
   const giveRewardToGroup = async (group: EventContribution[], toGive: number, itemId: string) => {
@@ -344,6 +345,7 @@ async function giveRewards(event: EventData) {
       }
 
       await addInventoryItem(chosen.userId, itemId, 1);
+      addItemSourceStat(itemId, "event", 1);
     }
   };
 

@@ -10,6 +10,7 @@ import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import {
   addInventoryItem,
+  addItemSourceStat,
   getInventory,
   removeInventoryItem,
 } from "../utils/functions/economy/inventory";
@@ -124,7 +125,11 @@ async function run(
 
     res += `\n${smelted.get(ore)} ${items[ingot].emoji} ${items[ingot].name}`;
 
-    promises.push(addInventoryItem(message.member, ingot, smelted.get(ore)));
+    promises.push(
+      addInventoryItem(message.member, ingot, smelted.get(ore)).then(() => {
+        addItemSourceStat(ingot, "smelt", smelted.get(ore));
+      }),
+    );
   }
 
   promises.push(removeInventoryItem(message.member, "coal", coal));

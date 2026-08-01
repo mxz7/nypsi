@@ -14,7 +14,7 @@ import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { addProgress } from "../utils/functions/economy/achievements";
-import { addInventoryItem } from "../utils/functions/economy/inventory";
+import { addInventoryItem, addItemSourceStat } from "../utils/functions/economy/inventory";
 import { getItems } from "../utils/functions/economy/utils";
 import { getAllMembersRest } from "../utils/functions/guilds/members";
 import { getMember } from "../utils/functions/member";
@@ -193,6 +193,7 @@ async function run(
   ) {
     await removeMarriage(message.member);
     await addInventoryItem(marriage.partnerId, "broken_ring", 1);
+    addItemSourceStat("broken_ring", "divorce", 1);
 
     addNotificationToQueue({
       memberId: marriage.partnerId,

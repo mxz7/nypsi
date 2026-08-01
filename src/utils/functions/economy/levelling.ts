@@ -15,7 +15,7 @@ import { addTag } from "../users/tags";
 import { getLastKnownAvatar } from "../users/username";
 import { addBalance, getBankBalance, removeBankBalance } from "./balance";
 import { addBooster, getBoosters } from "./boosters";
-import { addInventoryItem } from "./inventory";
+import { addInventoryItem, addItemSourceStat } from "./inventory";
 import { calculateLevelXp, cratesFormula, moneyFormula } from "./levelling-formula";
 import { addStat } from "./stats";
 import { addTaskProgress } from "./tasks";
@@ -509,6 +509,7 @@ export async function doLevelUp(member: MemberResolvable) {
   if (items.size > 0) {
     for (const [itemId, amount] of items.entries()) {
       await addInventoryItem(userId, itemId, amount);
+      addItemSourceStat(itemId, "level", amount);
     }
   }
   if (tags.length > 0) {

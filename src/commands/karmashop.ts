@@ -18,7 +18,7 @@ import Constants from "../utils/Constants";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { hasGemBeenGiven, markGemAsGiven } from "../utils/functions/economy/gems";
 import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds";
-import { addInventoryItem } from "../utils/functions/economy/inventory";
+import { addInventoryItem, addItemSourceStat } from "../utils/functions/economy/inventory";
 import { getRawLevel } from "../utils/functions/economy/levelling";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { addXp } from "../utils/functions/economy/xp";
@@ -344,6 +344,7 @@ async function run(
       case "item":
       case "premium":
         await addInventoryItem(message.member, wanted.value, 1);
+        addItemSourceStat(wanted.value, "karma_shop", 1);
         break;
       case "xp":
         await addXp(message.member, wanted.value);
@@ -362,6 +363,7 @@ async function run(
       await markGemAsGiven();
       logger.info(`${message.author.id} received purple_gem randomly (karmashop)`);
       await addInventoryItem(message.member, "purple_gem", 1);
+      addItemSourceStat("purple_gem", "karma_shop", 1);
       addProgress(message.member, "gem_hunter", 1);
       addNotificationToQueue({
         memberId: message.author.id,

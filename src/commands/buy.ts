@@ -13,7 +13,7 @@ import redis from "../init/redis";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getBalance, removeBalance } from "../utils/functions/economy/balance";
-import { addInventoryItem } from "../utils/functions/economy/inventory";
+import { addInventoryItem, addItemSourceStat } from "../utils/functions/economy/inventory";
 import { addStat } from "../utils/functions/economy/stats";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
@@ -199,6 +199,7 @@ async function run(
   await removeBalance(message.member, selected.buy * amount);
   addStat(message.member, "spent-shop", selected.buy * amount);
   await addInventoryItem(message.member, selected.id, amount);
+  addItemSourceStat(selected.id, "shop", amount);
 
   const embed = new CustomEmbed(
     message.member,

@@ -39,7 +39,7 @@ import {
 import { addEventProgress } from "../utils/functions/economy/events.js";
 import { hasGemBeenGiven, markGemAsGiven } from "../utils/functions/economy/gems.js";
 import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds.js";
-import { addInventoryItem } from "../utils/functions/economy/inventory.js";
+import { addInventoryItem, addItemSourceStat } from "../utils/functions/economy/inventory.js";
 import { createGame } from "../utils/functions/economy/stats.js";
 import {
   createUser,
@@ -898,6 +898,7 @@ async function playGame(
           await markGemAsGiven();
           logger.info(`${message.author.id} received green_gem randomly (mines)`);
           addInventoryItem(message.member, "green_gem", 1);
+          addItemSourceStat("green_gem", "mines", 1);
           addProgress(message.author.id, "gem_hunter", 1);
           followUp = {
             embeds: [

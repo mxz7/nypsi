@@ -21,6 +21,7 @@ import {
 import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds";
 import {
   addInventoryItem,
+  addItemSourceStat,
   gemBreak,
   getInventory,
   removeInventoryItem,
@@ -295,6 +296,7 @@ async function run(
     }
 
     await addInventoryItem(member, chosen, amount);
+    addItemSourceStat(chosen, "hunt", amount);
 
     if (!chosen) {
       console.error(chosen);

@@ -11,7 +11,13 @@ import { MemoryMutex } from "../mutex";
 import { addProgress } from "./achievements";
 import { getBoosters } from "./boosters";
 import { addEventProgress } from "./events";
-import { addInventoryItem, gemBreak, getInventory, removeInventoryItem } from "./inventory";
+import {
+  addInventoryItem,
+  addItemSourceStat,
+  gemBreak,
+  getInventory,
+  removeInventoryItem,
+} from "./inventory";
 import { getUpgrades } from "./levelling";
 import { rollPet } from "./pets";
 import { addStat } from "./stats";
@@ -295,6 +301,7 @@ export async function getClaimable(
 
     if (claim && items > 0) {
       await addInventoryItem(member, plantData.item, items);
+      addItemSourceStat(plantData.item, "farm", items);
       await addProgress(member, "green_fingers", items);
       const eventProgress = client
         ? await addEventProgress(client, member, "farming", items)

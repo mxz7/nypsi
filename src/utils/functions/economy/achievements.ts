@@ -10,7 +10,7 @@ import { addInlineNotification, addNotificationToQueue } from "../users/notifica
 import { getPreferences } from "../users/preferences";
 import { addTag } from "../users/tags";
 import { hasGemBeenGiven, markGemAsGiven } from "./gems";
-import { addInventoryItem } from "./inventory";
+import { addInventoryItem, addItemSourceStat } from "./inventory";
 import {
   createUser,
   getAchievements,
@@ -186,7 +186,9 @@ async function completeAchievement(userId: string, achievementId: string) {
     rewardsDesc.push(`+ \`${earnedCrates}x\` 🎁 69420 crate`);
     rewardsDesc.push(`+ \`${earnedTickets}x\` 🎫 lottery ticket`);
     await addInventoryItem(userId, "69420_crate", earnedCrates);
+    addItemSourceStat("69420_crate", "achievement", earnedCrates);
     await addInventoryItem(userId, "lottery_ticket", earnedTickets);
+    addItemSourceStat("lottery_ticket", "achievement", earnedTickets);
   }
 
   if (rewardsDesc.length > 0) {
@@ -211,6 +213,7 @@ async function completeAchievement(userId: string, achievementId: string) {
         if (!amount) break;
 
         await addInventoryItem(userId, prize.split(":")[0], amount);
+        addItemSourceStat(prize.split(":")[0], "achievement", amount);
         prizes.push(
           `+ \`${amount}x\` ${getItems()[prize.split(":")[0]].emoji} ${
             getItems()[prize.split(":")[0]].name
@@ -241,6 +244,7 @@ async function completeAchievement(userId: string, achievementId: string) {
       logger.info(`${userId} received ${gem} randomly`);
 
       await addInventoryItem(userId, gem, 1);
+      addItemSourceStat(gem, "achievement", 1);
       await addProgress(userId, "gem_hunter", 1);
 
       addNotificationToQueue({

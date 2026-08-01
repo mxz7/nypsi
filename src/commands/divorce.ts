@@ -12,7 +12,7 @@ import {
 } from "discord.js";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { addInventoryItem } from "../utils/functions/economy/inventory";
+import { addInventoryItem, addItemSourceStat } from "../utils/functions/economy/inventory";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { escapeFormattingCharacters } from "../utils/functions/string";
 import { isMarried, removeMarriage } from "../utils/functions/users/marriage";
@@ -100,6 +100,7 @@ async function run(
     interaction.deferUpdate();
     await removeMarriage(message.member);
     await addInventoryItem(married.partnerId, "broken_ring", 1);
+    addItemSourceStat("broken_ring", "divorce", 1);
 
     embed.setDescription(`✅ you have divorced ${partnerName}`);
 

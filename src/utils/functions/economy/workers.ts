@@ -11,7 +11,7 @@ import { pluralize } from "../string";
 import { addProgress } from "./achievements";
 import { addBalance } from "./balance";
 import { getBoosters } from "./boosters";
-import { addInventoryItem, gemBreak, getInventory } from "./inventory";
+import { addInventoryItem, addItemSourceStat, gemBreak, getInventory } from "./inventory";
 import { addStat } from "./stats";
 import { getBaseUpgrades, getBaseWorkers, getItems } from "./utils";
 
@@ -322,6 +322,7 @@ export async function claimFromWorkers(
           byproductAmounts[byproduct],
       );
       await addInventoryItem(worker.userId, byproduct, byproductAmounts[byproduct]);
+      addItemSourceStat(byproduct, "worker", byproductAmounts[byproduct]);
     }
   }
 
