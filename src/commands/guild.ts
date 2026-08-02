@@ -1058,15 +1058,16 @@ async function run(
       return message.channel.send({ embeds: [new ErrorEmbed("failed to download image")] });
 
     const contentType = imageRes.headers.get("content-type");
+    const extension = contentType.split("/")[1];
 
-    if (!["jpeg", "jpg", "gif", "png", "webp"].includes(contentType.split("/")[1]))
+    if (!["jpeg", "jpg", "gif", "png", "webp"].includes(extension))
       return message.channel.send({
         embeds: [new ErrorEmbed("invalid file type. must be an image")],
       });
 
     const arrayBuffer = await imageRes.arrayBuffer();
 
-    const buffer = await sharp(arrayBuffer, { animated: contentType.split("/")[1] === "gif" })
+    const buffer = await sharp(arrayBuffer, { animated: extension === "gif" })
       .resize({ width: 256, height: 256, fit: "cover" })
       .toBuffer();
 
@@ -1079,7 +1080,7 @@ async function run(
       });
     }
 
-    const id = `avatar/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}/${nanoid()}`;
+    const id = `avatar/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}/${nanoid()}.${extension}`;
 
     await uploadImage(id, buffer, contentType);
 
