@@ -61,7 +61,7 @@
       "coconut_seed": 7,
       "rain": 2,
       "magic_potato": 2,
-      "ring": 15,
+      "ring": 7.5,
       "fertiliser": {
         "weight": 25,
         "count": {
@@ -403,7 +403,7 @@
           "max": 75
         }
       },
-      "ring": 2,
+      "ring": 0.9,
       "superdraw_lottery_ticket": {
         "weight": 40,
         "count": {
@@ -527,7 +527,7 @@
           "max": 300
         }
       },
-      "ring": 10,
+      "ring": 8,
       "rocky": 4,
       "tiger": 8,
       "fox": 8,
