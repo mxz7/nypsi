@@ -3,6 +3,7 @@
 - add item source tracking stats
 - show upcoming levelling rewards in $level
 - autoscaling command channels
+- give dabloon rewards for using global boosters
 
 # july 2026
 
