@@ -4524,7 +4524,8 @@
       "boosts": ["xp"],
       "effect": 1,
       "time": 86400,
-      "global": true
+      "global": true,
+      "usesPerDabloon": 1000
     },
     "in_crates": true
   },
@@ -4550,7 +4551,8 @@
       "boosts": ["farm_output"],
       "effect": 0.2,
       "time": 86400,
-      "global": true
+      "global": true,
+      "usesPerDabloon": 100
     },
     "in_crates": false
   },
