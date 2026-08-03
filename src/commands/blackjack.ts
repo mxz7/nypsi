@@ -85,6 +85,7 @@ module.exports = cmd;
 
 type Game = {
   id: number;
+  turn: number;
   bet: number;
   deck: string[];
   dealerHand: string[];
@@ -256,6 +257,7 @@ async function prepareGame(
 
   const game: Game = {
     id,
+    turn: 0,
     bet,
     deck: shuffle(newDeck),
     dealerHand: [],
@@ -317,6 +319,15 @@ async function prepareGame(
   } else {
     msg = await send({ embeds: [embed], components: [row] });
   }
+
+  logger.debug(`blackjack: ${message.author.id} game started`, {
+    gameId: game.id,
+    messageId: msg.id,
+    channelId: message.channelId,
+    guildId: message.guildId,
+    bet: game.bet,
+    playerTotal: total(game.playerHand),
+  });
 
   playGame(game, message, send, msg, args);
 }
@@ -402,15 +413,47 @@ async function playGame(
     interaction?: ButtonInteraction,
   ) => {
     let res: InteractionResponse<boolean> | OmitPartialGroupDMChannel<Message<boolean>>;
+    const startedAt = Date.now();
 
-    // logger.debug(`blackjack: ${message.author.id} message edited for ${reason}`);
-
-    if (!interaction || interaction.deferred || interaction.replied) res = await m.edit(data);
-    else
-      res = await interaction.update(data).catch(() => {
-        logger.error(`blackjack: ${message.author.id} update interaction failed, editing`);
-        return m.edit(data);
+    try {
+      if (!interaction || interaction.deferred || interaction.replied) res = await m.edit(data);
+      else
+        res = await interaction.update(data).catch((error) => {
+          logger.warn(`blackjack: ${message.author.id} interaction update failed, editing`, {
+            error,
+            gameId: game.id,
+            messageId: m.id,
+            turn: game.turn,
+            reason,
+            interactionId: interaction.id,
+            customId: interaction.customId,
+          });
+          return m.edit(data);
+        });
+    } catch (error) {
+      logger.error(`blackjack: ${message.author.id} message edit failed`, {
+        error,
+        gameId: game.id,
+        messageId: m.id,
+        turn: game.turn,
+        reason,
+        interactionId: interaction?.id,
+        customId: interaction?.customId,
+        deferred: interaction?.deferred,
+        replied: interaction?.replied,
+        durationMs: Date.now() - startedAt,
       });
+      throw error;
+    }
+
+    logger.debug(`blackjack: ${message.author.id} message edit completed`, {
+      gameId: game.id,
+      messageId: m.id,
+      turn: game.turn,
+      reason,
+      interactionId: interaction?.id,
+      durationMs: Date.now() - startedAt,
+    });
 
     // try {
     //   logger.debug(`blackjack: ${message.member.id} message edited for ${reason}`, {
@@ -425,6 +468,13 @@ async function playGame(
 
   const replay = async (embed: CustomEmbed, interaction: ButtonInteraction, retry = false) => {
     await removeUserPlaying(message.author.id);
+    logger.debug(`blackjack: ${message.author.id} game ended and playing state removed`, {
+      gameId: game.id,
+      messageId: m.id,
+      turn: game.turn,
+      playerTotal: total(game.playerHand),
+      dealerTotal: total(game.dealerHand),
+    });
     if (
       !(await isPremium(message.member)) ||
       !((await getTier(message.member)) >= 2) ||
@@ -734,22 +784,44 @@ async function playGame(
     const filter = (i: Interaction) => i.user.id == message.author.id;
 
     let fail = false;
+    const listenStartedAt = Date.now();
+
+    logger.debug(`blackjack: ${message.author.id} waiting for interaction`, {
+      gameId: game.id,
+      messageId: m.id,
+      turn: game.turn + 1,
+      playerTotal: total(game.playerHand),
+      dealerTotal: total(game.dealerHand),
+    });
 
     const reaction = await m
       .awaitMessageComponent({ filter, time: 90000 })
       .then(async (collected) => {
         setTimeout(() => {
           if (!collected.deferred && !collected.replied) {
-            collected.deferUpdate().catch((e) => {
-              logger.error(`blackjack: ${message.author.id} failed to defer update`, e);
-              console.error(e);
+            collected.deferUpdate().catch((error) => {
+              logger.error(`blackjack: ${message.author.id} failed to defer update`, {
+                error,
+                gameId: game.id,
+                messageId: m.id,
+                interactionId: collected.id,
+                customId: collected.customId,
+              });
             });
           }
         }, 2000);
         return collected as ButtonInteraction;
       })
-      .catch((e) => {
-        logger.warn(`blackjack: ${message.author.id} interaction error`, e);
+      .catch((error) => {
+        logger.warn(`blackjack: ${message.author.id} interaction collector ended`, {
+          error,
+          gameId: game.id,
+          messageId: m.id,
+          turn: game.turn + 1,
+          playerTotal: total(game.playerHand),
+          dealerTotal: total(game.dealerHand),
+          durationMs: Date.now() - listenStartedAt,
+        });
         fail = true;
         game.state = "end";
         removeUserPlaying(message.author.id);
@@ -757,6 +829,18 @@ async function playGame(
       });
 
     if (fail || !reaction) return;
+
+    game.turn++;
+    logger.debug(`blackjack: ${message.author.id} received interaction`, {
+      gameId: game.id,
+      messageId: m.id,
+      turn: game.turn,
+      interactionId: reaction.id,
+      customId: reaction.customId,
+      durationMs: Date.now() - listenStartedAt,
+      deferred: reaction.deferred,
+      replied: reaction.replied,
+    });
 
     if (reaction.customId === "hit") {
       newCard(game.deck, game.playerHand);

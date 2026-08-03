@@ -63,6 +63,7 @@ type Game = {
   win: number;
   grid: string[];
   id: number;
+  turn: number;
   multi: number;
   increment: number;
   moneyBag?: number;
@@ -357,6 +358,7 @@ async function prepareGame(
     win: 0,
     grid: grid,
     id: id,
+    turn: 0,
     multi: multi,
     increment: incrementAmount,
   };
@@ -383,11 +385,23 @@ async function prepareGame(
     msg = await send({ embeds: [embed], components: rows });
   }
 
-  playGame(game, message, send, msg, args).catch((e: string) => {
-    logger.error(
-      `error occurred playing mines - ${message.author.id} (${message.author.username})`,
-    );
-    console.error(e);
+  logger.debug(`mines: ${message.author.id} game started`, {
+    gameId: game.id,
+    messageId: msg.id,
+    channelId: message.channelId,
+    guildId: message.guildId,
+    bet: game.bet,
+    bombCount,
+  });
+
+  playGame(game, message, send, msg, args).catch((error: unknown) => {
+    logger.error(`mines: ${message.author.id} game loop failed`, {
+      error,
+      gameId: game.id,
+      messageId: msg.id,
+      turn: game.turn,
+      win: game.win,
+    });
     removeUserPlaying(message.author.id);
     return send({
       embeds: [new ErrorEmbed("an error occurred while running - join support server")],
@@ -502,9 +516,35 @@ async function playGame(
     interaction?: ButtonInteraction,
   ) => {
     let res: InteractionResponse<boolean> | OmitPartialGroupDMChannel<Message<boolean>>;
+    const startedAt = Date.now();
 
-    if (!interaction || interaction.deferred || interaction.replied) res = await msg.edit(data);
-    else res = await interaction.update(data).catch(() => msg.edit(data));
+    try {
+      if (!interaction || interaction.deferred || interaction.replied) res = await msg.edit(data);
+      else res = await interaction.update(data).catch(() => msg.edit(data));
+    } catch (error) {
+      logger.error(`mines: ${message.author.id} message edit failed`, {
+        error,
+        gameId: game.id,
+        messageId: msg.id,
+        turn: game.turn,
+        reason,
+        interactionId: interaction?.id,
+        customId: interaction?.customId,
+        deferred: interaction?.deferred,
+        replied: interaction?.replied,
+        durationMs: Date.now() - startedAt,
+      });
+      throw error;
+    }
+
+    logger.debug(`mines: ${message.author.id} message edit completed`, {
+      gameId: game.id,
+      messageId: msg.id,
+      turn: game.turn,
+      reason,
+      interactionId: interaction?.id,
+      durationMs: Date.now() - startedAt,
+    });
 
     // try {
     //   const updatedMsg = await res.fetch();
@@ -520,6 +560,12 @@ async function playGame(
 
   const replay = async (embed: CustomEmbed, interaction: ButtonInteraction, update = true) => {
     await removeUserPlaying(message.author.id);
+    logger.debug(`mines: ${message.author.id} game ended and playing state removed`, {
+      gameId: game.id,
+      messageId: msg.id,
+      turn: game.turn,
+      win: game.win,
+    });
 
     if (
       percentChance(0.05) &&
@@ -766,22 +812,42 @@ async function playGame(
 
   const filter = (i: Interaction) => i.user.id == message.author.id;
   let fail = false;
+  const listenStartedAt = Date.now();
+
+  logger.debug(`mines: ${message.author.id} waiting for interaction`, {
+    gameId: game.id,
+    messageId: msg.id,
+    turn: game.turn + 1,
+    win: game.win,
+  });
 
   const response = await msg
     .awaitMessageComponent({ filter, time: 90000 })
     .then(async (collected) => {
       setTimeout(() => {
         if (!collected.deferred && !collected.replied) {
-          collected.deferUpdate().catch((e) => {
-            logger.error(`mines: ${message.author.id} failed to defer update`, e);
-            console.error(e);
+          collected.deferUpdate().catch((error) => {
+            logger.error(`mines: ${message.author.id} failed to defer update`, {
+              error,
+              gameId: game.id,
+              messageId: msg.id,
+              interactionId: collected.id,
+              customId: collected.customId,
+            });
           });
         }
       }, 2000);
       return collected as ButtonInteraction;
     })
-    .catch((e) => {
-      logger.warn(`mines: ${message.author.id} interaction error`, e);
+    .catch((error) => {
+      logger.warn(`mines: ${message.author.id} interaction collector ended`, {
+        error,
+        gameId: game.id,
+        messageId: msg.id,
+        turn: game.turn + 1,
+        win: game.win,
+        durationMs: Date.now() - listenStartedAt,
+      });
       fail = true;
       removeUserPlaying(message.author.id);
       message.channel.send({ content: message.author.toString() + " mines game expired" });
@@ -791,7 +857,17 @@ async function playGame(
 
   if (!response) return;
 
-  // logger.debug(`mines: ${message.author.id} received interaction: ${response.customId}`);
+  game.turn++;
+  logger.debug(`mines: ${message.author.id} received interaction`, {
+    gameId: game.id,
+    messageId: msg.id,
+    turn: game.turn,
+    interactionId: response.id,
+    customId: response.customId,
+    durationMs: Date.now() - listenStartedAt,
+    deferred: response.deferred,
+    replied: response.replied,
+  });
 
   if (response.customId.length != 2 && response.customId != "finish") {
     logger.error(`mines: ${message.author.id} weird coordinate thing`, { response, game });
