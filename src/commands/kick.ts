@@ -80,6 +80,14 @@ async function run(
       return;
     }
 
+    if (!target.kickable) {
+      return send({
+        embeds: [
+          new ErrorEmbed(`i cannot kick ${target.toString()}, make sure my role is above theirs`),
+        ],
+      });
+    }
+
     await target.kick(reason);
   }
 

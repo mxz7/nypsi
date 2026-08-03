@@ -164,6 +164,14 @@ async function run(
       return;
     }
 
+    if (!target.bannable) {
+      return send({
+        embeds: [
+          new ErrorEmbed(`i cannot ban ${target.toString()}, make sure my role is above theirs`),
+        ],
+      });
+    }
+
     await message.guild.members
       .ban(target, {
         reason: reason,
@@ -313,6 +321,8 @@ async function doBan(
         }
 
         if ((target?.user.id || userId) == message.client.user.id) return false;
+
+        if (!target?.bannable) return false;
 
         await message.guild.members.ban(target, {
           reason: reason,
