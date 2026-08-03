@@ -7,9 +7,10 @@ description: Track and reward actual uses of global economy boosters. Use when a
 
 - Global boosters opt into rewards with `boosterEffect.global: true` and a positive integer
   `boosterEffect.usesPerDabloon` in `data/items.json`.
-- Call `trackGlobalBoosterUse()` from `src/utils/functions/economy/boosters.ts` only after the
-  booster contributes to a completed action. Do not count previews such as the profile multiplier
-  display or farm claim estimates.
+- Call `trackGlobalBoosterUse()` from `src/utils/functions/economy/boosters.ts` with the benefiting
+  member only after the booster contributes to a completed action. The helper excludes uses by the
+  booster owner. Do not count previews such as the profile multiplier display or farm claim
+  estimates.
 - Progress is stored in Redis under `GLOBAL_BOOSTER_PROGRESS`, keyed by the booster database ID so
   separate activations cannot share progress.
 - `checkBoosters()` consumes the progress and rewards the activating user when that booster expires.
