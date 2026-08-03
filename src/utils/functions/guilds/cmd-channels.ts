@@ -1,5 +1,5 @@
-import { CategoryChannel, ChannelType } from "discord.js";
 import type { Guild, TextChannel } from "discord.js";
+import { CategoryChannel, ChannelType } from "discord.js";
 import redis from "../../../init/redis";
 import type { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
@@ -21,6 +21,7 @@ const RATE_LIMIT_KEY = "nypsi:cmd-channels:rate-limit";
 export const RESIZE_COOLDOWN_KEY = "nypsi:cmd-channels:resize-cooldown";
 
 const resizeMutex = new RedisMutex("nypsi:cmd-channels:resize", false, 30_000);
+const ignoredActivityIds = new Set<string>();
 
 type ActivityChannel = {
   id: string;
@@ -97,13 +98,19 @@ export function describeActivity(value: string | null) {
   };
 }
 
-export function trackCmdChannelActivity(channel: ActivityChannel | null, source: string) {
+export function trackCmdChannelActivity(
+  channel: ActivityChannel | null,
+  source: string,
+  activityId?: string,
+) {
   if (
     !channel ||
     channel.guildId !== Constants.NYPSI_SERVER_ID ||
     channel.parentId !== ACTIVE_CATEGORY_ID
   )
     return;
+
+  if (activityId && ignoredActivityIds.delete(activityId)) return;
 
   redis.set(activityKey(channel.id), Date.now(), "EX", ACTIVITY_TTL_SECONDS).catch((error) =>
     logger.warn("cmd-channels: failed to record activity", {
@@ -165,8 +172,8 @@ async function sendOpenedMessage(channel: TextChannel, source: ResizeSource) {
       embeds: [
         new CustomEmbed().setDescription(
           source === "automatic"
-            ? "✨ this command channel has been opened because the other channels are busy"
-            : "✨ this command channel has been opened",
+            ? "channel has been opened due to increased activity"
+            : "channel has been opened",
         ),
       ],
     })
@@ -179,13 +186,13 @@ async function sendOpenedMessage(channel: TextChannel, source: ResizeSource) {
 }
 
 async function sendClosingMessage(channel: TextChannel, source: ResizeSource) {
-  await channel
+  return channel
     .send({
       embeds: [
         new CustomEmbed().setDescription(
           source === "automatic"
-            ? "💤 this command channel has been quiet for a while, so it is being closed"
-            : "💤 this command channel is being closed",
+            ? "channel will be closed soon due to inactivity"
+            : "channel is being closed",
         ),
       ],
     })
@@ -214,8 +221,48 @@ export async function activateCmdChannel(guild: Guild, channel: TextChannel, sou
 }
 
 export async function archiveCmdChannel(guild: Guild, channel: TextChannel, source: ResizeSource) {
-  await sendClosingMessage(channel, source);
-  await sleep(5000);
+  const closingMessage = await sendClosingMessage(channel, source);
+
+  if (source === "automatic") {
+    if (closingMessage) {
+      ignoredActivityIds.add(closingMessage.id);
+      setTimeout(() => ignoredActivityIds.delete(closingMessage.id), 30_000);
+    }
+
+    const closingStartedAt = Date.now();
+
+    await redis.set(activityKey(channel.id), closingStartedAt, "EX", ACTIVITY_TTL_SECONDS);
+    await sleep(5000);
+
+    const latestActivity = parseInt(await redis.get(activityKey(channel.id)));
+
+    if (latestActivity > closingStartedAt) {
+      if (closingMessage) {
+        await closingMessage
+          .edit({
+            embeds: [new CustomEmbed().setDescription("channel closure cancelled")],
+          })
+          .catch((error) =>
+            logger.warn("cmd-channels: failed to update cancelled closing message", {
+              error,
+              channelId: channel.id,
+            }),
+          );
+      }
+
+      logger.info("cmd-channels: channel closure cancelled", {
+        channelId: channel.id,
+        channelName: channel.name,
+        closingStartedAt,
+        latestActivity,
+      });
+
+      return false;
+    }
+  } else {
+    await sleep(5000);
+  }
+
   await channel.setParent(ARCHIVE_CATEGORY_ID);
 
   logger.info("cmd-channels: channel closed", {
@@ -224,6 +271,8 @@ export async function archiveCmdChannel(guild: Guild, channel: TextChannel, sour
     channelName: channel.name,
     activeChannels: getCmdChannelState(guild)?.active.map((item) => item.name),
   });
+
+  return true;
 }
 
 export async function setCmdChannelResizeCooldown(

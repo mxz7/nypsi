@@ -99,7 +99,7 @@ const removeExtraSpacesRegex = / +(?= )/g;
 export default async function messageCreate(message: Message) {
   if (message.partial) await message.fetch();
 
-  trackCmdChannelActivity(message.channel, "message");
+  trackCmdChannelActivity(message.channel, "message", message.id);
 
   if (!message.channel.isSendable()) return;
 

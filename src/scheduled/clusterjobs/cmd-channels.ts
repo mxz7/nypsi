@@ -91,7 +91,9 @@ async function checkCmdChannels(guild: Guild) {
       activeChannels: state.active.map((item) => item.name),
     });
 
-    await archiveCmdChannel(guild, removalCandidate, "automatic");
+    const closed = await archiveCmdChannel(guild, removalCandidate, "automatic");
+    if (!closed) return;
+
     await setCmdChannelResizeCooldown("automatic", "closed");
   });
 }

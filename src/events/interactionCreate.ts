@@ -19,7 +19,7 @@ import { runInteraction } from "../utils/handlers/interactions";
 import { logger } from "../utils/logger";
 
 export default async function interactionCreate(interaction: Interaction) {
-  trackCmdChannelActivity(interaction.channel, "interaction");
+  trackCmdChannelActivity(interaction.channel, "interaction", interaction.id);
 
   if (interaction.isButton()) {
     let msg = `${interaction.guildId} ${interaction.channelId} ${interaction.user.username}: ${interaction.customId}`;
