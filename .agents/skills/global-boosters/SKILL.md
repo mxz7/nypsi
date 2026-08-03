@@ -15,6 +15,6 @@ description: Track and reward actual uses of global economy boosters. Use when a
   separate activations cannot share progress.
 - `checkBoosters()` consumes the progress and rewards the activating user when that booster expires.
   The successful booster-row deletion gates payout to prevent concurrent expiry checks from paying
-  more than once.
+  more than once. Boosters owned by `Constants.BOT_USER_ID` never receive a reward.
 - Record generated dabloons with `addItemSourceStat()` using
   `global_booster:<boosterItemId>` as the source.

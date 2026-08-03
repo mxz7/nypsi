@@ -77,7 +77,10 @@ async function checkBoosters(member: MemberResolvable, boosters: Map<string, Boo
         if (booster.scope === "global") {
           const item = getItems()[booster.boosterId];
           const uses = parseInt((await redis.getdel(getGlobalBoosterProgressKey(booster))) ?? "0");
-          const reward = Math.floor(uses / item.boosterEffect.usesPerDabloon);
+          const reward =
+            booster.userId === Constants.BOT_USER_ID
+              ? 0
+              : Math.floor(uses / item.boosterEffect.usesPerDabloon);
 
           if (reward > 0) {
             await addInventoryItem(booster.userId, "dabloon", reward);
