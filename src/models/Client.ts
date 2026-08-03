@@ -26,7 +26,6 @@ import { doChatReactions } from "../utils/functions/chatreactions/utils";
 import { initCrashGame } from "../utils/functions/economy/crash";
 import { runEconomySetup } from "../utils/functions/economy/utils";
 import { runChristmas } from "../utils/functions/guilds/christmas";
-import { trackCmdChannelRateLimit } from "../utils/functions/guilds/cmd-channels";
 import { runCountdowns } from "../utils/functions/guilds/countdowns";
 import { runSnipeClearIntervals } from "../utils/functions/guilds/messages";
 import { openKarmaShop } from "../utils/functions/karma/karmashop";
@@ -97,7 +96,6 @@ export class NypsiClient extends Client {
         logger.warn(`rest: rate limited: ${info.route} ${info.timeToReset}ms until reset`, {
           ...info,
         });
-        trackCmdChannelRateLimit(this, info);
       });
       logger.debug("rest rate limit event loaded");
       this.on("guildMemberUpdate", guildMemberUpdate.bind(null));

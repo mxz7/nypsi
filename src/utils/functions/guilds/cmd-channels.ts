@@ -1,7 +1,6 @@
 import type { Guild, TextChannel } from "discord.js";
 import { CategoryChannel, ChannelType } from "discord.js";
 import redis from "../../../init/redis";
-import type { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
@@ -12,12 +11,14 @@ export const ACTIVE_CATEGORY_ID = "1246516186171314337";
 export const ARCHIVE_CATEGORY_ID = "1060585526945665197";
 export const MIN_CHANNELS = 3;
 export const ACTIVITY_TTL_SECONDS = 600;
-export const RATE_LIMIT_TTL_SECONDS = 600;
-export const RESIZE_COOLDOWN_SECONDS = 1200;
+export const COMMAND_WINDOW_SECONDS = 30;
+export const COMMANDS_PER_HALF_WINDOW = 6;
+export const OPEN_COOLDOWN_SECONDS = 120;
+export const CLOSE_COOLDOWN_SECONDS = 1200;
 const CHANNEL_NAME_PATTERN = /^cmds-(\d+)$/;
 
 const ACTIVITY_KEY = "nypsi:cmd-channels:activity";
-const RATE_LIMIT_KEY = "nypsi:cmd-channels:rate-limit";
+const COMMAND_ACTIVITY_KEY = "nypsi:cmd-channels:commands";
 export const RESIZE_COOLDOWN_KEY = "nypsi:cmd-channels:resize-cooldown";
 
 const resizeMutex = new RedisMutex("nypsi:cmd-channels:resize", false, 30_000);
@@ -27,14 +28,6 @@ type ActivityChannel = {
   id: string;
   guildId?: string | null;
   parentId?: string | null;
-};
-
-type RateLimitInfo = {
-  majorParameter: string;
-  method: string;
-  retryAfter: number;
-  route: string;
-  timeToReset: number;
 };
 
 export type CmdChannelState = {
@@ -48,8 +41,8 @@ export function activityKey(channelId: string) {
   return `${ACTIVITY_KEY}:${channelId}`;
 }
 
-export function rateLimitKey(channelId: string) {
-  return `${RATE_LIMIT_KEY}:${channelId}`;
+export function commandActivityKey(channelId: string) {
+  return `${COMMAND_ACTIVITY_KEY}:${channelId}`;
 }
 
 function getChannelNumber(channel: TextChannel) {
@@ -121,34 +114,28 @@ export function trackCmdChannelActivity(
   );
 }
 
-export function trackCmdChannelRateLimit(client: NypsiClient, info: RateLimitInfo) {
-  if (info.method !== "POST" || info.route !== "/channels/:id/messages") return;
-
-  const channel = client.channels.cache.get(info.majorParameter);
-
+export function trackCmdChannelCommand(channel: ActivityChannel | null, commandId: string) {
   if (
     !channel ||
-    channel.isDMBased() ||
     channel.guildId !== Constants.NYPSI_SERVER_ID ||
-    !("parentId" in channel) ||
     channel.parentId !== ACTIVE_CATEGORY_ID
   )
     return;
 
+  const now = Date.now();
+  const key = commandActivityKey(channel.id);
+
   redis
-    .set(rateLimitKey(channel.id), Date.now(), "EX", RATE_LIMIT_TTL_SECONDS)
-    .then(() =>
-      logger.info("cmd-channels: recorded message rate limit", {
-        channelId: channel.id,
-        channelName: "name" in channel ? channel.name : undefined,
-        retryAfter: info.retryAfter,
-        timeToReset: info.timeToReset,
-      }),
-    )
+    .pipeline()
+    .zadd(key, now, commandId)
+    .zremrangebyscore(key, 0, now - COMMAND_WINDOW_SECONDS * 2000)
+    .expire(key, COMMAND_WINDOW_SECONDS * 2)
+    .exec()
     .catch((error) =>
-      logger.warn("cmd-channels: failed to record message rate limit", {
+      logger.warn("cmd-channels: failed to record command activity", {
         error,
         channelId: channel.id,
+        commandId,
       }),
     );
 }
@@ -279,11 +266,13 @@ export async function setCmdChannelResizeCooldown(
   source: ResizeSource,
   action: "opened" | "closed",
 ) {
+  const ttl = action === "opened" ? OPEN_COOLDOWN_SECONDS : CLOSE_COOLDOWN_SECONDS;
+
   await redis.set(
     RESIZE_COOLDOWN_KEY,
     JSON.stringify({ source, action, timestamp: Date.now() }),
     "EX",
-    RESIZE_COOLDOWN_SECONDS,
+    ttl,
   );
 }
 

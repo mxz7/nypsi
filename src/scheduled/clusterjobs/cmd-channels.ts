@@ -7,41 +7,70 @@ import {
   activateCmdChannel,
   activityKey,
   archiveCmdChannel,
+  CLOSE_COOLDOWN_SECONDS,
+  commandActivityKey,
+  COMMAND_WINDOW_SECONDS,
+  COMMANDS_PER_HALF_WINDOW,
   describeActivity,
   getCmdChannelState,
   MIN_CHANNELS,
-  RATE_LIMIT_TTL_SECONDS,
-  rateLimitKey,
+  OPEN_COOLDOWN_SECONDS,
   RESIZE_COOLDOWN_KEY,
-  RESIZE_COOLDOWN_SECONDS,
   setCmdChannelResizeCooldown,
   withCmdChannelResizeLock,
 } from "../../utils/functions/guilds/cmd-channels";
 import { logger } from "../../utils/logger";
 
-const CHECK_INTERVAL_MS = 60_000;
+const CHECK_INTERVAL_MS = 10_000;
+
+async function getCommandActivity(channelIds: string[]) {
+  const now = Date.now();
+  const halfWindowMs = (COMMAND_WINDOW_SECONDS * 1000) / 2;
+  const pipeline = redis.pipeline();
+
+  for (const channelId of channelIds) {
+    const key = commandActivityKey(channelId);
+
+    pipeline.zcount(key, now - halfWindowMs * 2, now - halfWindowMs - 1);
+    pipeline.zcount(key, now - halfWindowMs, now);
+  }
+
+  const results = await pipeline.exec();
+
+  for (const [error] of results) {
+    if (error) throw error;
+  }
+
+  return channelIds.map((channelId, index) => {
+    const previousHalf = Number(results[index * 2][1]);
+    const currentHalf = Number(results[index * 2 + 1][1]);
+
+    return {
+      channelId,
+      previousHalf,
+      currentHalf,
+      full: previousHalf >= COMMANDS_PER_HALF_WINDOW && currentHalf >= COMMANDS_PER_HALF_WINDOW,
+    };
+  });
+}
 
 async function checkCmdChannels(guild: Guild) {
   const state = getCmdChannelState(guild);
   if (!state) return;
 
   const removalCandidate = state.active.at(-1);
-  const rateLimitKeys = state.active.map((channel) => rateLimitKey(channel.id));
   const keys = [
     RESIZE_COOLDOWN_KEY,
     ...(removalCandidate ? [activityKey(removalCandidate.id)] : []),
-    ...rateLimitKeys,
   ];
-  const [cooldown, ...activityValues] = await redis.mget(keys);
+  const [[cooldown, ...activityValues], commandActivity] = await Promise.all([
+    redis.mget(keys),
+    getCommandActivity(state.active.map((channel) => channel.id)),
+  ]);
   const removalActivity = removalCandidate ? activityValues.shift() : null;
-  const rateLimits = activityValues;
-
-  const rateLimitActivity = Object.fromEntries(
-    state.active.map((channel, index) => [channel.name, describeActivity(rateLimits[index])]),
-  );
-  const allChannelsRateLimited = rateLimits.every(Boolean);
+  const allChannelsFull = commandActivity.every((channel) => channel.full);
   const belowMinimum = state.active.length < MIN_CHANNELS;
-  const canAdd = state.archived.length > 0 && (belowMinimum || allChannelsRateLimited);
+  const canAdd = state.archived.length > 0 && (belowMinimum || allChannelsFull);
   const canRemove = Boolean(
     removalCandidate && state.active.length > MIN_CHANNELS && !removalActivity,
   );
@@ -59,8 +88,11 @@ async function checkCmdChannels(guild: Guild) {
           activity: describeActivity(removalActivity),
         }
       : null,
-    rateLimits: rateLimitActivity,
-    allChannelsRateLimited,
+    commandActivity: commandActivity.map((activity, index) => ({
+      ...activity,
+      channelName: state.active[index].name,
+    })),
+    allChannelsFull,
     canAdd,
     canRemove,
   });
@@ -76,11 +108,10 @@ async function checkCmdChannels(guild: Guild) {
         channelName: channel.name,
         activeChannels: state.active.map((item) => item.name),
         belowMinimum,
-        allChannelsRateLimited,
+        allChannelsFull,
       });
 
       await activateCmdChannel(guild, channel, "automatic");
-      if (rateLimitKeys.length > 0) await redis.del(...rateLimitKeys);
       await setCmdChannelResizeCooldown("automatic", "opened");
       return;
     }
@@ -108,8 +139,10 @@ export function startCmdChannelManager(client: NypsiClient) {
     shardId: guild.shardId,
     checkIntervalSeconds: CHECK_INTERVAL_MS / 1000,
     activityWindowSeconds: ACTIVITY_TTL_SECONDS,
-    rateLimitWindowSeconds: RATE_LIMIT_TTL_SECONDS,
-    resizeCooldownSeconds: RESIZE_COOLDOWN_SECONDS,
+    commandWindowSeconds: COMMAND_WINDOW_SECONDS,
+    commandsPerHalfWindow: COMMANDS_PER_HALF_WINDOW,
+    openCooldownSeconds: OPEN_COOLDOWN_SECONDS,
+    closeCooldownSeconds: CLOSE_COOLDOWN_SECONDS,
     minimumChannels: MIN_CHANNELS,
   });
 
