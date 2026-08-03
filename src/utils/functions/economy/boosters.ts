@@ -29,8 +29,8 @@ function getGlobalBoosterProgressKey(booster: Booster) {
   return `${Constants.redis.nypsi.GLOBAL_BOOSTER_PROGRESS}:${booster.id}`;
 }
 
-export async function trackGlobalBoosterUse(booster: Booster) {
-  if (booster.scope !== "global") return;
+export async function trackGlobalBoosterUse(booster: Booster, member: MemberResolvable) {
+  if (booster.scope !== "global" || booster.userId === getUserId(member)) return;
 
   await redis.incr(getGlobalBoosterProgressKey(booster));
 }

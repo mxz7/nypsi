@@ -303,7 +303,7 @@ export async function getClaimable(
 
     if (claim && items > 0) {
       await addInventoryItem(member, plantData.item, items);
-      await Promise.all(globalBoosters.map(trackGlobalBoosterUse));
+      await Promise.all(globalBoosters.map((booster) => trackGlobalBoosterUse(booster, member)));
       addItemSourceStat(plantData.item, "farm", items);
       await addProgress(member, "green_fingers", items);
       const eventProgress = client

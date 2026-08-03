@@ -245,7 +245,10 @@ export async function calcEarnedGambleXp(
 
   if (earned < 0) earned = 0;
 
-  if (earned > 0) await Promise.all(xpBonus.globalBoosters.map(trackGlobalBoosterUse));
+  if (earned > 0)
+    await Promise.all(
+      xpBonus.globalBoosters.map((booster) => trackGlobalBoosterUse(booster, member)),
+    );
 
   return Math.floor(earned);
 }
@@ -277,7 +280,10 @@ export async function calcEarnedHFMXp(member: GuildMember, items: number, guildI
 
   earned += xpBonus.boosterEffect * earned;
 
-  if (earned > 0) await Promise.all(xpBonus.globalBoosters.map(trackGlobalBoosterUse));
+  if (earned > 0)
+    await Promise.all(
+      xpBonus.globalBoosters.map((booster) => trackGlobalBoosterUse(booster, member)),
+    );
 
   return Math.floor(earned);
 }
