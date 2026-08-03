@@ -120,8 +120,12 @@ async function run(
 
         if (profile.voteKicks.find((i) => i.userId === message.author.id)) {
           const res = await removeVoteKick(message.author.id, profile.userId);
-          profile = await getZProfile(profile.userId);
-          render(msg);
+          const refreshedProfile = await getZProfile(profile.userId);
+
+          if (refreshedProfile) {
+            profile = refreshedProfile;
+            render(msg);
+          }
 
           if (res === "removed") {
             await interaction.reply({
@@ -138,7 +142,9 @@ async function run(
           }
         } else {
           const res = await castVoteKick(message.author.id, profile.userId, message.guild);
-          profile = await getZProfile(profile.userId);
+          const refreshedProfile = await getZProfile(profile.userId);
+
+          if (refreshedProfile) profile = refreshedProfile;
 
           if (res === "already voted") {
             await interaction.reply({ embeds: [new ErrorEmbed("already voted")] });
@@ -249,7 +255,13 @@ async function run(
     return (message as Message).react("💤");
   }
 
-  showProfile(await getZProfile(memberId));
+  const targetProfile = await getZProfile(memberId);
+
+  if (!targetProfile) {
+    return send({ embeds: [new ErrorEmbed("user not exist error")] });
+  }
+
+  return showProfile(targetProfile);
 }
 
 cmd.setRun(run);

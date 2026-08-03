@@ -1,7 +1,7 @@
 import { Guild, OverwriteType } from "discord.js";
 import prisma from "../../init/database";
-import redis from "../../init/redis";
 import { CustomEmbed } from "../../models/EmbedBuilders";
+import { RedisCache } from "../cache";
 import Constants from "../Constants";
 import { logger } from "../logger";
 import sleep from "./sleep";
@@ -37,13 +37,12 @@ export type z = {
   invitedById: string | null;
 };
 
-export async function getZProfile(userId: string): Promise<z> {
-  const cache = await redis.get(`${Constants.redis.cache.z.profile}:${userId}`);
+const profileCache = new RedisCache<z | false>(Constants.redis.cache.z.profile, 3600);
 
-  if (cache) {
-    if (cache === "null") return null;
-    return JSON.parse(cache);
-  }
+export async function getZProfile(userId: string): Promise<z | null> {
+  const cached = await profileCache.get(userId);
+
+  if (cached !== null) return cached || null;
 
   const query = await prisma.z.findUnique({
     where: {
@@ -58,7 +57,7 @@ export async function getZProfile(userId: string): Promise<z> {
   });
 
   if (!query) {
-    await redis.set(`${Constants.redis.cache.z.profile}:${userId}`, "null", "EX", 3600);
+    await profileCache.set(userId, false);
     return null;
   }
 
@@ -66,12 +65,7 @@ export async function getZProfile(userId: string): Promise<z> {
 
   const z = { ...query, rating: -rating };
 
-  await redis.set(
-    `${Constants.redis.cache.z.profile}:${userId}`,
-    z ? JSON.stringify(z) : "null",
-    "EX",
-    3600,
-  );
+  await profileCache.set(userId, z);
 
   return z;
 }
@@ -152,10 +146,7 @@ export async function castVoteKick(
     },
   });
 
-  await redis.del(
-    `${Constants.redis.cache.z.profile}:${userId}`,
-    `${Constants.redis.cache.z.profile}:${targetId}`,
-  );
+  await Promise.all([profileCache.delete(userId), profileCache.delete(targetId)]);
 
   if (target.voteKicks.length + 1 >= (await getTargetKicks())) {
     removeZUser(targetId, guild);
@@ -179,10 +170,8 @@ export async function removeZUser(userId: string, guild: Guild) {
     },
   });
 
-  await redis.del(
-    `${Constants.redis.cache.z.profile}:${userId}`,
-    `${Constants.redis.cache.z.profile}:${query.invitedById}`,
-  );
+  await profileCache.delete(userId);
+  if (query.invitedById) await profileCache.delete(query.invitedById);
 
   for (const channelId of Constants.Z_CHANNELS) {
     const channel = guild.channels.cache.get(channelId);
@@ -238,10 +227,7 @@ export async function removeVoteKick(userId: string, targetId: string) {
     },
   });
 
-  await redis.del(
-    `${Constants.redis.cache.z.profile}:${userId}`,
-    `${Constants.redis.cache.z.profile}:${targetId}`,
-  );
+  await Promise.all([profileCache.delete(userId), profileCache.delete(targetId)]);
 
   return "removed";
 }
@@ -272,10 +258,7 @@ export async function invite(userId: string, targetId: string, guild: Guild) {
     },
   });
 
-  await redis.del(
-    `${Constants.redis.cache.z.profile}:${userId}`,
-    `${Constants.redis.cache.z.profile}:${targetId}`,
-  );
+  await Promise.all([profileCache.delete(userId), profileCache.delete(targetId)]);
 
   for (const channelId of Constants.Z_CHANNELS) {
     const channel = guild.channels.cache.get(channelId);
