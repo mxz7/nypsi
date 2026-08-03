@@ -2,7 +2,6 @@ import type { Guild } from "discord.js";
 import redis from "../../init/redis";
 import type { NypsiClient } from "../../models/Client";
 import Constants from "../../utils/Constants";
-import type { CmdChannelState } from "../../utils/functions/guilds/cmd-channels";
 import {
   ACTIVITY_TTL_SECONDS,
   activateCmdChannel,
@@ -22,20 +21,16 @@ import { logger } from "../../utils/logger";
 
 const CHECK_INTERVAL_MS = 60_000;
 
-type Evaluation = {
-  action?: "add" | "remove";
-  state?: CmdChannelState;
-};
-
-async function evaluateCmdChannels(guild: Guild, mutate: boolean): Promise<Evaluation> {
+async function checkCmdChannels(guild: Guild) {
   const state = getCmdChannelState(guild);
-  if (!state) return {};
+  if (!state) return;
 
   const removalCandidate = state.active.at(-1);
+  const rateLimitKeys = state.active.map((channel) => rateLimitKey(channel.id));
   const keys = [
     RESIZE_COOLDOWN_KEY,
     ...(removalCandidate ? [activityKey(removalCandidate.id)] : []),
-    ...state.active.map((channel) => rateLimitKey(channel.id)),
+    ...rateLimitKeys,
   ];
   const [cooldown, ...activityValues] = await redis.mget(keys);
   const removalActivity = removalCandidate ? activityValues.shift() : null;
@@ -52,7 +47,6 @@ async function evaluateCmdChannels(guild: Guild, mutate: boolean): Promise<Evalu
   );
 
   logger.debug("cmd-channels: evaluated channel capacity", {
-    mutate,
     activeChannels: state.active.map((channel) => ({ id: channel.id, name: channel.name })),
     archivedChannels: state.archived.map((channel) => ({ id: channel.id, name: channel.name })),
     provisionedMaximum: state.active.length + state.archived.length,
@@ -71,50 +65,34 @@ async function evaluateCmdChannels(guild: Guild, mutate: boolean): Promise<Evalu
     canRemove,
   });
 
-  if (cooldown) return { state };
-
-  if (canAdd) {
-    if (mutate) {
-      const channel = state.archived[0];
-
-      await activateCmdChannel(guild, channel, "automatic");
-      await redis.del(...state.active.map((item) => rateLimitKey(item.id)));
-      await setCmdChannelResizeCooldown("automatic", "opened");
-    }
-
-    return { action: "add", state };
-  }
-
-  if (canRemove) {
-    if (mutate) {
-      await archiveCmdChannel(guild, removalCandidate, "automatic");
-      await setCmdChannelResizeCooldown("automatic", "closed");
-    }
-
-    return { action: "remove", state };
-  }
-
-  return { state };
-}
-
-async function checkCmdChannels(guild: Guild) {
-  const evaluation = await evaluateCmdChannels(guild, false);
-  if (!evaluation.action) return;
-
-  logger.info("cmd-channels: resize condition met", {
-    action: evaluation.action,
-    activeChannels: evaluation.state.active.map((channel) => channel.name),
-    archivedChannels: evaluation.state.archived.map((channel) => channel.name),
-  });
+  if (cooldown || (!canAdd && !canRemove)) return;
 
   await withCmdChannelResizeLock(async () => {
-    const confirmed = await evaluateCmdChannels(guild, true);
+    if (canAdd) {
+      const channel = state.archived[0];
 
-    if (!confirmed.action) {
-      logger.info("cmd-channels: resize condition changed while acquiring lock", {
-        originalAction: evaluation.action,
+      logger.info("cmd-channels: opening channel", {
+        channelId: channel.id,
+        channelName: channel.name,
+        activeChannels: state.active.map((item) => item.name),
+        belowMinimum,
+        allChannelsRateLimited,
       });
+
+      await activateCmdChannel(guild, channel, "automatic");
+      if (rateLimitKeys.length > 0) await redis.del(...rateLimitKeys);
+      await setCmdChannelResizeCooldown("automatic", "opened");
+      return;
     }
+
+    logger.info("cmd-channels: closing inactive channel", {
+      channelId: removalCandidate.id,
+      channelName: removalCandidate.name,
+      activeChannels: state.active.map((item) => item.name),
+    });
+
+    await archiveCmdChannel(guild, removalCandidate, "automatic");
+    await setCmdChannelResizeCooldown("automatic", "closed");
   });
 }
 
