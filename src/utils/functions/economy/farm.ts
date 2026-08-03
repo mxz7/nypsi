@@ -9,7 +9,7 @@ import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
 import { MemoryMutex } from "../mutex";
 import { addProgress } from "./achievements";
-import { getBoosters } from "./boosters";
+import { getBoosters, trackGlobalBoosterUse } from "./boosters";
 import { addEventProgress } from "./events";
 import {
   addInventoryItem,
@@ -206,6 +206,7 @@ export async function getClaimable(
     let intervalMulti = 1; // upgrades interval (max afk time cookie clicker esque)
     let outputMulti = 1; // upgrades farm direct output
     let storageMulti = 1; // upgrades farm max item storage
+    const globalBoosters = [];
 
     // checking farm/plant upgrades
     for (const upgrade of Object.values(farmUpgrades)) {
@@ -225,6 +226,7 @@ export async function getClaimable(
 
       if (item.boosterEffect.boosts.includes("farm_output")) {
         outputMulti += item.boosterEffect.effect * booster.length;
+        globalBoosters.push(...booster.filter((entry) => entry.scope === "global"));
       }
     }
 
@@ -301,6 +303,7 @@ export async function getClaimable(
 
     if (claim && items > 0) {
       await addInventoryItem(member, plantData.item, items);
+      await Promise.all(globalBoosters.map(trackGlobalBoosterUse));
       addItemSourceStat(plantData.item, "farm", items);
       await addProgress(member, "green_fingers", items);
       const eventProgress = client

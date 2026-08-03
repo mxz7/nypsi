@@ -16,6 +16,7 @@ import { pluralize } from "../string";
 import { addNotificationToQueue } from "../users/notifications";
 import { getPreferences } from "../users/preferences";
 import { getLastKnownUsername } from "../users/username";
+import { addInventoryItem, addItemSourceStat } from "./inventory";
 import { getItems } from "./utils";
 
 const lastBoosterCheck = new Map<string, number>();
@@ -23,6 +24,16 @@ const boostersCache = new RedisCache<Record<string, Booster[]>>(
   Constants.redis.cache.economy.BOOSTERS,
   300,
 );
+
+function getGlobalBoosterProgressKey(booster: Booster) {
+  return `${Constants.redis.nypsi.GLOBAL_BOOSTER_PROGRESS}:${booster.id}`;
+}
+
+export async function trackGlobalBoosterUse(booster: Booster) {
+  if (booster.scope !== "global") return;
+
+  await redis.incr(getGlobalBoosterProgressKey(booster));
+}
 
 setInterval(() => {
   for (const [key, value] of lastBoosterCheck.entries()) {
@@ -59,24 +70,38 @@ async function checkBoosters(member: MemberResolvable, boosters: Map<string, Boo
 
     for (const booster of boosters2) {
       if (booster.expire <= now) {
-        await prisma.booster
-          .delete({
-            where: {
-              id: booster.id,
-            },
-          })
-          .catch(() => {});
+        const deleted = await prisma.booster.deleteMany({ where: { id: booster.id } });
 
-        if (booster.scope === "global" && (await getPreferences(booster.userId)).dms.booster) {
-          addNotificationToQueue({
-            memberId: booster.userId,
-            payload: {
-              embed: new CustomEmbed(
-                booster.userId,
-                `your ${getItems()[booster.boosterId].emoji} **${getItems()[booster.boosterId].name}** global booster has expired`,
-              ),
-            },
-          });
+        if (deleted.count === 0) continue;
+
+        if (booster.scope === "global") {
+          const item = getItems()[booster.boosterId];
+          const uses = parseInt((await redis.getdel(getGlobalBoosterProgressKey(booster))) ?? "0");
+          const reward = Math.floor(uses / item.boosterEffect.usesPerDabloon);
+
+          if (reward > 0) {
+            await addInventoryItem(booster.userId, "dabloon", reward);
+            addItemSourceStat("dabloon", `global_booster:${booster.boosterId}`, reward);
+          }
+
+          if ((await getPreferences(booster.userId)).dms.booster) {
+            const rewardText =
+              reward > 0
+                ? `\n\n**${uses.toLocaleString()}** uses earned you **${reward.toLocaleString()}** ${getItems().dabloon.emoji} ${pluralize("dabloon", reward)}`
+                : "";
+
+            addNotificationToQueue({
+              memberId: booster.userId,
+              payload: {
+                embed: new CustomEmbed(
+                  booster.userId,
+                  `your ${item.emoji} **${item.name}** global booster has expired${rewardText}`,
+                ),
+              },
+            });
+          }
+
+          continue;
         }
 
         if (expired.has(booster.boosterId)) {
