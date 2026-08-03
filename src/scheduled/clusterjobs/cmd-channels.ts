@@ -5,7 +5,6 @@ import Constants from "../../utils/Constants";
 import type { CmdChannelState } from "../../utils/functions/guilds/cmd-channels";
 import {
   ACTIVITY_TTL_SECONDS,
-  ACTIVE_CATEGORY_ID,
   activateCmdChannel,
   activityKey,
   archiveCmdChannel,
@@ -23,50 +22,10 @@ import { logger } from "../../utils/logger";
 
 const CHECK_INTERVAL_MS = 60_000;
 
-type RateLimitInfo = {
-  majorParameter: string;
-  method: string;
-  retryAfter: number;
-  route: string;
-  timeToReset: number;
-};
-
 type Evaluation = {
   action?: "add" | "remove";
   state?: CmdChannelState;
 };
-
-export function trackCmdChannelRateLimit(client: NypsiClient, info: RateLimitInfo) {
-  if (info.method !== "POST" || info.route !== "/channels/:id/messages") return;
-
-  const channel = client.channels.cache.get(info.majorParameter);
-
-  if (
-    !channel ||
-    channel.isDMBased() ||
-    channel.guildId !== Constants.NYPSI_SERVER_ID ||
-    !("parentId" in channel) ||
-    channel.parentId !== ACTIVE_CATEGORY_ID
-  )
-    return;
-
-  redis
-    .set(rateLimitKey(channel.id), Date.now(), "EX", RATE_LIMIT_TTL_SECONDS)
-    .then(() =>
-      logger.info("cmd-channels: recorded message rate limit", {
-        channelId: channel.id,
-        channelName: "name" in channel ? channel.name : undefined,
-        retryAfter: info.retryAfter,
-        timeToReset: info.timeToReset,
-      }),
-    )
-    .catch((error) =>
-      logger.warn("cmd-channels: failed to record message rate limit", {
-        error,
-        channelId: channel.id,
-      }),
-    );
-}
 
 async function evaluateCmdChannels(guild: Guild, mutate: boolean): Promise<Evaluation> {
   const state = getCmdChannelState(guild);

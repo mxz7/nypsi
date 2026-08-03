@@ -17,10 +17,7 @@ import messageUpdate from "../events/messageUpdate";
 import roleDelete from "../events/roleDelete";
 import userUpdate from "../events/userUpdate";
 import redis from "../init/redis";
-import {
-  startCmdChannelManager,
-  trackCmdChannelRateLimit,
-} from "../scheduled/clusterjobs/cmd-channels";
+import { startCmdChannelManager } from "../scheduled/clusterjobs/cmd-channels";
 import { runLogs, runModerationChecks } from "../scheduled/clusterjobs/moderationchecks";
 import startRandomDrops from "../scheduled/clusterjobs/random-drops";
 import Constants from "../utils/Constants";
@@ -29,6 +26,7 @@ import { doChatReactions } from "../utils/functions/chatreactions/utils";
 import { initCrashGame } from "../utils/functions/economy/crash";
 import { runEconomySetup } from "../utils/functions/economy/utils";
 import { runChristmas } from "../utils/functions/guilds/christmas";
+import { trackCmdChannelRateLimit } from "../utils/functions/guilds/cmd-channels";
 import { runCountdowns } from "../utils/functions/guilds/countdowns";
 import { runSnipeClearIntervals } from "../utils/functions/guilds/messages";
 import { openKarmaShop } from "../utils/functions/karma/karmashop";

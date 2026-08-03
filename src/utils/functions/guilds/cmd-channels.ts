@@ -1,6 +1,7 @@
 import { CategoryChannel, ChannelType } from "discord.js";
 import type { Guild, TextChannel } from "discord.js";
 import redis from "../../../init/redis";
+import type { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
@@ -25,6 +26,14 @@ type ActivityChannel = {
   id: string;
   guildId?: string | null;
   parentId?: string | null;
+};
+
+type RateLimitInfo = {
+  majorParameter: string;
+  method: string;
+  retryAfter: number;
+  route: string;
+  timeToReset: number;
 };
 
 export type CmdChannelState = {
@@ -103,6 +112,38 @@ export function trackCmdChannelActivity(channel: ActivityChannel | null, source:
       source,
     }),
   );
+}
+
+export function trackCmdChannelRateLimit(client: NypsiClient, info: RateLimitInfo) {
+  if (info.method !== "POST" || info.route !== "/channels/:id/messages") return;
+
+  const channel = client.channels.cache.get(info.majorParameter);
+
+  if (
+    !channel ||
+    channel.isDMBased() ||
+    channel.guildId !== Constants.NYPSI_SERVER_ID ||
+    !("parentId" in channel) ||
+    channel.parentId !== ACTIVE_CATEGORY_ID
+  )
+    return;
+
+  redis
+    .set(rateLimitKey(channel.id), Date.now(), "EX", RATE_LIMIT_TTL_SECONDS)
+    .then(() =>
+      logger.info("cmd-channels: recorded message rate limit", {
+        channelId: channel.id,
+        channelName: "name" in channel ? channel.name : undefined,
+        retryAfter: info.retryAfter,
+        timeToReset: info.timeToReset,
+      }),
+    )
+    .catch((error) =>
+      logger.warn("cmd-channels: failed to record message rate limit", {
+        error,
+        channelId: channel.id,
+      }),
+    );
 }
 
 export async function withCmdChannelResizeLock<T>(callback: () => Promise<T>) {
