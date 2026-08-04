@@ -4,6 +4,7 @@
 - show upcoming levelling rewards in $level
 - autoscaling command channels
 - give dabloon rewards for using global boosters
+- add yapper achievement
 
 # july 2026
 
