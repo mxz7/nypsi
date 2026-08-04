@@ -4,8 +4,8 @@ import { NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { getUserId, MemberResolvable } from "../member";
+import { MemoryMutex } from "../mutex";
 import { percentChance } from "../random";
-import sleep from "../sleep";
 import { addInlineNotification, addNotificationToQueue } from "../users/notifications";
 import { getPreferences } from "../users/preferences";
 import { addTag } from "../users/tags";
@@ -301,60 +301,50 @@ async function cascadeAchievementTiers(
   }
 }
 
-const addProgressMutex = new Set<string>();
+const achievementProgressMutex = new MemoryMutex();
 
 export async function addProgress(
   member: MemberResolvable,
   achievementStartName: string,
   amount: number,
-  repeat = 0,
 ) {
   const userId = getUserId(member);
+  const mutexKey = `${userId}:${achievementStartName}`;
 
-  if (addProgressMutex.has(userId)) {
-    if (repeat > 10) addProgressMutex.delete(userId);
-    await sleep(100);
-    return addProgress(userId, achievementStartName, amount, repeat + 1);
-  }
+  await achievementProgressMutex.acquire(mutexKey);
 
-  addProgressMutex.add(userId);
+  try {
+    if (!(await userExists(userId))) return;
+    if ((await isEcoBanned(userId)).banned) return;
 
-  if (!(await userExists(userId))) {
-    addProgressMutex.delete(userId);
-    return;
-  }
-  if ((await isEcoBanned(userId)).banned) {
-    addProgressMutex.delete(userId);
-    return;
-  }
+    let progress: number;
+    let incrementApplied = false;
 
-  let progress: number;
-  let incrementApplied = false;
+    await cascadeAchievementTiers(
+      userId,
+      achievementStartName,
+      async (achievementId, achievement, achievements) => {
+        if (!incrementApplied) {
+          incrementApplied = true;
 
-  await cascadeAchievementTiers(
-    userId,
-    achievementStartName,
-    async (achievementId, achievement, achievements) => {
-      if (!incrementApplied) {
-        incrementApplied = true;
+          if (achievement) {
+            progress = Number(achievement.progress) + amount;
+            return addAchievementProgress(userId, achievementId, amount);
+          }
 
-        if (achievement) {
-          progress = Number(achievement.progress) + amount;
-          return addAchievementProgress(userId, achievementId, amount);
+          const completedProgress = achievements
+            .filter((entry) => entry.completed)
+            .reduce((highest, entry) => Math.max(highest, Number(entry.progress)), 0);
+
+          progress = completedProgress + amount;
         }
 
-        const completedProgress = achievements
-          .filter((entry) => entry.completed)
-          .reduce((highest, entry) => Math.max(highest, Number(entry.progress)), 0);
-
-        progress = completedProgress + amount;
-      }
-
-      return addAchievementProgress(userId, achievementId, progress);
-    },
-  );
-
-  addProgressMutex.delete(userId);
+        return addAchievementProgress(userId, achievementId, progress);
+      },
+    );
+  } finally {
+    achievementProgressMutex.release(mutexKey);
+  }
 }
 
 export async function setProgress(
@@ -363,11 +353,18 @@ export async function setProgress(
   amount: number,
 ) {
   const userId = getUserId(member);
+  const mutexKey = `${userId}:${achievementStartName}`;
 
-  if (!(await userExists(userId))) return;
-  if ((await isEcoBanned(userId)).banned) return;
+  await achievementProgressMutex.acquire(mutexKey);
 
-  await cascadeAchievementTiers(userId, achievementStartName, (achievementId) =>
-    setAchievementProgress(userId, achievementId, amount),
-  );
+  try {
+    if (!(await userExists(userId))) return;
+    if ((await isEcoBanned(userId)).banned) return;
+
+    await cascadeAchievementTiers(userId, achievementStartName, (achievementId) =>
+      setAchievementProgress(userId, achievementId, amount),
+    );
+  } finally {
+    achievementProgressMutex.release(mutexKey);
+  }
 }
