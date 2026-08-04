@@ -15,14 +15,15 @@ export default {
       Constants.redis.nypsi.HOURLY_DB_REPORT_COUNT,
     );
 
-    let total = parseInt(queries.reduce((a, b) => (parseInt(a) + parseInt(b)).toString()));
-    let avg = (total / queries.length).toFixed(2);
+    let total = queries.reduce((sum, duration) => sum + parseFloat(duration), 0);
+    let avg = queries.length > 0 ? total / queries.length : 0;
 
     log(
-      `average query takes ${avg}ms (${queries.length.toLocaleString()} queries in the last hour)`,
+      `average query took ${avg.toFixed(2)}ms (${queries.length.toLocaleString()} queries since the last report)`,
       {
-        queryCountsTotal: Object.values(queryCounts).reduce((a, b) =>
-          (parseInt(a) + parseInt(b)).toString(),
+        queryCountsTotal: Object.values(queryCounts).reduce(
+          (sum, count) => sum + parseInt(count),
+          0,
         ),
         queryCounts,
       },
@@ -36,7 +37,7 @@ export default {
         },
         {
           category: "hourly_query_time",
-          value: total / queries.length,
+          value: avg,
         },
       ],
     });
@@ -44,20 +45,22 @@ export default {
     const commands = await redis.lrange(Constants.redis.nypsi.HOURLY_COMMAND_PREPROCESS, 0, -1);
     await redis.del(Constants.redis.nypsi.HOURLY_COMMAND_PREPROCESS);
 
-    total = parseInt(commands.reduce((a, b) => (parseInt(a) + parseInt(b)).toString()));
-    avg = (total / commands.length).toFixed(2);
+    total = commands.reduce((sum, duration) => sum + parseFloat(duration), 0);
+    avg = commands.length > 0 ? total / commands.length : 0;
 
-    log(`average cmd pre process takes ${avg}ms (${total.toLocaleString()} cmds in the last hour)`);
+    log(
+      `average cmd pre process took ${avg.toFixed(2)}ms (${commands.length.toLocaleString()} cmds since the last report)`,
+    );
 
     await prisma.botMetrics.createMany({
       data: [
         {
           category: "hourly_preprocess",
-          value: total,
+          value: commands.length,
         },
         {
           category: "hourly_preprocess_time",
-          value: total / commands.length,
+          value: avg,
         },
       ],
     });
