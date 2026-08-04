@@ -4,6 +4,7 @@
 - show upcoming levelling rewards in $level
 - autoscaling command channels
 - give dabloon rewards for using global boosters
+- add evil larry
 
 # july 2026
 
