@@ -313,5 +313,12 @@
     "name": "year 6",
     "description": "be in the official nypsi server for over 6 years",
     "emoji": "🌺"
+  },
+  "yapper": {
+    "id": "yapper",
+    "name": "yapper",
+    "description": "found in the yapper v achievement",
+    "emoji": "<:honk:1016412021773844601>",
+    "image": "honk.png"
   }
 }
