@@ -250,10 +250,92 @@ export function reloadCommand(commandsArray: string[]) {
   return true;
 }
 
+type PremiumCommand = NonNullable<Awaited<ReturnType<typeof getCommand>>>;
+
+export type ResolvedMessageCommand =
+  | { type: "built-in"; command: Command; cmd: string; args: string[]; content?: string }
+  | { type: "premium"; customCommand: PremiumCommand; cmd: string; args: string[] }
+  | { type: "foreign-alias"; owner: string; cmd: string; args: string[] }
+  | { type: "none"; cmd: string; args: string[] };
+
+export async function resolveMessageCommand(
+  cmd: string,
+  message: NypsiMessage,
+  args: string[],
+): Promise<ResolvedMessageCommand> {
+  if (commands.has(cmd)) {
+    return { type: "built-in", command: commands.get(cmd), cmd, args };
+  }
+
+  if (aliases.has(cmd)) {
+    return {
+      type: "built-in",
+      command: commands.get(aliases.get(cmd)),
+      cmd,
+      args,
+    };
+  }
+
+  if (shorthands.has(cmd)) {
+    const expansion = shorthands.get(cmd);
+    const expandedParts = expansion.split(" ");
+    const targetCmd = expandedParts[0];
+    const command = commands.get(targetCmd);
+
+    if (command) {
+      const originalArgsStr = args.join(" ");
+      const resolvedArgs = [targetCmd, ...expandedParts.slice(1), ...args.slice(1)];
+      const prefix = message.content.slice(0, message.content.length - originalArgsStr.length);
+
+      const content = `${prefix}${command.name} ${resolvedArgs.slice(1).join(" ")}`;
+
+      return { type: "built-in", command, cmd: targetCmd, args: resolvedArgs, content };
+    }
+  }
+
+  const userAliases = await getUserAliases(message.author.id);
+  const foundAlias = userAliases.find((alias) => alias.alias === cmd);
+
+  if (foundAlias) {
+    const resolvedArgs = foundAlias.command.split(" ");
+    const targetCmd = resolvedArgs[0];
+    const command = commands.get(targetCmd);
+
+    if (!command) return { type: "none", cmd, args };
+
+    if (!recentlyUsedUserAliases.has(message.channel.id)) {
+      recentlyUsedUserAliases.set(message.channel.id, new Map());
+    }
+    if (!recentlyUsedUserAliases.get(message.channel.id).has(cmd)) {
+      recentlyUsedUserAliases.get(message.channel.id).set(cmd, message.author.id);
+    }
+
+    resolvedArgs.push(...message.content.split(" ").slice(1));
+    const content = `${message.content[0]}${command.name} ${resolvedArgs.slice(1).join(" ")}`;
+
+    return { type: "built-in", command, cmd: targetCmd, args: resolvedArgs, content };
+  }
+
+  const owner = recentlyUsedUserAliases.get(message.channel.id)?.get(cmd);
+
+  if (owner) return { type: "foreign-alias", owner, cmd, args };
+
+  const customCommand = await getCommand(cmd);
+
+  if (customCommand) return { type: "premium", customCommand, cmd, args };
+
+  return { type: "none", cmd, args };
+}
+
+export async function runMessageCommand(resolved: ResolvedMessageCommand, message: NypsiMessage) {
+  return runCommand(resolved.cmd, message, resolved.args, resolved);
+}
+
 export async function runCommand(
   cmd: string,
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
+  resolvedMessageCommand?: ResolvedMessageCommand,
 ) {
   const preProcessLength = [performance.now()];
   if (message.author.bot && !Constants.WHITELISTED_BOTS.includes(message.author.id)) return;
@@ -276,7 +358,14 @@ export async function runCommand(
 
   let command: Command;
 
-  if (!commands.has(cmd) && aliases.has(cmd)) {
+  if (resolvedMessageCommand?.type === "built-in") {
+    command = resolvedMessageCommand.command;
+    cmd = resolvedMessageCommand.cmd;
+    args = resolvedMessageCommand.args;
+    if (message instanceof Message && resolvedMessageCommand.content) {
+      message.content = resolvedMessageCommand.content;
+    }
+  } else if (!commands.has(cmd) && aliases.has(cmd)) {
     command = commands.get(aliases.get(cmd));
   } else if (!commands.has(cmd) && shorthands.has(cmd)) {
     const expansion = shorthands.get(cmd);
@@ -284,12 +373,7 @@ export async function runCommand(
     const targetCmd = expandedParts[0];
     command = commands.get(targetCmd);
     if (command) {
-      const originalArgsStr = args.join(" ");
       args = [targetCmd, ...expandedParts.slice(1), ...args.slice(1)];
-      if (message instanceof Message) {
-        const prefix = message.content.slice(0, message.content.length - originalArgsStr.length);
-        message.content = `${prefix}${command.name} ${args.slice(1).join(" ")}`;
-      }
       cmd = targetCmd;
     }
   } else {
@@ -374,100 +458,79 @@ export async function runCommand(
       ],
     });
 
-  if (!commandExists(cmd) && message instanceof Message) {
-    if (!aliases.has(cmd)) {
-      const userAliases = await getUserAliases(message.author.id);
-      const foundAlias = userAliases.find((alias) => alias.alias === cmd);
+  if (resolvedMessageCommand && message instanceof Message) {
+    if (resolvedMessageCommand.type === "none") return;
 
-      if (foundAlias) {
-        if (!recentlyUsedUserAliases.has(message.channel.id))
-          recentlyUsedUserAliases.set(message.channel.id, new Map());
-        if (!recentlyUsedUserAliases.get(message.channel.id).has(cmd))
-          recentlyUsedUserAliases.get(message.channel.id).set(cmd, message.author.id);
+    if (resolvedMessageCommand.type === "foreign-alias") {
+      const owner = resolvedMessageCommand.owner;
+      const ownerUsername = await getLastKnownUsername(owner, true);
 
-        cmd = foundAlias.command.split(" ")[0];
-        command = commands.get(cmd);
+      const premium = await isPremium(message.member);
+      const command = await getUserAliases(owner).then((r) => r.find((a) => a.alias === cmd));
 
-        args = foundAlias.command.split(" ");
-        args.push(...message.content.split(" ").splice(1, Infinity));
+      let commandString = `\`${cmd}\``;
 
-        message.content = `${message.content[0]}${command.name} ${args
-          .slice(1, Infinity)
-          .join(" ")}`;
-      } else if (recentlyUsedUserAliases.get(message.channel.id)?.has(cmd)) {
-        if (!cmd) return;
-        const owner = recentlyUsedUserAliases.get(message.channel.id).get(cmd);
-        const ownerUsername = await getLastKnownUsername(owner, true);
+      const prefixes = await getPrefix(message.guild);
 
-        const premium = await isPremium(message.member);
-        const command = await getUserAliases(owner).then((r) => r.find((a) => a.alias === cmd));
-
-        let commandString = `\`${cmd}\``;
-
-        const prefixes = await getPrefix(message.guild);
-
-        if (command) {
-          const prefix = prefixes[0];
-          commandString = `\`${prefix}${cmd}\` -> \`${prefix}${command.command}\``;
-        }
-
-        return message.channel.send({
-          embeds: [
-            new ErrorEmbed(
-              `${commandString} is a custom alias owned by **${ownerUsername}**${!premium ? "\n\nto create your own custom aliases you need a premium membership: /premium" : ""}`,
-            ),
-          ],
-        });
-      } else {
-        if (await isLockedOut(message.author.id)) return;
-        const customCommand = await getCommand(cmd);
-
-        if (!customCommand) {
-          return;
-        }
-
-        const content = customCommand.content;
-
-        if ((await getDisabledCommands(message.guild)).indexOf("customcommand") != -1) {
-          return message.channel.send({
-            embeds: [new ErrorEmbed("custom commands have been disabled in this server")],
-          });
-        }
-
-        const filter = await getChatFilter(message.guild);
-
-        let contentToCheck: string | string[] = cleanString(content.toLowerCase().normalize("NFD"));
-
-        contentToCheck = contentToCheck.split(" ");
-
-        for (const word of filter) {
-          if (contentToCheck.indexOf(word.content) != -1) {
-            return message.channel.send({
-              embeds: [new ErrorEmbed("this custom command is not allowed in this server")],
-            });
-          }
-        }
-
-        message.content += ` [custom cmd - ${customCommand.owner}]`;
-
-        const ownerTag = await getLastKnownUsername(customCommand.owner, false);
-        await addUse(customCommand.owner);
-        logCommand(message, ["", "", ""]);
-
-        const embed = new CustomEmbed(message.member, content).setFooter({
-          text: `${customCommand.uses.toLocaleString()} ${pluralize("use", customCommand.uses)}`,
-        });
-
-        if (ownerTag) {
-          embed.setFooter({
-            text: `by ${ownerTag} | ${customCommand.uses.toLocaleString()} ${pluralize("use", customCommand.uses)}`,
-          });
-        }
-
-        trackCmdChannelCommand(message.channel, message.id);
-
-        return message.channel.send({ embeds: [embed] });
+      if (command) {
+        const prefix = prefixes[0];
+        commandString = `\`${prefix}${cmd}\` -> \`${prefix}${command.command}\``;
       }
+
+      return message.channel.send({
+        embeds: [
+          new ErrorEmbed(
+            `${commandString} is a custom alias owned by **${ownerUsername}**${!premium ? "\n\nto create your own custom aliases you need a premium membership: /premium" : ""}`,
+          ),
+        ],
+      });
+    }
+
+    if (resolvedMessageCommand.type === "premium") {
+      if (await isLockedOut(message.author.id)) return;
+      const customCommand = resolvedMessageCommand.customCommand;
+
+      const content = customCommand.content;
+
+      if ((await getDisabledCommands(message.guild)).indexOf("customcommand") != -1) {
+        return message.channel.send({
+          embeds: [new ErrorEmbed("custom commands have been disabled in this server")],
+        });
+      }
+
+      const filter = await getChatFilter(message.guild);
+
+      let contentToCheck: string | string[] = cleanString(content.toLowerCase().normalize("NFD"));
+
+      contentToCheck = contentToCheck.split(" ");
+
+      for (const word of filter) {
+        if (contentToCheck.indexOf(word.content) != -1) {
+          return message.channel.send({
+            embeds: [new ErrorEmbed("this custom command is not allowed in this server")],
+          });
+        }
+      }
+
+      message.content += ` [custom cmd - ${customCommand.owner}]`;
+
+      const ownerTag = await getLastKnownUsername(customCommand.owner, false);
+      await addUse(customCommand.owner);
+      logCommand(message, ["", "", ""]);
+
+      const embed = new CustomEmbed(message.member, content).setFooter({
+        text: `${customCommand.uses.toLocaleString()} ${pluralize("use", customCommand.uses)}`,
+      });
+
+      if (ownerTag) {
+        embed.setFooter({
+          text: `by ${ownerTag} | ${customCommand.uses.toLocaleString()} ${pluralize("use", customCommand.uses)}`,
+        });
+      }
+
+      trackCmdChannelCommand(message.channel, message.id);
+
+      return message.channel.send({ embeds: [embed] });
     }
   }
 

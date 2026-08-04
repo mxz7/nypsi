@@ -11,7 +11,6 @@ import {
   PermissionsBitField,
   TextChannel,
 } from "discord.js";
-import { compareTwoStrings } from "string-similarity";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
 import { NypsiMessage } from "../models/Command";
@@ -31,6 +30,7 @@ import { isSlashOnly } from "../utils/functions/guilds/slash";
 import { getGuildName, getPrefix, hasGuild } from "../utils/functions/guilds/utils";
 import { isScamImage } from "../utils/functions/image";
 import { checkTriggers } from "../utils/functions/message-triggers";
+import { checkNypsiChatMessage } from "../utils/functions/nypsi/chat-spam";
 import sleep from "../utils/functions/sleep";
 import {
   getSupportRequest,
@@ -43,18 +43,16 @@ import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { getLastCommand } from "../utils/functions/users/commands";
 import { getLastKnownUsername } from "../utils/functions/users/username";
 import { hasProfile } from "../utils/functions/users/utils";
-import { runCommand } from "../utils/handlers/commandhandler";
+import {
+  resolveMessageCommand,
+  ResolvedMessageCommand,
+  runMessageCommand,
+} from "../utils/handlers/commandhandler";
 import { logger } from "../utils/logger";
 import { mentionQueue } from "../utils/queues/queues";
 import ms = require("ms");
 
 const dmCooldown = new Set<string>();
-const lastContent = new Map<string, { history: string[]; last: number }>();
-
-setInterval(() => {
-  lastContent.clear();
-}, ms("30 minutes"));
-
 const brainrotFilter = [
   "skibidi",
   "gyatt",
@@ -300,10 +298,27 @@ export default async function messageCreate(message: Message) {
   message.content = message.content.replace(removeExtraSpacesRegex, ""); // remove any additional spaces
   const lowercaseContent = message.content.toLowerCase();
 
+  const prefixes = await getPrefix(message.guild);
+
+  if (message.client.user.id == "685193083570094101") prefixes.push("£");
+
+  const slashOnly = await isSlashOnly(message.guild);
+  const commandPrefix = slashOnly
+    ? undefined
+    : prefixes.find((prefix) => message.content.startsWith(prefix));
+  const commandName = commandPrefix
+    ? message.content.substring(commandPrefix.length).split(" ")[0].toLowerCase()
+    : undefined;
+  const commandArgs = commandPrefix
+    ? message.content.substring(commandPrefix.length).split(" ")
+    : undefined;
+  const resolvedCommand: ResolvedMessageCommand = commandName
+    ? await resolveMessageCommand(commandName, message as NypsiMessage, commandArgs)
+    : undefined;
+  const commandMessage = resolvedCommand && ["built-in", "premium"].includes(resolvedCommand.type);
+
   const checkTask = async () => {
     await sleep(500);
-
-    const lastContents = lastContent.get(message.author.id);
 
     if (message.author.id === Constants.OWNER_ID) redis.set("nypsi:owner:lastchat", Date.now());
 
@@ -325,43 +340,11 @@ export default async function messageCreate(message: Message) {
       });
     }
 
-    const addProgress = async () => {
-      await addTaskProgress(message.author.id, "chat_daily");
-      await addTaskProgress(message.author.id, "chat_weekly");
-      addEventProgress(message.client as NypsiClient, message.member, "messages", 1);
-    };
+    await addTaskProgress(message.author.id, "chat_daily");
+    await addTaskProgress(message.author.id, "chat_weekly");
+    addEventProgress(message.client as NypsiClient, message.member, "messages", 1);
 
-    if (!lastContents) {
-      lastContent.set(message.author.id, {
-        history: [lowercaseContent],
-        last: Date.now(),
-      });
-    } else {
-      let fail = false;
-
-      if (lastContents.last > Date.now() - 1000) {
-        fail = true;
-      } else {
-        for (const content of lastContents.history) {
-          const similarity = compareTwoStrings(content, lowercaseContent);
-
-          if (similarity > 90) {
-            fail = true;
-            break;
-          }
-        }
-      }
-
-      lastContents.history.push(lowercaseContent);
-      lastContents.last = Date.now();
-      if (lastContents.history.length >= 3) lastContents.history.shift();
-
-      lastContent.set(message.author.id, lastContents);
-
-      if (fail) return;
-    }
-
-    addProgress();
+    if (!commandMessage) await checkNypsiChatMessage(message);
   };
 
   const checkNeedSupport = async () => {
@@ -443,10 +426,6 @@ export default async function messageCreate(message: Message) {
   // for snipe/esnipe
   addToMessageCache(message);
 
-  const prefixes = await getPrefix(message.guild);
-
-  if (message.client.user.id == "685193083570094101") prefixes.push("£");
-
   if (
     message.content == `<@!${message.client.user.id}>` ||
     message.content == `<@${message.client.user.id}>`
@@ -462,18 +441,7 @@ export default async function messageCreate(message: Message) {
       });
   }
 
-  if (!(await isSlashOnly(message.guild))) {
-    for (const prefix of prefixes) {
-      if (message.content.startsWith(prefix)) {
-        const args = message.content.substring(prefix.length).split(" ");
-
-        const cmd = args[0].toLowerCase();
-
-        runCommand(cmd, message as NypsiMessage, args);
-        break;
-      }
-    }
-  }
+  if (resolvedCommand) runMessageCommand(resolvedCommand, message as NypsiMessage);
 
   if (
     message.mentions.everyone ||
