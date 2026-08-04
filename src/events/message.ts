@@ -19,6 +19,7 @@ import { Mention, MentionJobData } from "../types/workers/mentions";
 import Constants from "../utils/Constants";
 import { isHelpChatAvailable } from "../utils/functions/ai/help-chat";
 import { a } from "../utils/functions/anticheat";
+import { addProgress } from "../utils/functions/economy/achievements";
 import { addEventProgress } from "../utils/functions/economy/events";
 import { handleLootDropMessage } from "../utils/functions/economy/loot-drops";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
@@ -46,8 +47,8 @@ import { getLastCommand } from "../utils/functions/users/commands";
 import { getLastKnownUsername } from "../utils/functions/users/username";
 import { hasProfile } from "../utils/functions/users/utils";
 import {
-  resolveMessageCommand,
   ResolvedMessageCommand,
+  resolveMessageCommand,
   runMessageCommand,
 } from "../utils/handlers/commandhandler";
 import { logger } from "../utils/logger";
@@ -351,8 +352,9 @@ export default async function messageCreate(message: Message) {
       });
     }
 
-    await addTaskProgress(message.author.id, "chat_daily");
-    await addTaskProgress(message.author.id, "chat_weekly");
+    addProgress(message.author.id, "yapper", 1);
+    addTaskProgress(message.author.id, "chat_daily");
+    addTaskProgress(message.author.id, "chat_weekly");
     addEventProgress(message.client as NypsiClient, message.member, "messages", 1);
 
     if (!commandMessage) await checkNypsiChatMessage(message);

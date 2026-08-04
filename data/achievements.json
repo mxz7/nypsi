@@ -1778,5 +1778,60 @@
     "target": 15000,
     "description": "use 15,000 roleplay commands",
     "prize": ["legendary_scratch_card:1"]
+  },
+  "yapper_i": {
+    "id": "yapper_i",
+    "name": "yapper **I**",
+    "emoji": "<:honk:1016412021773844601>",
+    "target": 10000,
+    "description": "send 10,000 messages in the official nypsi server",
+    "prize": ["legendary_scratch_card:1"]
+  },
+  "yapper_ii": {
+    "id": "yapper_ii",
+    "name": "yapper **II**",
+    "emoji": "<:honk:1016412021773844601>",
+    "target": 50000,
+    "description": "send 50,000 messages in the official nypsi server",
+    "prize": ["legendary_scratch_card:2", "bronze_credit:2"]
+  },
+  "yapper_iii": {
+    "id": "yapper_iii",
+    "name": "yapper **III**",
+    "emoji": "<:honk:1016412021773844601>",
+    "target": 200000,
+    "description": "send 200,000 messages in the official nypsi server",
+    "prize": ["nypsi_crate:1", "legendary_scratch_card:3", "silver_credit:2"]
+  },
+  "yapper_iv": {
+    "id": "yapper_iv",
+    "name": "yapper **IV**",
+    "emoji": "<:honk:1016412021773844601>",
+    "target": 500000,
+    "description": "send 500,000 messages in the official nypsi server",
+    "prize": [
+      "gem_crate:1",
+      "nypsi_crate:2",
+      "legendary_scratch_card:4",
+      "gold_credit:2",
+      "omega_crate:1"
+    ]
+  },
+  "yapper_v": {
+    "id": "yapper_v",
+    "name": "yapper **V**",
+    "emoji": "<:honk:1016412021773844601>",
+    "target": 1000000,
+    "description": "send 1,000,000 messages in the official nypsi server",
+    "prize": [
+      "crystal_heart:1",
+      "gem_crate:2",
+      "nypsi_crate:3",
+      "legendary_scratch_card:5",
+      "platinum_credit:2",
+      "omega_crate:1",
+      "rain:1",
+      "tag:yapper"
+    ]
   }
 }
