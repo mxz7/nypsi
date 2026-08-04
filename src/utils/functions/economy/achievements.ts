@@ -273,6 +273,34 @@ export async function getUserAchievement(member: MemberResolvable, achievementId
   });
 }
 
+type UserAchievement = Awaited<ReturnType<typeof getAllAchievements>>[number];
+
+async function cascadeAchievementTiers(
+  userId: string,
+  achievementStartName: string,
+  update: (
+    achievementId: string,
+    achievement: UserAchievement | undefined,
+    achievements: UserAchievement[],
+  ) => Promise<boolean>,
+) {
+  const achievementData = getAchievements();
+  const achievementIds = ["i", "ii", "iii", "iv", "v"]
+    .map((tier) => `${achievementStartName}_${tier}`)
+    .filter((achievementId) => achievementData[achievementId]);
+  const achievements = await getAllAchievements(userId, achievementStartName);
+  const achievementsById = new Map(
+    achievements.map((achievement) => [achievement.achievementId, achievement]),
+  );
+
+  for (const achievementId of achievementIds) {
+    const achievement = achievementsById.get(achievementId);
+
+    if (achievement?.completed) continue;
+    if (!(await update(achievementId, achievement, achievements))) break;
+  }
+}
+
 const addProgressMutex = new Set<string>();
 
 export async function addProgress(
@@ -300,66 +328,31 @@ export async function addProgress(
     return;
   }
 
-  const doProgress = async (
-    achievement: { achievementId: string; progress: number | bigint },
-    incrementNext = true,
-  ) => {
-    let achievementId = achievement.achievementId;
-    let progress = amount;
+  let progress: number;
+  let incrementApplied = false;
 
-    while (await addAchievementProgress(userId, achievementId, progress)) {
-      if (!incrementNext) break;
+  await cascadeAchievementTiers(
+    userId,
+    achievementStartName,
+    async (achievementId, achievement, achievements) => {
+      if (!incrementApplied) {
+        incrementApplied = true;
 
-      let nextId: string;
+        if (achievement) {
+          progress = Number(achievement.progress) + amount;
+          return addAchievementProgress(userId, achievementId, amount);
+        }
 
-      if (achievementId.endsWith("_i")) {
-        nextId = `${achievementStartName}_ii`;
-      } else if (achievementId.endsWith("_ii")) {
-        nextId = `${achievementStartName}_iii`;
-      } else if (achievementId.endsWith("_iii")) {
-        nextId = `${achievementStartName}_iv`;
-      } else if (achievementId.endsWith("_iv")) {
-        nextId = `${achievementStartName}_v`;
+        const completedProgress = achievements
+          .filter((entry) => entry.completed)
+          .reduce((highest, entry) => Math.max(highest, Number(entry.progress)), 0);
+
+        progress = completedProgress + amount;
       }
 
-      if (!nextId) break;
-      achievementId = nextId;
-
-      progress = Number(achievement.progress) + amount;
-    }
-  };
-
-  const achievements = await getAllAchievements(userId, achievementStartName);
-  let count = 0;
-
-  for (const achievement of achievements) {
-    if (achievement.achievementId.includes(achievementStartName)) count++;
-
-    // will always return if a valid achievement is found
-    if (achievement.achievementId.includes(achievementStartName) && !achievement.completed) {
-      await doProgress(achievement);
-      addProgressMutex.delete(userId);
-      return;
-    }
-  }
-
-  switch (count) {
-    case 0:
-      await doProgress({ achievementId: `${achievementStartName}_i`, progress: amount }, false);
-      break;
-    case 1:
-      await doProgress({ achievementId: `${achievementStartName}_ii`, progress: amount }, false);
-      break;
-    case 2:
-      await doProgress({ achievementId: `${achievementStartName}_iii`, progress: amount }, false);
-      break;
-    case 3:
-      await doProgress({ achievementId: `${achievementStartName}_iv`, progress: amount }, false);
-      break;
-    case 4:
-      await doProgress({ achievementId: `${achievementStartName}_v`, progress: amount }, false);
-      break;
-  }
+      return addAchievementProgress(userId, achievementId, progress);
+    },
+  );
 
   addProgressMutex.delete(userId);
 }
@@ -373,48 +366,8 @@ export async function setProgress(
 
   if (!(await userExists(userId))) return;
   if ((await isEcoBanned(userId)).banned) return;
-  const achievements = await getAllAchievements(userId, achievementStartName);
-  let count = 0;
 
-  for (const achievement of achievements) {
-    if (achievement.achievementId.includes(achievementStartName)) count++;
-    // will always return if a valid achievement is found
-    if (achievement.achievementId.includes(achievementStartName) && !achievement.completed) {
-      const res = await setAchievementProgress(userId, achievement.achievementId, amount);
-
-      if (res && !achievement.achievementId.endsWith("_v")) {
-        let thing: string;
-        if (achievement.achievementId.endsWith("_i")) {
-          thing = `${achievementStartName}_ii`;
-        } else if (achievement.achievementId.endsWith("_ii")) {
-          thing = `${achievementStartName}_iii`;
-        } else if (achievement.achievementId.endsWith("_iii")) {
-          thing = `${achievementStartName}_iv`;
-        } else if (achievement.achievementId.endsWith("iv")) {
-          thing = `${achievementStartName}_v`;
-        }
-
-        if (thing) await setAchievementProgress(userId, thing, amount);
-      }
-      return;
-    }
-  }
-
-  switch (count) {
-    case 0:
-      await setAchievementProgress(userId, `${achievementStartName}_i`, amount);
-      break;
-    case 1:
-      await setAchievementProgress(userId, `${achievementStartName}_ii`, amount);
-      break;
-    case 2:
-      await setAchievementProgress(userId, `${achievementStartName}_iii`, amount);
-      break;
-    case 3:
-      await setAchievementProgress(userId, `${achievementStartName}_iv`, amount);
-      break;
-    case 4:
-      await setAchievementProgress(userId, `${achievementStartName}_v`, amount);
-      break;
-  }
+  await cascadeAchievementTiers(userId, achievementStartName, (achievementId) =>
+    setAchievementProgress(userId, achievementId, amount),
+  );
 }
