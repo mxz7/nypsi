@@ -112,6 +112,25 @@ describe("RedisMutex", () => {
     expect([px, ttl, nx]).toEqual(["PX", 1_500, "NX"]);
   });
 
+  test("tries to acquire once without waiting", async () => {
+    redisMock.set.mockResolvedValue(null);
+    const mutex = new RedisMutex("economy");
+
+    await expect(mutex.tryAcquire("user")).resolves.toBe(false);
+
+    expect(redisMock.set).toHaveBeenCalledOnce();
+  });
+
+  test("returns true when a non-blocking acquisition succeeds", async () => {
+    redisMock.set.mockResolvedValue("OK");
+    redisMock.eval.mockResolvedValue(1);
+    const mutex = new RedisMutex("economy");
+
+    await expect(mutex.tryAcquire("user")).resolves.toBe(true);
+
+    mutex.release("user");
+  });
+
   test("polls until Redis grants the lock", async () => {
     vi.useFakeTimers();
     redisMock.set

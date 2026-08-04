@@ -51,6 +51,7 @@ import {
 } from "../functions/economy/utils";
 import { addXp, getXp } from "../functions/economy/xp";
 import { getDisabledChannels } from "../functions/guilds/channels";
+import { trackCmdChannelCommand } from "../functions/guilds/cmd-channels";
 import { getDisabledCommands } from "../functions/guilds/disabledcommands";
 import { getChatFilter } from "../functions/guilds/filters";
 import { getPrefix } from "../functions/guilds/utils";
@@ -463,10 +464,14 @@ export async function runCommand(
           });
         }
 
+        trackCmdChannelCommand(message.channel, message.id);
+
         return message.channel.send({ embeds: [embed] });
       }
     }
   }
+
+  trackCmdChannelCommand(message.channel, message.id);
 
   if (
     Constants.WHITELISTED_BOTS.includes(message.author.id) &&

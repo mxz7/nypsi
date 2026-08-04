@@ -17,6 +17,7 @@ import messageUpdate from "../events/messageUpdate";
 import roleDelete from "../events/roleDelete";
 import userUpdate from "../events/userUpdate";
 import redis from "../init/redis";
+import { startCmdChannelManager } from "../scheduled/clusterjobs/cmd-channels";
 import { runLogs, runModerationChecks } from "../scheduled/clusterjobs/moderationchecks";
 import startRandomDrops from "../scheduled/clusterjobs/random-drops";
 import Constants from "../utils/Constants";
@@ -159,6 +160,8 @@ export class NypsiClient extends Client {
       logger.debug("cluster message event loaded");
 
       logger.info("listeners loaded");
+
+      startCmdChannelManager(this);
 
       setTimeout(async () => {
         this.runIntervals();

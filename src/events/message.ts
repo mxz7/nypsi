@@ -23,6 +23,7 @@ import { a } from "../utils/functions/anticheat";
 import { addEventProgress } from "../utils/functions/economy/events";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { userExists } from "../utils/functions/economy/utils";
+import { trackCmdChannelActivity } from "../utils/functions/guilds/cmd-channels";
 import { getLastCommand as getLastGuildCommand } from "../utils/functions/guilds/commands";
 import { checkAutoMute, checkMessageContent } from "../utils/functions/guilds/filters";
 import { addToMessageCache } from "../utils/functions/guilds/messages";
@@ -97,6 +98,8 @@ const removeExtraSpacesRegex = / +(?= )/g;
 
 export default async function messageCreate(message: Message) {
   if (message.partial) await message.fetch();
+
+  trackCmdChannelActivity(message.channel, "message", message.id);
 
   if (!message.channel.isSendable()) return;
 

@@ -12,12 +12,26 @@ import {
 import { NypsiCommandInteraction, createNypsiInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
+import {
+  trackCmdChannelActivity,
+  trackCmdChannelCommand,
+} from "../utils/functions/guilds/cmd-channels";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { runCommand } from "../utils/handlers/commandhandler";
 import { runInteraction } from "../utils/handlers/interactions";
 import { logger } from "../utils/logger";
 
 export default async function interactionCreate(interaction: Interaction) {
+  trackCmdChannelActivity(interaction.channel, "interaction", interaction.id);
+
+  if (interaction.isMessageComponent()) {
+    setTimeout(() => {
+      if (interaction.deferred || interaction.replied) {
+        trackCmdChannelCommand(interaction.channel, interaction.id);
+      }
+    }, 5000);
+  }
+
   if (interaction.isButton()) {
     let msg = `${interaction.guildId} ${interaction.channelId} ${interaction.user.username}: ${interaction.customId}`;
 

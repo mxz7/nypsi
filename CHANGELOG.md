@@ -2,6 +2,7 @@
 
 - add item source tracking stats
 - show upcoming levelling rewards in $level
+- autoscaling command channels
 
 # july 2026
 

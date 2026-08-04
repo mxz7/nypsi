@@ -1,5 +1,6 @@
 import redis from "../../init/redis";
 import { logger } from "../logger";
+import sleep from "./sleep";
 
 export abstract class Mutex {
   protected shouldLog: boolean;
@@ -91,24 +92,40 @@ export class RedisMutex extends Mutex {
     return key === undefined ? this.prefix : `${this.prefix}:${key}`;
   }
 
-  async acquire(key?: string): Promise<void> {
+  private async acquireOnce(key?: string): Promise<boolean> {
     const token = crypto.randomUUID();
+    const redisKey = this.redisKey(key);
+    const result = await redis.set(redisKey, token, "PX", this.ttl, "NX");
+
+    if (result !== "OK") return false;
+
+    this.tokens.set(key, token);
+    if (this.shouldLog) {
+      logger.debug(`redis-mutex: acquired ${redisKey}`);
+    }
+
+    return true;
+  }
+
+  async tryAcquire(key?: string): Promise<boolean> {
     const redisKey = this.redisKey(key);
 
     if (this.shouldLog) {
       logger.debug(`redis-mutex: requested ${redisKey}`);
     }
 
-    while (true) {
-      const result = await redis.set(redisKey, token, "PX", this.ttl, "NX");
-      if (result === "OK") {
-        this.tokens.set(key, token);
-        if (this.shouldLog) {
-          logger.debug(`redis-mutex: acquired ${redisKey}`);
-        }
-        return;
-      }
-      await new Promise((resolve) => setTimeout(resolve, this.pollInterval));
+    return this.acquireOnce(key);
+  }
+
+  async acquire(key?: string): Promise<void> {
+    const redisKey = this.redisKey(key);
+
+    if (this.shouldLog) {
+      logger.debug(`redis-mutex: requested ${redisKey}`);
+    }
+
+    while (!(await this.acquireOnce(key))) {
+      await sleep(this.pollInterval);
     }
   }
 

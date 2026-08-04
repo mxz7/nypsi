@@ -9,8 +9,6 @@ import {
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
-  CategoryChannel,
-  ChannelType,
   CommandInteraction,
   ComponentType,
   Guild,
@@ -23,12 +21,11 @@ import {
   ModalSubmitInteraction,
   StringSelectMenuBuilder,
   StringSelectMenuOptionBuilder,
-  TextChannel,
   TextInputBuilder,
   TextInputStyle,
   User,
 } from "discord.js";
-import { inPlaceSort, sort } from "fast-sort";
+import { inPlaceSort } from "fast-sort";
 import { Prisma } from "#generated/prisma";
 import prisma from "../init/database";
 import redis from "../init/redis";
@@ -98,6 +95,7 @@ import {
   setVoteStreak,
 } from "../utils/functions/economy/vote";
 import { getXp, updateXp } from "../utils/functions/economy/xp";
+import { addCmdChannel, removeCmdChannel } from "../utils/functions/guilds/cmd-channels";
 import { getPeaks } from "../utils/functions/guilds/utils";
 import { addKarma, getKarma, removeKarma } from "../utils/functions/karma/karma";
 import { topBalance } from "../utils/functions/leaderboards/economy";
@@ -2939,64 +2937,6 @@ async function run(
     return doPunishments(target);
   };
 
-  const addCmd = async () => {
-    const category = (await message.guild.channels.fetch("1246516186171314337")) as CategoryChannel;
-    const archive = (await message.guild.channels.fetch("1060585526945665197")) as CategoryChannel;
-
-    const { children } = category;
-
-    const name = `cmds-${children.cache.size + 1}`;
-
-    let channel: TextChannel;
-
-    const archivedChannel = archive.children.cache.find((i) => i.name === name) as TextChannel;
-
-    if (archivedChannel) {
-      await archivedChannel.setParent("1246516186171314337");
-
-      channel = archivedChannel;
-    } else {
-      channel = await children.create({ name, type: ChannelType.GuildText });
-    }
-
-    console.log(children.cache.size);
-
-    console.log(channel.position);
-
-    await channel.setPosition(children.cache.size - 1);
-
-    console.log(channel.position);
-
-    logger.info(`admin: ${message.author.id} (${message.author.username}) added cmd channel`);
-
-    return message.react("✅");
-  };
-
-  const remCmd = async () => {
-    const category = (await message.guild.channels.fetch("1246516186171314337")) as CategoryChannel;
-
-    const { children } = category;
-
-    logger.debug(
-      "children",
-      children.cache.map((v) => ({ name: v.name, position: v.position })),
-    );
-
-    const filtered = Array.from(
-      children.cache.filter((channel) => channel.name.startsWith("cmds-")).values(),
-    );
-
-    const ordered = sort(filtered).desc((i) => parseInt(i.name.split("-")[1]));
-
-    const toDelete = ordered[0];
-
-    await toDelete.setParent("1060585526945665197"); // archive
-
-    logger.info(`admin: ${message.author.id} (${message.author.username}) removed cmd channel`);
-
-    return message.react("✅");
-  };
-
   const giveStar = async (id: string, amount = 1) => {
     const user = await getUserFromId(id);
 
@@ -3454,7 +3394,23 @@ async function run(
       });
     }
 
-    return args[1].toLowerCase() == "add" ? addCmd() : remCmd();
+    const channel =
+      args[1].toLowerCase() == "add"
+        ? await addCmdChannel(message.guild)
+        : await removeCmdChannel(message.guild);
+
+    if (!channel) {
+      return send({
+        embeds: [new ErrorEmbed("the command channel count could not be changed")],
+      });
+    }
+
+    logger.info(
+      `admin: ${message.author.id} (${message.author.username}) ${args[1].toLowerCase() == "add" ? "added" : "removed"} cmd channel`,
+      { channelId: channel.id, channelName: channel.name },
+    );
+
+    return message.react("✅");
   } else if (args[0].toLowerCase() === "runjob") {
     if (!(await hasAdminPermission(message.member, "run-job"))) {
       return send({
