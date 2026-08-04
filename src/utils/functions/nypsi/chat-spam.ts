@@ -1,6 +1,7 @@
 import { Message, PermissionsBitField } from "discord.js";
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
+import { redisDeserialize, redisSerialize } from "../../cache";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { MStoTime } from "../date";
@@ -28,14 +29,14 @@ export async function checkNypsiChatMessage(message: Message) {
   let state: ChatSpamState;
 
   try {
-    state = rawState ? JSON.parse(rawState) : undefined;
+    state = rawState ? redisDeserialize<ChatSpamState>(rawState) : undefined;
   } catch {
     state = undefined;
   }
 
   const evaluation = evaluateNypsiChatMessage(message.content, message.createdTimestamp, state);
 
-  await redis.set(stateKey, JSON.stringify(evaluation.state), "EX", STATE_TTL_SECONDS);
+  await redis.set(stateKey, redisSerialize(evaluation.state), "EX", STATE_TTL_SECONDS);
 
   if (evaluation.pointsAdded > 0) {
     logger.debug(`spam: score increased for ${message.author.id} (${message.author.username})`, {

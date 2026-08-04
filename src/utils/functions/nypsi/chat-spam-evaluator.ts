@@ -1,5 +1,7 @@
 import { compareTwoStrings } from "string-similarity";
 
+const PUNISHMENT_SCORE = 6;
+
 type ChatHistoryEntry = {
   content: string;
   createdAt: number;
@@ -124,7 +126,7 @@ export function evaluateNypsiChatMessage(
   const decay = Math.floor(Math.max(0, now - state.updatedAt) / 30000);
   const scoreBefore = Math.max(0, state.score - decay);
   const scoreAfter = scoreBefore + pointsAdded;
-  const shouldTimeout = scoreAfter >= 6;
+  const shouldTimeout = scoreAfter >= PUNISHMENT_SCORE;
 
   return {
     causes,
