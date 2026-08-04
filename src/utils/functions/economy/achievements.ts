@@ -1,11 +1,15 @@
+import { RESTGetAPIGuildMessagesSearchResult, Routes } from "discord-api-types/v10";
+import { SnowflakeUtil } from "discord.js";
 import prisma from "../../../init/database";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
+import { getRest } from "../../rest";
 import { getUserId, MemberResolvable } from "../member";
 import { MemoryMutex } from "../mutex";
 import { percentChance } from "../random";
+import sleep from "../sleep";
 import { addInlineNotification, addNotificationToQueue } from "../users/notifications";
 import { getPreferences } from "../users/preferences";
 import { addTag } from "../users/tags";
@@ -317,6 +321,17 @@ export async function addProgress(
     if (!(await userExists(userId))) return;
     if ((await isEcoBanned(userId)).banned) return;
 
+    if (achievementStartName === "yapper") {
+      const existingProgress = await getAllAchievements(userId, achievementStartName);
+
+      if (existingProgress.length === 0) {
+        const historicProgress = await getHistoricYapperProgress(userId, Date.now());
+
+        if (historicProgress === undefined) return;
+        amount += historicProgress;
+      }
+    }
+
     let progress: number;
     let incrementApplied = false;
 
@@ -366,5 +381,48 @@ export async function setProgress(
     );
   } finally {
     achievementProgressMutex.release(mutexKey);
+  }
+}
+
+async function getHistoricYapperProgress(userId: string, before: number) {
+  const query = new URLSearchParams({
+    author_id: userId,
+    include_nsfw: "true",
+    limit: "1",
+    max_id: SnowflakeUtil.generate({
+      increment: 0n,
+      processId: 0n,
+      timestamp: before,
+      workerId: 0n,
+    }).toString(),
+  });
+  const search = () =>
+    getRest().get(Routes.guildMessagesSearch(Constants.NYPSI_SERVER_ID), {
+      query,
+    }) as Promise<RESTGetAPIGuildMessagesSearchResult>;
+
+  try {
+    let result = await search();
+
+    if (!("total_results" in result)) {
+      logger.info("achievements: retrying historic yapper progress search", {
+        retryAfter: result.retry_after,
+        userId,
+      });
+      await sleep(Math.max(result.retry_after * 1000, 1000));
+      result = await search();
+    }
+
+    if (!("total_results" in result) || result.doing_deep_historical_index) return;
+
+    logger.info("achievements: fetched historic yapper progress", {
+      before,
+      progress: result.total_results,
+      userId,
+    });
+
+    return result.total_results;
+  } catch (error) {
+    logger.warn("achievements: failed to fetch historic yapper progress", { error, userId });
   }
 }
