@@ -93,6 +93,10 @@ for (const [id, item] of Object.entries(items)) {
 
         if (item.boosterEffect.global !== undefined) {
           expect.soft(item.boosterEffect.global).toBe(true);
+          expectPositiveInteger(
+            item.boosterEffect.usesPerDabloon,
+            `${id}.boosterEffect.usesPerDabloon`,
+          );
         }
       }
     } else if (item.role === "scratch-card") {

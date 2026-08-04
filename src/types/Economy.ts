@@ -29,6 +29,7 @@ export interface Item {
     effect: number;
     time: number;
     global?: boolean;
+    usesPerDabloon?: number;
   };
   worker_upgrade_id?: string;
   plural: string;

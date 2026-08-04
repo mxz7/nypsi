@@ -8,7 +8,7 @@ import { getUserId, MemberResolvable } from "../member";
 import { isBooster } from "../premium/boosters";
 import { getTier } from "../premium/premium";
 import { calcMaxBet, getRequiredBetForXp } from "./balance";
-import { getBoosters } from "./boosters";
+import { getBoosters, trackGlobalBoosterUse } from "./boosters";
 import { gemBreak, getInventory } from "./inventory";
 import { doLevelUp, getRawLevel, getUpgrades } from "./levelling";
 import { rollPet } from "./pets";
@@ -155,12 +155,16 @@ export async function getXpBonus(member: MemberResolvable, client: NypsiClient, 
   }
 
   const beforeBoosters = boosterEffect;
+  const globalBoosters = [];
 
   for (const boosterId of boosters.keys()) {
     if (boosterId == "beginner_booster") {
       boosterEffect += 1;
     } else if (items[boosterId].boosterEffect.boosts.includes("xp")) {
       boosterEffect += items[boosterId].boosterEffect.effect * boosters.get(boosterId).length;
+      globalBoosters.push(
+        ...boosters.get(boosterId).filter((booster) => booster.scope === "global"),
+      );
     }
   }
 
@@ -180,6 +184,7 @@ export async function getXpBonus(member: MemberResolvable, client: NypsiClient, 
     baseBreakdown,
     multiplierBreakdown,
     rawLevel,
+    globalBoosters,
   };
 }
 
@@ -198,7 +203,9 @@ export async function calcEarnedGambleXp(
     return 0;
   }
 
-  let { min, boosterEffect, rawLevel } = await getXpBonus(member, client, guildId);
+  const xpBonus = await getXpBonus(member, client, guildId);
+  let { min } = xpBonus;
+  const { boosterEffect, rawLevel } = xpBonus;
   const maxBet = await calcMaxBet(member);
 
   let maxBetAdjusted = maxBet;
@@ -238,6 +245,11 @@ export async function calcEarnedGambleXp(
 
   if (earned < 0) earned = 0;
 
+  if (earned > 0)
+    await Promise.all(
+      xpBonus.globalBoosters.map((booster) => trackGlobalBoosterUse(booster, member)),
+    );
+
   return Math.floor(earned);
 }
 
@@ -267,6 +279,11 @@ export async function calcEarnedHFMXp(member: GuildMember, items: number, guildI
   let earned = Math.random() * (max - min) + min;
 
   earned += xpBonus.boosterEffect * earned;
+
+  if (earned > 0)
+    await Promise.all(
+      xpBonus.globalBoosters.map((booster) => trackGlobalBoosterUse(booster, member)),
+    );
 
   return Math.floor(earned);
 }
