@@ -1,4 +1,4 @@
-import { DeleteObjectCommand, DeleteObjectsCommand } from "@aws-sdk/client-s3";
+import { DeleteObjectsCommand } from "@aws-sdk/client-s3";
 import { Guild } from "discord.js";
 import { nanoid } from "nanoid";
 import prisma from "../../../init/database";
@@ -6,7 +6,7 @@ import s3 from "../../../init/s3";
 import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
-import { putObject } from "../s3";
+import { deleteObject, putObject } from "../s3";
 import sharp = require("sharp");
 
 const evidenceMaxCache = new RedisCache<number>(Constants.redis.cache.guild.EVIDENCE_MAX, 21600);
@@ -60,20 +60,7 @@ export async function deleteEvidence(guild: Guild, caseId: number) {
     },
   });
 
-  if (evidence)
-    s3.send(
-      new DeleteObjectCommand({
-        Key: `evidence/${guild.id}/${evidence.id}`,
-        Bucket: process.env.S3_BUCKET,
-      }),
-    ).catch((err) => {
-      console.error(err);
-      logger.error(`evidence: failed to delete evidence for case ${caseId} in ${guild.id}`, {
-        caseId,
-        guildId: guild.id,
-        err,
-      });
-    });
+  if (evidence) await deleteObject(`evidence/${guild.id}/${evidence.id}`);
 }
 
 export async function deleteAllEvidence(guild: Guild) {

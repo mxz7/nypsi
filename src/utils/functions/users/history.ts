@@ -1,9 +1,10 @@
-import { DeleteObjectCommand, DeleteObjectsCommand } from "@aws-sdk/client-s3";
+import { DeleteObjectsCommand } from "@aws-sdk/client-s3";
 import prisma from "../../../init/database";
 import s3 from "../../../init/s3";
 import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { getUserId, MemberResolvable } from "../member";
+import { deleteObject } from "../s3";
 import { hasProfile } from "./utils";
 
 const trackingCache = new RedisCache<boolean>(Constants.redis.cache.user.TRACKING, 86400);
@@ -141,7 +142,7 @@ export async function deleteAvatar(id: number) {
   if (query && query.value.startsWith("${Constants.CDN_DOMAIN}")) {
     const key = query.value.substring(22);
 
-    s3.send(new DeleteObjectCommand({ Bucket: process.env.S3_BUCKET, Key: key }));
+    await deleteObject(key);
   }
 
   return res;
@@ -196,7 +197,7 @@ export async function clearAvatarHistory(member: MemberResolvable) {
 
   for (const avatar of avatars) {
     const key = avatar.value.substring(22);
-    s3.send(new DeleteObjectCommand({ Bucket: process.env.S3_BUCKET, Key: key }));
+    await deleteObject(key);
     await prisma.username.delete({ where: { id: avatar.id } });
   }
 }

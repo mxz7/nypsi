@@ -1,11 +1,9 @@
-import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { parse } from "@twemoji/parser";
 import sharp from "sharp";
 import prisma from "../../init/database";
-import s3 from "../../init/s3";
 import { RedisCache } from "../cache";
 import Constants from "../Constants";
-import { putObject } from "./s3";
+import { deleteObject, putObject } from "./s3";
 
 export function isImageUrl(url: string): boolean {
   return /\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(url);
@@ -88,9 +86,14 @@ export async function uploadImage(id: string, buffer: Buffer, ContentType: strin
 }
 
 export async function deleteImage(id: string) {
-  await s3.send(new DeleteObjectCommand({ Bucket: process.env.S3_BUCKET, Key: id }));
+  const result = await deleteObject(id);
+
+  if (!result) return false;
+
   await prisma.images.delete({ where: { id } });
   await imageExistsCache.delete(id);
+
+  return true;
 }
 
 export async function dhash(input: Buffer): Promise<bigint> {
