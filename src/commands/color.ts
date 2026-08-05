@@ -105,7 +105,7 @@ async function run(
 
       generating = true;
       await interaction.deferReply();
-      const circleId = `colour/${color}/128x128-circle`;
+      const circleId = `colour/${color}/128x128-circle.png`;
 
       if (!(await imageExists(circleId))) {
         const res = await fetch(`https://singlecolorimage.com/get/${color}/32x32`);

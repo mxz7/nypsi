@@ -105,9 +105,6 @@ export async function createEvidence(
   contentType: string,
 ) {
   logger.debug(`uploading case evidence`, { guildId: guild.id, caseId, userId });
-  const id = nanoid();
-  const key = `evidence/${guild.id}/${id}`;
-
   const res = await fetch(fileUrl);
 
   const buffer = await res.arrayBuffer();
@@ -122,6 +119,9 @@ export async function createEvidence(
   } else {
     image = Buffer.from(buffer);
   }
+
+  const id = `${nanoid()}.${contentType.split("/")[1]}`;
+  const key = `evidence/${guild.id}/${id}`;
 
   // if (buffer.byteLength < image.length) image = Buffer.from(buffer);
 
