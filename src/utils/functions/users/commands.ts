@@ -1,8 +1,6 @@
-import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { User } from "discord.js";
 import { nanoid } from "nanoid";
 import prisma from "../../../init/database";
-import s3 from "../../../init/s3";
 import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { debounce } from "../../debounce";
@@ -11,6 +9,7 @@ import { getRawLevel } from "../economy/levelling";
 import { isEcoBanned } from "../economy/utils";
 import { setLastCommand } from "../guilds/commands";
 import { getUserId, MemberResolvable } from "../member";
+import { putObject } from "../s3";
 import sleep from "../sleep";
 import { addNewAvatar, addNewUsername, fetchUsernameHistory, isTracking } from "./history";
 import { getLastKnownAvatar, getLastKnownUsername, updateLastKnownAvatarCache } from "./username";
@@ -23,7 +22,7 @@ const lastCommandCache = new RedisCache<number>(
 );
 
 setInterval(async () => {
-  logger.debug(`recent commands size: ${recentCommands.size}`);
+  logger.debug(`recent commands: cache size ${recentCommands.size}`, { size: recentCommands.size });
 
   let count = 0;
 
@@ -36,7 +35,7 @@ setInterval(async () => {
     }
   }
 
-  if (count > 0) logger.debug(`${count} deleted from recent commands`);
+  if (count > 0) logger.debug(`recent commands: deleted ${count} stale entries`, { count });
 }, ms("1 hour"));
 
 export async function getLastCommand(member: MemberResolvable): Promise<Date> {
@@ -133,24 +132,12 @@ export async function updateUser(user: User, command: string, guildId?: string) 
         const ext = newAvatar.split(".").pop().split("?")[0];
         const key = `avatar/${user.id}/${nanoid()}.${ext}`;
 
-        const res = await s3
-          .send(
-            new PutObjectCommand({
-              Bucket: process.env.S3_BUCKET,
-              Key: key,
-              Body: Buffer.from(arrayBuffer),
-              ContentType: `image/${ext}`,
-            }),
-          )
-          .catch((err) => {
-            console.error(err);
-            logger.error(`failed to upload new avatar for ${user.id} (${username})`, { err });
-          });
+        const res = await putObject(key, Buffer.from(arrayBuffer), `image/${ext}`);
 
         if (!res) return;
 
         await addNewAvatar(user.id, `${Constants.CDN_DOMAIN}/${key}`);
-        logger.debug(`uploaded new avatar for ${user.id}`);
+        logger.debug(`avatar-history: added avatar for ${user.id}`, { userId: user.id });
       })();
     }
   }

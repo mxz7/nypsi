@@ -1,4 +1,3 @@
-import { PutObjectCommand } from "@aws-sdk/client-s3";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -10,7 +9,6 @@ import {
   MessageFlags,
 } from "discord.js";
 import { nanoid } from "nanoid";
-import s3 from "../init/s3";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
@@ -18,6 +16,7 @@ import { formatDate } from "../utils/functions/date";
 import { getRawLevel } from "../utils/functions/economy/levelling";
 import { isEcoBanned } from "../utils/functions/economy/utils";
 import PageManager from "../utils/functions/page";
+import { putObject } from "../utils/functions/s3";
 import {
   addNewAvatar,
   clearAvatarHistory,
@@ -82,25 +81,14 @@ async function run(
       const ext = avatar.split(".").pop().split("?")[0];
       const key = `avatar/${message.author.id}/${nanoid()}.${ext}`;
 
-      await s3
-        .send(
-          new PutObjectCommand({
-            Bucket: process.env.S3_BUCKET,
-            Key: key,
-            Body: Buffer.from(arrayBuffer),
-            ContentType: `image/${ext}`,
-          }),
-        )
-        .catch((err) => {
-          console.error(err);
-          logger.error(
-            `error uploading avatar of ${message.author.id} (${message.author.username})`,
-            { err },
-          );
-        });
+      const result = await putObject(key, Buffer.from(arrayBuffer), `image/${ext}`);
+
+      if (!result) return;
 
       await addNewAvatar(message.member, `${Constants.CDN_DOMAIN}/${key}`);
-      logger.debug(`uploaded new avatar for ${message.author.id}`);
+      logger.debug(`avatar-history: added avatar for ${message.author.id}`, {
+        userId: message.author.id,
+      });
 
       history = await fetchAvatarHistory(message.member);
     } else return send({ embeds: [new ErrorEmbed("no avatar history")] });

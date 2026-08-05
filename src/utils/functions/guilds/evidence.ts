@@ -1,4 +1,4 @@
-import { DeleteObjectCommand, DeleteObjectsCommand, PutObjectCommand } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, DeleteObjectsCommand } from "@aws-sdk/client-s3";
 import { Guild } from "discord.js";
 import { nanoid } from "nanoid";
 import prisma from "../../../init/database";
@@ -6,6 +6,7 @@ import s3 from "../../../init/s3";
 import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
+import { putObject } from "../s3";
 import sharp = require("sharp");
 
 const evidenceMaxCache = new RedisCache<number>(Constants.redis.cache.guild.EVIDENCE_MAX, 21600);
@@ -67,7 +68,11 @@ export async function deleteEvidence(guild: Guild, caseId: number) {
       }),
     ).catch((err) => {
       console.error(err);
-      logger.error(`failed to delete evidence for case ${caseId} in ${guild.id}`, { err });
+      logger.error(`evidence: failed to delete evidence for case ${caseId} in ${guild.id}`, {
+        caseId,
+        guildId: guild.id,
+        err,
+      });
     });
 }
 
@@ -87,7 +92,10 @@ export async function deleteAllEvidence(guild: Guild) {
 
   await s3.send(cmd).catch((err) => {
     console.error(err);
-    logger.error(`failed to delete all evidence in ${guild.id}`, { err });
+    logger.error(`evidence: failed to delete all evidence in ${guild.id}`, {
+      guildId: guild.id,
+      err,
+    });
   });
 
   await prisma.moderationEvidence.deleteMany({
@@ -104,7 +112,11 @@ export async function createEvidence(
   fileUrl: string,
   contentType: string,
 ) {
-  logger.debug(`uploading case evidence`, { guildId: guild.id, caseId, userId });
+  logger.debug(`evidence: uploading evidence for case ${caseId} in ${guild.id}`, {
+    guildId: guild.id,
+    caseId,
+    userId,
+  });
   const res = await fetch(fileUrl);
 
   const buffer = await res.arrayBuffer();
@@ -125,19 +137,7 @@ export async function createEvidence(
 
   // if (buffer.byteLength < image.length) image = Buffer.from(buffer);
 
-  const success = await s3
-    .send(
-      new PutObjectCommand({
-        Bucket: process.env.S3_BUCKET,
-        Key: key,
-        Body: image,
-        ContentType: contentType,
-      }),
-    )
-    .catch((err) => {
-      console.error(err);
-      logger.error(`failed to upload evidence for case ${caseId} in ${guild.id}`, { err });
-    });
+  const success = await putObject(key, image, contentType);
 
   if (!success) return false;
 
@@ -151,7 +151,11 @@ export async function createEvidence(
     },
   });
 
-  logger.debug("case evidence uploaded");
+  logger.debug(`evidence: created evidence for case ${caseId} in ${guild.id}`, {
+    guildId: guild.id,
+    caseId,
+    userId,
+  });
 
   return true;
 }

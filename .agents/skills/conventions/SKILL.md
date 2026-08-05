@@ -1,6 +1,6 @@
 ---
 name: conventions
-description: Describes how to structure commands, scheduled jobs, interaction handlers, and user-facing messages/embeds in nypsi. Use when creating or modifying a command, a cron job in src/scheduled/jobs, an interaction/autocomplete handler, or when sending any message to a user.
+description: Describes how to structure commands, scheduled jobs, interaction handlers, logging, and user-facing messages/embeds in nypsi. Use when creating or modifying a command, a cron job in src/scheduled/jobs, an interaction/autocomplete handler, a log message, or any message sent to a user.
 ---
 
 # Conventions
@@ -25,6 +25,12 @@ Group variable declarations by context and separate different groups with a blan
 ## User Facing Messages
 
 Use `CustomEmbed` for standard messages, and `ErrorEmbed` for error messages. Only use `content` string if a mention is specifically needed.
+
+## Logging
+
+Format every log message as `<subject>: <message>`, using a stable lowercase subject. Include useful
+identifying context in the message when it improves readability, and also include those values in
+metadata for structured filtering. Keep large or noisy values, including error objects, in metadata.
 
 ## Commands
 

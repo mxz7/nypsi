@@ -1,10 +1,11 @@
-import { DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { parse } from "@twemoji/parser";
 import sharp from "sharp";
 import prisma from "../../init/database";
 import s3 from "../../init/s3";
 import { RedisCache } from "../cache";
 import Constants from "../Constants";
+import { putObject } from "./s3";
 
 export function isImageUrl(url: string): boolean {
   return /\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(url);
@@ -75,17 +76,11 @@ export async function imageExists(id: string) {
 }
 
 export async function uploadImage(id: string, buffer: Buffer, ContentType: string) {
-  await Promise.all([
-    s3.send(
-      new PutObjectCommand({
-        Bucket: process.env.S3_BUCKET,
-        Key: id,
-        Body: buffer,
-        ContentType: ContentType,
-      }),
-    ),
-    prisma.images.create({ data: { id, bytes: buffer.byteLength } }),
-  ]);
+  const result = await putObject(id, buffer, ContentType);
+
+  if (!result) return false;
+
+  await prisma.images.create({ data: { id, bytes: buffer.byteLength } });
 
   await imageExistsCache.set(id, true);
 
