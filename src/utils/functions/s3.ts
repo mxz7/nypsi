@@ -3,6 +3,8 @@ import s3 from "../../init/s3";
 import { logger } from "../logger";
 
 export async function putObject(key: string, body: Buffer, contentType: string) {
+  const now = performance.now();
+
   try {
     const result = await s3.send(
       new PutObjectCommand({
@@ -21,6 +23,7 @@ export async function putObject(key: string, body: Buffer, contentType: string) 
       versionId: result.VersionId,
       requestId: result.$metadata.requestId,
       attempts: result.$metadata.attempts,
+      timeTaken: (performance.now() - now) / 1000,
     });
 
     return result;
