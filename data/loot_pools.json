@@ -51,7 +51,13 @@
       "looting": 30,
       "super_cursor": 45,
       "bob": 70,
-      "stolen_credit_card": 100,
+      "stolen_credit_card": {
+        "weight": 100,
+        "count": {
+          "min": 1,
+          "max": 2
+        }
+      },
       "banana_seed": 10,
       "apple_seed": 7,
       "strawberry_seed": 10,
@@ -225,7 +231,7 @@
       "galvanised_square_steel": 75,
       "blue_rocks": 65,
       "ancient_debris": 40,
-      "stolen_credit_card": 80,
+      "stolen_credit_card": 60,
       "grandma": 20,
       "grandpa": 10,
       "super_cursor": 5,
@@ -280,9 +286,9 @@
     },
     "items": {
       "galvanised_square_steel": 50,
-      "stolen_credit_card": 75,
+      "stolen_credit_card": 100,
       "calendar": 35,
-      "bob": 100,
+      "bob": 95,
       "streak_token": 50,
       "grandma": 60,
       "grandpa": 75,
