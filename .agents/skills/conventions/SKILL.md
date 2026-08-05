@@ -28,6 +28,8 @@ Use `CustomEmbed` for standard messages, and `ErrorEmbed` for error messages. On
 
 ## Logging
 
+Never await logger calls.
+
 Format every log message as `<subject>: <message>`, using a stable lowercase subject. Include useful
 identifying context in the message when it improves readability, and also include those values in
 metadata for structured filtering. Keep large or noisy values, including error objects, in metadata.

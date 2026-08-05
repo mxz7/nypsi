@@ -15,7 +15,7 @@ export async function putObject(key: string, body: Buffer, contentType: string) 
       }),
     );
 
-    await logger.info(`s3: uploaded object ${key}`, {
+    logger.info(`s3: uploaded object ${key}`, {
       key,
       contentType,
       bytes: body.byteLength,
@@ -28,7 +28,7 @@ export async function putObject(key: string, body: Buffer, contentType: string) 
 
     return result;
   } catch (error) {
-    await logger.error(`s3: failed to upload object ${key}`, {
+    logger.error(`s3: failed to upload object ${key}`, {
       key,
       contentType,
       bytes: body.byteLength,
