@@ -1,6 +1,4 @@
 import { WriteStream, createWriteStream } from "fs";
-import { flavors } from "@catppuccin/palette";
-import DiscordTransport from "../models/DiscordLogs";
 import chalk = require("chalk");
 import dayjs = require("dayjs");
 
@@ -335,21 +333,6 @@ logger.addTransport(
   new ConsoleTransport({
     levels: ["debug", "info", "warn", "error"],
     formatter,
-  }),
-);
-logger.addTransport(
-  new DiscordTransport({
-    formatter,
-    levels: ["info", "warn", "error"],
-    webhook: process.env.BOTLOGS_HOOK,
-    mode: "hybrid",
-    interval: 5000,
-    colors: new Map([
-      ["error", flavors.mocha.colors.red.hex as `#${string}`],
-      ["warn", flavors.mocha.colors.yellow.hex as `#${string}`],
-      ["debug", flavors.mocha.colors.pink.hex as `#${string}`],
-      ["info", flavors.mocha.colors.sky.hex as `#${string}`],
-    ]),
   }),
 );
 
