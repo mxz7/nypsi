@@ -7,6 +7,10 @@ description: Explains command/interaction handler patterns, slash command option
 
 ## Command System
 
+Do not create a `src/commands/helpers/` directory or place shared helper modules under
+`src/commands/`; this project does not use that structure. Keep command-specific helpers in the
+command file, and put reusable domain logic under `src/utils/functions/` in the appropriate domain.
+
 ### Command Definition Pattern
 
 Located in [src/commands/](../../../src/commands/) (~180 commands)
