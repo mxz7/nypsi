@@ -6,6 +6,7 @@
 - give dabloon rewards for using global boosters
 - add evil larry
 - prevent duplicate broken rings from simultaneous divorces
+- add pet naming and improve pet activation notifs
 
 # july 2026
 
