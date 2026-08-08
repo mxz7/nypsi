@@ -45,6 +45,56 @@ type SettleMarketFillRequest = {
   seasonInterim: boolean;
 };
 
+export class MarketEscrowError extends Error {
+  constructor(public readonly reason: "insufficient_balance" | "insufficient_inventory") {
+    super(reason);
+  }
+}
+
+export async function escrowMarketOrderAssets(
+  prisma: Prisma.TransactionClient,
+  request: {
+    amount: number;
+    itemId: string;
+    orderType: MatchableMarketOrder["orderType"];
+    price: bigint;
+    userId: string;
+  },
+) {
+  if (request.orderType === "buy") {
+    const result = await prisma.economy.update({
+      where: { userId: request.userId },
+      data: { money: { decrement: request.price * BigInt(request.amount) } },
+      select: { money: true },
+    });
+
+    if (result.money < 0n) throw new MarketEscrowError("insufficient_balance");
+    return;
+  }
+
+  const result = await prisma.inventory
+    .update({
+      where: { userId_item: { userId: request.userId, item: request.itemId } },
+      data: { amount: { decrement: request.amount } },
+      select: { amount: true },
+    })
+    .catch((error: unknown) => {
+      if ((error as { code?: string }).code === "P2025") {
+        throw new MarketEscrowError("insufficient_inventory");
+      }
+
+      throw error;
+    });
+
+  if (result.amount < 0n) throw new MarketEscrowError("insufficient_inventory");
+
+  if (result.amount === 0n) {
+    await prisma.inventory.delete({
+      where: { userId_item: { userId: request.userId, item: request.itemId } },
+    });
+  }
+}
+
 /** Calculates the asset movements for one fill at the existing order's price. */
 export function calculateMarketFill(request: MarketFillRequest): MarketFillAccounting {
   const { restingOrder, amount } = request;

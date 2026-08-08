@@ -10,7 +10,7 @@ import { getRest } from "../../rest";
 import { MemoryMutex, RedisMutex } from "../mutex";
 import ms = require("ms");
 
-const mutex = new MemoryMutex(true);
+const mutex = new MemoryMutex();
 const checkMutex = new MemoryMutex();
 
 // recently checked against db
@@ -209,7 +209,7 @@ const restMembersCacheRedis = new RedisCache<RestMembersCache>(
   Constants.redis.cache.guild.MEMBERS_SLIM,
   Math.floor(ms("24 hours") / 1000),
 );
-const restMutex = new RedisMutex("rest-members", true);
+const restMutex = new RedisMutex("rest-members");
 
 async function fetchAndCacheMembersRest(
   guildId: string,

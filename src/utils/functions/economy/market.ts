@@ -39,6 +39,8 @@ import { getBalance } from "./balance";
 import { autosellInventoryItem, getInventory, isGem } from "./inventory";
 import { quoteMarketOrder } from "./market/matching";
 import {
+  escrowMarketOrderAssets,
+  MarketEscrowError,
   settleMarketFill,
   SettledMarketFill,
   updateIncomingMarketOrder,
@@ -52,6 +54,14 @@ const marketAverageCache = new RedisCache<number>(
   3 * 60 * 60,
 );
 
+export type CreateMarketOrderResult =
+  | { error: "insufficient_balance" | "insufficient_inventory" }
+  | {
+      amount: number;
+      fills: { amount: number; price: bigint }[];
+      url?: string;
+    };
+
 async function withMarketLock<T>(itemId: string, operation: () => Promise<T>): Promise<T> {
   await marketMutex.acquire(itemId);
 
@@ -62,11 +72,84 @@ async function withMarketLock<T>(itemId: string, operation: () => Promise<T>): P
   }
 }
 
-export async function checkMarketOrder(
-  order: Market,
-  client: NypsiClient,
-): Promise<{ fills: SettledMarketFill[]; remainingAmount: number } | undefined> {
-  return withMarketLock(order.itemId, () => checkMarketOrderUnlocked(order, client));
+async function lockMarketRows(
+  prisma: Prisma.TransactionClient,
+  request: {
+    itemId: string;
+    orderIds?: number[];
+    inventoryUserIds?: string[];
+    balanceUserIds?: string[];
+  },
+) {
+  const { itemId } = request;
+  const sortedOrderIds = [...(request.orderIds ?? [])].sort((a, b) => a - b);
+  const inventoryUserIds = [...new Set(request.inventoryUserIds ?? [])].sort();
+  const balanceUserIds = [...new Set(request.balanceUserIds ?? [])].sort();
+  const startedAt = Date.now();
+  const advisoryStartedAt = Date.now();
+
+  logger.debug("market: acquiring postgres locks", {
+    balanceUserCount: balanceUserIds.length,
+    inventoryUserCount: inventoryUserIds.length,
+    itemId,
+    orderCount: sortedOrderIds.length,
+    orderIds: sortedOrderIds,
+  });
+
+  await prisma.$queryRaw`SELECT pg_advisory_xact_lock(hashtext('market'), hashtext(${itemId}))::text`;
+  const advisoryWaitMs = Date.now() - advisoryStartedAt;
+
+  let marketRowsWaitMs = 0;
+
+  if (sortedOrderIds.length > 0) {
+    const rowsStartedAt = Date.now();
+
+    await prisma.$queryRaw`SELECT "id" FROM "Market" WHERE "id" IN (${Prisma.join(
+      sortedOrderIds,
+    )}) ORDER BY "id" FOR UPDATE`;
+    marketRowsWaitMs = Date.now() - rowsStartedAt;
+  }
+
+  let inventoryRowsWaitMs = 0;
+  let lockedInventoryRowCount = 0;
+
+  if (inventoryUserIds.length > 0) {
+    const rowsStartedAt = Date.now();
+
+    const rows = await prisma.$queryRaw<{ userId: string }[]>`SELECT "userId" FROM "Inventory"
+      WHERE "item" = ${itemId} AND "userId" IN (${Prisma.join(inventoryUserIds)})
+      ORDER BY "userId" FOR UPDATE`;
+    inventoryRowsWaitMs = Date.now() - rowsStartedAt;
+    lockedInventoryRowCount = rows.length;
+  }
+
+  let balanceRowsWaitMs = 0;
+  let lockedBalanceRowCount = 0;
+
+  if (balanceUserIds.length > 0) {
+    const rowsStartedAt = Date.now();
+
+    const rows = await prisma.$queryRaw<{ userId: string }[]>`SELECT "userId" FROM "Economy"
+      WHERE "userId" IN (${Prisma.join(balanceUserIds)})
+      ORDER BY "userId" FOR UPDATE`;
+    balanceRowsWaitMs = Date.now() - rowsStartedAt;
+    lockedBalanceRowCount = rows.length;
+  }
+
+  logger.debug("market: acquired postgres locks", {
+    advisoryWaitMs,
+    balanceRowsWaitMs,
+    balanceUserCount: balanceUserIds.length,
+    inventoryRowsWaitMs,
+    inventoryUserCount: inventoryUserIds.length,
+    itemId,
+    lockedBalanceRowCount,
+    lockedInventoryRowCount,
+    marketRowsWaitMs,
+    orderCount: sortedOrderIds.length,
+    orderIds: sortedOrderIds,
+    totalWaitMs: Date.now() - startedAt,
+  });
 }
 
 export async function marketSell(
@@ -92,6 +175,19 @@ export async function marketBuy(
 ): Promise<{ status: string; remaining: number }> {
   return withMarketLock(itemId, () =>
     marketBuyUnlocked(member, itemId, amount, storedPrice, client, orderId),
+  );
+}
+
+export async function createMarketOrder(
+  member: MemberResolvable,
+  itemId: string,
+  amount: number,
+  price: number,
+  orderType: OrderType,
+  client: NypsiClient,
+): Promise<CreateMarketOrderResult> {
+  return withMarketLock(itemId, () =>
+    createMarketOrderUnlocked(member, itemId, amount, price, orderType, client),
   );
 }
 
@@ -205,71 +301,176 @@ export async function getMarketAverage(item: string) {
   return avg;
 }
 
-export async function createMarketOrder(
+async function createMarketOrderUnlocked(
   member: MemberResolvable,
   itemId: string,
   amount: number,
   price: number,
   orderType: OrderType,
   client: NypsiClient,
-) {
-  const order = await prisma.market.create({
-    data: {
-      ownerId: getUserId(member),
-      itemId: itemId,
-      itemAmount: amount,
-      price: price,
-      orderType: orderType,
-    },
+): Promise<CreateMarketOrderResult> {
+  const ownerId = getUserId(member);
+  const [taxRate, seasonInterim] = await Promise.all([
+    getTax(),
+    redis.exists(Constants.redis.nypsi.INFINITE_MAX_BET).then(Boolean),
+  ]);
+
+  let creation: { fills: SettledMarketFill[]; order: Market; remainingAmount: number };
+
+  logger.debug("market: starting atomic order creation", {
+    amount,
+    itemId,
+    orderType,
+    ownerId,
+    price,
   });
 
-  const settlement = await checkMarketOrder(order, client);
-  let sold = settlement?.remainingAmount === 0;
+  try {
+    creation = await prisma.$transaction(
+      async (tx) => {
+        const transaction = tx as Prisma.TransactionClient;
+        await lockMarketRows(transaction, { itemId });
 
-  if (settlement) {
-    amount = settlement.remainingAmount;
+        const filters: Prisma.MarketWhereInput = {
+          itemId,
+          completed: false,
+          orderType: orderType === "buy" ? "sell" : "buy",
+          price: orderType === "buy" ? { lte: price } : { gte: price },
+          ownerId: { not: ownerId },
+        };
+        let candidateOrders = await tx.market.findMany({ where: filters });
+        const candidateIds = candidateOrders.map((order) => order.id).sort((a, b) => a - b);
+        let quote = quoteMarketOrder(candidateOrders, {
+          side: orderType,
+          amount,
+          limitPrice: BigInt(price),
+          ownerId,
+        });
 
-    const query = await prisma.market.findUnique({
-      where: {
-        id: order.id,
+        await lockMarketRows(transaction, {
+          itemId,
+          orderIds: candidateIds,
+          inventoryUserIds: [
+            ownerId,
+            ...quote.fills
+              .filter((fill) => fill.order.orderType === "buy")
+              .map((fill) => fill.order.ownerId),
+          ],
+          balanceUserIds: [
+            ownerId,
+            Constants.BOT_USER_ID,
+            ...quote.fills
+              .filter((fill) => fill.order.orderType === "sell")
+              .map((fill) => fill.order.ownerId),
+          ],
+        });
+
+        if (candidateIds.length > 0) {
+          candidateOrders = await tx.market.findMany({ where: filters });
+          quote = quoteMarketOrder(candidateOrders, {
+            side: orderType,
+            amount,
+            limitPrice: BigInt(price),
+            ownerId,
+          });
+        }
+
+        const policies = await prepareMarketFillPolicies(quote.fills, ownerId);
+
+        await escrowMarketOrderAssets(transaction, {
+          amount,
+          itemId,
+          orderType,
+          price: BigInt(price),
+          userId: ownerId,
+        });
+
+        const order = await tx.market.create({
+          data: { ownerId, itemId, itemAmount: amount, price, orderType },
+        });
+        const fills: SettledMarketFill[] = [];
+
+        for (const fill of quote.fills) {
+          const policy = policies.get(fill.order.id)!;
+          const result = await settleMarketFill(transaction, {
+            orderId: fill.order.id,
+            incomingUserId: ownerId,
+            amount: fill.amount,
+            taxRate,
+            sellerTaxExempt: policy.sellerTaxExempt,
+            incomingAssetsEscrowed: true,
+            incomingLimitPrice: BigInt(price),
+            isAlt: policy.isAlt,
+            seasonInterim,
+          });
+
+          if (!result) throw new Error("market order changed during creation settlement");
+
+          fills.push(result);
+        }
+
+        const filledAmount = fills.reduce((total, fill) => total + fill.amount, 0);
+        const remainingAmount =
+          filledAmount > 0
+            ? await updateIncomingMarketOrder(transaction, order, filledAmount, seasonInterim)
+            : amount;
+
+        return { fills, order, remainingAmount };
       },
-      select: {
-        completed: true,
-        itemAmount: true,
-      },
-    });
-
-    if (!query) {
-      sold = true;
-    } else {
-      const { completed, itemAmount } = query;
-
-      if (completed) sold = true;
-      else if (itemAmount !== amount) amount = itemAmount;
+      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+    );
+  } catch (error) {
+    if (error instanceof MarketEscrowError) {
+      logger.debug("market: order creation rejected during escrow", {
+        amount,
+        itemId,
+        orderType,
+        ownerId,
+        price,
+        reason: error.reason,
+      });
+      return { error: error.reason };
     }
+
+    logger.error("market: atomic order creation failed", {
+      amount,
+      error,
+      itemId,
+      orderType,
+      ownerId,
+      price,
+    });
+    throw error;
   }
 
-  const response: {
-    sold: boolean;
-    amount: number;
-    fills: { amount: number; price: bigint }[];
-    url?: string;
-  } = {
-    sold,
-    amount,
-    fills: settlement?.fills.map((fill) => ({ amount: fill.amount, price: fill.price })) ?? [],
+  logger.debug("market: atomic order creation committed", {
+    filledAmount: creation.fills.reduce((total, fill) => total + fill.amount, 0),
+    itemId,
+    orderId: creation.order.id,
+    orderType,
+    ownerId,
+    remainingAmount: creation.remainingAmount,
+  });
+
+  await invalidateMarketOrderCreationCaches(ownerId, itemId, orderType);
+  await invalidateMarketSettlementCaches(creation.fills);
+  await processMarketAutosell(creation.fills, client);
+  publishMarketSettlements(creation.fills, client);
+
+  const response: CreateMarketOrderResult = {
+    amount: creation.remainingAmount,
+    fills: creation.fills.map((fill) => ({ amount: fill.amount, price: fill.price })),
   };
 
-  if (sold) return response;
+  if (creation.remainingAmount === 0) return response;
 
-  order.itemAmount = amount;
+  creation.order.itemAmount = creation.remainingAmount;
 
-  const payload = await getMarketOrderEmbed(order);
-
+  const payload = await getMarketOrderEmbed(creation.order);
   const cluster = await findChannelCluster(client, Constants.MARKET_CHANNEL_ID);
 
   if (cluster) {
-    const { url, id } = await client.cluster
+    const result = await client.cluster
       .broadcastEval(
         async (client, { payload, channelId, cluster }) => {
           const c = client as unknown as NypsiClient;
@@ -278,12 +479,10 @@ export async function createMarketOrder(
 
           const channel = client.channels.cache.get(channelId);
 
-          if (!channel) return;
-          if (!channel.isSendable()) return;
+          if (!channel?.isSendable()) return;
 
           try {
             const msg = await channel.send(payload);
-
             return { url: msg.url, id: msg.id };
           } catch {
             return;
@@ -293,26 +492,17 @@ export async function createMarketOrder(
           context: { payload, channelId: Constants.MARKET_CHANNEL_ID, cluster: cluster.cluster },
         },
       )
-      .then((res) => {
-        return res.filter((i) => Boolean(i))[0];
+      .then((results) => results.find(Boolean));
+
+    if (result) {
+      await prisma.market.update({
+        where: { id: creation.order.id },
+        data: { messageId: result.id },
       });
 
-    if (!url) {
-      return response;
+      response.url = result.url;
+      checkMarketWatchers(itemId, creation.remainingAmount, member, orderType, price, result.url);
     }
-
-    await prisma.market.update({
-      where: {
-        id: order.id,
-      },
-      data: {
-        messageId: id,
-      },
-    });
-
-    response.url = url;
-
-    checkMarketWatchers(itemId, amount, member, orderType, price, url);
   }
 
   addStat(member, `market-created-${orderType}`);
@@ -388,54 +578,6 @@ export async function getMarketOrderEmbed(order: Market) {
     embeds: [embed],
     components: order.completed ? [] : [row],
   };
-}
-
-async function checkMarketOrderUnlocked(
-  order: Market,
-  client: NypsiClient,
-): Promise<{ fills: SettledMarketFill[]; remainingAmount: number } | undefined> {
-  const candidateOrders = await prisma.market.findMany({
-    where: {
-      AND: [
-        { itemId: order.itemId },
-        { completed: false },
-        { orderType: order.orderType === "buy" ? "sell" : "buy" },
-        { price: order.orderType === "buy" ? { lte: order.price } : { gte: order.price } },
-        { ownerId: { not: order.ownerId } },
-      ],
-    },
-  });
-  const quote = quoteMarketOrder(candidateOrders, {
-    side: order.orderType,
-    amount: order.itemAmount,
-    limitPrice: order.price,
-    ownerId: order.ownerId,
-  });
-
-  if (quote.fills.length === 0) {
-    return;
-  }
-
-  let settlement: { fills: SettledMarketFill[]; remainingAmount: number };
-
-  try {
-    settlement = await settleMarketFills({
-      fills: quote.fills,
-      incomingUserId: order.ownerId,
-      requestedAmount: order.itemAmount,
-      incomingAssetsEscrowed: true,
-      incomingLimitPrice: order.price,
-      incomingOrder: order,
-    });
-  } catch {
-    return;
-  }
-
-  await invalidateMarketSettlementCaches(settlement.fills);
-  await processMarketAutosell(settlement.fills, client);
-  publishMarketSettlements(settlement.fills, client);
-
-  return settlement;
 }
 
 export async function updateMarketWatch(
@@ -726,40 +868,65 @@ async function settleMarketFills(request: {
       redis.exists(Constants.redis.nypsi.INFINITE_MAX_BET).then(Boolean),
     ]);
 
-    const settlement = await prisma.$transaction(async (tx) => {
-      const results: SettledMarketFill[] = [];
+    const settlement = await prisma.$transaction(
+      async (tx) => {
+        const transaction = tx as Prisma.TransactionClient;
+        const itemId = request.incomingOrder?.itemId ?? request.fills[0]?.order.itemId;
+        const results: SettledMarketFill[] = [];
 
-      for (const fill of request.fills) {
-        const policy = policies.get(fill.order.id)!;
-        const result = await settleMarketFill(tx as Prisma.TransactionClient, {
-          orderId: fill.order.id,
-          incomingUserId: request.incomingUserId,
-          amount: fill.amount,
-          taxRate,
-          sellerTaxExempt: policy.sellerTaxExempt,
-          incomingAssetsEscrowed: request.incomingAssetsEscrowed,
-          incomingLimitPrice: request.incomingLimitPrice,
-          isAlt: policy.isAlt,
-          seasonInterim,
+        if (!itemId) throw new Error("market settlement requires an item");
+
+        await lockMarketRows(transaction, {
+          itemId,
+          orderIds: request.fills.map((fill) => fill.order.id),
+          inventoryUserIds: [
+            request.incomingUserId,
+            ...request.fills
+              .filter((fill) => fill.order.orderType === "buy")
+              .map((fill) => fill.order.ownerId),
+          ],
+          balanceUserIds: [
+            request.incomingUserId,
+            Constants.BOT_USER_ID,
+            ...request.fills
+              .filter((fill) => fill.order.orderType === "sell")
+              .map((fill) => fill.order.ownerId),
+          ],
         });
 
-        if (!result) throw new Error("market order changed during settlement");
-
-        results.push(result);
-      }
-
-      const filledAmount = results.reduce((total, fill) => total + fill.amount, 0);
-      const remainingAmount = request.incomingOrder
-        ? await updateIncomingMarketOrder(
-            tx as Prisma.TransactionClient,
-            request.incomingOrder,
-            filledAmount,
+        for (const fill of request.fills) {
+          const policy = policies.get(fill.order.id)!;
+          const result = await settleMarketFill(transaction, {
+            orderId: fill.order.id,
+            incomingUserId: request.incomingUserId,
+            amount: fill.amount,
+            taxRate,
+            sellerTaxExempt: policy.sellerTaxExempt,
+            incomingAssetsEscrowed: request.incomingAssetsEscrowed,
+            incomingLimitPrice: request.incomingLimitPrice,
+            isAlt: policy.isAlt,
             seasonInterim,
-          )
-        : request.requestedAmount - filledAmount;
+          });
 
-      return { fills: results, remainingAmount };
-    });
+          if (!result) throw new Error("market order changed during settlement");
+
+          results.push(result);
+        }
+
+        const filledAmount = results.reduce((total, fill) => total + fill.amount, 0);
+        const remainingAmount = request.incomingOrder
+          ? await updateIncomingMarketOrder(
+              transaction,
+              request.incomingOrder,
+              filledAmount,
+              seasonInterim,
+            )
+          : request.requestedAmount - filledAmount;
+
+        return { fills: results, remainingAmount };
+      },
+      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+    );
 
     logger.debug("market: settlement committed", {
       ...context,
@@ -783,6 +950,26 @@ async function settleMarketFills(request: {
     logger.error("market: settlement failed", { ...context, error });
     throw error;
   }
+}
+
+async function invalidateMarketOrderCreationCaches(
+  userId: string,
+  itemId: string,
+  orderType: OrderType,
+) {
+  const keys =
+    orderType === "buy"
+      ? [`${Constants.redis.cache.economy.BALANCE}:${userId.toLowerCase()}`]
+      : [
+          `${Constants.redis.cache.economy.INVENTORY}:${userId.toLowerCase()}`,
+          `${Constants.redis.cache.economy.ITEM_EXISTS}:${itemId}`,
+        ];
+
+  if (orderType === "sell" && isGem(itemId)) {
+    keys.push(`${Constants.redis.cache.economy.HAS_GEM}:${userId}:${itemId}`.toLowerCase());
+  }
+
+  await redis.del(...keys);
 }
 
 async function invalidateMarketSettlementCaches(fills: SettledMarketFill[]) {

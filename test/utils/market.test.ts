@@ -6,6 +6,7 @@ import {
 } from "../../src/utils/functions/economy/market/matching";
 import {
   calculateMarketFill,
+  escrowMarketOrderAssets,
   settleMarketFill,
   updateIncomingMarketOrder,
 } from "../../src/utils/functions/economy/market/settlement";
@@ -203,6 +204,93 @@ describe("calculateMarketFill", () => {
 
     expect(fill.sellerTax).toBe(0n);
     expect(fill.sellerProceeds).toBe(1000n);
+  });
+});
+
+describe("escrowMarketOrderAssets", () => {
+  test("reserves a buy order's full limit value", async () => {
+    const transaction = {
+      economy: { update: vi.fn().mockResolvedValue({ money: 500n }) },
+      inventory: { update: vi.fn(), delete: vi.fn() },
+    };
+
+    await escrowMarketOrderAssets(transaction as never, {
+      amount: 5,
+      itemId: "cookie",
+      orderType: "buy",
+      price: 100n,
+      userId: "buyer",
+    });
+
+    expect(transaction.economy.update).toHaveBeenCalledWith({
+      where: { userId: "buyer" },
+      data: { money: { decrement: 500n } },
+      select: { money: true },
+    });
+  });
+
+  test("rejects a buy escrow that would make the balance negative", async () => {
+    const transaction = {
+      economy: { update: vi.fn().mockResolvedValue({ money: -1n }) },
+      inventory: { update: vi.fn(), delete: vi.fn() },
+    };
+
+    await expect(
+      escrowMarketOrderAssets(transaction as never, {
+        amount: 5,
+        itemId: "cookie",
+        orderType: "buy",
+        price: 100n,
+        userId: "buyer",
+      }),
+    ).rejects.toMatchObject({ reason: "insufficient_balance" });
+  });
+
+  test("removes an emptied sell escrow row", async () => {
+    const transaction = {
+      economy: { update: vi.fn() },
+      inventory: {
+        update: vi.fn().mockResolvedValue({ amount: 0n }),
+        delete: vi.fn().mockResolvedValue({}),
+      },
+    };
+
+    await escrowMarketOrderAssets(transaction as never, {
+      amount: 5,
+      itemId: "cookie",
+      orderType: "sell",
+      price: 100n,
+      userId: "seller",
+    });
+
+    expect(transaction.inventory.update).toHaveBeenCalledWith({
+      where: { userId_item: { userId: "seller", item: "cookie" } },
+      data: { amount: { decrement: 5 } },
+      select: { amount: true },
+    });
+    expect(transaction.inventory.delete).toHaveBeenCalledWith({
+      where: { userId_item: { userId: "seller", item: "cookie" } },
+    });
+  });
+
+  test("treats a missing inventory row as insufficient sell escrow", async () => {
+    const transaction = {
+      economy: { update: vi.fn() },
+      inventory: {
+        update: vi.fn().mockRejectedValue({ code: "P2025" }),
+        delete: vi.fn(),
+      },
+    };
+
+    await expect(
+      escrowMarketOrderAssets(transaction as never, {
+        amount: 1,
+        itemId: "cookie",
+        orderType: "sell",
+        price: 100n,
+        userId: "seller",
+      }),
+    ).rejects.toMatchObject({ reason: "insufficient_inventory" });
   });
 });
 
