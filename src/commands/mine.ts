@@ -26,7 +26,12 @@ import {
   getInventory,
   removeInventoryItem,
 } from "../utils/functions/economy/inventory";
-import { rollPet } from "../utils/functions/economy/pets";
+import {
+  formatPetFoundItem,
+  getActivePetForTarget,
+  rollPet,
+  takePetFoundItem,
+} from "../utils/functions/economy/pets";
 import { addStat } from "../utils/functions/economy/stats";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { getToolPreferences } from "../utils/functions/economy/tool_preferences";
@@ -251,7 +256,10 @@ async function run(
   if (chosenArea == "nether") await addStat(member, "nether_portal");
   else if (chosenArea === "end") await addStat(member, "end_portal");
 
-  times += (await rollPet(member, "mine")) ?? 0;
+  const minePet = await getActivePetForTarget(member, "mine");
+  const petBonus = await rollPet(member, "mine");
+
+  times += petBonus ?? 0;
   const foundItems = new Map<string, number>();
 
   for (let i = 0; i < times; i++) {
@@ -398,15 +406,23 @@ async function run(
     eventData = await getCurrentEvent();
   }
 
+  const petFoundItem = petBonus !== undefined && minePet ? takePetFoundItem(foundItems) : undefined;
+
   embed.setDescription(
     `you go to the ${chosenArea} and swing your **${items[pickaxe].name}**\n\nyou found${
-      total > 0
+      foundItems.size > 0
         ? `: \n${Array.from(foundItems.entries())
             .map((i) => `- \`${i[1]}x\` ${items[i[0]].emoji} ${items[i[0]].name}`)
             .join("\n")}`
         : " **nothing**"
     }`,
   );
+
+  if (petBonus !== undefined && minePet) {
+    embed.setDescription(
+      `${embed.data.description}\n\n${formatPetFoundItem(minePet, petFoundItem)}`,
+    );
+  }
 
   if (eventProgress) {
     embed.addField("event progress", formatEventProgress(eventData, eventProgress, message.member));
