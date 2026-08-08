@@ -2,8 +2,6 @@ import dayjs = require("dayjs");
 import prisma from "../../init/database";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import { Job } from "../../types/Jobs";
-import { addBalance } from "../../utils/functions/economy/balance";
-import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { deleteMarketOrder } from "../../utils/functions/economy/market";
 import { getItems, userExists } from "../../utils/functions/economy/utils";
 import { pluralize } from "../../utils/functions/string";
@@ -26,7 +24,6 @@ export default {
         ownerId: true,
         itemAmount: true,
         itemId: true,
-        price: true,
         id: true,
       },
     });
@@ -44,11 +41,9 @@ export default {
     });
 
     for (const order of buyOrders) {
-      await deleteMarketOrder(order.id, manager);
+      if (!(await deleteMarketOrder(order.id, manager))) continue;
 
       if (!(await userExists(order.ownerId))) continue;
-
-      await addBalance(order.ownerId, Number(order.price) * order.itemAmount);
 
       const embed = new CustomEmbed(order.ownerId);
 
@@ -70,11 +65,9 @@ export default {
     }
 
     for (const order of sellOrders) {
-      await deleteMarketOrder(order.id, manager);
+      if (!(await deleteMarketOrder(order.id, manager))) continue;
 
       if (!(await userExists(order.ownerId))) continue;
-
-      await addInventoryItem(order.ownerId, order.itemId, Number(order.itemAmount));
 
       const embed = new CustomEmbed(order.ownerId);
 

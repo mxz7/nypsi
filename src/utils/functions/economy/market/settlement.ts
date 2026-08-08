@@ -51,6 +51,34 @@ export class MarketEscrowError extends Error {
   }
 }
 
+export async function cancelMarketOrder(
+  prisma: Prisma.TransactionClient,
+  orderId: number,
+): Promise<Market | undefined> {
+  const order = await prisma.market.findFirst({
+    where: { id: orderId, completed: false },
+  });
+
+  if (!order) return;
+
+  await prisma.market.delete({ where: { id: orderId } });
+
+  if (order.orderType === "buy") {
+    await prisma.economy.update({
+      where: { userId: order.ownerId },
+      data: { money: { increment: order.price * BigInt(order.itemAmount) } },
+    });
+  } else {
+    await prisma.inventory.upsert({
+      where: { userId_item: { userId: order.ownerId, item: order.itemId } },
+      update: { amount: { increment: order.itemAmount } },
+      create: { userId: order.ownerId, item: order.itemId, amount: order.itemAmount },
+    });
+  }
+
+  return order;
+}
+
 export async function escrowMarketOrderAssets(
   prisma: Prisma.TransactionClient,
   request: {

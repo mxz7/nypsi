@@ -645,8 +645,6 @@ export async function gemBreak(
       const res = await deleteMarketOrder(order.id, client);
       if (typeof res == "string" || !res) return;
 
-      await addInventoryItem(order.ownerId, order.itemId, order.itemAmount);
-
       if ((await (await getInventory(userId)).hasGem(gem)).inInventory) {
         await removeInventoryItem(userId, gem, 1);
       } else return;
