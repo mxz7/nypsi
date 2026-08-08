@@ -86,6 +86,29 @@ export async function getPreferences(member: MemberResolvable): Promise<Preferen
   return preferences;
 }
 
+export async function getPrivacyEnabled(member: MemberResolvable): Promise<boolean> {
+  const userId = getUserId(member);
+  const preference = await prisma.preferences.findUnique({
+    where: { userId_key: { userId, key: "leaderboards" } },
+    select: { value: true },
+  });
+
+  return preference?.value === true;
+}
+
+export async function getPrivacyEnabledUserIds(userIds: string[]): Promise<Set<string>> {
+  const preferences = await prisma.preferences.findMany({
+    where: {
+      userId: { in: userIds },
+      key: "leaderboards",
+      value: { equals: true },
+    },
+    select: { userId: true },
+  });
+
+  return new Set(preferences.map((preference) => preference.userId));
+}
+
 export async function updatePreference<K extends PreferenceKey>(
   member: MemberResolvable,
   key: K,

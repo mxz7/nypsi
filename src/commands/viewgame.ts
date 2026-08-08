@@ -13,7 +13,7 @@ import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { fetchGame } from "../utils/functions/economy/stats";
 import PageManager from "../utils/functions/page";
-import { getPreferences } from "../utils/functions/users/preferences";
+import { getPrivacyEnabled, getPrivacyEnabledUserIds } from "../utils/functions/users/preferences";
 import { getLastKnownAvatar, getLastKnownUsername } from "../utils/functions/users/username";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import dayjs = require("dayjs");
@@ -91,13 +91,9 @@ async function run(
 
     if (query.length === 0) return send({ embeds: [new ErrorEmbed("no results found")] });
 
-    const preferences = new Map(
-      await Promise.all(
-        [...new Set(query.map((game) => game.userId))].map(
-          async (userId) => [userId, await getPreferences(userId)] as const,
-        ),
-      ),
-    );
+    const privateUserIds = await getPrivacyEnabledUserIds([
+      ...new Set(query.map((game) => game.userId)),
+    ]);
 
     const embed = new CustomEmbed(message.member).setFooter({
       text: `${query.length.toLocaleString()} ${query.length >= 1000 ? "(max) " : ""}results found`,
@@ -110,9 +106,7 @@ async function run(
             36,
           )}?ref=bot-game) \`(${game.id})\`\n` +
           `**user** \`${
-            !preferences.get(game.userId).leaderboards
-              ? game.economy.user.lastKnownUsername
-              : "[hidden]"
+            !privateUserIds.has(game.userId) ? game.economy.user.lastKnownUsername : "[hidden]"
           }\`\n` +
           `**game** \`${game.game}\`\n` +
           `**time** <t:${Math.floor(game.date.getTime() / 1000)}>\n` +
@@ -163,7 +157,7 @@ async function run(
         query.map((game) => {
           return {
             id: game.id.toString(36),
-            user: !preferences.get(game.userId).leaderboards
+            user: !privateUserIds.has(game.userId)
               ? game.economy.user.lastKnownUsername
               : "[hidden]",
             game: game.game,
@@ -203,9 +197,9 @@ async function run(
     if (!game)
       return send({ embeds: [new ErrorEmbed(`couldn't find a game with id \`${args[0]}\``)] });
 
-    const username = !(await getPreferences(game.userId))?.leaderboards
-      ? await getLastKnownUsername(game.userId, false).catch(() => {})
-      : "[hidden]";
+    const username = (await getPrivacyEnabled(game.userId))
+      ? "[hidden]"
+      : await getLastKnownUsername(game.userId, false).catch(() => {});
 
     const embed = new CustomEmbed(game.userId).setHeader(
       username ? `${username}'s ${game.game} game` : `id: ${game.id.toString(36)}`,
