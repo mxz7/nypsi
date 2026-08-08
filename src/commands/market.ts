@@ -28,13 +28,8 @@ import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Item } from "../types/Economy";
 import Constants from "../utils/Constants";
-import { addBalance, getBalance } from "../utils/functions/economy/balance";
-import {
-  addInventoryItem,
-  calcItemValue,
-  getInventory,
-  selectItem,
-} from "../utils/functions/economy/inventory";
+import { getBalance } from "../utils/functions/economy/balance";
+import { calcItemValue, getInventory, selectItem } from "../utils/functions/economy/inventory";
 import { getRawLevel } from "../utils/functions/economy/levelling";
 import {
   countItemOnMarket,
@@ -42,7 +37,6 @@ import {
   deleteMarketOrder,
   deleteMarketWatch,
   getMarketItemOrders,
-  getMarketOrder,
   getMarketOrders,
   getMarketTransactionData,
   getMarketWatch,
@@ -652,32 +646,14 @@ async function run(
         if (res) {
           if (res == "delAll") {
             for (const order of orders) {
-              const result = await deleteMarketOrder(order.id, message.client as NypsiClient);
-
-              if (result) {
-                if (type == "buy") {
-                  await addBalance(message.member, order.itemAmount * Number(order.price));
-                } else {
-                  await addInventoryItem(message.member, order.itemId, order.itemAmount);
-                }
-              }
+              await deleteMarketOrder(order.id, message.client as NypsiClient);
             }
 
             await updateEmbed();
             return pageManager();
           }
 
-          const order = await getMarketOrder(parseInt(res));
-
-          const result = await deleteMarketOrder(parseInt(res), message.client as NypsiClient);
-
-          if (result) {
-            if (type == "buy") {
-              await addBalance(message.member, order.itemAmount * Number(order.price));
-            } else {
-              await addInventoryItem(message.member, order.itemId, order.itemAmount);
-            }
-          }
+          await deleteMarketOrder(parseInt(res), message.client as NypsiClient);
         }
 
         await updateEmbed();
@@ -1391,12 +1367,6 @@ async function run(
       await deleteMarketOrder(order.id, message.client as NypsiClient);
 
       if (!(await userExists(order.ownerId))) return;
-
-      if (order.orderType == "buy") {
-        await addBalance(order.ownerId, order.itemAmount * Number(order.price));
-      } else {
-        await addInventoryItem(order.ownerId, order.itemId, order.itemAmount);
-      }
 
       if ((await getPreferences(order.ownerId)).dms.market) {
         const embed = new CustomEmbed().setColor(Constants.EMBED_FAIL_COLOR);

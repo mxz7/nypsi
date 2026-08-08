@@ -39,6 +39,7 @@ import { getBalance } from "./balance";
 import { autosellInventoryItem, getInventory, isGem } from "./inventory";
 import { quoteMarketOrder } from "./market/matching";
 import {
+  cancelMarketOrder,
   escrowMarketOrderAssets,
   MarketEscrowError,
   settleMarketFill,
@@ -189,6 +190,32 @@ export async function createMarketOrder(
   return withMarketLock(itemId, () =>
     createMarketOrderUnlocked(member, itemId, amount, price, orderType, client),
   );
+}
+
+export async function deleteMarketOrder(
+  id: number,
+  client: NypsiClient | ClusterManager | undefined,
+) {
+  const existingOrder = await prisma.market
+    .findFirst({
+      where: {
+        AND: [{ id }, { completed: false }],
+      },
+    })
+    .catch(() => {});
+
+  if (!existingOrder) return false;
+
+  const order = await withMarketLock(existingOrder.itemId, () =>
+    deleteMarketOrderUnlocked(id, existingOrder),
+  );
+
+  if (!order) return false;
+
+  await invalidateMarketOrderCreationCaches(order.ownerId, order.itemId, order.orderType);
+  await deleteMarketOrderMessage(order.messageId, client);
+
+  return true;
 }
 
 /**
@@ -718,37 +745,29 @@ export async function countItemOnMarket(itemId: string, type: OrderType) {
   return amount?._sum?.itemAmount || 0;
 }
 
-export async function deleteMarketOrder(
-  id: number,
+async function deleteMarketOrderUnlocked(id: number, existingOrder: Market) {
+  return prisma.$transaction(
+    async (tx) => {
+      const transaction = tx as Prisma.TransactionClient;
+
+      await lockMarketRows(transaction, {
+        itemId: existingOrder.itemId,
+        orderIds: [id],
+        inventoryUserIds: existingOrder.orderType === "sell" ? [existingOrder.ownerId] : [],
+        balanceUserIds: [existingOrder.ownerId],
+      });
+
+      return cancelMarketOrder(transaction, id);
+    },
+    { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+  );
+}
+
+async function deleteMarketOrderMessage(
+  messageId: string | undefined,
   client: NypsiClient | ClusterManager | undefined,
 ) {
-  const existingOrder = await prisma.market
-    .findFirst({
-      where: {
-        AND: [{ id: id }, { completed: false }],
-      },
-    })
-    .catch(() => {});
-
-  if (!existingOrder) return false;
-
-  const order = await withMarketLock(existingOrder.itemId, async () => {
-    const order = await prisma.market.findFirst({
-      where: {
-        AND: [{ id }, { completed: false }],
-      },
-    });
-
-    if (!order) return;
-
-    await prisma.market.delete({ where: { id } });
-
-    return order;
-  });
-
-  if (!order) return false;
-
-  if (order.messageId && client) {
+  if (messageId && client) {
     await (client instanceof ClusterManager ? client : client.cluster).broadcastEval(
       async (client, { channelId, guildId, messageId }) => {
         const guild = client.guilds.cache.get(guildId);
@@ -771,13 +790,11 @@ export async function deleteMarketOrder(
         context: {
           guildId: Constants.NYPSI_SERVER_ID,
           channelId: Constants.MARKET_CHANNEL_ID,
-          messageId: order.messageId,
+          messageId,
         },
       },
     );
   }
-
-  return Boolean(order);
 }
 
 export async function getMarketTransactionData(

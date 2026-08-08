@@ -32,6 +32,9 @@ description: Maintain Nypsi's player market backend, including order matching, f
   affected inventory and balance rows in deterministic user-ID order before settlement.
 - Keep market-row state/history, escrow consumption, wallet/inventory transfers, buyer refunds, and
   tax-bank credits together in `market/settlement.ts` using the provided Prisma transaction client.
+- Cancellation holds the Redis item mutex and the same PostgreSQL locks as settlement, then re-reads,
+  deletes, and refunds the active order in one serializable transaction. Callers must not refund the
+  escrow themselves.
 - For balance and inventory debits, use `update` with the resulting value selected and throw if it is
   negative; the transaction rollback restores the original value. Avoid conditional `updateMany`
   guards for these debits.

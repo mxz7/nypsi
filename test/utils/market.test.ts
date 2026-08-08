@@ -5,6 +5,7 @@ import {
   quoteMarketOrder,
 } from "../../src/utils/functions/economy/market/matching";
 import {
+  cancelMarketOrder,
   calculateMarketFill,
   escrowMarketOrderAssets,
   settleMarketFill,
@@ -204,6 +205,80 @@ describe("calculateMarketFill", () => {
 
     expect(fill.sellerTax).toBe(0n);
     expect(fill.sellerProceeds).toBe(1000n);
+  });
+});
+
+describe("cancelMarketOrder", () => {
+  test("deletes a buy order and refunds its remaining escrow", async () => {
+    const marketOrder = {
+      ...order(10, "buy", 100, 4, "buyer"),
+      itemId: "cookie",
+      messageId: null,
+      createdAt: new Date(),
+    };
+    const transaction = {
+      market: {
+        findFirst: vi.fn().mockResolvedValue(marketOrder),
+        delete: vi.fn().mockResolvedValue(marketOrder),
+      },
+      economy: { update: vi.fn().mockResolvedValue({}) },
+      inventory: { upsert: vi.fn() },
+    };
+
+    await expect(cancelMarketOrder(transaction as never, marketOrder.id)).resolves.toBe(
+      marketOrder,
+    );
+    expect(transaction.market.delete).toHaveBeenCalledWith({ where: { id: marketOrder.id } });
+    expect(transaction.economy.update).toHaveBeenCalledWith({
+      where: { userId: marketOrder.ownerId },
+      data: { money: { increment: 400n } },
+    });
+    expect(transaction.inventory.upsert).not.toHaveBeenCalled();
+  });
+
+  test("deletes a sell order and refunds its remaining items", async () => {
+    const marketOrder = {
+      ...order(11, "sell", 100, 4, "seller"),
+      itemId: "cookie",
+      messageId: null,
+      createdAt: new Date(),
+    };
+    const transaction = {
+      market: {
+        findFirst: vi.fn().mockResolvedValue(marketOrder),
+        delete: vi.fn().mockResolvedValue(marketOrder),
+      },
+      economy: { update: vi.fn() },
+      inventory: { upsert: vi.fn().mockResolvedValue({}) },
+    };
+
+    await expect(cancelMarketOrder(transaction as never, marketOrder.id)).resolves.toBe(
+      marketOrder,
+    );
+    expect(transaction.market.delete).toHaveBeenCalledWith({ where: { id: marketOrder.id } });
+    expect(transaction.inventory.upsert).toHaveBeenCalledWith({
+      where: { userId_item: { userId: marketOrder.ownerId, item: marketOrder.itemId } },
+      update: { amount: { increment: marketOrder.itemAmount } },
+      create: {
+        userId: marketOrder.ownerId,
+        item: marketOrder.itemId,
+        amount: marketOrder.itemAmount,
+      },
+    });
+    expect(transaction.economy.update).not.toHaveBeenCalled();
+  });
+
+  test("does not refund an order that is no longer active", async () => {
+    const transaction = {
+      market: { findFirst: vi.fn().mockResolvedValue(null), delete: vi.fn() },
+      economy: { update: vi.fn() },
+      inventory: { upsert: vi.fn() },
+    };
+
+    await expect(cancelMarketOrder(transaction as never, 10)).resolves.toBeUndefined();
+    expect(transaction.market.delete).not.toHaveBeenCalled();
+    expect(transaction.economy.update).not.toHaveBeenCalled();
+    expect(transaction.inventory.upsert).not.toHaveBeenCalled();
   });
 });
 
