@@ -97,18 +97,32 @@ async function run(
   const { res, interaction } = reaction;
 
   if (res == "yes") {
-    interaction.deferUpdate();
-    await removeMarriage(message.member);
-    await addInventoryItem(married.partnerId, "broken_ring", 1);
+    await interaction.deferUpdate();
+
+    if (!(await isMarried(message.member))) {
+      embed.setDescription("❌ you are no longer married");
+      return edit({ embeds: [embed], components: [] }, msg);
+    }
+
+    const divorce = await removeMarriage(message.member);
+
+    if (!divorce) {
+      embed.setDescription("❌ you are no longer married");
+      return edit({ embeds: [embed], components: [] }, msg);
+    }
+
+    const divorcePartnerName = await getLastKnownUsername(divorce.partnerId);
+
+    await addInventoryItem(divorce.partnerId, "broken_ring", 1);
     addItemSourceStat("broken_ring", "divorce", 1);
 
-    embed.setDescription(`✅ you have divorced ${partnerName}`);
+    embed.setDescription(`✅ you have divorced ${divorcePartnerName}`);
 
     addNotificationToQueue({
-      memberId: married.partnerId,
+      memberId: divorce.partnerId,
       payload: {
         embed: new CustomEmbed(
-          married.partnerId,
+          divorce.partnerId,
           `${getItems()["broken_ring"].emoji} you have been divorced by ${escapeFormattingCharacters(message.member.user.username)}!`,
         ).setFooter({ text: `+1 broken ring` }),
       },

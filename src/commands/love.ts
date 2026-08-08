@@ -191,23 +191,27 @@ async function run(
     target.id !== marriage.partnerId &&
     (target1.id === message.author.id || target2.id === message.author.id)
   ) {
-    await removeMarriage(message.member);
-    await addInventoryItem(marriage.partnerId, "broken_ring", 1);
-    addItemSourceStat("broken_ring", "divorce", 1);
+    const divorce = await removeMarriage(message.member);
 
-    addNotificationToQueue({
-      memberId: marriage.partnerId,
-      payload: {
-        embed: new CustomEmbed(
-          marriage.partnerId,
-          `${getItems()["broken_ring"].emoji} **${escapeFormattingCharacters(message.member.user.username)}** has cheated on you!`,
-        ).setFooter({ text: `+1 broken ring` }),
-      },
-    });
+    if (divorce) {
+      await addInventoryItem(divorce.partnerId, "broken_ring", 1);
+      addItemSourceStat("broken_ring", "divorce", 1);
 
-    desc += `\n\n${getItems()["broken_ring"].emoji} you cheated on **${await getLastKnownUsername(marriage.partnerId, true)}**!`;
+      addNotificationToQueue({
+        memberId: divorce.partnerId,
+        payload: {
+          embed: new CustomEmbed(
+            divorce.partnerId,
+            `${getItems()["broken_ring"].emoji} **${escapeFormattingCharacters(message.member.user.username)}** has cheated on you!`,
+          ).setFooter({ text: `+1 broken ring` }),
+        },
+      });
 
-    marriage = false;
+      desc += `\n\n${getItems()["broken_ring"].emoji} you cheated on **${await getLastKnownUsername(divorce.partnerId, true)}**!`;
+      marriage = false;
+    } else {
+      marriage = await isMarried(message.member);
+    }
   }
 
   if (
@@ -307,7 +311,11 @@ async function run(
       });
     }
 
-    await addMarriage(target1.user.id, target2.user.id);
+    if (!(await addMarriage(target1.user.id, target2.user.id))) {
+      return i.followUp({
+        embeds: [new ErrorEmbed("some trickery has gone on and you can't be married... cunts")],
+      });
+    }
     cache.delete(combo);
 
     return i.followUp({

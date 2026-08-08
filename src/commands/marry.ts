@@ -207,8 +207,11 @@ async function run(
         `❌ ${escapeFormattingCharacters(message.member.user.username)} is already married`,
       );
     } else {
-      await addMarriage(message.member.id, target.id);
-      embed.setDescription("you may now kiss the bride!");
+      if (await addMarriage(message.member.id, target.id)) {
+        embed.setDescription("you may now kiss the bride!");
+      } else {
+        embed.setDescription("❌ one of you is already married");
+      }
     }
   } else {
     await addInventoryItem(message.member, "broken_ring", 1);
