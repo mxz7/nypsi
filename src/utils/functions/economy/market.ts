@@ -74,9 +74,14 @@ async function withMarketLock<T>(itemId: string, operation: () => Promise<T>): P
 
 async function lockMarketRows(
   prisma: Prisma.TransactionClient,
-  itemId: string,
-  orderIds: number[],
+  request: {
+    itemId: string;
+    orderIds?: number[];
+    inventoryUserIds?: string[];
+    balanceUserIds?: string[];
+  },
 ) {
+  const { itemId } = request;
   const advisoryStartedAt = Date.now();
 
   logger.debug("market: waiting for postgres advisory lock", { itemId });
@@ -86,25 +91,68 @@ async function lockMarketRows(
     waitMs: Date.now() - advisoryStartedAt,
   });
 
-  if (orderIds.length === 0) return;
+  const sortedOrderIds = [...(request.orderIds ?? [])].sort((a, b) => a - b);
 
-  const sortedOrderIds = [...orderIds].sort((a, b) => a - b);
-  const rowsStartedAt = Date.now();
+  if (sortedOrderIds.length > 0) {
+    const startedAt = Date.now();
 
-  logger.debug("market: waiting for postgres row locks", {
-    itemId,
-    orderCount: sortedOrderIds.length,
-    orderIds: sortedOrderIds,
-  });
-  await prisma.$queryRaw`SELECT "id" FROM "Market" WHERE "id" IN (${Prisma.join(
-    sortedOrderIds,
-  )}) ORDER BY "id" FOR UPDATE`;
-  logger.debug("market: acquired postgres row locks", {
-    itemId,
-    orderCount: sortedOrderIds.length,
-    orderIds: sortedOrderIds,
-    waitMs: Date.now() - rowsStartedAt,
-  });
+    logger.debug("market: waiting for postgres row locks", {
+      itemId,
+      orderCount: sortedOrderIds.length,
+      orderIds: sortedOrderIds,
+    });
+    await prisma.$queryRaw`SELECT "id" FROM "Market" WHERE "id" IN (${Prisma.join(
+      sortedOrderIds,
+    )}) ORDER BY "id" FOR UPDATE`;
+    logger.debug("market: acquired postgres row locks", {
+      itemId,
+      orderCount: sortedOrderIds.length,
+      orderIds: sortedOrderIds,
+      waitMs: Date.now() - startedAt,
+    });
+  }
+
+  const inventoryUserIds = [...new Set(request.inventoryUserIds ?? [])].sort();
+
+  if (inventoryUserIds.length > 0) {
+    const startedAt = Date.now();
+
+    logger.debug("market: waiting for postgres inventory row locks", {
+      itemId,
+      userCount: inventoryUserIds.length,
+      userIds: inventoryUserIds,
+    });
+    const rows = await prisma.$queryRaw<{ userId: string }[]>`SELECT "userId" FROM "Inventory"
+      WHERE "item" = ${itemId} AND "userId" IN (${Prisma.join(inventoryUserIds)})
+      ORDER BY "userId" FOR UPDATE`;
+    logger.debug("market: acquired postgres inventory row locks", {
+      itemId,
+      lockedRowCount: rows.length,
+      userCount: inventoryUserIds.length,
+      userIds: inventoryUserIds,
+      waitMs: Date.now() - startedAt,
+    });
+  }
+
+  const balanceUserIds = [...new Set(request.balanceUserIds ?? [])].sort();
+
+  if (balanceUserIds.length > 0) {
+    const startedAt = Date.now();
+
+    logger.debug("market: waiting for postgres balance row locks", {
+      userCount: balanceUserIds.length,
+      userIds: balanceUserIds,
+    });
+    const rows = await prisma.$queryRaw<{ userId: string }[]>`SELECT "userId" FROM "Economy"
+      WHERE "userId" IN (${Prisma.join(balanceUserIds)})
+      ORDER BY "userId" FOR UPDATE`;
+    logger.debug("market: acquired postgres balance row locks", {
+      lockedRowCount: rows.length,
+      userCount: balanceUserIds.length,
+      userIds: balanceUserIds,
+      waitMs: Date.now() - startedAt,
+    });
+  }
 }
 
 export async function marketSell(
@@ -284,7 +332,7 @@ async function createMarketOrderUnlocked(
     creation = await prisma.$transaction(
       async (tx) => {
         const transaction = tx as Prisma.TransactionClient;
-        await lockMarketRows(transaction, itemId, []);
+        await lockMarketRows(transaction, { itemId });
 
         const filters: Prisma.MarketWhereInput = {
           itemId,
@@ -295,18 +343,41 @@ async function createMarketOrderUnlocked(
         };
         let candidateOrders = await tx.market.findMany({ where: filters });
         const candidateIds = candidateOrders.map((order) => order.id).sort((a, b) => a - b);
-
-        if (candidateIds.length > 0) {
-          await lockMarketRows(transaction, itemId, candidateIds);
-          candidateOrders = await tx.market.findMany({ where: filters });
-        }
-
-        const quote = quoteMarketOrder(candidateOrders, {
+        let quote = quoteMarketOrder(candidateOrders, {
           side: orderType,
           amount,
           limitPrice: BigInt(price),
           ownerId,
         });
+
+        await lockMarketRows(transaction, {
+          itemId,
+          orderIds: candidateIds,
+          inventoryUserIds: [
+            ownerId,
+            ...quote.fills
+              .filter((fill) => fill.order.orderType === "buy")
+              .map((fill) => fill.order.ownerId),
+          ],
+          balanceUserIds: [
+            ownerId,
+            Constants.BOT_USER_ID,
+            ...quote.fills
+              .filter((fill) => fill.order.orderType === "sell")
+              .map((fill) => fill.order.ownerId),
+          ],
+        });
+
+        if (candidateIds.length > 0) {
+          candidateOrders = await tx.market.findMany({ where: filters });
+          quote = quoteMarketOrder(candidateOrders, {
+            side: orderType,
+            amount,
+            limitPrice: BigInt(price),
+            ownerId,
+          });
+        }
+
         const policies = await prepareMarketFillPolicies(quote.fills, ownerId);
 
         await escrowMarketOrderAssets(transaction, {
@@ -808,11 +879,23 @@ async function settleMarketFills(request: {
 
         if (!itemId) throw new Error("market settlement requires an item");
 
-        await lockMarketRows(
-          transaction,
+        await lockMarketRows(transaction, {
           itemId,
-          request.fills.map((fill) => fill.order.id),
-        );
+          orderIds: request.fills.map((fill) => fill.order.id),
+          inventoryUserIds: [
+            request.incomingUserId,
+            ...request.fills
+              .filter((fill) => fill.order.orderType === "buy")
+              .map((fill) => fill.order.ownerId),
+          ],
+          balanceUserIds: [
+            request.incomingUserId,
+            Constants.BOT_USER_ID,
+            ...request.fills
+              .filter((fill) => fill.order.orderType === "sell")
+              .map((fill) => fill.order.ownerId),
+          ],
+        });
 
         for (const fill of request.fills) {
           const policy = policies.get(fill.order.id)!;
