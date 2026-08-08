@@ -20,6 +20,7 @@ import {
 import { sort } from "fast-sort";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { isUserContentAllowed } from "../utils/functions/ai/moderation.js";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getBalance, removeBalance } from "../utils/functions/economy/balance";
 import {
@@ -285,6 +286,15 @@ async function run(
               flags: MessageFlags.Ephemeral,
               embeds: [new ErrorEmbed("invalid name")],
             });
+
+          if (
+            !(await isUserContentAllowed(name, { source: "car name", userId: message.author.id }))
+          ) {
+            return res.reply({
+              flags: MessageFlags.Ephemeral,
+              embeds: [new ErrorEmbed("invalid name")],
+            });
+          }
 
           res.reply({
             flags: MessageFlags.Ephemeral,

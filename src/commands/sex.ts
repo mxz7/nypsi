@@ -5,6 +5,7 @@ import { NypsiClient } from "../models/Client.js";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants.js";
+import { isUserContentAllowed } from "../utils/functions/ai/moderation.js";
 import { MStoTime } from "../utils/functions/date.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
 import {
@@ -107,6 +108,17 @@ async function run(
             "⚠️ your message contains inappropriate content, if you keep doing this, you **WILL** be banned from nypsi",
           ),
         ],
+      });
+    }
+
+    if (
+      !(await isUserContentAllowed(description, {
+        source: "sex message",
+        userId: message.author.id,
+      }))
+    ) {
+      return send({
+        embeds: [new ErrorEmbed("your message contains inappropriate content")],
       });
     }
 

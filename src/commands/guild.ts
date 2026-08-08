@@ -20,6 +20,7 @@ import redis from "../init/redis";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
+import { isUserContentAllowed } from "../utils/functions/ai/moderation";
 import { daysAgo, formatDate } from "../utils/functions/date";
 import { getBalance, removeBalance } from "../utils/functions/economy/balance";
 import {
@@ -337,6 +338,10 @@ async function run(
     const regex = /^[A-Za-z0-9 ]*$/;
 
     if (!regex.test(name)) return send({ embeds: [new ErrorEmbed("invalid guild name")] });
+
+    if (!(await isUserContentAllowed(name, { source: "guild name", userId: message.author.id }))) {
+      return send({ embeds: [new ErrorEmbed("invalid guild name")] });
+    }
 
     await addCooldown(cmd.name, message.member, 3);
 
@@ -1071,6 +1076,24 @@ async function run(
       .resize({ width: 256, height: 256, fit: "cover" })
       .toBuffer();
 
+    if (
+      !(await isUserContentAllowed(
+        [
+          {
+            type: "image_url",
+            image_url: {
+              url: `data:${contentType};base64,${buffer.toString("base64")}`,
+            },
+          },
+        ],
+        { source: "guild avatar", userId: message.author.id },
+      ))
+    ) {
+      return message.channel.send({
+        embeds: [new ErrorEmbed("that image cannot be used as a guild avatar")],
+      });
+    }
+
     if (guild.avatarId) {
       await deleteImage(guild.avatarId);
 
@@ -1118,6 +1141,10 @@ async function run(
     for (const word of filter) {
       if (cleanString(motd).toLowerCase().includes(word))
         return send({ embeds: [new ErrorEmbed("invalid guild motd")] });
+    }
+
+    if (!(await isUserContentAllowed(motd, { source: "guild motd", userId: message.author.id }))) {
+      return send({ embeds: [new ErrorEmbed("invalid guild motd")] });
     }
 
     await addCooldown(cmd.name, message.member, 3);

@@ -4,6 +4,7 @@ import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
+import { isUserContentAllowed } from "../utils/functions/ai/moderation";
 import { daysAgo, daysUntil, formatDate } from "../utils/functions/date";
 import { getRawLevel } from "../utils/functions/economy/levelling";
 import { getTagsData, userExists } from "../utils/functions/economy/utils";
@@ -624,6 +625,15 @@ async function run(
         return send({ embeds: [new ErrorEmbed("spammy content 🙄")] });
       }
 
+      if (
+        !(await isUserContentAllowed(`${commandTrigger}\n${commandContent}`, {
+          source: "custom command",
+          userId: message.author.id,
+        }))
+      ) {
+        return send({ embeds: [new ErrorEmbed("inappropriate content 🙄")] });
+      }
+
       if (commandExists(commandTrigger) || commandAliasExists(commandTrigger))
         return send({ embeds: [new ErrorEmbed("this is already a nypsi command")] });
 
@@ -724,6 +734,15 @@ async function run(
         if (trigger.includes(word) || command.toLowerCase().includes(word)) {
           return send({ embeds: [new ErrorEmbed("explicit content 🙄")] });
         }
+      }
+
+      if (
+        !(await isUserContentAllowed(`${trigger}\n${command}`, {
+          source: "custom alias",
+          userId: message.author.id,
+        }))
+      ) {
+        return send({ embeds: [new ErrorEmbed("inappropriate content 🙄")] });
       }
 
       if (aliases.find((i) => i.alias === trigger))
