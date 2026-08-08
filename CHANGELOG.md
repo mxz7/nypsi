@@ -5,6 +5,7 @@
 - autoscaling command channels
 - give dabloon rewards for using global boosters
 - add evil larry
+- prevent duplicate broken rings from simultaneous divorces
 
 # july 2026
 
