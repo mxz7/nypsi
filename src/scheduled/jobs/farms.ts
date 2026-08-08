@@ -38,7 +38,7 @@ export default {
 
       for (const plantId of plantIds) {
         const result = await getClaimable(userId, plantId, true, manager);
-        if (result.sold <= 0) continue;
+        if (!Number.isFinite(result.sold) || result.sold <= 0) continue;
 
         const itemId = getPlantsData()[plantId].item;
         storage.harvested[itemId] = (storage.harvested[itemId] || 0) + result.sold;

@@ -183,7 +183,7 @@ export async function getClaimable(
         plant.fertilisedAt.valueOf() > fertiliseTime,
     );
 
-    if (plants.length === 0) return { items: 0 };
+    if (plants.length === 0) return claim ? { sold: 0 } : { items: 0 };
 
     if (claim) {
       await prisma.farm.updateMany({
@@ -317,10 +317,9 @@ export async function getClaimable(
       };
     }
 
-    return {
-      items,
-      multiplier: outputMulti > 1 ? Math.round((outputMulti - 1) * 100).toString() : null,
-    };
+    const multiplier = outputMulti > 1 ? Math.round((outputMulti - 1) * 100).toString() : null;
+
+    return claim ? { sold: items, multiplier } : { items, multiplier };
   } finally {
     farmClaimMutex.release(mutexKey);
   }
