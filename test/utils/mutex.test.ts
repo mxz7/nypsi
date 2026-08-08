@@ -1,10 +1,11 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { resetRedisMock } from "../mocks/redis";
 
-const { loggerError, redisMock } = await vi.hoisted(async () => {
+const { loggerDebug, loggerError, redisMock } = await vi.hoisted(async () => {
   const { createRedisMock } = await import("../mocks/redis");
 
   return {
+    loggerDebug: vi.fn(),
     loggerError: vi.fn(),
     redisMock: createRedisMock(),
   };
@@ -13,7 +14,7 @@ const { loggerError, redisMock } = await vi.hoisted(async () => {
 vi.mock("../../src/init/redis", () => ({ default: redisMock }));
 
 vi.mock("../../src/utils/logger", () => ({
-  logger: { debug: vi.fn(), error: loggerError },
+  logger: { debug: loggerDebug, error: loggerError },
 }));
 
 import { MemoryMutex, RedisMutex } from "../../src/utils/functions/mutex";
@@ -165,6 +166,29 @@ describe("RedisMutex", () => {
 
     mutex.release("user");
     expect(redisMock.eval).toHaveBeenCalledOnce();
+  });
+
+  test("logs how long acquisition and ownership took", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(1_000);
+    redisMock.set.mockResolvedValue("OK");
+    redisMock.eval.mockResolvedValue(1);
+    const mutex = new RedisMutex("economy", true);
+
+    await mutex.acquire("user");
+    vi.setSystemTime(1_250);
+    mutex.release("user");
+    await vi.runAllTimersAsync();
+
+    expect(loggerDebug).toHaveBeenCalledWith("redis-mutex: acquired mutex:economy:user", {
+      redisKey: "mutex:economy:user",
+      waitMs: 0,
+    });
+    expect(loggerDebug).toHaveBeenCalledWith("redis-mutex: released mutex:economy:user", {
+      heldMs: 250,
+      redisKey: "mutex:economy:user",
+      released: true,
+    });
   });
 
   test("ignores release calls for keys it does not own", () => {
