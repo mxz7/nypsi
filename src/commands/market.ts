@@ -1782,18 +1782,33 @@ async function run(
 
     const fromCommand = !msg;
 
-    const price = (
-      await getMarketTransactionData(item.id, amount, type == "buy" ? "sell" : "buy", member)
-    ).cost;
-
-    embed.setDescription(
-      `are you sure you want to ${type} ${amount} ${pluralize(item, amount)} for $${price.toLocaleString()}?`,
-    );
-
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("confirm").setLabel("confirm").setStyle(ButtonStyle.Primary),
+      new ButtonBuilder()
+        .setCustomId("confirm")
+        .setLabel(`confirm ${type}`)
+        .setStyle(ButtonStyle.Primary),
       new ButtonBuilder().setCustomId("cancel").setLabel("cancel").setStyle(ButtonStyle.Danger),
     );
+
+    const getPrice = async () =>
+      (await getMarketTransactionData(item.id, amount, type == "buy" ? "sell" : "buy", member))
+        .cost;
+
+    const setConfirmationDescription = (price: number, previousPrice?: number) => {
+      const priceChange =
+        previousPrice !== undefined
+          ? `\n\n**NEW PRICE**: **$${previousPrice.toLocaleString()}** → **$${price.toLocaleString()}**\n\n`
+          : "";
+
+      embed.setDescription(
+        `are you sure you want to ${type} ${amount} ${pluralize(item, amount)} for **$${price.toLocaleString()}**?${priceChange}`,
+      );
+    };
+
+    let price = await getPrice();
+    let priceChangeVisible = false;
+
+    setConfirmationDescription(price);
 
     if (msg) {
       msg = await msg.edit({ embeds: [embed], components: [row] });
@@ -1822,12 +1837,14 @@ async function run(
       const { res, interaction } = response;
 
       if (res == "confirm") {
-        const res =
+        price = await getPrice();
+
+        const transaction =
           type == "buy"
             ? await marketBuy(message.member, item.id, amount, price, msg.client as NypsiClient)
             : await marketSell(message.member, item.id, amount, price, msg.client as NypsiClient);
 
-        if (!res) {
+        if (!transaction) {
           if (fromCommand) {
             await interaction.deferUpdate();
             return await msg.edit({
@@ -1838,44 +1855,60 @@ async function run(
 
           await interaction.reply({
             embeds: [new ErrorEmbed("unknown error occurred")],
-            options: { flags: MessageFlags.Ephemeral },
-          });
-
-          return itemView(item, msg);
-        }
-
-        if (res && res.status !== "success" && res.status !== "partial") {
-          if (fromCommand) {
-            await interaction.deferUpdate();
-            return await edit({ embeds: [new ErrorEmbed(res.status)], components: [] }, msg);
-          }
-          await interaction.reply({
-            embeds: [new ErrorEmbed(res.toString())],
             flags: MessageFlags.Ephemeral,
           });
           return itemView(item, msg);
         }
 
-        if (res.status === "partial") {
-          embed.setDescription(
-            `✅ ${type == "buy" ? "bought" : "sold"} ${amount} ${item.emoji} ${pluralize(item, amount)} for $${price.toLocaleString()}`,
-          );
-        } else {
-          embed.setDescription(
-            `✅ ${type == "buy" ? "bought" : "sold"} ${amount.toLocaleString()} ${item.emoji} ${pluralize(item, amount)} for $${price.toLocaleString()}`,
-          );
+        if (transaction.status !== "success" && transaction.status !== "partial") {
+          if (fromCommand) {
+            await interaction.deferUpdate();
+            return await msg.edit({
+              embeds: [new ErrorEmbed(transaction.status)],
+              components: [],
+            });
+          }
+
+          await interaction.reply({
+            embeds: [new ErrorEmbed(transaction.status)],
+            flags: MessageFlags.Ephemeral,
+          });
+          return itemView(item, msg);
         }
 
-        if (fromCommand) {
-          await interaction.deferUpdate();
+        const filledAmount = amount - transaction.remaining;
+        const previousTransaction = `✅ ${type == "buy" ? "bought" : "sold"} ${filledAmount.toLocaleString()} ${item.emoji} ${pluralize(item, filledAmount)} for $${price.toLocaleString()}`;
+
+        await interaction.reply({
+          embeds: [
+            new CustomEmbed(message.member)
+              .setHeader(`${item.name} market confirmation`, getEmojiImage(item.emoji))
+              .setDescription(previousTransaction),
+          ],
+          flags: MessageFlags.Ephemeral,
+        });
+
+        const acceptedPrice = price;
+        const updatedPrice = await getPrice();
+
+        if (updatedPrice == -1) {
+          embed.setDescription(previousTransaction);
           return await msg.edit({ embeds: [embed], components: [] });
         }
 
-        await interaction.reply({
-          embeds: [embed],
-          flags: MessageFlags.Ephemeral,
-        });
-        return itemView(item, msg);
+        if (updatedPrice !== acceptedPrice) {
+          setConfirmationDescription(updatedPrice, acceptedPrice);
+          price = updatedPrice;
+          priceChangeVisible = true;
+          await msg.edit({ embeds: [embed], components: [row] });
+        } else if (priceChangeVisible) {
+          setConfirmationDescription(updatedPrice);
+          price = updatedPrice;
+          priceChangeVisible = false;
+          await msg.edit({ embeds: [embed], components: [row] });
+        }
+
+        return pageManager();
       } else if (res == "cancel") {
         if (fromCommand) await edit({ embeds: [embed], components: [] }, msg);
         await interaction.reply({
