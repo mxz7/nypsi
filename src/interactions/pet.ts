@@ -11,15 +11,16 @@ export default {
 
     return interaction.respond(
       pets
-        .map((pet) => getItems()[getPetsData()[pet.petId].item])
+        .map((pet) => ({ pet, item: getItems()[getPetsData()[pet.petId].item] }))
         .filter(
-          (item) =>
+          ({ pet, item }) =>
             item.id.includes(search) ||
             item.name.includes(search) ||
-            item.aliases?.some((alias) => alias.includes(search)),
+            item.aliases?.some((alias) => alias.includes(search)) ||
+            pet.name?.toLowerCase().includes(search),
         )
-        .map((item) => ({
-          name: `${item.emoji} ${item.name}`,
+        .map(({ pet, item }) => ({
+          name: `${item.emoji} ${item.name}${pet.name ? ` - ${pet.name}` : ""}`,
           value: item.id,
         })),
     );

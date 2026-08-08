@@ -22,8 +22,24 @@ generic effects framework, manager, repository, or separate manual upgrade flow.
   `benefit * 100`; fish, hunt, and mine descriptions omit the bonus placeholder. Cow's bakery
   benefit is `1`, which doubles the output.
 - Prisma storage uses the `Pet` model/table with `userId`, `petId`, `level`, `active`, and
-  `activations`. Do not create migrations; regenerate Prisma after schema changes.
+  `activations`, plus an optional custom `name`. Do not create migrations; regenerate Prisma after
+  schema changes.
 - Delete pets during the economy season reset and transfer them during profile transfer.
+
+## Naming
+
+- Paid naming logic lives in `src/utils/functions/economy/pet-names.ts`. The first named pet costs
+  $10 million and each additional currently named pet adds $10 million. Renaming uses the current
+  next-name price; removing a name always costs $5 million.
+- Pet names are limited to 16 characters and two words. They may contain only ASCII letters and
+  numbers, with one ordinary space separating the words, and must pass `isUserContentAllowed` with
+  `pet name` as the moderation source. Enforce the local format with `isValidPetName` in both the
+  command and the naming domain function.
+- Use `getPetDisplayName` when directly referring to a user's pet, including activation notices and
+  upgrade results. Keep the base species/category label in economy breakdowns so their source stays
+  clear.
+- In the pets command, keep the species as the page heading and select label and show the custom
+  name as a separate field.
 
 ## Economy functions
 
@@ -49,8 +65,12 @@ Keep integrations as small as the comparable booster/gem logic:
 if (claim) outputMulti += (await rollPet(member, "farm")) ?? 0;
 ```
 
-- Fish, hunt, and mine: roll once before the existing attempt loop and add the result directly to
-  `times`.
+- Fish, hunt, and mine: get the active pet, roll once before the existing attempt loop, and add the
+  result directly to `times`. When it activates, append `formatPetFoundItem` below the existing
+  command description; do not add a separate embed field. Use `takePetFoundItem` after reward and
+  progress calculations to move one item type and its full quantity out of the normal displayed
+  list and onto the pet line without changing actual rewards. If there is no real item, say the pet
+  found nothing.
 - Bakery: add the cow benefit to the total output multiplier inside `runBakery`; activation doubles
   the output.
 - XP: roll eagle inside `getXpBonus` and add its benefit to `boosterEffect`, exactly like an XP
@@ -60,13 +80,15 @@ if (claim) outputMulti += (await rollPet(member, "farm")) ?? 0;
 - Gamble multi: apply shark unconditionally inside `getGambleMulti`, alongside gems and boosters.
   Do not add an option for callers to bypass the pet benefit.
 
-Do not recursively call command handlers, preserve durability, alter durability consumption, roll
-again for pet-generated attempts, or add command-specific activation feedback.
+Do not recursively call command handlers, preserve durability, alter durability consumption, or
+roll again for pet-generated attempts.
 
-After a successful activation count update, check `dms.petActivation`. When enabled, add a concise
-activation notice with `addInlineNotification`. This notification is inline only; never send it
-through `addNotificationToQueue`. Cow activations are the exception: do not add an inline
-notification because the bakery response shows the cow's contributed cookies in its `stats` field.
+After a successful activation count update, bakery, fish, hunt, and mine show the contribution in
+their command response. For other targets, `trackPetActivation` stores per-user counts and the
+window start time under `Constants.redis.nypsi.PET_ACTIVATIONS`. On each activation, if the window
+is at least one hour old, add one inline notification with the total activation count and clear it;
+otherwise update the stored count. Do not use a scheduled job for these summaries. Clear pending
+counts when `dms.petActivation` is disabled. Use `ms` for the window and Redis TTL durations.
 
 ## Command and item use
 

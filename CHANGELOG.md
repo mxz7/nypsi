@@ -7,6 +7,7 @@
 - add evil larry
 - prevent duplicate broken rings from simultaneous divorces
 - improved reliability of market system and moved $mk create to $mk buy|sell <item> <amount> <price/item>
+- add pet naming and improve pet activation notifs
 
 # july 2026
 
