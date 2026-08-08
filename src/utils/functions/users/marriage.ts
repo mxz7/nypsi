@@ -10,26 +10,50 @@ import { RedisMutex } from "../mutex";
 const marriageCache = new RedisCache<false | Marriage>(Constants.redis.cache.user.MARRIED, 86400);
 const marriageMutex = new RedisMutex("marriage");
 
+async function removeMarriageByUserId(userId: string): Promise<false | Marriage> {
+  const marriage = await prisma.marriage.findFirst({ where: { userId } });
+
+  if (!marriage) return false;
+
+  await prisma.marriage.deleteMany({
+    where: {
+      OR: [{ userId }, { partnerId: userId }],
+    },
+  });
+  await Promise.all([
+    marriageCache.delete(marriage.userId),
+    marriageCache.delete(marriage.partnerId),
+  ]);
+
+  return marriage;
+}
+
 export async function isMarried(member: MemberResolvable): Promise<false | Marriage> {
   const userId = getUserId(member);
 
-  const cached = await marriageCache.get(userId);
-  if (cached !== null) return cached;
+  await marriageMutex.acquire();
 
-  const res = await prisma.marriage.findFirst({
-    where: {
-      userId,
-    },
-  });
+  try {
+    const cached = await marriageCache.get(userId);
+    if (cached !== null) return cached;
 
-  if (res && !(await prisma.user.findFirst({ where: { id: res.partnerId } }))) {
-    await removeMarriage(member);
-    return false;
+    const res = await prisma.marriage.findFirst({
+      where: {
+        userId,
+      },
+    });
+
+    if (res && !(await prisma.user.findFirst({ where: { id: res.partnerId } }))) {
+      await removeMarriageByUserId(userId);
+      return false;
+    }
+
+    await marriageCache.set(userId, res || false);
+
+    return res || false;
+  } finally {
+    marriageMutex.release();
   }
-
-  await marriageCache.set(userId, res || false);
-
-  return res || false;
 }
 
 export async function addMarriage(userId: string, targetId: string): Promise<boolean> {
@@ -68,20 +92,7 @@ export async function removeMarriage(member: MemberResolvable): Promise<false | 
   await marriageMutex.acquire();
 
   try {
-    const marriage = await prisma.marriage.findFirst({ where: { userId } });
-
-    if (!marriage) return false;
-
-    await prisma.marriage.deleteMany({
-      where: {
-        OR: [{ userId }, { partnerId: userId }],
-      },
-    });
-    await Promise.all([
-      marriageCache.delete(marriage.userId),
-      marriageCache.delete(marriage.partnerId),
-    ]);
-
+    const marriage = await removeMarriageByUserId(userId);
     return marriage;
   } finally {
     marriageMutex.release();
