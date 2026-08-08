@@ -11,6 +11,7 @@ type CachedUsername = {
 
 const usernameCache = new RedisCache<CachedUsername>(Constants.redis.cache.user.username, 7200);
 const avatarCache = new RedisCache<string | false>(Constants.redis.cache.user.avatar, 86400);
+const defaultAvatar = "https://cdn.discordapp.com/embed/avatars/0.png";
 
 export async function updateLastKnownUsername(member: MemberResolvable, tag: string) {
   const userId = getUserId(member);
@@ -100,7 +101,7 @@ export async function getIdFromUsername(username: string) {
 
 export async function getLastKnownAvatar(id: string) {
   const cached = await avatarCache.get(id);
-  if (cached !== null) return cached || null;
+  if (cached !== null) return cached || defaultAvatar;
 
   const query = await prisma.user.findUnique({
     where: {
@@ -113,7 +114,7 @@ export async function getLastKnownAvatar(id: string) {
 
   await avatarCache.set(id, query?.avatar || false);
 
-  return query?.avatar || null;
+  return query?.avatar || defaultAvatar;
 }
 
 export async function updateLastKnownAvatarCache(id: string, avatar: string) {
