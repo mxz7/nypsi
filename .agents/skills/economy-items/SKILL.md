@@ -24,6 +24,8 @@ Note: several older commands (`help.ts`, `autosell.ts`, `buy.ts`, `karmashop.ts`
 
 After calculating a cache miss, it asynchronously records one global `item-value-<itemId>` `GraphMetrics` row per day for historic graphs. An atomic Redis `SET NX EX` gate limits each item to one database existence check every 7–12 hours, and a shared `RedisMutex` serializes these checks across all processes. This history write is not awaited by the caller.
 
+Use `hasItemValueData(itemId)` when an action must only be available with a history-supported value. It returns true only when completed market or offer history provides a value, avoiding the `$1,000` fallback that can be retained in the value cache when no history exists.
+
 ## Recording item acquisition sources
 
 `addItemSourceStat(itemId, source, amount)` in `src/utils/functions/economy/inventory.ts` increments the global `ItemSourceStats` row identified by `(itemId, source)`. Call it explicitly and without `await` after a successful `addInventoryItem()` whenever an item is newly generated. The function handles and logs its own database errors. The season reset deletes all source-stat rows.

@@ -813,6 +813,25 @@ export async function getSellFilter(member: MemberResolvable) {
   return query;
 }
 
+function hasFixedItemValue(item: string) {
+  return (
+    getItems()[item].buy ||
+    item === "cookie" ||
+    item === "bitcoin" ||
+    item === "ethereum" ||
+    ["prey", "fish", "sellable", "ore"].includes(getItems()[item].role)
+  );
+}
+
+export async function hasItemValueData(item: string) {
+  const [marketAvg, offersAvg] = await Promise.all([
+    getMarketAverage(item),
+    getOffersAverage(item),
+  ]);
+
+  return marketAvg > 0 || offersAvg > 0;
+}
+
 export async function calcItemValue(item: string) {
   const cache = await itemValueCache.get(item);
 
@@ -820,13 +839,7 @@ export async function calcItemValue(item: string) {
 
   let itemValue = 1000;
 
-  if (
-    getItems()[item].buy ||
-    item === "cookie" ||
-    item === "bitcoin" ||
-    item === "ethereum" ||
-    ["prey", "fish", "sellable", "ore"].includes(getItems()[item].role)
-  ) {
+  if (hasFixedItemValue(item)) {
     itemValue = getItems()[item].sell || 1000;
   } else {
     const [marketAvg, offersAvg] = await Promise.all([
