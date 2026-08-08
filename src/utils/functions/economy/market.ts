@@ -65,7 +65,7 @@ async function withMarketLock<T>(itemId: string, operation: () => Promise<T>): P
 export async function checkMarketOrder(
   order: Market,
   client: NypsiClient,
-): Promise<boolean | number> {
+): Promise<{ fills: SettledMarketFill[]; remainingAmount: number } | undefined> {
   return withMarketLock(order.itemId, () => checkMarketOrderUnlocked(order, client));
 }
 
@@ -223,10 +223,12 @@ export async function createMarketOrder(
     },
   });
 
-  const checkSold = await checkMarketOrder(order, client);
-  let sold = false;
+  const settlement = await checkMarketOrder(order, client);
+  let sold = settlement?.remainingAmount === 0;
 
-  if (checkSold) {
+  if (settlement) {
+    amount = settlement.remainingAmount;
+
     const query = await prisma.market.findUnique({
       where: {
         id: order.id,
@@ -247,9 +249,15 @@ export async function createMarketOrder(
     }
   }
 
-  const response: { sold: boolean; amount: number; url?: string } = {
+  const response: {
+    sold: boolean;
+    amount: number;
+    fills: { amount: number; price: bigint }[];
+    url?: string;
+  } = {
     sold,
     amount,
+    fills: settlement?.fills.map((fill) => ({ amount: fill.amount, price: fill.price })) ?? [],
   };
 
   if (sold) return response;
@@ -385,7 +393,7 @@ export async function getMarketOrderEmbed(order: Market) {
 async function checkMarketOrderUnlocked(
   order: Market,
   client: NypsiClient,
-): Promise<boolean | number> {
+): Promise<{ fills: SettledMarketFill[]; remainingAmount: number } | undefined> {
   const candidateOrders = await prisma.market.findMany({
     where: {
       AND: [
@@ -405,7 +413,7 @@ async function checkMarketOrderUnlocked(
   });
 
   if (quote.fills.length === 0) {
-    return false;
+    return;
   }
 
   let settlement: { fills: SettledMarketFill[]; remainingAmount: number };
@@ -420,15 +428,14 @@ async function checkMarketOrderUnlocked(
       incomingOrder: order,
     });
   } catch {
-    return false;
+    return;
   }
 
   await invalidateMarketSettlementCaches(settlement.fills);
   await processMarketAutosell(settlement.fills, client);
   publishMarketSettlements(settlement.fills, client);
 
-  if (settlement.remainingAmount === 0) return true;
-  else return settlement.remainingAmount;
+  return settlement;
 }
 
 export async function updateMarketWatch(

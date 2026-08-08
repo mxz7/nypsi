@@ -449,4 +449,35 @@ describe("updateIncomingMarketOrder", () => {
     expect(transaction.market.delete).toHaveBeenCalledWith({ where: { id: 10 } });
     expect(transaction.market.update).not.toHaveBeenCalled();
   });
+
+  test("completes a fully filled incoming order without creating a zero-amount order", async () => {
+    const incomingOrder = {
+      ...order(10, "buy", 20_000, 2, "buyer"),
+      itemId: "cookie",
+      messageId: null,
+      createdAt: new Date(0),
+    };
+    const transaction = {
+      market: {
+        update: vi.fn().mockResolvedValue({}),
+        create: vi.fn().mockResolvedValue({}),
+        delete: vi.fn().mockResolvedValue({}),
+      },
+    };
+
+    const remaining = await updateIncomingMarketOrder(
+      transaction as never,
+      incomingOrder,
+      2,
+      false,
+    );
+
+    expect(remaining).toBe(0);
+    expect(transaction.market.update).toHaveBeenCalledWith({
+      where: { id: 10 },
+      data: { completed: true },
+    });
+    expect(transaction.market.create).not.toHaveBeenCalled();
+    expect(transaction.market.delete).not.toHaveBeenCalled();
+  });
 });
