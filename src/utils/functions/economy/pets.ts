@@ -17,6 +17,11 @@ import { getItems, getPetsData } from "./utils";
 const petsCache = new RedisCache<Pet[]>(Constants.redis.cache.economy.PETS, 180);
 const petsMutex = new RedisMutex("pets");
 
+export function getPetDisplayName(pet: Pet) {
+  const item = getItems()[getPetsData()[pet.petId].item];
+  return pet.name ?? item.name;
+}
+
 export async function getUserPets(member: MemberResolvable): Promise<Pet[]> {
   const userId = getUserId(member);
   const cache = await petsCache.get(userId);
@@ -76,7 +81,7 @@ export async function addPet(member: MemberResolvable, petId: string): Promise<P
 export async function updatePet(
   member: MemberResolvable,
   petId: string,
-  data: { level?: number; active?: boolean; activationIncrement?: number },
+  data: { level?: number; active?: boolean; activationIncrement?: number; name?: string | null },
 ): Promise<Pet> {
   const userId = getUserId(member);
   const pet = await prisma.pet.update({
@@ -84,6 +89,7 @@ export async function updatePet(
     data: {
       level: data.level,
       active: data.active,
+      name: data.name,
       activations:
         data.activationIncrement === undefined
           ? undefined
@@ -148,16 +154,15 @@ export async function deactivatePet(member: MemberResolvable, petId: string): Pr
   return updatePet(member, petId, { active: false });
 }
 
-async function addActivateNotification(user: MemberResolvable, petId: string) {
+async function addActivateNotification(user: MemberResolvable, pet: Pet) {
   if ((await getPreferences(user)).dms.petActivation) {
-    const pet = getPetsData()[petId];
-    const item = getItems()[pet.item];
+    const item = getItems()[getPetsData()[pet.petId].item];
 
     const userId = getUserId(user);
 
     await addInlineNotification({
       memberId: userId,
-      embed: new CustomEmbed(userId, `your ${item.emoji}  **${item.name}** pet activated!`),
+      embed: new CustomEmbed(userId, `your ${item.emoji} **${getPetDisplayName(pet)}** activated!`),
     });
   }
 }
@@ -187,7 +192,7 @@ export async function rollPet(
   logger.info(`pets: ${userId}'s ${pet.petId} activated`);
   await updatePet(member, pet.petId, { activationIncrement: 1 });
 
-  if (pet.petId !== "cow") addActivateNotification(userId, pet.petId);
+  if (pet.petId !== "cow") addActivateNotification(userId, pet);
 
   return data.benefit[levelIndex];
 }

@@ -22,8 +22,24 @@ generic effects framework, manager, repository, or separate manual upgrade flow.
   `benefit * 100`; fish, hunt, and mine descriptions omit the bonus placeholder. Cow's bakery
   benefit is `1`, which doubles the output.
 - Prisma storage uses the `Pet` model/table with `userId`, `petId`, `level`, `active`, and
-  `activations`. Do not create migrations; regenerate Prisma after schema changes.
+  `activations`, plus an optional custom `name`. Do not create migrations; regenerate Prisma after
+  schema changes.
 - Delete pets during the economy season reset and transfer them during profile transfer.
+
+## Naming
+
+- Paid naming logic lives in `src/utils/functions/economy/pet-names.ts`. The first named pet costs
+  $10 million and each additional currently named pet adds $10 million. Renaming uses the current
+  next-name price; removing a name always costs $5 million.
+- Pet names are limited to 16 characters and two words. They may contain only ASCII letters and
+  numbers, with one ordinary space separating the words, and must pass `isUserContentAllowed` with
+  `pet name` as the moderation source. Enforce the local format with `isValidPetName` in both the
+  command and the naming domain function.
+- Use `getPetDisplayName` when directly referring to a user's pet, including activation notices and
+  upgrade results. Keep the base species/category label in economy breakdowns so their source stays
+  clear.
+- In the pets command, keep the species as the page heading and select label and show the custom
+  name as a separate field.
 
 ## Economy functions
 
