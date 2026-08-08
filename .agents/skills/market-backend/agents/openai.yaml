@@ -1,0 +1,4 @@
+interface:
+  display_name: "Market Backend"
+  short_description: "Maintain Nypsi market matching and settlement"
+  default_prompt: "Use the market backend conventions to safely update order matching, settlement, locking, or cancellation."
