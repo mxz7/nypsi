@@ -1,5 +1,6 @@
 import { Pet } from "#generated/prisma";
 import prisma from "../../../init/database";
+import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { PetTarget } from "../../../types/Economy";
 import { RedisCache } from "../../cache";
@@ -8,14 +9,54 @@ import { logger } from "../../logger";
 import { getUserId, MemberResolvable } from "../member";
 import { RedisMutex } from "../mutex";
 import { percentChance } from "../random";
+import { pluralize } from "../string";
 import { addInlineNotification } from "../users/notifications";
 import { getPreferences } from "../users/preferences";
 import { getInventory, removeInventoryItem } from "./inventory";
 import { getUpgrades } from "./levelling";
 import { getItems, getPetsData } from "./utils";
+import ms = require("ms");
 
 const petsCache = new RedisCache<Pet[]>(Constants.redis.cache.economy.PETS, 180);
 const petsMutex = new RedisMutex("pets");
+const petActivationNotificationsMutex = new RedisMutex("pet-activation-notifications");
+const resultMessageTargets = new Set<PetTarget>(["bakery", "fish", "hunt", "mine"]);
+const petActivationWindow = ms("1 hour");
+const petActivationStateTtl = ms("2 hours") / 1000;
+
+type PetActivationState = {
+  startedAt: number;
+  activations: number;
+};
+
+export function getPetDisplayName(pet: Pet) {
+  const item = getItems()[getPetsData()[pet.petId].item];
+  return pet.name ?? item.name;
+}
+
+export function formatPetFoundItem(pet: Pet, found?: { itemId: string; amount: number }) {
+  const items = getItems();
+  const petItem = items[getPetsData()[pet.petId].item];
+
+  if (!found) {
+    return `${petItem.emoji} **${getPetDisplayName(pet)}** found **nothing**`;
+  }
+
+  const foundItem = items[found.itemId];
+  return `${petItem.emoji} **${getPetDisplayName(pet)}** found \`${found.amount.toLocaleString()}x\` ${foundItem.emoji} **${foundItem.name}**`;
+}
+
+export function takePetFoundItem(foundItems: Map<string, number>) {
+  const items = getItems();
+  const itemId = Array.from(foundItems.keys()).find((entry) => items[entry]);
+
+  if (!itemId) return;
+
+  const amount = foundItems.get(itemId);
+  foundItems.delete(itemId);
+
+  return { itemId, amount };
+}
 
 export async function getUserPets(member: MemberResolvable): Promise<Pet[]> {
   const userId = getUserId(member);
@@ -76,7 +117,7 @@ export async function addPet(member: MemberResolvable, petId: string): Promise<P
 export async function updatePet(
   member: MemberResolvable,
   petId: string,
-  data: { level?: number; active?: boolean; activationIncrement?: number },
+  data: { level?: number; active?: boolean; activationIncrement?: number; name?: string | null },
 ): Promise<Pet> {
   const userId = getUserId(member);
   const pet = await prisma.pet.update({
@@ -84,6 +125,7 @@ export async function updatePet(
     data: {
       level: data.level,
       active: data.active,
+      name: data.name,
       activations:
         data.activationIncrement === undefined
           ? undefined
@@ -148,17 +190,49 @@ export async function deactivatePet(member: MemberResolvable, petId: string): Pr
   return updatePet(member, petId, { active: false });
 }
 
-async function addActivateNotification(user: MemberResolvable, petId: string) {
-  if ((await getPreferences(user)).dms.petActivation) {
-    const pet = getPetsData()[petId];
-    const item = getItems()[pet.item];
+async function trackPetActivation(user: MemberResolvable) {
+  const userId = getUserId(user);
+  const key = `${Constants.redis.nypsi.PET_ACTIVATIONS}:${userId}`;
 
-    const userId = getUserId(user);
+  if (!(await getPreferences(userId)).dms.petActivation) {
+    await redis.del(key);
+    return;
+  }
 
-    await addInlineNotification({
-      memberId: userId,
-      embed: new CustomEmbed(userId, `your ${item.emoji}  **${item.name}** pet activated!`),
-    });
+  await petActivationNotificationsMutex.acquire(userId);
+
+  try {
+    const now = Date.now();
+    const stored = await redis.get(key);
+    let state: PetActivationState;
+
+    try {
+      state = stored ? JSON.parse(stored) : undefined;
+    } catch {
+      state = undefined;
+    }
+
+    if (!state?.startedAt || typeof state.activations !== "number") {
+      state = { startedAt: now, activations: 0 };
+    }
+
+    state.activations++;
+
+    if (now - state.startedAt < petActivationWindow) {
+      await redis.set(key, JSON.stringify(state), "EX", petActivationStateTtl);
+      return;
+    }
+
+    const embed = new CustomEmbed(
+      userId,
+      `your pets activated **${state.activations.toLocaleString()} ${pluralize("time", state.activations)}** in the past hour`,
+    ).setHeader("pet activations");
+
+    await addInlineNotification({ memberId: userId, embed });
+
+    await redis.del(key);
+  } finally {
+    petActivationNotificationsMutex.release(userId);
   }
 }
 
@@ -187,7 +261,7 @@ export async function rollPet(
   logger.info(`pets: ${userId}'s ${pet.petId} activated`);
   await updatePet(member, pet.petId, { activationIncrement: 1 });
 
-  if (pet.petId !== "cow") addActivateNotification(userId, pet.petId);
+  if (!resultMessageTargets.has(target)) await trackPetActivation(userId);
 
   return data.benefit[levelIndex];
 }

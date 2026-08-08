@@ -2,19 +2,32 @@ import {
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
+  LabelBuilder,
   MessageFlags,
+  ModalBuilder,
   StringSelectMenuBuilder,
   StringSelectMenuOptionBuilder,
+  TextInputBuilder,
+  TextInputStyle,
 } from "discord.js";
 import { Pet } from "#generated/prisma";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
-import { CustomContainer, ErrorEmbed } from "../models/EmbedBuilders";
+import { CustomContainer, CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { isUserContentAllowed } from "../utils/functions/ai/moderation";
 import { getInventory } from "../utils/functions/economy/inventory";
+import {
+  PET_NAME_REMOVAL_COST,
+  calcPetNameCost,
+  isValidPetName,
+  removePetName,
+  setPetName,
+} from "../utils/functions/economy/pet-names";
 import {
   activatePet,
   addPet,
   deactivatePet,
   getActivePets,
+  getPetDisplayName,
   getPetSlotCount,
   getUserPet,
   getUserPets,
@@ -51,7 +64,12 @@ async function runPets(
     const search = args.join(" ").toLowerCase();
     selectedPetId = userPets.find((pet) => {
       const item = getItems()[getPetsData()[pet.petId].item];
-      return pet.petId === search || item.name === search || item.aliases?.includes(search);
+      return (
+        pet.petId === search ||
+        pet.name?.toLowerCase() === search ||
+        item.name === search ||
+        item.aliases?.includes(search)
+      );
     })?.petId;
 
     if (!selectedPetId) {
@@ -93,7 +111,8 @@ async function runPets(
           : activePets
               .map((pet) => {
                 const item = getItems()[getPetsData()[pet.petId].item];
-                return `${item.emoji} **${item.name}** (${pet.level})\n- ${formatDescription(pet)}`;
+                const name = pet.name ? `\n- **name** ${pet.name}` : "";
+                return `${item.emoji} **${item.name}** (${pet.level})${name}\n- ${formatDescription(pet)}`;
               })
               .join("\n\n");
 
@@ -117,6 +136,7 @@ async function runPets(
     const requiredItems = petData.items[pet.level];
     const canUpgrade =
       requiredItems !== undefined && inventory.count(petData.item) >= requiredItems;
+    const namingCost = calcPetNameCost(userPets.filter((entry) => entry.name).length);
     const nextLevel =
       requiredItems !== undefined
         ? `\n\n\`${requiredItems.toLocaleString()}x\` needed for next level`
@@ -132,11 +152,22 @@ async function runPets(
       .setLabel("level up")
       .setStyle(canUpgrade ? ButtonStyle.Success : ButtonStyle.Secondary)
       .setDisabled(disabled || !canUpgrade);
+    const name = new ButtonBuilder()
+      .setCustomId("pets-name")
+      .setLabel(`${pet.name ? "rename" : "name"} ($${namingCost.toLocaleString()})`)
+      .setStyle(ButtonStyle.Secondary)
+      .setDisabled(disabled);
+    const removeName = new ButtonBuilder()
+      .setCustomId("pets-remove-name")
+      .setLabel(`remove name ($${PET_NAME_REMOVAL_COST.toLocaleString()})`)
+      .setStyle(ButtonStyle.Danger)
+      .setDisabled(disabled || !pet.name);
 
     return new CustomContainer(message.member)
       .addTextDisplayComponents((text) =>
         text.setContent(
           `## ${item.emoji} ${item.name}\n` +
+            `**name** ${pet.name ?? "not named"}\n` +
             `**level** ${pet.level}/${petData.items.length}\n` +
             `**status** ${pet.active ? "active" : "inactive"}\n` +
             `**effect** ${formatDescription(pet)}\n` +
@@ -147,6 +178,7 @@ async function runPets(
       .addSeparatorComponents((separator) => separator)
       .addActionRowComponents((row) => row.addComponents(select))
       .addActionRowComponents((row) => row.addComponents(toggle, levelUp))
+      .addActionRowComponents((row) => row.addComponents(name, removeName))
       .addTextDisplayComponents((text) =>
         text.setContent(`-# active pets ${activePets.length}/${slots}`),
       );
@@ -167,10 +199,87 @@ async function runPets(
     if (interaction.isStringSelectMenu()) {
       selectedPetId = interaction.values[0] === "overview" ? undefined : interaction.values[0];
     } else if (interaction.isButton()) {
+      if (interaction.customId === "pets-name") {
+        const pet = await getUserPet(message.member, selectedPetId);
+        const modal = new ModalBuilder()
+          .setCustomId("pets-name-modal")
+          .setTitle(`name ${getItems()[getPetsData()[selectedPetId].item].name}`)
+          .addLabelComponents(
+            new LabelBuilder().setLabel("pet name").setTextInputComponent(
+              new TextInputBuilder()
+                .setCustomId("name")
+                .setPlaceholder(pet?.name ?? "enter a name")
+                .setMaxLength(16)
+                .setRequired(true)
+                .setStyle(TextInputStyle.Short),
+            ),
+          );
+
+        await interaction.showModal(modal);
+
+        const submission = await interaction
+          .awaitModalSubmit({
+            filter: (entry) => entry.user.id === message.author.id,
+            time: 120_000,
+          })
+          .catch((): undefined => undefined);
+
+        if (!submission) return;
+
+        const name = submission.fields.getTextInputValue("name").trim();
+
+        if (!isValidPetName(name)) {
+          await submission.reply({
+            flags: MessageFlags.Ephemeral,
+            embeds: [
+              new ErrorEmbed(
+                "pet names can contain only letters and numbers, with up to 2 words and 16 characters",
+              ),
+            ],
+          });
+          return;
+        }
+
+        if (
+          !(await isUserContentAllowed(name, {
+            source: "pet name",
+            userId: message.author.id,
+          }))
+        ) {
+          await submission.reply({
+            flags: MessageFlags.Ephemeral,
+            embeds: [new ErrorEmbed("invalid name")],
+          });
+          return;
+        }
+
+        let namedPet: Pet;
+
+        try {
+          namedPet = await setPetName(message.member, selectedPetId, name);
+        } catch (error) {
+          const messageText = error instanceof Error ? error.message : "failed to name pet";
+          await submission.reply({
+            flags: MessageFlags.Ephemeral,
+            embeds: [new ErrorEmbed(messageText)],
+          });
+          return;
+        }
+
+        await submission.reply({
+          flags: MessageFlags.Ephemeral,
+          embeds: [new CustomEmbed(message.member, `${getPetDisplayName(namedPet)} is now named`)],
+        });
+        await response.edit({ components: [await render()] });
+        return;
+      }
+
       try {
         if (interaction.customId === "pets-level-up") {
           await addPet(message.member, selectedPetId);
-        } else {
+        } else if (interaction.customId === "pets-remove-name") {
+          await removePetName(message.member, selectedPetId);
+        } else if (interaction.customId === "pets-toggle") {
           const pet = await getUserPet(message.member, selectedPetId);
           if (pet?.active) {
             await deactivatePet(message.member, selectedPetId);
@@ -189,7 +298,7 @@ async function runPets(
             activePets
               .map((pet) => {
                 const item = getItems()[getPetsData()[pet.petId].item];
-                return `${item.emoji} ${item.name}`;
+                return `${item.emoji} ${getPetDisplayName(pet)}`;
               })
               .join("\n"),
           );
