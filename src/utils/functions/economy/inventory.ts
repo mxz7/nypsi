@@ -226,6 +226,22 @@ async function doAutosellThing(
   return;
 }
 
+export async function autosellInventoryItem(
+  member: MemberResolvable,
+  itemId: string,
+  amount: number,
+  client?: NypsiClient,
+) {
+  const userId = getUserId(member);
+
+  if (amount <= 0 || !(await getAutosellItems(userId)).includes(itemId)) return false;
+
+  await removeInventoryItem(userId, itemId, amount);
+  await doAutosellThing(userId, itemId, amount, client);
+
+  return true;
+}
+
 export async function addInventoryItem(member: MemberResolvable, itemId: string, amount: number) {
   const userId = getUserId(member);
 
