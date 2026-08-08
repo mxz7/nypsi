@@ -73,7 +73,7 @@ export class RedisMutex extends Mutex {
   private readonly ttl: number;
   private readonly pollInterval: number;
   private readonly prefix: string;
-  private tokens = new Map<string | undefined, string>();
+  private locks = new Map<string | undefined, { acquiredAt: number; token: string }>();
 
   /**
    * @param prefix        - lock key namespace, used directly when acquire/release omit a key
@@ -92,16 +92,21 @@ export class RedisMutex extends Mutex {
     return key === undefined ? this.prefix : `${this.prefix}:${key}`;
   }
 
-  private async acquireOnce(key?: string): Promise<boolean> {
+  private async acquireOnce(key: string | undefined, requestedAt: number): Promise<boolean> {
     const token = crypto.randomUUID();
     const redisKey = this.redisKey(key);
     const result = await redis.set(redisKey, token, "PX", this.ttl, "NX");
 
     if (result !== "OK") return false;
 
-    this.tokens.set(key, token);
+    const acquiredAt = Date.now();
+
+    this.locks.set(key, { acquiredAt, token });
     if (this.shouldLog) {
-      logger.debug(`redis-mutex: acquired ${redisKey}`);
+      logger.debug(`redis-mutex: acquired ${redisKey}`, {
+        redisKey,
+        waitMs: acquiredAt - requestedAt,
+      });
     }
 
     return true;
@@ -109,38 +114,49 @@ export class RedisMutex extends Mutex {
 
   async tryAcquire(key?: string): Promise<boolean> {
     const redisKey = this.redisKey(key);
+    const requestedAt = Date.now();
 
     if (this.shouldLog) {
       logger.debug(`redis-mutex: requested ${redisKey}`);
     }
 
-    return this.acquireOnce(key);
+    return this.acquireOnce(key, requestedAt);
   }
 
   async acquire(key?: string): Promise<void> {
     const redisKey = this.redisKey(key);
+    const requestedAt = Date.now();
 
     if (this.shouldLog) {
       logger.debug(`redis-mutex: requested ${redisKey}`);
     }
 
-    while (!(await this.acquireOnce(key))) {
+    while (!(await this.acquireOnce(key, requestedAt))) {
       await sleep(this.pollInterval);
     }
   }
 
   release(key?: string): void {
-    if (this.shouldLog) {
-      logger.debug(`redis-mutex: release ${this.redisKey(key)}`);
-    }
+    const lock = this.locks.get(key);
+    if (!lock) return;
 
-    const token = this.tokens.get(key);
-    if (!token) return;
+    const redisKey = this.redisKey(key);
 
-    this.tokens.delete(key);
+    this.locks.delete(key);
 
-    redis.eval(RELEASE_SCRIPT, 1, this.redisKey(key), token).catch((err) => {
-      logger.error(`redis-mutex: release error for ${this.redisKey(key)}`, err);
-    });
+    redis
+      .eval(RELEASE_SCRIPT, 1, redisKey, lock.token)
+      .then((result) => {
+        if (this.shouldLog) {
+          logger.debug(`redis-mutex: released ${redisKey}`, {
+            heldMs: Date.now() - lock.acquiredAt,
+            redisKey,
+            released: result === 1,
+          });
+        }
+      })
+      .catch((err) => {
+        logger.error(`redis-mutex: release error for ${redisKey}`, err);
+      });
   }
 }
