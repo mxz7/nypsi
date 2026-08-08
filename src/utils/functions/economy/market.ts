@@ -77,13 +77,34 @@ async function lockMarketRows(
   itemId: string,
   orderIds: number[],
 ) {
+  const advisoryStartedAt = Date.now();
+
+  logger.debug("market: waiting for postgres advisory lock", { itemId });
   await prisma.$queryRaw`SELECT pg_advisory_xact_lock(hashtext('market'), hashtext(${itemId}))`;
+  logger.debug("market: acquired postgres advisory lock", {
+    itemId,
+    waitMs: Date.now() - advisoryStartedAt,
+  });
 
   if (orderIds.length === 0) return;
 
+  const sortedOrderIds = [...orderIds].sort((a, b) => a - b);
+  const rowsStartedAt = Date.now();
+
+  logger.debug("market: waiting for postgres row locks", {
+    itemId,
+    orderCount: sortedOrderIds.length,
+    orderIds: sortedOrderIds,
+  });
   await prisma.$queryRaw`SELECT "id" FROM "Market" WHERE "id" IN (${Prisma.join(
-    [...orderIds].sort((a, b) => a - b),
+    sortedOrderIds,
   )}) ORDER BY "id" FOR UPDATE`;
+  logger.debug("market: acquired postgres row locks", {
+    itemId,
+    orderCount: sortedOrderIds.length,
+    orderIds: sortedOrderIds,
+    waitMs: Date.now() - rowsStartedAt,
+  });
 }
 
 export async function marketSell(
