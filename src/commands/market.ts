@@ -1787,8 +1787,13 @@ async function run(
         .setCustomId("confirm")
         .setLabel(`confirm ${type}`)
         .setStyle(ButtonStyle.Primary),
-      new ButtonBuilder().setCustomId("cancel").setLabel("cancel").setStyle(ButtonStyle.Danger),
     );
+
+    if (!fromCommand) {
+      row.addComponents(
+        new ButtonBuilder().setCustomId("cancel").setLabel("cancel").setStyle(ButtonStyle.Danger),
+      );
+    }
 
     const getPrice = async () =>
       (await getMarketTransactionData(item.id, amount, type == "buy" ? "sell" : "buy", member))
