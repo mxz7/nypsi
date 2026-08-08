@@ -82,77 +82,74 @@ async function lockMarketRows(
   },
 ) {
   const { itemId } = request;
+  const sortedOrderIds = [...(request.orderIds ?? [])].sort((a, b) => a - b);
+  const inventoryUserIds = [...new Set(request.inventoryUserIds ?? [])].sort();
+  const balanceUserIds = [...new Set(request.balanceUserIds ?? [])].sort();
+  const startedAt = Date.now();
   const advisoryStartedAt = Date.now();
 
-  logger.debug("market: waiting for postgres advisory lock", { itemId });
-  await prisma.$queryRaw`SELECT pg_advisory_xact_lock(hashtext('market'), hashtext(${itemId}))::text`;
-  logger.debug("market: acquired postgres advisory lock", {
+  logger.debug("market: acquiring postgres locks", {
+    balanceUserCount: balanceUserIds.length,
+    inventoryUserCount: inventoryUserIds.length,
     itemId,
-    waitMs: Date.now() - advisoryStartedAt,
+    orderCount: sortedOrderIds.length,
+    orderIds: sortedOrderIds,
   });
 
-  const sortedOrderIds = [...(request.orderIds ?? [])].sort((a, b) => a - b);
+  await prisma.$queryRaw`SELECT pg_advisory_xact_lock(hashtext('market'), hashtext(${itemId}))::text`;
+  const advisoryWaitMs = Date.now() - advisoryStartedAt;
+
+  let marketRowsWaitMs = 0;
 
   if (sortedOrderIds.length > 0) {
-    const startedAt = Date.now();
+    const rowsStartedAt = Date.now();
 
-    logger.debug("market: waiting for postgres row locks", {
-      itemId,
-      orderCount: sortedOrderIds.length,
-      orderIds: sortedOrderIds,
-    });
     await prisma.$queryRaw`SELECT "id" FROM "Market" WHERE "id" IN (${Prisma.join(
       sortedOrderIds,
     )}) ORDER BY "id" FOR UPDATE`;
-    logger.debug("market: acquired postgres row locks", {
-      itemId,
-      orderCount: sortedOrderIds.length,
-      orderIds: sortedOrderIds,
-      waitMs: Date.now() - startedAt,
-    });
+    marketRowsWaitMs = Date.now() - rowsStartedAt;
   }
 
-  const inventoryUserIds = [...new Set(request.inventoryUserIds ?? [])].sort();
+  let inventoryRowsWaitMs = 0;
+  let lockedInventoryRowCount = 0;
 
   if (inventoryUserIds.length > 0) {
-    const startedAt = Date.now();
+    const rowsStartedAt = Date.now();
 
-    logger.debug("market: waiting for postgres inventory row locks", {
-      itemId,
-      userCount: inventoryUserIds.length,
-      userIds: inventoryUserIds,
-    });
     const rows = await prisma.$queryRaw<{ userId: string }[]>`SELECT "userId" FROM "Inventory"
       WHERE "item" = ${itemId} AND "userId" IN (${Prisma.join(inventoryUserIds)})
       ORDER BY "userId" FOR UPDATE`;
-    logger.debug("market: acquired postgres inventory row locks", {
-      itemId,
-      lockedRowCount: rows.length,
-      userCount: inventoryUserIds.length,
-      userIds: inventoryUserIds,
-      waitMs: Date.now() - startedAt,
-    });
+    inventoryRowsWaitMs = Date.now() - rowsStartedAt;
+    lockedInventoryRowCount = rows.length;
   }
 
-  const balanceUserIds = [...new Set(request.balanceUserIds ?? [])].sort();
+  let balanceRowsWaitMs = 0;
+  let lockedBalanceRowCount = 0;
 
   if (balanceUserIds.length > 0) {
-    const startedAt = Date.now();
+    const rowsStartedAt = Date.now();
 
-    logger.debug("market: waiting for postgres balance row locks", {
-      userCount: balanceUserIds.length,
-      userIds: balanceUserIds,
-    });
     const rows = await prisma.$queryRaw<{ userId: string }[]>`SELECT "userId" FROM "Economy"
       WHERE "userId" IN (${Prisma.join(balanceUserIds)})
       ORDER BY "userId" FOR UPDATE`;
-    logger.debug("market: acquired postgres balance row locks", {
-      lockedRowCount: rows.length,
-      userCount: balanceUserIds.length,
-      userIds: balanceUserIds,
-      waitMs: Date.now() - startedAt,
-    });
+    balanceRowsWaitMs = Date.now() - rowsStartedAt;
+    lockedBalanceRowCount = rows.length;
   }
+
+  logger.debug("market: acquired postgres locks", {
+    advisoryWaitMs,
+    balanceRowsWaitMs,
+    balanceUserCount: balanceUserIds.length,
+    inventoryRowsWaitMs,
+    inventoryUserCount: inventoryUserIds.length,
+    itemId,
+    lockedBalanceRowCount,
+    lockedInventoryRowCount,
+    marketRowsWaitMs,
+    orderCount: sortedOrderIds.length,
+    orderIds: sortedOrderIds,
+    totalWaitMs: Date.now() - startedAt,
+  });
 }
 
 export async function marketSell(
