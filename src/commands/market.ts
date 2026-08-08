@@ -1837,7 +1837,36 @@ async function run(
       const { res, interaction } = response;
 
       if (res == "confirm") {
-        price = await getPrice();
+        const refreshedPrice = await getPrice();
+
+        if (refreshedPrice == -1) {
+          await interaction.reply({
+            embeds: [new ErrorEmbed(`not enough ${item.plural} on the market`)],
+            flags: MessageFlags.Ephemeral,
+          });
+          return await msg.edit({
+            embeds: [new ErrorEmbed(`not enough ${item.plural} on the market`)],
+            components: [],
+          });
+        }
+
+        if (refreshedPrice !== price) {
+          await interaction.reply({
+            embeds: [
+              new CustomEmbed(message.member).setDescription(
+                `⚠️ order cancelled because the price changed from **$${price.toLocaleString()}** to **$${refreshedPrice.toLocaleString()}**`,
+              ),
+            ],
+            flags: MessageFlags.Ephemeral,
+          });
+
+          setConfirmationDescription(refreshedPrice, price);
+          price = refreshedPrice;
+          priceChangeVisible = true;
+          await msg.edit({ embeds: [embed], components: [row] });
+
+          return pageManager();
+        }
 
         const transaction =
           type == "buy"
