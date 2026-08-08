@@ -419,8 +419,7 @@ async function checkMarketOrderUnlocked(
       incomingLimitPrice: order.price,
       incomingOrder: order,
     });
-  } catch (e) {
-    logger.error("market: failed to settle crossed order", { error: e, orderId: order.id });
+  } catch {
     return false;
   }
 
@@ -697,46 +696,86 @@ async function settleMarketFills(request: {
   incomingLimitPrice?: bigint;
   incomingOrder?: Market;
 }) {
-  const [policies, taxRate, seasonInterim] = await Promise.all([
-    prepareMarketFillPolicies(request.fills, request.incomingUserId),
-    getTax(),
-    redis.exists(Constants.redis.nypsi.INFINITE_MAX_BET).then(Boolean),
-  ]);
+  const context = {
+    fills: request.fills.map((fill) => ({
+      amount: fill.amount,
+      orderId: fill.order.id,
+      price: fill.order.price,
+      side: fill.order.orderType,
+    })),
+    incomingAssetsEscrowed: request.incomingAssetsEscrowed,
+    incomingLimitPrice: request.incomingLimitPrice,
+    incomingOrderId: request.incomingOrder?.id,
+    incomingUserId: request.incomingUserId,
+    requestedAmount: request.requestedAmount,
+  };
 
-  return prisma.$transaction(async (tx) => {
-    const results: SettledMarketFill[] = [];
+  logger.debug("market: starting settlement", context);
 
-    for (const fill of request.fills) {
-      const policy = policies.get(fill.order.id)!;
-      const result = await settleMarketFill(tx as Prisma.TransactionClient, {
-        orderId: fill.order.id,
-        incomingUserId: request.incomingUserId,
-        amount: fill.amount,
-        taxRate,
-        sellerTaxExempt: policy.sellerTaxExempt,
-        incomingAssetsEscrowed: request.incomingAssetsEscrowed,
-        incomingLimitPrice: request.incomingLimitPrice,
-        isAlt: policy.isAlt,
-        seasonInterim,
-      });
+  try {
+    const [policies, taxRate, seasonInterim] = await Promise.all([
+      prepareMarketFillPolicies(request.fills, request.incomingUserId),
+      getTax(),
+      redis.exists(Constants.redis.nypsi.INFINITE_MAX_BET).then(Boolean),
+    ]);
 
-      if (!result) throw new Error("market order changed during settlement");
+    const settlement = await prisma.$transaction(async (tx) => {
+      const results: SettledMarketFill[] = [];
 
-      results.push(result);
-    }
-
-    const filledAmount = results.reduce((total, fill) => total + fill.amount, 0);
-    const remainingAmount = request.incomingOrder
-      ? await updateIncomingMarketOrder(
-          tx as Prisma.TransactionClient,
-          request.incomingOrder,
-          filledAmount,
+      for (const fill of request.fills) {
+        const policy = policies.get(fill.order.id)!;
+        const result = await settleMarketFill(tx as Prisma.TransactionClient, {
+          orderId: fill.order.id,
+          incomingUserId: request.incomingUserId,
+          amount: fill.amount,
+          taxRate,
+          sellerTaxExempt: policy.sellerTaxExempt,
+          incomingAssetsEscrowed: request.incomingAssetsEscrowed,
+          incomingLimitPrice: request.incomingLimitPrice,
+          isAlt: policy.isAlt,
           seasonInterim,
-        )
-      : request.requestedAmount - filledAmount;
+        });
 
-    return { fills: results, remainingAmount };
-  });
+        if (!result) throw new Error("market order changed during settlement");
+
+        results.push(result);
+      }
+
+      const filledAmount = results.reduce((total, fill) => total + fill.amount, 0);
+      const remainingAmount = request.incomingOrder
+        ? await updateIncomingMarketOrder(
+            tx as Prisma.TransactionClient,
+            request.incomingOrder,
+            filledAmount,
+            seasonInterim,
+          )
+        : request.requestedAmount - filledAmount;
+
+      return { fills: results, remainingAmount };
+    });
+
+    logger.debug("market: settlement committed", {
+      ...context,
+      filledAmount: settlement.fills.reduce((total, fill) => total + fill.amount, 0),
+      remainingAmount: settlement.remainingAmount,
+      results: settlement.fills.map((fill) => ({
+        amount: fill.amount,
+        buyerId: fill.buyerId,
+        gross: fill.gross,
+        orderId: fill.restingOrderId,
+        price: fill.price,
+        refund: fill.incomingRefund,
+        sellerId: fill.sellerId,
+        sellerProceeds: fill.sellerProceeds,
+        sellerTax: fill.sellerTax,
+      })),
+    });
+
+    return settlement;
+  } catch (error) {
+    logger.error("market: settlement failed", { ...context, error });
+    throw error;
+  }
 }
 
 async function invalidateMarketSettlementCaches(fills: SettledMarketFill[]) {
@@ -781,7 +820,15 @@ async function invalidateMarketSettlementCaches(fills: SettledMarketFill[]) {
     }
   }
 
-  if (keys.length > 0) await redis.del(...new Set(keys));
+  if (keys.length > 0) {
+    const uniqueKeys = [...new Set(keys)];
+
+    await redis.del(...uniqueKeys);
+    logger.debug("market: invalidated settlement caches", {
+      fillOrderIds: fills.map((fill) => fill.restingOrderId),
+      keyCount: uniqueKeys.length,
+    });
+  }
 }
 
 async function processMarketAutosell(fills: SettledMarketFill[], client: NypsiClient) {
@@ -951,9 +998,7 @@ async function marketSellUnlocked(
       requestedAmount: amount,
       incomingAssetsEscrowed: false,
     });
-  } catch (e) {
-    logger.error("market: sell transaction failed", { error: e, itemId, userId });
-
+  } catch {
     return { status: "internal error", remaining: -1 };
   }
 
@@ -1033,9 +1078,7 @@ async function marketBuyUnlocked(
       requestedAmount: amount,
       incomingAssetsEscrowed: false,
     });
-  } catch (e) {
-    logger.error("market: buy transaction failed", { error: e, itemId, userId });
-
+  } catch {
     return { status: "internal error", remaining: -1 };
   }
 

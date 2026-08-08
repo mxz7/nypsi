@@ -151,7 +151,11 @@ export async function settleMarketFill(
       select: { money: true },
     });
 
-    if (result.money < 0n) throw new Error("insufficient balance during market settlement");
+    if (result.money < 0n) {
+      throw new Error(
+        `insufficient balance during market settlement: resulting balance ${result.money}`,
+      );
+    }
   }
 
   if (accounting.incomingItemDebit > 0) {
@@ -161,7 +165,11 @@ export async function settleMarketFill(
       select: { amount: true },
     });
 
-    if (result.amount < 0n) throw new Error("insufficient inventory during market settlement");
+    if (result.amount < 0n) {
+      throw new Error(
+        `insufficient inventory during market settlement: resulting amount ${result.amount}`,
+      );
+    }
 
     if (result.amount === 0n) {
       await prisma.inventory.delete({
