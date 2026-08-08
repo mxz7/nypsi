@@ -161,7 +161,9 @@ export class NypsiClient extends Client {
 
       logger.info("listeners loaded");
 
-      startCmdChannelManager(this);
+      setTimeout(() => {
+        startCmdChannelManager(this);
+      }, ms("10 minutes"));
 
       setTimeout(async () => {
         this.runIntervals();
