@@ -15,7 +15,7 @@ description: Maintain Nypsi's player market backend, including order matching, f
 - Never restore the legacy local `Set`, `MARKET_IN_TRANSACTION` Redis key, recursive polling, or
   timeout-based forced unlocks.
 - Let exported mutation entry points acquire the lock. Helpers called within them, including
-  `completeOrder()`, must assume the caller already holds it; `RedisMutex` is not reentrant.
+  `settleMarketFill()`, must assume the caller already holds it; `RedisMutex` is not reentrant.
 - After waiting for the lock, re-read mutable rows before changing them. Cancellation follows this
   pattern so a fill that won the race returns `false` instead of deleting stale state.
 - Keep Discord requests and other slow post-mutation effects outside the locked section when they do
@@ -24,9 +24,16 @@ description: Maintain Nypsi's player market backend, including order matching, f
 ## Settlement
 
 - Treat balance, inventory, escrow, and market-row changes as one settlement boundary.
-- Be aware that the current `completeOrder()` passes a Prisma transaction client only to market-row
-  operations; existing balance and inventory helpers use the global Prisma client. Do not assume the
-  current settlement is fully atomic when refactoring it.
+- Keep market-row state/history, escrow consumption, wallet/inventory transfers, buyer refunds, and
+  tax-bank credits together in `market/settlement.ts` using the provided Prisma transaction client.
+- For balance and inventory debits, use `update` with the resulting value selected and throw if it is
+  negative; the transaction rollback restores the original value. Avoid conditional `updateMany`
+  guards for these debits.
+- Calculate tax from the executed value and the actual seller's premium tier, regardless of which
+  side owns the resting order.
+- Invalidate balance, inventory, item-existence, and gem caches only after commit. Run acquisition
+  autosell after commit as a separate follow-up so it cannot escape or invalidate the market
+  transaction.
 - Keep stats, transaction logs, DMs, watcher notifications, and Discord message updates outside the
   database transaction. Derive them from a committed structured result.
 - Preserve season-interim and alt-account history behavior unless the task explicitly changes it.
