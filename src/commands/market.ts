@@ -543,20 +543,13 @@ async function run(
               message.client as NypsiClient,
             );
 
-            let description: string;
-
-            if (createRes.sold) {
-              description = `✅ your buy order has been instantly fulfilled`;
-            } else if (createRes.amount < parseInt(amount)) {
-              description = `✅ your buy order has been partially fulfilled`;
-            } else {
-              description = `✅ your buy order has been created`;
-            }
-
-            if (createRes.url) description = `[${description}](${createRes.url})`;
-
             await res.editReply({
-              embeds: [new CustomEmbed(message.member, description)],
+              embeds: [
+                new CustomEmbed(
+                  message.member,
+                  formatOrderCreation(createRes, "buy", selected, cost),
+                ),
+              ],
               options: { flags: MessageFlags.Ephemeral },
             });
           } else if (type == "sell") {
@@ -625,20 +618,13 @@ async function run(
               message.client as NypsiClient,
             );
 
-            let description: string;
-
-            if (createRes.sold) {
-              description = `✅ your sell order has been instantly fulfilled`;
-            } else if (createRes.amount < parseInt(amount)) {
-              description = `✅ your sell order has been partially fulfilled`;
-            } else {
-              description = `✅ your sell order has been created`;
-            }
-
-            if (createRes.url) description = `[${description}](${createRes.url})`;
-
             await res.editReply({
-              embeds: [new CustomEmbed(message.member, description)],
+              embeds: [
+                new CustomEmbed(
+                  message.member,
+                  formatOrderCreation(createRes, "sell", selected, cost),
+                ),
+              ],
               options: { flags: MessageFlags.Ephemeral },
             });
           }
@@ -788,6 +774,36 @@ async function run(
     return { msg: msg, reaction: reaction as ButtonInteraction };
   };
 
+  const formatOrderCreation = (
+    result: Awaited<ReturnType<typeof createMarketOrder>>,
+    type: OrderType,
+    selected: Item,
+    price: number,
+  ) => {
+    if (result.fills.length === 0) {
+      let description = `✅ your ${type} order has been created`;
+
+      if (result.url) description = `[${description}](${result.url})`;
+
+      return description;
+    }
+
+    const fulfilled = result.fills
+      .map(
+        (fill) =>
+          `- \`${fill.amount.toLocaleString()}x\` at **$${fill.price.toLocaleString()} each**`,
+      )
+      .join("\n");
+
+    if (result.amount === 0) return `✅ **fulfilled:**\n${fulfilled}`;
+
+    let created = `**${result.amount.toLocaleString()}x** ${selected.emoji} ${selected.name} at **$${price.toLocaleString()} each**`;
+
+    if (result.url) created = `[${created}](${result.url})`;
+
+    return `✅ created as a ${type} order: ${created}\n\n**fulfilled:**\n${fulfilled}`;
+  };
+
   const createOrder = async (
     type: OrderType,
     selected: Item,
@@ -903,16 +919,10 @@ async function run(
       type,
       message.client as NypsiClient,
     );
-    let description: string;
-
-    if (result.sold) description = `✅ your ${type} order has been instantly fulfilled`;
-    else if (result.amount < itemAmount) {
-      description = `✅ your ${type} order has been partially fulfilled`;
-    } else description = `✅ your ${type} order has been created`;
-
-    if (result.url) description = `[${description}](${result.url})`;
-
-    const embed = new CustomEmbed(message.member, description);
+    const embed = new CustomEmbed(
+      message.member,
+      formatOrderCreation(result, type, selected, cost),
+    );
 
     if (msg) return msg.edit({ embeds: [embed], components: [] });
     return send({ embeds: [embed] });
