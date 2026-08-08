@@ -540,6 +540,7 @@ model Pet {
   level       Int     @default(1)
   active      Boolean @default(false)
   activations BigInt  @default(0)
+  name        String?
 
   economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
