@@ -140,7 +140,7 @@
       "id": "leaderboards",
       "name": "privacy",
       "description": "enabling privacy hides your username from global leaderboards and stops your profile being visible on the nypsi website",
-      "default": true
+      "default": false
     },
     "tips": {
       "id": "tips",
