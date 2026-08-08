@@ -37,6 +37,7 @@ import { getPreferences } from "../users/preferences";
 import { getLastKnownAvatar, getLastKnownUsername } from "../users/username";
 import { addBalance, getBalance, removeBalance } from "./balance";
 import { addInventoryItem, getInventory, isGem, removeInventoryItem } from "./inventory";
+import { quoteMarketOrder } from "./market/matching";
 import { addStat } from "./stats";
 import { createUser, getItems, userExists } from "./utils";
 
@@ -380,7 +381,7 @@ async function checkMarketOrderUnlocked(
   order: Market,
   client: NypsiClient,
 ): Promise<boolean | number> {
-  const validOrders = await prisma.market.findMany({
+  const candidateOrders = await prisma.market.findMany({
     where: {
       AND: [
         { itemId: order.itemId },
@@ -390,10 +391,15 @@ async function checkMarketOrderUnlocked(
         { ownerId: { not: order.ownerId } },
       ],
     },
-    orderBy: { id: "desc" },
+  });
+  const quote = quoteMarketOrder(candidateOrders, {
+    side: order.orderType,
+    amount: order.itemAmount,
+    limitPrice: order.price,
+    ownerId: order.ownerId,
   });
 
-  if (validOrders.length === 0) {
+  if (quote.fills.length === 0) {
     return false;
   }
 
@@ -402,18 +408,10 @@ async function checkMarketOrderUnlocked(
 
   try {
     await prisma.$transaction(async (prisma) => {
-      for (const validOrder of validOrders) {
-        let amount: number;
-
-        if (validOrder.itemAmount > remaining) {
-          amount = remaining;
-          remaining = 0;
-        } else {
-          amount = validOrder.itemAmount;
-          remaining -= validOrder.itemAmount;
-        }
-
-        if (amount === 0) break;
+      for (const fill of quote.fills) {
+        const validOrder = fill.order;
+        const amount = fill.amount;
+        remaining -= amount;
 
         const res = await completeOrder(
           validOrder.id,
@@ -694,27 +692,17 @@ export async function getMarketTransactionData(
         { ownerId: { not: getUserId(excludeMember) } },
       ],
     },
-    orderBy: [{ price: type == "buy" ? "desc" : "asc" }, { id: "asc" }],
   });
-  const orders: Market[] = [];
+  const quote = quoteMarketOrder(allOrders, {
+    side: type === "sell" ? "buy" : "sell",
+    amount,
+    ownerId: getUserId(excludeMember),
+  });
 
-  let cost = 0;
-
-  for (const order of allOrders) {
-    if (amount >= order.itemAmount) {
-      cost += Number(order.price) * order.itemAmount;
-      amount -= order.itemAmount;
-      orders.push(order);
-      if (amount <= 0) break;
-    } else {
-      cost += Number(order.price) * amount;
-      amount = 0;
-      orders.push(order);
-      break;
-    }
-  }
-
-  return { cost: amount == 0 ? cost : -1, orders: orders };
+  return {
+    cost: quote.remainingAmount === 0 ? Number(quote.total) : -1,
+    orders: quote.fills.map((fill) => fill.order),
+  };
 }
 
 export async function completeOrder(

@@ -33,6 +33,9 @@ description: Maintain Nypsi's player market backend, including order matching, f
 
 ## Matching
 
+- Keep price-time selection and quote arithmetic pure in
+  `src/utils/functions/economy/market/matching.ts`. Database functions should fetch candidate rows
+  and pass them to `quoteMarketOrder()` rather than implementing their own loops.
 - Use one matcher for direct fills and newly crossed orders.
 - Match incoming buys against lowest sell price then oldest ID; match incoming sells against highest
   buy price then oldest ID.
