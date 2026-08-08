@@ -24,6 +24,11 @@ description: Maintain Nypsi's player market backend, including order matching, f
 ## Settlement
 
 - Treat balance, inventory, escrow, and market-row changes as one settlement boundary.
+- `createMarketOrder()` owns initial escrow; command and interaction callers must not deduct balance
+  or inventory themselves. Keep escrow deduction, order insertion, matching, and remainder updates in
+  one serializable transaction.
+- Atomic creation holds the Redis item mutex, a transaction-scoped PostgreSQL advisory item lock, and
+  locks matching market rows in deterministic ID order with `FOR UPDATE`.
 - Keep market-row state/history, escrow consumption, wallet/inventory transfers, buyer refunds, and
   tax-bank credits together in `market/settlement.ts` using the provided Prisma transaction client.
 - For balance and inventory debits, use `update` with the resulting value selected and throw if it is
