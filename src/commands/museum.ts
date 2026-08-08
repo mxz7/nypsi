@@ -756,7 +756,7 @@ async function run(
       await addToMuseum(message.member, item.id, amount);
       await removeInventoryItem(message.member, item.id, amount);
 
-      interaction.update({
+      await interaction.update({
         embeds: [
           new CustomEmbed(
             message.member,
