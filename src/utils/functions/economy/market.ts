@@ -27,6 +27,7 @@ import { logger } from "../../logger";
 import { findChannelCluster } from "../clusters";
 import { getUserId, MemberResolvable } from "../member";
 import { getAllGroupAccountIds } from "../moderation/alts";
+import { RedisMutex } from "../mutex";
 import { filterOutliers } from "../outliers";
 import { getTier } from "../premium/premium";
 import { pluralize } from "../string";
@@ -38,13 +39,56 @@ import { addBalance, getBalance, removeBalance } from "./balance";
 import { addInventoryItem, getInventory, isGem, removeInventoryItem } from "./inventory";
 import { addStat } from "./stats";
 import { createUser, getItems, userExists } from "./utils";
-import ms = require("ms");
 
-const inTransaction = new Set<string>();
+const marketMutex = new RedisMutex("market", true, 10 * 60 * 1000);
 const marketAverageCache = new RedisCache<number>(
   Constants.redis.cache.economy.MARKET_AVG,
   3 * 60 * 60,
 );
+
+async function withMarketLock<T>(itemId: string, operation: () => Promise<T>): Promise<T> {
+  await marketMutex.acquire(itemId);
+
+  try {
+    return await operation();
+  } finally {
+    marketMutex.release(itemId);
+  }
+}
+
+export async function checkMarketOrder(
+  order: Market,
+  client: NypsiClient,
+): Promise<boolean | number> {
+  return withMarketLock(order.itemId, () => checkMarketOrderUnlocked(order, client));
+}
+
+export async function marketSell(
+  member: MemberResolvable,
+  itemId: string,
+  amount: number,
+  storedPrice: number,
+  client: NypsiClient,
+  orderId?: number,
+): Promise<{ status: string; remaining: number }> {
+  return withMarketLock(itemId, () =>
+    marketSellUnlocked(member, itemId, amount, storedPrice, client, orderId),
+  );
+}
+
+export async function marketBuy(
+  member: MemberResolvable,
+  itemId: string,
+  amount: number,
+  storedPrice: number,
+  client: NypsiClient,
+  orderId?: number,
+): Promise<{ status: string; remaining: number }> {
+  return withMarketLock(itemId, () =>
+    marketBuyUnlocked(member, itemId, amount, storedPrice, client, orderId),
+  );
+}
+
 /**
  * items is map of itemId -> map of userId -> amount
  */
@@ -332,27 +376,10 @@ export async function getMarketOrderEmbed(order: Market) {
   };
 }
 
-export async function checkMarketOrder(
+async function checkMarketOrderUnlocked(
   order: Market,
   client: NypsiClient,
-  repeatCount = 0,
 ): Promise<boolean | number> {
-  if (
-    inTransaction.has(order.itemId) ||
-    (await redis.exists(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${order.itemId}`))
-  ) {
-    return new Promise((resolve) => {
-      logger.debug(`repeating market overlap check - ${order.itemId} (${repeatCount})`);
-      setTimeout(async () => {
-        if (repeatCount > 100) inTransaction.delete(order.itemId);
-        resolve(checkMarketOrder(order, client, repeatCount + 1));
-      }, 10);
-    });
-  }
-
-  inTransaction.add(order.itemId);
-  await redis.set(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${order.itemId}`, "t", "EX", 60);
-
   const validOrders = await prisma.market.findMany({
     where: {
       AND: [
@@ -367,8 +394,6 @@ export async function checkMarketOrder(
   });
 
   if (validOrders.length === 0) {
-    inTransaction.delete(order.itemId);
-    await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${order.itemId}`);
     return false;
   }
 
@@ -450,9 +475,6 @@ export async function checkMarketOrder(
   }
 
   await addToNypsiBank(Number(excessMoney));
-
-  inTransaction.delete(order.itemId);
-  await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${order.itemId}`);
 
   if (remaining === 0) return true;
   else return remaining;
@@ -599,9 +621,8 @@ export async function countItemOnMarket(itemId: string, type: OrderType) {
 export async function deleteMarketOrder(
   id: number,
   client: NypsiClient | ClusterManager | undefined,
-  repeatCount = 1,
 ) {
-  const order = await prisma.market
+  const existingOrder = await prisma.market
     .findFirst({
       where: {
         AND: [{ id: id }, { completed: false }],
@@ -609,29 +630,23 @@ export async function deleteMarketOrder(
     })
     .catch(() => {});
 
-  if (!order) return false;
+  if (!existingOrder) return false;
 
-  if (
-    inTransaction.has(order.itemId) ||
-    (await redis.exists(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${order.itemId}`))
-  ) {
-    return new Promise((resolve) => {
-      logger.debug(`repeating market order delete - ${id}`);
-      setTimeout(async () => {
-        if (repeatCount > 100) {
-          inTransaction.delete(order.itemId);
-          await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${order.itemId}`);
-        }
-        resolve(deleteMarketOrder(id, client, repeatCount + 1));
-      }, 1000);
+  const order = await withMarketLock(existingOrder.itemId, async () => {
+    const order = await prisma.market.findFirst({
+      where: {
+        AND: [{ id }, { completed: false }],
+      },
     });
-  }
 
-  await prisma.market.delete({
-    where: {
-      id: id,
-    },
+    if (!order) return;
+
+    await prisma.market.delete({ where: { id } });
+
+    return order;
   });
+
+  if (!order) return false;
 
   if (order.messageId && client) {
     await (client instanceof ClusterManager ? client : client.cluster).broadcastEval(
@@ -708,48 +723,14 @@ export async function completeOrder(
   amount: number,
   client: NypsiClient,
   prisma: PrismaClient | Prisma.TransactionClient,
-  checkLock?: { itemId: string },
-  repeatCount = 0,
 ): Promise<boolean> {
   const buyerId = getUserId(buyer);
-
-  if (checkLock) {
-    if (
-      inTransaction.has(checkLock.itemId) ||
-      (await redis.exists(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${checkLock.itemId}`))
-    ) {
-      return new Promise((resolve) => {
-        logger.debug(
-          `repeating market overlap check (completeOrder) - ${checkLock.itemId} (${repeatCount})`,
-        );
-        setTimeout(async () => {
-          if (repeatCount > 100) inTransaction.delete(checkLock.itemId);
-          resolve(
-            completeOrder(orderId, buyerId, amount, client, prisma, checkLock, repeatCount + 1),
-          );
-        }, 10);
-      });
-    }
-
-    inTransaction.add(checkLock.itemId);
-    await redis.set(
-      `${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${checkLock.itemId}`,
-      "t",
-      "EX",
-      60,
-    );
-  }
 
   const order = await prisma.market.findFirst({
     where: { AND: [{ id: orderId }, { completed: false }] },
   });
 
   if (!order || order.itemAmount < amount) {
-    if (checkLock) {
-      await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${checkLock.itemId}`);
-      inTransaction.delete(checkLock.itemId);
-    }
-
     return false;
   }
 
@@ -825,11 +806,6 @@ export async function completeOrder(
     addStat(order.ownerId, "earned-market", Number(amount) * Number(order.price) - taxedAmount);
   }
 
-  if (checkLock) {
-    await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${checkLock.itemId}`);
-    inTransaction.delete(checkLock.itemId);
-  }
-
   // send logs and dms
   (async () => {
     transaction(order.ownerId, buyerId, "item", amount, order.itemId, "market");
@@ -901,36 +877,15 @@ export async function completeOrder(
   return true;
 }
 
-export async function marketSell(
+async function marketSellUnlocked(
   member: MemberResolvable,
   itemId: string,
   amount: number,
   storedPrice: number,
   client: NypsiClient,
   orderId?: number,
-  repeatCount = 1,
 ): Promise<{ status: string; remaining: number }> {
   const userId = getUserId(member);
-
-  if (
-    inTransaction.has(itemId) ||
-    (await redis.exists(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`))
-  ) {
-    return new Promise((resolve) => {
-      logger.debug(`repeating market sell - ${amount}x ${itemId}`);
-      setTimeout(async () => {
-        if (repeatCount > 100) inTransaction.delete(itemId);
-        resolve(marketSell(userId, itemId, amount, storedPrice, client, orderId, repeatCount + 1));
-      }, 50);
-    });
-  }
-
-  inTransaction.add(itemId);
-  setTimeout(() => {
-    inTransaction.delete(itemId);
-  }, ms("3 minutes"));
-
-  await redis.set(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`, "d", "EX", 600);
 
   if (!(await userExists(userId))) await createUser(userId);
 
@@ -942,8 +897,6 @@ export async function marketSell(
     });
 
     if (!order || order.itemAmount < amount) {
-      await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
-      inTransaction.delete(itemId);
       return { status: "too slow ):", remaining: -1 };
     }
   }
@@ -955,21 +908,15 @@ export async function marketSell(
 
   if (orderId) {
     if (orders[0].completed || orders[0].itemAmount < amount) {
-      await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
-      inTransaction.delete(itemId);
       return { status: "too slow ):", remaining: -1 };
     }
   }
 
   if (sellPrice == -1) {
-    await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
-    inTransaction.delete(itemId);
     return { status: "not enough items", remaining: -1 };
   }
 
   if (storedPrice !== sellPrice) {
-    await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
-    inTransaction.delete(itemId);
     return {
       status: `since viewing the market, the sell price has changed from $${storedPrice.toLocaleString()} to $${sellPrice.toLocaleString()}. please press sell again with this updated price in mind`,
       remaining: -1,
@@ -979,8 +926,6 @@ export async function marketSell(
   const inventory = await getInventory(userId);
 
   if (inventory.count(itemId) < amount) {
-    await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
-    inTransaction.delete(itemId);
     return {
       status: `you do not have this many ${getItems()[itemId].plural}`,
       remaining: -1,
@@ -1015,9 +960,6 @@ export async function marketSell(
     console.error(e);
     logger.error("market sell transaction failed", e);
 
-    await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
-    inTransaction.delete(itemId);
-
     return { status: "internal error", remaining: -1 };
   }
 
@@ -1027,9 +969,6 @@ export async function marketSell(
     `market: ${userId} (${await getLastKnownUsername(userId, false)}) sold ${amount} ${itemId}`,
   );
 
-  await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
-  inTransaction.delete(itemId);
-
   if (remaining) {
     return { status: "partial", remaining };
   }
@@ -1037,36 +976,15 @@ export async function marketSell(
   return { status: "success", remaining };
 }
 
-export async function marketBuy(
+async function marketBuyUnlocked(
   member: MemberResolvable,
   itemId: string,
   amount: number,
   storedPrice: number,
   client: NypsiClient,
   orderId?: number,
-  repeatCount = 1,
 ): Promise<{ status: string; remaining: number }> {
   const userId = getUserId(member);
-
-  if (
-    inTransaction.has(itemId) ||
-    (await redis.exists(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`))
-  ) {
-    return new Promise((resolve) => {
-      logger.debug(`repeating market buy - ${amount}x ${itemId}`);
-      setTimeout(async () => {
-        if (repeatCount > 100) inTransaction.delete(itemId);
-        resolve(marketBuy(userId, itemId, amount, storedPrice, client, orderId, repeatCount + 1));
-      }, 50);
-    });
-  }
-
-  inTransaction.add(itemId);
-  setTimeout(() => {
-    inTransaction.delete(itemId);
-  }, ms("3 minutes"));
-
-  await redis.set(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`, "d", "EX", 600);
 
   if (!(await userExists(userId))) await createUser(userId);
 
@@ -1078,8 +996,6 @@ export async function marketBuy(
     });
 
     if (!order || order.itemAmount < amount) {
-      await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
-      inTransaction.delete(itemId);
       return { status: "too slow ):", remaining: -1 };
     }
   }
@@ -1091,21 +1007,15 @@ export async function marketBuy(
 
   if (orderId) {
     if (orders[0].completed || orders[0].itemAmount < amount) {
-      await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
-      inTransaction.delete(itemId);
       return { status: "too slow ):", remaining: -1 };
     }
   }
 
   if (buyPrice == -1) {
-    await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
-    inTransaction.delete(itemId);
     return { status: "not enough items", remaining: -1 };
   }
 
   if (storedPrice !== buyPrice) {
-    await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
-    inTransaction.delete(itemId);
     return {
       status: `since viewing the market, the buy price has changed from $${storedPrice.toLocaleString()} to $${buyPrice.toLocaleString()}. please press buy again with this updated price in mind`,
       remaining: -1,
@@ -1113,8 +1023,6 @@ export async function marketBuy(
   }
 
   if ((await getBalance(userId)) < buyPrice) {
-    await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
-    inTransaction.delete(itemId);
     return { status: "insufficient funds", remaining: -1 };
   }
 
@@ -1147,9 +1055,6 @@ export async function marketBuy(
     console.error(e);
     logger.error("market buy transaction failed", e);
 
-    await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
-    inTransaction.delete(itemId);
-
     return { status: "internal error", remaining: -1 };
   }
 
@@ -1158,9 +1063,6 @@ export async function marketBuy(
   logger.info(
     `market: ${userId} (${await getLastKnownUsername(userId, false)}) bought ${amount} ${itemId}`,
   );
-
-  await redis.del(`${Constants.redis.nypsi.MARKET_IN_TRANSACTION}:${itemId}`);
-  inTransaction.delete(itemId);
 
   if (remaining) {
     return { status: "partial", remaining };
