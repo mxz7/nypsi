@@ -322,7 +322,6 @@ export default {
       HOURLY_COMMAND_PREPROCESS: "nypso:preprocess",
       CRASH_STATUS: "nypsi:crash:status",
       FARM_STATUS_DM: "nypsi:farm:status:dm",
-      MARKET_IN_TRANSACTION: "nypsi:market:intransaction",
       TRADE_FULFILLING: "nypsi:trade:fulfilling",
       MARKET_DM: "nypsi:market:dm",
       DOCS_CONTENT: "nypsi:docs",
