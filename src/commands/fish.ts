@@ -30,7 +30,12 @@ import {
   itemExists,
   removeInventoryItem,
 } from "../utils/functions/economy/inventory";
-import { rollPet } from "../utils/functions/economy/pets";
+import {
+  formatPetFoundItem,
+  getActivePetForTarget,
+  rollPet,
+  takePetFoundItem,
+} from "../utils/functions/economy/pets";
 import { addStat } from "../utils/functions/economy/stats";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { getToolPreferences } from "../utils/functions/economy/tool_preferences";
@@ -229,7 +234,10 @@ async function run(
     new ButtonBuilder().setCustomId("fish").setLabel("fish").setStyle(ButtonStyle.Success),
   );
 
-  times += (await rollPet(member, "fish")) ?? 0;
+  const fishPet = await getActivePetForTarget(member, "fish");
+  const petBonus = await rollPet(member, "fish");
+
+  times += petBonus ?? 0;
   const foundItems = new Map<string, number>();
 
   for (let i = 0; i < times; i++) {
@@ -400,15 +408,24 @@ async function run(
     eventData = await getCurrentEvent();
   }
 
+  const petFoundItem = petBonus !== undefined && fishPet ? takePetFoundItem(foundItems) : undefined;
+  const displayedItems = Array.from(foundItems.entries()).filter(([itemId]) => items[itemId]);
+
   embed.setDescription(
     `you go to the pond and cast your **${items[fishingRod].name}**\n\nyou caught${
-      total > 0
-        ? `: \n${Array.from(foundItems.entries())
+      displayedItems.length > 0
+        ? `: \n${displayedItems
             .map((i) => `- \`${i[1]}x\` ${items[i[0]].emoji} ${items[i[0]].name}`)
             .join("\n")}`
         : " **nothing**"
     }`,
   );
+
+  if (petBonus !== undefined && fishPet) {
+    embed.setDescription(
+      `${embed.data.description}\n\n${formatPetFoundItem(fishPet, petFoundItem)}`,
+    );
+  }
 
   if (eventProgress) {
     embed.addField("event progress", formatEventProgress(eventData, eventProgress, message.member));

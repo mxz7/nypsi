@@ -16,10 +16,35 @@ import { getItems, getPetsData } from "./utils";
 
 const petsCache = new RedisCache<Pet[]>(Constants.redis.cache.economy.PETS, 180);
 const petsMutex = new RedisMutex("pets");
+const resultMessageTargets = new Set<PetTarget>(["bakery", "fish", "hunt", "mine"]);
 
 export function getPetDisplayName(pet: Pet) {
   const item = getItems()[getPetsData()[pet.petId].item];
   return pet.name ?? item.name;
+}
+
+export function formatPetFoundItem(pet: Pet, found?: { itemId: string; amount: number }) {
+  const items = getItems();
+  const petItem = items[getPetsData()[pet.petId].item];
+
+  if (!found) {
+    return `${petItem.emoji} **${getPetDisplayName(pet)}** found **nothing**`;
+  }
+
+  const foundItem = items[found.itemId];
+  return `${petItem.emoji} **${getPetDisplayName(pet)}** found \`${found.amount.toLocaleString()}x\` ${foundItem.emoji} **${foundItem.name}**`;
+}
+
+export function takePetFoundItem(foundItems: Map<string, number>) {
+  const items = getItems();
+  const itemId = Array.from(foundItems.keys()).find((entry) => items[entry]);
+
+  if (!itemId) return;
+
+  const amount = foundItems.get(itemId);
+  foundItems.delete(itemId);
+
+  return { itemId, amount };
 }
 
 export async function getUserPets(member: MemberResolvable): Promise<Pet[]> {
@@ -192,7 +217,7 @@ export async function rollPet(
   logger.info(`pets: ${userId}'s ${pet.petId} activated`);
   await updatePet(member, pet.petId, { activationIncrement: 1 });
 
-  if (pet.petId !== "cow") addActivateNotification(userId, pet);
+  if (!resultMessageTargets.has(target)) addActivateNotification(userId, pet);
 
   return data.benefit[levelIndex];
 }

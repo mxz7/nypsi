@@ -65,8 +65,12 @@ Keep integrations as small as the comparable booster/gem logic:
 if (claim) outputMulti += (await rollPet(member, "farm")) ?? 0;
 ```
 
-- Fish, hunt, and mine: roll once before the existing attempt loop and add the result directly to
-  `times`.
+- Fish, hunt, and mine: get the active pet, roll once before the existing attempt loop, and add the
+  result directly to `times`. When it activates, append `formatPetFoundItem` below the existing
+  command description; do not add a separate embed field. Use `takePetFoundItem` after reward and
+  progress calculations to move one item type and its full quantity out of the normal displayed
+  list and onto the pet line without changing actual rewards. If there is no real item, say the pet
+  found nothing.
 - Bakery: add the cow benefit to the total output multiplier inside `runBakery`; activation doubles
   the output.
 - XP: roll eagle inside `getXpBonus` and add its benefit to `boosterEffect`, exactly like an XP
@@ -76,13 +80,13 @@ if (claim) outputMulti += (await rollPet(member, "farm")) ?? 0;
 - Gamble multi: apply shark unconditionally inside `getGambleMulti`, alongside gems and boosters.
   Do not add an option for callers to bypass the pet benefit.
 
-Do not recursively call command handlers, preserve durability, alter durability consumption, roll
-again for pet-generated attempts, or add command-specific activation feedback.
+Do not recursively call command handlers, preserve durability, alter durability consumption, or
+roll again for pet-generated attempts.
 
 After a successful activation count update, check `dms.petActivation`. When enabled, add a concise
 activation notice with `addInlineNotification`. This notification is inline only; never send it
-through `addNotificationToQueue`. Cow activations are the exception: do not add an inline
-notification because the bakery response shows the cow's contributed cookies in its `stats` field.
+through `addNotificationToQueue`. Bakery, fish, hunt, and mine activations are exceptions because
+their command responses show the pet's contribution directly.
 
 ## Command and item use
 

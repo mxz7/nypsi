@@ -26,7 +26,12 @@ import {
   getInventory,
   removeInventoryItem,
 } from "../utils/functions/economy/inventory";
-import { rollPet } from "../utils/functions/economy/pets";
+import {
+  formatPetFoundItem,
+  getActivePetForTarget,
+  rollPet,
+  takePetFoundItem,
+} from "../utils/functions/economy/pets";
 import { addStat } from "../utils/functions/economy/stats";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { getToolPreferences } from "../utils/functions/economy/tool_preferences";
@@ -217,7 +222,10 @@ async function run(
     huntItems.push("nothing");
   }
 
-  times += (await rollPet(member, "hunt")) ?? 0;
+  const huntPet = await getActivePetForTarget(member, "hunt");
+  const petBonus = await rollPet(member, "hunt");
+
+  times += petBonus ?? 0;
   const foundItems = new Map<string, number>();
 
   for (let i = 0; i < times; i++) {
@@ -349,15 +357,23 @@ async function run(
     eventData = await getCurrentEvent();
   }
 
+  const petFoundItem = petBonus !== undefined && huntPet ? takePetFoundItem(foundItems) : undefined;
+
   embed.setDescription(
     `you go to the ${chosenPlace} and prepare your **${items[gun].name}**\n\nyou killed${
-      total > 0
+      foundItems.size > 0
         ? `: \n${Array.from(foundItems.entries())
             .map((i) => `- \`${i[1]}x\` ${items[i[0]].emoji} ${items[i[0]].name}`)
             .join("\n")}`
         : " **nothing**"
     }`,
   );
+
+  if (petBonus !== undefined && huntPet) {
+    embed.setDescription(
+      `${embed.data.description}\n\n${formatPetFoundItem(huntPet, petFoundItem)}`,
+    );
+  }
 
   if (eventProgress) {
     embed.addField(
