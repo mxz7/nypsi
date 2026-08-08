@@ -13,7 +13,7 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
-import { Market, MarketWatch, OrderType, Prisma, PrismaClient } from "#generated/prisma";
+import { Market, MarketWatch, OrderType, Prisma } from "#generated/prisma";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
@@ -31,13 +31,18 @@ import { RedisMutex } from "../mutex";
 import { filterOutliers } from "../outliers";
 import { getTier } from "../premium/premium";
 import { pluralize } from "../string";
-import { addToNypsiBank, getTax } from "../tax";
+import { getTax } from "../tax";
 import { addNotificationToQueue } from "../users/notifications";
 import { getPreferences } from "../users/preferences";
 import { getLastKnownAvatar, getLastKnownUsername } from "../users/username";
-import { addBalance, getBalance, removeBalance } from "./balance";
-import { addInventoryItem, getInventory, isGem, removeInventoryItem } from "./inventory";
+import { getBalance } from "./balance";
+import { autosellInventoryItem, getInventory, isGem } from "./inventory";
 import { quoteMarketOrder } from "./market/matching";
+import {
+  settleMarketFill,
+  SettledMarketFill,
+  updateIncomingMarketOrder,
+} from "./market/settlement";
 import { addStat } from "./stats";
 import { createUser, getItems, userExists } from "./utils";
 
@@ -403,79 +408,27 @@ async function checkMarketOrderUnlocked(
     return false;
   }
 
-  let excessMoney = 0n;
-  let remaining = order.itemAmount;
+  let settlement: { fills: SettledMarketFill[]; remainingAmount: number };
 
   try {
-    await prisma.$transaction(async (prisma) => {
-      for (const fill of quote.fills) {
-        const validOrder = fill.order;
-        const amount = fill.amount;
-        remaining -= amount;
-
-        const res = await completeOrder(
-          validOrder.id,
-          order.ownerId,
-          amount,
-          client,
-          prisma as Prisma.TransactionClient,
-        );
-
-        if (validOrder.price > order.price) {
-          excessMoney += (validOrder.price - order.price) * BigInt(amount);
-        }
-
-        if (!res) break;
-      }
-
-      if (remaining === 0) {
-        // we delete instead of keeping for status during season interim
-        if (await redis.exists(Constants.redis.nypsi.INFINITE_MAX_BET)) {
-          await prisma.market.delete({ where: { id: order.id } });
-        } else {
-          await prisma.market.update({
-            where: {
-              id: order.id,
-            },
-            data: {
-              completed: true,
-            },
-          });
-        }
-      } else if (remaining < order.itemAmount) {
-        await prisma.market.update({
-          where: {
-            id: order.id,
-          },
-          data: {
-            itemAmount: remaining,
-          },
-        });
-
-        // don't create another during season interim
-        if (order.price > 10_000 && !(await redis.exists(Constants.redis.nypsi.INFINITE_MAX_BET))) {
-          await prisma.market.create({
-            data: {
-              ownerId: order.ownerId,
-              itemId: order.itemId,
-              itemAmount: order.itemAmount - remaining,
-              orderType: order.orderType,
-              price: order.price,
-              completed: true,
-            },
-          });
-        }
-      }
+    settlement = await settleMarketFills({
+      fills: quote.fills,
+      incomingUserId: order.ownerId,
+      requestedAmount: order.itemAmount,
+      incomingAssetsEscrowed: true,
+      incomingLimitPrice: order.price,
+      incomingOrder: order,
     });
-  } catch (e) {
-    console.error(e);
-    logger.error("error in completing market order", e);
+  } catch {
+    return false;
   }
 
-  await addToNypsiBank(Number(excessMoney));
+  await invalidateMarketSettlementCaches(settlement.fills);
+  await processMarketAutosell(settlement.fills, client);
+  publishMarketSettlements(settlement.fills, client);
 
-  if (remaining === 0) return true;
-  else return remaining;
+  if (settlement.remainingAmount === 0) return true;
+  else return settlement.remainingAmount;
 }
 
 export async function updateMarketWatch(
@@ -701,168 +654,282 @@ export async function getMarketTransactionData(
 
   return {
     cost: quote.remainingAmount === 0 ? Number(quote.total) : -1,
+    fills: quote.fills,
     orders: quote.fills.map((fill) => fill.order),
   };
 }
 
-export async function completeOrder(
-  orderId: number,
-  buyer: MemberResolvable,
-  amount: number,
-  client: NypsiClient,
-  prisma: PrismaClient | Prisma.TransactionClient,
-): Promise<boolean> {
-  const buyerId = getUserId(buyer);
+type MarketFillPolicy = {
+  isAlt: boolean;
+  sellerTaxExempt: boolean;
+};
 
-  const order = await prisma.market.findFirst({
-    where: { AND: [{ id: orderId }, { completed: false }] },
-  });
+async function prepareMarketFillPolicies(
+  fills: { order: Market }[],
+  incomingUserId: string,
+): Promise<Map<number, MarketFillPolicy>> {
+  const policies = await Promise.all(
+    fills.map(async ({ order }) => {
+      const sellerId = order.orderType === "buy" ? incomingUserId : order.ownerId;
+      const isAlt =
+        order.price < 10_000 ||
+        (await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, order.ownerId)).includes(
+          incomingUserId,
+        );
 
-  if (!order || order.itemAmount < amount) {
-    return false;
-  }
+      return {
+        orderId: order.id,
+        isAlt,
+        sellerTaxExempt: (await getTier(sellerId)) === 4,
+      };
+    }),
+  );
 
-  let isAlt = false;
+  return new Map(policies.map(({ orderId, ...policy }) => [orderId, policy]));
+}
 
-  const accounts = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, order.ownerId);
+async function settleMarketFills(request: {
+  fills: { order: Market; amount: number }[];
+  incomingUserId: string;
+  requestedAmount: number;
+  incomingAssetsEscrowed: boolean;
+  incomingLimitPrice?: bigint;
+  incomingOrder?: Market;
+}) {
+  const context = {
+    fills: request.fills.map((fill) => ({
+      amount: fill.amount,
+      orderId: fill.order.id,
+      price: fill.order.price,
+      side: fill.order.orderType,
+    })),
+    incomingAssetsEscrowed: request.incomingAssetsEscrowed,
+    incomingLimitPrice: request.incomingLimitPrice,
+    incomingOrderId: request.incomingOrder?.id,
+    incomingUserId: request.incomingUserId,
+    requestedAmount: request.requestedAmount,
+  };
 
-  if (accounts.includes(buyerId) || order.price < 10_000) isAlt = true;
+  logger.debug("market: starting settlement", context);
 
-  if (order.itemAmount === amount) {
-    order.completed = true;
+  try {
+    const [policies, taxRate, seasonInterim] = await Promise.all([
+      prepareMarketFillPolicies(request.fills, request.incomingUserId),
+      getTax(),
+      redis.exists(Constants.redis.nypsi.INFINITE_MAX_BET).then(Boolean),
+    ]);
 
-    // delete during season interim
-    if (isAlt && (await redis.exists(Constants.redis.nypsi.INFINITE_MAX_BET))) {
-      await prisma.market.delete({
-        where: { id: order.id },
-      });
-    } else {
-      await prisma.market.update({
-        where: { id: order.id },
-        data: { completed: true },
-      });
-    }
-  } else {
-    // only create during normal season play
-    if (!isAlt && !(await redis.exists(Constants.redis.nypsi.INFINITE_MAX_BET))) {
-      await prisma.market.create({
-        data: {
-          itemId: order.itemId,
-          orderType: order.orderType,
-          ownerId: order.ownerId,
-          itemAmount: amount,
-          price: order.price,
-          completed: true,
-        },
-      });
-    }
+    const settlement = await prisma.$transaction(async (tx) => {
+      const results: SettledMarketFill[] = [];
 
-    await prisma.market.update({
-      where: { id: order.id },
-      data: { itemAmount: { decrement: amount } },
+      for (const fill of request.fills) {
+        const policy = policies.get(fill.order.id)!;
+        const result = await settleMarketFill(tx as Prisma.TransactionClient, {
+          orderId: fill.order.id,
+          incomingUserId: request.incomingUserId,
+          amount: fill.amount,
+          taxRate,
+          sellerTaxExempt: policy.sellerTaxExempt,
+          incomingAssetsEscrowed: request.incomingAssetsEscrowed,
+          incomingLimitPrice: request.incomingLimitPrice,
+          isAlt: policy.isAlt,
+          seasonInterim,
+        });
+
+        if (!result) throw new Error("market order changed during settlement");
+
+        results.push(result);
+      }
+
+      const filledAmount = results.reduce((total, fill) => total + fill.amount, 0);
+      const remainingAmount = request.incomingOrder
+        ? await updateIncomingMarketOrder(
+            tx as Prisma.TransactionClient,
+            request.incomingOrder,
+            filledAmount,
+            seasonInterim,
+          )
+        : request.requestedAmount - filledAmount;
+
+      return { fills: results, remainingAmount };
     });
-    order.itemAmount -= amount;
+
+    logger.debug("market: settlement committed", {
+      ...context,
+      filledAmount: settlement.fills.reduce((total, fill) => total + fill.amount, 0),
+      remainingAmount: settlement.remainingAmount,
+      results: settlement.fills.map((fill) => ({
+        amount: fill.amount,
+        buyerId: fill.buyerId,
+        gross: fill.gross,
+        orderId: fill.restingOrderId,
+        price: fill.price,
+        refund: fill.incomingRefund,
+        sellerId: fill.sellerId,
+        sellerProceeds: fill.sellerProceeds,
+        sellerTax: fill.sellerTax,
+      })),
+    });
+
+    return settlement;
+  } catch (error) {
+    logger.error("market: settlement failed", { ...context, error });
+    throw error;
+  }
+}
+
+async function invalidateMarketSettlementCaches(fills: SettledMarketFill[]) {
+  const balanceUsers = new Set<string>();
+  const inventoryUsers = new Set<string>();
+  const itemIds = new Set<string>();
+
+  for (const fill of fills) {
+    balanceUsers.add(fill.sellerId);
+    inventoryUsers.add(fill.buyerId);
+    itemIds.add(fill.itemId);
+
+    if (fill.incomingMoneyDebit > 0n || fill.incomingRefund > 0n) {
+      balanceUsers.add(fill.incomingUserId);
+    }
+
+    if (fill.incomingItemDebit > 0) inventoryUsers.add(fill.incomingUserId);
   }
 
-  const tax = await getTax();
-  let taxedAmount = 0;
+  const keys = [
+    ...Array.from(
+      balanceUsers,
+      (userId) => `${Constants.redis.cache.economy.BALANCE}:${userId.toLowerCase()}`,
+    ),
+    ...Array.from(
+      inventoryUsers,
+      (userId) => `${Constants.redis.cache.economy.INVENTORY}:${userId.toLowerCase()}`,
+    ),
+    ...Array.from(itemIds, (itemId) => `${Constants.redis.cache.economy.ITEM_EXISTS}:${itemId}`),
+  ];
 
-  if ((await getTier(order.ownerId)) !== 4) {
-    taxedAmount += Math.floor(Number(amount) * Number(order.price) * tax);
-  }
+  for (const fill of fills) {
+    if (!isGem(fill.itemId)) continue;
 
-  await addToNypsiBank(taxedAmount);
-
-  if (order.orderType === "buy") {
-    await addInventoryItem(order.ownerId, order.itemId, Number(amount));
-    await addBalance(buyerId, Number(amount) * Number(order.price) - taxedAmount);
-
-    addStat(buyerId, "market-sold-items", Number(amount));
-    addStat(buyerId, "earned-market", Number(amount) * Number(order.price) - taxedAmount);
-    addStat(order.ownerId, "market-fulfilled-buy", Number(amount));
-    addStat(order.ownerId, "spent-market", Number(amount) * Number(order.price));
-  } else {
-    await addInventoryItem(buyerId, order.itemId, Number(amount));
-    await addBalance(order.ownerId, Number(amount) * Number(order.price) - taxedAmount);
-
-    if (isGem(order.itemId))
-      await redis.del(`${Constants.redis.cache.economy.HAS_GEM}:${order.ownerId}:${order.itemId}`);
-
-    addStat(buyerId, "market-bought-items", Number(amount));
-    addStat(buyerId, "spent-market", Number(amount) * Number(order.price));
-    addStat(order.ownerId, "market-fulfilled-sell", Number(amount));
-    addStat(order.ownerId, "earned-market", Number(amount) * Number(order.price) - taxedAmount);
-  }
-
-  // send logs and dms
-  (async () => {
-    transaction(order.ownerId, buyerId, "item", amount, order.itemId, "market");
-    transaction(
-      buyerId,
-      order.ownerId,
-      "money",
-      Number(amount) * Number(order.price) - taxedAmount,
-      undefined,
-      "market",
+    keys.push(
+      `${Constants.redis.cache.economy.HAS_GEM}:${fill.buyerId}:${fill.itemId}`.toLowerCase(),
     );
-
-    if ((await getPreferences(order.ownerId)).dms.market) {
-      let dmQueue = await redis
-        .hget(`${Constants.redis.nypsi.MARKET_DM}:${order.orderType}`, order.ownerId)
-        .then((r) => (r ? (JSON.parse(r) as DMQueue) : undefined));
-
-      if (!dmQueue) {
-        dmQueue = { userId: order.ownerId, createdAt: Date.now(), earned: 0, items: {} };
-      }
-
-      dmQueue.earned += Number(amount) * Number(order.price) - taxedAmount;
-
-      if (dmQueue.items[order.itemId]) {
-        if (dmQueue.items[order.itemId][buyerId]) {
-          dmQueue.items[order.itemId][buyerId] += Number(amount);
-        } else {
-          dmQueue.items[order.itemId][buyerId] = Number(amount);
-        }
-      } else {
-        dmQueue.items[order.itemId] = { [buyerId]: Number(amount) };
-      }
-
-      await redis.hset(
-        `${Constants.redis.nypsi.MARKET_DM}:${order.orderType}`,
-        order.ownerId,
-        JSON.stringify(dmQueue),
+    if (fill.incomingItemDebit > 0) {
+      keys.push(
+        `${Constants.redis.cache.economy.HAS_GEM}:${fill.incomingUserId}:${fill.itemId}`.toLowerCase(),
       );
     }
-  })();
+  }
 
-  (async () => {
-    if (order.messageId) {
-      const embed = await getMarketOrderEmbed(order);
+  if (keys.length > 0) {
+    const uniqueKeys = [...new Set(keys)];
 
-      await client.cluster.broadcastEval(
-        async (client, { channelId, messageId, embed }) => {
-          const channel = client.channels.cache.get(channelId) as TextChannel;
+    await redis.del(...uniqueKeys);
+    logger.debug("market: invalidated settlement caches", {
+      fillOrderIds: fills.map((fill) => fill.restingOrderId),
+      keyCount: uniqueKeys.length,
+    });
+  }
+}
 
-          if (!channel || !channel.isTextBased()) return "no-channel";
+async function processMarketAutosell(fills: SettledMarketFill[], client: NypsiClient) {
+  const acquisitions = new Map<string, { userId: string; itemId: string; amount: number }>();
 
-          const msg = await channel.messages.fetch(messageId).catch(() => {});
+  for (const fill of fills) {
+    const key = `${fill.buyerId}:${fill.itemId}`;
+    const acquisition = acquisitions.get(key);
 
-          if (!msg) return "no-msg";
+    if (acquisition) acquisition.amount += fill.amount;
+    else acquisitions.set(key, { userId: fill.buyerId, itemId: fill.itemId, amount: fill.amount });
+  }
 
-          await msg.edit(embed).catch(() => {});
-        },
-        {
-          context: {
-            channelId: Constants.MARKET_CHANNEL_ID,
-            messageId: order.messageId,
-            embed,
-          },
-        },
-      );
+  for (const acquisition of acquisitions.values()) {
+    await autosellInventoryItem(
+      acquisition.userId,
+      acquisition.itemId,
+      acquisition.amount,
+      client,
+    ).catch((error) =>
+      logger.error("market: failed to process autosell", { error, ...acquisition }),
+    );
+  }
+}
+
+function publishMarketSettlements(fills: SettledMarketFill[], client: NypsiClient) {
+  for (const fill of fills) {
+    if (fill.orderType === "buy") {
+      addStat(fill.sellerId, "market-sold-items", fill.amount);
+      addStat(fill.sellerId, "earned-market", Number(fill.sellerProceeds));
+      addStat(fill.buyerId, "market-fulfilled-buy", fill.amount);
+      addStat(fill.buyerId, "spent-market", Number(fill.gross));
+    } else {
+      addStat(fill.buyerId, "market-bought-items", fill.amount);
+      addStat(fill.buyerId, "spent-market", Number(fill.gross));
+      addStat(fill.sellerId, "market-fulfilled-sell", fill.amount);
+      addStat(fill.sellerId, "earned-market", Number(fill.sellerProceeds));
     }
-  })();
 
-  return true;
+    publishMarketSettlementEffects(fill, client).catch((error) =>
+      logger.error("market: failed to publish settlement effects", {
+        error,
+        orderId: fill.restingOrderId,
+      }),
+    );
+  }
+}
+
+async function publishMarketSettlementEffects(fill: SettledMarketFill, client: NypsiClient) {
+  transaction(fill.sellerId, fill.buyerId, "item", fill.amount, fill.itemId, "market");
+  transaction(fill.buyerId, fill.sellerId, "money", fill.sellerProceeds, undefined, "market");
+
+  const order = fill.order;
+  const counterpartyId = order.ownerId === fill.buyerId ? fill.sellerId : fill.buyerId;
+
+  if ((await getPreferences(order.ownerId)).dms.market) {
+    let dmQueue = await redis
+      .hget(`${Constants.redis.nypsi.MARKET_DM}:${order.orderType}`, order.ownerId)
+      .then((result) => (result ? (JSON.parse(result) as DMQueue) : undefined));
+
+    if (!dmQueue) {
+      dmQueue = { userId: order.ownerId, createdAt: Date.now(), earned: 0, items: {} };
+    }
+
+    dmQueue.earned += Number(fill.sellerProceeds);
+
+    if (!dmQueue.items[order.itemId]) dmQueue.items[order.itemId] = {};
+    dmQueue.items[order.itemId][counterpartyId] =
+      (dmQueue.items[order.itemId][counterpartyId] ?? 0) + fill.amount;
+
+    await redis.hset(
+      `${Constants.redis.nypsi.MARKET_DM}:${order.orderType}`,
+      order.ownerId,
+      JSON.stringify(dmQueue),
+    );
+  }
+
+  if (!order.messageId) return;
+
+  const embed = await getMarketOrderEmbed(order);
+
+  await client.cluster.broadcastEval(
+    async (client, { channelId, messageId, embed }) => {
+      const channel = client.channels.cache.get(channelId) as TextChannel;
+
+      if (!channel || !channel.isTextBased()) return "no-channel";
+
+      const msg = await channel.messages.fetch(messageId).catch(() => {});
+
+      if (!msg) return "no-msg";
+
+      await msg.edit(embed).catch(() => {});
+    },
+    {
+      context: {
+        channelId: Constants.MARKET_CHANNEL_ID,
+        messageId: order.messageId,
+        embed,
+      },
+    },
+  );
 }
 
 async function marketSellUnlocked(
@@ -890,12 +957,14 @@ async function marketSellUnlocked(
   }
 
   // looking for buy orders
-  const { cost: sellPrice, orders } = orderId
-    ? { cost: Number(order.price) * amount, orders: [order] }
+  const marketData = orderId
+    ? quoteMarketOrder([order], { side: "sell", amount, ownerId: userId })
     : await getMarketTransactionData(itemId, amount, "buy", userId);
+  const sellPrice = "cost" in marketData ? marketData.cost : Number(marketData.total);
+  const fills = marketData.fills;
 
   if (orderId) {
-    if (orders[0].completed || orders[0].itemAmount < amount) {
+    if (fills.length !== 1 || fills[0].order.completed || fills[0].order.itemAmount < amount) {
       return { status: "too slow ):", remaining: -1 };
     }
   }
@@ -920,48 +989,32 @@ async function marketSellUnlocked(
     };
   }
 
-  let remaining = amount;
+  let settlement: { fills: SettledMarketFill[]; remainingAmount: number };
 
   try {
-    await prisma.$transaction(async (prisma) => {
-      for (const order of orders) {
-        let amount: number;
-        if (order.itemAmount > remaining) {
-          amount = remaining;
-          remaining = 0;
-        } else {
-          amount = order.itemAmount;
-          remaining -= order.itemAmount;
-        }
-
-        const res = await completeOrder(
-          order.id,
-          userId,
-          amount,
-          client,
-          prisma as Prisma.TransactionClient,
-        );
-        if (!res) break;
-      }
+    settlement = await settleMarketFills({
+      fills,
+      incomingUserId: userId,
+      requestedAmount: amount,
+      incomingAssetsEscrowed: false,
     });
-  } catch (e) {
-    console.error(e);
-    logger.error("market sell transaction failed", e);
-
+  } catch {
     return { status: "internal error", remaining: -1 };
   }
 
-  await removeInventoryItem(userId, itemId, amount - remaining);
+  await invalidateMarketSettlementCaches(settlement.fills);
+  await processMarketAutosell(settlement.fills, client);
+  publishMarketSettlements(settlement.fills, client);
 
   logger.info(
     `market: ${userId} (${await getLastKnownUsername(userId, false)}) sold ${amount} ${itemId}`,
   );
 
-  if (remaining) {
-    return { status: "partial", remaining };
+  if (settlement.remainingAmount) {
+    return { status: "partial", remaining: settlement.remainingAmount };
   }
 
-  return { status: "success", remaining };
+  return { status: "success", remaining: settlement.remainingAmount };
 }
 
 async function marketBuyUnlocked(
@@ -989,12 +1042,14 @@ async function marketBuyUnlocked(
   }
 
   // looking for sell orders
-  const { cost: buyPrice, orders } = orderId
-    ? { cost: Number(order.price) * amount, orders: [order] }
+  const marketData = orderId
+    ? quoteMarketOrder([order], { side: "buy", amount, ownerId: userId })
     : await getMarketTransactionData(itemId, amount, "sell", userId);
+  const buyPrice = "cost" in marketData ? marketData.cost : Number(marketData.total);
+  const fills = marketData.fills;
 
   if (orderId) {
-    if (orders[0].completed || orders[0].itemAmount < amount) {
+    if (fills.length !== 1 || fills[0].order.completed || fills[0].order.itemAmount < amount) {
       return { status: "too slow ):", remaining: -1 };
     }
   }
@@ -1014,49 +1069,32 @@ async function marketBuyUnlocked(
     return { status: "insufficient funds", remaining: -1 };
   }
 
-  let remaining = amount;
+  let settlement: { fills: SettledMarketFill[]; remainingAmount: number };
 
   try {
-    await prisma.$transaction(async (prisma) => {
-      for (const order of orders) {
-        let amount: number;
-        if (order.itemAmount > remaining) {
-          amount = remaining;
-          remaining = 0;
-        } else {
-          amount = order.itemAmount;
-          remaining -= order.itemAmount;
-        }
-
-        const res = await completeOrder(
-          order.id,
-          userId,
-          amount,
-          client,
-          prisma as Prisma.TransactionClient,
-        );
-
-        if (!res) break;
-      }
+    settlement = await settleMarketFills({
+      fills,
+      incomingUserId: userId,
+      requestedAmount: amount,
+      incomingAssetsEscrowed: false,
     });
-  } catch (e) {
-    console.error(e);
-    logger.error("market buy transaction failed", e);
-
+  } catch {
     return { status: "internal error", remaining: -1 };
   }
 
-  await removeBalance(userId, buyPrice);
+  await invalidateMarketSettlementCaches(settlement.fills);
+  await processMarketAutosell(settlement.fills, client);
+  publishMarketSettlements(settlement.fills, client);
 
   logger.info(
     `market: ${userId} (${await getLastKnownUsername(userId, false)}) bought ${amount} ${itemId}`,
   );
 
-  if (remaining) {
-    return { status: "partial", remaining };
+  if (settlement.remainingAmount) {
+    return { status: "partial", remaining: settlement.remainingAmount };
   }
 
-  return { status: "success", remaining };
+  return { status: "success", remaining: settlement.remainingAmount };
 }
 
 export async function showMarketConfirmationModal(
