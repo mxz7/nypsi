@@ -38,12 +38,7 @@ export async function addMarriage(userId: string, targetId: string): Promise<boo
   try {
     const existingMarriage = await prisma.marriage.findFirst({
       where: {
-        OR: [
-          { userId },
-          { partnerId: userId },
-          { userId: targetId },
-          { partnerId: targetId },
-        ],
+        OR: [{ userId }, { partnerId: userId }, { userId: targetId }, { partnerId: targetId }],
       },
     });
 
@@ -82,7 +77,10 @@ export async function removeMarriage(member: MemberResolvable): Promise<false | 
         OR: [{ userId }, { partnerId: userId }],
       },
     });
-    await Promise.all([marriageCache.delete(marriage.userId), marriageCache.delete(marriage.partnerId)]);
+    await Promise.all([
+      marriageCache.delete(marriage.userId),
+      marriageCache.delete(marriage.partnerId),
+    ]);
 
     return marriage;
   } finally {
