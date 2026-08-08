@@ -81,34 +81,6 @@ cmd.slashData
   .addSubcommand((manage) =>
     manage.setName("manage").setDescription("manage your buy and sell orders"),
   )
-  .addSubcommand((create) =>
-    create
-      .setName("create")
-      .setDescription("create a buy or sell order")
-      .addStringOption((option) =>
-        option
-          .setName("item-global")
-          .setDescription("which item?")
-          .setAutocomplete(true)
-          .setRequired(true),
-      )
-      .addStringOption((option) =>
-        option
-          .setName("order-type")
-          .setDescription("do you want to buy or sell this item?")
-          .setRequired(true)
-          .setChoices({ name: "buy order", value: "buy" }, { name: "sell order", value: "sell" }),
-      )
-      .addStringOption((option) =>
-        option.setName("amount").setDescription("how many of this item?").setRequired(true),
-      )
-      .addStringOption((option) =>
-        option
-          .setName("price")
-          .setDescription("how much do you want to sell each item for?")
-          .setRequired(true),
-      ),
-  )
   .addSubcommand((view) =>
     view
       .setName("search")
@@ -134,6 +106,12 @@ cmd.slashData
       )
       .addStringOption((option) =>
         option.setName("amount").setDescription("how many of this item?").setRequired(true),
+      )
+      .addStringOption((option) =>
+        option
+          .setName("price")
+          .setDescription("maximum price per item; creates an order for any remainder")
+          .setRequired(false),
       ),
   )
   .addSubcommand((help) => help.setName("help").setDescription("view the market help menu"))
@@ -150,6 +128,12 @@ cmd.slashData
       )
       .addStringOption((option) =>
         option.setName("amount").setDescription("how many of this item?").setRequired(true),
+      )
+      .addStringOption((option) =>
+        option
+          .setName("price")
+          .setDescription("minimum price per item; creates an order for any remainder")
+          .setRequired(false),
       ),
   )
   .addSubcommand((watch) =>
@@ -804,6 +788,136 @@ async function run(
     return { msg: msg, reaction: reaction as ButtonInteraction };
   };
 
+  const createOrder = async (
+    type: OrderType,
+    selected: Item,
+    amountInput: string,
+    priceInput: string,
+    maxOrders: number,
+  ) => {
+    if ((await getMarketOrders(message.member, type)).length >= maxOrders) {
+      return send({ embeds: [new ErrorEmbed(`you are at the max number of ${type} orders`)] });
+    }
+
+    if (selected.account_locked) {
+      return send({ embeds: [new ErrorEmbed("this item cannot be traded")] });
+    }
+
+    const cost = await formatBet(priceInput.toLowerCase(), message.member).catch(() => {});
+
+    if (!cost) return send({ embeds: [new ErrorEmbed("invalid price")] });
+    if (cost > 10_000_000_000) {
+      return send({ embeds: [new ErrorEmbed("the maximum price per item is $10b")] });
+    }
+
+    let amount = amountInput;
+
+    if (amount.toLowerCase() === "all") {
+      amount =
+        type === "buy"
+          ? Math.floor((await getBalance(message.member)) / cost).toString()
+          : (await getInventory(message.member)).count(selected.id).toString();
+    }
+
+    if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
+      return send({ embeds: [new ErrorEmbed("invalid amount")] });
+    }
+
+    if (parseInt(amount) > 100_000) {
+      return send({ embeds: [new ErrorEmbed("the maximum amount of items per order is 100,000")] });
+    }
+
+    const itemAmount = parseInt(amount);
+
+    if (type === "buy" && (await getBalance(message.member)) < itemAmount * cost) {
+      return send({ embeds: [new ErrorEmbed("you don't have enough money")] });
+    }
+
+    if (type === "sell" && (await getInventory(message.member)).count(selected.id) < itemAmount) {
+      return send({ embeds: [new ErrorEmbed(`you don't have enough ${selected.plural}`)] });
+    }
+
+    const itemWorth = await calcItemValue(selected.id);
+    let msg: NypsiMessage;
+
+    if (
+      (type === "buy" && cost >= itemWorth * 1.5) ||
+      (type === "sell" && cost <= itemWorth / 1.5)
+    ) {
+      const confirmation = await confirmCreation(cost, itemWorth, type);
+
+      if (!confirmation) return;
+
+      msg = confirmation.msg;
+      await confirmation.reaction.deferUpdate();
+    }
+
+    const showError = (description: string) => {
+      if (msg) return msg.edit({ embeds: [new ErrorEmbed(description)], components: [] });
+      return send({ embeds: [new ErrorEmbed(description)] });
+    };
+
+    if ((await getMarketOrders(message.member, type)).length >= maxOrders) {
+      return showError(`you are at the max number of ${type} orders`);
+    }
+
+    if (type === "buy") {
+      if ((await getBalance(message.member)) < itemAmount * cost) {
+        return showError("you don't have enough money");
+      }
+
+      const ownSellOrders = (await getMarketOrders(message.member, "sell")).filter(
+        (order) => order.itemId === selected.id,
+      );
+
+      if (ownSellOrders.some((order) => order.price < cost)) {
+        return showError(
+          "you cannot make a buy order for more than your lowest sell order for this item",
+        );
+      }
+
+      await removeBalance(message.member, itemAmount * cost);
+    } else {
+      if ((await getInventory(message.member)).count(selected.id) < itemAmount) {
+        return showError(`you don't have enough ${selected.plural}`);
+      }
+
+      const ownBuyOrders = (await getMarketOrders(message.member, "buy")).filter(
+        (order) => order.itemId === selected.id,
+      );
+
+      if (ownBuyOrders.some((order) => order.price > cost)) {
+        return showError(
+          "you cannot make a sell order for less than your highest buy order for this item",
+        );
+      }
+
+      await removeInventoryItem(message.member, selected.id, itemAmount);
+    }
+
+    const result = await createMarketOrder(
+      message.member,
+      selected.id,
+      itemAmount,
+      cost,
+      type,
+      message.client as NypsiClient,
+    );
+    let description: string;
+
+    if (result.sold) description = `✅ your ${type} order has been instantly fulfilled`;
+    else if (result.amount < itemAmount) {
+      description = `✅ your ${type} order has been partially fulfilled`;
+    } else description = `✅ your ${type} order has been created`;
+
+    if (result.url) description = `[${description}](${result.url})`;
+
+    const embed = new CustomEmbed(message.member, description);
+
+    if (msg) return msg.edit({ embeds: [embed], components: [] });
+    return send({ embeds: [embed] });
+  };
+
   const deleteOrder = async (
     type: string,
     msg: NypsiMessage,
@@ -1078,6 +1192,8 @@ async function run(
 
     let amount = args[2] ?? "1";
 
+    if (args[3]) return createOrder("buy", item, amount, args[3], max);
+
     if (amount.toLowerCase() == "all") {
       amount = (await getMarketItemOrders(item.id, "sell", message.member))
         .reduce((count, order) => order.itemAmount + count, 0)
@@ -1119,7 +1235,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(`not enough ${item.plural} on the market`).setFooter({
-            text: "create a buy order with /market create",
+            text: "create a buy order with /market buy <item> <amount> <price>",
           }),
         ],
       });
@@ -1134,9 +1250,11 @@ async function run(
 
     if (!item) return send({ embeds: [new ErrorEmbed("invalid item")] });
 
-    const inventory = await getInventory(message.member);
-
     let amount = args[2] ?? "1";
+
+    if (args[3]) return createOrder("sell", item, amount, args[3], max);
+
+    const inventory = await getInventory(message.member);
 
     if (amount.toLowerCase() == "all") {
       const invAmount = inventory.count(item.id);
@@ -1158,7 +1276,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(`not enough ${item.plural} on the market`).setFooter({
-            text: "create a sell order with /market create",
+            text: "create a sell order with /market sell <item> <amount> <price>",
           }),
         ],
       });
@@ -1172,208 +1290,11 @@ async function run(
 
     return await confirmTransaction("sell", item, parseInt(amount), message.member);
   } else if (args[0].toLowerCase().includes("create") || args[0].toLowerCase() == "c") {
-    if (args.length < 4)
-      return send({
-        embeds: [new ErrorEmbed("/market create <item> <buy/sell> <amount> <price>")],
-      });
-
-    const item = args[1];
-    let type = args[2];
-    let amount = args[3];
-    let price = args[4];
-
-    const selected = selectItem(item);
-
-    if (type === "b") type = "buy";
-    else if (type === "s") type = "sell";
-
-    if (type != "buy" && type != "sell") {
-      return send({ embeds: [new ErrorEmbed("invalid order type (**b**uy/**s**ell)")] });
-    }
-
-    if ((await getMarketOrders(message.member, type)).length >= max)
-      return send({
-        embeds: [new ErrorEmbed(`you are at the max number of ${type} orders`)],
-      });
-
-    if (!selected) {
-      return send({ embeds: [new ErrorEmbed("couldnt find that item")] });
-    }
-
-    if (selected.account_locked) {
-      return send({ embeds: [new ErrorEmbed("this item cannot be traded")] });
-    }
-
-    if (!price) {
-      price = amount;
-      amount = "1";
-    }
-
-    if (amount.toLowerCase() === "all") {
-      amount = Math.max((await getInventory(message.member)).count(selected.id), 1).toString();
-    }
-
-    if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
-      return send({ embeds: [new ErrorEmbed("invalid amount")] });
-    }
-
-    if (parseInt(amount) > 100_000) {
-      return send({ embeds: [new ErrorEmbed("the maximum amount of items per order is 100,000")] });
-    }
-
-    if (!parseInt(price) || isNaN(parseInt(price)) || parseInt(price) < 1) {
-      return send({ embeds: [new ErrorEmbed("invalid price")] });
-    }
-
-    const cost = await formatBet(price.toLowerCase(), message.member).catch(() => {});
-
-    if (!cost) return send({ embeds: [new ErrorEmbed("invalid price")] });
-    if (cost > 10_000_000_000)
-      return send({ embeds: [new ErrorEmbed("the maximum price per item is $10b")] });
-
-    const itemWorth = await calcItemValue(selected.id);
-
-    if (type == "buy") {
-      if ((await getBalance(message.member)) < parseInt(amount) * cost) {
-        return send({ embeds: [new ErrorEmbed("you don't have enough money")] });
-      }
-
-      let msg: NypsiMessage;
-
-      if (cost >= itemWorth * 1.5) {
-        const res = await confirmCreation(cost, itemWorth, "buy");
-        if (res) msg = res.msg;
-        else return;
-      }
-
-      if ((await getBalance(message.member)) < parseInt(amount) * cost) {
-        return msg.edit({ embeds: [new ErrorEmbed("sneaky bitch")], components: [] });
-      }
-
-      const userItemSellOrders = (await getMarketOrders(message.member, "sell")).filter(
-        (i) => i.itemId == selected.id,
-      );
-
-      if (
-        userItemSellOrders.length > 0 &&
-        userItemSellOrders.reduce((a, b) => (a.price < b.price ? a : b)).price < cost
-      ) {
-        return send({
-          embeds: [
-            new ErrorEmbed(
-              "you cannot make a buy order for more than your lowest sell order for this item",
-            ),
-          ],
-        });
-      }
-
-      await removeBalance(message.member, parseInt(amount) * cost);
-
-      const createRes = await createMarketOrder(
-        message.member,
-        selected.id,
-        parseInt(amount),
-        cost,
-        "buy",
-        message.client as NypsiClient,
-      );
-
-      let description: string;
-
-      if (createRes.sold) {
-        description = `✅ your buy order has been instantly fulfilled`;
-      } else if (createRes.amount < parseInt(amount)) {
-        description = `✅ your buy order has been partially fulfilled`;
-      } else {
-        description = `✅ your buy order has been created`;
-      }
-
-      if (createRes.url) description = `[${description}](${createRes.url})`;
-
-      if (msg) {
-        return msg.edit({
-          embeds: [new CustomEmbed(message.member, description)],
-          components: [],
-        });
-      } else {
-        return send({
-          embeds: [new CustomEmbed(message.member, description)],
-        });
-      }
-    } else if (type == "sell") {
-      let inventory = await getInventory(message.member);
-
-      if (inventory.count(selected.id) < parseInt(amount)) {
-        return send({
-          embeds: [new ErrorEmbed(`you don't have enough ${selected.plural}`)],
-        });
-      }
-
-      let msg: NypsiMessage;
-
-      if (cost <= itemWorth / 1.5) {
-        const res = await confirmCreation(cost, itemWorth, "sell");
-        if (res) msg = res.msg;
-        else return;
-      }
-
-      inventory = await getInventory(message.member);
-
-      if (inventory.count(selected.id) < parseInt(amount)) {
-        return msg.edit({ embeds: [new ErrorEmbed("sneaky bitch")], components: [] });
-      }
-
-      const userItemBuyOrders = (await getMarketOrders(message.member, "buy")).filter(
-        (i) => i.itemId == selected.id,
-      );
-
-      if (
-        userItemBuyOrders.length > 0 &&
-        userItemBuyOrders.reduce((a, b) => (a.price > b.price ? a : b)).price > cost
-      ) {
-        return send({
-          embeds: [
-            new ErrorEmbed(
-              "you cannot make a sell order for less than your highest buy order for this item",
-            ),
-          ],
-        });
-      }
-
-      await removeInventoryItem(message.member, selected.id, parseInt(amount));
-
-      const createRes = await createMarketOrder(
-        message.member,
-        selected.id,
-        parseInt(amount),
-        cost,
-        "sell",
-        message.client as NypsiClient,
-      );
-
-      let description: string;
-
-      if (createRes.sold) {
-        description = `✅ your sell order has been instantly fulfilled`;
-      } else if (createRes.amount < parseInt(amount)) {
-        description = `✅ your sell order has been partially fulfilled`;
-      } else {
-        description = `✅ your sell order has been created`;
-      }
-
-      if (createRes.url) description = `[${description}](${createRes.url})`;
-
-      if (msg) {
-        return msg.edit({
-          embeds: [new CustomEmbed(message.member, description)],
-          components: [],
-        });
-      } else {
-        return send({
-          embeds: [new CustomEmbed(message.member, description)],
-        });
-      }
-    }
+    return send({
+      embeds: [
+        new ErrorEmbed("order creation has moved to /market buy|sell <item> <amount> <price>"),
+      ],
+    });
   } else if (args[0].toLowerCase().includes("help")) {
     const embed = new CustomEmbed(message.member).setHeader("market help");
 
@@ -1385,7 +1306,7 @@ async function run(
       {
         name: "usage",
         value:
-          "/market manage\n/market create <item> <buy/sell> <amount> <price>\n/market <buy/sell> <item> [amount]\n/market search <item>\n/market watch <item> <buy/sell> [price]",
+          "/market manage\n/market <buy/sell> <item> <amount> [price]\n/market search <item>\n/market watch <item> <buy/sell> [price]",
       },
       {
         name: "buy/sell orders",
