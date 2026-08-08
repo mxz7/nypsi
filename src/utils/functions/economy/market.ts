@@ -85,7 +85,7 @@ async function lockMarketRows(
   const advisoryStartedAt = Date.now();
 
   logger.debug("market: waiting for postgres advisory lock", { itemId });
-  await prisma.$queryRaw`SELECT pg_advisory_xact_lock(hashtext('market'), hashtext(${itemId}))`;
+  await prisma.$queryRaw`SELECT pg_advisory_xact_lock(hashtext('market'), hashtext(${itemId}))::text`;
   logger.debug("market: acquired postgres advisory lock", {
     itemId,
     waitMs: Date.now() - advisoryStartedAt,
