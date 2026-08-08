@@ -28,12 +28,11 @@ import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Item } from "../types/Economy";
 import Constants from "../utils/Constants";
-import { addBalance, getBalance, removeBalance } from "../utils/functions/economy/balance";
+import { addBalance, getBalance } from "../utils/functions/economy/balance";
 import {
   addInventoryItem,
   calcItemValue,
   getInventory,
-  removeInventoryItem,
   selectItem,
 } from "../utils/functions/economy/inventory";
 import { getRawLevel } from "../utils/functions/economy/levelling";
@@ -532,8 +531,6 @@ async function run(
               return pageManager();
             }
 
-            await removeBalance(message.member, parseInt(amount) * cost);
-
             const createRes = await createMarketOrder(
               message.member,
               selected.id,
@@ -542,6 +539,15 @@ async function run(
               "buy",
               message.client as NypsiClient,
             );
+
+            if ("error" in createRes) {
+              await res.editReply({
+                embeds: [new ErrorEmbed("you don't have enough money")],
+                options: { flags: MessageFlags.Ephemeral },
+              });
+              await updateEmbed();
+              return pageManager();
+            }
 
             await res.editReply({
               embeds: [
@@ -607,8 +613,6 @@ async function run(
               return pageManager();
             }
 
-            await removeInventoryItem(message.member, selected.id, parseInt(amount));
-
             const createRes = await createMarketOrder(
               message.member,
               selected.id,
@@ -617,6 +621,15 @@ async function run(
               "sell",
               message.client as NypsiClient,
             );
+
+            if ("error" in createRes) {
+              await res.editReply({
+                embeds: [new ErrorEmbed(`you don't have enough ${selected.plural}`)],
+                options: { flags: MessageFlags.Ephemeral },
+              });
+              await updateEmbed();
+              return pageManager();
+            }
 
             await res.editReply({
               embeds: [
@@ -775,7 +788,7 @@ async function run(
   };
 
   const formatOrderCreation = (
-    result: Awaited<ReturnType<typeof createMarketOrder>>,
+    result: Extract<Awaited<ReturnType<typeof createMarketOrder>>, { fills: unknown }>,
     type: OrderType,
     selected: Item,
     price: number,
@@ -891,8 +904,6 @@ async function run(
           "you cannot make a buy order for more than your lowest sell order for this item",
         );
       }
-
-      await removeBalance(message.member, itemAmount * cost);
     } else {
       if ((await getInventory(message.member)).count(selected.id) < itemAmount) {
         return showError(`you don't have enough ${selected.plural}`);
@@ -907,8 +918,6 @@ async function run(
           "you cannot make a sell order for less than your highest buy order for this item",
         );
       }
-
-      await removeInventoryItem(message.member, selected.id, itemAmount);
     }
 
     const result = await createMarketOrder(
@@ -919,6 +928,15 @@ async function run(
       type,
       message.client as NypsiClient,
     );
+
+    if ("error" in result) {
+      return showError(
+        result.error === "insufficient_balance"
+          ? "you don't have enough money"
+          : `you don't have enough ${selected.plural}`,
+      );
+    }
+
     const embed = new CustomEmbed(
       message.member,
       formatOrderCreation(result, type, selected, cost),
