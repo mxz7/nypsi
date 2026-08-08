@@ -83,10 +83,12 @@ if (claim) outputMulti += (await rollPet(member, "farm")) ?? 0;
 Do not recursively call command handlers, preserve durability, alter durability consumption, or
 roll again for pet-generated attempts.
 
-After a successful activation count update, check `dms.petActivation`. When enabled, add a concise
-activation notice with `addInlineNotification`. This notification is inline only; never send it
-through `addNotificationToQueue`. Bakery, fish, hunt, and mine activations are exceptions because
-their command responses show the pet's contribution directly.
+After a successful activation count update, bakery, fish, hunt, and mine show the contribution in
+their command response. For other targets, `trackPetActivation` stores per-user counts and the
+window start time under `Constants.redis.nypsi.PET_ACTIVATIONS`. On each activation, if the window
+is at least one hour old, add one inline notification with the total activation count and clear it;
+otherwise update the stored count. Do not use a scheduled job for these summaries. Clear pending
+counts when `dms.petActivation` is disabled. Use `ms` for the window and Redis TTL durations.
 
 ## Command and item use
 
