@@ -290,6 +290,7 @@ export default {
       GEM_GIVEN: "nypsi:gemgiven",
       HOURLY_DB_REPORT: "nypsi:hourlydbreport",
       HOURLY_DB_REPORT_COUNT: "nypsi:hourlydbreport_count",
+      PET_ACTIVATIONS: "nypsi:pets:activations",
       LOCKED_OUT: "nypsi:requirescaptcha",
       MILF_QUEUE: "nypsi:milf:queue",
       NEWS_SEEN: "nypsi:news:seen",
