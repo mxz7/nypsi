@@ -29,7 +29,12 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Item } from "../types/Economy";
 import Constants from "../utils/Constants";
 import { getBalance } from "../utils/functions/economy/balance";
-import { calcItemValue, getInventory, selectItem } from "../utils/functions/economy/inventory";
+import {
+  calcItemValue,
+  getInventory,
+  hasItemValueData,
+  selectItem,
+} from "../utils/functions/economy/inventory";
 import { getRawLevel } from "../utils/functions/economy/levelling";
 import {
   countItemOnMarket,
@@ -799,6 +804,7 @@ async function run(
     amountInput: string,
     priceInput: string,
     maxOrders: number,
+    responseMessage?: NypsiMessage,
   ) => {
     if ((await getMarketOrders(message.member, type)).length >= maxOrders) {
       return send({ embeds: [new ErrorEmbed(`you are at the max number of ${type} orders`)] });
@@ -843,7 +849,7 @@ async function run(
     }
 
     const itemWorth = await calcItemValue(selected.id);
-    let msg: NypsiMessage;
+    let msg = responseMessage;
 
     if (
       (type === "buy" && cost >= itemWorth * 1.5) ||
@@ -920,6 +926,44 @@ async function run(
 
     if (msg) return msg.edit({ embeds: [embed], components: [] });
     return send({ embeds: [embed] });
+  };
+
+  const showSuggestedOrder = async (type: OrderType, item: Item, amount: number) => {
+    const [hasValueData, itemWorth] = await Promise.all([
+      hasItemValueData(item.id),
+      calcItemValue(item.id),
+    ]);
+    const noResultsEmbed = new ErrorEmbed(`not enough ${item.plural} on the market`).setFooter({
+      text: `create a ${type} order with /market ${type} <item> <amount> <price>`,
+    });
+
+    if (!hasValueData || itemWorth === undefined) return send({ embeds: [noResultsEmbed] });
+
+    const embed = new CustomEmbed(message.member).setDescription(
+      `not enough ${item.plural} on the market. create a ${type} order at the current item value instead?`,
+    );
+
+    const id = `market-suggested-${type}-${Math.floor(Math.random() * 69420)}`;
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId(id)
+        .setLabel(`create ${type} order at $${itemWorth.toLocaleString()}`)
+        .setStyle(ButtonStyle.Primary),
+    );
+    const msg = (await send({ embeds: [embed], components: [row] })) as NypsiMessage;
+
+    const interaction = await msg
+      .awaitMessageComponent({ filter: (i) => i.user.id === message.author.id, time: 60000 })
+      .catch(async () => {
+        await msg.edit({ components: [] });
+      });
+
+    if (!interaction || interaction.customId !== id) return;
+
+    await interaction.deferUpdate();
+    await msg.edit({ components: [] });
+
+    return createOrder(type, item, amount.toString(), itemWorth.toString(), max, msg);
   };
 
   const deleteOrder = async (
@@ -1236,13 +1280,7 @@ async function run(
     if (
       (await getMarketTransactionData(item.id, parseInt(amount), "sell", message.member)).cost == -1
     ) {
-      return send({
-        embeds: [
-          new ErrorEmbed(`not enough ${item.plural} on the market`).setFooter({
-            text: "create a buy order with /market buy <item> <amount> <price>",
-          }),
-        ],
-      });
+      return showSuggestedOrder("buy", item, parseInt(amount));
     }
 
     return await confirmTransaction("buy", item, parseInt(amount), message.member);
@@ -1277,13 +1315,7 @@ async function run(
     if (
       (await getMarketTransactionData(item.id, parseInt(amount), "buy", message.member)).cost == -1
     ) {
-      return send({
-        embeds: [
-          new ErrorEmbed(`not enough ${item.plural} on the market`).setFooter({
-            text: "create a sell order with /market sell <item> <amount> <price>",
-          }),
-        ],
-      });
+      return showSuggestedOrder("sell", item, parseInt(amount));
     }
 
     if (inventory.count(item.id) < parseInt(amount)) {
