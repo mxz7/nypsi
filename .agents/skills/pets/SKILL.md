@@ -30,7 +30,8 @@ generic effects framework, manager, repository, or separate manual upgrade flow.
 
 - Paid naming logic lives in `src/utils/functions/economy/pet-names.ts`. The first named pet costs
   $10 million and each additional currently named pet adds $10 million. Renaming uses the current
-  next-name price; removing a name always costs $5 million.
+  next-name price; removing a name always costs $10 million so removing then naming cannot undercut
+  a direct rename.
 - Pet names are limited to 16 characters and two words. They may contain only ASCII letters and
   numbers, with one ordinary space separating the words, and must pass `isUserContentAllowed` with
   `pet name` as the moderation source. Enforce the local format with `isValidPetName` in both the

@@ -8,7 +8,7 @@ import { getUserPet, updatePet } from "./pets";
 const petNamesMutex = new RedisMutex("pet-names");
 
 const PET_NAME_BASE_COST = 10_000_000;
-export const PET_NAME_REMOVAL_COST = 5_000_000;
+export const PET_NAME_REMOVAL_COST = PET_NAME_BASE_COST;
 
 export function calcPetNameCost(namedPetCount: number) {
   return PET_NAME_BASE_COST * (namedPetCount + 1);
