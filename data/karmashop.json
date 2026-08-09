@@ -58,7 +58,7 @@
     "name": "basic crate",
     "emoji": "📦",
     "id": "basic_crate",
-    "cost": 25,
+    "cost": 15,
     "items_left": 250,
     "aliases": ["basic"],
     "type": "item",
@@ -134,22 +134,11 @@
     "name": "pot of gold",
     "emoji": "<:pot_of_gold:1404088756415234048>",
     "id": "pot_of_gold",
-    "cost": 1500,
+    "cost": 1250,
     "items_left": 1,
     "type": "item",
     "value": "pot_of_gold",
     "aliases": ["mpot", "pog"],
-    "limit": 1
-  },
-  "magic_potato": {
-    "name": "magic potato",
-    "emoji": "🥔",
-    "id": "magic_potato",
-    "cost": 1500,
-    "items_left": 1,
-    "type": "item",
-    "value": "magic_potato",
-    "aliases": ["potato"],
     "limit": 1
   }
 }
