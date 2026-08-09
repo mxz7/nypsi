@@ -1,11 +1,41 @@
-import { describe, expect, test } from "vitest";
+import { afterAll, describe, expect, test } from "vitest";
 import {
+  decrypt,
+  encrypt,
   formatBytes,
   formatTime,
   getDuration,
   getOrdinalSuffix,
   pluralize,
 } from "../../src/utils/functions/string";
+
+const originalEncryptKey = process.env.ENCRYPT_KEY;
+
+afterAll(() => {
+  if (originalEncryptKey === undefined) {
+    delete process.env.ENCRYPT_KEY;
+  } else {
+    process.env.ENCRYPT_KEY = originalEncryptKey;
+  }
+});
+
+describe("encryption", () => {
+  test("decrypts ciphertext created by CryptoJS", () => {
+    process.env.ENCRYPT_KEY = "test encryption key";
+
+    expect(decrypt("U2FsdGVkX18AESIzRFVmd1yXDf7RtLj3L9NdwBSOk0nG5htjL3G9aNkBsZl2L957")).toBe(
+      "backwards compatible ✓",
+    );
+  });
+
+  test("round trips using the OpenSSL salted format", () => {
+    process.env.ENCRYPT_KEY = "test encryption key";
+    const ciphertext = encrypt("new encrypted content");
+
+    expect(Buffer.from(ciphertext, "base64").subarray(0, 8).toString()).toBe("Salted__");
+    expect(decrypt(ciphertext)).toBe("new encrypted content");
+  });
+});
 
 describe("getDuration", () => {
   test("parses a duration containing every supported unit", () => {

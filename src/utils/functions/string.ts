@@ -1,21 +1,42 @@
-import * as CryptoJS from "crypto-js";
+import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:crypto";
 import { Item, Plant, PlantUpgrade } from "../../types/Economy";
 import { WorkerUpgrades } from "../../types/Workers";
+
+const OPENSSL_SALTED_PREFIX = Buffer.from("Salted__");
+
+function deriveOpenSslKey(password: string, salt: Buffer): { iv: Buffer; key: Buffer } {
+  const passwordBytes = Buffer.from(password, "utf8");
+  let block = Buffer.alloc(0);
+  let derived = Buffer.alloc(0);
+
+  while (derived.length < 48) {
+    block = createHash("md5").update(block).update(passwordBytes).update(salt).digest();
+    derived = Buffer.concat([derived, block]);
+  }
+
+  return {
+    key: derived.subarray(0, 32),
+    iv: derived.subarray(32, 48),
+  };
+}
 
 export function cleanString(string: string): string {
   return string.replace(/[^A-z0-9\s]/g, "").toLowerCase();
 }
 
 export function encrypt(content: string): string {
-  let ciphertext;
-
   try {
-    ciphertext = CryptoJS.AES.encrypt(content, process.env.ENCRYPT_KEY);
+    if (!process.env.ENCRYPT_KEY) throw new Error("ENCRYPT_KEY is not set");
+
+    const salt = randomBytes(8);
+    const { key, iv } = deriveOpenSslKey(process.env.ENCRYPT_KEY, salt);
+    const cipher = createCipheriv("aes-256-cbc", key, iv);
+    const encrypted = Buffer.concat([cipher.update(content, "utf8"), cipher.final()]);
+
+    return Buffer.concat([OPENSSL_SALTED_PREFIX, salt, encrypted]).toString("base64");
   } catch {
     return "noencrypt:@:";
   }
-
-  return ciphertext.toString();
 }
 
 export function decrypt(ciphertext: string): string {
@@ -23,9 +44,14 @@ export function decrypt(ciphertext: string): string {
     return ciphertext.split("noencrypt:@:")[1];
   }
 
-  const bytes = CryptoJS.AES.decrypt(ciphertext, process.env.ENCRYPT_KEY);
+  const encrypted = Buffer.from(ciphertext, "base64");
+  const salt = encrypted.subarray(8, 16);
+  const { key, iv } = deriveOpenSslKey(process.env.ENCRYPT_KEY, salt);
+  const decipher = createDecipheriv("aes-256-cbc", key, iv);
 
-  return bytes.toString(CryptoJS.enc.Utf8);
+  return Buffer.concat([decipher.update(encrypted.subarray(16)), decipher.final()]).toString(
+    "utf8",
+  );
 }
 
 export function getZeroWidth() {
