@@ -310,6 +310,7 @@ export default {
       KARMA_NEXT_OPEN: "nypsi:ks:nextopen",
       KARMA_SHOP_ITEMS: "nypsi:ks:items",
       KARMA_SHOP_BUYING: "nypsi:ks:buying",
+      KARMA_SHOP_NOTIFIED: "nypsi:ks:notified",
       AUTO_SELL_ITEMS: "nypsi:autosell:items",
       AUTO_SELL_ITEMS_MEMBERS: "nypsi:autosell:items:members",
       AUTO_SELL_PROCESS: "nypsi:autosell:process",

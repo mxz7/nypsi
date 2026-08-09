@@ -56,6 +56,7 @@ import { getDisabledCommands } from "../functions/guilds/disabledcommands";
 import { getChatFilter } from "../functions/guilds/filters";
 import { getPrefix } from "../functions/guilds/utils";
 import { addKarma, getKarma } from "../functions/karma/karma";
+import { getLastKarmaShopOpen, isKarmaShopOpen } from "../functions/karma/karmashop";
 import { getAllGroupAccountIds } from "../functions/moderation/alts";
 import { getNews, hasSeenNews } from "../functions/news";
 import { getUserAliases } from "../functions/premium/aliases";
@@ -799,6 +800,22 @@ export async function runCommand(
       const news = await getNews();
 
       const embeds: (Embed | CustomEmbed | APIEmbed)[] = [];
+
+      if ((await isKarmaShopOpen()) && (await getKarma(message.author.id)) > 100) {
+        const opening = (await getLastKarmaShopOpen()).getTime();
+        const notificationKey = `${Constants.redis.nypsi.KARMA_SHOP_NOTIFIED}:${opening}:${message.author.id}`;
+        const claimed = await redis.set(notificationKey, "t", "EX", ms("1 hour") / 1000, "NX");
+
+        if (claimed) {
+          await addInlineNotification({
+            memberId: message.author.id,
+            embed: new CustomEmbed(
+              message.member,
+              "the karma shop is open! use `/karmashop view` to see what's available 🔮",
+            ),
+          });
+        }
+      }
 
       if (
         news.text != "" &&
