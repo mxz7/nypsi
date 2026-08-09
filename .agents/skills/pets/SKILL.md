@@ -68,10 +68,11 @@ if (claim) outputMulti += (await rollPet(member, "farm")) ?? 0;
 
 - Fish, hunt, and mine: get the active pet, roll once before the existing attempt loop, and add the
   result directly to `times`. When it activates, append `formatPetFoundItem` below the existing
-  command description; do not add a separate embed field. Use `takePetFoundItem` after reward and
-  progress calculations to move one item type and its full quantity out of the normal displayed
+  command description; do not add a separate embed field. The pet line uses the command's result
+  verb: caught for fish, killed for hunt, and found for mine. Use `takePetFoundItem` after reward
+  and progress calculations to move one item type and its full quantity out of the normal displayed
   list and onto the pet line without changing actual rewards. If there is no real item, say the pet
-  found nothing.
+  caught, killed, or found nothing as appropriate.
 - Bakery: add the cow benefit to the total output multiplier inside `runBakery`; activation doubles
   the output.
 - XP: roll eagle inside `getXpBonus` and add its benefit to `boosterEffect`, exactly like an XP

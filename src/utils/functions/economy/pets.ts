@@ -36,14 +36,17 @@ export function getPetDisplayName(pet: Pet) {
 
 export function formatPetFoundItem(pet: Pet, found?: { itemId: string; amount: number }) {
   const items = getItems();
-  const petItem = items[getPetsData()[pet.petId].item];
+  const petData = getPetsData()[pet.petId];
+  const petItem = items[petData.item];
+  const resultVerb =
+    petData.target === "fish" ? "caught" : petData.target === "hunt" ? "killed" : "found";
 
   if (!found) {
-    return `${petItem.emoji} **${getPetDisplayName(pet)}** found **nothing**`;
+    return `${petItem.emoji} **${getPetDisplayName(pet)}** ${resultVerb} **nothing**`;
   }
 
   const foundItem = items[found.itemId];
-  return `${petItem.emoji} **${getPetDisplayName(pet)}** found \`${found.amount.toLocaleString()}x\` ${foundItem.emoji} **${foundItem.name}**`;
+  return `${petItem.emoji} **${getPetDisplayName(pet)}** ${resultVerb} \`${found.amount.toLocaleString()}x\` ${foundItem.emoji} **${foundItem.name}**`;
 }
 
 export function takePetFoundItem(foundItems: Map<string, number>) {
