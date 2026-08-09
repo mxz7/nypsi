@@ -1,74 +1,44 @@
-import ms = require("ms");
-import { randomUUID } from "crypto";
-import {
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  GuildTextBasedChannel,
-  MessageActionRowComponentBuilder,
-  User,
-} from "discord.js";
+import { Routes } from "discord-api-types/v10";
+import { GuildTextBasedChannel, User } from "discord.js";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { NypsiClient } from "../../models/Client";
-import { CustomEmbed, ErrorEmbed } from "../../models/EmbedBuilders";
-import { LootPoolResult } from "../../types/LootPool";
+import { CustomEmbed } from "../../models/EmbedBuilders";
 import Constants from "../../utils/Constants";
-import { findChannelCluster } from "../../utils/functions/clusters";
 import { MStoTime } from "../../utils/functions/date";
-import { addProgress } from "../../utils/functions/economy/achievements";
-import { addEventProgress } from "../../utils/functions/economy/events";
-import { hasGemBeenGiven, markGemAsGiven } from "../../utils/functions/economy/gems";
+import { hasGemBeenGiven } from "../../utils/functions/economy/gems";
 import { isGem, itemExists } from "../../utils/functions/economy/inventory";
-import {
-  describeLootPoolResult,
-  giveLootPoolResult,
-  rollLootPool,
-} from "../../utils/functions/economy/loot_pools";
-import { addTaskProgress } from "../../utils/functions/economy/tasks";
-import {
-  createUser,
-  getItems,
-  getLootPools,
-  isEcoBanned,
-  userExists,
-} from "../../utils/functions/economy/utils";
-import { getPrefix } from "../../utils/functions/guilds/utils";
+import { startLootDrop } from "../../utils/functions/economy/loot-drops";
+import { rollLootPool } from "../../utils/functions/economy/loot_pools";
+import { getItems, getLootPools } from "../../utils/functions/economy/utils";
 import { removeUserPlaying, setUserPlaying } from "../../utils/functions/playing";
 import { percentChance, shuffle } from "../../utils/functions/random";
 import sleep from "../../utils/functions/sleep";
-import { escapeFormattingCharacters, getZeroWidth } from "../../utils/functions/string";
-import { getLastKnownUsername } from "../../utils/functions/users/username";
-import { createProfile, hasProfile } from "../../utils/functions/users/utils";
+import { escapeFormattingCharacters } from "../../utils/functions/string";
 import { logger } from "../../utils/logger";
+import { getRest } from "../../utils/rest";
 import dayjs = require("dayjs");
+import ms = require("ms");
 import pAll = require("p-all");
 
 const max = 3;
 const cooldownSeconds = 900;
 const activityWithinSeconds = 20;
 const activeUsersRequired = 2;
-const words = [
-  "nypsi",
-  "nypsi best discord bot",
-  "{prefix}boob",
-  "{prefix}pp",
-  "{prefix}bake",
-  "{prefix}slots all",
-  "{prefix}height",
-  "{prefix}findamilf",
-  "{prefix}cat",
-  "{prefix}dog",
-  "meow",
-];
 
 function doRandomDrop(client: NypsiClient) {
-  const rand = Math.floor(Math.random() * ms("10 minutes") + ms("3 minutes"));
+  const delay = Math.floor(Math.random() * ms("10 minutes") + ms("3 minutes"));
+
   setTimeout(() => {
-    randomDrop(client);
+    randomDrop(client).catch((error) =>
+      logger.error("lootdrop: random drop cycle failed", {
+        clusterId: client.cluster.id,
+        error,
+      }),
+    );
     doRandomDrop(client);
-  }, rand);
-  logger.info(`::auto next random drops will occur in ${MStoTime(rand)}`);
+  }, delay);
+  logger.info(`lootdrop: next random drops will occur in ${MStoTime(delay)}`);
 }
 
 export default async function startRandomDrops(client: NypsiClient) {
@@ -86,36 +56,29 @@ async function getChannels() {
 
   const channels: { channelId: string; users: number }[] = [];
 
-  for (const i of query) {
-    const index = channels.findIndex((j) => j.channelId === i.channelId);
-    if (index > -1) {
-      channels[index].users++;
+  for (const activeChannel of query) {
+    const existing = channels.find((channel) => channel.channelId === activeChannel.channelId);
+
+    if (existing) {
+      existing.users++;
     } else {
-      channels.push({ channelId: i.channelId, users: 1 });
+      channels.push({ channelId: activeChannel.channelId, users: 1 });
     }
   }
 
   return channels
-    .filter((i) => i.users >= activeUsersRequired || percentChance(5))
-    .map((i) => i.channelId);
+    .filter((channel) => channel.users >= activeUsersRequired || percentChance(5))
+    .map((channel) => channel.channelId);
 }
 
 async function rollRandomDrop() {
   const gemGiven = await hasGemBeenGiven();
 
-  return await rollLootPool(
+  return rollLootPool(
     getLootPools().random_drop,
     async (itemId) =>
       (getItems()[itemId].unique && (await itemExists(itemId))) || (gemGiven && isGem(itemId)),
   );
-}
-
-async function giveRandomDropResult(winner: string, prize: LootPoolResult) {
-  await giveLootPoolResult(winner, prize, "random_drop");
-
-  if (prize.item && isGem(prize.item)) {
-    await markGemAsGiven();
-  }
 }
 
 async function randomDrop(client: NypsiClient) {
@@ -124,12 +87,11 @@ async function randomDrop(client: NypsiClient) {
   if (
     channels.length === 0 ||
     (await redis.get("nypsi:maintenance")) ||
-    (await redis.get(`${Constants.redis.nypsi.RESTART}:${client.cluster.id}`)) == "t"
+    (await redis.get(`${Constants.redis.nypsi.RESTART}:${client.cluster.id}`)) === "t"
   )
     return;
 
   let count = 0;
-
   const functions = [];
 
   for (const channelId of shuffle(channels)) {
@@ -143,643 +105,104 @@ async function randomDrop(client: NypsiClient) {
 
       const prize = await rollRandomDrop();
 
-      const games = [fastClickGame, clickSpecificGame, typeFastGame];
-
-      logger.info(`random drop started in ${channelId}`);
-      const winner = await games[Math.floor(Math.random() * games.length)](
-        client,
-        channelId,
-        prize,
-      );
-
-      if (winner) {
-        if (!(await hasProfile(winner))) await createProfile(winner);
-        if (!(await userExists(winner))) await createUser(winner);
-        if ((await isEcoBanned(winner).catch(() => ({ banned: false }))).banned) return;
-
-        logger.info(
-          `random drop in ${channelId} winner: ${winner} (${await getLastKnownUsername(
-            winner,
-            false,
-          )}) prize: ${JSON.stringify(prize)}`,
-        );
-
-        switch (prize.item) {
-          case "pumpkin":
-            addEventProgress(client, winner, "halloween", prize.count || 1);
-            break;
-          case "christmas_tree":
-            addEventProgress(client, winner, "christmas", prize.count || 1);
-            break;
-        }
-
-        await giveRandomDropResult(winner, prize);
-        addProgress(winner, "lootdrops_pro", 1);
-        addTaskProgress(winner, "lootdrops");
-      }
-
-      if (count >= max) return;
+      logger.info(`lootdrop: starting random drop in ${channelId}`, { channelId, prize });
+      await startLootDrop(client, channelId, prize);
     });
   }
 
   await pAll(functions, { concurrency: 2 });
 }
 
-async function fastClickGame(
-  client: NypsiClient,
-  channelId: string,
-  prize: LootPoolResult,
-  rain?: string,
-) {
-  const cluster = await findChannelCluster(client, channelId);
-
-  if (typeof cluster.cluster !== "number") return;
-
-  const embed = new CustomEmbed()
-    .setColor(0xffffff)
-    .setHeader("loot drop", client.user.avatarURL())
-    .setDescription(`first to click the button wins ${describeLootPoolResult(prize)}`);
-  const winEmbed = new CustomEmbed()
-    .setColor(Constants.EMBED_SUCCESS_COLOR)
-    .setHeader(`you've won a loot drop!`)
-    .setDescription(`you've won ${describeLootPoolResult(prize)}`);
-
-  if (rain) {
-    embed.setFooter({ text: `${rain}'s rain` });
-    winEmbed.setFooter({ text: `${rain}'s rain` });
-  }
-
-  const buttonId = randomUUID();
-
-  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId(buttonId).setLabel("click me").setStyle(ButtonStyle.Success),
-  );
-
-  const winner = await client.cluster.broadcastEval(
-    async (c, { embed, row, channelId, cluster, buttonId, winEmbed, bannedEmbed }) => {
-      const client = c as unknown as NypsiClient;
-
-      if (client.cluster.id != cluster) return;
-
-      const channel = client.channels.cache.get(channelId);
-
-      if (!channel) return;
-
-      if (!channel.isSendable()) return;
-
-      const msg = await channel.send({ embeds: [embed], components: [row] });
-
-      const path = await import("path");
-
-      const { logger } = await import(path.join(process.cwd(), "dist", "utils", "logger.js"));
-
-      try {
-        const { isEcoBanned } = await import(
-          path.join(process.cwd(), "dist", "utils", "functions", "economy", "utils.js")
-        );
-
-        const started = Date.now();
-        const res = await msg
-          .awaitMessageComponent({
-            filter: async (i) => {
-              try {
-                if ((await isEcoBanned(i.user.id)).banned) {
-                  i.reply({ embeds: [bannedEmbed], flags: 64 });
-                  return false;
-                }
-              } catch (err) {
-                logger.error(
-                  `lootdrop: failed to check for ecoban on user ${i.user.id} in fastClick`,
-                  {
-                    err,
-                  },
-                );
-                return i.customId === buttonId;
-              }
-              return i.customId === buttonId;
-            },
-            time: 30000,
-          })
-          .catch((err) => {
-            logger.error("lootdrop: awaitInteraction failed in fastClick", { err, buttonId });
-          });
-
-        row.components.forEach((b) => (b.disabled = true));
-
-        if (!res) {
-          embed.description += "\n\nnobody clicked the button in time 😢";
-
-          await msg.edit({ embeds: [embed], components: [row] });
-          return;
-        }
-
-        embed.description += `\n\n**${res.user.username.replaceAll("_", "\\_")}** has won in \`${(
-          (Date.now() - started) /
-          1000
-        ).toFixed(2)}s\`!!`;
-
-        msg.edit({ embeds: [embed], components: [row] });
-        res.reply({ embeds: [winEmbed], flags: 64 });
-
-        return res.user.id;
-      } catch (err) {
-        logger.error("lootdrop: fastClick error", { err });
-
-        embed.description +=
-          "\n\nsomething went wrong with this lootdrop, please make a support ticket";
-
-        await msg.edit({ embeds: [embed], components: [row] });
-        return;
-      }
-    },
-    {
-      context: {
-        embed,
-        row,
-        channelId,
-        cluster: cluster.cluster,
-        buttonId,
-        winEmbed,
-        bannedEmbed: new ErrorEmbed("you're banned don't even try loser"),
-      },
-    },
-  );
-
-  const winnerId = winner.filter((i) => Boolean(i))[0];
-
-  if (!(await userExists(winnerId))) await createUser(winnerId);
-
-  return winnerId;
-}
-
-async function typeFastGame(
-  client: NypsiClient,
-  channelId: string,
-  prize: LootPoolResult,
-  rain?: string,
-) {
-  const cluster = await findChannelCluster(client, channelId);
-
-  if (typeof cluster.cluster !== "number") return;
-
-  const chosenWord = words[Math.floor(Math.random() * words.length)].replace(
-    `{prefix}`,
-    (await getPrefix(cluster.guildId))[0],
-  );
-
-  let displayWord = chosenWord;
-
-  const zeroWidthCount = chosenWord.length / 2;
-
-  for (let i = 0; i < zeroWidthCount; i++) {
-    const pos = Math.floor(Math.random() * chosenWord.length + 1);
-
-    displayWord = displayWord.substring(0, pos) + getZeroWidth() + displayWord.substring(pos);
-  }
-
-  const embed = new CustomEmbed()
-    .setColor(0xffffff)
-    .setHeader("loot drop", client.user.avatarURL())
-    .setDescription(`first to type \`${displayWord}\` wins ${describeLootPoolResult(prize)}`);
-
-  if (rain) {
-    embed.setFooter({ text: `${rain}'s rain` });
-  }
-
-  const winner = await client.cluster.broadcastEval(
-    async (c, { embed, channelId, cluster, chosenWord }) => {
-      const client = c as unknown as NypsiClient;
-
-      if (client.cluster.id != cluster) return;
-
-      const channel = client.channels.cache.get(channelId);
-
-      if (!channel) return;
-
-      if (!channel.isSendable()) return;
-
-      const msg = await channel.send({ embeds: [embed] });
-
-      const path = await import("path");
-
-      const { logger } = await import(path.join(process.cwd(), "dist", "utils", "logger.js"));
-
-      try {
-        const { isEcoBanned } = await import(
-          path.join(process.cwd(), "dist", "utils", "functions", "economy", "utils.js")
-        );
-
-        const started = Date.now();
-        const res = await channel
-          .awaitMessages({
-            filter: async (m) => {
-              try {
-                if ((await isEcoBanned(m.member.id)).banned) {
-                  return false;
-                }
-              } catch (err) {
-                logger.error(
-                  `lootdrop: failed to check for ecoban on user ${m.member.id} in typeFast`,
-                  {
-                    err,
-                  },
-                );
-                return m.content.toLowerCase() === chosenWord.toLowerCase();
-              }
-              return m.content.toLowerCase() === chosenWord.toLowerCase();
-            },
-            time: 30000,
-            max: 1,
-          })
-          .then((m) => m.first())
-          .catch((err) => logger.error("lootdrop: awaitMessages failed in typeFast", { err }));
-
-        if (!res) {
-          embed.description += "\n\nnobody won 😢";
-
-          await msg.edit({ embeds: [embed] });
-          return;
-        }
-
-        embed.description += `\n\n**${res.author.username.replaceAll("_", "\\_")}** has won in \`${(
-          (Date.now() - started) /
-          1000
-        ).toFixed(2)}s\`!!`;
-
-        res.react("🏆");
-        await msg.edit({ embeds: [embed] });
-
-        return res.author.id;
-      } catch (err) {
-        logger.error("lootdrop: typeFast error", { err });
-
-        embed.description +=
-          "\n\nsomething went wrong with this lootdrop, please make a support ticket";
-
-        await msg.edit({ embeds: [embed] });
-        return;
-      }
-    },
-    { context: { embed, channelId, cluster: cluster.cluster, chosenWord } },
-  );
-
-  const winnerId = winner.filter((i) => Boolean(i))[0];
-
-  if (!(await userExists(winnerId))) await createUser(winnerId);
-
-  return winnerId;
-}
-
-async function clickSpecificGame(
-  client: NypsiClient,
-  channelId: string,
-  prize: LootPoolResult,
-  rain?: string,
-) {
-  const cluster = await findChannelCluster(client, channelId);
-
-  if (typeof cluster.cluster !== "number") return;
-
-  const types = [
-    {
-      type: "colour",
-      values: [
-        { name: "red", label: "" },
-        { name: "blue", label: "" },
-        { name: "green", label: "" },
-        { name: "gray", label: "" },
-      ],
-    },
-    {
-      type: "emoji1",
-      values: [
-        { name: "laughing", label: "😂" },
-        { name: "yum", label: "😋" },
-        { name: "drooling", label: "🤤" },
-        { name: "kissing", label: "😘" },
-        { name: "sad", label: "☹️" },
-      ],
-    },
-    {
-      type: "emoji2",
-      values: [
-        { name: "angry", label: "😡" },
-        { name: "shocked", label: "😮" },
-        { name: "rich", label: "🤑" },
-        { name: "cowboy", label: "🤠" },
-        { name: "angel", label: "😇" },
-      ],
-    },
-    {
-      type: "emoji3",
-      values: [
-        { name: "angry", label: "😡" },
-        { name: "cheeky", label: "🤭" },
-        { name: "yummy", label: "😋" },
-        { name: "heart", label: "🫶" },
-        { name: "kissing", label: "😘" },
-      ],
-    },
-    {
-      type: "emoji4",
-      values: [
-        { name: "cheeky", label: "🤭" },
-        { name: "white heart", label: "🤍" },
-        { name: "bubbles", label: "🫧" },
-        { name: "loved", label: "🥰" },
-        { name: "eye rolling", label: "🙄" },
-      ],
-    },
-    {
-      type: "emoji5",
-      values: [
-        { name: "heart", label: "🫶" },
-        { name: "sad", label: "😔" },
-        { name: "spicy", label: "🌶️" },
-        { name: "happy", label: "😃" },
-        { name: "eye rolling", label: "🙄" },
-      ],
-    },
-    {
-      type: "emoji6",
-      values: [
-        { name: "detective", label: "🕵️‍♂️" },
-        { name: "sponge", label: "🧽" },
-        { name: "egg", label: "🍳" },
-        { name: "otter", label: "🦦" },
-        { name: "badminton", label: "🏸" },
-      ],
-    },
-  ];
-
-  const chosenType = types[Math.floor(Math.random() * types.length)];
-  const chosenValue = chosenType.values[Math.floor(Math.random() * chosenType.values.length)];
-
-  const embed = new CustomEmbed()
-    .setColor(0xffffff)
-    .setHeader("loot drop", client.user.avatarURL())
-    .setDescription(
-      `first to click the **${chosenValue.name}** ${
-        chosenType.type.includes("emoji") ? "emoji" : "button"
-      } wins ${describeLootPoolResult(prize)}`,
-    );
-  const winEmbed = new CustomEmbed()
-    .setColor(Constants.EMBED_SUCCESS_COLOR)
-    .setHeader(`you've won a loot drop!`)
-    .setDescription(`you've won ${describeLootPoolResult(prize)}`);
-  const failEmbed = new CustomEmbed()
-    .setColor(Constants.EMBED_FAIL_COLOR)
-    .setHeader(`uh oh ):`)
-    .setDescription(
-      `you clicked the wrong ${
-        chosenType.type.includes("emoji") ? "emoji" : "button"
-      }!! you had to click the **${chosenValue.name}** ${
-        chosenType.type.includes("emoji") ? "emoji" : "button"
-      }`,
-    );
-
-  if (rain) {
-    embed.setFooter({ text: `${rain}'s rain` });
-    winEmbed.setFooter({ text: `${rain}'s rain` });
-    failEmbed.setFooter({ text: `${rain}'s rain` });
-  }
-
-  const ids = [];
-  while (ids.length < 5) ids.push(randomUUID());
-
-  let winningId: string;
-
-  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>();
-
-  for (const i of shuffle(chosenType.values)) {
-    const id = ids.shift();
-
-    if (i.name === chosenValue.name) winningId = id;
-
-    const button = new ButtonBuilder().setCustomId(id);
-
-    if (chosenType.type.includes("emoji")) {
-      button.setEmoji(i.label);
-      button.setStyle(ButtonStyle.Secondary);
-    } else {
-      button.setLabel(getZeroWidth());
-      switch (i.name) {
-        case "red":
-          button.setStyle(ButtonStyle.Danger);
-          break;
-        case "blue":
-          button.setStyle(ButtonStyle.Primary);
-          break;
-        case "gray":
-          button.setStyle(ButtonStyle.Secondary);
-          break;
-        case "green":
-          button.setStyle(ButtonStyle.Success);
-          break;
-      }
-    }
-
-    row.addComponents(button);
-  }
-
-  const winner = await client.cluster.broadcastEval(
-    async (c, { embed, row, channelId, cluster, winningId, winEmbed, failEmbed, bannedEmbed }) => {
-      const client = c as unknown as NypsiClient;
-
-      if (client.cluster.id != cluster) return;
-
-      const channel = client.channels.cache.get(channelId);
-
-      if (!channel) return;
-
-      if (!channel.isSendable()) return;
-
-      const msg = await channel.send({ embeds: [embed], components: [row] });
-
-      const path = await import("path");
-
-      const { logger } = await import(path.join(process.cwd(), "dist", "utils", "logger.js"));
-
-      try {
-        const { isEcoBanned } = await import(
-          path.join(process.cwd(), "dist", "utils", "functions", "economy", "utils.js")
-        );
-
-        const losers: string[] = [];
-
-        const started = Date.now();
-        const res = await msg
-          .awaitMessageComponent({
-            filter: async (i) => {
-              if (losers.includes(i.user.id)) return;
-              if (i.customId !== winningId) {
-                i.reply({ embeds: [failEmbed], flags: 64 });
-                losers.push(i.user.id);
-                return false;
-              }
-
-              try {
-                if ((await isEcoBanned(i.user.id)).banned) {
-                  i.reply({ embeds: [bannedEmbed], flags: 64 });
-                  return false;
-                }
-              } catch (err) {
-                logger.error(
-                  `lootdrop: failed to check for ecoban on user ${i.user.id} in clickSpecific`,
-                  {
-                    err,
-                  },
-                );
-                return true;
-              }
-
-              return true;
-            },
-            time: 30000,
-          })
-          .catch((err) =>
-            logger.error("lootdrop: awaitInteraction failed in clickSpecific", { err, winningId }),
-          );
-
-        row.components.forEach((b) => (b.disabled = true));
-
-        if (!res) {
-          embed.description += "\n\nnobody clicked the button in time 😢";
-
-          await msg.edit({ embeds: [embed], components: [row] });
-          return;
-        }
-
-        embed.description += `\n\n**${res.user.username.replaceAll("_", "\\_")}** has won in \`${(
-          (Date.now() - started) /
-          1000
-        ).toFixed(2)}s\`!!`;
-
-        res
-          .update({ embeds: [embed], components: [row] })
-          .then(() => res.followUp({ embeds: [winEmbed], flags: 64 }));
-
-        return res.user.id;
-      } catch (err) {
-        logger.error("lootdrop: clickSpecific error", { err });
-
-        embed.description +=
-          "\n\nsomething went wrong with this lootdrop, please make a support ticket";
-
-        await msg.edit({ embeds: [embed], components: [row] });
-        return;
-      }
-    },
-    {
-      context: {
-        embed,
-        row,
-        channelId,
-        cluster: cluster.cluster,
-        winningId,
-        winEmbed,
-        failEmbed,
-        bannedEmbed: new ErrorEmbed("you're banned don't even try loser"),
-      },
-    },
-  );
-
-  const winnerId = winner.filter((i) => Boolean(i))[0];
-
-  if (!(await userExists(winnerId))) await createUser(winnerId);
-
-  return winnerId;
-}
-
 export async function startRandomDrop(client: NypsiClient, channelId: string, rain?: string) {
-  const prize = await rollRandomDrop();
+  try {
+    const prize = await rollRandomDrop();
 
-  const games = [fastClickGame, clickSpecificGame, typeFastGame];
-
-  logger.info(`random drop started in ${channelId} ${rain ? "(rain)" : ""}`);
-  const winner = await games[Math.floor(Math.random() * games.length)](
-    client,
-    channelId,
-    prize,
-    rain,
-  );
-
-  if (winner) {
-    if (!(await hasProfile(winner))) await createProfile(winner);
-    if (!(await userExists(winner))) await createUser(winner);
-    if ((await isEcoBanned(winner).catch(() => ({ banned: false }))).banned) return;
-
-    logger.info(
-      `random drop in ${channelId} winner: ${winner} (${await getLastKnownUsername(
-        winner,
-        false,
-      )}) prize: ${JSON.stringify(prize)} ${rain ? "(rain)" : ""}`,
-    );
-
-    switch (prize.item) {
-      case "pumpkin":
-        addEventProgress(client, winner, "halloween", prize.count || 1);
-        break;
-      case "christmas_tree":
-        addEventProgress(client, winner, "christmas", prize.count || 1);
-        break;
-    }
-
-    if (!rain) {
-      addProgress(winner, "lootdrops_pro", 1);
-      addTaskProgress(winner, "lootdrops");
-    }
-
-    await giveRandomDropResult(winner, prize);
+    logger.info(`lootdrop: starting random drop in ${channelId}`, { channelId, prize, rain });
+    await startLootDrop(client, channelId, prize, rain);
+  } catch (error) {
+    logger.error("lootdrop: failed to start random drop", { channelId, error, rain });
   }
+}
+
+async function sendLootRainMessage(
+  client: NypsiClient,
+  channelId: string,
+  user: User,
+  status: "starting" | "ended",
+) {
+  const description =
+    status === "starting"
+      ? `**${escapeFormattingCharacters(user.username)}'s loot rain is starting!!!**`
+      : `**${escapeFormattingCharacters(user.username)}'s loot rain has ended.**`;
+
+  await getRest(client)
+    .post(Routes.channelMessages(channelId), {
+      body: {
+        embeds: [new CustomEmbed(null, description).setColor(0xffffff)],
+      },
+    })
+    .catch((error) =>
+      logger.error(`lootdrop: failed to send loot rain ${status} message`, {
+        channelId,
+        error,
+        userId: user.id,
+      }),
+    );
 }
 
 export async function startLootRain(channel: GuildTextBasedChannel, user: User) {
   let length = 60;
   if (Constants.LOOT_RAIN_ALLOWED_CHANNELS.includes(channel.id)) length = 120;
 
-  logger.info(`starting loot rain in ${channel.id}`);
+  logger.info(`lootdrop: starting loot rain in ${channel.id}`, {
+    channelId: channel.id,
+    userId: user.id,
+  });
   if (await redis.exists(`nypsi:lootrain:channel:${channel.id}`)) return;
+
   await redis.set(`nypsi:lootrain:channel:${channel.id}`, "meow", "EX", length * 2);
   await setUserPlaying(channel.id, "loot rain");
 
-  let active = true;
+  const client = channel.client as NypsiClient;
 
-  await channel.send({
-    embeds: [
-      new CustomEmbed(
-        null,
-        `**${escapeFormattingCharacters(user.username)}'s loot rain is starting!!!**`,
-      ).setColor(0xffffff),
-    ],
-  });
-
+  await sendLootRainMessage(client, channel.id, user, "starting");
   await sleep(5000);
+
+  let active = true;
 
   setTimeout(() => {
     active = false;
     redis.del(`nypsi:lootrain:channel:${channel.id}`);
     removeUserPlaying(channel.id);
-    logger.info(`${channel.id} loot rain has ended`);
+    logger.info(`lootdrop: loot rain ended in ${channel.id}`, { channelId: channel.id });
   }, length * 1000);
 
   const spawn = async () => {
     if (!active) {
-      channel.send({
-        embeds: [
-          new CustomEmbed(
-            null,
-            `**${escapeFormattingCharacters(user.username)}'s loot rain has ended.**`,
-          ).setColor(0xffffff),
-        ],
-      });
+      await sendLootRainMessage(client, channel.id, user, "ended");
       return;
     }
 
-    setTimeout(spawn, Math.floor(Math.random() * 3000) + 4000);
-
-    startRandomDrop(channel.client as NypsiClient, channel.id, user.username);
+    setTimeout(
+      () => {
+        spawn().catch((error) =>
+          logger.error("lootdrop: loot rain spawn failed", {
+            channelId: channel.id,
+            error,
+            userId: user.id,
+          }),
+        );
+      },
+      Math.floor(Math.random() * 3000) + 4000,
+    );
+    await startRandomDrop(client, channel.id, user.username);
   };
 
-  spawn();
+  await spawn().catch((error) =>
+    logger.error("lootdrop: initial loot rain spawn failed", {
+      channelId: channel.id,
+      error,
+      userId: user.id,
+    }),
+  );
 }

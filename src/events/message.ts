@@ -20,6 +20,7 @@ import Constants from "../utils/Constants";
 import { isHelpChatAvailable } from "../utils/functions/ai/help-chat";
 import { a } from "../utils/functions/anticheat";
 import { addEventProgress } from "../utils/functions/economy/events";
+import { handleLootDropMessage } from "../utils/functions/economy/loot-drops";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { userExists } from "../utils/functions/economy/utils";
 import { trackCmdChannelActivity } from "../utils/functions/guilds/cmd-channels";
@@ -102,6 +103,15 @@ export default async function messageCreate(message: Message) {
   trackCmdChannelActivity(message.channel, "message", message.id);
 
   if (!message.channel.isSendable()) return;
+
+  void handleLootDropMessage(message).catch((error) =>
+    logger.error("lootdrop: message handler failed", {
+      channelId: message.channelId,
+      error,
+      messageId: message.id,
+      userId: message.author.id,
+    }),
+  );
 
   if (message.channel.isDMBased() && !message.author.bot) {
     logger.info("message in DM from " + message.author.username + ": " + message.content);

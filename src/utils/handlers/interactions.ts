@@ -11,6 +11,10 @@ import { logger } from "../logger";
 const autocompleteHandlers = new Map<string, AutocompleteHandler>();
 const interactionHandlers = new Map<string, InteractionHandler>();
 
+function getInteractionHandler(customId: string) {
+  return interactionHandlers.get(customId) ?? interactionHandlers.get(customId.split(":")[0]);
+}
+
 export async function loadInteractions() {
   const files = await readdir("./dist/interactions").then((r) =>
     r.filter((i) => i.endsWith(".js")),
@@ -47,7 +51,7 @@ export async function reloadInteractions() {
 export async function runInteraction(interaction: Interaction) {
   if (interaction.isAutocomplete()) {
     return autocompleteHandlers.get(interaction.options.getFocused(true).name)?.run(interaction);
-  } else if (interaction.isMessageComponent() && !interactionHandlers.has(interaction.customId)) {
+  } else if (interaction.isMessageComponent() && !getInteractionHandler(interaction.customId)) {
     if (!(await hasProfile(interaction.user.id))) await createProfile(interaction.user);
 
     if (
@@ -244,6 +248,6 @@ export async function runInteraction(interaction: Interaction) {
       }
       return;
     }
-    return interactionHandlers.get(interaction.customId)?.run(interaction);
+    return getInteractionHandler(interaction.customId)?.run(interaction);
   }
 }

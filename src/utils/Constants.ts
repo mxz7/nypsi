@@ -326,6 +326,7 @@ export default {
       FARM_STATUS_DM: "nypsi:farm:status:dm",
       TRADE_FULFILLING: "nypsi:trade:fulfilling",
       MARKET_DM: "nypsi:market:dm",
+      LOOT_DROP: "nypsi:lootdrop",
       DOCS_CONTENT: "nypsi:docs",
       COUNTER_ERROR: "nypsi:counter:error",
       LAST_SEASONAL_ITEM: "nypsi:last_seasonal_item",
