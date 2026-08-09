@@ -8,7 +8,6 @@ import {
   User,
 } from "discord.js";
 import { inPlaceSort, sort } from "fast-sort";
-import { compareTwoStrings } from "string-similarity";
 import { NypsiClient } from "../../models/Client";
 import Constants from "../Constants";
 import { logger } from "../logger";
@@ -18,6 +17,7 @@ import {
   SlimMember,
   transformGuildMemberToSlim,
 } from "./guilds/members";
+import { compareTwoStrings } from "./string";
 import chooseMember from "./workers/choosemember";
 import ms = require("ms");
 

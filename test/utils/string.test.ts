@@ -2,6 +2,7 @@ import { afterAll, describe, expect, test } from "vitest";
 import {
   decrypt,
   encrypt,
+  compareTwoStrings,
   formatBytes,
   formatTime,
   getDuration,
@@ -34,6 +35,28 @@ describe("encryption", () => {
 
     expect(Buffer.from(ciphertext, "base64").subarray(0, 8).toString()).toBe("Salted__");
     expect(decrypt(ciphertext)).toBe("new encrypted content");
+  });
+});
+
+describe("compareTwoStrings", () => {
+  test.each([
+    ["", "", 1],
+    ["a", "a", 1],
+    ["a", "b", 0],
+    ["hello", "hello", 1],
+    ["hello", "world", 0],
+    ["healed", "sealed", 0.8],
+    ["web applications", "applications of the web", 0.7878787878787878],
+  ])("compares %j with %j", (first, second, expected) => {
+    expect(compareTwoStrings(first, second)).toBe(expected);
+  });
+
+  test("ignores whitespace", () => {
+    expect(compareTwoStrings("hello world", "helloworld")).toBe(1);
+  });
+
+  test("counts duplicate bigrams only once per occurrence", () => {
+    expect(compareTwoStrings("aaaa", "aa")).toBe(0.5);
   });
 });
 

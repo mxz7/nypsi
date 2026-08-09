@@ -16,7 +16,6 @@ import {
   User,
 } from "discord.js";
 import { nanoid } from "nanoid";
-import { compareTwoStrings } from "string-similarity";
 import { countries } from "../../../../data/lists.json";
 import prisma from "../../../init/database";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../models/Command";
@@ -27,7 +26,7 @@ import { logger } from "../../logger";
 import { MStoTime } from "../date";
 import { addProgress } from "../economy/achievements";
 import { addTaskProgress } from "../economy/tasks";
-import { escapeFormattingCharacters } from "../string";
+import { compareTwoStrings, escapeFormattingCharacters } from "../string";
 import { fetchCountryData } from "./countries";
 
 export async function startGTFGame(

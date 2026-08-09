@@ -1,5 +1,4 @@
 import { Guild, GuildMember, Message, Role, ThreadChannel } from "discord.js";
-import * as stringSimilarity from "string-similarity";
 import prisma from "../../../init/database";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { RedisCache } from "../../cache";
@@ -19,6 +18,7 @@ import {
   isMuted,
   newMute,
 } from "../moderation/mute";
+import { compareTwoStrings } from "../string";
 import { isAltPunish } from "./altpunish";
 import ms = require("ms");
 
@@ -185,7 +185,7 @@ export async function checkMessageContent(
         }
       } else {
         for (const contentWord of content.split(" ")) {
-          const similarity = stringSimilarity.compareTwoStrings(word.content, contentWord);
+          const similarity = compareTwoStrings(word.content, contentWord);
 
           if (similarity >= (word.percentMatch || 100) / 100) {
             const contentModified = content.replace(contentWord, `**${contentWord}**`);

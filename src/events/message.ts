@@ -11,7 +11,6 @@ import {
   PermissionsBitField,
   TextChannel,
 } from "discord.js";
-import { compareTwoStrings } from "string-similarity";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
 import { NypsiMessage } from "../models/Command";
@@ -32,6 +31,7 @@ import { getGuildName, getPrefix, hasGuild } from "../utils/functions/guilds/uti
 import { isScamImage } from "../utils/functions/image";
 import { checkTriggers } from "../utils/functions/message-triggers";
 import sleep from "../utils/functions/sleep";
+import { compareTwoStrings } from "../utils/functions/string";
 import {
   getSupportRequest,
   handleAttachments,

@@ -95,9 +95,6 @@ importers:
       sharp:
         specifier: ^0.35.3
         version: 0.35.3(@types/node@25.6.0)
-      string-similarity:
-        specifier: 4.0.4
-        version: 4.0.4
       sudoku-gen:
         specifier: ^1.0.2
         version: 1.0.2
@@ -120,9 +117,6 @@ importers:
       '@types/node-os-utils':
         specifier: 1.3.4
         version: 1.3.4
-      '@types/string-similarity':
-        specifier: 4.0.2
-        version: 4.0.2
       '@types/urban-dictionary':
         specifier: 3.0.2
         version: 3.0.2
@@ -1465,9 +1459,6 @@ packages:
   '@types/react@19.2.18':
     resolution: {integrity: sha512-AnzbBERsrLKtk2XSfTbYRLjQPdy116Sty4q+T+Bp3IC4l6jNBvreVPAHmpq9qhXQM7CXZPjLVmGMw9sy+hxQ3w==}
 
-  '@types/string-similarity@4.0.2':
-    resolution: {integrity: sha512-LkJQ/jsXtCVMK+sKYAmX/8zEq+/46f1PTQw7YtmQwb74jemS1SlNLmARM2Zml9DgdDTWKAtc5L13WorpHPDjDA==}
-
   '@types/urban-dictionary@3.0.2':
     resolution: {integrity: sha512-JRzGHobtpGu8fepWfoxKgiquPkaOxAKp60xDpyjgJS7RVqVMnVg27Xz7kIllH2n4zyB+HWUhdoeZkTLPBN8vLg==}
 
@@ -2386,10 +2377,6 @@ packages:
 
   std-env@4.2.0:
     resolution: {integrity: sha512-oCUKSupKTHX53EyjDtuZQ64pjLJ6yYCtpmEw0goYxtjG9KpbRe8KAsl2tBUGU9DyMcJ0RwJ8GqJAFzMXcXW1Rw==}
-
-  string-similarity@4.0.4:
-    resolution: {integrity: sha512-/q/8Q4Bl4ZKAPjj8WerIBJWALKkaPRfrvhfF8k/B23i4nzrlRj2/go1m90In7nG/3XDSbOo0+pu6RvCTM9RGMQ==}
-    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
 
   sudoku-gen@1.0.2:
     resolution: {integrity: sha512-zQFQNbar9qGpbteAH7CQShGoR5lk7r4KYlt0Wsvts1eVMzLb2EZUovzc7gAmoHp+HmXGYadmqCyyXoY7QVEyhA==}
@@ -3599,8 +3586,6 @@ snapshots:
     dependencies:
       csstype: 3.2.3
 
-  '@types/string-similarity@4.0.2': {}
-
   '@types/urban-dictionary@3.0.2': {}
 
   '@types/ws@8.18.1':
@@ -4556,8 +4541,6 @@ snapshots:
   std-env@3.10.0: {}
 
   std-env@4.2.0: {}
-
-  string-similarity@4.0.4: {}
 
   sudoku-gen@1.0.2: {}
 
