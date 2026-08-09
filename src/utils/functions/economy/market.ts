@@ -1,3 +1,4 @@
+import { RESTPostAPIChannelMessageResult, Routes } from "discord-api-types/v10";
 import { ClusterManager } from "discord-hybrid-sharding";
 import {
   ActionRowBuilder,
@@ -9,7 +10,6 @@ import {
   MessageFlags,
   ModalBuilder,
   ModalSubmitInteraction,
-  TextChannel,
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
@@ -24,7 +24,7 @@ import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { transaction } from "../../discord-logs";
 import { logger } from "../../logger";
-import { findChannelCluster } from "../clusters";
+import { getRest } from "../../rest";
 import { getUserId, MemberResolvable } from "../member";
 import { getAllGroupAccountIds } from "../moderation/alts";
 import { RedisMutex } from "../mutex";
@@ -494,42 +494,30 @@ async function createMarketOrderUnlocked(
   creation.order.itemAmount = creation.remainingAmount;
 
   const payload = await getMarketOrderEmbed(creation.order);
-  const cluster = await findChannelCluster(client, Constants.MARKET_CHANNEL_ID);
+  let result: RESTPostAPIChannelMessageResult | undefined;
 
-  if (cluster) {
-    const result = await client.cluster
-      .broadcastEval(
-        async (client, { payload, channelId, cluster }) => {
-          const c = client as unknown as NypsiClient;
+  try {
+    result = (await getRest(client).post(Routes.channelMessages(Constants.MARKET_CHANNEL_ID), {
+      body: payload,
+    })) as RESTPostAPIChannelMessageResult;
+  } catch (error) {
+    logger.error("market: failed to create order message", {
+      channelId: Constants.MARKET_CHANNEL_ID,
+      error,
+      orderId: creation.order.id,
+    });
+  }
 
-          if (c.cluster.id !== cluster) return;
+  if (result) {
+    const url = `https://discord.com/channels/${Constants.NYPSI_SERVER_ID}/${Constants.MARKET_CHANNEL_ID}/${result.id}`;
 
-          const channel = client.channels.cache.get(channelId);
+    await prisma.market.update({
+      where: { id: creation.order.id },
+      data: { messageId: result.id },
+    });
 
-          if (!channel?.isSendable()) return;
-
-          try {
-            const msg = await channel.send(payload);
-            return { url: msg.url, id: msg.id };
-          } catch {
-            return;
-          }
-        },
-        {
-          context: { payload, channelId: Constants.MARKET_CHANNEL_ID, cluster: cluster.cluster },
-        },
-      )
-      .then((results) => results.find(Boolean));
-
-    if (result) {
-      await prisma.market.update({
-        where: { id: creation.order.id },
-        data: { messageId: result.id },
-      });
-
-      response.url = result.url;
-      checkMarketWatchers(itemId, creation.remainingAmount, member, orderType, price, result.url);
-    }
+    response.url = url;
+    checkMarketWatchers(itemId, creation.remainingAmount, member, orderType, price, url);
   }
 
   addStat(member, `market-created-${orderType}`);
@@ -768,32 +756,17 @@ async function deleteMarketOrderMessage(
   client: NypsiClient | ClusterManager | undefined,
 ) {
   if (messageId && client) {
-    await (client instanceof ClusterManager ? client : client.cluster).broadcastEval(
-      async (client, { channelId, guildId, messageId }) => {
-        const guild = client.guilds.cache.get(guildId);
+    const rest = getRest(client instanceof NypsiClient ? client : undefined);
 
-        if (!guild) return "no-guild";
-
-        const channel = guild.channels.cache.get(channelId);
-
-        if (!channel) return "no-channel";
-
-        if (!channel.isTextBased()) return "invalid-channel";
-
-        const message = await channel.messages.fetch(messageId).catch(() => {});
-
-        if (!message) return "no-message";
-
-        await message.delete().catch(() => {});
-      },
-      {
-        context: {
-          guildId: Constants.NYPSI_SERVER_ID,
+    await rest
+      .delete(Routes.channelMessage(Constants.MARKET_CHANNEL_ID, messageId))
+      .catch((error) =>
+        logger.error("market: failed to delete order message", {
           channelId: Constants.MARKET_CHANNEL_ID,
+          error,
           messageId,
-        },
-      },
-    );
+        }),
+      );
   }
 }
 
@@ -1121,26 +1094,16 @@ async function publishMarketSettlementEffects(fill: SettledMarketFill, client: N
 
   const embed = await getMarketOrderEmbed(order);
 
-  await client.cluster.broadcastEval(
-    async (client, { channelId, messageId, embed }) => {
-      const channel = client.channels.cache.get(channelId) as TextChannel;
-
-      if (!channel || !channel.isTextBased()) return "no-channel";
-
-      const msg = await channel.messages.fetch(messageId).catch(() => {});
-
-      if (!msg) return "no-msg";
-
-      await msg.edit(embed).catch(() => {});
-    },
-    {
-      context: {
+  await getRest(client)
+    .patch(Routes.channelMessage(Constants.MARKET_CHANNEL_ID, order.messageId), { body: embed })
+    .catch((error) =>
+      logger.error("market: failed to update order message", {
         channelId: Constants.MARKET_CHANNEL_ID,
+        error,
         messageId: order.messageId,
-        embed,
-      },
-    },
-  );
+        orderId: order.id,
+      }),
+    );
 }
 
 async function marketSellUnlocked(
