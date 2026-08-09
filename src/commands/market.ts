@@ -103,7 +103,10 @@ cmd.slashData
           .setRequired(true),
       )
       .addStringOption((option) =>
-        option.setName("amount").setDescription("how many of this item?").setRequired(true),
+        option
+          .setName("amount")
+          .setDescription("item amount, or price when buying one for over $100k")
+          .setRequired(true),
       )
       .addStringOption((option) =>
         option
@@ -125,7 +128,10 @@ cmd.slashData
           .setRequired(true),
       )
       .addStringOption((option) =>
-        option.setName("amount").setDescription("how many of this item?").setRequired(true),
+        option
+          .setName("amount")
+          .setDescription("item amount, or price when selling one for over $100k")
+          .setRequired(true),
       )
       .addStringOption((option) =>
         option
@@ -1241,6 +1247,7 @@ async function run(
     let amount = args[2] ?? "1";
 
     if (args[3]) return createOrder("buy", item, amount, args[3], max);
+    if ((formatNumber(amount) ?? 0) > 100_000) return createOrder("buy", item, "1", amount, max);
 
     if (amount.toLowerCase() == "all") {
       amount = (await getMarketItemOrders(item.id, "sell", message.member))
@@ -1295,6 +1302,7 @@ async function run(
     let amount = args[2] ?? "1";
 
     if (args[3]) return createOrder("sell", item, amount, args[3], max);
+    if ((formatNumber(amount) ?? 0) > 100_000) return createOrder("sell", item, "1", amount, max);
 
     const inventory = await getInventory(message.member);
 
