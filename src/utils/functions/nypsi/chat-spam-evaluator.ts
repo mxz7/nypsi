@@ -1,4 +1,4 @@
-import { compareTwoStrings } from "string-similarity";
+import { compareTwoStrings } from "../string";
 
 const PUNISHMENT_SCORE = 8;
 
