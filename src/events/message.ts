@@ -323,9 +323,10 @@ export default async function messageCreate(message: Message) {
   const commandArgs = commandPrefix
     ? message.content.substring(commandPrefix.length).split(" ")
     : undefined;
-  const resolvedCommand: ResolvedMessageCommand = commandName
-    ? await resolveMessageCommand(commandName, message as NypsiMessage, commandArgs)
-    : undefined;
+  const resolvedCommand: ResolvedMessageCommand =
+    commandName !== undefined
+      ? await resolveMessageCommand(commandName, message as NypsiMessage, commandArgs)
+      : undefined;
   const commandMessage = resolvedCommand && ["built-in", "premium"].includes(resolvedCommand.type);
 
   const checkTask = async () => {
