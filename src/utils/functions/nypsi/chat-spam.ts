@@ -1,4 +1,5 @@
 import { Message, PermissionsBitField } from "discord.js";
+import ms from "ms";
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { redisDeserialize, redisSerialize } from "../../cache";
@@ -8,10 +9,10 @@ import { MStoTime } from "../date";
 import { newCase } from "../moderation/cases";
 import { ChatSpamState, evaluateNypsiChatMessage } from "./chat-spam-evaluator";
 
-const STATE_TTL_SECONDS = 30 * 60;
-const STRIKE_TTL_SECONDS = 7 * 24 * 60 * 60;
+const STATE_TTL_SECONDS = 60;
+const STRIKE_TTL_SECONDS = Math.floor(ms("3 days") / 1000);
 // 15s, 30s, 1min, 5min, 30min, 2h, 12h, day, week
-const TIMEOUT_LENGTHS = [15, 30, 60, 300, 1800, 7200, 43200, 86400, 604800];
+const TIMEOUT_LENGTHS = [15, 30, 60, 300, 1800, 7200, 43200];
 
 export async function checkNypsiChatMessage(message: Message) {
   if (message.guildId !== Constants.NYPSI_SERVER_ID || message.author.bot || !message.member) {
