@@ -8,11 +8,11 @@ import {
   activityKey,
   archiveCmdChannel,
   CLOSE_COOLDOWN_SECONDS,
-  COMMAND_WINDOW_SECONDS,
-  commandActivityKey,
-  COMMANDS_PER_HALF_WINDOW,
   describeActivity,
   getCmdChannelState,
+  LOAD_EVENTS_PER_HALF_WINDOW,
+  LOAD_WINDOW_SECONDS,
+  loadActivityKey,
   MIN_CHANNELS,
   OPEN_COOLDOWN_SECONDS,
   RESIZE_COOLDOWN_KEY,
@@ -23,13 +23,13 @@ import { logger } from "../../utils/logger";
 
 const CHECK_INTERVAL_MS = 60_000;
 
-async function getCommandActivity(channelIds: string[]) {
+async function getLoadActivity(channelIds: string[]) {
   const now = Date.now();
-  const halfWindowMs = (COMMAND_WINDOW_SECONDS * 1000) / 2;
+  const halfWindowMs = (LOAD_WINDOW_SECONDS * 1000) / 2;
   const pipeline = redis.pipeline();
 
   for (const channelId of channelIds) {
-    const key = commandActivityKey(channelId);
+    const key = loadActivityKey(channelId);
 
     pipeline.zcount(key, now - halfWindowMs * 2, now - halfWindowMs - 1);
     pipeline.zcount(key, now - halfWindowMs, now);
@@ -49,7 +49,8 @@ async function getCommandActivity(channelIds: string[]) {
       channelId,
       previousHalf,
       currentHalf,
-      full: previousHalf >= COMMANDS_PER_HALF_WINDOW && currentHalf >= COMMANDS_PER_HALF_WINDOW,
+      full:
+        previousHalf >= LOAD_EVENTS_PER_HALF_WINDOW && currentHalf >= LOAD_EVENTS_PER_HALF_WINDOW,
     };
   });
 }
@@ -63,12 +64,12 @@ async function checkCmdChannels(guild: Guild) {
     RESIZE_COOLDOWN_KEY,
     ...(removalCandidate ? [activityKey(removalCandidate.id)] : []),
   ];
-  const [[cooldown, ...activityValues], commandActivity] = await Promise.all([
+  const [[cooldown, ...activityValues], loadActivity] = await Promise.all([
     redis.mget(keys),
-    getCommandActivity(state.active.map((channel) => channel.id)),
+    getLoadActivity(state.active.map((channel) => channel.id)),
   ]);
   const removalActivity = removalCandidate ? activityValues.shift() : null;
-  const allChannelsFull = commandActivity.every((channel) => channel.full);
+  const allChannelsFull = loadActivity.every((channel) => channel.full);
   const belowMinimum = state.active.length < MIN_CHANNELS;
   const canAdd = state.archived.length > 0 && (belowMinimum || allChannelsFull);
   const canRemove = Boolean(
@@ -88,7 +89,7 @@ async function checkCmdChannels(guild: Guild) {
           activity: describeActivity(removalActivity),
         }
       : null,
-    commandActivity: commandActivity.map((activity, index) => ({
+    loadActivity: loadActivity.map((activity, index) => ({
       ...activity,
       channelName: state.active[index].name,
     })),
@@ -139,8 +140,8 @@ export function startCmdChannelManager(client: NypsiClient) {
     shardId: guild.shardId,
     checkIntervalSeconds: CHECK_INTERVAL_MS / 1000,
     activityWindowSeconds: ACTIVITY_TTL_SECONDS,
-    commandWindowSeconds: COMMAND_WINDOW_SECONDS,
-    commandsPerHalfWindow: COMMANDS_PER_HALF_WINDOW,
+    loadWindowSeconds: LOAD_WINDOW_SECONDS,
+    loadEventsPerHalfWindow: LOAD_EVENTS_PER_HALF_WINDOW,
     openCooldownSeconds: OPEN_COOLDOWN_SECONDS,
     closeCooldownSeconds: CLOSE_COOLDOWN_SECONDS,
     minimumChannels: MIN_CHANNELS,

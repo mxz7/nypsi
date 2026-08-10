@@ -11,14 +11,14 @@ export const ACTIVE_CATEGORY_ID = "1246516186171314337";
 export const ARCHIVE_CATEGORY_ID = "1060585526945665197";
 export const MIN_CHANNELS = 3;
 export const ACTIVITY_TTL_SECONDS = 600;
-export const COMMAND_WINDOW_SECONDS = 30;
-export const COMMANDS_PER_HALF_WINDOW = 6;
+export const LOAD_WINDOW_SECONDS = 60;
+export const LOAD_EVENTS_PER_HALF_WINDOW = 12;
 export const OPEN_COOLDOWN_SECONDS = 120;
 export const CLOSE_COOLDOWN_SECONDS = 1200;
 const CHANNEL_NAME_PATTERN = /^cmds-(\d+)$/;
 
 const ACTIVITY_KEY = "nypsi:cmd-channels:activity";
-const COMMAND_ACTIVITY_KEY = "nypsi:cmd-channels:commands";
+const LOAD_ACTIVITY_KEY = "nypsi:cmd-channels:load";
 export const RESIZE_COOLDOWN_KEY = "nypsi:cmd-channels:resize-cooldown";
 
 const resizeMutex = new RedisMutex("nypsi:cmd-channels:resize", false, 30_000);
@@ -41,8 +41,8 @@ export function activityKey(channelId: string) {
   return `${ACTIVITY_KEY}:${channelId}`;
 }
 
-export function commandActivityKey(channelId: string) {
-  return `${COMMAND_ACTIVITY_KEY}:${channelId}`;
+export function loadActivityKey(channelId: string) {
+  return `${LOAD_ACTIVITY_KEY}:${channelId}`;
 }
 
 function getChannelNumber(channel: TextChannel) {
@@ -114,7 +114,11 @@ export function trackCmdChannelActivity(
   );
 }
 
-export function trackCmdChannelCommand(channel: ActivityChannel | null, commandId: string) {
+export function trackCmdChannelLoad(
+  channel: ActivityChannel | null,
+  activityId: string,
+  source: "message" | "slash-command",
+) {
   if (
     !channel ||
     channel.guildId !== Constants.NYPSI_SERVER_ID ||
@@ -123,19 +127,20 @@ export function trackCmdChannelCommand(channel: ActivityChannel | null, commandI
     return;
 
   const now = Date.now();
-  const key = commandActivityKey(channel.id);
+  const key = loadActivityKey(channel.id);
 
   redis
     .pipeline()
-    .zadd(key, now, commandId)
-    .zremrangebyscore(key, 0, now - COMMAND_WINDOW_SECONDS * 2000)
-    .expire(key, COMMAND_WINDOW_SECONDS * 2)
+    .zadd(key, now, activityId)
+    .zremrangebyscore(key, 0, now - LOAD_WINDOW_SECONDS * 2000)
+    .expire(key, LOAD_WINDOW_SECONDS * 2)
     .exec()
     .catch((error) =>
-      logger.warn("cmd-channels: failed to record command activity", {
+      logger.warn("cmd-channels: failed to record load activity", {
+        activityId,
+        source,
         error,
         channelId: channel.id,
-        commandId,
       }),
     );
 }

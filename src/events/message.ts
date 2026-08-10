@@ -24,7 +24,10 @@ import { addEventProgress } from "../utils/functions/economy/events";
 import { handleLootDropMessage } from "../utils/functions/economy/loot-drops";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { userExists } from "../utils/functions/economy/utils";
-import { trackCmdChannelActivity } from "../utils/functions/guilds/cmd-channels";
+import {
+  trackCmdChannelActivity,
+  trackCmdChannelLoad,
+} from "../utils/functions/guilds/cmd-channels";
 import { getLastCommand as getLastGuildCommand } from "../utils/functions/guilds/commands";
 import { checkAutoMute, checkMessageContent } from "../utils/functions/guilds/filters";
 import { addToMessageCache } from "../utils/functions/guilds/messages";
@@ -100,6 +103,7 @@ export default async function messageCreate(message: Message) {
   if (message.partial) await message.fetch();
 
   trackCmdChannelActivity(message.channel, "message", message.id);
+  if (!message.author.bot) trackCmdChannelLoad(message.channel, message.id, "message");
 
   if (!message.channel.isSendable()) return;
 
