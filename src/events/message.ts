@@ -34,7 +34,6 @@ import { isScamImage } from "../utils/functions/image";
 import { checkTriggers } from "../utils/functions/message-triggers";
 import { checkNypsiChatMessage } from "../utils/functions/nypsi/chat-spam";
 import sleep from "../utils/functions/sleep";
-import { compareTwoStrings } from "../utils/functions/string";
 import {
   getSupportRequest,
   handleAttachments,
