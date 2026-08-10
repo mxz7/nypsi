@@ -3,13 +3,13 @@ import redis from "../../init/redis";
 import type { NypsiClient } from "../../models/Client";
 import Constants from "../../utils/Constants";
 import {
-  ACTIVITY_TTL_SECONDS,
   activateCmdChannel,
+  ACTIVITY_TTL_SECONDS,
   activityKey,
   archiveCmdChannel,
   CLOSE_COOLDOWN_SECONDS,
-  commandActivityKey,
   COMMAND_WINDOW_SECONDS,
+  commandActivityKey,
   COMMANDS_PER_HALF_WINDOW,
   describeActivity,
   getCmdChannelState,
@@ -21,7 +21,7 @@ import {
 } from "../../utils/functions/guilds/cmd-channels";
 import { logger } from "../../utils/logger";
 
-const CHECK_INTERVAL_MS = 10_000;
+const CHECK_INTERVAL_MS = 60_000;
 
 async function getCommandActivity(channelIds: string[]) {
   const now = Date.now();
