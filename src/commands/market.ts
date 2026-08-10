@@ -954,7 +954,7 @@ async function run(
       new ButtonBuilder()
         .setCustomId(id)
         .setLabel(`create ${type} order at $${itemWorth.toLocaleString()}`)
-        .setStyle(ButtonStyle.Primary),
+        .setStyle(ButtonStyle.Secondary),
     );
     const msg = (await send({ embeds: [embed], components: [row] })) as NypsiMessage;
 
