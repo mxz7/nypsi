@@ -1,7 +1,7 @@
 {
-  "69420_crate": {
-    "itemId": "69420_crate",
-    "cost": 75
+  "pet_crate": {
+    "itemId": "pet_crate",
+    "cost": 400
   },
   "nypsi_crate": {
     "itemId": "nypsi_crate",

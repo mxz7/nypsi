@@ -3,6 +3,18 @@
   "workers_crate": {},
   "boosters_crate": {},
   "pandora_box": {},
+  "pet_crate": {
+    "items": {
+      "cow": 100,
+      "beaver": 100,
+      "tiger": 100,
+      "fox": 100,
+      "chicken": 40,
+      "rocky": 40,
+      "eagle": 10,
+      "shark": 10
+    }
+  },
   "69420_crate_money": {
     "money": {
       "69420": 100
@@ -538,7 +550,8 @@
       "rocky": 4,
       "tiger": 8,
       "fox": 8,
-      "beaver": 8
+      "beaver": 8,
+      "pet_crate": 5
     }
   },
   "random_drop": {

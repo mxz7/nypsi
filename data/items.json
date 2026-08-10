@@ -2654,6 +2654,21 @@
       "gem_crate": 1
     }
   },
+  "pet_crate": {
+    "id": "pet_crate",
+    "name": "pet crate",
+    "article": "a",
+    "plural": "pet crates",
+    "emoji": "<:pet_crate:1536415177845776478>",
+    "role": "crate",
+    "longDesc": "open to receive one random pet",
+    "aliases": ["petcrate", "pcrate"],
+    "rarity": 5,
+    "in_crates": false,
+    "loot_pools": {
+      "pet_crate": 1
+    }
+  },
   "bronze_credit": {
     "id": "bronze_credit",
     "name": "bronze credit",
