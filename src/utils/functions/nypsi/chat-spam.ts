@@ -10,8 +10,8 @@ import { ChatSpamState, evaluateNypsiChatMessage } from "./chat-spam-evaluator";
 
 const STATE_TTL_SECONDS = 30 * 60;
 const STRIKE_TTL_SECONDS = 7 * 24 * 60 * 60;
-// 30s, 1min, 5min, 30min, 2h, 12h, day, week
-const TIMEOUT_LENGTHS = [30, 60, 300, 1800, 7200, 43200, 86400, 604800];
+// 15s, 30s, 1min, 5min, 30min, 2h, 12h, day, week
+const TIMEOUT_LENGTHS = [15, 30, 60, 300, 1800, 7200, 43200, 86400, 604800];
 
 export async function checkNypsiChatMessage(message: Message) {
   if (message.guildId !== Constants.NYPSI_SERVER_ID || message.author.bot || !message.member) {

@@ -1,6 +1,6 @@
 import { compareTwoStrings } from "string-similarity";
 
-const PUNISHMENT_SCORE = 6;
+const PUNISHMENT_SCORE = 8;
 
 type ChatHistoryEntry = {
   content: string;
