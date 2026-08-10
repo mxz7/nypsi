@@ -30,8 +30,8 @@ importers:
         specifier: ^17.0.2
         version: 17.0.2
       '@yusifaliyevpro/countries':
-        specifier: ^5.1.5
-        version: 5.1.5
+        specifier: ^5.2.3
+        version: 5.2.3
       '@zeyrbot/urbandictionary':
         specifier: ^1.0.3
         version: 1.0.3
@@ -40,7 +40,7 @@ importers:
         version: 4.1.0
       bullmq:
         specifier: ^5.80.4
-        version: 5.80.4(supports-color@7.2.0)
+        version: 5.80.4
       chalk:
         specifier: 4.1.2
         version: 4.1.2
@@ -73,7 +73,7 @@ importers:
         version: 4.13.1
       ioredis:
         specifier: 5.11.1
-        version: 5.11.1(supports-color@7.2.0)
+        version: 5.11.1
       mathjs:
         specifier: 15.2.0
         version: 15.2.0
@@ -1653,8 +1653,8 @@ packages:
     resolution: {integrity: sha512-Xfe6rpCTxSxfbswi/W/Pz7zp1WWSNn4A0eW4mLkQUewCrXXtMj31lCg+iQyTkh/CkusZSq9eDflu7tjEDXUY6g==}
     engines: {node: '>=v14.0.0', npm: '>=7.0.0'}
 
-  '@yusifaliyevpro/countries@5.1.5':
-    resolution: {integrity: sha512-qECFuQRSKG8EtKb5dgd9+mK7DcFBh+zow9iG3MMVfJjKPHem15Wz2lm5XJtA3bQYtVELwQvvMvGe6yp6mwHisQ==}
+  '@yusifaliyevpro/countries@5.2.3':
+    resolution: {integrity: sha512-zKAFFk+BLqGkD0QfUX7kK6Hb37tMytKtmGiYDk0pFf0JT8yoBZm2COrkfDf4Qio0oPgk/7Hwo5cx9fnAlrnBWA==}
 
   '@zeyrbot/urbandictionary@1.0.3':
     resolution: {integrity: sha512-w4Nc88ikL4DakWTXwvKfCztDVmKNhcP3tLwmGWH7BwJcyDpvL5eJp+duumVyh6wrqhbRzlE7fLuDJPnl7jHkBw==}
@@ -3772,7 +3772,7 @@ snapshots:
 
   '@vladfrangu/async_event_emitter@2.4.7': {}
 
-  '@yusifaliyevpro/countries@5.1.5':
+  '@yusifaliyevpro/countries@5.2.3':
     dependencies:
       zod: 4.4.3
 
@@ -3811,10 +3811,10 @@ snapshots:
     dependencies:
       node-gyp-build: 4.8.4
 
-  bullmq@5.80.4(supports-color@7.2.0):
+  bullmq@5.80.4:
     dependencies:
       cron-parser: 4.9.0
-      ioredis: 5.11.1(supports-color@7.2.0)
+      ioredis: 5.11.1
       msgpackr: 2.0.4
       node-abort-controller: 3.1.1
       semver: 7.8.5
@@ -3939,11 +3939,9 @@ snapshots:
 
   dayjs@1.11.21: {}
 
-  debug@4.4.3(supports-color@7.2.0):
+  debug@4.4.3:
     dependencies:
       ms: 2.1.3
-    optionalDependencies:
-      supports-color: 7.2.0
 
   decimal.js@10.6.0: {}
 
@@ -4129,11 +4127,11 @@ snapshots:
 
   internmap@2.0.3: {}
 
-  ioredis@5.11.1(supports-color@7.2.0):
+  ioredis@5.11.1:
     dependencies:
       '@ioredis/commands': 1.10.0
       cluster-key-slot: 1.1.1
-      debug: 4.4.3(supports-color@7.2.0)
+      debug: 4.4.3
       denque: 2.1.0
       redis-errors: 1.2.0
       redis-parser: 3.0.0
