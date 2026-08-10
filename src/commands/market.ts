@@ -830,10 +830,19 @@ async function run(
     let amount = amountInput;
 
     if (amount.toLowerCase() === "all") {
-      amount =
-        type === "buy"
-          ? Math.floor((await getBalance(message.member)) / cost).toString()
-          : (await getInventory(message.member)).count(selected.id).toString();
+      if (type === "buy") {
+        amount = Math.floor((await getBalance(message.member)) / cost).toString();
+
+        if (parseInt(amount) < 1) {
+          return send({ embeds: [new ErrorEmbed("you don't have enough money")] });
+        }
+      } else {
+        amount = (await getInventory(message.member)).count(selected.id).toString();
+
+        if (parseInt(amount) < 1) {
+          return send({ embeds: [new ErrorEmbed(`you don't have any ${selected.plural}`)] });
+        }
+      }
     }
 
     if (!parseInt(amount) || isNaN(parseInt(amount)) || parseInt(amount) < 1) {
@@ -1250,9 +1259,14 @@ async function run(
     if ((formatNumber(amount) ?? 0) > 100_000) return createOrder("buy", item, "1", amount, max);
 
     if (amount.toLowerCase() == "all") {
-      amount = (await getMarketItemOrders(item.id, "sell", message.member))
-        .reduce((count, order) => order.itemAmount + count, 0)
-        .toString();
+      const sellOrders = await getMarketItemOrders(item.id, "sell", message.member);
+      const marketAmount = sellOrders.reduce((count, order) => order.itemAmount + count, 0);
+
+      if (marketAmount < 1) {
+        return send({ embeds: [new ErrorEmbed("there are no sell orders for this item")] });
+      }
+
+      amount = marketAmount.toString();
 
       const marketData = await getMarketTransactionData(
         item.id,
@@ -1277,6 +1291,10 @@ async function run(
         }
 
         amount = validCount.toString();
+
+        if (validCount < 1) {
+          return send({ embeds: [new ErrorEmbed("you don't have enough money")] });
+        }
       }
     }
 
@@ -1308,10 +1326,19 @@ async function run(
 
     if (amount.toLowerCase() == "all") {
       const invAmount = inventory.count(item.id);
+
+      if (invAmount < 1) {
+        return send({ embeds: [new ErrorEmbed(`you don't have any ${item.plural}`)] });
+      }
+
       const marketAmount = (await getMarketItemOrders(item.id, "buy", message.member)).reduce(
         (count, order) => order.itemAmount + count,
         0,
       );
+
+      if (marketAmount < 1) {
+        return send({ embeds: [new ErrorEmbed("there are no buy orders for this item")] });
+      }
 
       amount = Math.min(invAmount, marketAmount).toString();
     }
