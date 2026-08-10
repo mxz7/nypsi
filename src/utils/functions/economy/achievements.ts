@@ -322,6 +322,11 @@ export async function addProgress(
     if ((await isEcoBanned(userId)).banned) return;
 
     if (achievementStartName === "yapper") {
+      if (process.env.DEV && process.env.DEV === "true") {
+        // stop fake nypsi being annoyign
+        return;
+      }
+
       const existingProgress = await getAllAchievements(userId, achievementStartName);
 
       if (existingProgress.length === 0) {
