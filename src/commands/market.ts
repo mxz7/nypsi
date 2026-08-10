@@ -1839,6 +1839,12 @@ async function run(
       (await getMarketTransactionData(item.id, amount, type == "buy" ? "sell" : "buy", member))
         .cost;
 
+    const canRepeatTransaction = async (price: number) => {
+      if (type == "buy") return (await getBalance(member)) >= price;
+
+      return (await getInventory(member)).count(item.id) >= amount;
+    };
+
     const setConfirmationDescription = (price: number, previousPrice?: number) => {
       const priceChange =
         previousPrice !== undefined
@@ -1965,7 +1971,7 @@ async function run(
         const acceptedPrice = price;
         const updatedPrice = await getPrice();
 
-        if (updatedPrice == -1) {
+        if (updatedPrice == -1 || !(await canRepeatTransaction(updatedPrice))) {
           embed.setDescription(previousTransaction);
           return await msg.edit({ embeds: [embed], components: [] });
         }
