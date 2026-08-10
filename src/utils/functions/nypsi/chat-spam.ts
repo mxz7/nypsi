@@ -83,7 +83,7 @@ export async function checkNypsiChatMessage(message: Message) {
     "mute",
     message.author.id,
     message.client.user,
-    `[${MStoTime(length * 1000, true).trim()}] chat spam (automatic)`,
+    `[${MStoTime(length * 1000, true).trim()}] chat spam`,
   );
 
   logger.info(
