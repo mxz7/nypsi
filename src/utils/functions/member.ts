@@ -9,6 +9,7 @@ import {
 } from "discord.js";
 import { inPlaceSort, sort } from "fast-sort";
 import { NypsiClient } from "../../models/Client";
+import { MapCache } from "../cache";
 import Constants from "../Constants";
 import { logger } from "../logger";
 import {
@@ -21,37 +22,16 @@ import { compareTwoStrings } from "./string";
 import chooseMember from "./workers/choosemember";
 import ms = require("ms");
 
-const memberCache = new Map<string, Map<string, { userId: string; expire: number }>>();
+const memberCache = new MapCache<string>(ms("15 minutes") / 1000);
 
-export function clearMemberCache(guildId?: string) {
-  if (guildId) memberCache.delete(guildId);
-  else memberCache.clear();
+function getMemberCacheKey(guildId: string, memberName = "") {
+  return `${guildId}:${memberName}`;
 }
 
-setInterval(() => {
-  let count = 0;
-
-  for (const [guildId, map] of memberCache.entries()) {
-    for (const [search, user] of map.entries()) {
-      if (user.expire < Date.now()) {
-        count++;
-        map.delete(search);
-      }
-    }
-
-    if (map.size === 0) memberCache.delete(guildId);
-  }
-
-  if (count > 0) {
-    const guildSize = memberCache.size;
-    const membersSize = Array.from(memberCache.values()).map((i) => i.size);
-
-    logger.debug(`${count.toLocaleString()} member find cache entries deleted`, {
-      guilds: guildSize,
-      members: membersSize.length > 0 ? membersSize.reduce((a, b) => a + b) : 0,
-    });
-  }
-}, ms("30 minutes"));
+export function clearMemberCache(guildId?: string) {
+  if (guildId) memberCache.deleteByPrefix(getMemberCacheKey(guildId));
+  else memberCache.clear();
+}
 
 export async function getMember(
   guild: Guild,
@@ -73,14 +53,10 @@ export async function getMember(
 
   memberName = memberName.toLowerCase();
 
-  const cacheHit = memberCache.get(guild.id)?.get(memberName);
+  const cacheHit = !debug && memberCache.get(getMemberCacheKey(guild.id, memberName));
 
-  if (cacheHit && !debug) {
-    if (cacheHit.expire < Date.now()) {
-      memberCache.get(guild.id).delete(memberName);
-    } else {
-      return (await fetchMember(cacheHit.userId)) || null;
-    }
+  if (cacheHit) {
+    return (await fetchMember(cacheHit)) || null;
   }
 
   if (memberName.match(Constants.MEMBER_MENTION_REGEX)) {
@@ -170,16 +146,7 @@ export async function getMember(
   }
 
   if (targetId) {
-    if (memberCache.get(guild.id)) {
-      memberCache
-        .get(guild.id)
-        .set(memberName, { userId: targetId, expire: Date.now() + ms("15 minutes") });
-    } else {
-      memberCache.set(
-        guild.id,
-        new Map([[memberName, { userId: targetId, expire: Date.now() + ms("15 minutes") }]]),
-      );
-    }
+    memberCache.set(getMemberCacheKey(guild.id, memberName), targetId);
   }
 
   if (debug) {

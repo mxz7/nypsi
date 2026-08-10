@@ -154,4 +154,30 @@ describe("MapCache", () => {
     vi.setSystemTime(15_000);
     expect(cache.get("key")).toBeNull();
   });
+
+  test("deletes entries by prefix", () => {
+    vi.useFakeTimers();
+    const cache = new MapCache<number>(60);
+    cache.set("guild-1:first", 1);
+    cache.set("guild-1:second", 2);
+    cache.set("guild-2:first", 3);
+
+    cache.deleteByPrefix("guild-1:");
+
+    expect(cache.get("guild-1:first")).toBeNull();
+    expect(cache.get("guild-1:second")).toBeNull();
+    expect(cache.get("guild-2:first")).toBe(3);
+  });
+
+  test("clears all entries", () => {
+    vi.useFakeTimers();
+    const cache = new MapCache<number>(60);
+    cache.set("first", 1);
+    cache.set("second", 2);
+
+    cache.clear();
+
+    expect(cache.get("first")).toBeNull();
+    expect(cache.get("second")).toBeNull();
+  });
 });

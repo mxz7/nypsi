@@ -102,4 +102,14 @@ export class MapCache<T> {
       expiresAt: Date.now() + ttl * 1000,
     });
   }
+
+  deleteByPrefix(prefix: string): void {
+    for (const key of this.store.keys()) {
+      if (key.startsWith(prefix)) this.store.delete(key);
+    }
+  }
+
+  clear(): void {
+    this.store.clear();
+  }
 }
