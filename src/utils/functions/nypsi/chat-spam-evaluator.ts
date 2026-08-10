@@ -1,6 +1,6 @@
 import { compareTwoStrings } from "../string";
 
-const PUNISHMENT_SCORE = 8;
+export const PUNISHMENT_SCORE = 8;
 
 type ChatHistoryEntry = {
   content: string;
