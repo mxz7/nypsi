@@ -103,7 +103,7 @@ async function run(
     const requestEmbed = new CustomEmbed(message.member);
     const requestRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
-        .setCustomId("gtf-accept")
+        .setCustomId("btn-accept-guess-the-flag-challenge")
         .setLabel("accept")
         .setStyle(ButtonStyle.Success),
     );
@@ -115,7 +115,10 @@ async function run(
         `**${escapeFormattingCharacters(message.author.username)}** has challenged you to a guess the flag game\n\ndo you accept?`,
       );
       requestRow.addComponents(
-        new ButtonBuilder().setCustomId("gtf-deny").setLabel("deny").setStyle(ButtonStyle.Danger),
+        new ButtonBuilder()
+          .setCustomId("btn-decline-guess-the-flag-challenge")
+          .setLabel("deny")
+          .setStyle(ButtonStyle.Danger),
       );
       requestMessage = await send({
         content: `${target.user.toString()} you have been invited to a guess the flag game`,
@@ -127,7 +130,10 @@ async function run(
         `**${escapeFormattingCharacters(message.author.username)}** has created an open guess the flag game`,
       );
       requestRow.addComponents(
-        new ButtonBuilder().setCustomId("gtf-deny").setLabel("cancel").setStyle(ButtonStyle.Danger),
+        new ButtonBuilder()
+          .setCustomId("btn-decline-guess-the-flag-challenge")
+          .setLabel("cancel")
+          .setStyle(ButtonStyle.Danger),
       );
       requestMessage = await send({
         embeds: [requestEmbed],
@@ -150,7 +156,7 @@ async function run(
       return;
     }
 
-    if (res.customId === "gtf-deny") {
+    if (res.customId === "btn-decline-guess-the-flag-challenge") {
       if (res.user.id === message.author.id) {
         requestMessage.edit({ components: [] });
         return res.reply({

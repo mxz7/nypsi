@@ -280,7 +280,7 @@ async function run(
     const buildSelectRow = (current: string | null) =>
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new StringSelectMenuBuilder()
-          .setCustomId("rp-stats-action")
+          .setCustomId("select-rp-stats-action")
           .setPlaceholder("view top users per action")
           .setOptions([
             new StringSelectMenuOptionBuilder()

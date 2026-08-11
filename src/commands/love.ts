@@ -237,7 +237,7 @@ async function run(
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder()
-      .setCustomId("love-marry")
+      .setCustomId("btn-love-marry")
       .setLabel("get married! (0/2)")
       .setStyle(ButtonStyle.Success),
   );

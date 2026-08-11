@@ -11,7 +11,7 @@ import { addNotificationToQueue } from "../utils/functions/users/notifications";
 import { getPreferences } from "../utils/functions/users/preferences";
 
 export default {
-  name: "deny-offer",
+  name: "btn-deny-offer",
   type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;

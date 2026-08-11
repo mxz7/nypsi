@@ -150,13 +150,13 @@ async function run(
   });
 
   collector.on("collect", async (interaction) => {
-    if (interaction.customId === "sudoku-coord-toggle") {
+    if (interaction.customId === "btn-sudoku-coord-toggle") {
       currentMode = currentMode === "box" ? "coordinates" : "box";
       await setUserCoordMode(message.author.id, currentMode);
       await interaction.update(
         buildConfirmationMessage(difficulty, currentMode, message.author.displayAvatarURL()),
       );
-    } else if (interaction.customId === "sudoku-confirm-start") {
+    } else if (interaction.customId === "btn-sudoku-confirm-start") {
       collector.stop("started");
       const game = await createSudokuGame(message.author.id, difficulty);
       await interaction.update(

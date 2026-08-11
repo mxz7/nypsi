@@ -11,7 +11,7 @@ import { coordToIndex, getGameById, getUserCoordMode } from "../utils/functions/
 import { buildGameMessage } from "../utils/functions/sudoku/ui";
 
 export default {
-  name: "sudoku-highlight",
+  name: "btn-sudoku-highlight",
   type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;
@@ -40,7 +40,7 @@ export default {
     const cellPlaceholder =
       coordMode === "box" ? "e.g. A5 (box A, cell 5)" : "e.g. C3 (column C, row 3)";
 
-    const modalId = crypto.randomUUID();
+    const modalId = `modal-sudoku-highlight:${crypto.randomUUID()}`;
 
     const modal = new ModalBuilder()
       .setCustomId(modalId)

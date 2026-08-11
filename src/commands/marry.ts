@@ -142,12 +142,12 @@ async function run(
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder()
-      .setCustomId("yes")
+      .setCustomId("btn-confirm")
       .setLabel("i do!")
       .setStyle(ButtonStyle.Success)
       .setEmoji(getItems()["ring"].emoji),
     new ButtonBuilder()
-      .setCustomId("no")
+      .setCustomId("btn-cancel")
       .setLabel("run away")
       .setStyle(ButtonStyle.Danger)
       .setEmoji(getItems()["broken_ring"].emoji),
@@ -181,7 +181,7 @@ async function run(
               new ButtonBuilder()
                 .setStyle(ButtonStyle.Danger)
                 .setLabel("expired")
-                .setCustomId("boobies")
+                .setCustomId("btn-disabled")
                 .setDisabled(true),
             ),
           ],
@@ -199,7 +199,7 @@ async function run(
     return;
   }
 
-  if (reaction == "yes") {
+  if (reaction == "btn-confirm") {
     if (await isMarried(target)) {
       embed.setDescription("❌ you are already married");
     } else if (await isMarried(message.member)) {

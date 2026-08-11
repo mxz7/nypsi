@@ -90,11 +90,11 @@ async function run(
 
   let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder()
-      .setCustomId("⬅")
+      .setCustomId("btn-previous-page")
       .setLabel("back")
       .setStyle(ButtonStyle.Primary)
       .setDisabled(true),
-    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+    new ButtonBuilder().setCustomId("btn-next-page").setLabel("next").setStyle(ButtonStyle.Primary),
   );
 
   let msg: Message;
@@ -130,7 +130,7 @@ async function run(
 
       if (!reaction) return;
 
-      if (reaction == "⬅") {
+      if (reaction == "btn-previous-page") {
         if (currentPage <= 0) {
           return pageManager();
         } else {
@@ -149,12 +149,12 @@ async function run(
           if (currentPage == 0) {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
               new ButtonBuilder()
-                .setCustomId("⬅")
+                .setCustomId("btn-previous-page")
                 .setLabel("back")
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(true),
               new ButtonBuilder()
-                .setCustomId("➡")
+                .setCustomId("btn-next-page")
                 .setLabel("next")
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(false),
@@ -162,12 +162,12 @@ async function run(
           } else {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
               new ButtonBuilder()
-                .setCustomId("⬅")
+                .setCustomId("btn-previous-page")
                 .setLabel("back")
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(false),
               new ButtonBuilder()
-                .setCustomId("➡")
+                .setCustomId("btn-next-page")
                 .setLabel("next")
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(false),
@@ -176,7 +176,7 @@ async function run(
           await msg.edit({ embeds: [newEmbed], components: [row] });
           return pageManager();
         }
-      } else if (reaction == "➡") {
+      } else if (reaction == "btn-next-page") {
         if (currentPage + 1 >= lastPage) {
           return pageManager();
         } else {
@@ -195,12 +195,12 @@ async function run(
           if (currentPage + 1 == lastPage) {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
               new ButtonBuilder()
-                .setCustomId("⬅")
+                .setCustomId("btn-previous-page")
                 .setLabel("back")
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(false),
               new ButtonBuilder()
-                .setCustomId("➡")
+                .setCustomId("btn-next-page")
                 .setLabel("next")
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(true),
@@ -208,12 +208,12 @@ async function run(
           } else {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
               new ButtonBuilder()
-                .setCustomId("⬅")
+                .setCustomId("btn-previous-page")
                 .setLabel("back")
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(false),
               new ButtonBuilder()
-                .setCustomId("➡")
+                .setCustomId("btn-next-page")
                 .setLabel("next")
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(false),

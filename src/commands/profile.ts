@@ -230,7 +230,7 @@ async function run(
     if (target.id === message.author.id)
       row.addComponents(
         new ButtonBuilder()
-          .setCustomId("p-pre")
+          .setCustomId("btn-view-prestige")
           .setLabel("prestige")
           .setEmoji("✨")
           .setStyle(level >= 100 ? ButtonStyle.Success : ButtonStyle.Danger),
@@ -239,7 +239,7 @@ async function run(
     if (upgrades.length > 0)
       row.addComponents(
         new ButtonBuilder()
-          .setCustomId("p-upg")
+          .setCustomId("btn-view-upgrades")
           .setLabel("upgrades")
           .setEmoji("💫")
           .setStyle(ButtonStyle.Primary),
@@ -247,7 +247,7 @@ async function run(
 
     row.addComponents(
       new ButtonBuilder()
-        .setCustomId("p-mul")
+        .setCustomId("btn-view-multiplier")
         .setLabel("multiplier")
         .setEmoji("🌟")
         .setStyle(ButtonStyle.Primary),
@@ -256,7 +256,7 @@ async function run(
     if (tags.length > 0)
       row.addComponents(
         new ButtonBuilder()
-          .setCustomId("p-tag")
+          .setCustomId("btn-view-tags")
           .setLabel("tags")
           .setEmoji("🏷️")
           .setStyle(ButtonStyle.Primary),
@@ -278,7 +278,7 @@ async function run(
 
     if (!reaction) return msg.edit({ components: [] });
 
-    if (reaction.customId === "p-pre") {
+    if (reaction.customId === "btn-view-prestige") {
       const [level, prestige] = await Promise.all([getLevel(target), getPrestige(target)]);
       if (reaction.user.id === target.user.id) {
         if (level < 100) {
@@ -313,7 +313,10 @@ async function run(
         ).setHeader("prestige", message.author.avatarURL());
 
         const prestigeRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-          new ButtonBuilder().setCustomId("✅").setLabel("do it.").setStyle(ButtonStyle.Success),
+          new ButtonBuilder()
+            .setCustomId("btn-confirm")
+            .setLabel("do it.")
+            .setStyle(ButtonStyle.Success),
         );
 
         const prestigeMsg = await reaction
@@ -334,7 +337,7 @@ async function run(
                   new ButtonBuilder()
                     .setStyle(ButtonStyle.Danger)
                     .setLabel("expired")
-                    .setCustomId("boobies")
+                    .setCustomId("btn-disabled")
                     .setDisabled(true),
                 ),
               ],
@@ -343,7 +346,7 @@ async function run(
 
         if (!prestigeReaction) return;
 
-        if (prestigeReaction === "✅") {
+        if (prestigeReaction === "btn-confirm") {
           const [level, prestige] = await Promise.all([
             getLevel(message.member),
             getPrestige(message.member),
@@ -438,7 +441,7 @@ async function run(
           return awaitButton();
         }
       }
-    } else if (reaction.customId === "p-upg") {
+    } else if (reaction.customId === "btn-view-upgrades") {
       if (await onCooldown("p-upg", message.member)) {
         const res = await getResponse("p-upg", message.member);
 
@@ -472,7 +475,7 @@ async function run(
       await reaction.reply({ embeds: [embed] });
 
       return awaitButton();
-    } else if (reaction.customId === "p-mul") {
+    } else if (reaction.customId === "btn-view-multiplier") {
       if (await onCooldown("p-mul", message.member)) {
         const res = await getResponse("p-mul", message.member);
 
@@ -556,7 +559,7 @@ async function run(
       await reaction.reply({ embeds: [embed] });
 
       return awaitButton();
-    } else if (reaction.customId === "p-tag") {
+    } else if (reaction.customId === "btn-view-tags") {
       if (await onCooldown("p-tag", message.member)) {
         const res = await getResponse("p-tag", message.member);
 

@@ -75,7 +75,7 @@ async function run(
   await addCooldown(cmd.name, message.member);
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("✅").setLabel("do it.").setStyle(ButtonStyle.Success),
+    new ButtonBuilder().setCustomId("btn-confirm").setLabel("do it.").setStyle(ButtonStyle.Success),
   );
 
   const msg = await send({ embeds: [embed], components: [row] });
@@ -96,7 +96,7 @@ async function run(
             new ButtonBuilder()
               .setStyle(ButtonStyle.Danger)
               .setLabel("expired")
-              .setCustomId("boobies")
+              .setCustomId("btn-disabled")
               .setDisabled(true),
           ),
         ],
@@ -104,7 +104,7 @@ async function run(
       addExpiry(cmd.name, message.member, 30);
     });
 
-  if (reaction == "✅" || Constants.WHITELISTED_BOTS.includes(message.author.id)) {
+  if (reaction == "btn-confirm" || Constants.WHITELISTED_BOTS.includes(message.author.id)) {
     await addExpiry(cmd.name, message.member, 300);
     [level, prestige] = await Promise.all([getLevel(message.member), getPrestige(message.member)]);
 

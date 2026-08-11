@@ -215,7 +215,7 @@ async function run(
   );
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("hunt").setLabel("hunt").setStyle(ButtonStyle.Success),
+    new ButtonBuilder().setCustomId("btn-hunt").setLabel("hunt").setStyle(ButtonStyle.Success),
   );
 
   for (let i = 0; i < 10; i++) {

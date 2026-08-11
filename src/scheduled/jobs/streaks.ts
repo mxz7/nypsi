@@ -195,7 +195,7 @@ async function doVoteStreaks(manager: ClusterManager) {
     new ButtonBuilder()
       .setStyle(ButtonStyle.Secondary)
       .setLabel("enable vote reminders")
-      .setCustomId("enable-vote-reminders"),
+      .setCustomId("btn-enable-vote-reminders"),
   );
 
   const notifications: NotificationPayload[] = [];

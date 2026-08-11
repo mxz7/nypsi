@@ -393,7 +393,7 @@ function createRows(board: string[][], end = false) {
     for (const item of rowData) {
       const button = new ButtonBuilder();
 
-      button.setCustomId(`${i}${row.components.length}`);
+      button.setCustomId(`btn-select-tower-cell:${i}:${row.components.length}`);
       button.setLabel("\u200B");
       button.setStyle(ButtonStyle.Secondary);
 
@@ -439,12 +439,12 @@ function createRows(board: string[][], end = false) {
 
   rows[rows.length] = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder()
-      .setCustomId("finish")
+      .setCustomId("btn-finish")
       .setLabel("finish")
       .setStyle(ButtonStyle.Success)
       .setDisabled(end),
     new ButtonBuilder()
-      .setCustomId("random")
+      .setCustomId("btn-random")
       .setLabel("random")
       .setStyle(ButtonStyle.Primary)
       .setDisabled(end),
@@ -505,7 +505,7 @@ async function playGame(
       await redis.expire(`anticheat:interactivegame:count:${message.author.id}`, 86400);
 
       (components[components.length - 1].components[0] as ButtonBuilder)
-        .setCustomId("rp")
+        .setCustomId("btn-play-again")
         .setLabel("play again")
         .setDisabled(false);
 
@@ -519,14 +519,14 @@ async function playGame(
       })
       .catch(() => {
         (components[components.length - 1].components[0] as ButtonBuilder)
-          .setCustomId("rp")
+          .setCustomId("btn-play-again")
           .setLabel("play again")
           .setDisabled(true);
         msg.edit({ components });
         return;
       });
 
-    if (res && res.customId == "rp") {
+    if (res && res.customId == "btn-play-again") {
       await res.deferUpdate();
       logger.info(
         `::cmd ${message.guild.id} ${message.channelId} ${message.author.username}: replaying tower`,
@@ -871,7 +871,7 @@ async function playGame(
 
   if (!response.isButton()) return;
 
-  if (response.customId == "random") {
+  if (response.customId == "btn-random") {
     const y = getActiveRow(board);
 
     const rows = createRows(board, false);
@@ -881,7 +881,7 @@ async function playGame(
     return clickSquare(response, x, y);
   }
 
-  if (response.customId == "finish") {
+  if (response.customId == "btn-finish") {
     if (game.win < 1) {
       lose(response);
       return;
@@ -894,7 +894,7 @@ async function playGame(
     }
   }
 
-  const [y, x] = response.customId.split("").map((i) => parseInt(i));
+  const [, y, x] = response.customId.split(":").map((i) => parseInt(i));
 
   return clickSquare(response, x, y);
 }

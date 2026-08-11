@@ -226,14 +226,16 @@ export async function runItemInfo(
       const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [];
       rows.push(
         new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-          new StringSelectMenuBuilder().setCustomId("tabs").setOptions(metaTabs),
+          new StringSelectMenuBuilder().setCustomId("select-tabs").setOptions(metaTabs),
         ),
       );
 
       if (tabs[tabName].subTabs !== undefined) {
         rows.push(
           new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-            new StringSelectMenuBuilder().setCustomId("subtabs").setOptions(tabs[tabName].subTabs),
+            new StringSelectMenuBuilder()
+              .setCustomId("select-subtabs")
+              .setOptions(tabs[tabName].subTabs),
           ),
         );
       }
@@ -250,12 +252,12 @@ export async function runItemInfo(
           rows.push(
             new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
               new ButtonBuilder()
-                .setCustomId("⬅")
+                .setCustomId("btn-previous-page")
                 .setLabel("back")
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled((page ?? 0) <= 0),
               new ButtonBuilder()
-                .setCustomId("➡")
+                .setCustomId("btn-next-page")
                 .setLabel("next")
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled((page ?? 0) >= target.length - 1),
@@ -273,7 +275,7 @@ export async function runItemInfo(
         rows.push(
           new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
             new ButtonBuilder()
-              .setCustomId("item-info-alternate")
+              .setCustomId("btn-item-info-alternate")
               .setLabel(showAlternate ? alternate.returnButtonLabel : alternate.buttonLabel)
               .setStyle(ButtonStyle.Secondary),
           ),
@@ -316,22 +318,25 @@ export async function runItemInfo(
       let targetPage = page;
       let targetShowAlternate = showAlternate;
 
-      if (res.isButton() && ["⬅", "➡"].includes(res.customId)) {
-        targetPage = (page ?? 0) + +(res.customId === "➡") - +(res.customId === "⬅");
+      if (res.isButton() && ["btn-previous-page", "btn-next-page"].includes(res.customId)) {
+        targetPage =
+          (page ?? 0) +
+          +(res.customId === "btn-next-page") -
+          +(res.customId === "btn-previous-page");
       }
 
-      if (res.isButton() && res.customId === "item-info-alternate") {
+      if (res.isButton() && res.customId === "btn-item-info-alternate") {
         targetShowAlternate = !showAlternate;
         targetPage = undefined;
       }
 
-      if (res.isStringSelectMenu() && res.customId === "subtabs") {
+      if (res.isStringSelectMenu() && res.customId === "select-subtabs") {
         targetSub = res.values[0];
         targetPage = undefined;
         targetShowAlternate = false;
       }
 
-      if (res.isStringSelectMenu() && res.customId === "tabs") {
+      if (res.isStringSelectMenu() && res.customId === "select-tabs") {
         targetTab = res.values[0];
         targetSub = undefined;
         targetPage = undefined;

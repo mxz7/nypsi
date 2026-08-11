@@ -80,7 +80,7 @@ export default new ItemUse(
         components: [
           new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
             new ButtonBuilder()
-              .setCustomId("con")
+              .setCustomId("btn-continue-item-use")
               .setLabel("continue")
               .setStyle(ButtonStyle.Danger),
           ),

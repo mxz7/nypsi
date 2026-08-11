@@ -87,7 +87,7 @@ async function runPets(
     const activePets = userPets.filter((pet) => pet.active);
 
     const select = new StringSelectMenuBuilder()
-      .setCustomId("pets-select")
+      .setCustomId("select-pet")
       .setDisabled(disabled)
       .addOptions(
         new StringSelectMenuOptionBuilder()
@@ -143,22 +143,22 @@ async function runPets(
         : "\n**max level**";
 
     const toggle = new ButtonBuilder()
-      .setCustomId("pets-toggle")
+      .setCustomId("btn-pets-toggle")
       .setLabel(pet.active ? "deactivate" : "activate")
       .setStyle(pet.active ? ButtonStyle.Danger : ButtonStyle.Success)
       .setDisabled(disabled);
     const levelUp = new ButtonBuilder()
-      .setCustomId("pets-level-up")
+      .setCustomId("btn-pets-level-up")
       .setLabel("level up")
       .setStyle(canUpgrade ? ButtonStyle.Success : ButtonStyle.Secondary)
       .setDisabled(disabled || !canUpgrade);
     const name = new ButtonBuilder()
-      .setCustomId("pets-name")
+      .setCustomId("btn-pets-name")
       .setLabel(`${pet.name ? "rename" : "name"} ($${namingCost.toLocaleString()})`)
       .setStyle(ButtonStyle.Secondary)
       .setDisabled(disabled);
     const removeName = new ButtonBuilder()
-      .setCustomId("pets-remove-name")
+      .setCustomId("btn-pets-remove-name")
       .setLabel(`remove name ($${PET_NAME_REMOVAL_COST.toLocaleString()})`)
       .setStyle(ButtonStyle.Danger)
       .setDisabled(disabled || !pet.name);
@@ -199,10 +199,10 @@ async function runPets(
     if (interaction.isStringSelectMenu()) {
       selectedPetId = interaction.values[0] === "overview" ? undefined : interaction.values[0];
     } else if (interaction.isButton()) {
-      if (interaction.customId === "pets-name") {
+      if (interaction.customId === "btn-pets-name") {
         const pet = await getUserPet(message.member, selectedPetId);
         const modal = new ModalBuilder()
-          .setCustomId("pets-name-modal")
+          .setCustomId("modal-name-pet")
           .setTitle(`name ${getItems()[getPetsData()[selectedPetId].item].name}`)
           .addLabelComponents(
             new LabelBuilder().setLabel("pet name").setTextInputComponent(
@@ -275,11 +275,11 @@ async function runPets(
       }
 
       try {
-        if (interaction.customId === "pets-level-up") {
+        if (interaction.customId === "btn-pets-level-up") {
           await addPet(message.member, selectedPetId);
-        } else if (interaction.customId === "pets-remove-name") {
+        } else if (interaction.customId === "btn-pets-remove-name") {
           await removePetName(message.member, selectedPetId);
-        } else if (interaction.customId === "pets-toggle") {
+        } else if (interaction.customId === "btn-pets-toggle") {
           const pet = await getUserPet(message.member, selectedPetId);
           if (pet?.active) {
             await deactivatePet(message.member, selectedPetId);

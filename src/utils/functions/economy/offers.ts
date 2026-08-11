@@ -36,20 +36,20 @@ export async function createOffer(
 ) {
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder()
-      .setCustomId("accept-offer")
+      .setCustomId("btn-accept-offer")
       .setLabel("accept")
       .setStyle(ButtonStyle.Success),
-    new ButtonBuilder().setCustomId("deny-offer").setLabel("deny").setStyle(ButtonStyle.Danger),
+    new ButtonBuilder().setCustomId("btn-deny-offer").setLabel("deny").setStyle(ButtonStyle.Danger),
     new ButtonBuilder()
-      .setCustomId("block-item")
+      .setCustomId("btn-block-item")
       .setLabel("block item")
       .setStyle(ButtonStyle.Secondary),
     new ButtonBuilder()
-      .setCustomId("block-user")
+      .setCustomId("btn-block-user")
       .setLabel("block user")
       .setStyle(ButtonStyle.Secondary),
     new ButtonBuilder()
-      .setCustomId("disable-offers")
+      .setCustomId("btn-disable-offers")
       .setLabel("disable all offers")
       .setStyle(ButtonStyle.Secondary),
   );

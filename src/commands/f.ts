@@ -48,7 +48,7 @@ async function run(
     `press **F** to pay your respects to **${content}**`,
   );
 
-  const customId = `${content}-${new Date().getTime()}`;
+  const customId = `btn-pay-respects:${new Date().getTime()}`;
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder().setStyle(ButtonStyle.Primary).setLabel("F").setCustomId(customId),
   );

@@ -146,7 +146,7 @@ async function prepare(
       if (inventory.has(selected.id)) {
         buttons[0].addComponents(
           new ButtonBuilder()
-            .setCustomId("retry")
+            .setCustomId("btn-retry")
             .setLabel("play again")
             .setStyle(ButtonStyle.Success),
         );
@@ -176,7 +176,7 @@ async function prepare(
 
         if (!response || !response.isButton()) return;
 
-        if (response.customId === "retry") {
+        if (response.customId === "btn-retry") {
           if (
             (await redis.get(
               `${Constants.redis.nypsi.RESTART}:${(message.client as NypsiClient).cluster.id}`,

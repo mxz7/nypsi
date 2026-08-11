@@ -305,7 +305,7 @@ async function run(
     if (leaderboards.get("overall")) {
       row.addComponents(
         new ButtonBuilder()
-          .setCustomId("overall")
+          .setCustomId("btn-overall")
           .setLabel("overall")
           .setEmoji("🏆")
           .setStyle(ButtonStyle.Secondary),
@@ -315,7 +315,7 @@ async function run(
     if (leaderboards.get("wins")) {
       row.addComponents(
         new ButtonBuilder()
-          .setCustomId("wins")
+          .setCustomId("btn-wins")
           .setLabel("first")
           .setEmoji("🥇")
           .setStyle(ButtonStyle.Secondary),
@@ -325,7 +325,7 @@ async function run(
     if (leaderboards.get("second")) {
       row.addComponents(
         new ButtonBuilder()
-          .setCustomId("second")
+          .setCustomId("btn-second")
           .setLabel("second")
           .setEmoji("🥈")
           .setStyle(ButtonStyle.Secondary),
@@ -335,7 +335,7 @@ async function run(
     if (leaderboards.get("third")) {
       row.addComponents(
         new ButtonBuilder()
-          .setCustomId("third")
+          .setCustomId("btn-third")
           .setLabel("third")
           .setEmoji("🥉")
           .setStyle(ButtonStyle.Secondary),
@@ -345,7 +345,7 @@ async function run(
     if (leaderboards.get("time")) {
       row.addComponents(
         new ButtonBuilder()
-          .setCustomId("time")
+          .setCustomId("btn-time")
           .setLabel("speed")
           .setEmoji("🏎️")
           .setStyle(ButtonStyle.Secondary),
@@ -355,9 +355,11 @@ async function run(
     if (leaderboards.size === 0 || row.components?.length === 0)
       return send({ embeds: [new ErrorEmbed("no data")] });
 
+    const getButtonId = (button: MessageActionRowComponentBuilder) =>
+      (button.data as { custom_id: string }).custom_id;
+
     row.components[0].setDisabled(true);
-    // @ts-expect-error stupid discordjs types
-    embed.setDescription(leaderboards.get((row.components[0] as ButtonBuilder).data.custom_id));
+    embed.setDescription(leaderboards.get(getButtonId(row.components[0]).slice(4)));
 
     const msg = await send({ embeds: [embed], components: [row] });
 
@@ -376,13 +378,15 @@ async function run(
 
       embed.setDescription(
         leaderboards.get(
-          // @ts-expect-error stupid discordjs types
-          row.components.find((i) => i.data.custom_id === interaction.customId).data.custom_id,
+          getButtonId(
+            row.components.find((button) => getButtonId(button) === interaction.customId),
+          ).slice(4),
         ),
       );
       row.components.forEach((i) => i.setDisabled(false));
-      // @ts-expect-error stupid discordjs types
-      row.components.find((i) => i.data.custom_id === interaction.customId).setDisabled(true);
+      row.components
+        .find((button) => getButtonId(button) === interaction.customId)
+        .setDisabled(true);
 
       interaction.update({ embeds: [embed], components: [row] });
       return listen();
@@ -422,7 +426,7 @@ async function run(
         new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
           new ButtonBuilder()
             .setLabel("vote start")
-            .setCustomId("vs")
+            .setCustomId("btn-vs")
             .setStyle(ButtonStyle.Success),
         ),
       ];
@@ -658,8 +662,11 @@ async function run(
       await removeBalance(message.member, wager);
 
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder().setCustomId("y").setLabel("accept").setStyle(ButtonStyle.Success),
-        new ButtonBuilder().setCustomId("n").setLabel("deny").setStyle(ButtonStyle.Danger),
+        new ButtonBuilder()
+          .setCustomId("btn-confirm")
+          .setLabel("accept")
+          .setStyle(ButtonStyle.Success),
+        new ButtonBuilder().setCustomId("btn-cancel").setLabel("deny").setStyle(ButtonStyle.Danger),
       );
 
       const requestEmbed = new CustomEmbed(
@@ -678,7 +685,7 @@ async function run(
 
       const filter = (i: Interaction) =>
         i.user.id == target.id ||
-        (message.author.id === i.user.id && (i as ButtonInteraction).customId === "n");
+        (message.author.id === i.user.id && (i as ButtonInteraction).customId === "btn-cancel");
 
       let fail = false;
 
@@ -698,7 +705,7 @@ async function run(
 
       if (fail || !response) return;
 
-      if (response.customId === "y") {
+      if (response.customId === "btn-confirm") {
         return doGame(target, wager, response as ButtonInteraction, m);
       } else {
         cancelled = true;
@@ -743,8 +750,14 @@ async function run(
       await removeBalance(message.member, wager);
 
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder().setCustomId("y").setLabel("play").setStyle(ButtonStyle.Success),
-        new ButtonBuilder().setCustomId("n").setLabel("cancel").setStyle(ButtonStyle.Danger),
+        new ButtonBuilder()
+          .setCustomId("btn-confirm")
+          .setLabel("play")
+          .setStyle(ButtonStyle.Success),
+        new ButtonBuilder()
+          .setCustomId("btn-cancel")
+          .setLabel("cancel")
+          .setStyle(ButtonStyle.Danger),
       );
 
       const requestEmbed = new CustomEmbed(
@@ -761,12 +774,12 @@ async function run(
       });
 
       const filter = async (i: Interaction): Promise<boolean> => {
-        if (i.user.id != message.author.id && (i as ButtonInteraction).customId == "n")
+        if (i.user.id != message.author.id && (i as ButtonInteraction).customId == "btn-cancel")
           return false;
         if ((await isEcoBanned(i.user)).banned && wager > 0) return false;
 
         if (i.user.id === message.author.id) {
-          return (i as ButtonInteraction).customId === "n";
+          return (i as ButtonInteraction).customId === "btn-cancel";
         }
 
         if (!(await userExists(i.user)) || (await getBalance(i.user)) < wager) {
@@ -818,7 +831,7 @@ async function run(
       if (!target)
         return message.channel.send({ embeds: [new ErrorEmbed("invalid guild member")] });
 
-      if (response.customId === "y") {
+      if (response.customId === "btn-confirm") {
         return doGame(target, wager, response as ButtonInteraction, m);
       } else {
         cancelled = true;
@@ -1334,11 +1347,14 @@ async function run(
         if (pages.size > 1) {
           let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
             new ButtonBuilder()
-              .setCustomId("⬅")
+              .setCustomId("btn-previous-page")
               .setLabel("back")
               .setStyle(ButtonStyle.Primary)
               .setDisabled(true),
-            new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+            new ButtonBuilder()
+              .setCustomId("btn-next-page")
+              .setLabel("next")
+              .setStyle(ButtonStyle.Primary),
           );
           const msg = await send({ embeds: [embed], components: [row] });
 
@@ -1369,7 +1385,7 @@ async function run(
 
             if (!reaction) return;
 
-            if (reaction == "⬅") {
+            if (reaction == "btn-previous-page") {
               if (currentPage <= 1) {
                 return pageManager();
               } else {
@@ -1380,12 +1396,12 @@ async function run(
                 if (currentPage == 1) {
                   row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                     new ButtonBuilder()
-                      .setCustomId("⬅")
+                      .setCustomId("btn-previous-page")
                       .setLabel("back")
                       .setStyle(ButtonStyle.Primary)
                       .setDisabled(true),
                     new ButtonBuilder()
-                      .setCustomId("➡")
+                      .setCustomId("btn-next-page")
                       .setLabel("next")
                       .setStyle(ButtonStyle.Primary)
                       .setDisabled(false),
@@ -1393,12 +1409,12 @@ async function run(
                 } else {
                   row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                     new ButtonBuilder()
-                      .setCustomId("⬅")
+                      .setCustomId("btn-previous-page")
                       .setLabel("back")
                       .setStyle(ButtonStyle.Primary)
                       .setDisabled(false),
                     new ButtonBuilder()
-                      .setCustomId("➡")
+                      .setCustomId("btn-next-page")
                       .setLabel("next")
                       .setStyle(ButtonStyle.Primary)
                       .setDisabled(false),
@@ -1408,7 +1424,7 @@ async function run(
                 await edit({ embeds: [embed], components: [row] }, msg);
                 return pageManager();
               }
-            } else if (reaction == "➡") {
+            } else if (reaction == "btn-next-page") {
               if (currentPage >= lastPage) {
                 return pageManager();
               } else {
@@ -1419,12 +1435,12 @@ async function run(
                 if (currentPage == lastPage) {
                   row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                     new ButtonBuilder()
-                      .setCustomId("⬅")
+                      .setCustomId("btn-previous-page")
                       .setLabel("back")
                       .setStyle(ButtonStyle.Primary)
                       .setDisabled(false),
                     new ButtonBuilder()
-                      .setCustomId("➡")
+                      .setCustomId("btn-next-page")
                       .setLabel("next")
                       .setStyle(ButtonStyle.Primary)
                       .setDisabled(true),
@@ -1432,12 +1448,12 @@ async function run(
                 } else {
                   row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                     new ButtonBuilder()
-                      .setCustomId("⬅")
+                      .setCustomId("btn-previous-page")
                       .setLabel("back")
                       .setStyle(ButtonStyle.Primary)
                       .setDisabled(false),
                     new ButtonBuilder()
-                      .setCustomId("➡")
+                      .setCustomId("btn-next-page")
                       .setLabel("next")
                       .setStyle(ButtonStyle.Primary)
                       .setDisabled(false),

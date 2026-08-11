@@ -120,16 +120,19 @@ async function run(
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
-        .setCustomId("⬅")
+        .setCustomId("btn-previous-page")
         .setLabel("back")
         .setStyle(ButtonStyle.Primary)
         .setDisabled(true),
-      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
-      new ButtonBuilder().setCustomId("❌").setLabel("clear").setStyle(ButtonStyle.Danger),
+      new ButtonBuilder()
+        .setCustomId("btn-next-page")
+        .setLabel("next")
+        .setStyle(ButtonStyle.Primary),
+      new ButtonBuilder().setCustomId("btn-cancel").setLabel("clear").setStyle(ButtonStyle.Danger),
     );
     const row2 = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
-        .setCustomId("toggle-global")
+        .setCustomId("btn-toggle-global")
         .setLabel(preferences.mentionsGlobal ? "all servers" : message.guild.name.substring(0, 80))
         .setStyle(ButtonStyle.Secondary),
     );
@@ -166,7 +169,7 @@ async function run(
         return manager.embed;
       },
       handleResponses: new Map()
-        .set("❌", async (manager: PageManager<string>, interaction: ButtonInteraction) => {
+        .set("btn-cancel", async (manager: PageManager<string>, interaction: ButtonInteraction) => {
           await interaction.deferUpdate();
           await deleteUserMentions(
             manager.userId,
@@ -182,7 +185,7 @@ async function run(
           return;
         })
         .set(
-          "toggle-global",
+          "btn-toggle-global",
           async (manager: PageManager<string>, interaction: ButtonInteraction) => {
             await interaction.deferUpdate();
             await updatePreference(message.member, "mentionsGlobal", !preferences.mentionsGlobal);

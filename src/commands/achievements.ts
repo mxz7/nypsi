@@ -115,11 +115,14 @@ async function run(
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
-        .setCustomId("⬅")
+        .setCustomId("btn-previous-page")
         .setLabel("back")
         .setStyle(ButtonStyle.Primary)
         .setDisabled(true),
-      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+      new ButtonBuilder()
+        .setCustomId("btn-next-page")
+        .setLabel("next")
+        .setStyle(ButtonStyle.Primary),
     );
 
     const msg = await send({ embeds: [embed], components: [row] });
@@ -196,11 +199,14 @@ async function run(
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
-        .setCustomId("⬅")
+        .setCustomId("btn-previous-page")
         .setLabel("back")
         .setStyle(ButtonStyle.Primary)
         .setDisabled(true),
-      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+      new ButtonBuilder()
+        .setCustomId("btn-next-page")
+        .setLabel("next")
+        .setStyle(ButtonStyle.Primary),
     );
 
     let msg: Message;
@@ -355,12 +361,12 @@ async function run(
     const getRow = (id: string) => {
       return new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
-          .setCustomId("⬅")
+          .setCustomId("btn-previous-page")
           .setLabel("back")
           .setStyle(ButtonStyle.Primary)
           .setDisabled(tiers.indexOf(id) == 0),
         new ButtonBuilder()
-          .setCustomId("➡")
+          .setCustomId("btn-next-page")
           .setLabel("next")
           .setStyle(ButtonStyle.Primary)
           .setDisabled(tiers.indexOf(id) == tiers.length - 1),
@@ -403,13 +409,13 @@ async function run(
 
       const { res } = response;
 
-      if (res == "➡") {
+      if (res == "btn-next-page") {
         selected = allAchievementData[tiers[tiers.indexOf(selected.id) + 1]];
         const embed = await getAchievementEmbed(selected);
 
         msg = await msg.edit({ embeds: [embed], components: [getRow(selected.id)] });
         return pageManager();
-      } else if (res == "⬅") {
+      } else if (res == "btn-previous-page") {
         selected = allAchievementData[tiers[tiers.indexOf(selected.id) - 1]];
         const embed = await getAchievementEmbed(selected);
 

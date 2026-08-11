@@ -36,7 +36,7 @@ async function awaitUpcomingRewardsInteraction(
   const interaction = await response
     .awaitMessageComponent({
       componentType: ComponentType.Button,
-      filter: (i) => i.user.id === userId && i.customId === "level-upcoming-rewards",
+      filter: (i) => i.user.id === userId && i.customId === "btn-level-upcoming-rewards",
       time: 60000,
     })
     .catch((): null => null);
@@ -104,7 +104,7 @@ cmd.setRun(async (message, send) => {
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder()
-      .setCustomId("level-upcoming-rewards")
+      .setCustomId("btn-level-upcoming-rewards")
       .setLabel("upcoming rewards")
       .setStyle(ButtonStyle.Secondary),
   );

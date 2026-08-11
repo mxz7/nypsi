@@ -8,7 +8,7 @@ import { getBlockedList, setBlockedList } from "../utils/functions/economy/offer
 import { getItems, isEcoBanned } from "../utils/functions/economy/utils";
 
 export default {
-  name: "block-item",
+  name: "btn-block-item",
   type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;

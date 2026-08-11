@@ -40,12 +40,12 @@ async function run(
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder()
-      .setCustomId("daily")
+      .setCustomId("btn-daily")
       .setLabel(`daily (${tasks.filter((t) => t.completed && t.type === "daily").length}/3)`)
       .setStyle(ButtonStyle.Secondary)
       .setDisabled(true),
     new ButtonBuilder()
-      .setCustomId("weekly")
+      .setCustomId("btn-weekly")
       .setLabel(`weekly (${tasks.filter((t) => t.completed && t.type === "weekly").length}/3)`)
       .setStyle(ButtonStyle.Secondary),
   );
@@ -168,7 +168,7 @@ async function run(
 
     pageManager();
 
-    if (interaction.customId === "daily") {
+    if (interaction.customId === "btn-daily") {
       embed.setFields(dailies);
       embed.setDescription(`expires <t:${dailyEnd}:R>`);
       embed.setHeader(`${message.author.username}'s daily tasks`, message.author.avatarURL());

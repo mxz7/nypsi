@@ -147,7 +147,7 @@ async function run(
 
   const categorySelectMenu = (disabled = false, selected = "home") => {
     return new StringSelectMenuBuilder()
-      .setCustomId(`select-category`)
+      .setCustomId("select-museum-category")
       .setDisabled(disabled)
       .addOptions(
         itemCategories.map((category) => {
@@ -160,7 +160,7 @@ async function run(
   };
 
   const doCategorySelect = async (interaction: Interaction) => {
-    if (!interaction.isStringSelectMenu() || interaction.customId != "select-category") {
+    if (!interaction.isStringSelectMenu() || interaction.customId != "select-museum-category") {
       return false;
     }
     return interaction.values[0];
@@ -170,7 +170,7 @@ async function run(
 
   const doFindItem = async (interaction: ButtonInteraction, defer = true) => {
     const modal = new ModalBuilder()
-      .setCustomId("museum-find")
+      .setCustomId("modal-find-museum-item")
       .setTitle("find an item")
       .addLabelComponents(
         new LabelBuilder()
@@ -260,12 +260,12 @@ async function run(
           .addActionRowComponents((row) =>
             row.addComponents(
               new ButtonBuilder()
-                .setCustomId("edit")
+                .setCustomId("btn-edit")
                 .setLabel("edit")
                 .setStyle(ButtonStyle.Secondary)
                 .setDisabled(disabled),
               new ButtonBuilder()
-                .setCustomId("find")
+                .setCustomId("btn-find")
                 .setLabel("find item")
                 .setStyle(ButtonStyle.Secondary)
                 .setDisabled(disabled),
@@ -300,7 +300,7 @@ async function run(
       const response = await msg
         .awaitMessageComponent({ filter, time: 60000 })
         .then(async (collected) => {
-          if (collected.customId != "find")
+          if (collected.customId != "btn-find")
             await collected.deferUpdate().catch(() => {
               fail = true;
               return pageManager();
@@ -321,13 +321,13 @@ async function run(
 
       if (categorySelect) {
         return categoryView(categorySelect);
-      } else if (res == "find") {
+      } else if (res == "btn-find") {
         const res = await doFindItem(interaction as ButtonInteraction);
 
         if (!res) return pageManager();
 
         return categoryView(res.category, res.page);
-      } else if (res == "edit") {
+      } else if (res == "btn-edit") {
         return editView();
       }
 
@@ -374,17 +374,17 @@ async function run(
           .addActionRowComponents((row) =>
             row.addComponents(
               new ButtonBuilder()
-                .setCustomId(`alter-${i}`)
+                .setCustomId(`btn-select-museum-display-slot:${i}`)
                 .setLabel(featuredItems[i] ? "delete" : "add")
                 .setStyle(featuredItems[i] ? ButtonStyle.Danger : ButtonStyle.Success)
                 .setDisabled(disabled),
               new ButtonBuilder()
-                .setCustomId(`up-${i}`)
+                .setCustomId(`btn-move-museum-display-slot-up:${i}`)
                 .setEmoji("⬆️")
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(disabled || i == 0),
               new ButtonBuilder()
-                .setCustomId(`down-${i}`)
+                .setCustomId(`btn-move-museum-display-slot-down:${i}`)
                 .setEmoji("⬇️")
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(disabled || i == featuredItems.length - 1),
@@ -397,12 +397,12 @@ async function run(
         .addActionRowComponents((row) =>
           row.addComponents(
             new ButtonBuilder()
-              .setCustomId("save")
+              .setCustomId("btn-save")
               .setLabel("save")
               .setStyle(ButtonStyle.Success)
               .setDisabled(disabled),
             new ButtonBuilder()
-              .setCustomId("clear")
+              .setCustomId("btn-clear")
               .setLabel("clear")
               .setStyle(ButtonStyle.Danger)
               .setDisabled(disabled || featuredItems.every((i) => i === undefined)),
@@ -430,7 +430,7 @@ async function run(
       const response = await msg
         .awaitMessageComponent({ filter, time: 60000 })
         .then(async (collected) => {
-          if (!collected.customId.startsWith("alter-"))
+          if (!collected.customId.startsWith("btn-select-museum-display-slot:"))
             await collected.deferUpdate().catch(() => {
               fail = true;
               return pageManager();
@@ -450,7 +450,7 @@ async function run(
 
       const { res, interaction } = response;
 
-      if (res == "save") {
+      if (res == "btn-save") {
         if (
           JSON.stringify(featuredItems.filter(Boolean)) !=
           JSON.stringify(await museum.getFavoritedItems())
@@ -459,10 +459,10 @@ async function run(
         }
 
         return homeView();
-      } else if (res == "clear") {
+      } else if (res == "btn-clear") {
         featuredItems = Array(5).fill(undefined);
-      } else if (res.startsWith("alter-")) {
-        const slot = parseInt(res.split("-")[1]);
+      } else if (res.startsWith("btn-select-museum-display-slot:")) {
+        const slot = parseInt(res.split(":")[1]);
 
         if (featuredItems[slot]) {
           featuredItems[slot] = undefined;
@@ -491,16 +491,16 @@ async function run(
 
           featuredItems[slot] = res.item;
         }
-      } else if (res.startsWith("up-")) {
-        const slot = parseInt(res.split("-")[1]);
+      } else if (res.startsWith("btn-move-museum-display-slot-up:")) {
+        const slot = parseInt(res.split(":")[1]);
 
         if (slot > 0) {
           const temp = featuredItems[slot];
           featuredItems[slot] = featuredItems[slot - 1];
           featuredItems[slot - 1] = temp;
         }
-      } else if (res.startsWith("down-")) {
-        const slot = parseInt(res.split("-")[1]);
+      } else if (res.startsWith("btn-move-museum-display-slot-down:")) {
+        const slot = parseInt(res.split(":")[1]);
 
         if (slot < featuredItems.length - 1) {
           const temp = featuredItems[slot];
@@ -572,17 +572,17 @@ async function run(
           .addActionRowComponents((row) =>
             row.addComponents(
               new ButtonBuilder()
-                .setCustomId("⬅")
+                .setCustomId("btn-previous-page")
                 .setLabel("back")
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(disabled || currentPage == 1),
               new ButtonBuilder()
-                .setCustomId("➡")
+                .setCustomId("btn-next-page")
                 .setLabel("next")
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(disabled || currentPage == pages.size),
               new ButtonBuilder()
-                .setCustomId("find")
+                .setCustomId("btn-find")
                 .setLabel("find item")
                 .setStyle(ButtonStyle.Secondary)
                 .setDisabled(disabled),
@@ -592,7 +592,7 @@ async function run(
         builder.addActionRowComponents((row) =>
           row.addComponents(
             new ButtonBuilder()
-              .setCustomId("find")
+              .setCustomId("btn-find")
               .setLabel("find item")
               .setStyle(ButtonStyle.Secondary)
               .setDisabled(disabled),
@@ -625,7 +625,7 @@ async function run(
       const response = await msg
         .awaitMessageComponent({ filter, time: 60000 })
         .then(async (collected) => {
-          if (collected.customId != "find")
+          if (collected.customId != "btn-find")
             await collected.deferUpdate().catch(() => {
               fail = true;
               return pageManager();
@@ -646,11 +646,11 @@ async function run(
 
       if (categorySelect) {
         return categorySelect == "home" ? homeView() : categoryView(categorySelect);
-      } else if (res == "➡") {
+      } else if (res == "btn-next-page") {
         if (currentPage < pages.size) currentPage++;
-      } else if (res == "⬅") {
+      } else if (res == "btn-previous-page") {
         if (currentPage > 1) currentPage--;
-      } else if (res == "find") {
+      } else if (res == "btn-find") {
         const res = await doFindItem(interaction as ButtonInteraction);
 
         if (!res) return pageManager();
@@ -721,8 +721,11 @@ async function run(
       });
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("confirm").setLabel("confirm").setStyle(ButtonStyle.Success),
-      new ButtonBuilder().setCustomId("cancel").setLabel("cancel").setStyle(ButtonStyle.Danger),
+      new ButtonBuilder()
+        .setCustomId("btn-confirm")
+        .setLabel("confirm")
+        .setStyle(ButtonStyle.Success),
+      new ButtonBuilder().setCustomId("btn-cancel").setLabel("cancel").setStyle(ButtonStyle.Danger),
     );
 
     const msg = await send({
@@ -748,7 +751,7 @@ async function run(
 
     if (!interaction) return;
 
-    if (interaction.customId === "confirm") {
+    if (interaction.customId === "btn-confirm") {
       inventory = await getInventory(message.member);
       if (inventory.count(item) < amount)
         return interaction.update({ embeds: [new ErrorEmbed(`sneaky bitch`)], components: [] });

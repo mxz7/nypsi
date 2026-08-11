@@ -496,7 +496,7 @@ export async function openSupportRequest(
     return;
   }
 
-  const id = `support-request-modal-${Math.floor(Math.random() * 10_000_000)}`;
+  const id = `modal-support-request-${Math.floor(Math.random() * 10_000_000)}`;
 
   const modal = new ModalBuilder().setCustomId(id).setTitle("nypsi support request");
 

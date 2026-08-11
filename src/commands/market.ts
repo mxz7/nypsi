@@ -264,22 +264,22 @@ async function run(
 
     const topRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
-        .setCustomId("viewRecent")
+        .setCustomId("btn-view-recent")
         .setLabel("recent orders")
         .setStyle(viewRecent ? ButtonStyle.Success : ButtonStyle.Secondary),
       new ButtonBuilder()
-        .setCustomId("viewOwn")
+        .setCustomId("btn-view-own")
         .setLabel("your orders")
         .setStyle(viewRecent ? ButtonStyle.Secondary : ButtonStyle.Success),
     );
 
     const bottomRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
-        .setCustomId("mBuy")
+        .setCustomId("btn-manage-buy-orders")
         .setLabel("manage buy orders")
         .setStyle(ButtonStyle.Primary),
       new ButtonBuilder()
-        .setCustomId("mSell")
+        .setCustomId("btn-manage-sell-orders")
         .setLabel("manage sell orders")
         .setStyle(ButtonStyle.Primary),
     );
@@ -314,13 +314,13 @@ async function run(
 
       const { res } = response;
 
-      if (res == "mBuy") {
+      if (res == "btn-manage-buy-orders") {
         return manageOrders("buy", msg);
-      } else if (res == "mSell") {
+      } else if (res == "btn-manage-sell-orders") {
         return manageOrders("sell", msg);
-      } else if (res == "viewRecent") {
+      } else if (res == "btn-view-recent") {
         return viewMarket(true, msg);
-      } else if (res == "viewOwn") {
+      } else if (res == "btn-view-own") {
         return viewMarket(false, msg);
       }
     };
@@ -350,19 +350,22 @@ async function run(
 
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
-          .setCustomId("newOrder")
+          .setCustomId("btn-new-order")
           .setLabel("create order")
           .setStyle(ButtonStyle.Primary)
           .setDisabled(orders.length >= max),
         new ButtonBuilder()
-          .setCustomId("delOrder")
+          .setCustomId("btn-del-order")
           .setLabel("delete order")
           .setStyle(ButtonStyle.Danger)
           .setDisabled(orders.length == 0),
       );
 
       const bottomRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder().setCustomId("back").setLabel("back").setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder()
+          .setCustomId("btn-back")
+          .setLabel("back")
+          .setStyle(ButtonStyle.Secondary),
       );
 
       if (msg) {
@@ -382,7 +385,7 @@ async function run(
       const response = await msg
         .awaitMessageComponent({ filter, time: 60000 })
         .then(async (collected) => {
-          if (collected.customId !== "newOrder")
+          if (collected.customId !== "btn-new-order")
             await collected.deferUpdate().catch(() => {
               fail = true;
               return pageManager();
@@ -399,7 +402,7 @@ async function run(
 
       const { res, interaction } = response;
 
-      if (res == "newOrder") {
+      if (res == "btn-new-order") {
         if ((await getMarketOrders(message.member, type)).length >= max) {
           await interaction.reply({
             embeds: [new ErrorEmbed(`you are at the max number of ${type} orders`)],
@@ -650,7 +653,7 @@ async function run(
 
         await updateEmbed();
         return pageManager();
-      } else if (res == "delOrder") {
+      } else if (res == "btn-del-order") {
         const res =
           orders.length == 1 ? orders[0].id.toString() : await deleteOrder(type, msg, orders);
 
@@ -669,7 +672,7 @@ async function run(
 
         await updateEmbed();
         return pageManager();
-      } else if (res == "back") {
+      } else if (res == "btn-back") {
         return viewMarket(true, msg);
       }
     };
@@ -678,7 +681,7 @@ async function run(
   };
 
   async function createOrderModal(type: string, interaction: ButtonInteraction) {
-    const id = `market-${type}-order-${Math.floor(Math.random() * 69420)}`;
+    const id = `modal-create-${type}-market-order-${Math.floor(Math.random() * 69420)}`;
     const modal = new ModalBuilder().setCustomId(id).setTitle(`create ${type} order`);
 
     modal.addLabelComponents(
@@ -732,8 +735,11 @@ async function run(
     );
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("✅").setLabel("confirm").setStyle(ButtonStyle.Success),
-      new ButtonBuilder().setCustomId("❌").setLabel("cancel").setStyle(ButtonStyle.Danger),
+      new ButtonBuilder()
+        .setCustomId("btn-confirm")
+        .setLabel("confirm")
+        .setStyle(ButtonStyle.Success),
+      new ButtonBuilder().setCustomId("btn-cancel").setLabel("cancel").setStyle(ButtonStyle.Danger),
     );
 
     if (msg) {
@@ -752,7 +758,7 @@ async function run(
             new ButtonBuilder()
               .setStyle(ButtonStyle.Danger)
               .setLabel("expired")
-              .setCustomId("boobies")
+              .setCustomId("btn-disabled")
               .setDisabled(true),
           ),
         ],
@@ -762,7 +768,7 @@ async function run(
 
     if (!reaction) return false;
 
-    if (reaction.customId === "❌") {
+    if (reaction.customId === "btn-cancel") {
       msg.edit({ components: [] });
       await reaction.reply({
         embeds: [new CustomEmbed(message.member, "✅ cancelled")],
@@ -958,7 +964,7 @@ async function run(
       `not enough ${item.plural} on the market. create a ${type} order at the current item value instead?`,
     );
 
-    const id = `market-suggested-${type}-${Math.floor(Math.random() * 69420)}`;
+    const id = `btn-create-suggested-${type}-order:${Math.floor(Math.random() * 69420)}`;
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
         .setCustomId(id)
@@ -1014,13 +1020,13 @@ async function run(
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new StringSelectMenuBuilder()
-        .setCustomId("order")
+        .setCustomId("select-order")
         .setPlaceholder("order you want to delete")
         .setOptions(options),
     );
 
     const backRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("back").setLabel("back").setStyle(ButtonStyle.Danger),
+      new ButtonBuilder().setCustomId("btn-back").setLabel("back").setStyle(ButtonStyle.Danger),
     );
 
     await edit({ embeds: [embed], components: [row, backRow] }, msg);
@@ -1563,17 +1569,17 @@ async function run(
 
       const topRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
-          .setCustomId("buyOne")
+          .setCustomId("btn-buy-one")
           .setLabel("buy one")
           .setStyle(ButtonStyle.Primary)
           .setDisabled(totalSellOrderCount == 0),
         new ButtonBuilder()
-          .setCustomId("buyMulti")
+          .setCustomId("btn-buy-multi")
           .setLabel("buy multiple")
           .setStyle(ButtonStyle.Primary)
           .setDisabled(totalSellOrderCount <= 1),
         new ButtonBuilder()
-          .setCustomId("refresh")
+          .setCustomId("btn-refresh")
           .setLabel("refresh")
           .setStyle(ButtonStyle.Secondary),
       );
@@ -1600,12 +1606,12 @@ async function run(
 
       const bottomRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
-          .setCustomId("sellOne")
+          .setCustomId("btn-sell-one")
           .setLabel("sell one")
           .setStyle(ButtonStyle.Primary)
           .setDisabled(totalBuyOrderCount == 0),
         new ButtonBuilder()
-          .setCustomId("sellMulti")
+          .setCustomId("btn-sell-multi")
           .setLabel("sell multiple")
           .setStyle(ButtonStyle.Primary)
           .setDisabled(totalBuyOrderCount <= 1),
@@ -1640,7 +1646,7 @@ async function run(
 
       const { res, interaction } = response;
 
-      if (res == "buyOne") {
+      if (res == "btn-buy-one") {
         if (
           (await getBalance(message.member)) <
           (await getMarketTransactionData(item.id, 1, "sell", message.member)).cost
@@ -1670,7 +1676,7 @@ async function run(
         await interaction.deferUpdate();
 
         return confirmTransaction("buy", item, 1, message.member, msg);
-      } else if (res == "buyMulti") {
+      } else if (res == "btn-buy-multi") {
         const res = await quantitySelectionModal(
           interaction as ButtonInteraction,
           "buy",
@@ -1737,7 +1743,7 @@ async function run(
 
         await updateEmbed();
         return pageManager();
-      } else if (res == "sellOne") {
+      } else if (res == "btn-sell-one") {
         const inventory = await getInventory(message.member);
 
         if (!inventory.has(item.id)) {
@@ -1762,7 +1768,7 @@ async function run(
         await interaction.deferUpdate();
 
         return confirmTransaction("sell", item, 1, message.member, msg);
-      } else if (res == "sellMulti") {
+      } else if (res == "btn-sell-multi") {
         const res = await quantitySelectionModal(
           interaction as ButtonInteraction,
           "sell",
@@ -1825,7 +1831,7 @@ async function run(
 
         await updateEmbed();
         return pageManager();
-      } else if (res == "refresh") {
+      } else if (res == "btn-refresh") {
         await interaction.deferUpdate();
         await updateEmbed();
         return pageManager();
@@ -1851,14 +1857,17 @@ async function run(
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
-        .setCustomId("confirm")
+        .setCustomId("btn-confirm")
         .setLabel(`confirm ${type}`)
         .setStyle(ButtonStyle.Primary),
     );
 
     if (!fromCommand) {
       row.addComponents(
-        new ButtonBuilder().setCustomId("cancel").setLabel("cancel").setStyle(ButtonStyle.Danger),
+        new ButtonBuilder()
+          .setCustomId("btn-cancel")
+          .setLabel("cancel")
+          .setStyle(ButtonStyle.Danger),
       );
     }
 
@@ -1914,7 +1923,7 @@ async function run(
 
       const { res, interaction } = response;
 
-      if (res == "confirm") {
+      if (res == "btn-confirm") {
         const refreshedPrice = await getPrice();
 
         if (refreshedPrice == -1) {
@@ -2016,7 +2025,7 @@ async function run(
         }
 
         return pageManager();
-      } else if (res == "cancel") {
+      } else if (res == "btn-cancel") {
         if (fromCommand) await edit({ embeds: [embed], components: [] }, msg);
         await interaction.reply({
           embeds: [new CustomEmbed(message.member, "✅ cancelled")],
@@ -2036,7 +2045,7 @@ async function run(
     inOrders: number,
     inInventory?: number,
   ) {
-    const id = `market-quantity-${Math.floor(Math.random() * 69420)}`;
+    const id = `modal-select-market-quantity-${Math.floor(Math.random() * 69420)}`;
     const modal = new ModalBuilder().setCustomId(id).setTitle("select quantity");
 
     modal.addLabelComponents(

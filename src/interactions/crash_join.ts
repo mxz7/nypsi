@@ -8,7 +8,7 @@ import { addCrashPlayer } from "../utils/functions/economy/crash";
 import { isEcoBanned, userExists } from "../utils/functions/economy/utils";
 
 export default {
-  name: "crash-join",
+  name: "btn-crash-join",
   type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;

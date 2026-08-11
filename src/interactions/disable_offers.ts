@@ -8,7 +8,7 @@ import { isEcoBanned } from "../utils/functions/economy/utils";
 import { updatePreference } from "../utils/functions/users/preferences";
 
 export default {
-  name: "disable-offers",
+  name: "btn-disable-offers",
   type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;

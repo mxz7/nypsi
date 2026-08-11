@@ -547,19 +547,22 @@ export async function getMarketOrderEmbed(order: Market) {
     embed.setColor("#b4befe");
     description += `buying **${order.itemAmount.toLocaleString()}x** ${getItems()[order.itemId].emoji} **[${getItems()[order.itemId].name}](https://nypsi.xyz/items/${order.itemId}?ref=bot-market)** for $${(Number(order.price) * order.itemAmount).toLocaleString()}`;
     row.addComponents(
-      new ButtonBuilder().setCustomId("market-full").setLabel("sell").setStyle(ButtonStyle.Success),
+      new ButtonBuilder()
+        .setCustomId("btn-market-full")
+        .setLabel("sell")
+        .setStyle(ButtonStyle.Success),
     );
     if (order.itemAmount >= 10)
       row.addComponents(
         new ButtonBuilder()
-          .setCustomId("market-partial")
+          .setCustomId("btn-market-partial")
           .setLabel("sell some")
           .setStyle(ButtonStyle.Secondary),
       );
     else if (order.itemAmount > 1)
       row.addComponents(
         new ButtonBuilder()
-          .setCustomId("market-one")
+          .setCustomId("btn-market-one")
           .setLabel("sell one")
           .setStyle(ButtonStyle.Secondary),
       );
@@ -567,19 +570,22 @@ export async function getMarketOrderEmbed(order: Market) {
     embed.setColor("#a6e3a1");
     description += `selling **${order.itemAmount.toLocaleString()}x** ${getItems()[order.itemId].emoji} **[${getItems()[order.itemId].name}](https://nypsi.xyz/items/${order.itemId}?ref=bot-market)** for $${(Number(order.price) * order.itemAmount).toLocaleString()}`;
     row.addComponents(
-      new ButtonBuilder().setCustomId("market-full").setLabel("buy").setStyle(ButtonStyle.Success),
+      new ButtonBuilder()
+        .setCustomId("btn-market-full")
+        .setLabel("buy")
+        .setStyle(ButtonStyle.Success),
     );
     if (order.itemAmount >= 10)
       row.addComponents(
         new ButtonBuilder()
-          .setCustomId("market-partial")
+          .setCustomId("btn-market-partial")
           .setLabel("buy some")
           .setStyle(ButtonStyle.Secondary),
       );
     else if (order.itemAmount > 1)
       row.addComponents(
         new ButtonBuilder()
-          .setCustomId("market-one")
+          .setCustomId("btn-market-one")
           .setLabel("buy one")
           .setStyle(ButtonStyle.Secondary),
       );
@@ -1276,7 +1282,7 @@ export async function showMarketConfirmationModal(
   action: OrderType,
   cost: number,
 ) {
-  const id = `market-confirm-${Math.floor(Math.random() * 69420)}`;
+  const id = `modal-market-confirm-${Math.floor(Math.random() * 69420)}`;
 
   const modal = new ModalBuilder().setCustomId(id).setTitle("confirmation");
 

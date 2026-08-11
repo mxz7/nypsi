@@ -155,7 +155,7 @@ export async function createTradeRequest(
 
   const buttonRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder()
-      .setCustomId("fr")
+      .setCustomId("btn-fulfill-trade-request")
       .setLabel("fulfill trade request")
       .setStyle(ButtonStyle.Success),
   );
@@ -283,7 +283,7 @@ export async function bumpTradeRequest(id: number, client: NypsiClient) {
 
   const buttonRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder()
-      .setCustomId("fr")
+      .setCustomId("btn-fulfill-trade-request")
       .setLabel("fulfill trade request")
       .setStyle(ButtonStyle.Success),
   );

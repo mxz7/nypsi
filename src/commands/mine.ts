@@ -250,7 +250,7 @@ async function run(
   );
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("mine").setLabel("mine").setStyle(ButtonStyle.Success),
+    new ButtonBuilder().setCustomId("btn-mine").setLabel("mine").setStyle(ButtonStyle.Success),
   );
 
   if (chosenArea == "nether") await addStat(member, "nether_portal");

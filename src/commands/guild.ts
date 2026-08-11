@@ -430,7 +430,10 @@ async function run(
     embed.setDescription(`you have been invited to join **${guild.guildName}**\n\ndo you accept?`);
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("yes").setLabel("accept").setStyle(ButtonStyle.Success),
+      new ButtonBuilder()
+        .setCustomId("btn-confirm")
+        .setLabel("accept")
+        .setStyle(ButtonStyle.Success),
     );
 
     const msg = await message.channel
@@ -458,7 +461,7 @@ async function run(
                 new ButtonBuilder()
                   .setStyle(ButtonStyle.Danger)
                   .setLabel("expired")
-                  .setCustomId("boobies")
+                  .setCustomId("btn-disabled")
                   .setDisabled(true),
               ),
             ],
@@ -471,7 +474,7 @@ async function run(
 
     if (fail) return;
 
-    if (reaction == "yes") {
+    if (reaction == "btn-confirm") {
       if (await redis.exists(Constants.redis.nypsi.INFINITE_MAX_BET)) {
         return send({ embeds: [new ErrorEmbed("guild invites/leaves are currently disabled")] });
       }
@@ -521,8 +524,11 @@ async function run(
     );
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("✅").setLabel("confirm").setStyle(ButtonStyle.Success),
-      new ButtonBuilder().setCustomId("❌").setLabel("cancel").setStyle(ButtonStyle.Danger),
+      new ButtonBuilder()
+        .setCustomId("btn-confirm")
+        .setLabel("confirm")
+        .setStyle(ButtonStyle.Success),
+      new ButtonBuilder().setCustomId("btn-cancel").setLabel("cancel").setStyle(ButtonStyle.Danger),
     );
 
     const msg = await send({ embeds: [embed], components: [row] });
@@ -535,7 +541,7 @@ async function run(
             new ButtonBuilder()
               .setStyle(ButtonStyle.Danger)
               .setLabel("expired")
-              .setCustomId("boobies")
+              .setCustomId("btn-disabled")
               .setDisabled(true),
           ),
         ],
@@ -546,7 +552,7 @@ async function run(
 
     if (!reaction) return;
 
-    if (reaction.customId === "❌") {
+    if (reaction.customId === "btn-cancel") {
       msg.edit({ components: [] });
       return reaction.reply({
         embeds: [new CustomEmbed(message.member, "✅ cancelled")],
@@ -686,8 +692,11 @@ async function run(
     );
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("✅").setLabel("confirm").setStyle(ButtonStyle.Success),
-      new ButtonBuilder().setCustomId("❌").setLabel("cancel").setStyle(ButtonStyle.Danger),
+      new ButtonBuilder()
+        .setCustomId("btn-confirm")
+        .setLabel("confirm")
+        .setStyle(ButtonStyle.Success),
+      new ButtonBuilder().setCustomId("btn-cancel").setLabel("cancel").setStyle(ButtonStyle.Danger),
     );
 
     const msg = await send({ embeds: [embed], components: [row] });
@@ -700,7 +709,7 @@ async function run(
             new ButtonBuilder()
               .setStyle(ButtonStyle.Danger)
               .setLabel("expired")
-              .setCustomId("boobies")
+              .setCustomId("btn-disabled")
               .setDisabled(true),
           ),
         ],
@@ -711,7 +720,7 @@ async function run(
 
     if (!reaction) return;
 
-    if (reaction.customId === "❌") {
+    if (reaction.customId === "btn-cancel") {
       msg.edit({ components: [] });
       return reaction.reply({
         embeds: [new CustomEmbed(message.member, "✅ cancelled")],
@@ -773,7 +782,10 @@ async function run(
     }
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("✅").setLabel("do it.").setStyle(ButtonStyle.Success),
+      new ButtonBuilder()
+        .setCustomId("btn-confirm")
+        .setLabel("do it.")
+        .setStyle(ButtonStyle.Success),
     );
 
     const msg = await send({
@@ -805,7 +817,7 @@ async function run(
 
     if (!reaction.isButton()) return;
 
-    if (reaction.customId == "✅") {
+    if (reaction.customId == "btn-confirm") {
       if (amount > (await getBalance(message.member))) {
         return reaction.message.edit({
           embeds: [new ErrorEmbed("you cannot afford this payment")],
@@ -904,14 +916,17 @@ async function run(
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
         .setLabel("overall")
-        .setCustomId("overall")
+        .setCustomId("btn-overall")
         .setStyle(ButtonStyle.Secondary)
         .setDisabled(true),
       new ButtonBuilder()
         .setLabel("this level")
-        .setCustomId("level")
+        .setCustomId("btn-level")
         .setStyle(ButtonStyle.Secondary),
-      new ButtonBuilder().setLabel("today").setCustomId("today").setStyle(ButtonStyle.Secondary),
+      new ButtonBuilder()
+        .setLabel("today")
+        .setCustomId("btn-today")
+        .setStyle(ButtonStyle.Secondary),
     );
 
     embed.setFields(
@@ -933,7 +948,7 @@ async function run(
 
       if (!interaction) return;
 
-      const tab = interaction.customId as keyof typeof formattedStats;
+      const tab = interaction.customId.slice(4) as keyof typeof formattedStats;
 
       embed.setFields(
         { name: "xp", value: formattedStats[tab].xp, inline: true },
@@ -941,7 +956,7 @@ async function run(
       );
 
       row.components.forEach((btn) => {
-        btn.setDisabled((btn.data as any).custom_id === tab);
+        btn.setDisabled((btn.data as any).custom_id === interaction.customId);
       });
 
       await interaction.update({ embeds: [embed], components: [row] });
@@ -1226,8 +1241,11 @@ async function run(
       ).setTitle("⚠️ warning");
 
       const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
-        new ButtonBuilder().setCustomId("yes").setLabel("yes").setStyle(ButtonStyle.Success),
-        new ButtonBuilder().setCustomId("no").setLabel("no").setStyle(ButtonStyle.Danger),
+        new ButtonBuilder()
+          .setCustomId("btn-confirm")
+          .setLabel("yes")
+          .setStyle(ButtonStyle.Success),
+        new ButtonBuilder().setCustomId("btn-cancel").setLabel("no").setStyle(ButtonStyle.Danger),
       );
 
       confirmMsg = await send({ embeds: [embed], components: [row] });
@@ -1242,7 +1260,7 @@ async function run(
 
       if (!interaction) return;
 
-      if (interaction.customId === "no")
+      if (interaction.customId === "btn-cancel")
         return interaction.reply({
           embeds: [new ErrorEmbed("purchase cancelled")],
           flags: MessageFlags.Ephemeral,
@@ -1339,12 +1357,18 @@ async function run(
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
-        .setCustomId("⬅")
+        .setCustomId("btn-previous-page")
         .setLabel("back")
         .setStyle(ButtonStyle.Primary)
         .setDisabled(true),
-      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
-      new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle(ButtonStyle.Danger),
+      new ButtonBuilder()
+        .setCustomId("btn-next-page")
+        .setLabel("next")
+        .setStyle(ButtonStyle.Primary),
+      new ButtonBuilder()
+        .setCustomId("btn-cancel")
+        .setLabel("clear mentions")
+        .setStyle(ButtonStyle.Danger),
     );
 
     const embed = new CustomEmbed(message.member)

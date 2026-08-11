@@ -151,9 +151,18 @@ async function run(
     const updateButtons = (page: number) => {
       if (offers.length > 0) {
         row.setComponents(
-          new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary),
-          new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
-          new ButtonBuilder().setCustomId("del").setLabel("delete").setStyle(ButtonStyle.Danger),
+          new ButtonBuilder()
+            .setCustomId("btn-previous-page")
+            .setLabel("back")
+            .setStyle(ButtonStyle.Primary),
+          new ButtonBuilder()
+            .setCustomId("btn-next-page")
+            .setLabel("next")
+            .setStyle(ButtonStyle.Primary),
+          new ButtonBuilder()
+            .setCustomId("btn-delete")
+            .setLabel("delete")
+            .setStyle(ButtonStyle.Danger),
         );
 
         if (offers.length == 1) {
@@ -175,7 +184,10 @@ async function run(
       await displayOffer(0);
     } else {
       row.addComponents(
-        new ButtonBuilder().setCustomId("del").setLabel("delete").setStyle(ButtonStyle.Danger),
+        new ButtonBuilder()
+          .setCustomId("btn-delete")
+          .setLabel("delete")
+          .setStyle(ButtonStyle.Danger),
       );
       await displayOffer(0);
     }
@@ -219,7 +231,7 @@ async function run(
 
       const { res, interaction } = response;
 
-      if (res == "⬅") {
+      if (res == "btn-previous-page") {
         if (currentPage == 0) {
           return pageManager();
         }
@@ -232,7 +244,7 @@ async function run(
 
         await msg.edit({ embeds: [embed], components: [row] });
         return pageManager();
-      } else if (res == "➡") {
+      } else if (res == "btn-next-page") {
         if (currentPage == maxPage) {
           return pageManager();
         }
@@ -244,7 +256,7 @@ async function run(
 
         await msg.edit({ embeds: [embed], components: [row] });
         return pageManager();
-      } else if (res == "del") {
+      } else if (res == "btn-delete") {
         const res = await deleteOffer(offers[currentPage], message.client as NypsiClient).catch(
           (e) => {
             logger.warn("failed to delete offer", e);

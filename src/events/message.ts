@@ -159,7 +159,7 @@ export default async function messageCreate(message: Message) {
       if (aiAvailable) {
         rowComponents.push(
           new ButtonBuilder()
-            .setCustomId("help-ai-start")
+            .setCustomId("btn-help-ai-start")
             .setLabel("ask ai for help")
             .setStyle(ButtonStyle.Primary),
         );
@@ -167,7 +167,7 @@ export default async function messageCreate(message: Message) {
 
       rowComponents.push(
         new ButtonBuilder()
-          .setCustomId("s")
+          .setCustomId("btn-contact-support")
           .setLabel("talk to a staff member")
           .setStyle(ButtonStyle.Danger),
         new ButtonBuilder()
@@ -195,7 +195,7 @@ export default async function messageCreate(message: Message) {
         return await msg.edit({ components: [row] });
       }
 
-      if (res.customId == "s") {
+      if (res.customId == "btn-contact-support") {
         await openSupportRequest(res as ButtonInteraction, message.client as NypsiClient);
         return;
       }

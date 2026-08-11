@@ -5,7 +5,7 @@ import Constants from "../utils/Constants";
 import { updatePreference } from "../utils/functions/users/preferences";
 
 export default {
-  name: "enable-vote-reminders",
+  name: "btn-enable-vote-reminders",
   type: "interaction",
   async run(interaction) {
     await updatePreference(interaction.user.id, "dms.voteReminder", true);

@@ -54,7 +54,7 @@ async function run(
   const buildRow = () =>
     new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
-        .setCustomId("toggle")
+        .setCustomId("btn-toggle-avatar-source")
         .setLabel(showingServerAvatar ? "show user avatar" : "show server avatar")
         .setStyle(ButtonStyle.Primary),
     );

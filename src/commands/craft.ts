@@ -77,7 +77,7 @@ async function run(
 
     const components = [
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder().setCustomId("bck").setLabel("back").setStyle(ButtonStyle.Primary),
+        new ButtonBuilder().setCustomId("btn-back").setLabel("back").setStyle(ButtonStyle.Primary),
       ),
     ];
 
@@ -107,7 +107,7 @@ async function run(
       if (!reaction) return;
       if (!reaction.isButton()) return;
 
-      if (reaction.customId == "bck") {
+      if (reaction.customId == "btn-back") {
         mainPage(msg);
         return;
       }
@@ -220,11 +220,14 @@ async function run(
     if (pages.size > 1) {
       components[0].addComponents(
         new ButtonBuilder()
-          .setCustomId("⬅")
+          .setCustomId("btn-previous-page")
           .setLabel("back")
           .setStyle(ButtonStyle.Primary)
           .setDisabled(true),
-        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+        new ButtonBuilder()
+          .setCustomId("btn-next-page")
+          .setLabel("next")
+          .setStyle(ButtonStyle.Primary),
       );
 
       embed.setFooter({ text: `1/${pages.size}` });
@@ -234,7 +237,7 @@ async function run(
       components[pages.size > 1 ? 1 : 0] =
         new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
           new ButtonBuilder()
-            .setCustomId("prog")
+            .setCustomId("btn-view-progress")
             .setLabel("currently crafting")
             .setStyle(ButtonStyle.Success),
         );
@@ -280,7 +283,7 @@ async function run(
       if (!reaction) return;
       if (!reaction.isButton()) return;
 
-      if (reaction.customId == "⬅") {
+      if (reaction.customId == "btn-previous-page") {
         if (currentPage <= 1) {
           return pageManager();
         } else {
@@ -292,12 +295,12 @@ async function run(
           if (currentPage == 1) {
             components[0].setComponents(
               new ButtonBuilder()
-                .setCustomId("⬅")
+                .setCustomId("btn-previous-page")
                 .setLabel("back")
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(true),
               new ButtonBuilder()
-                .setCustomId("➡")
+                .setCustomId("btn-next-page")
                 .setLabel("next")
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(false),
@@ -305,12 +308,12 @@ async function run(
           } else {
             components[0].setComponents(
               new ButtonBuilder()
-                .setCustomId("⬅")
+                .setCustomId("btn-previous-page")
                 .setLabel("back")
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(false),
               new ButtonBuilder()
-                .setCustomId("➡")
+                .setCustomId("btn-next-page")
                 .setLabel("next")
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(false),
@@ -319,7 +322,7 @@ async function run(
           await reaction.message.edit({ embeds: [embed], components });
           return pageManager();
         }
-      } else if (reaction.customId == "➡") {
+      } else if (reaction.customId == "btn-next-page") {
         if (currentPage >= pages.size) {
           return pageManager();
         } else {
@@ -330,12 +333,12 @@ async function run(
           if (currentPage == pages.size) {
             components[0].setComponents(
               new ButtonBuilder()
-                .setCustomId("⬅")
+                .setCustomId("btn-previous-page")
                 .setLabel("back")
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(false),
               new ButtonBuilder()
-                .setCustomId("➡")
+                .setCustomId("btn-next-page")
                 .setLabel("next")
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(true),
@@ -343,12 +346,12 @@ async function run(
           } else {
             components[0].setComponents(
               new ButtonBuilder()
-                .setCustomId("⬅")
+                .setCustomId("btn-previous-page")
                 .setLabel("back")
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(false),
               new ButtonBuilder()
-                .setCustomId("➡")
+                .setCustomId("btn-next-page")
                 .setLabel("next")
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(false),
@@ -357,7 +360,7 @@ async function run(
           await reaction.message.edit({ embeds: [embed], components });
           return pageManager();
         }
-      } else if (reaction.customId == "prog") {
+      } else if (reaction.customId == "btn-view-progress") {
         craftingPage(msg);
         return;
       }

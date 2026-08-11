@@ -75,7 +75,7 @@ async function run(
         components: [
           new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(
             new ButtonBuilder()
-              .setCustomId("enable-vote-reminders")
+              .setCustomId("btn-enable-vote-reminders")
               .setStyle(ButtonStyle.Secondary)
               .setLabel("enable vote reminders"),
           ),
@@ -102,7 +102,7 @@ async function run(
     if (!dmSettings.dms.voteReminder)
       row.addComponents(
         new ButtonBuilder()
-          .setCustomId("enable-vote-reminders")
+          .setCustomId("btn-enable-vote-reminders")
           .setStyle(ButtonStyle.Secondary)
           .setLabel("enable vote reminders"),
       );

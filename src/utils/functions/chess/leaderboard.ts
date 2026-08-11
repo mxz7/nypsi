@@ -73,7 +73,7 @@ export async function showChessLeaderboard(
     new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       (["solved", "rating", "fastest"] as ChessLeaderboardType[]).map((type) =>
         new ButtonBuilder()
-          .setCustomId(type)
+          .setCustomId(`btn-view-chess-${type}-leaderboard`)
           .setLabel(LABELS[type])
           .setStyle(ButtonStyle.Secondary)
           .setDisabled(disabled || currentType === type),
@@ -84,12 +84,12 @@ export async function showChessLeaderboard(
       : [
           new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
             new ButtonBuilder()
-              .setCustomId("⬅")
+              .setCustomId("btn-previous-page")
               .setLabel("back")
               .setStyle(ButtonStyle.Primary)
               .setDisabled(disabled || currentPage <= 1),
             new ButtonBuilder()
-              .setCustomId("➡")
+              .setCustomId("btn-next-page")
               .setLabel("next")
               .setStyle(ButtonStyle.Primary)
               .setDisabled(disabled || currentPage >= data.pages.size),
@@ -132,12 +132,12 @@ export async function showChessLeaderboard(
 
     const { res } = response;
 
-    if (res === "⬅") {
+    if (res === "btn-previous-page") {
       if (currentPage > 1) currentPage--;
-    } else if (res === "➡") {
+    } else if (res === "btn-next-page") {
       if (currentPage < data.pages.size) currentPage++;
-    } else if (res === "solved" || res === "rating" || res === "fastest") {
-      currentType = res;
+    } else if (res.startsWith("btn-view-chess-") && res.endsWith("-leaderboard")) {
+      currentType = res.slice(15, -12) as ChessLeaderboardType;
       currentPage = 1;
       data = await fetchData(currentType);
     }

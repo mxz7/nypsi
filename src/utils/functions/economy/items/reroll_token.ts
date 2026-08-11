@@ -55,7 +55,7 @@ export default new ItemUse(
 
     const selectMenu = new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(
       new StringSelectMenuBuilder()
-        .setCustomId("upgrade-list")
+        .setCustomId("select-upgrade-list")
         .setOptions(
           upgrades.map((upgrade) => {
             return { label: upgradesData[upgrade.upgradeId].name, value: upgrade.upgradeId };
@@ -66,7 +66,7 @@ export default new ItemUse(
 
     const button = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
-        .setCustomId("booobies")
+        .setCustomId("btn-disabled")
         .setLabel("reroll")
         .setStyle(ButtonStyle.Success)
         .setDisabled(true),

@@ -6,7 +6,7 @@ import { fulfillTradeRequest } from "../utils/functions/economy/trade_requests";
 import { isEcoBanned, userExists } from "../utils/functions/economy/utils";
 
 export default {
-  name: "fr",
+  name: "btn-fulfill-trade-request",
   type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;

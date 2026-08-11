@@ -21,7 +21,7 @@ import { pluralize } from "../utils/functions/string";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 export default {
-  name: "vote-crates",
+  name: "btn-vote-crates",
   type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;
@@ -149,11 +149,14 @@ export default {
     } else {
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
-          .setCustomId("⬅")
+          .setCustomId("btn-previous-page")
           .setLabel("back")
           .setStyle(ButtonStyle.Primary)
           .setDisabled(true),
-        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+        new ButtonBuilder()
+          .setCustomId("btn-next-page")
+          .setLabel("next")
+          .setStyle(ButtonStyle.Primary),
       );
 
       const msg = await interaction.editReply({ embeds: [embed], components: [row] });

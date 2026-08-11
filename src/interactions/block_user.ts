@@ -9,7 +9,7 @@ import { isEcoBanned } from "../utils/functions/economy/utils";
 import { getLastKnownUsername } from "../utils/functions/users/username";
 
 export default {
-  name: "block-user",
+  name: "btn-block-user",
   type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;

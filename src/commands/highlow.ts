@@ -290,10 +290,16 @@ async function prepareGame(
   newCard(message.member);
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("⬆").setLabel("higher").setStyle(ButtonStyle.Primary),
-    new ButtonBuilder().setCustomId("⬇").setLabel("lower").setStyle(ButtonStyle.Primary),
     new ButtonBuilder()
-      .setCustomId("💰")
+      .setCustomId("btn-choose-higher")
+      .setLabel("higher")
+      .setStyle(ButtonStyle.Primary),
+    new ButtonBuilder()
+      .setCustomId("btn-choose-lower")
+      .setLabel("lower")
+      .setStyle(ButtonStyle.Primary),
+    new ButtonBuilder()
+      .setCustomId("btn-cash-out")
       .setLabel("cash out")
       .setStyle(ButtonStyle.Success)
       .setDisabled(true),
@@ -419,7 +425,10 @@ async function playGame(
     await redis.expire(`anticheat:interactivegame:count:${message.author.id}`, 86400);
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setLabel("play again").setStyle(ButtonStyle.Success).setCustomId("rp"),
+      new ButtonBuilder()
+        .setLabel("play again")
+        .setStyle(ButtonStyle.Success)
+        .setCustomId("btn-play-again"),
     );
 
     await edit({ embeds: [embed], components: [row] }, interaction);
@@ -434,7 +443,7 @@ async function playGame(
         return;
       });
 
-    if (res && res.customId == "rp") {
+    if (res && res.customId == "btn-play-again") {
       await res.deferUpdate();
       logger.info(
         `::cmd ${message.guild.id} ${message.channelId} ${message.author.username}: replaying highlow`,
@@ -636,7 +645,7 @@ async function playGame(
 
   if (fail || !reaction) return;
 
-  if (reaction.customId == "⬆") {
+  if (reaction.customId == "btn-choose-higher") {
     const oldCard = getValue(message.member);
     newCard(message.member);
     card = games.get(message.author.id).card;
@@ -661,10 +670,16 @@ async function playGame(
       });
 
       let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder().setCustomId("⬆").setLabel("higher").setStyle(ButtonStyle.Primary),
-        new ButtonBuilder().setCustomId("⬇").setLabel("lower").setStyle(ButtonStyle.Primary),
         new ButtonBuilder()
-          .setCustomId("💰")
+          .setCustomId("btn-choose-higher")
+          .setLabel("higher")
+          .setStyle(ButtonStyle.Primary),
+        new ButtonBuilder()
+          .setCustomId("btn-choose-lower")
+          .setLabel("lower")
+          .setStyle(ButtonStyle.Primary),
+        new ButtonBuilder()
+          .setCustomId("btn-cash-out")
           .setLabel("cash out")
           .setStyle(ButtonStyle.Success)
           .setDisabled(true),
@@ -672,10 +687,16 @@ async function playGame(
 
       if (win >= 1) {
         row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-          new ButtonBuilder().setCustomId("⬆").setLabel("higher").setStyle(ButtonStyle.Primary),
-          new ButtonBuilder().setCustomId("⬇").setLabel("lower").setStyle(ButtonStyle.Primary),
           new ButtonBuilder()
-            .setCustomId("💰")
+            .setCustomId("btn-choose-higher")
+            .setLabel("higher")
+            .setStyle(ButtonStyle.Primary),
+          new ButtonBuilder()
+            .setCustomId("btn-choose-lower")
+            .setLabel("lower")
+            .setStyle(ButtonStyle.Primary),
+          new ButtonBuilder()
+            .setCustomId("btn-cash-out")
             .setLabel("cash out")
             .setStyle(ButtonStyle.Success)
             .setDisabled(false),
@@ -708,7 +729,7 @@ async function playGame(
       lose(reaction);
       return;
     }
-  } else if (reaction.customId == "⬇") {
+  } else if (reaction.customId == "btn-choose-lower") {
     const oldCard = getValue(message.member);
     newCard(message.member);
     card = games.get(message.author.id).card;
@@ -733,10 +754,16 @@ async function playGame(
       });
 
       let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder().setCustomId("⬆").setLabel("higher").setStyle(ButtonStyle.Primary),
-        new ButtonBuilder().setCustomId("⬇").setLabel("lower").setStyle(ButtonStyle.Primary),
         new ButtonBuilder()
-          .setCustomId("💰")
+          .setCustomId("btn-choose-higher")
+          .setLabel("higher")
+          .setStyle(ButtonStyle.Primary),
+        new ButtonBuilder()
+          .setCustomId("btn-choose-lower")
+          .setLabel("lower")
+          .setStyle(ButtonStyle.Primary),
+        new ButtonBuilder()
+          .setCustomId("btn-cash-out")
           .setLabel("cash out")
           .setStyle(ButtonStyle.Success)
           .setDisabled(true),
@@ -744,10 +771,16 @@ async function playGame(
 
       if (win >= 1) {
         row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-          new ButtonBuilder().setCustomId("⬆").setLabel("higher").setStyle(ButtonStyle.Primary),
-          new ButtonBuilder().setCustomId("⬇").setLabel("lower").setStyle(ButtonStyle.Primary),
           new ButtonBuilder()
-            .setCustomId("💰")
+            .setCustomId("btn-choose-higher")
+            .setLabel("higher")
+            .setStyle(ButtonStyle.Primary),
+          new ButtonBuilder()
+            .setCustomId("btn-choose-lower")
+            .setLabel("lower")
+            .setStyle(ButtonStyle.Primary),
+          new ButtonBuilder()
+            .setCustomId("btn-cash-out")
             .setLabel("cash out")
             .setStyle(ButtonStyle.Success)
             .setDisabled(false),
@@ -779,7 +812,7 @@ async function playGame(
       lose(reaction);
       return;
     }
-  } else if (reaction.customId == "💰") {
+  } else if (reaction.customId == "btn-cash-out") {
     if (win < 1) {
       return playGame(message, send, m, args);
     } else if (win == 1) {

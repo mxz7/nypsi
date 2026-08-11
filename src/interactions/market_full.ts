@@ -16,7 +16,7 @@ import { getItems, isEcoBanned, userExists } from "../utils/functions/economy/ut
 import { getPreferences } from "../utils/functions/users/preferences";
 
 export default {
-  name: "market-full",
+  name: "btn-market-full",
   type: "interaction",
   async run(interaction) {
     const doChecks = async (order: Market) => {

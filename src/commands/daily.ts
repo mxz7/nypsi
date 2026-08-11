@@ -57,7 +57,7 @@ async function run(
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
         .setStyle(ButtonStyle.Secondary)
-        .setCustomId("daily-upcoming-rewards")
+        .setCustomId("btn-daily-upcoming-rewards")
         .setLabel("upcoming rewards"),
     );
 
@@ -96,7 +96,7 @@ async function run(
 
   const upcomingButton = new ButtonBuilder()
     .setStyle(ButtonStyle.Secondary)
-    .setCustomId("daily-upcoming-rewards")
+    .setCustomId("btn-daily-upcoming-rewards")
     .setLabel("upcoming");
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(

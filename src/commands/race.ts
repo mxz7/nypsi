@@ -108,9 +108,12 @@ async function run(
       message.author.avatarURL(),
     );
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("join").setLabel("join race").setStyle(ButtonStyle.Success),
       new ButtonBuilder()
-        .setCustomId("start")
+        .setCustomId("btn-join")
+        .setLabel("join race")
+        .setStyle(ButtonStyle.Success),
+      new ButtonBuilder()
+        .setCustomId("btn-start")
         .setLabel("start now")
         .setStyle(ButtonStyle.Secondary),
     );
@@ -166,7 +169,7 @@ class Race {
   }
 
   private async collectorFunction(interaction: ButtonInteraction): Promise<any> {
-    if (interaction.customId === "join") {
+    if (interaction.customId === "btn-join") {
       if (!(await userExists(interaction.user)))
         return interaction.reply({
           flags: MessageFlags.Ephemeral,
@@ -241,7 +244,7 @@ class Race {
       });
 
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new StringSelectMenuBuilder().setOptions(options).setCustomId("car"),
+        new StringSelectMenuBuilder().setOptions(options).setCustomId("select-car"),
       );
 
       if (this.started)
@@ -313,7 +316,7 @@ class Race {
           ).setHeader(this.embed.data.author.name, this.embed.data.author.icon_url),
         ],
       });
-    } else if (interaction.customId === "start") {
+    } else if (interaction.customId === "btn-start") {
       if (interaction.user.id !== this.ownerId)
         return interaction.reply({
           flags: MessageFlags.Ephemeral,

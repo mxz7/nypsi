@@ -5,7 +5,7 @@ import { getGameById, getUserCoordMode, resignGame } from "../utils/functions/su
 import { buildEndedGameMessage } from "../utils/functions/sudoku/ui";
 
 export default {
-  name: "sudoku-resign",
+  name: "btn-sudoku-resign",
   type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;

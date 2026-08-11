@@ -194,11 +194,11 @@ cmd.setRun(async (message, send, args) => {
 
   let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder()
-      .setCustomId("⬅")
+      .setCustomId("btn-previous-page")
       .setLabel("back")
       .setStyle(ButtonStyle.Primary)
       .setDisabled(true),
-    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+    new ButtonBuilder().setCustomId("btn-next-page").setLabel("next").setStyle(ButtonStyle.Primary),
   );
 
   if (pageSystemNeeded) {
@@ -214,7 +214,7 @@ cmd.setRun(async (message, send, args) => {
         components.push(
           new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
             new ButtonBuilder()
-              .setCustomId("help-ai-start")
+              .setCustomId("btn-help-ai-start")
               .setLabel("ask ai")
               .setStyle(ButtonStyle.Secondary),
           ),
@@ -247,7 +247,7 @@ cmd.setRun(async (message, send, args) => {
 
     if (!reaction) return;
 
-    if (reaction == "⬅") {
+    if (reaction == "btn-previous-page") {
       if (currentPage <= 1) {
         return pageManager();
       } else {
@@ -257,12 +257,12 @@ cmd.setRun(async (message, send, args) => {
         if (currentPage == 1) {
           row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
             new ButtonBuilder()
-              .setCustomId("⬅")
+              .setCustomId("btn-previous-page")
               .setLabel("back")
               .setStyle(ButtonStyle.Primary)
               .setDisabled(true),
             new ButtonBuilder()
-              .setCustomId("➡")
+              .setCustomId("btn-next-page")
               .setLabel("next")
               .setStyle(ButtonStyle.Primary)
               .setDisabled(false),
@@ -270,12 +270,12 @@ cmd.setRun(async (message, send, args) => {
         } else {
           row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
             new ButtonBuilder()
-              .setCustomId("⬅")
+              .setCustomId("btn-previous-page")
               .setLabel("back")
               .setStyle(ButtonStyle.Primary)
               .setDisabled(false),
             new ButtonBuilder()
-              .setCustomId("➡")
+              .setCustomId("btn-next-page")
               .setLabel("next")
               .setStyle(ButtonStyle.Primary)
               .setDisabled(false),
@@ -284,7 +284,7 @@ cmd.setRun(async (message, send, args) => {
         await msg.edit({ embeds: [embed], components: [row] });
         return pageManager();
       }
-    } else if (reaction == "➡") {
+    } else if (reaction == "btn-next-page") {
       if (currentPage >= lastPage) {
         return pageManager();
       } else {
@@ -294,12 +294,12 @@ cmd.setRun(async (message, send, args) => {
         if (currentPage == lastPage) {
           row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
             new ButtonBuilder()
-              .setCustomId("⬅")
+              .setCustomId("btn-previous-page")
               .setLabel("back")
               .setStyle(ButtonStyle.Primary)
               .setDisabled(false),
             new ButtonBuilder()
-              .setCustomId("➡")
+              .setCustomId("btn-next-page")
               .setLabel("next")
               .setStyle(ButtonStyle.Primary)
               .setDisabled(true),
@@ -307,12 +307,12 @@ cmd.setRun(async (message, send, args) => {
         } else {
           row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
             new ButtonBuilder()
-              .setCustomId("⬅")
+              .setCustomId("btn-previous-page")
               .setLabel("back")
               .setStyle(ButtonStyle.Primary)
               .setDisabled(false),
             new ButtonBuilder()
-              .setCustomId("➡")
+              .setCustomId("btn-next-page")
               .setLabel("next")
               .setStyle(ButtonStyle.Primary)
               .setDisabled(false),

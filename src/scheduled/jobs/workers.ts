@@ -150,7 +150,7 @@ export default {
           embed: null,
           components: new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
             new ButtonBuilder()
-              .setCustomId("w-claim")
+              .setCustomId("btn-claim-workers")
               .setLabel("claim")
               .setStyle(ButtonStyle.Success),
           ),

@@ -81,7 +81,10 @@ async function run(
     embed.setDescription("you can request and view all of your data stored by nypsi");
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("y").setLabel("request data").setStyle(ButtonStyle.Success),
+      new ButtonBuilder()
+        .setCustomId("btn-confirm")
+        .setLabel("request data")
+        .setStyle(ButtonStyle.Success),
     );
 
     const m = await send({ embeds: [embed], components: [row] });
@@ -105,7 +108,7 @@ async function run(
 
     if (typeof response != "string") return;
 
-    if (response == "y") {
+    if (response == "btn-confirm") {
       embed.setDescription("fetching your data...");
 
       await m.edit({ embeds: [embed], components: [] });
@@ -286,7 +289,10 @@ async function run(
     );
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("y").setLabel("delete").setStyle(ButtonStyle.Danger),
+      new ButtonBuilder()
+        .setCustomId("btn-confirm")
+        .setLabel("delete")
+        .setStyle(ButtonStyle.Danger),
     );
 
     const m = await send({ embeds: [embed], components: [row] });
@@ -310,7 +316,7 @@ async function run(
 
     if (typeof response != "string") return;
 
-    if (response == "y") {
+    if (response == "btn-confirm") {
       await addCooldown(cmd.name + "_delete", message.member, Math.floor(ms("1 week") / 1000));
       embed.setDescription("deleting all of your data...");
 

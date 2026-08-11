@@ -284,7 +284,10 @@ async function run(
       await redis.expire(`anticheat:interactivegame:count:${message.author.id}`, 86400);
 
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder().setLabel("rob again").setStyle(ButtonStyle.Success).setCustomId("rp"),
+        new ButtonBuilder()
+          .setLabel("rob again")
+          .setStyle(ButtonStyle.Success)
+          .setCustomId("btn-play-again"),
       );
 
       await msg.edit({ embeds: [newEmbed], components: [row] });
@@ -299,7 +302,7 @@ async function run(
           return;
         });
 
-      if (result && result.customId == "rp") {
+      if (result && result.customId == "btn-play-again") {
         logger.info(
           `::cmd ${message.guild.id} ${message.channelId} ${message.author.username}: replaying bankrob`,
           { userId: message.author.id, guildId: message.guildId, channelId: message.channelId },
@@ -362,7 +365,10 @@ async function run(
   if (!(await onCooldown(cmd.name, message.member)))
     components.push(
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder().setCustomId("ro").setLabel("rob").setStyle(ButtonStyle.Danger),
+        new ButtonBuilder()
+          .setCustomId("btn-rob-again")
+          .setLabel("rob")
+          .setStyle(ButtonStyle.Danger),
       ),
     );
 
@@ -381,7 +387,7 @@ async function run(
         return;
       });
 
-    if (res && res.customId == "ro") {
+    if (res && res.customId == "btn-rob-again") {
       return doRob(msg, res as ButtonInteraction);
     }
   };

@@ -17,7 +17,7 @@ import {
 import { buildEndedGameMessage, buildGameMessage } from "../utils/functions/sudoku/ui";
 
 export default {
-  name: "sudoku-move",
+  name: "btn-sudoku-move",
   type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;
@@ -46,7 +46,7 @@ export default {
     const cellPlaceholder =
       coordMode === "box" ? "e.g. A5 (box A, cell 5)" : "e.g. C3 (column C, row 3)";
 
-    const modalId = crypto.randomUUID();
+    const modalId = `modal-sudoku-move:${crypto.randomUUID()}`;
 
     const modal = new ModalBuilder()
       .setCustomId(modalId)

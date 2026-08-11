@@ -5,7 +5,7 @@ import { handleLootDropInteraction } from "../utils/functions/economy/loot-drops
 import { logger } from "../utils/logger";
 
 export default {
-  name: "loot-drop",
+  name: "btn-loot-drop",
   type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;

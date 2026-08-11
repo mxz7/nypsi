@@ -65,10 +65,10 @@ async function run(
 
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
-          .setCustomId("invites")
+          .setCustomId("btn-invites")
           .setLabel("invites")
           .setStyle(ButtonStyle.Primary),
-        new ButtonBuilder().setCustomId("kick").setLabel("kick").setStyle(ButtonStyle.Danger),
+        new ButtonBuilder().setCustomId("btn-kick").setLabel("kick").setStyle(ButtonStyle.Danger),
       );
 
       if (profile.removed) {
@@ -93,7 +93,7 @@ async function run(
 
       if (!interaction) return;
 
-      if (interaction.customId === "invites") {
+      if (interaction.customId === "btn-invites") {
         const embed = new CustomEmbed(profile.userId).setHeader(
           `${await getLastKnownUsername(profile.userId, false)}'s invites`,
           await getLastKnownAvatar(profile.userId),
@@ -109,7 +109,7 @@ async function run(
         embed.setDescription(desc.join("\n"));
 
         interaction.reply({ embeds: [embed] });
-      } else if (interaction.customId === "kick") {
+      } else if (interaction.customId === "btn-kick") {
         if (profile.userId === message.author.id)
           return interaction.reply({ embeds: [new ErrorEmbed("masochist")] });
 

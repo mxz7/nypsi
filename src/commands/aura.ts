@@ -62,7 +62,7 @@ async function run(
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
-        .setCustomId("history")
+        .setCustomId("btn-history")
         .setLabel("history")
         .setEmoji("📖")
         .setStyle(ButtonStyle.Secondary),

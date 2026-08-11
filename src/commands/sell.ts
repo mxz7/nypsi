@@ -110,8 +110,11 @@ async function run(
     embed.setFooter({ text: `total: $${total.toLocaleString()}` });
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("✅").setLabel("confirm").setStyle(ButtonStyle.Success),
-      new ButtonBuilder().setCustomId("❌").setLabel("cancel").setStyle(ButtonStyle.Danger),
+      new ButtonBuilder()
+        .setCustomId("btn-confirm")
+        .setLabel("confirm")
+        .setStyle(ButtonStyle.Success),
+      new ButtonBuilder().setCustomId("btn-cancel").setLabel("cancel").setStyle(ButtonStyle.Danger),
     );
 
     const msg = await send({ embeds: [embed], components: [row] });
@@ -128,7 +131,7 @@ async function run(
             new ButtonBuilder()
               .setStyle(ButtonStyle.Danger)
               .setLabel("expired")
-              .setCustomId("boobies")
+              .setCustomId("btn-disabled")
               .setDisabled(true),
           ),
         ],
@@ -139,7 +142,7 @@ async function run(
 
     if (!reaction) return;
 
-    if (reaction.customId === "❌") {
+    if (reaction.customId === "btn-cancel") {
       msg.edit({ components: [] });
       return reaction.reply({
         embeds: [new CustomEmbed(message.member, "✅ cancelled")],
@@ -147,7 +150,7 @@ async function run(
       });
     }
 
-    if (reaction.customId == "✅") {
+    if (reaction.customId == "btn-confirm") {
       await reaction.deferReply({ flags: MessageFlags.Ephemeral });
 
       const { selected, taxedAmount, desc, amounts, total, taxEnabled, multi } =
@@ -204,11 +207,14 @@ async function run(
 
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
-          .setCustomId("⬅")
+          .setCustomId("btn-previous-page")
           .setLabel("back")
           .setStyle(ButtonStyle.Primary)
           .setDisabled(true),
-        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+        new ButtonBuilder()
+          .setCustomId("btn-next-page")
+          .setLabel("next")
+          .setStyle(ButtonStyle.Primary),
       );
       if (pages.size == 1)
         return msg
@@ -390,8 +396,14 @@ async function run(
 
     if (selected.role !== "sellable" && marketWorth > (selected.sell ?? 1000)) {
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder().setCustomId("✅").setLabel("confirm").setStyle(ButtonStyle.Success),
-        new ButtonBuilder().setCustomId("❌").setLabel("cancel").setStyle(ButtonStyle.Danger),
+        new ButtonBuilder()
+          .setCustomId("btn-confirm")
+          .setLabel("confirm")
+          .setStyle(ButtonStyle.Success),
+        new ButtonBuilder()
+          .setCustomId("btn-cancel")
+          .setLabel("cancel")
+          .setStyle(ButtonStyle.Danger),
       );
 
       msg = await send({
@@ -419,7 +431,7 @@ async function run(
       if (!interaction) {
         addExpiry(cmd.name, message.member, 1);
         return msg.edit({ components: [row] });
-      } else if (interaction.customId === "❌") {
+      } else if (interaction.customId === "btn-cancel") {
         addExpiry(cmd.name, message.member, 1);
         await interaction.update({ components: [row] });
         await interaction.followUp({
@@ -427,7 +439,7 @@ async function run(
           flags: MessageFlags.Ephemeral,
         });
         return;
-      } else if (interaction.customId === "✅") {
+      } else if (interaction.customId === "btn-confirm") {
         await interaction.deferUpdate();
       }
 

@@ -922,7 +922,7 @@ export async function awaitDailyUpcomingRewardsInteraction(message: Message, use
   const interaction = await message
     .awaitMessageComponent({
       componentType: ComponentType.Button,
-      filter: (i) => i.user.id === userId && i.customId === "daily-upcoming-rewards",
+      filter: (i) => i.user.id === userId && i.customId === "btn-daily-upcoming-rewards",
       time: 60000,
     })
     .catch((): null => null);
@@ -946,7 +946,7 @@ export async function awaitDailyUpcomingRewardsInteraction(message: Message, use
       return {
         type: ComponentType.ActionRow as const,
         components: row.components
-          .filter((child) => child.customId !== "daily-upcoming-rewards")
+          .filter((child) => child.customId !== "btn-daily-upcoming-rewards")
           .map((child) => child.toJSON()),
       };
     })

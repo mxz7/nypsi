@@ -119,12 +119,15 @@ async function run(
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder()
-      .setCustomId("⬅")
+      .setCustomId("btn-previous-page")
       .setLabel("back")
       .setStyle(ButtonStyle.Primary)
       .setDisabled(true),
-    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
-    new ButtonBuilder().setCustomId("d").setLabel("delete").setStyle(ButtonStyle.Danger),
+    new ButtonBuilder().setCustomId("btn-next-page").setLabel("next").setStyle(ButtonStyle.Primary),
+    new ButtonBuilder()
+      .setCustomId("btn-delete-avatar")
+      .setLabel("delete")
+      .setStyle(ButtonStyle.Danger),
   );
 
   let msg: Message;
@@ -143,7 +146,7 @@ async function run(
     allowMessageDupe: false,
     pages: PageManager.createPages(history, 1),
     handleResponses: new Map().set(
-      "d",
+      "btn-delete-avatar",
       async (
         manager: PageManager<{
           id: number;

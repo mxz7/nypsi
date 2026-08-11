@@ -53,7 +53,7 @@ export default new ItemUse(
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
         .setStyle(ButtonStyle.Secondary)
-        .setCustomId("run-daily")
+        .setCustomId("btn-run-daily")
         .setLabel("you haven't done /daily!"),
     );
 

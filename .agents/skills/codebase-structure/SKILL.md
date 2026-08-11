@@ -163,7 +163,7 @@ export default {
 
 ```ts
 export default {
-  name: "accept-offer",
+  name: "btn-accept-offer",
   type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;
@@ -184,7 +184,7 @@ export default {
 - Namespaced component IDs use `<handler-name>:<context>`; routing first checks the exact custom ID,
   then falls back to the segment before the first `:`. Keep dynamic state outside the custom ID when
   it is too large or sensitive.
-- Profile transfer checks block interactions except special IDs like `t-f-p-boobies`
+- Profile transfer checks block interactions except special IDs like `btn-confirm-profile-transfer`
 
 ---
 

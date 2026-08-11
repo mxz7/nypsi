@@ -136,7 +136,9 @@ export async function sendReactionRole(
       continue;
     }
 
-    const button = new ButtonBuilder().setCustomId(role.roleId).setStyle(ButtonStyle.Secondary);
+    const button = new ButtonBuilder()
+      .setCustomId(`btn-toggle-reaction-role:${role.roleId}`)
+      .setStyle(ButtonStyle.Secondary);
 
     if (role.label.split(" ")[0].match(Constants.EMOJI_REGEX)) {
       button.setEmoji(role.label.split(" ")[0]);

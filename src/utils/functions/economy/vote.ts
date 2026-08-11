@@ -204,7 +204,7 @@ export async function giveVoteRewards(
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder()
       .setLabel("open crates")
-      .setCustomId("vote-crates")
+      .setCustomId("btn-vote-crates")
       .setStyle(ButtonStyle.Success),
   );
 
@@ -212,7 +212,7 @@ export async function giveVoteRewards(
     row.addComponents(
       new ButtonBuilder()
         .setLabel("enable vote reminders")
-        .setCustomId("enable-vote-reminders")
+        .setCustomId("btn-enable-vote-reminders")
         .setStyle(ButtonStyle.Secondary),
     );
   }

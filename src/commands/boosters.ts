@@ -44,11 +44,11 @@ async function run(
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder()
-      .setCustomId("⬅")
+      .setCustomId("btn-previous-page")
       .setLabel("back")
       .setStyle(ButtonStyle.Primary)
       .setDisabled(true),
-    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+    new ButtonBuilder().setCustomId("btn-next-page").setLabel("next").setStyle(ButtonStyle.Primary),
   );
 
   const msg = await send({ embeds: [embed], components: [row] });

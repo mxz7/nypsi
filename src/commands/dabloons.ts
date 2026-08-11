@@ -37,10 +37,10 @@ const cmd = new Command("dabloons", "view the dabloons shop", "money").setAliase
 cmd.slashEnabled = true;
 
 const componentIds = {
-  select: "dabloons-item-select",
-  amount: "dabloons-amount",
-  buy: "dabloons-buy",
-  amountModal: "dabloons-amount-modal",
+  select: "select-dabloons-item",
+  amount: "btn-set-dabloons-amount",
+  buy: "btn-buy-dabloons-item",
+  amountModal: "modal-set-dabloons-amount",
 } as const;
 
 type Order = {

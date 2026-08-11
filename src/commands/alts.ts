@@ -113,7 +113,7 @@ async function run(
 
     await res.deferReply();
 
-    if (res.customId === "add-alt") {
+    if (res.customId === "btn-add-alt") {
       await res.editReply({
         embeds: [new CustomEmbed(message.member, "send user id")],
       });
@@ -268,7 +268,7 @@ async function run(
       });
 
       return waitForButton(altMsg);
-    } else if (res.customId === "del-alt") {
+    } else if (res.customId === "btn-delete-alt") {
       await res.editReply({
         embeds: [new CustomEmbed(message.member, "send user id")],
       });
@@ -355,12 +355,15 @@ async function getRow(
   member: string,
 ) {
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("add-alt").setLabel("add alt").setStyle(ButtonStyle.Success),
+    new ButtonBuilder()
+      .setCustomId("btn-add-alt")
+      .setLabel("add alt")
+      .setStyle(ButtonStyle.Success),
   );
   if ((await getUserAlts(message.guild, member)).length > 0)
     row.addComponents(
       new ButtonBuilder()
-        .setCustomId("del-alt")
+        .setCustomId("btn-delete-alt")
         .setLabel("remove alt")
         .setStyle(ButtonStyle.Danger),
     );

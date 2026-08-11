@@ -9,7 +9,7 @@ import {
 import { buildGameMessage } from "../utils/functions/sudoku/ui";
 
 export default {
-  name: "sudoku-play-again",
+  name: "btn-sudoku-play-again",
   type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;

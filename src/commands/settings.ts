@@ -217,11 +217,11 @@ async function run(
 
       const userSelection = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
-          .setCustomId("enable-setting")
+          .setCustomId("btn-enable-setting")
           .setLabel("enable")
           .setStyle(ButtonStyle.Success),
         new ButtonBuilder()
-          .setCustomId("disable-setting")
+          .setCustomId("btn-disable-setting")
           .setLabel("disable")
           .setStyle(ButtonStyle.Danger),
       );
@@ -229,11 +229,11 @@ async function run(
       if (typeof value === "number") {
         const boobies = [
           new ButtonBuilder()
-            .setCustomId("enable")
+            .setCustomId("btn-enable")
             .setLabel("set value")
             .setStyle(ButtonStyle.Success),
           new ButtonBuilder()
-            .setCustomId("disable")
+            .setCustomId("btn-disable")
             .setLabel("disable")
             .setStyle(ButtonStyle.Danger)
             .setDisabled(value === 0),
@@ -257,7 +257,7 @@ async function run(
         }
 
         userSelection.setComponents(
-          new StringSelectMenuBuilder().setCustomId("typesetting").setOptions(boobies),
+          new StringSelectMenuBuilder().setCustomId("select-typesetting").setOptions(boobies),
         );
       } else {
         if (value) {
@@ -272,7 +272,7 @@ async function run(
           embeds: [embed],
           components: [
             new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new StringSelectMenuBuilder().setCustomId("setting").setOptions(options),
+              new StringSelectMenuBuilder().setCustomId("select-setting").setOptions(options),
             ),
             userSelection,
           ],
@@ -282,7 +282,7 @@ async function run(
           embeds: [embed],
           components: [
             new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new StringSelectMenuBuilder().setCustomId("setting").setOptions(options),
+              new StringSelectMenuBuilder().setCustomId("select-setting").setOptions(options),
             ),
             userSelection,
           ],
@@ -320,7 +320,7 @@ async function run(
         return;
       }
 
-      if (res.isStringSelectMenu() && res.customId == "setting") {
+      if (res.isStringSelectMenu() && res.customId == "select-setting") {
         for (const option of options) {
           option.setDefault(false);
 
@@ -331,7 +331,7 @@ async function run(
 
         msg = await showSetting(settings, res.values[0], options, res.message);
         return pageManager();
-      } else if (res.isStringSelectMenu() && res.customId == "typesetting") {
+      } else if (res.isStringSelectMenu() && res.customId == "select-typesetting") {
         const selected = options.find((o) => o.data.default).data.value;
         const value = notificationPreferences[selected].types.find((x) => x.value == res.values[0]);
 
@@ -342,12 +342,12 @@ async function run(
         msg = await showSetting(settings, selected, options, res.message);
 
         return pageManager();
-      } else if (res.customId.startsWith("enable")) {
+      } else if (res.customId.startsWith("btn-enable")) {
         const selected = options.find((o) => o.data.default).data.value;
 
         if (typeof getValue(settings, selected) == "number") {
           const modal = new ModalBuilder()
-            .setCustomId("settings-update")
+            .setCustomId("modal-settings-update")
             .setTitle("net worth notifications");
 
           modal.addLabelComponents(
@@ -366,7 +366,7 @@ async function run(
           await res.showModal(modal);
 
           const filter = (i: ModalSubmitInteraction) =>
-            i.user.id == res.user.id && i.customId === "settings-update";
+            i.user.id == res.user.id && i.customId === "modal-settings-update";
 
           const modalResponse = await res
             .awaitModalSubmit({ filter, time: 120000 })
@@ -396,7 +396,7 @@ async function run(
         msg = await showSetting(settings, selected, options, res.message);
 
         return pageManager();
-      } else if (res.customId.startsWith("disable")) {
+      } else if (res.customId.startsWith("btn-disable")) {
         const selected = options.find((o) => o.data.default).data.value;
 
         await res.deferUpdate();
@@ -438,11 +438,11 @@ async function run(
 
       const userSelection = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
-          .setCustomId("enable-setting")
+          .setCustomId("btn-enable-setting")
           .setLabel("enable")
           .setStyle(ButtonStyle.Success),
         new ButtonBuilder()
-          .setCustomId("disable-setting")
+          .setCustomId("btn-disable-setting")
           .setLabel("disable")
           .setStyle(ButtonStyle.Danger),
       );
@@ -451,11 +451,11 @@ async function run(
       if (typeof settings[settingId] === "number" || typeof settings[settingId] === "bigint") {
         const boobies = [
           new ButtonBuilder()
-            .setCustomId("enable")
+            .setCustomId("btn-enable")
             .setLabel("set value")
             .setStyle(ButtonStyle.Success),
           new ButtonBuilder()
-            .setCustomId("disable")
+            .setCustomId("btn-disable")
             .setLabel("disable")
             .setStyle(ButtonStyle.Danger)
             // @ts-expect-error gay
@@ -481,7 +481,7 @@ async function run(
         }
 
         userSelection.setComponents(
-          new StringSelectMenuBuilder().setCustomId("typesetting").setOptions(boobies),
+          new StringSelectMenuBuilder().setCustomId("select-typesetting").setOptions(boobies),
         );
       } else {
         // @ts-expect-error annoying grr
@@ -497,7 +497,7 @@ async function run(
           embeds: [embed],
           components: [
             new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new StringSelectMenuBuilder().setCustomId("setting").setOptions(options),
+              new StringSelectMenuBuilder().setCustomId("select-setting").setOptions(options),
             ),
             userSelection,
           ],
@@ -507,7 +507,7 @@ async function run(
           embeds: [embed],
           components: [
             new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new StringSelectMenuBuilder().setCustomId("setting").setOptions(options),
+              new StringSelectMenuBuilder().setCustomId("select-setting").setOptions(options),
             ),
             userSelection,
           ],
@@ -545,7 +545,7 @@ async function run(
         return;
       }
 
-      if (res.isStringSelectMenu() && res.customId == "setting") {
+      if (res.isStringSelectMenu() && res.customId == "select-setting") {
         for (const option of options) {
           option.setDefault(false);
 
@@ -556,7 +556,7 @@ async function run(
 
         msg = await showSetting(settings, res.values[0], options, res.message);
         return pageManager();
-      } else if (res.isStringSelectMenu() && res.customId == "typesetting") {
+      } else if (res.isStringSelectMenu() && res.customId == "select-typesetting") {
         const selected = options.find((o) => o.data.default).data.value;
         const value = generalPreferences[selected].types.find((x) => x.value == res.values[0]);
 
@@ -572,12 +572,14 @@ async function run(
         msg = await showSetting(settings, selected, options, res.message);
 
         return pageManager();
-      } else if (res.customId.startsWith("enable")) {
+      } else if (res.customId.startsWith("btn-enable")) {
         const selected = options.find((o) => o.data.default).data.value;
 
         // @ts-expect-error grr
         if (typeof settings[selected] == "number" || typeof settings[selected] === "bigint") {
-          const modal = new ModalBuilder().setCustomId("settings-update").setTitle("update amount");
+          const modal = new ModalBuilder()
+            .setCustomId("modal-settings-update")
+            .setTitle("update amount");
 
           modal.addLabelComponents(
             new LabelBuilder()
@@ -597,7 +599,7 @@ async function run(
           await res.showModal(modal);
 
           const filter = (i: ModalSubmitInteraction) =>
-            i.user.id == res.user.id && i.customId === "settings-update";
+            i.user.id == res.user.id && i.customId === "modal-settings-update";
 
           const modalResponse = await res
             .awaitModalSubmit({ filter, time: 120000 })
@@ -643,7 +645,7 @@ async function run(
         msg = await showSetting(settings, selected, options, res.message);
 
         return pageManager();
-      } else if (res.customId.startsWith("disable")) {
+      } else if (res.customId.startsWith("btn-disable")) {
         const selected = options.find((o) => o.data.default).data.value;
 
         await res.deferUpdate();
@@ -846,7 +848,7 @@ async function run(
     const embed = new CustomEmbed(message.member);
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
-        .setCustomId("setemail")
+        .setCustomId("btn-set-email")
         .setLabel("set email")
         .setStyle(ButtonStyle.Success),
     );
@@ -857,7 +859,7 @@ async function run(
       );
       row.addComponents(
         new ButtonBuilder()
-          .setCustomId("viewemail")
+          .setCustomId("btn-view-email")
           .setLabel("view email")
           .setStyle(ButtonStyle.Danger),
       );
@@ -877,7 +879,7 @@ async function run(
       return msg.edit({ components: [] });
     }
 
-    if (res.customId == "viewemail") {
+    if (res.customId == "btn-view-email") {
       await res.deferUpdate();
 
       let fail = false;
@@ -896,9 +898,9 @@ async function run(
       }
 
       return msg.edit({ embeds: [new CustomEmbed(message.member, "sent in dms")], components: [] });
-    } else if (res.customId == "setemail") {
+    } else if (res.customId == "btn-set-email") {
       const modal = new ModalBuilder()
-        .setCustomId("email")
+        .setCustomId("modal-set-email")
         .setTitle("email")
         .addLabelComponents(
           new LabelBuilder()
@@ -1128,7 +1130,10 @@ async function run(
           }
 
           const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-            new ButtonBuilder().setCustomId("d").setLabel("disable").setStyle(ButtonStyle.Danger),
+            new ButtonBuilder()
+              .setCustomId("btn-disable-email")
+              .setLabel("disable")
+              .setStyle(ButtonStyle.Danger),
           );
 
           const msg = await send({ embeds: [embed], components: [row] });
@@ -1157,7 +1162,7 @@ async function run(
 
             const { res } = response;
 
-            if (res == "d") {
+            if (res == "btn-disable-email") {
               await setModLogs(message.guild, null);
 
               embed.setDescription(notEnabled);

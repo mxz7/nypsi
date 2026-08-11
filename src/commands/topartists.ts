@@ -133,11 +133,11 @@ async function run(
 
   let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder()
-      .setCustomId("⬅")
+      .setCustomId("btn-previous-page")
       .setLabel("back")
       .setStyle(ButtonStyle.Primary)
       .setDisabled(true),
-    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+    new ButtonBuilder().setCustomId("btn-next-page").setLabel("next").setStyle(ButtonStyle.Primary),
   );
 
   if (pages.size == 0) {
@@ -164,7 +164,7 @@ async function run(
 
     if (!reaction) return;
 
-    if (reaction == "⬅") {
+    if (reaction == "btn-previous-page") {
       if (currentPage <= 1) {
         return pageManager();
       } else {
@@ -176,12 +176,12 @@ async function run(
         if (currentPage == 1) {
           row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
             new ButtonBuilder()
-              .setCustomId("⬅")
+              .setCustomId("btn-previous-page")
               .setLabel("back")
               .setStyle(ButtonStyle.Primary)
               .setDisabled(true),
             new ButtonBuilder()
-              .setCustomId("➡")
+              .setCustomId("btn-next-page")
               .setLabel("next")
               .setStyle(ButtonStyle.Primary)
               .setDisabled(false),
@@ -189,12 +189,12 @@ async function run(
         } else {
           row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
             new ButtonBuilder()
-              .setCustomId("⬅")
+              .setCustomId("btn-previous-page")
               .setLabel("back")
               .setStyle(ButtonStyle.Primary)
               .setDisabled(false),
             new ButtonBuilder()
-              .setCustomId("➡")
+              .setCustomId("btn-next-page")
               .setLabel("next")
               .setStyle(ButtonStyle.Primary)
               .setDisabled(false),
@@ -203,7 +203,7 @@ async function run(
         await edit({ embeds: [embed], components: [row] }, msg);
         return pageManager();
       }
-    } else if (reaction == "➡") {
+    } else if (reaction == "btn-next-page") {
       if (currentPage == lastPage) {
         return pageManager();
       } else {
@@ -215,12 +215,12 @@ async function run(
         if (currentPage == lastPage) {
           row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
             new ButtonBuilder()
-              .setCustomId("⬅")
+              .setCustomId("btn-previous-page")
               .setLabel("back")
               .setStyle(ButtonStyle.Primary)
               .setDisabled(false),
             new ButtonBuilder()
-              .setCustomId("➡")
+              .setCustomId("btn-next-page")
               .setLabel("next")
               .setStyle(ButtonStyle.Primary)
               .setDisabled(true),
@@ -228,12 +228,12 @@ async function run(
         } else {
           row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
             new ButtonBuilder()
-              .setCustomId("⬅")
+              .setCustomId("btn-previous-page")
               .setLabel("back")
               .setStyle(ButtonStyle.Primary)
               .setDisabled(false),
             new ButtonBuilder()
-              .setCustomId("➡")
+              .setCustomId("btn-next-page")
               .setLabel("next")
               .setStyle(ButtonStyle.Primary)
               .setDisabled(false),

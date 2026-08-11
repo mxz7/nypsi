@@ -69,7 +69,7 @@ async function run(
   const response = await runBakery(member);
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("bake").setLabel("bake").setStyle(ButtonStyle.Success),
+    new ButtonBuilder().setCustomId("btn-bake").setLabel("bake").setStyle(ButtonStyle.Success),
   );
 
   return send({ embeds: [response], components: [row] });

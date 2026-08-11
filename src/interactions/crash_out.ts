@@ -7,7 +7,7 @@ import { crashOut } from "../utils/functions/economy/crash";
 import { isEcoBanned, userExists } from "../utils/functions/economy/utils";
 
 export default {
-  name: "crash-out",
+  name: "btn-crash-out",
   type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;

@@ -98,7 +98,7 @@ async function run(
   const viewOverview = async (data: MovieDetails | TVDetails, msg?: NypsiMessage) => {
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
-        .setCustomId("watch")
+        .setCustomId("btn-watch")
         .setLabel("where to watch")
         .setStyle(ButtonStyle.Primary),
     );
@@ -106,15 +106,18 @@ async function run(
     if (data.type == "tv") {
       row.addComponents(
         new ButtonBuilder()
-          .setCustomId("season")
+          .setCustomId("btn-season")
           .setLabel("view season")
           .setStyle(ButtonStyle.Primary),
       );
     }
 
     row.addComponents(
-      new ButtonBuilder().setCustomId("credits").setLabel("credits").setStyle(ButtonStyle.Primary),
-      new ButtonBuilder().setCustomId("rate").setLabel("rate").setStyle(ButtonStyle.Primary),
+      new ButtonBuilder()
+        .setCustomId("btn-credits")
+        .setLabel("credits")
+        .setStyle(ButtonStyle.Primary),
+      new ButtonBuilder().setCustomId("btn-rate").setLabel("rate").setStyle(ButtonStyle.Primary),
     );
 
     const createEmbed = async () => {
@@ -173,7 +176,7 @@ async function run(
       const response = await msg
         .awaitMessageComponent({ filter, time: 60000 })
         .then(async (collected) => {
-          if (collected.customId !== "season" && collected.customId !== "rate")
+          if (collected.customId !== "btn-season" && collected.customId !== "btn-rate")
             await collected.deferUpdate().catch(() => {
               fail = true;
               return pageManager();
@@ -190,7 +193,7 @@ async function run(
 
       const { res, interaction } = response;
 
-      if (res == "season") {
+      if (res == "btn-season") {
         const res = await numberSelectionModal(
           interaction as ButtonInteraction,
           "select season",
@@ -220,11 +223,11 @@ async function run(
             return pageManager();
           }
         }
-      } else if (res == "watch") {
+      } else if (res == "btn-watch") {
         return viewWhereToWatch(data, msg);
-      } else if (res == "credits") {
+      } else if (res == "btn-credits") {
         return viewCredits(data, msg);
-      } else if (res == "rate") {
+      } else if (res == "btn-rate") {
         const res = await numberSelectionModal(
           interaction as ButtonInteraction,
           "enter rating",
@@ -323,7 +326,7 @@ async function run(
 
     const selectRow = () => {
       const options = new StringSelectMenuBuilder()
-        .setCustomId("country")
+        .setCustomId("select-country")
         .setPlaceholder("select a country");
 
       for (const country of data.providers) {
@@ -347,7 +350,7 @@ async function run(
     };
 
     const bottomRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("back").setLabel("back").setStyle(ButtonStyle.Primary),
+      new ButtonBuilder().setCustomId("btn-back").setLabel("back").setStyle(ButtonStyle.Primary),
     );
 
     if (msg) {
@@ -423,7 +426,7 @@ async function run(
         selectedCountry = interaction.values[0];
         await msg.edit({ embeds: [makeEmbed()], components: [selectRow(), bottomRow] });
         return pageManager();
-      } else if (res == "back") {
+      } else if (res == "btn-back") {
         return viewOverview(data, msg);
       }
     };
@@ -446,22 +449,22 @@ async function run(
       );
 
     const bottomRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("back").setLabel("back").setStyle(ButtonStyle.Secondary),
+      new ButtonBuilder().setCustomId("btn-back").setLabel("back").setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
-        .setCustomId("select-episode")
+        .setCustomId("btn-select-episode")
         .setLabel("select episode")
         .setStyle(ButtonStyle.Success),
       new ButtonBuilder()
-        .setCustomId("select-season")
+        .setCustomId("btn-select-season")
         .setLabel("select season")
         .setStyle(ButtonStyle.Success),
       new ButtonBuilder()
-        .setCustomId("⬅")
+        .setCustomId("btn-previous-page")
         .setLabel("previous")
         .setStyle(ButtonStyle.Primary)
         .setDisabled(data.seasons[0].season_number >= seasonNumber),
       new ButtonBuilder()
-        .setCustomId("➡")
+        .setCustomId("btn-next-page")
         .setLabel("next")
         .setStyle(ButtonStyle.Primary)
         .setDisabled(data.seasons[data.seasons.length - 1].season_number <= seasonNumber),
@@ -484,7 +487,7 @@ async function run(
       const response = await msg
         .awaitMessageComponent({ filter, time: 60000 })
         .then(async (collected) => {
-          if (!collected.customId.includes("select"))
+          if (!collected.customId.includes("btn-select"))
             await collected.deferUpdate().catch(() => {
               fail = true;
               return pageManager();
@@ -501,11 +504,11 @@ async function run(
 
       const { res, interaction } = response;
 
-      if (res == "➡") {
+      if (res == "btn-next-page") {
         return viewSeason(data, seasonNumber + 1, msg);
-      } else if (res == "⬅") {
+      } else if (res == "btn-previous-page") {
         return viewSeason(data, seasonNumber - 1, msg);
-      } else if (res == "select-season") {
+      } else if (res == "btn-select-season") {
         const res = await numberSelectionModal(
           interaction as ButtonInteraction,
           "select season",
@@ -535,7 +538,7 @@ async function run(
             return pageManager();
           }
         }
-      } else if (res == "select-episode") {
+      } else if (res == "btn-select-episode") {
         const episodes = await getEpisodes(data.id, seasonNumber);
 
         if (episodes === "unavailable") {
@@ -581,7 +584,7 @@ async function run(
             return pageManager();
           }
         }
-      } else if (res == "back") {
+      } else if (res == "btn-back") {
         return viewOverview(data, msg);
       }
     };
@@ -612,18 +615,18 @@ async function run(
       );
 
     const bottomRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("back").setLabel("back").setStyle(ButtonStyle.Secondary),
+      new ButtonBuilder().setCustomId("btn-back").setLabel("back").setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
-        .setCustomId("select")
+        .setCustomId("btn-select")
         .setLabel("select episode")
         .setStyle(ButtonStyle.Success),
       new ButtonBuilder()
-        .setCustomId("⬅")
+        .setCustomId("btn-previous-page")
         .setLabel("previous")
         .setStyle(ButtonStyle.Primary)
         .setDisabled(episodes[0].episode_number >= episodeNumber),
       new ButtonBuilder()
-        .setCustomId("➡")
+        .setCustomId("btn-next-page")
         .setLabel("next")
         .setStyle(ButtonStyle.Primary)
         .setDisabled(episodes[episodes.length - 1].episode_number <= episodeNumber),
@@ -646,7 +649,7 @@ async function run(
       const response = await msg
         .awaitMessageComponent({ filter, time: 60000 })
         .then(async (collected) => {
-          if (collected.customId !== "select")
+          if (collected.customId !== "btn-select")
             await collected.deferUpdate().catch(() => {
               fail = true;
               return pageManager();
@@ -663,11 +666,11 @@ async function run(
 
       const { res, interaction } = response;
 
-      if (res == "➡") {
+      if (res == "btn-next-page") {
         return viewEpisode(data, episodes, seasonNumber, episodeNumber + 1, msg);
-      } else if (res == "⬅") {
+      } else if (res == "btn-previous-page") {
         return viewEpisode(data, episodes, seasonNumber, episodeNumber - 1, msg);
-      } else if (res == "select") {
+      } else if (res == "btn-select") {
         const res = await numberSelectionModal(
           interaction as ButtonInteraction,
           "select episode",
@@ -697,7 +700,7 @@ async function run(
             return pageManager();
           }
         }
-      } else if (res == "back") {
+      } else if (res == "btn-back") {
         return viewSeason(data, seasonNumber, msg);
       }
     };
@@ -741,25 +744,25 @@ async function run(
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
-        .setCustomId("⬅")
+        .setCustomId("btn-previous-page")
         .setLabel("previous")
         .setStyle(ButtonStyle.Primary)
         .setDisabled(true),
       new ButtonBuilder()
-        .setCustomId("➡")
+        .setCustomId("btn-next-page")
         .setLabel("next")
         .setStyle(ButtonStyle.Primary)
         .setDisabled(pages.size == 1),
     );
 
     const bottomRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("back").setLabel("back").setStyle(ButtonStyle.Primary),
+      new ButtonBuilder().setCustomId("btn-back").setLabel("back").setStyle(ButtonStyle.Primary),
       new ButtonBuilder()
-        .setCustomId("cast")
+        .setCustomId("btn-cast")
         .setLabel("cast")
         .setStyle(ButtonStyle.Success)
         .setDisabled(true),
-      new ButtonBuilder().setCustomId("crew").setLabel("crew").setStyle(ButtonStyle.Success),
+      new ButtonBuilder().setCustomId("btn-crew").setLabel("crew").setStyle(ButtonStyle.Success),
     );
 
     await msg.edit({ embeds: [embed], components: [row, bottomRow] });
@@ -779,7 +782,7 @@ async function run(
       updateEmbed: updatePage,
       handleResponses: new Map()
         .set(
-          "back",
+          "btn-back",
           async (
             _: PageManager<{ name: string; role: string }>,
             interaction: ButtonInteraction,
@@ -789,7 +792,7 @@ async function run(
           },
         )
         .set(
-          "cast",
+          "btn-cast",
           async (
             manager: PageManager<{ name: string; role: string }>,
             interaction: ButtonInteraction,
@@ -823,7 +826,7 @@ async function run(
           },
         )
         .set(
-          "crew",
+          "btn-crew",
           async (
             manager: PageManager<{ name: string; role: string }>,
             interaction: ButtonInteraction,
@@ -1036,11 +1039,14 @@ async function run(
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
-        .setCustomId("⬅")
+        .setCustomId("btn-previous-page")
         .setLabel("back")
         .setStyle(ButtonStyle.Primary)
         .setDisabled(true),
-      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+      new ButtonBuilder()
+        .setCustomId("btn-next-page")
+        .setLabel("next")
+        .setStyle(ButtonStyle.Primary),
     );
 
     let msg: Message;
@@ -1070,7 +1076,7 @@ async function run(
   }
 
   async function countrySelectionModal(interaction: StringSelectMenuInteraction) {
-    const id = `tmdb-country-select-${Math.floor(Math.random() * 69420)}`;
+    const id = `modal-select-tmdb-country-${Math.floor(Math.random() * 69420)}`;
     const modal = new ModalBuilder().setCustomId(id).setTitle("enter country");
 
     modal.addLabelComponents(
@@ -1099,7 +1105,7 @@ async function run(
     label: string,
     placeholder: string,
   ) {
-    const id = `tmdb-number-select-${Math.floor(Math.random() * 69420)}`;
+    const id = `modal-select-tmdb-number-${Math.floor(Math.random() * 69420)}`;
     const modal = new ModalBuilder().setCustomId(id).setTitle(title);
 
     modal.addLabelComponents(

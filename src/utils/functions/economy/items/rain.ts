@@ -29,7 +29,7 @@ export default new ItemUse(
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
-        .setCustomId("start-rain")
+        .setCustomId("btn-start-rain")
         .setLabel("start loot rain")
         .setStyle(ButtonStyle.Success),
     );
@@ -61,7 +61,7 @@ export default new ItemUse(
       return;
     }
 
-    if (res.customId === "start-rain") {
+    if (res.customId === "btn-start-rain") {
       if (await redis.exists(`nypsi:lootrain:channel:${message.channelId}`))
         return res.reply({
           embeds: [

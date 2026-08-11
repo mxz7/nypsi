@@ -252,13 +252,25 @@ async function createChessGame(
   updateEmbed(false);
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("chess-guess").setLabel("move").setStyle(ButtonStyle.Primary),
-    new ButtonBuilder().setCustomId("chess-hint").setLabel("hint").setStyle(ButtonStyle.Secondary),
-    new ButtonBuilder().setCustomId("chess-end").setLabel("resign").setStyle(ButtonStyle.Danger),
+    new ButtonBuilder()
+      .setCustomId("btn-chess-guess")
+      .setLabel("move")
+      .setStyle(ButtonStyle.Primary),
+    new ButtonBuilder()
+      .setCustomId("btn-chess-hint")
+      .setLabel("hint")
+      .setStyle(ButtonStyle.Secondary),
+    new ButtonBuilder()
+      .setCustomId("btn-chess-end")
+      .setLabel("resign")
+      .setStyle(ButtonStyle.Danger),
   );
 
   const replayRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setLabel("play again").setStyle(ButtonStyle.Success).setCustomId("rp"),
+    new ButtonBuilder()
+      .setLabel("play again")
+      .setStyle(ButtonStyle.Success)
+      .setCustomId("btn-play-again"),
   );
 
   let msg: Message;
@@ -330,7 +342,7 @@ async function createChessGame(
   };
 
   collector.on("collect", async (interaction) => {
-    if (interaction.customId === "chess-end") {
+    if (interaction.customId === "btn-chess-end") {
       row.components.forEach((c) => (c as ButtonBuilder).setDisabled(true));
       embed
         .setDescription(`**game ended**\n\nsolution: \`${solutionDisplay}\``)
@@ -355,11 +367,11 @@ async function createChessGame(
       return collector.stop("cancelled");
     }
 
-    if (interaction.customId === "chess-hint") {
+    if (interaction.customId === "btn-chess-hint") {
       // Remove hint button so it can only be used once
       const hintIdx = row.components.findIndex((c) => {
         const b = c as ButtonBuilder;
-        return (b.data as { custom_id?: string }).custom_id === "chess-hint";
+        return (b.data as { custom_id?: string }).custom_id === "btn-chess-hint";
       });
       if (hintIdx !== -1) row.components.splice(hintIdx, 1);
 
@@ -371,7 +383,7 @@ async function createChessGame(
     }
 
     // chess-guess: show modal
-    const modalId = `chess-guess-${nanoid()}`;
+    const modalId = `modal-chess-move-${nanoid()}`;
 
     const modal = new ModalBuilder()
       .setCustomId(modalId)
@@ -744,8 +756,8 @@ async function handleDuel(
   );
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("y").setLabel("accept").setStyle(ButtonStyle.Success),
-    new ButtonBuilder().setCustomId("n").setLabel("deny").setStyle(ButtonStyle.Danger),
+    new ButtonBuilder().setCustomId("btn-confirm").setLabel("accept").setStyle(ButtonStyle.Success),
+    new ButtonBuilder().setCustomId("btn-cancel").setLabel("deny").setStyle(ButtonStyle.Danger),
   );
 
   const m = await send({
@@ -772,7 +784,7 @@ async function handleDuel(
 
   if (!response) return;
 
-  if (response !== "y") {
+  if (response !== "btn-confirm") {
     embed.setDescription("chess duel request denied");
     await m.edit({ embeds: [embed], components: [] }).catch(() => {});
     return;
@@ -847,11 +859,11 @@ async function startChessDuel(
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder()
-      .setCustomId("chess-duel-move")
+      .setCustomId("btn-chess-duel-move")
       .setLabel("move")
       .setStyle(ButtonStyle.Primary),
     new ButtonBuilder()
-      .setCustomId("chess-duel-resign")
+      .setCustomId("btn-chess-duel-resign")
       .setLabel("resign")
       .setStyle(ButtonStyle.Danger),
   );
@@ -989,14 +1001,14 @@ async function startChessDuel(
   };
 
   collector.on("collect", async (interaction) => {
-    if (interaction.customId === "chess-duel-resign") {
+    if (interaction.customId === "btn-chess-duel-resign") {
       const winnerId = interaction.user.id === whitePlayer.id ? blackPlayer.id : whitePlayer.id;
       await interaction.deferUpdate().catch(() => {});
       await endGame("resign", winnerId);
       return;
     }
 
-    if (interaction.customId === "chess-duel-move") {
+    if (interaction.customId === "btn-chess-duel-move") {
       // Only the active player can move
       const activePlayer = getActivePlayer();
 
@@ -1010,7 +1022,7 @@ async function startChessDuel(
         return;
       }
 
-      const modalId = `chess-duel-${nanoid()}`;
+      const modalId = `modal-chess-duel-move-${nanoid()}`;
 
       const modal = new ModalBuilder()
         .setCustomId(modalId)

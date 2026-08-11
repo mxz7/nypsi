@@ -73,22 +73,22 @@ function createAutoBuyRow(
 ): ActionRowBuilder<MessageActionRowComponentBuilder> {
   return new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder()
-      .setCustomId("autobuy-mode-daily")
+      .setCustomId("btn-autobuy-mode-daily")
       .setLabel("daily")
       .setStyle(mode === "daily" ? ButtonStyle.Primary : ButtonStyle.Secondary)
       .setDisabled(disabled),
     new ButtonBuilder()
-      .setCustomId("autobuy-mode-lottery")
+      .setCustomId("btn-autobuy-mode-lottery")
       .setLabel("every lottery")
       .setStyle(mode === "lottery" ? ButtonStyle.Primary : ButtonStyle.Secondary)
       .setDisabled(disabled),
     new ButtonBuilder()
-      .setCustomId("autobuy-set-amount")
+      .setCustomId("btn-autobuy-set-amount")
       .setLabel("set amount")
       .setStyle(ButtonStyle.Secondary)
       .setDisabled(disabled),
     new ButtonBuilder()
-      .setCustomId("autobuy-disable")
+      .setCustomId("btn-autobuy-disable")
       .setLabel("disable")
       .setStyle(ButtonStyle.Danger)
       .setDisabled(disabled),
@@ -96,7 +96,7 @@ function createAutoBuyRow(
 }
 
 async function getAmountFromModal(interaction: ButtonInteraction) {
-  const id = `lottery-autobuy-amount-${Math.floor(Math.random() * 1_000_000)}`;
+  const id = `modal-set-lottery-autobuy-amount-${Math.floor(Math.random() * 1_000_000)}`;
   const modal = new ModalBuilder().setCustomId(id).setTitle("set lottery autobuy amount");
 
   modal.addLabelComponents(
@@ -232,21 +232,21 @@ async function run(
 
       if (!collected || !collected.isButton()) return;
 
-      if (collected.customId === "autobuy-mode-daily") {
+      if (collected.customId === "btn-autobuy-mode-daily") {
         mode = "daily";
         await setLotteryAutoBuySettings(message.member, amount, mode);
         await collected.update({
           embeds: [createAutoBuyEmbed(message.member, amount, mode)],
           components: [createAutoBuyRow(mode)],
         });
-      } else if (collected.customId === "autobuy-mode-lottery") {
+      } else if (collected.customId === "btn-autobuy-mode-lottery") {
         mode = "lottery";
         await setLotteryAutoBuySettings(message.member, amount, mode);
         await collected.update({
           embeds: [createAutoBuyEmbed(message.member, amount, mode)],
           components: [createAutoBuyRow(mode)],
         });
-      } else if (collected.customId === "autobuy-set-amount") {
+      } else if (collected.customId === "btn-autobuy-set-amount") {
         const modalSubmit = await getAmountFromModal(collected);
 
         if (!modalSubmit) return;
@@ -276,7 +276,7 @@ async function run(
           embeds: [createAutoBuyEmbed(message.member, amount, mode)],
           components: [createAutoBuyRow(mode)],
         });
-      } else if (collected.customId === "autobuy-disable") {
+      } else if (collected.customId === "btn-autobuy-disable") {
         amount = null;
         mode = null;
         await setLotteryAutoBuySettings(message.member, null, null);

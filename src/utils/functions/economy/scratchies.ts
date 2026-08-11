@@ -107,7 +107,7 @@ export default class ScratchCard {
     for (const row of this.area) {
       const buttonRow = new ActionRowBuilder<MessageActionRowComponentBuilder>();
       for (const col of row) {
-        const button = new ButtonBuilder().setCustomId(index.join("-"));
+        const button = new ButtonBuilder().setCustomId(`btn-reveal-scratchie:${index.join(":")}`);
 
         if (col.clicks === 2) {
           button.setDisabled(true);
@@ -146,8 +146,8 @@ export default class ScratchCard {
   }
 
   public async clicked(interaction: ButtonInteraction) {
-    if (interaction.customId === "retry") return;
-    const [y, x] = interaction.customId.split("-").map((i) => parseInt(i));
+    if (interaction.customId === "btn-retry") return;
+    const [, y, x] = interaction.customId.split(":").map((i) => parseInt(i));
     try {
       if (this.area[y][x].clicks === 1) return;
     } catch (e) {

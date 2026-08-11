@@ -21,7 +21,7 @@ import { getItems, isEcoBanned, userExists } from "../utils/functions/economy/ut
 const userFulfilling = new Map<string, number>();
 
 export default {
-  name: "market-partial",
+  name: "btn-market-partial",
   type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;
@@ -161,7 +161,7 @@ async function showMultiModal(
   action: OrderType,
   maxAmount: number,
 ) {
-  const id = `market-confirm-${Math.floor(Math.random() * 69420)}`;
+  const id = `modal-market-confirm-${Math.floor(Math.random() * 69420)}`;
   const modal = new ModalBuilder().setCustomId(id).setTitle(`${action} multiple`);
 
   modal.addLabelComponents(

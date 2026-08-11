@@ -51,7 +51,7 @@ async function listenForSupportRequest(message: Message, userId: string, client:
 }
 
 async function showQuestionModal(interaction: ButtonInteraction) {
-  const id = `help-ai-question-${Math.floor(Math.random() * 10_000_000)}`;
+  const id = `modal-help-ai-question-${Math.floor(Math.random() * 10_000_000)}`;
   const modal = new ModalBuilder().setCustomId(id).setTitle("ask nypsi help ai");
 
   modal.addLabelComponents(
@@ -184,7 +184,7 @@ async function setupHelpChatPageManager(
         pageManager.lastPage,
       );
     },
-    handleResponses: new Map([["help-ai-continue", handleContinue]]),
+    handleResponses: new Map([["btn-help-ai-continue", handleContinue]]),
   });
 
   manager.currentPage = manager.lastPage;
@@ -193,7 +193,7 @@ async function setupHelpChatPageManager(
 }
 
 export default {
-  name: "help-ai-start",
+  name: "btn-help-ai-start",
   type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;

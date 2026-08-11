@@ -60,8 +60,8 @@ async function run(
     .setDescription(`are you sure you want to divorce ${partnerName}?`);
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("yes").setLabel("confirm").setStyle(ButtonStyle.Danger),
-    new ButtonBuilder().setCustomId("no").setLabel("cancel").setStyle(ButtonStyle.Primary),
+    new ButtonBuilder().setCustomId("btn-confirm").setLabel("confirm").setStyle(ButtonStyle.Danger),
+    new ButtonBuilder().setCustomId("btn-cancel").setLabel("cancel").setStyle(ButtonStyle.Primary),
   );
 
   const msg = await send({ embeds: [embed], components: [row] });
@@ -83,7 +83,7 @@ async function run(
               new ButtonBuilder()
                 .setStyle(ButtonStyle.Danger)
                 .setLabel("expired")
-                .setCustomId("boobies")
+                .setCustomId("btn-disabled")
                 .setDisabled(true),
             ),
           ],
@@ -96,7 +96,7 @@ async function run(
 
   const { res, interaction } = reaction;
 
-  if (res == "yes") {
+  if (res == "btn-confirm") {
     await interaction.deferUpdate();
 
     if (!(await isMarried(message.member))) {

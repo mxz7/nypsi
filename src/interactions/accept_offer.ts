@@ -23,7 +23,7 @@ import { addNotificationToQueue } from "../utils/functions/users/notifications";
 import { getPreferences } from "../utils/functions/users/preferences";
 
 export default {
-  name: "accept-offer",
+  name: "btn-accept-offer",
   type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;

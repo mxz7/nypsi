@@ -70,7 +70,7 @@ async function run(
 
   if (args.length === 0 || args[0].toLowerCase() === "view") {
     const boosters = await getBoosters(message.member);
-    const options = new StringSelectMenuBuilder().setCustomId("farm");
+    const options = new StringSelectMenuBuilder().setCustomId("select-farm");
 
     const plants = new Map<string, number>();
 
@@ -179,11 +179,17 @@ async function run(
       const upgrades = getPlantUpgrades();
 
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(
-        new ButtonBuilder().setCustomId("back1").setLabel("back").setStyle(ButtonStyle.Danger),
+        new ButtonBuilder()
+          .setCustomId("btn-back-to-farm")
+          .setLabel("back")
+          .setStyle(ButtonStyle.Danger),
       );
 
       const maxRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(
-        new ButtonBuilder().setCustomId("back2").setLabel("back").setStyle(ButtonStyle.Danger),
+        new ButtonBuilder()
+          .setCustomId("btn-back-to-farm")
+          .setLabel("back")
+          .setStyle(ButtonStyle.Danger),
       );
 
       let desc = "";
@@ -205,11 +211,11 @@ async function run(
         }
 
         const button = new ButtonBuilder()
-          .setCustomId(`up-${upgradeId}`)
+          .setCustomId(`btn-upgrade-farm:${upgradeId}`)
           .setEmoji("⬆️")
           .setLabel(`add ${upgrade.name}`);
         const maxButton = new ButtonBuilder()
-          .setCustomId(`up-${upgradeId}-max`)
+          .setCustomId(`btn-upgrade-farm:${upgradeId}:max`)
           .setEmoji("⏫")
           .setLabel(`add all ${upgrade.plural}`);
 
@@ -237,7 +243,10 @@ async function run(
     };
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(
-      new ButtonBuilder().setCustomId("upg").setLabel("upgrades").setStyle(ButtonStyle.Primary),
+      new ButtonBuilder()
+        .setCustomId("btn-view-upgrades")
+        .setLabel("upgrades")
+        .setStyle(ButtonStyle.Primary),
     );
 
     const msg = await send({
@@ -267,7 +276,7 @@ async function run(
 
       if (!interaction) return;
 
-      if (interaction.customId === "farm" || interaction.customId.startsWith("back")) {
+      if (interaction.customId === "select-farm" || interaction.customId === "btn-back-to-farm") {
         if (interaction.isStringSelectMenu()) selected = interaction.values[0];
         const embed = await render(selected);
         inUpgradeMenu = false;
@@ -282,7 +291,7 @@ async function run(
         return listen();
       }
 
-      if (interaction.customId === "upg") {
+      if (interaction.customId === "btn-view-upgrades") {
         const { embed, rows } = await renderUpgrades(selected);
         inUpgradeMenu = true;
         await interaction.update({
@@ -292,8 +301,8 @@ async function run(
         return listen();
       }
 
-      if (interaction.customId.startsWith("up-")) {
-        const upgradeId = interaction.customId.split("-")[1];
+      if (interaction.customId.startsWith("btn-upgrade-farm:")) {
+        const upgradeId = interaction.customId.split(":")[1];
         const upgrade = getPlantUpgrades()[upgradeId];
 
         if (upgrade.type_single) {
@@ -323,7 +332,7 @@ async function run(
 
           let count = 1;
 
-          if (interaction.customId.endsWith("-max")) {
+          if (interaction.customId.endsWith(":max")) {
             count = Math.min(itemCount, upgrade.type_single.stack_limit - userUpgradeCount);
           }
 
@@ -364,7 +373,7 @@ async function run(
           await removeInventoryItem(message.member, nextLevelItem.id, 1);
           await addFarmUpgrade(message.member, selected, upgradeId, 1);
 
-          if (interaction.customId.endsWith("-max")) {
+          if (interaction.customId.endsWith(":max")) {
             while (userUpgradeLevel < upgrade.type_upgradable.items.length) {
               const userUpgradeLevel =
                 (await getFarmUpgrades(message.member)).find(

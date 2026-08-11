@@ -61,9 +61,18 @@ export async function startGTFGame(
   );
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setLabel("guess").setCustomId("gtf-guess").setStyle(ButtonStyle.Primary),
-    new ButtonBuilder().setLabel("hint").setCustomId("gtf-hint").setStyle(ButtonStyle.Secondary),
-    new ButtonBuilder().setLabel("end").setCustomId("gtf-end").setStyle(ButtonStyle.Danger),
+    new ButtonBuilder()
+      .setLabel("guess")
+      .setCustomId("btn-guess-the-flag")
+      .setStyle(ButtonStyle.Primary),
+    new ButtonBuilder()
+      .setLabel("hint")
+      .setCustomId("btn-show-flag-hint")
+      .setStyle(ButtonStyle.Secondary),
+    new ButtonBuilder()
+      .setLabel("end")
+      .setCustomId("btn-end-guess-the-flag")
+      .setStyle(ButtonStyle.Danger),
   );
 
   if (secondPlayer) {
@@ -118,9 +127,9 @@ export async function startGTFGame(
   });
 
   collector.on("collect", async (interaction) => {
-    if (interaction.customId === "gtf-end") {
+    if (interaction.customId === "btn-end-guess-the-flag") {
       return collector.stop("cancelled");
-    } else if (interaction.customId === "gtf-hint") {
+    } else if (interaction.customId === "btn-show-flag-hint") {
       row.components.splice(1, 1);
       await interaction.update({ embeds: [embed], components: [row] });
       await interaction.followUp({
@@ -131,7 +140,7 @@ export async function startGTFGame(
       return;
     }
 
-    const id = `gtf-guess-${nanoid()}`;
+    const id = `modal-guess-flag-${nanoid()}`;
 
     const modal = new ModalBuilder()
       .setCustomId(id)
@@ -295,7 +304,7 @@ export async function startGTFGame(
       components.push(
         new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
           new ButtonBuilder()
-            .setCustomId("gtf-play-again")
+            .setCustomId("btn-play-guess-the-flag-again")
             .setLabel("play again")
             .setStyle(ButtonStyle.Success),
         ),
@@ -324,7 +333,7 @@ async function playAgain(
       return;
     });
 
-  if (!res || res.customId !== "gtf-play-again") return;
+  if (!res || res.customId !== "btn-play-guess-the-flag-again") return;
 
   await addCooldown("guesstheflag", message.member, 5);
 

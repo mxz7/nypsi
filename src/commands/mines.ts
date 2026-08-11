@@ -424,7 +424,9 @@ function getRows(grid: string[], end: boolean) {
 
     if (coordinate === "e5") break;
 
-    const button = new ButtonBuilder().setCustomId(coordinate).setLabel("\u200b");
+    const button = new ButtonBuilder()
+      .setCustomId(`btn-reveal-mine:${coordinate}`)
+      .setLabel("\u200b");
 
     switch (item) {
       case "a":
@@ -472,7 +474,7 @@ function getRows(grid: string[], end: boolean) {
   }
 
   const button = new ButtonBuilder()
-    .setCustomId("finish")
+    .setCustomId("btn-finish")
     .setLabel("finish")
     .setStyle(ButtonStyle.Success);
 
@@ -607,7 +609,7 @@ async function playGame(
             components[components.length - 1].components.length - 1
           ] as ButtonBuilder
         )
-          .setCustomId("rp")
+          .setCustomId("btn-play-again")
           .setLabel("play again")
           .setDisabled(false);
 
@@ -624,7 +626,7 @@ async function playGame(
                 components[components.length - 1].components.length - 1
               ] as ButtonBuilder
             )
-              .setCustomId("rp")
+              .setCustomId("btn-play-again")
               .setLabel("play again")
               .setDisabled(true);
             msg.edit({ components });
@@ -633,7 +635,7 @@ async function playGame(
 
         if (!res) return;
 
-        if (res.customId == "rp") {
+        if (res.customId == "btn-play-again") {
           await res.deferUpdate();
           logger.info(
             `::cmd ${message.guild.id} ${message.channelId} ${message.author.username}: replaying mines`,
@@ -869,7 +871,7 @@ async function playGame(
     replied: response.replied,
   });
 
-  if (response.customId.length != 2 && response.customId != "finish") {
+  if (!response.customId.startsWith("btn-reveal-mine:") && response.customId != "btn-finish") {
     logger.error(`mines: ${message.author.id} weird coordinate thing`, { response, game });
     await message.channel.send({
       content: message.author.toString() + " invalid coordinate, example: `a3`",
@@ -877,7 +879,7 @@ async function playGame(
     return playGame(game, message, send, msg, args);
   }
 
-  if (response.customId == "finish") {
+  if (response.customId == "btn-finish") {
     if (game.win < 1) {
       lose(response);
       return;
@@ -888,7 +890,7 @@ async function playGame(
       win1(response);
       return;
     }
-  } else if (response.customId === "rp") {
+  } else if (response.customId === "btn-play-again") {
     logger.debug(`mines: ${message.author.id} rerendering stuck message`);
 
     const desc = await renderGambleScreen({
@@ -904,8 +906,9 @@ async function playGame(
     await edit({ embeds: [embed], components }, "rerendering stuck message", response);
     return playGame(game, message, send, msg, args);
   } else {
-    const letter = response.customId.split("")[0];
-    const number = response.customId.split("")[1];
+    const coordinate = response.customId.split(":")[1];
+    const letter = coordinate[0];
+    const number = coordinate[1];
 
     let check = false;
     let check1 = false;
@@ -932,7 +935,7 @@ async function playGame(
     }
   }
 
-  const location = toLocation(response.customId);
+  const location = toLocation(response.customId.split(":")[1]);
 
   let followUp: InteractionReplyOptions;
 

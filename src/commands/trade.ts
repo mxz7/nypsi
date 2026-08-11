@@ -129,34 +129,34 @@ async function run(
 
       const topRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
-          .setCustomId("addRequestedItem")
+          .setCustomId("btn-add-requested-item")
           .setLabel("request item")
           .setStyle(ButtonStyle.Secondary)
           .setDisabled(requestedItems.length >= 3),
         new ButtonBuilder()
-          .setCustomId("addOfferedItem")
+          .setCustomId("btn-add-offered-item")
           .setLabel("offer item")
           .setStyle(ButtonStyle.Secondary)
           .setDisabled(offeredItems.length >= 3),
         new ButtonBuilder()
-          .setCustomId("addOfferedMoney")
+          .setCustomId("btn-add-offered-money")
           .setLabel("offer money")
           .setStyle(ButtonStyle.Secondary),
       );
 
       const middleRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
-          .setCustomId("deleteRequestedItem")
+          .setCustomId("btn-delete-requested-item")
           .setLabel("delete item request")
           .setStyle(ButtonStyle.Danger)
           .setDisabled(requestedItems.length == 0),
         new ButtonBuilder()
-          .setCustomId("deleteOfferedItem")
+          .setCustomId("btn-delete-offered-item")
           .setLabel("delete item offer")
           .setStyle(ButtonStyle.Danger)
           .setDisabled(offeredItems.length == 0),
         new ButtonBuilder()
-          .setCustomId("deleteOfferedMoney")
+          .setCustomId("btn-delete-offered-money")
           .setLabel("delete money offer")
           .setStyle(ButtonStyle.Danger)
           .setDisabled(offeredMoney == 0),
@@ -164,7 +164,7 @@ async function run(
 
       const bottomRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
-          .setCustomId("create")
+          .setCustomId("btn-create")
           .setLabel("create")
           .setStyle(ButtonStyle.Success)
           .setDisabled(requestedItems.length == 0 || offeredItems.length == 0),
@@ -186,7 +186,7 @@ async function run(
       const response = await msg
         .awaitMessageComponent({ filter, componentType: ComponentType.Button, time: 60000 })
         .then(async (collected) => {
-          if (!collected.customId.startsWith("add"))
+          if (!collected.customId.startsWith("btn-add"))
             await collected.deferUpdate().catch(() => {
               fail = true;
               return pageManager();
@@ -203,7 +203,7 @@ async function run(
 
       const { res, interaction } = response;
 
-      if (res == "addRequestedItem") {
+      if (res == "btn-add-requested-item") {
         const res = await addRequestedItem(interaction).catch(() => {});
 
         if (res) {
@@ -243,7 +243,7 @@ async function run(
         return pageManager();
       }
 
-      if (res == "addOfferedItem") {
+      if (res == "btn-add-offered-item") {
         const res = await addOfferedItem(interaction).catch(() => {});
 
         if (res) {
@@ -295,7 +295,7 @@ async function run(
         return pageManager();
       }
 
-      if (res == "addOfferedMoney") {
+      if (res == "btn-add-offered-money") {
         const res = await addOfferedMoney(interaction).catch(() => {});
 
         if (res) {
@@ -333,7 +333,7 @@ async function run(
         return pageManager();
       }
 
-      if (res == "deleteRequestedItem") {
+      if (res == "btn-delete-requested-item") {
         if (requestedItems.length == 1) {
           requestedItems.pop();
         } else {
@@ -348,7 +348,7 @@ async function run(
         return pageManager();
       }
 
-      if (res == "deleteOfferedItem") {
+      if (res == "btn-delete-offered-item") {
         if (offeredItems.length == 1) {
           offeredItems.pop();
         } else {
@@ -363,14 +363,14 @@ async function run(
         return pageManager();
       }
 
-      if (res == "deleteOfferedMoney") {
+      if (res == "btn-delete-offered-money") {
         offeredMoney = 0;
 
         await updateRequestEmbed(true);
         return pageManager();
       }
 
-      if (res == "create") {
+      if (res == "btn-create") {
         inventory = await getInventory(message.member);
         balance = await getBalance(message.member);
 
@@ -437,7 +437,7 @@ async function run(
   };
 
   async function addRequestedItem(interaction: ButtonInteraction) {
-    const id = `request-item-${Math.floor(Math.random() * 69420)}`;
+    const id = `modal-request-trade-item-${Math.floor(Math.random() * 69420)}`;
     const modal = new ModalBuilder().setCustomId(id).setTitle("request item");
 
     modal.addLabelComponents(
@@ -470,7 +470,7 @@ async function run(
   }
 
   async function addOfferedItem(interaction: ButtonInteraction) {
-    const id = `offer-item-${Math.floor(Math.random() * 69420)}`;
+    const id = `modal-offer-trade-item-${Math.floor(Math.random() * 69420)}`;
     const modal = new ModalBuilder().setCustomId(id).setTitle("offer item");
 
     modal.addLabelComponents(
@@ -503,7 +503,7 @@ async function run(
   }
 
   async function addOfferedMoney(interaction: ButtonInteraction) {
-    const id = `offer-money-${Math.floor(Math.random() * 69420)}`;
+    const id = `modal-offer-trade-money-${Math.floor(Math.random() * 69420)}`;
     const modal = new ModalBuilder().setCustomId(id).setTitle("offer money");
 
     modal.addLabelComponents(
@@ -547,13 +547,13 @@ async function run(
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new StringSelectMenuBuilder()
-        .setCustomId("item")
+        .setCustomId("select-item")
         .setPlaceholder("item you want to delete")
         .setOptions(options),
     );
 
     const backRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("back").setLabel("back").setStyle(ButtonStyle.Danger),
+      new ButtonBuilder().setCustomId("btn-back").setLabel("back").setStyle(ButtonStyle.Danger),
     );
 
     await edit({ embeds: [embed], components: [row, backRow] }, msg);
@@ -613,9 +613,18 @@ async function run(
     const updateButtons = async (page: number) => {
       if (tradeRequests.length > 0) {
         row.setComponents(
-          new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary),
-          new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
-          new ButtonBuilder().setCustomId("del").setLabel("delete").setStyle(ButtonStyle.Danger),
+          new ButtonBuilder()
+            .setCustomId("btn-previous-page")
+            .setLabel("back")
+            .setStyle(ButtonStyle.Primary),
+          new ButtonBuilder()
+            .setCustomId("btn-next-page")
+            .setLabel("next")
+            .setStyle(ButtonStyle.Primary),
+          new ButtonBuilder()
+            .setCustomId("btn-delete")
+            .setLabel("delete")
+            .setStyle(ButtonStyle.Danger),
         );
 
         if (tradeRequests.length == 1) {
@@ -636,7 +645,7 @@ async function run(
         ) {
           row.addComponents(
             new ButtonBuilder()
-              .setCustomId("bump")
+              .setCustomId("btn-bump")
               .setLabel("bump")
               .setStyle(ButtonStyle.Secondary)
               .setDisabled(true),
@@ -644,7 +653,7 @@ async function run(
         } else {
           row.addComponents(
             new ButtonBuilder()
-              .setCustomId("bump")
+              .setCustomId("btn-bump")
               .setLabel("bump")
               .setStyle(ButtonStyle.Secondary)
               .setDisabled(false),
@@ -662,7 +671,7 @@ async function run(
         row.addComponents(
           new ButtonBuilder()
             .setLabel("create trade request")
-            .setCustomId("y")
+            .setCustomId("btn-confirm")
             .setStyle(ButtonStyle.Success),
         );
       }
@@ -674,7 +683,10 @@ async function run(
       displayTradeRequests(0);
     } else {
       row.addComponents(
-        new ButtonBuilder().setCustomId("del").setLabel("delete").setStyle(ButtonStyle.Danger),
+        new ButtonBuilder()
+          .setCustomId("btn-delete")
+          .setLabel("delete")
+          .setStyle(ButtonStyle.Danger),
       );
       displayTradeRequests(0);
     }
@@ -711,9 +723,9 @@ async function run(
 
       const { res, interaction } = response;
 
-      if (res == "y") {
+      if (res == "btn-confirm") {
         return createTradeRequestProcess(msg);
-      } else if (res == "⬅") {
+      } else if (res == "btn-previous-page") {
         if (currentPage == 0) {
           return pageManager();
         }
@@ -726,7 +738,7 @@ async function run(
 
         await edit({ embeds: [embed], components: [row] }, msg);
         return pageManager();
-      } else if (res == "➡") {
+      } else if (res == "btn-next-page") {
         if (currentPage == maxPage) {
           return pageManager();
         }
@@ -738,7 +750,7 @@ async function run(
 
         await edit({ embeds: [embed], components: [row] }, msg);
         return pageManager();
-      } else if (res == "del") {
+      } else if (res == "btn-delete") {
         const res = await deleteTradeRequest(
           tradeRequests[currentPage].id,
           message.client as NypsiClient,
@@ -771,7 +783,7 @@ async function run(
         }
 
         return manageTradeRequests(msg);
-      } else if (res === "bump") {
+      } else if (res === "btn-bump") {
         const bumpRes = await bumpTradeRequest(
           tradeRequests[currentPage].id,
           message.client as NypsiClient,

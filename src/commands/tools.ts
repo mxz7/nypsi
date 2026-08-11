@@ -89,7 +89,7 @@ async function run(
     disabled = false,
   ) => {
     return new StringSelectMenuBuilder()
-      .setCustomId(`select-${type}`)
+      .setCustomId(`select-tools-${type}`)
       .setDisabled(disabled)
       .addOptions(
         (["highest", "incredible", "normal", "terrible"] as ToolPreferenceSelection[]).map(
@@ -115,7 +115,7 @@ async function run(
       )
       .setButtonAccessory(
         new ButtonBuilder()
-          .setCustomId(`toggle-${button}`)
+          .setCustomId(`btn-toggle-tool-${button}`)
           .setLabel(
             button == "unbreaking"
               ? preferences.useBestToolOnUnbreaking
@@ -194,16 +194,16 @@ async function run(
 
       await setToolPreference(
         message.member,
-        interaction.customId.split("-")[1] as "gun" | "pickaxe" | "rod",
+        interaction.customId.split("-")[2] as "gun" | "pickaxe" | "rod",
         value,
       );
-    } else if (res == "toggle-unbreaking") {
+    } else if (res == "btn-toggle-tool-unbreaking") {
       await toggleToolPreference(
         message.member,
         "unbreaking",
         !preferences.useBestToolOnUnbreaking,
       );
-    } else if (res == "toggle-lower") {
+    } else if (res == "btn-toggle-tool-lower") {
       await toggleToolPreference(message.member, "lower", !preferences.useLowerToolOnEmpty);
     }
     preferences = await getToolPreferences(message.member);

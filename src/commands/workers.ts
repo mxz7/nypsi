@@ -177,7 +177,10 @@ async function run(
         embed.setDescription(desc);
 
         row.addComponents(
-          new ButtonBuilder().setCustomId("upg").setLabel("upgrades").setStyle(ButtonStyle.Primary),
+          new ButtonBuilder()
+            .setCustomId("btn-view-upgrades")
+            .setLabel("upgrades")
+            .setStyle(ButtonStyle.Primary),
         );
       } else {
         embed.setDescription(
@@ -191,12 +194,15 @@ async function run(
 
         if ((await getRawLevel(message.member)) >= worker.prestige_requirement) {
           row.addComponents(
-            new ButtonBuilder().setCustomId("bu").setLabel("buy").setStyle(ButtonStyle.Primary),
+            new ButtonBuilder()
+              .setCustomId("btn-buy-worker")
+              .setLabel("buy")
+              .setStyle(ButtonStyle.Primary),
           );
         } else {
           row.addComponents(
             new ButtonBuilder()
-              .setCustomId("bu")
+              .setCustomId("btn-buy-worker")
               .setLabel("buy")
               .setStyle(ButtonStyle.Primary)
               .setDisabled(true),
@@ -227,7 +233,7 @@ async function run(
     }
 
     let workersList = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new StringSelectMenuBuilder().setCustomId("worker").setOptions(options),
+      new StringSelectMenuBuilder().setCustomId("select-worker").setOptions(options),
     );
 
     const { buttonRow, embed } = await displayWorker(baseWorkers[defaultWorker]);
@@ -271,14 +277,14 @@ async function run(
         }
 
         workersList = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-          new StringSelectMenuBuilder().setCustomId("worker").setOptions(options),
+          new StringSelectMenuBuilder().setCustomId("select-worker").setOptions(options),
         );
 
         await res
           .update({ embeds: [embed], components: [workersList, buttonRow] })
           .catch(() => res.message.edit({ embeds: [embed], components: [workersList, buttonRow] }));
         return pageManager();
-      } else if (res.customId == "bu") {
+      } else if (res.customId == "btn-buy-worker") {
         const balance = await getBalance(message.member);
 
         const selected = options.filter((o) => o.data.default)[0].data.value;
@@ -305,7 +311,7 @@ async function run(
 
           return showWorkers(selected, msg, res as ButtonInteraction);
         }
-      } else if (res.customId == "upg") {
+      } else if (res.customId == "btn-view-upgrades") {
         const selected = options.filter((o) => o.data.default)[0].data.value;
         return upgradeWorker(baseWorkers[selected], res.message, res as ButtonInteraction);
       }
@@ -327,10 +333,16 @@ async function run(
 
     const baseUpgrades = getBaseUpgrades();
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("ba").setLabel("back").setStyle(ButtonStyle.Danger),
+      new ButtonBuilder()
+        .setCustomId("btn-back-to-workers")
+        .setLabel("back")
+        .setStyle(ButtonStyle.Danger),
     );
     const maxRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("ba2").setLabel("back").setStyle(ButtonStyle.Danger),
+      new ButtonBuilder()
+        .setCustomId("btn-back-to-upgrades")
+        .setLabel("back")
+        .setStyle(ButtonStyle.Danger),
     );
 
     for (const upgradeId of Object.keys(baseUpgrades)) {
@@ -348,11 +360,11 @@ async function run(
         }** ${owned}/${baseUpgrades[upgradeId].stack_limit}`;
 
         const button = new ButtonBuilder()
-          .setCustomId(`up-${upgradeId}`)
+          .setCustomId(`btn-upgrade-worker:${upgradeId}`)
           .setEmoji("⬆️")
           .setLabel(`${baseUpgrades[upgradeId].name}`);
         const maxButton = new ButtonBuilder()
-          .setCustomId(`up-${upgradeId}-max`)
+          .setCustomId(`btn-upgrade-worker:${upgradeId}:max`)
           .setEmoji("⏫")
           .setLabel(baseUpgrades[upgradeId].name);
 
@@ -416,10 +428,10 @@ async function run(
         return;
       }
 
-      if (res.customId == "ba" || res.customId === "ba2") {
+      if (res.customId == "btn-back-to-workers" || res.customId === "btn-back-to-upgrades") {
         return showWorkers(worker.id, msg, res as ButtonInteraction);
-      } else if (res.customId.startsWith("up-")) {
-        const upgradeId = res.customId.split("-")[1];
+      } else if (res.customId.startsWith("btn-upgrade-worker:")) {
+        const upgradeId = res.customId.split(":")[1];
 
         if (
           userWorkers
@@ -450,7 +462,7 @@ async function run(
           userWorkers
             .find((w) => w.workerId == worker.id)
             .upgrades.find((u) => u.upgradeId == upgradeId)?.amount || 0,
-          res.customId.endsWith("-max")
+          res.customId.endsWith(":max")
             ? baseUpgrades[upgradeId].stack_limit -
                 (userWorkers
                   .find((w) => w.workerId === worker.id)
@@ -484,7 +496,7 @@ async function run(
           message.member,
           worker.id,
           upgradeId,
-          res.customId.endsWith("-max")
+          res.customId.endsWith(":max")
             ? baseUpgrades[upgradeId].stack_limit -
                 (userWorkers
                   .find((w) => w.workerId === worker.id)

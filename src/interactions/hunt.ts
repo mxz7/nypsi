@@ -12,7 +12,7 @@ import { isEcoBanned } from "../utils/functions/economy/utils";
 import { runCommand } from "../utils/handlers/commandhandler";
 
 export default {
-  name: "hunt",
+  name: "btn-hunt",
   type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;
@@ -33,7 +33,7 @@ export default {
     runCommand("hunt", int, []);
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("hunt").setLabel("hunt").setStyle(ButtonStyle.Success),
+      new ButtonBuilder().setCustomId("btn-hunt").setLabel("hunt").setStyle(ButtonStyle.Success),
     );
 
     const existingRow = interaction.message.components[0];
@@ -50,7 +50,7 @@ export default {
 
       row.addComponents(
         new ButtonBuilder()
-          .setCustomId("captcha")
+          .setCustomId("btn-captcha")
           .setLabel("you must complete a captcha")
           .setStyle(ButtonStyle.Secondary)
           .setDisabled(true)

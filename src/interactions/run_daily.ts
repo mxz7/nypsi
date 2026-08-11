@@ -30,7 +30,7 @@ import { logger } from "../utils/logger";
 import dayjs = require("dayjs");
 
 export default {
-  name: "run-daily",
+  name: "btn-run-daily",
   type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;
@@ -57,7 +57,7 @@ export default {
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
           .setStyle(ButtonStyle.Secondary)
-          .setCustomId("daily-upcoming-rewards")
+          .setCustomId("btn-daily-upcoming-rewards")
           .setLabel("upcoming"),
       );
 
@@ -101,7 +101,7 @@ export default {
 
     const upcomingButton = new ButtonBuilder()
       .setStyle(ButtonStyle.Secondary)
-      .setCustomId("daily-upcoming-rewards")
+      .setCustomId("btn-daily-upcoming-rewards")
       .setLabel("upcoming");
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(

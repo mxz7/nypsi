@@ -405,8 +405,11 @@ async function run(
         );
 
         const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-          new ButtonBuilder().setCustomId("y").setLabel("yes").setStyle(ButtonStyle.Success),
-          new ButtonBuilder().setCustomId("n").setLabel("no").setStyle(ButtonStyle.Danger),
+          new ButtonBuilder()
+            .setCustomId("btn-confirm")
+            .setLabel("yes")
+            .setStyle(ButtonStyle.Success),
+          new ButtonBuilder().setCustomId("btn-cancel").setLabel("no").setStyle(ButtonStyle.Danger),
         );
 
         const msg = await send({ embeds: [authorConfirmationEmbed], components: [row] });
@@ -428,7 +431,7 @@ async function run(
         if ((await getBalance(message.member)) < bet)
           return interaction.reply({ embeds: [new ErrorEmbed("nice try buddy")] });
 
-        if (interaction.customId !== "y") {
+        if (interaction.customId !== "btn-confirm") {
           msg.edit({ components: [] });
           return interaction.reply({
             embeds: [new CustomEmbed(message.member, "✅ coinflip cancelled")],
@@ -484,8 +487,11 @@ async function run(
     let cancelled = false;
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("y").setLabel("accept").setStyle(ButtonStyle.Success),
-      new ButtonBuilder().setCustomId("n").setLabel("deny").setStyle(ButtonStyle.Danger),
+      new ButtonBuilder()
+        .setCustomId("btn-confirm")
+        .setLabel("accept")
+        .setStyle(ButtonStyle.Success),
+      new ButtonBuilder().setCustomId("btn-cancel").setLabel("deny").setStyle(ButtonStyle.Danger),
     );
 
     let msg: Message;
@@ -517,7 +523,7 @@ async function run(
     let proceeded = false;
     const filter = async (i: ButtonInteraction) => {
       if (message.author.id === i.user.id) {
-        return i.customId === "n";
+        return i.customId === "btn-cancel";
       }
 
       if (playing.has(i.user.id)) {
@@ -530,7 +536,7 @@ async function run(
 
       if (i.user.id !== target.user.id) return false;
 
-      if (i.customId == "n") return true;
+      if (i.customId == "btn-cancel") return true;
 
       if (bet) {
         const maxBet = await calcMaxBet(i.user);
@@ -542,8 +548,14 @@ async function run(
           );
 
           const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-            new ButtonBuilder().setCustomId("y").setLabel("yes").setStyle(ButtonStyle.Success),
-            new ButtonBuilder().setCustomId("n").setLabel("no").setStyle(ButtonStyle.Danger),
+            new ButtonBuilder()
+              .setCustomId("btn-confirm")
+              .setLabel("yes")
+              .setStyle(ButtonStyle.Success),
+            new ButtonBuilder()
+              .setCustomId("btn-cancel")
+              .setLabel("no")
+              .setStyle(ButtonStyle.Danger),
           );
 
           const confirmMsg = await i
@@ -573,7 +585,7 @@ async function run(
 
           confirmInteraction.update({ components: [] });
 
-          return confirmInteraction.customId === "y";
+          return confirmInteraction.customId === "btn-confirm";
         }
       }
 
@@ -600,7 +612,7 @@ async function run(
 
     if (fail || !response) return;
 
-    if (response.customId == "y") {
+    if (response.customId == "btn-confirm") {
       if (bet) {
         return doGame(message.member, target, "money", response as ButtonInteraction, msg, bet);
       } else {
@@ -670,8 +682,11 @@ async function run(
         );
 
         const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-          new ButtonBuilder().setCustomId("y").setLabel("yes").setStyle(ButtonStyle.Success),
-          new ButtonBuilder().setCustomId("n").setLabel("no").setStyle(ButtonStyle.Danger),
+          new ButtonBuilder()
+            .setCustomId("btn-confirm")
+            .setLabel("yes")
+            .setStyle(ButtonStyle.Success),
+          new ButtonBuilder().setCustomId("btn-cancel").setLabel("no").setStyle(ButtonStyle.Danger),
         );
 
         const msg = await send({ embeds: [authorConfirmationEmbed], components: [row] });
@@ -693,7 +708,7 @@ async function run(
         if ((await getBalance(message.member)) < bet)
           return interaction.reply({ embeds: [new ErrorEmbed("nice try buddy")] });
 
-        if (interaction.customId !== "y") {
+        if (interaction.customId !== "btn-confirm") {
           msg.edit({ components: [] });
           return interaction.reply({
             embeds: [new CustomEmbed(message.member, "✅ coinflip cancelled")],
@@ -739,8 +754,8 @@ async function run(
     let cancelled = false;
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("y").setLabel("play").setStyle(ButtonStyle.Success),
-      new ButtonBuilder().setCustomId("n").setLabel("cancel").setStyle(ButtonStyle.Danger),
+      new ButtonBuilder().setCustomId("btn-confirm").setLabel("play").setStyle(ButtonStyle.Success),
+      new ButtonBuilder().setCustomId("btn-cancel").setLabel("cancel").setStyle(ButtonStyle.Danger),
     );
 
     let msg: Message;
@@ -757,9 +772,9 @@ async function run(
     let proceeded = false;
     let fail = false;
     const filter = async (i: ButtonInteraction): Promise<boolean> => {
-      if (i.customId === "n" && message.author.id !== i.user.id) return false;
+      if (i.customId === "btn-cancel" && message.author.id !== i.user.id) return false;
       if (message.author.id === i.user.id) {
-        return i.customId === "n";
+        return i.customId === "btn-cancel";
       }
       if ((await isEcoBanned(i.user)).banned) return false;
 
@@ -772,7 +787,7 @@ async function run(
       }
 
       if (i.user.id === message.author.id) {
-        return (i as ButtonInteraction).customId === "n";
+        return (i as ButtonInteraction).customId === "btn-cancel";
       }
 
       if (!(await userExists(i.user))) {
@@ -803,8 +818,14 @@ async function run(
           );
 
           const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-            new ButtonBuilder().setCustomId("y").setLabel("yes").setStyle(ButtonStyle.Success),
-            new ButtonBuilder().setCustomId("n").setLabel("no").setStyle(ButtonStyle.Danger),
+            new ButtonBuilder()
+              .setCustomId("btn-confirm")
+              .setLabel("yes")
+              .setStyle(ButtonStyle.Success),
+            new ButtonBuilder()
+              .setCustomId("btn-cancel")
+              .setLabel("no")
+              .setStyle(ButtonStyle.Danger),
           );
 
           const confirmMsg = await i
@@ -834,7 +855,7 @@ async function run(
 
           confirmInteraction.update({ components: [] });
 
-          return confirmInteraction.customId === "y";
+          return confirmInteraction.customId === "btn-confirm";
         }
       } else {
         const inventory = await getInventory(i.user);
@@ -876,7 +897,7 @@ async function run(
 
     if (!target) return message.channel.send({ embeds: [new ErrorEmbed("invalid guild member")] });
 
-    if (response.customId == "y") {
+    if (response.customId == "btn-confirm") {
       if (bet) {
         return doGame(message.member, target, "money", response as ButtonInteraction, msg, bet);
       } else {

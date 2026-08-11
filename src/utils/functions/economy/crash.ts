@@ -49,14 +49,17 @@ let ready = false;
 let startTimeout: NodeJS.Timeout;
 
 const waitingButtons = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-  new ButtonBuilder().setCustomId("crash-join").setLabel("join").setStyle(ButtonStyle.Success),
+  new ButtonBuilder().setCustomId("btn-crash-join").setLabel("join").setStyle(ButtonStyle.Success),
   new ButtonBuilder()
     .setURL("https://nypsi.xyz/wiki/economy/crash?ref=bot-crash")
     .setStyle(ButtonStyle.Link)
     .setLabel("help"),
 );
 const startedButtons = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-  new ButtonBuilder().setCustomId("crash-out").setLabel("cash out").setStyle(ButtonStyle.Success),
+  new ButtonBuilder()
+    .setCustomId("btn-crash-out")
+    .setLabel("cash out")
+    .setStyle(ButtonStyle.Success),
 );
 
 export async function getCrashStatus(): Promise<CrashStatus | null> {
@@ -225,7 +228,7 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
   }
 
   const modal = new ModalBuilder()
-    .setCustomId("crash-join-modal")
+    .setCustomId("modal-join-crash-game")
     .setTitle("join crash")
     .addLabelComponents(
       new LabelBuilder()

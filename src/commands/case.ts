@@ -105,7 +105,7 @@ async function run(
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
-        .setCustomId("evidence")
+        .setCustomId("btn-evidence")
         .setEmoji("📋")
         .setLabel("evidence")
         .setStyle(caseData.evidence ? ButtonStyle.Success : ButtonStyle.Secondary),
@@ -115,7 +115,7 @@ async function run(
       if (caseData.deleted) {
         row.addComponents(
           new ButtonBuilder()
-            .setCustomId("restore")
+            .setCustomId("btn-restore")
             .setLabel("restore")
             .setStyle(ButtonStyle.Secondary)
             .setEmoji("♻️"),
@@ -123,7 +123,7 @@ async function run(
       } else {
         row.addComponents(
           new ButtonBuilder()
-            .setCustomId("delete")
+            .setCustomId("btn-delete")
             .setLabel("delete")
             .setEmoji("🗑️")
             .setStyle(ButtonStyle.Danger),
@@ -154,7 +154,7 @@ async function run(
 
       if (!interaction) return;
 
-      if (interaction.customId === "delete") {
+      if (interaction.customId === "btn-delete") {
         if (caseData.deleted) {
           await interaction.reply({
             embeds: [new ErrorEmbed("case is already marked as deleted")],
@@ -170,7 +170,7 @@ async function run(
         });
 
         return displayCase(caseMsg);
-      } else if (interaction.customId === "restore") {
+      } else if (interaction.customId === "btn-restore") {
         if (!caseData.deleted) {
           await interaction.reply({
             embeds: [new ErrorEmbed("case is not marked as deleted")],
@@ -187,7 +187,7 @@ async function run(
         });
 
         return displayCase(caseMsg);
-      } else if (interaction.customId === "evidence") {
+      } else if (interaction.customId === "btn-evidence") {
         showEvidence(interaction);
         return listen();
       }
@@ -219,7 +219,7 @@ async function run(
             new ButtonBuilder()
               .setLabel("delete")
               .setEmoji("🗑️")
-              .setCustomId("delete")
+              .setCustomId("btn-delete")
               .setStyle(ButtonStyle.Danger),
           );
         }
@@ -228,7 +228,7 @@ async function run(
         row.addComponents(
           new ButtonBuilder()
             .setLabel("upload")
-            .setCustomId("upload")
+            .setCustomId("btn-upload")
             .setEmoji("✉️")
             .setStyle(ButtonStyle.Success),
         );
@@ -261,7 +261,7 @@ async function run(
 
         if (!interaction) return;
 
-        if (interaction.customId === "delete") {
+        if (interaction.customId === "btn-delete") {
           let perms = false;
           if (
             message.member.permissions.has(PermissionFlagsBits.ManageGuild) ||
@@ -279,7 +279,7 @@ async function run(
           caseData = await getCase(message.guild, caseData.caseId);
           showEvidence(interaction, evidenceMsg);
           displayCase(caseMsg);
-        } else if (interaction.customId === "upload") {
+        } else if (interaction.customId === "btn-upload") {
           const check = await getCase(message.guild, caseId);
 
           if (check.evidence)

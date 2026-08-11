@@ -71,12 +71,15 @@ async function run(
       new ButtonBuilder()
         .setLabel("another")
         .setEmoji("🔁")
-        .setCustomId("another")
+        .setCustomId("btn-generate-another-color")
         .setStyle(ButtonStyle.Secondary),
     );
 
   row.addComponents(
-    new ButtonBuilder().setStyle(ButtonStyle.Secondary).setCustomId("circle").setLabel("circle"),
+    new ButtonBuilder()
+      .setStyle(ButtonStyle.Secondary)
+      .setCustomId("btn-circle")
+      .setLabel("circle"),
   );
 
   const msg = await send({ embeds: [embed], components: [row] }).catch(async () =>
@@ -96,7 +99,7 @@ async function run(
 
     if (!interaction || interaction instanceof Message) return;
 
-    if (interaction.customId === "circle") {
+    if (interaction.customId === "btn-circle") {
       if (generating)
         return interaction.reply({
           embeds: [new ErrorEmbed("circle already being generated")],
@@ -157,7 +160,7 @@ async function run(
         );
 
       return listen();
-    } else if (interaction.customId === "another") {
+    } else if (interaction.customId === "btn-generate-another-color") {
       color = getRandomColour();
 
       embed.setHeader(`#${color}`);

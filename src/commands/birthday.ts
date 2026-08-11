@@ -228,7 +228,7 @@ async function run(
 
     let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
-        .setCustomId("set-birthday")
+        .setCustomId("btn-set-birthday")
         .setLabel("set birthday")
         .setStyle(ButtonStyle.Success),
     );
@@ -269,9 +269,9 @@ async function run(
 
     msg.edit({ components: [] });
 
-    if (interaction.customId !== "set-birthday") return;
+    if (interaction.customId !== "btn-set-birthday") return;
 
-    const id = `set-birthday-${Math.floor(Math.random() * 69420)}`;
+    const id = `modal-set-birthday-${Math.floor(Math.random() * 69420)}`;
     const modal = new ModalBuilder()
       .setCustomId(id)
       .setTitle("your birthday")
@@ -280,7 +280,7 @@ async function run(
           .setLabel("what month?")
           .setStringSelectMenuComponent(
             new StringSelectMenuBuilder()
-              .setCustomId("month")
+              .setCustomId("select-month")
               .setPlaceholder("month")
               .setRequired(true)
               .addOptions(
@@ -396,8 +396,11 @@ async function run(
       });
 
     row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("confirm").setLabel("confirm").setStyle(ButtonStyle.Success),
-      new ButtonBuilder().setCustomId("cancel").setLabel("cancel").setStyle(ButtonStyle.Danger),
+      new ButtonBuilder()
+        .setCustomId("btn-confirm")
+        .setLabel("confirm")
+        .setStyle(ButtonStyle.Success),
+      new ButtonBuilder().setCustomId("btn-cancel").setLabel("cancel").setStyle(ButtonStyle.Danger),
     );
 
     await res.deferUpdate();
@@ -425,7 +428,7 @@ async function run(
 
     if (!interaction) return;
 
-    if (interaction.customId === "confirm") {
+    if (interaction.customId === "btn-confirm") {
       await setBirthday(message.member, birthday);
 
       interaction.update({

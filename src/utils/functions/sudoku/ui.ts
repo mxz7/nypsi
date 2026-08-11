@@ -52,11 +52,11 @@ export function buildConfirmationMessage(
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder()
-      .setCustomId("sudoku-confirm-start")
+      .setCustomId("btn-sudoku-confirm-start")
       .setLabel("play")
       .setStyle(ButtonStyle.Success),
     new ButtonBuilder()
-      .setCustomId("sudoku-coord-toggle")
+      .setCustomId("btn-sudoku-coord-toggle")
       .setLabel(modeToggleLabel(coordMode))
       .setStyle(ButtonStyle.Secondary),
   );
@@ -93,19 +93,19 @@ export async function buildGameMessage(
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder()
-      .setCustomId("sudoku-move")
+      .setCustomId("btn-sudoku-move")
       .setLabel("make move")
       .setStyle(ButtonStyle.Primary),
     new ButtonBuilder()
-      .setCustomId("sudoku-notes")
+      .setCustomId("btn-sudoku-notes")
       .setLabel("note")
       .setStyle(ButtonStyle.Secondary),
     new ButtonBuilder()
-      .setCustomId("sudoku-highlight")
+      .setCustomId("btn-sudoku-highlight")
       .setLabel("highlight")
       .setStyle(ButtonStyle.Secondary),
     new ButtonBuilder()
-      .setCustomId("sudoku-resign")
+      .setCustomId("btn-sudoku-resign")
       .setLabel("resign")
       .setStyle(ButtonStyle.Danger),
   );
@@ -149,7 +149,7 @@ export async function buildEndedGameMessage(
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder()
-      .setCustomId("sudoku-play-again")
+      .setCustomId("btn-sudoku-play-again")
       .setLabel("play again")
       .setStyle(ButtonStyle.Success),
   );

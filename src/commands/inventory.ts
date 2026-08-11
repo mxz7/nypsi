@@ -130,12 +130,15 @@ async function run(
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder()
-      .setCustomId("⬅")
+      .setCustomId("btn-previous-page")
       .setLabel("back")
       .setStyle(ButtonStyle.Primary)
       .setDisabled(true),
-    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
-    new ButtonBuilder().setCustomId("fil").setLabel("filter").setStyle(ButtonStyle.Secondary),
+    new ButtonBuilder().setCustomId("btn-next-page").setLabel("next").setStyle(ButtonStyle.Primary),
+    new ButtonBuilder()
+      .setCustomId("btn-filter-inventory")
+      .setLabel("filter")
+      .setStyle(ButtonStyle.Secondary),
   );
 
   let msg: Message;
@@ -163,10 +166,10 @@ async function run(
     },
     updateEmbed: updatePage,
     handleResponses: new Map().set(
-      "fil",
+      "btn-filter-inventory",
       async (manager: PageManager<Item>, interaction: ButtonInteraction) => {
         const modal = new ModalBuilder()
-          .setCustomId("inv-filter")
+          .setCustomId("modal-filter-inventory")
           .setTitle("filter inventory")
           .addLabelComponents(
             new LabelBuilder()

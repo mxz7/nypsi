@@ -345,12 +345,12 @@ export function createHelpPageRows(
     rows.push(
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
-          .setCustomId("⬅")
+          .setCustomId("btn-previous-page")
           .setLabel("back")
           .setStyle(ButtonStyle.Primary)
           .setDisabled(false),
         new ButtonBuilder()
-          .setCustomId("➡")
+          .setCustomId("btn-next-page")
           .setLabel("next")
           .setStyle(ButtonStyle.Primary)
           .setDisabled(true),
@@ -361,7 +361,7 @@ export function createHelpPageRows(
   rows.push(
     new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
-        .setCustomId("help-ai-continue")
+        .setCustomId("btn-help-ai-continue")
         .setLabel("reply")
         .setStyle(ButtonStyle.Secondary)
         .setDisabled(disableContinue),
@@ -391,7 +391,7 @@ export function createCannotAnswerRows(): ActionRowBuilder<MessageActionRowCompo
   return [
     new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
-        .setCustomId("help-ai-support")
+        .setCustomId("btn-help-ai-support")
         .setLabel("talk to staff")
         .setStyle(ButtonStyle.Danger),
     ),

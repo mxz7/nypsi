@@ -121,8 +121,11 @@ async function run(
 
   if (selected.buy * amount > 5_000_000) {
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(
-      new ButtonBuilder().setCustomId("confirm").setLabel("confirm").setStyle(ButtonStyle.Success),
-      new ButtonBuilder().setCustomId("cancel").setLabel("cancel").setStyle(ButtonStyle.Danger),
+      new ButtonBuilder()
+        .setCustomId("btn-confirm")
+        .setLabel("confirm")
+        .setStyle(ButtonStyle.Success),
+      new ButtonBuilder().setCustomId("btn-cancel").setLabel("cancel").setStyle(ButtonStyle.Danger),
     );
 
     msg = await send({
@@ -153,7 +156,7 @@ async function run(
       interaction.deferUpdate().catch(() => {});
     }, 1500);
 
-    if (interaction.customId === "cancel") {
+    if (interaction.customId === "btn-cancel") {
       row.components.forEach((i) => i.setDisabled(true));
 
       return interaction

@@ -51,12 +51,12 @@ export default class PageManager<T> {
   static defaultRow(disabled = false) {
     return new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
-        .setCustomId("⬅")
+        .setCustomId("btn-previous-page")
         .setLabel("back")
         .setStyle(ButtonStyle.Primary)
         .setDisabled(true),
       new ButtonBuilder()
-        .setCustomId("➡")
+        .setCustomId("btn-next-page")
         .setLabel("next")
         .setStyle(ButtonStyle.Primary)
         .setDisabled(disabled),
@@ -148,8 +148,8 @@ export default class PageManager<T> {
 
     this.handleResponses = new Map();
 
-    this.handleResponses.set("⬅", this.back);
-    this.handleResponses.set("➡", this.next);
+    this.handleResponses.set("btn-previous-page", this.back);
+    this.handleResponses.set("btn-next-page", this.next);
 
     if (opts.handleResponses) {
       for (const [k, v] of opts.handleResponses.entries()) {

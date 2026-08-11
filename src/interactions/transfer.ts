@@ -5,7 +5,7 @@ import Constants from "../utils/Constants";
 import { doProfileTransfer } from "../utils/functions/users/utils";
 
 export default {
-  name: "t-f-p-boobies",
+  name: "btn-confirm-profile-transfer",
   type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;

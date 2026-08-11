@@ -115,7 +115,7 @@ async function run(
     await Promise.all(promises);
 
     const pages = new Map<string, string>();
-    const options = new StringSelectMenuBuilder().setCustomId("game_type");
+    const options = new StringSelectMenuBuilder().setCustomId("select-game-type");
 
     for (const stat of gambleStats) {
       const wins = winsMap.get(stat.game) || 0;
@@ -186,7 +186,7 @@ async function run(
 
       if (!interaction) return;
 
-      if (interaction.customId === "game_type") {
+      if (interaction.customId === "select-game-type") {
         rendered = render(interaction.values[0]);
         interaction.update(rendered);
         return listen();
@@ -277,11 +277,14 @@ async function run(
     if (pages.size > 1) {
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
-          .setCustomId("⬅")
+          .setCustomId("btn-previous-page")
           .setLabel("back")
           .setStyle(ButtonStyle.Primary)
           .setDisabled(true),
-        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+        new ButtonBuilder()
+          .setCustomId("btn-next-page")
+          .setLabel("next")
+          .setStyle(ButtonStyle.Primary),
       );
       const msg = await send({ embeds: [embed], components: [row] });
       const manager = new PageManager({
@@ -326,11 +329,14 @@ async function run(
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
-        .setCustomId("⬅")
+        .setCustomId("btn-previous-page")
         .setLabel("back")
         .setStyle(ButtonStyle.Primary)
         .setDisabled(true),
-      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+      new ButtonBuilder()
+        .setCustomId("btn-next-page")
+        .setLabel("next")
+        .setStyle(ButtonStyle.Primary),
     );
 
     if (pages.size == 1) {
@@ -376,11 +382,14 @@ async function run(
 
     let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
-        .setCustomId("⬅")
+        .setCustomId("btn-previous-page")
         .setLabel("back")
         .setStyle(ButtonStyle.Primary)
         .setDisabled(true),
-      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+      new ButtonBuilder()
+        .setCustomId("btn-next-page")
+        .setLabel("next")
+        .setStyle(ButtonStyle.Primary),
     );
 
     let msg: Message;
@@ -413,7 +422,7 @@ async function run(
         message.author.avatarURL(),
       );
 
-      if (reaction == "⬅") {
+      if (reaction == "btn-previous-page") {
         if (currentPage <= 1) {
           return pageManager();
         } else {
@@ -430,12 +439,12 @@ async function run(
           if (currentPage == 1) {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
               new ButtonBuilder()
-                .setCustomId("⬅")
+                .setCustomId("btn-previous-page")
                 .setLabel("back")
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(true),
               new ButtonBuilder()
-                .setCustomId("➡")
+                .setCustomId("btn-next-page")
                 .setLabel("next")
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(false),
@@ -443,12 +452,12 @@ async function run(
           } else {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
               new ButtonBuilder()
-                .setCustomId("⬅")
+                .setCustomId("btn-previous-page")
                 .setLabel("back")
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(false),
               new ButtonBuilder()
-                .setCustomId("➡")
+                .setCustomId("btn-next-page")
                 .setLabel("next")
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(false),
@@ -457,7 +466,7 @@ async function run(
           await edit({ embeds: [newEmbed], components: [row] }, msg);
           return pageManager();
         }
-      } else if (reaction == "➡") {
+      } else if (reaction == "btn-next-page") {
         if (currentPage >= pages.size) {
           return pageManager();
         } else {
@@ -474,12 +483,12 @@ async function run(
           if (currentPage == pages.size) {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
               new ButtonBuilder()
-                .setCustomId("⬅")
+                .setCustomId("btn-previous-page")
                 .setLabel("back")
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(false),
               new ButtonBuilder()
-                .setCustomId("➡")
+                .setCustomId("btn-next-page")
                 .setLabel("next")
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(true),
@@ -487,12 +496,12 @@ async function run(
           } else {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
               new ButtonBuilder()
-                .setCustomId("⬅")
+                .setCustomId("btn-previous-page")
                 .setLabel("back")
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(false),
               new ButtonBuilder()
-                .setCustomId("➡")
+                .setCustomId("btn-next-page")
                 .setLabel("next")
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(false),
@@ -821,11 +830,14 @@ async function run(
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
-        .setCustomId("⬅")
+        .setCustomId("btn-previous-page")
         .setLabel("back")
         .setStyle(ButtonStyle.Primary)
         .setDisabled(true),
-      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+      new ButtonBuilder()
+        .setCustomId("btn-next-page")
+        .setLabel("next")
+        .setStyle(ButtonStyle.Primary),
     );
 
     const msg = await send({ embeds: [embed], components: [row] });

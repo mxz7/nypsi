@@ -377,12 +377,12 @@ function getRow(doubleDown = true, disabled = false) {
     new ButtonBuilder()
       .setLabel("hit")
       .setStyle(ButtonStyle.Primary)
-      .setCustomId("hit")
+      .setCustomId("btn-hit")
       .setDisabled(disabled),
     new ButtonBuilder()
       .setLabel("stand")
       .setStyle(ButtonStyle.Primary)
-      .setCustomId("stand")
+      .setCustomId("btn-stand")
       .setDisabled(disabled),
   );
 
@@ -391,7 +391,7 @@ function getRow(doubleDown = true, disabled = false) {
       new ButtonBuilder()
         .setLabel("double down")
         .setStyle(ButtonStyle.Secondary)
-        .setCustomId("dd")
+        .setCustomId("btn-double-down")
         .setDisabled(disabled),
     );
 
@@ -507,7 +507,10 @@ async function playGame(
     await redis.expire(`anticheat:interactivegame:count:${message.author.id}`, 86400);
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setLabel("play again").setStyle(ButtonStyle.Success).setCustomId("rp"),
+      new ButtonBuilder()
+        .setLabel("play again")
+        .setStyle(ButtonStyle.Success)
+        .setCustomId("btn-play-again"),
     );
 
     await edit(
@@ -530,7 +533,7 @@ async function playGame(
     //   `blackjack: ${message.author.id} received replay response: ${res ? res.customId : null}`,
     // );
 
-    if (res && res.customId == "rp") {
+    if (res && res.customId == "btn-play-again") {
       await res.deferUpdate().catch(() => {
         logger.warn(`blackjack: ${message.author.id} failed to defer update for replay`);
       });
@@ -842,7 +845,7 @@ async function playGame(
       replied: reaction.replied,
     });
 
-    if (reaction.customId === "hit") {
+    if (reaction.customId === "btn-hit") {
       newCard(game.deck, game.playerHand);
 
       const cont = checkContinue();
@@ -856,9 +859,9 @@ async function playGame(
         await edit({ embeds: [embed], components: [row] }, "hit", reaction);
         return listen();
       }
-    } else if (reaction.customId === "stand") {
+    } else if (reaction.customId === "btn-stand") {
       await playerDone(reaction);
-    } else if (reaction.customId === "dd") {
+    } else if (reaction.customId === "btn-double-down") {
       const balance = await getBalance(message.member);
 
       if (balance >= bet && game.playerHand.length === 2) {
@@ -874,7 +877,7 @@ async function playGame(
         game.playerDone = true;
         return lose(reaction);
       } else return playerDone(reaction);
-    } else if (reaction.customId === "rp") {
+    } else if (reaction.customId === "btn-play-again") {
       const embed = await render("playing");
 
       let doubleDown = false;

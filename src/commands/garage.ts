@@ -80,7 +80,7 @@ async function run(
         new ButtonBuilder()
           .setStyle(ButtonStyle.Secondary)
           .setLabel("rename")
-          .setCustomId("rename"),
+          .setCustomId("btn-rename"),
       );
 
       const skinItems = inventory.entries.filter((i) => getItems()[i.item].role === "car_skin");
@@ -95,7 +95,7 @@ async function run(
       for (const item of Object.values(getItems()).filter((i) => i.role === "car_upgrade")) {
         const button = new ButtonBuilder()
           .setLabel(item.name)
-          .setCustomId(`upg-${item.id}`)
+          .setCustomId(`btn-upgrade-car:${item.id}`)
           .setStyle(ButtonStyle.Success);
 
         if (inventory.has(item.id)) {
@@ -117,7 +117,7 @@ async function run(
           skinOptions.length > 0
             ? new StringSelectMenuBuilder()
                 .setOptions({ value: "none", label: "no skin", default: !car.skin }, ...skinOptions)
-                .setCustomId("skin")
+                .setCustomId("select-skin")
             : undefined,
         description:
           `**name** ${car.name}\n` +
@@ -135,7 +135,7 @@ async function run(
           new ButtonBuilder()
             .setStyle(ButtonStyle.Success)
             .setLabel(`buy car ($${calcCarCost(cars.length).toLocaleString()})`)
-            .setCustomId("buy"),
+            .setCustomId("btn-buy"),
         ),
         selectMenuOption: new StringSelectMenuOptionBuilder().setLabel("new car").setValue("new"),
         description: `you can buy a custom car for $${calcCarCost(cars.length).toLocaleString()}`,
@@ -150,7 +150,7 @@ async function run(
       const components = [
         new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
           new StringSelectMenuBuilder()
-            .setCustomId("car")
+            .setCustomId("select-car")
             .setOptions(pages.map((i) => i.selectMenuOption)),
         ),
         pages[index].buttonRow,
@@ -190,7 +190,7 @@ async function run(
       }
 
       if (interaction.componentType === ComponentType.StringSelect) {
-        if (interaction.customId === "car") {
+        if (interaction.customId === "select-car") {
           if (interaction.values[0] === "new") return showCars(cars, cars.length, msg, interaction);
           else
             return showCars(
@@ -199,7 +199,7 @@ async function run(
               msg,
               interaction,
             );
-        } else if (interaction.customId === "skin") {
+        } else if (interaction.customId === "select-skin") {
           const chosen = interaction.values[0];
 
           await setSkin(message.member, cars[index].id, chosen === "none" ? undefined : chosen);
@@ -224,7 +224,7 @@ async function run(
           }
         }
       } else if (interaction.componentType === ComponentType.Button) {
-        if (interaction.customId === "buy") {
+        if (interaction.customId === "btn-buy") {
           const balance = await getBalance(message.member);
           const cost = calcCarCost((await getGarage(message.member)).length);
 
@@ -240,9 +240,9 @@ async function run(
           await removeBalance(message.member, cost);
           addStat(message.member, "spent-garage", cost);
           return showCars(await getGarage(message.member), index, msg, interaction);
-        } else if (interaction.customId === "rename") {
+        } else if (interaction.customId === "btn-rename") {
           const modal = new ModalBuilder()
-            .setCustomId("rename_modal")
+            .setCustomId("modal-rename-car")
             .setTitle(`rename ${cars[index].name}`)
             .addLabelComponents(
               new LabelBuilder()
@@ -303,8 +303,8 @@ async function run(
 
           await setCarName(message.member, cars[index].id, name);
           return showCars(await getGarage(message.member), index, msg);
-        } else if (interaction.customId.startsWith("upg-")) {
-          const upgrade = interaction.customId.substring(4);
+        } else if (interaction.customId.startsWith("btn-upgrade-car:")) {
+          const upgrade = interaction.customId.split(":")[1];
           const inventory = await getInventory(message.member);
 
           if (!inventory.has(upgrade)) {

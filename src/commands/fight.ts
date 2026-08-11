@@ -122,8 +122,8 @@ async function run(
   );
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("y").setLabel("accept").setStyle(ButtonStyle.Success),
-    new ButtonBuilder().setCustomId("n").setLabel("deny").setStyle(ButtonStyle.Danger),
+    new ButtonBuilder().setCustomId("btn-confirm").setLabel("accept").setStyle(ButtonStyle.Success),
+    new ButtonBuilder().setCustomId("btn-cancel").setLabel("deny").setStyle(ButtonStyle.Danger),
   );
 
   const m = await send({
@@ -154,7 +154,7 @@ async function run(
 
   if (typeof response != "string") return;
 
-  if (response != "y") {
+  if (response != "btn-confirm") {
     embed.setDescription("fight request denied");
     return await m.edit({ embeds: [embed], components: [] });
   }
@@ -187,8 +187,14 @@ async function run(
   await wait(2);
 
   const fightRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("fight-attack").setLabel("attack").setStyle(ButtonStyle.Danger),
-    new ButtonBuilder().setCustomId("fight-heal").setLabel("heal").setStyle(ButtonStyle.Success),
+    new ButtonBuilder()
+      .setCustomId("btn-fight-attack")
+      .setLabel("attack")
+      .setStyle(ButtonStyle.Danger),
+    new ButtonBuilder()
+      .setCustomId("btn-fight-heal")
+      .setLabel("heal")
+      .setStyle(ButtonStyle.Success),
   );
 
   const [homeBoosters, awayBoosters] = await Promise.all([
@@ -247,13 +253,13 @@ async function run(
   collector.on("collect", async (i) => {
     if (ended) return;
 
-    if (i.customId == "fight-attack") {
+    if (i.customId == "btn-fight-attack") {
       if (i.user.id == message.author.id) {
         fight.homeHit();
       } else {
         fight.awayHit();
       }
-    } else if (i.customId == "fight-heal") {
+    } else if (i.customId == "btn-fight-heal") {
       if (i.user.id == message.author.id) {
         const res = fight.homeHeal();
 

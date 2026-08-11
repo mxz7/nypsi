@@ -432,12 +432,12 @@ export async function showMuseumLeaderboard(
       : [
           new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
             new ButtonBuilder()
-              .setCustomId("amount")
+              .setCustomId("btn-amount")
               .setLabel("amount")
               .setStyle(ButtonStyle.Secondary)
               .setDisabled(disabled || amountLeaderboardShown),
             new ButtonBuilder()
-              .setCustomId("comp")
+              .setCustomId("btn-view-completion")
               .setLabel("completion time")
               .setStyle(ButtonStyle.Secondary)
               .setDisabled(disabled || !amountLeaderboardShown),
@@ -449,12 +449,12 @@ export async function showMuseumLeaderboard(
       : [
           new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
             new ButtonBuilder()
-              .setCustomId("⬅")
+              .setCustomId("btn-previous-page")
               .setLabel("back")
               .setStyle(ButtonStyle.Primary)
               .setDisabled(disabled || currentPage <= 1),
             new ButtonBuilder()
-              .setCustomId("➡")
+              .setCustomId("btn-next-page")
               .setLabel("next")
               .setStyle(ButtonStyle.Primary)
               .setDisabled(disabled || currentPage >= data.pages.size),
@@ -501,24 +501,24 @@ export async function showMuseumLeaderboard(
     if (!response) return;
 
     const { res } = response;
-    if (res == "⬅") {
+    if (res == "btn-previous-page") {
       if (currentPage > 1) currentPage--;
-    } else if (res == "➡") {
+    } else if (res == "btn-next-page") {
       if (currentPage < data.pages.size) currentPage++;
-    } else if (res == "comp" || res == "amount") {
+    } else if (res == "btn-view-completion" || res == "btn-amount") {
       if (global) {
         data =
-          res == "amount"
+          res == "btn-amount"
             ? await topMuseumAmount("global", undefined, selected.id, message.member)
             : await topMuseumCompletion("global", undefined, selected.id, message.member);
       } else {
         data =
-          res == "amount"
+          res == "btn-amount"
             ? await topMuseumAmount("guild", message.guild, selected.id, message.member)
             : await topMuseumCompletion("guild", message.guild, selected.id, message.member);
       }
 
-      amountLeaderboardShown = res == "amount";
+      amountLeaderboardShown = res == "btn-amount";
       currentPage = 1;
     }
 
@@ -576,12 +576,12 @@ async function showMuseumCompletionLeaderboard(
   const rows = (disabled = false) => [
     new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
-        .setCustomId("percent")
+        .setCustomId("btn-percent")
         .setLabel("percent")
         .setStyle(ButtonStyle.Secondary)
         .setDisabled(disabled || viewPercent),
       new ButtonBuilder()
-        .setCustomId("amount")
+        .setCustomId("btn-amount")
         .setLabel("amount")
         .setStyle(ButtonStyle.Secondary)
         .setDisabled(disabled || !viewPercent),
@@ -592,12 +592,12 @@ async function showMuseumCompletionLeaderboard(
       : [
           new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
             new ButtonBuilder()
-              .setCustomId("⬅")
+              .setCustomId("btn-previous-page")
               .setLabel("back")
               .setStyle(ButtonStyle.Primary)
               .setDisabled(disabled || currentPage <= 1),
             new ButtonBuilder()
-              .setCustomId("➡")
+              .setCustomId("btn-next-page")
               .setLabel("next")
               .setStyle(ButtonStyle.Primary)
               .setDisabled(disabled || currentPage >= getPages().size),
@@ -642,12 +642,12 @@ async function showMuseumCompletionLeaderboard(
     if (!response) return;
 
     const { res } = response;
-    if (res == "⬅") {
+    if (res == "btn-previous-page") {
       if (currentPage > 1) currentPage--;
-    } else if (res == "➡") {
+    } else if (res == "btn-next-page") {
       if (currentPage < getPages().size) currentPage++;
-    } else if (res == "percent" || res == "amount") {
-      viewPercent = res == "percent";
+    } else if (res == "btn-percent" || res == "btn-amount") {
+      viewPercent = res == "btn-percent";
       currentPage = 1;
     }
 

@@ -104,7 +104,7 @@ function getDropComponents(drop: ActiveLootDrop, disabled = false) {
 
   for (const buttonData of drop.buttons) {
     const button = new ButtonBuilder()
-      .setCustomId(`loot-drop:${drop.id}:${buttonData.choice}`)
+      .setCustomId(`btn-loot-drop:${drop.id}:${buttonData.choice}`)
       .setStyle(buttonData.style)
       .setDisabled(disabled);
 

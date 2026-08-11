@@ -56,7 +56,7 @@ export async function runInteraction(interaction: Interaction) {
 
     if (
       (await redis.exists(`${Constants.redis.nypsi.PROFILE_TRANSFER}:${interaction.user.id}`)) &&
-      (interaction.isButton() ? interaction.customId !== "t-f-p-boobies" : true)
+      (interaction.isButton() ? interaction.customId !== "btn-confirm-profile-transfer" : true)
     ) {
       if (interaction.isRepliable()) {
         interaction.reply({
@@ -76,6 +76,7 @@ export async function runInteraction(interaction: Interaction) {
 
     const interactionMessageId = interaction.message.id;
     const customId = interaction.customId;
+    const roleIdFromCustomId = customId.split(":")[1];
 
     const reactionRole = reactionRoles.find((r) => r.messageId === interactionMessageId);
     if (!reactionRole) return;
@@ -139,16 +140,16 @@ export async function runInteraction(interaction: Interaction) {
       }
     }
 
-    const roleId = reactionRole.roles.find((r) => r.roleId === customId).roleId;
+    const roleId = reactionRole.roles.find((r) => r.roleId === roleIdFromCustomId)?.roleId;
     if (!roleId) {
       return interaction
         .reply({
-          embeds: [new ErrorEmbed(`couldn't find role with id \`${customId}\``)],
+          embeds: [new ErrorEmbed(`couldn't find role with id \`${roleIdFromCustomId}\``)],
           flags: MessageFlags.Ephemeral,
         })
         .catch(() =>
           interaction.editReply({
-            embeds: [new ErrorEmbed(`couldn't find role with id \`${customId}\``)],
+            embeds: [new ErrorEmbed(`couldn't find role with id \`${roleIdFromCustomId}\``)],
           }),
         );
     }
@@ -235,7 +236,7 @@ export async function runInteraction(interaction: Interaction) {
   } else if (interaction.isMessageComponent()) {
     if (
       (await redis.exists(`${Constants.redis.nypsi.PROFILE_TRANSFER}:${interaction.user.id}`)) &&
-      (interaction.isButton() ? interaction.customId !== "t-f-p-boobies" : true)
+      (interaction.isButton() ? interaction.customId !== "btn-confirm-profile-transfer" : true)
     ) {
       if (interaction.isRepliable()) {
         interaction.reply({

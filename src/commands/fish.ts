@@ -231,7 +231,7 @@ async function run(
   );
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("fish").setLabel("fish").setStyle(ButtonStyle.Success),
+    new ButtonBuilder().setCustomId("btn-fish").setLabel("fish").setStyle(ButtonStyle.Success),
   );
 
   const fishPet = await getActivePetForTarget(member, "fish");

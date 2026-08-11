@@ -335,12 +335,12 @@ async function run(
       const components = [
         new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
           new ButtonBuilder()
-            .setCustomId("punishment-economy")
+            .setCustomId("btn-punishment-economy")
             .setLabel(economyBanned ? "remove economy ban" : "economy ban")
             .setStyle(economyBanned ? ButtonStyle.Secondary : ButtonStyle.Danger)
             .setDisabled(!canEcoBan || !profile),
           new ButtonBuilder()
-            .setCustomId("punishment-blacklist")
+            .setCustomId("btn-punishment-blacklist")
             .setLabel(blacklisted ? "remove blacklist" : "blacklist")
             .setStyle(blacklisted ? ButtonStyle.Secondary : ButtonStyle.Danger)
             .setDisabled(!canBlacklist || !profile),
@@ -384,7 +384,7 @@ async function run(
 
       if (!action) return;
 
-      if (!["punishment-economy", "punishment-blacklist"].includes(action.customId)) {
+      if (!["btn-punishment-economy", "btn-punishment-blacklist"].includes(action.customId)) {
         await action.reply({
           embeds: [new ErrorEmbed("invalid punishment action")],
           flags: MessageFlags.Ephemeral,
@@ -393,7 +393,7 @@ async function run(
       }
 
       const panel = await getPanel();
-      const economy = action.customId === "punishment-economy";
+      const economy = action.customId === "btn-punishment-economy";
       const active = economy ? panel.economyBanned : panel.blacklisted;
       const permission = economy ? "ecoban" : "blacklist";
 
@@ -405,7 +405,7 @@ async function run(
         return waitForPunishment();
       }
 
-      const modalId = `punishment-${user.id}-${Date.now()}`;
+      const modalId = `modal-update-punishment:${user.id}:${Date.now()}`;
       const modal = new ModalBuilder()
         .setCustomId(modalId)
         .setTitle(`${active ? "remove" : "issue"} ${economy ? "economy ban" : "blacklist"}`);
@@ -530,31 +530,31 @@ async function run(
     const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
-          .setCustomId("db-data")
+          .setCustomId("btn-view-database-data")
           .setLabel("view all db data")
           .setStyle(ButtonStyle.Primary)
           .setEmoji("💻")
           .setDisabled(!(await hasAdminPermission(message.member, "user-db-data"))),
         new ButtonBuilder()
-          .setCustomId("cmds")
+          .setCustomId("btn-view-premium-commands")
           .setLabel("command count")
           .setStyle(ButtonStyle.Primary)
           .setEmoji("⌨️")
           .setDisabled(!(await hasAdminPermission(message.member, "view-user-info"))),
         new ButtonBuilder()
-          .setCustomId("view-premium")
+          .setCustomId("btn-view-premium")
           .setLabel("premium")
           .setStyle(ButtonStyle.Primary)
           .setEmoji("💎")
           .setDisabled(!(await hasAdminPermission(message.member, "view-user-info"))),
         new ButtonBuilder()
-          .setCustomId("set-admin")
+          .setCustomId("btn-set-admin")
           .setLabel("set admin level")
           .setStyle(ButtonStyle.Primary)
           .setEmoji("👨🏻‍💼")
           .setDisabled(!(await hasAdminPermission(message.member, "set-admin-level"))),
         new ButtonBuilder()
-          .setCustomId("create-chat")
+          .setCustomId("btn-create-chat")
           .setLabel("create chat")
           .setStyle(ButtonStyle.Primary)
           .setEmoji("💬")
@@ -562,31 +562,31 @@ async function run(
       ),
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
-          .setCustomId("ac")
+          .setCustomId("btn-view-anti-cheat")
           .setLabel("anticheat")
           .setStyle(ButtonStyle.Primary)
           .setEmoji("🤥")
           .setDisabled(!(await hasAdminPermission(message.member, "view-user-info"))),
         new ButtonBuilder()
-          .setCustomId("tags")
+          .setCustomId("btn-tags")
           .setLabel("tags")
           .setStyle(ButtonStyle.Primary)
           .setEmoji("🏷️")
           .setDisabled(!(await hasAdminPermission(message.member, "view-user-info"))),
         new ButtonBuilder()
-          .setCustomId("add-purchase")
+          .setCustomId("btn-add-purchase")
           .setLabel("add purchase")
           .setEmoji("💰")
           .setStyle(ButtonStyle.Primary)
           .setDisabled(!(await hasAdminPermission(message.member, "add-purchase"))),
         new ButtonBuilder()
-          .setCustomId("view-birthday")
+          .setCustomId("btn-view-birthday")
           .setLabel("birthday")
           .setEmoji("🎂")
           .setStyle(ButtonStyle.Primary)
           .setDisabled(!(await hasAdminPermission(message.member, "view-user-info"))),
         new ButtonBuilder()
-          .setCustomId("view-streak")
+          .setCustomId("btn-view-streak")
           .setLabel("streaks")
           .setEmoji("📅")
           .setStyle(ButtonStyle.Primary)
@@ -594,31 +594,31 @@ async function run(
       ),
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
-          .setCustomId("set-bal")
+          .setCustomId("btn-set-balance")
           .setLabel("set balance")
           .setStyle(ButtonStyle.Danger)
           .setEmoji("💰")
           .setDisabled(!(await hasAdminPermission(message.member, "set-balance"))),
         new ButtonBuilder()
-          .setCustomId("set-bank")
+          .setCustomId("btn-set-bank")
           .setLabel("set bank")
           .setStyle(ButtonStyle.Danger)
           .setEmoji("💳")
           .setDisabled(!(await hasAdminPermission(message.member, "set-balance"))),
         new ButtonBuilder()
-          .setCustomId("set-prestige")
+          .setCustomId("btn-set-prestige")
           .setLabel("set prestige")
           .setStyle(ButtonStyle.Danger)
           .setEmoji("🌟")
           .setDisabled(!(await hasAdminPermission(message.member, "set-prestige"))),
         new ButtonBuilder()
-          .setCustomId("set-level")
+          .setCustomId("btn-set-level")
           .setLabel("set level")
           .setStyle(ButtonStyle.Danger)
           .setEmoji("⭐")
           .setDisabled(!(await hasAdminPermission(message.member, "set-level"))),
         new ButtonBuilder()
-          .setCustomId("set-xp")
+          .setCustomId("btn-set-xp")
           .setLabel("set xp")
           .setStyle(ButtonStyle.Danger)
           .setEmoji("✨")
@@ -626,19 +626,19 @@ async function run(
       ),
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
-          .setCustomId("set-inv")
+          .setCustomId("btn-set-inventory")
           .setLabel("modify inventory")
           .setStyle(ButtonStyle.Danger)
           .setEmoji("🎒")
           .setDisabled(!(await hasAdminPermission(message.member, "set-inv"))),
         new ButtonBuilder()
-          .setCustomId("set-karma")
+          .setCustomId("btn-set-karma")
           .setLabel("set karma")
           .setStyle(ButtonStyle.Danger)
           .setEmoji("🔮")
           .setDisabled(!(await hasAdminPermission(message.member, "set-karma"))),
         new ButtonBuilder()
-          .setCustomId("punishments")
+          .setCustomId("btn-punishments")
           .setLabel("punishments")
           .setStyle(ButtonStyle.Danger)
           .setEmoji("❌")
@@ -647,7 +647,7 @@ async function run(
               !(await hasAdminPermission(message.member, "blacklist")),
           ),
         new ButtonBuilder()
-          .setCustomId("wipe")
+          .setCustomId("btn-wipe")
           .setLabel("wipe")
           .setStyle(ButtonStyle.Danger)
           .setEmoji("🧹")
@@ -684,7 +684,7 @@ async function run(
 
       await res.deferReply();
 
-      if (res.customId === "db-data") {
+      if (res.customId === "btn-view-database-data") {
         if (!(await hasAdminPermission(message.member, "user-db-data"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("user-db-data")],
@@ -700,7 +700,7 @@ async function run(
 
         await res.editReply({ files });
         return waitForButton();
-      } else if (res.customId === "cmds") {
+      } else if (res.customId === "btn-view-premium-commands") {
         if (!(await hasAdminPermission(message.member, "view-user-info"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("view-user-info")],
@@ -725,7 +725,7 @@ async function run(
 
         await res.editReply({ embeds: [embed] });
         return waitForButton();
-      } else if (res.customId === "view-premium") {
+      } else if (res.customId === "btn-view-premium") {
         if (!(await hasAdminPermission(message.member, "view-user-info"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("view-user-info")],
@@ -737,7 +737,7 @@ async function run(
         );
         doPremium(user, res as ButtonInteraction);
         return waitForButton();
-      } else if (res.customId === "set-admin") {
+      } else if (res.customId === "btn-set-admin") {
         if (!(await hasAdminPermission(message.member, "set-admin-level"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("set-admin-level")],
@@ -777,7 +777,7 @@ async function run(
         await setAdminLevel(user, parseInt(msg.content));
         await res.editReply({ embeds: [new CustomEmbed(message.member, "✅")] });
         return waitForButton();
-      } else if (res.customId === "create-chat") {
+      } else if (res.customId === "btn-create-chat") {
         if (!(await hasAdminPermission(message.member, "create-chat"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("create-chat")],
@@ -810,7 +810,7 @@ async function run(
         });
 
         return waitForButton();
-      } else if (res.customId === "tags") {
+      } else if (res.customId === "btn-tags") {
         if (!(await hasAdminPermission(message.member, "view-user-info"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("view-user-info")],
@@ -820,7 +820,7 @@ async function run(
 
         doTags(user, res as ButtonInteraction);
         return waitForButton();
-      } else if (res.customId === "add-purchase") {
+      } else if (res.customId === "btn-add-purchase") {
         if (!(await hasAdminPermission(message.member, "add-purchase"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("add-purchase")],
@@ -870,7 +870,7 @@ async function run(
         }
 
         msgResponse.first().react("✅");
-      } else if (res.customId === "view-birthday") {
+      } else if (res.customId === "btn-view-birthday") {
         if (!(await hasAdminPermission(message.member, "view-user-info"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("view-user-info")],
@@ -882,7 +882,7 @@ async function run(
         );
         doBirthday(user, res as ButtonInteraction);
         return waitForButton();
-      } else if (res.customId === "view-streak") {
+      } else if (res.customId === "btn-view-streak") {
         if (!(await hasAdminPermission(message.member, "view-user-info"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("view-user-info")],
@@ -894,7 +894,7 @@ async function run(
         );
         doStreaks(user, res as ButtonInteraction);
         return waitForButton();
-      } else if (res.customId === "set-bal") {
+      } else if (res.customId === "btn-set-balance") {
         if (!(await hasAdminPermission(message.member, "set-balance"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("set-balance")],
@@ -937,7 +937,7 @@ async function run(
         await updateBalance(user, value);
         msg.react("✅");
         return waitForButton();
-      } else if (res.customId === "set-bank") {
+      } else if (res.customId === "btn-set-bank") {
         if (!(await hasAdminPermission(message.member, "set-balance"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("set-balance")],
@@ -980,7 +980,7 @@ async function run(
         await updateBankBalance(user, value);
         msg.react("✅");
         return waitForButton();
-      } else if (res.customId === "set-prestige") {
+      } else if (res.customId === "btn-set-prestige") {
         if (!(await hasAdminPermission(message.member, "set-prestige"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("set-prestige")],
@@ -1023,7 +1023,7 @@ async function run(
         await setPrestige(user, Math.min(maxPrestige, value));
         msg.react("✅");
         return waitForButton();
-      } else if (res.customId === "set-level") {
+      } else if (res.customId === "btn-set-level") {
         if (!(await hasAdminPermission(message.member, "set-level"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("set-level")],
@@ -1066,7 +1066,7 @@ async function run(
         await setLevel(user, value);
         msg.react("✅");
         return waitForButton();
-      } else if (res.customId === "set-xp") {
+      } else if (res.customId === "btn-set-xp") {
         if (!(await hasAdminPermission(message.member, "set-xp"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("set-xp")],
@@ -1109,7 +1109,7 @@ async function run(
         await updateXp(user, value);
         msg.react("✅");
         return waitForButton();
-      } else if (res.customId === "set-inv") {
+      } else if (res.customId === "btn-set-inventory") {
         if (!(await hasAdminPermission(message.member, "set-inv"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("set-inv")],
@@ -1162,7 +1162,7 @@ async function run(
         await setInventoryItem(user, item.id, value);
         msg.react("✅");
         return waitForButton();
-      } else if (res.customId === "set-karma") {
+      } else if (res.customId === "btn-set-karma") {
         if (!(await hasAdminPermission(message.member, "set-karma"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("set-karma")],
@@ -1209,10 +1209,10 @@ async function run(
 
         msg.react("✅");
         return waitForButton();
-      } else if (res.customId === "punishments") {
+      } else if (res.customId === "btn-punishments") {
         await doPunishments(user, res as ButtonInteraction);
         return waitForButton();
-      } else if (res.customId === "ac") {
+      } else if (res.customId === "btn-view-anti-cheat") {
         if (!(await hasAdminPermission(message.member, "view-user-info"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("view-user-info")],
@@ -1224,7 +1224,7 @@ async function run(
         );
         doAnticheat(user, res as ButtonInteraction);
         return waitForButton();
-      } else if (res.customId === "wipe") {
+      } else if (res.customId === "btn-wipe") {
         if (!(await hasAdminPermission(message.member, "wipe"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("wipe")],
@@ -1241,7 +1241,10 @@ async function run(
           ],
           components: [
             new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new ButtonBuilder().setCustomId("yes").setLabel("yes").setStyle(ButtonStyle.Danger),
+              new ButtonBuilder()
+                .setCustomId("btn-confirm")
+                .setLabel("yes")
+                .setStyle(ButtonStyle.Danger),
             ),
           ],
         });
@@ -1254,7 +1257,7 @@ async function run(
           })
           .catch(() => {});
 
-        if (confirmRes && confirmRes.customId === "yes") {
+        if (confirmRes && confirmRes.customId === "btn-confirm") {
           await confirmRes.reply({
             embeds: [new CustomEmbed(message.member, `wiping ${user.username} (${user.id})...`)],
           });
@@ -1377,31 +1380,31 @@ async function run(
       const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [
         new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
           new ButtonBuilder()
-            .setCustomId("add-premium")
+            .setCustomId("btn-add-premium")
             .setLabel("add premium")
             .setStyle(ButtonStyle.Primary)
             .setEmoji("➕")
             .setDisabled(!canSetPremium),
           new ButtonBuilder()
-            .setCustomId("set-tier")
+            .setCustomId("btn-set-tier")
             .setLabel("set tier")
             .setStyle(ButtonStyle.Primary)
             .setEmoji("😁")
             .setDisabled(!canSetPremium),
           new ButtonBuilder()
-            .setCustomId("set-expire")
+            .setCustomId("btn-set-expire")
             .setLabel("set expire date")
             .setStyle(ButtonStyle.Primary)
             .setEmoji("😣")
             .setDisabled(!canSetPremium),
           new ButtonBuilder()
-            .setCustomId("set-credits")
+            .setCustomId("btn-set-credits")
             .setLabel("set credits")
             .setStyle(ButtonStyle.Primary)
             .setEmoji("🪙")
             .setDisabled(!canSetPremium),
           new ButtonBuilder()
-            .setCustomId("raw-data")
+            .setCustomId("btn-raw-data")
             .setLabel("view raw data")
             .setStyle(ButtonStyle.Primary)
             .setEmoji("🥩")
@@ -1410,19 +1413,19 @@ async function run(
 
         new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
           new ButtonBuilder()
-            .setCustomId("del-cmd")
+            .setCustomId("btn-delete-command")
             .setLabel("delete cmd")
             .setStyle(ButtonStyle.Danger)
             .setEmoji("❌")
             .setDisabled(!(await hasAdminPermission(message.member, "delete-prem-cmd"))),
           new ButtonBuilder()
-            .setCustomId("del-aliases")
+            .setCustomId("btn-delete-aliases")
             .setLabel("delete aliases")
             .setStyle(ButtonStyle.Danger)
             .setEmoji("❌")
             .setDisabled(!(await hasAdminPermission(message.member, "delete-prem-aliases"))),
           new ButtonBuilder()
-            .setCustomId("expire-now")
+            .setCustomId("btn-expire-now")
             .setLabel("expire now")
             .setStyle(ButtonStyle.Danger)
             .setEmoji("❌")
@@ -1477,7 +1480,7 @@ async function run(
 
       await res.deferReply();
 
-      if (res.customId === "add-premium") {
+      if (res.customId === "btn-add-premium") {
         if (!(await hasAdminPermission(message.member, "set-premium"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("set-premium")],
@@ -1524,7 +1527,7 @@ async function run(
         await addMember(user, parseInt(msg.content));
         msg.react("✅");
         return waitForButton();
-      } else if (res.customId === "set-tier") {
+      } else if (res.customId === "btn-set-tier") {
         if (!(await hasAdminPermission(message.member, "set-premium"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("set-premium")],
@@ -1571,7 +1574,7 @@ async function run(
         await setTier(user, parseInt(msg.content));
         msg.react("✅");
         return waitForButton();
-      } else if (res.customId === "set-expire") {
+      } else if (res.customId === "btn-set-expire") {
         if (!(await hasAdminPermission(message.member, "set-premium"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("set-premium")],
@@ -1622,7 +1625,7 @@ async function run(
         await setExpireDate(user, date.toDate());
         msg.react("✅");
         return waitForButton();
-      } else if (res.customId === "raw-data") {
+      } else if (res.customId === "btn-raw-data") {
         if (!(await hasAdminPermission(message.member, "view-user-info"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("view-user-info")],
@@ -1639,7 +1642,7 @@ async function run(
           ],
         });
         return waitForButton();
-      } else if (res.customId === "del-cmd") {
+      } else if (res.customId === "btn-delete-command") {
         if (!(await hasAdminPermission(message.member, "delete-prem-cmd"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("delete-prem-cmd")],
@@ -1654,7 +1657,7 @@ async function run(
           embeds: [new CustomEmbed(message.member, "deleted custom command")],
         });
         return waitForButton();
-      } else if (res.customId === "del-aliases") {
+      } else if (res.customId === "btn-delete-aliases") {
         if (!(await hasAdminPermission(message.member, "delete-prem-aliases"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("delete-prem-aliases")],
@@ -1670,7 +1673,7 @@ async function run(
           embeds: [new CustomEmbed(message.member, "deleted all aliases for that user")],
         });
         return waitForButton();
-      } else if (res.customId === "expire-now") {
+      } else if (res.customId === "btn-expire-now") {
         if (!(await hasAdminPermission(message.member, "set-premium"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("set-premium")],
@@ -1683,7 +1686,7 @@ async function run(
         await expireUser(user, message.client as NypsiClient);
         await res.editReply({ embeds: [new CustomEmbed(message.member, "done sir.")] });
         return waitForButton();
-      } else if (res.customId === "set-credits") {
+      } else if (res.customId === "btn-set-credits") {
         if (!(await hasAdminPermission(message.member, "set-premium"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("set-premium")],
@@ -1750,25 +1753,25 @@ async function run(
       const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [
         new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
           new ButtonBuilder()
-            .setCustomId("set-daily")
+            .setCustomId("btn-set-daily")
             .setLabel("set daily streak")
             .setStyle(ButtonStyle.Primary)
             .setEmoji("📅")
             .setDisabled(!canSetStreaks),
           new ButtonBuilder()
-            .setCustomId("set-vote")
+            .setCustomId("btn-set-vote")
             .setLabel("set vote streak")
             .setStyle(ButtonStyle.Primary)
             .setEmoji("🗳")
             .setDisabled(!canSetStreaks),
           new ButtonBuilder()
-            .setCustomId("set-daily-tasks")
+            .setCustomId("btn-set-daily-tasks")
             .setLabel("set daily task streak")
             .setStyle(ButtonStyle.Primary)
             .setEmoji("📋")
             .setDisabled(!canSetStreaks),
           new ButtonBuilder()
-            .setCustomId("set-weekly-tasks")
+            .setCustomId("btn-set-weekly-tasks")
             .setLabel("set weekly task streak")
             .setStyle(ButtonStyle.Primary)
             .setEmoji("📋")
@@ -1777,13 +1780,13 @@ async function run(
 
         new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
           new ButtonBuilder()
-            .setCustomId("rerun-daily")
+            .setCustomId("btn-rerun-daily")
             .setLabel("rerun daily rewards")
             .setStyle(ButtonStyle.Primary)
             .setEmoji("📅")
             .setDisabled(!canSetStreaks || daily <= 0),
           new ButtonBuilder()
-            .setCustomId("rerun-vote")
+            .setCustomId("btn-rerun-vote")
             .setLabel("rerun vote rewards")
             .setStyle(ButtonStyle.Primary)
             .setEmoji("🗳")
@@ -1815,7 +1818,7 @@ async function run(
 
       await res.deferReply();
 
-      if (res.customId === "set-daily") {
+      if (res.customId === "btn-set-daily") {
         if (!(await hasAdminPermission(message.member, "set-streak"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("set-streak")],
@@ -1849,7 +1852,7 @@ async function run(
         await setDaily(user, parseInt(msg.content));
         msg.react("✅");
         return waitForButton();
-      } else if (res.customId === "set-vote") {
+      } else if (res.customId === "btn-set-vote") {
         if (!(await hasAdminPermission(message.member, "set-streak"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("set-streak")],
@@ -1883,7 +1886,7 @@ async function run(
         await setVoteStreak(user, parseInt(msg.content));
         msg.react("✅");
         return waitForButton();
-      } else if (res.customId === "set-daily-tasks") {
+      } else if (res.customId === "btn-set-daily-tasks") {
         if (!(await hasAdminPermission(message.member, "set-streak"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("set-streak")],
@@ -1917,7 +1920,7 @@ async function run(
         await setTaskStreak(user, "daily", parseInt(msg.content));
         msg.react("✅");
         return waitForButton();
-      } else if (res.customId === "set-weekly-tasks") {
+      } else if (res.customId === "btn-set-weekly-tasks") {
         if (!(await hasAdminPermission(message.member, "set-streak"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("set-streak")],
@@ -1951,7 +1954,7 @@ async function run(
         await setTaskStreak(user, "weekly", parseInt(msg.content));
         msg.react("✅");
         return waitForButton();
-      } else if (res.customId === "rerun-daily") {
+      } else if (res.customId === "btn-rerun-daily") {
         if (!(await hasAdminPermission(message.member, "run-streak"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("run-streak")],
@@ -1971,7 +1974,7 @@ async function run(
         );
 
         return waitForButton();
-      } else if (res.customId === "rerun-vote") {
+      } else if (res.customId === "btn-rerun-vote") {
         if (!(await hasAdminPermission(message.member, "run-streak"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("run-streak")],
@@ -2051,13 +2054,13 @@ async function run(
       const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [
         new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
           new ButtonBuilder()
-            .setCustomId("set-bday")
+            .setCustomId("btn-set-birthday")
             .setLabel("set birthday")
             .setStyle(ButtonStyle.Primary)
             .setEmoji("🎂")
             .setDisabled(!canSetBirthday),
           new ButtonBuilder()
-            .setCustomId("reset-bday")
+            .setCustomId("btn-reset-birthday")
             .setLabel("reset birthday")
             .setStyle(ButtonStyle.Primary)
             .setEmoji("❌")
@@ -2088,7 +2091,7 @@ async function run(
 
       if (!interaction) return;
 
-      if (interaction.customId === "set-bday") {
+      if (interaction.customId === "btn-set-birthday") {
         if (!(await hasAdminPermission(message.member, "set-birthday"))) {
           await interaction.editReply({
             embeds: [requiredLevelEmbed("set-birthday")],
@@ -2096,7 +2099,7 @@ async function run(
           return waitForButton();
         }
 
-        const id = `set-birthday-${Math.floor(Math.random() * 69420)}`;
+        const id = `modal-set-user-birthday-${Math.floor(Math.random() * 69420)}`;
         const modal = new ModalBuilder()
           .setCustomId(id)
           .setTitle(`${user.username}'s birthday`)
@@ -2105,7 +2108,7 @@ async function run(
               .setLabel("what month?")
               .setStringSelectMenuComponent(
                 new StringSelectMenuBuilder()
-                  .setCustomId("month")
+                  .setCustomId("select-month")
                   .setPlaceholder("month")
                   .setRequired(true)
                   .addOptions(
@@ -2200,7 +2203,7 @@ async function run(
         await setBirthday(user.id, birthday);
 
         return waitForButton();
-      } else if (interaction.customId === "reset-bday") {
+      } else if (interaction.customId === "btn-reset-birthday") {
         if (!(await hasAdminPermission(message.member, "set-birthday"))) {
           await interaction.editReply({
             embeds: [requiredLevelEmbed("set-birthday")],
@@ -2227,13 +2230,13 @@ async function run(
       const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [
         new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
           new ButtonBuilder()
-            .setCustomId("ac-hist")
+            .setCustomId("btn-view-anti-cheat-history")
             .setLabel("show data")
             .setStyle(ButtonStyle.Primary)
             .setEmoji("📋")
             .setDisabled(!(await hasAdminPermission(message.member, "anticheat-history"))),
           new ButtonBuilder()
-            .setCustomId("ac-clear")
+            .setCustomId("btn-clear-anti-cheat-history")
             .setLabel("clear")
             .setStyle(ButtonStyle.Primary)
             .setEmoji("🗑️")
@@ -2242,13 +2245,13 @@ async function run(
 
         new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
           new ButtonBuilder()
-            .setCustomId("captcha-hist")
+            .setCustomId("btn-captcha-hist")
             .setLabel("captcha history")
             .setStyle(ButtonStyle.Primary)
             .setEmoji("🤖")
             .setDisabled(!(await hasAdminPermission(message.member, "captcha-history"))),
           new ButtonBuilder()
-            .setCustomId("give-captcha")
+            .setCustomId("btn-give-captcha")
             .setLabel("give captcha")
             .setStyle(ButtonStyle.Primary)
             .setEmoji("🤖")
@@ -2276,7 +2279,7 @@ async function run(
 
       await res.deferReply();
 
-      if (res.customId === "ac-hist") {
+      if (res.customId === "btn-view-anti-cheat-history") {
         if (!(await hasAdminPermission(message.member, "anticheat-history"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("anticheat-history")],
@@ -2314,7 +2317,7 @@ async function run(
           ],
         });
         return waitForButton();
-      } else if (res.customId === "ac-clear") {
+      } else if (res.customId === "btn-clear-anti-cheat-history") {
         if (!(await hasAdminPermission(message.member, "clear-anticheat"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("clear-anticheat")],
@@ -2332,7 +2335,7 @@ async function run(
 
         await res.editReply({ content: "✅" });
         return waitForButton();
-      } else if (res.customId === "give-captcha") {
+      } else if (res.customId === "btn-give-captcha") {
         if (!(await hasAdminPermission(message.member, "captchatest"))) {
           res.followUp({ embeds: [requiredLevelEmbed("captchatest")] });
           return;
@@ -2346,7 +2349,7 @@ async function run(
 
         res.followUp({ content: "✅" });
         return waitForButton();
-      } else if (res.customId === "captcha-hist") {
+      } else if (res.customId === "btn-captcha-hist") {
         if (!(await hasAdminPermission(message.member, "captcha-history"))) {
           res.followUp({ embeds: [requiredLevelEmbed("captcha-history")] });
           return;
@@ -2404,13 +2407,13 @@ async function run(
     const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
-          .setCustomId("add-tag")
+          .setCustomId("btn-add-tag")
           .setLabel("add tag")
           .setStyle(ButtonStyle.Primary)
           .setEmoji("👍🏻")
           .setDisabled(!(await hasAdminPermission(message.member, "set-tags"))),
         new ButtonBuilder()
-          .setCustomId("remove-tag")
+          .setCustomId("btn-remove-tag")
           .setLabel("remove tag")
           .setStyle(ButtonStyle.Primary)
           .setEmoji("👎🏻")
@@ -2439,7 +2442,7 @@ async function run(
 
       await res.deferReply();
 
-      if (res.customId === "add-tag") {
+      if (res.customId === "btn-add-tag") {
         if (!(await hasAdminPermission(message.member, "set-tags"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("set-tags")],
@@ -2483,7 +2486,7 @@ async function run(
           ],
         });
         return waitForButton();
-      } else if (res.customId === "remove-tag") {
+      } else if (res.customId === "btn-remove-tag") {
         if (!(await hasAdminPermission(message.member, "set-tags"))) {
           await res.editReply({
             embeds: [requiredLevelEmbed("set-tags")],
@@ -3106,7 +3109,7 @@ async function run(
             new ButtonBuilder()
               .setStyle(ButtonStyle.Danger)
               .setLabel("confirm")
-              .setCustomId("t-f-p-boobies"),
+              .setCustomId("btn-confirm-profile-transfer"),
           ),
         },
       },
@@ -3166,7 +3169,7 @@ async function run(
           new ButtonBuilder()
             .setStyle(ButtonStyle.Danger)
             .setLabel("confirm")
-            .setCustomId("event-confirm"),
+            .setCustomId("btn-event-confirm"),
         ),
       ],
     });
