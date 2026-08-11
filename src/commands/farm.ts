@@ -185,12 +185,7 @@ async function run(
           .setStyle(ButtonStyle.Danger),
       );
 
-      const maxRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(
-        new ButtonBuilder()
-          .setCustomId("btn-back-to-farm")
-          .setLabel("back")
-          .setStyle(ButtonStyle.Danger),
-      );
+      const maxRow = new ActionRowBuilder<MessageActionRowComponentBuilder>();
 
       let desc = "";
 
