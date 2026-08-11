@@ -23,6 +23,10 @@ import {
 } from "../../utils/functions/economy/inventory";
 import { createLotteryEntry, getLotteryAutoBuyUsers } from "../../utils/functions/economy/lottery";
 import { addStat } from "../../utils/functions/economy/stats";
+import {
+  getSuperdrawChance,
+  getSuperdrawChanceMultiplier,
+} from "../../utils/functions/economy/superdraw";
 import { getItems } from "../../utils/functions/economy/utils";
 import { percentChance } from "../../utils/functions/random";
 import { pluralize } from "../../utils/functions/string";
@@ -275,20 +279,8 @@ async function deleteAllTickets(userIds: string[], isSuperDraw: boolean) {
   await pAll(promises, { concurrency: 5 });
 }
 
-function getSuperdrawChance(ticketAmount: number): number {
-  const maxChance = 0.1;
-  const minChance = 0.025;
-  const maxTicketsForMinChance = 1000;
-
-  const clamped = Math.min(Math.max(ticketAmount, 1), maxTicketsForMinChance);
-  const t = (clamped - 1) / (maxTicketsForMinChance - 1);
-  const progress = 1 - Math.pow(1 - t, 5);
-
-  return maxChance - (maxChance - minChance) * progress;
-}
-
-function rollSuperdrawTickets(ticketAmount: number): number {
-  const chance = getSuperdrawChance(ticketAmount);
+function rollSuperdrawTickets(ticketAmount: number, chanceMultiplier: number): number {
+  const chance = getSuperdrawChance(ticketAmount) * chanceMultiplier;
   let granted = 0;
 
   for (let i = 0; i < ticketAmount; i++) {
@@ -306,6 +298,10 @@ async function addSuperdrawRolloverTickets(
   log: (message: string) => void,
 ) {
   const tasks: (() => Promise<void>)[] = [];
+  const ticketAmounts = tickets
+    .map((ticket) => Number(ticket.amount))
+    .filter((amount) => amount > 0);
+  const chanceMultiplier = getSuperdrawChanceMultiplier(ticketAmounts);
 
   for (const ticket of tickets) {
     const amount = Number(ticket.amount);
@@ -314,7 +310,7 @@ async function addSuperdrawRolloverTickets(
       continue;
     }
 
-    const granted = rollSuperdrawTickets(amount);
+    const granted = rollSuperdrawTickets(amount, chanceMultiplier);
 
     if (granted <= 0) {
       continue;
