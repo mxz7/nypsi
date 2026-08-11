@@ -7,6 +7,7 @@ import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { MStoTime } from "../date";
 import { newCase } from "../moderation/cases";
+import { isWordleGameMessage } from "../users/wordle";
 import { ChatSpamState, evaluateNypsiChatMessage } from "./chat-spam-evaluator";
 
 const STATE_TTL_SECONDS = 60;
@@ -18,6 +19,8 @@ export async function checkNypsiChatMessage(message: Message) {
   if (message.guildId !== Constants.NYPSI_SERVER_ID || message.author.bot || !message.member) {
     return;
   }
+
+  if (isWordleGameMessage(message)) return;
 
   if (message.client.user.username.includes("beta") && message.channelId != "819640200699052052") {
     // only run fake nypsi in dev channel

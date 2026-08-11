@@ -16,7 +16,11 @@ import { getUserPlaying, removeUserPlaying, setUserPlaying } from "../utils/func
 import { formatTime } from "../utils/functions/string";
 import { getPreferences } from "../utils/functions/users/preferences";
 import { getLastKnownAvatar, getLastKnownUsername } from "../utils/functions/users/username";
-import { addWordleGame, getWordleGame } from "../utils/functions/users/wordle";
+import {
+  addWordleGame,
+  getWordleGame,
+  markWordleGameMessage,
+} from "../utils/functions/users/wordle";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
 
@@ -213,7 +217,13 @@ async function play(
 
   const embed = games.get(message.author.id).embed;
 
-  const filter = (m: Message) => m.author.id == message.author.id && !m.content.includes(" ");
+  const filter = (m: Message) => {
+    if (m.author.id != message.author.id || m.content.includes(" ")) return false;
+
+    // checking it is delayed by 500ms so this should also go first
+    markWordleGameMessage(m);
+    return true;
+  };
   let fail = false;
 
   const response: any = await message.channel
