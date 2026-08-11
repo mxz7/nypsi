@@ -16,7 +16,7 @@ Evaluate the combined activity in `src/scheduled/clusterjobs/cmd-channels.ts`. S
 `LOAD_EVENTS_PER_HALF_WINDOW` in both halves before opening another channel. Keeping two halves
 requires sustained load instead of allowing one short burst to trigger scaling.
 
-Scale-down uses the separate activity TTL key. Messages and interactions refresh that 10-minute
+Scale-down uses the separate activity TTL key. Messages and interactions refresh that 30-minute
 TTL. Only the highest-numbered active channel is a removal candidate, and never reduce below
 `MIN_CHANNELS`.
 

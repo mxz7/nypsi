@@ -10,7 +10,7 @@ import sleep from "../sleep";
 export const ACTIVE_CATEGORY_ID = "1246516186171314337";
 export const ARCHIVE_CATEGORY_ID = "1060585526945665197";
 export const MIN_CHANNELS = 3;
-export const ACTIVITY_TTL_SECONDS = 600;
+export const ACTIVITY_TTL_SECONDS = 1800;
 export const LOAD_WINDOW_SECONDS = 60;
 export const LOAD_EVENTS_PER_HALF_WINDOW = 12;
 export const OPEN_COOLDOWN_SECONDS = 120;
