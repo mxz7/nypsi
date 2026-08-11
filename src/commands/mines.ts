@@ -871,7 +871,11 @@ async function playGame(
     replied: response.replied,
   });
 
-  if (!response.customId.startsWith("btn-reveal-mine:") && response.customId != "btn-finish") {
+  if (
+    !response.customId.startsWith("btn-reveal-mine:") &&
+    response.customId != "btn-finish" &&
+    response.customId != "btn-play-again"
+  ) {
     logger.error(`mines: ${message.author.id} weird coordinate thing`, { response, game });
     await message.channel.send({
       content: message.author.toString() + " invalid coordinate, example: `a3`",
