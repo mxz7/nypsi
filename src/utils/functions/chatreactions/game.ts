@@ -16,6 +16,7 @@ import {
 } from "../economy/events";
 import { createGame } from "../economy/stats";
 import { addTaskProgress } from "../economy/tasks";
+import { markGameMessage } from "../nypsi/chat-spam-exemptions";
 import { isPremium } from "../premium/premium";
 import sleep from "../sleep";
 import { getZeroWidth, pluralize } from "../string";
@@ -63,13 +64,15 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel, 
   const blacklisted = await getBlacklisted(guild);
 
   const filter = async (m: Message) => {
+    markGameMessage(m);
     m.content = m.content.replaceAll("’", "'").replaceAll("”", "'").replaceAll("‘", "'");
-    return (
+    const accepted =
       m.content.toLowerCase() == word.actual.toLowerCase() &&
       !winners.find((i) => i.user.id === m.author.id) &&
       !m.member.user.bot &&
-      blacklisted.indexOf(m.author.id) == -1
-    );
+      blacklisted.indexOf(m.author.id) == -1;
+
+    return accepted;
   };
 
   const timeout = (await getReactionSettings(guild)).timeout;
@@ -336,13 +339,15 @@ export async function startChatReactionDuel(
     }, 750);
 
     const filter = async (m: Message) => {
+      markGameMessage(m);
       m.content = m.content.replaceAll("’", "'").replaceAll("”", "'").replaceAll("‘", "'");
 
       const a = m.content.toLowerCase() == word.actual.toLowerCase();
       const b = [challenger.user.id, target.user.id].includes(m.author.id);
       const c = winners[0]?.user != m.author;
+      const accepted = a && b && c;
 
-      return a && b && c;
+      return accepted;
     };
 
     const collector = channel.createMessageCollector({ filter, time: 30000, max: 2 });

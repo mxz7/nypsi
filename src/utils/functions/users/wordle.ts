@@ -1,19 +1,8 @@
-import { Message } from "discord.js";
 import { WordleGame } from "#generated/prisma";
 import prisma from "../../../init/database";
 import { addProgress } from "../economy/achievements";
 import { addTaskProgress } from "../economy/tasks";
 import { getUserId, MemberResolvable } from "../member";
-
-const wordleGameMessages = new WeakSet<Message>();
-
-export function markWordleGameMessage(message: Message) {
-  wordleGameMessages.add(message);
-}
-
-export function isWordleGameMessage(message: Message) {
-  return wordleGameMessages.has(message);
-}
 
 export async function addWordleGame(
   member: MemberResolvable,

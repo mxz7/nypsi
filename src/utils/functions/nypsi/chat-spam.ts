@@ -7,8 +7,8 @@ import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { MStoTime } from "../date";
 import { newCase } from "../moderation/cases";
-import { isWordleGameMessage } from "../users/wordle";
 import { ChatSpamState, evaluateNypsiChatMessage } from "./chat-spam-evaluator";
+import { isGameMessage } from "./chat-spam-exemptions";
 
 const STATE_TTL_SECONDS = 60;
 const STRIKE_TTL_SECONDS = Math.floor(ms("3 days") / 1000);
@@ -20,7 +20,7 @@ export async function checkNypsiChatMessage(message: Message) {
     return;
   }
 
-  if (isWordleGameMessage(message)) return;
+  if (isGameMessage(message)) return;
 
   if (message.client.user.username.includes("beta") && message.channelId != "819640200699052052") {
     // only run fake nypsi in dev channel

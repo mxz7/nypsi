@@ -12,15 +12,12 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { addKarma } from "../utils/functions/karma/karma";
+import { markGameMessage } from "../utils/functions/nypsi/chat-spam-exemptions";
 import { getUserPlaying, removeUserPlaying, setUserPlaying } from "../utils/functions/playing";
 import { formatTime } from "../utils/functions/string";
 import { getPreferences } from "../utils/functions/users/preferences";
 import { getLastKnownAvatar, getLastKnownUsername } from "../utils/functions/users/username";
-import {
-  addWordleGame,
-  getWordleGame,
-  markWordleGameMessage,
-} from "../utils/functions/users/wordle";
+import { addWordleGame, getWordleGame } from "../utils/functions/users/wordle";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
 
@@ -221,7 +218,7 @@ async function play(
     if (m.author.id != message.author.id || m.content.includes(" ")) return false;
 
     // checking it is delayed by 500ms so this should also go first
-    markWordleGameMessage(m);
+    markGameMessage(m);
     return true;
   };
   let fail = false;
