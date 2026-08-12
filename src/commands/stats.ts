@@ -156,7 +156,7 @@ async function run(
             .setStyle(ButtonStyle.Link)
             .setLabel("history")
             .setURL(
-              `https://nypsi.xyz/game?user=${message.author.id}&game=${type}&ref=bot-gamble-stats`,
+              `https://nypsi.xyz/games?user=${message.author.id}&game=${type}&ref=bot-gamble-stats`,
             )
             .setEmoji("📖"),
         ),
