@@ -829,6 +829,8 @@ async function playGame(
       setTimeout(() => {
         if (!collected.deferred && !collected.replied) {
           collected.deferUpdate().catch((error) => {
+            if (collected.deferred || collected.replied) return;
+
             logger.error(`mines: ${message.author.id} failed to defer update`, {
               error,
               gameId: game.id,
