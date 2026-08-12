@@ -104,6 +104,7 @@ const actions: Record<string, RoleplayAction> = {
     gifs: [
       "https://c.tenor.com/1w_SiTTl8joAAAAd/tenor.gif",
       "https://c.tenor.com/K9_q0nhLQyEAAAAC/tenor.gif",
+      "https://static2.klipy.com/ii/4e7bea9f7a3371424e6c16ebc93252fe/0f/3d/XwK3BKOF0DdhcRn.gif",
     ],
     text: "{sender} {action} {target}!! yummy",
     action: "licked",
