@@ -1881,14 +1881,22 @@ async function run(
       return (await getInventory(member)).count(item.id) >= amount;
     };
 
-    const setConfirmationDescription = (price: number, previousPrice?: number) => {
+    const setConfirmationDescription = (
+      price: number,
+      previousPrice?: number,
+      orderCancelled = false,
+    ) => {
+      const cancellationWarning =
+        orderCancelled && previousPrice !== undefined
+          ? `⚠️ order cancelled because the price changed from **$${previousPrice.toLocaleString()}** to **$${price.toLocaleString()}**\n\n`
+          : "";
       const priceChange =
-        previousPrice !== undefined
+        previousPrice !== undefined && !orderCancelled
           ? `\n\n**NEW PRICE**: **$${previousPrice.toLocaleString()}** → **$${price.toLocaleString()}**\n\n`
           : "";
 
       embed.setDescription(
-        `are you sure you want to ${type} ${amount} ${pluralize(item, amount)} for **$${price.toLocaleString()}**?${priceChange}`,
+        `${cancellationWarning}are you sure you want to ${type} ${amount} ${pluralize(item, amount)} for **$${price.toLocaleString()}**?${priceChange}`,
       );
     };
 
@@ -1927,30 +1935,20 @@ async function run(
         const refreshedPrice = await getPrice();
 
         if (refreshedPrice == -1) {
-          await interaction.reply({
-            embeds: [new ErrorEmbed(`not enough ${item.plural} on the market`)],
-            flags: MessageFlags.Ephemeral,
-          });
-          return await msg.edit({
+          return interaction.update({
             embeds: [new ErrorEmbed(`not enough ${item.plural} on the market`)],
             components: [],
           });
         }
 
         if (refreshedPrice !== price) {
-          await interaction.reply({
-            embeds: [
-              new CustomEmbed(message.member).setDescription(
-                `⚠️ order cancelled because the price changed from **$${price.toLocaleString()}** to **$${refreshedPrice.toLocaleString()}**`,
-              ),
-            ],
-            flags: MessageFlags.Ephemeral,
-          });
+          const previousPrice = price;
 
-          setConfirmationDescription(refreshedPrice, price);
+          setConfirmationDescription(refreshedPrice, previousPrice, true);
           price = refreshedPrice;
           priceChangeVisible = true;
-          await msg.edit({ embeds: [embed], components: [row] });
+
+          await interaction.update({ embeds: [embed], components: [row] });
 
           return pageManager();
         }
@@ -1995,34 +1993,36 @@ async function run(
         const filledAmount = amount - transaction.remaining;
         const previousTransaction = `✅ ${type == "buy" ? "bought" : "sold"} ${filledAmount.toLocaleString()} ${item.emoji} ${pluralize(item, filledAmount)} for $${price.toLocaleString()}`;
 
-        await interaction.reply({
-          embeds: [
-            new CustomEmbed(message.member)
-              .setHeader(`${item.name} market confirmation`, getEmojiImage(item.emoji))
-              .setDescription(previousTransaction),
-          ],
-          flags: MessageFlags.Ephemeral,
-        });
-
         const acceptedPrice = price;
         const updatedPrice = await getPrice();
 
         if (updatedPrice == -1 || !(await canRepeatTransaction(updatedPrice))) {
           embed.setDescription(previousTransaction);
-          return await msg.edit({ embeds: [embed], components: [] });
+          return interaction.update({ embeds: [embed], components: [] });
         }
 
         if (updatedPrice !== acceptedPrice) {
           setConfirmationDescription(updatedPrice, acceptedPrice);
           price = updatedPrice;
           priceChangeVisible = true;
-          await msg.edit({ embeds: [embed], components: [row] });
+          await interaction.update({ embeds: [embed], components: [row] });
         } else if (priceChangeVisible) {
           setConfirmationDescription(updatedPrice);
           price = updatedPrice;
           priceChangeVisible = false;
-          await msg.edit({ embeds: [embed], components: [row] });
+          await interaction.update({ embeds: [embed], components: [row] });
+        } else {
+          await interaction.update({ embeds: [embed], components: [row] });
         }
+
+        const receipt = new CustomEmbed(message.member)
+          .setHeader(`${item.name} market confirmation`, getEmojiImage(item.emoji))
+          .setDescription(previousTransaction);
+
+        await interaction.followUp({
+          embeds: [receipt],
+          flags: MessageFlags.Ephemeral,
+        });
 
         return pageManager();
       } else if (res == "btn-cancel") {
