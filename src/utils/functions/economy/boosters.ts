@@ -10,6 +10,7 @@ import { Booster, JeremyData } from "../../../types/Economy";
 import { SteveData } from "../../../types/Workers";
 import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
+import { logger } from "../../logger";
 import { getUserId, MemberResolvable } from "../member";
 import PageManager from "../page";
 import { pluralize } from "../string";
@@ -85,6 +86,16 @@ async function checkBoosters(member: MemberResolvable, boosters: Map<string, Boo
           if (reward > 0) {
             await addInventoryItem(booster.userId, "dabloon", reward);
             addItemSourceStat("dabloon", `global_booster:${booster.boosterId}`, reward);
+            logger.info(
+              `global booster: awarded ${reward} dabloons to ${booster.userId} on expiry`,
+              {
+                boosterId: booster.id,
+                boosterItemId: booster.boosterId,
+                reward,
+                userId: booster.userId,
+                uses,
+              },
+            );
           }
 
           if ((await getPreferences(booster.userId)).dms.booster) {
