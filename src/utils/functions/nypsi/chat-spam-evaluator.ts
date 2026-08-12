@@ -15,7 +15,7 @@ export type ChatSpamState = {
 
 export type ChatSpamEvaluation = {
   causes: Array<{
-    type: "similar-length" | "short-without-spaces" | "similar-content" | "rapid-messages";
+    type: "similar-length" | "similar-content" | "rapid-messages";
     points: number;
     data: Record<string, number>;
   }>;
@@ -37,13 +37,6 @@ function normalizeContent(content: string) {
     .trim();
 }
 
-function isShortMessageWithoutSpaces(content: string) {
-  if (content.length === 0 || content.length > 12) return false;
-
-  // Only letters and numbers are allowed; spaces and punctuation make this false.
-  return /^[\p{L}\p{N}]+$/u.test(content);
-}
-
 export function evaluateNypsiChatMessage(
   content: string,
   now: number,
@@ -62,15 +55,10 @@ export function evaluateNypsiChatMessage(
           0.05,
       ).length
     : 0;
-  const shortMessageWithoutSpaces = isShortMessageWithoutSpaces(normalized);
-  const recentShortMessagesWithoutSpaces = shortMessageWithoutSpaces
-    ? history.filter((entry) => isShortMessageWithoutSpaces(entry.content)).length
-    : 0;
-
   const causes: ChatSpamEvaluation["causes"] = [];
   const rapidMessages = recentFiveSeconds >= 5 || recentFifteenSeconds >= 8;
 
-  if (similarLengthMessages >= 5) {
+  if (similarLengthMessages >= 7) {
     causes.push({
       type: "similar-length",
       points: 1,
@@ -78,34 +66,23 @@ export function evaluateNypsiChatMessage(
     });
   }
 
-  if (recentShortMessagesWithoutSpaces >= 4) {
-    causes.push({
-      type: "short-without-spaces",
-      points: 2,
-      data: { matchingMessages: recentShortMessagesWithoutSpaces },
-    });
-  }
-
   if (normalized.length >= 4) {
-    const similarity = history.reduce(
-      (highest, entry) =>
-        entry.content.length >= 4
-          ? Math.max(highest, compareTwoStrings(entry.content, normalized))
-          : highest,
-      0,
-    );
+    const similarities = history
+      .filter((entry) => entry.content.length >= 4)
+      .map((entry) => compareTwoStrings(entry.content, normalized));
+    const matchingMessages = similarities.filter((similarity) => similarity >= 0.9).length;
 
-    if (similarity >= 0.9) {
+    if (matchingMessages >= 2) {
       causes.push({
         type: "similar-content",
         points: 2,
-        data: { similarity },
+        data: { matchingMessages, similarity: Math.max(...similarities) },
       });
     }
   } else {
     const matchingMessages = history.filter((entry) => entry.content === normalized).length;
 
-    if (matchingMessages >= 2) {
+    if (matchingMessages >= 3) {
       causes.push({
         type: "similar-content",
         points: 2,

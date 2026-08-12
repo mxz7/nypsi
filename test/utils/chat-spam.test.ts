@@ -36,7 +36,10 @@ describe("nypsi chat spam", () => {
 
   test("scores repeated messages", () => {
     const evaluation = evaluateNypsiChatMessage("give me task progress", 6000, {
-      history: [{ content: "give me task progress", createdAt: 1000 }],
+      history: [
+        { content: "give me task progress", createdAt: 1000 },
+        { content: "give me task progress", createdAt: 3000 },
+      ],
       score: 0,
       updatedAt: 1000,
     });
@@ -44,43 +47,41 @@ describe("nypsi chat spam", () => {
     expect(evaluation.causes).toContainEqual({
       type: "similar-content",
       points: 2,
-      data: { similarity: 1 },
-    });
-  });
-
-  test("scores a sustained run of short messages without spaces", () => {
-    const evaluation = evaluateNypsiChatMessage("zxaadv", 26000, {
-      history: [
-        { content: "xjklqwrz", createdAt: 1000 },
-        { content: "abaca", createdAt: 6000 },
-        { content: "abaavac", createdAt: 11000 },
-        { content: "asdasdqq", createdAt: 16000 },
-      ],
-      score: 0,
-      updatedAt: 16000,
-    });
-
-    expect(evaluation.causes).toContainEqual({
-      type: "short-without-spaces",
-      points: 2,
-      data: { matchingMessages: 4 },
+      data: { matchingMessages: 2, similarity: 1 },
     });
   });
 
   test("scores a run of similarly sized messages", () => {
-    const evaluation = evaluateNypsiChatMessage("dry eel map", 26000, {
-      history: ["red fox one", "big cat two", "new dog six", "old hen ten", "fun yak zip"].map(
-        (content, index) => ({ content, createdAt: 1000 + index * 5000 }),
-      ),
+    const evaluation = evaluateNypsiChatMessage("tan ant hop", 29000, {
+      history: [
+        "red fox one",
+        "big cat two",
+        "new dog six",
+        "old hen ten",
+        "fun yak zip",
+        "dry eel map",
+        "wet owl run",
+      ].map((content, index) => ({ content, createdAt: 1000 + index * 4000 })),
       score: 0,
-      updatedAt: 21000,
+      updatedAt: 25000,
     });
 
     expect(evaluation.causes).toContainEqual({
       type: "similar-length",
       points: 1,
-      data: { currentLength: 11, matchingMessages: 5 },
+      data: { currentLength: 11, matchingMessages: 7 },
     });
+  });
+
+  test("does not score ordinary short conversation", () => {
+    const evaluations = evaluateMessages(
+      ["ok", "3b", "offer", "value", "bruh", "what"].map((content, index) => ({
+        content,
+        at: 1000 + index * 1000,
+      })),
+    );
+
+    expect(evaluations.every((evaluation) => evaluation.pointsAdded === 0)).toBe(true);
   });
 
   test("decays old spam score", () => {
@@ -93,25 +94,37 @@ describe("nypsi chat spam", () => {
   });
 
   test("includes short messages in spam scoring", () => {
-    const evaluation = evaluateNypsiChatMessage("a", 11000, {
+    const evaluation = evaluateNypsiChatMessage("a", 16000, {
       history: [
         { content: "a", createdAt: 1000 },
         { content: "a", createdAt: 6000 },
+        { content: "a", createdAt: 11000 },
       ],
       score: 0,
-      updatedAt: 6000,
+      updatedAt: 11000,
     });
 
     expect(evaluation.causes).toContainEqual({
       type: "similar-content",
       points: 2,
-      data: { matchingMessages: 2, similarity: 1 },
+      data: { matchingMessages: 3, similarity: 1 },
     });
+  });
+
+  test("times out repeated single-letter spam", () => {
+    const evaluations = evaluateMessages(
+      Array.from({ length: 6 }, (_, index) => ({ content: "a", at: 1000 + index * 500 })),
+    );
+
+    expect(evaluations.at(-1).shouldTimeout).toBe(true);
   });
 
   test("times out when the punishment score is reached", () => {
     const evaluation = evaluateNypsiChatMessage("same message", 6000, {
-      history: [{ content: "same message", createdAt: 1000 }],
+      history: [
+        { content: "same message", createdAt: 1000 },
+        { content: "same message", createdAt: 3000 },
+      ],
       score: Math.max(0, PUNISHMENT_SCORE - 2),
       updatedAt: 6000,
     });
