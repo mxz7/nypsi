@@ -18,6 +18,7 @@ import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { getRest } from "../../rest";
 import { getPrefix } from "../guilds/utils";
+import { markGameMessage } from "../nypsi/chat-spam-exemptions";
 import { shuffle } from "../random";
 import { getZeroWidth } from "../string";
 import { createProfile, hasProfile } from "../users/utils";
@@ -552,15 +553,24 @@ export async function handleLootDropMessage(message: Message) {
   const dropIds = await redis.smembers(channelKey(message.channelId));
   if (dropIds.length === 0) return;
 
-  const drops = (await Promise.all(dropIds.map(getDrop)))
+  const typedDrops = (await Promise.all(dropIds.map(getDrop)))
     .filter((drop): drop is ActiveLootDrop => Boolean(drop))
-    .filter(
-      (drop) =>
-        drop.game === "type-fast" &&
-        message.content.toLowerCase() === drop.chosenWord?.toLowerCase(),
+    .filter((drop) => drop.game === "type-fast");
+  const drops = (
+    await Promise.all(
+      typedDrops.map(async (drop) => ((await redis.exists(claimKey(drop.id))) ? undefined : drop)),
     )
+  )
+    .filter((drop): drop is ActiveLootDrop => Boolean(drop))
     .sort((a, b) => a.startedAt - b.startedAt);
-  const drop = drops[0];
+
+  if (drops.length === 0) return;
+
+  markGameMessage(message);
+
+  const drop = drops.find(
+    (drop) => message.content.toLowerCase() === drop.chosenWord?.toLowerCase(),
+  );
 
   if (!drop || !(await isWinnerAllowed(message.author.id, drop))) return;
   if (!(await claimDrop(drop, message.author.id))) return;

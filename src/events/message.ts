@@ -107,7 +107,7 @@ export default async function messageCreate(message: Message) {
 
   if (!message.channel.isSendable()) return;
 
-  void handleLootDropMessage(message).catch((error) =>
+  const lootDropMessageHandled = handleLootDropMessage(message).catch((error) =>
     logger.error("lootdrop: message handler failed", {
       channelId: message.channelId,
       error,
@@ -361,7 +361,10 @@ export default async function messageCreate(message: Message) {
     addTaskProgress(message.author.id, "chat_weekly");
     addEventProgress(message.client as NypsiClient, message.member, "messages", 1);
 
-    if (!commandMessage) await checkNypsiChatMessage(message);
+    if (!commandMessage) {
+      await lootDropMessageHandled;
+      await checkNypsiChatMessage(message);
+    }
   };
 
   const checkNeedSupport = async () => {
