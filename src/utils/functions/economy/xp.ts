@@ -15,7 +15,7 @@ import { rollPet } from "./pets";
 import { getItems, getUpgradesData } from "./utils";
 
 const xpCache = new RedisCache<number>(Constants.redis.cache.economy.XP, 3600);
-const MAX_GAMBLE_XP_MULTIPLIER = 15;
+const MAX_GAMBLE_XP_MULTIPLIER = 5;
 
 export async function getXp(member: MemberResolvable): Promise<number> {
   const userId = getUserId(member);
