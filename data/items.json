@@ -4540,7 +4540,7 @@
       "effect": 1,
       "time": 86400,
       "global": true,
-      "usesPerDabloon": 450
+      "usesPerDabloon": 40
     },
     "in_crates": true
   },
@@ -4567,7 +4567,7 @@
       "effect": 0.2,
       "time": 86400,
       "global": true,
-      "usesPerDabloon": 30
+      "usesPerDabloon": 40
     },
     "in_crates": false
   },
