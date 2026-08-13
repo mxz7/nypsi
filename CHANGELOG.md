@@ -10,6 +10,7 @@
 - add pet naming and improve pet activation notifs
 - add pet crate
 - add yapper achievement
+- improve balancing of highlow and dragon tower
 
 # july 2026
 

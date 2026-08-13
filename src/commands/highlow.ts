@@ -57,6 +57,8 @@ const games = new Map<
   {
     bet: number;
     win: number;
+    correctGuesses: number;
+    cumulativeChance: number;
     deck: string[];
     card: string;
     id: number;
@@ -64,6 +66,9 @@ const games = new Map<
     oldCard?: string;
   }
 >();
+
+const HOUSE_RETURN = 0.95;
+const TERMINAL_PAYOUT = 100;
 
 const cmd = new Command("highlow", "higher or lower game", "money").setAliases(["hl"]);
 
@@ -117,7 +122,8 @@ async function prepareGame(
           "**Q**ueen | value of 12\n**K**ing | value of 13\n" +
           "⬆ **higher** the next card will be higher in value than your current card\n" +
           "⬇ **lower** the next card will be lower in value than your current card\n" +
-          "💰 **cash out** end the game and receive the current win\nmax win **15**x",
+          "💰 **cash out** end the game and receive the current win\n" +
+          "the game ends when the deck is empty or the payout reaches at least **100**x",
       );
 
     return send({ embeds: [embed] });
@@ -270,6 +276,8 @@ async function prepareGame(
   games.set(message.author.id, {
     bet: bet,
     win: 0,
+    correctGuesses: 0,
+    cumulativeChance: 1,
     deck: shuffle(newDeck),
     card: "",
     id: id,
@@ -335,41 +343,71 @@ async function prepareGame(
 }
 
 function newCard(member: GuildMember) {
-  const oldCard = games.get(member.user.id).card;
-  const deck = games.get(member.user.id).deck;
+  const game = games.get(member.user.id);
 
-  const choice = deck[0];
+  game.oldCard = game.card;
+  game.card = game.deck.shift();
+}
 
-  deck.shift();
+function getCardValue(card: string) {
+  const normalizedCard = card.toLowerCase();
 
-  games.set(member.user.id, {
-    bet: games.get(member.user.id).bet,
-    win: games.get(member.user.id).win,
-    deck: deck,
-    card: choice,
-    id: games.get(member.user.id).id,
-    voted: games.get(member.user.id).voted,
-    oldCard,
-  });
+  if (normalizedCard.includes("k")) {
+    return 13;
+  } else if (normalizedCard.includes("q")) {
+    return 12;
+  } else if (normalizedCard.includes("j")) {
+    return 11;
+  } else if (normalizedCard.includes("a")) {
+    return 1;
+  }
+
+  const value = parseInt(normalizedCard);
+
+  if (!value) throw new Error(`invalid highlow card: ${card}`);
+
+  return value;
 }
 
 function getValue(member: GuildMember) {
-  const card = games.get(member.user.id).card.toLowerCase();
+  return getCardValue(games.get(member.user.id).card);
+}
 
-  if (card.includes("k")) {
-    return 13;
-  } else if (card.includes("q")) {
-    return 12;
-  } else if (card.includes("j")) {
-    return 11;
-  } else if (card.includes("a")) {
-    return 1;
-  } else {
-    if (!parseInt(card)) {
-      return "ERROR";
-    }
-    return parseInt(card);
+function getSaferDirectionChance(member: GuildMember) {
+  const game = games.get(member.user.id);
+  const currentValue = getCardValue(game.card);
+  let higherCards = 0;
+  let lowerCards = 0;
+
+  for (const card of game.deck) {
+    const value = getCardValue(card);
+
+    if (value > currentValue) higherCards++;
+    if (value < currentValue) lowerCards++;
   }
+
+  const comparableCards = higherCards + lowerCards;
+
+  if (comparableCards === 0) return 1;
+
+  return Math.max(higherCards, lowerCards) / comparableCards;
+}
+
+function registerCorrectGuess(member: GuildMember, saferDirectionChance: number) {
+  const game = games.get(member.user.id);
+
+  game.correctGuesses++;
+  game.cumulativeChance *= saferDirectionChance;
+
+  if (game.correctGuesses === 1) {
+    game.win = 1;
+    return false;
+  }
+
+  const calculatedPayout = HOUSE_RETURN / game.cumulativeChance;
+  game.win = Math.max(game.win, parseFloat(calculatedPayout.toFixed(2)));
+
+  return calculatedPayout >= TERMINAL_PAYOUT;
 }
 
 async function playGame(
@@ -391,7 +429,7 @@ async function playGame(
     return interaction.update(data).catch(() => m.edit(data));
   };
 
-  const replay = async (embed: CustomEmbed, interaction: ButtonInteraction) => {
+  const replay = async (embed: CustomEmbed, interaction?: ButtonInteraction) => {
     await removeUserPlaying(message.author.id);
     if (
       !(await isPremium(message.member)) ||
@@ -564,7 +602,8 @@ async function playGame(
       }
     }
 
-    if (win >= 7) addProgress(message.member, "highlow_pro", 1);
+    if (games.get(message.author.id).correctGuesses >= 7)
+      addProgress(message.member, "highlow_pro", 1);
 
     const id = await createGame({
       userId: message.author.id,
@@ -591,7 +630,7 @@ async function playGame(
     return replay(newEmbed, interaction);
   };
 
-  const draw = async (interaction: ButtonInteraction) => {
+  const draw = async (interaction?: ButtonInteraction) => {
     const id = await createGame({
       userId: message.author.id,
       bet: bet,
@@ -618,8 +657,12 @@ async function playGame(
     return replay(newEmbed, interaction);
   };
 
-  if (win == 15) {
-    win1();
+  if (games.get(message.author.id).deck.length === 0) {
+    if (win === 1) {
+      await draw();
+    } else {
+      await win1();
+    }
     return;
   }
 
@@ -647,27 +690,19 @@ async function playGame(
 
   if (reaction.customId == "btn-choose-higher") {
     const oldCard = getValue(message.member);
+    const saferDirectionChance = getSaferDirectionChance(message.member);
     newCard(message.member);
     card = games.get(message.author.id).card;
     const newCard1 = getValue(message.member);
 
     if (newCard1 > oldCard) {
-      if (win == 0) {
-        win += 1;
-      } else if (win > 5) {
-        win += 1;
-      } else {
-        win += 0.5;
-      }
+      const reachedTerminalPayout = registerCorrectGuess(message.member, saferDirectionChance);
+      win = games.get(message.author.id).win;
 
-      games.set(message.author.id, {
-        bet: bet,
-        win: win,
-        deck: games.get(message.author.id).deck,
-        card: games.get(message.author.id).card,
-        id: games.get(message.author.id).id,
-        voted: games.get(message.author.id).voted,
-      });
+      if (reachedTerminalPayout) {
+        await win1(reaction);
+        return;
+      }
 
       let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
@@ -731,27 +766,19 @@ async function playGame(
     }
   } else if (reaction.customId == "btn-choose-lower") {
     const oldCard = getValue(message.member);
+    const saferDirectionChance = getSaferDirectionChance(message.member);
     newCard(message.member);
     card = games.get(message.author.id).card;
     const newCard1 = getValue(message.member);
 
     if (newCard1 < oldCard) {
-      if (win == 0) {
-        win += 1;
-      } else if (win > 5) {
-        win += 1;
-      } else {
-        win += 0.5;
-      }
+      const reachedTerminalPayout = registerCorrectGuess(message.member, saferDirectionChance);
+      win = games.get(message.author.id).win;
 
-      games.set(message.author.id, {
-        bet: bet,
-        win: win,
-        deck: games.get(message.author.id).deck,
-        card: games.get(message.author.id).card,
-        id: games.get(message.author.id).id,
-        voted: games.get(message.author.id).voted,
-      });
+      if (reachedTerminalPayout) {
+        await win1(reaction);
+        return;
+      }
 
       let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()

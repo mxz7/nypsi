@@ -82,15 +82,15 @@ interface Game {
  * bad click = x (end game)
  * last row is always finish / play again
  * only show 1 untouched row
- * auto finish on 15x or higher or last row
+ * auto finish on last row
  *
  */
 
 const payoutsData = new Map<string, number[]>([
-  ["easy", [0.5, 0.9, 1.4, 1.9, 2.5, 3.2, 4, 4.9, 6]],
-  ["medium", [1, 2, 2.9, 4, 5.1, 6.5, 8.2, 10, 12]],
-  ["hard", [1.35, 2.5, 4, 6, 8.5, 11, 14, 17.5, 21]],
-  ["expert", [2.5, 4.2, 6.1, 9, 11, 15, 17.7, 25, 50]],
+  ["easy", [0.97, 1.35, 1.66, 2.08, 2.61, 3.3, 4.16, 5.25, 6.64]],
+  ["medium", [1.04, 1.57, 2.08, 2.78, 3.72, 5.01, 6.76, 9.09, 12.22]],
+  ["hard", [1.19, 2.03, 3.05, 4.59, 6.95, 10.51, 15.87, 23.95, 36.08]],
+  ["expert", [1.62, 3.71, 7.46, 15.02, 30.19, 60.54, 121.31, 242.8, 500]],
 ]);
 
 // is the difference
@@ -351,16 +351,16 @@ function createBoard(diff: string) {
 
     switch (diff) {
       case "easy":
-        row = populate(3, Array.from({ length: 4 }).fill("a") as string[]);
+        row = populate(4, Array.from({ length: 5 }).fill("a") as string[]);
         break;
       case "medium":
-        row = populate(2, Array.from({ length: 3 }).fill("a") as string[]);
+        row = populate(3, Array.from({ length: 4 }).fill("a") as string[]);
         break;
       case "hard":
-        row = populate(1, Array.from({ length: 2 }).fill("a") as string[]);
+        row = populate(2, Array.from({ length: 3 }).fill("a") as string[]);
         break;
       case "expert":
-        row = populate(1, Array.from({ length: 4 }).fill("a") as string[]);
+        row = populate(1, Array.from({ length: 2 }).fill("a") as string[]);
         break;
     }
     board.push(row);

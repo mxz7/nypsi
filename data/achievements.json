@@ -518,7 +518,7 @@
     "name": "highlow professional **I**",
     "emoji": "🃏",
     "target": 5,
-    "description": "reach a 7x multiplier in highlow 5 times",
+    "description": "make 7 correct guesses in highlow 5 times",
     "prize": ["lucky_scratch_card:1"]
   },
   "highlow_pro_ii": {
@@ -526,7 +526,7 @@
     "name": "highlow professional **II**",
     "emoji": "🃏",
     "target": 25,
-    "description": "reach a 7x multiplier in highlow 25 times",
+    "description": "make 7 correct guesses in highlow 25 times",
     "prize": ["lucky_scratch_card:2"]
   },
   "highlow_pro_iii": {
@@ -534,7 +534,7 @@
     "name": "highlow professional **III**",
     "emoji": "🃏",
     "target": 100,
-    "description": "reach a 7x multiplier in highlow 100 times",
+    "description": "make 7 correct guesses in highlow 100 times",
     "prize": ["lucky_scratch_card:3"]
   },
   "highlow_pro_iv": {
@@ -542,7 +542,7 @@
     "name": "highlow professional **IV**",
     "emoji": "🃏",
     "target": 500,
-    "description": "reach a 7x multiplier in highlow 500 times",
+    "description": "make 7 correct guesses in highlow 500 times",
     "prize": ["legendary_scratch_card:2"]
   },
   "highlow_pro_v": {
@@ -550,7 +550,7 @@
     "name": "highlow professional **V**",
     "emoji": "🃏",
     "target": 1000,
-    "description": "reach a 7x multiplier in highlow 1,000 times",
+    "description": "make 7 correct guesses in highlow 1,000 times",
     "prize": ["nypsi_crate:1", "legendary_scratch_card:3"]
   },
   "roulette_pro_i": {
