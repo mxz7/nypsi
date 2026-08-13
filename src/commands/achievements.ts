@@ -3,7 +3,6 @@ import {
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
-  Interaction,
   Message,
   MessageActionRowComponentBuilder,
   MessageFlags,
@@ -358,73 +357,42 @@ async function run(
       return embed;
     };
 
-    const getRow = (id: string) => {
-      return new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder()
-          .setCustomId("btn-previous-page")
-          .setLabel("back")
-          .setStyle(ButtonStyle.Primary)
-          .setDisabled(tiers.indexOf(id) == 0),
-        new ButtonBuilder()
-          .setCustomId("btn-next-page")
-          .setLabel("next")
-          .setStyle(ButtonStyle.Primary)
-          .setDisabled(tiers.indexOf(id) == tiers.length - 1),
-      );
-    };
-
     const tiers = Object.keys(allAchievementData).filter(
       (i) =>
         i.substring(0, i.lastIndexOf("_")) ==
         selected.id.substring(0, selected.id.lastIndexOf("_")),
     );
 
-    const embed = await getAchievementEmbed(selected);
+    if (tiers.length == 1) {
+      return send({ embeds: [await getAchievementEmbed(selected)] });
+    }
 
-    if (tiers.length == 1) return send({ embeds: [embed] });
+    const achievementEmbeds = await Promise.all(
+      tiers.map((tier) => getAchievementEmbed(allAchievementData[tier])),
+    );
+    const currentPage = tiers.indexOf(selected.id) + 1;
+    const embed = achievementEmbeds[currentPage - 1];
+    const pages = PageManager.createPages(achievementEmbeds, 1);
+    const row = PageManager.defaultRow();
 
-    let msg = await send({ embeds: [embed], components: [getRow(selected.id)] });
+    row.components[0].setDisabled(currentPage == 1);
+    row.components[1].setDisabled(currentPage == tiers.length);
 
-    const filter = (i: Interaction) => i.user.id == message.author.id;
+    const msg = await send({ embeds: [embed], components: [row] });
+    const manager = new PageManager({
+      pages,
+      message: msg,
+      embed,
+      row,
+      userId: message.author.id,
+      updateEmbed(page) {
+        return page[0];
+      },
+    });
 
-    const pageManager: any = async () => {
-      let fail = false;
+    manager.currentPage = currentPage;
 
-      const response = await msg
-        .awaitMessageComponent({ filter, time: 60000 })
-        .then(async (collected) => {
-          await collected.deferUpdate().catch(() => {
-            fail = true;
-            return pageManager();
-          });
-          return { res: collected.customId };
-        })
-        .catch(async () => {
-          fail = true;
-          await msg.edit({ embeds: [embed], components: [] });
-        });
-
-      if (fail) return;
-      if (!response) return;
-
-      const { res } = response;
-
-      if (res == "btn-next-page") {
-        selected = allAchievementData[tiers[tiers.indexOf(selected.id) + 1]];
-        const embed = await getAchievementEmbed(selected);
-
-        msg = await msg.edit({ embeds: [embed], components: [getRow(selected.id)] });
-        return pageManager();
-      } else if (res == "btn-previous-page") {
-        selected = allAchievementData[tiers[tiers.indexOf(selected.id) - 1]];
-        const embed = await getAchievementEmbed(selected);
-
-        msg = await msg.edit({ embeds: [embed], components: [getRow(selected.id)] });
-        return pageManager();
-      }
-    };
-
-    return pageManager();
+    return manager.listen();
   };
 
   if (args.length == 0) {
