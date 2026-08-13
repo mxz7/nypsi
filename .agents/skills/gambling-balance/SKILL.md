@@ -5,11 +5,12 @@ description: Preserve Nypsi gambling RTP and volatility when changing Blackjack,
 
 # Gambling Balance
 
-Blackjack has approximately 98.8% base RTP under sensible no-split play. Target approximately 95%
-base RTP for Dragon Tower and High-Low because they offer larger maximum payouts and bonuses.
+Blackjack has approximately 98.8% base RTP under sensible no-split play. Dragon Tower uses a
+depth-weighted RTP curve because its shallow cash-outs are much faster and simpler to repeat, while
+High-Low targets approximately 95%; both offer larger maximum payouts and bonuses than Blackjack.
 Gamble multipliers are an earned bonus and apply to the entire winning payout; draws return the bet
-without a multiplier. Gambling payout multipliers above 15x still pay their full money reward but
-are treated as 15x by `calcEarnedGambleXp()` to bound single-game XP awards.
+without a multiplier. Gambling payout multipliers above 5x still pay their full money reward but are
+treated as 5x by `calcEarnedGambleXp()` to bound single-game XP awards.
 
 ## Dragon Tower
 
@@ -26,8 +27,9 @@ limited and should not be treated as reliable currency RTP. Gamble multipliers a
 profitable Tower cash-outs, including after the first floor. First-floor payouts target roughly 80%
 base RTP so they remain below 100% theoretical RTP with a 25% gamble multiplier. Easy's 0.93x first
 floor cannot be cashed out without finding the 3x gem; Medium's exact 1x first floor is a draw unless
-the gem is found. Later cash-out points target about 92% base RTP, below High-Low and Blackjack to
-account for Tower's simpler interaction. Expert's rounded 500x top is the deliberate exception at
+the gem is found. Floors two through nine target approximately 80%, 81%, 82%, 84%, 86%, 89%, 93%,
+and 96% base RTP. The rising curve rewards deeper, less common runs while keeping fast shallow
+cash-outs below High-Low and Blackjack. Expert's rounded 500x top is the deliberate exception at
 about 97.7% base RTP on its 1-in-512 completion path.
 
 ## High-Low
