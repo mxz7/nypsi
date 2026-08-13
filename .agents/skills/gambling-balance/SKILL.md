@@ -23,11 +23,12 @@ All difficulties have nine floors. Their layouts progress by total button count:
 Tower payout calculations must include the expected value of the hidden gem, which adds 3x to the
 game payout before the gamble multiplier is applied. The rare green-gem inventory reward is globally
 limited and should not be treated as reliable currency RTP. Gamble multipliers always apply to
-profitable Tower cash-outs, including after the first floor. First-floor payouts target roughly 83%
-base RTP so they remain below 100% theoretical RTP with a 20% gamble multiplier. Easy's 0.97x first
-floor cannot be cashed out without finding the 3x gem. Later cash-out points target about 95% base
-RTP. Expert's rounded 500x top is a deliberate exception at about 97.7% base RTP on its 1-in-512
-completion path.
+profitable Tower cash-outs, including after the first floor. First-floor payouts target roughly 80%
+base RTP so they remain below 100% theoretical RTP with a 25% gamble multiplier. Easy's 0.93x first
+floor cannot be cashed out without finding the 3x gem; Medium's exact 1x first floor is a draw unless
+the gem is found. Later cash-out points target about 92% base RTP, below High-Low and Blackjack to
+account for Tower's simpler interaction. Expert's rounded 500x top is the deliberate exception at
+about 97.7% base RTP on its 1-in-512 completion path.
 
 ## High-Low
 
