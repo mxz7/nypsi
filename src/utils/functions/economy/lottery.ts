@@ -43,7 +43,12 @@ function getPoolRange(prizePool: number) {
   const minimumPool = 750 * getLotteryTicketPoolValue("lottery_ticket");
   const effectivePool = Math.max(prizePool, minimumPool);
 
-  const step = Math.max(minimumPool, Math.round(effectivePool));
+  const targetStep = effectivePool * 0.25;
+  const magnitude = 10 ** Math.floor(Math.log10(targetStep));
+  const normalizedStep = targetStep / magnitude;
+  const stepMultiplier =
+    normalizedStep >= 7.5 ? 10 : normalizedStep >= 3.5 ? 5 : normalizedStep >= 1.5 ? 2 : 1;
+  const step = stepMultiplier * magnitude;
   const min = Math.floor(effectivePool / step) * step;
 
   return {
