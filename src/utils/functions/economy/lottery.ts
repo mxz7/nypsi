@@ -16,28 +16,39 @@ export async function getApproximatePrizePool(superdraw = false) {
     };
   }
 
-  const tickets = await prisma.inventory.aggregate({
+  const tickets = await prisma.inventory.groupBy({
+    by: ["item"],
     where,
     _sum: {
       amount: true,
     },
   });
 
-  return getPoolRange(Number(tickets._sum.amount ?? 0n));
+  const totalPool = tickets.reduce(
+    (total, ticket) =>
+      total + Number(ticket._sum.amount ?? 0n) * getLotteryTicketPoolValue(ticket.item),
+    0,
+  );
+
+  return getPoolRange(totalPool);
 }
 
-function getPoolRange(ticketCount: number) {
-  const effectiveTickets = Math.max(ticketCount, 750);
+export function getLotteryTicketPoolValue(itemId: string) {
   const value = getItems()["lottery_ticket"].buy;
 
-  const stepTickets = Math.max(750, Math.round(effectiveTickets));
+  return itemId === "superdraw_lottery_ticket" ? value * 0.5 : value;
+}
 
-  const minTickets = Math.floor(effectiveTickets / stepTickets) * stepTickets;
-  const maxTickets = minTickets + stepTickets;
+function getPoolRange(prizePool: number) {
+  const minimumPool = 750 * getLotteryTicketPoolValue("lottery_ticket");
+  const effectivePool = Math.max(prizePool, minimumPool);
+
+  const step = Math.max(minimumPool, Math.round(effectivePool));
+  const min = Math.floor(effectivePool / step) * step;
 
   return {
-    min: minTickets * value,
-    max: maxTickets * value,
+    min,
+    max: min + step,
   };
 }
 

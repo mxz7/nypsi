@@ -21,7 +21,11 @@ import {
   addItemSourceStat,
   setInventoryItem,
 } from "../../utils/functions/economy/inventory";
-import { createLotteryEntry, getLotteryAutoBuyUsers } from "../../utils/functions/economy/lottery";
+import {
+  createLotteryEntry,
+  getLotteryAutoBuyUsers,
+  getLotteryTicketPoolValue,
+} from "../../utils/functions/economy/lottery";
 import { addStat } from "../../utils/functions/economy/stats";
 import {
   getSuperdrawChance,
@@ -69,8 +73,10 @@ export default {
 
     const tickets = Array.from(ticketMap.entries()).map(([userId, amount]) => ({ userId, amount }));
     const total = Number(tickets.map((i) => i.amount).reduce((a, b) => a + b, 0n));
-    const lotteryTicketValue = getItems()["lottery_ticket"].buy;
-    const totalPool = total * lotteryTicketValue;
+    const totalPool = ticketRows.reduce(
+      (pool, ticket) => pool + Number(ticket.amount) * getLotteryTicketPoolValue(ticket.item),
+      0,
+    );
 
     const uniqueUsers = ticketRows.reduce(
       (acc, curr) => acc.add(curr.userId),
@@ -255,7 +261,7 @@ async function findWinner(
 }
 
 function getProgressiveTaxMultiplier(winnerShare: number): number {
-  const minMultiplier = 0.5;
+  const minMultiplier = 1;
   const maxMultiplier = 1.5;
   const clampedShare = Math.min(Math.max(winnerShare, 0), 1);
 
