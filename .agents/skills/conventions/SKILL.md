@@ -64,3 +64,9 @@ export default { name: "job-name", cron: "0 * * * *", run: async (log) => { … 
 ## Interaction Handlers
 
 Export an `InteractionHandler` or `AutocompleteHandler` from `src/interactions/`. See [src/types/InteractionHandler.ts](../../../src/types/InteractionHandler.ts) and the `codebase-structure` skill for routing/autocomplete/button examples.
+
+When a component interaction replaces the message state, prefer acknowledging it directly with
+`interaction.update(...)`. Avoid `deferUpdate()` followed by `message.edit(...)` unless the updated
+payload cannot be prepared within Discord's acknowledgement window. When processing time is
+variable, schedule `deferUpdate()` after 2,500 ms and use
+`interaction.update(data).catch(() => interaction.message.edit(data))`.

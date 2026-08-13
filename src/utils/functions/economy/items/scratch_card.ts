@@ -7,6 +7,7 @@ import {
   Interaction,
   InteractionEditReplyOptions,
   InteractionReplyOptions,
+  InteractionUpdateOptions,
   Message,
   MessageFlags,
   WebhookClient,
@@ -39,7 +40,10 @@ async function prepare(
 
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (interaction) {
-      return interaction.message.edit(data as BaseMessageOptions);
+      await interaction
+        .update(data as InteractionUpdateOptions)
+        .catch(() => interaction.message.edit(data as BaseMessageOptions));
+      return interaction.message;
     }
     if (!(message instanceof Message)) {
       if (message.deferred) {
@@ -162,8 +166,10 @@ async function prepare(
       if (retry) {
         const response = await msg
           .awaitMessageComponent({ filter, time: 90000 })
-          .then(async (collected) => {
-            await collected.deferUpdate();
+          .then((collected) => {
+            setTimeout(() => {
+              collected.deferUpdate().catch(() => {});
+            }, 2500);
             return collected;
           })
           .catch(() => {
@@ -185,18 +191,20 @@ async function prepare(
             if (message.author.id == Constants.OWNER_ID && message instanceof Message) {
               message.react("💀");
             } else {
-              response.message.edit({
+              const data = {
                 embeds: [
                   new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes"),
                 ],
-              });
+              };
+              await response.update(data).catch(() => response.message.edit(data));
               return;
             }
           }
 
           if (await isLockedOut(message.author.id)) {
             verifyUser(message);
-            msg.edit({ embeds: [new ErrorEmbed("please answer the captcha")] });
+            const data = { embeds: [new ErrorEmbed("please answer the captcha")] };
+            await response.update(data).catch(() => response.message.edit(data));
             return;
           }
 
@@ -211,14 +219,15 @@ async function prepare(
             ) {
               message.react("💀");
             } else {
-              msg.edit({
+              const data = {
                 embeds: [
                   new CustomEmbed(
                     message.member,
                     "fun & moderation commands are still available to you. maintenance mode only prevents certain commands to prevent loss of progress",
                   ).setTitle("⚠️ nypsi is under maintenance"),
                 ],
-              });
+              };
+              await response.update(data).catch(() => response.message.edit(data));
               return;
             }
           }
