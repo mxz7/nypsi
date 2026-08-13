@@ -8,7 +8,8 @@ description: Preserve Nypsi gambling RTP and volatility when changing Blackjack,
 Blackjack has approximately 98.8% base RTP under sensible no-split play. Target approximately 95%
 base RTP for Dragon Tower and High-Low because they offer larger maximum payouts and bonuses.
 Gamble multipliers are an earned bonus and apply to the entire winning payout; draws return the bet
-without a multiplier.
+without a multiplier. Gambling payout multipliers above 15x still pay their full money reward but
+are treated as 15x by `calcEarnedGambleXp()` to bound single-game XP awards.
 
 ## Dragon Tower
 

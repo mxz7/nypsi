@@ -68,6 +68,10 @@ Do not reinterpret a `baseBreakdown` value:
 Keep required-bet checks, adjusted maximum bet, percentage-of-max-bet, command multiplier, random
 roll, `boosterEffect`, clamping, and final flooring inside `calcEarnedGambleXp()`.
 
+Cap the gambling payout multiplier used for XP at 15x. Money payouts remain uncapped; this only
+prevents Dragon Tower and High-Low jackpots above the historical 15x range from producing extreme
+single-game XP awards.
+
 The final `Math.floor()` means awarded XP is whole. Display XP breakdown values as whole XP without
 changing the raw values used in calculation.
 
