@@ -19,3 +19,5 @@ anticheat_old.ts
 anticheat2.ts
 
 src/generated
+
+.agents/skills/query-database
