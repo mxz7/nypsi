@@ -1,10 +1,19 @@
 import { MessageFlags } from "discord.js";
 import { NypsiMessage } from "../models/Command";
-import { ErrorEmbed } from "../models/EmbedBuilders";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
+import Constants from "../utils/Constants";
 import { a } from "../utils/functions/anticheat";
 import { isLockedOut, verifyUser } from "../utils/functions/captcha";
-import { addClick, buildClickMessage, CLICK_BUTTON_ID } from "../utils/functions/clicks";
+import {
+  addClick,
+  addClickSessionReward,
+  buildClickMessage,
+  CLICK_BUTTON_ID,
+  parseClickSessionRewards,
+  rollClickLoot,
+} from "../utils/functions/clicks";
+import { describeLootPoolResult } from "../utils/functions/economy/loot_pools";
 import { isEcoBanned } from "../utils/functions/economy/utils";
 import { logger } from "../utils/logger";
 
@@ -32,34 +41,23 @@ export default {
       return verifyUser(message);
     }
 
-    if (ownerId !== interaction.user.id) {
-      const defer = setTimeout(() => interaction.deferReply().catch(() => {}), 2500);
-      const computeStartedAt = performance.now();
-
-      await a(interaction.user.id, interaction.user.username, "click", "click");
-      await addClick(interaction.user);
-      const message = await buildClickMessage(interaction.user, interaction.guild);
-      const computeTime = performance.now() - computeStartedAt;
-
-      logger.info(
-        `click: computed update for ${interaction.user.id} in ${computeTime.toFixed(2)}ms`,
-        {
-          userId: interaction.user.id,
-          guildId: interaction.guild.id,
-          computeTime,
-        },
-      );
-
-      clearTimeout(defer);
-      return interaction.reply(message).catch(() => interaction.editReply(message));
-    }
-
-    const defer = setTimeout(() => interaction.deferUpdate().catch(() => {}), 2500);
+    const ownsMessage = ownerId === interaction.user.id;
+    const defer = setTimeout(() => {
+      if (ownsMessage) interaction.deferUpdate().catch(() => {});
+      else interaction.deferReply().catch(() => {});
+    }, 2500);
     const computeStartedAt = performance.now();
+    const sessionRewards = ownsMessage
+      ? parseClickSessionRewards(interaction.message.embeds[0]?.description)
+      : {};
 
     await a(interaction.user.id, interaction.user.username, "click", "click");
     await addClick(interaction.user);
-    const message = await buildClickMessage(interaction.user, interaction.guild);
+    const loot = await rollClickLoot(interaction.user);
+
+    addClickSessionReward(sessionRewards, loot);
+
+    const message = await buildClickMessage(interaction.user, interaction.guild, sessionRewards);
     const computeTime = performance.now() - computeStartedAt;
 
     logger.info(
@@ -72,6 +70,20 @@ export default {
     );
 
     clearTimeout(defer);
-    await interaction.update(message).catch(() => interaction.editReply(message));
+
+    if (ownsMessage) {
+      await interaction.update(message).catch(() => interaction.editReply(message));
+    } else {
+      await interaction.reply(message).catch(() => interaction.editReply(message));
+    }
+
+    if (loot.item) {
+      const embed = new CustomEmbed(interaction.user)
+        .setColor(Constants.EMBED_SUCCESS_COLOR)
+        .setHeader(interaction.user.username, interaction.user.displayAvatarURL())
+        .setDescription(`you found ${describeLootPoolResult(loot)}!`);
+
+      setTimeout(() => interaction.followUp({ embeds: [embed] }).catch(() => {}), 500);
+    }
   },
 } as InteractionHandler;

@@ -8,7 +8,10 @@ import {
 } from "discord.js";
 import prisma from "../../init/database";
 import { CustomEmbed } from "../../models/EmbedBuilders";
-import { createUser, userExists } from "./economy/utils";
+import { LootPoolResult } from "../../types/LootPool";
+import { itemExists } from "./economy/inventory";
+import { giveLootPoolResult, rollLootPool } from "./economy/loot_pools";
+import { createUser, getItems, getLootPools, userExists } from "./economy/utils";
 import { getMembers } from "./leaderboards/helpers";
 import { getUserId, MemberResolvable } from "./member";
 
@@ -21,6 +24,8 @@ type ClickOverview = {
   globalClicks: number;
 };
 
+export type ClickSessionRewards = Record<string, number>;
+
 export async function addClick(member: MemberResolvable) {
   const userId = getUserId(member);
 
@@ -29,6 +34,43 @@ export async function addClick(member: MemberResolvable) {
     create: { userId, clicks: 1 },
     update: { clicks: { increment: 1 } },
   });
+}
+
+export async function rollClickLoot(member: MemberResolvable): Promise<LootPoolResult> {
+  const result = await rollLootPool(
+    getLootPools().click,
+    async (itemId) => getItems()[itemId].unique && (await itemExists(itemId)),
+  );
+
+  await giveLootPoolResult(member, result, "click");
+  return result;
+}
+
+export function parseClickSessionRewards(description?: string): ClickSessionRewards {
+  const rewards: ClickSessionRewards = {};
+  const session = description?.split("**current session rewards**\n")[1];
+
+  if (!session) return rewards;
+
+  const rewardPattern =
+    /\*\*([\d,]+)x\*\* .*?\]\(https:\/\/nypsi\.xyz\/items\/([^)?]+)(?:\?[^)]*)?\)/g;
+
+  for (const match of session.matchAll(rewardPattern)) {
+    const count = parseInt(match[1].replaceAll(",", ""));
+    const itemId = decodeURIComponent(match[2]);
+
+    if (getItems()[itemId] && count > 0) rewards[itemId] = count;
+  }
+
+  return rewards;
+}
+
+export function addClickSessionReward(
+  rewards: ClickSessionRewards,
+  result: LootPoolResult,
+): ClickSessionRewards {
+  if (result.item) rewards[result.item] = (rewards[result.item] ?? 0) + (result.count ?? 1);
+  return rewards;
 }
 
 export async function getClickStats(
@@ -69,6 +111,7 @@ export async function getClickStats(
 export async function buildClickMessage(
   member: MemberResolvable,
   guild: Guild,
+  sessionRewards: ClickSessionRewards = {},
 ): Promise<BaseMessageOptions> {
   const userId = getUserId(member);
 
@@ -90,12 +133,21 @@ export async function buildClickMessage(
     return { components: [row] };
   }
 
+  const session = Object.entries(sessionRewards)
+    .map(([itemId, count]) => {
+      const item = getItems()[itemId];
+
+      return `**${count.toLocaleString()}x** ${item.emoji} [${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-click)`;
+    })
+    .join("\n");
+
   const embed = new CustomEmbed(member)
     .setHeader(`${user.username}`, user.displayAvatarURL())
     .setDescription(
       `global position: **#${globalPosition}**\n` +
         `server position: **#${serverPosition}**\n` +
-        `total global clicks: **${stats.globalClicks.toLocaleString()}**`,
+        `total global clicks: **${stats.globalClicks.toLocaleString()}**` +
+        (session ? `\n\n**current session rewards**\n${session}` : ""),
     );
 
   return { embeds: [embed], components: [row] };
