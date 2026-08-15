@@ -9,6 +9,7 @@ import {
 import prisma from "../../init/database";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import { LootPoolResult } from "../../types/LootPool";
+import { logger } from "../logger";
 import { itemExists } from "./economy/inventory";
 import { giveLootPoolResult, rollLootPool } from "./economy/loot_pools";
 import { createUser, getItems, getLootPools, userExists } from "./economy/utils";
@@ -61,12 +62,18 @@ export async function addClick(member: MemberResolvable) {
 }
 
 export async function rollClickLoot(member: MemberResolvable): Promise<LootPoolResult> {
+  const userId = getUserId(member);
   const result = await rollLootPool(
     getLootPools().click,
     async (itemId) => getItems()[itemId].unique && (await itemExists(itemId)),
   );
 
   await giveLootPoolResult(member, result, "click");
+
+  if (Object.keys(result).length > 0) {
+    logger.info(`click: rewarded ${userId}`, { userId, reward: result });
+  }
+
   return result;
 }
 
