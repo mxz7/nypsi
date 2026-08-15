@@ -19,6 +19,7 @@ import { showMuseumLeaderboard } from "../utils/functions/economy/museum";
 import { getItems } from "../utils/functions/economy/utils.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { topChatReaction } from "../utils/functions/leaderboards/chat-reactions";
+import { topClicks } from "../utils/functions/leaderboards/clicks";
 import { topCommand, topCommandUses } from "../utils/functions/leaderboards/commands";
 import {
   topBalance,
@@ -62,6 +63,18 @@ cmd.slashEnabled = true;
 cmd.slashData
   .addSubcommand((balance) =>
     balance.setName("balance").setDescription("view top balances in the server"),
+  )
+  .addSubcommand((clicks) =>
+    clicks
+      .setName("clicks")
+      .setDescription("view top click counts")
+      .addStringOption((option) =>
+        option
+          .setName("scope")
+          .setDescription("show global/server")
+          .setChoices(...scopeChoices)
+          .setRequired(false),
+      ),
   )
   .addSubcommand((prestige) =>
     prestige
@@ -357,6 +370,17 @@ async function run(
     const data = await topBalance("guild", message.guild, message.member);
 
     return show(data.pages, data.pos, `top balance for ${message.guild.name}`);
+  } else if (["click", "clicks"].includes(args[0].toLowerCase())) {
+    const global = args[1]?.toLowerCase() === "global";
+    const data = global
+      ? await topClicks("global", undefined, message.member)
+      : await topClicks("guild", message.guild, message.member);
+
+    return show(
+      data.pages,
+      data.pos,
+      `top clicks ${global ? "[global]" : `for ${message.guild.name}`}`,
+    );
   } else if (args[0].toLowerCase() == "prestige" || args[0].toLowerCase() === "level") {
     let global = false;
 

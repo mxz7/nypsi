@@ -3,6 +3,7 @@ import { MStoTime } from "../../utils/functions/date";
 import { calcItemValue } from "../../utils/functions/economy/inventory";
 import { getItems } from "../../utils/functions/economy/utils";
 import { topChatReaction } from "../../utils/functions/leaderboards/chat-reactions";
+import { topClicks } from "../../utils/functions/leaderboards/clicks";
 import { topCommandUses } from "../../utils/functions/leaderboards/commands";
 import {
   topBalance,
@@ -27,6 +28,8 @@ export default {
     );
 
     await topBalance("global", undefined, undefined, 100);
+    await sleep(1000);
+    await topClicks("global", undefined, undefined, 100);
     await sleep(1000);
     await topDailyStreak("global", undefined, "", 100);
     await sleep(1000);
