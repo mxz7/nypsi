@@ -577,10 +577,10 @@
       },
       "stolen_credit_card": 20,
       "dabloon": {
-        "weight": 5,
+        "weight": 0.5,
         "count": {
           "min": 1,
-          "max": 25
+          "max": 20
         }
       },
       "lucky_7": 0.1,
