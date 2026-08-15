@@ -36,6 +36,7 @@ import { getGuildName, getPrefix, hasGuild } from "../utils/functions/guilds/uti
 import { isScamImage } from "../utils/functions/image";
 import { checkTriggers } from "../utils/functions/message-triggers";
 import { checkNypsiChatMessage } from "../utils/functions/nypsi/chat-spam";
+import { recordNypsiCatBotMessage } from "../utils/functions/nypsi/chat-spam-exemptions";
 import sleep from "../utils/functions/sleep";
 import {
   getSupportRequest,
@@ -106,6 +107,8 @@ export default async function messageCreate(message: Message) {
   if (!message.author.bot) trackCmdChannelLoad(message.channel, message.id, "message");
 
   if (!message.channel.isSendable()) return;
+
+  recordNypsiCatBotMessage(message);
 
   const lootDropMessageHandled = handleLootDropMessage(message).catch((error) =>
     logger.error("lootdrop: message handler failed", {
