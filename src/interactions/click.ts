@@ -14,18 +14,19 @@ export default {
 
     const ownerId = interaction.customId.split(":")[1];
 
-    if (ownerId !== interaction.user.id) {
-      return interaction.reply({
-        embeds: [new ErrorEmbed("this is not your click button")],
-        flags: MessageFlags.Ephemeral,
-      });
-    }
-
     if (!interaction.guild) {
       return interaction.reply({
         embeds: [new ErrorEmbed("click can only be played in a server")],
         flags: MessageFlags.Ephemeral,
       });
+    }
+
+    if (ownerId !== interaction.user.id) {
+      const defer = setTimeout(() => interaction.deferReply().catch(() => {}), 2500);
+      const message = await buildClickMessage(interaction.user, interaction.guild);
+
+      clearTimeout(defer);
+      return interaction.reply(message).catch(() => interaction.editReply(message));
     }
 
     const defer = setTimeout(() => interaction.deferUpdate().catch(() => {}), 2500);
@@ -45,6 +46,6 @@ export default {
     );
 
     clearTimeout(defer);
-    await interaction.update(message).catch(() => interaction.message.edit(message));
+    await interaction.update(message).catch(() => interaction.editReply(message));
   },
 } as InteractionHandler;
