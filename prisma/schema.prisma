@@ -476,10 +476,11 @@ model Inventory {
 
 model ItemSourceStats {
   itemId String
+  season Int
   source String
   amount BigInt @default(0)
 
-  @@id([itemId, source])
+  @@id([itemId, season, source])
 }
 
 model Museum {
