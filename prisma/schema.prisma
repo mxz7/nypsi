@@ -351,6 +351,7 @@ model Economy {
   CustomCar          CustomCar[]
   Farm               Farm[]
   FarmUpgrades       FarmUpgrades[]
+  clicks             Clicks[]
 }
 
 model Farm {
@@ -772,6 +773,13 @@ model Lottery {
   winnerTickets BigInt
   totalTickets  BigInt
   totalWin      BigInt?
+}
+
+model Clicks {
+  userId String @id
+  clicks Int    @default(0)
+
+  user Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
 }
 
 // guild specific tables
