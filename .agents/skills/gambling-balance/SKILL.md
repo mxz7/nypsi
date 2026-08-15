@@ -27,8 +27,8 @@ limited and should not be treated as reliable currency RTP. Gamble multipliers a
 profitable Tower cash-outs, including after the first floor. First-floor payouts target roughly 80%
 base RTP so they remain below 100% theoretical RTP with a 25% gamble multiplier. Easy's 0.93x first
 floor cannot be cashed out without finding the 3x gem; Medium's exact 1x first floor is a draw unless
-the gem is found. Floors two through nine target approximately 80%, 81%, 82%, 84%, 86%, 89%, 93%,
-and 96% base RTP. The rising curve rewards deeper, less common runs while keeping fast shallow
+the gem is found. Floors two through nine target approximately 81%, 82%, 83%, 85%, 87%, 90%, 94%,
+and 97% base RTP. The rising curve rewards deeper, less common runs while keeping fast shallow
 cash-outs below High-Low and Blackjack. Expert's rounded 500x top is the deliberate exception at
 about 97.7% base RTP on its 1-in-512 completion path.
 
