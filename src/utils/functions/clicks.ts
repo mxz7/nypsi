@@ -53,7 +53,7 @@ export function parseClickSessionRewards(description?: string): ClickSessionRewa
   if (!session) return rewards;
 
   const rewardPattern =
-    /\*\*([\d,]+)x\*\* .*?\]\(https:\/\/nypsi\.xyz\/items\/([^)?]+)(?:\?[^)]*)?\)/g;
+    /(?:\*\*|`)([\d,]+)x(?:\*\*|`) .*?\]\(https:\/\/nypsi\.xyz\/items\/([^)?]+)(?:\?[^)]*)?\)/g;
 
   for (const match of session.matchAll(rewardPattern)) {
     const count = parseInt(match[1].replaceAll(",", ""));
@@ -137,7 +137,7 @@ export async function buildClickMessage(
     .map(([itemId, count]) => {
       const item = getItems()[itemId];
 
-      return `**${count.toLocaleString()}x** ${item.emoji} [${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-click)`;
+      return `- \`${count.toLocaleString()}x\` ${item.emoji} [${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-click)`;
     })
     .join("\n");
 
