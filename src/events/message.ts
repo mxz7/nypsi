@@ -168,7 +168,7 @@ export default async function messageCreate(message: Message) {
       rowComponents.push(
         new ButtonBuilder()
           .setCustomId("btn-contact-support")
-          .setLabel("talk to a staff member")
+          .setLabel("talk to nypsi staff")
           .setStyle(ButtonStyle.Danger),
         new ButtonBuilder()
           .setStyle(ButtonStyle.Link)
