@@ -23,7 +23,20 @@ export default {
 
     if (ownerId !== interaction.user.id) {
       const defer = setTimeout(() => interaction.deferReply().catch(() => {}), 2500);
+      const computeStartedAt = performance.now();
+
+      await addClick(interaction.user);
       const message = await buildClickMessage(interaction.user, interaction.guild);
+      const computeTime = performance.now() - computeStartedAt;
+
+      logger.info(
+        `click: computed update for ${interaction.user.id} in ${computeTime.toFixed(2)}ms`,
+        {
+          userId: interaction.user.id,
+          guildId: interaction.guild.id,
+          computeTime,
+        },
+      );
 
       clearTimeout(defer);
       return interaction.reply(message).catch(() => interaction.editReply(message));
