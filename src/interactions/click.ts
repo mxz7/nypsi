@@ -2,6 +2,7 @@ import { MessageFlags } from "discord.js";
 import { ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
 import { addClick, buildClickMessage, CLICK_BUTTON_ID } from "../utils/functions/clicks";
+import { isEcoBanned } from "../utils/functions/economy/utils";
 import { logger } from "../utils/logger";
 
 export default {
@@ -9,6 +10,7 @@ export default {
   type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;
+    if ((await isEcoBanned(interaction.user)).banned) return;
 
     const ownerId = interaction.customId.split(":")[1];
 
