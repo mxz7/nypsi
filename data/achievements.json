@@ -1833,5 +1833,54 @@
       "rain:1",
       "tag:yapper"
     ]
+  },
+  "clicker_i": {
+    "id": "clicker_i",
+    "name": "clicker **I**",
+    "emoji": "<:default_arrow:1538231697110208642>",
+    "target": 100,
+    "description": "click 100 times",
+    "prize": ["lucky_scratch_card:1", "cursor:1"]
+  },
+  "clicker_ii": {
+    "id": "clicker_ii",
+    "name": "clicker **II**",
+    "emoji": "<:default_arrow:1538231697110208642>",
+    "target": 1000,
+    "description": "click 1,000 times",
+    "prize": ["legendary_scratch_card:1", "cursor:10"]
+  },
+  "clicker_iii": {
+    "id": "clicker_iii",
+    "name": "clicker **III**",
+    "emoji": "<:default_arrow:1538231697110208642>",
+    "target": 10000,
+    "description": "click 10,000 times",
+    "prize": ["legendary_scratch_card:2", "bronze_credit:1", "cursor:50"]
+  },
+  "clicker_iv": {
+    "id": "clicker_iv",
+    "name": "clicker **IV**",
+    "emoji": "<:default_arrow:1538231697110208642>",
+    "target": 50000,
+    "description": "click 50,000 times",
+    "prize": ["nypsi_crate:1", "legendary_scratch_card:2", "silver_credit:1", "cursor:100"]
+  },
+  "clicker_v": {
+    "id": "clicker_v",
+    "name": "clicker **V**",
+    "emoji": "<:default_arrow:1538231697110208642>",
+    "target": 100000,
+    "description": "click 100,000 times",
+    "prize": [
+      "gem_crate:1",
+      "nypsi_crate:2",
+      "legendary_scratch_card:4",
+      "gold_credit:1",
+      "omega_crate:1",
+      "rain:1",
+      "tag:clicker",
+      "cursor:250"
+    ]
   }
 }

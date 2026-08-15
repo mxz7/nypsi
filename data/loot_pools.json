@@ -554,6 +554,39 @@
       "pet_crate": 5
     }
   },
+  "click": {
+    "nothing": 11484,
+    "money": {
+      "1000000": 3,
+      "5000000": 1
+    },
+    "xp": {
+      "100": 4,
+      "500": 1.4
+    },
+    "items": {
+      "basic_crate": 20,
+      "69420_crate": 20,
+      "cookie": 21,
+      "lottery_ticket": {
+        "weight": 20,
+        "count": {
+          "min": 1,
+          "max": 50
+        }
+      },
+      "stolen_credit_card": 20,
+      "dabloon": {
+        "weight": 5,
+        "count": {
+          "min": 1,
+          "max": 25
+        }
+      },
+      "lucky_7": 0.1,
+      "nypsi_crate": 0.5
+    }
+  },
   "random_drop": {
     "items": {
       "diamond_pickaxe": {

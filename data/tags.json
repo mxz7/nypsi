@@ -278,6 +278,13 @@
     "description": "found in the sudoku professional v achievement",
     "emoji": "🧩"
   },
+  "clicker": {
+    "id": "clicker",
+    "name": "clicker",
+    "description": "found in the clicker v achievement",
+    "emoji": "<:default_arrow:1538231697110208642>",
+    "image": "default_arrow.png"
+  },
   "year1": {
     "id": "year1",
     "name": "year 1",

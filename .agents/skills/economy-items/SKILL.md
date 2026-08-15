@@ -32,6 +32,10 @@ Use `hasItemValueData(itemId)` when an action must only be available with a hist
 
 Do not record transfers, trades, market/offer fulfillment, refunds, or inventory restoration. Rewards obtained from a crate or scratch card use `item:<containerItemId>` as their source; `giveLootPoolResult()` and `openCrate()` already propagate this attribution.
 
+Click rewards use `giveLootPoolResult(member, result, "click")` inside `rollClickLoot()`, so item
+source stats are recorded automatically under `click`. Do not add another source-stat increment in
+the click interaction or it will double-count generated items.
+
 `getItemSourceStats(itemId)` returns the current season's rows ordered by amount. The item command's obtaining tab uses it for the optional **view source stats** alternate view; items without recorded rows do not show the toggle.
 
 ## Fuzzy/substring search (multiple results)

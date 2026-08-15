@@ -80,3 +80,16 @@ for (const [poolId, pool] of Object.entries(lootPools)) {
     }
   });
 }
+
+test("click reward rate", () => {
+  const pool = lootPools.click;
+  const itemWeight = Object.values(pool.items).reduce(
+    (total, entry) => total + (typeof entry === "number" ? entry : (entry.weight ?? 100)),
+    0,
+  );
+  const rewardWeight = [pool.money, pool.xp, pool.karma]
+    .flatMap((rewards) => Object.values(rewards ?? {}))
+    .reduce((total, weight) => total + weight, itemWeight);
+
+  expect(rewardWeight / (pool.nothing + rewardWeight)).toBeCloseTo(0.01);
+});
