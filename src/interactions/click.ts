@@ -1,6 +1,9 @@
 import { MessageFlags } from "discord.js";
+import { NypsiMessage } from "../models/Command";
 import { ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
+import { a } from "../utils/functions/anticheat";
+import { isLockedOut, verifyUser } from "../utils/functions/captcha";
 import { addClick, buildClickMessage, CLICK_BUTTON_ID } from "../utils/functions/clicks";
 import { isEcoBanned } from "../utils/functions/economy/utils";
 import { logger } from "../utils/logger";
@@ -21,10 +24,19 @@ export default {
       });
     }
 
+    if (await isLockedOut(interaction.user)) {
+      const message = interaction as unknown as NypsiMessage;
+
+      message.author = interaction.user;
+      message.content = "click";
+      return verifyUser(message);
+    }
+
     if (ownerId !== interaction.user.id) {
       const defer = setTimeout(() => interaction.deferReply().catch(() => {}), 2500);
       const computeStartedAt = performance.now();
 
+      await a(interaction.user.id, interaction.user.username, "click", "click");
       await addClick(interaction.user);
       const message = await buildClickMessage(interaction.user, interaction.guild);
       const computeTime = performance.now() - computeStartedAt;
@@ -45,6 +57,7 @@ export default {
     const defer = setTimeout(() => interaction.deferUpdate().catch(() => {}), 2500);
     const computeStartedAt = performance.now();
 
+    await a(interaction.user.id, interaction.user.username, "click", "click");
     await addClick(interaction.user);
     const message = await buildClickMessage(interaction.user, interaction.guild);
     const computeTime = performance.now() - computeStartedAt;
