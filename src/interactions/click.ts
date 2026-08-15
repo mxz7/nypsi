@@ -13,7 +13,9 @@ import {
   parseClickSessionRewards,
   rollClickLoot,
 } from "../utils/functions/clicks";
+import { addProgress } from "../utils/functions/economy/achievements";
 import { describeLootPoolResult } from "../utils/functions/economy/loot_pools";
+import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { isEcoBanned } from "../utils/functions/economy/utils";
 import { logger } from "../utils/logger";
 
@@ -51,9 +53,14 @@ export default {
       ? parseClickSessionRewards(interaction.message.embeds[0]?.description)
       : {};
 
-    await a(interaction.user.id, interaction.user.username, "click", "click");
-    await addClick(interaction.user);
-    const loot = await rollClickLoot(interaction.user);
+    const [loot] = await Promise.all([
+      rollClickLoot(interaction.user),
+      addClick(interaction.user),
+      addProgress(interaction.user, "clicker", 1),
+      addTaskProgress(interaction.user, "click_daily"),
+      addTaskProgress(interaction.user, "click_weekly"),
+      a(interaction.user.id, interaction.user.username, "click", "click"),
+    ]);
 
     addClickSessionReward(sessionRewards, loot);
 

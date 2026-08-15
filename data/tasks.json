@@ -59,6 +59,22 @@
     ],
     "type": "daily"
   },
+  "click_daily": {
+    "id": "click_daily",
+    "name": "clicker",
+    "description": "/click the button",
+    "target": [25, 50, 100],
+    "prizes": ["id:basic_crate:1", "id:69420_crate:1", "xp:500"],
+    "type": "daily"
+  },
+  "click_weekly": {
+    "id": "click_weekly",
+    "name": "clicker",
+    "description": "/click the button",
+    "target": [500, 750, 1000],
+    "prizes": ["id:basic_crate:3", "id:69420_crate:3", "xp:2000", "id:dabloon:25"],
+    "type": "weekly"
+  },
   "rickroll": {
     "id": "rickroll",
     "name": "rick astley",
