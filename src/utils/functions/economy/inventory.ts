@@ -298,18 +298,20 @@ export async function addItemSourceStat(itemId: string, source: string, amount: 
 
   return prisma.itemSourceStats
     .upsert({
-      where: { itemId_source: { itemId, source } },
+      where: {
+        itemId_season_source: { itemId, season: Constants.SEASON_NUMBER, source },
+      },
       update: { amount: { increment: amount } },
-      create: { itemId, source, amount },
+      create: { itemId, season: Constants.SEASON_NUMBER, source, amount },
     })
     .catch((error) =>
       logger.error(`failed to record item stat for ${itemId} from ${source}`, error),
     );
 }
 
-export async function getItemSourceStats(itemId: string) {
+export async function getItemSourceStats(itemId: string, season = Constants.SEASON_NUMBER) {
   return prisma.itemSourceStats.findMany({
-    where: { itemId, amount: { gt: 0 } },
+    where: { itemId, season, amount: { gt: 0 } },
     orderBy: { amount: "desc" },
   });
 }

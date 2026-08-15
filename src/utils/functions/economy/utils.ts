@@ -419,8 +419,6 @@ export async function reset() {
   await prisma.$executeRaw`TRUNCATE TABLE "Game" RESTART IDENTITY;`;
   logger.info("deleting stats");
   await prisma.stats.deleteMany();
-  logger.info("deleting item source stats");
-  await prisma.itemSourceStats.deleteMany();
   logger.info("deleting guilds");
   await prisma.economyGuildMember.deleteMany();
   const guilds = await prisma.economyGuild.findMany({ select: { avatarId: true } });
