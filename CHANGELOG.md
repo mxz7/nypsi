@@ -11,6 +11,7 @@
 - add pet crate
 - add yapper achievement
 - improve balancing of highlow and dragon tower
+- add /click game
 
 # july 2026
 
