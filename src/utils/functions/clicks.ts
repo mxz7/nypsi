@@ -16,6 +16,8 @@ import { getMembers } from "./leaderboards/helpers";
 import { getUserId, MemberResolvable } from "./member";
 
 export const CLICK_BUTTON_ID = "btn-click";
+const CLICK_SESSION_MONEY = "$money";
+const CLICK_SESSION_XP = "$xp";
 
 type ClickOverview = {
   userClicks: number;
@@ -25,6 +27,28 @@ type ClickOverview = {
 };
 
 export type ClickSessionRewards = Record<string, number>;
+
+export function buildClickButtonRow(userId: string, label: string, captchaWarning = false) {
+  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+    new ButtonBuilder()
+      .setCustomId(`${CLICK_BUTTON_ID}:${userId}`)
+      .setLabel(label)
+      .setStyle(ButtonStyle.Primary),
+  );
+
+  if (captchaWarning) {
+    row.addComponents(
+      new ButtonBuilder()
+        .setCustomId("btn-captcha")
+        .setLabel("you must complete a captcha")
+        .setStyle(ButtonStyle.Secondary)
+        .setDisabled(true)
+        .setEmoji("⚠️"),
+    );
+  }
+
+  return row;
+}
 
 export async function addClick(member: MemberResolvable) {
   const userId = getUserId(member);
@@ -62,6 +86,12 @@ export function parseClickSessionRewards(description?: string): ClickSessionRewa
     if (getItems()[itemId] && count > 0) rewards[itemId] = count;
   }
 
+  const money = /`\$([\d,]+)` money/.exec(session);
+  const xp = /`([\d,]+)xp` experience/.exec(session);
+
+  if (money) rewards[CLICK_SESSION_MONEY] = parseInt(money[1].replaceAll(",", ""));
+  if (xp) rewards[CLICK_SESSION_XP] = parseInt(xp[1].replaceAll(",", ""));
+
   return rewards;
 }
 
@@ -70,6 +100,9 @@ export function addClickSessionReward(
   result: LootPoolResult,
 ): ClickSessionRewards {
   if (result.item) rewards[result.item] = (rewards[result.item] ?? 0) + (result.count ?? 1);
+  if (result.money)
+    rewards[CLICK_SESSION_MONEY] = (rewards[CLICK_SESSION_MONEY] ?? 0) + result.money;
+  if (result.xp) rewards[CLICK_SESSION_XP] = (rewards[CLICK_SESSION_XP] ?? 0) + result.xp;
   return rewards;
 }
 
@@ -112,6 +145,7 @@ export async function buildClickMessage(
   member: MemberResolvable,
   guild: Guild,
   sessionRewards: ClickSessionRewards = {},
+  captchaWarning = false,
 ): Promise<BaseMessageOptions> {
   const userId = getUserId(member);
 
@@ -123,11 +157,7 @@ export async function buildClickMessage(
   const globalPosition = stats.globalPosition?.toLocaleString() ?? "--";
   const serverPosition = stats.serverPosition?.toLocaleString() ?? "--";
 
-  const button = new ButtonBuilder()
-    .setCustomId(`${CLICK_BUTTON_ID}:${userId}`)
-    .setLabel(stats.userClicks.toLocaleString())
-    .setStyle(ButtonStyle.Primary);
-  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(button);
+  const row = buildClickButtonRow(userId, stats.userClicks.toLocaleString(), captchaWarning);
 
   if (stats.userClicks === 0) {
     return { components: [row] };
@@ -135,6 +165,9 @@ export async function buildClickMessage(
 
   const session = Object.entries(sessionRewards)
     .map(([itemId, count]) => {
+      if (itemId === CLICK_SESSION_MONEY) return `- 💰 $**${count.toLocaleString()}**`;
+      if (itemId === CLICK_SESSION_XP) return `- ${count.toLocaleString()}xp`;
+
       const item = getItems()[itemId];
 
       return `- \`${count.toLocaleString()}x\` ${item.emoji} [${item.name}](https://nypsi.xyz/items/${item.id}?ref=bot-click)`;

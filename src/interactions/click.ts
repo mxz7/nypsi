@@ -1,4 +1,4 @@
-import { MessageFlags } from "discord.js";
+import { ComponentType, MessageFlags } from "discord.js";
 import { NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
@@ -8,6 +8,7 @@ import { isLockedOut, verifyUser } from "../utils/functions/captcha";
 import {
   addClick,
   addClickSessionReward,
+  buildClickButtonRow,
   buildClickMessage,
   CLICK_BUTTON_ID,
   parseClickSessionRewards,
@@ -35,7 +36,23 @@ export default {
       });
     }
 
-    if (await isLockedOut(interaction.user)) {
+    const lockedOut = await isLockedOut(interaction.user);
+    const existingRow = interaction.message.components[0];
+    const hasCaptchaWarning =
+      existingRow?.data.type === ComponentType.ActionRow &&
+      "components" in existingRow &&
+      existingRow.components.length > 1;
+    const componentData =
+      "data" in interaction.component ? interaction.component.data : interaction.component;
+    const buttonLabel = "label" in componentData ? componentData.label : "0";
+
+    if (Boolean(lockedOut) !== hasCaptchaWarning) {
+      await interaction.message.edit({
+        components: [buildClickButtonRow(ownerId, buttonLabel ?? "0", Boolean(lockedOut))],
+      });
+    }
+
+    if (lockedOut) {
       const message = interaction as unknown as NypsiMessage;
 
       message.author = interaction.user;
@@ -64,7 +81,13 @@ export default {
 
     addClickSessionReward(sessionRewards, loot);
 
-    const message = await buildClickMessage(interaction.user, interaction.guild, sessionRewards);
+    const needsCaptcha = Boolean(await isLockedOut(interaction.user));
+    const message = await buildClickMessage(
+      interaction.user,
+      interaction.guild,
+      sessionRewards,
+      needsCaptcha,
+    );
     const computeTime = performance.now() - computeStartedAt;
 
     logger.info(
@@ -84,7 +107,7 @@ export default {
       await interaction.reply(message).catch(() => interaction.editReply(message));
     }
 
-    if (loot.item) {
+    if (Object.keys(loot).length > 0) {
       const embed = new CustomEmbed(interaction.user)
         .setColor(Constants.EMBED_SUCCESS_COLOR)
         .setHeader(interaction.user.username, interaction.user.displayAvatarURL())
