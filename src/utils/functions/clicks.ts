@@ -7,9 +7,12 @@ import {
   type MessageActionRowComponentBuilder,
 } from "discord.js";
 import prisma from "../../init/database";
+import redis from "../../init/redis";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import { LootPoolResult } from "../../types/LootPool";
+import Constants from "../Constants";
 import { logger } from "../logger";
+import { RedisPubSub } from "../pubsub";
 import { itemExists } from "./economy/inventory";
 import { giveLootPoolResult, rollLootPool } from "./economy/loot_pools";
 import { createUser, getItems, getLootPools, userExists } from "./economy/utils";
@@ -19,6 +22,14 @@ import { getUserId, MemberResolvable } from "./member";
 export const CLICK_BUTTON_ID = "btn-click";
 const CLICK_SESSION_MONEY = "$money";
 const CLICK_SESSION_XP = "$xp";
+
+type ClickEvent = {
+  userId: string;
+  clicks: number;
+  lastClick: string;
+};
+
+const clickEvents = new RedisPubSub<ClickEvent>(redis, Constants.redis.pubsub.CLICKS);
 
 type ClickOverview = {
   userClicks: number;
@@ -53,12 +64,21 @@ export function buildClickButtonRow(userId: string, label: string, captchaWarnin
 
 export async function addClick(member: MemberResolvable) {
   const userId = getUserId(member);
+  const lastClick = new Date();
 
-  await prisma.clicks.upsert({
+  const click = await prisma.clicks.upsert({
     where: { userId },
-    create: { userId, clicks: 1 },
-    update: { clicks: { increment: 1 } },
+    create: { userId, clicks: 1, lastClick },
+    update: { clicks: { increment: 1 }, lastClick },
   });
+
+  await clickEvents
+    .publish({
+      userId,
+      clicks: click.clicks,
+      lastClick: click.lastClick.toISOString(),
+    })
+    .catch((error) => logger.error("click: failed to publish update", { userId, error }));
 }
 
 export async function rollClickLoot(member: MemberResolvable): Promise<LootPoolResult> {
