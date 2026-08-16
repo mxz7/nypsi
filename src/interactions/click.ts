@@ -25,7 +25,6 @@ export default {
   type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;
-    if ((await isEcoBanned(interaction.user)).banned) return;
 
     const ownerId = interaction.customId.split(":")[1];
 
@@ -59,6 +58,8 @@ export default {
       message.content = "click";
       return verifyUser(message);
     }
+
+    if ((await isEcoBanned(interaction.user)).banned) return;
 
     const ownsMessage = ownerId === interaction.user.id;
     const defer = setTimeout(() => {
