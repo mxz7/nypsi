@@ -1,4 +1,5 @@
 import { ComponentType, MessageFlags } from "discord.js";
+import { NypsiClient } from "../models/Client";
 import { NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
@@ -15,6 +16,7 @@ import {
   rollClickLoot,
 } from "../utils/functions/clicks";
 import { addProgress } from "../utils/functions/economy/achievements";
+import { addEventProgress } from "../utils/functions/economy/events";
 import { describeLootPoolResult } from "../utils/functions/economy/loot_pools";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { createUser, isEcoBanned, userExists } from "../utils/functions/economy/utils";
@@ -82,8 +84,9 @@ export default {
       : {};
 
     const writesStartedAt = performance.now();
-    const [loot] = await Promise.all([
+    const [loot, eventProgress] = await Promise.all([
       rollClickLoot(interaction.user),
+      addEventProgress(interaction.client as NypsiClient, interaction.user, "clicks", 1),
       addClick(interaction.user),
       addProgress(interaction.user, "clicker", 1),
       addTaskProgress(interaction.user, "click_daily"),
@@ -101,6 +104,7 @@ export default {
       interaction.guild,
       sessionRewards,
       needsCaptcha,
+      eventProgress,
     );
     const messageBuildTime = performance.now() - messageBuildStartedAt;
     const computeTime = performance.now() - computeStartedAt;

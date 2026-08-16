@@ -64,6 +64,7 @@
     "name": "cookie collector",
     "description": "bake {target} cookies!"
   },
+
   "milfs": {
     "id": "milfs",
     "name": "milf finder",
@@ -98,5 +99,10 @@
     "id": "christmas",
     "name": "christmas",
     "description": "collect {target} christmas trees!"
+  },
+  "clicks": {
+    "id": "clicks",
+    "name": "clicker",
+    "description": "click {target} times in /click!"
   }
 }

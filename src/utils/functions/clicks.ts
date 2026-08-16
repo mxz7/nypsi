@@ -13,6 +13,7 @@ import { LootPoolResult } from "../../types/LootPool";
 import Constants from "../Constants";
 import { logger } from "../logger";
 import { RedisPubSub } from "../pubsub";
+import { formatEventProgress, getCurrentEvent } from "./economy/events";
 import { itemExists } from "./economy/inventory";
 import { giveLootPoolResult, rollLootPool } from "./economy/loot_pools";
 import { createUser, getItems, getLootPools, userExists } from "./economy/utils";
@@ -173,6 +174,7 @@ export async function buildClickMessage(
   guild: Guild,
   sessionRewards: ClickSessionRewards = {},
   captchaWarning = false,
+  eventProgress?: number,
 ): Promise<BaseMessageOptions> {
   const userId = getUserId(member);
 
@@ -203,14 +205,20 @@ export async function buildClickMessage(
     })
     .join("\n");
 
+  let description =
+    `global position: **#${globalPosition}**\n` +
+    `server position: **#${serverPosition}**\n` +
+    `total global clicks: **${stats.globalClicks.toLocaleString()}**` +
+    (session ? `\n\n**current session rewards**\n${session}` : "");
+
+  if (eventProgress) {
+    const eventData = await getCurrentEvent();
+    description += `\n\n${formatEventProgress(eventData, eventProgress, userId)}`;
+  }
+
   const embed = new CustomEmbed(member)
     .setHeader(`${user.username}`, user.displayAvatarURL())
-    .setDescription(
-      `global position: **#${globalPosition}**\n` +
-        `server position: **#${serverPosition}**\n` +
-        `total global clicks: **${stats.globalClicks.toLocaleString()}**` +
-        (session ? `\n\n**current session rewards**\n${session}` : ""),
-    );
+    .setDescription(description);
 
   return { content, allowedMentions, embeds: [embed], components: [row] };
 }
