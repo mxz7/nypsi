@@ -154,6 +154,9 @@ for (const [group, values] of Object.entries(adminPermissionLevels)) {
 
 export default {
   redis: {
+    pubsub: {
+      CLICKS: "nypsi:clicks",
+    },
     cooldown: {
       MARKET_WATCH: "cd:marketwatch",
       GUILD_CREATE: "cd:guildcreate",

@@ -17,7 +17,7 @@ import {
 import { addProgress } from "../utils/functions/economy/achievements";
 import { describeLootPoolResult } from "../utils/functions/economy/loot_pools";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
-import { isEcoBanned } from "../utils/functions/economy/utils";
+import { createUser, isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { logger } from "../utils/logger";
 
 export default {
@@ -27,6 +27,10 @@ export default {
     if (!interaction.isButton()) return;
 
     const ownerId = interaction.customId.split(":")[1];
+
+    if (!(await userExists(interaction.user.id))) {
+      await createUser(interaction.user.id);
+    }
 
     if (!interaction.guild) {
       return interaction.reply({

@@ -777,8 +777,9 @@ model Lottery {
 }
 
 model Clicks {
-  userId String @id
-  clicks Int    @default(0)
+  userId    String   @id
+  clicks    Int      @default(0)
+  lastClick DateTime @default(now())
 
   user Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
 }
