@@ -71,6 +71,7 @@ export default {
       ? parseClickSessionRewards(interaction.message.embeds[0]?.description)
       : {};
 
+    const writesStartedAt = performance.now();
     const [loot] = await Promise.all([
       rollClickLoot(interaction.user),
       addClick(interaction.user),
@@ -79,9 +80,11 @@ export default {
       addTaskProgress(interaction.user, "click_weekly"),
       a(interaction.user.id, interaction.user.username, "click", "click"),
     ]);
+    const writesTime = performance.now() - writesStartedAt;
 
     addClickSessionReward(sessionRewards, loot);
 
+    const messageBuildStartedAt = performance.now();
     const needsCaptcha = Boolean(await isLockedOut(interaction.user));
     const message = await buildClickMessage(
       interaction.user,
@@ -89,14 +92,17 @@ export default {
       sessionRewards,
       needsCaptcha,
     );
+    const messageBuildTime = performance.now() - messageBuildStartedAt;
     const computeTime = performance.now() - computeStartedAt;
 
     logger.info(
-      `click: computed update for ${interaction.user.id} in ${computeTime.toFixed(2)}ms`,
+      `click: computed update for ${interaction.user.id} in ${computeTime.toFixed(2)}ms (writes ${writesTime.toFixed(2)}ms, message ${messageBuildTime.toFixed(2)}ms)`,
       {
         userId: interaction.user.id,
         guildId: interaction.guild.id,
         computeTime,
+        writesTime,
+        messageBuildTime,
       },
     );
 
