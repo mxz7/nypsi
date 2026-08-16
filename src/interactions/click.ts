@@ -48,9 +48,15 @@ export default {
     const componentData =
       "data" in interaction.component ? interaction.component.data : interaction.component;
     const buttonLabel = "label" in componentData ? componentData.label : "0";
+    const captchaMention = `<@${interaction.user.id}>`;
+    const captchaMessageChanged = lockedOut
+      ? interaction.message.content !== captchaMention
+      : interaction.message.content.length > 0;
 
-    if (Boolean(lockedOut) !== hasCaptchaWarning) {
+    if (Boolean(lockedOut) !== hasCaptchaWarning || captchaMessageChanged) {
       await interaction.message.edit({
+        content: lockedOut ? captchaMention : "",
+        allowedMentions: { users: lockedOut ? [interaction.user.id] : [] },
         components: [buildClickButtonRow(ownerId, buttonLabel ?? "0", Boolean(lockedOut))],
       });
     }

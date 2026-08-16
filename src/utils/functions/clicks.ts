@@ -185,9 +185,11 @@ export async function buildClickMessage(
   const serverPosition = stats.serverPosition?.toLocaleString() ?? "--";
 
   const row = buildClickButtonRow(userId, stats.userClicks.toLocaleString(), captchaWarning);
+  const content = captchaWarning ? `<@${userId}>` : "";
+  const allowedMentions = { users: captchaWarning ? [userId] : [] };
 
   if (stats.userClicks === 0) {
-    return { components: [row] };
+    return { content, allowedMentions, components: [row] };
   }
 
   const session = Object.entries(sessionRewards)
@@ -210,5 +212,5 @@ export async function buildClickMessage(
         (session ? `\n\n**current session rewards**\n${session}` : ""),
     );
 
-  return { embeds: [embed], components: [row] };
+  return { content, allowedMentions, embeds: [embed], components: [row] };
 }
