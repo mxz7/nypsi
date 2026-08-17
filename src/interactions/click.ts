@@ -1,4 +1,5 @@
 import { ComponentType, MessageFlags } from "discord.js";
+import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
 import { NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
@@ -72,6 +73,25 @@ export default {
     }
 
     if ((await isEcoBanned(interaction.user)).banned) return;
+
+    const clickMessageLockKey = `nypsi:click-message-lock:${interaction.user.id}`;
+    const claimedClickMessage = await redis.set(
+      clickMessageLockKey,
+      interaction.message.id,
+      "EX",
+      2,
+      "NX",
+    );
+
+    if (!claimedClickMessage && (await redis.get(clickMessageLockKey)) !== interaction.message.id) {
+      logger.warn(
+        `click: ${interaction.user.id} (${interaction.user.username}) attempted clicking multiple messages`,
+      );
+      return interaction.reply({
+        embeds: [new ErrorEmbed("you can only click one message at a time")],
+        flags: MessageFlags.Ephemeral,
+      });
+    }
 
     const ownsMessage = ownerId === interaction.user.id;
     const defer = setTimeout(() => {
