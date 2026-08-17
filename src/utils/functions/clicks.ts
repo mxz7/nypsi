@@ -114,11 +114,11 @@ export function parseClickSessionRewards(description?: string): ClickSessionRewa
     if (getItems()[itemId] && count > 0) rewards[itemId] = count;
   }
 
-  const money = /`\$([\d,]+)` money/.exec(session);
-  const xp = /`([\d,]+)xp` experience/.exec(session);
+  const money = /(?:💰 \$\*\*([\d,]+)\*\*|`\$([\d,]+)` money)/.exec(session);
+  const xp = /(?:^- ([\d,]+)xp$|`([\d,]+)xp` experience)/m.exec(session);
 
-  if (money) rewards[CLICK_SESSION_MONEY] = parseInt(money[1].replaceAll(",", ""));
-  if (xp) rewards[CLICK_SESSION_XP] = parseInt(xp[1].replaceAll(",", ""));
+  if (money) rewards[CLICK_SESSION_MONEY] = parseInt((money[1] ?? money[2]).replaceAll(",", ""));
+  if (xp) rewards[CLICK_SESSION_XP] = parseInt((xp[1] ?? xp[2]).replaceAll(",", ""));
 
   return rewards;
 }
