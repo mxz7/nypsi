@@ -12,6 +12,7 @@ import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
+import { RedisPubSub } from "../../pubsub";
 import { MStoTime } from "../date";
 import { getUserId, MemberResolvable } from "../member";
 import { percentChance } from "../random";
@@ -28,7 +29,19 @@ import dayjs = require("dayjs");
 
 export type EventData = Event & { contributions: EventContribution[] };
 
+type EventProgressEvent = {
+  eventId: number;
+  userId: string;
+  userProgress: number;
+  totalProgress: number;
+};
+
 let completing = false;
+
+const eventProgressEvents = new RedisPubSub<EventProgressEvent>(
+  redis,
+  Constants.redis.pubsub.EVENT_PROGRESS,
+);
 
 const REWARDS_TOP5P = 10;
 const REWARDS_TOP10P = 15;
@@ -246,7 +259,7 @@ export async function addEventProgress(
 
   amount += amount * ((await rollPet(user, "event")) ?? 0);
 
-  await prisma.eventContribution.upsert({
+  const contribution = await prisma.eventContribution.upsert({
     where: {
       userId_eventId: {
         userId,
@@ -279,6 +292,17 @@ export async function addEventProgress(
     progress = getEventProgress(await getCurrentEvent(false));
     await redis.set(Constants.redis.cache.economy.eventProgress, progress);
   }
+
+  await eventProgressEvents
+    .publish({
+      eventId: event.id,
+      userId,
+      userProgress: Number(contribution.contribution),
+      totalProgress: progress,
+    })
+    .catch((error) =>
+      logger.error("event: failed to publish progress update", { eventId: event.id, error }),
+    );
 
   if (hasEventEnded(event, progress)) {
     completeEvent(client, userId);

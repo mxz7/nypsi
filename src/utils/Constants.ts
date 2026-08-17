@@ -156,6 +156,7 @@ export default {
   redis: {
     pubsub: {
       CLICKS: "nypsi:clicks",
+      EVENT_PROGRESS: "nypsi:event-progress",
     },
     cooldown: {
       MARKET_WATCH: "cd:marketwatch",
