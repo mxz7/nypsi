@@ -47,3 +47,7 @@ awarded when a player cashes out after at least seven correct guesses.
 Default Mines randomly chooses 3-6 mines and adds 0.6x per safe selection. RTP analysis must include
 the 3x diamond and the money bag, which is credited immediately and remains credited if the player
 later hits a mine. The money bag can overwrite the diamond during board generation.
+
+When a player reveals the money bag, call `addBalance()` immediately without awaiting or storing its
+promise. Update the board interaction, then send the follow-up notification so the payout work does
+not delay acknowledgement.

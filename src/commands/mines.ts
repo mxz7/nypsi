@@ -963,7 +963,7 @@ async function playGame(
         const amount = (Math.random() * 66.6666666 + 33.3333333) / 100;
 
         game.moneyBag = Math.floor(game.bet * amount);
-        await addBalance(message.member, game.moneyBag);
+        addBalance(message.member, game.moneyBag);
 
         followUp = {
           embeds: [
@@ -1018,13 +1018,13 @@ async function playGame(
         components[4].components[4].setDisabled(true);
       }
 
-      await edit({ embeds: [embed], components }, "rerendering game", response).then(() => {
-        if (followUp) {
-          response.followUp(followUp).catch(() => {
-            logger.warn(`mines: ${message.author.id} failed to send follow up`, followUp);
-          });
-        }
-      });
+      await edit({ embeds: [embed], components }, "rerendering game", response);
+
+      if (followUp) {
+        response.followUp(followUp).catch(() => {
+          logger.warn(`mines: ${message.author.id} failed to send follow up`, followUp);
+        });
+      }
 
       return playGame(game, message, send, msg, args);
     default:
