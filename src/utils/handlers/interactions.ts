@@ -76,7 +76,9 @@ export async function runInteraction(interaction: Interaction) {
 
     const interactionMessageId = interaction.message.id;
     const customId = interaction.customId;
-    const roleIdFromCustomId = customId.split(":")[1];
+    const roleIdFromCustomId = customId.startsWith("btn-toggle-reaction-role:")
+      ? customId.split(":")[1]
+      : customId;
 
     const reactionRole = reactionRoles.find((r) => r.messageId === interactionMessageId);
     if (!reactionRole) return;
