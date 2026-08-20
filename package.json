@@ -36,7 +36,7 @@
     "chalk": "4.1.2",
     "chess.js": "^1.4.0",
     "cron": "^4.4.0",
-    "dayjs": "1.11.21",
+    "dayjs": "1.11.23",
     "discord-api-types": "^0.38.53",
     "discord-hybrid-sharding": "3.0.1",
     "discord.js": "14.27.0",
