@@ -29,8 +29,8 @@ dev: build
 	$(MAKE) run-worker-dms
 
 checks:
-	pnpm lint
-	pnpm format:check
+	CI=true pnpm lint
+	CI=true pnpm format:check
 
 check: checks
 	$(MAKE) build
