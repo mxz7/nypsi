@@ -5,7 +5,7 @@ import { DMQueue } from "../../types/Market";
 import { NotificationPayload } from "../../types/Notification";
 import Constants from "../../utils/Constants";
 import { getItems } from "../../utils/functions/economy/utils";
-import { addNotificationToQueue } from "../../utils/functions/users/notifications";
+import { addMarketNotification } from "../../utils/functions/users/market-notifications";
 import { getPreferences } from "../../utils/functions/users/preferences";
 import { getLastKnownUsername } from "../../utils/functions/users/username";
 
@@ -36,8 +36,7 @@ export default {
 
       await redis.hdel(`${Constants.redis.nypsi.MARKET_DM}:sell`, userId);
 
-      addNotificationToQueue(await createPayload(data, "sell"));
-      count++;
+      if (await addMarketNotification(await createPayload(data, "sell"))) count++;
     }
 
     const buyKeys = await redis.hkeys(`${Constants.redis.nypsi.MARKET_DM}:buy`);
@@ -62,12 +61,11 @@ export default {
 
       await redis.hdel(`${Constants.redis.nypsi.MARKET_DM}:buy`, userId);
 
-      addNotificationToQueue(await createPayload(data, "buy"));
-      count++;
+      if (await addMarketNotification(await createPayload(data, "buy"))) count++;
     }
 
     if (count > 0) {
-      log(`queued ${count} market DMs`);
+      log(`queued ${count} market notifications`);
     }
   },
 } satisfies Job;

@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { expect, test } from "vitest";
 import {
   LEVEL_NOTIFICATION_PREFERENCES,
+  MARKET_NOTIFICATION_PREFERENCES,
   PreferenceData,
   WORKER_NOTIFICATION_PREFERENCES,
 } from "../../src/types/Preferences";
@@ -31,6 +32,9 @@ test("notification option values should match application enums", () => {
   );
   expect(notifications.level.types?.map((type) => type.value).sort()).toEqual(
     [...LEVEL_NOTIFICATION_PREFERENCES].sort(),
+  );
+  expect(notifications.market.types?.map((type) => type.value).sort()).toEqual(
+    [...MARKET_NOTIFICATION_PREFERENCES].sort(),
   );
   expect(preferences.sudokuCoordMode.types?.map((type) => type.value).sort()).toEqual(
     [...SUDOKU_COORD_MODES].sort(),

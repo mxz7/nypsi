@@ -8,6 +8,9 @@ export type WorkerNotificationPreference = (typeof WORKER_NOTIFICATION_PREFERENC
 export const LEVEL_NOTIFICATION_PREFERENCES = ["Disabled", "All", "OnlyReward"] as const;
 export type LevelNotificationPreference = (typeof LEVEL_NOTIFICATION_PREFERENCES)[number];
 
+export const MARKET_NOTIFICATION_PREFERENCES = ["Disabled", "DM", "Inline"] as const;
+export type MarketNotificationPreference = (typeof MARKET_NOTIFICATION_PREFERENCES)[number];
+
 export interface PreferenceData {
   id: string;
   name: string;
@@ -20,7 +23,7 @@ export interface DmPreferences {
   rob: boolean;
   lottery: boolean;
   premium: boolean;
-  market: boolean;
+  market: MarketNotificationPreference;
   voteReminder: boolean;
   worker: WorkerNotificationPreference;
   booster: boolean;

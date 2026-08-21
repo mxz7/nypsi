@@ -5,8 +5,7 @@ import { Job } from "../../types/Jobs";
 import { deleteMarketOrder } from "../../utils/functions/economy/market";
 import { getItems, userExists } from "../../utils/functions/economy/utils";
 import { pluralize } from "../../utils/functions/string";
-import { addNotificationToQueue } from "../../utils/functions/users/notifications";
-import { getPreferences } from "../../utils/functions/users/preferences";
+import { addMarketNotification } from "../../utils/functions/users/market-notifications";
 
 export default {
   name: "checkmarket",
@@ -53,15 +52,13 @@ export default {
         } has expired. you have been given back your money`,
       );
 
-      if ((await getPreferences(order.ownerId)).dms.market) {
-        addNotificationToQueue({
-          memberId: order.ownerId,
-          payload: {
-            content: "your buy order has expired",
-            embed: embed,
-          },
-        });
-      }
+      await addMarketNotification({
+        memberId: order.ownerId,
+        payload: {
+          content: "your buy order has expired",
+          embed: embed,
+        },
+      });
     }
 
     for (const order of sellOrders) {
@@ -77,15 +74,13 @@ export default {
         } has expired. you have been given back your ${pluralize("item", order.itemAmount)}`,
       );
 
-      if ((await getPreferences(order.ownerId)).dms.market) {
-        addNotificationToQueue({
-          memberId: order.ownerId,
-          payload: {
-            content: "your sell order has expired",
-            embed: embed,
-          },
-        });
-      }
+      await addMarketNotification({
+        memberId: order.ownerId,
+        payload: {
+          content: "your sell order has expired",
+          embed: embed,
+        },
+      });
     }
 
     if (sellOrders.length > 0) {

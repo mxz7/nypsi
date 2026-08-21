@@ -46,8 +46,7 @@ import {
 import { createUser, formatBet, getItems, userExists } from "../utils/functions/economy/utils";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { hasAdminPermission } from "../utils/functions/users/admin";
-import { addNotificationToQueue } from "../utils/functions/users/notifications";
-import { getPreferences } from "../utils/functions/users/preferences";
+import { addMarketNotification } from "../utils/functions/users/market-notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
 
@@ -863,26 +862,24 @@ async function run(
         await addBalance(tradeRequest.ownerId, Number(tradeRequest.offeredMoney));
       }
 
-      if ((await getPreferences(tradeRequest.ownerId)).dms.market) {
-        const embed = new CustomEmbed().setColor(Constants.EMBED_FAIL_COLOR);
+      const embed = new CustomEmbed().setColor(Constants.EMBED_FAIL_COLOR);
 
-        embed.setDescription(
-          `your trade request has been removed by a staff. your items have been returned.`,
-        );
+      embed.setDescription(
+        `your trade request has been removed by a staff. your items have been returned.`,
+      );
 
-        if (args.length > 2) {
-          args.splice(0, 2);
-          embed.addField("reason", args.join(" "));
-        }
-
-        addNotificationToQueue({
-          memberId: tradeRequest.ownerId,
-          payload: {
-            embed: embed,
-            content: "your trade request has been removed by a staff member",
-          },
-        });
+      if (args.length > 2) {
+        args.splice(0, 2);
+        embed.addField("reason", args.join(" "));
       }
+
+      await addMarketNotification({
+        memberId: tradeRequest.ownerId,
+        payload: {
+          embed: embed,
+          content: "your trade request has been removed by a staff member",
+        },
+      });
     }
 
     await (message as Message).react("✅");

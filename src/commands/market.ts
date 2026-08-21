@@ -63,8 +63,7 @@ import { MemberResolvable } from "../utils/functions/member";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { pluralize } from "../utils/functions/string";
 import { hasAdminPermission } from "../utils/functions/users/admin";
-import { addNotificationToQueue } from "../utils/functions/users/notifications";
-import { getPreferences } from "../utils/functions/users/preferences";
+import { addMarketNotification } from "../utils/functions/users/market-notifications";
 import { addCooldown, addExpiry, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
 
@@ -1441,28 +1440,26 @@ async function run(
 
       if (!(await userExists(order.ownerId))) return;
 
-      if ((await getPreferences(order.ownerId)).dms.market) {
-        const embed = new CustomEmbed().setColor(Constants.EMBED_FAIL_COLOR);
+      const embed = new CustomEmbed().setColor(Constants.EMBED_FAIL_COLOR);
 
-        embed.setDescription(
-          `your ${order.orderType} order for ${order.itemAmount}x ${items[order.itemId].emoji} ${
-            items[order.itemId].name
-          } has been removed by a staff member. you have been given back your ${order.orderType == "buy" ? "money" : `${pluralize("item", order.itemAmount)}`}`,
-        );
+      embed.setDescription(
+        `your ${order.orderType} order for ${order.itemAmount}x ${items[order.itemId].emoji} ${
+          items[order.itemId].name
+        } has been removed by a staff member. you have been given back your ${order.orderType == "buy" ? "money" : `${pluralize("item", order.itemAmount)}`}`,
+      );
 
-        if (args.length > 2) {
-          args.splice(0, 2);
-          embed.addField("reason", args.join(" "));
-        }
-
-        addNotificationToQueue({
-          memberId: order.ownerId,
-          payload: {
-            embed: embed,
-            content: `your ${order.orderType} order has been removed by a staff member`,
-          },
-        });
+      if (args.length > 2) {
+        args.splice(0, 2);
+        embed.addField("reason", args.join(" "));
       }
+
+      await addMarketNotification({
+        memberId: order.ownerId,
+        payload: {
+          embed: embed,
+          content: `your ${order.orderType} order has been removed by a staff member`,
+        },
+      });
     }
 
     await (message as Message).react("✅");

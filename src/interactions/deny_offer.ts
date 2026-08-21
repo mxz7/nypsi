@@ -7,8 +7,7 @@ import Constants from "../utils/Constants";
 import { addBalance } from "../utils/functions/economy/balance";
 import { getItems, isEcoBanned } from "../utils/functions/economy/utils";
 import { escapeFormattingCharacters } from "../utils/functions/string";
-import { addNotificationToQueue } from "../utils/functions/users/notifications";
-import { getPreferences } from "../utils/functions/users/preferences";
+import { addMarketNotification } from "../utils/functions/users/market-notifications";
 
 export default {
   name: "btn-deny-offer",
@@ -64,19 +63,17 @@ export default {
 
     await interaction.update({ embeds: [embed], components: [] });
 
-    if ((await getPreferences(offer.ownerId)).dms.market) {
-      addNotificationToQueue({
-        memberId: offer.ownerId,
-        payload: {
-          content: `your offer to ${escapeFormattingCharacters(interaction.user.username)} for ${offer.itemAmount}x ${
-            getItems()[offer.itemId].name
-          } has been denied`,
-          embed: new CustomEmbed(
-            null,
-            `your $${offer.money.toLocaleString()} has been returned`,
-          ).setColor(Constants.EMBED_FAIL_COLOR),
-        },
-      });
-    }
+    await addMarketNotification({
+      memberId: offer.ownerId,
+      payload: {
+        content: `your offer to ${escapeFormattingCharacters(interaction.user.username)} for ${offer.itemAmount}x ${
+          getItems()[offer.itemId].name
+        } has been denied`,
+        embed: new CustomEmbed(
+          null,
+          `your $${offer.money.toLocaleString()} has been returned`,
+        ).setColor(Constants.EMBED_FAIL_COLOR),
+      },
+    });
   },
 } as InteractionHandler;

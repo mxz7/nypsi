@@ -45,6 +45,12 @@ function hydratePreferences(rows: { key: string; value: unknown }[]): Preference
   const preferences = getDefaults();
 
   for (const row of rows) {
+    // can be removed after like a week
+    if (row.key === "dms.market" && typeof row.value === "boolean") {
+      preferences.dms.market = row.value ? "DM" : "Disabled";
+      continue;
+    }
+
     const definition = preferenceData[row.key];
 
     if (
@@ -76,7 +82,16 @@ export async function getPreferences(member: MemberResolvable): Promise<Preferen
   const userId = getUserId(member);
   const cached = await preferencesCache.get(userId);
 
-  if (cached) return cached;
+  if (cached) {
+    const legacyMarketPreference = cached.dms.market as unknown;
+
+    if (typeof legacyMarketPreference === "boolean") {
+      cached.dms.market = legacyMarketPreference ? "DM" : "Disabled";
+      await preferencesCache.set(userId, cached);
+    }
+
+    return cached;
+  }
 
   const rows = await prisma.preferences.findMany({ where: { userId } });
   const preferences = hydratePreferences(rows);

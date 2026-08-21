@@ -17,9 +17,8 @@ import { Market, MarketWatch, OrderType, Prisma } from "#generated/prisma";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
-import { CustomEmbed, getColor } from "../../../models/EmbedBuilders";
+import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { DMQueue } from "../../../types/Market";
-import { NotificationPayload } from "../../../types/Notification";
 import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { transaction } from "../../discord-logs";
@@ -32,7 +31,7 @@ import { filterOutliers } from "../outliers";
 import { getTier } from "../premium/premium";
 import { pluralize } from "../string";
 import { getTax } from "../tax";
-import { addNotificationToQueue } from "../users/notifications";
+import { addMarketNotification } from "../users/market-notifications";
 import { getPreferences } from "../users/preferences";
 import { getLastKnownAvatar, getLastKnownUsername } from "../users/username";
 import { getBalance } from "./balance";
@@ -700,29 +699,24 @@ export async function checkMarketWatchers(
     })
     .then((q) => q.map((i) => i.userId));
 
-  const payload: NotificationPayload = {
-    payload: {
-      embed: new CustomEmbed().setDescription(
-        `a ${type} order has made been for ${amount} ${getItems()[itemId].emoji} **[${pluralize(getItems()[itemId], amount)}](https://nypsi.xyz/items/${itemId}?ref=bot-market)**`,
-      ),
-      components: new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("jump").setURL(url),
-      ),
-    },
-    memberId: "boob",
-  };
-
   for (const userId of users) {
-    if (!(await getPreferences(userId)).dms.market) continue;
-
     if (await redis.exists(`${Constants.redis.cooldown.MARKET_WATCH}:${userId}`)) continue;
 
-    payload.memberId = userId;
-    payload.payload.embed.setColor(getColor(userId));
+    const queued = await addMarketNotification({
+      payload: {
+        embed: new CustomEmbed(userId).setDescription(
+          `a ${type} order has made been for ${amount} ${getItems()[itemId].emoji} **[${pluralize(getItems()[itemId], amount)}](https://nypsi.xyz/items/${itemId}?ref=bot-market)**`,
+        ),
+        components: new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+          new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel("jump").setURL(url),
+        ),
+      },
+      memberId: userId,
+    });
 
-    addNotificationToQueue(payload);
-
-    await redis.set(`${Constants.redis.cooldown.MARKET_WATCH}:${userId}`, "true", "EX", 300);
+    if (queued) {
+      await redis.set(`${Constants.redis.cooldown.MARKET_WATCH}:${userId}`, "true", "EX", 300);
+    }
   }
 }
 
@@ -1074,7 +1068,7 @@ async function publishMarketSettlementEffects(fill: SettledMarketFill, client: N
   const order = fill.order;
   const counterpartyId = order.ownerId === fill.buyerId ? fill.sellerId : fill.buyerId;
 
-  if ((await getPreferences(order.ownerId)).dms.market) {
+  if ((await getPreferences(order.ownerId)).dms.market !== "Disabled") {
     let dmQueue = await redis
       .hget(`${Constants.redis.nypsi.MARKET_DM}:${order.orderType}`, order.ownerId)
       .then((result) => (result ? (JSON.parse(result) as DMQueue) : undefined));

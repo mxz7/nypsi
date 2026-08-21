@@ -19,8 +19,7 @@ import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import { getTier } from "../utils/functions/premium/premium";
 import { escapeFormattingCharacters } from "../utils/functions/string";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
-import { addNotificationToQueue } from "../utils/functions/users/notifications";
-import { getPreferences } from "../utils/functions/users/preferences";
+import { addMarketNotification } from "../utils/functions/users/market-notifications";
 
 export default {
   name: "btn-accept-offer",
@@ -122,22 +121,20 @@ export default {
 
     await interaction.message.edit({ embeds: [embed], components: [] });
 
-    if ((await getPreferences(offer.ownerId)).dms.market) {
-      addNotificationToQueue({
-        memberId: offer.ownerId,
-        payload: {
-          content: `your offer to ${escapeFormattingCharacters(interaction.user.username)} for ${offer.itemAmount}x ${
-            getItems()[offer.itemId].name
-          } has been accepted`,
-          embed: new CustomEmbed(
-            null,
-            `you paid $${offer.money.toLocaleString()} for **${offer.itemAmount.toLocaleString()}x** ${
-              getItems()[offer.itemId].emoji
-            } **${getItems()[offer.itemId].name}**`,
-          ).setColor(Constants.EMBED_SUCCESS_COLOR),
-        },
-      });
-    }
+    await addMarketNotification({
+      memberId: offer.ownerId,
+      payload: {
+        content: `your offer to ${escapeFormattingCharacters(interaction.user.username)} for ${offer.itemAmount}x ${
+          getItems()[offer.itemId].name
+        } has been accepted`,
+        embed: new CustomEmbed(
+          null,
+          `you paid $${offer.money.toLocaleString()} for **${offer.itemAmount.toLocaleString()}x** ${
+            getItems()[offer.itemId].emoji
+          } **${getItems()[offer.itemId].name}**`,
+        ).setColor(Constants.EMBED_SUCCESS_COLOR),
+      },
+    });
 
     for (const testOffer of await prisma.offer.findMany({
       where: {

@@ -22,8 +22,7 @@ import { getUserId, MemberResolvable } from "../member";
 import { getAllGroupAccountIds } from "../moderation/alts";
 import { getTier, isPremium } from "../premium/premium";
 import { addToNypsiBank, getTax } from "../tax";
-import { addNotificationToQueue } from "../users/notifications";
-import { getPreferences } from "../users/preferences";
+import { addMarketNotification } from "../users/market-notifications";
 import { addBalance } from "./balance";
 import { addInventoryItem, getInventory, isGem, removeInventoryItem } from "./inventory";
 import { createUser, getItems, userExists } from "./utils";
@@ -531,19 +530,17 @@ export async function fulfillTradeRequest(
     );
   }
 
-  if ((await getPreferences(tradeRequest.ownerId)).dms.market) {
-    const embedDm = new CustomEmbed(tradeRequest.ownerId).setDescription(
-      `your trade request has been fulfilled\n\nyou have received:\n${tradeRequest.requestedItems.map((item) => `- **${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} ${items[item.split(":")[0]].name}`).join("\n")}`,
-    );
+  const notificationEmbed = new CustomEmbed(tradeRequest.ownerId).setDescription(
+    `your trade request has been fulfilled\n\nyou have received:\n${tradeRequest.requestedItems.map((item) => `- **${parseInt(item.split(":")[1]).toLocaleString()}x** ${items[item.split(":")[0]].emoji} ${items[item.split(":")[0]].name}`).join("\n")}`,
+  );
 
-    addNotificationToQueue({
-      memberId: tradeRequest.ownerId,
-      payload: {
-        content: `your trade request has been fulfilled`,
-        embed: embedDm,
-      },
-    });
-  }
+  await addMarketNotification({
+    memberId: tradeRequest.ownerId,
+    payload: {
+      content: `your trade request has been fulfilled`,
+      embed: notificationEmbed,
+    },
+  });
 
   const embed = new EmbedBuilder(interaction.message.embeds[0].data);
 

@@ -21,8 +21,21 @@
     "market": {
       "id": "market",
       "name": "market notifications",
-      "description": "get a dm when someone buys or fills your market order",
-      "default": true
+      "description": "choose how to receive notifications about market orders, offers, and trades",
+      "default": "DM",
+      "types": [
+        {
+          "name": "disabled",
+          "description": "do not receive market notifications",
+          "value": "Disabled"
+        },
+        { "name": "dm", "description": "receive market notifications in your dms", "value": "DM" },
+        {
+          "name": "inline",
+          "description": "show market notifications alongside your next command",
+          "value": "Inline"
+        }
+      ]
     },
     "voteReminder": {
       "id": "voteReminder",
@@ -127,7 +140,7 @@
     "marketDelay": {
       "id": "marketDelay",
       "name": "market notification delay",
-      "description": "delay your market notifications by: {VALUE}s. this will help you get less dms if you are selling/buying a lot of items",
+      "description": "delay grouped market fill notifications by: {VALUE}s. this helps reduce notifications if you are selling/buying a lot of items",
       "default": 300
     },
     "offers": {
