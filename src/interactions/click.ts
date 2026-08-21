@@ -74,23 +74,12 @@ export default {
 
     if ((await isEcoBanned(interaction.user)).banned) return;
 
-    const clickMessageLockKey = `nypsi:click-message-lock:${interaction.user.id}`;
-    const claimedClickMessage = await redis.set(
-      clickMessageLockKey,
-      interaction.message.id,
-      "EX",
-      2,
-      "NX",
-    );
+    const clickCooldownKey = `nypsi:click-cooldown:${interaction.user.id}`;
+    const claimedClick = await redis.set(clickCooldownKey, "1", "PX", 750, "NX");
 
-    if (!claimedClickMessage && (await redis.get(clickMessageLockKey)) !== interaction.message.id) {
-      logger.warn(
-        `click: ${interaction.user.id} (${interaction.user.username}) attempted clicking multiple messages`,
-      );
-      return interaction.reply({
-        embeds: [new ErrorEmbed("you can only click one message at a time")],
-        flags: MessageFlags.Ephemeral,
-      });
+    if (!claimedClick) {
+      logger.warn(`clicks: ${interaction.user.id} too fast`);
+      return interaction.deferUpdate().catch(() => {});
     }
 
     const ownsMessage = ownerId === interaction.user.id;
