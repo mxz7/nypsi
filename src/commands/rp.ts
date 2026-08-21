@@ -139,6 +139,7 @@ const actions: Record<string, RoleplayAction> = {
       "https://c.tenor.com/f5asRSsfl-wAAAAC/tenor.gif",
       "https://c.tenor.com/9PAkJvbE6R0AAAAC/tenor.gif",
       "https://c.tenor.com/gERa1EVU2ocAAAAd/tenor.gif",
+      "https://static2.klipy.com/ii/39f2394ae36df6e199be9eb7c9fa1012/bf/7c/9iCqwpUY.gif",
     ],
     text: "{sender} gave {target} head pats!! there there",
     action: "gave head pats to",
