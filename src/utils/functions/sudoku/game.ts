@@ -4,8 +4,8 @@ import prisma from "../../../init/database";
 import { SudokuCoordMode } from "../../../types/Sudoku";
 import { addProgress } from "../economy/achievements";
 import { addTaskProgress } from "../economy/tasks";
-import { getPreferences } from "../users/preferences";
-import { updatePreference } from "../users/preferences";
+import { publishLeaderboardUpdate } from "../leaderboards/publish";
+import { getPreferences, updatePreference } from "../users/preferences";
 import {
   clearDigitNotesFromPeers,
   decodeCellChar,
@@ -16,9 +16,8 @@ import {
 } from "./cell";
 import { coordToIndex, indexToCoord, isGivenCell } from "./coordinate";
 
-export { SudokuDifficulty, SudokuGame };
+export { coordToIndex, indexToCoord, isGivenCell, SudokuDifficulty, SudokuGame };
 export type { SudokuCoordMode };
-export { coordToIndex, indexToCoord, isGivenCell };
 
 export async function createSudokuGame(userId: string, difficulty: SudokuDifficulty) {
   const sudoku = getSudoku(difficulty);
@@ -108,19 +107,21 @@ export async function applyMove(
   const newBoard = correct ? clearDigitNotesFromPeers(boardWithMove, index, digit) : boardWithMove;
 
   const complete = newBoard === game.solution;
+  const completedAt = complete ? new Date() : undefined;
 
   await prisma.sudokuGame.update({
     where: { id: game.id },
     data: {
       board: newBoard,
       ...(correct ? {} : { mistakes: { increment: 1 } }),
-      ...(complete ? { state: "completed", completedAt: new Date() } : {}),
+      ...(complete ? { state: "completed", completedAt } : {}),
     },
   });
 
   if (complete) {
     addTaskProgress(game.userId, "sudoku_weekly", 1);
     addProgress(game.userId, "sudoku", 1);
+    publishLeaderboardUpdate("sudoku-solved", game.userId, "1", true);
   }
 
   return { ok: true, correct, complete };

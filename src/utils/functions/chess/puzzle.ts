@@ -3,6 +3,7 @@ import prisma from "../../../init/database";
 import { logger } from "../../logger";
 import { addProgress } from "../economy/achievements";
 import { addTaskProgress } from "../economy/tasks";
+import { publishLeaderboardUpdate } from "../leaderboards/publish";
 import { normalizeToUci } from "./moves";
 
 export { normalizeToUci };
@@ -196,6 +197,13 @@ export async function addChessSolve(userId: string, puzzleRating: number, solveT
       ...(newAverageSolveTime !== undefined && { averageSolveTime: newAverageSolveTime }),
     },
   });
+
+  publishLeaderboardUpdate("chess-solved", userId, "1", true);
+  publishLeaderboardUpdate("chess-rating", userId, newAverageWinningRating.toString());
+
+  if (existing?.fastestSolve == null || solveTimeMs < existing.fastestSolve) {
+    publishLeaderboardUpdate("chess-fastest", userId, solveTimeMs.toString());
+  }
 }
 
 export async function addChessFail(userId: string) {

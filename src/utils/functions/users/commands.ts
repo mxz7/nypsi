@@ -8,6 +8,7 @@ import { logger } from "../../logger";
 import { getRawLevel } from "../economy/levelling";
 import { isEcoBanned } from "../economy/utils";
 import { setLastCommand } from "../guilds/commands";
+import { publishLeaderboardUpdate } from "../leaderboards/publish";
 import { getUserId, MemberResolvable } from "../member";
 import { putObject } from "../s3";
 import sleep from "../sleep";
@@ -171,6 +172,8 @@ export async function updateUser(user: User, command: string, guildId?: string) 
       },
     },
   });
+
+  publishLeaderboardUpdate("commands", user.id, "1", true);
 
   if (guildId) {
     setLastCommand(guildId, date.getTime());

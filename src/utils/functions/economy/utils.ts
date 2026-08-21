@@ -35,6 +35,7 @@ import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { deleteImage } from "../image";
+import { publishLeaderboardUpdate } from "../leaderboards/publish";
 import { getUserId, MemberResolvable } from "../member";
 import { getAllGroupAccountIds } from "../moderation/alts";
 import { MemoryMutex } from "../mutex";
@@ -652,9 +653,10 @@ export async function getLastDaily(member: MemberResolvable) {
 }
 
 export async function updateLastDaily(member: MemberResolvable, updateLast = true, amount = 1) {
-  await prisma.economy.update({
+  const userId = getUserId(member);
+  const query = await prisma.economy.update({
     where: {
-      userId: getUserId(member),
+      userId,
     },
     data: updateLast
       ? {
@@ -664,7 +666,12 @@ export async function updateLastDaily(member: MemberResolvable, updateLast = tru
       : {
           dailyStreak: { increment: amount },
         },
+    select: {
+      dailyStreak: true,
+    },
   });
+
+  publishLeaderboardUpdate("streak", userId, query.dailyStreak.toString());
 }
 
 export async function getDailyStreak(member: MemberResolvable) {
@@ -974,14 +981,18 @@ function getDailyXp(currentStreak: number) {
 }
 
 export async function setDaily(member: MemberResolvable, amount: number) {
+  const userId = getUserId(member);
+
   await prisma.economy.update({
     where: {
-      userId: getUserId(member),
+      userId,
     },
     data: {
       dailyStreak: amount,
     },
   });
+
+  publishLeaderboardUpdate("streak", userId, amount.toString());
 }
 
 type BaseRenderGambleScreenArgs = {

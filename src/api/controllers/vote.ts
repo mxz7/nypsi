@@ -4,6 +4,7 @@ import redis from "../../init/redis";
 import Constants from "../../utils/Constants";
 import { isEcoBanned, userExists } from "../../utils/functions/economy/utils";
 import { giveVoteRewards } from "../../utils/functions/economy/vote";
+import { publishLeaderboardUpdate } from "../../utils/functions/leaderboards/publish";
 import { isUserBlacklisted } from "../../utils/functions/users/blacklist";
 import { addNotificationToQueue } from "../../utils/functions/users/notifications";
 import { logger } from "../../utils/logger";
@@ -91,6 +92,9 @@ async function doVote(user: string) {
       voteStreak: true,
     },
   });
+
+  publishLeaderboardUpdate("vote-month", user, votes.monthVote.toString());
+  publishLeaderboardUpdate("vote-streak", user, votes.voteStreak.toString());
 
   if ((await isEcoBanned(user)).banned) {
     logger.info(`vote: ${user} banned`);

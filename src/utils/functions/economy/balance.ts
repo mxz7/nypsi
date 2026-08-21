@@ -7,6 +7,7 @@ import { NotificationPayload } from "../../../types/Notification";
 import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
+import { publishLeaderboardUpdate } from "../leaderboards/publish";
 import { getUserId, MemberResolvable } from "../member";
 import { isBooster } from "../premium/boosters";
 import { getTier } from "../premium/premium";
@@ -77,6 +78,8 @@ export async function updateBalance(member: MemberResolvable, amount: number) {
   });
 
   await balanceCache.set(userId, Number(query.money));
+
+  publishLeaderboardUpdate("balance", userId, query.money.toString());
 }
 
 export async function addBalance(member: MemberResolvable, amount: number) {
@@ -95,6 +98,8 @@ export async function addBalance(member: MemberResolvable, amount: number) {
   });
 
   await balanceCache.set(userId, Number(query.money));
+
+  publishLeaderboardUpdate("balance", userId, query.money.toString());
 
   return query.money;
 }
@@ -115,6 +120,8 @@ export async function removeBalance(member: MemberResolvable, amount: number) {
   });
 
   await balanceCache.set(userId, Number(query.money));
+
+  publishLeaderboardUpdate("balance", userId, query.money.toString());
 
   return query.money;
 }
@@ -955,6 +962,8 @@ export async function calcNetWorth(
       userId: true,
     },
   });
+
+  publishLeaderboardUpdate("net-worth", userId, Math.floor(worth).toString());
 
   setImmediate(async () => {
     const dmSettings = await getPreferences(userId);

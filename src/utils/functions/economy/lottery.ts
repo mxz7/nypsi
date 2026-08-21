@@ -1,5 +1,6 @@
 import { Prisma } from "#generated/prisma";
 import prisma from "../../../init/database";
+import { publishLeaderboardUpdate } from "../leaderboards/publish";
 import { getUserId, MemberResolvable } from "../member";
 import { getItems } from "./utils";
 
@@ -121,6 +122,8 @@ export async function createLotteryEntry(
       totalWin: BigInt(totalWinnings),
     },
   });
+
+  publishLeaderboardUpdate("lottery", winnerId, "1", true);
 }
 
 export async function getLotteryStats(member: MemberResolvable) {

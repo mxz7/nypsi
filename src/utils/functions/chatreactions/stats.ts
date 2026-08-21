@@ -1,6 +1,7 @@
 import { Guild, GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import { isEcoBanned } from "../economy/utils";
+import { publishLeaderboardUpdate } from "../leaderboards/publish";
 
 export async function getReactionStats(guild: Guild, member: GuildMember) {
   const query = await prisma.chatReactionStats.findFirst({
@@ -170,6 +171,10 @@ export async function addLeaderboardEntry(
   if ((await isEcoBanned(userId)).banned) return res;
 
   await Promise.all([daily(), global()]);
+
+  const timeMs = (time * 1000).toString();
+  if (res.daily) publishLeaderboardUpdate("chatreaction-daily", userId, timeMs);
+  if (res.global) publishLeaderboardUpdate("chatreaction-alltime", userId, timeMs);
 
   return res;
 }

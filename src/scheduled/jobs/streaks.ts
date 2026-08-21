@@ -18,6 +18,8 @@ import {
   removeInventoryItem,
 } from "../../utils/functions/economy/inventory";
 import { addStat } from "../../utils/functions/economy/stats";
+import { setDaily } from "../../utils/functions/economy/utils";
+import { setVoteStreak } from "../../utils/functions/economy/vote";
 import { pluralize } from "../../utils/functions/string";
 import { addNotificationToQueue } from "../../utils/functions/users/notifications";
 import { getPreferences } from "../../utils/functions/users/preferences";
@@ -126,14 +128,7 @@ async function doDailyStreaks(manager: ClusterManager) {
       if (preferences.dms.other && user.dailyStreak >= 7)
         notifications.push({ memberId: user.userId, payload: { embed: resetEmbed } });
 
-      await prisma.economy.update({
-        where: {
-          userId: user.userId,
-        },
-        data: {
-          dailyStreak: 0,
-        },
-      });
+      await setDaily(user.userId, 0);
     });
   }
 
@@ -268,14 +263,7 @@ async function doVoteStreaks(manager: ClusterManager) {
         }
       }
 
-      await prisma.economy.update({
-        where: {
-          userId: user.userId,
-        },
-        data: {
-          voteStreak: 0,
-        },
-      });
+      await setVoteStreak(user.userId, 0);
     });
   }
 

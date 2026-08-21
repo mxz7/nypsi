@@ -11,6 +11,7 @@ import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { addKarma } from "../karma/karma";
+import { publishLeaderboardUpdate } from "../leaderboards/publish";
 import { getUserId, MemberResolvable } from "../member";
 import { percentChance } from "../random";
 import { pluralize } from "../string";
@@ -74,14 +75,18 @@ export async function getVoteStreak(member: MemberResolvable) {
 }
 
 export async function setVoteStreak(member: MemberResolvable, amount: number) {
+  const userId = getUserId(member);
+
   await prisma.economy.update({
     where: {
-      userId: getUserId(member),
+      userId,
     },
     data: {
       voteStreak: amount,
     },
   });
+
+  publishLeaderboardUpdate("vote-streak", userId, amount.toString());
 }
 
 export async function giveVoteRewards(

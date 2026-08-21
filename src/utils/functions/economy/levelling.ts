@@ -7,6 +7,7 @@ import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { addKarma } from "../karma/karma";
+import { publishLeaderboardUpdate } from "../leaderboards/publish";
 import { getUserId, MemberResolvable } from "../member";
 import { pluralize } from "../string";
 import { addNotificationToQueue } from "../users/notifications";
@@ -261,16 +262,22 @@ export async function getPrestige(member: MemberResolvable): Promise<number> {
 export async function setPrestige(member: MemberResolvable, amount: number) {
   const userId = getUserId(member);
 
-  await prisma.economy.update({
+  const query = await prisma.economy.update({
     where: {
       userId,
     },
     data: {
       prestige: amount,
     },
+    select: {
+      prestige: true,
+      level: true,
+    },
   });
 
   await prestigeCache.delete(userId);
+
+  publishLeaderboardUpdate("level", userId, `P${query.prestige} L${query.level}`);
 }
 
 export async function getLevel(member: MemberResolvable): Promise<number> {
@@ -321,10 +328,13 @@ export async function setLevel(member: MemberResolvable, amount: number) {
     },
     select: {
       level: true,
+      prestige: true,
     },
   });
 
   await levelCache.delete(userId);
+
+  publishLeaderboardUpdate("level", userId, `P${query.prestige} L${query.level}`);
 
   return query.level;
 }

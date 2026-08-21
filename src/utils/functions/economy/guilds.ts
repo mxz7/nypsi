@@ -9,6 +9,7 @@ import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { deleteImage } from "../image";
+import { publishLeaderboardUpdate } from "../leaderboards/publish";
 import { getUserId, MemberResolvable } from "../member";
 import { MemoryMutex } from "../mutex";
 import { addNotificationToQueue } from "../users/notifications";
@@ -230,6 +231,8 @@ export async function createGuild(name: string, owner: GuildMember) {
   });
 
   await guildUserCache.delete(owner.id);
+
+  publishLeaderboardUpdate("guilds", name, "1");
 }
 
 export async function deleteGuild(name: string) {
@@ -264,6 +267,8 @@ export async function deleteGuild(name: string) {
       AND: [{ category: { contains: "guild" } }, { userId: guild.guildName }],
     },
   });
+
+  publishLeaderboardUpdate("guilds", name, "0");
 }
 
 export async function addToGuildBank(name: string, amount: number, member: MemberResolvable) {
@@ -467,6 +472,8 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
 
       await guildRequirementsCache.delete(guild.guildName);
       await guildLevelCache.delete(guild.guildName);
+
+      publishLeaderboardUpdate("guilds", guild.guildName, (guild.level + 1).toString());
 
       const upgradeMsg = `**${guild.guildName}** has upgraded to level **${guild.level + 1}**`;
 

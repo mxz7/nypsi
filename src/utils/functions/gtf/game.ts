@@ -26,6 +26,7 @@ import { logger } from "../../logger";
 import { MStoTime } from "../date";
 import { addProgress } from "../economy/achievements";
 import { addTaskProgress } from "../economy/tasks";
+import { publishLeaderboardUpdate } from "../leaderboards/publish";
 import { compareTwoStrings, escapeFormattingCharacters } from "../string";
 import { fetchCountryData } from "./countries";
 
@@ -364,5 +365,12 @@ async function saveGameStats(
       country: countryId,
       guesses,
     },
+    select: {
+      id: true,
+    },
   });
+
+  if (won) {
+    publishLeaderboardUpdate("flag-wins", userId, "1", true);
+  }
 }

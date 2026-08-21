@@ -10,6 +10,7 @@ import { Item } from "../../../types/Economy";
 import { RedisCache } from "../../cache";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
+import { publishLeaderboardUpdate } from "../leaderboards/publish";
 import { getUserId, MemberResolvable } from "../member";
 import { RedisMutex } from "../mutex";
 import { getTier, isPremium } from "../premium/premium";
@@ -291,6 +292,8 @@ export async function addInventoryItem(member: MemberResolvable, itemId: string,
   await inventoryCache.delete(userId);
   await redis.del(`${Constants.redis.cache.economy.ITEM_EXISTS}:${itemId}`);
   if (isGem(itemId)) await hasGemCache.delete(`${userId}:${itemId}`);
+
+  publishLeaderboardUpdate(`item-${itemId}`, userId, amount.toString(), true);
 }
 
 export async function addItemSourceStat(itemId: string, source: string, amount: number) {
@@ -368,6 +371,8 @@ export async function removeInventoryItem(
   await inventoryCache.delete(userId);
   await redis.del(`${Constants.redis.cache.economy.ITEM_EXISTS}:${itemId}`);
   if (isGem(itemId)) await hasGemCache.delete(`${userId}:${itemId}`);
+
+  publishLeaderboardUpdate(`item-${itemId}`, userId, (-amount).toString(), true);
 }
 
 export async function setInventoryItem(member: MemberResolvable, itemId: string, amount: number) {
@@ -419,6 +424,8 @@ export async function setInventoryItem(member: MemberResolvable, itemId: string,
   await inventoryCache.delete(userId);
   await redis.del(`${Constants.redis.cache.economy.ITEM_EXISTS}:${itemId}`);
   if (isGem(itemId)) await hasGemCache.delete(`${userId}:${itemId}`);
+
+  publishLeaderboardUpdate(`item-${itemId}`, userId, Math.max(0, amount).toString());
 }
 
 export async function getTotalAmountOfItem(itemId: string) {
