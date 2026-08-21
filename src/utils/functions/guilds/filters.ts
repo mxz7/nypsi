@@ -22,6 +22,7 @@ import { compareTwoStrings } from "../string";
 import { isAltPunish } from "./altpunish";
 import ms = require("ms");
 
+const maxFuzzyComparisons = 10_000;
 const chatFilterCache = new Map<
   string,
   { content: string; percentMatch: number; guildId: string }[]
@@ -125,8 +126,9 @@ export async function checkMessageContent(
   }
 
   content = content.toLowerCase().normalize("NFD");
+  const contentWords = content.split(/\s+/).filter(Boolean);
 
-  if (content.length >= 69) {
+  if (contentWords.length * filter.length >= maxFuzzyComparisons) {
     for (const word of filter) {
       if (word.content.includes(" ")) {
         if (content.includes(word.content)) {
@@ -146,7 +148,7 @@ export async function checkMessageContent(
           return false;
         }
       } else {
-        if (content.split(" ").indexOf(word.content) != -1) {
+        if (contentWords.indexOf(word.content) != -1) {
           const contentModified = content.replace(word.content, `**${word.content}**`);
           if (modlog && guild instanceof Guild) {
             addModLog(
@@ -184,7 +186,7 @@ export async function checkMessageContent(
           return false;
         }
       } else {
-        for (const contentWord of content.split(" ")) {
+        for (const contentWord of contentWords) {
           const similarity = compareTwoStrings(word.content, contentWord);
 
           if (similarity >= (word.percentMatch || 100) / 100) {
