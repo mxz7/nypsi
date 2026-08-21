@@ -12,6 +12,7 @@
 - add yapper achievement
 - improve balancing of highlow and dragon tower
 - add /click game
+- website leaderboards and event leaderboard updates in realtime
 
 # july 2026
 
