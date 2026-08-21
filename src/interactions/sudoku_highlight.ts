@@ -7,7 +7,8 @@ import {
 } from "discord.js";
 import { ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
-import { coordToIndex, getGameById, getUserCoordMode } from "../utils/functions/sudoku/game";
+import { coordToIndex } from "../utils/functions/sudoku/coordinate";
+import { getGameById, getUserCoordMode } from "../utils/functions/sudoku/game";
 import { buildGameMessage } from "../utils/functions/sudoku/ui";
 
 export default {

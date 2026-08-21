@@ -1,6 +1,8 @@
 import { ComponentType, Message, MessageFlags } from "discord.js";
+import { SudokuDifficulty } from "#generated/prisma";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
+import { SudokuCoordMode } from "../types/Sudoku";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { formatTime } from "../utils/functions/string";
 import {
@@ -9,8 +11,6 @@ import {
   getSudokuStats,
   getUserCoordMode,
   setUserCoordMode,
-  SudokuCoordMode,
-  SudokuDifficulty,
 } from "../utils/functions/sudoku/game";
 import { buildConfirmationMessage, buildGameMessage } from "../utils/functions/sudoku/ui";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";

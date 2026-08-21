@@ -1,7 +1,7 @@
 import { SudokuCoordMode } from "../../../types/Sudoku";
 import { logger } from "../../logger";
 import { decodeCellChar, hasNote, isRawDigitChar } from "./cell";
-import { indexToCoord } from "./game";
+import { indexToCoord } from "./coordinate";
 import sharp = require("sharp");
 
 const CELL = 96;

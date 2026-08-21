@@ -7,9 +7,9 @@ import {
 } from "discord.js";
 import { ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
+import { coordToIndex } from "../utils/functions/sudoku/coordinate";
 import {
   applyMove,
-  coordToIndex,
   eraseCell,
   getGameById,
   getUserCoordMode,

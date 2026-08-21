@@ -14,10 +14,7 @@ import {
   sanitizeBoardString,
   toggleNoteMask,
 } from "./cell";
-import { coordToIndex, indexToCoord, isGivenCell } from "./coordinate";
-
-export { coordToIndex, indexToCoord, isGivenCell, SudokuDifficulty, SudokuGame };
-export type { SudokuCoordMode };
+import { coordToIndex, isGivenCell } from "./coordinate";
 
 export async function createSudokuGame(userId: string, difficulty: SudokuDifficulty) {
   const sudoku = getSudoku(difficulty);
