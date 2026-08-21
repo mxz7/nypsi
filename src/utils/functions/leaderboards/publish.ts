@@ -1,6 +1,8 @@
 import redis from "../../../init/redis";
+import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { RedisPubSub } from "../../pubsub";
+import { getPreferences } from "../users/preferences";
 
 export type LeaderboardChannel =
   | "balance"
@@ -40,12 +42,21 @@ type LeaderboardConnection = {
 const CONNECTION_INACTIVITY_MS = 15 * 60 * 1000;
 const connections = new Map<LeaderboardChannel, LeaderboardConnection>();
 
-export function publishLeaderboardUpdate(
+export async function publishLeaderboardUpdate(
   leaderboard: LeaderboardChannel,
   entityId: string,
   value: string | Promise<string | undefined>,
   increment?: true,
-): void {
+): Promise<void> {
+  if (entityId.match(Constants.SNOWFLAKE_REGEX)) {
+    const privacy = !(await getPreferences(entityId)).leaderboards;
+
+    if (!privacy) {
+      // don't publish hidden users
+      return;
+    }
+  }
+
   if (typeof value !== "string") {
     void value
       .then((resolvedValue) => {
