@@ -62,7 +62,7 @@ export async function getAlts(guild: Guild | string, member: MemberResolvable) {
 
   for (const alt of [mainId, ...query.map((i) => i.altId)])
     await redis.set(
-      `${Constants.redis.cache.guild.ALTS}:${id}:${alt}}`,
+      `${Constants.redis.cache.guild.ALTS}:${id}:${alt}`,
       JSON.stringify({ altId: alt, mainId }),
       "EX",
       ms("6 hour") / 1000,
@@ -97,7 +97,7 @@ export async function getAllGroupAccountIds(guild: Guild | string, member: Membe
       `${Constants.redis.cache.guild.ALTS}:${id}:${userId}`,
       JSON.stringify([]),
       "EX",
-      ms("24 hours"),
+      ms("24 hours") / 1000,
     );
     return [userId];
   }
