@@ -37,7 +37,7 @@ import {
 } from "./inventory";
 import { getItemCount, getItemWeight, getTotalWeight } from "./loot_pools";
 import { countItemOnMarket } from "./market";
-import { getBaseWorkers, getItems, getLootPools, getPlantsData } from "./utils";
+import { getBaseWorkers, getItems, getLootPools, getPlantsData, getTagsData } from "./utils";
 
 const rarities = [
   "common",
@@ -680,6 +680,13 @@ export function getObtainingData(selected: Item): ObtainingData {
     const weight =
       (getItemWeight(randomDropPool.items[selected.id]) * 100) / getTotalWeight(randomDropPool, []);
     description.push(`💧 loot drop: \`${weight.toFixed(4)}%\``);
+  }
+
+  const clickPool = lootPools["click"];
+  if (Object.keys(clickPool.items ?? {}).includes(selected.id)) {
+    const weight =
+      (getItemWeight(clickPool.items[selected.id]) * 100) / getTotalWeight(clickPool, []);
+    description.push(`${getTagsData().clicker.emoji} /click: \`${weight.toFixed(4)}%\``);
   }
 
   for (const worker of Object.values(workers).filter((w) => w.base.byproducts)) {
