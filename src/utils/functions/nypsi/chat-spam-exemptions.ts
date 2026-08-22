@@ -32,8 +32,5 @@ export async function isChatSpamExempt(message: Message) {
 
   const catBotMessageAt = Number(await redis.get(getCatResponseKey(message.channelId)));
 
-  return (
-    catBotMessageAt <= message.createdTimestamp &&
-    message.createdTimestamp - catBotMessageAt <= CAT_RESPONSE_WINDOW_MS
-  );
+  return Math.abs(message.createdTimestamp - catBotMessageAt) <= CAT_RESPONSE_WINDOW_MS;
 }
