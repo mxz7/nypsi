@@ -565,7 +565,7 @@
       "500": 1.4
     },
     "items": {
-      "basic_crate": 20,
+      "basic_crate": 25,
       "69420_crate": 20,
       "cookie": 21,
       "lottery_ticket": {
@@ -584,7 +584,14 @@
         }
       },
       "lucky_7": 0.1,
-      "nypsi_crate": 0.5
+      "nypsi_crate": 0.5,
+      "dino_nugget": 1,
+      "rose": 0.1,
+      "lotus": 0.01,
+      "wilson": 0.01,
+      "rubber_duck": 1,
+      "ethel": 0.5,
+      "gem_shard": 0.1
     }
   },
   "random_drop": {
