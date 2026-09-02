@@ -75,7 +75,7 @@ export default {
     if ((await isEcoBanned(interaction.user)).banned) return;
 
     const clickCooldownKey = `nypsi:click-cooldown:${interaction.user.id}`;
-    const claimedClick = await redis.set(clickCooldownKey, "1", "PX", 750, "NX");
+    const claimedClick = await redis.set(clickCooldownKey, "1", "PX", 600, "NX");
 
     if (!claimedClick) {
       logger.warn(`clicks: ${interaction.user.id} too fast in ${interaction.channelId}`);
