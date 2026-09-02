@@ -78,7 +78,7 @@ export default {
     const claimedClick = await redis.set(clickCooldownKey, "1", "PX", 750, "NX");
 
     if (!claimedClick) {
-      logger.warn(`clicks: ${interaction.user.id} too fast`);
+      logger.warn(`clicks: ${interaction.user.id} too fast in ${interaction.channelId}`);
       return interaction.deferUpdate().catch(() => {});
     }
 
