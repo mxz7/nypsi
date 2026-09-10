@@ -124,7 +124,7 @@ export class Museum {
     if (cache) return cache[itemId] || -1;
 
     const completedItems = Object.entries(this.items)
-      .filter(([_, item]) => item.completedAt)
+      .filter(([, item]) => item.completedAt)
       .map(([id]) => id);
 
     if (completedItems.length === 0) return null;
