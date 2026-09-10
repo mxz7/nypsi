@@ -19,7 +19,7 @@ importers:
         version: 2.6.3
       '@hono/node-server':
         specifier: ^2.1.1
-        version: 2.1.1(hono@4.13.3)
+        version: 2.1.1(hono@4.13.5)
       '@prisma/adapter-pg':
         specifier: ^7.9.1
         version: 7.9.1
@@ -69,8 +69,8 @@ importers:
         specifier: 3.4.1
         version: 3.4.1
       hono:
-        specifier: ^4.13.3
-        version: 4.13.3
+        specifier: ^4.13.5
+        version: 4.13.5
       ioredis:
         specifier: 5.11.1
         version: 5.11.1(supports-color@7.2.0)
@@ -1967,8 +1967,8 @@ packages:
     resolution: {integrity: sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==}
     engines: {node: '>=8'}
 
-  hono@4.13.3:
-    resolution: {integrity: sha512-r8AO2mYHoLxSHkgafNeC/BXyb2vWRxD3jem4Ts+ptav8oTG5FIRifAjuJEmZI4bSvvc2ns0GxmIYiZnHqN3mMw==}
+  hono@4.13.5:
+    resolution: {integrity: sha512-O6+/eCYRkzzzy0rPWwKLiGBR1nFuUPZynnwjxN1MBA62NNqbT0wQEzQyK2gSO5yDIDB336sXQleAhOHrzlYyKw==}
     engines: {node: '>=16.9.0'}
 
   iconv-lite@0.7.3:
@@ -2949,9 +2949,9 @@ snapshots:
   '@esbuild/win32-x64@0.28.2':
     optional: true
 
-  '@hono/node-server@2.1.1(hono@4.13.3)':
+  '@hono/node-server@2.1.1(hono@4.13.5)':
     dependencies:
-      hono: 4.13.3
+      hono: 4.13.5
 
   '@img/colour@1.1.0': {}
 
@@ -4101,7 +4101,7 @@ snapshots:
 
   has-flag@4.0.0: {}
 
-  hono@4.13.3: {}
+  hono@4.13.5: {}
 
   iconv-lite@0.7.3:
     dependencies:
