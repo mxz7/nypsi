@@ -363,7 +363,12 @@ function createClickSpecificDrop(
     style: value.style,
   }));
   const winningChoice = shuffledButtons.find((button) => button.name === chosenValue.name)?.choice;
-  const buttons = shuffledButtons.map(({ name: _, ...button }) => button);
+  const buttons = shuffledButtons.map(({ choice, emoji, label, style }) => ({
+    choice,
+    emoji,
+    label,
+    style,
+  }));
 
   return {
     avatarUrl: client.user.avatarURL(),
