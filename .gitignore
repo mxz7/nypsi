@@ -14,6 +14,13 @@ out/
 *.eslintcache
 *.prettiercache
 
+**/.terraform/*
+*.tfplan
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+
 anticheat.ts
 anticheat_old.ts
 anticheat2.ts

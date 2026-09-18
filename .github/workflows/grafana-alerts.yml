@@ -1,0 +1,78 @@
+name: grafana alerts
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/grafana-alerts.yml"
+      - "infra/grafana/**"
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/grafana-alerts.yml"
+      - "infra/grafana/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: grafana-alerts
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+    working-directory: infra/grafana
+
+jobs:
+  validate:
+    name: validate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v7
+
+      - name: setup terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: 1.16.3
+
+      - name: initialize terraform
+        run: terraform init -backend=false -input=false
+
+      - name: check formatting
+        run: terraform fmt -check
+
+      - name: validate configuration
+        run: terraform validate
+
+  deploy:
+    name: deploy
+    if: github.event_name != 'pull_request'
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: production
+
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.B2_APPLICATION_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.B2_APPLICATION_KEY }}
+      GRAFANA_AUTH: ${{ secrets.GRAFANA_AUTH }}
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v7
+
+      - name: setup terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: 1.16.3
+
+      - name: initialize terraform
+        run: terraform init -input=false
+
+      - name: create terraform plan
+        run: terraform plan -input=false -out=grafana.tfplan
+
+      - name: apply terraform plan
+        run: terraform apply -input=false -auto-approve grafana.tfplan
