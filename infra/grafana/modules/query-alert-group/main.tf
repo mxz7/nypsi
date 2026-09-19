@@ -58,23 +58,29 @@ resource "grafana_rule_group" "this" {
           to   = 0
         }
 
-        model = jsonencode(merge(
+        model = var.datasource_type == "prometheus" ? jsonencode(
+          {
+            datasource    = local.query_datasource
+            editorMode    = "code"
+            expr          = rule.value.expression
+            instant       = true
+            intervalMs    = 1000
+            legendFormat  = "__auto"
+            maxDataPoints = 43200
+            range         = false
+            refId         = "A"
+          }
+          ) : jsonencode(
           {
             datasource    = local.query_datasource
             editorMode    = "code"
             expr          = rule.value.expression
             intervalMs    = 1000
             maxDataPoints = 43200
+            queryType     = "instant"
             refId         = "A"
-          },
-          var.datasource_type == "prometheus" ? {
-            instant      = true
-            legendFormat = "__auto"
-            range        = false
-            } : {
-            queryType = "instant"
-          },
-        ))
+          }
+        )
       }
 
       data {
