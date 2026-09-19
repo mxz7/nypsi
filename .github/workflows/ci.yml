@@ -3,6 +3,22 @@ name: ci
 on:
   push:
     branches: [main]
+    paths:
+      - ".github/actions/setup/**"
+      - ".github/workflows/ci.yml"
+      - ".env.example"
+      - ".oxfmtrc.json"
+      - ".oxlintrc.json"
+      - "data/**"
+      - "prisma/**"
+      - "src/**"
+      - "test/**"
+      - "Makefile"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "prisma.config.ts"
+      - "tsconfig.json"
   pull_request:
 
 permissions:
