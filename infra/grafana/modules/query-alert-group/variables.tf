@@ -1,4 +1,8 @@
-variable "service" {
+variable "group_name" {
+  type = string
+}
+
+variable "uid_prefix" {
   type = string
 }
 
@@ -10,8 +14,17 @@ variable "datasource_uid" {
   type = string
 }
 
+variable "datasource_type" {
+  type = string
+}
+
 variable "contact_point" {
   type = string
+}
+
+variable "common_labels" {
+  type    = map(string)
+  default = {}
 }
 
 variable "evaluation_interval_seconds" {

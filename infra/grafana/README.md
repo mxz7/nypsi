@@ -3,7 +3,7 @@
 Terraform manages Grafana alert rules for nypsi services. The existing `discord staff`
 contact point remains managed in Grafana and is selected directly by each rule.
 
-Alert definitions live in `alerts.tf`. The reusable `modules/log-alert-group` module
+Alert definitions live in `alerts.tf`. The reusable `modules/query-alert-group` module
 adds the Grafana query, threshold expression, common labels, and notification settings.
 Adding a service means adding another module instance; adding an alert means adding one
 entry to that service's `alerts` map.

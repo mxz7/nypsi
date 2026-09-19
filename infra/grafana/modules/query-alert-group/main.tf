@@ -4,14 +4,14 @@ locals {
     uid  = "__expr__"
   }
 
-  loki_datasource = {
-    type = "loki"
+  query_datasource = {
+    type = var.datasource_type
     uid  = var.datasource_uid
   }
 }
 
 resource "grafana_rule_group" "this" {
-  name             = "${var.service} logs"
+  name             = var.group_name
   folder_uid       = var.folder_uid
   interval_seconds = var.evaluation_interval_seconds
 
@@ -19,9 +19,9 @@ resource "grafana_rule_group" "this" {
     for_each = var.alerts
 
     content {
-      uid            = "${var.service}-${replace(rule.key, "_", "-")}"
+      uid            = "${var.uid_prefix}-${replace(rule.key, "_", "-")}"
       name           = rule.value.title
-      condition      = "B"
+      condition      = "C"
       for            = rule.value.pending_for
       no_data_state  = rule.value.no_data_state
       exec_err_state = rule.value.exec_err_state
@@ -35,10 +35,9 @@ resource "grafana_rule_group" "this" {
       labels = merge(
         {
           managed_by = "terraform"
-          service    = var.service
           severity   = rule.value.severity
-          source     = "loki"
         },
+        var.common_labels,
         rule.value.labels,
       )
 
@@ -59,19 +58,66 @@ resource "grafana_rule_group" "this" {
           to   = 0
         }
 
-        model = jsonencode({
-          datasource    = local.loki_datasource
-          editorMode    = "code"
-          expr          = rule.value.expression
-          intervalMs    = 1000
-          maxDataPoints = 43200
-          queryType     = "instant"
-          refId         = "A"
-        })
+        model = jsonencode(merge(
+          {
+            datasource    = local.query_datasource
+            editorMode    = "code"
+            expr          = rule.value.expression
+            intervalMs    = 1000
+            maxDataPoints = 43200
+            refId         = "A"
+          },
+          var.datasource_type == "prometheus" ? {
+            instant      = true
+            legendFormat = "__auto"
+            range        = false
+            } : {
+            queryType = "instant"
+          },
+        ))
       }
 
       data {
         ref_id         = "B"
+        datasource_uid = "__expr__"
+
+        relative_time_range {
+          from = 0
+          to   = 0
+        }
+
+        model = jsonencode({
+          conditions = [
+            {
+              evaluator = {
+                params = []
+                type   = "gt"
+              }
+              operator = {
+                type = "and"
+              }
+              query = {
+                params = ["B"]
+              }
+              reducer = {
+                params = []
+                type   = "last"
+              }
+              type = "query"
+            }
+          ]
+          datasource    = local.expression_datasource
+          expression    = "A"
+          intervalMs    = 1000
+          maxDataPoints = 43200
+          reducer       = "last"
+          refId         = "B"
+          type          = "reduce"
+        })
+      }
+
+      data {
+        ref_id         = "C"
         datasource_uid = "__expr__"
 
         relative_time_range {
@@ -90,7 +136,7 @@ resource "grafana_rule_group" "this" {
                 type = "and"
               }
               query = {
-                params = ["A"]
+                params = ["C"]
               }
               reducer = {
                 params = []
@@ -100,11 +146,11 @@ resource "grafana_rule_group" "this" {
             }
           ]
           datasource    = local.expression_datasource
-          expression    = "A"
+          expression    = "B"
           intervalMs    = 1000
           maxDataPoints = 43200
-          refId         = "B"
-          type          = "classic_conditions"
+          refId         = "C"
+          type          = "threshold"
         })
       }
     }
