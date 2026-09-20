@@ -44,6 +44,22 @@ Terraform validates.
 Prometheus instant queries use native booleans `instant = true` and `range = false`.
 Loki uses `queryType = "instant"`.
 
+## PostgreSQL backup health
+
+The nypsi PostgreSQL backup is monitored through pgBackRest metrics in Prometheus.
+The `Nypsi PostgreSQL Overview` dashboard is the reference for these queries. For
+stanza `nypsi`, the relevant healthy values are:
+
+- `pgbackrest_stanza_status` equals `0`.
+- `pgbackrest_backup_last_error_status{backup_type="full"}` equals `0`.
+- `pgbackrest_wal_archive_status` equals `1`.
+- `pgbackrest_backup_since_last_completion_seconds{backup_type="full"}` remains
+  below the chosen maximum backup age.
+
+Filter every metric to `stanza="nypsi"`; the exporter may expose unrelated invalid
+stanzas. Treat missing backup metrics as alerting so loss of the exporter is not
+mistaken for a healthy backup.
+
 ## State and deployment
 
 Terraform state is stored in the private Backblaze B2 bucket

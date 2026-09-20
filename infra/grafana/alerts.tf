@@ -38,6 +38,37 @@ module "nypsi_log_alerts" {
   }
 }
 
+module "nypsi_postgres_alerts" {
+  source = "./modules/query-alert-group"
+
+  group_name      = "nypsi postgres"
+  uid_prefix      = "nypsi-postgres"
+  folder_uid      = grafana_folder.alerts.uid
+  datasource_uid  = data.grafana_data_source.prometheus.uid
+  datasource_type = "prometheus"
+  contact_point   = "discord staff"
+
+  common_labels = {
+    service = "nypsi-postgres"
+    source  = "prometheus"
+  }
+
+  alerts = {
+    backup_health = {
+      title           = "nypsi PostgreSQL backup unhealthy"
+      expression      = "(max(pgbackrest_stanza_status{stanza=\"nypsi\"}) != bool 0) + (max(pgbackrest_backup_last_error_status{stanza=\"nypsi\", backup_type=\"full\"}) != bool 0) + (min(pgbackrest_wal_archive_status{stanza=\"nypsi\"}) != bool 1) + (max(pgbackrest_backup_since_last_completion_seconds{stanza=\"nypsi\", backup_type=\"full\"}) > bool 129600)"
+      range_seconds   = 300
+      threshold       = 0
+      pending_for     = "5m"
+      severity        = "critical"
+      summary         = "nypsi PostgreSQL backup health check failed"
+      description     = "The pgBackRest stanza, latest full backup, or WAL archive is unhealthy; the latest full backup may also be more than 36 hours old."
+      repeat_interval = "2h"
+      no_data_state   = "Alerting"
+    }
+  }
+}
+
 module "system_resource_alerts" {
   source = "./modules/query-alert-group"
 
