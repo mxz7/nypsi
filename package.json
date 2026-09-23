@@ -65,7 +65,7 @@
     "oxlint": "^1.79.0",
     "oxlint-tsgolint": "^7.0.2002",
     "prisma": "7.10.0",
-    "tsx": "^4.23.13",
+    "tsx": "^4.23.15",
     "typescript": "7.0.2",
     "vitest": "^5.0.1"
   },
