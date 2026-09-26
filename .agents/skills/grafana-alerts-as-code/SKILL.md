@@ -17,8 +17,12 @@ instance for a new service/group.
 - Datasources are looked up by the stable names `loki` and `prometheus`; do not
   hardcode their generated UIDs.
 - Rules are placed in the Terraform-managed folder with UID `nypsi-alerts`.
-- The existing `discord staff` contact point is managed in Grafana, not Terraform.
-  Rules reference it by name.
+- The existing `discord staff` contact point is imported and managed by Terraform.
+  Rules reference it by name. Its webhook URL comes from the production GitHub
+  environment secret `DISCORD_STAFF_WEBHOOK_URL` and is stored in private Terraform
+  state.
+- `infra/grafana/notifications.tf` provisions the Discord notification template from
+  `discord.tmpl` and sets the contact point's Title and Message fields to use it.
 - Rule UIDs are deterministic: `<uid_prefix>-<alert_map_key>`, with underscores in
   the key replaced by hyphens. Choose stable, unique prefixes and keys; changing
   either replaces the rule identity.

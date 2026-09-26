@@ -58,6 +58,7 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.B2_APPLICATION_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.B2_APPLICATION_KEY }}
       GRAFANA_AUTH: ${{ secrets.GRAFANA_AUTH }}
+      TF_VAR_discord_webhook_url: ${{ secrets.DISCORD_STAFF_WEBHOOK_URL }}
 
     steps:
       - name: checkout repository
