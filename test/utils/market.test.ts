@@ -7,9 +7,9 @@ import {
 import {
   cancelMarketOrder,
   calculateMarketFill,
+  createRemainingMarketOrder,
   escrowMarketOrderAssets,
   settleMarketFill,
-  updateIncomingMarketOrder,
 } from "../../src/utils/functions/economy/market/settlement";
 
 function order(
@@ -557,90 +557,50 @@ describe("settleMarketFill", () => {
   });
 });
 
-describe("updateIncomingMarketOrder", () => {
-  test("leaves a partially filled remainder and records completed history", async () => {
-    const incomingOrder = {
-      ...order(10, "buy", 20_000, 5, "buyer"),
-      itemId: "cookie",
-      messageId: null,
-      createdAt: new Date(0),
-    };
-    const transaction = {
-      market: {
-        update: vi.fn().mockResolvedValue({}),
-        create: vi.fn().mockResolvedValue({}),
-        delete: vi.fn().mockResolvedValue({}),
-      },
-    };
+describe("createRemainingMarketOrder", () => {
+  const request = {
+    ownerId: "seller",
+    itemId: "cookie",
+    amount: 5,
+    price: 18_000_000n,
+    orderType: "sell" as const,
+  };
 
-    const remaining = await updateIncomingMarketOrder(
-      transaction as never,
-      incomingOrder,
-      2,
-      false,
-    );
+  test("creates no incoming row when the entire order fills", async () => {
+    const transaction = { market: { create: vi.fn() } };
 
-    expect(remaining).toBe(3);
-    expect(transaction.market.update).toHaveBeenCalledWith({
-      where: { id: 10 },
-      data: { itemAmount: 3 },
-    });
-    expect(transaction.market.create).toHaveBeenCalledWith({
-      data: expect.objectContaining({ itemAmount: 2, completed: true }),
-    });
-    expect(transaction.market.delete).not.toHaveBeenCalled();
-  });
+    const result = await createRemainingMarketOrder(transaction as never, request, 5);
 
-  test("deletes a fully filled incoming order during season interim", async () => {
-    const incomingOrder = {
-      ...order(10, "buy", 20_000, 2, "buyer"),
-      itemId: "cookie",
-      messageId: null,
-      createdAt: new Date(0),
-    };
-    const transaction = {
-      market: {
-        update: vi.fn().mockResolvedValue({}),
-        create: vi.fn().mockResolvedValue({}),
-        delete: vi.fn().mockResolvedValue({}),
-      },
-    };
-
-    const remaining = await updateIncomingMarketOrder(transaction as never, incomingOrder, 2, true);
-
-    expect(remaining).toBe(0);
-    expect(transaction.market.delete).toHaveBeenCalledWith({ where: { id: 10 } });
-    expect(transaction.market.update).not.toHaveBeenCalled();
-  });
-
-  test("completes a fully filled incoming order without creating a zero-amount order", async () => {
-    const incomingOrder = {
-      ...order(10, "buy", 20_000, 2, "buyer"),
-      itemId: "cookie",
-      messageId: null,
-      createdAt: new Date(0),
-    };
-    const transaction = {
-      market: {
-        update: vi.fn().mockResolvedValue({}),
-        create: vi.fn().mockResolvedValue({}),
-        delete: vi.fn().mockResolvedValue({}),
-      },
-    };
-
-    const remaining = await updateIncomingMarketOrder(
-      transaction as never,
-      incomingOrder,
-      2,
-      false,
-    );
-
-    expect(remaining).toBe(0);
-    expect(transaction.market.update).toHaveBeenCalledWith({
-      where: { id: 10 },
-      data: { completed: true },
-    });
+    expect(result).toEqual({ remainingAmount: 0 });
     expect(transaction.market.create).not.toHaveBeenCalled();
-    expect(transaction.market.delete).not.toHaveBeenCalled();
+  });
+
+  test("creates only an active order for the unfilled remainder", async () => {
+    const order = { id: 10, itemAmount: 3 };
+    const transaction = { market: { create: vi.fn().mockResolvedValue(order) } };
+
+    const result = await createRemainingMarketOrder(transaction as never, request, 2);
+
+    expect(result).toEqual({ remainingAmount: 3, order });
+    expect(transaction.market.create).toHaveBeenCalledWith({
+      data: {
+        ownerId: "seller",
+        itemId: "cookie",
+        itemAmount: 3,
+        price: 18_000_000n,
+        orderType: "sell",
+      },
+    });
+  });
+
+  test("creates the full active order when nothing matches", async () => {
+    const transaction = { market: { create: vi.fn().mockResolvedValue({ id: 10 }) } };
+
+    const result = await createRemainingMarketOrder(transaction as never, request, 0);
+
+    expect(result.remainingAmount).toBe(5);
+    expect(transaction.market.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({ itemAmount: 5 }),
+    });
   });
 });

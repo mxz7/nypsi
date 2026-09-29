@@ -1,4 +1,4 @@
-import type { Market, Prisma } from "#generated/prisma";
+import type { Market, OrderType, Prisma } from "#generated/prisma";
 import Constants from "../../../Constants";
 import type { MatchableMarketOrder } from "./matching";
 
@@ -289,40 +289,33 @@ export async function settleMarketFill(
   return { ...accounting, incomingUserId: request.incomingUserId, order };
 }
 
-export async function updateIncomingMarketOrder(
+export async function createRemainingMarketOrder(
   prisma: Prisma.TransactionClient,
-  order: Market,
+  request: {
+    ownerId: string;
+    itemId: string;
+    amount: number;
+    price: bigint;
+    orderType: OrderType;
+  },
   filledAmount: number,
-  seasonInterim: boolean,
-): Promise<number> {
-  if (!Number.isInteger(filledAmount) || filledAmount < 1 || filledAmount > order.itemAmount) {
-    throw new RangeError("filled amount must fit within the incoming market order");
+): Promise<{ remainingAmount: number; order?: Market }> {
+  if (!Number.isInteger(filledAmount) || filledAmount < 0 || filledAmount > request.amount) {
+    throw new RangeError("filled amount must fit within the requested market order");
   }
 
-  const remainingAmount = order.itemAmount - filledAmount;
+  const remainingAmount = request.amount - filledAmount;
+  if (remainingAmount === 0) return { remainingAmount };
 
-  if (remainingAmount === 0) {
-    if (seasonInterim) await prisma.market.delete({ where: { id: order.id } });
-    else await prisma.market.update({ where: { id: order.id }, data: { completed: true } });
-  } else {
-    await prisma.market.update({
-      where: { id: order.id },
-      data: { itemAmount: remainingAmount },
-    });
+  const order = await prisma.market.create({
+    data: {
+      ownerId: request.ownerId,
+      itemId: request.itemId,
+      itemAmount: remainingAmount,
+      price: request.price,
+      orderType: request.orderType,
+    },
+  });
 
-    if (order.price > 10_000 && !seasonInterim) {
-      await prisma.market.create({
-        data: {
-          ownerId: order.ownerId,
-          itemId: order.itemId,
-          itemAmount: filledAmount,
-          orderType: order.orderType,
-          price: order.price,
-          completed: true,
-        },
-      });
-    }
-  }
-
-  return remainingAmount;
+  return { remainingAmount, order };
 }

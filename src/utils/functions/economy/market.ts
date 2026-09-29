@@ -43,7 +43,7 @@ import {
   MarketEscrowError,
   settleMarketFill,
   SettledMarketFill,
-  updateIncomingMarketOrder,
+  createRemainingMarketOrder,
 } from "./market/settlement";
 import { addStat } from "./stats";
 import { createUser, getItems, userExists } from "./utils";
@@ -341,7 +341,7 @@ async function createMarketOrderUnlocked(
     redis.exists(Constants.redis.nypsi.INFINITE_MAX_BET).then(Boolean),
   ]);
 
-  let creation: { fills: SettledMarketFill[]; order: Market; remainingAmount: number };
+  let creation: { fills: SettledMarketFill[]; order?: Market; remainingAmount: number };
 
   logger.debug("market: starting atomic order creation", {
     amount,
@@ -411,9 +411,6 @@ async function createMarketOrderUnlocked(
           userId: ownerId,
         });
 
-        const order = await tx.market.create({
-          data: { ownerId, itemId, itemAmount: amount, price, orderType },
-        });
         const fills: SettledMarketFill[] = [];
 
         for (const fill of quote.fills) {
@@ -436,10 +433,11 @@ async function createMarketOrderUnlocked(
         }
 
         const filledAmount = fills.reduce((total, fill) => total + fill.amount, 0);
-        const remainingAmount =
-          filledAmount > 0
-            ? await updateIncomingMarketOrder(transaction, order, filledAmount, seasonInterim)
-            : amount;
+        const { order, remainingAmount } = await createRemainingMarketOrder(
+          transaction,
+          { ownerId, itemId, amount, price: BigInt(price), orderType },
+          filledAmount,
+        );
 
         return { fills, order, remainingAmount };
       },
@@ -472,7 +470,7 @@ async function createMarketOrderUnlocked(
   logger.debug("market: atomic order creation committed", {
     filledAmount: creation.fills.reduce((total, fill) => total + fill.amount, 0),
     itemId,
-    orderId: creation.order.id,
+    orderId: creation.order?.id,
     orderType,
     ownerId,
     remainingAmount: creation.remainingAmount,
@@ -488,9 +486,7 @@ async function createMarketOrderUnlocked(
     fills: creation.fills.map((fill) => ({ amount: fill.amount, price: fill.price })),
   };
 
-  if (creation.remainingAmount === 0) return response;
-
-  creation.order.itemAmount = creation.remainingAmount;
+  if (!creation.order) return response;
 
   const payload = await getMarketOrderEmbed(creation.order);
   let result: RESTPostAPIChannelMessageResult | undefined;
@@ -833,7 +829,6 @@ async function settleMarketFills(request: {
   requestedAmount: number;
   incomingAssetsEscrowed: boolean;
   incomingLimitPrice?: bigint;
-  incomingOrder?: Market;
 }) {
   const context = {
     fills: request.fills.map((fill) => ({
@@ -844,7 +839,6 @@ async function settleMarketFills(request: {
     })),
     incomingAssetsEscrowed: request.incomingAssetsEscrowed,
     incomingLimitPrice: request.incomingLimitPrice,
-    incomingOrderId: request.incomingOrder?.id,
     incomingUserId: request.incomingUserId,
     requestedAmount: request.requestedAmount,
   };
@@ -861,7 +855,7 @@ async function settleMarketFills(request: {
     const settlement = await prisma.$transaction(
       async (tx) => {
         const transaction = tx as Prisma.TransactionClient;
-        const itemId = request.incomingOrder?.itemId ?? request.fills[0]?.order.itemId;
+        const itemId = request.fills[0]?.order.itemId;
         const results: SettledMarketFill[] = [];
 
         if (!itemId) throw new Error("market settlement requires an item");
@@ -904,14 +898,7 @@ async function settleMarketFills(request: {
         }
 
         const filledAmount = results.reduce((total, fill) => total + fill.amount, 0);
-        const remainingAmount = request.incomingOrder
-          ? await updateIncomingMarketOrder(
-              transaction,
-              request.incomingOrder,
-              filledAmount,
-              seasonInterim,
-            )
-          : request.requestedAmount - filledAmount;
+        const remainingAmount = request.requestedAmount - filledAmount;
 
         return { fills: results, remainingAmount };
       },

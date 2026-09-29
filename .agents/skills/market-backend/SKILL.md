@@ -57,6 +57,9 @@ description: Maintain Nypsi's player market backend, including order matching, f
   buy price then oldest ID.
 - Execute at the resting order's price. Calculate tax from the executed value and explicitly refund
   unused buy-side reservation.
+- When creating an order that crosses the book, keep completed history on the resting orders only.
+  Create a new order row only for the unfilled remainder; this matches direct-fill history and keeps
+  submitted limit prices out of the completed-row average.
 - Add invariant tests for conservation of money/items, price limits, FIFO, partial fills, refunds,
   and rollback before changing settlement behavior.
 
