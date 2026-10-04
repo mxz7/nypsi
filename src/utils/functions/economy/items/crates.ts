@@ -149,9 +149,19 @@ export default new ItemUse(
     embed.setDescription(pages.get(1).join("\n"));
 
     if (foundAll.items["pumpkin"]) {
-      await addEventProgress(message.client as NypsiClient, message.member, "halloween", 1);
+      await addEventProgress(
+        message.client as NypsiClient,
+        message.member,
+        "halloween",
+        foundAll.items["pumpkin"],
+      );
     } else if (foundAll.items["christmas_tree"]) {
-      await addEventProgress(message.client as NypsiClient, message.member, "christmas", 1);
+      await addEventProgress(
+        message.client as NypsiClient,
+        message.member,
+        "christmas",
+        foundAll.items["christmas_tree"],
+      );
     }
 
     await sleep(2500);
