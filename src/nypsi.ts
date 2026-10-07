@@ -1,6 +1,7 @@
 import { getInfo } from "discord-hybrid-sharding";
 import { ActivityType, GatewayIntentBits, Options, Partials } from "discord.js";
 import { NypsiClient } from "./models/Client";
+import { cacheWithSharedEmpty } from "./utils/discord-cache";
 import { getLastCommandSync } from "./utils/functions/guilds/commands";
 import ms = require("ms");
 
@@ -74,7 +75,7 @@ const client = new NypsiClient({
       },
     },
   },
-  makeCache: Options.cacheWithLimits({
+  makeCache: cacheWithSharedEmpty({
     ApplicationCommandManager: 0,
     BaseGuildEmojiManager: 0,
     GuildBanManager: 0,
