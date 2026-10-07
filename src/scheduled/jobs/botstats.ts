@@ -68,12 +68,67 @@ export default {
     const rawResults = await manager.broadcastEval((c) => {
       const client = c as unknown as NypsiClient;
       const mem = process.memoryUsage();
+      const cache = {
+        guilds: client.guilds.cache.size,
+        users: client.users.cache.size,
+        members: 0,
+        roles: 0,
+        channels: client.channels.cache.size,
+        threads: 0,
+        archivedThreads: 0,
+        dmChannels: 0,
+        permissionOverwrites: 0,
+        largestMemberCache: 0,
+      };
+
+      const guildCaches = [];
+
+      for (const guild of client.guilds.cache.values()) {
+        const members = guild.members.cache.size;
+        const roles = guild.roles.cache.size;
+        let permissionOverwrites = 0;
+
+        for (const channel of guild.channels.cache.values()) {
+          if ("permissionOverwrites" in channel) {
+            permissionOverwrites += channel.permissionOverwrites.cache.size;
+          }
+        }
+
+        cache.members += members;
+        cache.roles += roles;
+        cache.largestMemberCache = Math.max(cache.largestMemberCache, members);
+        guildCaches.push({
+          guildId: guild.id,
+          members,
+          roles,
+          channels: guild.channels.cache.size,
+          permissionOverwrites,
+        });
+      }
+
+      for (const channel of client.channels.cache.values()) {
+        if (channel.isThread()) {
+          cache.threads++;
+          if (channel.archived) cache.archivedThreads++;
+        }
+        if (channel.isDMBased()) cache.dmChannels++;
+        if ("permissionOverwrites" in channel) {
+          cache.permissionOverwrites += channel.permissionOverwrites.cache.size;
+        }
+      }
 
       return {
         cluster: client.cluster.id,
         rss: mem.rss,
         heapUsed: mem.heapUsed,
         heapTotal: mem.heapTotal,
+        external: mem.external,
+        arrayBuffers: mem.arrayBuffers,
+        cache,
+        largestMemberCaches: guildCaches.toSorted((a, b) => b.members - a.members).slice(0, 5),
+        largestOverwriteCaches: guildCaches
+          .toSorted((a, b) => b.permissionOverwrites - a.permissionOverwrites)
+          .slice(0, 5),
       };
     });
 
@@ -87,8 +142,9 @@ export default {
     );
 
     const mainMem = process.memoryUsage();
-    log("cluster memory usage", {
+    log("memory: cluster usage", {
       clusters: results,
+      cacheDetails: rawResults,
       main: `rss=${bytesToMb(mainMem.rss)}mb heap=${bytesToMb(mainMem.heapUsed)}/${bytesToMb(mainMem.heapTotal)}mb`,
     });
   },
