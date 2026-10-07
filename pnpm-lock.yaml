@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  discord.js@14.27.0: dafc9f620462be5d03095d018cddfd7fb91afededae055135a706c806b76701b
+
 importers:
 
   .:
@@ -61,7 +64,7 @@ importers:
         version: 3.0.1
       discord.js:
         specifier: 14.27.0
-        version: 14.27.0(bufferutil@4.1.0)
+        version: 14.27.0(patch_hash=dafc9f620462be5d03095d018cddfd7fb91afededae055135a706c806b76701b)(bufferutil@4.1.0)
       dotenv:
         specifier: 17.4.2
         version: 17.4.2
@@ -3933,7 +3936,7 @@ snapshots:
 
   discord-hybrid-sharding@3.0.1: {}
 
-  discord.js@14.27.0(bufferutil@4.1.0):
+  discord.js@14.27.0(patch_hash=dafc9f620462be5d03095d018cddfd7fb91afededae055135a706c806b76701b)(bufferutil@4.1.0):
     dependencies:
       '@discordjs/builders': 1.14.1
       '@discordjs/collection': 1.5.3

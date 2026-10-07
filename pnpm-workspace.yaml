@@ -16,3 +16,5 @@ minimumReleaseAgeExclude:
   - fast-uri@3.1.2
   - fast-xml-parser@5.7.0
   - hono@4.12.18
+patchedDependencies:
+  discord.js@14.27.0: patches/discord.js@14.27.0.patch

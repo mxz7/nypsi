@@ -1,0 +1,188 @@
+diff --git a/src/structures/BaseGuildTextChannel.js b/src/structures/BaseGuildTextChannel.js
+index 9b8490ecc995ded59812e7585c475e563cfa66d1..09f3f11173b15583fe9c43923fc767c0b0ee19cc 100644
+--- a/src/structures/BaseGuildTextChannel.js
++++ b/src/structures/BaseGuildTextChannel.js
+@@ -1,5 +1,7 @@
+ 'use strict';
+ 
++const defineLazyManager = require('../util/defineLazyManager');
++
+ const GuildChannel = require('./GuildChannel');
+ const TextBasedChannel = require('./interfaces/TextBasedChannel');
+ const GuildMessageManager = require('../managers/GuildMessageManager');
+@@ -18,13 +20,13 @@ class BaseGuildTextChannel extends GuildChannel {
+      * A manager of the messages sent to this channel
+      * @type {GuildMessageManager}
+      */
+-    this.messages = new GuildMessageManager(this);
++    defineLazyManager(this, 'messages', GuildMessageManager);
+ 
+     /**
+      * A manager of the threads belonging to this channel
+      * @type {GuildTextThreadManager}
+      */
+-    this.threads = new GuildTextThreadManager(this);
++    defineLazyManager(this, 'threads', GuildTextThreadManager);
+ 
+     /**
+      * If the guild considers this channel NSFW
+diff --git a/src/structures/BaseGuildVoiceChannel.js b/src/structures/BaseGuildVoiceChannel.js
+index 220ac6c8d83b20d14e9699bac91902469f674da9..3458c0ebe828448958c617fe4fe08c05718cc2d9 100644
+--- a/src/structures/BaseGuildVoiceChannel.js
++++ b/src/structures/BaseGuildVoiceChannel.js
+@@ -1,5 +1,7 @@
+ 'use strict';
+ 
++const defineLazyManager = require('../util/defineLazyManager');
++
+ const { Collection } = require('@discordjs/collection');
+ const { PermissionFlagsBits } = require('discord-api-types/v10');
+ const GuildChannel = require('./GuildChannel');
+@@ -18,7 +20,7 @@ class BaseGuildVoiceChannel extends GuildChannel {
+      * A manager of the messages sent to this channel
+      * @type {GuildMessageManager}
+      */
+-    this.messages = new GuildMessageManager(this);
++    defineLazyManager(this, 'messages', GuildMessageManager);
+ 
+     /**
+      * If the guild considers this channel NSFW
+diff --git a/src/structures/GuildChannel.js b/src/structures/GuildChannel.js
+index 830c27cabb492dc65e731b5b8b446a78a6c70354..ba7330ee8fec1549f20f63a27ce5b061f05b0f6f 100644
+--- a/src/structures/GuildChannel.js
++++ b/src/structures/GuildChannel.js
+@@ -1,5 +1,7 @@
+ 'use strict';
+ 
++const defineLazyManager = require('../util/defineLazyManager');
++
+ const { Snowflake } = require('@sapphire/snowflake');
+ const { PermissionFlagsBits, ChannelType } = require('discord-api-types/v10');
+ const { BaseChannel } = require('./BaseChannel');
+@@ -40,7 +42,8 @@ class GuildChannel extends BaseChannel {
+      * A manager of permission overwrites that belong to this channel
+      * @type {PermissionOverwriteManager}
+      */
+-    this.permissionOverwrites = new PermissionOverwriteManager(this);
++    Object.defineProperty(this, '_rawPermissionOverwrites', { value: [], writable: true, configurable: true });
++    defineLazyManager(this, 'permissionOverwrites', PermissionOverwriteManager, '_rawPermissionOverwrites');
+ 
+     if (data && immediatePatch) this._patch(data);
+   }
+@@ -79,6 +82,10 @@ class GuildChannel extends BaseChannel {
+     }
+ 
+     if ('permission_overwrites' in data) {
++      if (Object.getOwnPropertyDescriptor(this, 'permissionOverwrites').get) {
++        this._rawPermissionOverwrites = data.permission_overwrites;
++        return;
++      }
+       this.permissionOverwrites.cache.clear();
+       for (const overwrite of data.permission_overwrites) {
+         this.permissionOverwrites._add(overwrite);
+diff --git a/src/structures/PermissionOverwrites.js b/src/structures/PermissionOverwrites.js
+index 27515aa12d06fcbd9fe806ed1eb2b52841e99848..50b64fe1d5dacdcf45f86c0f2497be6a3bf89a36 100644
+--- a/src/structures/PermissionOverwrites.js
++++ b/src/structures/PermissionOverwrites.js
+@@ -5,6 +5,7 @@ const Base = require('./Base');
+ const { Role } = require('./Role');
+ const { DiscordjsTypeError, ErrorCodes } = require('../errors');
+ const PermissionsBitField = require('../util/PermissionsBitField');
++const getFrozenPermissions = require('../util/getFrozenPermissions');
+ 
+ /**
+  * Represents a permission overwrite for a role or member in a guild channel.
+@@ -45,7 +46,7 @@ class PermissionOverwrites extends Base {
+        * The permissions that are denied for the user or role.
+        * @type {Readonly<PermissionsBitField>}
+        */
+-      this.deny = new PermissionsBitField(BigInt(data.deny)).freeze();
++      this.deny = getFrozenPermissions(BigInt(data.deny));
+     }
+ 
+     if ('allow' in data) {
+@@ -53,7 +54,7 @@ class PermissionOverwrites extends Base {
+        * The permissions that are allowed for the user or role.
+        * @type {Readonly<PermissionsBitField>}
+        */
+-      this.allow = new PermissionsBitField(BigInt(data.allow)).freeze();
++      this.allow = getFrozenPermissions(BigInt(data.allow));
+     }
+   }
+ 
+diff --git a/src/structures/ThreadOnlyChannel.js b/src/structures/ThreadOnlyChannel.js
+index 0445b9988e9ee5da2501f89fc7f90ac45ce94b66..e02b1179f9cf08882255e3734ee276d8657e0312 100644
+--- a/src/structures/ThreadOnlyChannel.js
++++ b/src/structures/ThreadOnlyChannel.js
+@@ -1,5 +1,7 @@
+ 'use strict';
+ 
++const defineLazyManager = require('../util/defineLazyManager');
++
+ const GuildChannel = require('./GuildChannel');
+ const TextBasedChannel = require('./interfaces/TextBasedChannel');
+ const GuildForumThreadManager = require('../managers/GuildForumThreadManager');
+@@ -49,7 +51,7 @@ class ThreadOnlyChannel extends GuildChannel {
+      * A manager of the threads belonging to this channel
+      * @type {GuildForumThreadManager}
+      */
+-    this.threads = new GuildForumThreadManager(this);
++    defineLazyManager(this, 'threads', GuildForumThreadManager);
+ 
+     this._patch(data);
+   }
+diff --git a/src/util/defineLazyManager.js b/src/util/defineLazyManager.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..d7d7a946f09f8230704bfe87efafcfb37a6a6370
+--- /dev/null
++++ b/src/util/defineLazyManager.js
+@@ -0,0 +1,20 @@
++'use strict';
++const getters = new Map();
++function defineLazyManager(owner, name, Manager, dataProperty) {
++  let descriptors = getters.get(Manager);
++  if (!descriptors) {
++    const set = function setManager(value) {
++      Object.defineProperty(this, name, { value, writable: true, configurable: true, enumerable: true });
++    };
++    const get = function getManager() {
++      const manager = new Manager(this, dataProperty ? this[dataProperty] : undefined);
++      if (dataProperty) this[dataProperty] = null;
++      set.call(this, manager);
++      return manager;
++    };
++    descriptors = { get, set, configurable: true, enumerable: true };
++    getters.set(Manager, descriptors);
++  }
++  Object.defineProperty(owner, name, descriptors);
++}
++module.exports = defineLazyManager;
+diff --git a/src/util/getFrozenPermissions.js b/src/util/getFrozenPermissions.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..58346e8028877ba27593823240d30b01437527cc
+--- /dev/null
++++ b/src/util/getFrozenPermissions.js
+@@ -0,0 +1,23 @@
++'use strict';
++
++const PermissionsBitField = require('./PermissionsBitField');
++
++const permissions = new Map();
++const maxSize = 1_024;
++
++/**
++ * Shares immutable permission bitfields used by cached structures.
++ * @param {bigint} bits The permission bits
++ * @returns {Readonly<PermissionsBitField>}
++ * @private
++ */
++function getFrozenPermissions(bits) {
++  const existing = permissions.get(bits);
++  if (existing) return existing;
++
++  const value = new PermissionsBitField(bits).freeze();
++  if (permissions.size < maxSize) permissions.set(bits, value);
++  return value;
++}
++
++module.exports = getFrozenPermissions;

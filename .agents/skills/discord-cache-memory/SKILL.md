@@ -8,6 +8,16 @@ description: Investigate or reduce Nypsi gateway process memory usage, including
 Client cache configuration lives in `src/nypsi.ts`. Verify behavior against the installed
 discord.js source when changing it; the observations below were checked against 14.27.0.
 
+Nypsi applies `patches/discord.js@14.27.0.patch` through pnpm `patchedDependencies`.
+It pools frozen overwrite bitfields and lazily constructs channel message/thread/overwrite
+managers. `src/utils/discord-cache.ts` shares frozen empty zero-limit collections for the
+settings in `src/nypsi.ts`; caches with retention callbacks or nonzero limits stay private.
+The deployment workflow copies `patches/`; `test/discord-cache/*.test.ts` runs in the existing
+Vitest suite (`pnpm test`). These tests reverse the patch into a temporary baseline and compare installed
+code against stock 14.27.0. Git is required. Update the patch with `pnpm patch`/`patch-commit`,
+keep the exact dependency version pinned, and commit the patch, workspace config and lockfile.
+After changing library behavior, inspect telemetry for accidental lazy-manager materialisation.
+
 - `RoleManager`, `ChannelManager`, `GuildChannelManager`, `GuildManager`, and
   `PermissionOverwriteManager` customization is unsupported. Member permissions and role
   hierarchy depend on the complete guild role cache; channel permission checks and overwrite
@@ -38,9 +48,44 @@ discord.js source when changing it; the observations below were checked against 
 - `GuildMember.roles` and its `.cache` construct transient managers/collections referencing
   guild role objects; `GuildMember.permissions` computes a new bitfield. Repeated access can
   create allocation churn, but is not evidence of retained duplicate role objects.
+- Overwrite `allow`/`deny` and role permissions are separately allocated frozen bitfields.
+  Sharing equal frozen values is a possible optimization without evicting cache entries;
+  overwrite objects themselves remain channel-specific. Measure value repetition and CPU
+  costs before deployment. A bounded FIFO prototype had severe overhead for unique values;
+  a capped pool that bypasses new values when full avoided eviction churn, but still added
+  overhead on misses and cannot adapt to new common values after filling.
+- `maxSize: 0` still creates a separate empty `LimitedCollection` per manager. A local
+  Node 24/V8 snapshot measured roughly 200 bytes per empty collection including its Map
+  table; this is version-dependent. Nypsi shares a frozen zero-limit collection to avoid
+  those allocations, but only for caches with no retention callback. Keep nonzero caches
+  private and test `_add`, cloning, threads, and methods returning new collections.
+- Guild channels eagerly create message/thread/overwrite managers even when their caches
+  are disabled or never read. The package patch uses lazy managers. Savings
+  depend on how many channels are touched; permission checks and channel cloning can
+  materialize overwrite managers. Retaining raw overwrite payloads must preserve patches,
+  snapshots, serialization, REST behavior, and permission precedence. Telemetry must inspect
+  own descriptors instead of reading lazy getters and accidentally warming every channel.
+- Nypsi uses Prisma 7 with `engineType = "client"` and `@prisma/adapter-pg`, not the
+  legacy native query engine. Its generated client still lazily loads a WebAssembly query
+  compiler: import-only memory measurements miss that cost. Warm real queries with a mock
+  adapter when comparing ORM overhead without a live database. Drizzle can use the same
+  pg driver, so pool memory and application result caches are not automatic ORM savings.
+- On Debian with default Node, investigate native allocations alongside Discord caches.
+  RSS minus `heapTotal` includes native allocations and mappings, not just fragmentation.
+  Node documents glibc fragmentation; Sharp recommends allocator tuning. Compare equivalent
+  workloads and observe actual Sharp concurrency: changing allocator settings can change
+  Sharp's default concurrency as well. Do not assume the entire RSS gap is reclaimable.
+- Do not assume discord.js v14 has extensive automated permission behavior coverage. Its
+  package test script focuses on documentation/types. Permission-sharing experiments need
+  explicit runtime tests for precedence, updates, old snapshots, REST edits, and cloning,
+  ideally compared against the unpatched version.
 
 The hourly `src/scheduled/jobs/botstats.ts` report includes `cacheDetails` with per-cluster
 memory bytes, cache entry counts, and the five largest member/overwrite guild caches.
+It also reports V8 physical/malloced memory, Linux `smaps_rollup` fields in KiB (or null),
+Node/allocator settings, already-loaded Sharp cache/concurrency/counters, channel types,
+disabled-cache bindings, and overwrite-value repetition against a bounded 1024-value pool.
+The repetition estimate follows current cache iteration order, not historical insertion order.
 Channel totals come from the global cache once; threads and DM channels are subsets.
 Counts indicate where to investigate, not retained byte sizes. `arrayBuffers` is included
 in `external`, so do not add them. Compare steady-state heap and cache counts across similar

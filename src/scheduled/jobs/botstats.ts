@@ -68,6 +68,60 @@ export default {
     const rawResults = await manager.broadcastEval((c) => {
       const client = c as unknown as NypsiClient;
       const mem = process.memoryUsage();
+      const heap = require("node:v8").getHeapStatistics();
+      const channelTypes: Record<string, number> = {};
+      const disabledCacheBindings: Record<string, number> = {};
+      const overwritePool = new Set<bigint>();
+      let repeatedOverwriteFields = 0;
+      let overwriteFieldsOutsidePool = 0;
+
+      const countDisabledCache = (manager: unknown) => {
+        const collection = (manager as { cache?: { maxSize?: number; keepOverLimit?: unknown } })
+          ?.cache;
+        if (collection?.maxSize !== 0 || collection.keepOverLimit) return;
+
+        const name = manager.constructor.name;
+        disabledCacheBindings[name] = (disabledCacheBindings[name] || 0) + 1;
+      };
+
+      const countOverwrites = (channel: unknown) => {
+        const raw = Object.getOwnPropertyDescriptor(channel, "_rawPermissionOverwrites")?.value;
+        if (Array.isArray(raw)) return raw.length;
+
+        const manager = Object.getOwnPropertyDescriptor(channel, "permissionOverwrites")?.value;
+        return manager?.cache.size || 0;
+      };
+
+      const observeOverwriteField = (bits: bigint) => {
+        if (overwritePool.has(bits)) repeatedOverwriteFields++;
+        else if (overwritePool.size < 1_024) overwritePool.add(bits);
+        else overwriteFieldsOutsidePool++;
+      };
+
+      let linuxMemoryKiB: Record<string, number> = null;
+      if (process.platform === "linux") {
+        try {
+          const smaps = require("node:fs").readFileSync("/proc/self/smaps_rollup", "utf8");
+          linuxMemoryKiB = {};
+          for (const line of smaps.split("\n")) {
+            const match = line.match(/^(\w+):\s+(\d+) kB$/);
+            if (match) linuxMemoryKiB[match[1]] = Number(match[2]);
+          }
+        } catch {
+          linuxMemoryKiB = null;
+        }
+      }
+
+      const sharpModule = require.cache[require.resolve("sharp")]
+        ?.exports as typeof import("sharp");
+      const sharpStats = sharpModule
+        ? {
+            cache: sharpModule.cache(),
+            concurrency: sharpModule.concurrency(),
+            counters: sharpModule.counters(),
+          }
+        : null;
+
       const cache = {
         guilds: client.guilds.cache.size,
         users: client.users.cache.size,
@@ -89,9 +143,22 @@ export default {
         let permissionOverwrites = 0;
 
         for (const channel of guild.channels.cache.values()) {
-          if ("permissionOverwrites" in channel) {
-            permissionOverwrites += channel.permissionOverwrites.cache.size;
-          }
+          permissionOverwrites += countOverwrites(channel);
+        }
+
+        for (const name of [
+          "commands",
+          "bans",
+          "presences",
+          "voiceStates",
+          "stageInstances",
+          "invites",
+          "scheduledEvents",
+          "autoModerationRules",
+          "emojis",
+          "stickers",
+        ]) {
+          countDisabledCache(Object.getOwnPropertyDescriptor(guild, name)?.value);
         }
 
         cache.members += members;
@@ -107,13 +174,30 @@ export default {
       }
 
       for (const channel of client.channels.cache.values()) {
+        channelTypes[channel.type] = (channelTypes[channel.type] || 0) + 1;
+        countDisabledCache(Object.getOwnPropertyDescriptor(channel, "messages")?.value);
+        countDisabledCache(Object.getOwnPropertyDescriptor(channel, "threads")?.value);
+        countDisabledCache(Object.getOwnPropertyDescriptor(channel, "members")?.value);
+
         if (channel.isThread()) {
           cache.threads++;
           if (channel.archived) cache.archivedThreads++;
         }
         if (channel.isDMBased()) cache.dmChannels++;
-        if ("permissionOverwrites" in channel) {
-          cache.permissionOverwrites += channel.permissionOverwrites.cache.size;
+        cache.permissionOverwrites += countOverwrites(channel);
+        const raw = Object.getOwnPropertyDescriptor(channel, "_rawPermissionOverwrites")?.value;
+        if (Array.isArray(raw)) {
+          for (const overwrite of raw) {
+            observeOverwriteField(BigInt(overwrite.deny));
+            observeOverwriteField(BigInt(overwrite.allow));
+          }
+        } else {
+          const manager = Object.getOwnPropertyDescriptor(channel, "permissionOverwrites")?.value;
+          if (!manager) continue;
+          for (const overwrite of manager.cache.values()) {
+            observeOverwriteField(overwrite.deny.bitfield);
+            observeOverwriteField(overwrite.allow.bitfield);
+          }
         }
       }
 
@@ -124,7 +208,24 @@ export default {
         heapTotal: mem.heapTotal,
         external: mem.external,
         arrayBuffers: mem.arrayBuffers,
+        heapPhysical: heap.total_physical_size,
+        v8Malloced: heap.malloced_memory,
+        linuxMemoryKiB,
+        runtime: {
+          node: process.version,
+          platform: process.platform,
+          mallocArenaMax: process.env.MALLOC_ARENA_MAX || null,
+          jemallocPreloaded: /jemalloc/.test(process.env.LD_PRELOAD || ""),
+        },
+        sharpStats,
         cache,
+        channelTypes,
+        disabledCacheBindings,
+        overwriteSharing: {
+          poolSize: overwritePool.size,
+          repeatedFields: repeatedOverwriteFields,
+          fieldsOutsidePool: overwriteFieldsOutsidePool,
+        },
         largestMemberCaches: guildCaches.toSorted((a, b) => b.members - a.members).slice(0, 5),
         largestOverwriteCaches: guildCaches
           .toSorted((a, b) => b.permissionOverwrites - a.permissionOverwrites)
