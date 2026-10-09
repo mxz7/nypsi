@@ -20,10 +20,10 @@ module "nypsi_log_alerts" {
       title         = "nypsi error burst"
       expression    = "sum(count_over_time({service_name=\"nypsi\", level=\"error\"}[15m]))"
       range_seconds = 900
-      threshold     = 8
+      threshold     = 9
       pending_for   = "1m"
       summary       = "nypsi error logs are arriving unusually quickly"
-      description   = "nypsi logged at least nine errors in a rolling fifteen-minute window."
+      description   = "nypsi logged at least ten errors in a rolling fifteen-minute window."
     }
 
     logs_absent = {
