@@ -16,6 +16,20 @@ module "nypsi_log_alerts" {
   }
 
   alerts = {
+    type_error = {
+      title           = "nypsi TypeError"
+      expression      = "sum(count_over_time({service_name=\"nypsi\", level=\"error\"} |= \"TypeError\" [15m])) or vector(0)"
+      range_seconds   = 900
+      threshold       = 0
+      severity        = "critical"
+      summary         = "nypsi logged a TypeError"
+      description     = "At least one TypeError occurred in the last fifteen minutes. Check the error stack in Loki for a code bug or missing input validation."
+      repeat_interval = "1h"
+      labels = {
+        discord_user_id = "672793821850894347" # me!
+      }
+    }
+
     error_burst = {
       title         = "nypsi error burst"
       expression    = "sum(count_over_time({service_name=\"nypsi\", level=\"error\"}[15m]))"
@@ -36,6 +50,9 @@ module "nypsi_log_alerts" {
       summary         = "nypsi appears to have stopped logging"
       description     = "Loki has received no nypsi logs for at least thirty minutes."
       repeat_interval = "1h"
+      labels = {
+        discord_user_id = "672793821850894347"
+      }
     }
   }
 }
@@ -84,8 +101,9 @@ module "system_resource_alerts" {
   contact_point   = "discord staff"
 
   common_labels = {
-    service = "infrastructure"
-    source  = "prometheus"
+    service         = "infrastructure"
+    source          = "prometheus"
+    discord_user_id = "672793821850894347"
   }
 
   alerts = {

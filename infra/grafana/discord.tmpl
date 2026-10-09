@@ -1,6 +1,12 @@
 {{ define "nypsi.discord.title" }}{{ if gt (len .Alerts.Firing) 0 }}{{ if eq .CommonLabels.severity "critical" }}🔴{{ else }}🟠{{ end }}{{ else }}✅{{ end }} {{ .GroupLabels.alertname }}{{ if gt (len .Alerts) 1 }} · {{ len .Alerts }} instances{{ end }}{{ end }}
 
 {{ define "nypsi.discord.message" -}}
+{{ if gt (len .Alerts.Firing) 0 -}}
+{{ with .CommonLabels.discord_user_id -}}
+<@{{ . }}>
+
+{{ end -}}
+{{ end -}}
 {{ range .Alerts.Firing -}}
 **{{ .Annotations.summary }}**
 {{ .Annotations.description }}

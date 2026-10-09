@@ -36,6 +36,13 @@ instances can appear together in one Discord notification while remaining distin
 Grafana alert instances. Include `{{ $labels.instance }}` in host summaries and
 descriptions.
 
+The Discord template uses an optional `discord_user_id` rule label to mention a
+user only in firing notifications. TypeError and absent-log rules set this label;
+the system resource group sets it through `common_labels` for all resource rules.
+Other rules and resolved-only messages do not ping. Grafana 13.2 sends the Message field as
+top-level content by default. Keep `use_embed_description` disabled: Discord does
+not send mention notifications from embed descriptions.
+
 ## Important query-model constraint
 
 Keep the Prometheus and Loki `jsonencode` models as separate conditional branches.
@@ -49,9 +56,11 @@ Prometheus instant queries use native booleans `instant = true` and `range = fal
 Loki uses `queryType = "instant"`.
 
 Host resource and log groups evaluate every five minutes. Resource queries use
-fifteen-minute windows, error bursts count at least nine errors over fifteen
-minutes, and missing-log detection checks thirty minutes. Backup health retains
-one-minute evaluation. For instant queries, `range_seconds` alone does not add
+fifteen-minute windows, error bursts count at least ten errors over fifteen
+minutes, and missing-log detection checks thirty minutes. The critical TypeError
+rule fires on any error log containing `TypeError` over fifteen minutes, without
+a pending period, and repeats hourly. Its `or vector(0)` fallback makes an empty
+window healthy. Backup health retains one-minute evaluation. For instant queries, `range_seconds` alone does not add
 historical aggregation: set the window in PromQL/LogQL as well. CPU uses `rate`;
 memory and disk average their gauges with `avg_over_time`.
 

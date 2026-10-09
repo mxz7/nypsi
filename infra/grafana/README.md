@@ -31,6 +31,15 @@ missing-log detection checks thirty minutes. PostgreSQL backup health evaluates
 every minute. Prometheus queries are instant queries, so their PromQL expressions
 must specify the history window; `range_seconds` alone does not average readings.
 
+The critical TypeError alert fires on the first evaluation that sees any error log
+containing `TypeError` within fifteen minutes, with no pending period. It evaluates
+every five minutes and repeats hourly while firing. `or vector(0)` keeps an empty
+window healthy. The TypeError, absent-log, and all system resource alerts set
+`discord_user_id` to mention the maintainer in firing notifications; resolved
+notifications and alerts without that label do not ping.
+Grafana 13.2 sends the Discord Message field as top-level message content by default.
+Keep `use_embed_description` disabled so mentions actually notify the user.
+
 State is stored in the private Backblaze B2 bucket `maxz-terraform-state` at
 `nypsi/grafana/terraform.tfstate`. Backblaze B2 does not support the conditional S3
 writes required by Terraform's native lockfile, so applies must only run through the
