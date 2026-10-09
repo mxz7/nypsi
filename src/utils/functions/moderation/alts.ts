@@ -63,7 +63,7 @@ export async function getAlts(guild: Guild | string, member: MemberResolvable) {
   for (const alt of [mainId, ...query.map((i) => i.altId)])
     await redis.set(
       `${Constants.redis.cache.guild.ALTS}:${id}:${alt}`,
-      JSON.stringify({ altId: alt, mainId }),
+      JSON.stringify(query),
       "EX",
       ms("6 hour") / 1000,
     );

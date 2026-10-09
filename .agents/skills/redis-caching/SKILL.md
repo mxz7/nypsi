@@ -16,3 +16,9 @@ All structured values sent through Redis must use `redisSerialize` and `redisDes
 ## Shared guild settings
 
 Guild prefixes, slash-only mode, and disabled channels use `RedisCache` so the bot clusters and main API process share one cache. Code that updates these settings outside their setters must delete the corresponding Redis key after the database update.
+
+## Moderation alt groups
+
+`src/utils/functions/moderation/alts.ts` shares `cache:guilds:alts:<guildId>:<userId>` between all alt readers. Each main and alt key must contain the **complete array** of Prisma alt relationships for the group, excluding a synthetic main-to-main entry. `[]` means no linked accounts. Group caches expire after six hours; standalone-account caches expire after 24 hours.
+
+The August 2026 correction of a trailing `}` in the writer's key exposed an older object/array mismatch: caching one `{ mainId, altId }` object makes `getAllGroupAccountIds` throw when reading `parsed[0].mainId`. Cache the full `findMany` result. Preserve whole-group cache invalidation when adding or deleting links. Readers do not support the old single-object format; those existing keys need to expire or be cleared when deploying the fix.
