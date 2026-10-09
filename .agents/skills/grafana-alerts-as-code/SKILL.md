@@ -48,6 +48,13 @@ Terraform validates.
 Prometheus instant queries use native booleans `instant = true` and `range = false`.
 Loki uses `queryType = "instant"`.
 
+Host resource and log groups evaluate every five minutes. Resource queries use
+fifteen-minute windows, error bursts count at least nine errors over fifteen
+minutes, and missing-log detection checks thirty minutes. Backup health retains
+one-minute evaluation. For instant queries, `range_seconds` alone does not add
+historical aggregation: set the window in PromQL/LogQL as well. CPU uses `rate`;
+memory and disk average their gauges with `avg_over_time`.
+
 ## PostgreSQL backup health
 
 The nypsi PostgreSQL backup is monitored through pgBackRest metrics in Prometheus.

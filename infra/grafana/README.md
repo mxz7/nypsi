@@ -25,6 +25,12 @@ adds the Grafana query, threshold expression, common labels, and notification se
 Adding a service means adding another module instance; adding an alert means adding one
 entry to that service's `alerts` map.
 
+Host resource and log alerts evaluate every five minutes. Host resource queries
+use a fifteen-minute window; error bursts count logs over fifteen minutes, and
+missing-log detection checks thirty minutes. PostgreSQL backup health evaluates
+every minute. Prometheus queries are instant queries, so their PromQL expressions
+must specify the history window; `range_seconds` alone does not average readings.
+
 State is stored in the private Backblaze B2 bucket `maxz-terraform-state` at
 `nypsi/grafana/terraform.tfstate`. Backblaze B2 does not support the conditional S3
 writes required by Terraform's native lockfile, so applies must only run through the

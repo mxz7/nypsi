@@ -1,6 +1,8 @@
 module "nypsi_log_alerts" {
   source = "./modules/query-alert-group"
 
+  evaluation_interval_seconds = 300
+
   group_name      = "nypsi logs"
   uid_prefix      = "nypsi"
   folder_uid      = grafana_folder.alerts.uid
@@ -16,23 +18,23 @@ module "nypsi_log_alerts" {
   alerts = {
     error_burst = {
       title         = "nypsi error burst"
-      expression    = "sum(count_over_time({service_name=\"nypsi\", level=\"error\"}[5m]))"
-      range_seconds = 300
-      threshold     = 2
+      expression    = "sum(count_over_time({service_name=\"nypsi\", level=\"error\"}[15m]))"
+      range_seconds = 900
+      threshold     = 8
       pending_for   = "1m"
       summary       = "nypsi error logs are arriving unusually quickly"
-      description   = "nypsi logged at least three errors in a rolling five-minute window."
+      description   = "nypsi logged at least nine errors in a rolling fifteen-minute window."
     }
 
     logs_absent = {
       title           = "nypsi logs absent"
-      expression      = "sum(absent_over_time({service_name=\"nypsi\"}[10m]))"
-      range_seconds   = 600
+      expression      = "sum(absent_over_time({service_name=\"nypsi\"}[30m]))"
+      range_seconds   = 1800
       threshold       = 0
       pending_for     = "5m"
       severity        = "critical"
       summary         = "nypsi appears to have stopped logging"
-      description     = "Loki has received no nypsi logs for at least ten minutes."
+      description     = "Loki has received no nypsi logs for at least thirty minutes."
       repeat_interval = "1h"
     }
   }
@@ -72,6 +74,8 @@ module "nypsi_postgres_alerts" {
 module "system_resource_alerts" {
   source = "./modules/query-alert-group"
 
+  evaluation_interval_seconds = 300
+
   group_name      = "system resources"
   uid_prefix      = "system"
   folder_uid      = grafana_folder.alerts.uid
@@ -87,37 +91,37 @@ module "system_resource_alerts" {
   alerts = {
     cpu_high = {
       title           = "host CPU usage high"
-      expression      = "100 * (1 - avg by (instance) (rate(node_cpu_seconds_total{instance=~\"grimes|eugene|dixon\", mode=\"idle\"}[5m])))"
-      range_seconds   = 300
+      expression      = "100 * (1 - avg by (instance) (rate(node_cpu_seconds_total{instance=~\"grimes|eugene|dixon\", mode=\"idle\"}[15m])))"
+      range_seconds   = 900
       threshold       = 90
       pending_for     = "10m"
       severity        = "warning"
       summary         = "{{ $labels.instance }} CPU usage is high"
-      description     = "CPU usage on {{ $labels.instance }} has exceeded 90% for ten minutes."
+      description     = "Fifteen-minute average CPU usage on {{ $labels.instance }} has exceeded 90% for ten minutes."
       repeat_interval = "2h"
     }
 
     memory_high = {
       title           = "host memory usage high"
-      expression      = "100 * (1 - (node_memory_MemAvailable_bytes{instance=~\"grimes|eugene|dixon\"} / node_memory_MemTotal_bytes{instance=~\"grimes|eugene|dixon\"}))"
-      range_seconds   = 300
+      expression      = "100 * (1 - (avg_over_time(node_memory_MemAvailable_bytes{instance=~\"grimes|eugene|dixon\"}[15m]) / avg_over_time(node_memory_MemTotal_bytes{instance=~\"grimes|eugene|dixon\"}[15m])))"
+      range_seconds   = 900
       threshold       = 90
       pending_for     = "10m"
       severity        = "warning"
       summary         = "{{ $labels.instance }} memory usage is high"
-      description     = "Memory usage on {{ $labels.instance }} has exceeded 90% for ten minutes."
+      description     = "Fifteen-minute average memory usage on {{ $labels.instance }} has exceeded 90% for ten minutes."
       repeat_interval = "2h"
     }
 
     disk_high = {
       title           = "host root disk usage high"
-      expression      = "100 * (1 - (node_filesystem_avail_bytes{instance=~\"grimes|eugene|dixon\", mountpoint=\"/\"} / node_filesystem_size_bytes{instance=~\"grimes|eugene|dixon\", mountpoint=\"/\"}))"
-      range_seconds   = 300
+      expression      = "100 * (1 - (avg_over_time(node_filesystem_avail_bytes{instance=~\"grimes|eugene|dixon\", mountpoint=\"/\"}[15m]) / avg_over_time(node_filesystem_size_bytes{instance=~\"grimes|eugene|dixon\", mountpoint=\"/\"}[15m])))"
+      range_seconds   = 900
       threshold       = 85
       pending_for     = "15m"
       severity        = "warning"
       summary         = "{{ $labels.instance }} root disk usage is high"
-      description     = "Root disk usage on {{ $labels.instance }} has exceeded 85% for fifteen minutes."
+      description     = "Fifteen-minute average root disk usage on {{ $labels.instance }} has exceeded 85% for fifteen minutes."
       repeat_interval = "4h"
     }
   }
