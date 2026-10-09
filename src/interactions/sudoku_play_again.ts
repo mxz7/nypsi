@@ -1,5 +1,6 @@
 import { SudokuDifficulty } from "#generated/prisma";
 import { InteractionHandler } from "../types/InteractionHandler";
+import { createUser, userExists } from "../utils/functions/economy/utils";
 import {
   createSudokuGame,
   getActiveGame,
@@ -22,6 +23,8 @@ export default {
     const difficulty: SudokuDifficulty = (prevGame?.difficulty as SudokuDifficulty) ?? "easy";
 
     await interaction.deferReply();
+
+    if (!(await userExists(interaction.user))) await createUser(interaction.user);
 
     // If there is somehow still an active game, resume it instead
     const existing = await getActiveGame(interaction.user.id);
