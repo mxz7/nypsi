@@ -40,7 +40,7 @@
     "discord-api-types": "^0.38.56",
     "discord-hybrid-sharding": "3.0.1",
     "discord.js": "14.27.0",
-    "dotenv": "17.4.2",
+    "dotenv": "18.0.7",
     "fast-sort": "3.4.1",
     "hono": "^4.13.13",
     "ioredis": "5.11.1",
