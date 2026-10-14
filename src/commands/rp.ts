@@ -172,6 +172,15 @@ const actions: Record<string, RoleplayAction> = {
     action: "mourned",
     aliases: ["rip"],
   },
+  mog: {
+    gifs: [
+      "https://c.tenor.com/_IYLqkeG6KgAAAAC/tenor.gif",
+      "https://c.tenor.com/R1U76Ds4-kUAAAAC/tenor.gif",
+      "https://c.tenor.com/Oiq4UyCvyIIAAAAC/tenor.gif",
+    ],
+    text: "{sender} {action} {target}!!",
+    action: "mogged",
+  },
 };
 
 const cmd = new Command("rp", "roleplay actions", "fun").setAliases(["roleplay"]);
@@ -265,7 +274,7 @@ async function run(
       );
 
       embed.addField(
-        `top users you've ${selectedAction}ed`,
+        `top users you've ${actions[selectedAction]?.action ?? `${selectedAction}ed`}`,
         topUsers
           .map(
             (r, i) =>
@@ -409,9 +418,8 @@ async function run(
   addTaskProgress(message.author.id, "roleplay_daily", 1);
   addProgress(message.author.id, "roleplayer", 1);
 
-  const embed = new CustomEmbed(message.member)
-    .setHeader(text, message.author.avatarURL())
-    .setImage(gif);
+  const embed = new CustomEmbed(message.member).setHeader(text, message.author.avatarURL());
+  if (gif) embed.setImage(gif);
 
   embed.setFooter({
     text: `you've ${actionData.action} ${targetName} ${count.toLocaleString()} ${pluralize("time", count)}`,
