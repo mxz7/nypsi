@@ -93,6 +93,20 @@ async function run(
   }
 
   if (!locked) {
+    try {
+      await channel.permissionOverwrites.edit(message.guild.members.me, {
+        SendMessages: true,
+      });
+    } catch {
+      return send({
+        embeds: [
+          new ErrorEmbed(
+            "i couldn't allow myself to send messages in that channel, so it has not been locked",
+          ),
+        ],
+      });
+    }
+
     await channel.permissionOverwrites.edit(role, {
       SendMessages: false,
     });
