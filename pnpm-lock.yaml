@@ -66,8 +66,8 @@ importers:
         specifier: 14.27.0
         version: 14.27.0(patch_hash=dafc9f620462be5d03095d018cddfd7fb91afededae055135a706c806b76701b)(bufferutil@4.1.0)
       dotenv:
-        specifier: 17.4.2
-        version: 17.4.2
+        specifier: 18.0.8
+        version: 18.0.8
       fast-sort:
         specifier: 3.4.1
         version: 3.4.1
@@ -1854,6 +1854,11 @@ packages:
   dotenv@17.4.2:
     resolution: {integrity: sha512-nI4U3TottKAcAD9LLud4Cb7b2QztQMUEfHbvhTH09bqXTxnSie8WnjPALV/WMCrJZ6UV/qHJ6L03OqO3LcdYZw==}
     engines: {node: '>=12'}
+
+  dotenv@18.0.8:
+    resolution: {integrity: sha512-2KDeoFoK/zRtcnbunCDlLG5VWVMcyqeQc6iK65o231nfNAcuGrKoqUQfJFUtBI+QlShk5HKIHxwebBtUl3rEfA==}
+    engines: {node: '>=12'}
+    hasBin: true
 
   effect@3.20.0:
     resolution: {integrity: sha512-qMLfDJscrNG8p/aw+IkT9W7fgj50Z4wG5bLBy0Txsxz8iUHjDIkOgO3SV0WZfnQbNG2VJYb0b+rDLMrhM4+Krw==}
@@ -3932,6 +3937,8 @@ snapshots:
       - utf-8-validate
 
   dotenv@17.4.2: {}
+
+  dotenv@18.0.8: {}
 
   effect@3.20.0:
     dependencies:
