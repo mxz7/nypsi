@@ -61,6 +61,31 @@ cmd.slashData
   );
 ```
 
+### Slash Argument Adapter
+
+[`src/events/interactionCreate.ts`](../../../src/events/interactionCreate.ts) converts slash options
+to the same positional `args` used by prefix handlers. It inserts subcommand/group names, splits
+string values on spaces, and omits absent options. `logCommand()` in the command handler removes
+the initial placeholder before calling the command. Named option boundaries are therefore lost:
+later optional values can occupy an earlier argument's position. For independently optional inputs,
+read the named options via `message.isChatInputCommand()` and `message.options.getString(...)`,
+`getUser(...)`, etc.; preserve prefix argument parsing separately. Existing examples include
+`mines`, `tower`, `role`, and `purge includes`. Do not globally stop splitting strings without
+checking handlers that reconstruct free text with `args.join(" ")` or expect multiple tokens.
+
+Slash registration uploads only commands with `slashEnabled = true`, using each command's
+`slashData.toJSON()`. Prefix aliases and shorthands do not register additional slash commands.
+`reloadslash` (or `reloadslash guild`) syncs the current guild; `reloadslash global` syncs global
+commands. The shared sync utility in `src/utils/functions/slash-commands.ts` fetches deployed
+definitions with localizations, creates missing commands, patches changed commands by ID, and
+deletes obsolete chat-input commands. Other application-command types are preserved. Options and
+choices are compared in order; Discord metadata and equivalent defaults are ignored. Unset global
+installation/interaction contexts inherit Discord's configuration rather than being managed by the
+sync. Payloads come from the loaded command registry, so rebuild and use `reload` to load code
+changes before `reloadslash`. Sync failures propagate to the command instead of showing success.
+`deleteslash` uses the same utility file to bulk-clear the selected scope. Registration and deletion
+REST logic belong there, not in `commandhandler.ts`.
+
 ### Command Types
 
 ```ts
