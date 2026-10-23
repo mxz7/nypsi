@@ -100,6 +100,14 @@ user or a numeric position. Preserve the existing `avatarhistory` and `usernameh
 keys across prefix and slash entry points. When removing standalone command sources, also clear
 their stale `dist/commands/*.js` files: incremental TypeScript builds do not remove them.
 
+### Rating Commands
+
+`src/commands/rate.ts` owns the ten standalone rating actions, with generated slash subcommands and
+prefix shorthands for the former command names and aliases. Cooldowns retain each action's old name
+and duration, and each action has its own one-minute result cache. Keep the action-specific reward,
+premium probability, booster, achievement, and self-only task logic when changing the shared
+dispatcher. Rating command tests belong in `test/commands/rate.test.ts`.
+
 ### Command Types
 
 ```ts
