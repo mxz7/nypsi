@@ -9,6 +9,14 @@ description: Describes how to structure commands, scheduled jobs, interaction ha
 
 Use kebab-case for file names.
 
+## Tests
+
+Group new tests by the code area they exercise. Command tests belong in `test/commands/`, utility
+tests in `test/utils/`, and JSON data validation in `test/data/`. Follow an existing relevant test
+directory when one exists; create a focused directory for a new area rather than adding files at
+the root of `test/`. Name tests after their subject, such as `test/commands/user.test.ts` and
+`test/utils/slash-commands.test.ts`. Put reusable mocks in `test/mocks/`.
+
 ## Variable grouping
 
 Group variable declarations by context and separate different groups with a blank line:

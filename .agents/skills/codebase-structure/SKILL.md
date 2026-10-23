@@ -90,6 +90,16 @@ changes before `reloadslash`. Sync failures propagate to the command instead of 
 `deleteslash` uses the same utility file to bulk-clear the selected scope. Registration and deletion
 REST logic belong there, not in `commandhandler.ts`.
 
+### User Information Commands
+
+`src/commands/user.ts` owns `info`, `avatar`, `banner`, `avatar-history`, `username-history`, and
+`join` subcommands. Former command names and aliases are prefix shorthands generated from its
+action definitions; bare prefix `user <member>` still opens information. Avatar history remains
+self-only, and history clearing always targets the invoker. Slash join lookups accept either a
+user or a numeric position. Preserve the existing `avatarhistory` and `usernamehistory` cooldown
+keys across prefix and slash entry points. When removing standalone command sources, also clear
+their stale `dist/commands/*.js` files: incremental TypeScript builds do not remove them.
+
 ### Command Types
 
 ```ts
