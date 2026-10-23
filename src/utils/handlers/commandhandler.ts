@@ -1352,33 +1352,3 @@ export async function uploadSlashCommands(clientID: string, client: NypsiClient)
     logger.error("failed refresh of global [/] commands", error);
   }
 }
-
-export async function deleteSlashCommandsFromGuild(
-  guildID: string,
-  clientID: string,
-  client: NypsiClient,
-) {
-  logger.info("started deletion of [/] commands...");
-  const rest = getRest(client);
-
-  try {
-    await rest.put(Routes.applicationGuildCommands(clientID, guildID), { body: [] });
-
-    logger.info("slash commands: finished deletion of [/] commands");
-  } catch (error) {
-    logger.error("slash commands: failed deletion of [/] commands", { error });
-  }
-}
-
-export async function deleteSlashCommands(clientID: string, client: NypsiClient) {
-  logger.info("started deletion of global [/] commands...");
-  const rest = getRest(client);
-
-  try {
-    await rest.put(Routes.applicationCommands(clientID), { body: [] });
-
-    logger.info("slash commands: finished deletion of global [/] commands");
-  } catch (error) {
-    logger.error("slash commands: failed deletion of global [/] commands", { error });
-  }
-}
