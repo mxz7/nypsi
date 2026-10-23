@@ -364,6 +364,11 @@ async function run(
 
   const commandStats = async () => {
     const uses = await getCommandUses(message.member);
+
+    if (uses.length === 0) {
+      return send({ embeds: [new ErrorEmbed("you have no command stats")] });
+    }
+
     const total = uses.map((x) => x.uses).reduce((a, b) => a + b);
 
     const pages = PageManager.createPages(
