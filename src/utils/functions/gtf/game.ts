@@ -169,7 +169,7 @@ export async function startGTFGame(
     if (!res) return;
     if (!res.isModalSubmit()) return;
 
-    const guess = res.fields.getTextInputValue("guess");
+    const guess = res.fields.getTextInputValue("guess").trim();
 
     if (
       secondPlayer
@@ -189,7 +189,9 @@ export async function startGTFGame(
 
     let correct = false;
 
-    if (compareTwoStrings(guess.toLowerCase(), country.name.common.toLowerCase()) > 0.9) {
+    if (guess.toLowerCase() === country.cca2.toLowerCase()) {
+      correct = true;
+    } else if (compareTwoStrings(guess.toLowerCase(), country.name.common.toLowerCase()) > 0.9) {
       correct = true;
     } else if (compareTwoStrings(guess.toLowerCase(), country.name.official.toLowerCase()) > 0.9) {
       correct = true;
