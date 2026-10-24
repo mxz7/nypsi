@@ -16,7 +16,10 @@ description: How to look up economy items by user-provided text (name/id/alias/p
 - Matches (in order) against: `item.id`, `item.name`, `item.id` with underscores stripped, any of `item.aliases`, `item.name` with spaces stripped, `item.plural`.
 - Returns `undefined` if nothing matches — always check for that.
 
-Note: several older commands (`help.ts`, `autosell.ts`, `buy.ts`, `karmashop.ts`, `top.ts`, `crateall.ts`) have their own hand-rolled inline copies of similar matching logic predating `selectItem` — don't copy those; use `selectItem` for new code.
+Note: several older commands (`help.ts`, `autosell.ts`, `buy.ts`, `top.ts`, `crateall.ts`) have their own hand-rolled inline copies of similar matching logic predating `selectItem` — don't copy those; use `selectItem` for new code.
+
+The karma shop in `src/commands/karma.ts` resolves its own shop catalog IDs and aliases. These are
+`KarmaShopItem` entries, so do not use `selectItem()` to resolve them.
 
 ## Computing worth — `calcItemValue(itemId: string)`
 

@@ -9,6 +9,14 @@ description: Describes how to structure commands, scheduled jobs, interaction ha
 
 Use kebab-case for file names.
 
+## Tests
+
+Group new tests by the code area they exercise. Command tests belong in `test/commands/`, utility
+tests in `test/utils/`, and JSON data validation in `test/data/`. Follow an existing relevant test
+directory when one exists; create a focused directory for a new area rather than adding files at
+the root of `test/`. Name tests after their subject, such as `test/commands/user.test.ts` and
+`test/utils/slash-commands.test.ts`. Put reusable mocks in `test/mocks/`.
+
 ## Variable grouping
 
 Group variable declarations by context and separate different groups with a blank line:
@@ -39,7 +47,7 @@ metadata for structured filtering. Keep large or noisy values, including error o
 Do not import or query Prisma directly in command files. Put database access in domain utility
 functions under `src/utils/functions/` and call those functions from the command.
 
-Create a `Command` instance and export it as default:
+Create a `Command` instance and export it with `module.exports` for the command loader:
 
 ```ts
 import { Command } from "../models/Command.js";
@@ -48,7 +56,7 @@ const cmd = new Command("name", "description", "category")
   .setAliases(["alias"])
   .setRun(async (message, send, args) => { … });
 
-export default cmd;
+module.exports = cmd;
 ```
 
 Commands are auto-loaded from `src/commands/` at startup. See [src/models/Command.ts](../../../src/models/Command.ts) for full API, and the `codebase-structure` skill for slash option/subcommand patterns.

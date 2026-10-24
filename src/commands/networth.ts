@@ -4,6 +4,7 @@ import {
   ButtonInteraction,
   ButtonStyle,
   CommandInteraction,
+  Message,
   MessageActionRowComponentBuilder,
   MessageFlags,
 } from "discord.js";
@@ -26,6 +27,11 @@ const cmd = new Command("networth", "view breakdown of your networth", "money").
   "nw",
 ]);
 
+cmd.slashEnabled = true;
+cmd.slashData.addUserOption((option) =>
+  option.setName("user").setDescription("user to view networth of (defaults to you)"),
+);
+
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   send: SendMessage,
@@ -42,8 +48,14 @@ async function run(
 
   let target = message.member;
 
-  if (args.length >= 1) {
-    target = await getMember(message.guild, args.join(" "));
+  let search = args.join(" ");
+  if (!(message instanceof Message) && message.isChatInputCommand()) {
+    const user = message.options.getUser("user");
+    search = user ? `<@${user.id}>` : "";
+  }
+
+  if (search) {
+    target = await getMember(message.guild, search);
 
     if (!target) {
       return send({ embeds: [new ErrorEmbed("invalid user")] });

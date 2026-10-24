@@ -30,8 +30,17 @@ import {
 
 const cmd = new Command("help", "view all commands and their information", "info");
 
+cmd.slashEnabled = true;
+cmd.slashData.addStringOption((option) =>
+  option.setName("query").setDescription("command, category, or item to get help with"),
+);
+
 cmd.setRun(async (message, send, args) => {
-  if (!(message instanceof Message)) return;
+  const slash = !(message instanceof Message) && message.isChatInputCommand();
+  if (slash) {
+    const query = message.options.getString("query")?.trim();
+    args = query ? query.split(/\s+/) : [];
+  }
 
   const helpCategories = new Map<string, Map<number, string[]>>();
 
@@ -42,6 +51,9 @@ cmd.setRun(async (message, send, args) => {
 
     if (category == "none") continue;
 
+    const invocation = slash && getCommandData(cmdKey).slashEnabled ? "/" : prefix;
+    const line = `${invocation}**${getCmdName(cmdKey)}** *${getCmdDesc(cmdKey)}*`;
+
     if (helpCategories.has(category)) {
       const current = helpCategories.get(category);
       const lastPage = current.get(current.size);
@@ -49,11 +61,11 @@ cmd.setRun(async (message, send, args) => {
       if (lastPage.length == 10) {
         const newPage = [];
 
-        newPage.push(`${prefix}**${getCmdName(cmdKey)}** *${getCmdDesc(cmdKey)}*`);
+        newPage.push(line);
         current.set(current.size + 1, newPage);
       } else {
         const page = current.get(current.size);
-        page.push(`${prefix}**${getCmdName(cmdKey)}** *${getCmdDesc(cmdKey)}*`);
+        page.push(line);
         current.set(current.size, page);
       }
 
@@ -61,7 +73,7 @@ cmd.setRun(async (message, send, args) => {
     } else {
       const pages = new Map<number, string[]>();
 
-      pages.set(1, [`${prefix}**${getCmdName(cmdKey)}** *${getCmdDesc(cmdKey)}*`]);
+      pages.set(1, [line]);
 
       helpCategories.set(category, pages);
     }
@@ -77,7 +89,7 @@ cmd.setRun(async (message, send, args) => {
     let categoriesMsg = "";
 
     for (const category of categories) {
-      categoriesMsg += `» ${prefix}help **${category}**\n`;
+      categoriesMsg += `» ${slash ? "/help query:" : `${prefix}help`} **${category}**\n`;
     }
 
     const news = await getNews();
@@ -178,9 +190,9 @@ cmd.setRun(async (message, send, args) => {
         }\n\nto disable custom commands in your server you can do:\n${prefix}disablecmd + customcommand`,
       );
     } else if (selectedItem) {
-      return await runItemInfo(message, args, selectedItem, "general");
+      return await runItemInfo(message, args, selectedItem, "general", send);
     } else {
-      return message.channel.send({
+      return send({
         embeds: [
           new ErrorEmbed(
             "unknown command or item\nyou may find what you're looking for on the wiki: https://nypsi.xyz/wiki",
@@ -202,7 +214,7 @@ cmd.setRun(async (message, send, args) => {
   );
 
   if (pageSystemNeeded) {
-    msg = await message.channel.send({
+    msg = await send({
       embeds: [embed],
       components: [row],
     });
@@ -221,10 +233,10 @@ cmd.setRun(async (message, send, args) => {
         );
       }
 
-      return await message.channel.send({ embeds: [embed], components });
+      return await send({ embeds: [embed], components });
     }
 
-    return await message.channel.send({ embeds: [embed] });
+    return await send({ embeds: [embed] });
   }
 
   const pages = helpCategories.get(args[0].toLowerCase());

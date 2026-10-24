@@ -22,7 +22,7 @@ const cmd = new Command("name", "description", "category")
   .setDocs("https://nypsi.xyz/wiki/...")
   .setRun(async (message, send, args) => { … });
 
-export default cmd;
+module.exports = cmd;
 ```
 
 ### Slash Command Options (SlashCommandBuilder)
@@ -61,6 +61,14 @@ cmd.slashData
   );
 ```
 
+### Saved Premium Aliases
+
+Personal aliases store a full command string. In `resolveMessageCommand()`, expand a saved target
+through built-in shorthands when it is no longer a registered command, before looking up the
+canonical command. This keeps aliases targeting removed standalone commands working after grouping.
+Keep injected subcommand arguments first, then saved arguments, then arguments supplied at invocation.
+Registered commands retain precedence over shorthands; unknown saved targets still resolve to none.
+
 ### Slash Argument Adapter
 
 [`src/events/interactionCreate.ts`](../../../src/events/interactionCreate.ts) converts slash options
@@ -72,6 +80,17 @@ read the named options via `message.isChatInputCommand()` and `message.options.g
 `getUser(...)`, etc.; preserve prefix argument parsing separately. Existing examples include
 `mines`, `tower`, `role`, and `purge includes`. Do not globally stop splitting strings without
 checking handlers that reconstruct free text with `args.join(" ")` or expect multiple tokens.
+
+### Slash Replies
+
+Enabling `slashEnabled` also requires every response path to acknowledge the interaction through
+its supplied `send` function. Remove prefix-only `instanceof Message` guards when adding support;
+replace direct `message.channel.send()` responses, including errors and pagination's initial send.
+Pass `send` through helpers such as `runItemInfo(..., send)`, whose default sends to the channel.
+The shared sender returns the reply message, so existing message edits and collectors can use it.
+`help.ts` supports an optional named `query` for categories, commands, and multiword item searches;
+its slash category lists use `/` for registered commands and the server prefix for prefix-only ones.
+`networth.ts` uses an optional named `user`; `level`, `work`, and `tools` have no slash options.
 
 Slash registration uploads only commands with `slashEnabled = true`, using each command's
 `slashData.toJSON()`. Prefix aliases and shorthands do not register additional slash commands.
@@ -89,6 +108,46 @@ Payloads come from the loaded command registry, so rebuild and use `reload` to l
 changes before `reloadslash`. Sync failures propagate to the command instead of showing success.
 `deleteslash` uses the same utility file to bulk-clear the selected scope. Registration and deletion
 REST logic belong there, not in `commandhandler.ts`.
+
+### Slash Coverage Scope
+
+Crypto and Last.fm commands intentionally remain prefix-only. Crypto lookups are already covered
+by item information (`item`, prefix alias `i`), so do not add a crypto slash command or family.
+Last.fm is outside the slash parity work; do not add slash alternatives for its music commands.
+A prefix command's existence does not by itself mean it needs slash coverage.
+
+### User Information Commands
+
+`src/commands/user.ts` owns `info`, `avatar`, `banner`, `avatar-history`, `username-history`, and
+`join` subcommands. Former command names and aliases are prefix shorthands generated from its
+action definitions; bare prefix `user <member>` still opens information. Avatar history remains
+self-only, and history clearing always targets the invoker. Slash join lookups accept either a
+user or a numeric position. Preserve the existing `avatarhistory` and `usernamehistory` cooldown
+keys across prefix and slash entry points. When removing standalone command sources, also clear
+their stale `dist/commands/*.js` files: incremental TypeScript builds do not remove them.
+
+### Rating Commands
+
+`src/commands/rate.ts` owns the ten standalone rating actions, with generated slash subcommands and
+prefix shorthands for the former command names and aliases. Cooldowns retain each action's old name
+and duration, and each action has its own one-minute result cache. Keep the action-specific reward,
+premium probability, booster, achievement, and self-only task logic when changing the shared
+dispatcher. Rating command tests belong in `test/commands/rate.test.ts`.
+
+### Bank Commands
+
+`src/commands/bank.ts` owns `deposit`, `withdraw`, and `rob`. Former names (`deposit`, `dep`,
+`withdraw`, `with`, and `bankrob`) are prefix shorthands. Preserve the separate `deposit`,
+`withdraw`, and `bankrob` cooldown keys; masks clear `cd:bankrob:<userId>`. Robbery game records
+and replay anticheat checks also retain `bankrob`. Player-to-player robbery remains in `rob.ts`.
+
+### Karma Commands
+
+`src/commands/karma.ts` owns `balance`, `shop`, `buy`, and `help`. Bare prefix `karma [user]`
+still shows a balance. `karmashop` and `ks` expand to `karma shop`, accepting the old `view`,
+`buy`, `help`, and owner-only `open`/`close` arguments; `karmahelp` expands to `karma help`.
+Help is independent of shop availability and cooldowns. Shop viewing and buying retain the
+`karmashop` cooldown key. Keep `item-karmashop` as the buy option name for autocomplete routing.
 
 ### Command Types
 

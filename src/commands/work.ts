@@ -13,6 +13,8 @@ const cmd = new Command(
   "money",
 );
 
+cmd.slashEnabled = true;
+
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   send: SendMessage,
@@ -64,7 +66,7 @@ async function run(
 
   const embed = new CustomEmbed(message.member, work).setHeader("work", message.author.avatarURL());
 
-  send({ embeds: [embed] }).then(async (m) => {
+  return send({ embeds: [embed] }).then(async (m) => {
     if ((await getBalance(message.member)) >= 2000000) {
       embed.setDescription(work + "\n\n+$**" + earned.toLocaleString() + "**");
     } else {
