@@ -79,9 +79,13 @@ Slash registration uploads only commands with `slashEnabled = true`, using each 
 commands. The shared sync utility in `src/utils/functions/slash-commands.ts` fetches deployed
 definitions with localizations, creates missing commands, patches changed commands by ID, and
 deletes obsolete chat-input commands. Other application-command types are preserved. Options and
-choices are compared in order; Discord metadata and equivalent defaults are ignored. Unset global
-installation/interaction contexts inherit Discord's configuration rather than being managed by the
-sync. Payloads come from the loaded command registry, so rebuild and use `reload` to load code
+choices are compared in order; Discord metadata and equivalent defaults are ignored. Explicit global
+interaction contexts are compared as sets; deployed `contexts: null` does not equal `[0, 1, 2]`.
+Omitted global `contexts` and `integration_types` are unmanaged: existing commands retain deployed
+visibility, including when patched for other changes. Removing a local setting does not reset it;
+provide explicit arrays to change it. New commands use Discord's defaults for omitted settings.
+Sync regression tests belong in `test/utils/slash-commands.test.ts`.
+Payloads come from the loaded command registry, so rebuild and use `reload` to load code
 changes before `reloadslash`. Sync failures propagate to the command instead of showing success.
 `deleteslash` uses the same utility file to bulk-clear the selected scope. Registration and deletion
 REST logic belong there, not in `commandhandler.ts`.

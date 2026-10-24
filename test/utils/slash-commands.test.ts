@@ -2,7 +2,7 @@ import type { REST } from "@discordjs/rest";
 import { APIApplicationCommand, ApplicationCommandType, Routes } from "discord-api-types/v10";
 import { SlashCommandBuilder } from "discord.js";
 import { describe, expect, test, vi } from "vitest";
-import { deleteSlashCommands, syncSlashCommands } from "../src/utils/functions/slash-commands";
+import { deleteSlashCommands, syncSlashCommands } from "../../src/utils/functions/slash-commands";
 
 const applicationId = "123456789012345678";
 const guildId = "234567890123456789";
@@ -198,6 +198,36 @@ describe("slash command synchronization", () => {
 
     current.contexts = [0];
     expect((await syncSlashCommands(rest, applicationId, [command])).updated).toEqual(["use"]);
+  });
+
+  test("patches nullable deployed contexts when all contexts are explicitly requested", async () => {
+    const command = { ...definition(), contexts: [0, 1, 2] };
+    const current = { ...deployed(command), contexts: null };
+    const rest = mockRest([current]);
+
+    expect((await syncSlashCommands(rest, applicationId, [command])).updated).toEqual(["use"]);
+    expect(rest.patch).toHaveBeenCalledExactlyOnceWith(
+      Routes.applicationCommand(applicationId, current.id),
+      { body: expect.objectContaining({ contexts: [0, 1, 2] }) },
+    );
+
+    rest.get.mockResolvedValueOnce([deployed(command)]);
+    expect((await syncSlashCommands(rest, applicationId, [command])).unchanged).toBe(1);
+    expect(rest.patch).toHaveBeenCalledOnce();
+  });
+
+  test("preserves deployed visibility when local settings are omitted, including on other edits", async () => {
+    const current = { ...deployed(), contexts: [0], integration_types: [1] };
+    const rest = mockRest([current]);
+
+    expect((await syncSlashCommands(rest, applicationId, [definition()])).unchanged).toBe(1);
+    expect(rest.patch).not.toHaveBeenCalled();
+
+    const command = { ...definition(), description: "updated description" };
+    expect((await syncSlashCommands(rest, applicationId, [command])).updated).toEqual(["use"]);
+    const body = rest.patch.mock.calls[0][1].body;
+    expect(body.contexts).toBeUndefined();
+    expect(body.integration_types).toBeUndefined();
   });
 
   test("uses guild routes and excludes global-only fields from guild comparisons and writes", async () => {

@@ -76,7 +76,7 @@ function comparableCommand(
     nsfw: command.nsfw ?? false,
     dm_permission:
       !guildId && desired.dm_permission !== undefined ? (command.dm_permission ?? true) : undefined,
-    contexts: !guildId && desired.contexts != null ? (command.contexts ?? [0, 1, 2]) : undefined,
+    contexts: !guildId && desired.contexts != null ? command.contexts : undefined,
     integration_types:
       !guildId && desired.integration_types != null
         ? (command.integration_types ?? [0])
