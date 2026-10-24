@@ -1,10 +1,10 @@
 .PHONY: build watch run dev clean check checks
 
 build:
-	pnx tsc --incremental
+	pn exec tsc --incremental
 
 watch:
-	pnx tsc --build --watch --preserveWatchOutput
+	pn exec tsc --build --watch --preserveWatchOutput
 
 run: 
 	node .
