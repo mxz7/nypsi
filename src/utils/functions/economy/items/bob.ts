@@ -2,21 +2,22 @@ import { CommandInteraction } from "discord.js";
 import prisma from "../../../../init/database";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
-import { ItemUse } from "../../../../models/ItemUse";
+import { ItemUse, ItemUseRequest } from "../../../../models/ItemUse";
 import { MStoTime } from "../../date";
 import sleep from "../../sleep";
 import { pluralize } from "../../string";
 import { getCraftingItems } from "../crafting";
 import { getInventory, removeInventoryItem } from "../inventory";
+import { getItemUseAmountError } from "../item-use";
 import { addStat } from "../stats";
-import { formatNumber, getItems } from "../utils";
+import { getItems } from "../utils";
 import dayjs = require("dayjs");
 
 export default new ItemUse(
   "bob",
   async (
     message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
-    args: string[],
+    input: ItemUseRequest,
   ) => {
     const crafting = await prisma.crafting.findMany({
       where: {
@@ -31,25 +32,21 @@ export default new ItemUse(
     });
 
     if (crafting.length < 1)
-      return ItemUse.send(message, {
+      return input.send({
         embeds: [new ErrorEmbed("you are not currently crafting anything")],
       });
 
     const inventory = await getInventory(message.member);
 
-    let amount = 1;
-
-    if (args[1] && args[1].toLowerCase() === "all") args[1] = inventory.count("bob").toString();
-
-    if (args[1]) {
-      amount = formatNumber(args[1]);
-    }
+    let amount = input.amount;
 
     if (!amount || isNaN(amount) || amount < 1)
-      return ItemUse.send(message, { embeds: [new ErrorEmbed("invalid amount")] });
+      return input.send({ embeds: [new ErrorEmbed("invalid amount")] });
 
     if (inventory.count("bob") < amount)
-      return ItemUse.send(message, { embeds: [new ErrorEmbed("you don't have this many bobs")] });
+      return input.send({
+        embeds: [new ErrorEmbed(getItemUseAmountError(input.item, inventory.count("bob"), amount))],
+      });
 
     const breakdown: string[] = [];
 
@@ -95,7 +92,7 @@ export default new ItemUse(
     }
 
     if (maxUsedAmount == 0)
-      return ItemUse.send(message, {
+      return input.send({
         embeds: [new ErrorEmbed("you are not currently crafting anything")],
       });
 
@@ -104,7 +101,7 @@ export default new ItemUse(
 
     getCraftingItems(message.member);
 
-    const msg = await ItemUse.send(message, {
+    const msg = await input.send({
       embeds: [
         new CustomEmbed(message.member, "<:nypsi_bob:1078776552067694672> sending bob to work..."),
       ],
@@ -112,13 +109,16 @@ export default new ItemUse(
 
     await sleep(2000);
 
-    return msg.edit({
-      embeds: [
-        new CustomEmbed(
-          message.member,
-          `<:nypsi_bob:1078776552067694672> bob has removed ${maxUsedAmount} ${pluralize("hour", maxUsedAmount)} of crafting time from ${crafting.length} ${pluralize("item", crafting.length)}\n\n${breakdown.join("\n")}`,
-        ),
-      ],
-    });
+    const embed = new CustomEmbed(
+      message.member,
+      `<:nypsi_bob:1078776552067694672> bob has removed ${maxUsedAmount} ${pluralize("hour", maxUsedAmount)} of crafting time from ${crafting.length} ${pluralize("item", crafting.length)}\n\n${breakdown.join("\n")}`,
+    );
+    if (maxUsedAmount < input.amount) {
+      embed.setFooter({
+        text: `used ${maxUsedAmount} of ${input.amount.toLocaleString()} bobs to finish the remaining crafting time`,
+      });
+    }
+    return msg.edit({ embeds: [embed] });
   },
+  { amount: true },
 );

@@ -6,9 +6,8 @@ import {
 } from "discord.js";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
-import { ItemUse } from "../../../../models/ItemUse";
+import { ItemUse, ItemUseRequest } from "../../../../models/ItemUse";
 import { getDisabledCommands } from "../../guilds/disabledcommands";
-import { getMember } from "../../member";
 import { removeInventoryItem } from "../inventory";
 import { isPassive } from "../passive";
 import { addStat } from "../stats";
@@ -18,7 +17,7 @@ export default new ItemUse(
   "handcuffs",
   async (
     message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
-    args: string[],
+    input: ItemUseRequest,
   ) => {
     const edit = async (data: MessageEditOptions, msg: Message) => {
       if (!(message instanceof Message)) {
@@ -30,29 +29,19 @@ export default new ItemUse(
     };
 
     if ((await getDisabledCommands(message.guild)).includes("rob")) {
-      return ItemUse.send(message, {
+      return input.send({
         embeds: [new ErrorEmbed(`handcuffs have been disabled in ${message.guild.name}`)],
       });
     }
 
-    if (args.length == 1) {
-      return ItemUse.send(message, {
-        embeds: [new ErrorEmbed("/use handcuffs <member>")],
-      });
-    }
-
-    const handcuffsTarget = await getMember(message.guild, args[1]);
-
-    if (!handcuffsTarget) {
-      return ItemUse.send(message, { embeds: [new ErrorEmbed("invalid user")] });
-    }
+    const handcuffsTarget = input.target;
 
     if (message.member == handcuffsTarget) {
-      return ItemUse.send(message, { embeds: [new ErrorEmbed("bit of self bondage huh")] });
+      return input.send({ embeds: [new ErrorEmbed("you can't use handcuffs on yourself")] });
     }
 
     if (await isHandcuffed(handcuffsTarget.user.id)) {
-      return ItemUse.send(message, {
+      return input.send({
         embeds: [
           new ErrorEmbed(
             `**${handcuffsTarget.user.username.replaceAll("_", "\\_")}** is already restrained`,
@@ -64,12 +53,12 @@ export default new ItemUse(
     if (!(await userExists(handcuffsTarget))) await createUser(handcuffsTarget);
 
     if (await isPassive(handcuffsTarget))
-      return ItemUse.send(message, {
+      return input.send({
         embeds: [new ErrorEmbed(`${handcuffsTarget.toString()} is currently in passive mode`)],
       });
 
     if (await isPassive(message.member))
-      return ItemUse.send(message, {
+      return input.send({
         embeds: [new ErrorEmbed("you are currently in passive mode")],
       });
 
@@ -79,7 +68,7 @@ export default new ItemUse(
       addHandcuffs(handcuffsTarget.id),
     ]);
 
-    const msg = await ItemUse.send(message, {
+    const msg = await input.send({
       embeds: [
         new CustomEmbed(
           message.member,
@@ -100,4 +89,5 @@ export default new ItemUse(
       msg,
     );
   },
+  { target: true },
 );

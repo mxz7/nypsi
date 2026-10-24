@@ -9,7 +9,7 @@ import {
 import { randomInt } from "mathjs";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
-import { ItemUse } from "../../../../models/ItemUse";
+import { ItemUse, ItemUseRequest } from "../../../../models/ItemUse";
 import Constants from "../../../Constants";
 import sleep from "../../sleep";
 import {
@@ -24,7 +24,10 @@ import { getUpgradesData, maxPrestige } from "../utils";
 
 export default new ItemUse(
   "reroll_token",
-  async (message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) => {
+  async (
+    message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+    input: ItemUseRequest,
+  ) => {
     let [inventory, upgrades] = await Promise.all([
       getInventory(message.member),
       getUpgrades(message.member),
@@ -33,7 +36,7 @@ export default new ItemUse(
     const upgradesData = getUpgradesData();
 
     if (upgrades.length === 0)
-      return ItemUse.send(message, {
+      return input.send({
         embeds: [
           new ErrorEmbed("you have no upgrades to reroll, you must prestige to receive an upgrade"),
         ],
@@ -42,11 +45,11 @@ export default new ItemUse(
     const upgradesCount = upgrades.reduce((total, upgrade) => total + upgrade.amount, 0);
 
     if (upgradesCount >= maxPrestige) {
-      return ItemUse.send(message, { embeds: [new ErrorEmbed("you already have all upgrades")] });
+      return input.send({ embeds: [new ErrorEmbed("you already have all upgrades")] });
     }
 
     if (!inventory.has("reroll_token"))
-      return ItemUse.send(message, { embeds: [new ErrorEmbed("you don't have a reroll token")] });
+      return input.send({ embeds: [new ErrorEmbed("you don't have a reroll token")] });
 
     const embed = new CustomEmbed(
       message.member,
@@ -72,7 +75,7 @@ export default new ItemUse(
         .setDisabled(true),
     );
 
-    const msg = await ItemUse.send(message, { embeds: [embed], components: [selectMenu, button] });
+    const msg = await input.send({ embeds: [embed], components: [selectMenu, button] });
 
     const reactionManager: any = async () => {
       const interaction = await msg
@@ -110,15 +113,18 @@ export default new ItemUse(
 
         const chosen = (selectMenu.components[0] as StringSelectMenuBuilder).options.find(
           (i) => i.data.default,
-        ).data.value;
+        )?.data.value;
 
-        if (!chosen) return interaction.reply({ embeds: [new ErrorEmbed("invalid upgrade")] });
+        if (!chosen)
+          return interaction.reply({ embeds: [new ErrorEmbed("choose an upgrade to reroll")] });
 
         if (
           !upgrades.find((i) => i.upgradeId === chosen) ||
           upgrades.find((i) => i.upgradeId === chosen).amount < 1
         )
-          return interaction.reply({ embeds: [new ErrorEmbed("sneaky sneaky sneaky")] });
+          return interaction.reply({
+            embeds: [new ErrorEmbed("you no longer have the selected upgrade to reroll")],
+          });
 
         embed.setDescription(
           `<a:nypsi_reroll_token_spin:1185247632927490069> rerolling **${upgradesData[chosen].name}**...`,

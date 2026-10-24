@@ -7,9 +7,8 @@ import {
 import redis from "../../../../init/redis";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
-import { ItemUse } from "../../../../models/ItemUse";
+import { ItemUse, ItemUseRequest } from "../../../../models/ItemUse";
 import Constants from "../../../Constants";
-import { getMember } from "../../member";
 import sleep from "../../sleep";
 import { removeInventoryItem } from "../inventory";
 import { isPassive } from "../passive";
@@ -19,7 +18,7 @@ export default new ItemUse(
   "radio",
   async (
     message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
-    args: string[],
+    input: ItemUseRequest,
   ) => {
     const edit = async (data: MessageEditOptions, msg: Message) => {
       if (!(message instanceof Message)) {
@@ -30,34 +29,24 @@ export default new ItemUse(
       }
     };
 
-    if (args.length == 1) {
-      return ItemUse.send(message, {
-        embeds: [new ErrorEmbed("/use radio <member>")],
-      });
-    }
-
-    const radioTarget = await getMember(message.guild, args[1]);
-
-    if (!radioTarget) {
-      return ItemUse.send(message, { embeds: [new ErrorEmbed("invalid user")] });
-    }
+    const radioTarget = input.target;
 
     if (message.member == radioTarget) {
-      return ItemUse.send(message, { embeds: [new ErrorEmbed("invalid user")] });
+      return input.send({ embeds: [new ErrorEmbed("you can't use a radio on yourself")] });
     }
 
     if (await isPassive(radioTarget))
-      return ItemUse.send(message, {
+      return input.send({
         embeds: [new ErrorEmbed(`${radioTarget.toString()} is currently in passive mode`)],
       });
 
     if (await isPassive(message.member))
-      return ItemUse.send(message, {
+      return input.send({
         embeds: [new ErrorEmbed("you are currently in passive mode")],
       });
 
     if ((await redis.exists(`${Constants.redis.cooldown.ROB_RADIO}:${radioTarget.user.id}`)) == 1) {
-      return ItemUse.send(message, {
+      return input.send({
         embeds: [
           new ErrorEmbed(
             `the police are already looking for **${radioTarget.user.username.replaceAll("_", "\\_")}**`,
@@ -76,7 +65,7 @@ export default new ItemUse(
     await removeInventoryItem(message.member, "radio", 1);
     await addStat(message.member, "radio");
 
-    const msg = await ItemUse.send(message, {
+    const msg = await input.send({
       embeds: [new CustomEmbed(message.member, "putting report out on police scanner...")],
     });
 
@@ -94,4 +83,5 @@ export default new ItemUse(
       msg,
     );
   },
+  { target: true },
 );

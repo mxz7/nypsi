@@ -267,7 +267,9 @@ export default {
 
 - Loads all handlers from `dist/interactions/` at startup
 - Maps by handler name into `Map<string, InteractionHandler>` and `Map<string, AutocompleteHandler>`
-- For autocomplete: retrieves handler by `interaction.options.getFocused(true).name`
+- For autocomplete: first checks `<commandName>:<focusedOptionName>`, then falls back to the
+  focused option name. Use a command-prefixed handler name when suggestions differ for one command
+  without changing its public option name (for example `use:item` handles `/use item`).
 - For button/select menu: retrieves handler by `interaction.customId` (fallback to reaction role logic)
 - Namespaced component IDs use `<handler-name>:<context>`; routing first checks the exact custom ID,
   then falls back to the segment before the first `:`. Keep dynamic state outside the custom ID when

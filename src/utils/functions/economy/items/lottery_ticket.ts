@@ -1,13 +1,16 @@
 import { CommandInteraction } from "discord.js";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
 import { CustomEmbed } from "../../../../models/EmbedBuilders";
-import { ItemUse } from "../../../../models/ItemUse";
+import { ItemUse, ItemUseRequest } from "../../../../models/ItemUse";
 import { getPrefix } from "../../guilds/utils";
 
 export default new ItemUse(
   "lottery_ticket",
-  async (message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) => {
-    return ItemUse.send(message, {
+  async (
+    message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+    input: ItemUseRequest,
+  ) => {
+    return input.send({
       embeds: [
         new CustomEmbed(
           message.member,
@@ -16,4 +19,5 @@ export default new ItemUse(
       ],
     });
   },
+  { suggest: false },
 );

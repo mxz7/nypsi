@@ -8,7 +8,7 @@ import {
 } from "discord.js";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
-import { ItemUse } from "../../../../models/ItemUse";
+import { ItemUse, ItemUseRequest } from "../../../../models/ItemUse";
 import {
   addMember,
   getCredits,
@@ -26,11 +26,14 @@ const GOLD_TIER = 3;
 
 export default new ItemUse(
   "gold_credit",
-  async (message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) => {
+  async (
+    message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+    input: ItemUseRequest,
+  ) => {
     const currentTier = await getTier(message.author.id);
 
     if (currentTier > GOLD_TIER)
-      return ItemUse.send(message, {
+      return input.send({
         embeds: [new ErrorEmbed("your current premium tier is higher than gold")],
       });
 
@@ -42,7 +45,7 @@ export default new ItemUse(
       await removeInventoryItem(message.member, "gold_credit", 1);
       await addStat(message.member, "gold_credit");
 
-      return ItemUse.send(message, {
+      return input.send({
         embeds: [
           new CustomEmbed(
             message.member,
@@ -61,7 +64,7 @@ export default new ItemUse(
       await addMember(message.author.id, GOLD_TIER, new Date());
       await setCredits(message.author.id, 7);
 
-      return ItemUse.send(message, {
+      return input.send({
         embeds: [
           new CustomEmbed(
             message.member,
@@ -70,7 +73,7 @@ export default new ItemUse(
         ],
       });
     } else {
-      const msg = await ItemUse.send(message, {
+      const msg = await input.send({
         embeds: [
           new CustomEmbed(
             message.member,
@@ -97,7 +100,10 @@ export default new ItemUse(
 
       const inventory = await getInventory(message.member);
       if (!inventory.has("gold_credit")) {
-        return res.editReply({ embeds: [new ErrorEmbed("lol!")] });
+        return res.editReply({
+          embeds: [new ErrorEmbed("you no longer have a gold credit in your inventory")],
+          components: [],
+        });
       }
       await removeInventoryItem(message.member, "gold_credit", 1);
       await addStat(message.member, "gold_credit");

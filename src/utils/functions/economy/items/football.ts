@@ -1,7 +1,7 @@
 import { CommandInteraction } from "discord.js";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
 import { CustomEmbed } from "../../../../models/EmbedBuilders";
-import { ItemUse } from "../../../../models/ItemUse";
+import { ItemUse, ItemUseRequest } from "../../../../models/ItemUse";
 import { addStat } from "../stats";
 
 const responses = [
@@ -12,7 +12,10 @@ const responses = [
 
 export default new ItemUse(
   "football",
-  async (message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) => {
+  async (
+    message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+    input: ItemUseRequest,
+  ) => {
     const chosen = responses[Math.floor(Math.random() * responses.length)];
 
     const embed = new CustomEmbed(message.member);
@@ -22,7 +25,7 @@ export default new ItemUse(
 
     await addStat(message.member, "football");
 
-    return ItemUse.send(message, {
+    return input.send({
       embeds: [embed],
     });
   },

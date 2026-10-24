@@ -5,7 +5,6 @@ import {
   ButtonStyle,
   CommandInteraction,
   Interaction,
-  InteractionEditReplyOptions,
   InteractionReplyOptions,
   InteractionUpdateOptions,
   Message,
@@ -16,7 +15,7 @@ import redis from "../../../../init/redis";
 import { NypsiClient } from "../../../../models/Client";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
-import { ItemUse } from "../../../../models/ItemUse";
+import { ItemUse, ItemUseRequest } from "../../../../models/ItemUse";
 import Constants from "../../../Constants";
 import { addHourlyCommand } from "../../../handlers/commandhandler";
 import { getTimestamp, logger } from "../../../logger";
@@ -27,13 +26,13 @@ import { percentChance } from "../../random";
 import { escapeFormattingCharacters, pluralize } from "../../string";
 import { hasAdminPermission } from "../../users/admin";
 import { recentCommands } from "../../users/commands";
-import { getInventory, removeInventoryItem, selectItem } from "../inventory";
+import { getInventory, removeInventoryItem } from "../inventory";
 import ScratchCard from "../scratchies";
 import { addStat, createGame } from "../stats";
 
 async function prepare(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
-  args: string[],
+  input: ItemUseRequest,
   interaction?: ButtonInteraction,
 ): Promise<any> {
   recentCommands.set(message.author.id, Date.now());
@@ -45,21 +44,7 @@ async function prepare(
         .catch(() => interaction.message.edit(data as BaseMessageOptions));
       return interaction.message;
     }
-    if (!(message instanceof Message)) {
-      if (message.deferred) {
-        await message.editReply(data as InteractionEditReplyOptions);
-      } else {
-        await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions);
-        });
-      }
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
+    return input.send(data);
   };
 
   const currentGame = await getUserPlaying(message.author.id);
@@ -72,11 +57,7 @@ async function prepare(
 
   let inventory = await getInventory(message.member);
 
-  const selected = selectItem(args[0].toLowerCase());
-
-  if (!selected || typeof selected == "string") {
-    return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] });
-  }
+  const selected = input.item;
 
   if (!inventory.has(selected.id)) {
     return send({
@@ -236,7 +217,7 @@ async function prepare(
             `::cmd ${message.guild.id} ${message.channelId} ${message.author.username}: replaying ${selected.id}`,
             { userId: message.author.id, guildId: message.guildId, channelId: message.channelId },
           );
-          return prepare(message, args, response);
+          return prepare(message, input, response);
         }
       }
       return;
@@ -306,7 +287,10 @@ async function prepare(
 
 export default new ItemUse(
   "scratch_card",
-  (message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction), args: string[]) => {
-    return prepare(message, args);
+  (
+    message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+    input: ItemUseRequest,
+  ) => {
+    return prepare(message, input);
   },
 );

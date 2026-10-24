@@ -1,16 +1,19 @@
 import { CommandInteraction } from "discord.js";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
-import { ItemUse } from "../../../../models/ItemUse";
+import { ItemUse, ItemUseRequest } from "../../../../models/ItemUse";
 import { hasPadlock, setPadlock } from "../balance";
 import { removeInventoryItem } from "../inventory";
 import { addStat } from "../stats";
 
 export default new ItemUse(
   "padlock",
-  async (message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) => {
+  async (
+    message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+    input: ItemUseRequest,
+  ) => {
     if (await hasPadlock(message.member)) {
-      return ItemUse.send(message, {
+      return input.send({
         embeds: [new ErrorEmbed("you already have a padlock on your balance")],
       });
     }
@@ -21,7 +24,7 @@ export default new ItemUse(
       setPadlock(message.member, true),
     ]);
 
-    return ItemUse.send(message, {
+    return input.send({
       embeds: [new CustomEmbed(message.member, "✅ your padlock has been applied")],
     });
   },
