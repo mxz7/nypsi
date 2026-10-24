@@ -10,7 +10,6 @@ import {
   Message,
   MessageFlags,
   PermissionFlagsBits,
-  Routes,
   WebhookClient,
 } from "discord.js";
 import { tips } from "../../../data/lists.json";
@@ -76,7 +75,6 @@ import { getPreferences } from "../functions/users/preferences";
 import { getLastKnownUsername } from "../functions/users/username";
 import { createProfile, hasProfile } from "../functions/users/utils";
 import { getTimestamp, logger } from "../logger";
-import { getRest } from "../rest";
 import dayjs = require("dayjs");
 import ms = require("ms");
 
@@ -1305,80 +1303,4 @@ export function runCommandUseTimers(client: NypsiClient) {
 
 export function startRestart() {
   restarting = true;
-}
-
-export async function uploadSlashCommandsToGuild(
-  guildID: string,
-  clientID: string,
-  client: NypsiClient,
-) {
-  logger.info("started refresh of [/] commands...");
-  const rest = getRest(client);
-
-  const slashData = [];
-
-  for (const cmd of Array.from(commands.values())) {
-    if (!cmd.slashEnabled) continue;
-    slashData.push(cmd.slashData.toJSON());
-  }
-
-  try {
-    logger.info(`uploading ${slashData.length} [/] commands`);
-    await rest.put(Routes.applicationGuildCommands(clientID, guildID), { body: slashData });
-
-    logger.info("finished refresh of [/] commands");
-  } catch (error) {
-    logger.error("failed refresh of [/] commands", error);
-  }
-}
-
-export async function uploadSlashCommands(clientID: string, client: NypsiClient) {
-  logger.info("started refresh of global [/] commands...");
-  const rest = getRest(client);
-
-  const slashData = [];
-
-  for (const cmd of Array.from(commands.values())) {
-    if (!cmd.slashEnabled) continue;
-    slashData.push(cmd.slashData.toJSON());
-  }
-
-  try {
-    logger.info(`uploading ${slashData.length} [/] commands`);
-    await rest.put(Routes.applicationCommands(clientID), { body: slashData });
-
-    logger.info("finished refresh of global [/] commands");
-  } catch (error) {
-    logger.error("failed refresh of global [/] commands", error);
-  }
-}
-
-export async function deleteSlashCommandsFromGuild(
-  guildID: string,
-  clientID: string,
-  client: NypsiClient,
-) {
-  logger.info("started deletion of [/] commands...");
-  const rest = getRest(client);
-
-  try {
-    await rest.put(Routes.applicationGuildCommands(clientID, guildID), { body: [] });
-
-    logger.info("slash commands: finished deletion of [/] commands");
-  } catch (error) {
-    logger.error("slash commands: failed deletion of [/] commands", { error });
-  }
-}
-
-export async function deleteSlashCommands(clientID: string, client: NypsiClient) {
-  logger.info("started deletion of global [/] commands...");
-  const rest = getRest(client);
-
-  try {
-    await rest.put(Routes.applicationCommands(clientID), { body: [] });
-
-    logger.info("slash commands: finished deletion of global [/] commands");
-  } catch (error) {
-    logger.error("slash commands: failed deletion of global [/] commands", { error });
-  }
 }

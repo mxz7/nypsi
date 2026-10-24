@@ -1,11 +1,11 @@
 import { CommandInteraction, Message } from "discord.js";
 import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
+import { ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
-import {
-  deleteSlashCommands,
-  deleteSlashCommandsFromGuild,
-} from "../utils/handlers/commandhandler";
+import { deleteSlashCommands } from "../utils/functions/slash-commands";
+import { logger } from "../utils/logger";
+import { getRest } from "../utils/rest";
 
 const cmd = new Command("deleteslash", "delete slash commands", "none").setPermissions([
   "bot owner",
@@ -18,22 +18,29 @@ async function run(
 ) {
   if (message.author.id != Constants.OWNER_ID) return;
 
-  if (args.length == 0) {
-    await deleteSlashCommandsFromGuild(
-      message.guild.id,
-      message.client.user.id,
-      message.client as NypsiClient,
-    );
+  const global = args[0]?.toLowerCase() === "global";
 
-    if (!(message instanceof Message)) return;
+  if (args.length > 1 || (args.length === 1 && !global && args[0].toLowerCase() !== "guild")) {
+    return send({ embeds: [new ErrorEmbed("deleteslash [global|guild]")] });
+  }
 
-    return await message.react("✅");
-  } else if (args[0].toLowerCase() == "global") {
-    await deleteSlashCommands(message.client.user.id, message.client as NypsiClient);
+  const applicationId = message.client.user.id;
+  const guildId = global ? undefined : message.guild.id;
+  const scope = global ? "global" : `guild ${guildId}`;
 
-    if (!(message instanceof Message)) return;
+  try {
+    await deleteSlashCommands(getRest(message.client as NypsiClient), applicationId, guildId);
+    logger.info(`slash commands: deleted ${scope} commands`, { applicationId, guildId });
 
-    return await message.react("✅");
+    if (message instanceof Message) return await message.react("✅");
+  } catch (error) {
+    logger.error(`slash commands: failed to delete ${scope} commands`, {
+      applicationId,
+      guildId,
+      error,
+    });
+
+    return send({ embeds: [new ErrorEmbed(`${scope}: failed to delete slash commands`)] });
   }
 }
 
