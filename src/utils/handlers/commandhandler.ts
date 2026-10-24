@@ -295,7 +295,13 @@ export async function resolveMessageCommand(
   const foundAlias = userAliases.find((alias) => alias.alias === cmd);
 
   if (foundAlias) {
-    const resolvedArgs = foundAlias.command.split(" ");
+    let resolvedArgs = foundAlias.command.split(" ");
+    const expansion = shorthands.get(resolvedArgs[0]);
+
+    if (!commands.has(resolvedArgs[0]) && expansion) {
+      resolvedArgs = [...expansion.split(" "), ...resolvedArgs.slice(1)];
+    }
+
     const targetCmd = resolvedArgs[0];
     const command = commands.get(targetCmd);
 

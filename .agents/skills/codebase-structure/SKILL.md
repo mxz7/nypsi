@@ -61,6 +61,14 @@ cmd.slashData
   );
 ```
 
+### Saved Premium Aliases
+
+Personal aliases store a full command string. In `resolveMessageCommand()`, expand a saved target
+through built-in shorthands when it is no longer a registered command, before looking up the
+canonical command. This keeps aliases targeting removed standalone commands working after grouping.
+Keep injected subcommand arguments first, then saved arguments, then arguments supplied at invocation.
+Registered commands retain precedence over shorthands; unknown saved targets still resolve to none.
+
 ### Slash Argument Adapter
 
 [`src/events/interactionCreate.ts`](../../../src/events/interactionCreate.ts) converts slash options
