@@ -22,7 +22,7 @@ const cmd = new Command("name", "description", "category")
   .setDocs("https://nypsi.xyz/wiki/...")
   .setRun(async (message, send, args) => { … });
 
-export default cmd;
+module.exports = cmd;
 ```
 
 ### Slash Command Options (SlashCommandBuilder)
@@ -90,6 +90,13 @@ changes before `reloadslash`. Sync failures propagate to the command instead of 
 `deleteslash` uses the same utility file to bulk-clear the selected scope. Registration and deletion
 REST logic belong there, not in `commandhandler.ts`.
 
+### Slash Coverage Scope
+
+Crypto and Last.fm commands intentionally remain prefix-only. Crypto lookups are already covered
+by item information (`item`, prefix alias `i`), so do not add a crypto slash command or family.
+Last.fm is outside the slash parity work; do not add slash alternatives for its music commands.
+A prefix command's existence does not by itself mean it needs slash coverage.
+
 ### User Information Commands
 
 `src/commands/user.ts` owns `info`, `avatar`, `banner`, `avatar-history`, `username-history`, and
@@ -107,6 +114,13 @@ prefix shorthands for the former command names and aliases. Cooldowns retain eac
 and duration, and each action has its own one-minute result cache. Keep the action-specific reward,
 premium probability, booster, achievement, and self-only task logic when changing the shared
 dispatcher. Rating command tests belong in `test/commands/rate.test.ts`.
+
+### Bank Commands
+
+`src/commands/bank.ts` owns `deposit`, `withdraw`, and `rob`. Former names (`deposit`, `dep`,
+`withdraw`, `with`, and `bankrob`) are prefix shorthands. Preserve the separate `deposit`,
+`withdraw`, and `bankrob` cooldown keys; masks clear `cd:bankrob:<userId>`. Robbery game records
+and replay anticheat checks also retain `bankrob`. Player-to-player robbery remains in `rob.ts`.
 
 ### Command Types
 

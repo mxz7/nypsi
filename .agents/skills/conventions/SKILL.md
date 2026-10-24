@@ -47,7 +47,7 @@ metadata for structured filtering. Keep large or noisy values, including error o
 Do not import or query Prisma directly in command files. Put database access in domain utility
 functions under `src/utils/functions/` and call those functions from the command.
 
-Create a `Command` instance and export it as default:
+Create a `Command` instance and export it with `module.exports` for the command loader:
 
 ```ts
 import { Command } from "../models/Command.js";
@@ -56,7 +56,7 @@ const cmd = new Command("name", "description", "category")
   .setAliases(["alias"])
   .setRun(async (message, send, args) => { … });
 
-export default cmd;
+module.exports = cmd;
 ```
 
 Commands are auto-loaded from `src/commands/` at startup. See [src/models/Command.ts](../../../src/models/Command.ts) for full API, and the `codebase-structure` skill for slash option/subcommand patterns.

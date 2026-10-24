@@ -5,8 +5,10 @@ import {
   ButtonStyle,
   CommandInteraction,
   Interaction,
+  InteractionEditReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
+  MessageEditOptions,
   MessageFlags,
   WebhookClient,
 } from "discord.js";
@@ -18,7 +20,15 @@ import Constants from "../utils/Constants.js";
 import { a } from "../utils/functions/anticheat";
 import { giveCaptcha, isLockedOut, verifyUser } from "../utils/functions/captcha";
 import { addProgress } from "../utils/functions/economy/achievements.js";
-import { addBalance, getBalance, removeBalance } from "../utils/functions/economy/balance.js";
+import {
+  addBalance,
+  addBankBalance,
+  getBalance,
+  getBankBalance,
+  getMaxBankBalance,
+  removeBalance,
+  removeBankBalance,
+} from "../utils/functions/economy/balance.js";
 import {
   addEventProgress,
   EventData,
@@ -28,7 +38,8 @@ import {
 import { getInventory, removeInventoryItem } from "../utils/functions/economy/inventory.js";
 import { createGame } from "../utils/functions/economy/stats.js";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
-import { createUser, userExists } from "../utils/functions/economy/utils.js";
+import { createUser, formatNumber, userExists } from "../utils/functions/economy/utils.js";
+import { getPrefix } from "../utils/functions/guilds/utils";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { percentChance } from "../utils/functions/random";
 import { escapeFormattingCharacters } from "../utils/functions/string";
@@ -47,11 +58,273 @@ import {
 } from "../utils/handlers/cooldownhandler.js";
 import { getTimestamp, logger } from "../utils/logger";
 
-const cmd = new Command("bankrob", "attempt to rob a bank for a high reward", "money");
+const cmd = new Command("bank", "deposit, withdraw, or rob the bank", "money").setShorthands({
+  deposit: "bank deposit",
+  dep: "bank deposit",
+  withdraw: "bank withdraw",
+  with: "bank withdraw",
+  bankrob: "bank rob",
+});
 
 cmd.slashEnabled = true;
+cmd.slashData
+  .addSubcommand((sub) =>
+    sub
+      .setName("deposit")
+      .setDescription("deposit money into your bank")
+      .addStringOption((option) =>
+        option.setName("amount").setDescription("amount to deposit").setRequired(true),
+      ),
+  )
+  .addSubcommand((sub) =>
+    sub
+      .setName("withdraw")
+      .setDescription("withdraw money from your bank")
+      .addStringOption((option) =>
+        option.setName("amount").setDescription("amount to withdraw").setRequired(true),
+      ),
+  )
+  .addSubcommand((sub) =>
+    sub.setName("rob").setDescription("attempt to rob a bank for a high reward"),
+  );
 
-async function run(
+cmd.setRun(async (message, send, args) => {
+  let action = args[0]?.toLowerCase();
+  let inputs = args.slice(1);
+
+  if (!(message instanceof Message) && message.isChatInputCommand()) {
+    action = message.options.getSubcommand();
+    inputs = action === "rob" ? [] : [message.options.getString("amount", true)];
+  }
+
+  switch (action) {
+    case "deposit":
+      return runDeposit(message, send, inputs);
+    case "withdraw":
+      return runWithdraw(message, send, inputs);
+    case "rob":
+      return runRob(message, send);
+    default: {
+      const prefix = (await getPrefix(message.guild))[0];
+      return send({
+        embeds: [
+          new CustomEmbed(message.member)
+            .setHeader("bank commands")
+            .setDescription(
+              `${prefix}bank deposit <amount>\n${prefix}bank withdraw <amount>\n${prefix}bank rob`,
+            ),
+        ],
+      });
+    }
+  }
+});
+
+async function runDeposit(
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
+  args: string[],
+) {
+  if (!(await userExists(message.member))) await createUser(message.member);
+
+  if (await onCooldown("deposit", message.member)) {
+    const res = await getResponse("deposit", message.member);
+
+    if (res.respond) send({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
+    return;
+  }
+
+  const prefix = (await getPrefix(message.guild))[0];
+
+  if (args.length == 0) {
+    const embed = new CustomEmbed(message.member)
+      .setHeader("deposit help")
+      .addField("usage", `${prefix}deposit <amount>`)
+      .addField(
+        "help",
+        "you can deposit money into your bank to keep it safe from robberies (and gambling if you have *issues*)\n" +
+          "however there is a limit to the size of your bank account, when starting, your bank has a capacity of $**15,000**, but will upgrade as you use the bot more.",
+      );
+    return send({ embeds: [embed] });
+  }
+
+  if (args[0].toLowerCase() == "all") {
+    args[0] = (await getBalance(message.member)).toString();
+    const amount = parseInt(args[0]);
+    if (
+      amount >
+      (await getMaxBankBalance(message.member)) - (await getBankBalance(message.member))
+    ) {
+      args[0] = (
+        (await getMaxBankBalance(message.member)) - (await getBankBalance(message.member))
+      ).toString();
+    }
+  }
+
+  if (args[0] == "half") {
+    args[0] = ((await getBankBalance(message.member)) / 2).toString();
+  }
+
+  const amount = formatNumber(args[0]);
+
+  if (!amount || isNaN(amount)) {
+    return send({ embeds: [new ErrorEmbed("invalid amount")] });
+  }
+
+  if (amount > (await getBalance(message.member))) {
+    return send({ embeds: [new ErrorEmbed("you cannot afford this payment")] });
+  }
+
+  if (amount > (await getMaxBankBalance(message.member)) - (await getBankBalance(message.member))) {
+    return send({ embeds: [new ErrorEmbed("your bank is not big enough for this payment")] });
+  }
+
+  if (amount <= 0) {
+    return send({ embeds: [new ErrorEmbed("invalid payment")] });
+  }
+
+  await addCooldown("deposit", message.member, 3);
+
+  const embed = new CustomEmbed(message.member)
+    .setHeader("bank deposit", message.author.avatarURL())
+    .addField(
+      "bank balance",
+      "$**" +
+        (await getBankBalance(message.member)).toLocaleString() +
+        "** / $**" +
+        (await getMaxBankBalance(message.member)).toLocaleString() +
+        "**",
+    )
+    .addField("transaction amount", "+$**" + amount.toLocaleString() + "**");
+
+  const m = await send({ embeds: [embed] });
+
+  await removeBalance(message.member, amount);
+  await addBankBalance(message.member, amount);
+
+  const embed1 = new CustomEmbed(message.member)
+    .setHeader("bank deposit", message.author.avatarURL())
+    .addField(
+      "bank balance",
+      "$**" +
+        (await getBankBalance(message.member)).toLocaleString() +
+        "** / $**" +
+        (await getMaxBankBalance(message.member)).toLocaleString() +
+        "**",
+    )
+    .addField("transaction amount", "+$**" + amount.toLocaleString() + "**");
+
+  const edit = async (data: MessageEditOptions, msg: Message) => {
+    if (!(message instanceof Message)) {
+      await message.editReply(data as InteractionEditReplyOptions);
+      return await message.fetchReply();
+    } else {
+      return await msg.edit(data);
+    }
+  };
+
+  setTimeout(() => edit({ embeds: [embed1] }, m), 1500);
+}
+
+async function runWithdraw(
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+  send: SendMessage,
+  args: string[],
+) {
+  if (!(await userExists(message.member))) await createUser(message.member);
+
+  if (await onCooldown("withdraw", message.member)) {
+    const res = await getResponse("withdraw", message.member);
+
+    if (res.respond) send({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
+    return;
+  }
+
+  const prefix = (await getPrefix(message.guild))[0];
+
+  if (args.length == 0) {
+    const embed = new CustomEmbed(message.member)
+      .setHeader("withdraw help")
+      .addField("usage", `${prefix}withdraw <amount>`)
+      .addField(
+        "help",
+        "you can withdraw money from your bank as long as you have that amount available in your bank",
+      );
+    return send({ embeds: [embed] });
+  }
+
+  if ((await getBankBalance(message.member)) == 0) {
+    return send({ embeds: [new ErrorEmbed("you don't have any money in your bank account")] });
+  }
+
+  if (args[0].toLowerCase() == "all") {
+    args[0] = (await getBankBalance(message.member)).toString();
+  }
+
+  if (args[0] == "half") {
+    args[0] = ((await getBankBalance(message.member)) / 2).toString();
+  }
+
+  const amount = formatNumber(args[0]);
+
+  if (amount > (await getBankBalance(message.member))) {
+    return send({
+      embeds: [new ErrorEmbed("you don't have enough money in your bank account")],
+    });
+  }
+
+  if (!amount) {
+    return send({ embeds: [new ErrorEmbed("invalid payment")] });
+  }
+
+  if (amount <= 0) {
+    return send({ embeds: [new ErrorEmbed("invalid payment")] });
+  }
+
+  await addCooldown("withdraw", message.member, 3);
+
+  const embed = new CustomEmbed(message.member)
+    .setHeader("bank withdrawal", message.author.avatarURL())
+    .addField(
+      "bank balance",
+      "$**" +
+        (await getBankBalance(message.member)).toLocaleString() +
+        "** / $**" +
+        (await getMaxBankBalance(message.member)).toLocaleString() +
+        "**",
+    )
+    .addField("transaction amount", "-$**" + amount.toLocaleString() + "**");
+
+  const m = await send({ embeds: [embed] });
+
+  await removeBankBalance(message.member, amount);
+  await addBalance(message.member, amount);
+
+  const embed1 = new CustomEmbed(message.member)
+    .setHeader("bank withdrawal", message.author.avatarURL())
+    .addField(
+      "bank balance",
+      "$**" +
+        (await getBankBalance(message.member)).toLocaleString() +
+        "** / $**" +
+        (await getMaxBankBalance(message.member)).toLocaleString() +
+        "**",
+    );
+
+  embed1.addField("transaction amount", "-$**" + amount.toLocaleString() + "**");
+
+  const edit = async (data: MessageEditOptions, msg: Message) => {
+    if (!(message instanceof Message)) {
+      await message.editReply(data as InteractionEditReplyOptions);
+      return await message.fetchReply();
+    } else {
+      return await msg.edit(data);
+    }
+  };
+
+  setTimeout(() => edit({ embeds: [embed1] }, m), 1500);
+}
+
+async function runRob(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   send: SendMessage,
 ) {
@@ -101,14 +374,14 @@ async function run(
     return `**nypsi**\n*$${worth.toLocaleString()}*\n\n**max steal** $${steal.toLocaleString()}\n**max loss** $${loss.toLocaleString()}${
       lawyer ? " 🧑‍⚖️" : ""
     }${
-      (await onCooldown(cmd.name, message.member))
-        ? `\n\non cooldown for \`${await getRemaining(cmd.name, message.member)}\``
+      (await onCooldown("bankrob", message.member))
+        ? `\n\non cooldown for \`${await getRemaining("bankrob", message.member)}\``
         : ""
     }`;
   };
 
   const robBank = async (bank: string, interaction: ButtonInteraction, replay = false) => {
-    if (await onCooldown(cmd.name, message.member)) {
+    if (await onCooldown("bankrob", message.member)) {
       if (replay) {
         if (!(await getInventory(message.member)).has("mask")) {
           interaction.reply({
@@ -119,7 +392,7 @@ async function run(
         }
         await removeInventoryItem(message.member, "mask", 1);
       } else {
-        const res = await getResponse(cmd.name, message.member);
+        const res = await getResponse("bankrob", message.member);
 
         if (res.respond) {
           interaction.reply({ embeds: [res.embed], flags: MessageFlags.Ephemeral });
@@ -140,7 +413,7 @@ async function run(
 
     await interaction.deferUpdate();
 
-    await addCooldown(cmd.name, message.member, 900);
+    await addCooldown("bankrob", message.member, 900);
 
     const res = await getMaxValues(await getNypsiBankBalance());
 
@@ -362,7 +635,7 @@ async function run(
 
   const components: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [];
 
-  if (!(await onCooldown(cmd.name, message.member)))
+  if (!(await onCooldown("bankrob", message.member)))
     components.push(
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
@@ -393,7 +666,5 @@ async function run(
   };
   return pageManager();
 }
-
-cmd.setRun(run);
 
 module.exports = cmd;
