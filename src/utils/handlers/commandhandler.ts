@@ -867,7 +867,7 @@ export async function runCommand(
             memberId: message.author.id,
             embed: new CustomEmbed(
               message.member,
-              "the karma shop is open! use `/karmashop view` to see what's available 🔮",
+              "the karma shop is open! use `/karma shop` to see what's available 🔮",
             ),
           });
         }

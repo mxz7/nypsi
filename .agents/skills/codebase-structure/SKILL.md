@@ -122,6 +122,14 @@ dispatcher. Rating command tests belong in `test/commands/rate.test.ts`.
 `withdraw`, and `bankrob` cooldown keys; masks clear `cd:bankrob:<userId>`. Robbery game records
 and replay anticheat checks also retain `bankrob`. Player-to-player robbery remains in `rob.ts`.
 
+### Karma Commands
+
+`src/commands/karma.ts` owns `balance`, `shop`, `buy`, and `help`. Bare prefix `karma [user]`
+still shows a balance. `karmashop` and `ks` expand to `karma shop`, accepting the old `view`,
+`buy`, `help`, and owner-only `open`/`close` arguments; `karmahelp` expands to `karma help`.
+Help is independent of shop availability and cooldowns. Shop viewing and buying retain the
+`karmashop` cooldown key. Keep `item-karmashop` as the buy option name for autocomplete routing.
+
 ### Command Types
 
 ```ts
