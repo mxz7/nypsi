@@ -29,6 +29,8 @@ const cmd = new Command(
   "money",
 ).setAliases(["tool"]);
 
+cmd.slashEnabled = true;
+
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   send: SendMessage,

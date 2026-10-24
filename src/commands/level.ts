@@ -28,6 +28,8 @@ const cmd = new Command("level", "view your progress to the next level", "money"
   "levelup",
 ]);
 
+cmd.slashEnabled = true;
+
 async function awaitUpcomingRewardsInteraction(
   response: Message,
   userId: string,

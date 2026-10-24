@@ -73,6 +73,17 @@ read the named options via `message.isChatInputCommand()` and `message.options.g
 `mines`, `tower`, `role`, and `purge includes`. Do not globally stop splitting strings without
 checking handlers that reconstruct free text with `args.join(" ")` or expect multiple tokens.
 
+### Slash Replies
+
+Enabling `slashEnabled` also requires every response path to acknowledge the interaction through
+its supplied `send` function. Remove prefix-only `instanceof Message` guards when adding support;
+replace direct `message.channel.send()` responses, including errors and pagination's initial send.
+Pass `send` through helpers such as `runItemInfo(..., send)`, whose default sends to the channel.
+The shared sender returns the reply message, so existing message edits and collectors can use it.
+`help.ts` supports an optional named `query` for categories, commands, and multiword item searches;
+its slash category lists use `/` for registered commands and the server prefix for prefix-only ones.
+`networth.ts` uses an optional named `user`; `level`, `work`, and `tools` have no slash options.
+
 Slash registration uploads only commands with `slashEnabled = true`, using each command's
 `slashData.toJSON()`. Prefix aliases and shorthands do not register additional slash commands.
 `reloadslash` (or `reloadslash guild`) syncs the current guild; `reloadslash global` syncs global
