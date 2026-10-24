@@ -7,9 +7,8 @@ import {
 import redis from "../../../../init/redis";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
-import { ItemUse } from "../../../../models/ItemUse";
+import { ItemUse, ItemUseRequest } from "../../../../models/ItemUse";
 import Constants from "../../../Constants";
-import { getMember } from "../../member";
 import sleep from "../../sleep";
 import { removeInventoryItem } from "../inventory";
 import { addStat } from "../stats";
@@ -18,7 +17,7 @@ export default new ItemUse(
   "chastity_cage",
   async (
     message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
-    args: string[],
+    input: ItemUseRequest,
   ) => {
     const edit = async (data: MessageEditOptions, msg: Message) => {
       if (!(message instanceof Message)) {
@@ -29,21 +28,11 @@ export default new ItemUse(
       }
     };
 
-    if (args.length == 1) {
-      return ItemUse.send(message, {
-        embeds: [new ErrorEmbed("/use chastity <member>")],
-      });
-    }
-
-    const chastityTarget = await getMember(message.guild, args[1]);
-
-    if (!chastityTarget) {
-      return ItemUse.send(message, { embeds: [new ErrorEmbed("invalid user")] });
-    }
+    const chastityTarget = input.target;
 
     if (message.member == chastityTarget) {
-      return ItemUse.send(message, {
-        embeds: [new ErrorEmbed("why would you do that to yourself.")],
+      return input.send({
+        embeds: [new ErrorEmbed("you can't use a chastity cage on yourself")],
       });
     }
 
@@ -51,7 +40,7 @@ export default new ItemUse(
       (await redis.exists(`${Constants.redis.cooldown.SEX_CHASTITY}:${chastityTarget.user.id}`)) ==
       1
     ) {
-      return ItemUse.send(message, {
+      return input.send({
         embeds: [
           new ErrorEmbed(
             `**${chastityTarget.user.username.replaceAll("_", "\\_")}** is already equipped with a chastity cage`,
@@ -70,7 +59,7 @@ export default new ItemUse(
     await removeInventoryItem(message.member, "chastity_cage", 1);
     await addStat(message.member, "chastity_cage");
 
-    const msg = await ItemUse.send(message, {
+    const msg = await input.send({
       embeds: [new CustomEmbed(message.member, "locking chastity cage...")],
     });
 
@@ -88,4 +77,5 @@ export default new ItemUse(
       msg,
     );
   },
+  { target: true },
 );

@@ -9,14 +9,15 @@ import { inPlaceSort } from "fast-sort";
 import { NypsiClient } from "../../../../models/Client";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
-import { ItemUse } from "../../../../models/ItemUse";
+import { ItemUse, ItemUseRequest } from "../../../../models/ItemUse";
 import PageManager from "../../page";
 import { getTier, isPremium } from "../../premium/premium";
 import sleep from "../../sleep";
 import { pluralize } from "../../string";
 import { addProgress } from "../achievements";
 import { addEventProgress } from "../events";
-import { calcItemValue, getInventory, selectItem } from "../inventory";
+import { calcItemValue, getInventory } from "../inventory";
+import { getItemUseAmountError } from "../item-use";
 import { openCrate } from "../loot_pools";
 import { addStat } from "../stats";
 import { addTaskProgress } from "../tasks";
@@ -26,29 +27,19 @@ export default new ItemUse(
   "crates",
   async (
     message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
-    args: string[],
+    input: ItemUseRequest,
   ) => {
     const inventory = await getInventory(message.member);
 
-    const selected = selectItem(args[0].toLowerCase());
-
-    if (!selected || typeof selected == "string") {
-      return ItemUse.send(message, { embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] });
-    }
+    const selected = input.item;
 
     if (!inventory.has(selected.id)) {
-      return ItemUse.send(message, {
+      return input.send({
         embeds: [new ErrorEmbed(`you don't have ${selected.article} ${selected.name}`)],
       });
     }
 
-    let amount = 1;
-
-    if (args[1]?.toLowerCase() === "all") {
-      amount = inventory.count(selected.id);
-    } else if (parseInt(args[1])) {
-      amount = parseInt(args[1]);
-    }
+    let amount = input.amount;
 
     let max = 10;
 
@@ -62,8 +53,10 @@ export default new ItemUse(
     if (amount > max) amount = max;
 
     if (inventory.count(selected.id) < amount)
-      return ItemUse.send(message, {
-        embeds: [new ErrorEmbed(`you don't have ${amount} ${selected.name}`)],
+      return input.send({
+        embeds: [
+          new ErrorEmbed(getItemUseAmountError(selected, inventory.count(selected.id), amount)),
+        ],
       });
 
     const embed = new CustomEmbed(
@@ -74,7 +67,9 @@ export default new ItemUse(
       message.author.avatarURL(),
     );
 
-    const msg = await ItemUse.send(message, { embeds: [embed] });
+    const limitNote = input.amount > amount ? `limited to ${max} crates per use` : "";
+    if (limitNote) embed.setFooter({ text: limitNote });
+    const msg = await input.send({ embeds: [embed] });
 
     const foundAll = {
       money: 0,
@@ -124,7 +119,9 @@ export default new ItemUse(
       const xpText = foundAll.xp > 0 ? `+${foundAll.xp.toLocaleString()}xp` : "";
       const karmaText = foundAll.karma > 0 ? `+${foundAll.karma.toLocaleString()}🔮` : "";
       const joiner = foundAll.xp > 0 && foundAll.karma > 0 ? "    " : "";
-      embed.setFooter({ text: `${xpText}${joiner}${karmaText}` });
+      embed.setFooter({
+        text: `${xpText}${joiner}${karmaText}${limitNote ? ` · ${limitNote}` : ""}`,
+      });
     }
 
     const values = new Map<string, number>();
@@ -195,4 +192,5 @@ export default new ItemUse(
       return manager.listen();
     }
   },
+  { amount: true },
 );

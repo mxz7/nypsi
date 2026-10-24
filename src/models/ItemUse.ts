@@ -1,60 +1,32 @@
-import {
-  BaseMessageOptions,
-  CommandInteraction,
-  InteractionEditReplyOptions,
-  InteractionReplyOptions,
-  Message,
-} from "discord.js";
-import { NypsiCommandInteraction, NypsiMessage } from "./Command";
+import type { CommandInteraction, GuildMember } from "discord.js";
+import type { Item } from "../types/Economy";
+import type { NypsiCommandInteraction, NypsiMessage, SendMessage } from "./Command";
+
+export interface ItemUseOptions {
+  amount?: boolean;
+  target?: boolean;
+  suggest?: boolean;
+}
+
+export interface ItemUseRequest {
+  item: Item;
+  amount: number;
+  all: boolean;
+  target?: GuildMember;
+  send: SendMessage;
+}
 
 export class ItemUse {
   public itemId: string;
+  public options: ItemUseOptions;
   public run: (
     message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
-    args?: string[],
-  ) => void;
+    input: ItemUseRequest,
+  ) => unknown;
 
-  constructor(
-    itemId: string,
-    func: (
-      message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
-      args?: string[],
-    ) => void,
-  ) {
+  constructor(itemId: string, func: ItemUse["run"], options: ItemUseOptions = {}) {
     this.itemId = itemId;
     this.run = func;
-  }
-
-  static async send(
-    message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
-    data: BaseMessageOptions | InteractionReplyOptions,
-  ): Promise<Message> {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data as InteractionEditReplyOptions).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
+    this.options = options;
   }
 }

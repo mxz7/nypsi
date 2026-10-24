@@ -1,21 +1,23 @@
 import { CommandInteraction } from "discord.js";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
-import { ItemUse } from "../../../../models/ItemUse";
+import { ItemUse, ItemUseRequest } from "../../../../models/ItemUse";
 import { fertiliseFarm, getFarm } from "../farm";
 
 export default new ItemUse(
   "fertiliser",
-  async (message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) => {
+  async (
+    message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+    input: ItemUseRequest,
+  ) => {
     const farm = await getFarm(message.author.id);
 
-    if (farm.length === 0)
-      return ItemUse.send(message, { embeds: [new ErrorEmbed("you have no plants")] });
+    if (farm.length === 0) return input.send({ embeds: [new ErrorEmbed("you have no plants")] });
 
     const res = await fertiliseFarm(message.author.id);
 
     if (res.msg === "no fertiliser") {
-      return ItemUse.send(message, {
+      return input.send({
         embeds: [
           new ErrorEmbed(
             "you don't have any fertiliser" +
@@ -24,7 +26,7 @@ export default new ItemUse(
         ],
       });
     } else if (res.msg === "no need") {
-      return ItemUse.send(message, {
+      return input.send({
         embeds: [
           new ErrorEmbed(
             "none of your plants need fertiliser" +
@@ -35,7 +37,7 @@ export default new ItemUse(
     }
 
     if (res.done) {
-      return ItemUse.send(message, {
+      return input.send({
         embeds: [
           new CustomEmbed(
             message.member,

@@ -11,7 +11,7 @@ import {
 import redis from "../../../../init/redis";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
-import { ItemUse } from "../../../../models/ItemUse";
+import { ItemUse, ItemUseRequest } from "../../../../models/ItemUse";
 import { startLootRain } from "../../../../scheduled/clusterjobs/random-drops";
 import Constants from "../../../Constants";
 import { pluralize } from "../../string";
@@ -20,7 +20,10 @@ import { addStat } from "../stats";
 
 export default new ItemUse(
   "rain",
-  async (message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) => {
+  async (
+    message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+    input: ItemUseRequest,
+  ) => {
     let length = 1;
 
     if (message.channel.isDMBased()) return;
@@ -34,7 +37,7 @@ export default new ItemUse(
         .setStyle(ButtonStyle.Success),
     );
 
-    const msg = await ItemUse.send(message, {
+    const msg = await input.send({
       embeds: [
         new CustomEmbed(
           message.member,
@@ -66,7 +69,7 @@ export default new ItemUse(
         return res.reply({
           embeds: [
             new ErrorEmbed(
-              "there is already a rain happening in this channel doofus. do you want to destroy nypsi!?",
+              "a loot rain is already happening in this channel. wait for it to finish",
             ),
           ],
           flags: MessageFlags.Ephemeral,
@@ -76,11 +79,7 @@ export default new ItemUse(
 
       if (!inventory.has("rain")) {
         return res.reply({
-          embeds: [
-            new ErrorEmbed("what happened to your rain buddy. YEAH. I SAW THAT").setImage(
-              "${Constants.CDN_DOMAIN}/static/i_saw_that.jpeg",
-            ),
-          ],
+          embeds: [new ErrorEmbed("you no longer have a loot rain in your inventory")],
           flags: MessageFlags.Ephemeral,
         });
       }

@@ -2,18 +2,21 @@ import { CommandInteraction } from "discord.js";
 import redis from "../../../../init/redis";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
-import { ItemUse } from "../../../../models/ItemUse";
+import { ItemUse, ItemUseRequest } from "../../../../models/ItemUse";
 import { removeInventoryItem } from "../inventory";
 import { addStat } from "../stats";
 
 export default new ItemUse(
   "mask",
-  async (message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) => {
+  async (
+    message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+    input: ItemUseRequest,
+  ) => {
     const robCooldown = (await redis.exists(`cd:rob:${message.author.id}`)) == 1;
     const bankRobCooldown = (await redis.exists(`cd:bankrob:${message.author.id}`)) == 1;
     const storeRobCooldown = (await redis.exists(`cd:storerob:${message.author.id}`)) == 1;
     if (!robCooldown && !bankRobCooldown && !storeRobCooldown) {
-      return ItemUse.send(message, {
+      return input.send({
         embeds: [new ErrorEmbed("you are currently not on a rob cooldown")],
       });
     }
@@ -34,6 +37,6 @@ export default new ItemUse(
     await removeInventoryItem(message.member, "mask", 1);
     await addStat(message.member, "mask");
 
-    return ItemUse.send(message, { embeds: [embed] });
+    return input.send({ embeds: [embed] });
   },
 );

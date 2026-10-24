@@ -50,7 +50,11 @@ export async function reloadInteractions() {
 
 export async function runInteraction(interaction: Interaction) {
   if (interaction.isAutocomplete()) {
-    return autocompleteHandlers.get(interaction.options.getFocused(true).name)?.run(interaction);
+    const name = interaction.options.getFocused(true).name;
+    const handler =
+      autocompleteHandlers.get(`${interaction.commandName}:${name}`) ??
+      autocompleteHandlers.get(name);
+    return handler?.run(interaction);
   } else if (interaction.isMessageComponent() && !getInteractionHandler(interaction.customId)) {
     if (!(await hasProfile(interaction.user.id))) await createProfile(interaction.user);
 

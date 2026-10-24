@@ -55,3 +55,23 @@ the click interaction or it will double-count generated items.
 - `pools: { poolName, count, breakdown: { chance, itemId?, amount? }[] }[]` — if the item itself is a container (e.g. a crate), the full odds breakdown of everything inside it, per pool.
 
 `getItems()`/`getLootPools()`/`getBaseWorkers()`/`getPlantsData()` are all read synchronously under the hood — no DB calls, safe to call from anywhere (including AI tool executors) without extra caching.
+
+## Item use — prefix and slash
+
+`src/commands/use.ts` reads slash options by name (`item`, `amount`, `member`) and resolves prefix
+item names before parsing the remaining inputs. Both paths build an `ItemUseRequest` containing
+`item`, normalized `amount`, `all`, an optional resolved `target`, and the command's `send` callback.
+Custom handlers in `src/utils/functions/economy/items/` accept this request; do not parse positional
+arguments or implement a separate reply helper in a handler.
+
+`src/utils/functions/economy/item-use.ts` shares the lazy handler registry and role capabilities with
+`src/interactions/item-use.ts` (`use:item`). Declare `{ amount: true }` for bulk actions and
+`{ target: true }` for required member targets in the `ItemUse` constructor. Single actions force one
+use; untargeted actions ignore members; invalid/missing quantities default to one. Keep inventory,
+prerequisite, stacking, premium, and per-use limit checks in the appropriate effect handler, and
+explain applied caps. Pet actions still invoke one `addPet` upgrade with its configured item cost.
+
+Autocomplete suggests only owned, visible items with a registered use action. Redirect-only handlers
+such as calendar and lottery ticket set `{ suggest: false }`. Generic inventory autocomplete remains
+available to other commands. Restart the bot after changing the handler request contract or registry;
+reloading only the command can leave cached handler modules using the previous contract.

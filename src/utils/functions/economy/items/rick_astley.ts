@@ -2,9 +2,8 @@ import { CommandInteraction } from "discord.js";
 import redis from "../../../../init/redis";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
-import { ItemUse } from "../../../../models/ItemUse";
+import { ItemUse, ItemUseRequest } from "../../../../models/ItemUse";
 import Constants from "../../../Constants";
-import { getMember } from "../../member";
 import { escapeFormattingCharacters } from "../../string";
 import { removeInventoryItem } from "../inventory";
 import { addStat } from "../stats";
@@ -13,22 +12,17 @@ export default new ItemUse(
   "rick_astley",
   async (
     message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
-    args: string[],
+    input: ItemUseRequest,
   ) => {
-    if (args.length === 1)
-      return ItemUse.send(message, { embeds: [new ErrorEmbed("invalid member")] });
-
-    const target = await getMember(message.guild, args.slice(1, args.length).join(" "));
-
-    if (!target) return ItemUse.send(message, { embeds: [new ErrorEmbed("invalid member")] });
+    const target = input.target;
 
     if (target.user.id === message.author.id)
-      return ItemUse.send(message, {
-        embeds: [new ErrorEmbed("you cannot rick roll yourself IDIOT")],
+      return input.send({
+        embeds: [new ErrorEmbed("you can't use rick astley on yourself")],
       });
 
     if (await redis.exists(`${Constants.redis.nypsi.RICKROLL}:${target.user.id}`))
-      return ItemUse.send(message, {
+      return input.send({
         embeds: [
           new ErrorEmbed(
             `${escapeFormattingCharacters(target.user.username)} already has a rick roll queued`,
@@ -41,7 +35,7 @@ export default new ItemUse(
 
     await redis.set(`${Constants.redis.nypsi.RICKROLL}:${target.user.id}`, message.author.id);
 
-    return ItemUse.send(message, {
+    return input.send({
       embeds: [
         new CustomEmbed(
           message.member,
@@ -50,4 +44,5 @@ export default new ItemUse(
       ],
     });
   },
+  { target: true },
 );
