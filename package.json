@@ -37,10 +37,10 @@
     "chess.js": "^1.4.0",
     "cron": "^4.4.0",
     "dayjs": "1.11.23",
-    "discord-api-types": "^0.38.56",
+    "discord-api-types": "^0.38.57",
     "discord-hybrid-sharding": "3.0.1",
     "discord.js": "14.27.0",
-    "dotenv": "18.0.8",
+    "dotenv": "18.0.9",
     "fast-sort": "3.4.1",
     "hono": "^4.13.13",
     "ioredis": "6.0.0",
@@ -53,7 +53,7 @@
     "sharp": "^0.35.5",
     "sudoku-gen": "^1.0.3",
     "zlib-sync": "^0.1.10",
-    "zod": "^4.6.6"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@types/figlet": "1.7.0",
@@ -63,7 +63,7 @@
     "@types/urban-dictionary": "3.0.2",
     "oxfmt": "^0.74.0",
     "oxlint": "^1.79.0",
-    "oxlint-tsgolint": "^7.0.2004",
+    "oxlint-tsgolint": "^7.0.2005",
     "prisma": "7.10.1",
     "tsx": "^4.23.15",
     "typescript": "7.0.2",
