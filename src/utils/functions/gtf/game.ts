@@ -127,6 +127,59 @@ export async function startGTFGame(
     time: 300000,
   });
 
+  const isCorrectGuess = (guess: string) => {
+    const normalized = guess.trim().toLowerCase();
+
+    return (
+      normalized === country.cca2.toLowerCase() ||
+      [country.name.common, country.name.official, ...country.altSpellings].some(
+        (name) => compareTwoStrings(normalized, name.toLowerCase()) > 0.9,
+      )
+    );
+  };
+
+  const completeGame = (user: User, createdTimestamp: number) => {
+    winner = user;
+    collector.stop("win");
+    const completionTime = createdTimestamp - startedAt;
+    const winnerGuesses = secondPlayer
+      ? guesses.filter((guess) => guess.startsWith(winner.username + ":"))
+      : guesses;
+
+    saveGameStats(winner.id, id, winnerGuesses, true, completionTime);
+    if (secondPlayer) {
+      const loser = winner.id === message.author.id ? secondPlayer : message.author;
+      saveGameStats(
+        loser.id,
+        id,
+        guesses.filter((guess) => guess.startsWith(loser.username + ":")),
+        false,
+      );
+    }
+
+    return completionTime;
+  };
+
+  const messageCollector =
+    "createMessageCollector" in msg.channel
+      ? msg.channel.createMessageCollector({
+          filter: (guess) =>
+            !collector.ended &&
+            !guess.author.bot &&
+            (guess.author.id === message.author.id || guess.author.id === secondPlayer?.id) &&
+            isCorrectGuess(guess.content),
+          time: 300000,
+        })
+      : undefined;
+
+  messageCollector?.on("collect", (guess) => {
+    if (collector.ended) return;
+
+    const answer = guess.content.trim();
+    guesses.push(secondPlayer ? `${guess.author.username}: ${answer}` : answer);
+    completeGame(guess.author, guess.createdTimestamp);
+  });
+
   collector.on("collect", async (interaction) => {
     if (interaction.customId === "btn-end-guess-the-flag") {
       return collector.stop("cancelled");
@@ -169,6 +222,14 @@ export async function startGTFGame(
     if (!res) return;
     if (!res.isModalSubmit()) return;
 
+    if (collector.ended)
+      return res
+        .reply({
+          embeds: [new ErrorEmbed("this game has ended")],
+          flags: MessageFlags.Ephemeral,
+        })
+        .catch(() => {});
+
     const guess = res.fields.getTextInputValue("guess").trim();
 
     if (
@@ -187,35 +248,8 @@ export async function startGTFGame(
 
     guesses.push(secondPlayer ? `${interaction.user.username}: ${guess}` : guess);
 
-    let correct = false;
-
-    if (guess.toLowerCase() === country.cca2.toLowerCase()) {
-      correct = true;
-    } else if (compareTwoStrings(guess.toLowerCase(), country.name.common.toLowerCase()) > 0.9) {
-      correct = true;
-    } else if (compareTwoStrings(guess.toLowerCase(), country.name.official.toLowerCase()) > 0.9) {
-      correct = true;
-    } else {
-      for (const spelling of country.altSpellings) {
-        if (compareTwoStrings(guess.toLowerCase(), spelling.toLowerCase()) > 0.9) {
-          correct = true;
-          break;
-        }
-      }
-    }
-
-    if (collector.ended)
-      return res
-        .reply({
-          embeds: [new ErrorEmbed("this game has ended")],
-          flags: MessageFlags.Ephemeral,
-        })
-        .catch(() => {});
-
-    if (correct) {
-      winner = res.user;
-      collector.stop("win");
-      const completionTime = res.createdTimestamp - startedAt;
+    if (isCorrectGuess(guess)) {
+      const completionTime = completeGame(res.user, res.createdTimestamp);
       await res
         .reply({
           embeds: [
@@ -227,29 +261,6 @@ export async function startGTFGame(
           flags: MessageFlags.Ephemeral,
         })
         .catch(() => {});
-      saveGameStats(
-        winner.id,
-        id,
-        guesses.filter((i) => i.startsWith(winner.username + ":")),
-        true,
-        completionTime,
-      );
-      if (winner.id === message.author.id) {
-        if (secondPlayer)
-          saveGameStats(
-            secondPlayer.id,
-            id,
-            guesses.filter((i) => i.startsWith(secondPlayer.username + ":")),
-            false,
-          );
-      } else {
-        saveGameStats(
-          message.author.id,
-          id,
-          guesses.filter((i) => i.startsWith(message.author.username + ":")),
-          false,
-        );
-      }
     } else {
       embed.setFields({ name: "guesses", value: guesses.map((i) => `\`${i}\``).join("\n") });
 
@@ -264,6 +275,7 @@ export async function startGTFGame(
   });
 
   collector.on("end", async (collected, reason) => {
+    messageCollector?.stop();
     row.components.forEach((c) => c.setDisabled(true));
 
     if (guesses.length > 0)
