@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { percentChance, randomRound, shuffle } from "../../src/utils/functions/random";
+import { percentChance, randomRound, shuffle } from "../../../src/utils/functions/random";
 
 afterEach(() => {
   vi.restoreAllMocks();

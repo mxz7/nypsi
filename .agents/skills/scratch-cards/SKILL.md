@@ -12,7 +12,8 @@ description: Investigate or change interactive scratch cards, including click st
   Discord's disabled buttons alone do not enforce this invariant.
 - `clicked()` rejects `clicks !== 0`. Keep this guard before the state mutation: accepting a
   winning cell would reset it from `2` to `1`, consume a click, and render it red while the
-  other winning cells stay green. Regression coverage is in `test/utils/scratchies.test.ts`.
+  other winning cells stay green. Regression coverage is in
+  `test/utils/functions/economy/scratchies.test.ts`.
 - Rewards are granted when a line is completed, before the card finishes. `card.won` stays true
   after a repeat click; a mixed red/green line does not imply the original reward was revoked.
 - Displayed game IDs are base 36 (`parseInt(id, 36)` maps to `Game.id`). Scratch-card `outcome`

@@ -8,7 +8,7 @@ import {
   getDuration,
   getOrdinalSuffix,
   pluralize,
-} from "../../src/utils/functions/string";
+} from "../../../src/utils/functions/string";
 
 const originalEncryptKey = process.env.ENCRYPT_KEY;
 

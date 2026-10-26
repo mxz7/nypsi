@@ -19,13 +19,13 @@ const { store, redisMock, altMock } = vi.hoisted(() => {
   };
 });
 
-vi.mock("../../src/init/redis", () => ({ default: redisMock }));
-vi.mock("../../src/init/database", () => ({ default: { alt: altMock } }));
-vi.mock("../../src/utils/logger", () => ({ logger: { error: vi.fn() } }));
-vi.mock("../../src/utils/functions/member", () => ({ getUserId: (id: string) => id }));
+vi.mock("../../../../src/init/redis", () => ({ default: redisMock }));
+vi.mock("../../../../src/init/database", () => ({ default: { alt: altMock } }));
+vi.mock("../../../../src/utils/logger", () => ({ logger: { error: vi.fn() } }));
+vi.mock("../../../../src/utils/functions/member", () => ({ getUserId: (id: string) => id }));
 
-import { redisSerialize } from "../../src/utils/cache";
-import Constants from "../../src/utils/Constants";
+import { redisSerialize } from "../../../../src/utils/cache";
+import Constants from "../../../../src/utils/Constants";
 import {
   addAlt,
   deleteAlt,
@@ -33,7 +33,7 @@ import {
   getAlts,
   getMainAccountId,
   isMainAccount,
-} from "../../src/utils/functions/moderation/alts";
+} from "../../../../src/utils/functions/moderation/alts";
 
 const entries = [
   { mainId: "main", altId: "alt-1" },

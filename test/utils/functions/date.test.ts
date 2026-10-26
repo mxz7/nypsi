@@ -1,5 +1,10 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { MStoTime, daysAgo, daysUntil, daysUntilChristmas } from "../../src/utils/functions/date";
+import {
+  MStoTime,
+  daysAgo,
+  daysUntil,
+  daysUntilChristmas,
+} from "../../../src/utils/functions/date";
 
 afterEach(() => {
   vi.useRealTimers();

@@ -3,7 +3,7 @@ import {
   calculateLevelXp,
   cratesFormula,
   moneyFormula,
-} from "../../src/utils/functions/economy/levelling-formula";
+} from "../../../../src/utils/functions/economy/levelling-formula";
 
 const calculatePrestigeXp = (prestige: number) => {
   let total = 0;

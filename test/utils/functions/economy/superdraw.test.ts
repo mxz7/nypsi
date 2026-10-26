@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   getSuperdrawChance,
   getSuperdrawChanceMultiplier,
-} from "../../src/utils/functions/economy/superdraw";
+} from "../../../../src/utils/functions/economy/superdraw";
 
 describe("superdraw rollover tickets", () => {
   it("preserves small-holder rewards", () => {

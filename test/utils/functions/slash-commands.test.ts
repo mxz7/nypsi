@@ -2,7 +2,10 @@ import type { REST } from "@discordjs/rest";
 import { APIApplicationCommand, ApplicationCommandType, Routes } from "discord-api-types/v10";
 import { SlashCommandBuilder } from "discord.js";
 import { describe, expect, test, vi } from "vitest";
-import { deleteSlashCommands, syncSlashCommands } from "../../src/utils/functions/slash-commands";
+import {
+  deleteSlashCommands,
+  syncSlashCommands,
+} from "../../../src/utils/functions/slash-commands";
 
 const applicationId = "123456789012345678";
 const guildId = "234567890123456789";

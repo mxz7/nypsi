@@ -103,7 +103,7 @@ interaction contexts are compared as sets; deployed `contexts: null` does not eq
 Omitted global `contexts` and `integration_types` are unmanaged: existing commands retain deployed
 visibility, including when patched for other changes. Removing a local setting does not reset it;
 provide explicit arrays to change it. New commands use Discord's defaults for omitted settings.
-Sync regression tests belong in `test/utils/slash-commands.test.ts`.
+Sync regression tests belong in `test/utils/functions/slash-commands.test.ts`.
 Payloads come from the loaded command registry, so rebuild and use `reload` to load code
 changes before `reloadslash`. Sync failures propagate to the command instead of showing success.
 `deleteslash` uses the same utility file to bulk-clear the selected scope. Registration and deletion

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import PageManager from "../../src/utils/functions/page";
+import PageManager from "../../../src/utils/functions/page";
 
 describe("PageManager.createPages", () => {
   test("splits an array into numbered pages", () => {

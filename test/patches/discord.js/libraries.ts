@@ -18,7 +18,7 @@ execFileSync(
   [
     "apply",
     "--reverse",
-    fileURLToPath(new URL("../../patches/discord.js@14.27.0.patch", import.meta.url)),
+    fileURLToPath(new URL("../../../patches/discord.js@14.27.0.patch", import.meta.url)),
   ],
   {
     cwd: baselineRoot,

@@ -12,8 +12,9 @@ Nypsi applies `patches/discord.js@14.27.0.patch` through pnpm `patchedDependenci
 It pools frozen overwrite bitfields and lazily constructs channel message/thread/overwrite
 managers. `src/utils/discord-cache.ts` shares frozen empty zero-limit collections for the
 settings in `src/nypsi.ts`; caches with retention callbacks or nonzero limits stay private.
-The deployment workflow copies `patches/`; `test/discord-cache/*.test.ts` runs in the existing
-Vitest suite (`pnpm test`). These tests reverse the patch into a temporary baseline and compare installed
+The deployment workflow copies `patches/`; `test/patches/discord.js/*.test.ts` runs in the existing
+Vitest suite (`pnpm test`). Nypsi's shared-cache wrapper is covered by `test/utils/discord-cache.test.ts`.
+The patch tests reverse the patch into a temporary baseline and compare installed
 code against stock 14.27.0. Git is required. Update the patch with `pnpm patch`/`patch-commit`,
 keep the exact dependency version pinned, and commit the patch, workspace config and lockfile.
 After changing library behavior, inspect telemetry for accidental lazy-manager materialisation.

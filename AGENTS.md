@@ -5,7 +5,7 @@ Discord bot built with TypeScript, discord.js 14, Prisma (PostgreSQL), Redis, an
 ## Build & Test
 
 ```bash
-pnpm test          # vitest run – tests validate JSON data files in data/
+pnpm test          # vitest run – source, data, and dependency-patch tests
 pnpm lint          # oxlint --type-aware --max-warnings=0
 pnpm format        # oxfmt --write
 pnpm validate      # format:check + test + lint
@@ -23,21 +23,21 @@ Use `pnpm install` for adding packages, optionally specifying `-D`, you will ver
 
 ## Architecture
 
-| Directory              | Role                                                            |
-| ---------------------- | --------------------------------------------------------------- |
-| `src/commands/`        | ~180 command files, each exports a `Command` instance           |
-| `src/interactions/`    | Button / select menu / autocomplete handlers                    |
-| `src/events/`          | discord.js event listeners                                      |
-| `src/scheduled/jobs/`  | 30+ cron jobs (type `Job` from `src/types/Jobs.ts`)             |
-| `src/utils/functions/` | Domain logic (economy/, guilds/, users/, leaderboards/, …)      |
-| `src/utils/handlers/`  | Command dispatch, cooldowns, interaction routing                |
-| `src/init/`            | Startup singletons: database, redis, s3                         |
-| `src/worker-queues/`   | BullMQ workers (mentions, dms) – separate Node processes        |
-| `src/api/`             | Hono REST API (bearer-auth protected)                           |
-| `src/models/`          | Core types: `Command`, `Client`, `EmbedBuilders`                |
-| `src/types/`           | Shared TS interfaces (Economy, Jobs, Workers, …)                |
-| `data/`                | JSON config for items, upgrades, achievements, loot pools, etc. |
-| `test/`                | Vitest tests – validate JSON data files against their schemas   |
+| Directory              | Role                                                              |
+| ---------------------- | ----------------------------------------------------------------- |
+| `src/commands/`        | ~180 command files, each exports a `Command` instance             |
+| `src/interactions/`    | Button / select menu / autocomplete handlers                      |
+| `src/events/`          | discord.js event listeners                                        |
+| `src/scheduled/jobs/`  | 30+ cron jobs (type `Job` from `src/types/Jobs.ts`)               |
+| `src/utils/functions/` | Domain logic (economy/, guilds/, users/, leaderboards/, …)        |
+| `src/utils/handlers/`  | Command dispatch, cooldowns, interaction routing                  |
+| `src/init/`            | Startup singletons: database, redis, s3                           |
+| `src/worker-queues/`   | BullMQ workers (mentions, dms) – separate Node processes          |
+| `src/api/`             | Hono REST API (bearer-auth protected)                             |
+| `src/models/`          | Core types: `Command`, `Client`, `EmbedBuilders`                  |
+| `src/types/`           | Shared TS interfaces (Economy, Jobs, Workers, …)                  |
+| `data/`                | JSON config for items, upgrades, achievements, loot pools, etc.   |
+| `test/`                | Vitest tests mirroring src/, plus data and dependency-patch tests |
 
 ## Key Pitfalls
 

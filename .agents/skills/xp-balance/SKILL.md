@@ -162,7 +162,7 @@ complete-prestige costs and their first differences. At high prestige, the
 growth between prestiges can exceed the small within-prestige reset, so do not
 assume every first level after prestiging is cheaper than the preceding level.
 
-Update `test/utils/levelling-formula.test.ts` whenever intentionally changing
+Update `test/utils/functions/economy/levelling-formula.test.ts` whenever intentionally changing
 the curve or its checkpoints.
 
 ## Basic crate level rewards

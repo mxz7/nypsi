@@ -1,6 +1,6 @@
 ---
 name: conventions
-description: Describes how to structure commands, scheduled jobs, interaction handlers, logging, and user-facing messages/embeds in nypsi. Use when creating or modifying a command, a cron job in src/scheduled/jobs, an interaction/autocomplete handler, a log message, or any message sent to a user.
+description: Describes how to structure tests, commands, scheduled jobs, interaction handlers, logging, and user-facing messages/embeds in nypsi. Use when creating or restructuring tests, modifying a command, a cron job in src/scheduled/jobs, an interaction/autocomplete handler, a log message, or any message sent to a user.
 ---
 
 # Conventions
@@ -11,11 +11,12 @@ Use kebab-case for file names.
 
 ## Tests
 
-Group new tests by the code area they exercise. Command tests belong in `test/commands/`, utility
-tests in `test/utils/`, and JSON data validation in `test/data/`. Follow an existing relevant test
-directory when one exists; create a focused directory for a new area rather than adding files at
-the root of `test/`. Name tests after their subject, such as `test/commands/user.test.ts` and
-`test/utils/slash-commands.test.ts`. Put reusable mocks in `test/mocks/`.
+Mirror each source file's path under `test/`, replacing `src/` with `test/` and `.ts` with
+`.test.ts`. For example, `src/utils/functions/economy/scratchies.ts` is covered by
+`test/utils/functions/economy/scratchies.test.ts`; command tests follow `test/commands/`.
+Split suites that cover separate source files into their corresponding test files. Keep JSON
+data validation under `test/data/`, dependency-patch coverage under `test/patches/<package>/`,
+and reusable mocks in `test/mocks/`. Data test names should match their data file's basename.
 
 ## Variable grouping
 

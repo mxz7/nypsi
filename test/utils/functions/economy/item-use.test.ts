@@ -1,16 +1,18 @@
 import { beforeEach, expect, test, vi } from "vitest";
-import type { Item } from "../../src/types/Economy";
+import type { Item } from "../../../../src/types/Economy";
 
 const mocks = vi.hoisted(() => ({ selectItem: vi.fn(), readdir: vi.fn() }));
 vi.mock("node:fs/promises", () => ({ readdir: mocks.readdir }));
-vi.mock("../../src/utils/functions/economy/inventory", () => ({ selectItem: mocks.selectItem }));
-vi.mock("../../src/utils/logger", () => ({ logger: { info: vi.fn() } }));
-vi.mock("../../src/utils/functions/economy/items/handcuffs", async () => {
-  const { ItemUse } = await import("../../src/models/ItemUse");
+vi.mock("../../../../src/utils/functions/economy/inventory", () => ({
+  selectItem: mocks.selectItem,
+}));
+vi.mock("../../../../src/utils/logger", () => ({ logger: { info: vi.fn() } }));
+vi.mock("../../../../src/utils/functions/economy/items/handcuffs", async () => {
+  const { ItemUse } = await import("../../../../src/models/ItemUse");
   return { default: new ItemUse("handcuffs", vi.fn(), { target: true }) };
 });
-vi.mock("../../src/utils/functions/economy/items/calendar", async () => {
-  const { ItemUse } = await import("../../src/models/ItemUse");
+vi.mock("../../../../src/utils/functions/economy/items/calendar", async () => {
+  const { ItemUse } = await import("../../../../src/models/ItemUse");
   return { default: new ItemUse("calendar", vi.fn(), { suggest: false }) };
 });
 
@@ -18,7 +20,7 @@ import {
   getItemUseDefinition,
   parseItemUseAmount,
   parseItemUseArguments,
-} from "../../src/utils/functions/economy/item-use";
+} from "../../../../src/utils/functions/economy/item-use";
 
 beforeEach(() => {
   vi.clearAllMocks();

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { applyPassiveBakePenalty } from "../src/utils/functions/economy/bakery-range";
+import { applyPassiveBakePenalty } from "../../../../src/utils/functions/economy/bakery-range";
 
 describe("passive bakery penalty", () => {
   test("preserves the random range for an upgraded bakery", () => {

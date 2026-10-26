@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { filterOutliers } from "../../src/utils/functions/outliers";
+import { filterOutliers } from "../../../src/utils/functions/outliers";
 
 describe("filterOutliers", () => {
   test("leaves small samples untouched", () => {

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { formatNumber, formatNumberPretty } from "../../src/utils/functions/economy/number";
+import { formatNumber, formatNumberPretty } from "../../../../src/utils/functions/economy/number";
 
 describe("formatNumber", () => {
   test.each([

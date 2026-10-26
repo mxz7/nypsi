@@ -3,7 +3,7 @@ import {
   ChatSpamState,
   evaluateNypsiChatMessage,
   PUNISHMENT_SCORE,
-} from "../../src/utils/functions/nypsi/chat-spam-evaluator";
+} from "../../../../src/utils/functions/nypsi/chat-spam-evaluator";
 
 function evaluateMessages(messages: { content: string; at: number }[]) {
   let state: ChatSpamState;

@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { resetRedisMock } from "../mocks/redis";
+import { resetRedisMock } from "../../mocks/redis";
 
 const { loggerDebug, loggerError, redisMock } = await vi.hoisted(async () => {
-  const { createRedisMock } = await import("../mocks/redis");
+  const { createRedisMock } = await import("../../mocks/redis");
 
   return {
     loggerDebug: vi.fn(),
@@ -11,13 +11,13 @@ const { loggerDebug, loggerError, redisMock } = await vi.hoisted(async () => {
   };
 });
 
-vi.mock("../../src/init/redis", () => ({ default: redisMock }));
+vi.mock("../../../src/init/redis", () => ({ default: redisMock }));
 
-vi.mock("../../src/utils/logger", () => ({
+vi.mock("../../../src/utils/logger", () => ({
   logger: { debug: loggerDebug, error: loggerError },
 }));
 
-import { MemoryMutex, RedisMutex } from "../../src/utils/functions/mutex";
+import { MemoryMutex, RedisMutex } from "../../../src/utils/functions/mutex";
 
 afterEach(() => {
   vi.useRealTimers();

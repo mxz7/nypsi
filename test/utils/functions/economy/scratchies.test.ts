@@ -1,9 +1,9 @@
 import { ButtonStyle, type ButtonInteraction, type GuildMember } from "discord.js";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
-import type { Item } from "../../src/types/Economy";
+import type { Item } from "../../../../src/types/Economy";
 
 const mocks = vi.hoisted(() => ({ reward: vi.fn() }));
-vi.mock("../../src/models/EmbedBuilders", async () => {
+vi.mock("../../../../src/models/EmbedBuilders", async () => {
   const { EmbedBuilder } = await import("discord.js");
   return {
     CustomEmbed: class extends EmbedBuilder {
@@ -13,23 +13,23 @@ vi.mock("../../src/models/EmbedBuilders", async () => {
     },
   };
 });
-vi.mock("../../src/utils/logger", () => ({ logger: { warn: vi.fn(), error: vi.fn() } }));
-vi.mock("../../src/utils/functions/playing", () => ({ removeUserPlaying: vi.fn() }));
-vi.mock("../../src/utils/functions/economy/achievements", () => ({ addProgress: vi.fn() }));
-vi.mock("../../src/utils/functions/economy/tasks", () => ({ addTaskProgress: vi.fn() }));
-vi.mock("../../src/utils/functions/economy/events", () => ({ addEventProgress: vi.fn() }));
-vi.mock("../../src/utils/functions/economy/gems", () => ({}));
-vi.mock("../../src/utils/functions/economy/inventory", () => ({ isGem: () => false }));
-vi.mock("../../src/utils/functions/economy/loot_pools", () => ({
+vi.mock("../../../../src/utils/logger", () => ({ logger: { warn: vi.fn(), error: vi.fn() } }));
+vi.mock("../../../../src/utils/functions/playing", () => ({ removeUserPlaying: vi.fn() }));
+vi.mock("../../../../src/utils/functions/economy/achievements", () => ({ addProgress: vi.fn() }));
+vi.mock("../../../../src/utils/functions/economy/tasks", () => ({ addTaskProgress: vi.fn() }));
+vi.mock("../../../../src/utils/functions/economy/events", () => ({ addEventProgress: vi.fn() }));
+vi.mock("../../../../src/utils/functions/economy/gems", () => ({}));
+vi.mock("../../../../src/utils/functions/economy/inventory", () => ({ isGem: () => false }));
+vi.mock("../../../../src/utils/functions/economy/loot_pools", () => ({
   giveLootPoolResult: mocks.reward,
   describeLootPoolResult: () => "a super cursor",
 }));
-vi.mock("../../src/utils/functions/economy/stats", () => ({ addStat: vi.fn() }));
-vi.mock("../../src/utils/functions/economy/utils", () => ({
+vi.mock("../../../../src/utils/functions/economy/stats", () => ({ addStat: vi.fn() }));
+vi.mock("../../../../src/utils/functions/economy/utils", () => ({
   getItems: () => ({ super_cursor: { emoji: "👆" } }),
 }));
 
-import ScratchCard from "../../src/utils/functions/economy/scratchies";
+import ScratchCard from "../../../../src/utils/functions/economy/scratchies";
 
 beforeEach(() => {
   vi.useFakeTimers();
