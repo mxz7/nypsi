@@ -434,7 +434,7 @@ export async function isRequestSuitable(
     const userContext = buildPrompt("user_context", context);
 
     const response = await openai.responses.parse({
-      model: "gpt-5.6-luna",
+      model: "gpt-6-luna",
       reasoning: { effort: "none" },
       input: [
         { role: "system", content: prompt },

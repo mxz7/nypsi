@@ -18,7 +18,7 @@ export default openai;
 export async function prompt(instructions: string, text: string) {
   try {
     const response = await openai.responses.create({
-      model: "gpt-5.6-luna",
+      model: "gpt-6-luna",
       reasoning: { effort: "none" },
       instructions,
       input: text,

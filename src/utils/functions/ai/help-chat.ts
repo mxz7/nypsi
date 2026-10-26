@@ -26,7 +26,7 @@ import { createProfile, hasProfile } from "../users/utils";
 import openai, { buildPrompt, getDocsRaw } from "./openai";
 import { aiTools, executeAiTool } from "./tools";
 
-const MODEL: ResponsesModel = "gpt-5.6-luna";
+const MODEL: ResponsesModel = "gpt-6-luna";
 type ChatHistoryInput = { role: "user" | "assistant"; content: string };
 
 // max amount of tool-call round trips per user message, to prevent runaway loops
