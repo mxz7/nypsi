@@ -9,11 +9,10 @@ import {
   MessageActionRowComponentBuilder,
   MessageFlags,
 } from "discord.js";
-import prisma from "../init/database";
 import { Command, NypsiCommandInteraction, NypsiMessage, SendMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { MStoTime } from "../utils/functions/date";
 import { startGTFGame } from "../utils/functions/gtf/game";
+import { getGameStats } from "../utils/functions/gtf/stats";
 import { getMember } from "../utils/functions/member";
 import { escapeFormattingCharacters } from "../utils/functions/string";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -66,29 +65,28 @@ async function run(
     return startGTFGame(message);
   } else if (args[0].toLowerCase() === "stats") {
     await addCooldown(cmd.name, message.member, 5);
-    const [quick, average, won, lost, avgGuess] = await Promise.all([
-      prisma.flagGame.aggregate({
-        _min: {
-          time: true,
-        },
-        where: { AND: [{ userId: message.author.id }, { won: true }] },
-      }),
-      prisma.flagGame.aggregate({
-        _avg: {
-          time: true,
-        },
-        where: { AND: [{ userId: message.author.id }, { won: true }] },
-      }),
-      prisma.flagGame.count({ where: { AND: [{ userId: message.author.id }, { won: true }] } }),
-      prisma.flagGame.count({ where: { AND: [{ userId: message.author.id }, { won: false }] } }),
-      prisma.$executeRaw`select avg(array_length(guesses, 1)) as "averageGuesses" from "FlagGame" where won = true and "userId" = ${message.author.id};`,
-    ]);
+    const stats = await getGameStats(message.author.id);
+
+    const total = stats.wins + stats.losses;
+    const winRate = total > 0 ? (stats.wins / total) * 100 : 0;
+    const winsRank = stats.winPosition ? ` (#${stats.winPosition.toLocaleString()})` : "";
+    const fastest =
+      stats.fastest != null
+        ? `\`${(stats.fastest / 1000).toFixed(2)}s\` (#${stats.timePosition.toLocaleString()})`
+        : "n/a";
+    const average = stats.average != null ? `\`${(stats.average / 1000).toFixed(2)}s\`` : "n/a";
+    const averageGuesses =
+      stats.averageGuesses != null ? `\`${stats.averageGuesses.toFixed(2)}\`` : "n/a";
 
     const embed = new CustomEmbed(
       message.member,
-      `you have won ${won.toLocaleString()} games of ${(won + lost).toLocaleString()} total games (${((won / (won + lost)) * 100).toFixed(1)}%)\n\n` +
-        `your fastest game was \`${MStoTime(quick._min.time)}\`\n` +
-        `your average win takes \`${MStoTime(average._avg.time)}\` with \`${avgGuess.toFixed(2)}\` guesses`,
+      `games played: **${total.toLocaleString()}**\n` +
+        `wins: **${stats.wins.toLocaleString()}**${winsRank}\n` +
+        `losses: **${stats.losses.toLocaleString()}**\n` +
+        `win rate: **${winRate.toFixed(1)}%**\n\n` +
+        `fastest win: ${fastest}\n` +
+        `average win: ${average}\n` +
+        `average guesses per win: ${averageGuesses}`,
     ).setHeader(`${message.author.username}'s guess the flag stats`);
 
     return send({ embeds: [embed] });

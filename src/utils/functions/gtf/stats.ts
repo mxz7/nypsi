@@ -3,6 +3,49 @@ import { addProgress } from "../economy/achievements";
 import { addTaskProgress } from "../economy/tasks";
 import { publishLeaderboardUpdate } from "../leaderboards/publish";
 
+export async function getGameStats(userId: string) {
+  const [stats] = await prisma.$queryRaw<
+    {
+      wins: number;
+      losses: number;
+      fastest: number | null;
+      average: number | null;
+      averageGuesses: number | null;
+    }[]
+  >`
+    SELECT
+      COUNT(*) FILTER (WHERE won)::int AS wins,
+      COUNT(*) FILTER (WHERE NOT won)::int AS losses,
+      MIN(time) FILTER (WHERE won) AS fastest,
+      (AVG(time) FILTER (WHERE won))::double precision AS average,
+      (AVG(cardinality(guesses)) FILTER (WHERE won))::double precision AS "averageGuesses"
+    FROM "FlagGame"
+    WHERE "userId" = ${userId}
+  `;
+
+  const [higherWins, fasterPlayers] = await Promise.all([
+    stats.wins > 0
+      ? prisma.flagGame.groupBy({
+          by: ["userId"],
+          where: { won: true },
+          having: { userId: { _count: { gt: stats.wins } } },
+        })
+      : Promise.resolve([]),
+    stats.fastest != null
+      ? prisma.flagGame.groupBy({
+          by: ["userId"],
+          where: { won: true, time: { lt: stats.fastest } },
+        })
+      : Promise.resolve([]),
+  ]);
+
+  return {
+    ...stats,
+    winPosition: stats.wins > 0 ? higherWins.length + 1 : undefined,
+    timePosition: stats.fastest != null ? fasterPlayers.length + 1 : undefined,
+  };
+}
+
 export async function saveGameStats(
   userId: string,
   countryId: string,
