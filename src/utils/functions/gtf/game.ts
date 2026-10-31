@@ -178,6 +178,8 @@ export async function startGTFGame(
     const answer = guess.content.trim();
     guesses.push(secondPlayer ? `${guess.author.username}: ${answer}` : answer);
     completeGame(guess.author, guess.createdTimestamp);
+
+    guess.react("✅").catch(() => {});
   });
 
   collector.on("collect", async (interaction) => {
