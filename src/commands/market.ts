@@ -1845,10 +1845,18 @@ async function run(
     member: MemberResolvable,
     msg?: NypsiMessage,
   ) {
+    const itemWorth = await calcItemValue(item.id);
+
     const embed = new CustomEmbed(message.member).setHeader(
       `${item.name} market confirmation`,
       getEmojiImage(item.emoji),
     );
+
+    if (itemWorth) {
+      embed.setFooter({
+        text: `avg: $${itemWorth.toLocaleString()}`,
+      });
+    }
 
     const fromCommand = !msg;
 
@@ -1891,9 +1899,10 @@ async function run(
         previousPrice !== undefined && !orderCancelled
           ? `\n\n**NEW PRICE**: **$${previousPrice.toLocaleString()}** → **$${price.toLocaleString()}**\n\n`
           : "";
+      const pricePerItem = amount > 1 ? ` ($${(price / amount).toLocaleString()} each)` : "";
 
       embed.setDescription(
-        `${cancellationWarning}are you sure you want to ${type} ${amount} ${pluralize(item, amount)} for **$${price.toLocaleString()}**?${priceChange}`,
+        `${cancellationWarning}are you sure you want to ${type} ${amount} ${pluralize(item, amount)} for **$${price.toLocaleString()}**${pricePerItem}?${priceChange}`,
       );
     };
 
