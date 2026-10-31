@@ -17,6 +17,7 @@ import { getGuildByUser } from "../utils/functions/economy/guilds";
 import { selectItem } from "../utils/functions/economy/inventory";
 import { showMuseumLeaderboard } from "../utils/functions/economy/museum";
 import { getItems } from "../utils/functions/economy/utils.js";
+import { showGTFLeaderboard } from "../utils/functions/gtf/leaderboard";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { topChatReaction } from "../utils/functions/leaderboards/chat-reactions";
 import { topClicks } from "../utils/functions/leaderboards/clicks";
@@ -225,6 +226,18 @@ cmd.slashData
     chess
       .setName("chess")
       .setDescription("view chess puzzle leaderboards")
+      .addStringOption((option) =>
+        option
+          .setName("scope")
+          .setDescription("show global/server")
+          .setChoices(...scopeChoices)
+          .setRequired(false),
+      ),
+  )
+  .addSubcommand((guesstheflag) =>
+    guesstheflag
+      .setName("guesstheflag")
+      .setDescription("view guess the flag leaderboards")
       .addStringOption((option) =>
         option
           .setName("scope")
@@ -688,6 +701,9 @@ async function run(
   } else if (args[0].toLowerCase() == "chess") {
     const global = args[1]?.toLowerCase() === "global";
     return showChessLeaderboard(message, send, global);
+  } else if (["guesstheflag", "gtf", "flag"].includes(args[0].toLowerCase())) {
+    const global = args[1]?.toLowerCase() === "global";
+    return showGTFLeaderboard(message, send, global);
   } else if (args[0].toLowerCase() == "sudoku") {
     const global = args[1]?.toLowerCase() === "global";
     return showSudokuLeaderboard(message, send, global);
