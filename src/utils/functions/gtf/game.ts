@@ -342,7 +342,7 @@ export async function startGTFGame(
           new CustomEmbed(
             winner.id,
             `${secondPlayer ? `**${escapeFormattingCharacters(winner.username)}**'s new personal best` : "new personal best"}: \`${formatTime(stats.time)}\` (#${stats.timePosition.toLocaleString()})`,
-          ).setHeader("new personal best", winner.avatarURL()),
+          ),
         ],
         allowedMentions: { repliedUser: false },
       });
