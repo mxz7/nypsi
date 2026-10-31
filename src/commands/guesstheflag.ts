@@ -87,7 +87,7 @@ async function run(
         `fastest win: ${fastest}\n` +
         `average win: ${average}\n` +
         `average guesses per win: ${averageGuesses}`,
-    ).setHeader(`${message.author.username}'s guess the flag stats`);
+    ).setHeader(`${message.author.username}'s guess the flag stats`, message.author.avatarURL());
 
     return send({ embeds: [embed] });
   } else if (args[0].toLowerCase() === "duel") {
