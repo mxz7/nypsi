@@ -17,18 +17,15 @@ import {
 } from "discord.js";
 import { nanoid } from "nanoid";
 import { countries } from "../../../../data/lists.json";
-import prisma from "../../../init/database";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../models/Command";
 import { CustomEmbed, ErrorEmbed, getColor } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { addCooldown } from "../../handlers/cooldownhandler";
 import { logger } from "../../logger";
 import { MStoTime } from "../date";
-import { addProgress } from "../economy/achievements";
-import { addTaskProgress } from "../economy/tasks";
-import { publishLeaderboardUpdate } from "../leaderboards/publish";
-import { compareTwoStrings, escapeFormattingCharacters } from "../string";
+import { compareTwoStrings, escapeFormattingCharacters, formatTime } from "../string";
 import { fetchCountryData } from "./countries";
+import { saveGameStats } from "./stats";
 
 export async function startGTFGame(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
@@ -88,6 +85,7 @@ export async function startGTFGame(
 
   let msg: Message;
   let winner: User;
+  let winnerStats: ReturnType<typeof saveGameStats>;
   const guesses: string[] = [];
 
   if (replayInteraction) {
@@ -140,13 +138,13 @@ export async function startGTFGame(
 
   const completeGame = (user: User, createdTimestamp: number) => {
     winner = user;
-    collector.stop("win");
     const completionTime = createdTimestamp - startedAt;
     const winnerGuesses = secondPlayer
       ? guesses.filter((guess) => guess.startsWith(winner.username + ":"))
       : guesses;
 
-    saveGameStats(winner.id, id, winnerGuesses, true, completionTime);
+    winnerStats = saveGameStats(winner.id, id, winnerGuesses, true, completionTime);
+    collector.stop("win");
     if (secondPlayer) {
       const loser = winner.id === message.author.id ? secondPlayer : message.author;
       saveGameStats(
@@ -283,6 +281,8 @@ export async function startGTFGame(
     if (guesses.length > 0)
       embed.setFields({ name: "guesses", value: guesses.map((i) => `\`${i}\``).join("\n") });
 
+    const stats = winnerStats ? await winnerStats : undefined;
+
     if (reason === "cancelled") {
       saveGameStats(message.author.id, id, guesses, false);
       if (secondPlayer) saveGameStats(secondPlayer.id, id, guesses, false);
@@ -313,6 +313,11 @@ export async function startGTFGame(
           )
           .setColor(Constants.EMBED_SUCCESS_COLOR);
       }
+
+      embed.setDescription(
+        `${embed.data.description}\n\nwins: **${stats.wins.toLocaleString()}** (#${stats.winPosition.toLocaleString()})`,
+      );
+      embed.setFooter({ text: `${formatTime(stats.time)}` });
     }
 
     const components: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [row];
@@ -330,6 +335,18 @@ export async function startGTFGame(
 
     if (reason === "cancelled") await collected.last().update({ embeds: [embed], components });
     else await msg.edit({ embeds: [embed], components });
+
+    if (stats?.newFastest) {
+      await msg.reply({
+        embeds: [
+          new CustomEmbed(
+            winner.id,
+            `${secondPlayer ? `**${escapeFormattingCharacters(winner.username)}**'s new personal best` : "new personal best"}: \`${formatTime(stats.time)}\` (#${stats.timePosition.toLocaleString()})`,
+          ).setHeader("new personal best", winner.avatarURL()),
+        ],
+        allowedMentions: { repliedUser: false },
+      });
+    }
 
     if (!secondPlayer) await playAgain(msg, message);
   });
@@ -359,34 +376,4 @@ async function playAgain(
   }, 2000);
 
   await startGTFGame(message, undefined, undefined, res);
-}
-
-async function saveGameStats(
-  userId: string,
-  countryId: string,
-  guesses: string[],
-  won: boolean,
-  time?: number,
-) {
-  if (won) {
-    addProgress(userId, "flag", 1);
-    addTaskProgress(userId, "flag_daily");
-    addTaskProgress(userId, "flag_weekly");
-  }
-  await prisma.flagGame.create({
-    data: {
-      time,
-      won,
-      userId,
-      country: countryId,
-      guesses,
-    },
-    select: {
-      id: true,
-    },
-  });
-
-  if (won) {
-    publishLeaderboardUpdate("flag-wins", userId, "1", true);
-  }
 }
