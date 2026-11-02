@@ -90,8 +90,8 @@ importers:
         specifier: 1.3.7
         version: 1.3.7
       openai:
-        specifier: ^7.45.1
-        version: 7.45.1(@aws-sdk/credential-provider-node@3.972.71)(@smithy/signature-v4@5.6.9)(undici@6.29.1)(ws@8.21.3(bufferutil@4.1.0))(zod@4.6.7)
+        specifier: ^7.46.0
+        version: 7.46.0(@aws-sdk/credential-provider-node@3.972.71)(@smithy/signature-v4@5.6.9)(undici@6.29.1)(ws@8.21.3(bufferutil@4.1.0))(zod@4.6.7)
       p-all:
         specifier: 3.0.0
         version: 3.0.0
@@ -1967,8 +1967,8 @@ packages:
   ohash@2.0.12:
     resolution: {integrity: sha512-65S/5gk9YSsaRjcyf7Nfa6h/d3E8/1gslpXfI4W7Dxn/oap8IKRuNT5VXkLQ1YFKIEg4apRY4Pj6aiwFzrDdmw==}
 
-  openai@7.45.1:
-    resolution: {integrity: sha512-mutrJXwhJIMZ24Lab2COFtNp44OcpZSnV4O2O7q38wAHUa2m2fQqUO5pj1XS3PqLfOTeODBUS9YoadqDnnGk5A==}
+  openai@7.46.0:
+    resolution: {integrity: sha512-FmbPcDtc0BTCN7ZQ5SBEnC4lPNMEUjA6w/lRkbh7l9IzWx1Mue6P7OEU2cayp5S5YjLuc7VEUfBCYqoQpb6+1w==}
     engines: {node: '>=22.0.0'}
     peerDependencies:
       '@aws-sdk/credential-provider-node': '>=3.972.0 <4'
@@ -3987,7 +3987,7 @@ snapshots:
 
   ohash@2.0.12: {}
 
-  openai@7.45.1(@aws-sdk/credential-provider-node@3.972.71)(@smithy/signature-v4@5.6.9)(undici@6.29.1)(ws@8.21.3(bufferutil@4.1.0))(zod@4.6.7):
+  openai@7.46.0(@aws-sdk/credential-provider-node@3.972.71)(@smithy/signature-v4@5.6.9)(undici@6.29.1)(ws@8.21.3(bufferutil@4.1.0))(zod@4.6.7):
     optionalDependencies:
       '@aws-sdk/credential-provider-node': 3.972.71
       '@smithy/signature-v4': 5.6.9
