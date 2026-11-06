@@ -3665,13 +3665,11 @@ async function run(
     const pool: LootPool = {
       nothing: 100,
       xp: {
-        69: 100,
+        5: 0.1,
       },
       items: {
-        basic_crate: 1,
-        pandora_box: 0.5,
-        lucky_scratch_card: 0.75,
-        fertiliser: 2,
+        basic_crate: 0.0035,
+        pandora_box: 0.0005,
       },
     };
 
@@ -3798,11 +3796,11 @@ async function run(
     const pool: LootPool = {
       nothing: 100,
       xp: {
-        10: 0.1,
+        10: 0.2,
       },
       items: {
-        basic_crate: 0.007,
-        pandora_box: 0.001,
+        basic_crate: 0.014,
+        pandora_box: 0.002,
       },
     };
 
